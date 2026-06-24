@@ -114,6 +114,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [`--lenient` と `--force` の実行経路を削除する](2026-06-01-1206-remove-lenient-and-force-flag-paths.md) | — | 2026-06-01 |
 | [signal CLI 名前空間統一と gate strictness の宣言的管理](2026-06-16-1030-signal-gate-strictness-config.md) | Proposed | 2026-06-16 |
 | [TDDD GAT trait サポート: パーサ QualifiedPath + 比較フォーマッター正規化 + カタログ関連アイテムスキーマ](2026-06-18-0822-typeref-parser-qualified-path-support.md) | Proposed | 2026-06-18 |
+| [cli 系 3 層への TDDD 適用と既存 linter によるロール配置制約の設定](2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md) | Proposed | 2026-06-21 |
 
 ### トラック・ワークフロー
 
@@ -177,6 +178,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [review-scope.json に scope 別 briefing 注入機構を追加する — plan-artifacts scope の新設](2026-04-18-1354-review-scope-prompt-injection.md) | Proposed | 2026-04-18 |
 | [CLI→domain 直接参照禁止と usecase 経由への一本化](2026-04-30-0848-cli-via-usecase-only.md) | — | 2026-04-30 |
 | [composition root を専用 crate (apps/cli-composition) に切り出す](2026-05-27-0110-composition-root-dedicated-crate.md) | Proposed | 2026-05-27 |
+| [CLI delivery 側の責務分離 — composition root(wire) と primary adapter(invoke+render) への分解](2026-06-21-1328-cli-composition-split-presentation-layer.md) | Proposed | 2026-06-21 |
 | [git 書き込みガードの enforcement を git hooks 層へ移行する](2026-06-10-1630-git-hooks-process-level-enforcement.md) | Proposed | 2026-06-10 |
 | [hooksPath 未設定時の runtime fail-closed を agent 実行面の setup preflight に分離する](2026-06-12-1518-hooks-path-setup-fail-closed.md) | Proposed | 2026-06-12 |
 

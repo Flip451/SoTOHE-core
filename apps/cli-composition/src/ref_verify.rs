@@ -1,7 +1,31 @@
+//! `ref_verify` command family — per-context composition root and CliApp shim.
+
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
-use crate::{CliApp, CommandOutcome};
+use crate::{CommandOutcome, error::CompositionError};
+
+// ---------------------------------------------------------------------------
+// Per-context composition root
+// ---------------------------------------------------------------------------
+
+/// Composition root for the `ref_verify` command family.
+///
+/// Unit struct: no adapter dependencies are injected at construction time.
+pub struct RefVerifyCompositionRoot;
+
+impl RefVerifyCompositionRoot {
+    /// Create a new `RefVerifyCompositionRoot`.
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+impl Default for RefVerifyCompositionRoot {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 #[derive(Debug, Clone)]
 pub struct RefVerifyRunInput {
@@ -33,36 +57,42 @@ struct RefVerifyCommandContext {
 fn resolve_ref_verify_context(
     items_dir: &Path,
     track_id: &str,
-) -> Result<RefVerifyCommandContext, String> {
+) -> Result<RefVerifyCommandContext, CompositionError> {
     let project_root = super::track::resolve_project_root(items_dir)
-        .map_err(|e| format!("cannot resolve project root: {e}"))?;
-    let canonical_root = project_root
-        .canonicalize()
-        .map_err(|e| format!("cannot canonicalize project root: {e}"))?;
+        .map_err(|e| CompositionError::WiringFailed(format!("cannot resolve project root: {e}")))?;
+    let canonical_root = project_root.canonicalize().map_err(|e| {
+        CompositionError::WiringFailed(format!("cannot canonicalize project root: {e}"))
+    })?;
     super::track::validate_track_id_str(track_id)
-        .map_err(|e| format!("invalid --track-id: {e}"))?;
+        .map_err(|e| CompositionError::WiringFailed(format!("invalid --track-id: {e}")))?;
     let track_id = domain::TrackId::try_new(track_id.to_owned())
-        .map_err(|e| format!("invalid track ID: {e}"))?;
+        .map_err(|e| CompositionError::WiringFailed(format!("invalid track ID: {e}")))?;
     Ok(RefVerifyCommandContext { canonical_root, track_id })
 }
 
 fn load_ref_verify_config(
     project_root: &std::path::Path,
-) -> Result<usecase::ref_verify::RefVerifyConfig, String> {
+) -> Result<usecase::ref_verify::RefVerifyConfig, CompositionError> {
     let config_path = project_root.join(REF_VERIFY_CONFIG_PATH);
-    if !config_path
-        .try_exists()
-        .map_err(|e| format!("cannot inspect ref-verify config path: {e}"))?
-    {
+    if !config_path.try_exists().map_err(|e| {
+        CompositionError::ConfigLoad(format!("cannot inspect ref-verify config path: {e}"))
+    })? {
         return Ok(usecase::ref_verify::RefVerifyConfig::default());
     }
 
     let text = std::fs::read_to_string(&config_path).map_err(|e| {
-        format!("cannot read ref-verify config at '{}': {e}", config_path.display())
+        CompositionError::ConfigLoad(format!(
+            "cannot read ref-verify config at '{}': {e}",
+            config_path.display()
+        ))
     })?;
 
-    let dto: RefVerifyConfigDto = serde_json::from_str(&text)
-        .map_err(|e| format!("invalid ref-verify config at '{}': {e}", config_path.display()))?;
+    let dto: RefVerifyConfigDto = serde_json::from_str(&text).map_err(|e| {
+        CompositionError::ConfigLoad(format!(
+            "invalid ref-verify config at '{}': {e}",
+            config_path.display()
+        ))
+    })?;
     let defaults = usecase::ref_verify::RefVerifyConfig::default();
     let injection = dto
         .known_bad_injection_rate_percent
@@ -72,21 +102,40 @@ fn load_ref_verify_config(
         .unwrap_or_else(|| defaults.known_bad_detection_threshold_percent.as_u8());
     let parallelism = dto.max_parallelism.unwrap_or_else(|| defaults.max_parallelism.as_usize());
 
-    usecase::ref_verify::RefVerifyConfig::try_new(injection, threshold, parallelism)
-        .map_err(|e| format!("ref-verify config validation failed: {e}"))
+    usecase::ref_verify::RefVerifyConfig::try_new(injection, threshold, parallelism).map_err(|e| {
+        CompositionError::ConfigLoad(format!("ref-verify config validation failed: {e}"))
+    })
 }
 
-fn current_git_branch(project_root: &Path) -> Result<String, String> {
+fn current_git_branch(project_root: &Path) -> Result<String, CompositionError> {
     use infrastructure::git_cli::{GitRepository as _, SystemGitRepo};
     SystemGitRepo::discover_from(project_root)
-        .map_err(|e| format!("cannot discover git repo: {e}"))?
+        .map_err(|e| CompositionError::Infrastructure(format!("cannot discover git repo: {e}")))?
         .current_branch()
-        .map_err(|e| format!("cannot read current branch: {e}"))?
-        .ok_or_else(|| "cannot read current branch: HEAD is detached".to_owned())
+        .map_err(|e| CompositionError::Infrastructure(format!("cannot read current branch: {e}")))?
+        .ok_or_else(|| {
+            CompositionError::Infrastructure(
+                "cannot read current branch: HEAD is detached".to_owned(),
+            )
+        })
 }
 
-impl CliApp {
-    pub fn ref_verify_run(&self, input: RefVerifyRunInput) -> Result<CommandOutcome, String> {
+impl RefVerifyCompositionRoot {
+    /// Build a wired [`cli_driver::ref_verify::RefVerifyDriver`] for the ref_verify family.
+    ///
+    /// Delegates to `FsRefVerifyAggregateAdapter` in `infrastructure`, which wires both
+    /// sub-services internally (D3/D4 cli_driver policy).  Adapter impls belong in
+    /// `infrastructure`; `cli_composition` only performs wiring here.
+    pub fn ref_verify_driver(&self) -> cli_driver::ref_verify::RefVerifyDriver {
+        let service = Arc::new(infrastructure::FsRefVerifyAggregateAdapter::new())
+            as Arc<dyn usecase::ref_verify::RefVerifyAggregateService>;
+        cli_driver::ref_verify::RefVerifyDriver::new(service)
+    }
+
+    pub fn ref_verify_run(
+        &self,
+        input: RefVerifyRunInput,
+    ) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::agent_profiles::{AGENT_PROFILES_PATH, AgentProfiles};
         use infrastructure::ref_verify::{
             AgentRefVerifierAdapter, RefVerifyCacheAdapter, RefVerifyPairSourceAdapter,
@@ -103,9 +152,9 @@ impl CliApp {
         // pair-set derivation follows from which track artifacts exist on
         // disk; cli-composition performs no firing-surface translation.
         let resolver = RefVerifyScopeResolver::new(canonical_root.clone());
-        let scope = resolver
-            .resolve(track_id.as_ref())
-            .map_err(|e| format!("ref-verify scope resolution failed: {e}"))?;
+        let scope = resolver.resolve(track_id.as_ref()).map_err(|e| {
+            CompositionError::WiringFailed(format!("ref-verify scope resolution failed: {e}"))
+        })?;
 
         let config = load_ref_verify_config(&canonical_root)?;
 
@@ -114,8 +163,9 @@ impl CliApp {
         let cache = Arc::new(RefVerifyCacheAdapter::new(canonical_root.clone())) as Arc<_>;
 
         let profiles_path = canonical_root.join(AGENT_PROFILES_PATH);
-        let profiles = AgentProfiles::load(&profiles_path)
-            .map_err(|e| format!("cannot load agent-profiles.json: {e}"))?;
+        let profiles = AgentProfiles::load(&profiles_path).map_err(|e| {
+            CompositionError::ConfigLoad(format!("cannot load agent-profiles.json: {e}"))
+        })?;
         let profiles = Arc::new(profiles);
 
         let runner = make_ref_verifier_process_runner(canonical_root.clone());
@@ -155,14 +205,14 @@ impl CliApp {
                     exit_code: 1,
                 })
             }
-            Err(e) => Err(format!("ref-verify run failed: {e}")),
+            Err(e) => Err(CompositionError::Usecase(format!("ref-verify run failed: {e}"))),
         }
     }
 
     pub fn ref_verify_check_approved(
         &self,
         input: RefVerifyCheckApprovedInput,
-    ) -> Result<CommandOutcome, String> {
+    ) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::ref_verify::{
             RefVerifyCacheAdapter, RefVerifyPairSourceAdapter, RefVerifyScopeResolver,
         };
@@ -176,16 +226,16 @@ impl CliApp {
         // check-approved is the commit gate's read-only verification surface;
         // the scope derives from artifact existence like every other run.
         let resolver = RefVerifyScopeResolver::new(canonical_root.clone());
-        let scope = resolver
-            .resolve(track_id.as_ref())
-            .map_err(|e| format!("ref-verify scope resolution failed: {e}"))?;
+        let scope = resolver.resolve(track_id.as_ref()).map_err(|e| {
+            CompositionError::WiringFailed(format!("ref-verify scope resolution failed: {e}"))
+        })?;
 
         let current_branch = current_git_branch(&canonical_root)?;
         let expected_branch = format!("track/{}", track_id.as_ref());
         if current_branch != expected_branch {
-            return Err(format!(
+            return Err(CompositionError::WiringFailed(format!(
                 "ref-verify check-approved failed: track is not active: current branch '{current_branch}', expected '{expected_branch}'"
-            ));
+            )));
         }
 
         let cmd = usecase::ref_verify::RefVerifyCommand {
@@ -196,9 +246,11 @@ impl CliApp {
         let config = usecase::ref_verify::RefVerifyConfig::default();
 
         let pair_source = RefVerifyPairSourceAdapter::new(canonical_root.clone());
-        let pairs = pair_source
-            .load_pairs(&cmd, &config)
-            .map_err(|e| format!("ref-verify check-approved: failed to load pairs: {e}"))?;
+        let pairs = pair_source.load_pairs(&cmd, &config).map_err(|e| {
+            CompositionError::Infrastructure(format!(
+                "ref-verify check-approved: failed to load pairs: {e}"
+            ))
+        })?;
         let production_pairs: Vec<_> = pairs.into_iter().filter(|p| !p.known_bad).collect();
 
         if production_pairs.is_empty() {
@@ -224,9 +276,9 @@ impl CliApp {
 
         for (cache_scope, pair_keys) in &scope_keys {
             let entries = cache_adapter.load_entries(&cmd, cache_scope).map_err(|e| {
-                format!(
+                CompositionError::Infrastructure(format!(
                     "ref-verify check-approved: failed to read verify-cache for {cache_scope:?}: {e}"
-                )
+                ))
             })?;
 
             use domain::tddd::semantic_verify::SemanticVerdict;
@@ -286,8 +338,9 @@ mod tests {
     use std::ffi::OsString;
     use std::path::{Path, PathBuf};
 
+    use super::RefVerifyCompositionRoot;
     use crate::{
-        CliApp, CommandOutcome, RefVerifyCheckApprovedInput, RefVerifyRunInput,
+        CommandOutcome, RefVerifyCheckApprovedInput, RefVerifyRunInput,
         test_support::repo_root_for_tests,
     };
 
@@ -427,12 +480,16 @@ mod tests {
             .unwrap();
     }
 
+    #[derive(Debug, thiserror::Error)]
+    #[error("{0}")]
+    struct RefVerifyTestError(String);
+
     fn ref_verify_chain1_cmd(
         track_id: &str,
-    ) -> Result<usecase::ref_verify::RefVerifyCommand, String> {
+    ) -> Result<usecase::ref_verify::RefVerifyCommand, RefVerifyTestError> {
         Ok(usecase::ref_verify::RefVerifyCommand {
             track_id: domain::TrackId::try_new(track_id.to_owned())
-                .map_err(|e| format!("invalid track ID: {e}"))?,
+                .map_err(|e| RefVerifyTestError(format!("invalid track ID: {e}")))?,
             scope: usecase::ref_verify::RefVerifyScope::Chain1,
             current_branch: format!("track/{track_id}"),
         })
@@ -492,7 +549,7 @@ mod tests {
         let fake_claude_dir = write_fake_claude_into_path_dir(project_root);
 
         with_fake_track_branch_and_path(project_root, track_id, &fake_claude_dir, || {
-            CliApp::new()
+            RefVerifyCompositionRoot::new()
                 .ref_verify_run(RefVerifyRunInput { track_id: track_id.to_owned(), items_dir })
                 .unwrap()
         })
@@ -659,7 +716,7 @@ exit 64
         std::fs::create_dir_all(&cfg_dir).unwrap();
         std::fs::write(cfg_dir.join("ref-verify.json"), r#"{"unknown_field": 1}"#).unwrap();
         let err = super::load_ref_verify_config(dir.path()).unwrap_err();
-        assert!(err.contains("invalid ref-verify config"));
+        assert!(err.to_string().contains("invalid ref-verify config"));
     }
 
     #[test]
@@ -673,7 +730,7 @@ exit 64
         )
         .unwrap();
         let err = super::load_ref_verify_config(dir.path()).unwrap_err();
-        assert!(err.contains("ref-verify config validation failed"));
+        assert!(err.to_string().contains("ref-verify config validation failed"));
     }
 
     #[test]
@@ -683,7 +740,7 @@ exit 64
         std::fs::create_dir_all(&cfg_dir).unwrap();
         std::fs::write(cfg_dir.join("ref-verify.json"), r#"{"max_parallelism": 0}"#).unwrap();
         let err = super::load_ref_verify_config(dir.path()).unwrap_err();
-        assert!(err.contains("ref-verify config validation failed"));
+        assert!(err.to_string().contains("ref-verify config validation failed"));
     }
 
     // ── ref_verify_check_approved ────────────────────────────────────────────
@@ -691,11 +748,10 @@ exit 64
     #[test]
     fn test_ref_verify_check_approved_invalid_track_id_returns_error() {
         let (_tmp, items_dir) = temp_project_with_items_dir();
-        let result = CliApp::new().ref_verify_check_approved(RefVerifyCheckApprovedInput {
-            track_id: "../outside".to_owned(),
-            items_dir,
-        });
-        let msg = result.unwrap_err();
+        let result = RefVerifyCompositionRoot::new().ref_verify_check_approved(
+            RefVerifyCheckApprovedInput { track_id: "../outside".to_owned(), items_dir },
+        );
+        let msg = result.unwrap_err().to_string();
         assert!(
             msg.contains("invalid --track-id") || msg.contains("invalid track"),
             "invalid track id must be rejected, got: {msg}"
@@ -705,11 +761,13 @@ exit 64
     #[test]
     fn test_ref_verify_check_approved_outside_repo_items_dir_returns_error() {
         let dir = tempfile::tempdir().unwrap();
-        let result = CliApp::new().ref_verify_check_approved(RefVerifyCheckApprovedInput {
-            track_id: "my-track".to_owned(),
-            items_dir: dir.path().to_path_buf(),
-        });
-        let msg = result.unwrap_err();
+        let result = RefVerifyCompositionRoot::new().ref_verify_check_approved(
+            RefVerifyCheckApprovedInput {
+                track_id: "my-track".to_owned(),
+                items_dir: dir.path().to_path_buf(),
+            },
+        );
+        let msg = result.unwrap_err().to_string();
         assert!(
             msg.contains("items_dir") || msg.contains("project root"),
             "items_dir outside repo must be rejected, got: {msg}"
@@ -726,7 +784,7 @@ exit 64
         write_pass_cache_for_first_chain1_pair(&items_dir, track_id);
 
         let outcome = with_fake_track_branch(&project_root, track_id, || {
-            CliApp::new().ref_verify_check_approved(RefVerifyCheckApprovedInput {
+            RefVerifyCompositionRoot::new().ref_verify_check_approved(RefVerifyCheckApprovedInput {
                 track_id: track_id.to_owned(),
                 items_dir,
             })
@@ -761,7 +819,7 @@ exit 64
         write_pass_cache_for_first_chain1_pair(&items_dir, track_id);
 
         let outcome = with_fake_track_branch(&project_root, track_id, || {
-            CliApp::new().ref_verify_check_approved(RefVerifyCheckApprovedInput {
+            RefVerifyCompositionRoot::new().ref_verify_check_approved(RefVerifyCheckApprovedInput {
                 track_id: track_id.to_owned(),
                 items_dir,
             })
@@ -787,7 +845,7 @@ exit 64
         write_chain1_fixture(&items_dir, track_id);
 
         let outcome = with_fake_track_branch(&project_root, track_id, || {
-            CliApp::new().ref_verify_check_approved(RefVerifyCheckApprovedInput {
+            RefVerifyCompositionRoot::new().ref_verify_check_approved(RefVerifyCheckApprovedInput {
                 track_id: track_id.to_owned(),
                 items_dir,
             })
@@ -828,7 +886,7 @@ exit 64
         );
 
         let outcome = with_fake_track_branch(&project_root, track_id, || {
-            CliApp::new().ref_verify_check_approved(RefVerifyCheckApprovedInput {
+            RefVerifyCompositionRoot::new().ref_verify_check_approved(RefVerifyCheckApprovedInput {
                 track_id: track_id.to_owned(),
                 items_dir,
             })
@@ -859,12 +917,13 @@ exit 64
         .unwrap();
 
         let err = with_fake_track_branch(&project_root, track_id, || {
-            CliApp::new().ref_verify_check_approved(RefVerifyCheckApprovedInput {
+            RefVerifyCompositionRoot::new().ref_verify_check_approved(RefVerifyCheckApprovedInput {
                 track_id: track_id.to_owned(),
                 items_dir,
             })
         })
-        .unwrap_err();
+        .unwrap_err()
+        .to_string();
 
         assert!(
             err.contains("failed to read verify-cache"),
@@ -881,12 +940,13 @@ exit 64
         write_chain1_fixture(&items_dir, track_id);
 
         let err = with_fake_git_branch(&project_root, "not-the-track", || {
-            CliApp::new().ref_verify_check_approved(RefVerifyCheckApprovedInput {
+            RefVerifyCompositionRoot::new().ref_verify_check_approved(RefVerifyCheckApprovedInput {
                 track_id: track_id.to_owned(),
                 items_dir,
             })
         })
-        .unwrap_err();
+        .unwrap_err()
+        .to_string();
 
         assert!(err.contains("track is not active"), "expected active-track error, got: {err}");
     }
@@ -932,10 +992,10 @@ exit 64
         .unwrap();
 
         let result = with_fake_track_branch(&project_root, track_id, || {
-            CliApp::new()
+            RefVerifyCompositionRoot::new()
                 .ref_verify_run(RefVerifyRunInput { track_id: track_id.to_owned(), items_dir })
         });
-        let msg = result.unwrap_err();
+        let msg = result.unwrap_err().to_string();
         assert!(
             msg.contains("scope resolution failed"),
             "catalogue-without-spec must fail closed in scope resolution, got: {msg}"
@@ -967,7 +1027,7 @@ exit 64
 
         let outcome =
             with_fake_track_branch_and_path(&project_root, track_id, &fake_claude_dir, || {
-                CliApp::new()
+                RefVerifyCompositionRoot::new()
                     .ref_verify_run(RefVerifyRunInput { track_id: track_id.to_owned(), items_dir })
                     .unwrap()
             });
@@ -991,7 +1051,7 @@ exit 64
         std::fs::create_dir_all(items_dir.join(track_id)).unwrap();
 
         let outcome = with_fake_track_branch(&project_root, track_id, || {
-            CliApp::new()
+            RefVerifyCompositionRoot::new()
                 .ref_verify_check_approved(RefVerifyCheckApprovedInput {
                     track_id: track_id.to_owned(),
                     items_dir,
@@ -1036,7 +1096,7 @@ exit 64
 
         let outcome =
             with_fake_track_branch_and_path(&project_root, track_id, &fake_claude_dir, || {
-                CliApp::new()
+                RefVerifyCompositionRoot::new()
                     .ref_verify_run(RefVerifyRunInput {
                         track_id: track_id.to_owned(),
                         items_dir: items_dir.clone(),
@@ -1078,9 +1138,9 @@ exit 64
     #[test]
     fn test_ref_verify_run_invalid_track_id_returns_error() {
         let (_tmp, items_dir) = temp_project_with_items_dir();
-        let result = CliApp::new()
+        let result = RefVerifyCompositionRoot::new()
             .ref_verify_run(RefVerifyRunInput { track_id: "../outside".to_owned(), items_dir });
-        let msg = result.unwrap_err();
+        let msg = result.unwrap_err().to_string();
         assert!(
             msg.contains("invalid --track-id") || msg.contains("invalid track"),
             "invalid track id must be rejected, got: {msg}"
@@ -1090,11 +1150,11 @@ exit 64
     #[test]
     fn test_ref_verify_run_outside_repo_items_dir_returns_error() {
         let dir = tempfile::tempdir().unwrap();
-        let result = CliApp::new().ref_verify_run(RefVerifyRunInput {
+        let result = RefVerifyCompositionRoot::new().ref_verify_run(RefVerifyRunInput {
             track_id: "my-track".to_owned(),
             items_dir: dir.path().to_path_buf(),
         });
-        let msg = result.unwrap_err();
+        let msg = result.unwrap_err().to_string();
         assert!(
             msg.contains("items_dir") || msg.contains("project root"),
             "items_dir outside repo must be rejected, got: {msg}"

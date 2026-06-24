@@ -1,7 +1,7 @@
 //! `signal check-impl-catalog` — evaluate impl↔catalog gate (chain ③).
 
 use clap::Args;
-use cli_composition::{CliApp, CommandOutcome};
+use cli_composition::{CommandOutcome, CompositionError, SignalCompositionRoot};
 
 use super::CheckFlags;
 
@@ -17,7 +17,10 @@ pub struct CheckImplCatalogArgs {
 }
 
 /// Execute `signal check-impl-catalog`.
-pub fn run(app: &CliApp, args: CheckImplCatalogArgs) -> Result<CommandOutcome, String> {
+pub fn run(
+    app: &SignalCompositionRoot,
+    args: CheckImplCatalogArgs,
+) -> Result<CommandOutcome, CompositionError> {
     let gate = args.flags.gate_name();
     app.signal_check_impl_catalog(args.flags.strict, gate, args.flags.workspace_root)
 }

@@ -7,7 +7,8 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 use clap::{Args, Subcommand};
-use cli_composition::CliApp;
+use cli_composition::VerifyCompositionRoot;
+use cli_driver::verify::{VerifyDriver, VerifyInput};
 
 /// Arguments for spec-level verify subcommands.
 #[derive(Args)]
@@ -170,38 +171,67 @@ impl VerifyCommand {
     }
 }
 
-/// Dispatches `cmd` to the appropriate `CliApp` method and returns the raw `Result<CommandOutcome,
-/// String>` without printing anything.
+/// Dispatches `cmd` to the verify driver and returns the raw `CommandOutcome`
+/// without printing anything.
 ///
 /// `execute_with_summary` delegates here so the 20-arm match is not duplicated.
 #[allow(clippy::too_many_lines)]
-fn dispatch_to_outcome(
-    app: &CliApp,
-    cmd: VerifyCommand,
-) -> Result<cli_composition::CommandOutcome, String> {
+fn dispatch_to_outcome(driver: &VerifyDriver, cmd: VerifyCommand) -> cli_driver::CommandOutcome {
     match cmd {
-        VerifyCommand::TechStack(args) => app.verify_tech_stack(args.project_root),
-        VerifyCommand::LatestTrack(args) => app.verify_latest_track(args.project_root),
-        VerifyCommand::ArchDocs(args) => app.verify_arch_docs(args.project_root),
-        VerifyCommand::Layers(args) => app.verify_layers(args.project_root),
-        VerifyCommand::HooksPath(args) => app.verify_hooks_path(args.project_root),
-        VerifyCommand::SpecAttribution(args) => app.verify_spec_attribution(args.spec_path),
-        VerifyCommand::SpecFrontmatter(args) => app.verify_spec_frontmatter(args.spec_path),
-        VerifyCommand::CanonicalModules(args) => app.verify_canonical_modules(args.project_root),
-        VerifyCommand::ModuleSize(args) => app.verify_module_size(args.project_root),
-        VerifyCommand::DomainPurity(args) => app.verify_domain_purity(args.project_root),
-        VerifyCommand::DomainStrings(args) => app.verify_domain_strings(args.project_root),
-        VerifyCommand::UsecasePurity(args) => app.verify_usecase_purity(args.project_root),
-        VerifyCommand::DocLinks(args) => app.verify_doc_links(args.project_root),
-        VerifyCommand::ViewFreshness(args) => app.verify_view_freshness(args.project_root),
-        VerifyCommand::SpecSignals(args) => app.verify_spec_signals(args.spec_path),
-        VerifyCommand::PlanArtifactRefs(args) => app.verify_plan_artifact_refs(args.track_dir),
-        VerifyCommand::CatalogueSpecRefs(args) => app.verify_catalogue_spec_refs(
-            args.track_id,
-            args.items_dir,
-            args.workspace_root,
-            args.skip_stale,
-        ),
+        VerifyCommand::TechStack(args) => {
+            driver.handle(VerifyInput::TechStack { project_root: args.project_root })
+        }
+        VerifyCommand::LatestTrack(args) => {
+            driver.handle(VerifyInput::LatestTrack { project_root: args.project_root })
+        }
+        VerifyCommand::ArchDocs(args) => {
+            driver.handle(VerifyInput::ArchDocs { project_root: args.project_root })
+        }
+        VerifyCommand::Layers(args) => {
+            driver.handle(VerifyInput::Layers { project_root: args.project_root })
+        }
+        VerifyCommand::HooksPath(args) => {
+            driver.handle(VerifyInput::HooksPath { project_root: args.project_root })
+        }
+        VerifyCommand::SpecAttribution(args) => {
+            driver.handle(VerifyInput::SpecAttribution { spec_path: args.spec_path })
+        }
+        VerifyCommand::SpecFrontmatter(args) => {
+            driver.handle(VerifyInput::SpecFrontmatter { spec_path: args.spec_path })
+        }
+        VerifyCommand::CanonicalModules(args) => {
+            driver.handle(VerifyInput::CanonicalModules { project_root: args.project_root })
+        }
+        VerifyCommand::ModuleSize(args) => {
+            driver.handle(VerifyInput::ModuleSize { project_root: args.project_root })
+        }
+        VerifyCommand::DomainPurity(args) => {
+            driver.handle(VerifyInput::DomainPurity { project_root: args.project_root })
+        }
+        VerifyCommand::DomainStrings(args) => {
+            driver.handle(VerifyInput::DomainStrings { project_root: args.project_root })
+        }
+        VerifyCommand::UsecasePurity(args) => {
+            driver.handle(VerifyInput::UsecasePurity { project_root: args.project_root })
+        }
+        VerifyCommand::DocLinks(args) => {
+            driver.handle(VerifyInput::DocLinks { project_root: args.project_root })
+        }
+        VerifyCommand::ViewFreshness(args) => {
+            driver.handle(VerifyInput::ViewFreshness { project_root: args.project_root })
+        }
+        VerifyCommand::SpecSignals(args) => {
+            driver.handle(VerifyInput::SpecSignals { spec_path: args.spec_path })
+        }
+        VerifyCommand::PlanArtifactRefs(args) => {
+            driver.handle(VerifyInput::PlanArtifactRefs { track_dir: args.track_dir })
+        }
+        VerifyCommand::CatalogueSpecRefs(args) => driver.handle(VerifyInput::CatalogueSpecRefs {
+            track_id: args.track_id,
+            items_dir: args.items_dir,
+            workspace_root: args.workspace_root,
+            skip_stale: args.skip_stale,
+        }),
     }
 }
 
@@ -211,8 +241,8 @@ fn dispatch_to_outcome(
 /// in the emitted `TelemetryEvent::GateEval` (T005 contract: `reason_summary` should reflect
 /// actual findings rather than a static label).
 pub fn execute_with_summary(cmd: VerifyCommand) -> (ExitCode, Option<String>) {
-    let app = CliApp::new();
-    run_capturing(dispatch_to_outcome(&app, cmd))
+    let driver = VerifyCompositionRoot::new().verify_driver();
+    run_capturing(dispatch_to_outcome(&driver, cmd))
 }
 
 /// Dispatch `cmd`, print its outcome, and return the exit code.
@@ -231,29 +261,16 @@ pub(super) fn execute(cmd: VerifyCommand) -> ExitCode {
 /// summary text. The summary is stdout when present; falls back to stderr when stdout is absent
 /// (some gates, e.g. `catalogue-spec-refs`, report findings on stderr only). The caller can use
 /// the summary text as `reason_summary` for telemetry events.
-pub(super) fn run_capturing(
-    result: Result<cli_composition::CommandOutcome, String>,
-) -> (ExitCode, Option<String>) {
-    match result {
-        Ok(outcome) => {
-            // Prefer stdout; fall back to stderr so stderr-only gates (e.g.
-            // catalogue-spec-refs) still populate reason_summary in telemetry.
-            let summary = outcome.stdout.clone().or_else(|| outcome.stderr.clone());
-            let exit = print_outcome(&outcome);
-            (exit, summary)
-        }
-        Err(msg) => {
-            eprintln!("{msg}");
-            // Return the error message as the summary so reason_summary in
-            // GateEval telemetry reflects the actual failure rather than
-            // falling back to the static gate name.
-            (ExitCode::FAILURE, Some(msg))
-        }
-    }
+pub(super) fn run_capturing(outcome: cli_driver::CommandOutcome) -> (ExitCode, Option<String>) {
+    // Prefer stdout; fall back to stderr so stderr-only gates (e.g.
+    // catalogue-spec-refs) still populate reason_summary in telemetry.
+    let summary = outcome.stdout.clone().or_else(|| outcome.stderr.clone());
+    let exit = print_outcome(&outcome);
+    (exit, summary)
 }
 
 /// Emit a `CommandOutcome` and return the corresponding `ExitCode`.
-pub(super) fn print_outcome(outcome: &cli_composition::CommandOutcome) -> ExitCode {
+pub(super) fn print_outcome(outcome: &cli_driver::CommandOutcome) -> ExitCode {
     if let Some(ref s) = outcome.stdout {
         println!("{s}");
     }
@@ -286,7 +303,7 @@ pub(super) fn print_skip(label: &str, reason: &str) -> ExitCode {
 #[cfg(test)]
 pub(super) fn resolve_ci_verify_track_id_with_reader(
     branch_reader: std::sync::Arc<dyn usecase::track_resolution::BranchReaderPort>,
-) -> Result<Option<String>, String> {
+) -> Result<Option<String>, cli_composition::CompositionError> {
     use usecase::track_resolution::{
         ActiveTrackResolveError, ActiveTrackResolveInteractor, ActiveTrackResolveService as _,
         TrackResolutionError,
@@ -300,7 +317,7 @@ pub(super) fn resolve_ci_verify_track_id_with_reader(
             | TrackResolutionError::DetachedHead
             | TrackResolutionError::NoBranch,
         )) => Ok(None),
-        Err(e) => Err(e.to_string()),
+        Err(e) => Err(cli_composition::CompositionError::WiringFailed(e.to_string())),
     }
 }
 
@@ -315,7 +332,7 @@ pub(super) fn resolve_ci_verify_track_id_with_reader(
 #[cfg(test)]
 pub(super) fn dispatch_plan_artifact_refs_with_resolver(
     args: PlanArtifactRefsArgs,
-    resolver: impl Fn() -> Result<Option<String>, String>,
+    resolver: impl Fn() -> Result<Option<String>, cli_composition::CompositionError>,
 ) -> ExitCode {
     use infrastructure::verify::{VerifyFinding, VerifyOutcome};
 
@@ -368,7 +385,7 @@ pub(super) fn dispatch_plan_artifact_refs_with_resolver(
 #[cfg(test)]
 pub(super) fn dispatch_catalogue_spec_refs_skip_with_resolver(
     track_id: Option<String>,
-    resolver: impl Fn() -> Result<Option<String>, String>,
+    resolver: impl Fn() -> Result<Option<String>, cli_composition::CompositionError>,
 ) -> Option<ExitCode> {
     if track_id.is_none() {
         match resolver() {

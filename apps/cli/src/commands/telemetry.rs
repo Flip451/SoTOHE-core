@@ -15,9 +15,10 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 use clap::{Args, Subcommand};
-use cli_composition::{CliApp, TelemetryReportInput};
+use cli_composition::TelemetryCompositionRoot;
+use cli_driver::telemetry::{TelemetryInput, TelemetryReportInput};
 
-use crate::commands::outcome_to_exit;
+use crate::commands::driver_outcome_to_exit;
 
 // ── sotp telemetry ────────────────────────────────────────────────────────────
 
@@ -52,12 +53,11 @@ pub struct ReportArgs {
 /// Execute `sotp telemetry <subcommand>`.
 pub fn execute(cmd: TelemetryCommand) -> ExitCode {
     match cmd {
-        TelemetryCommand::Report(args) => {
-            outcome_to_exit(CliApp::new().telemetry_report(TelemetryReportInput {
-                track_id: args.track_id,
-                items_dir: args.items_dir,
-            }))
-        }
+        TelemetryCommand::Report(args) => driver_outcome_to_exit(
+            TelemetryCompositionRoot::new().telemetry_driver().handle(TelemetryInput::Report(
+                TelemetryReportInput { track_id: args.track_id, items_dir: args.items_dir },
+            )),
+        ),
     }
 }
 

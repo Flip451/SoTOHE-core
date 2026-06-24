@@ -3,9 +3,11 @@
 //! Encapsulates the `.commit_hash` write operation and failure-recovery hint output.
 //! The underlying persist logic is provided by `review_v2::persist_commit_hash_for_track`.
 
-use crate::{CliApp, CommandOutcome};
+use crate::CommandOutcome;
+use crate::error::CompositionError;
+use crate::track::composition_root::TrackCompositionRoot;
 
-impl CliApp {
+impl TrackCompositionRoot {
     /// Persist the current HEAD SHA to `.commit_hash` for the given track.
     ///
     /// Delegates to `review_v2::persist_commit_hash_for_track` for all domain type
@@ -23,7 +25,10 @@ impl CliApp {
     /// Returns `Err` only on unexpected internal failures that prevent even forming
     /// the outcome (currently not reachable — all failures are returned as
     /// `Ok(CommandOutcome::failure)`).
-    pub fn track_set_commit_hash(&self, track_id: &str) -> Result<CommandOutcome, String> {
+    pub fn track_set_commit_hash(
+        &self,
+        track_id: &str,
+    ) -> Result<CommandOutcome, CompositionError> {
         match crate::review_v2::persist_commit_hash_for_track(track_id) {
             Ok(sha) => {
                 eprintln!("[set-commit-hash] Recorded .commit_hash: {sha}");
@@ -52,7 +57,7 @@ mod tests {
     use std::path::Path;
     use std::process::Command;
 
-    use crate::CliApp;
+    use crate::track::composition_root::TrackCompositionRoot;
 
     fn seed_track_repo(path: &Path) {
         let init = Command::new("git").args(["init", "-q"]).current_dir(path).status().unwrap();
@@ -97,7 +102,7 @@ mod tests {
     #[test]
     fn test_track_set_commit_hash_with_invalid_track_id_returns_failure_outcome() {
         // track_id validation happens before any git operation.
-        let app = CliApp::new();
+        let app = TrackCompositionRoot::new();
         let result = app.track_set_commit_hash("../evil");
         assert!(result.is_ok(), "method must return Ok(outcome), not Err: {result:?}");
         let outcome = result.unwrap();
@@ -119,7 +124,7 @@ mod tests {
         std::fs::create_dir_all(&track_dir).unwrap();
 
         let outcome = from_working_dir(dir.path(), || {
-            let app = CliApp::new();
+            let app = TrackCompositionRoot::new();
             let result = app.track_set_commit_hash("my-track-2026");
             assert!(result.is_ok(), "method must return Ok(outcome): {result:?}");
             result.unwrap()

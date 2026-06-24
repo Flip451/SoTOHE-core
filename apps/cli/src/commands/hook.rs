@@ -7,7 +7,9 @@
 //!
 //! PreToolUse hooks: any internal error → exit 2 (fail-closed).
 
-use cli_composition::CliApp;
+use cli_composition::HookCompositionRoot;
+use cli_driver::CommandOutcome;
+use cli_driver::hook::{HookInput, HookName};
 
 /// Hook names as CLI value enum (clap layer only — DIP).
 #[derive(Debug, Clone, Copy, clap::ValueEnum)]
@@ -36,6 +38,17 @@ impl CliHookName {
             Self::GitRefUpdate => "git-ref-update",
             Self::GitPrePush => "git-pre-push",
             Self::SkillCompliance => "skill-compliance",
+        }
+    }
+
+    fn driver_name(self) -> HookName {
+        match self {
+            Self::HooksPathSetup => HookName::HooksPathSetup,
+            Self::BlockDirectGitOps => HookName::BlockDirectGitOps,
+            Self::BlockTestFileDeletion => HookName::BlockTestFileDeletion,
+            Self::GitRefUpdate => HookName::GitRefUpdate,
+            Self::GitPrePush => HookName::GitPrePush,
+            Self::SkillCompliance => HookName::SkillCompliance,
         }
     }
 
@@ -70,12 +83,12 @@ pub enum HookCommand {
 /// printing (T005 / AC-04).
 ///
 /// # Errors
-/// Returns `Err(msg)` when the underlying composition logic fails.
-pub fn execute_inner(cmd: HookCommand) -> Result<cli_composition::CommandOutcome, String> {
+/// Returns `Err` when the underlying composition logic fails.
+pub fn execute_inner(cmd: HookCommand) -> Result<CommandOutcome, crate::CliError> {
     match cmd {
         HookCommand::Dispatch { hook, git_hook_args } => {
             if !git_hook_args.is_empty() && !hook.accepts_git_hook_args() {
-                return Ok(cli_composition::CommandOutcome {
+                return Ok(CommandOutcome {
                     stdout: None,
                     stderr: Some(
                         "extra hook arguments are only supported for git process hooks".to_owned(),
@@ -84,8 +97,10 @@ pub fn execute_inner(cmd: HookCommand) -> Result<cli_composition::CommandOutcome
                 });
             }
 
-            let hook_name = hook.hook_name().to_owned();
-            CliApp::new().hook_dispatch(hook_name, git_hook_args)
+            let outcome = HookCompositionRoot::new()
+                .hook_driver()
+                .handle(HookInput::Dispatch { hook: hook.driver_name(), git_hook_args });
+            Ok(outcome)
         }
     }
 }

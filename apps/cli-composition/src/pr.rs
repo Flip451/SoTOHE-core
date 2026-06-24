@@ -1,4 +1,4 @@
-//! `pr` command family — CliApp impl methods.
+//! `pr` command family composition root methods.
 //!
 //! Implements the full PR workflow: push, ensure-pr, status, wait-and-merge,
 //! trigger-review, poll-review, and review-cycle. All methods use concrete
@@ -8,35 +8,141 @@
 //! Private polling and review helpers are in `poll` (see `pr/poll.rs`).
 
 mod poll;
+mod poll_adapters;
 
 use std::fs;
 use std::thread;
 use std::time::{Duration, Instant};
 
-use crate::{CliApp, CommandOutcome};
+use crate::{CommandOutcome, error::CompositionError};
+
+// ── Per-context composition root ──────────────────────────────────────────────
+
+/// Composition root for the `pr` command family.
+///
+/// Unit struct: no adapter dependencies are injected at construction time.
+pub struct PrCompositionRoot;
+
+impl PrCompositionRoot {
+    /// Create a new `PrCompositionRoot`.
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+impl Default for PrCompositionRoot {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 use poll::{
     PollReviewResult, checks_summary, cleanup_trigger_state, ensure_pr_body_file,
-    format_review_summary, parse_review, poll_review_for_cycle, resolve_branch_context,
-    resume_trigger_state, trigger_new_review,
+    format_review_summary, parse_review, resolve_branch_context, resume_trigger_state,
+    trigger_new_review,
 };
+use poll_adapters::make_polling_interactor;
 
 // ---------------------------------------------------------------------------
-// CliApp implementations
+// PrCompositionRoot implementations
 // ---------------------------------------------------------------------------
 
-impl CliApp {
+impl PrCompositionRoot {
+    /// Build a wired [`cli_driver::pr::PrDriver`] for the `pr` family.
+    ///
+    /// Constructs all closures that wire infrastructure + usecase together and
+    /// injects them into a [`usecase::pr::PrCommandInteractor`], which is then
+    /// handed to [`cli_driver::pr::PrDriver`].
+    pub fn pr_driver(&self) -> cli_driver::pr::PrDriver {
+        use std::sync::Arc;
+        use usecase::pr::{PrCommandInteractor, PrCommandOutput};
+
+        let push_fn = Arc::new(|track_id: Option<String>| {
+            let root = PrCompositionRoot::new();
+            match root.pr_push(track_id) {
+                Ok(o) => {
+                    PrCommandOutput { stdout: o.stdout, stderr: o.stderr, exit_code: o.exit_code }
+                }
+                Err(e) => PrCommandOutput::failure(Some(e.to_string())),
+            }
+        });
+        let ensure_fn = Arc::new(|track_id: Option<String>, base: String| {
+            let root = PrCompositionRoot::new();
+            match root.pr_ensure(track_id, base) {
+                Ok(o) => {
+                    PrCommandOutput { stdout: o.stdout, stderr: o.stderr, exit_code: o.exit_code }
+                }
+                Err(e) => PrCommandOutput::failure(Some(e.to_string())),
+            }
+        });
+        let status_fn = Arc::new(|pr: String| {
+            let root = PrCompositionRoot::new();
+            match root.pr_status(pr) {
+                Ok(o) => {
+                    PrCommandOutput { stdout: o.stdout, stderr: o.stderr, exit_code: o.exit_code }
+                }
+                Err(e) => PrCommandOutput::failure(Some(e.to_string())),
+            }
+        });
+        let wait_fn = Arc::new(|pr: String, interval: u64, timeout: u64, method: String| {
+            let root = PrCompositionRoot::new();
+            match root.pr_wait_and_merge(pr, interval, timeout, method) {
+                Ok(o) => {
+                    PrCommandOutput { stdout: o.stdout, stderr: o.stderr, exit_code: o.exit_code }
+                }
+                Err(e) => PrCommandOutput::failure(Some(e.to_string())),
+            }
+        });
+        let trigger_fn = Arc::new(|pr: String| {
+            let root = PrCompositionRoot::new();
+            match root.pr_trigger_review(pr) {
+                Ok(o) => {
+                    PrCommandOutput { stdout: o.stdout, stderr: o.stderr, exit_code: o.exit_code }
+                }
+                Err(e) => PrCommandOutput::failure(Some(e.to_string())),
+            }
+        });
+        let poll_fn =
+            Arc::new(|pr: String, trigger_timestamp: String, interval: u64, timeout: u64| {
+                let root = PrCompositionRoot::new();
+                match root.pr_poll_review(pr, trigger_timestamp, interval, timeout) {
+                    Ok(o) => PrCommandOutput {
+                        stdout: o.stdout,
+                        stderr: o.stderr,
+                        exit_code: o.exit_code,
+                    },
+                    Err(e) => PrCommandOutput::failure(Some(e.to_string())),
+                }
+            });
+        let cycle_fn = Arc::new(|track_id: Option<String>, resume: bool| {
+            let root = PrCompositionRoot::new();
+            match root.pr_review_cycle(track_id, resume) {
+                Ok(o) => {
+                    PrCommandOutput { stdout: o.stdout, stderr: o.stderr, exit_code: o.exit_code }
+                }
+                Err(e) => PrCommandOutput::failure(Some(e.to_string())),
+            }
+        });
+
+        let service = Arc::new(PrCommandInteractor::new(
+            push_fn, ensure_fn, status_fn, wait_fn, trigger_fn, poll_fn, cycle_fn,
+        ));
+        cli_driver::pr::PrDriver::new(service)
+    }
+
     /// Push the current track branch to origin.
     ///
     /// # Errors
     /// Returns `Err` when the underlying composition logic fails.
-    pub fn pr_push(&self, track_id: Option<String>) -> Result<CommandOutcome, String> {
+    pub fn pr_push(&self, track_id: Option<String>) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::git_cli::{GitRepository as _, SystemGitRepo};
 
         let ctx = resolve_branch_context(track_id.as_deref())?;
-        let repo = SystemGitRepo::discover().map_err(|e| e.to_string())?;
+        let repo =
+            SystemGitRepo::discover().map_err(|e| CompositionError::AdapterInit(e.to_string()))?;
         println!("Pushing {} to origin...", ctx.branch);
-        repo.push_branch(&ctx.branch).map_err(|e| e.to_string())?;
+        repo.push_branch(&ctx.branch)
+            .map_err(|e| CompositionError::Infrastructure(e.to_string()))?;
         let stdout = format!("[OK] Pushed {}", ctx.branch);
         Ok(CommandOutcome::success(Some(stdout)))
     }
@@ -49,7 +155,7 @@ impl CliApp {
         &self,
         track_id: Option<String>,
         base: String,
-    ) -> Result<CommandOutcome, String> {
+    ) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::gh_cli::{GhClient as _, SystemGhClient};
         use usecase::pr_workflow::pr_title;
 
@@ -91,12 +197,13 @@ impl CliApp {
     ///
     /// # Errors
     /// Returns `Err` when the underlying composition logic fails.
-    pub fn pr_status(&self, pr: String) -> Result<CommandOutcome, String> {
+    pub fn pr_status(&self, pr: String) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::gh_cli::{GhClient as _, SystemGhClient};
         use usecase::pr_workflow::CheckSummary;
 
         let client = SystemGhClient;
-        let checks = client.pr_checks(&pr).map_err(|e| e.to_string())?;
+        let checks =
+            client.pr_checks(&pr).map_err(|e| CompositionError::Infrastructure(e.to_string()))?;
         let url = client.pr_url(&pr);
         let mut lines = vec![format!("PR: {url}")];
         let exit_code = match checks_summary(&checks) {
@@ -126,14 +233,17 @@ impl CliApp {
         interval: u64,
         timeout: u64,
         method: String,
-    ) -> Result<CommandOutcome, String> {
+    ) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::gh_cli::{GhClient as _, SystemGhClient};
         use infrastructure::git_cli::{GitRepository as _, SystemGitRepo};
         use usecase::pr_workflow::{WaitDecision, decide_wait_action};
 
         let client = SystemGhClient;
-        let branch = client.pr_head_branch(&pr).map_err(|e| e.to_string())?;
-        let repo = SystemGitRepo::discover().map_err(|e| e.to_string())?;
+        let branch = client
+            .pr_head_branch(&pr)
+            .map_err(|e| CompositionError::Infrastructure(e.to_string()))?;
+        let repo =
+            SystemGitRepo::discover().map_err(|e| CompositionError::AdapterInit(e.to_string()))?;
         // Use an explicit refspec (+refs/heads/<branch>:refs/remotes/origin/<branch>) so that
         // refs/remotes/origin/<branch> is reliably updated. A bare `git fetch origin <branch>`
         // only refreshes FETCH_HEAD and does not guarantee that `origin/<branch>` is updated,
@@ -142,10 +252,14 @@ impl CliApp {
         match repo.output(&["fetch", "origin", &refspec]) {
             Ok(o) if !o.status.success() => {
                 let stderr = String::from_utf8_lossy(&o.stderr);
-                return Err(format!("git fetch origin/{branch} failed: {stderr}"));
+                return Err(CompositionError::Infrastructure(format!(
+                    "git fetch origin/{branch} failed: {stderr}"
+                )));
             }
             Err(e) => {
-                return Err(format!("failed to run git fetch: {e}"));
+                return Err(CompositionError::Infrastructure(format!(
+                    "failed to run git fetch: {e}"
+                )));
             }
             Ok(_) => {}
         }
@@ -212,11 +326,15 @@ impl CliApp {
         let start = Instant::now();
         loop {
             let elapsed = start.elapsed().as_secs();
-            let checks = client.pr_checks(&pr).map_err(|e| e.to_string())?;
+            let checks = client
+                .pr_checks(&pr)
+                .map_err(|e| CompositionError::Infrastructure(e.to_string()))?;
             match decide_wait_action(checks_summary(&checks), elapsed, timeout, interval) {
                 WaitDecision::MergeNow => {
                     println!("[OK] All checks passed. Merging...");
-                    client.merge_pr(&pr, &method).map_err(|e| e.to_string())?;
+                    client
+                        .merge_pr(&pr, &method)
+                        .map_err(|e| CompositionError::Infrastructure(e.to_string()))?;
                     return Ok(CommandOutcome::success(Some(format!(
                         "[OK] PR #{pr} merged ({method})."
                     ))));
@@ -245,25 +363,31 @@ impl CliApp {
     ///
     /// # Errors
     /// Returns `Err` when the underlying composition logic fails.
-    pub fn pr_trigger_review(&self, pr: String) -> Result<CommandOutcome, String> {
+    pub fn pr_trigger_review(&self, pr: String) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::agent_profiles::{AGENT_PROFILES_PATH, AgentProfiles, RoundType};
         use infrastructure::gh_cli::{GhClient as _, SystemGhClient};
         use infrastructure::git_cli::{GitRepository as _, SystemGitRepo};
 
-        let git_repo = SystemGitRepo::discover().map_err(|e| e.to_string())?;
+        let git_repo =
+            SystemGitRepo::discover().map_err(|e| CompositionError::AdapterInit(e.to_string()))?;
         let profiles_path = git_repo.root().join(AGENT_PROFILES_PATH);
-        let profiles = AgentProfiles::load(&profiles_path).map_err(|e| format!("{e}"))?;
+        let profiles = AgentProfiles::load(&profiles_path)
+            .map_err(|e| CompositionError::ConfigLoad(format!("{e}")))?;
         let resolved =
             profiles.resolve_execution("pr-reviewer", RoundType::Final).ok_or_else(|| {
-                "pr-reviewer capability not defined in agent-profiles.json".to_owned()
+                CompositionError::WiringFailed(
+                    "pr-reviewer capability not defined in agent-profiles.json".to_owned(),
+                )
             })?;
         usecase::pr_review::validate_reviewer_provider(&resolved.provider)
-            .map_err(|e| e.to_string())?;
+            .map_err(|e| CompositionError::WiringFailed(e.to_string()))?;
 
         let client = SystemGhClient;
-        let repo = client.repo_nwo().map_err(|e| e.to_string())?;
-        let response =
-            client.post_issue_comment(&repo, &pr, "@codex review").map_err(|e| e.to_string())?;
+        let repo =
+            client.repo_nwo().map_err(|e| CompositionError::Infrastructure(e.to_string()))?;
+        let response = client
+            .post_issue_comment(&repo, &pr, "@codex review")
+            .map_err(|e| CompositionError::Infrastructure(e.to_string()))?;
 
         let created_at = serde_json::from_str::<serde_json::Value>(&response)
             .ok()
@@ -271,7 +395,9 @@ impl CliApp {
             .unwrap_or_default();
 
         if created_at.is_empty() {
-            return Err("could not determine trigger timestamp from API response".to_owned());
+            return Err(CompositionError::Infrastructure(
+                "could not determine trigger timestamp from API response".to_owned(),
+            ));
         }
 
         let stdout = format!(
@@ -290,9 +416,12 @@ impl CliApp {
         trigger_timestamp: String,
         interval: u64,
         timeout: u64,
-    ) -> Result<CommandOutcome, String> {
-        use infrastructure::gh_cli::SystemGhClient;
+    ) -> Result<CommandOutcome, CompositionError> {
+        use infrastructure::gh_cli::{GhClient as _, SystemGhClient};
         use infrastructure::git_cli::{GitRepository as _, SystemGitRepo};
+        use usecase::pr_review_polling::{
+            PrReviewPollingCommand, PrReviewPollingOutput, PrReviewPollingService as _,
+        };
 
         let head = SystemGitRepo::discover().ok().and_then(|r| {
             r.output(&["rev-parse", "HEAD"])
@@ -301,23 +430,35 @@ impl CliApp {
                 .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_owned())
         });
 
-        match poll_review_for_cycle(
-            &pr,
-            &trigger_timestamp,
-            interval,
-            timeout,
-            &SystemGhClient,
-            &thread::sleep,
-            head.as_deref(),
-        )? {
-            PollReviewResult::ReviewFound(review) => {
+        let repo_nwo = SystemGhClient
+            .repo_nwo()
+            .map_err(|e| CompositionError::Infrastructure(e.to_string()))?;
+        let bounded_timeout = timeout.min(86400);
+        let max_iterations = match (bounded_timeout, interval) {
+            (0, _) => 0,
+            (_, 0) => 1,
+            (timeout, interval) => 1 + (timeout - 1) / interval,
+        };
+
+        let interactor = make_polling_interactor();
+        let cmd = PrReviewPollingCommand {
+            pr: pr.clone(),
+            repo_nwo,
+            trigger_timestamp,
+            interval_secs: interval,
+            max_iterations,
+            head_commit: head,
+        };
+
+        match interactor.poll(cmd).map_err(|e| CompositionError::Usecase(e.to_string()))? {
+            PrReviewPollingOutput::ReviewFound(review) => {
                 let review_str = serde_json::to_string(&review).unwrap_or_default();
                 Ok(CommandOutcome::success(Some(review_str)))
             }
-            PollReviewResult::ZeroFindings => Ok(CommandOutcome::success(Some(
+            PrReviewPollingOutput::ZeroFindings => Ok(CommandOutcome::success(Some(
                 r#"{"verdict":"zero_findings","findings":[]}"#.to_owned(),
             ))),
-            PollReviewResult::Timeout => Ok(CommandOutcome::failure(None)),
+            PrReviewPollingOutput::Timeout => Ok(CommandOutcome::failure(None)),
         }
     }
 
@@ -329,30 +470,38 @@ impl CliApp {
         &self,
         track_id: Option<String>,
         resume: bool,
-    ) -> Result<CommandOutcome, String> {
+    ) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::agent_profiles::{AGENT_PROFILES_PATH, AgentProfiles, RoundType};
         use infrastructure::gh_cli::{GhClient as _, SystemGhClient};
         use infrastructure::git_cli::{GitRepository as _, SystemGitRepo};
 
-        let repo = SystemGitRepo::discover().map_err(|e| e.to_string())?;
+        let repo =
+            SystemGitRepo::discover().map_err(|e| CompositionError::AdapterInit(e.to_string()))?;
 
         let profiles_path = repo.root().join(AGENT_PROFILES_PATH);
-        let profiles = AgentProfiles::load(&profiles_path).map_err(|e| format!("{e}"))?;
+        let profiles = AgentProfiles::load(&profiles_path)
+            .map_err(|e| CompositionError::ConfigLoad(format!("{e}")))?;
         let resolved =
             profiles.resolve_execution("pr-reviewer", RoundType::Final).ok_or_else(|| {
-                "pr-reviewer capability not defined in agent-profiles.json".to_owned()
+                CompositionError::WiringFailed(
+                    "pr-reviewer capability not defined in agent-profiles.json".to_owned(),
+                )
             })?;
         usecase::pr_review::validate_reviewer_provider(&resolved.provider)
-            .map_err(|e| e.to_string())?;
+            .map_err(|e| CompositionError::WiringFailed(e.to_string()))?;
 
         let branch = repo
             .current_branch()
-            .map_err(|e| e.to_string())?
-            .ok_or_else(|| "could not determine current branch".to_owned())?;
+            .map_err(|e| CompositionError::Infrastructure(e.to_string()))?
+            .ok_or_else(|| {
+                CompositionError::WiringFailed("could not determine current branch".to_owned())
+            })?;
         if !branch.starts_with("track/") {
-            return Err("not on a track branch (expected track/<id>); \
+            return Err(CompositionError::WiringFailed(
+                "not on a track branch (expected track/<id>); \
                  switch to the track branch and retry."
-                .to_owned());
+                    .to_owned(),
+            ));
         }
 
         let active_track_id = branch.strip_prefix("track/").unwrap_or(&branch).to_owned();
@@ -367,18 +516,33 @@ impl CliApp {
             }
         };
 
-        let nwo = client.repo_nwo().map_err(|e| e.to_string())?;
+        let nwo = client.repo_nwo().map_err(|e| CompositionError::Infrastructure(e.to_string()))?;
         let head_ref = head_ref_owned.as_deref();
 
-        let poll_result = poll_review_for_cycle(
-            &pr_number,
-            &trigger_timestamp,
-            15,
-            600,
-            &client,
-            &thread::sleep,
-            head_ref,
-        )?;
+        // D4 extraction: delegate to PrReviewPollingInteractor (T008).
+        // Timeout=600s, interval=15s → max_iterations=40.
+        use usecase::pr_review_polling::{
+            PrReviewPollingCommand, PrReviewPollingOutput, PrReviewPollingService as _,
+        };
+        let interactor = make_polling_interactor();
+        let poll_cmd = PrReviewPollingCommand {
+            pr: pr_number.clone(),
+            repo_nwo: nwo.clone(),
+            trigger_timestamp: trigger_timestamp.clone(),
+            interval_secs: 15,
+            max_iterations: 40, // 600s / 15s
+            head_commit: head_ref.map(str::to_owned),
+        };
+        let poll_result_raw =
+            interactor.poll(poll_cmd).map_err(|e| CompositionError::Usecase(e.to_string()))?;
+
+        // Map usecase PrReviewPollingOutput → local PollReviewResult for the
+        // parse_review / format_review_summary path below.
+        let poll_result = match poll_result_raw {
+            PrReviewPollingOutput::ReviewFound(v) => PollReviewResult::ReviewFound(v),
+            PrReviewPollingOutput::ZeroFindings => PollReviewResult::ZeroFindings,
+            PrReviewPollingOutput::Timeout => PollReviewResult::Timeout,
+        };
 
         let result = match poll_result {
             PollReviewResult::ZeroFindings => {

@@ -1,60 +1,113 @@
-//! Fixpoint resolution composition: adapters + `CliApp::fixpoint_resolve`.
+//! Fixpoint resolution composition: adapters + `TrackCompositionRoot::fixpoint_resolve`.
 //!
-//! Wires `FsReviewGateStateAdapter` and `FsRefVerifyGateStateAdapter` (secondary
-//! ports for the fixpoint resolver) plus a thin `CliApp` entry point that
-//! constructs `FixpointResolveInteractor` from injected adapters and returns the
-//! next required step as a plain string.
+//! Wires `FsReviewGateStateAdapter`, `FsRefVerifyGateStateAdapter` (secondary
+//! ports for the fixpoint resolver), and the D4 dry-gate port adapters
+//! (`FsDiffBaseResolverAdapter`, `FsDryCorpusMetaAdapter`,
+//! `FsDryApprovalFactoryAdapter`) that implement the three secondary ports
+//! required by `FixpointDryGateInteractor` (T008).
 //!
-//! Design: D2 / IN-02 / AC-03 / CN-02.
+//! Design: D2 / D4 / IN-02 / AC-03 / CN-02 / CN-07.
 
-use std::collections::BTreeSet;
 use std::path::PathBuf;
 use std::sync::Arc;
 
+use domain::CommitHash;
 use domain::TrackId;
-use domain::dry_check::{DryCheckApprovalVerdict, FragmentRef};
+use domain::dry_check::{DryCheckConfigFingerprint, DryCheckCorpusFingerprint};
+use infrastructure::dry_check::GitDryCheckDiffGetter;
 use infrastructure::dry_check::{
     DryCheckConfig as InfraDryCheckConfig, FsDryCheckCoverageAdapter, FsDryCheckStore,
+    FsDryCorpusMetaAdapter,
 };
+use infrastructure::semantic_dup::CodeFragmentExtractorAdapter;
 use usecase::dry_check::{
-    DryCheckApprovalInteractor, DryCheckApprovalService, DryCheckCycleError, fragment_ref_of,
+    DryCheckApprovalInteractor, DryCheckApprovalService, DryFragmentPipelineInteractor,
 };
 use usecase::fixpoint_resolve::{
-    FixpointResolveCommand, FixpointResolveInteractor, FixpointResolveService as _,
-    RefVerifyGateStatePort, RefVerifyGateStatus, ReviewGateStatePort, ReviewGateStatus,
+    DiffBaseResolverError, DiffBaseResolverPort, DryApprovalFactoryPort, FixpointDryGateCommand,
+    FixpointDryGateInteractor, FixpointDryGateService as _, FixpointResolveCommand,
+    FixpointResolveInteractor, FixpointResolveService as _, RefVerifyGateStatePort,
+    ReviewGateStatePort,
 };
-use usecase::review_v2::ReviewApprovalDecision;
-
 // Domain / usecase types used internally by this composition module and
 // its in-crate unit tests. They are intentionally NOT re-exported through
 // the `cli_composition` public surface — `apps/cli` consumes only DTOs and
 // primitives across the CN-02 boundary, so the format-shape contract and
 // the domain-validation contract are tested here, not in `apps/cli`.
-use domain::track_phase::{FixpointStep, ReviewScopeSet};
+use domain::track_phase::FixpointStep;
+use usecase::dry_check::DryCheckConfig;
 use usecase::fixpoint_resolve::{FixpointCurrentBranch, FixpointResolveError};
 
-use crate::{CliApp, CommandOutcome};
+use crate::CommandOutcome;
+use crate::error::CompositionError;
+use crate::track::composition_root::TrackCompositionRoot;
 
 use super::resolve_project_root;
 
 // ── NoOpDryApprovalService ────────────────────────────────────────────────────
+// Re-export shim: implementation relocated to `libs/infrastructure` per ADR 1328 D7.
+use infrastructure::dry_check::noop_approval::NoOpDryApprovalService;
 
-/// A trivial no-op [`DryCheckApprovalService`] that always returns `Approved`.
+// ── FsDiffBaseResolverAdapter ─────────────────────────────────────────────────
+
+/// Infrastructure adapter implementing [`DiffBaseResolverPort`].
 ///
-/// Used as the dry approval port when `dry_config.enabled` is `false` in T008:
-/// the `FixpointResolveInteractor` never calls `check_approved` in that case
-/// (the interactor itself bypasses the dry gate), but the field is `Arc<dyn
-/// DryCheckApprovalService>` and must be constructed regardless.  This no-op
-/// implementation ensures the construction succeeds without any I/O.
-struct NoOpDryApprovalService;
+/// Wraps `crate::dry::resolve_dry_diff_base_from_store` which reads
+/// `.commit_hash` from the track directory and falls back to
+/// `git rev-parse main`. Stateless unit struct.
+struct FsDiffBaseResolverAdapter;
 
-impl DryCheckApprovalService for NoOpDryApprovalService {
-    fn check_approved(
+impl DiffBaseResolverPort for FsDiffBaseResolverAdapter {
+    fn resolve_diff_base(
         &self,
-        _track_id: &TrackId,
-        _current_fragment_refs: &std::collections::BTreeSet<FragmentRef>,
-    ) -> Result<DryCheckApprovalVerdict, DryCheckCycleError> {
-        Ok(DryCheckApprovalVerdict::Approved)
+        track_dir: &std::path::Path,
+        canonical_root: &std::path::Path,
+        repo_root: &std::path::Path,
+    ) -> Result<CommitHash, DiffBaseResolverError> {
+        let commit_hash_path = track_dir.join(".commit_hash");
+        crate::dry::resolve_dry_diff_base_from_store(
+            &commit_hash_path,
+            canonical_root,
+            Some(repo_root),
+            "fixpoint-resolve",
+        )
+        .map_err(|e| DiffBaseResolverError::Unavailable(e.to_string()))
+    }
+}
+
+// ── FsDryApprovalFactoryAdapter ───────────────────────────────────────────────
+
+/// Infrastructure adapter implementing [`DryApprovalFactoryPort`].
+///
+/// Constructs a [`DryCheckApprovalInteractor`] from the injected
+/// infrastructure-layer config (used for `current_config_fingerprint`) and the
+/// resolved corpus metadata.
+struct FsDryApprovalFactoryAdapter;
+
+impl DryApprovalFactoryPort for FsDryApprovalFactoryAdapter {
+    fn build_approval(
+        &self,
+        track_dir: &std::path::Path,
+        canonical_root: &std::path::Path,
+        dry_config: DryCheckConfig,
+        config_fingerprint: DryCheckConfigFingerprint,
+        corpus_fingerprint: DryCheckCorpusFingerprint,
+    ) -> Arc<dyn DryCheckApprovalService + Send + Sync> {
+        let dry_check_json_path = track_dir.join("dry-check.json");
+        let dry_check_coverage_path = track_dir.join("dry-check-coverage.json");
+        let store =
+            Arc::new(FsDryCheckStore::new(dry_check_json_path, canonical_root.to_path_buf()));
+        let coverage = Arc::new(FsDryCheckCoverageAdapter::new(
+            dry_check_coverage_path,
+            canonical_root.to_path_buf(),
+        ));
+        Arc::new(DryCheckApprovalInteractor::new(
+            dry_config,
+            store,
+            coverage,
+            config_fingerprint,
+            corpus_fingerprint,
+        )) as Arc<dyn DryCheckApprovalService + Send + Sync>
     }
 }
 
@@ -74,220 +127,29 @@ pub struct FixpointResolveInput {
     pub items_dir: PathBuf,
 }
 
-// ── FsReviewGateStateAdapter ──────────────────────────────────────────────────
+// ── Gate-state adapters (re-exported from infrastructure) ────────────────────
+//
+// Both adapter structs were relocated to `libs/infrastructure/src/track/gate_state.rs`
+// per ADR 1328 D7 (port-impl adapters belong in libs/infrastructure).
+// This re-export shim keeps existing wiring call sites unchanged.
+pub(crate) use infrastructure::track::gate_state::{
+    FsRefVerifyGateStateAdapter, FsReviewGateStateAdapter,
+};
 
-/// Implements [`ReviewGateStatePort`] by delegating to the existing
-/// `check_approved_str` helper (same logic as `sotp review check-approved`).
-///
-/// Uses only the public API of the review subsystem — no internal `review.json`
-/// parsing (CN-02).
-struct FsReviewGateStateAdapter {
-    items_dir: PathBuf,
-}
+// ── Dry-gate helper ───────────────────────────────────────────────────────────
 
-impl ReviewGateStatePort for FsReviewGateStateAdapter {
-    /// Query the current review gate status for `track_id`.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`FixpointResolveError::GateQueryFailed`] when the review store
-    /// cannot be read or the evaluation fails.
-    fn review_status(&self, track_id: &TrackId) -> Result<ReviewGateStatus, FixpointResolveError> {
-        let output =
-            crate::review_v2::approved::check_approved_str(track_id.as_ref(), &self.items_dir)
-                .map_err(|e| FixpointResolveError::GateQueryFailed {
-                    gate: "review".to_owned(),
-                    message: e.to_string(),
-                })?;
-
-        match output.decision {
-            ReviewApprovalDecision::Approved | ReviewApprovalDecision::ApprovedWithBypass => {
-                Ok(ReviewGateStatus::Approved)
-            }
-            ReviewApprovalDecision::Blocked => {
-                let mut set = BTreeSet::new();
-                for s in &output.blocked_scopes {
-                    set.insert(s.clone());
-                }
-                let scopes = ReviewScopeSet::try_new(set).map_err(|e| {
-                    FixpointResolveError::GateQueryFailed {
-                        gate: "review".to_owned(),
-                        message: format!("review scope set construction failed: {e}"),
-                    }
-                })?;
-                Ok(ReviewGateStatus::NeedsReview { scopes })
-            }
-        }
-    }
-}
-
-// ── FsRefVerifyGateStateAdapter ───────────────────────────────────────────────
-
-/// Implements [`RefVerifyGateStatePort`] by delegating to the existing
-/// `ref_verify_check_approved` composition logic (same logic as `sotp ref-verify
-/// check-approved`).
-///
-/// Uses only the public gate API — no cache-file internals (CN-02).
-struct FsRefVerifyGateStateAdapter {
-    items_dir: PathBuf,
-}
-
-impl RefVerifyGateStatePort for FsRefVerifyGateStateAdapter {
-    /// Query the current ref-verify gate status for `track_id`.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`FixpointResolveError::GateQueryFailed`] when the cache read
-    /// fails.  A wrong-branch error from ref-verify is mapped to
-    /// `GateQueryFailed` as well — the CLI composition layer is responsible for
-    /// ensuring the branch matches before calling this adapter.
-    fn ref_verify_status(
-        &self,
-        track_id: &TrackId,
-    ) -> Result<RefVerifyGateStatus, FixpointResolveError> {
-        use crate::RefVerifyCheckApprovedInput;
-
-        let outcome = CliApp::new()
-            .ref_verify_check_approved(RefVerifyCheckApprovedInput {
-                track_id: track_id.as_ref().to_owned(),
-                items_dir: self.items_dir.clone(),
-            })
-            .map_err(|e| FixpointResolveError::GateQueryFailed {
-                gate: "ref_verify".to_owned(),
-                message: e,
-            })?;
-
-        if outcome.exit_code == 0 {
-            Ok(RefVerifyGateStatus::Approved)
-        } else {
-            Ok(RefVerifyGateStatus::Blocked)
-        }
-    }
-}
-
-// ── Dry-gate fragment helpers ─────────────────────────────────────────────────
-
-/// Resolve the dry-check diff-base commit for the given track directory.
-///
-/// Follows the same three-branch fail-closed policy as `dry check-approved` via
-/// the shared [`crate::dry::resolve_dry_diff_base_from_store`] helper:
-/// 1. Read `.commit_hash` → `Ok(Some(hash))` → use it.
-/// 2. `Ok(None)` → fall back to `git rev-parse main`.
-/// 3. `Err(Format)` / other → warn and fall back to `git rev-parse main`.
-///
-/// `repo_root` is the CWD-discovered git repository root (the caller's trust
-/// anchor).  It is passed as the `git_discovery_root` so that the fallback
-/// `git rev-parse main` uses the same repository as the hunk-discovery in
-/// `build_current_fragment_refs`, even when `canonical_root` (the project root,
-/// derived from `items_dir`) happens to lie inside a nested checkout.
-///
-/// # Errors
-///
-/// Returns `Err` only when `git rev-parse main` fails.
-fn resolve_dry_diff_base_for_track(
-    track_dir: &std::path::Path,
-    canonical_root: &std::path::Path,
-    repo_root: &std::path::Path,
-) -> Result<domain::CommitHash, String> {
-    let commit_hash_path = track_dir.join(".commit_hash");
-    crate::dry::resolve_dry_diff_base_from_store(
-        &commit_hash_path,
-        canonical_root,
-        Some(repo_root),
-        "fixpoint-resolve",
+/// Build the [`FixpointDryGateInteractor`] wired with all infrastructure adapters.
+fn make_dry_gate_interactor() -> FixpointDryGateInteractor {
+    let diff_source = Arc::new(GitDryCheckDiffGetter);
+    let extractor = Arc::new(CodeFragmentExtractorAdapter::new());
+    let fragment_pipeline = Arc::new(DryFragmentPipelineInteractor::new(diff_source, extractor));
+    FixpointDryGateInteractor::new(
+        Arc::new(NoOpDryApprovalService) as Arc<dyn DryCheckApprovalService + Send + Sync>,
+        Arc::new(FsDiffBaseResolverAdapter),
+        Arc::new(FsDryCorpusMetaAdapter),
+        fragment_pipeline,
+        Arc::new(FsDryApprovalFactoryAdapter),
     )
-}
-
-/// Build the current diff fragment ref set for the dry gate (D5 / IN-05).
-///
-/// `canonical_root` is the project root (parent of `track/items`); it is passed
-/// to [`extract_code_fragments`] so that all Rust source files in the project are
-/// scanned.  `repo_root` is the git repository root (returned by
-/// `SystemGitRepo::root()`); it is used for path normalization so that fragment
-/// source paths match the repo-relative paths emitted by
-/// [`GitDryCheckDiffGetter`].  In the common case `canonical_root == repo_root`;
-/// they differ only when the project lives in a subdirectory of a monorepo.
-///
-/// # Errors
-///
-/// Returns `Err` when diff listing or fragment extraction / normalization fails.
-fn build_current_fragment_refs(
-    canonical_root: &std::path::Path,
-    repo_root: &std::path::Path,
-    base: &domain::CommitHash,
-) -> Result<BTreeSet<FragmentRef>, String> {
-    use domain::dry_check::fragments_overlapping_hunks;
-    use domain::semantic_dup::CodeFragment;
-    use infrastructure::dry_check::GitDryCheckDiffGetter;
-    use infrastructure::semantic_dup::extractor::extract_code_fragments;
-    use usecase::dry_check::DryCheckDiffSource as _;
-
-    // Anchor diff discovery to the repo root.
-    // `GitDryCheckDiffGetter` calls `SystemGitRepo::discover()` which uses the
-    // process CWD; temporarily change CWD to `repo_root` so that the discover
-    // call is rooted at the correct repo regardless of the caller's CWD.
-    let original_cwd =
-        std::env::current_dir().map_err(|e| format!("cannot read current directory: {e}"))?;
-    std::env::set_current_dir(repo_root)
-        .map_err(|e| format!("cannot enter repo root '{}': {e}", repo_root.display()))?;
-
-    let getter = GitDryCheckDiffGetter;
-    let changed_hunks_result = getter.list_changed_hunks(base);
-
-    // Restore CWD before propagating any error.
-    let restore_err = std::env::set_current_dir(&original_cwd).err();
-    if let Some(e) = restore_err {
-        eprintln!("[warn] fixpoint-resolve: failed to restore CWD: {e}");
-    }
-
-    let changed_hunks =
-        changed_hunks_result.map_err(|e| format!("list_changed_hunks failed: {e}"))?;
-
-    let raw_fragments = extract_code_fragments(canonical_root)
-        .map_err(|e| format!("fragment extraction failed: {e}"))?;
-
-    // Normalize to repo-relative paths (strip the git repo root prefix so that
-    // fragment paths match the repo-relative hunk paths emitted by
-    // `GitDryCheckDiffGetter`).
-    let mut normalized: Vec<CodeFragment> = Vec::with_capacity(raw_fragments.len());
-    for frag in raw_fragments {
-        let rel = frag
-            .source_path
-            .strip_prefix(repo_root)
-            .map(|p| p.to_path_buf())
-            .unwrap_or_else(|_| frag.source_path.clone());
-        let rel_str = rel.to_string_lossy().replace('\\', "/");
-        let rebuilt = CodeFragment::new(
-            std::path::PathBuf::from(&rel_str),
-            frag.content().to_owned(),
-            frag.start_line(),
-            frag.end_line(),
-        )
-        .map_err(|e| format!("fragment rebuild failed: {e}"))?;
-        normalized.push(rebuilt);
-    }
-
-    let changed_paths: std::collections::HashSet<String> =
-        changed_hunks.iter().map(|h| h.path().as_str().to_owned()).collect();
-
-    let candidates: Vec<CodeFragment> = normalized
-        .iter()
-        .filter(|f| {
-            let key = f.source_path.to_string_lossy().replace('\\', "/");
-            changed_paths.contains(key.as_str())
-        })
-        .cloned()
-        .collect();
-
-    let diff_fragments = fragments_overlapping_hunks(&candidates, &changed_hunks);
-
-    let mut refs = BTreeSet::new();
-    for fragment in &diff_fragments {
-        let r = fragment_ref_of(fragment)
-            .map_err(|e| format!("fixpoint-resolve: fragment ref failed: {e}"))?;
-        refs.insert(r);
-    }
-    Ok(refs)
 }
 
 // ── Format helpers ────────────────────────────────────────────────────────────
@@ -311,9 +173,9 @@ pub(crate) fn format_fixpoint_step(step: FixpointStep) -> String {
     }
 }
 
-// ── CliApp::fixpoint_resolve ──────────────────────────────────────────────────
+// ── TrackCompositionRoot::fixpoint_resolve ────────────────────────────────────
 
-impl CliApp {
+impl TrackCompositionRoot {
     /// Resolve the next fixpoint step for the active track.
     ///
     /// Returns a [`CommandOutcome`] whose `stdout` contains one of:
@@ -329,25 +191,30 @@ impl CliApp {
     /// - `current_branch` is empty or does not match `"track/<track_id>"`.
     /// - git repo discovery or diff base resolution fails.
     /// - Any gate adapter returns an error.
-    pub fn fixpoint_resolve(&self, input: FixpointResolveInput) -> Result<CommandOutcome, String> {
+    pub fn fixpoint_resolve(
+        &self,
+        input: FixpointResolveInput,
+    ) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::git_cli::SystemGitRepo;
 
         // ── Validate inputs ───────────────────────────────────────────────────
         super::validate_track_id_str(&input.track_id)
-            .map_err(|e| format!("invalid --track-id: {e}"))?;
+            .map_err(|e| CompositionError::WiringFailed(format!("invalid --track-id: {e}")))?;
 
         let track_id = TrackId::try_new(input.track_id.clone())
-            .map_err(|e| format!("invalid track ID: {e}"))?;
+            .map_err(|e| CompositionError::WiringFailed(format!("invalid track ID: {e}")))?;
 
-        let current_branch = FixpointCurrentBranch::try_new(input.current_branch.clone())
-            .map_err(|e| format!("invalid --current-branch: {e}"))?;
+        let current_branch =
+            FixpointCurrentBranch::try_new(input.current_branch.clone()).map_err(|e| {
+                CompositionError::WiringFailed(format!("invalid --current-branch: {e}"))
+            })?;
 
         // ── Track-not-active guard ────────────────────────────────────────────
         let expected_branch = format!("track/{}", track_id.as_ref());
         if current_branch.as_str() != expected_branch {
-            return Err(
-                FixpointResolveError::TrackNotActive { branch: expected_branch }.to_string()
-            );
+            return Err(CompositionError::WiringFailed(
+                FixpointResolveError::TrackNotActive { branch: expected_branch }.to_string(),
+            ));
         }
 
         // ── Resolve items_dir and discover git repo ───────────────────────────
@@ -357,14 +224,13 @@ impl CliApp {
         // policy used by all other track commands (`resolve_existing_dir_under_repo`
         // in `dry/shared.rs`): CWD-discovery is the trust anchor, not path-based
         // discovery from an untrusted input argument.
-        let cwd_repo =
-            SystemGitRepo::discover().map_err(|e| format!("cannot discover git repo: {e}"))?;
+        let cwd_repo = SystemGitRepo::discover()
+            .map_err(|e| CompositionError::AdapterInit(format!("cannot discover git repo: {e}")))?;
         let repo_root = {
             use infrastructure::git_cli::GitRepository as _;
-            cwd_repo
-                .root()
-                .canonicalize()
-                .map_err(|e| format!("cannot canonicalize repo root: {e}"))?
+            cwd_repo.root().canonicalize().map_err(|e| {
+                CompositionError::Infrastructure(format!("cannot canonicalize repo root: {e}"))
+            })?
         };
 
         // Resolve the canonical items_dir path:
@@ -373,17 +239,17 @@ impl CliApp {
         //   `resolve_existing_dir_under_repo`) then canonicalize.
         let canonical_items_dir = if input.items_dir.is_absolute() {
             input.items_dir.canonicalize().map_err(|_| {
-                format!(
+                CompositionError::WiringFailed(format!(
                     "--items-dir '{}' must be an existing directory under the repository root",
                     input.items_dir.display()
-                )
+                ))
             })?
         } else {
             repo_root.join(&input.items_dir).canonicalize().map_err(|_| {
-                format!(
+                CompositionError::WiringFailed(format!(
                     "--items-dir '{}' must be an existing directory under the repository root",
                     input.items_dir.display()
-                )
+                ))
             })?
         };
 
@@ -391,10 +257,10 @@ impl CliApp {
         // This must be checked against the CWD-discovered `repo_root`, not against
         // a repo discovered from `canonical_root` (which could be a different checkout).
         if !canonical_items_dir.starts_with(&repo_root) {
-            return Err(format!(
+            return Err(CompositionError::WiringFailed(format!(
                 "--items-dir '{}' must be an existing directory under the repository root",
                 input.items_dir.display()
-            ));
+            )));
         }
 
         // Derive canonical_root (project root = parent of track/) from the
@@ -402,129 +268,82 @@ impl CliApp {
         // was absolute or relative.
         let canonical_root = resolve_project_root(&canonical_items_dir)
             .and_then(|p| {
-                p.canonicalize().map_err(|e| format!("cannot canonicalize project root: {e}"))
+                p.canonicalize().map_err(|e| {
+                    CompositionError::WiringFailed(format!("cannot canonicalize project root: {e}"))
+                })
             })
-            .map_err(|e| format!("cannot derive project root from items_dir: {e}"))?;
+            .map_err(|e| {
+                CompositionError::WiringFailed(format!(
+                    "cannot derive project root from items_dir: {e}"
+                ))
+            })?;
 
         // Verify items_dir is actually a directory (not a file or missing).
         if !canonical_items_dir.is_dir() {
-            return Err(format!(
+            return Err(CompositionError::WiringFailed(format!(
                 "--items-dir '{}' must be an existing directory under the repository root",
                 input.items_dir.display()
-            ));
+            )));
         }
 
         // ── Load DRY gate config early (T008) ────────────────────────────────
         // Load the usecase dry config before dry prep so `enabled=false` can skip all
         // dry diff-base resolution, corpus fingerprinting, and fragment-ref construction.
         let dry_config_path = repo_root.join(".harness/config/dry-check.json");
-        let dry_infra_config = InfraDryCheckConfig::load(&dry_config_path)
-            .map_err(|e| format!("failed to load dry-check config: {e}"))?;
-        let usecase_dry_config = crate::dry::build_usecase_dry_check_config_pub(&dry_infra_config)?;
+        let dry_infra_config = InfraDryCheckConfig::load(&dry_config_path).map_err(|e| {
+            CompositionError::ConfigLoad(format!("failed to load dry-check config: {e}"))
+        })?;
+        let usecase_dry_config = crate::dry::build_usecase_dry_check_config_pub(&dry_infra_config)
+            .map_err(CompositionError::ConfigLoad)?;
 
         let track_dir = canonical_items_dir.join(track_id.as_ref());
 
-        // ── Build dry-gate dependencies (only when enabled) ───────────────────
-        let (current_fragment_refs, dry_approval): (
-            std::collections::BTreeSet<FragmentRef>,
-            Arc<dyn DryCheckApprovalService + Send + Sync>,
-        ) = if usecase_dry_config.enabled {
-            // ── Build dry-gate fragment refs ──────────────────────────────────
-            //
-            // Anchor all git operations (diff-base ancestry check, diff getter) to
-            // the validated repo root.  Both `resolve_dry_diff_base_for_track`
-            // (through `FsDryCheckCommitHashStore::read` → `SystemGitRepo::discover`)
-            // and `build_current_fragment_refs` (through `GitDryCheckDiffGetter` →
-            // `SystemGitRepo::discover`) rely on CWD for repo discovery.
-            let original_cwd = std::env::current_dir()
-                .map_err(|e| format!("cannot read current directory: {e}"))?;
-            std::env::set_current_dir(&repo_root)
-                .map_err(|e| format!("cannot enter repo root '{}': {e}", repo_root.display()))?;
+        // ── Build dry-gate dependencies via D4 FixpointDryGateInteractor ─────
+        //
+        // CWD guard: set CWD = repo_root before the dry-gate call so that
+        // GitDryCheckDiffGetter (which uses SystemGitRepo::discover()) anchors
+        // to the caller's repository. Restored after the call regardless of
+        // success or failure (CN-07 / usecase purity: CWD guard stays here,
+        // not inside the usecase interactor).
+        let dry_gate = make_dry_gate_interactor();
+        let current_config_fingerprint = dry_infra_config.fingerprint();
 
-            let base_result =
-                resolve_dry_diff_base_for_track(&track_dir, &canonical_root, &repo_root);
+        let original_cwd = std::env::current_dir().map_err(|e| {
+            CompositionError::Infrastructure(format!("cannot read current directory: {e}"))
+        })?;
+        std::env::set_current_dir(&repo_root).map_err(|e| {
+            CompositionError::Infrastructure(format!(
+                "cannot enter repo root '{}': {e}",
+                repo_root.display()
+            ))
+        })?;
 
-            // Restore CWD before `build_current_fragment_refs` (which manages its
-            // own CWD guard internally).
-            if let Err(e) = std::env::set_current_dir(&original_cwd) {
-                eprintln!("[warn] fixpoint-resolve: failed to restore CWD after diff-base: {e}");
-            }
+        let dry_gate_result = dry_gate.resolve_dry_gate(FixpointDryGateCommand {
+            track_dir: track_dir.clone(),
+            canonical_root: canonical_root.clone(),
+            repo_root: repo_root.clone(),
+            dry_config: usecase_dry_config.clone(),
+            current_config_fingerprint,
+        });
 
-            let base = base_result?;
-            // Mirror `dry check-approved` for recorded sidecars while preserving
-            // the legacy no-sidecar project-root scan.
-            let corpus_root_manifest_path = track_dir.join("dry-check-corpus-root.json");
-            let (approval_workspace_root, current_corpus_fingerprint) =
-                match std::fs::symlink_metadata(&corpus_root_manifest_path) {
-                    Err(e) if e.kind() == std::io::ErrorKind::NotFound => (
-                        canonical_root.clone(),
-                        crate::dry::compute_current_dry_corpus_fingerprint(
-                            &track_dir,
-                            &canonical_root,
-                        ),
-                    ),
-                    _ => {
-                        let workspace_root = match crate::dry::resolve_dry_corpus_fingerprint_root(
-                            &track_dir, &repo_root,
-                        ) {
-                            Ok(workspace_root) => workspace_root,
-                            Err(e) => {
-                                eprintln!(
-                                    "[warn] fixpoint-resolve: {e}; treating corpus fingerprint as stale"
-                                );
-                                repo_root.clone()
-                            }
-                        };
-                        let fingerprint = crate::dry::compute_current_dry_corpus_fingerprint(
-                            &track_dir, &repo_root,
-                        );
-                        (workspace_root, fingerprint)
-                    }
-                };
-            let refs = build_current_fragment_refs(&approval_workspace_root, &repo_root, &base)?;
+        if let Err(e) = std::env::set_current_dir(&original_cwd) {
+            eprintln!("[warn] fixpoint-resolve: failed to restore CWD after dry-gate: {e}");
+        }
 
-            // ── Build dry-gate interactor (read-only) ─────────────────────────
-            let dry_check_json_path = track_dir.join("dry-check.json");
-            let dry_check_coverage_path = track_dir.join("dry-check-coverage.json");
+        let dry_gate_output = dry_gate_result.map_err(|e| {
+            CompositionError::Usecase(format!("fixpoint-resolve dry-gate failed: {e}"))
+        })?;
 
-            // Use `repo_root` (git repository root) to match `dry check-approved`, which
-            // also loads the config from `root.join(".harness/config/dry-check.json")` where
-            // `root` is the git repo root.  Using `canonical_root` (the project root, derived
-            // from `items_dir`) would load the wrong file in monorepo/nested-project layouts
-            // where the project root differs from the repository root.
-            let current_config_fingerprint = dry_infra_config.fingerprint();
-
-            let store = Arc::new(FsDryCheckStore::new(dry_check_json_path, canonical_root.clone()));
-            let coverage = Arc::new(FsDryCheckCoverageAdapter::new(
-                dry_check_coverage_path,
-                canonical_root.clone(),
-            ));
-            let approval = Arc::new(DryCheckApprovalInteractor::new(
-                usecase_dry_config.clone(),
-                store,
-                coverage,
-                current_config_fingerprint,
-                current_corpus_fingerprint,
-            )) as Arc<dyn DryCheckApprovalService + Send + Sync>;
-            (refs, approval)
-        } else {
-            // Gate disabled: skip all dry preparation; pass empty fragment refs and
-            // a no-op approval service.  The interactor's `resolve` bypasses the dry
-            // gate call when `dry_config.enabled` is false.
-            (
-                std::collections::BTreeSet::new(),
-                Arc::new(NoOpDryApprovalService) as Arc<dyn DryCheckApprovalService + Send + Sync>,
-            )
-        };
+        let current_fragment_refs = dry_gate_output.current_fragment_refs;
+        let dry_approval = dry_gate_output.dry_approval;
 
         // ── Build review and ref-verify gate adapters ─────────────────────────
         // Use the canonical (absolute, validated) items_dir so that these adapters
         // resolve track artifacts correctly regardless of the caller's CWD.
-        let review_state =
-            Arc::new(FsReviewGateStateAdapter { items_dir: canonical_items_dir.clone() })
-                as Arc<dyn ReviewGateStatePort>;
+        let review_state = Arc::new(FsReviewGateStateAdapter::new(canonical_items_dir.clone()))
+            as Arc<dyn ReviewGateStatePort>;
         let ref_verify_results =
-            Arc::new(FsRefVerifyGateStateAdapter { items_dir: canonical_items_dir.clone() })
+            Arc::new(FsRefVerifyGateStateAdapter::new(canonical_items_dir.clone()))
                 as Arc<dyn RefVerifyGateStatePort>;
 
         // ── Construct and run the interactor ──────────────────────────────────
@@ -537,7 +356,9 @@ impl CliApp {
 
         let cmd = FixpointResolveCommand { track_id, current_branch, current_fragment_refs };
 
-        let step = interactor.resolve(&cmd).map_err(|e| format!("fixpoint-resolve failed: {e}"))?;
+        let step = interactor
+            .resolve(&cmd)
+            .map_err(|e| CompositionError::Usecase(format!("fixpoint-resolve failed: {e}")))?;
 
         Ok(CommandOutcome::success(Some(format_fixpoint_step(step))))
     }
@@ -553,6 +374,11 @@ mod tests {
     use std::process::Command;
 
     use super::*;
+    use crate::track::composition_root::TrackCompositionRoot;
+
+    // Status types used in test assertions — no longer re-exported from the
+    // parent module's use list after the adapter relocation, so imported directly.
+    use domain::track_phase::ReviewScopeSet;
 
     // ── format_fixpoint_step tests ────────────────────────────────────────────
     //
@@ -655,7 +481,7 @@ mod tests {
         let outside_items = outside.path().join("track").join("items");
         std::fs::create_dir_all(&outside_items).unwrap();
 
-        let result = CliApp::new().fixpoint_resolve(FixpointResolveInput {
+        let result = TrackCompositionRoot::new().fixpoint_resolve(FixpointResolveInput {
             track_id: "my-track-2026".to_owned(),
             current_branch: "track/my-track-2026".to_owned(),
             items_dir: outside_items,
@@ -663,7 +489,7 @@ mod tests {
         drop(dir);
 
         assert!(result.is_err(), "expected Err when items_dir is outside the repo");
-        let msg = result.unwrap_err();
+        let msg = result.unwrap_err().to_string();
         assert!(
             msg.contains("items_dir")
                 || msg.contains("items-dir")
@@ -682,7 +508,7 @@ mod tests {
         let _lock = crate::test_support::process_env_lock().lock().unwrap();
         let (dir, items_dir) = seed_track_repo("my-track-2026");
 
-        let result = CliApp::new().fixpoint_resolve(FixpointResolveInput {
+        let result = TrackCompositionRoot::new().fixpoint_resolve(FixpointResolveInput {
             track_id: "my-track-2026".to_owned(),
             current_branch: "main".to_owned(),
             items_dir,
@@ -690,7 +516,7 @@ mod tests {
         drop(dir);
 
         assert!(result.is_err(), "expected Err when branch does not match track");
-        let msg = result.unwrap_err();
+        let msg = result.unwrap_err().to_string();
         assert!(
             msg.contains("not active")
                 || msg.contains("TrackNotActive")
@@ -705,7 +531,7 @@ mod tests {
         let _lock = crate::test_support::process_env_lock().lock().unwrap();
         let (dir, items_dir) = seed_track_repo("my-track-2026");
 
-        let result = CliApp::new().fixpoint_resolve(FixpointResolveInput {
+        let result = TrackCompositionRoot::new().fixpoint_resolve(FixpointResolveInput {
             track_id: "my-track-2026".to_owned(),
             current_branch: "".to_owned(),
             items_dir,
@@ -713,7 +539,7 @@ mod tests {
         drop(dir);
 
         assert!(result.is_err(), "expected Err for empty current_branch");
-        let msg = result.unwrap_err();
+        let msg = result.unwrap_err().to_string();
         assert!(
             msg.contains("current-branch") || msg.contains("InvalidCurrentBranch"),
             "error must mention the invalid branch, got: {msg}"
@@ -723,14 +549,14 @@ mod tests {
     /// An invalid `--track-id` (empty string) must be rejected immediately.
     #[test]
     fn test_fixpoint_resolve_invalid_track_id_returns_error() {
-        let result = CliApp::new().fixpoint_resolve(FixpointResolveInput {
+        let result = TrackCompositionRoot::new().fixpoint_resolve(FixpointResolveInput {
             track_id: "".to_owned(),
             current_branch: "track/x".to_owned(),
             items_dir: PathBuf::from("track/items"),
         });
 
         assert!(result.is_err(), "expected Err for empty track_id");
-        let msg = result.unwrap_err();
+        let msg = result.unwrap_err().to_string();
         assert!(
             msg.contains("track-id") || msg.contains("track id"),
             "error must mention the invalid track-id, got: {msg}"
@@ -808,7 +634,7 @@ mod tests {
         std::env::set_current_dir(root).expect("set_current_dir to temp repo must succeed");
 
         // No dry-check-coverage.json → dry gate is Blocked → step = "run-dfp".
-        let outcome = CliApp::new().fixpoint_resolve(FixpointResolveInput {
+        let outcome = TrackCompositionRoot::new().fixpoint_resolve(FixpointResolveInput {
             track_id: track_id_str.to_owned(),
             current_branch: format!("track/{track_id_str}"),
             items_dir: items_dir.clone(),
@@ -858,7 +684,7 @@ mod tests {
         let file_path = track_dir.join("items");
         std::fs::write(&file_path, "not a directory").unwrap();
 
-        let result = CliApp::new().fixpoint_resolve(FixpointResolveInput {
+        let result = TrackCompositionRoot::new().fixpoint_resolve(FixpointResolveInput {
             track_id: "my-track-2026".to_owned(),
             current_branch: "track/my-track-2026".to_owned(),
             items_dir: file_path,
@@ -866,75 +692,17 @@ mod tests {
         drop(dir);
 
         assert!(result.is_err(), "expected Err when items_dir is a file");
-        let msg = result.unwrap_err();
+        let msg = result.unwrap_err().to_string();
         assert!(
             msg.contains("directory") || msg.contains("items_dir") || msg.contains("items-dir"),
             "error must mention directory constraint, got: {msg}"
         );
     }
 
-    // ── FsReviewGateStateAdapter unit tests ───────────────────────────────────
-
-    /// `FsReviewGateStateAdapter::review_status` must return `Err(GateQueryFailed)`
-    /// when the underlying `check_approved_str` fails (no `review-scope.json`).
-    ///
-    /// This exercises the error-mapping path in the adapter.  The `run-rfp`,
-    /// `run-ref-verify`, and `commit` step variants are exercised at the usecase
-    /// layer (`libs/usecase/src/fixpoint_resolve.rs`) using stub adapters, so the
-    /// composition layer tests focus on adapter wiring correctness.
-    #[test]
-    fn test_fs_review_gate_state_adapter_returns_gate_query_failed_when_no_scope_config() {
-        let _lock = crate::test_support::process_env_lock().lock().unwrap();
-        use domain::TrackId;
-
-        let (dir, items_dir) = seed_track_repo("my-track-2026");
-
-        // `review-scope.json` is absent in the isolated repo — `check_approved_str`
-        // will fail to load the scope config and return an error.
-        let adapter = FsReviewGateStateAdapter { items_dir };
-        let track_id = TrackId::try_new("my-track-2026".to_owned()).unwrap();
-        let result = adapter.review_status(&track_id);
-
-        drop(dir);
-
-        assert!(result.is_err(), "expected Err when review-scope.json is absent");
-        assert!(
-            matches!(result.unwrap_err(), FixpointResolveError::GateQueryFailed { .. }),
-            "error must be GateQueryFailed"
-        );
-    }
-
-    // ── FsRefVerifyGateStateAdapter unit tests ────────────────────────────────
-
-    /// `FsRefVerifyGateStateAdapter::ref_verify_status` must return
-    /// `Ok(RefVerifyGateStatus::Approved)` when there are no production ref-verify
-    /// pairs (no `spec.json` in the track dir → zero Chain-1 pairs).
-    ///
-    /// Uses an isolated temp git repo on `track/my-track-2026` (via `seed_track_repo`)
-    /// so that the branch check inside `ref_verify_check_approved` passes without
-    /// relying on the host checkout state.  The track dir has no `spec.json`
-    /// (zero Chain-1 pairs), so the gate returns `Approved`.
-    ///
-    /// Exercises the `RefVerifyGateStatus::Approved` path in the adapter.
-    #[test]
-    fn test_fs_ref_verify_gate_state_adapter_returns_approved_when_no_production_pairs() {
-        let _lock = crate::test_support::process_env_lock().lock().unwrap();
-        use domain::TrackId;
-
-        let track_id_str = "my-track-2026";
-        // seed_track_repo creates an isolated git repo on `track/<id>` with the
-        // track dir already present.  No spec.json → zero Chain-1 pairs → Approved.
-        let (dir, items_dir) = seed_track_repo(track_id_str);
-
-        let adapter = FsRefVerifyGateStateAdapter { items_dir };
-        let track_id = TrackId::try_new(track_id_str.to_owned()).unwrap();
-        let result = adapter.ref_verify_status(&track_id);
-
-        drop(dir);
-
-        assert!(
-            matches!(result, Ok(RefVerifyGateStatus::Approved)),
-            "expected Ok(Approved) when no production pairs, got: {result:?}"
-        );
-    }
+    // ── FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter unit tests ─────
+    // The adapters were relocated to `libs/infrastructure/src/track/gate_state.rs`
+    // in T002 (D7 adapter relocation). Their unit tests now live alongside the
+    // struct definitions in that infrastructure module. This module retains only
+    // the wiring path tests (see above) to verify the re-export shim resolves
+    // correctly and the adapters compose into FixpointResolveInteractor.
 }

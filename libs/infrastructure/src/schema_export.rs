@@ -72,10 +72,16 @@ impl SchemaExporter for RustdocSchemaExporter {
 }
 
 impl usecase::export_schema::SchemaExporterPort for RustdocSchemaExporter {
-    fn export_as_json(&self, crate_name: &str) -> Result<String, String> {
-        let export =
-            <Self as SchemaExporter>::export(self, crate_name).map_err(|err| err.to_string())?;
-        crate::schema_export_codec::encode(&export, true).map_err(|err| err.to_string())
+    fn export_as_json(
+        &self,
+        crate_name: &str,
+    ) -> Result<String, usecase::export_schema::SchemaExporterError> {
+        let export = <Self as SchemaExporter>::export(self, crate_name).map_err(|err| {
+            usecase::export_schema::SchemaExporterError::ExportFailed(err.to_string())
+        })?;
+        crate::schema_export_codec::encode(&export, true).map_err(|err| {
+            usecase::export_schema::SchemaExporterError::ExportFailed(err.to_string())
+        })
     }
 }
 
@@ -258,12 +264,7 @@ fn build_schema_export(
                 types.push(ti);
             }
             ItemEnum::Enum(e) => {
-                let variants = extract_enum_variants(e, krate).map_err(|msg| {
-                    SchemaExportError::ParseFailed(format!(
-                        "enum '{}' variant payload extraction failed: {}",
-                        name, msg
-                    ))
-                })?;
+                let variants = extract_enum_variants(e, krate)?;
                 let ti = if let Some(mp) = module_path {
                     TypeInfo::with_module_path(
                         name,
@@ -451,35 +452,36 @@ fn extract_struct_fields(
 /// - `Struct { fields, .. }` → struct variant, payload types from struct-field items
 ///
 /// # Errors
-/// Returns `Err(String)` when a variant has stripped (private/hidden) payload fields,
-/// since the resulting `payload_types` would be silently incomplete.
+/// Returns `Err(SchemaExportError::ParseFailed)` when a variant has stripped
+/// (private/hidden) payload fields, since the resulting `payload_types` would be
+/// silently incomplete.
 fn extract_enum_variants(
     e: &rustdoc_types::Enum,
     krate: &rustdoc_types::Crate,
-) -> Result<Vec<MemberDeclaration>, String> {
+) -> Result<Vec<MemberDeclaration>, SchemaExportError> {
     let mut out = Vec::new();
     for id in &e.variants {
         let item = krate.index.get(id).ok_or_else(|| {
-            format!(
+            SchemaExportError::ParseFailed(format!(
                 "enum variant id {id:?} not found in rustdoc index; \
                  the exported JSON may be partial or stripped"
-            )
+            ))
         })?;
         let name = item.name.clone().ok_or_else(|| {
-            format!(
+            SchemaExportError::ParseFailed(format!(
                 "enum variant id {id:?} has no name in rustdoc index; \
                  the exported JSON may be partial or stripped"
-            )
+            ))
         })?;
         if let ItemEnum::Variant(v) = &item.inner {
             let payload_types = extract_variant_payload_types(v, krate, &name)?;
             out.push(MemberDeclaration::variant(name, payload_types));
         } else {
-            return Err(format!(
+            return Err(SchemaExportError::ParseFailed(format!(
                 "enum variant id {id:?} (name '{name}') resolves to non-Variant item; \
                  the exported JSON may be malformed or partial — \
                  payload extraction must be fail-closed (T001 ADR 2026-05-02-0316)"
-            ));
+            )));
         }
     }
     Ok(out)
@@ -492,7 +494,7 @@ fn extract_enum_variants(
 /// in `krate.index` and formatting its `StructField` type via `format_type`.
 ///
 /// # Errors
-/// Returns `Err(String)` (fail-closed) when:
+/// Returns `Err(SchemaExportError::ParseFailed)` (fail-closed) when:
 /// - A `Tuple` variant has a `None` slot — the corresponding field was stripped
 ///   from the rustdoc JSON (private or `#[doc(hidden)]`), so the payload list
 ///   would be silently shorter than the actual tuple arity.
@@ -502,60 +504,60 @@ fn extract_variant_payload_types(
     v: &Variant,
     krate: &rustdoc_types::Crate,
     variant_name: &str,
-) -> Result<Vec<String>, String> {
+) -> Result<Vec<String>, SchemaExportError> {
     match &v.kind {
         VariantKind::Plain => Ok(vec![]),
         VariantKind::Tuple(fields) => {
             let mut out = Vec::with_capacity(fields.len());
             for (i, opt_id) in fields.iter().enumerate() {
                 let id = opt_id.as_ref().ok_or_else(|| {
-                    format!(
+                    SchemaExportError::ParseFailed(format!(
                         "variant '{}' tuple field at index {} is stripped (private/hidden); \
                          payload_types would be incomplete",
                         variant_name, i
-                    )
+                    ))
                 })?;
                 let item = krate.index.get(id).ok_or_else(|| {
-                    format!(
+                    SchemaExportError::ParseFailed(format!(
                         "variant '{}' tuple field at index {} id not found in rustdoc index",
                         variant_name, i
-                    )
+                    ))
                 })?;
                 if let ItemEnum::StructField(ty) = &item.inner {
                     out.push(format_type(ty));
                 } else {
-                    return Err(format!(
+                    return Err(SchemaExportError::ParseFailed(format!(
                         "variant '{}' tuple field at index {} is not a StructField in rustdoc \
                          index",
                         variant_name, i
-                    ));
+                    )));
                 }
             }
             Ok(out)
         }
         VariantKind::Struct { fields, has_stripped_fields } => {
             if *has_stripped_fields {
-                return Err(format!(
+                return Err(SchemaExportError::ParseFailed(format!(
                     "variant '{}' struct has stripped fields; payload_types would be incomplete",
                     variant_name
-                ));
+                )));
             }
             let mut out = Vec::with_capacity(fields.len());
             for (i, id) in fields.iter().enumerate() {
                 let item = krate.index.get(id).ok_or_else(|| {
-                    format!(
+                    SchemaExportError::ParseFailed(format!(
                         "variant '{}' struct field at index {} id not found in rustdoc index",
                         variant_name, i
-                    )
+                    ))
                 })?;
                 if let ItemEnum::StructField(ty) = &item.inner {
                     out.push(format_type(ty));
                 } else {
-                    return Err(format!(
+                    return Err(SchemaExportError::ParseFailed(format!(
                         "variant '{}' struct field at index {} is not a StructField in rustdoc \
                          index",
                         variant_name, i
-                    ));
+                    )));
                 }
             }
             Ok(out)
@@ -1191,7 +1193,7 @@ mod tests {
             result.is_err(),
             "extract_enum_variants must fail-closed when a variant id resolves to a non-Variant item"
         );
-        let msg = result.unwrap_err();
+        let msg = result.unwrap_err().to_string();
         assert!(
             msg.contains("non-Variant"),
             "error message must mention 'non-Variant'; got: {msg}"

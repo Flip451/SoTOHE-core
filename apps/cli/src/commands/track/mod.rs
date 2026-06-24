@@ -631,6 +631,10 @@ mod tests {
         BranchReadError, BranchReaderPort, TrackResolutionError,
     };
 
+    #[derive(Debug, thiserror::Error)]
+    #[error("{0}")]
+    struct TrackTestError(String);
+
     #[derive(Debug)]
     struct StubBranchReader {
         branch: Option<String>,
@@ -698,9 +702,11 @@ mod tests {
     fn resolve_track_id_with_branch_reader(
         explicit_id: Option<String>,
         branch_reader: Arc<dyn BranchReaderPort>,
-    ) -> Result<String, String> {
+    ) -> Result<String, TrackTestError> {
         let interactor = ActiveTrackResolveInteractor::new(branch_reader);
-        interactor.resolve_for_read(explicit_id).map_err(format_resolve_error)
+        interactor
+            .resolve_for_read(explicit_id)
+            .map_err(|e| TrackTestError(format_resolve_error(e)))
     }
 
     // --- resolve_track_id ---
@@ -725,7 +731,7 @@ mod tests {
         let bad_items_dir = std::path::Path::new("not/a/track/items/structure");
         let result = resolve_track_id(None, bad_items_dir);
         assert!(result.is_err(), "expected Err for malformed items_dir, got: {result:?}");
-        let err_msg = result.unwrap_err();
+        let err_msg = result.unwrap_err().to_string();
         assert!(
             err_msg.contains("track/items"),
             "error should mention the expected items_dir form, got: {err_msg}"
@@ -757,7 +763,7 @@ mod tests {
             result.is_err(),
             "expected Err because temp dir is not a git repo, got: {result:?}"
         );
-        let err_msg = result.unwrap_err();
+        let err_msg = result.unwrap_err().to_string();
         let expected_root = tmp.path().to_string_lossy();
         assert!(
             err_msg.contains(expected_root.as_ref()),
@@ -794,7 +800,7 @@ mod tests {
     fn test_resolve_track_id_none_on_non_track_branch_returns_error_with_hint() {
         let result = resolve_track_id_with_branch_reader(None, branch_reader(Some("main")));
         assert!(result.is_err(), "expected Err on non-track branch");
-        let err_msg = result.unwrap_err();
+        let err_msg = result.unwrap_err().to_string();
         assert!(
             err_msg.contains("Hint:") || err_msg.contains("provide an explicit track-id"),
             "error must prompt user to provide explicit track-id, got: {err_msg}"
@@ -806,7 +812,7 @@ mod tests {
     fn test_resolve_track_id_none_on_detached_head_returns_error_with_hint() {
         let result = resolve_track_id_with_branch_reader(None, branch_reader(Some("HEAD")));
         assert!(result.is_err(), "expected Err on detached HEAD");
-        let err_msg = result.unwrap_err();
+        let err_msg = result.unwrap_err().to_string();
         assert!(
             err_msg.contains("detached HEAD") && err_msg.contains("provide an explicit track-id"),
             "error must mention detached HEAD and explicit track-id hint, got: {err_msg}"
@@ -824,9 +830,11 @@ mod tests {
     fn resolve_track_id_for_write_with_reader(
         explicit_id: Option<String>,
         branch_reader: Arc<dyn BranchReaderPort>,
-    ) -> Result<String, String> {
+    ) -> Result<String, TrackTestError> {
         let interactor = ActiveTrackResolveInteractor::new(branch_reader);
-        interactor.resolve_for_write(explicit_id).map_err(|e| format_write_error(&e))
+        interactor
+            .resolve_for_write(explicit_id)
+            .map_err(|e| TrackTestError(format_write_error(&e)))
     }
 
     /// AC-18 / D7: explicit id matches the branch-derived id → returns the id.
@@ -847,7 +855,7 @@ mod tests {
             branch_reader(Some("track/my-track-2026")),
         );
         assert!(result.is_err(), "expected Err on id mismatch");
-        let err_msg = result.unwrap_err();
+        let err_msg = result.unwrap_err().to_string();
         assert!(
             err_msg.contains("WRITE operation rejected") && err_msg.contains("other-track-2026"),
             "error must explain the mismatch, got: {err_msg}"
@@ -862,7 +870,7 @@ mod tests {
             branch_reader(Some("main")),
         );
         assert!(result.is_err(), "expected Err on non-track branch");
-        let err_msg = result.unwrap_err();
+        let err_msg = result.unwrap_err().to_string();
         assert!(
             err_msg.contains("WRITE operation") || err_msg.contains("branch"),
             "error must reference the branch issue, got: {err_msg}"
@@ -952,9 +960,11 @@ mod tests {
     fn resolve_track_id_from_root_for_write_with_reader(
         explicit_id: Option<String>,
         branch_reader: Arc<dyn BranchReaderPort>,
-    ) -> Result<String, String> {
+    ) -> Result<String, TrackTestError> {
         let interactor = ActiveTrackResolveInteractor::new(branch_reader);
-        interactor.resolve_for_write(explicit_id).map_err(|e| format_write_error(&e))
+        interactor
+            .resolve_for_write(explicit_id)
+            .map_err(|e| TrackTestError(format_write_error(&e)))
     }
 
     /// AC-18 / D7: explicit id matches the branch-derived id → returns the id.
@@ -975,7 +985,7 @@ mod tests {
             branch_reader(Some("track/my-track-2026")),
         );
         assert!(result.is_err(), "expected Err on id mismatch");
-        let err_msg = result.unwrap_err();
+        let err_msg = result.unwrap_err().to_string();
         assert!(
             err_msg.contains("WRITE operation rejected") && err_msg.contains("other-track-2026"),
             "error must explain the mismatch, got: {err_msg}"
@@ -990,7 +1000,7 @@ mod tests {
             branch_reader(Some("main")),
         );
         assert!(result.is_err(), "expected Err on non-track branch");
-        let err_msg = result.unwrap_err();
+        let err_msg = result.unwrap_err().to_string();
         assert!(
             err_msg.contains("WRITE operation") || err_msg.contains("branch"),
             "error must reference the branch issue, got: {err_msg}"

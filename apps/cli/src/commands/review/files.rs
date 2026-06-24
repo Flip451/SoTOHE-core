@@ -8,6 +8,7 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 use clap::Args;
+use cli_driver::review::ReviewInput;
 
 #[cfg(test)]
 use usecase::review_v2::ScopeQueryError;
@@ -35,25 +36,33 @@ pub(super) fn execute_files(args: &FilesArgs) -> ExitCode {
             print!("{output}");
             ExitCode::SUCCESS
         }
-        Err(msg) => {
-            eprintln!("{msg}");
+        Err(e) => {
+            eprintln!("{e}");
             ExitCode::FAILURE
         }
     }
 }
 
-fn run_files(args: &FilesArgs) -> Result<String, String> {
+fn run_files(args: &FilesArgs) -> Result<String, crate::CliError> {
     // READ resolution: anchors git discovery to the repo owning args.items_dir so that
     // track ID resolution uses the same repository as the scope config (AC-19 / CN-02).
-    let track_id =
-        crate::commands::track::resolve_track_id(args.track_id.clone(), &args.items_dir)?;
+    let track_id = crate::commands::track::resolve_track_id(args.track_id.clone(), &args.items_dir)
+        .map_err(|e| crate::CliError::Message(e.to_string()))?;
 
-    let outcome = cli_composition::CliApp::new().review_files(
-        args.scope.clone(),
-        Some(track_id),
-        args.items_dir.clone(),
-    )?;
-    outcome.stdout.ok_or_else(|| "review files returned no output".to_owned())
+    let outcome =
+        cli_composition::ReviewCompositionRoot::new().review_driver().handle(ReviewInput::Files {
+            scope: args.scope.clone(),
+            track_id: Some(track_id),
+            items_dir: args.items_dir.clone(),
+        });
+    if outcome.exit_code != 0 {
+        return Err(crate::CliError::Message(
+            outcome.stderr.unwrap_or_else(|| "review files failed".to_owned()),
+        ));
+    }
+    outcome
+        .stdout
+        .ok_or_else(|| crate::CliError::Message("review files returned no output".to_owned()))
 }
 
 #[cfg(test)]

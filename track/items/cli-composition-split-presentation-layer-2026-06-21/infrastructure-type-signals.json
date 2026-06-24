@@ -1,0 +1,291 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-06-24T17:01:49Z",
+  "declaration_hash": "74bed58033245c691d5e695d19d725887fd4c66940747a1ccd48c26f72778700",
+  "signals": [
+    {
+      "type_name": "CodeFragmentExtractorAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "CodeFragmentExtractorPort",
+        "core::default::Default",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "DemoRunError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "FsArchAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "ArchPort",
+        "core::default::Default"
+      ]
+    },
+    {
+      "type_name": "FsArchivedTrackTelemetryAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "ArchivedTrackTelemetryPort"
+      ]
+    },
+    {
+      "type_name": "FsConventionsAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "ConventionsPort",
+        "core::default::Default"
+      ]
+    },
+    {
+      "type_name": "FsDemoAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "DemoPort",
+        "core::default::Default"
+      ]
+    },
+    {
+      "type_name": "FsDryCorpusMetaAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "DryCorpusMetaPort"
+      ]
+    },
+    {
+      "type_name": "FsFileWriteAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "FileWritePort",
+        "core::default::Default"
+      ]
+    },
+    {
+      "type_name": "FsGitWorkflowAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "GitWorkflowService",
+        "core::default::Default"
+      ]
+    },
+    {
+      "type_name": "FsRefVerifyAggregateAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "RefVerifyAggregateService",
+        "core::default::Default"
+      ]
+    },
+    {
+      "type_name": "FsRefVerifyCheckApprovedAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "RefVerifyCheckApprovedDriverService",
+        "core::default::Default"
+      ]
+    },
+    {
+      "type_name": "FsRefVerifyGateStateAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "RefVerifyGateStatePort"
+      ]
+    },
+    {
+      "type_name": "FsRefVerifyRunAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "RefVerifyRunService",
+        "core::default::Default"
+      ]
+    },
+    {
+      "type_name": "FsReviewGateStateAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "ReviewGateStatePort"
+      ]
+    },
+    {
+      "type_name": "FsSpecFileWriterAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "SpecFileWriterPort",
+        "core::default::Default"
+      ]
+    },
+    {
+      "type_name": "FsTelemetryEmitDynamicAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "TelemetryEmitDynamicPort",
+        "core::default::Default"
+      ]
+    },
+    {
+      "type_name": "FsTelemetryReportAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "TelemetryReportPort",
+        "core::default::Default"
+      ]
+    },
+    {
+      "type_name": "FsVerifyAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "VerifyPort",
+        "core::default::Default",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "GitDryCheckDiffGetter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "DryCheckDiffSource",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "NoOpDryApprovalService",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "DryCheckApprovalService"
+      ]
+    },
+    {
+      "type_name": "NoopSemanticIndexPort",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "SemanticIndexPort"
+      ]
+    },
+    {
+      "type_name": "NullInsertIndexProxy",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "SemanticIndexPort"
+      ]
+    },
+    {
+      "type_name": "PersistentIndexLockError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "RecordingDryAgent",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "DryCheckAgentPort"
+      ]
+    },
+    {
+      "type_name": "SystemSleepAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "SleepPort",
+        "core::clone::Clone",
+        "core::default::Default",
+        "core::fmt::Debug",
+        "core::marker::Copy"
+      ]
+    },
+    {
+      "type_name": "TrackBranchError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "infrastructure::demo::run_example_demo",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::git_cli::collect_track_branch_claims",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::git_cli::load_explicit_track_branch",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::git_cli::load_explicit_track_branch_from_items_dir",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

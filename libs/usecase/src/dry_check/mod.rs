@@ -12,6 +12,7 @@ mod approval_interactor;
 mod calibration;
 mod config;
 mod errors;
+pub mod fragment_pipeline;
 mod interactor;
 mod judgment;
 mod known_bad;
@@ -24,13 +25,17 @@ pub(crate) mod shared;
 pub use approval_interactor::DryCheckApprovalInteractor;
 pub use config::{DryCheckConfig, DryCheckParallelism, DryCheckPercent};
 pub use errors::{DryCheckAgentError, DryCheckCycleError, DryCheckDiffError};
+pub use fragment_pipeline::{
+    CodeFragmentExtractorPort, DryFragmentPipelineCommand, DryFragmentPipelineInteractor,
+    DryFragmentPipelineOutput, DryFragmentPipelineService,
+};
 pub use interactor::DryCheckInteractor;
 pub use judgment::DryCheckAgentJudgment;
 pub use ports::{DryCheckAgentPort, DryCheckCoveragePort, DryCheckDiffSource, DryCheckJudgeTier};
 pub use results::DryCheckResults;
 pub use results_interactor::DryCheckResultsInteractor;
 pub use services::{DryCheckApprovalService, DryCheckResultsService, DryCheckService};
-pub use shared::fragment_ref_of;
+pub use shared::{DryCheckSharedError, fragment_ref_of};
 
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::indexing_slicing)]

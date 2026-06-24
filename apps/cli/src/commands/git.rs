@@ -4,7 +4,7 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 use clap::{Args, Subcommand};
-use cli_composition::CliApp;
+use cli_composition::GitCompositionRoot;
 
 use crate::commands::outcome_to_exit;
 
@@ -53,7 +53,7 @@ pub struct UnstageArgs {
 }
 
 pub fn execute(cmd: GitCommand) -> ExitCode {
-    let app = CliApp::new();
+    let app = GitCompositionRoot::new();
     match cmd {
         GitCommand::AddAll => outcome_to_exit(app.git_add_all()),
         GitCommand::AddFromFile(args) => {

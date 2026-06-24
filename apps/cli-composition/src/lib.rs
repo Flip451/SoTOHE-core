@@ -1,12 +1,12 @@
 //! CLI composition root for the `sotp` binary.
 //!
-//! Provides `CliApp` (the facade) and `CommandOutcome` (the unified return type).
+//! Provides `CommandOutcome` (the unified return type) and per-context composition roots.
 //! All public method arguments and return types use only `String`, `&str`,
 //! `PathBuf`, primitives, `CommandOutcome`, or DTOs defined in this crate —
 //! no `usecase` / `domain` / `infrastructure` types appear on the public face (CN-02).
 
 // ---------------------------------------------------------------------------
-// Submodule declarations (impl blocks for CliApp, grouped by command family)
+// Submodule declarations (grouped by command family)
 // ---------------------------------------------------------------------------
 
 mod arch;
@@ -15,6 +15,7 @@ mod conventions;
 mod demo;
 mod domain;
 pub mod dry;
+pub mod error;
 mod file;
 mod git;
 mod guard;
@@ -29,7 +30,9 @@ mod telemetry;
 pub mod track;
 pub mod verify;
 
+pub(crate) mod dry_driver_adapter;
 mod dry_fix_runner;
+pub(crate) mod semantic_dup_driver_adapter;
 
 /// Telemetry wiring for the composition root.
 ///
@@ -40,8 +43,10 @@ mod dry_fix_runner;
 pub mod telemetry_wiring;
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 pub(crate) mod test_support {
-    use std::path::PathBuf;
+    use std::path::{Path, PathBuf};
+    use std::process::Command;
     use std::sync::{Mutex, OnceLock};
 
     pub(crate) fn process_env_lock() -> &'static Mutex<()> {
@@ -62,6 +67,36 @@ pub(crate) mod test_support {
         let result = std::fs::set_permissions(script, std::fs::Permissions::from_mode(0o755));
         assert!(result.is_ok(), "failed to make {} executable: {result:?}", script.display());
     }
+
+    pub(crate) fn run_in_dir<T>(path: &Path, run: impl FnOnce() -> T) -> T {
+        let original = std::env::current_dir().unwrap();
+        std::env::set_current_dir(path).unwrap();
+        let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(run));
+        std::env::set_current_dir(original).unwrap();
+        match result {
+            Ok(value) => value,
+            Err(payload) => std::panic::resume_unwind(payload),
+        }
+    }
+
+    fn run_git(path: &Path, args: &[&str]) {
+        let status = Command::new("git")
+            .args(args)
+            .current_dir(path)
+            .env("GIT_AUTHOR_NAME", "Test")
+            .env("GIT_AUTHOR_EMAIL", "test@test.com")
+            .env("GIT_COMMITTER_NAME", "Test")
+            .env("GIT_COMMITTER_EMAIL", "test@test.com")
+            .status()
+            .unwrap();
+        assert!(status.success(), "git {args:?} failed with {status}");
+    }
+
+    pub(crate) fn seed_repo(path: &Path, branch: &str) {
+        run_git(path, &["init", "-q"]);
+        run_git(path, &["checkout", "-B", branch]);
+        run_git(path, &["commit", "--allow-empty", "-m", "init", "--no-gpg-sign"]);
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -70,6 +105,7 @@ pub(crate) mod test_support {
 
 pub use domain::ExportSchemaInput;
 pub use dry::{DryCheckApprovedInput, DryResultsInput, DryWriteInput, RunDryFixLocalInput};
+pub use error::CompositionError;
 pub use ref_verify::{RefVerifyCheckApprovedInput, RefVerifyRunInput};
 pub use review_v2::{
     ReviewResultsInput, ReviewRunClaudeInput, ReviewRunCodexInput, ReviewRunLocalInput,
@@ -82,13 +118,50 @@ pub use signal::SignalGateName;
 pub use telemetry::TelemetryReportInput;
 pub use track::fixpoint_resolve::FixpointResolveInput;
 
-/// Re-exports [`infrastructure::codex_common::tee_stderr_to_file`] so that
-/// `apps/cli` can use it without importing `infrastructure` directly (which the
-/// architecture disallows for normal `cli` dependencies).
+// ---------------------------------------------------------------------------
+// Per-context composition root re-exports (AC-04 / D2)
+// ---------------------------------------------------------------------------
+
+pub use arch::ArchCompositionRoot;
+pub use conventions::ConventionsCompositionRoot;
+pub use demo::DemoCompositionRoot;
+pub use domain::DomainCompositionRoot;
+pub use dry::DryCompositionRoot;
+pub use dry_fix_runner::DryFixRunnerCompositionRoot;
+pub use file::FileCompositionRoot;
+pub use git::GitCompositionRoot;
+pub use guard::GuardCompositionRoot;
+pub use hook::HookCompositionRoot;
+pub use pr::PrCompositionRoot;
+pub use ref_verify::RefVerifyCompositionRoot;
+pub use review_v2::ReviewCompositionRoot;
+pub use semantic_dup::SemanticDupCompositionRoot;
+pub use signal::SignalCompositionRoot;
+pub use telemetry::TelemetryCompositionRoot;
+pub use track::composition_root::TrackCompositionRoot;
+pub use verify::VerifyCompositionRoot;
+
+/// Tee the child process's stderr to a log file while also forwarding each
+/// line to the current process's stderr.
 ///
-/// Only `std` types appear in the signature, so no infrastructure types leak
-/// across the boundary.
-pub use infrastructure::codex_common::tee_stderr_to_file;
+/// Implemented natively with stdlib types so that `apps/cli` can call this
+/// helper without importing `infrastructure` directly.  The signature uses
+/// only `std` types; no infrastructure types cross the boundary.
+pub fn tee_stderr_to_file(pipe: std::process::ChildStderr, mut log_file: std::fs::File) {
+    use std::io::{BufRead as _, BufReader, Write as _};
+
+    let reader = BufReader::new(pipe);
+    for line in reader.lines() {
+        match line {
+            Ok(line) => {
+                let _ = writeln!(log_file, "{line}");
+                eprintln!("{line}");
+            }
+            Err(_) => break,
+        }
+    }
+    let _ = log_file.flush();
+}
 
 /// Build the argument vector for a `codex exec --sandbox read-only` invocation.
 ///
@@ -122,7 +195,7 @@ pub fn build_codex_read_only_invocation(
 // Public API types
 // ---------------------------------------------------------------------------
 
-/// Unified return type for all `CliApp` command methods.
+/// Unified return type for all command methods.
 ///
 /// `bin` reads `stdout` / `stderr` and emits them, then exits with `exit_code`.
 /// All fields are primitives so `bin` never needs to import domain types (CN-02).
@@ -142,32 +215,5 @@ impl CommandOutcome {
     /// Convenience constructor: failure with optional stderr text.
     pub fn failure(stderr: Option<String>) -> Self {
         Self { stdout: None, stderr, exit_code: 1 }
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Facade
-// ---------------------------------------------------------------------------
-
-/// Facade for all CLI command families.
-///
-/// Each method corresponds to one CLI subcommand.  T002 provides stub
-/// implementations (`Err("not implemented")`); T003-T005 fill in the real
-/// composition logic.
-///
-/// Public method signatures are fixed in T002 and must not change in T003-T005:
-/// only the bodies are replaced.
-pub struct CliApp;
-
-impl CliApp {
-    /// Create a new `CliApp` instance.
-    pub fn new() -> Self {
-        Self
-    }
-}
-
-impl Default for CliApp {
-    fn default() -> Self {
-        Self::new()
     }
 }

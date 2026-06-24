@@ -12,7 +12,8 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 use clap::Args;
-use cli_composition::RunReviewFixLocalInput;
+use cli_composition::ReviewCompositionRoot;
+use cli_driver::review::ReviewInput;
 
 use super::CodexRoundTypeArg;
 
@@ -42,41 +43,33 @@ pub struct FixLocalArgs {
     pub(super) model: Option<String>,
 }
 
-pub(super) fn execute_fix_local(args: &FixLocalArgs) -> ExitCode {
-    let input = build_run_review_fix_local_input(args);
-    match cli_composition::CliApp::new().review_run_fix_local(input) {
-        Ok(outcome) => {
-            // Smoke-test failures (exit_code 2) and normal outcomes all arrive
-            // as Ok(CommandOutcome) — the typed RunReviewFixError::SmokeTestFailed
-            // mapping is made in cli-composition/run_fix.rs before stringification,
-            // keeping the exit-code decision on the typed boundary, not a string match.
-            match emit_fix_local_outcome(&outcome) {
-                Ok(()) => ExitCode::from(outcome.exit_code),
-                Err(e) => {
-                    eprintln!("{e}");
-                    ExitCode::from(1)
-                }
-            }
-        }
-        Err(msg) => {
-            eprintln!("{msg}");
-            ExitCode::from(1)
-        }
-    }
-}
-
-fn build_run_review_fix_local_input(args: &FixLocalArgs) -> RunReviewFixLocalInput {
+fn build_review_fix_local_input(args: &FixLocalArgs) -> ReviewInput {
     let round_type = match args.round_type {
         CodexRoundTypeArg::Fast => "fast".to_owned(),
         CodexRoundTypeArg::Final => "final".to_owned(),
     };
-
-    RunReviewFixLocalInput {
+    ReviewInput::RunFixLocal {
         scope: args.scope.clone(),
         briefing_file: args.briefing_file.clone(),
         track_id: args.track_id.clone(),
         round_type,
         model: args.model.clone(),
+    }
+}
+
+pub(super) fn execute_fix_local(args: &FixLocalArgs) -> ExitCode {
+    let outcome =
+        ReviewCompositionRoot::new().review_driver().handle(build_review_fix_local_input(args));
+    // Smoke-test failures (exit_code 2) and normal outcomes all arrive
+    // as CommandOutcome — the typed RunReviewFixError::SmokeTestFailed
+    // mapping is made in cli-composition/run_fix.rs before stringification,
+    // keeping the exit-code decision on the typed boundary, not a string match.
+    match emit_fix_local_outcome(&outcome) {
+        Ok(()) => ExitCode::from(outcome.exit_code),
+        Err(e) => {
+            eprintln!("{e}");
+            ExitCode::from(1)
+        }
     }
 }
 
@@ -88,18 +81,18 @@ fn build_run_review_fix_local_input(args: &FixLocalArgs) -> RunReviewFixLocalInp
 ///
 /// # Errors
 /// Returns `Err` if writing to stdout fails.
-fn emit_fix_local_outcome(outcome: &cli_composition::CommandOutcome) -> Result<(), String> {
+fn emit_fix_local_outcome(outcome: &cli_driver::CommandOutcome) -> Result<(), crate::CliError> {
     if let Some(msg) = &outcome.stderr {
         eprintln!("{msg}");
     }
     if let Some(line) = &outcome.stdout {
-        writeln!(io::stdout(), "{line}").map_err(|e| format!("failed to write stdout: {e}"))?;
+        writeln!(io::stdout(), "{line}").map_err(crate::CliError::Io)?;
     }
     Ok(())
 }
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used)]
+#[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
     use super::*;
 
@@ -110,7 +103,7 @@ mod tests {
     }
 
     #[test]
-    fn test_fix_local_args_map_to_run_review_fix_local_input() {
+    fn test_fix_local_args_map_to_review_fix_local_input() {
         let cli = <TestCli as clap::Parser>::parse_from([
             "test",
             "--scope",
@@ -125,13 +118,18 @@ mod tests {
             "gpt-5.5",
         ]);
 
-        let input = build_run_review_fix_local_input(&cli.args);
+        let input = build_review_fix_local_input(&cli.args);
 
-        assert_eq!(input.scope, "cli");
-        assert_eq!(input.briefing_file, PathBuf::from("tmp/reviewer runtime/briefing cli.md"));
-        assert_eq!(input.track_id, "review-fix");
-        assert_eq!(input.round_type, "fast");
-        assert_eq!(input.model, Some("gpt-5.5".to_owned()));
+        match input {
+            ReviewInput::RunFixLocal { scope, briefing_file, track_id, round_type, model } => {
+                assert_eq!(scope, "cli");
+                assert_eq!(briefing_file, PathBuf::from("tmp/reviewer runtime/briefing cli.md"));
+                assert_eq!(track_id, "review-fix");
+                assert_eq!(round_type, "fast");
+                assert_eq!(model, Some("gpt-5.5".to_owned()));
+            }
+            _ => panic!("expected RunFixLocal"),
+        }
     }
 
     #[test]
@@ -148,10 +146,15 @@ mod tests {
             "final",
         ]);
 
-        let input = build_run_review_fix_local_input(&cli.args);
+        let input = build_review_fix_local_input(&cli.args);
 
-        assert_eq!(input.round_type, "final");
-        assert_eq!(input.model, None);
+        match input {
+            ReviewInput::RunFixLocal { round_type, model, .. } => {
+                assert_eq!(round_type, "final");
+                assert_eq!(model, None);
+            }
+            _ => panic!("expected RunFixLocal"),
+        }
     }
 
     #[test]
@@ -175,7 +178,7 @@ mod tests {
     /// caller reads `outcome.exit_code` directly (exit_code 2 for smoke-test, etc.).
     #[test]
     fn test_emit_fix_local_outcome_returns_ok_for_exit_code_2() {
-        let outcome = cli_composition::CommandOutcome { stdout: None, stderr: None, exit_code: 2 };
+        let outcome = cli_driver::CommandOutcome { stdout: None, stderr: None, exit_code: 2 };
         assert!(emit_fix_local_outcome(&outcome).is_ok());
     }
 
@@ -183,7 +186,7 @@ mod tests {
     /// outcome (0, 1, or 2 — including smoke-test exit 2 from run_fix.rs).
     #[test]
     fn test_emit_fix_local_outcome_returns_ok_for_exit_code_0() {
-        let outcome = cli_composition::CommandOutcome { stdout: None, stderr: None, exit_code: 0 };
+        let outcome = cli_driver::CommandOutcome { stdout: None, stderr: None, exit_code: 0 };
         assert!(emit_fix_local_outcome(&outcome).is_ok());
     }
 
@@ -203,12 +206,17 @@ mod tests {
             "fast",
         ]);
 
-        let input = build_run_review_fix_local_input(&cli.args);
+        let input = build_review_fix_local_input(&cli.args);
 
-        assert_eq!(
-            input.model, None,
-            "omitted --model must produce None so the profile model is used as default"
-        );
+        match input {
+            ReviewInput::RunFixLocal { model, .. } => {
+                assert_eq!(
+                    model, None,
+                    "omitted --model must produce None so the profile model is used as default"
+                );
+            }
+            _ => panic!("expected RunFixLocal"),
+        }
     }
 
     /// When --model is explicitly provided, it is forwarded in `input.model`
@@ -229,13 +237,18 @@ mod tests {
             "my-override-model",
         ]);
 
-        let input = build_run_review_fix_local_input(&cli.args);
+        let input = build_review_fix_local_input(&cli.args);
 
-        assert_eq!(
-            input.model,
-            Some("my-override-model".to_owned()),
-            "explicit --model must be forwarded as Some(...) to the input DTO"
-        );
+        match input {
+            ReviewInput::RunFixLocal { model, .. } => {
+                assert_eq!(
+                    model,
+                    Some("my-override-model".to_owned()),
+                    "explicit --model must be forwarded as Some(...) to the input DTO"
+                );
+            }
+            _ => panic!("expected RunFixLocal"),
+        }
     }
 
     /// Omitting `--briefing-file` must cause clap to reject the command with

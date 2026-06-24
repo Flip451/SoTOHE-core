@@ -10,6 +10,24 @@ use std::sync::Arc;
 
 use thiserror::Error;
 
+// ── ReviewRoundTypeError ──────────────────────────────────────────────────────
+
+/// Error type for [`ReviewRoundType::parse`].
+#[derive(Debug, thiserror::Error)]
+pub enum ReviewRoundTypeError {
+    #[error("{0}")]
+    InvalidValue(String),
+}
+
+impl std::ops::Deref for ReviewRoundTypeError {
+    type Target = str;
+    fn deref(&self) -> &Self::Target {
+        match self {
+            ReviewRoundTypeError::InvalidValue(msg) => msg.as_str(),
+        }
+    }
+}
+
 // ── ReviewRoundType ───────────────────────────────────────────────────────────
 
 /// Usecase-layer enum mirroring `domain::RoundType` (Fast/Final).
@@ -30,12 +48,14 @@ impl ReviewRoundType {
     ///
     /// # Errors
     ///
-    /// Returns `Err(String)` for unrecognised values.
-    pub fn parse(s: &str) -> Result<Self, String> {
+    /// Returns [`ReviewRoundTypeError`] for unrecognised values.
+    pub fn parse(s: &str) -> Result<Self, ReviewRoundTypeError> {
         match s {
             "fast" => Ok(Self::Fast),
             "final" => Ok(Self::Final),
-            other => Err(format!("unknown round type: '{other}' (expected 'fast' or 'final')")),
+            other => Err(ReviewRoundTypeError::InvalidValue(format!(
+                "unknown round type: '{other}' (expected 'fast' or 'final')"
+            ))),
         }
     }
 }
@@ -72,6 +92,10 @@ pub struct RunReviewOutput {
     pub skipped: bool,
     pub finding_count: usize,
     pub summary: Option<String>,
+    /// Original CLI exit code from the underlying reviewer subprocess. Preserves
+    /// the convention that `findings_remain` returns exit code 2 (so callers can
+    /// distinguish "review found issues" from "review subprocess failed").
+    pub exit_code: u8,
 }
 
 // ── RunReviewError ────────────────────────────────────────────────────────────
@@ -192,6 +216,7 @@ mod tests {
                 skipped: false,
                 finding_count: 0,
                 summary: None,
+                exit_code: 0,
             })
         });
         let interactor = RunReviewInteractor::new(run_fn);

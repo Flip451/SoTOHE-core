@@ -3,9 +3,29 @@
 use std::path::PathBuf;
 use std::process::ExitCode;
 
-use cli_composition::CliApp;
+use cli_composition::TrackCompositionRoot;
+use cli_driver::CommandOutcome;
+use cli_driver::track::TrackInput;
 
 use crate::CliError;
+
+pub(super) fn track_driver_outcome_to_result(
+    outcome: CommandOutcome,
+) -> Result<ExitCode, CliError> {
+    let exit_code = outcome.exit_code;
+    if let Some(stdout) = outcome.stdout {
+        println!("{stdout}");
+    }
+    if exit_code == 0 {
+        if let Some(stderr) = outcome.stderr {
+            eprintln!("{stderr}");
+        }
+        Ok(ExitCode::from(exit_code))
+    } else {
+        let message = outcome.stderr.unwrap_or_else(|| "track command failed".to_owned());
+        Err(CliError::Message(message))
+    }
+}
 
 pub(super) fn execute_add_task(
     items_dir: PathBuf,
@@ -14,14 +34,14 @@ pub(super) fn execute_add_task(
     section: Option<String>,
     after: Option<String>,
 ) -> Result<ExitCode, CliError> {
-    let app = CliApp::new();
-    let outcome = app
-        .track_add_task_resolved(items_dir, track_id, description, section, after)
-        .map_err(CliError::Message)?;
-    if let Some(ref s) = outcome.stdout {
-        println!("{s}");
-    }
-    Ok(ExitCode::from(outcome.exit_code))
+    let outcome = TrackCompositionRoot::new().track_driver().handle(TrackInput::AddTask {
+        items_dir,
+        track_id: Some(track_id),
+        description,
+        section,
+        after,
+    });
+    track_driver_outcome_to_result(outcome)
 }
 
 pub(super) fn execute_set_override(
@@ -30,51 +50,43 @@ pub(super) fn execute_set_override(
     status: String,
     reason: String,
 ) -> Result<ExitCode, CliError> {
-    let app = CliApp::new();
-    let outcome = app
-        .track_set_override_resolved(items_dir, track_id, status, reason)
-        .map_err(CliError::Message)?;
-    if let Some(ref s) = outcome.stdout {
-        println!("{s}");
-    }
-    Ok(ExitCode::from(outcome.exit_code))
+    let outcome = TrackCompositionRoot::new().track_driver().handle(TrackInput::SetOverride {
+        items_dir,
+        track_id: Some(track_id),
+        status,
+        reason,
+    });
+    track_driver_outcome_to_result(outcome)
 }
 
 pub(super) fn execute_clear_override(
     items_dir: PathBuf,
     track_id: String,
 ) -> Result<ExitCode, CliError> {
-    let app = CliApp::new();
-    let outcome =
-        app.track_clear_override_resolved(items_dir, track_id).map_err(CliError::Message)?;
-    if let Some(ref s) = outcome.stdout {
-        println!("{s}");
-    }
-    Ok(ExitCode::from(outcome.exit_code))
+    let outcome = TrackCompositionRoot::new()
+        .track_driver()
+        .handle(TrackInput::ClearOverride { items_dir, track_id: Some(track_id) });
+    track_driver_outcome_to_result(outcome)
 }
 
 pub(super) fn execute_next_task(
     items_dir: PathBuf,
     track_id: String,
 ) -> Result<ExitCode, CliError> {
-    let app = CliApp::new();
-    let outcome = app.track_next_task_resolved(items_dir, track_id).map_err(CliError::Message)?;
-    if let Some(ref s) = outcome.stdout {
-        println!("{s}");
-    }
-    Ok(ExitCode::from(outcome.exit_code))
+    let outcome = TrackCompositionRoot::new()
+        .track_driver()
+        .handle(TrackInput::NextTask { items_dir, track_id: Some(track_id) });
+    track_driver_outcome_to_result(outcome)
 }
 
 pub(super) fn execute_task_counts(
     items_dir: PathBuf,
     track_id: String,
 ) -> Result<ExitCode, CliError> {
-    let app = CliApp::new();
-    let outcome = app.track_task_counts_resolved(items_dir, track_id).map_err(CliError::Message)?;
-    if let Some(ref s) = outcome.stdout {
-        println!("{s}");
-    }
-    Ok(ExitCode::from(outcome.exit_code))
+    let outcome = TrackCompositionRoot::new()
+        .track_driver()
+        .handle(TrackInput::TaskCounts { items_dir, track_id: Some(track_id) });
+    track_driver_outcome_to_result(outcome)
 }
 
 #[cfg(test)]

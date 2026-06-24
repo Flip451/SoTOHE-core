@@ -1,52 +1,36 @@
-//! `arch` command family — CliApp impl methods.
+//! `arch` command family — `ArchCompositionRoot` impl methods.
 
-use std::path::Path;
+use std::sync::Arc;
 
-use infrastructure::arch::ArchRulesError;
+// ---------------------------------------------------------------------------
+// Per-context composition root
+// ---------------------------------------------------------------------------
 
-use crate::{CliApp, CommandOutcome};
+/// Composition root for the `arch` command family.
+///
+/// This family has no injectable adapter dependencies; adapters are
+/// constructed inline inside each method (infrastructure::arch::* functions).
+pub struct ArchCompositionRoot;
 
-fn render(
-    f: impl FnOnce(&Path) -> Result<String, ArchRulesError>,
-    root: &Path,
-) -> Result<CommandOutcome, String> {
-    f(root).map(|output| CommandOutcome::success(Some(output))).map_err(|e| e.to_string())
+impl ArchCompositionRoot {
+    /// Create a new `ArchCompositionRoot`.
+    pub fn new() -> Self {
+        Self
+    }
 }
 
-impl CliApp {
-    /// Render the workspace tree (crate paths only).
-    ///
-    /// # Errors
-    /// Returns `Err` when the architecture rules file cannot be read, parsed, or is structurally
-    /// invalid.
-    pub fn arch_tree(&self, project_root: &Path) -> Result<CommandOutcome, String> {
-        render(infrastructure::arch::render_workspace_tree, project_root)
+impl Default for ArchCompositionRoot {
+    fn default() -> Self {
+        Self::new()
     }
+}
 
-    /// Render the workspace tree including extra_dirs.
-    ///
-    /// # Errors
-    /// Returns `Err` when the architecture rules file cannot be read, parsed, or is structurally
-    /// invalid.
-    pub fn arch_tree_full(&self, project_root: &Path) -> Result<CommandOutcome, String> {
-        render(infrastructure::arch::render_workspace_tree_full, project_root)
-    }
+impl ArchCompositionRoot {
+    /// Build a wired [`cli_driver::arch::ArchDriver`] for the arch family.
+    pub fn arch_driver(&self) -> cli_driver::arch::ArchDriver {
+        use infrastructure::arch::FsArchAdapter;
 
-    /// List workspace member paths (one per line).
-    ///
-    /// # Errors
-    /// Returns `Err` when the architecture rules file cannot be read, parsed, or is structurally
-    /// invalid.
-    pub fn arch_members(&self, project_root: &Path) -> Result<CommandOutcome, String> {
-        render(infrastructure::arch::render_workspace_members, project_root)
-    }
-
-    /// Print the direct dependency check matrix.
-    ///
-    /// # Errors
-    /// Returns `Err` when the architecture rules file cannot be read, parsed, or is structurally
-    /// invalid.
-    pub fn arch_direct_checks(&self, project_root: &Path) -> Result<CommandOutcome, String> {
-        render(infrastructure::arch::render_direct_checks, project_root)
+        let port = Arc::new(FsArchAdapter::new());
+        cli_driver::arch::ArchDriver::new(port)
     }
 }

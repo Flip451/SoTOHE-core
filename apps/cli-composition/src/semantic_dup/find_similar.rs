@@ -9,15 +9,19 @@ use infrastructure::semantic_dup::{
 };
 use usecase::semantic_dup::{FindSimilarCommand, FindSimilarInteractor, FindSimilarService as _};
 
-use crate::{CliApp, CommandOutcome};
+use super::SemanticDupCompositionRoot;
+use crate::{CommandOutcome, error::CompositionError};
 
 use super::common::{LANCEDB_TABLE_MARKER, is_recognizable_lancedb_index};
 
 /// Input DTO for `sotp find-similar`.
 #[derive(Debug, Clone)]
 pub struct FindSimilarInput {
-    /// The query text fragment, or the content read from a file.
-    pub fragment_text: String,
+    /// Inline fragment text to search for.  Mutually exclusive with `file_path`.
+    pub fragment_text: Option<String>,
+    /// Path to a file whose content is used as the query fragment.  Mutually exclusive
+    /// with `fragment_text`.  Read by the composition layer before dispatching.
+    pub file_path: Option<PathBuf>,
     /// Number of top-k results to return. Default: 5.
     pub top_k: usize,
     /// Path to the local LanceDB database.
@@ -55,7 +59,7 @@ fn format_find_similar_results(results: &[SimilarFragment]) -> String {
         .join("\n\n")
 }
 
-impl CliApp {
+impl SemanticDupCompositionRoot {
     /// Run `sotp find-similar`: embed the query fragment and retrieve top-k
     /// similar entries from the index.
     ///
@@ -80,14 +84,31 @@ impl CliApp {
     pub fn semantic_dup_find_similar(
         &self,
         input: FindSimilarInput,
-    ) -> Result<CommandOutcome, String> {
-        let top_k = TopK::new(input.top_k).map_err(|e| format!("invalid --top-k value: {e}"))?;
+    ) -> Result<CommandOutcome, CompositionError> {
+        // Resolve fragment text: prefer inline text, fall back to reading from file.
+        let fragment_text = match (input.fragment_text, input.file_path) {
+            (Some(text), _) => text,
+            (None, Some(path)) => std::fs::read_to_string(&path).map_err(|e| {
+                CompositionError::Infrastructure(format!(
+                    "cannot read fragment file {}: {e}",
+                    path.display()
+                ))
+            })?,
+            (None, None) => {
+                return Err(CompositionError::WiringFailed(
+                    "find-similar: provide either an inline fragment argument or --file <path>"
+                        .to_owned(),
+                ));
+            }
+        };
+
+        let top_k = TopK::new(input.top_k)
+            .map_err(|e| CompositionError::WiringFailed(format!("invalid --top-k value: {e}")))?;
 
         // Query fragments use start_line=1 / end_line=u32::MAX as a sentinel
         // so they are never excluded by hunk-level filtering.
-        let fragment =
-            CodeFragment::new(PathBuf::from("<query>"), input.fragment_text.clone(), 1, u32::MAX)
-                .map_err(|e| format!("invalid query fragment: {e}"))?;
+        let fragment = CodeFragment::new(PathBuf::from("<query>"), fragment_text, 1, u32::MAX)
+            .map_err(|e| CompositionError::WiringFailed(format!("invalid query fragment: {e}")))?;
 
         // Validate that the semantic index exists and is recognizable BEFORE
         // constructing the embedding or index adapters.  An absent or typo'd
@@ -97,26 +118,29 @@ impl CliApp {
         // operational error, distinct from a query that legitimately found
         // nothing.
         if !is_recognizable_lancedb_index(&input.db_path) {
-            return Err(format!(
+            return Err(CompositionError::WiringFailed(format!(
                 "find-similar: no semantic index found at '{}' (missing '{}' marker); \
                  run `sotp dup-index build` first",
                 input.db_path.display(),
                 LANCEDB_TABLE_MARKER,
-            ));
+            )));
         }
 
-        let embedding_port = Arc::new(
-            FastEmbedAdapter::new().map_err(|e| format!("failed to load embedding model: {e}"))?,
-        );
+        let embedding_port = Arc::new(FastEmbedAdapter::new().map_err(|e| {
+            CompositionError::AdapterInit(format!("failed to load embedding model: {e}"))
+        })?);
         let index_port =
             Arc::new(LanceDbSemanticIndexAdapter::new(input.db_path.clone()).map_err(|e| {
-                format!("failed to open index at {}: {e}", input.db_path.display())
+                CompositionError::AdapterInit(format!(
+                    "failed to open index at {}: {e}",
+                    input.db_path.display()
+                ))
             })?);
 
         let interactor = FindSimilarInteractor::new(embedding_port, index_port);
         let output = interactor
             .find_similar(&FindSimilarCommand { fragment, top_k })
-            .map_err(|e| format!("find-similar failed: {e}"))?;
+            .map_err(|e| CompositionError::Usecase(format!("find-similar failed: {e}")))?;
 
         if output.results.is_empty() {
             return Ok(CommandOutcome::success(Some("(no results found)".to_owned())));
@@ -243,9 +267,13 @@ mod tests {
         let db_path = dir.path().join("nonexistent_index.db");
         assert!(!db_path.exists(), "pre-condition: db_path must not exist");
 
-        let app = crate::CliApp;
-        let input =
-            FindSimilarInput { fragment_text: "fn guard_test() {}".to_owned(), top_k: 5, db_path };
+        let app = crate::semantic_dup::SemanticDupCompositionRoot::new();
+        let input = FindSimilarInput {
+            fragment_text: Some("fn guard_test() {}".to_owned()),
+            file_path: None,
+            top_k: 5,
+            db_path,
+        };
 
         let result = app.semantic_dup_find_similar(input);
         assert!(
@@ -253,7 +281,7 @@ mod tests {
             "find-similar must return Err when db_path does not exist, got: {:?}",
             result.ok()
         );
-        let msg = result.unwrap_err();
+        let msg = result.unwrap_err().to_string();
         assert!(
             msg.contains("dup-index build"),
             "error message must reference 'dup-index build', got: {msg}"
@@ -276,9 +304,10 @@ mod tests {
             "pre-condition: marker must be absent"
         );
 
-        let app = crate::CliApp;
+        let app = crate::semantic_dup::SemanticDupCompositionRoot::new();
         let input = FindSimilarInput {
-            fragment_text: "fn guard_test_dir() {}".to_owned(),
+            fragment_text: Some("fn guard_test_dir() {}".to_owned()),
+            file_path: None,
             top_k: 5,
             db_path: db_path.clone(),
         };
@@ -289,7 +318,7 @@ mod tests {
             "find-similar must return Err when db_path exists but has no LanceDB marker, got: {:?}",
             result.ok()
         );
-        let msg = result.unwrap_err();
+        let msg = result.unwrap_err().to_string();
         assert!(
             msg.contains("dup-index build"),
             "error message must reference 'dup-index build', got: {msg}"

@@ -3,6 +3,7 @@ members = [
   "libs/domain",
   "libs/usecase",
   "libs/infrastructure",
+  "apps/cli-driver",
   "apps/cli",
   "apps/cli-composition",
 ]

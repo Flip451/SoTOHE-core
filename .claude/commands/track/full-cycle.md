@@ -40,8 +40,12 @@ Steps:
    `sotp dry write` → fix DRY violations → `sotp dry check-approved` until the gate passes.
    DFP runs **before** Review (RFP) and is **loosely coupled** to it (D1/OS-01): `/track:dry-check`
    never invokes `/track:review`; full-cycle sequences the two phases here.
-   Branch on the dfl terminal state (three **mutually-exclusive** outcomes — never collapse
-   `blocked` and `failed` into one branch):
+   Branch on the dfl terminal state (four **mutually-exclusive** outcomes — never collapse
+   `skipped`, `blocked`, and `failed` into one branch):
+   - **`skipped`** — `/track:dry-check` Step 0a detected `.harness/config/dry-check.json.enabled:
+     false` (or file missing) and did not run dfl. Treat as a pass-through equivalent to
+     `completed` and proceed to Review (Step 2). The single SSoT for the opt-out lives in
+     `/track:dry-check`; do NOT duplicate the config probe here.
    - **`completed`** — the DRY gate is Approved. Proceed to Review (Step 2).
    - **`blocked`** — DRY violations remain that dfl could not resolve autonomously (the loop
      exhausted its fix attempts). This is a **DRY-gate outcome, NOT a tooling error**. Halt the

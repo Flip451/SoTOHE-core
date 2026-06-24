@@ -3,7 +3,7 @@
 use std::path::PathBuf;
 
 use clap::Args;
-use cli_composition::{CliApp, CommandOutcome};
+use cli_composition::{CommandOutcome, CompositionError, SignalCompositionRoot};
 
 use super::CheckFlags;
 
@@ -20,7 +20,10 @@ pub struct CheckSpecAdrArgs {
 }
 
 /// Execute `signal check-spec-adr`.
-pub fn run(app: &CliApp, args: CheckSpecAdrArgs) -> Result<CommandOutcome, String> {
+pub fn run(
+    app: &SignalCompositionRoot,
+    args: CheckSpecAdrArgs,
+) -> Result<CommandOutcome, CompositionError> {
     let gate = args.flags.gate_name();
     app.signal_check_spec_adr(args.spec_json, args.flags.strict, gate, args.flags.workspace_root)
 }

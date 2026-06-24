@@ -28,6 +28,7 @@ libs/usecase         # domain を利用
 libs/infrastructure  # domain を利用（実装詳細）
 apps/cli             # CLI エントリーポイント（bin のみ。DI 配線は apps/cli-composition に委譲）
 apps/cli-composition # CLI composition root（domain / usecase / infrastructure を束ねる）
+apps/cli-driver      # CLI primary adapter（invoke + render、usecase のみに依存）
 ```
 
 ### 依存ルール（強制）

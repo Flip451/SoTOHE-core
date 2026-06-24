@@ -9,15 +9,20 @@ use infrastructure::semantic_dup::{
 };
 use usecase::semantic_dup::{DupCheckCommand, DupCheckInteractor, DupCheckService as _};
 
-use crate::{CliApp, CommandOutcome};
+use super::SemanticDupCompositionRoot;
+use crate::CommandOutcome;
+use crate::error::CompositionError;
 
 use super::common::{LANCEDB_TABLE_MARKER, is_recognizable_lancedb_index, truncate_snippet};
 
 /// Input DTO for `sotp dup-check`.
 #[derive(Debug, Clone)]
 pub struct DupCheckInput {
-    /// List of paths to individual fragment text files (one file per fragment).
-    pub fragment_files: Vec<PathBuf>,
+    /// Path to a newline-separated file listing fragment file paths to check.
+    /// Each line is a path to a file whose content is a single code fragment.
+    /// The file is read by the composition layer; each listed path is then read
+    /// in turn to obtain the fragment content.
+    pub files_from: PathBuf,
     /// Cosine similarity threshold above which a match is flagged (0.0–1.0).
     pub threshold: f32,
     /// Path to the local LanceDB database.
@@ -36,7 +41,7 @@ pub struct DupCheckInput {
 /// Read the ack-set (a newline-separated list of SHA-256 hex hashes) from `path`.
 ///
 /// Returns an empty set when the file does not exist yet (first run).
-fn read_ack_set(path: &Path) -> Result<std::collections::HashSet<String>, String> {
+fn read_ack_set(path: &Path) -> Result<std::collections::HashSet<String>, CompositionError> {
     match std::fs::read_to_string(path) {
         Ok(contents) => Ok(contents
             .lines()
@@ -45,17 +50,24 @@ fn read_ack_set(path: &Path) -> Result<std::collections::HashSet<String>, String
             .map(str::to_owned)
             .collect()),
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(std::collections::HashSet::new()),
-        Err(e) => Err(format!("cannot read ack file {}: {e}", path.display())),
+        Err(e) => Err(CompositionError::Infrastructure(format!(
+            "cannot read ack file {}: {e}",
+            path.display()
+        ))),
     }
 }
 
 /// Write the ack-set to `path`.
-fn write_ack_set(path: &Path, set: &std::collections::HashSet<String>) -> Result<(), String> {
+fn write_ack_set(
+    path: &Path,
+    set: &std::collections::HashSet<String>,
+) -> Result<(), CompositionError> {
     let mut sorted: Vec<&str> = set.iter().map(String::as_str).collect();
     sorted.sort_unstable();
     let contents = sorted.join("\n") + "\n";
-    std::fs::write(path, contents)
-        .map_err(|e| format!("cannot write ack file {}: {e}", path.display()))
+    std::fs::write(path, contents).map_err(|e| {
+        CompositionError::Infrastructure(format!("cannot write ack file {}: {e}", path.display()))
+    })
 }
 
 /// Compute a stable, collision-resistant content hash for a fragment.
@@ -70,7 +82,7 @@ fn fragment_content_hash(content: &str) -> String {
     format!("{digest:x}")
 }
 
-impl CliApp {
+impl SemanticDupCompositionRoot {
     /// Run `sotp dup-check`: check diff fragments against the semantic index.
     ///
     /// CN-02/AC-04: always exits 0 (soft gate — warnings to stderr, no block).
@@ -86,26 +98,60 @@ impl CliApp {
     /// missing or typo'd index silently disables the duplicate gate, so the
     /// command fails loudly instead.  Run `sotp dup-index build` first to create
     /// a valid index.
-    pub fn semantic_dup_check(&self, input: DupCheckInput) -> Result<CommandOutcome, String> {
+    pub fn semantic_dup_check(
+        &self,
+        input: DupCheckInput,
+    ) -> Result<CommandOutcome, CompositionError> {
         // Reject the illegal combination: --ack requires --ack-file to be set.
         if input.ack && input.ack_file.is_none() {
-            return Err("--ack requires --ack-file to be specified".to_owned());
+            return Err(CompositionError::WiringFailed(
+                "--ack requires --ack-file to be specified".to_owned(),
+            ));
         }
 
-        let threshold = SimilarityThreshold::new(input.threshold)
-            .map_err(|e| format!("invalid --threshold value: {e}"))?;
+        let threshold = SimilarityThreshold::new(input.threshold).map_err(|e| {
+            CompositionError::WiringFailed(format!("invalid --threshold value: {e}"))
+        })?;
+
+        // Read the newline-separated list of fragment file paths from `files_from`.
+        let fragment_file_paths: Vec<PathBuf> = {
+            use std::io::BufRead as _;
+            let file = std::fs::File::open(&input.files_from).map_err(|e| {
+                CompositionError::Infrastructure(format!(
+                    "cannot open --files-from file {}: {e}",
+                    input.files_from.display()
+                ))
+            })?;
+            let reader = std::io::BufReader::new(file);
+            let lines: Vec<String> =
+                reader.lines().collect::<Result<Vec<_>, _>>().map_err(|e| {
+                    CompositionError::Infrastructure(format!(
+                        "error reading --files-from file {}: {e}",
+                        input.files_from.display()
+                    ))
+                })?;
+            lines.into_iter().filter(|l| !l.trim().is_empty()).map(PathBuf::from).collect()
+        };
 
         // Read all fragment files.
         let mut fragments: Vec<CodeFragment> = Vec::new();
-        for path in &input.fragment_files {
-            let content = std::fs::read_to_string(path)
-                .map_err(|e| format!("cannot read fragment file {}: {e}", path.display()))?;
+        for path in &fragment_file_paths {
+            let content = std::fs::read_to_string(path).map_err(|e| {
+                CompositionError::Infrastructure(format!(
+                    "cannot read fragment file {}: {e}",
+                    path.display()
+                ))
+            })?;
             // Fragments loaded from files for dup-check do not have line-span
             // information (dup-check operates on whole-file fragments from CLI
             // arguments). Use start_line=1 / end_line=u32::MAX as a sentinel
             // so these fragments always overlap any hunk if needed.
-            let fragment = CodeFragment::new(path.clone(), content, 1, u32::MAX)
-                .map_err(|e| format!("invalid fragment in {}: {e}", path.display()))?;
+            let fragment = CodeFragment::new(path.clone(), content, 1, u32::MAX).map_err(|e| {
+                CompositionError::WiringFailed(format!(
+                    "invalid fragment in {}: {e}",
+                    path.display()
+                ))
+            })?;
             fragments.push(fragment);
         }
 
@@ -143,27 +189,30 @@ impl CliApp {
         // `fragments` table → no search results → exit 0 "no near-duplicates
         // found"), silently disabling the duplicate gate.
         if !is_recognizable_lancedb_index(&input.db_path) {
-            return Err(format!(
+            return Err(CompositionError::WiringFailed(format!(
                 "dup-check: no semantic index found at '{}' (missing '{}' marker); \
                  run `sotp dup-index build` first — refusing to run the duplicate \
                  gate against a missing index",
                 input.db_path.display(),
                 LANCEDB_TABLE_MARKER,
-            ));
+            )));
         }
 
-        let embedding_port = Arc::new(
-            FastEmbedAdapter::new().map_err(|e| format!("failed to load embedding model: {e}"))?,
-        );
+        let embedding_port = Arc::new(FastEmbedAdapter::new().map_err(|e| {
+            CompositionError::AdapterInit(format!("failed to load embedding model: {e}"))
+        })?);
         let index_port =
             Arc::new(LanceDbSemanticIndexAdapter::new(input.db_path.clone()).map_err(|e| {
-                format!("failed to open index at {}: {e}", input.db_path.display())
+                CompositionError::AdapterInit(format!(
+                    "failed to open index at {}: {e}",
+                    input.db_path.display()
+                ))
             })?);
 
         let interactor = DupCheckInteractor::new(embedding_port, index_port);
         let output = interactor
             .dup_check(&DupCheckCommand { fragments: check_fragments, threshold })
-            .map_err(|e| format!("dup-check failed: {e}"))?;
+            .map_err(|e| CompositionError::Usecase(format!("dup-check failed: {e}")))?;
 
         // Build stderr warnings string.
         let mut warning_lines: Vec<String> = Vec::new();
@@ -349,21 +398,35 @@ mod tests {
         assert_eq!(final_set.len(), 2);
     }
 
+    // ── Test helpers ──────────────────────────────────────────────────────────
+
+    /// Create a minimal fragment file in `dir` and return its path.
+    fn write_fragment_file(dir: &std::path::Path, name: &str, content: &str) -> std::path::PathBuf {
+        let path = dir.join(name);
+        std::fs::write(&path, content).unwrap();
+        path
+    }
+
+    /// Write a newline-separated `files_from` file listing `paths` and return its path.
+    fn write_files_from(dir: &std::path::Path, paths: &[std::path::PathBuf]) -> std::path::PathBuf {
+        let files_from = dir.join("files_from.txt");
+        let contents =
+            paths.iter().map(|p| p.to_string_lossy().into_owned()).collect::<Vec<_>>().join("\n");
+        std::fs::write(&files_from, contents).unwrap();
+        files_from
+    }
+
     // ── AC-04: soft-gate exit-0 behavior ─────────────────────────────────────
 
     #[test]
     fn test_dup_check_with_no_fragment_files_exits_zero_with_success_message() {
         let dir = tempfile::tempdir().unwrap();
         let db_path = dir.path().join("test.db");
-        let app = crate::CliApp;
+        let files_from = write_files_from(dir.path(), &[]);
+        let app = crate::semantic_dup::SemanticDupCompositionRoot::new();
 
-        let input = DupCheckInput {
-            fragment_files: vec![],
-            threshold: 0.8,
-            db_path,
-            ack_file: None,
-            ack: false,
-        };
+        let input =
+            DupCheckInput { files_from, threshold: 0.8, db_path, ack_file: None, ack: false };
 
         let outcome = app.semantic_dup_check(input).unwrap();
         assert_eq!(outcome.exit_code, 0, "dup-check must always exit 0 (AC-04)");
@@ -377,10 +440,11 @@ mod tests {
     fn test_dup_check_with_ack_but_no_ack_file_returns_error() {
         let dir = tempfile::tempdir().unwrap();
         let db_path = dir.path().join("test.db");
-        let app = crate::CliApp;
+        let files_from = write_files_from(dir.path(), &[]);
+        let app = crate::semantic_dup::SemanticDupCompositionRoot::new();
 
         let input = DupCheckInput {
-            fragment_files: vec![],
+            files_from,
             threshold: 0.8,
             db_path,
             ack_file: None,
@@ -396,21 +460,19 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let db_path = dir.path().join("test.db");
         let ack_path = dir.path().join("ack.txt");
-        let frag_path = dir.path().join("frag.rs");
-
-        // Write a fragment file.
-        let content = "fn suppressed() {}";
-        std::fs::write(&frag_path, content).unwrap();
+        let frag_path = write_fragment_file(dir.path(), "frag.rs", "fn suppressed() {}");
+        let files_from = write_files_from(dir.path(), std::slice::from_ref(&frag_path));
 
         // Pre-populate the ack set with this fragment's hash.
-        let hash = fragment_content_hash(content);
+        let content = std::fs::read_to_string(&frag_path).unwrap();
+        let hash = fragment_content_hash(&content);
         let mut ack_set: HashSet<String> = HashSet::new();
         ack_set.insert(hash);
         write_ack_set(&ack_path, &ack_set).unwrap();
 
-        let app = crate::CliApp;
+        let app = crate::semantic_dup::SemanticDupCompositionRoot::new();
         let input = DupCheckInput {
-            fragment_files: vec![frag_path],
+            files_from,
             threshold: 0.8,
             db_path,
             ack_file: Some(ack_path),
@@ -430,26 +492,20 @@ mod tests {
 
     // ── Missing-index guard (P1 fail-open fix) ────────────────────────────────
 
-    /// Create a minimal fragment file in `dir` and return its path.
-    fn write_fragment_file(dir: &std::path::Path, name: &str, content: &str) -> std::path::PathBuf {
-        let path = dir.join(name);
-        std::fs::write(&path, content).unwrap();
-        path
-    }
-
     #[test]
     fn test_dup_check_with_fragment_and_nonexistent_db_path_returns_err_missing_index() {
         // P1 fix: a fragment that reaches the gate but whose db_path does not
         // exist at all must produce Err, not a silent "no near-duplicates found".
         let dir = tempfile::tempdir().unwrap();
         let frag_path = write_fragment_file(dir.path(), "frag.rs", "fn guard_test() {}");
+        let files_from = write_files_from(dir.path(), &[frag_path]);
         // db_path points to a path that does not exist.
         let db_path = dir.path().join("nonexistent_index.db");
         assert!(!db_path.exists(), "pre-condition: db_path must not exist");
 
-        let app = crate::CliApp;
+        let app = crate::semantic_dup::SemanticDupCompositionRoot::new();
         let input = DupCheckInput {
-            fragment_files: vec![frag_path],
+            files_from,
             threshold: 0.8,
             db_path: db_path.clone(),
             ack_file: None,
@@ -462,7 +518,7 @@ mod tests {
             "dup-check must return Err when db_path does not exist, got: {:?}",
             result.ok()
         );
-        let msg = result.unwrap_err();
+        let msg = result.unwrap_err().to_string();
         assert!(
             msg.contains("dup-index build"),
             "error message must reference 'dup-index build', got: {msg}"
@@ -476,6 +532,7 @@ mod tests {
         // `fragments.lance/` marker must produce Err, not a silent pass.
         let dir = tempfile::tempdir().unwrap();
         let frag_path = write_fragment_file(dir.path(), "frag.rs", "fn guard_test_dir() {}");
+        let files_from = write_files_from(dir.path(), &[frag_path]);
         // Create a directory at db_path WITHOUT the LanceDB marker.
         let db_path = dir.path().join("not_an_index");
         std::fs::create_dir_all(&db_path).unwrap();
@@ -486,9 +543,9 @@ mod tests {
             "pre-condition: marker must be absent"
         );
 
-        let app = crate::CliApp;
+        let app = crate::semantic_dup::SemanticDupCompositionRoot::new();
         let input = DupCheckInput {
-            fragment_files: vec![frag_path],
+            files_from,
             threshold: 0.8,
             db_path: db_path.clone(),
             ack_file: None,
@@ -501,7 +558,7 @@ mod tests {
             "dup-check must return Err when db_path exists but has no LanceDB marker, got: {:?}",
             result.ok()
         );
-        let msg = result.unwrap_err();
+        let msg = result.unwrap_err().to_string();
         assert!(
             msg.contains("dup-index build"),
             "error message must reference 'dup-index build', got: {msg}"
@@ -519,18 +576,14 @@ mod tests {
         // Regression: the missing-index guard must NOT fire when there are zero
         // fragments to check — that early-return path exits before the guard.
         let dir = tempfile::tempdir().unwrap();
+        let files_from = write_files_from(dir.path(), &[]); // zero fragments → early return before guard
         // db_path does not exist — would trigger the guard if fragments were present.
         let db_path = dir.path().join("nonexistent_index.db");
         assert!(!db_path.exists(), "pre-condition: db_path must not exist");
 
-        let app = crate::CliApp;
-        let input = DupCheckInput {
-            fragment_files: vec![], // zero fragments → early return before guard
-            threshold: 0.8,
-            db_path,
-            ack_file: None,
-            ack: false,
-        };
+        let app = crate::semantic_dup::SemanticDupCompositionRoot::new();
+        let input =
+            DupCheckInput { files_from, threshold: 0.8, db_path, ack_file: None, ack: false };
 
         let outcome = app.semantic_dup_check(input).unwrap();
         assert_eq!(outcome.exit_code, 0, "zero-fragment check must exit 0 (AC-04)");

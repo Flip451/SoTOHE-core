@@ -1,14 +1,16 @@
 //! File utility subcommands.
 //!
-//! Thin CLI adapter: delegates all orchestration to [`cli_composition::CliApp`].
+//! Thin CLI adapter: delegates all orchestration to the file driver.
 
 use std::io::Read;
 use std::path::PathBuf;
 use std::process::ExitCode;
 
 use clap::Subcommand;
-use cli_composition::CliApp;
+use cli_composition::FileCompositionRoot;
+use cli_driver::file::FileInput;
 
+use super::driver_outcome_to_exit;
 use crate::CliError;
 
 /// Maximum stdin size (10 MB) — sufficient for metadata.json, registry, guides.
@@ -48,6 +50,8 @@ fn write_atomic(path: PathBuf) -> Result<ExitCode, CliError> {
         )));
     }
 
-    CliApp::new().file_write_atomic(path, &buf).map_err(CliError::Message)?;
-    Ok(ExitCode::SUCCESS)
+    let outcome = FileCompositionRoot::new()
+        .file_driver()
+        .handle(FileInput::WriteAtomic { path, content: buf });
+    Ok(driver_outcome_to_exit(outcome))
 }

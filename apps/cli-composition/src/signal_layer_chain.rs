@@ -7,7 +7,9 @@
 
 use std::path::{Path, PathBuf};
 
-use crate::{CommandOutcome, cmd_outcome::render_outcome, signal::SignalGateName};
+use crate::{
+    CommandOutcome, cmd_outcome::render_outcome, error::CompositionError, signal::SignalGateName,
+};
 use infrastructure::verify::tddd_layers::TdddLayerBinding;
 use usecase::signal::SignalLayerReaderError;
 
@@ -71,7 +73,7 @@ pub(crate) fn signal_check_layer_chain(
         &BindingSignalLayerReader,
         Box<dyn Fn(domain::tddd::LayerId, &str, &str) -> infrastructure::verify::VerifyOutcome>,
     ) -> infrastructure::verify::VerifyOutcome,
-) -> Result<CommandOutcome, String> {
+) -> Result<CommandOutcome, CompositionError> {
     let strict = match crate::signal::resolve_strict(
         strict_override,
         gate,
@@ -107,7 +109,7 @@ pub(crate) fn signal_check_layer_chain_with_strict(
         &BindingSignalLayerReader,
         Box<dyn Fn(domain::tddd::LayerId, &str, &str) -> infrastructure::verify::VerifyOutcome>,
     ) -> infrastructure::verify::VerifyOutcome,
-) -> Result<CommandOutcome, String> {
+) -> Result<CommandOutcome, CompositionError> {
     use infrastructure::git_cli::{GitRepository as _, SystemGitRepo};
     use infrastructure::signal_layer_reader::LocalSignalLayerReaderAdapter;
     use infrastructure::verify::tddd_layers::{
@@ -117,14 +119,19 @@ pub(crate) fn signal_check_layer_chain_with_strict(
     let root = match workspace_root {
         Some(ref r) => r.clone(),
         None => {
-            let repo = SystemGitRepo::discover()
-                .map_err(|e| format!("{command_label}: cannot discover git repo: {e}"))?;
+            let repo = SystemGitRepo::discover().map_err(|e| {
+                CompositionError::AdapterInit(format!(
+                    "{command_label}: cannot discover git repo: {e}"
+                ))
+            })?;
             repo.root().to_path_buf()
         }
     };
-    let bindings = load_tddd_layers_from_workspace(&root).map_err(|e| match e {
-        LoadTdddLayersError::Io { path, source } => format!("{}: {source}", path.display()),
-        LoadTdddLayersError::Parse(err) => format!("architecture-rules.json: {err}"),
+    let bindings = load_tddd_layers_from_workspace(&root).map_err(|e| {
+        CompositionError::ConfigLoad(match e {
+            LoadTdddLayersError::Io { path, source } => format!("{}: {source}", path.display()),
+            LoadTdddLayersError::Parse(err) => format!("architecture-rules.json: {err}"),
+        })
     })?;
     let bindings: Vec<_> = bindings.into_iter().filter(|b| include_binding(b)).collect();
 

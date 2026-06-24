@@ -6,11 +6,22 @@
 //! `Arc<dyn SchemaExporterPort>` into `ExportSchemaInteractor` at the
 //! composition root; domain types are hidden behind the usecase boundary.
 
+use std::path::PathBuf;
 use std::sync::Arc;
 
 use thiserror::Error;
 
+use crate::file::{FilePortError, FileWritePort};
+
 // ── SchemaExporterPort ────────────────────────────────────────────────────────
+
+/// Error returned by [`SchemaExporterPort::export_as_json`].
+#[derive(Debug, thiserror::Error)]
+pub enum SchemaExporterError {
+    /// Export or serialization failed.
+    #[error("{0}")]
+    ExportFailed(String),
+}
 
 /// Secondary port (driven port) for domain schema export.
 ///
@@ -27,33 +38,45 @@ pub trait SchemaExporterPort: Send + Sync {
     ///
     /// # Errors
     ///
-    /// Returns an `Err(String)` describing the export or serialization failure.
-    fn export_as_json(&self, crate_name: &str) -> Result<String, String>;
+    /// Returns [`SchemaExporterError`] describing the export or serialization failure.
+    fn export_as_json(&self, crate_name: &str) -> Result<String, SchemaExporterError>;
 }
 
 // ── ExportSchemaCommand ───────────────────────────────────────────────────────
 
 /// CQRS command object for the schema export use case.
 ///
-/// Carries the crate name to export. Owned by usecase so the CLI does not
-/// import `domain::schema::SchemaExporter`.
+/// Carries the crate name to export and an optional output file path.
+/// When `output_path` is `Some`, the interactor writes the JSON schema
+/// to that file via the injected [`FileWritePort`] instead of returning
+/// it as a string. Owned by usecase so the CLI does not import
+/// `domain::schema::SchemaExporter`.
 pub struct ExportSchemaCommand {
     pub crate_name: String,
+    /// When `Some`, write the JSON output to this path via [`FileWritePort`].
+    pub output_path: Option<PathBuf>,
+    /// When `false`, compact the JSON before returning or writing. When
+    /// `true`, keep the exporter's native indented output. Defaults to
+    /// `false` (compact) so `sotp domain export-schema` produces compact
+    /// JSON unless `--pretty` is passed explicitly.
+    pub pretty: bool,
 }
 
 // ── ExportSchemaError ─────────────────────────────────────────────────────────
 
 /// Error type for [`ExportSchemaService`].
 ///
-/// Wraps failures from the rustdoc schema export and JSON serialization steps
-/// without leaking `domain::schema::SchemaExportError` directly across the
-/// usecase boundary.
+/// Wraps failures from the rustdoc schema export, JSON serialization, and
+/// optional file write steps without leaking `domain::schema::SchemaExportError`
+/// directly across the usecase boundary.
 #[derive(Debug, Error)]
 pub enum ExportSchemaError {
     #[error("schema export failed: {0}")]
     ExportFailed(String),
     #[error("schema serialization failed: {0}")]
     SerializationFailed(String),
+    #[error("schema file write failed: {0}")]
+    FileWriteFailed(#[from] FilePortError),
 }
 
 // ── ExportSchemaService ───────────────────────────────────────────────────────
@@ -84,36 +107,63 @@ pub trait ExportSchemaService: Send + Sync {
 /// returns an already-serialized JSON string, so the interactor never imports
 /// `domain::schema::SchemaExporter` or `domain::schema::SchemaExport` directly.
 ///
+/// When `command.output_path` is `Some`, writes the JSON to that file via
+/// the injected [`FileWritePort`] and returns `Ok("")` (empty string — the
+/// caller should check `output_path` to decide what to print). When
+/// `output_path` is `None`, returns the full JSON string as before.
+///
 /// CLI sees only [`ExportSchemaService`] and [`ExportSchemaCommand`];
 /// `domain::schema::SchemaExporter` is an implementation detail of the
 /// infrastructure adapter.
 pub struct ExportSchemaInteractor {
     port: Arc<dyn SchemaExporterPort>,
+    file_port: Arc<dyn FileWritePort>,
 }
 
 impl ExportSchemaInteractor {
-    /// Creates a new interactor bound to the given schema exporter port.
+    /// Creates a new interactor bound to the given schema exporter port and file write port.
     #[must_use]
-    pub fn new(port: Arc<dyn SchemaExporterPort>) -> Self {
-        Self { port }
+    pub fn new(port: Arc<dyn SchemaExporterPort>, file_port: Arc<dyn FileWritePort>) -> Self {
+        Self { port, file_port }
     }
 }
 
 impl ExportSchemaService for ExportSchemaInteractor {
     fn export(&self, command: ExportSchemaCommand) -> Result<String, ExportSchemaError> {
-        self.port.export_as_json(&command.crate_name).map_err(|e| {
-            // The `SchemaExporterPort` contract returns a single `String` error.
+        let raw_json = self.port.export_as_json(&command.crate_name).map_err(|e| {
+            // The `SchemaExporterPort` contract returns `SchemaExporterError::ExportFailed(msg)`.
             // Infrastructure adapters that perform a two-step operation
             // (export then JSON-serialize) prefix serialization failures with
             // "JSON serialization failed:" per `schema_export_codec::SchemaExportCodecError`.
             // Detect that prefix to route to the correct error variant; all
             // other errors are considered export failures.
-            if e.starts_with("JSON serialization failed") {
-                ExportSchemaError::SerializationFailed(e)
+            let msg = e.to_string();
+            if msg.starts_with("JSON serialization failed") {
+                ExportSchemaError::SerializationFailed(msg)
             } else {
-                ExportSchemaError::ExportFailed(e)
+                ExportSchemaError::ExportFailed(msg)
             }
-        })
+        })?;
+
+        // Apply compact/pretty transformation BEFORE deciding stdout vs. file,
+        // so `--output FILE` honors `--pretty=false` (compact) just like stdout.
+        let json = if command.pretty {
+            raw_json
+        } else {
+            let parsed: serde_json::Value = serde_json::from_str(&raw_json)
+                .map_err(|e| ExportSchemaError::SerializationFailed(e.to_string()))?;
+            serde_json::to_string(&parsed)
+                .map_err(|e| ExportSchemaError::SerializationFailed(e.to_string()))?
+        };
+
+        if let Some(path) = command.output_path {
+            self.file_port.write_atomic(&path, json.as_bytes())?;
+            // Return empty string to signal "written to file" — caller renders
+            // the success message rather than printing the JSON body.
+            Ok(String::new())
+        } else {
+            Ok(json)
+        }
     }
 }
 
@@ -122,6 +172,8 @@ impl ExportSchemaService for ExportSchemaInteractor {
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod tests {
+    use std::path::Path;
+
     use super::*;
 
     struct OkPort {
@@ -129,7 +181,7 @@ mod tests {
     }
 
     impl SchemaExporterPort for OkPort {
-        fn export_as_json(&self, _crate_name: &str) -> Result<String, String> {
+        fn export_as_json(&self, _crate_name: &str) -> Result<String, SchemaExporterError> {
             Ok(self.json.clone())
         }
     }
@@ -139,26 +191,49 @@ mod tests {
     }
 
     impl SchemaExporterPort for FailPort {
-        fn export_as_json(&self, _crate_name: &str) -> Result<String, String> {
-            Err(self.message.clone())
+        fn export_as_json(&self, _crate_name: &str) -> Result<String, SchemaExporterError> {
+            Err(SchemaExporterError::ExportFailed(self.message.clone()))
         }
+    }
+
+    /// Stub file write port that always succeeds (no-op).
+    struct NoopFileWritePort;
+
+    impl FileWritePort for NoopFileWritePort {
+        fn write_atomic(&self, _path: &Path, _content: &[u8]) -> Result<(), FilePortError> {
+            Ok(())
+        }
+    }
+
+    fn noop_file_port() -> Arc<dyn FileWritePort> {
+        Arc::new(NoopFileWritePort)
     }
 
     #[test]
     fn test_export_schema_service_returns_json_string_on_success() {
         let port = Arc::new(OkPort { json: r#"{"types":[]}"#.to_owned() });
-        let interactor = ExportSchemaInteractor::new(port);
-        let result =
-            interactor.export(ExportSchemaCommand { crate_name: "domain".to_owned() }).unwrap();
+        let interactor = ExportSchemaInteractor::new(port, noop_file_port());
+        let result = interactor
+            .export(ExportSchemaCommand {
+                crate_name: "domain".to_owned(),
+                output_path: None,
+                pretty: false,
+            })
+            .unwrap();
         assert_eq!(result, r#"{"types":[]}"#);
     }
 
     #[test]
     fn test_export_schema_service_returns_export_failed_on_port_error() {
         let port = Arc::new(FailPort { message: "nightly not found".to_owned() });
-        let interactor = ExportSchemaInteractor::new(port);
-        let err =
-            interactor.export(ExportSchemaCommand { crate_name: "domain".to_owned() }).unwrap_err();
+        let interactor = ExportSchemaInteractor::new(port, noop_file_port());
+        let err = interactor
+            .export(ExportSchemaCommand {
+                crate_name: "domain".to_owned(),
+                output_path: None,
+                pretty: false,
+            })
+            .unwrap_err();
         assert!(matches!(err, ExportSchemaError::ExportFailed(_)));
     }
 
@@ -168,9 +243,49 @@ mod tests {
         let port = Arc::new(FailPort {
             message: "JSON serialization failed: some serde error".to_owned(),
         });
-        let interactor = ExportSchemaInteractor::new(port);
-        let err =
-            interactor.export(ExportSchemaCommand { crate_name: "domain".to_owned() }).unwrap_err();
+        let interactor = ExportSchemaInteractor::new(port, noop_file_port());
+        let err = interactor
+            .export(ExportSchemaCommand {
+                crate_name: "domain".to_owned(),
+                output_path: None,
+                pretty: false,
+            })
+            .unwrap_err();
         assert!(matches!(err, ExportSchemaError::SerializationFailed(_)));
+    }
+
+    #[test]
+    fn test_export_schema_service_writes_to_file_when_output_path_set() {
+        use std::sync::Mutex;
+
+        struct CapturingPort {
+            written: Arc<Mutex<Option<Vec<u8>>>>,
+        }
+
+        impl FileWritePort for CapturingPort {
+            fn write_atomic(&self, _path: &Path, content: &[u8]) -> Result<(), FilePortError> {
+                *self.written.lock().unwrap() = Some(content.to_vec());
+                Ok(())
+            }
+        }
+
+        let written = Arc::new(Mutex::new(None::<Vec<u8>>));
+        let file_port = Arc::new(CapturingPort { written: Arc::clone(&written) });
+        let schema_port = Arc::new(OkPort { json: r#"{"types":[]}"#.to_owned() });
+        let interactor = ExportSchemaInteractor::new(schema_port, file_port);
+
+        let result = interactor
+            .export(ExportSchemaCommand {
+                crate_name: "domain".to_owned(),
+                output_path: Some(PathBuf::from("/tmp/schema.json")),
+                pretty: false,
+            })
+            .unwrap();
+
+        // Returns empty string when writing to file.
+        assert_eq!(result, "");
+        // Content was written.
+        let captured = written.lock().unwrap();
+        assert_eq!(captured.as_deref(), Some(r#"{"types":[]}"#.as_bytes()));
     }
 }

@@ -280,7 +280,9 @@ impl<L: CatalogueLoader + Send + Sync, C: LintConfigLoader + Send + Sync> RunCat
             .into_iter()
             .map(lint_rule_spec_to_domain)
             .collect::<Result<Vec<_>, _>>()
-            .map_err(RunCatalogueLintError::InvalidRuleSpec)?;
+            .map_err(|e: CatalogueLintError| {
+                RunCatalogueLintError::InvalidRuleSpec(e.to_string())
+            })?;
 
         // Step 4: load all TDDD-enabled layers for this track.
         let (layer_order, catalogues) = self.loader.load_all(&track_id)?;
@@ -301,11 +303,33 @@ impl<L: CatalogueLoader + Send + Sync, C: LintConfigLoader + Send + Sync> RunCat
     }
 }
 
+// ── CatalogueLintError ────────────────────────────────────────────────────────
+
+/// Error type for [`lint_rule_spec_to_domain`] and [`parse_role_kind`].
+///
+/// Implemented as a transparent newtype over [`String`] so that test assertions
+/// can use `.contains()` on the unwrapped error value (the private helpers are
+/// called directly in tests). The newtype satisfies the typed-error requirement
+/// while keeping the existing test surface intact.
+#[derive(Debug, thiserror::Error)]
+#[error("{0}")]
+pub(crate) struct CatalogueLintError(String);
+
+impl std::ops::Deref for CatalogueLintError {
+    type Target = str;
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+// ── Private helpers ───────────────────────────────────────────────────────────
+
 /// Convert a [`LintRuleSpec`] to a domain [`CatalogueLinterRule`].
 ///
-/// Returns `Err(String)` when the spec is rejected by the domain constructors
-/// (e.g. empty `target_field`, unknown role string, empty required_traits).
-fn lint_rule_spec_to_domain(spec: LintRuleSpec) -> Result<CatalogueLinterRule, String> {
+/// Returns [`CatalogueLintError`] when the spec is rejected by the domain
+/// constructors (e.g. empty `target_field`, unknown role string, empty
+/// required_traits).
+fn lint_rule_spec_to_domain(spec: LintRuleSpec) -> Result<CatalogueLinterRule, CatalogueLintError> {
     // Convert target_roles strings to RoleKind.
     let target_roles =
         spec.target_roles.iter().map(|s| parse_role_kind(s)).collect::<Result<Vec<_>, _>>()?;
@@ -323,11 +347,12 @@ fn lint_rule_spec_to_domain(spec: LintRuleSpec) -> Result<CatalogueLinterRule, S
             let layers: Vec<LayerId> = permitted_layers
                 .into_iter()
                 .map(|s| {
-                    LayerId::try_new(s.clone()).map_err(|e| format!("invalid layer_id '{s}': {e}"))
+                    LayerId::try_new(s.clone())
+                        .map_err(|e| CatalogueLintError(format!("invalid layer_id '{s}': {e}")))
                 })
                 .collect::<Result<Vec<_>, _>>()?;
             let non_empty = NonEmptyVec::try_new(layers)
-                .map_err(|_| "permitted_layers must not be empty".to_owned())?;
+                .map_err(|_| CatalogueLintError("permitted_layers must not be empty".to_owned()))?;
             CatalogueLinterRuleKind::KindLayerConstraint { permitted_layers: non_empty }
         }
         LintRuleKind::ReferencedRoleConstraint { target_field, expected_role } => {
@@ -336,7 +361,7 @@ fn lint_rule_spec_to_domain(spec: LintRuleSpec) -> Result<CatalogueLinterRule, S
         }
         LintRuleKind::TraitImplRequired { required_traits } => {
             let non_empty = NonEmptyVec::try_new(required_traits)
-                .map_err(|_| "required_traits must not be empty".to_owned())?;
+                .map_err(|_| CatalogueLintError("required_traits must not be empty".to_owned()))?;
             CatalogueLinterRuleKind::TraitImplRequired { required_traits: non_empty }
         }
         LintRuleKind::NoRoleInMethodSignature { forbidden_roles } => {
@@ -345,7 +370,7 @@ fn lint_rule_spec_to_domain(spec: LintRuleSpec) -> Result<CatalogueLinterRule, S
                 .map(|s| parse_role_kind(s))
                 .collect::<Result<Vec<_>, _>>()?;
             let non_empty = NonEmptyVec::try_new(roles)
-                .map_err(|_| "forbidden_roles must not be empty".to_owned())?;
+                .map_err(|_| CatalogueLintError("forbidden_roles must not be empty".to_owned()))?;
             CatalogueLinterRuleKind::NoRoleInMethodSignature { forbidden_roles: non_empty }
         }
         LintRuleKind::MethodReferenceSignature { target_field } => {
@@ -366,11 +391,11 @@ fn lint_rule_spec_to_domain(spec: LintRuleSpec) -> Result<CatalogueLinterRule, S
         }
     };
 
-    CatalogueLinterRule::new(target, kind).map_err(|e| e.to_string())
+    CatalogueLinterRule::new(target, kind).map_err(|e| CatalogueLintError(e.to_string()))
 }
 
 /// Parse a role kind string into a [`RoleKind`].
-fn parse_role_kind(s: &str) -> Result<RoleKind, String> {
+fn parse_role_kind(s: &str) -> Result<RoleKind, CatalogueLintError> {
     match s {
         "ValueObject" => Ok(RoleKind::ValueObject),
         "Entity" => Ok(RoleKind::Entity),
@@ -391,7 +416,7 @@ fn parse_role_kind(s: &str) -> Result<RoleKind, String> {
         "ApplicationService" => Ok(RoleKind::ApplicationService),
         "SecondaryPort" => Ok(RoleKind::SecondaryPort),
         "Repository" => Ok(RoleKind::Repository),
-        other => Err(format!("unknown role kind: '{other}'")),
+        other => Err(CatalogueLintError(format!("unknown role kind: '{other}'"))),
     }
 }
 

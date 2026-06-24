@@ -2,9 +2,11 @@ use std::collections::HashMap;
 use std::path::Path;
 use std::sync::Arc;
 
-use domain::semantic_dup::{CodeFragment, SimilarFragment, TopK};
+use domain::semantic_dup::CodeFragment;
 use infrastructure::semantic_dup::index::LanceDbSemanticIndexAdapter;
-use usecase::semantic_dup::{EmbeddingPort, SemanticIndexError, SemanticIndexPort};
+use usecase::semantic_dup::{EmbeddingPort, SemanticIndexPort};
+
+use crate::error::CompositionError;
 
 use super::manifest::{
     EMBEDDING_MODEL_ID, IndexManifest, SEMANTIC_INDEX_CACHE_MARKER_SUFFIX, compute_manifest_diff,
@@ -12,85 +14,109 @@ use super::manifest::{
     persistent_index_suffixed_path, read_manifest, remove_manifest, write_manifest,
 };
 
+// ── Re-exports from infrastructure (D7 / CN-06) ───────────────────────────────
+
+pub(super) use infrastructure::semantic_dup::null_insert_proxy::{
+    NullInsertIndexProxy, PersistentIndexLock, acquire_persistent_index_lock,
+};
+
 const LANCEDB_TABLE_MARKER: &str = "fragments.lance";
 
-fn remove_persistent_index_marker(db_path: &Path) -> Result<(), String> {
+fn remove_persistent_index_marker(db_path: &Path) -> Result<(), CompositionError> {
     let marker = persistent_index_marker_path(db_path);
     match std::fs::remove_file(&marker) {
         Ok(()) => Ok(()),
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(()),
-        Err(e) => Err(format!("failed to remove index cache marker {}: {e}", marker.display())),
+        Err(e) => Err(CompositionError::Infrastructure(format!(
+            "failed to remove index cache marker {}: {e}",
+            marker.display()
+        ))),
     }
-}
-
-pub(super) fn persistent_index_lock_path(db_path: &Path) -> std::path::PathBuf {
-    persistent_index_suffixed_path(db_path, ".lock")
 }
 
 pub(super) fn persistent_index_marker_path(db_path: &Path) -> std::path::PathBuf {
     persistent_index_suffixed_path(db_path, SEMANTIC_INDEX_CACHE_MARKER_SUFFIX)
 }
 
-pub(super) fn write_persistent_index_marker(db_path: &Path) -> Result<(), String> {
+pub(super) fn write_persistent_index_marker(db_path: &Path) -> Result<(), CompositionError> {
     let created_db_path = match std::fs::symlink_metadata(db_path) {
         Ok(metadata) if metadata.file_type().is_symlink() => {
-            return Err(format!("index cache dir {} is a symlink", db_path.display()));
+            return Err(CompositionError::Infrastructure(format!(
+                "index cache dir {} is a symlink",
+                db_path.display()
+            )));
         }
         Ok(metadata) if metadata.is_dir() => false,
         Ok(_) => {
-            return Err(format!("index cache path {} is not a directory", db_path.display()));
+            return Err(CompositionError::Infrastructure(format!(
+                "index cache path {} is not a directory",
+                db_path.display()
+            )));
         }
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => true,
         Err(e) => {
-            return Err(format!("failed to inspect index cache dir {}: {e}", db_path.display()));
+            return Err(CompositionError::Infrastructure(format!(
+                "failed to inspect index cache dir {}: {e}",
+                db_path.display()
+            )));
         }
     };
 
     if let Some(parent) = db_path.parent() {
         if !parent.as_os_str().is_empty() {
-            std::fs::create_dir_all(parent)
-                .map_err(|e| format!("failed to create index cache parent dir: {e}"))?;
+            std::fs::create_dir_all(parent).map_err(|e| {
+                CompositionError::Infrastructure(format!(
+                    "failed to create index cache parent dir: {e}"
+                ))
+            })?;
         }
     }
-    std::fs::create_dir_all(db_path)
-        .map_err(|e| format!("failed to create index cache dir {}: {e}", db_path.display()))?;
+    std::fs::create_dir_all(db_path).map_err(|e| {
+        CompositionError::Infrastructure(format!(
+            "failed to create index cache dir {}: {e}",
+            db_path.display()
+        ))
+    })?;
 
     let marker = persistent_index_marker_path(db_path);
     match std::fs::symlink_metadata(&marker) {
         Ok(metadata) if metadata.file_type().is_symlink() => {
-            return Err(cleanup_failed_marker_write(
+            return Err(CompositionError::Infrastructure(cleanup_failed_marker_write(
                 db_path,
                 &marker,
                 created_db_path,
                 format!("index cache marker {} is a symlink", marker.display()),
-            ));
+            )));
         }
         Ok(_) => {}
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => {}
         Err(e) => {
-            return Err(cleanup_failed_marker_write(
+            return Err(CompositionError::Infrastructure(cleanup_failed_marker_write(
                 db_path,
                 &marker,
                 created_db_path,
                 format!("failed to inspect index cache marker {}: {e}", marker.display()),
-            ));
+            )));
         }
     }
 
     let canonical_db_path = db_path.canonicalize().map_err(|e| {
-        format!("failed to canonicalize index cache dir {}: {e}", db_path.display())
+        CompositionError::Infrastructure(format!(
+            "failed to canonicalize index cache dir {}: {e}",
+            db_path.display()
+        ))
     })?;
     std::fs::write(
         &marker,
         format!("sotp semantic index cache\npath={}\n", canonical_db_path.display()),
     )
     .map_err(|e| {
-        cleanup_failed_marker_write(
+        CompositionError::Infrastructure(cleanup_failed_marker_write(
             db_path,
             &marker,
             created_db_path,
             format!("failed to write index cache marker {}: {e}", marker.display()),
-        )
+        ))
     })
 }
 
@@ -126,30 +152,45 @@ fn cleanup_failed_marker_write(
     }
 }
 
-fn persistent_index_marker_matches(db_path: &Path) -> Result<bool, String> {
+fn persistent_index_marker_matches(db_path: &Path) -> Result<bool, CompositionError> {
     let marker = persistent_index_marker_path(db_path);
     match std::fs::symlink_metadata(&marker) {
         Ok(metadata) if metadata.file_type().is_symlink() => {
-            return Err(format!("index cache marker {} is a symlink", marker.display()));
+            return Err(CompositionError::Infrastructure(format!(
+                "index cache marker {} is a symlink",
+                marker.display()
+            )));
         }
         Ok(metadata) if metadata.is_file() => {}
         Ok(_) => {
-            return Err(format!("index cache marker {} is not a regular file", marker.display()));
+            return Err(CompositionError::Infrastructure(format!(
+                "index cache marker {} is not a regular file",
+                marker.display()
+            )));
         }
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(false),
         Err(e) => {
-            return Err(format!("failed to inspect index cache marker {}: {e}", marker.display()));
+            return Err(CompositionError::Infrastructure(format!(
+                "failed to inspect index cache marker {}: {e}",
+                marker.display()
+            )));
         }
     }
     let marker_content = match std::fs::read_to_string(&marker) {
         Ok(content) => content,
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(false),
         Err(e) => {
-            return Err(format!("failed to read index cache marker {}: {e}", marker.display()));
+            return Err(CompositionError::Infrastructure(format!(
+                "failed to read index cache marker {}: {e}",
+                marker.display()
+            )));
         }
     };
     let canonical_db_path = db_path.canonicalize().map_err(|e| {
-        format!("failed to canonicalize index cache dir {}: {e}", db_path.display())
+        CompositionError::Infrastructure(format!(
+            "failed to canonicalize index cache dir {}: {e}",
+            db_path.display()
+        ))
     })?;
     let expected_path_line = format!("path={}", canonical_db_path.display());
     Ok(marker_content.lines().any(|line| line == expected_path_line))
@@ -198,122 +239,68 @@ impl ExistingDirectoryKind {
     }
 }
 
-fn existing_directory_state(path: &Path, kind: ExistingDirectoryKind) -> Result<bool, String> {
+fn existing_directory_state(
+    path: &Path,
+    kind: ExistingDirectoryKind,
+) -> Result<bool, CompositionError> {
     match std::fs::symlink_metadata(path) {
-        Ok(metadata) if metadata.file_type().is_symlink() => Err(kind.symlink_error(path)),
+        Ok(metadata) if metadata.file_type().is_symlink() => {
+            Err(CompositionError::Infrastructure(kind.symlink_error(path)))
+        }
         Ok(metadata) if metadata.is_dir() => Ok(true),
-        Ok(_) => Err(kind.not_directory_error(path)),
+        Ok(_) => Err(CompositionError::Infrastructure(kind.not_directory_error(path))),
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(false),
-        Err(e) => Err(kind.inspect_error(path, &e)),
+        Err(e) => Err(CompositionError::Infrastructure(kind.inspect_error(path, &e))),
     }
 }
 
-fn persistent_index_table_exists(db_path: &Path) -> Result<bool, String> {
+fn persistent_index_table_exists(db_path: &Path) -> Result<bool, CompositionError> {
     let table_marker = db_path.join(LANCEDB_TABLE_MARKER);
     existing_directory_state(&table_marker, ExistingDirectoryKind::TableMarker)
 }
 
-fn validate_existing_persistent_index_dir(db_path: &Path) -> Result<bool, String> {
+fn validate_existing_persistent_index_dir(db_path: &Path) -> Result<bool, CompositionError> {
     existing_directory_state(db_path, ExistingDirectoryKind::PersistentIndexPath)
 }
 
-fn require_persistent_index_marker(db_path: &Path, operation: &str) -> Result<(), String> {
+fn require_persistent_index_marker(
+    db_path: &Path,
+    operation: &str,
+) -> Result<(), CompositionError> {
     if persistent_index_marker_matches(db_path)? {
         Ok(())
     } else {
-        Err(format!(
+        Err(CompositionError::Infrastructure(format!(
             "refusing to {operation} unmarked semantic index directory {}; \
              remove it manually or choose an empty --db-path",
             db_path.display()
-        ))
+        )))
     }
 }
 
-pub(super) struct PersistentIndexLock {
-    _file: std::fs::File,
-}
-
-pub(super) fn acquire_persistent_index_lock(db_path: &Path) -> Result<PersistentIndexLock, String> {
-    use fs4::fs_std::FileExt as _;
-
-    let lock_path = persistent_index_lock_path(db_path);
-    if let Some(parent) = lock_path.parent() {
-        if !parent.as_os_str().is_empty() {
-            std::fs::create_dir_all(parent)
-                .map_err(|e| format!("failed to create index lock parent dir: {e}"))?;
-        }
-    }
-    let file = std::fs::OpenOptions::new()
-        .create(true)
-        .write(true)
-        .truncate(false)
-        .open(&lock_path)
-        .map_err(|e| format!("failed to open index lock {}: {e}", lock_path.display()))?;
-    file.lock_exclusive()
-        .map_err(|e| format!("failed to lock index cache {}: {e}", lock_path.display()))?;
-
-    Ok(PersistentIndexLock { _file: file })
-}
+// PersistentIndexLock and acquire_persistent_index_lock are re-exported above
+// from infrastructure::semantic_dup::null_insert_proxy.
 
 /// Remove `db_path` directory (and all its contents) to clear stale index data.
 ///
 /// If the directory does not exist, returns `Ok(())` (idempotent).
 /// Used by the full-rebuild path before opening a fresh index.
-pub(super) fn clear_persistent_index_dir(db_path: &Path) -> Result<(), String> {
+pub(super) fn clear_persistent_index_dir(db_path: &Path) -> Result<(), CompositionError> {
     if !validate_existing_persistent_index_dir(db_path)? {
         remove_persistent_index_marker(db_path)?;
         return Ok(());
     }
     require_persistent_index_marker(db_path, "clear")?;
-    std::fs::remove_dir_all(db_path)
-        .map_err(|e| format!("failed to clear stale index at {}: {e}", db_path.display()))?;
+    std::fs::remove_dir_all(db_path).map_err(|e| {
+        CompositionError::Infrastructure(format!(
+            "failed to clear stale index at {}: {e}",
+            db_path.display()
+        ))
+    })?;
     remove_persistent_index_marker(db_path)
 }
 
-/// A `SemanticIndexPort` proxy that makes `insert` and `insert_batch` no-ops
-/// while forwarding `delete_by_source_path` and `search` to the wrapped adapter.
-///
-/// Used on the reuse / incremental path: the persistent index is already
-/// populated (or partially updated) before the interactors run.
-pub(super) struct NullInsertIndexProxy {
-    inner: Arc<LanceDbSemanticIndexAdapter>,
-    _cache_lock: PersistentIndexLock,
-}
-
-impl NullInsertIndexProxy {
-    pub(super) fn new(
-        inner: Arc<LanceDbSemanticIndexAdapter>,
-        cache_lock: PersistentIndexLock,
-    ) -> Self {
-        Self { inner, _cache_lock: cache_lock }
-    }
-}
-
-impl SemanticIndexPort for NullInsertIndexProxy {
-    fn insert(
-        &self,
-        _fragment: &CodeFragment,
-        _embedding: &[f32],
-    ) -> Result<(), SemanticIndexError> {
-        Ok(())
-    }
-
-    fn insert_batch(&self, _items: &[(CodeFragment, Vec<f32>)]) -> Result<(), SemanticIndexError> {
-        Ok(())
-    }
-
-    fn delete_by_source_path(&self, source_path: &Path) -> Result<(), SemanticIndexError> {
-        self.inner.delete_by_source_path(source_path)
-    }
-
-    fn search(
-        &self,
-        embedding: &[f32],
-        top_k: TopK,
-    ) -> Result<Vec<SimilarFragment>, SemanticIndexError> {
-        self.inner.search(embedding, top_k)
-    }
-}
+// NullInsertIndexProxy is re-exported above from infrastructure::semantic_dup::null_insert_proxy.
 
 fn group_fragment_refs_by_path(fragments: &[CodeFragment]) -> HashMap<String, Vec<&CodeFragment>> {
     let mut by_path: HashMap<String, Vec<&CodeFragment>> = Default::default();
@@ -369,32 +356,37 @@ fn embed_and_insert(
     embedding_port: &dyn EmbeddingPort,
     fragments: Vec<CodeFragment>,
     context: &str,
-) -> Result<(), String> {
+) -> Result<(), CompositionError> {
     let insert_label = batch_operation_label(context, "insert_batch");
     if fragments.is_empty() {
-        return adapter
-            .insert_batch(&[])
-            .map_err(|e| format!("{insert_label} (empty) failed: {e}"));
+        return adapter.insert_batch(&[]).map_err(|e| {
+            CompositionError::Infrastructure(format!("{insert_label} (empty) failed: {e}"))
+        });
     }
 
     let embed_label = batch_operation_label(context, "embed_batch");
-    let embeddings =
-        embedding_port.embed_batch(&fragments).map_err(|e| format!("{embed_label} failed: {e}"))?;
+    let embeddings = embedding_port
+        .embed_batch(&fragments)
+        .map_err(|e| CompositionError::Infrastructure(format!("{embed_label} failed: {e}")))?;
     if embeddings.len() != fragments.len() {
-        return Err(format!(
+        return Err(CompositionError::Infrastructure(format!(
             "{embed_label} returned {} embeddings for {} fragments",
             embeddings.len(),
             fragments.len()
-        ));
+        )));
     }
 
     let items: Vec<(CodeFragment, Vec<f32>)> = fragments.into_iter().zip(embeddings).collect();
-    adapter.insert_batch(&items).map_err(|e| format!("{insert_label} failed: {e}"))
+    adapter
+        .insert_batch(&items)
+        .map_err(|e| CompositionError::Infrastructure(format!("{insert_label} failed: {e}")))
 }
 
-fn cleanup_incomplete_index_error(db_path: &Path, error: String) -> String {
+fn cleanup_incomplete_index_error(db_path: &Path, error: CompositionError) -> CompositionError {
     if let Err(cleanup_error) = clear_persistent_index_dir(db_path) {
-        format!("{error}; additionally failed to clean incomplete index cache: {cleanup_error}")
+        CompositionError::Infrastructure(format!(
+            "{error}; additionally failed to clean incomplete index cache: {cleanup_error}"
+        ))
     } else {
         error
     }
@@ -406,23 +398,23 @@ fn finalize_index_with_manifest(
     manifest: &IndexManifest,
     adapter: LanceDbSemanticIndexAdapter,
     cache_lock: PersistentIndexLock,
-) -> Result<Arc<dyn SemanticIndexPort>, String> {
+) -> Result<Arc<dyn SemanticIndexPort>, CompositionError> {
     if let Err(e) = write_manifest(manifest_sidecar, manifest) {
         let mut cleanup_errors = Vec::new();
         if let Err(cleanup_error) = remove_manifest(manifest_sidecar) {
-            cleanup_errors.push(cleanup_error);
+            cleanup_errors.push(cleanup_error.to_string());
         }
         drop(adapter);
         if let Err(cleanup_error) = clear_persistent_index_dir(db_path) {
-            cleanup_errors.push(cleanup_error);
+            cleanup_errors.push(cleanup_error.to_string());
         }
         if !cleanup_errors.is_empty() {
-            return Err(format!(
+            return Err(CompositionError::Infrastructure(format!(
                 "{e}; additionally failed to clean incomplete index cache: {}",
                 cleanup_errors.join("; ")
-            ));
+            )));
         }
-        return Err(e);
+        return Err(CompositionError::Infrastructure(e));
     }
 
     Ok(Arc::new(NullInsertIndexProxy::new(Arc::new(adapter), cache_lock)))
@@ -439,11 +431,13 @@ pub(super) fn open_persistent_index_with_corpus(
     db_path: &Path,
     corpus_fragments: Vec<CodeFragment>,
     embedding_port: &dyn EmbeddingPort,
-) -> Result<Arc<dyn SemanticIndexPort>, String> {
-    let cache_lock = acquire_persistent_index_lock(db_path)?;
+) -> Result<Arc<dyn SemanticIndexPort>, CompositionError> {
+    let cache_lock = acquire_persistent_index_lock(db_path)
+        .map_err(|e| CompositionError::Infrastructure(e.to_string()))?;
     let manifest_sidecar = manifest_sidecar_path(db_path);
 
-    let stored_manifest = read_manifest(&manifest_sidecar)?;
+    let stored_manifest =
+        read_manifest(&manifest_sidecar).map_err(CompositionError::Infrastructure)?;
     let diff =
         compute_manifest_diff(&corpus_fragments, stored_manifest.as_ref(), EMBEDDING_MODEL_ID);
 
@@ -476,30 +470,41 @@ pub(super) fn open_persistent_index_with_corpus(
 
     if diff.dirty.is_empty() && diff.deleted.is_empty() {
         let adapter = LanceDbSemanticIndexAdapter::new(db_path.to_path_buf()).map_err(|e| {
-            format!("failed to open persistent index at {}: {e}", db_path.display())
+            CompositionError::Infrastructure(format!(
+                "failed to open persistent index at {}: {e}",
+                db_path.display()
+            ))
         })?;
         return Ok(Arc::new(NullInsertIndexProxy::new(Arc::new(adapter), cache_lock)));
     }
 
-    let adapter = LanceDbSemanticIndexAdapter::new(db_path.to_path_buf())
-        .map_err(|e| format!("failed to open persistent index at {}: {e}", db_path.display()))?;
+    let adapter = LanceDbSemanticIndexAdapter::new(db_path.to_path_buf()).map_err(|e| {
+        CompositionError::Infrastructure(format!(
+            "failed to open persistent index at {}: {e}",
+            db_path.display()
+        ))
+    })?;
 
     let by_path = group_fragment_refs_by_path(&corpus_fragments);
 
-    remove_manifest(&manifest_sidecar)?;
+    remove_manifest(&manifest_sidecar).map_err(CompositionError::Infrastructure)?;
 
-    let update_result: Result<IndexManifest, String> = (|| {
+    let update_result: Result<IndexManifest, CompositionError> = (|| {
         for path_str in &diff.dirty {
             let path = Path::new(path_str);
-            adapter
-                .delete_by_source_path(path)
-                .map_err(|e| format!("incremental delete for '{path_str}' failed: {e}"))?;
+            adapter.delete_by_source_path(path).map_err(|e| {
+                CompositionError::Infrastructure(format!(
+                    "incremental delete for '{path_str}' failed: {e}"
+                ))
+            })?;
         }
 
         for path_str in &diff.deleted {
             let path = Path::new(path_str);
             adapter.delete_by_source_path(path).map_err(|e| {
-                format!("incremental delete (removed file) for '{path_str}' failed: {e}")
+                CompositionError::Infrastructure(format!(
+                    "incremental delete (removed file) for '{path_str}' failed: {e}"
+                ))
             })?;
         }
 
@@ -538,8 +543,8 @@ fn full_rebuild_index(
     embedding_port: &dyn EmbeddingPort,
     manifest_sidecar: &Path,
     cache_lock: PersistentIndexLock,
-) -> Result<Arc<dyn SemanticIndexPort>, String> {
-    remove_manifest(manifest_sidecar)?;
+) -> Result<Arc<dyn SemanticIndexPort>, CompositionError> {
+    remove_manifest(manifest_sidecar).map_err(CompositionError::Infrastructure)?;
     clear_persistent_index_dir(db_path)?;
     write_persistent_index_marker(db_path)?;
 
@@ -547,10 +552,10 @@ fn full_rebuild_index(
         Ok(a) => a,
         Err(e) => {
             let _ = clear_persistent_index_dir(db_path);
-            return Err(format!(
+            return Err(CompositionError::Infrastructure(format!(
                 "failed to open fresh persistent index at {}: {e}",
                 db_path.display()
-            ));
+            )));
         }
     };
 

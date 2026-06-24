@@ -1,13 +1,12 @@
 //! Per-tier `ReviewRound` telemetry for `sotp dry write` (T013 / IN-07 / AC-09).
 //!
-//! This module houses the tiered recorder types and telemetry helpers extracted
-//! from `super::dry` to keep the composition module within the 700-line limit:
+//! This module houses the telemetry helpers extracted from `super::dry` to keep
+//! the composition module within the 700-line limit.  The recorder / agent types
+//! were relocated to `infrastructure::dry_check::recording_agent` (D7 / CN-06):
 //!
-//! - [`DryAgentRunRecorder`]: atomic counters and timing for one dry-check tier.
-//! - [`TieredDryAgentRecorder`]: pair of recorders (fast + final) returned by
-//!   [`RecordingDryAgent::new`].
-//! - [`RecordingDryAgent`]: `DryCheckAgentPort` decorator that records per-tier
-//!   judgment activity without changing agent behavior.
+//! - [`DryAgentRunRecorder`]: re-exported from `infrastructure`.
+//! - [`TieredDryAgentRecorder`]: re-exported from `infrastructure`.
+//! - [`RecordingDryAgent`]: re-exported from `infrastructure`.
 //! - [`DryRoundTelemetry`]: telemetry payload built from a recorder snapshot.
 //! - [`dry_tiered_telemetry_for_result`]: builds `(fast, final_)` telemetry from
 //!   the cycle result and tiered recorder.
@@ -16,186 +15,16 @@
 //! - [`emit_dry_tier_review_round`]: emits a `ReviewRound` event with
 //!   pre-computed or elapsed duration.
 
-use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
-use std::sync::{Arc, Mutex};
 use std::time::Instant;
 
 use domain::dry_check::DryCheckFinding;
-use domain::semantic_dup::CodeFragment;
-use usecase::dry_check::{
-    DryCheckAgentError, DryCheckAgentJudgment, DryCheckAgentPort, DryCheckCycleError,
-    DryCheckJudgeTier,
+use usecase::dry_check::{DryCheckAgentError, DryCheckCycleError};
+
+// ── Re-exports from infrastructure ───────────────────────────────────────────
+
+pub(super) use infrastructure::dry_check::recording_agent::{
+    RecordingDryAgent, TieredDryAgentRecorder,
 };
-
-use crate::review_v2::record_instant_once;
-
-// ── Per-tier recorder ─────────────────────────────────────────────────────────
-
-#[derive(Clone)]
-pub(super) struct DryAgentRunRecorder {
-    completed: Arc<AtomicBool>,
-    /// Set to `true` when any `judge()` call for this tier returns `Err(_)`.
-    ///
-    /// Tracks the tier of a subprocess error directly, avoiding the sticky
-    /// `completed` flag which would misattribute the error tier when one
-    /// final-tier call completes successfully and a later call fails.
-    errored: Arc<AtomicBool>,
-    findings_count: Arc<AtomicU64>,
-    started_at: Arc<Mutex<Option<Instant>>>,
-}
-
-impl DryAgentRunRecorder {
-    pub(super) fn new() -> Self {
-        Self {
-            completed: Arc::new(AtomicBool::new(false)),
-            errored: Arc::new(AtomicBool::new(false)),
-            findings_count: Arc::new(AtomicU64::new(0)),
-            started_at: Arc::new(Mutex::new(None)),
-        }
-    }
-
-    pub(super) fn record_started(&self) {
-        record_instant_once(&self.started_at);
-    }
-
-    pub(super) fn record_completed(&self) {
-        self.completed.store(true, Ordering::Relaxed);
-    }
-
-    pub(super) fn record_error(&self) {
-        self.errored.store(true, Ordering::Relaxed);
-    }
-
-    pub(super) fn record_violation(&self) {
-        let mut current = self.findings_count.load(Ordering::Relaxed);
-        while current < u64::from(u32::MAX) {
-            match self.findings_count.compare_exchange_weak(
-                current,
-                current + 1,
-                Ordering::Relaxed,
-                Ordering::Relaxed,
-            ) {
-                Ok(_) => return,
-                Err(next) => current = next,
-            }
-        }
-    }
-
-    pub(super) fn has_completed(&self) -> bool {
-        self.completed.load(Ordering::Relaxed)
-    }
-
-    pub(super) fn has_errored(&self) -> bool {
-        self.errored.load(Ordering::Relaxed)
-    }
-
-    pub(super) fn findings_count(&self) -> u32 {
-        self.findings_count.load(Ordering::Relaxed).try_into().unwrap_or(u32::MAX)
-    }
-
-    pub(super) fn started_at(&self) -> Option<Instant> {
-        self.started_at.lock().ok().and_then(|started_at| *started_at)
-    }
-}
-
-// ── TieredDryAgentRecorder ────────────────────────────────────────────────────
-
-/// Tier-split recorder returned by [`RecordingDryAgent::new`].
-///
-/// Holds separate [`DryAgentRunRecorder`] instances for the fast and final tiers
-/// so that `dry_write` can emit per-tier `ReviewRound` telemetry
-/// (T013 / IN-07 / AC-09).
-pub(super) struct TieredDryAgentRecorder {
-    pub(super) fast: DryAgentRunRecorder,
-    pub(super) final_: DryAgentRunRecorder,
-}
-
-// ── RecordingDryAgent ─────────────────────────────────────────────────────────
-
-pub(super) struct RecordingDryAgent<A> {
-    inner: A,
-    fast_recorder: DryAgentRunRecorder,
-    final_recorder: DryAgentRunRecorder,
-}
-
-impl<A> RecordingDryAgent<A> {
-    pub(super) fn new(inner: A) -> (Self, TieredDryAgentRecorder) {
-        let fast_recorder = DryAgentRunRecorder::new();
-        let final_recorder = DryAgentRunRecorder::new();
-        let tiered =
-            TieredDryAgentRecorder { fast: fast_recorder.clone(), final_: final_recorder.clone() };
-        (Self { inner, fast_recorder, final_recorder }, tiered)
-    }
-}
-
-/// Returns `true` when `(changed, candidate)` is a known-bad calibration probe pair.
-///
-/// Calibration probe pairs are identified by both fragment paths together.
-/// The pairs are hard-coded in `usecase::dry_check::known_bad::known_bad_probe_pairs`
-/// and are stable by design — the probe corpus is a fixed in-memory fixture.
-///
-/// The known probe pairs (changed_path, candidate_path) are:
-/// - `(probes/changed_a.rs, probes/candidate_a.rs)`
-/// - `(probes/changed_b.rs, probes/candidate_b.rs)`
-/// - `(probes/changed_c.rs, probes/candidate_c.rs)`
-///
-/// Matching the full pair (rather than any single fragment path) ensures that
-/// a legitimate production pair involving e.g. `probes/changed_a.rs` alongside
-/// a different candidate file is still correctly recorded — only the exact
-/// synthetic fixture pairs are excluded.
-///
-/// Recording calibration probe calls would inflate `started_at` (causing
-/// tier telemetry to be emitted even when no production pairs were judged) and
-/// inflate `findings_count` (probes are expected to return `Violation`, which
-/// is correct agent behaviour, not a production finding).  Both are excluded here.
-fn is_calibration_probe_pair(changed: &CodeFragment, candidate: &CodeFragment) -> bool {
-    const PROBE_PAIRS: &[(&str, &str)] = &[
-        ("probes/changed_a.rs", "probes/candidate_a.rs"),
-        ("probes/changed_b.rs", "probes/candidate_b.rs"),
-        ("probes/changed_c.rs", "probes/candidate_c.rs"),
-    ];
-    let changed_str = changed.source_path.to_string_lossy();
-    let candidate_str = candidate.source_path.to_string_lossy();
-    PROBE_PAIRS.iter().any(|&(ch, ca)| changed_str == ch && candidate_str == ca)
-}
-
-impl<A: DryCheckAgentPort> DryCheckAgentPort for RecordingDryAgent<A> {
-    fn judge(
-        &self,
-        changed_fragment: &CodeFragment,
-        candidate_fragment: &CodeFragment,
-        tier: DryCheckJudgeTier,
-    ) -> Result<DryCheckAgentJudgment, DryCheckAgentError> {
-        // Skip recording for calibration probe calls so that tier telemetry is
-        // only emitted when production pairs were actually judged (F2) and
-        // `findings_count` reflects production violations only (F1).
-        if is_calibration_probe_pair(changed_fragment, candidate_fragment) {
-            return self.inner.judge(changed_fragment, candidate_fragment, tier);
-        }
-
-        let recorder = match tier {
-            DryCheckJudgeTier::Fast => &self.fast_recorder,
-            DryCheckJudgeTier::Final => &self.final_recorder,
-        };
-        recorder.record_started();
-        let result = self.inner.judge(changed_fragment, candidate_fragment, tier);
-        match &result {
-            Ok(judgment) => {
-                if matches!(judgment, DryCheckAgentJudgment::Violation { .. }) {
-                    recorder.record_violation();
-                }
-                recorder.record_completed();
-            }
-            Err(_) => {
-                // Record the error on the tier that produced it so that
-                // `has_errored()` can be used to attribute subprocess failures
-                // accurately, even when earlier calls on the same tier succeeded.
-                recorder.record_error();
-            }
-        }
-        result
-    }
-}
 
 // ── DryRoundTelemetry ─────────────────────────────────────────────────────────
 

@@ -1,36 +1,69 @@
 use crate::dry::RunDryFixLocalInput;
-use crate::{CliApp, CommandOutcome};
+use crate::{CommandOutcome, error::CompositionError};
 use std::ffi::OsString;
 use std::path::{Path, PathBuf};
-impl CliApp {
-    pub fn dry_run_fix_local(&self, input: RunDryFixLocalInput) -> Result<CommandOutcome, String> {
+
+// ── Per-context composition root ──────────────────────────────────────────────
+
+/// Composition root for the `dry_fix_runner` command family.
+///
+/// Unit struct: no adapter dependencies are injected at construction time.
+pub struct DryFixRunnerCompositionRoot;
+
+impl DryFixRunnerCompositionRoot {
+    /// Create a new `DryFixRunnerCompositionRoot`.
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+impl Default for DryFixRunnerCompositionRoot {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl DryFixRunnerCompositionRoot {
+    pub fn dry_run_fix_local(
+        &self,
+        input: RunDryFixLocalInput,
+    ) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::agent_profiles::{AGENT_PROFILES_PATH, AgentProfiles, RoundType};
         use infrastructure::git_cli::{GitRepository, SystemGitRepo};
-        let repo = SystemGitRepo::discover()
-            .map_err(|e| format!("[ERROR] failed to discover git repository root: {e}"))?;
+        let repo = SystemGitRepo::discover().map_err(|e| {
+            CompositionError::AdapterInit(format!(
+                "[ERROR] failed to discover git repository root: {e}"
+            ))
+        })?;
         let profiles_path = repo.root().join(AGENT_PROFILES_PATH);
-        let profiles = AgentProfiles::load(&profiles_path)
-            .map_err(|e| format!("[ERROR] failed to load agent-profiles.json: {e}"))?;
+        let profiles = AgentProfiles::load(&profiles_path).map_err(|e| {
+            CompositionError::ConfigLoad(format!("[ERROR] failed to load agent-profiles.json: {e}"))
+        })?;
         let track_id = ::domain::TrackId::try_new(input.track_id.trim())
-            .map_err(|e| format!("invalid --track-id: {e}"))?;
+            .map_err(|e| CompositionError::WiringFailed(format!("invalid --track-id: {e}")))?;
         let resolved =
             profiles.resolve_execution("dry-fix-lead", RoundType::Final).ok_or_else(|| {
-                "[ERROR] dry-fix-lead capability not defined in agent-profiles.json".to_owned()
+                CompositionError::WiringFailed(
+                    "[ERROR] dry-fix-lead capability not defined in agent-profiles.json".to_owned(),
+                )
             })?;
         let model = input.model.clone().or_else(|| resolved.model.clone()).ok_or_else(|| {
-            "[ERROR] no model specified: pass --model or set model in agent-profiles.json \
-         dry-fix-lead capability"
-                .to_owned()
+            CompositionError::WiringFailed(
+                "[ERROR] no model specified: pass --model or set model in agent-profiles.json \
+             dry-fix-lead capability"
+                    .to_owned(),
+            )
         })?;
         eprintln!("[sotp dry fix-local] provider={} model={}", resolved.provider, &model);
         match resolved.provider.as_str() {
             "codex" => run_dry_fix_codex(&model, track_id.as_ref(), &input.briefing_file),
-            other => Err(format!(
+            other => Err(CompositionError::WiringFailed(format!(
                 "[ERROR] unsupported dry-fix-lead provider '{other}' (supported: 'codex')"
-            )),
+            ))),
         }
     }
 }
+
 const DRY_FIX_SENTINEL_PREFIX: &str = "DRY_FIX_STATUS: ";
 const DRY_FIX_REDACTED_ENV_VARS: &[&str] =
     &["OPENAI_API_KEY", "OPENAI_ORG_ID", "OPENAI_BASE_URL", "CODEX_API_KEY"];
@@ -38,7 +71,7 @@ pub(crate) fn run_dry_fix_codex(
     model: &str,
     track_id: &str,
     briefing_file: &Path,
-) -> Result<CommandOutcome, String> {
+) -> Result<CommandOutcome, CompositionError> {
     let codex_bin = resolve_codex_bin();
     let extra_path = bin_parent_dir(&codex_bin);
     dry_fix_smoke_test_forbidden_sandbox()?;
@@ -50,8 +83,9 @@ pub(crate) fn run_dry_fix_codex(
     dry_fix_smoke_test_codex_version(&codex_bin, &smoke_env)?;
     let prompt = build_dry_fix_prompt(track_id, briefing_file)?;
     let output_last_message = dry_fix_runtime_path("dry-fix-codex-last-message", "txt")?;
-    std::fs::write(&output_last_message, "")
-        .map_err(|e| format!("failed to initialize last-message file: {e}"))?;
+    std::fs::write(&output_last_message, "").map_err(|e| {
+        CompositionError::Infrastructure(format!("failed to initialize last-message file: {e}"))
+    })?;
     let _last_message_cleanup = DryFixLastMessageCleanup(output_last_message.clone());
     let args = build_dry_fix_invocation(model, &codex_home, &safe_home, &output_last_message);
     let (stdout, log_path) = dry_fix_spawn_and_collect(&codex_bin, &args, &safe_env, &prompt)?;
@@ -60,10 +94,10 @@ pub(crate) fn run_dry_fix_codex(
         Ok(content) => content,
         Err(e) => {
             log_cleanup.keep_for_diagnosis();
-            return Err(format!(
+            return Err(CompositionError::Infrastructure(format!(
                 "failed to read last-message file: {e}; log: {}",
                 log_path.display()
-            ));
+            )));
         }
     };
     let status =
@@ -72,10 +106,10 @@ pub(crate) fn run_dry_fix_codex(
         Some(s) => s,
         None => {
             log_cleanup.keep_for_diagnosis();
-            return Err(format!(
+            return Err(CompositionError::Infrastructure(format!(
                 "no DRY_FIX_STATUS sentinel found in fixer output; log: {}",
                 log_path.display()
-            ));
+            )));
         }
     };
     if status != "completed" {
@@ -149,21 +183,21 @@ fn bin_parent_dir(bin: &OsString) -> Option<PathBuf> {
     let p = Path::new(bin);
     if p.is_absolute() { p.parent().map(PathBuf::from) } else { None }
 }
-fn dry_fix_smoke_test_forbidden_sandbox() -> Result<(), String> {
+fn dry_fix_smoke_test_forbidden_sandbox() -> Result<(), CompositionError> {
     let val = std::env::var("CODEX_SANDBOX").unwrap_or_default();
     if matches!(val.as_str(), "danger-full-access" | "dangerously-bypass-approvals-and-sandbox") {
-        return Err(format!(
+        return Err(CompositionError::Infrastructure(format!(
             "[ERROR] smoke test failed: forbidden sandbox override detected in environment: \
          CODEX_SANDBOX={val} — danger-full-access and \
          dangerously-bypass-approvals-and-sandbox are prohibited"
-        ));
+        )));
     }
     Ok(())
 }
 pub(crate) fn dry_fix_smoke_test_codex_version(
     bin: &OsString,
     safe_env: &[(OsString, OsString)],
-) -> Result<(), String> {
+) -> Result<(), CompositionError> {
     use std::process::{Command, Stdio};
     let mut cmd = Command::new(bin);
     cmd.arg("--version").stdin(Stdio::null()).stdout(Stdio::piped()).stderr(Stdio::piped());
@@ -172,7 +206,9 @@ pub(crate) fn dry_fix_smoke_test_codex_version(
         cmd.env(key, value);
     }
     let output = cmd.output().map_err(|e| {
-        format!("[ERROR] smoke test failed: codex CLI not found or failed to execute: {e}")
+        CompositionError::Infrastructure(format!(
+            "[ERROR] smoke test failed: codex CLI not found or failed to execute: {e}"
+        ))
     })?;
     let combined = {
         let mut s = String::from_utf8_lossy(&output.stdout).into_owned();
@@ -180,25 +216,27 @@ pub(crate) fn dry_fix_smoke_test_codex_version(
         s
     };
     let version_str = parse_semver_from_output(&combined).ok_or_else(|| {
-        "[ERROR] smoke test failed: cannot determine codex version from `codex --version` output"
-            .to_owned()
-    })?;
-    let (major, minor) = parse_major_minor_version(&version_str).ok_or_else(|| {
-        format!(
-            "[ERROR] smoke test failed: cannot parse codex version components from '{version_str}'"
+        CompositionError::Infrastructure(
+            "[ERROR] smoke test failed: cannot determine codex version from `codex --version` output"
+                .to_owned(),
         )
     })?;
+    let (major, minor) = parse_major_minor_version(&version_str).ok_or_else(|| {
+        CompositionError::Infrastructure(format!(
+            "[ERROR] smoke test failed: cannot parse codex version components from '{version_str}'"
+        ))
+    })?;
     if major > 0 {
-        return Err(format!(
+        return Err(CompositionError::Infrastructure(format!(
             "[ERROR] smoke test failed: codex version {version_str} is outside validated range \
          (>= 0.115.0, < 1.0.0): major version upgrade requires re-validation"
-        ));
+        )));
     }
     if minor < 115 {
-        return Err(format!(
+        return Err(CompositionError::Infrastructure(format!(
             "[ERROR] smoke test failed: codex version {version_str} is below minimum validated \
          version 0.115.0"
-        ));
+        )));
     }
     Ok(())
 }
@@ -217,26 +255,36 @@ fn parse_major_minor_version(version: &str) -> Option<(u32, u32)> {
     let minor = parts.next()?.parse::<u32>().ok()?;
     Some((major, minor))
 }
-fn prepend_dir_to_path(dir: &Path) -> Result<OsString, String> {
+fn prepend_dir_to_path(dir: &Path) -> Result<OsString, CompositionError> {
     let mut paths = vec![dir.to_path_buf()];
     if let Some(existing) = std::env::var_os("PATH") {
         if !existing.is_empty() {
             paths.extend(std::env::split_paths(&existing));
         }
     }
-    std::env::join_paths(paths)
-        .map_err(|e| format!("failed to prepend {} to PATH: {e}", dir.display()))
+    std::env::join_paths(paths).map_err(|e| {
+        CompositionError::Infrastructure(format!(
+            "failed to prepend {} to PATH: {e}",
+            dir.display()
+        ))
+    })
 }
-fn dry_fix_resolve_codex_home() -> Result<PathBuf, String> {
+fn dry_fix_resolve_codex_home() -> Result<PathBuf, CompositionError> {
     if let Ok(explicit) = std::env::var("CODEX_HOME") {
         if !explicit.is_empty() {
             let p = if let Some(rest) = explicit.strip_prefix("~/") {
-                let home = std::env::var("HOME")
-                    .map_err(|e| format!("CODEX_HOME starts with ~/ but HOME not set: {e}"))?;
+                let home = std::env::var("HOME").map_err(|e| {
+                    CompositionError::Infrastructure(format!(
+                        "CODEX_HOME starts with ~/ but HOME not set: {e}"
+                    ))
+                })?;
                 PathBuf::from(home).join(rest)
             } else if explicit == "~" {
-                let home = std::env::var("HOME")
-                    .map_err(|e| format!("CODEX_HOME is ~ but HOME not set: {e}"))?;
+                let home = std::env::var("HOME").map_err(|e| {
+                    CompositionError::Infrastructure(format!(
+                        "CODEX_HOME is ~ but HOME not set: {e}"
+                    ))
+                })?;
                 PathBuf::from(home).join(".codex")
             } else {
                 PathBuf::from(&explicit)
@@ -244,19 +292,23 @@ fn dry_fix_resolve_codex_home() -> Result<PathBuf, String> {
             return dry_fix_make_absolute(p);
         }
     }
-    let home = std::env::var("HOME")
-        .map_err(|e| format!("HOME env var is not set (cannot resolve default CODEX_HOME): {e}"))?;
+    let home = std::env::var("HOME").map_err(|e| {
+        CompositionError::Infrastructure(format!(
+            "HOME env var is not set (cannot resolve default CODEX_HOME): {e}"
+        ))
+    })?;
     dry_fix_make_absolute(PathBuf::from(home).join(".codex"))
 }
-fn dry_fix_make_absolute(path: PathBuf) -> Result<PathBuf, String> {
+fn dry_fix_make_absolute(path: PathBuf) -> Result<PathBuf, CompositionError> {
     if path.is_absolute() {
         return Ok(path);
     }
-    let cwd =
-        std::env::current_dir().map_err(|e| format!("failed to resolve current directory: {e}"))?;
+    let cwd = std::env::current_dir().map_err(|e| {
+        CompositionError::Infrastructure(format!("failed to resolve current directory: {e}"))
+    })?;
     Ok(cwd.join(path))
 }
-fn dry_fix_create_safe_home() -> Result<PathBuf, String> {
+fn dry_fix_create_safe_home() -> Result<PathBuf, CompositionError> {
     use std::sync::atomic::{AtomicU64, Ordering};
     use std::time::{SystemTime, UNIX_EPOCH};
     static COUNTER: AtomicU64 = AtomicU64::new(0);
@@ -264,7 +316,9 @@ fn dry_fix_create_safe_home() -> Result<PathBuf, String> {
     for _ in 0..16_u8 {
         let ts = SystemTime::now()
             .duration_since(UNIX_EPOCH)
-            .map_err(|e| format!("failed to compute timestamp: {e}"))?
+            .map_err(|e| {
+                CompositionError::Infrastructure(format!("failed to compute timestamp: {e}"))
+            })?
             .as_nanos();
         let seq = COUNTER.fetch_add(1, Ordering::Relaxed);
         let path = dir.join(format!("dry-fix-codex-home-{}-{ts}-{seq}", std::process::id()));
@@ -279,17 +333,22 @@ fn dry_fix_create_safe_home() -> Result<PathBuf, String> {
             Ok(()) => return Ok(path),
             Err(e) if e.kind() == std::io::ErrorKind::AlreadyExists => continue,
             Err(e) => {
-                return Err(format!("failed to create safe HOME {}: {e}", path.display()));
+                return Err(CompositionError::Infrastructure(format!(
+                    "failed to create safe HOME {}: {e}",
+                    path.display()
+                )));
             }
         }
     }
-    Err("failed to create a unique safe HOME after repeated attempts".to_owned())
+    Err(CompositionError::Infrastructure(
+        "failed to create a unique safe HOME after repeated attempts".to_owned(),
+    ))
 }
 pub(crate) fn dry_fix_build_safe_env(
     safe_home: &Path,
     codex_home: &Path,
     extra_path_prefix: Option<&Path>,
-) -> Result<Vec<(OsString, OsString)>, String> {
+) -> Result<Vec<(OsString, OsString)>, CompositionError> {
     #[rustfmt::skip]
     const BLOCKED: &[&str] = &[
         "GITHUB_TOKEN", "SSH_AUTH_SOCK", "GIT_SSH", "GIT_SSH_COMMAND",
@@ -373,23 +432,29 @@ fn dry_fix_writable_roots_config(roots: &[&Path]) -> OsString {
 fn dry_fix_escape_config_string(raw: &str) -> String {
     raw.replace('\\', "\\\\").replace('"', "\\\"")
 }
-fn build_dry_fix_prompt(track_id: &str, briefing_file: &Path) -> Result<String, String> {
+fn build_dry_fix_prompt(track_id: &str, briefing_file: &Path) -> Result<String, CompositionError> {
     let briefing_path = briefing_file.to_str().ok_or_else(|| {
-        format!("briefing_file path is not valid UTF-8: {}", briefing_file.display())
+        CompositionError::Infrastructure(format!(
+            "briefing_file path is not valid UTF-8: {}",
+            briefing_file.display()
+        ))
     })?;
     if briefing_path.is_empty()
         || briefing_path
             .chars()
             .any(|c| c == '`' || c.is_control() || matches!(c, '\u{2028}' | '\u{2029}'))
     {
-        return Err(format!(
+        return Err(CompositionError::Infrastructure(format!(
             "briefing_file path contains characters that are unsafe in the fixer prompt: \
          {}",
             briefing_file.display()
-        ));
+        )));
     }
-    let briefing_content = std::fs::read_to_string(briefing_file)
-        .map_err(|e| format!("failed to read briefing file {briefing_path}: {e}"))?;
+    let briefing_content = std::fs::read_to_string(briefing_file).map_err(|e| {
+        CompositionError::Infrastructure(format!(
+            "failed to read briefing file {briefing_path}: {e}"
+        ))
+    })?;
     let prompt = format!(
         "$dry-fix-lead\n\n\
      {briefing_content}\n\n\
@@ -405,22 +470,26 @@ fn build_dry_fix_prompt(track_id: &str, briefing_file: &Path) -> Result<String, 
     );
     Ok(prompt)
 }
-fn dry_fix_runtime_path(prefix: &str, ext: &str) -> Result<PathBuf, String> {
+fn dry_fix_runtime_path(prefix: &str, ext: &str) -> Result<PathBuf, CompositionError> {
     use std::sync::atomic::{AtomicU64, Ordering};
     use std::time::{SystemTime, UNIX_EPOCH};
     static COUNTER: AtomicU64 = AtomicU64::new(0);
     let timestamp = SystemTime::now()
         .duration_since(UNIX_EPOCH)
-        .map_err(|e| format!("failed to compute timestamp: {e}"))?
+        .map_err(|e| CompositionError::Infrastructure(format!("failed to compute timestamp: {e}")))?
         .as_nanos();
     let seq = COUNTER.fetch_add(1, Ordering::Relaxed);
     let path = PathBuf::from("tmp/reviewer-runtime")
         .join(format!("{prefix}-{}-{timestamp}-{seq}.{ext}", std::process::id()));
-    let parent = path
-        .parent()
-        .ok_or_else(|| format!("runtime path must have a parent: {}", path.display()))?;
-    std::fs::create_dir_all(parent)
-        .map_err(|e| format!("failed to create {}: {e}", parent.display()))?;
+    let parent = path.parent().ok_or_else(|| {
+        CompositionError::Infrastructure(format!(
+            "runtime path must have a parent: {}",
+            path.display()
+        ))
+    })?;
+    std::fs::create_dir_all(parent).map_err(|e| {
+        CompositionError::Infrastructure(format!("failed to create {}: {e}", parent.display()))
+    })?;
     Ok(path)
 }
 pub(crate) fn dry_fix_spawn_and_collect(
@@ -428,7 +497,7 @@ pub(crate) fn dry_fix_spawn_and_collect(
     args: &[OsString],
     safe_env: &[(OsString, OsString)],
     prompt: &str,
-) -> Result<(String, PathBuf), String> {
+) -> Result<(String, PathBuf), CompositionError> {
     use std::io::Write as _;
     use std::process::{Command, Stdio};
     use std::thread;
@@ -442,7 +511,9 @@ pub(crate) fn dry_fix_spawn_and_collect(
     command.stdin(Stdio::piped());
     command.stdout(Stdio::piped());
     command.stderr(Stdio::piped());
-    let mut child = command.spawn().map_err(|e| format!("failed to spawn Codex fixer: {e}"))?;
+    let mut child = command.spawn().map_err(|e| {
+        CompositionError::Infrastructure(format!("failed to spawn Codex fixer: {e}"))
+    })?;
     let redactions = dry_fix_redaction_values(safe_env);
     let stdout_pipe = child.stdout.take();
     let stdout_redactions = redactions.clone();
@@ -461,9 +532,14 @@ pub(crate) fn dry_fix_spawn_and_collect(
         let stdout = stdout_handle.join().ok().and_then(|r| r.ok()).unwrap_or_default();
         let stderr = stderr_handle.join().ok().and_then(|r| r.ok()).unwrap_or_default();
         write_dry_fix_log(&log_path, bin, "killed", &stdout, &stderr);
-        return Err(format!("{msg}; log: {}", log_path.display()));
+        return Err(CompositionError::Infrastructure(format!(
+            "{msg}; log: {}",
+            log_path.display()
+        )));
     }
-    let exit_status = child.wait().map_err(|e| format!("failed to wait for Codex fixer: {e}"))?;
+    let exit_status = child.wait().map_err(|e| {
+        CompositionError::Infrastructure(format!("failed to wait for Codex fixer: {e}"))
+    })?;
     let status_str = exit_status.to_string();
     let (stdout, stdout_error) =
         dry_fix_collector_result_for_log(join_dry_fix_collector(stdout_handle, "stdout"), "stdout");
@@ -471,39 +547,49 @@ pub(crate) fn dry_fix_spawn_and_collect(
         dry_fix_collector_result_for_log(join_dry_fix_collector(stderr_handle, "stderr"), "stderr");
     write_dry_fix_log(&log_path, bin, &status_str, &stdout, &stderr);
     if let Some(error) = stdout_error.or(stderr_error) {
-        return Err(format!("{error}; log: {}", log_path.display()));
+        return Err(CompositionError::Infrastructure(format!(
+            "{}; log: {}",
+            error,
+            log_path.display()
+        )));
     }
     Ok((stdout, log_path))
 }
 fn dry_fix_collector_result_for_log(
-    result: Result<String, String>,
+    result: Result<String, CompositionError>,
     stream_name: &str,
-) -> (String, Option<String>) {
+) -> (String, Option<CompositionError>) {
     match result {
         Ok(output) => (output, None),
         Err(error) => (format!("[failed to collect {stream_name}: {error}]\n"), Some(error)),
     }
 }
 fn join_dry_fix_collector(
-    handle: std::thread::JoinHandle<Result<String, String>>,
+    handle: std::thread::JoinHandle<Result<String, CompositionError>>,
     stream_name: &str,
-) -> Result<String, String> {
+) -> Result<String, CompositionError> {
     handle
         .join()
-        .map_err(|_| format!("{stream_name} collector thread panicked"))?
-        .map_err(|e| format!("{stream_name} collection error: {e}"))
+        .map_err(|_| {
+            CompositionError::Infrastructure(format!("{stream_name} collector thread panicked"))
+        })?
+        .map_err(|e| {
+            CompositionError::Infrastructure(format!("{stream_name} collection error: {e}"))
+        })
 }
 fn collect_pipe<R: std::io::Read>(
     pipe: Option<R>,
     echo_to_stderr: bool,
     redactions: &[(String, String)],
-) -> Result<String, String> {
+) -> Result<String, CompositionError> {
     use std::io::{BufRead, BufReader};
     let mut collected = String::new();
     if let Some(pipe) = pipe {
         let reader = BufReader::new(pipe);
         for line in reader.lines() {
-            let line = line.map_err(|e| format!("failed to read Codex fixer output: {e}"))?;
+            let line = line.map_err(|e| {
+                CompositionError::Infrastructure(format!("failed to read Codex fixer output: {e}"))
+            })?;
             let line = redact_dry_fix_sensitive_text(&line, redactions);
             if echo_to_stderr {
                 eprintln!("{line}");

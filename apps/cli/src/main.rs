@@ -3,7 +3,9 @@
 use std::process::ExitCode;
 
 use clap::{Parser, Subcommand};
-use cli_composition::CliApp;
+use cli_composition::{CompositionError, DemoCompositionRoot, TelemetryCompositionRoot};
+use cli_driver::demo::DemoInput;
+use cli_driver::telemetry::TelemetryInput;
 
 mod commands;
 mod error;
@@ -150,18 +152,16 @@ fn run_cli_with(
         Some(CliCommand::Dry { cmd }) => dry_execute(cmd),
         Some(CliCommand::RefVerify { cmd }) => ref_verify_execute(cmd),
         Some(CliCommand::Signal { cmd }) => commands::signal::execute(cmd),
-        Some(CliCommand::Demo) | None => match CliApp::new().demo() {
-            Ok(outcome) => {
-                if let Some(msg) = outcome.stdout {
-                    println!("{msg}");
-                }
-                ExitCode::from(outcome.exit_code)
+        Some(CliCommand::Demo) | None => {
+            let outcome = DemoCompositionRoot::new().demo_driver().handle(DemoInput::Run);
+            if let Some(msg) = outcome.stdout {
+                println!("{msg}");
             }
-            Err(err) => {
-                eprintln!("{err}");
-                ExitCode::FAILURE
+            if let Some(msg) = outcome.stderr {
+                eprintln!("{msg}");
             }
-        },
+            ExitCode::from(outcome.exit_code)
+        }
     }
 }
 
@@ -250,67 +250,24 @@ fn emit_archived_track_subcommand(
     command_label: &str,
     exit_code: i32,
     start: std::time::Instant,
-) -> Result<(), String> {
-    use std::io::Write as _;
-
-    let repo_root = repo_root_for_items_dir(items_dir)?;
-    let path =
-        repo_root.join("track").join("archive").join(track_id).join("logs").join("telemetry.jsonl");
+) -> Result<(), CompositionError> {
     let duration_ms = u64::try_from(start.elapsed().as_millis()).unwrap_or(u64::MAX);
-    let event = serde_json::json!({
-        "event_type": "TrackSubcommand",
-        "schema_version": 1,
-        "track_id": track_id,
-        "command": command_label,
-        "exit_code": exit_code,
-        "duration_ms": duration_ms,
-        "timestamp": chrono::Utc::now().to_rfc3339(),
-    });
-    let mut bytes = serde_json::to_vec(&event).map_err(|e| e.to_string())?;
-    bytes.push(b'\n');
-
-    let parent = path
-        .parent()
-        .ok_or_else(|| format!("archive telemetry path has no parent: {}", path.display()))?;
-    std::fs::create_dir_all(parent)
-        .map_err(|e| format!("failed to create telemetry directory {}: {e}", parent.display()))?;
-    let mut file = std::fs::OpenOptions::new()
-        .append(true)
-        .create(true)
-        .open(&path)
-        .map_err(|e| format!("failed to open telemetry file {}: {e}", path.display()))?;
-    let written = file
-        .write(&bytes)
-        .map_err(|e| format!("failed to write telemetry file {}: {e}", path.display()))?;
-    if written != bytes.len() {
-        return Err(format!(
-            "short write for telemetry file {}: wrote {written} of {} bytes",
-            path.display(),
-            bytes.len()
-        ));
+    let outcome = TelemetryCompositionRoot::new().telemetry_driver().handle(
+        TelemetryInput::EmitArchivedTrackSubcommand {
+            items_dir: items_dir.to_path_buf(),
+            track_id: track_id.to_owned(),
+            subcommand: command_label.to_owned(),
+            exit_code,
+            duration_ms,
+        },
+    );
+    if outcome.exit_code == 0 {
+        Ok(())
+    } else {
+        let msg =
+            outcome.stderr.unwrap_or_else(|| "archived-track telemetry emit failed".to_owned());
+        Err(CompositionError::Infrastructure(msg))
     }
-
-    Ok(())
-}
-
-fn repo_root_for_items_dir(items_dir: &std::path::Path) -> Result<std::path::PathBuf, String> {
-    let project_root = commands::track::resolve_project_root(items_dir)?;
-    let output = std::process::Command::new("git")
-        .args(["rev-parse", "--show-toplevel"])
-        .current_dir(&project_root)
-        .output()
-        .map_err(|e| format!("failed to run git rev-parse --show-toplevel: {e}"))?;
-    if !output.status.success() {
-        let stderr = String::from_utf8_lossy(&output.stderr).trim().to_owned();
-        let code = output.status.code().unwrap_or(-1);
-        return Err(format!("git rev-parse --show-toplevel failed (exit {code}): {stderr}"));
-    }
-    let root = String::from_utf8_lossy(&output.stdout).trim().to_owned();
-    if root.is_empty() {
-        return Err("git rev-parse --show-toplevel returned an empty path".to_owned());
-    }
-
-    Ok(std::path::PathBuf::from(root))
 }
 
 // ---------------------------------------------------------------------------
@@ -376,8 +333,8 @@ fn execute_hook_with_telemetry(cmd: commands::hook::HookCommand) -> ExitCode {
             }
             ExitCode::from(outcome.exit_code)
         }
-        Err(msg) => {
-            eprintln!("{msg}");
+        Err(e) => {
+            eprintln!("{e}");
             // Fail-closed for hooks: internal error → block (exit 2).
             // Emit HookBlock so internal failures are visible in telemetry
             // (same as a deliberate block verdict from the dispatch logic).
@@ -546,7 +503,8 @@ mod tests {
     use std::process::ExitCode;
 
     use clap::Parser as _;
-    use cli_composition::CliApp;
+    use cli_composition::DemoCompositionRoot;
+    use cli_driver::demo::DemoInput as DriverDemoInput;
     use tempfile::TempDir;
 
     use super::run_cli_with;
@@ -579,9 +537,8 @@ mod tests {
     fn example_cli_flow_saves_track_successfully() {
         // Delegates to infrastructure::demo::run_example_demo which creates an in-memory
         // track, persists it, derives status "planned", and returns the display string.
-        let result = CliApp::new().demo();
-        assert!(result.is_ok(), "demo failed: {:?}", result.err());
-        let outcome = result.unwrap();
+        let outcome = DemoCompositionRoot::new().demo_driver().handle(DriverDemoInput::Run);
+        assert_eq!(outcome.exit_code, 0, "demo failed: {:?}", outcome.stderr);
         let msg = outcome.stdout.unwrap_or_default();
         assert!(msg.contains("planned"), "expected 'planned' in output: {msg}");
     }
@@ -778,22 +735,25 @@ mod tests {
     /// entrypoint and dispatch through `run_cli` to the report command.
     #[test]
     fn test_telemetry_report_dispatch_via_run_cli_succeeds_with_existing_track() {
+        let _guard = process_env_lock().lock().unwrap();
         let dir = TempDir::new().unwrap();
+        let root = dir.path();
         let track_id = "telemetry-route-track";
-        fs::create_dir_all(dir.path().join(track_id)).unwrap();
-        let items_dir = dir.path().to_str().unwrap();
+        seed_repo(root, &format!("track/{track_id}"));
+        fs::create_dir_all(root.join("track").join("items").join(track_id)).unwrap();
 
-        let cli = Cli::try_parse_from([
-            "sotp",
-            "telemetry",
-            "report",
-            track_id,
-            "--items-dir",
-            items_dir,
-        ])
-        .unwrap();
-
-        let exit = run_cli(cli, |_cmd| ExitCode::FAILURE);
+        let exit = run_in_dir(root, || {
+            let cli = Cli::try_parse_from([
+                "sotp",
+                "telemetry",
+                "report",
+                track_id,
+                "--items-dir",
+                "track/items",
+            ])
+            .unwrap();
+            run_cli(cli, |_cmd| ExitCode::FAILURE)
+        });
         assert_eq!(exit, ExitCode::SUCCESS);
     }
 
@@ -809,6 +769,7 @@ mod tests {
         fs::create_dir_all(&archived_track_dir).unwrap();
         let nested_cwd = root.join("nested").join("workdir");
         fs::create_dir_all(&nested_cwd).unwrap();
+        let started_at = std::time::Instant::now() - std::time::Duration::from_millis(1);
 
         run_in_dir(&nested_cwd, || {
             super::emit_archived_track_subcommand(
@@ -816,7 +777,7 @@ mod tests {
                 track_id,
                 "track archive",
                 0,
-                std::time::Instant::now(),
+                started_at,
             )
             .unwrap();
         });
@@ -842,9 +803,19 @@ mod tests {
         let line = fs::read_to_string(&archived_log).unwrap();
         let value: serde_json::Value = serde_json::from_str(line.trim()).unwrap();
         assert_eq!(value["event_type"], "TrackSubcommand");
+        assert_eq!(value["schema_version"], 1);
         assert_eq!(value["track_id"], track_id);
         assert_eq!(value["command"], "track archive");
         assert_eq!(value["exit_code"], 0);
+        let duration_ms = value["duration_ms"].as_u64().expect("duration_ms must be u64");
+        assert!(
+            (1..60_000).contains(&duration_ms),
+            "duration_ms must be recorded and within a sane range: {duration_ms}"
+        );
+        assert!(
+            value.get("timestamp").is_some(),
+            "timestamp field must be present in the JSONL line"
+        );
     }
 
     #[test]

@@ -16,3 +16,41 @@ pub use build::DupIndexBuildInput;
 pub use check::DupCheckInput;
 pub use find_similar::FindSimilarInput;
 pub use measure_quality::DupIndexMeasureQualityInput;
+
+// ── Per-context composition root ──────────────────────────────────────────────
+
+/// Composition root for the `semantic_dup` command family.
+///
+/// Unit struct: no adapter dependencies are injected at construction time.
+pub struct SemanticDupCompositionRoot;
+
+impl SemanticDupCompositionRoot {
+    /// Create a new `SemanticDupCompositionRoot`.
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+impl Default for SemanticDupCompositionRoot {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl SemanticDupCompositionRoot {
+    /// Construct a wired [`cli_driver::semantic_dup::SemanticDupDriver`] for injection into the CLI.
+    ///
+    /// Builds `SemanticDupDriverAdapter`, wraps it in `SemanticDupDriverInteractor`,
+    /// and returns a `SemanticDupDriver` ready to handle all `semantic_dup` subcommands.
+    pub fn semantic_dup_driver(&self) -> cli_driver::semantic_dup::SemanticDupDriver {
+        use std::sync::Arc;
+
+        use usecase::semantic_dup_driver::SemanticDupDriverInteractor;
+
+        use crate::semantic_dup_driver_adapter::SemanticDupDriverAdapter;
+
+        let port = Arc::new(SemanticDupDriverAdapter::new());
+        let service = Arc::new(SemanticDupDriverInteractor::new(port));
+        cli_driver::semantic_dup::SemanticDupDriver::new(service)
+    }
+}

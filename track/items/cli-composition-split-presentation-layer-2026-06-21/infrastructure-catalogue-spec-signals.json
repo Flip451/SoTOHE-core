@@ -1,0 +1,156 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "74bed58033245c691d5e695d19d725887fd4c66940747a1ccd48c26f72778700",
+  "signals": [
+    {
+      "type_name": "CodeFragmentExtractorAdapter",
+      "signal": "blue",
+      "entry_hash": "b95ec12c9132e206c8199f0667d1e5196a278287e95501429170b748232d1ce3"
+    },
+    {
+      "type_name": "DemoRunError",
+      "signal": "blue",
+      "entry_hash": "9eed65c2011bde24dbc69370ab7c2eb9a49d26450541aeb57434338d67dc4b9e"
+    },
+    {
+      "type_name": "FsArchAdapter",
+      "signal": "blue",
+      "entry_hash": "f43de657c125f730d71106a1a622931821268a0ca309ca6556aed4d9001d1f66"
+    },
+    {
+      "type_name": "FsArchivedTrackTelemetryAdapter",
+      "signal": "blue",
+      "entry_hash": "7e2f2e0d1f29dec027798f677361ddf6a70ad776a3bc1fc670a3dcf60d9e1984"
+    },
+    {
+      "type_name": "FsConventionsAdapter",
+      "signal": "blue",
+      "entry_hash": "6114c48f4dea37c731733dea36c4f4a33b6bbd2684373a5b6a5e5bb39f714658"
+    },
+    {
+      "type_name": "FsDemoAdapter",
+      "signal": "blue",
+      "entry_hash": "8b8d05331925c662bd9ad00377d2975a2fb3f0818b813b327d18356de219f68f"
+    },
+    {
+      "type_name": "FsDryCorpusMetaAdapter",
+      "signal": "blue",
+      "entry_hash": "c85cfc10c6933d05cb579a27276a29715cadc07d2ecc4de3898c91a46d1f65bc"
+    },
+    {
+      "type_name": "FsFileWriteAdapter",
+      "signal": "blue",
+      "entry_hash": "fa7880d6bd937846235548a6d5895ad770bc61d8086e51e30e8121cdc7963e9a"
+    },
+    {
+      "type_name": "FsGitWorkflowAdapter",
+      "signal": "blue",
+      "entry_hash": "fb061a23e79a31a3c899f9febb165bcdda3ddfc98f880d256eb720114d04e4e8"
+    },
+    {
+      "type_name": "FsRefVerifyAggregateAdapter",
+      "signal": "blue",
+      "entry_hash": "d1c738e8cb2c351c028ebfb499c1809590afa0e92100fc8b3a1d2acabf79055b"
+    },
+    {
+      "type_name": "FsRefVerifyCheckApprovedAdapter",
+      "signal": "blue",
+      "entry_hash": "69a60cca1fd9f1342b525afe5c7570a02aae238546433d242ed0868fa64599ad"
+    },
+    {
+      "type_name": "FsRefVerifyGateStateAdapter",
+      "signal": "blue",
+      "entry_hash": "991eaf65f978403f13f6d86b8db7373e0e7c71610273c271e4314976915a1204"
+    },
+    {
+      "type_name": "FsRefVerifyRunAdapter",
+      "signal": "blue",
+      "entry_hash": "ce97ad6c816178bc1d98e6e7ee6ebf1fe51d373816ce43628d4a823cb51bc4aa"
+    },
+    {
+      "type_name": "FsReviewGateStateAdapter",
+      "signal": "blue",
+      "entry_hash": "454a9f9032ba0868ce9f320c4ed376c9ef2723ff1665519ec3cd4d7516fa82c4"
+    },
+    {
+      "type_name": "FsSpecFileWriterAdapter",
+      "signal": "blue",
+      "entry_hash": "43ddb7f3c0d172da5850a38c24814f1872030afd7b37b9da42105ef730d6ee3f"
+    },
+    {
+      "type_name": "FsTelemetryEmitDynamicAdapter",
+      "signal": "blue",
+      "entry_hash": "ff9d6b9dbe577e7f0c4f1a1f58b0b250a996a8bc14788aee1fdb20f344e3537e"
+    },
+    {
+      "type_name": "FsTelemetryReportAdapter",
+      "signal": "blue",
+      "entry_hash": "dd7690621f77ab16b675968d869369362da8cd09b96dbaa4810d9e000d2a898b"
+    },
+    {
+      "type_name": "FsVerifyAdapter",
+      "signal": "blue",
+      "entry_hash": "2099e29e81444d5eadf73b3b581adbcc00f48b3b79898722b5bd80055501bbdc"
+    },
+    {
+      "type_name": "GitDryCheckDiffGetter",
+      "signal": "blue",
+      "entry_hash": "7688e35d139e45636bfa624325f52b096a9e5e3dc4d0c2a96353eb32d9c8b433"
+    },
+    {
+      "type_name": "NoOpDryApprovalService",
+      "signal": "blue",
+      "entry_hash": "7f7e8ab40614f901300f178b2f80e59773e31cf2399d591e63877259f7df4f7b"
+    },
+    {
+      "type_name": "NoopSemanticIndexPort",
+      "signal": "blue",
+      "entry_hash": "87cb083dd0126f8bbd6fb370f847ba67fec941beefa9914ecc59502aff38162e"
+    },
+    {
+      "type_name": "NullInsertIndexProxy",
+      "signal": "blue",
+      "entry_hash": "ad737c4546c1e117b229c53dcc855c822d941334cba74b6597e3a63890e1301e"
+    },
+    {
+      "type_name": "PersistentIndexLockError",
+      "signal": "blue",
+      "entry_hash": "a5d34c02c2502b07d1da3678424fa26b0a84bafa6dee755535588934651dd179"
+    },
+    {
+      "type_name": "RecordingDryAgent",
+      "signal": "blue",
+      "entry_hash": "b7218e695c2e257911eaec0d357374d8004bdc87aaacea42f73b59bc411b9b2e"
+    },
+    {
+      "type_name": "SystemSleepAdapter",
+      "signal": "blue",
+      "entry_hash": "04c8255edeea9411ae3e9cbe0e801f06ae85fd1c8d0a01e1c3a5f71a3116c81f"
+    },
+    {
+      "type_name": "TrackBranchError",
+      "signal": "blue",
+      "entry_hash": "552941c9114ae8d9daad42900eab6705ad42eb16fc231bfd2272476b50678432"
+    },
+    {
+      "type_name": "infrastructure::demo::run_example_demo",
+      "signal": "blue",
+      "entry_hash": "c9711e7b6c94c7dd8a05da85a6f715c5c515dcec4cfd75a64ea56a07824431bb"
+    },
+    {
+      "type_name": "infrastructure::git_cli::collect_track_branch_claims",
+      "signal": "blue",
+      "entry_hash": "92c0ffe22fa3b72405cdf02dca4e059a2a6e53f31b040e6e604e10c8fd1617a8"
+    },
+    {
+      "type_name": "infrastructure::git_cli::load_explicit_track_branch",
+      "signal": "blue",
+      "entry_hash": "d3ae00c84255fce11f37b88e8f939f08af28edde97ff7b25b4fea98225029768"
+    },
+    {
+      "type_name": "infrastructure::git_cli::load_explicit_track_branch_from_items_dir",
+      "signal": "blue",
+      "entry_hash": "4760ce1d38249ccb28025fb78e34d25e8baf08c49bbd7e646f04013f2717f878"
+    }
+  ]
+}

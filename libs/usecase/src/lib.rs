@@ -8,6 +8,7 @@
 pub use domain::tddd::LayerId;
 pub use domain::{TrackId, ValidationError};
 
+pub mod arch;
 pub mod baseline_capture;
 pub mod baseline_graph_workflow;
 pub mod catalogue_impl_signals;
@@ -18,29 +19,49 @@ pub mod catalogue_traversal;
 pub mod chain;
 pub mod commit_hash_persistence;
 pub mod contract_map_workflow;
+pub mod conventions;
+pub mod d4_orchestration;
+pub mod demo;
 pub mod dry_check;
+pub mod dry_driver;
 pub mod export_schema;
+pub mod file;
 pub mod fixpoint_resolve;
 pub mod git_workflow;
 pub mod guard;
 pub mod hook;
 pub mod hook_dispatch;
 pub mod merge_gate;
+pub mod pr;
 pub mod pr_review;
+pub mod pr_review_polling;
 pub mod pr_workflow;
 pub mod pre_commit_type_signals;
 pub mod ref_verify;
 pub mod review_v2;
 pub mod review_workflow;
 pub mod semantic_dup;
+pub mod semantic_dup_driver;
 pub mod signal;
+pub mod signal_gate;
+pub mod signal_service;
 pub mod skill_compliance;
+pub mod spec_adr_signal;
 pub mod task_completion;
 pub mod task_ops;
+pub mod telemetry;
 pub mod track_phase;
 pub mod track_resolution;
+pub mod track_service;
 pub mod type_signals;
+pub mod verify;
 pub mod verify_adr_signals;
+
+pub use telemetry::{
+    ArchivedTrackTelemetryCommand, ArchivedTrackTelemetryError, ArchivedTrackTelemetryInteractor,
+    ArchivedTrackTelemetryPort, ArchivedTrackTelemetryService, TelemetryAggregateService,
+    TelemetryEmitDynamicPort, TelemetryReportPort,
+};
 
 use std::sync::Arc;
 

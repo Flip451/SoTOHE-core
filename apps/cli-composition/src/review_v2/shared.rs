@@ -11,11 +11,36 @@ use infrastructure::review_v2::{
     ClaudeReviewer, CodexReviewer, FsCommitHashStore, FsReviewStore, GitDiffGetter,
     SystemReviewHasher, load_v2_scope_config,
 };
+use thiserror::Error;
 use usecase::review_v2::{
     ReviewCycle, ScopeQueryInteractor, error::DiffGetError, ports::DiffGetter,
 };
 
 use super::null_reviewer::NullReviewer;
+
+/// Typed error for shared v2 review composition helpers.
+///
+/// Replaces the stringly-typed error boundary previously used by the internal
+/// builder functions in this module. All variants carry a human-readable
+/// message so callers can convert to string via `.to_string()` when needed.
+#[derive(Debug, PartialEq, Error)]
+pub enum ReviewSharedError {
+    /// Git repository discovery or operation failed.
+    #[error("{0}")]
+    Git(String),
+
+    /// Filesystem or path operation failed.
+    #[error("{0}")]
+    Path(String),
+
+    /// Configuration loading or parsing failed.
+    #[error("{0}")]
+    Config(String),
+
+    /// Invalid input (e.g. bad track-id, invalid commit hash).
+    #[error("{0}")]
+    InvalidInput(String),
+}
 
 /// Stub `DiffGetter` for pure-logic use cases (e.g. `classify`) that do not
 /// need diff listings. `list_diff_files` always returns an empty list.
@@ -126,17 +151,17 @@ pub enum CodexReviewOutcome {
 /// Returns `(scope_config, review_store, commit_hash_store, base)`.
 ///
 /// # Errors
-/// Returns a human-readable error string on failure.
+/// Returns [`ReviewSharedError`] on failure.
 pub(super) fn build_v2_shared(
     track_id: &TrackId,
     items_dir: &Path,
-) -> Result<(ReviewScopeConfig, FsReviewStore, FsCommitHashStore, CommitHash), String> {
+) -> Result<(ReviewScopeConfig, FsReviewStore, FsCommitHashStore, CommitHash), ReviewSharedError> {
     let git = discover_repo_from_items_dir(items_dir)?;
     let root = git.root().to_path_buf();
 
-    let canonical_root = root
-        .canonicalize()
-        .map_err(|e| format!("failed to canonicalize repo root {}: {e}", root.display()))?;
+    let canonical_root = root.canonicalize().map_err(|e| {
+        ReviewSharedError::Path(format!("failed to canonicalize repo root {}: {e}", root.display()))
+    })?;
     let items_dir_abs =
         if items_dir.is_absolute() { items_dir.to_path_buf() } else { root.join(items_dir) };
     // Canonicalize directly: resolve all symlinks and `..` components together.
@@ -146,31 +171,31 @@ pub(super) fn build_v2_shared(
     // If `items_dir` does not exist on the filesystem, we cannot verify containment
     // and treat it as if it were outside the repository root (fail-closed).
     let canonical_items_dir = items_dir_abs.canonicalize().map_err(|_| {
-        format!(
+        ReviewSharedError::Path(format!(
             "items_dir '{}' is outside the repository root '{}' or does not exist. \
              Only paths under the repo are allowed.",
             items_dir.display(),
             canonical_root.display()
-        )
+        ))
     })?;
     if !canonical_items_dir.starts_with(&canonical_root) {
-        return Err(format!(
+        return Err(ReviewSharedError::Path(format!(
             "items_dir '{}' is outside the repository root '{}'. \
              Only paths under the repo are allowed.",
             items_dir.display(),
             canonical_root.display()
-        ));
+        )));
     }
 
     let track_dir = items_dir_abs.join(track_id.as_ref());
     if !track_dir.is_dir() {
-        return Err(format!(
+        return Err(ReviewSharedError::Path(format!(
             "track directory '{}' does not exist. \
              Check --track-id '{}' and --items-dir '{}'.",
             track_dir.display(),
             track_id.as_ref(),
             items_dir.display(),
-        ));
+        )));
     }
 
     // Use the canonicalized repo root as the trusted_root for symlink guards:
@@ -178,7 +203,7 @@ pub(super) fn build_v2_shared(
     // `canonical_root` is guaranteed non-symlink and safe as a trusted root.
     let scope_json_path = canonical_root.join(".harness/config/review-scope.json");
     let scope_config = load_v2_scope_config(&scope_json_path, track_id, &canonical_root)
-        .map_err(|e| format!("load review-scope.json: {e}"))?;
+        .map_err(|e| ReviewSharedError::Config(format!("load review-scope.json: {e}")))?;
 
     let review_json_path = track_dir.join("review.json");
     let commit_hash_path = track_dir.join(".commit_hash");
@@ -190,7 +215,7 @@ pub(super) fn build_v2_shared(
     Ok((scope_config, review_store, commit_hash_store, base))
 }
 
-fn discover_repo_from_items_dir(items_dir: &Path) -> Result<SystemGitRepo, String> {
+fn discover_repo_from_items_dir(items_dir: &Path) -> Result<SystemGitRepo, ReviewSharedError> {
     if let Ok(repo) = SystemGitRepo::discover_from(items_dir) {
         return Ok(repo);
     }
@@ -199,10 +224,10 @@ fn discover_repo_from_items_dir(items_dir: &Path) -> Result<SystemGitRepo, Strin
             return Ok(repo);
         }
     }
-    SystemGitRepo::discover().map_err(|e| format!("git discover: {e}"))
+    SystemGitRepo::discover().map_err(|e| ReviewSharedError::Git(format!("git discover: {e}")))
 }
 
-pub(super) fn repo_root_from_items_dir(items_dir: &Path) -> Result<PathBuf, String> {
+pub(super) fn repo_root_from_items_dir(items_dir: &Path) -> Result<PathBuf, ReviewSharedError> {
     Ok(discover_repo_from_items_dir(items_dir)?.root().to_path_buf())
 }
 
@@ -212,20 +237,28 @@ struct RepoCwdGuard {
 }
 
 impl RepoCwdGuard {
-    fn change_to(repo_root: &Path) -> Result<Self, String> {
-        let original = std::env::current_dir()
-            .map_err(|e| format!("failed to read current directory: {e}"))?;
-        std::env::set_current_dir(repo_root)
-            .map_err(|e| format!("failed to enter repo root {}: {e}", repo_root.display()))?;
+    fn change_to(repo_root: &Path) -> Result<Self, ReviewSharedError> {
+        let original = std::env::current_dir().map_err(|e| {
+            ReviewSharedError::Path(format!("failed to read current directory: {e}"))
+        })?;
+        std::env::set_current_dir(repo_root).map_err(|e| {
+            ReviewSharedError::Path(format!(
+                "failed to enter repo root {}: {e}",
+                repo_root.display()
+            ))
+        })?;
         Ok(Self { original, restored: false })
     }
 
-    fn restore(&mut self) -> Result<(), String> {
+    fn restore(&mut self) -> Result<(), ReviewSharedError> {
         if self.restored {
             return Ok(());
         }
         std::env::set_current_dir(&self.original).map_err(|e| {
-            format!("failed to restore current directory {}: {e}", self.original.display())
+            ReviewSharedError::Path(format!(
+                "failed to restore current directory {}: {e}",
+                self.original.display()
+            ))
         })?;
         self.restored = true;
         Ok(())
@@ -240,8 +273,8 @@ impl Drop for RepoCwdGuard {
 
 pub(super) fn with_repo_cwd<T>(
     repo_root: &Path,
-    f: impl FnOnce() -> Result<T, String>,
-) -> Result<T, String> {
+    f: impl FnOnce() -> Result<T, ReviewSharedError>,
+) -> Result<T, ReviewSharedError> {
     let mut guard = RepoCwdGuard::change_to(repo_root)?;
     let result = f();
     if let Err(e) = guard.restore() {
@@ -254,7 +287,7 @@ pub(super) fn with_repo_cwd<T>(
 pub(super) fn resolve_diff_base(
     store: &FsCommitHashStore,
     git: &SystemGitRepo,
-) -> Result<CommitHash, String> {
+) -> Result<CommitHash, ReviewSharedError> {
     match store.read() {
         Ok(Some(hash)) => return Ok(hash),
         Ok(None) => {}
@@ -263,25 +296,27 @@ pub(super) fn resolve_diff_base(
         }
     }
 
-    let output =
-        git.output(&["rev-parse", "main"]).map_err(|e| format!("git rev-parse main: {e}"))?;
+    let output = git
+        .output(&["rev-parse", "main"])
+        .map_err(|e| ReviewSharedError::Git(format!("git rev-parse main: {e}")))?;
     if !output.status.success() {
-        return Err("git rev-parse main failed".to_owned());
+        return Err(ReviewSharedError::Git("git rev-parse main failed".to_owned()));
     }
     let sha = String::from_utf8_lossy(&output.stdout).trim().to_owned();
-    CommitHash::try_new(&sha).map_err(|e| format!("invalid main SHA: {e}"))
+    CommitHash::try_new(&sha)
+        .map_err(|e| ReviewSharedError::InvalidInput(format!("invalid main SHA: {e}")))
 }
 
 /// Builds the v2 review composition with a real `CodexReviewer`.
 ///
 /// # Errors
-/// Returns a human-readable error string on failure.
+/// Returns [`ReviewSharedError`] on failure.
 #[allow(dead_code)]
 pub(crate) fn build_review_v2_with_reviewer(
     track_id: &TrackId,
     items_dir: &Path,
     reviewer: CodexReviewer,
-) -> Result<ReviewV2CompositionWithCodex, String> {
+) -> Result<ReviewV2CompositionWithCodex, ReviewSharedError> {
     let (scope_config, review_store, commit_hash_store, base) =
         build_v2_shared(track_id, items_dir)?;
     let cycle =
@@ -299,11 +334,11 @@ pub(crate) fn build_review_v2_with_reviewer(
 /// 6. Returns `ReviewCycle` with `NullReviewer` (status/check-approved only)
 ///
 /// # Errors
-/// Returns a human-readable error string on failure.
+/// Returns [`ReviewSharedError`] on failure.
 pub(crate) fn build_review_v2(
     track_id: &TrackId,
     items_dir: &Path,
-) -> Result<ReviewV2Composition, String> {
+) -> Result<ReviewV2Composition, ReviewSharedError> {
     let (scope_config, review_store, commit_hash_store, base) =
         build_v2_shared(track_id, items_dir)?;
     let cycle = ReviewCycle::new(
@@ -322,25 +357,25 @@ pub(crate) fn build_review_v2(
 /// import `domain::TrackId` use this entry point (CN-01 / AC-03).
 ///
 /// # Errors
-/// Returns a human-readable error string on failure.
+/// Returns [`ReviewSharedError`] on failure.
 pub fn build_review_v2_str(
     track_id_str: &str,
     items_dir: &Path,
-) -> Result<ReviewV2Composition, String> {
-    let track_id =
-        TrackId::try_new(track_id_str).map_err(|e| format!("invalid --track-id: {e}"))?;
+) -> Result<ReviewV2Composition, ReviewSharedError> {
+    let track_id = TrackId::try_new(track_id_str)
+        .map_err(|e| ReviewSharedError::InvalidInput(format!("invalid --track-id: {e}")))?;
     build_review_v2(&track_id, items_dir)
 }
 
 /// Builds the v2 review composition with a real `ClaudeReviewer`.
 ///
 /// # Errors
-/// Returns a human-readable error string on failure.
+/// Returns [`ReviewSharedError`] on failure.
 pub(crate) fn build_review_v2_with_claude_reviewer(
     track_id: &TrackId,
     items_dir: &Path,
     reviewer: ClaudeReviewer,
-) -> Result<ReviewV2CompositionWithClaude, String> {
+) -> Result<ReviewV2CompositionWithClaude, ReviewSharedError> {
     let (scope_config, review_store, commit_hash_store, base) =
         build_v2_shared(track_id, items_dir)?;
     let cycle =
@@ -354,26 +389,26 @@ pub(crate) fn build_review_v2_with_claude_reviewer(
 /// import `domain::TrackId` use this entry point (CN-01 / AC-03).
 ///
 /// # Errors
-/// Returns a human-readable error string on failure.
+/// Returns [`ReviewSharedError`] on failure.
 #[allow(dead_code)] // used in run.rs tests only
 pub(crate) fn build_review_v2_with_claude_reviewer_str(
     track_id_str: &str,
     items_dir: &Path,
     reviewer: ClaudeReviewer,
-) -> Result<ReviewV2CompositionWithClaude, String> {
-    let track_id =
-        TrackId::try_new(track_id_str).map_err(|e| format!("invalid --track-id: {e}"))?;
+) -> Result<ReviewV2CompositionWithClaude, ReviewSharedError> {
+    let track_id = TrackId::try_new(track_id_str)
+        .map_err(|e| ReviewSharedError::InvalidInput(format!("invalid --track-id: {e}")))?;
     build_review_v2_with_claude_reviewer(&track_id, items_dir, reviewer)
 }
 
 /// Resolves the diff base + diff getter for `sotp review files`.
 ///
 /// # Errors
-/// Returns a human-readable error string on failure.
+/// Returns [`ReviewSharedError`] on failure.
 pub(crate) fn resolve_diff_base_and_getter(
     track_id: &TrackId,
     items_dir: &Path,
-) -> Result<(GitDiffGetter, CommitHash), String> {
+) -> Result<(GitDiffGetter, CommitHash), ReviewSharedError> {
     let (_scope_config, _review_store, _commit_hash_store, base) =
         build_v2_shared(track_id, items_dir)?;
     Ok((GitDiffGetter, base))
@@ -385,17 +420,18 @@ pub(crate) fn resolve_diff_base_and_getter(
 /// this entry point (CN-01 / AC-03).
 ///
 /// # Errors
-/// Returns a human-readable error string on failure.
+/// Returns [`ReviewSharedError`] on failure.
 pub(crate) fn build_scope_query_interactor_str(
     track_id_str: &str,
     items_dir: &Path,
-) -> Result<ScopeQueryInteractor<GitDiffGetter>, String> {
+) -> Result<ScopeQueryInteractor<GitDiffGetter>, ReviewSharedError> {
     use super::scope::load_scope_config_only;
 
-    let track_id =
-        TrackId::try_new(track_id_str).map_err(|e| format!("invalid --track-id: {e}"))?;
+    let track_id = TrackId::try_new(track_id_str)
+        .map_err(|e| ReviewSharedError::InvalidInput(format!("invalid --track-id: {e}")))?;
     let (diff_getter, base) = resolve_diff_base_and_getter(&track_id, items_dir)?;
-    let scope_config = load_scope_config_only(&track_id, items_dir)?;
+    let scope_config =
+        load_scope_config_only(&track_id, items_dir).map_err(ReviewSharedError::Config)?;
     Ok(ScopeQueryInteractor::new(scope_config, diff_getter, base))
 }
 
@@ -410,19 +446,23 @@ pub(crate) fn build_scope_query_interactor_str(
 /// base.
 ///
 /// # Errors
-/// Returns a human-readable error string on failure (invalid track id,
+/// Returns [`ReviewSharedError`] on failure (invalid track id,
 /// scope-config load failure, items_dir traversal guard).
 pub(crate) fn build_scope_query_interactor_no_diff_str(
     track_id_str: &str,
     items_dir: &Path,
-) -> Result<ScopeQueryInteractor<NullDiffGetter>, String> {
+) -> Result<ScopeQueryInteractor<NullDiffGetter>, ReviewSharedError> {
     use super::scope::load_scope_config_only;
 
-    let track_id =
-        TrackId::try_new(track_id_str).map_err(|e| format!("invalid --track-id: {e}"))?;
-    let scope_config = load_scope_config_only(&track_id, items_dir)?;
-    let placeholder_base = CommitHash::try_new("0".repeat(40))
-        .map_err(|e| format!("internal: placeholder commit hash construction failed: {e}"))?;
+    let track_id = TrackId::try_new(track_id_str)
+        .map_err(|e| ReviewSharedError::InvalidInput(format!("invalid --track-id: {e}")))?;
+    let scope_config =
+        load_scope_config_only(&track_id, items_dir).map_err(ReviewSharedError::Config)?;
+    let placeholder_base = CommitHash::try_new("0".repeat(40)).map_err(|e| {
+        ReviewSharedError::InvalidInput(format!(
+            "internal: placeholder commit hash construction failed: {e}"
+        ))
+    })?;
     Ok(ScopeQueryInteractor::new(scope_config, NullDiffGetter, placeholder_base))
 }
 
@@ -445,18 +485,22 @@ pub(crate) fn build_scope_query_interactor_no_diff_str(
 /// file is missing / malformed.
 pub(crate) fn load_agent_profiles_from_repo(
     items_dir: Option<&Path>,
-) -> Result<infrastructure::agent_profiles::AgentProfiles, String> {
+) -> Result<infrastructure::agent_profiles::AgentProfiles, ReviewSharedError> {
     let repo = if let Some(dir) = items_dir {
-        let project_root = crate::track::resolve_project_root(dir)?;
-        SystemGitRepo::discover_from(&project_root)
-            .map_err(|e| format!("[ERROR] failed to discover git repository root: {e}"))?
+        let project_root = crate::track::resolve_project_root(dir)
+            .map_err(|e| ReviewSharedError::Path(e.to_string()))?;
+        SystemGitRepo::discover_from(&project_root).map_err(|e| {
+            ReviewSharedError::Git(format!("[ERROR] failed to discover git repository root: {e}"))
+        })?
     } else {
-        SystemGitRepo::discover()
-            .map_err(|e| format!("[ERROR] failed to discover git repository root: {e}"))?
+        SystemGitRepo::discover().map_err(|e| {
+            ReviewSharedError::Git(format!("[ERROR] failed to discover git repository root: {e}"))
+        })?
     };
     let profiles_path = repo.root().join(infrastructure::agent_profiles::AGENT_PROFILES_PATH);
-    infrastructure::agent_profiles::AgentProfiles::load(&profiles_path)
-        .map_err(|e| format!("[ERROR] failed to load agent-profiles.json: {e}"))
+    infrastructure::agent_profiles::AgentProfiles::load(&profiles_path).map_err(|e| {
+        ReviewSharedError::Config(format!("[ERROR] failed to load agent-profiles.json: {e}"))
+    })
 }
 
 pub(crate) struct ResolvedAgentExecution {
@@ -475,17 +519,19 @@ pub(crate) fn resolve_agent_execution(
     capability: &str,
     round_type: infrastructure::agent_profiles::RoundType,
     model_override: Option<&str>,
-) -> Result<ResolvedAgentExecution, String> {
+) -> Result<ResolvedAgentExecution, ReviewSharedError> {
     let profiles = load_agent_profiles_from_repo(items_dir)?;
     let resolved = profiles.resolve_execution(capability, round_type).ok_or_else(|| {
-        format!("[ERROR] {capability} capability not defined in agent-profiles.json")
+        ReviewSharedError::Config(format!(
+            "[ERROR] {capability} capability not defined in agent-profiles.json"
+        ))
     })?;
     let model =
         model_override.map(str::to_owned).or_else(|| resolved.model.clone()).ok_or_else(|| {
-            format!(
+            ReviewSharedError::Config(format!(
                 "[ERROR] no model specified: pass --model or set model in agent-profiles.json \
                  {capability} capability"
-            )
+            ))
         })?;
     Ok(ResolvedAgentExecution { provider: resolved.provider.clone(), model })
 }
@@ -500,8 +546,8 @@ pub(crate) fn resolve_agent_execution(
 /// Returns `Err` with a human-readable message for any unrecognised value.
 pub(crate) fn parse_round_type(
     s: &str,
-) -> Result<infrastructure::agent_profiles::RoundType, String> {
-    s.parse()
+) -> Result<infrastructure::agent_profiles::RoundType, ReviewSharedError> {
+    s.parse().map_err(ReviewSharedError::InvalidInput)
 }
 
 #[cfg(test)]
@@ -509,7 +555,7 @@ pub(crate) fn parse_round_type(
 mod tests {
     use std::path::PathBuf;
 
-    use super::with_repo_cwd;
+    use super::{ReviewSharedError, with_repo_cwd};
 
     struct CwdRestore(PathBuf);
 
@@ -533,7 +579,7 @@ mod tests {
 
         let result = with_repo_cwd(repo.path(), || {
             std::fs::remove_dir_all(&original_path).unwrap();
-            Ok::<u32, String>(42)
+            Ok::<u32, ReviewSharedError>(42)
         });
 
         assert_eq!(result, Ok(42));

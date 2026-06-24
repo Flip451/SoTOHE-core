@@ -42,7 +42,7 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 use clap::{Args, Subcommand, ValueEnum};
-use cli_composition::{CliApp, SignalGateName};
+use cli_composition::{CompositionError, SignalCompositionRoot, SignalGateName};
 
 use super::outcome_to_exit;
 
@@ -188,7 +188,7 @@ pub enum SignalCommand {
 
 /// Dispatch a [`SignalCommand`] and return an [`ExitCode`].
 pub fn execute(cmd: SignalCommand) -> ExitCode {
-    let app = CliApp::new();
+    let app = SignalCompositionRoot::new();
     match cmd {
         SignalCommand::CalcAdrUser(args) => outcome_to_exit(calc_adr_user::run(&app, args)),
         SignalCommand::CheckAdrUser(args) => outcome_to_exit(check_adr_user::run(&app, args)),
@@ -207,9 +207,9 @@ pub fn execute(cmd: SignalCommand) -> ExitCode {
 }
 
 fn run_aggregate_check(
-    app: &CliApp,
+    app: &SignalCompositionRoot,
     args: SignalCheckArgs,
-) -> Result<cli_composition::CommandOutcome, String> {
+) -> Result<cli_composition::CommandOutcome, CompositionError> {
     let gate: SignalGateName = args.gate.into();
     app.signal_check_gate(args.project_root, args.spec_json, gate, args.workspace_root)
 }

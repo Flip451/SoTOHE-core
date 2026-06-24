@@ -3,7 +3,8 @@
 use std::process::ExitCode;
 use std::time::Duration;
 
-use cli_composition::CommandOutcome;
+use cli_composition::{CommandOutcome, CompositionError};
+use cli_driver::CommandOutcome as DriverOutcome;
 
 /// Polling interval for subprocess completion checks in CLI command adapters.
 ///
@@ -36,8 +37,8 @@ pub mod verify_catalogue_spec_refs;
 ///
 /// On `Ok(outcome)`: prints stdout (no trailing newline added — the content
 /// already includes one when expected) and stderr, then returns the exit code.
-/// On `Err(msg)`: prints `msg` to stderr and returns `ExitCode::FAILURE`.
-pub(crate) fn outcome_to_exit(result: Result<CommandOutcome, String>) -> ExitCode {
+/// On `Err(e)`: prints the error message to stderr and returns `ExitCode::FAILURE`.
+pub(crate) fn outcome_to_exit(result: Result<CommandOutcome, CompositionError>) -> ExitCode {
     match result {
         Ok(outcome) => {
             if let Some(stdout) = outcome.stdout {
@@ -48,9 +49,23 @@ pub(crate) fn outcome_to_exit(result: Result<CommandOutcome, String>) -> ExitCod
             }
             ExitCode::from(outcome.exit_code)
         }
-        Err(msg) => {
-            eprintln!("{msg}");
+        Err(e) => {
+            eprintln!("{e}");
             ExitCode::FAILURE
         }
     }
+}
+
+/// Convert a driver `CommandOutcome` directly into an `ExitCode`, printing stdout/stderr.
+///
+/// Used by call sites that use the new `<Name>CompositionRoot::new().<name>_driver().handle(...)`
+/// pattern, which returns `cli_driver::CommandOutcome` directly (not wrapped in `Result`).
+pub(crate) fn driver_outcome_to_exit(outcome: DriverOutcome) -> ExitCode {
+    if let Some(stdout) = outcome.stdout {
+        println!("{stdout}");
+    }
+    if let Some(stderr) = outcome.stderr {
+        eprintln!("{stderr}");
+    }
+    ExitCode::from(outcome.exit_code)
 }

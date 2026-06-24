@@ -5,6 +5,7 @@ use std::sync::Mutex;
 use std::time::Instant;
 
 use crate::CommandOutcome;
+use crate::error::CompositionError;
 
 use super::shared::CodexReviewOutcome;
 
@@ -28,7 +29,7 @@ pub(crate) fn record_instant_once(slot: &Mutex<Option<Instant>>) {
 pub(super) fn resolve_track_id_or_branch(
     track_id: Option<String>,
     items_dir: &std::path::Path,
-) -> Result<String, String> {
+) -> Result<String, CompositionError> {
     if let Some(id) = track_id {
         return Ok(id);
     }
@@ -52,8 +53,8 @@ pub(super) fn resolve_track_id_or_branch(
 pub(super) fn resolve_track_id_or_branch_write(
     track_id: Option<String>,
     items_dir: &std::path::Path,
-) -> Result<String, String> {
-    crate::CliApp::new().track_resolve_id_for_write(track_id, items_dir.to_path_buf())
+) -> Result<String, CompositionError> {
+    crate::TrackCompositionRoot::new().track_resolve_id_for_write(track_id, items_dir.to_path_buf())
 }
 
 /// Resolves the current track ID from the active git branch (`track/<id>`).
@@ -64,20 +65,24 @@ pub(super) fn resolve_track_id_or_branch_write(
 ///
 /// # Errors
 /// Returns `Err` when git discovery fails or the branch is not a track branch.
-pub(super) fn resolve_track_id_from_branch(items_dir: &std::path::Path) -> Result<String, String> {
+pub(super) fn resolve_track_id_from_branch(
+    items_dir: &std::path::Path,
+) -> Result<String, CompositionError> {
     use infrastructure::git_cli::{GitRepository, SystemGitRepo};
 
     let project_root = crate::track::resolve_project_root(items_dir)?;
     let output = SystemGitRepo::discover_from(&project_root)
         .and_then(|r| r.output(&["rev-parse", "--abbrev-ref", "HEAD"]))
-        .map_err(|e| format!("failed to detect current branch: {e}"))?;
+        .map_err(|e| {
+            CompositionError::AdapterInit(format!("failed to detect current branch: {e}"))
+        })?;
 
     let branch = String::from_utf8_lossy(&output.stdout).trim().to_owned();
     branch.strip_prefix("track/").map(str::to_owned).ok_or_else(|| {
-        format!(
+        CompositionError::WiringFailed(format!(
             "current branch '{branch}' is not a track branch \
                  (expected 'track/<id>')"
-        )
+        ))
     })
 }
 
@@ -92,14 +97,21 @@ pub(super) fn resolve_track_id_from_branch(items_dir: &std::path::Path) -> Resul
 pub(super) fn build_base_prompt_from_input(
     briefing_file: Option<PathBuf>,
     prompt: Option<String>,
-) -> Result<String, String> {
+) -> Result<String, CompositionError> {
     if let Some(path) = briefing_file {
         if !path.is_file() {
-            return Err(format!("briefing file not found: {}", path.display()));
+            return Err(CompositionError::WiringFailed(format!(
+                "briefing file not found: {}",
+                path.display()
+            )));
         }
         Ok(format!("Read {} and perform the task described there.", path.display()))
     } else {
-        prompt.ok_or_else(|| "either --briefing-file or --prompt is required".to_owned())
+        prompt.ok_or_else(|| {
+            CompositionError::WiringFailed(
+                "either --briefing-file or --prompt is required".to_owned(),
+            )
+        })
     }
 }
 
@@ -112,7 +124,7 @@ pub(super) fn build_base_prompt_from_input(
 /// All other variants return `Ok`.
 pub(super) fn outcome_to_command_outcome(
     outcome: CodexReviewOutcome,
-) -> Result<CommandOutcome, String> {
+) -> Result<CommandOutcome, CompositionError> {
     match outcome {
         CodexReviewOutcome::Skipped { scope_label } => {
             eprintln!("[auto-record] Scope '{scope_label}' is empty, skipping");
@@ -128,7 +140,9 @@ pub(super) fn outcome_to_command_outcome(
         CodexReviewOutcome::FastCompleted { verdict_json, exit_code, .. } => {
             Ok(CommandOutcome { stdout: Some(verdict_json), stderr: None, exit_code })
         }
-        CodexReviewOutcome::SubprocessFailed { error, .. } => Err(error),
+        CodexReviewOutcome::SubprocessFailed { error, .. } => {
+            Err(CompositionError::Infrastructure(error))
+        }
     }
 }
 
@@ -169,7 +183,7 @@ fn has_windows_drive_prefix(path: &str) -> bool {
 ///
 /// # Errors
 /// Returns a newline-joined string of all validation errors when any path fails.
-pub(super) fn validate_all_paths(paths: &[String]) -> Result<(), String> {
+pub(super) fn validate_all_paths(paths: &[String]) -> Result<(), CompositionError> {
     let mut errors: Vec<String> = Vec::new();
     for raw in paths {
         if raw.is_empty() {
@@ -187,7 +201,7 @@ pub(super) fn validate_all_paths(paths: &[String]) -> Result<(), String> {
             }
         }
     }
-    if errors.is_empty() { Ok(()) } else { Err(errors.join("\n")) }
+    if errors.is_empty() { Ok(()) } else { Err(CompositionError::WiringFailed(errors.join("\n"))) }
 }
 
 #[cfg(test)]

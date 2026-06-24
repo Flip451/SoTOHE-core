@@ -33,9 +33,10 @@ pub(crate) fn run_fix_local(input: RunReviewFixLocalInput) -> Result<CommandOutc
     let scope = input.scope.trim().to_owned();
     validate_review_group_name_str(&scope).map_err(|e| format!("invalid --scope: {e}"))?;
 
-    let infra_round_type = parse_round_type(&input.round_type)?;
+    let infra_round_type = parse_round_type(&input.round_type).map_err(|e| e.to_string())?;
     let resolved =
-        resolve_agent_execution(None, "review-fix-lead", infra_round_type, input.model.as_deref())?;
+        resolve_agent_execution(None, "review-fix-lead", infra_round_type, input.model.as_deref())
+            .map_err(|e| e.to_string())?;
     let model = resolved.model;
 
     eprintln!("[sotp review fix-local] provider={} model={}", resolved.provider, &model);

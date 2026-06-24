@@ -5,7 +5,7 @@
 use std::path::PathBuf;
 use std::process::ExitCode;
 
-use cli_composition::CliApp;
+use cli_composition::TrackCompositionRoot;
 
 use crate::CliError;
 
@@ -23,9 +23,9 @@ pub fn execute_spec_element_hash(
     track_id: String,
     anchor: Option<String>,
 ) -> Result<ExitCode, CliError> {
-    let outcome = CliApp::new()
+    let outcome = TrackCompositionRoot::new()
         .track_spec_element_hash(items_dir, Some(track_id), anchor)
-        .map_err(CliError::Message)?;
+        .map_err(|e| CliError::Message(e.to_string()))?;
     if let Some(ref s) = outcome.stdout {
         println!("{s}");
     }

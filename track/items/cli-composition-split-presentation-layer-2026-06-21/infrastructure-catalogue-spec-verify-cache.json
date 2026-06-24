@@ -1,0 +1,1398 @@
+{
+  "schema_version": 1,
+  "layer": "infrastructure",
+  "entries": [
+    {
+      "claim_hash": "7e2f2e0d1f29dec027798f677361ddf6a70ad776a3bc1fc670a3dcf60d9e1984",
+      "evidence_hash": "3fcc8acc89942c850edcccbf2ebcb945f635c105484678cd688c1c042dfa279c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli/src/main.rs` の `emit_archived_track_subcommand`（`std::fs` / `serde_json` / `chrono::Utc::now()`）を infrastructure adapter（時刻取得・fs 書き込み）として切り出し、composition が wire して driver 経由で呼ぶ経路にする。bin は parse + dispatch + emit のみに戻す。"
+      }
+    },
+    {
+      "claim_hash": "7e2f2e0d1f29dec027798f677361ddf6a70ad776a3bc1fc670a3dcf60d9e1984",
+      "evidence_hash": "d20dcc5c2703ed4ae86ec50f0ad78a137928a0f1daa83dcfe974d8a4b0796db7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "bin に直接 I/O（`std::fs` / `serde_json` / `chrono::Utc::now()` 相当のシステムコール）を持ってはならない。telemetry 永続化を含む全 I/O は infrastructure adapter + driver 経由にする。"
+      }
+    },
+    {
+      "claim_hash": "7e2f2e0d1f29dec027798f677361ddf6a70ad776a3bc1fc670a3dcf60d9e1984",
+      "evidence_hash": "6d59add287fc0094243346dd18947d43d1727e90eb9de6118cc270761a016299",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli/src/main.rs` に `std::fs` / `serde_json` / `chrono::Utc::now()` を使った直接 I/O が存在しない。cli-bin-business-logic カテゴリ（audit: `main.rs:247-294`）の 1 件が解消されており、telemetry 永続化が infrastructure adapter 経由の driver 呼び出しになっている。"
+      }
+    },
+    {
+      "claim_hash": "2e9e98ccaf2e446b41c46e3c63936779feb843f085e30baafe13973a79a564a1",
+      "evidence_hash": "a76b50abc24836050bdecee68483fbb9a05901ae469b4a87a9e2229cecd70b87",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` 内の port 実装 adapter 7 件（FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService / LazyBranchReader）を `libs/infrastructure` へ移設する。"
+      }
+    },
+    {
+      "claim_hash": "2e9e98ccaf2e446b41c46e3c63936779feb843f085e30baafe13973a79a564a1",
+      "evidence_hash": "388eeaef245590de5f54b5860a4a0b5b720cbe45c6bca95af095a9299e8c944f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port を実装する struct（secondary adapter）は `libs/infrastructure` に定義しなければならない。`cli_composition` は adapter を wire するが定義はしない。"
+      }
+    },
+    {
+      "claim_hash": "2e9e98ccaf2e446b41c46e3c63936779feb843f085e30baafe13973a79a564a1",
+      "evidence_hash": "1988e73d1768a9595d0261fd21a4740454ef9099b9e053bb4b1246f40bc03143",
+      "verdict": {
+        "kind": "pass",
+        "citation": "FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService が `libs/infrastructure` に移設されており、LazyBranchReader が除去されている"
+      }
+    },
+    {
+      "claim_hash": "43ec1ab11432292c2abfb4cb060a591161b85860cac55308e59134539274bf88",
+      "evidence_hash": "a76b50abc24836050bdecee68483fbb9a05901ae469b4a87a9e2229cecd70b87",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` 内の port 実装 adapter 7 件（FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService / LazyBranchReader）を `libs/infrastructure` へ移設する。"
+      }
+    },
+    {
+      "claim_hash": "43ec1ab11432292c2abfb4cb060a591161b85860cac55308e59134539274bf88",
+      "evidence_hash": "388eeaef245590de5f54b5860a4a0b5b720cbe45c6bca95af095a9299e8c944f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port を実装する struct（secondary adapter）は `libs/infrastructure` に定義しなければならない。`cli_composition` は adapter を wire するが定義はしない。"
+      }
+    },
+    {
+      "claim_hash": "43ec1ab11432292c2abfb4cb060a591161b85860cac55308e59134539274bf88",
+      "evidence_hash": "1988e73d1768a9595d0261fd21a4740454ef9099b9e053bb4b1246f40bc03143",
+      "verdict": {
+        "kind": "pass",
+        "citation": "FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService が `libs/infrastructure` に移設されており"
+      }
+    },
+    {
+      "claim_hash": "43ddb7f3c0d172da5850a38c24814f1872030afd7b37b9da42105ef730d6ee3f",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "43ddb7f3c0d172da5850a38c24814f1872030afd7b37b9da42105ef730d6ee3f",
+      "evidence_hash": "9ffb7e8c8e57699c842e3e5a649e0d76da137d08cb3e6fbfc61cefcefbaaa0a0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各オーケストレーション（signal chain sequencing / diff-fragment pipeline / dry_write メトリクス集計 / dry_check_approved fragment-ref derivation など）が usecase application service に移設されている。"
+      }
+    },
+    {
+      "claim_hash": "7f7e8ab40614f901300f178b2f80e59773e31cf2399d591e63877259f7df4f7b",
+      "evidence_hash": "a76b50abc24836050bdecee68483fbb9a05901ae469b4a87a9e2229cecd70b87",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` 内の port 実装 adapter 7 件（FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService / LazyBranchReader）を `libs/infrastructure` へ移設する。"
+      }
+    },
+    {
+      "claim_hash": "7f7e8ab40614f901300f178b2f80e59773e31cf2399d591e63877259f7df4f7b",
+      "evidence_hash": "388eeaef245590de5f54b5860a4a0b5b720cbe45c6bca95af095a9299e8c944f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port を実装する struct（secondary adapter）は `libs/infrastructure` に定義しなければならない。`cli_composition` は adapter を wire するが定義はしない。null-object stub は infrastructure companion stub にするか、infra 非依存なら usecase 提供の test-double にする。"
+      }
+    },
+    {
+      "claim_hash": "7f7e8ab40614f901300f178b2f80e59773e31cf2399d591e63877259f7df4f7b",
+      "evidence_hash": "1988e73d1768a9595d0261fd21a4740454ef9099b9e053bb4b1246f40bc03143",
+      "verdict": {
+        "kind": "pass",
+        "citation": "NoOpDryApprovalService が `libs/infrastructure` に移設されており"
+      }
+    },
+    {
+      "claim_hash": "87cb083dd0126f8bbd6fb370f847ba67fec941beefa9914ecc59502aff38162e",
+      "evidence_hash": "a76b50abc24836050bdecee68483fbb9a05901ae469b4a87a9e2229cecd70b87",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` 内の port 実装 adapter 7 件（FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService / LazyBranchReader）を `libs/infrastructure` へ移設する。"
+      }
+    },
+    {
+      "claim_hash": "87cb083dd0126f8bbd6fb370f847ba67fec941beefa9914ecc59502aff38162e",
+      "evidence_hash": "388eeaef245590de5f54b5860a4a0b5b720cbe45c6bca95af095a9299e8c944f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port を実装する struct（secondary adapter）は `libs/infrastructure` に定義しなければならない。`cli_composition` は adapter を wire するが定義はしない。null-object stub は infrastructure companion stub にするか、infra 非依存なら usecase 提供の test-double にする。"
+      }
+    },
+    {
+      "claim_hash": "87cb083dd0126f8bbd6fb370f847ba67fec941beefa9914ecc59502aff38162e",
+      "evidence_hash": "1988e73d1768a9595d0261fd21a4740454ef9099b9e053bb4b1246f40bc03143",
+      "verdict": {
+        "kind": "pass",
+        "citation": "adapter-outside-infrastructure カテゴリ（audit: 7 件）が解消されている。FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService が `libs/infrastructure` に移設されており"
+      }
+    },
+    {
+      "claim_hash": "ad737c4546c1e117b229c53dcc855c822d941334cba74b6597e3a63890e1301e",
+      "evidence_hash": "a76b50abc24836050bdecee68483fbb9a05901ae469b4a87a9e2229cecd70b87",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` 内の port 実装 adapter 7 件（FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService / LazyBranchReader）を `libs/infrastructure` へ移設する。"
+      }
+    },
+    {
+      "claim_hash": "ad737c4546c1e117b229c53dcc855c822d941334cba74b6597e3a63890e1301e",
+      "evidence_hash": "388eeaef245590de5f54b5860a4a0b5b720cbe45c6bca95af095a9299e8c944f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port を実装する struct（secondary adapter）は `libs/infrastructure` に定義しなければならない。`cli_composition` は adapter を wire するが定義はしない。null-object stub は infrastructure companion stub にするか、infra 非依存なら usecase 提供の test-double にする。"
+      }
+    },
+    {
+      "claim_hash": "ad737c4546c1e117b229c53dcc855c822d941334cba74b6597e3a63890e1301e",
+      "evidence_hash": "1988e73d1768a9595d0261fd21a4740454ef9099b9e053bb4b1246f40bc03143",
+      "verdict": {
+        "kind": "pass",
+        "citation": "NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService が `libs/infrastructure` に移設されており"
+      }
+    },
+    {
+      "claim_hash": "86276795afd992d4b412289b4464f1dae27c9d3f86cf0471d04cd883799cf3b0",
+      "evidence_hash": "a76b50abc24836050bdecee68483fbb9a05901ae469b4a87a9e2229cecd70b87",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` 内の port 実装 adapter 7 件（FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService / LazyBranchReader）を `libs/infrastructure` へ移設する"
+      }
+    },
+    {
+      "claim_hash": "86276795afd992d4b412289b4464f1dae27c9d3f86cf0471d04cd883799cf3b0",
+      "evidence_hash": "388eeaef245590de5f54b5860a4a0b5b720cbe45c6bca95af095a9299e8c944f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port を実装する struct（secondary adapter）は `libs/infrastructure` に定義しなければならない。`cli_composition` は adapter を wire するが定義はしない。"
+      }
+    },
+    {
+      "claim_hash": "86276795afd992d4b412289b4464f1dae27c9d3f86cf0471d04cd883799cf3b0",
+      "evidence_hash": "1988e73d1768a9595d0261fd21a4740454ef9099b9e053bb4b1246f40bc03143",
+      "verdict": {
+        "kind": "pass",
+        "citation": "FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService が `libs/infrastructure` に移設されており"
+      }
+    },
+    {
+      "claim_hash": "2e9e98ccaf2e446b41c46e3c63936779feb843f085e30baafe13973a79a564a1",
+      "evidence_hash": "57a875ca5ed94acf4c5092abb938977c1cfb33a9ebbb26ce122bb05720b9e53f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` 内の adapter-outside-infrastructure 7 件を解消する。FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService の 6 件は `libs/infrastructure` へ移設する。"
+      }
+    },
+    {
+      "claim_hash": "43ec1ab11432292c2abfb4cb060a591161b85860cac55308e59134539274bf88",
+      "evidence_hash": "57a875ca5ed94acf4c5092abb938977c1cfb33a9ebbb26ce122bb05720b9e53f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` 内の adapter-outside-infrastructure 7 件を解消する。FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService の 6 件は `libs/infrastructure` へ移設する。"
+      }
+    },
+    {
+      "claim_hash": "7f7e8ab40614f901300f178b2f80e59773e31cf2399d591e63877259f7df4f7b",
+      "evidence_hash": "57a875ca5ed94acf4c5092abb938977c1cfb33a9ebbb26ce122bb05720b9e53f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService の 6 件は `libs/infrastructure` へ移設する。`"
+      }
+    },
+    {
+      "claim_hash": "87cb083dd0126f8bbd6fb370f847ba67fec941beefa9914ecc59502aff38162e",
+      "evidence_hash": "57a875ca5ed94acf4c5092abb938977c1cfb33a9ebbb26ce122bb05720b9e53f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService の 6 件は `libs/infrastructure` へ移設する。"
+      }
+    },
+    {
+      "claim_hash": "ad737c4546c1e117b229c53dcc855c822d941334cba74b6597e3a63890e1301e",
+      "evidence_hash": "57a875ca5ed94acf4c5092abb938977c1cfb33a9ebbb26ce122bb05720b9e53f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService の 6 件は `libs/infrastructure` へ移設する。"
+      }
+    },
+    {
+      "claim_hash": "86276795afd992d4b412289b4464f1dae27c9d3f86cf0471d04cd883799cf3b0",
+      "evidence_hash": "57a875ca5ed94acf4c5092abb938977c1cfb33a9ebbb26ce122bb05720b9e53f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` 内の adapter-outside-infrastructure 7 件を解消する。FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService の 6 件は `libs/infrastructure` へ移設する。"
+      }
+    },
+    {
+      "claim_hash": "991eaf65f978403f13f6d86b8db7373e0e7c71610273c271e4314976915a1204",
+      "evidence_hash": "57a875ca5ed94acf4c5092abb938977c1cfb33a9ebbb26ce122bb05720b9e53f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` 内の adapter-outside-infrastructure 7 件を解消する。FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService の 6 件は `libs/infrastructure` へ移設する。"
+      }
+    },
+    {
+      "claim_hash": "991eaf65f978403f13f6d86b8db7373e0e7c71610273c271e4314976915a1204",
+      "evidence_hash": "388eeaef245590de5f54b5860a4a0b5b720cbe45c6bca95af095a9299e8c944f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port を実装する struct（secondary adapter）は `libs/infrastructure` に定義しなければならない。`cli_composition` は adapter を wire するが定義はしない。"
+      }
+    },
+    {
+      "claim_hash": "991eaf65f978403f13f6d86b8db7373e0e7c71610273c271e4314976915a1204",
+      "evidence_hash": "1988e73d1768a9595d0261fd21a4740454ef9099b9e053bb4b1246f40bc03143",
+      "verdict": {
+        "kind": "pass",
+        "citation": "FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService が `libs/infrastructure` に移設されており"
+      }
+    },
+    {
+      "claim_hash": "454a9f9032ba0868ce9f320c4ed376c9ef2723ff1665519ec3cd4d7516fa82c4",
+      "evidence_hash": "57a875ca5ed94acf4c5092abb938977c1cfb33a9ebbb26ce122bb05720b9e53f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService の 6 件は `libs/infrastructure` へ移設する。"
+      }
+    },
+    {
+      "claim_hash": "454a9f9032ba0868ce9f320c4ed376c9ef2723ff1665519ec3cd4d7516fa82c4",
+      "evidence_hash": "388eeaef245590de5f54b5860a4a0b5b720cbe45c6bca95af095a9299e8c944f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port を実装する struct（secondary adapter）は `libs/infrastructure` に定義しなければならない。`cli_composition` は adapter を wire するが定義はしない。"
+      }
+    },
+    {
+      "claim_hash": "454a9f9032ba0868ce9f320c4ed376c9ef2723ff1665519ec3cd4d7516fa82c4",
+      "evidence_hash": "1988e73d1768a9595d0261fd21a4740454ef9099b9e053bb4b1246f40bc03143",
+      "verdict": {
+        "kind": "pass",
+        "citation": "FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService が `libs/infrastructure` に移設されており"
+      }
+    },
+    {
+      "claim_hash": "b7218e695c2e257911eaec0d357374d8004bdc87aaacea42f73b59bc411b9b2e",
+      "evidence_hash": "57a875ca5ed94acf4c5092abb938977c1cfb33a9ebbb26ce122bb05720b9e53f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService の 6 件は `libs/infrastructure` へ移設する。"
+      }
+    },
+    {
+      "claim_hash": "b7218e695c2e257911eaec0d357374d8004bdc87aaacea42f73b59bc411b9b2e",
+      "evidence_hash": "388eeaef245590de5f54b5860a4a0b5b720cbe45c6bca95af095a9299e8c944f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port を実装する struct（secondary adapter）は `libs/infrastructure` に定義しなければならない。`cli_composition` は adapter を wire するが定義はしない。"
+      }
+    },
+    {
+      "claim_hash": "b7218e695c2e257911eaec0d357374d8004bdc87aaacea42f73b59bc411b9b2e",
+      "evidence_hash": "1988e73d1768a9595d0261fd21a4740454ef9099b9e053bb4b1246f40bc03143",
+      "verdict": {
+        "kind": "pass",
+        "citation": "adapter-outside-infrastructure カテゴリ（audit: 7 件）が解消されている。FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService が `libs/infrastructure` に移設されており、LazyBranchReader が除去されている（UFCS 曖昧性が呼び出し側で解消されている）。"
+      }
+    },
+    {
+      "claim_hash": "72467b17a93234387cbc8c68a466d6eb0794b72cca95ea7d21ad55d5416edf82",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "72467b17a93234387cbc8c68a466d6eb0794b72cca95ea7d21ad55d5416edf82",
+      "evidence_hash": "9ffb7e8c8e57699c842e3e5a649e0d76da137d08cb3e6fbfc61cefcefbaaa0a0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各オーケストレーション（signal chain sequencing / diff-fragment pipeline / dry_write メトリクス集計 / dry_check_approved fragment-ref derivation など）が usecase application service に移設されている。"
+      }
+    },
+    {
+      "claim_hash": "7688e35d139e45636bfa624325f52b096a9e5e3dc4d0c2a96353eb32d9c8b433",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "7688e35d139e45636bfa624325f52b096a9e5e3dc4d0c2a96353eb32d9c8b433",
+      "evidence_hash": "9ffb7e8c8e57699c842e3e5a649e0d76da137d08cb3e6fbfc61cefcefbaaa0a0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各オーケストレーション（signal chain sequencing / diff-fragment pipeline / dry_write メトリクス集計 / dry_check_approved fragment-ref derivation など）が usecase application service に移設されている。"
+      }
+    },
+    {
+      "claim_hash": "c85cfc10c6933d05cb579a27276a29715cadc07d2ecc4de3898c91a46d1f65bc",
+      "evidence_hash": "a425cb25b341819d488eb925a8226f03957f002d0165b56db13ffabc3f481bb1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「multi-step オーケストレーション（signal chain sequencing / diff-fragment pipeline / PR polling など）は driving adapter（`cli_driver`）ではなく usecase の application service に置かなければならない。driving adapter は単一 use case の invoke + render に留める。」"
+      }
+    },
+    {
+      "claim_hash": "c85cfc10c6933d05cb579a27276a29715cadc07d2ecc4de3898c91a46d1f65bc",
+      "evidence_hash": "9ffb7e8c8e57699c842e3e5a649e0d76da137d08cb3e6fbfc61cefcefbaaa0a0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各オーケストレーション（signal chain sequencing / diff-fragment pipeline / dry_write メトリクス集計 / dry_check_approved fragment-ref derivation など）が usecase application service に移設されている。"
+      }
+    },
+    {
+      "claim_hash": "ce5d616e9b7e266b04f82b43dae6b515733088a2fe77ca6dcca62dc55e66c274",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "ce5d616e9b7e266b04f82b43dae6b515733088a2fe77ca6dcca62dc55e66c274",
+      "evidence_hash": "a425cb25b341819d488eb925a8226f03957f002d0165b56db13ffabc3f481bb1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション（signal chain sequencing / diff-fragment pipeline / PR polling など）は driving adapter（`cli_driver`）ではなく usecase の application service に置かなければならない。driving adapter は単一 use case の invoke + render に留める。"
+      }
+    },
+    {
+      "claim_hash": "ce5d616e9b7e266b04f82b43dae6b515733088a2fe77ca6dcca62dc55e66c274",
+      "evidence_hash": "9ffb7e8c8e57699c842e3e5a649e0d76da137d08cb3e6fbfc61cefcefbaaa0a0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step-orchestration カテゴリ（audit: 6 件）が cli_composition から除去されており、各オーケストレーション（signal chain sequencing / diff-fragment pipeline / dry_write メトリクス集計 / dry_check_approved fragment-ref derivation など）が usecase application service に移設されている。"
+      }
+    },
+    {
+      "claim_hash": "c85cfc10c6933d05cb579a27276a29715cadc07d2ecc4de3898c91a46d1f65bc",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "a52d8b3ee05a78f1bf338a2871717fe9c94b112e1809b5b102b498f7f4a07cad",
+      "evidence_hash": "cfeb28639653cd2ecb749303819aba5ea6a3ae507d29379ef69a40cce48e6f5a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "driving adapter（primary adapter / controller）として use case を注入保持し、`handle(input)` で invoke + render して `CommandOutcome` を返す責務を担う。`CommandOutcome` 型と render 関数群をこの層に置く。"
+      }
+    },
+    {
+      "claim_hash": "1ea4d54ca94f1b415dca0e56cc3d44cb6669b908bd6d69c52eece34c2501c21f",
+      "evidence_hash": "cfeb28639653cd2ecb749303819aba5ea6a3ae507d29379ef69a40cce48e6f5a",
+      "verdict": {
+        "kind": "fail",
+        "reason": "New behavioral commitment: the claim defines a secondary filesystem adapter implementing usecase::arch::ArchPort and delegating to bin/sotp arch subcommands, while the evidence only commits to creating apps/cli-driver as a primary driving adapter/controller that injects a use case, handles input, invokes and renders CommandOutcome. The referenced spec element does not motivate this adapter responsibility."
+      }
+    },
+    {
+      "claim_hash": "587e9a527ea658fdbad5ff15094e2a25cc7ef631140090a0fb8f8e7e3c691753",
+      "evidence_hash": "cfeb28639653cd2ecb749303819aba5ea6a3ae507d29379ef69a40cce48e6f5a",
+      "verdict": {
+        "kind": "fail",
+        "reason": "New behavioral commitment: the evidence only commits to creating `apps/cli-driver` as a primary driving adapter/controller that injects a use case, invokes and renders from `handle(input)`, and owns `CommandOutcome`/render functions. It does not motivate a secondary filesystem conventions adapter implementing `ConventionsPort` or delegating to `bin/sotp conventions` subcommands, so this reference is unrelated to the entry's purpose."
+      }
+    },
+    {
+      "claim_hash": "c58dbc19ebca636228b749e06354e4780e2ceea471753e3a0150e7ce770e163d",
+      "evidence_hash": "cfeb28639653cd2ecb749303819aba5ea6a3ae507d29379ef69a40cce48e6f5a",
+      "verdict": {
+        "kind": "fail",
+        "reason": "New behavioral commitment: the claim adds a secondary filesystem demo adapter that implements DemoPort and runs the built-in demo, while the evidence only commits to a new cli_driver primary adapter/controller that injects a use case, invokes and renders in handle(input), and owns CommandOutcome/rendering. The referenced spec element does not motivate this adapter's purpose."
+      }
+    },
+    {
+      "claim_hash": "b3f52df5e636aede994d180d602f7ed07ba44d34faaa947901bd9f462f4a4729",
+      "evidence_hash": "cfeb28639653cd2ecb749303819aba5ea6a3ae507d29379ef69a40cce48e6f5a",
+      "verdict": {
+        "kind": "fail",
+        "reason": "New behavioral commitment: the claim adds a filesystem secondary adapter implementing FileWritePort with atomic file writes, while the evidence only specifies the new apps/cli-driver primary adapter/controller responsibilities for handle(input), invoke + render, CommandOutcome, and render functions. The evidence does not motivate a filesystem write adapter, so this reference is semantically unrelated."
+      }
+    },
+    {
+      "claim_hash": "09751a4f16ecd93511fd2cbb393d308e554c8f1e409189d3c72cf2f9df2bf649",
+      "evidence_hash": "cfeb28639653cd2ecb749303819aba5ea6a3ae507d29379ef69a40cce48e6f5a",
+      "verdict": {
+        "kind": "fail",
+        "reason": "New behavioral commitment: the evidence commits only to creating `apps/cli-driver` as a primary driving adapter/controller that injects a use case, handles input, invokes and renders `CommandOutcome`; it does not motivate a filesystem secondary adapter implementing `GitWorkflowService` or delegation to `SystemGitRepo`, so this reference is unrelated to the cited spec element."
+      }
+    },
+    {
+      "claim_hash": "3496eb0056c7535db3f000cd61a3bfb259e9a8ba3fc0b0a8f8e43576204a0da0",
+      "evidence_hash": "cfeb28639653cd2ecb749303819aba5ea6a3ae507d29379ef69a40cce48e6f5a",
+      "verdict": {
+        "kind": "fail",
+        "reason": "New behavioral commitment / wrong reference: the claim defines a secondary aggregate adapter for RefVerifyAggregateService that composes filesystem ref-verification adapters, while the evidence only commits to a new cli_driver primary driving adapter/controller that invokes a use case, renders, and returns CommandOutcome."
+      }
+    },
+    {
+      "claim_hash": "1b56941d678c6c516e55b17faa77854376fc9573fb5efe9f1521b360339bce17",
+      "evidence_hash": "cfeb28639653cd2ecb749303819aba5ea6a3ae507d29379ef69a40cce48e6f5a",
+      "verdict": {
+        "kind": "fail",
+        "reason": "New behavioral commitment: the evidence specifies creation of `apps/cli-driver` as a primary driving adapter/controller that injects a use case, invokes it from `handle(input)`, renders, and returns `CommandOutcome`. The claim instead defines a filesystem secondary adapter for the ref_verify check-approved workflow, which is not a natural implementation of that CLI-driver responsibility and is not motivated by this spec element."
+      }
+    },
+    {
+      "claim_hash": "175c3effc02ead04ac35b8258e51c578f148b156dd0b9182c51a7b4d2ad5eb1e",
+      "evidence_hash": "cfeb28639653cd2ecb749303819aba5ea6a3ae507d29379ef69a40cce48e6f5a",
+      "verdict": {
+        "kind": "fail",
+        "reason": "New behavioral commitment / wrong reference: the claim adds a secondary filesystem telemetry adapter that emits archived-track telemetry and dynamically discovers the repo root, while the evidence only specifies creating `apps/cli-driver` as a driving adapter/controller responsible for invoking use cases, rendering, and returning `CommandOutcome`; it motivates no part of this telemetry adapter responsibility."
+      }
+    },
+    {
+      "claim_hash": "fdaf448cb5c03766884456cb109fa481e07c60c6cc99b3d45751fc3ce586e8c7",
+      "evidence_hash": "cfeb28639653cd2ecb749303819aba5ea6a3ae507d29379ef69a40cce48e6f5a",
+      "verdict": {
+        "kind": "fail",
+        "reason": "New behavioral commitment: the claim introduces a filesystem secondary adapter for TelemetryReportPort that aggregates telemetry JSONL from an items directory, while the evidence only commits to creating apps/cli-driver as a primary driving adapter/controller with handle(input), rendering, CommandOutcome, and render functions. The evidence motivates no telemetry report adapter responsibility, so this reference is unrelated."
+      }
+    },
+    {
+      "claim_hash": "73f089894331bb2b26dc6cd163e6eefe5aa563a0efdaae82492262848a3dc42e",
+      "evidence_hash": "cfeb28639653cd2ecb749303819aba5ea6a3ae507d29379ef69a40cce48e6f5a",
+      "verdict": {
+        "kind": "fail",
+        "reason": "New behavioral commitment: the claim defines a filesystem secondary adapter implementing VerifyPort and delegating verify_* methods, but the evidence only commits to a new apps/cli-driver primary adapter/controller that invokes a use case, renders output, and owns CommandOutcome/render functions. The referenced spec element does not motivate the filesystem verify adapter responsibility, so this reference is semantically unrelated."
+      }
+    },
+    {
+      "claim_hash": "1c774e0502bb9ce20f809764c6497d4a80e4b78e54a5e573a743be7ab243f798",
+      "evidence_hash": "fde36f306f5f79e93d276ba5aedf461b1e88eccb050dc87e855e84766c96abc9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "secondary adapter → interactor → driving adapter を構築し、use case を driving adapter に注入して返す。"
+      }
+    },
+    {
+      "claim_hash": "1c774e0502bb9ce20f809764c6497d4a80e4b78e54a5e573a743be7ab243f798",
+      "evidence_hash": "388eeaef245590de5f54b5860a4a0b5b720cbe45c6bca95af095a9299e8c944f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port を実装する struct（secondary adapter）は `libs/infrastructure` に定義しなければならない。`cli_composition` は adapter を wire するが定義はしない。"
+      }
+    },
+    {
+      "claim_hash": "057908c7f6c49435ecfffc0ed091e80f7092b4880edfc52568bb4209ae83fb73",
+      "evidence_hash": "fde36f306f5f79e93d276ba5aedf461b1e88eccb050dc87e855e84766c96abc9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`secondary adapter → interactor → driving adapter を構築し、use case を driving adapter に注入して返す。use case を invoke しない。`"
+      }
+    },
+    {
+      "claim_hash": "057908c7f6c49435ecfffc0ed091e80f7092b4880edfc52568bb4209ae83fb73",
+      "evidence_hash": "388eeaef245590de5f54b5860a4a0b5b720cbe45c6bca95af095a9299e8c944f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port を実装する struct（secondary adapter）は `libs/infrastructure` に定義しなければならない。`cli_composition` は adapter を wire するが定義はしない。"
+      }
+    },
+    {
+      "claim_hash": "58de8954a109add3a6a66e10447f92bc2e9899b4c7cc17b16e772f1aefd2771f",
+      "evidence_hash": "fde36f306f5f79e93d276ba5aedf461b1e88eccb050dc87e855e84766c96abc9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "secondary adapter → interactor → driving adapter を構築し、use case を driving adapter に注入して返す。use case を invoke しない。"
+      }
+    },
+    {
+      "claim_hash": "58de8954a109add3a6a66e10447f92bc2e9899b4c7cc17b16e772f1aefd2771f",
+      "evidence_hash": "388eeaef245590de5f54b5860a4a0b5b720cbe45c6bca95af095a9299e8c944f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port を実装する struct（secondary adapter）は `libs/infrastructure` に定義しなければならない。`cli_composition` は adapter を wire するが定義はしない。"
+      }
+    },
+    {
+      "claim_hash": "c87a0137ebf3d4f5a9e172ea1c6038738f384c1fbabdc28ff21ffa2d7d4f2493",
+      "evidence_hash": "fde36f306f5f79e93d276ba5aedf461b1e88eccb050dc87e855e84766c96abc9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "secondary adapter → interactor → driving adapter を構築し、use case を driving adapter に注入して返す。use case を invoke しない。"
+      }
+    },
+    {
+      "claim_hash": "c87a0137ebf3d4f5a9e172ea1c6038738f384c1fbabdc28ff21ffa2d7d4f2493",
+      "evidence_hash": "388eeaef245590de5f54b5860a4a0b5b720cbe45c6bca95af095a9299e8c944f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port を実装する struct（secondary adapter）は `libs/infrastructure` に定義しなければならない。`cli_composition` は adapter を wire するが定義はしない。"
+      }
+    },
+    {
+      "claim_hash": "3831da6e787be8ae05cc5664784b5b831e1ec9ea9eee9cd6f35483cc3081c4eb",
+      "evidence_hash": "fde36f306f5f79e93d276ba5aedf461b1e88eccb050dc87e855e84766c96abc9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` の責務を DI（object graph の組み立て）のみに絞る。secondary adapter → interactor → driving adapter を構築し、use case を driving adapter に注入して返す。"
+      }
+    },
+    {
+      "claim_hash": "3831da6e787be8ae05cc5664784b5b831e1ec9ea9eee9cd6f35483cc3081c4eb",
+      "evidence_hash": "388eeaef245590de5f54b5860a4a0b5b720cbe45c6bca95af095a9299e8c944f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port を実装する struct（secondary adapter）は `libs/infrastructure` に定義しなければならない。`cli_composition` は adapter を wire するが定義はしない。"
+      }
+    },
+    {
+      "claim_hash": "5f579bbc3e3f97fdd7c3649908baedf5a7ffca0253bd2ca7e0748ffac45aecc0",
+      "evidence_hash": "fde36f306f5f79e93d276ba5aedf461b1e88eccb050dc87e855e84766c96abc9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` の責務を DI（object graph の組み立て）のみに絞る。secondary adapter → interactor → driving adapter を構築し、use case を driving adapter に注入して返す。use case を invoke しない。"
+      }
+    },
+    {
+      "claim_hash": "5f579bbc3e3f97fdd7c3649908baedf5a7ffca0253bd2ca7e0748ffac45aecc0",
+      "evidence_hash": "388eeaef245590de5f54b5860a4a0b5b720cbe45c6bca95af095a9299e8c944f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port を実装する struct（secondary adapter）は `libs/infrastructure` に定義しなければならない。`cli_composition` は adapter を wire するが定義はしない。"
+      }
+    },
+    {
+      "claim_hash": "d96aac7d43126021d0bc26060c6fd849489c8d32140f3ec002291da4525d9556",
+      "evidence_hash": "fde36f306f5f79e93d276ba5aedf461b1e88eccb050dc87e855e84766c96abc9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "secondary adapter → interactor → driving adapter を構築し、use case を driving adapter に注入して返す。use case を invoke しない。"
+      }
+    },
+    {
+      "claim_hash": "d96aac7d43126021d0bc26060c6fd849489c8d32140f3ec002291da4525d9556",
+      "evidence_hash": "388eeaef245590de5f54b5860a4a0b5b720cbe45c6bca95af095a9299e8c944f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port を実装する struct（secondary adapter）は `libs/infrastructure` に定義しなければならない。`cli_composition` は adapter を wire するが定義はしない。"
+      }
+    },
+    {
+      "claim_hash": "d738808e11c50e4d2b300fa5aa4d447d9db7ea448c47741a8c50a3945127a3ed",
+      "evidence_hash": "fde36f306f5f79e93d276ba5aedf461b1e88eccb050dc87e855e84766c96abc9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "secondary adapter → interactor → driving adapter を構築し、use case を driving adapter に注入して返す。 use case を invoke しない。"
+      }
+    },
+    {
+      "claim_hash": "d738808e11c50e4d2b300fa5aa4d447d9db7ea448c47741a8c50a3945127a3ed",
+      "evidence_hash": "388eeaef245590de5f54b5860a4a0b5b720cbe45c6bca95af095a9299e8c944f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port を実装する struct（secondary adapter）は `libs/infrastructure` に定義しなければならない。`cli_composition` は adapter を wire するが定義はしない。"
+      }
+    },
+    {
+      "claim_hash": "ff9d6b9dbe577e7f0c4f1a1f58b0b250a996a8bc14788aee1fdb20f344e3537e",
+      "evidence_hash": "3fcc8acc89942c850edcccbf2ebcb945f635c105484678cd688c1c042dfa279c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli/src/main.rs` の `emit_archived_track_subcommand`（`std::fs` / `serde_json` / `chrono::Utc::now()`）を infrastructure adapter（時刻取得・fs 書き込み）として切り出し、composition が wire して driver 経由で呼ぶ経路にする。"
+      }
+    },
+    {
+      "claim_hash": "ff9d6b9dbe577e7f0c4f1a1f58b0b250a996a8bc14788aee1fdb20f344e3537e",
+      "evidence_hash": "d20dcc5c2703ed4ae86ec50f0ad78a137928a0f1daa83dcfe974d8a4b0796db7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "bin に直接 I/O（`std::fs` / `serde_json` / `chrono::Utc::now()` 相当のシステムコール）を持ってはならない。telemetry 永続化を含む全 I/O は infrastructure adapter + driver 経由にする。"
+      }
+    },
+    {
+      "claim_hash": "ff9d6b9dbe577e7f0c4f1a1f58b0b250a996a8bc14788aee1fdb20f344e3537e",
+      "evidence_hash": "6d59add287fc0094243346dd18947d43d1727e90eb9de6118cc270761a016299",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli/src/main.rs` に `std::fs` / `serde_json` / `chrono::Utc::now()` を使った直接 I/O が存在しない。cli-bin-business-logic カテゴリ（audit: `main.rs:247-294`）の 1 件が解消されており、telemetry 永続化が infrastructure adapter 経由の driver 呼び出しになっている。"
+      }
+    },
+    {
+      "claim_hash": "dd7690621f77ab16b675968d869369362da8cd09b96dbaa4810d9e000d2a898b",
+      "evidence_hash": "3fcc8acc89942c850edcccbf2ebcb945f635c105484678cd688c1c042dfa279c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli/src/main.rs` の `emit_archived_track_subcommand`（`std::fs` / `serde_json` / `chrono::Utc::now()`）を infrastructure adapter（時刻取得・fs 書き込み）として切り出し、composition が wire して driver 経由で呼ぶ経路にする。bin は parse + dispatch + emit のみに戻す。"
+      }
+    },
+    {
+      "claim_hash": "dd7690621f77ab16b675968d869369362da8cd09b96dbaa4810d9e000d2a898b",
+      "evidence_hash": "d20dcc5c2703ed4ae86ec50f0ad78a137928a0f1daa83dcfe974d8a4b0796db7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "bin に直接 I/O（`std::fs` / `serde_json` / `chrono::Utc::now()` 相当のシステムコール）を持ってはならない。telemetry 永続化を含む全 I/O は infrastructure adapter + driver 経由にする。"
+      }
+    },
+    {
+      "claim_hash": "dd7690621f77ab16b675968d869369362da8cd09b96dbaa4810d9e000d2a898b",
+      "evidence_hash": "6d59add287fc0094243346dd18947d43d1727e90eb9de6118cc270761a016299",
+      "verdict": {
+        "kind": "pass",
+        "citation": "telemetry 永続化が infrastructure adapter 経由の driver 呼び出しになっている。"
+      }
+    },
+    {
+      "claim_hash": "dbd7e9c9f5d3437b7f2b2b5537e5a983eb56ac45db0673a06243b1fdf32aebf6",
+      "evidence_hash": "fde36f306f5f79e93d276ba5aedf461b1e88eccb050dc87e855e84766c96abc9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` の責務を DI（object graph の組み立て）のみに絞る。secondary adapter → interactor → driving adapter を構築し、use case を driving adapter に注入して返す。"
+      }
+    },
+    {
+      "claim_hash": "dbd7e9c9f5d3437b7f2b2b5537e5a983eb56ac45db0673a06243b1fdf32aebf6",
+      "evidence_hash": "388eeaef245590de5f54b5860a4a0b5b720cbe45c6bca95af095a9299e8c944f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port を実装する struct（secondary adapter）は `libs/infrastructure` に定義しなければならない。`cli_composition` は adapter を wire するが定義はしない。"
+      }
+    },
+    {
+      "claim_hash": "3eb82b933fed8a55ccdfd6aa3098a4c80c8c799f40ad47f15db384a706cb3313",
+      "evidence_hash": "fde36f306f5f79e93d276ba5aedf461b1e88eccb050dc87e855e84766c96abc9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "secondary adapter → interactor → driving adapter を構築し、use case を driving adapter に注入して返す。use case を invoke しない。"
+      }
+    },
+    {
+      "claim_hash": "3eb82b933fed8a55ccdfd6aa3098a4c80c8c799f40ad47f15db384a706cb3313",
+      "evidence_hash": "388eeaef245590de5f54b5860a4a0b5b720cbe45c6bca95af095a9299e8c944f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port を実装する struct（secondary adapter）は `libs/infrastructure` に定義しなければならない。`cli_composition` は adapter を wire するが定義はしない。"
+      }
+    },
+    {
+      "claim_hash": "89b3acd2acde02e4eecb1a42d5d9eebc5f4ed1c3fe0aae1b0e3fa2270f926768",
+      "evidence_hash": "30117287fe40fec243b34f0f93d5c070c1c8246be7c73570e2c7b05c63a4b147",
+      "verdict": {
+        "kind": "pass",
+        "citation": "T023 で infrastructure 層に追加される secondary adapter 群: `FsArchAdapter` / `FsConventionsAdapter` / `FsDemoAdapter` / `FsFileWriteAdapter` / `FsVerifyAdapter` / `FsGitWorkflowAdapter` / `FsRefVerify*Adapter` / `FsTelemetry*Adapter` などが対応する usecase secondary port を実装する。各 adapter は trusted-root validation を経由し、エラーは port のエラー型へ String 化して境界変換する。"
+      }
+    },
+    {
+      "claim_hash": "89b3acd2acde02e4eecb1a42d5d9eebc5f4ed1c3fe0aae1b0e3fa2270f926768",
+      "evidence_hash": "388eeaef245590de5f54b5860a4a0b5b720cbe45c6bca95af095a9299e8c944f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port を実装する struct（secondary adapter）は `libs/infrastructure` に定義しなければならない。`cli_composition` は adapter を wire するが定義はしない。"
+      }
+    },
+    {
+      "claim_hash": "65efa2052e4fa5db9c792fba42a38dd5986c3db6fc1a922fd036978b3ea3ed7d",
+      "evidence_hash": "30117287fe40fec243b34f0f93d5c070c1c8246be7c73570e2c7b05c63a4b147",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`FsArchAdapter` / `FsConventionsAdapter` / `FsDemoAdapter` / `FsFileWriteAdapter` / `FsVerifyAdapter` / `FsGitWorkflowAdapter` / `FsRefVerify*Adapter` / `FsTelemetry*Adapter` などが対応する usecase secondary port を実装する。各 adapter は trusted-root validation を経由し、エラーは port のエラー型へ String 化して境界変換する。"
+      }
+    },
+    {
+      "claim_hash": "65efa2052e4fa5db9c792fba42a38dd5986c3db6fc1a922fd036978b3ea3ed7d",
+      "evidence_hash": "388eeaef245590de5f54b5860a4a0b5b720cbe45c6bca95af095a9299e8c944f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port を実装する struct（secondary adapter）は `libs/infrastructure` に定義しなければならない。`cli_composition` は adapter を wire するが定義はしない。"
+      }
+    },
+    {
+      "claim_hash": "7f19fa6f49f757e7159524bf9a1db77debaf78f0d6eaa01100d8f0ca8d834569",
+      "evidence_hash": "30117287fe40fec243b34f0f93d5c070c1c8246be7c73570e2c7b05c63a4b147",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`FsArchAdapter` / `FsConventionsAdapter` / `FsDemoAdapter` / `FsFileWriteAdapter` / `FsVerifyAdapter` / `FsGitWorkflowAdapter` / `FsRefVerify*Adapter` / `FsTelemetry*Adapter` などが対応する usecase secondary port を実装する。各 adapter は trusted-root validation を経由し、エラーは port のエラー型へ String 化して境界変換する。"
+      }
+    },
+    {
+      "claim_hash": "7f19fa6f49f757e7159524bf9a1db77debaf78f0d6eaa01100d8f0ca8d834569",
+      "evidence_hash": "388eeaef245590de5f54b5860a4a0b5b720cbe45c6bca95af095a9299e8c944f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port を実装する struct（secondary adapter）は `libs/infrastructure` に定義しなければならない。`cli_composition` は adapter を wire するが定義はしない。"
+      }
+    },
+    {
+      "claim_hash": "9f01cc83b3790d5a8fd32d6150ea926f8f8f953931ec991a66400da7d62373a2",
+      "evidence_hash": "30117287fe40fec243b34f0f93d5c070c1c8246be7c73570e2c7b05c63a4b147",
+      "verdict": {
+        "kind": "pass",
+        "citation": "T023 で infrastructure 層に追加される secondary adapter 群: `FsArchAdapter` / `FsConventionsAdapter` / `FsDemoAdapter` / `FsFileWriteAdapter` / `FsVerifyAdapter` / `FsGitWorkflowAdapter` / `FsRefVerify*Adapter` / `FsTelemetry*Adapter` などが対応する usecase secondary port を実装する。各 adapter は trusted-root validation を経由し、エラーは port のエラー型へ String 化して境界変換する。"
+      }
+    },
+    {
+      "claim_hash": "9f01cc83b3790d5a8fd32d6150ea926f8f8f953931ec991a66400da7d62373a2",
+      "evidence_hash": "388eeaef245590de5f54b5860a4a0b5b720cbe45c6bca95af095a9299e8c944f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port を実装する struct（secondary adapter）は `libs/infrastructure` に定義しなければならない。`cli_composition` は adapter を wire するが定義はしない。"
+      }
+    },
+    {
+      "claim_hash": "6e5a29504ad4a8c33e60eaa6d18dde4b6049dc5274140748a6bdaaba21be2983",
+      "evidence_hash": "30117287fe40fec243b34f0f93d5c070c1c8246be7c73570e2c7b05c63a4b147",
+      "verdict": {
+        "kind": "pass",
+        "citation": "T023 で infrastructure 層に追加される secondary adapter 群: `FsArchAdapter` / `FsConventionsAdapter` / `FsDemoAdapter` / `FsFileWriteAdapter` / `FsVerifyAdapter` / `FsGitWorkflowAdapter` / `FsRefVerify*Adapter` / `FsTelemetry*Adapter` などが対応する usecase secondary port を実装する。各 adapter は trusted-root validation を経由し、エラーは port のエラー型へ String 化して境界変換する。"
+      }
+    },
+    {
+      "claim_hash": "6e5a29504ad4a8c33e60eaa6d18dde4b6049dc5274140748a6bdaaba21be2983",
+      "evidence_hash": "388eeaef245590de5f54b5860a4a0b5b720cbe45c6bca95af095a9299e8c944f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port を実装する struct（secondary adapter）は `libs/infrastructure` に定義しなければならない。`cli_composition` は adapter を wire するが定義はしない。"
+      }
+    },
+    {
+      "claim_hash": "428df9be6f3e0eb0e81c3acad5252a9ba368beb5fbbdd40a7b6f25772483d161",
+      "evidence_hash": "30117287fe40fec243b34f0f93d5c070c1c8246be7c73570e2c7b05c63a4b147",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`FsArchAdapter` / `FsConventionsAdapter` / `FsDemoAdapter` / `FsFileWriteAdapter` / `FsVerifyAdapter` / `FsGitWorkflowAdapter` / `FsRefVerify*Adapter` / `FsTelemetry*Adapter` などが対応する usecase secondary port を実装する。各 adapter は trusted-root validation を経由し、エラーは port のエラー型へ String 化して境界変換する。"
+      }
+    },
+    {
+      "claim_hash": "428df9be6f3e0eb0e81c3acad5252a9ba368beb5fbbdd40a7b6f25772483d161",
+      "evidence_hash": "388eeaef245590de5f54b5860a4a0b5b720cbe45c6bca95af095a9299e8c944f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port を実装する struct（secondary adapter）は `libs/infrastructure` に定義しなければならない。`cli_composition` は adapter を wire するが定義はしない。"
+      }
+    },
+    {
+      "claim_hash": "bebf5179ce0f12d2f7c41f86ee09f73b18453f2a6b716ec521e79b4bb9327f3a",
+      "evidence_hash": "30117287fe40fec243b34f0f93d5c070c1c8246be7c73570e2c7b05c63a4b147",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`FsArchAdapter` / `FsConventionsAdapter` / `FsDemoAdapter` / `FsFileWriteAdapter` / `FsVerifyAdapter` / `FsGitWorkflowAdapter` / `FsRefVerify*Adapter` / `FsTelemetry*Adapter` などが対応する usecase secondary port を実装する。各 adapter は trusted-root validation を経由し、エラーは port のエラー型へ String 化して境界変換する。"
+      }
+    },
+    {
+      "claim_hash": "bebf5179ce0f12d2f7c41f86ee09f73b18453f2a6b716ec521e79b4bb9327f3a",
+      "evidence_hash": "388eeaef245590de5f54b5860a4a0b5b720cbe45c6bca95af095a9299e8c944f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port を実装する struct（secondary adapter）は `libs/infrastructure` に定義しなければならない。`cli_composition` は adapter を wire するが定義はしない。"
+      }
+    },
+    {
+      "claim_hash": "2a618c34803a5a65cca2b29c66b8c52c5eca8c03086357099d05248805865810",
+      "evidence_hash": "30117287fe40fec243b34f0f93d5c070c1c8246be7c73570e2c7b05c63a4b147",
+      "verdict": {
+        "kind": "pass",
+        "citation": "T023 で infrastructure 層に追加される secondary adapter 群: `FsArchAdapter` / `FsConventionsAdapter` / `FsDemoAdapter` / `FsFileWriteAdapter` / `FsVerifyAdapter` / `FsGitWorkflowAdapter` / `FsRefVerify*Adapter` / `FsTelemetry*Adapter` などが対応する usecase secondary port を実装する。各 adapter は trusted-root validation を経由し、エラーは port のエラー型へ String 化して境界変換する。"
+      }
+    },
+    {
+      "claim_hash": "2a618c34803a5a65cca2b29c66b8c52c5eca8c03086357099d05248805865810",
+      "evidence_hash": "388eeaef245590de5f54b5860a4a0b5b720cbe45c6bca95af095a9299e8c944f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port を実装する struct（secondary adapter）は `libs/infrastructure` に定義しなければならない。`cli_composition` は adapter を wire するが定義はしない。"
+      }
+    },
+    {
+      "claim_hash": "f7b1d6777ef0e9bc6871e4d9f4bd05dc19675e326a3146ccd8888f239ce8b7e4",
+      "evidence_hash": "30117287fe40fec243b34f0f93d5c070c1c8246be7c73570e2c7b05c63a4b147",
+      "verdict": {
+        "kind": "pass",
+        "citation": "infrastructure 層に追加される secondary adapter 群: `FsArchAdapter` / `FsConventionsAdapter` / `FsDemoAdapter` / `FsFileWriteAdapter` / `FsVerifyAdapter` / `FsGitWorkflowAdapter` / `FsRefVerify*Adapter` / `FsTelemetry*Adapter` などが対応する usecase secondary port を実装する。各 adapter は trusted-root validation を経由し、エラーは port のエラー型へ String 化して境界変換する。"
+      }
+    },
+    {
+      "claim_hash": "f7b1d6777ef0e9bc6871e4d9f4bd05dc19675e326a3146ccd8888f239ce8b7e4",
+      "evidence_hash": "388eeaef245590de5f54b5860a4a0b5b720cbe45c6bca95af095a9299e8c944f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port を実装する struct（secondary adapter）は `libs/infrastructure` に定義しなければならない。`cli_composition` は adapter を wire するが定義はしない。"
+      }
+    },
+    {
+      "claim_hash": "f43de657c125f730d71106a1a622931821268a0ca309ca6556aed4d9001d1f66",
+      "evidence_hash": "57a875ca5ed94acf4c5092abb938977c1cfb33a9ebbb26ce122bb05720b9e53f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` 内の adapter-outside-infrastructure 7 件を解消する。... 6 件は `libs/infrastructure` へ移設する。"
+      }
+    },
+    {
+      "claim_hash": "f43de657c125f730d71106a1a622931821268a0ca309ca6556aed4d9001d1f66",
+      "evidence_hash": "388eeaef245590de5f54b5860a4a0b5b720cbe45c6bca95af095a9299e8c944f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port を実装する struct（secondary adapter）は `libs/infrastructure` に定義しなければならない。`cli_composition` は adapter を wire するが定義はしない。"
+      }
+    },
+    {
+      "claim_hash": "6114c48f4dea37c731733dea36c4f4a33b6bbd2684373a5b6a5e5bb39f714658",
+      "evidence_hash": "57a875ca5ed94acf4c5092abb938977c1cfb33a9ebbb26ce122bb05720b9e53f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` 内の adapter-outside-infrastructure 7 件を解消する。FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService の 6 件は `libs/infrastructure` へ移設する。"
+      }
+    },
+    {
+      "claim_hash": "6114c48f4dea37c731733dea36c4f4a33b6bbd2684373a5b6a5e5bb39f714658",
+      "evidence_hash": "388eeaef245590de5f54b5860a4a0b5b720cbe45c6bca95af095a9299e8c944f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port を実装する struct（secondary adapter）は `libs/infrastructure` に定義しなければならない。`cli_composition` は adapter を wire するが定義はしない。"
+      }
+    },
+    {
+      "claim_hash": "10737745f79682ec77a180939cd6daf09c8435808dd7ed8ad18df65d229d90a9",
+      "evidence_hash": "388eeaef245590de5f54b5860a4a0b5b720cbe45c6bca95af095a9299e8c944f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port を実装する struct（secondary adapter）は `libs/infrastructure` に定義しなければならない。`cli_composition` は adapter を wire するが定義はしない。"
+      }
+    },
+    {
+      "claim_hash": "dab89a9c1148cff10adbd0af2dea7149e66e5b1d3234973cd0e45e9a36cadc80",
+      "evidence_hash": "388eeaef245590de5f54b5860a4a0b5b720cbe45c6bca95af095a9299e8c944f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port を実装する struct（secondary adapter）は `libs/infrastructure` に定義しなければならない。`cli_composition` は adapter を wire するが定義はしない。"
+      }
+    },
+    {
+      "claim_hash": "fb061a23e79a31a3c899f9febb165bcdda3ddfc98f880d256eb720114d04e4e8",
+      "evidence_hash": "57a875ca5ed94acf4c5092abb938977c1cfb33a9ebbb26ce122bb05720b9e53f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` 内の adapter-outside-infrastructure 7 件を解消する。`LazyBranchReader` は UFCS 回避用の二重 adapter であり、呼び出し側の trait 曖昧性解消で除去して infrastructure の `SystemGitRepo` 実装に一本化する。"
+      }
+    },
+    {
+      "claim_hash": "fb061a23e79a31a3c899f9febb165bcdda3ddfc98f880d256eb720114d04e4e8",
+      "evidence_hash": "388eeaef245590de5f54b5860a4a0b5b720cbe45c6bca95af095a9299e8c944f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port を実装する struct（secondary adapter）は `libs/infrastructure` に定義しなければならない。`cli_composition` は adapter を wire するが定義はしない。"
+      }
+    },
+    {
+      "claim_hash": "9ae29b57112c7bbeeb7500b3a69eb9d3e8addec962693d5f515b24c05acd5efc",
+      "evidence_hash": "57a875ca5ed94acf4c5092abb938977c1cfb33a9ebbb26ce122bb05720b9e53f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` 内の adapter-outside-infrastructure 7 件を解消する。FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService の 6 件は `libs/infrastructure` へ移設する。"
+      }
+    },
+    {
+      "claim_hash": "9ae29b57112c7bbeeb7500b3a69eb9d3e8addec962693d5f515b24c05acd5efc",
+      "evidence_hash": "388eeaef245590de5f54b5860a4a0b5b720cbe45c6bca95af095a9299e8c944f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port を実装する struct（secondary adapter）は `libs/infrastructure` に定義しなければならない。`cli_composition` は adapter を wire するが定義はしない。"
+      }
+    },
+    {
+      "claim_hash": "69a60cca1fd9f1342b525afe5c7570a02aae238546433d242ed0868fa64599ad",
+      "evidence_hash": "57a875ca5ed94acf4c5092abb938977c1cfb33a9ebbb26ce122bb05720b9e53f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` 内の adapter-outside-infrastructure 7 件を解消する。... は `libs/infrastructure` へ移設する。"
+      }
+    },
+    {
+      "claim_hash": "69a60cca1fd9f1342b525afe5c7570a02aae238546433d242ed0868fa64599ad",
+      "evidence_hash": "388eeaef245590de5f54b5860a4a0b5b720cbe45c6bca95af095a9299e8c944f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port を実装する struct（secondary adapter）は `libs/infrastructure` に定義しなければならない。`cli_composition` は adapter を wire するが定義はしない。"
+      }
+    },
+    {
+      "claim_hash": "ce97ad6c816178bc1d98e6e7ee6ebf1fe51d373816ce43628d4a823cb51bc4aa",
+      "evidence_hash": "57a875ca5ed94acf4c5092abb938977c1cfb33a9ebbb26ce122bb05720b9e53f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` 内の adapter-outside-infrastructure 7 件を解消する。FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService の 6 件は `libs/infrastructure` へ移設する。"
+      }
+    },
+    {
+      "claim_hash": "ce97ad6c816178bc1d98e6e7ee6ebf1fe51d373816ce43628d4a823cb51bc4aa",
+      "evidence_hash": "388eeaef245590de5f54b5860a4a0b5b720cbe45c6bca95af095a9299e8c944f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port を実装する struct（secondary adapter）は `libs/infrastructure` に定義しなければならない。`cli_composition` は adapter を wire するが定義はしない。"
+      }
+    },
+    {
+      "claim_hash": "2099e29e81444d5eadf73b3b581adbcc00f48b3b79898722b5bd80055501bbdc",
+      "evidence_hash": "57a875ca5ed94acf4c5092abb938977c1cfb33a9ebbb26ce122bb05720b9e53f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` 内の adapter-outside-infrastructure 7 件を解消する。FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService の 6 件は `libs/infrastructure` へ移設する。"
+      }
+    },
+    {
+      "claim_hash": "2099e29e81444d5eadf73b3b581adbcc00f48b3b79898722b5bd80055501bbdc",
+      "evidence_hash": "388eeaef245590de5f54b5860a4a0b5b720cbe45c6bca95af095a9299e8c944f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port を実装する struct（secondary adapter）は `libs/infrastructure` に定義しなければならない。`cli_composition` は adapter を wire するが定義はしない。"
+      }
+    },
+    {
+      "claim_hash": "10737745f79682ec77a180939cd6daf09c8435808dd7ed8ad18df65d229d90a9",
+      "evidence_hash": "57a875ca5ed94acf4c5092abb938977c1cfb33a9ebbb26ce122bb05720b9e53f",
+      "verdict": {
+        "kind": "fail",
+        "reason": "New behavioral commitment: IN-11 specifically scopes the adapter relocation to FsReviewGateStateAdapter, FsRefVerifyGateStateAdapter, RecordingDryAgent, NullInsertIndexProxy, NoopSemanticIndexPort, NoOpDryApprovalService, and LazyBranchReader. FsDemoAdapter and built-in demo execution are not mentioned or derivable from this evidence."
+      }
+    },
+    {
+      "claim_hash": "dab89a9c1148cff10adbd0af2dea7149e66e5b1d3234973cd0e45e9a36cadc80",
+      "evidence_hash": "57a875ca5ed94acf4c5092abb938977c1cfb33a9ebbb26ce122bb05720b9e53f",
+      "verdict": {
+        "kind": "fail",
+        "reason": "New behavioral commitment: IN-11 only requires resolving seven existing adapter-outside-infrastructure cases in cli_composition by moving six named adapters to libs/infrastructure and removing LazyBranchReader; it does not mention or naturally require a new FsFileWriteAdapter/FileWritePort filesystem write responsibility."
+      }
+    },
+    {
+      "claim_hash": "8b8d05331925c662bd9ad00377d2975a2fb3f0818b813b327d18356de219f68f",
+      "evidence_hash": "388eeaef245590de5f54b5860a4a0b5b720cbe45c6bca95af095a9299e8c944f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port を実装する struct（secondary adapter）は `libs/infrastructure` に定義しなければならない。`cli_composition` は adapter を wire するが定義はしない。"
+      }
+    },
+    {
+      "claim_hash": "fa7880d6bd937846235548a6d5895ad770bc61d8086e51e30e8121cdc7963e9a",
+      "evidence_hash": "388eeaef245590de5f54b5860a4a0b5b720cbe45c6bca95af095a9299e8c944f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port を実装する struct（secondary adapter）は `libs/infrastructure` に定義しなければならない。`cli_composition` は adapter を wire するが定義はしない。"
+      }
+    },
+    {
+      "claim_hash": "168eff29ebb287cc4cf8cdcac879e75c45409dc6e47044cad900ed40b6082ba4",
+      "evidence_hash": "f5eeae84e02f903f656e5c3dc9b3ebdfee347f5bc9c5280f526fb278fb37c50c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "infrastructure 層の `DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` など、adapter に固有の typed error enum も同様にこの scope で管理される."
+      }
+    },
+    {
+      "claim_hash": "2b7a04ec850556de5b70573c4403f0cf2c56ce4818defb3a231f4ccd7877f48a",
+      "evidence_hash": "f5eeae84e02f903f656e5c3dc9b3ebdfee347f5bc9c5280f526fb278fb37c50c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "secondary port の infrastructure adapter 実装は infrastructure 層に配置し、... infrastructure 層の `DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` など、adapter に固有の typed error enum も同様にこの scope で管理される。"
+      }
+    },
+    {
+      "claim_hash": "abfc43ac4918910530911b9a73af7e6e5097e232937b9512367f35e942b19e4a",
+      "evidence_hash": "f5eeae84e02f903f656e5c3dc9b3ebdfee347f5bc9c5280f526fb278fb37c50c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "secondary port の infrastructure adapter 実装は infrastructure 層に配置し、... infrastructure 層の `DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` など、adapter に固有の typed error enum も同様にこの scope で管理される。"
+      }
+    },
+    {
+      "claim_hash": "00122d099b9c15159282572f52bc88454fa07e5102120192b30e53b3cc9023b6",
+      "evidence_hash": "f5eeae84e02f903f656e5c3dc9b3ebdfee347f5bc9c5280f526fb278fb37c50c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "secondary port の infrastructure adapter 実装は infrastructure 層に配置し... infrastructure 層の `DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` など、adapter に固有の typed error enum も同様にこの scope で管理される。"
+      }
+    },
+    {
+      "claim_hash": "bd3aa42cfbdead7dc0c4006a45b514c02b41393756e2027b288c5512037d6e5d",
+      "evidence_hash": "f5eeae84e02f903f656e5c3dc9b3ebdfee347f5bc9c5280f526fb278fb37c50c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "infrastructure 層の `DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` など、adapter に固有の typed error enum も同様にこの scope で管理される。"
+      }
+    },
+    {
+      "claim_hash": "b930addcbfb7fb91113421c974747ce610848ee391a645e8d68810f3cdb85ae2",
+      "evidence_hash": "f5eeae84e02f903f656e5c3dc9b3ebdfee347f5bc9c5280f526fb278fb37c50c",
+      "verdict": {
+        "kind": "fail",
+        "reason": "Contradiction: the evidence explicitly places infrastructure adapter-specific `TrackBranchError` under managed `typed error enum` errors, while the claim declares `TrackBranchError` as a tuple struct newtype over `String` rather than an enum."
+      }
+    },
+    {
+      "claim_hash": "8b74eb7f5cb5807ee4451edf3d507c371ce5326daf735e7be92e8431e716bd3e",
+      "evidence_hash": "f5eeae84e02f903f656e5c3dc9b3ebdfee347f5bc9c5280f526fb278fb37c50c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "infrastructure 層の `DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` など、adapter に固有の typed error enum も同様にこの scope で管理される。"
+      }
+    },
+    {
+      "claim_hash": "168eff29ebb287cc4cf8cdcac879e75c45409dc6e47044cad900ed40b6082ba4",
+      "evidence_hash": "de9875dec86aa46f857f81706f749a38db70e4646ed1d10651d82b977fed91c7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "infrastructure 層の `DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` など、adapter に固有の typed error 型も同様にこの scope で管理される。"
+      }
+    },
+    {
+      "claim_hash": "bd3aa42cfbdead7dc0c4006a45b514c02b41393756e2027b288c5512037d6e5d",
+      "evidence_hash": "de9875dec86aa46f857f81706f749a38db70e4646ed1d10651d82b977fed91c7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "infrastructure 層の `DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` など、adapter に固有の typed error 型も同様にこの scope で管理される。"
+      }
+    },
+    {
+      "claim_hash": "b930addcbfb7fb91113421c974747ce610848ee391a645e8d68810f3cdb85ae2",
+      "evidence_hash": "de9875dec86aa46f857f81706f749a38db70e4646ed1d10651d82b977fed91c7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "infrastructure 層の `DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` など、adapter に固有の typed error 型も同様にこの scope で管理される。"
+      }
+    },
+    {
+      "claim_hash": "8b74eb7f5cb5807ee4451edf3d507c371ce5326daf735e7be92e8431e716bd3e",
+      "evidence_hash": "de9875dec86aa46f857f81706f749a38db70e4646ed1d10651d82b977fed91c7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "infrastructure 層の DemoRunError・TrackBranchError・PersistentIndexLockError など、adapter に固有の typed error 型も同様にこの scope で管理される。"
+      }
+    },
+    {
+      "claim_hash": "2b7a04ec850556de5b70573c4403f0cf2c56ce4818defb3a231f4ccd7877f48a",
+      "evidence_hash": "de9875dec86aa46f857f81706f749a38db70e4646ed1d10651d82b977fed91c7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "secondary port の infrastructure adapter 実装は infrastructure 層に配置し、aggregate/application service の実装は usecase 層に置いて ports を注入される。port／service が返すエラーは IN-13 に準拠した `thiserror` 派生 typed error 型（enum もしくは単一バリアントの tuple newtype struct を含む）とする。infrastructure 層の `DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` など、adapter に固有の typed error 型も同様にこの scope で管理される。"
+      }
+    },
+    {
+      "claim_hash": "abfc43ac4918910530911b9a73af7e6e5097e232937b9512367f35e942b19e4a",
+      "evidence_hash": "de9875dec86aa46f857f81706f749a38db70e4646ed1d10651d82b977fed91c7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "secondary port の infrastructure adapter 実装は infrastructure 層に配置し、... infrastructure 層の `DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` など、adapter に固有の typed error 型も同様にこの scope で管理される。"
+      }
+    },
+    {
+      "claim_hash": "00122d099b9c15159282572f52bc88454fa07e5102120192b30e53b3cc9023b6",
+      "evidence_hash": "de9875dec86aa46f857f81706f749a38db70e4646ed1d10651d82b977fed91c7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "secondary port の infrastructure adapter 実装は infrastructure 層に配置し、aggregate/application service の実装は usecase 層に置いて ports を注入される。port／service が返すエラーは IN-13 に準拠した `thiserror` 派生 typed error 型（enum もしくは単一バリアントの tuple newtype struct を含む）とする。infrastructure 層の `DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` など、adapter に固有の typed error 型も同様にこの scope で管理される。"
+      }
+    },
+    {
+      "claim_hash": "9f029fc3c16b619ef429f7886abe29a00409d1980d06c4a08c40ca48239a2c1a",
+      "evidence_hash": "f5eeae84e02f903f656e5c3dc9b3ebdfee347f5bc9c5280f526fb278fb37c50c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port／service が返すエラーは IN-13 に準拠した typed enum とする。infrastructure 層の `DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` など、adapter に固有の typed error enum も同様にこの scope で管理される。"
+      }
+    },
+    {
+      "claim_hash": "0110dc279b46f2f6a4d96c511b09467f5f74880655e36b59e588f55f62b24705",
+      "evidence_hash": "f5eeae84e02f903f656e5c3dc9b3ebdfee347f5bc9c5280f526fb278fb37c50c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "infrastructure 層の `DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` など、adapter に固有の typed error enum も同様にこの scope で管理される。"
+      }
+    },
+    {
+      "claim_hash": "b95ec12c9132e206c8199f0667d1e5196a278287e95501429170b748232d1ce3",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "b95ec12c9132e206c8199f0667d1e5196a278287e95501429170b748232d1ce3",
+      "evidence_hash": "9ffb7e8c8e57699c842e3e5a649e0d76da137d08cb3e6fbfc61cefcefbaaa0a0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各オーケストレーション（signal chain sequencing / diff-fragment pipeline / dry_write メトリクス集計 / dry_check_approved fragment-ref derivation など）が usecase application service に移設されている。"
+      }
+    },
+    {
+      "claim_hash": "303dd457f4ebc67222ce1c1f994d0976395fe7067c5ba81b01963f7828014d89",
+      "evidence_hash": "57a875ca5ed94acf4c5092abb938977c1cfb33a9ebbb26ce122bb05720b9e53f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` 内の adapter-outside-infrastructure 7 件を解消する。FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService の 6 件は `libs/infrastructure` へ移設する。"
+      }
+    },
+    {
+      "claim_hash": "04c8255edeea9411ae3e9cbe0e801f06ae85fd1c8d0a01e1c3a5f71a3116c81f",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "04c8255edeea9411ae3e9cbe0e801f06ae85fd1c8d0a01e1c3a5f71a3116c81f",
+      "evidence_hash": "a425cb25b341819d488eb925a8226f03957f002d0165b56db13ffabc3f481bb1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション（signal chain sequencing / diff-fragment pipeline / PR polling など）は driving adapter（`cli_driver`）ではなく usecase の application service に置かなければならない。driving adapter は単一 use case の invoke + render に留める。"
+      }
+    },
+    {
+      "claim_hash": "04c8255edeea9411ae3e9cbe0e801f06ae85fd1c8d0a01e1c3a5f71a3116c81f",
+      "evidence_hash": "9ffb7e8c8e57699c842e3e5a649e0d76da137d08cb3e6fbfc61cefcefbaaa0a0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各オーケストレーション（signal chain sequencing / diff-fragment pipeline / dry_write メトリクス集計 / dry_check_approved fragment-ref derivation など）が usecase application service に移設されている。"
+      }
+    },
+    {
+      "claim_hash": "190ea2a20b1b2c7ea679670a977b77e2679988a134804e22f650fa23a90b7479",
+      "evidence_hash": "57a875ca5ed94acf4c5092abb938977c1cfb33a9ebbb26ce122bb05720b9e53f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`LazyBranchReader` は UFCS 回避用の二重 adapter であり、呼び出し側の trait 曖昧性解消で除去して infrastructure の `SystemGitRepo` 実装に一本化する。"
+      }
+    },
+    {
+      "claim_hash": "a1b9b085af66ead8d6853e8208748cd30850f926c8b99b605239d2ca5e6fe8da",
+      "evidence_hash": "57a875ca5ed94acf4c5092abb938977c1cfb33a9ebbb26ce122bb05720b9e53f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`LazyBranchReader` は UFCS 回避用の二重 adapter であり、呼び出し側の trait 曖昧性解消で除去して infrastructure の `SystemGitRepo` 実装に一本化する。"
+      }
+    },
+    {
+      "claim_hash": "3f6bdd00192366e27acd18ead6f90732ceeb9538941017965fb56dee92feb6e3",
+      "evidence_hash": "57a875ca5ed94acf4c5092abb938977c1cfb33a9ebbb26ce122bb05720b9e53f",
+      "verdict": {
+        "kind": "fail",
+        "reason": "New behavioral commitment: DemoRunError defines an outward error contract for run_example_demo covering track creation and persistence failures, but IN-11 only concerns relocating/removing cli_composition infrastructure adapters and does not motivate any demo API error type."
+      }
+    },
+    {
+      "claim_hash": "e117adf6675c8013b92ecfa1f14db9c763c2e82a4dc841ec7f6395421282bcd6",
+      "evidence_hash": "57a875ca5ed94acf4c5092abb938977c1cfb33a9ebbb26ce122bb05720b9e53f",
+      "verdict": {
+        "kind": "fail",
+        "reason": "The referenced evidence is unrelated: IN-11 commits to resolving adapter-outside-infrastructure items in cli_composition by moving six named adapters to libs/infrastructure and removing LazyBranchReader, while the claim defines an error type for track-branch resolution free functions. This introduces a behavioral/design concern not grounded by the evidence."
+      }
+    },
+    {
+      "claim_hash": "886ba27e891c97825b8375cbdca9b100562e40dea4144d8a6ea261e3dc0ba6ed",
+      "evidence_hash": "57a875ca5ed94acf4c5092abb938977c1cfb33a9ebbb26ce122bb05720b9e53f",
+      "verdict": {
+        "kind": "fail",
+        "reason": "New behavioral commitment / wrong reference: the claim defines a demo runner that creates and persists an in-memory track and returns a display string, while IN-11 only commits to moving specific adapter implementations into libs/infrastructure and removing LazyBranchReader by resolving trait ambiguity. The evidence motivates no part of the demo-running behavior."
+      }
+    },
+    {
+      "claim_hash": "9bcb4d09a9a86530cc07a16f86cd43801b56931449e2d926f10b6311f558dc6f",
+      "evidence_hash": "57a875ca5ed94acf4c5092abb938977c1cfb33a9ebbb26ce122bb05720b9e53f",
+      "verdict": {
+        "kind": "fail",
+        "reason": "New behavioral commitment: the claim defines collecting and parsing explicit track-branch records from a default items directory and returning TrackBranchError on read/parse failures, but IN-11 only commits to moving six adapter types to libs/infrastructure and removing LazyBranchReader by consolidating behavior into SystemGitRepo. The cited evidence does not motivate this record-collection responsibility."
+      }
+    },
+    {
+      "claim_hash": "9eed65c2011bde24dbc69370ab7c2eb9a49d26450541aeb57434338d67dc4b9e",
+      "evidence_hash": "4a86be20ee0a5cadbd65ecdfaa10675aa005e472649fd72495e21ce82fe47c6c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` 等の typed error enum を infrastructure 層に新設し、`git_cli` / `demo` の free function が `Result<_, TypedError>` を返すよう変更する。"
+      }
+    },
+    {
+      "claim_hash": "a5d34c02c2502b07d1da3678424fa26b0a84bafa6dee755535588934651dd179",
+      "evidence_hash": "4a86be20ee0a5cadbd65ecdfaa10675aa005e472649fd72495e21ce82fe47c6c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` 等の typed error enum を infrastructure 層に新設し、`git_cli` / `demo` の free function が `Result<_, TypedError>` を返すよう変更する。"
+      }
+    },
+    {
+      "claim_hash": "552941c9114ae8d9daad42900eab6705ad42eb16fc231bfd2272476b50678432",
+      "evidence_hash": "4a86be20ee0a5cadbd65ecdfaa10675aa005e472649fd72495e21ce82fe47c6c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "infrastructure adapter 移設に伴う typed error enum の導入と free function シグネチャの変更。`DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` 等の typed error enum を infrastructure 層に新設し、`git_cli` / `demo` の free function が `Result<_, TypedError>` を返すよう変更する。"
+      }
+    },
+    {
+      "claim_hash": "c9711e7b6c94c7dd8a05da85a6f715c5c515dcec4cfd75a64ea56a07824431bb",
+      "evidence_hash": "4a86be20ee0a5cadbd65ecdfaa10675aa005e472649fd72495e21ce82fe47c6c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` 等の typed error enum を infrastructure 層に新設し、`git_cli` / `demo` の free function が `Result<_, TypedError>` を返すよう変更する。"
+      }
+    },
+    {
+      "claim_hash": "92c0ffe22fa3b72405cdf02dca4e059a2a6e53f31b040e6e604e10c8fd1617a8",
+      "evidence_hash": "4a86be20ee0a5cadbd65ecdfaa10675aa005e472649fd72495e21ce82fe47c6c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` 等の typed error enum を infrastructure 層に新設し、`git_cli` / `demo` の free function が `Result<_, TypedError>` を返すよう変更する。"
+      }
+    },
+    {
+      "claim_hash": "d3ae00c84255fce11f37b88e8f939f08af28edde97ff7b25b4fea98225029768",
+      "evidence_hash": "4a86be20ee0a5cadbd65ecdfaa10675aa005e472649fd72495e21ce82fe47c6c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` 等の typed error enum を infrastructure 層に新設し、`git_cli` / `demo` の free function が `Result<_, TypedError>` を返すよう変更する。"
+      }
+    },
+    {
+      "claim_hash": "4760ce1d38249ccb28025fb78e34d25e8baf08c49bbd7e646f04013f2717f878",
+      "evidence_hash": "4a86be20ee0a5cadbd65ecdfaa10675aa005e472649fd72495e21ce82fe47c6c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "infrastructure adapter 移設に伴う typed error enum の導入と free function シグネチャの変更。`DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` 等の typed error enum を infrastructure 層に新設し、`git_cli` / `demo` の free function が `Result<_, TypedError>` を返すよう変更する。"
+      }
+    },
+    {
+      "claim_hash": "9eed65c2011bde24dbc69370ab7c2eb9a49d26450541aeb57434338d67dc4b9e",
+      "evidence_hash": "4cd212fbfc321547fccf5b93c4e4f086540afe36c3896bc15ca0f710c825ae70",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` 等の typed error enum を infrastructure 層に新設し、`git_cli` / `demo` の free function が `Result<_, TypedError>` を返すよう変更する。"
+      }
+    },
+    {
+      "claim_hash": "a5d34c02c2502b07d1da3678424fa26b0a84bafa6dee755535588934651dd179",
+      "evidence_hash": "4cd212fbfc321547fccf5b93c4e4f086540afe36c3896bc15ca0f710c825ae70",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` 等の typed error enum を infrastructure 層に新設し、`git_cli` / `demo` の free function が `Result<_, TypedError>` を返すよう変更する。"
+      }
+    },
+    {
+      "claim_hash": "552941c9114ae8d9daad42900eab6705ad42eb16fc231bfd2272476b50678432",
+      "evidence_hash": "4cd212fbfc321547fccf5b93c4e4f086540afe36c3896bc15ca0f710c825ae70",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` 等の typed error enum を infrastructure 層に新設し、`git_cli` / `demo` の free function が `Result<_, TypedError>` を返すよう変更する。"
+      }
+    },
+    {
+      "claim_hash": "c9711e7b6c94c7dd8a05da85a6f715c5c515dcec4cfd75a64ea56a07824431bb",
+      "evidence_hash": "4cd212fbfc321547fccf5b93c4e4f086540afe36c3896bc15ca0f710c825ae70",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` 等の typed error enum を infrastructure 層に新設し、`git_cli` / `demo` の free function が `Result<_, TypedError>` を返すよう変更する。"
+      }
+    },
+    {
+      "claim_hash": "92c0ffe22fa3b72405cdf02dca4e059a2a6e53f31b040e6e604e10c8fd1617a8",
+      "evidence_hash": "4cd212fbfc321547fccf5b93c4e4f086540afe36c3896bc15ca0f710c825ae70",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` 等の typed error enum を infrastructure 層に新設し、`git_cli` / `demo` の free function が `Result<_, TypedError>` を返すよう変更する。"
+      }
+    },
+    {
+      "claim_hash": "d3ae00c84255fce11f37b88e8f939f08af28edde97ff7b25b4fea98225029768",
+      "evidence_hash": "4cd212fbfc321547fccf5b93c4e4f086540afe36c3896bc15ca0f710c825ae70",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` 等の typed error enum を infrastructure 層に新設し、`git_cli` / `demo` の free function が `Result<_, TypedError>` を返すよう変更する。"
+      }
+    },
+    {
+      "claim_hash": "4760ce1d38249ccb28025fb78e34d25e8baf08c49bbd7e646f04013f2717f878",
+      "evidence_hash": "4cd212fbfc321547fccf5b93c4e4f086540afe36c3896bc15ca0f710c825ae70",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` 等の typed error enum を infrastructure 層に新設し、`git_cli` / `demo` の free function が `Result<_, TypedError>` を返すよう変更する。"
+      }
+    },
+    {
+      "claim_hash": "9eed65c2011bde24dbc69370ab7c2eb9a49d26450541aeb57434338d67dc4b9e",
+      "evidence_hash": "a6e0751d89875020bb137e66dd7443933e67a70459ba7bf5fcabeea35a231a65",
+      "verdict": {
+        "kind": "pass",
+        "citation": "infrastructure adapter 移設に伴う typed error enum の導入と free function シグネチャの変更。`DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` 等の typed error enum を infrastructure 層に新設し、`git_cli` / `demo` の free function が `Result<_, TypedError>` を返すよう変更する。"
+      }
+    },
+    {
+      "claim_hash": "a5d34c02c2502b07d1da3678424fa26b0a84bafa6dee755535588934651dd179",
+      "evidence_hash": "a6e0751d89875020bb137e66dd7443933e67a70459ba7bf5fcabeea35a231a65",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` 等の typed error enum を infrastructure 層に新設し、`git_cli` / `demo` の free function が `Result<_, TypedError>` を返すよう変更する。"
+      }
+    },
+    {
+      "claim_hash": "552941c9114ae8d9daad42900eab6705ad42eb16fc231bfd2272476b50678432",
+      "evidence_hash": "a6e0751d89875020bb137e66dd7443933e67a70459ba7bf5fcabeea35a231a65",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` 等の typed error enum を infrastructure 層に新設し、`git_cli` / `demo` の free function が `Result<_, TypedError>` を返すよう変更する。"
+      }
+    },
+    {
+      "claim_hash": "c9711e7b6c94c7dd8a05da85a6f715c5c515dcec4cfd75a64ea56a07824431bb",
+      "evidence_hash": "a6e0751d89875020bb137e66dd7443933e67a70459ba7bf5fcabeea35a231a65",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` 等の typed error enum を infrastructure 層に新設し、`git_cli` / `demo` の free function が `Result<_, TypedError>` を返すよう変更する。"
+      }
+    },
+    {
+      "claim_hash": "92c0ffe22fa3b72405cdf02dca4e059a2a6e53f31b040e6e604e10c8fd1617a8",
+      "evidence_hash": "a6e0751d89875020bb137e66dd7443933e67a70459ba7bf5fcabeea35a231a65",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` 等の typed error enum を infrastructure 層に新設し、`git_cli` / `demo` の free function が `Result<_, TypedError>` を返すよう変更する。"
+      }
+    },
+    {
+      "claim_hash": "d3ae00c84255fce11f37b88e8f939f08af28edde97ff7b25b4fea98225029768",
+      "evidence_hash": "a6e0751d89875020bb137e66dd7443933e67a70459ba7bf5fcabeea35a231a65",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` 等の typed error enum を infrastructure 層に新設し、`git_cli` / `demo` の free function が `Result<_, TypedError>` を返すよう変更する。"
+      }
+    },
+    {
+      "claim_hash": "4760ce1d38249ccb28025fb78e34d25e8baf08c49bbd7e646f04013f2717f878",
+      "evidence_hash": "a6e0751d89875020bb137e66dd7443933e67a70459ba7bf5fcabeea35a231a65",
+      "verdict": {
+        "kind": "pass",
+        "citation": "infrastructure adapter 移設に伴う typed error enum の導入と free function シグネチャの変更。`DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` 等の typed error enum を infrastructure 層に新設し、`git_cli` / `demo` の free function が `Result<_, TypedError>` を返すよう変更する。"
+      }
+    },
+    {
+      "claim_hash": "d1c738e8cb2c351c028ebfb499c1809590afa0e92100fc8b3a1d2acabf79055b",
+      "evidence_hash": "57a875ca5ed94acf4c5092abb938977c1cfb33a9ebbb26ce122bb05720b9e53f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` 内の adapter-outside-infrastructure 7 件を解消する。... は `libs/infrastructure` へ移設する。"
+      }
+    },
+    {
+      "claim_hash": "d1c738e8cb2c351c028ebfb499c1809590afa0e92100fc8b3a1d2acabf79055b",
+      "evidence_hash": "388eeaef245590de5f54b5860a4a0b5b720cbe45c6bca95af095a9299e8c944f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port を実装する struct（secondary adapter）は `libs/infrastructure` に定義しなければならない。`cli_composition` は adapter を wire するが定義はしない。"
+      }
+    }
+  ]
+}

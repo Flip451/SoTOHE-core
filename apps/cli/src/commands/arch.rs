@@ -1,15 +1,18 @@
 //! `sotp arch` subcommand group.
 //!
-//! Each subcommand delegates to the corresponding `CliApp` method and
-//! prints the outcome. Exits 0 on success, 1 on error.
+//! Each subcommand delegates to the corresponding driver and prints the outcome.
+//! Exits 0 on success, 1 on error.
 
 use std::path::PathBuf;
 use std::process::ExitCode;
 
 use clap::Subcommand;
-use cli_composition::CliApp;
+use cli_composition::ArchCompositionRoot;
+use cli_driver::arch::{
+    ArchInput, ArchInput::DirectChecks, ArchInput::Members, ArchInput::Tree, ArchInput::TreeFull,
+};
 
-use super::outcome_to_exit;
+use super::driver_outcome_to_exit;
 
 /// Architecture rules analysis subcommands.
 #[derive(Debug, Subcommand)]
@@ -41,14 +44,14 @@ pub enum ArchCommand {
 }
 
 pub fn execute(cmd: ArchCommand) -> ExitCode {
-    let app = CliApp::new();
-    let result = match cmd {
-        ArchCommand::Tree { project_root } => app.arch_tree(&project_root),
-        ArchCommand::TreeFull { project_root } => app.arch_tree_full(&project_root),
-        ArchCommand::Members { project_root } => app.arch_members(&project_root),
-        ArchCommand::DirectChecks { project_root } => app.arch_direct_checks(&project_root),
+    let driver = ArchCompositionRoot::new().arch_driver();
+    let input: ArchInput = match cmd {
+        ArchCommand::Tree { project_root } => Tree { project_root },
+        ArchCommand::TreeFull { project_root } => TreeFull { project_root },
+        ArchCommand::Members { project_root } => Members { project_root },
+        ArchCommand::DirectChecks { project_root } => DirectChecks { project_root },
     };
-    outcome_to_exit(result)
+    driver_outcome_to_exit(driver.handle(input))
 }
 
 #[cfg(test)]

@@ -2,9 +2,10 @@
 
 use std::process::ExitCode;
 
-use cli_composition::CliApp;
+use cli_composition::GuardCompositionRoot;
+use cli_driver::guard::GuardInput;
 
-use crate::commands::outcome_to_exit;
+use crate::commands::driver_outcome_to_exit;
 
 /// Guard subcommands for shell command checking.
 #[derive(Debug, clap::Subcommand)]
@@ -20,6 +21,8 @@ pub enum GuardCommand {
 /// Executes a guard subcommand.
 pub fn execute(cmd: GuardCommand) -> ExitCode {
     match cmd {
-        GuardCommand::Check { command } => outcome_to_exit(CliApp::new().guard_check(command)),
+        GuardCommand::Check { command } => driver_outcome_to_exit(
+            GuardCompositionRoot::new().guard_driver().handle(GuardInput::Check { command }),
+        ),
     }
 }

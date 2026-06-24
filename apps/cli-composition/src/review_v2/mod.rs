@@ -14,6 +14,7 @@ pub(crate) mod run;
 mod run_fix;
 pub(crate) mod scope;
 pub(crate) mod shared;
+mod shim;
 
 pub use inputs::{
     ReviewResultsInput, ReviewRunClaudeInput, ReviewRunCodexInput, ReviewRunLocalInput,
@@ -45,7 +46,9 @@ use std::time::{Duration, Instant};
 
 use infrastructure::review_v2::{ClaudeReviewer, CodexReviewer};
 
-use crate::{CliApp, CommandOutcome};
+use crate::{CommandOutcome, error::CompositionError};
+
+pub use shim::ReviewCompositionRoot;
 
 struct ReviewTelemetry<'a> {
     findings_count: u32,
@@ -55,8 +58,8 @@ struct ReviewTelemetry<'a> {
     subprocess_started_at: Option<Instant>,
 }
 
-fn review_telemetry_for_outcome<'a>(
-    run_result: &'a Result<CodexReviewOutcome, String>,
+fn review_telemetry_for_outcome<'a, E>(
+    run_result: &'a Result<CodexReviewOutcome, E>,
     requested_round_type: &'a str,
 ) -> Option<ReviewTelemetry<'a>> {
     match run_result {
@@ -102,7 +105,7 @@ fn review_telemetry_for_outcome<'a>(
     }
 }
 
-impl CliApp {
+impl ReviewCompositionRoot {
     /// Run the local Codex-backed reviewer and auto-record verdict to review.json.
     ///
     /// Resolves `track_id` from the current git branch when `input.track_id` is
@@ -112,16 +115,21 @@ impl CliApp {
     /// # Errors
     /// Returns `Err` when arg validation, composition build, or the review cycle
     /// fails.
-    pub fn review_run_codex(&self, input: ReviewRunCodexInput) -> Result<CommandOutcome, String> {
+    pub fn review_run_codex(
+        &self,
+        input: ReviewRunCodexInput,
+    ) -> Result<CommandOutcome, CompositionError> {
         let track_id = resolve_track_id_or_branch_write(input.track_id, &input.items_dir)?;
 
-        validate_track_id_str(&track_id).map_err(|e| format!("invalid --track-id: {e}"))?;
+        validate_track_id_str(&track_id)
+            .map_err(|e| CompositionError::WiringFailed(format!("invalid --track-id: {e}")))?;
         validate_review_group_name_str(&input.group)
-            .map_err(|e| format!("invalid --group: {e}"))?;
+            .map_err(|e| CompositionError::WiringFailed(format!("invalid --group: {e}")))?;
 
         let group = input.group.trim().to_owned();
 
-        let maybe_briefing = get_briefing_for_scope_str(&group, &track_id, &input.items_dir)?;
+        let maybe_briefing = get_briefing_for_scope_str(&group, &track_id, &input.items_dir)
+            .map_err(CompositionError::Infrastructure)?;
         if let Some(path) = &maybe_briefing {
             if !is_safe_briefing_path(path) {
                 eprintln!(
@@ -138,7 +146,8 @@ impl CliApp {
             &track_id,
             &input.items_dir,
             is_safe_briefing_path,
-        )?;
+        )
+        .map_err(CompositionError::Infrastructure)?;
 
         let timeout = Duration::from_secs(input.timeout_seconds);
         let reviewer =
@@ -179,7 +188,7 @@ impl CliApp {
             }
         }
 
-        outcome_to_command_outcome(run_result?)
+        outcome_to_command_outcome(run_result.map_err(CompositionError::Usecase)?)
     }
 
     /// Run the local Claude-backed reviewer and auto-record verdict to review.json.
@@ -191,16 +200,21 @@ impl CliApp {
     /// # Errors
     /// Returns `Err` when arg validation, composition build, or the review cycle
     /// fails.
-    pub fn review_run_claude(&self, input: ReviewRunClaudeInput) -> Result<CommandOutcome, String> {
+    pub fn review_run_claude(
+        &self,
+        input: ReviewRunClaudeInput,
+    ) -> Result<CommandOutcome, CompositionError> {
         let track_id = resolve_track_id_or_branch_write(input.track_id, &input.items_dir)?;
 
-        validate_track_id_str(&track_id).map_err(|e| format!("invalid --track-id: {e}"))?;
+        validate_track_id_str(&track_id)
+            .map_err(|e| CompositionError::WiringFailed(format!("invalid --track-id: {e}")))?;
         validate_review_group_name_str(&input.group)
-            .map_err(|e| format!("invalid --group: {e}"))?;
+            .map_err(|e| CompositionError::WiringFailed(format!("invalid --group: {e}")))?;
 
         let group = input.group.trim().to_owned();
 
-        let maybe_briefing = get_briefing_for_scope_str(&group, &track_id, &input.items_dir)?;
+        let maybe_briefing = get_briefing_for_scope_str(&group, &track_id, &input.items_dir)
+            .map_err(CompositionError::Infrastructure)?;
         if let Some(path) = &maybe_briefing {
             if !is_safe_briefing_path(path) {
                 eprintln!(
@@ -217,7 +231,8 @@ impl CliApp {
             &track_id,
             &input.items_dir,
             is_safe_briefing_path,
-        )?;
+        )
+        .map_err(CompositionError::Infrastructure)?;
 
         let timeout = Duration::from_secs(input.timeout_seconds);
         let reviewer =
@@ -255,7 +270,7 @@ impl CliApp {
             }
         }
 
-        outcome_to_command_outcome(run_result?)
+        outcome_to_command_outcome(run_result.map_err(CompositionError::Usecase)?)
     }
 
     /// Run the local reviewer with provider auto-resolved from agent-profiles.json.
@@ -268,12 +283,19 @@ impl CliApp {
     /// # Errors
     /// Returns `Err` when profile loading, provider resolution, arg validation,
     /// or the review cycle fails.
-    pub fn review_run_local(&self, input: ReviewRunLocalInput) -> Result<CommandOutcome, String> {
-        let profiles = shared::load_agent_profiles_from_repo(Some(&input.items_dir))?;
-        let infra_round_type = shared::parse_round_type(&input.round_type)?;
+    pub fn review_run_local(
+        &self,
+        input: ReviewRunLocalInput,
+    ) -> Result<CommandOutcome, CompositionError> {
+        let profiles = shared::load_agent_profiles_from_repo(Some(&input.items_dir))
+            .map_err(|e| CompositionError::ConfigLoad(e.to_string()))?;
+        let infra_round_type = shared::parse_round_type(&input.round_type)
+            .map_err(|e| CompositionError::WiringFailed(e.to_string()))?;
         let mut resolved =
             profiles.resolve_execution("reviewer", infra_round_type).ok_or_else(|| {
-                "[ERROR] reviewer capability not defined in agent-profiles.json".to_owned()
+                CompositionError::ConfigLoad(
+                    "[ERROR] reviewer capability not defined in agent-profiles.json".to_owned(),
+                )
             })?;
 
         if let Some(model_override) = input.model {
@@ -289,10 +311,13 @@ impl CliApp {
         let track_id = resolve_track_id_or_branch_write(input.track_id, &input.items_dir)?;
         let group = input.group.trim().to_owned();
 
-        validate_track_id_str(&track_id).map_err(|e| format!("invalid --track-id: {e}"))?;
-        validate_review_group_name_str(&group).map_err(|e| format!("invalid --group: {e}"))?;
+        validate_track_id_str(&track_id)
+            .map_err(|e| CompositionError::WiringFailed(format!("invalid --track-id: {e}")))?;
+        validate_review_group_name_str(&group)
+            .map_err(|e| CompositionError::WiringFailed(format!("invalid --group: {e}")))?;
 
-        let maybe_briefing = get_briefing_for_scope_str(&group, &track_id, &input.items_dir)?;
+        let maybe_briefing = get_briefing_for_scope_str(&group, &track_id, &input.items_dir)
+            .map_err(CompositionError::Infrastructure)?;
         if let Some(path) = &maybe_briefing {
             if !is_safe_briefing_path(path) {
                 eprintln!(
@@ -309,7 +334,8 @@ impl CliApp {
             &track_id,
             &input.items_dir,
             is_safe_briefing_path,
-        )?;
+        )
+        .map_err(CompositionError::Infrastructure)?;
 
         let timeout = Duration::from_secs(input.timeout_seconds);
 
@@ -317,8 +343,10 @@ impl CliApp {
         let (run_result, provider_name, effective_model) = match resolved.provider.as_str() {
             "codex" => {
                 let model = resolved.model.ok_or_else(|| {
-                    "[ERROR] codex reviewer requires a model (set model in agent-profiles.json)"
-                        .to_owned()
+                    CompositionError::ConfigLoad(
+                        "[ERROR] codex reviewer requires a model (set model in agent-profiles.json)"
+                            .to_owned(),
+                    )
                 })?;
                 let reviewer =
                     CodexReviewer::new(&model, timeout, base_prompt).with_scope_label(&group);
@@ -333,8 +361,10 @@ impl CliApp {
             }
             "claude" => {
                 let model = resolved.model.ok_or_else(|| {
-                    "[ERROR] claude reviewer requires a model (set model in agent-profiles.json)"
-                        .to_owned()
+                    CompositionError::ConfigLoad(
+                        "[ERROR] claude reviewer requires a model (set model in agent-profiles.json)"
+                            .to_owned(),
+                    )
                 })?;
                 let reviewer =
                     ClaudeReviewer::new(&model, timeout, base_prompt).with_scope_label(&group);
@@ -348,10 +378,10 @@ impl CliApp {
                 (result, "claude".to_owned(), model)
             }
             other => {
-                return Err(format!(
+                return Err(CompositionError::WiringFailed(format!(
                     "[ERROR] unsupported reviewer provider '{other}' \
                      (supported: 'codex', 'claude')"
-                ));
+                )));
             }
         };
 
@@ -383,7 +413,7 @@ impl CliApp {
             }
         }
 
-        outcome_to_command_outcome(run_result?)
+        outcome_to_command_outcome(run_result.map_err(CompositionError::Usecase)?)
     }
 
     /// Run the review-fix-lead fixer with provider auto-resolved from agent-profiles.json.
@@ -399,8 +429,8 @@ impl CliApp {
     pub fn review_run_fix_local(
         &self,
         input: RunReviewFixLocalInput,
-    ) -> Result<CommandOutcome, String> {
-        run_fix::run_fix_local(input)
+    ) -> Result<CommandOutcome, CompositionError> {
+        run_fix::run_fix_local(input).map_err(CompositionError::Infrastructure)
     }
 
     /// Check if the review state is approved and code hash is current.
@@ -415,11 +445,12 @@ impl CliApp {
         &self,
         track_id: Option<String>,
         items_dir: PathBuf,
-    ) -> Result<CommandOutcome, String> {
+    ) -> Result<CommandOutcome, CompositionError> {
         use usecase::review_v2::ReviewApprovalDecision;
 
         let track_id = resolve_track_id_or_branch(track_id, &items_dir)?;
-        let output = check_approved_str(&track_id, &items_dir).map_err(|e| format!("{e}"))?;
+        let output = check_approved_str(&track_id, &items_dir)
+            .map_err(|e| CompositionError::Usecase(format!("{e}")))?;
 
         let (msg, exit_code) = match output.decision {
             ReviewApprovalDecision::Approved => {
@@ -461,7 +492,10 @@ impl CliApp {
     ///
     /// # Errors
     /// Returns `Err` when track ID resolution or review store access fails.
-    pub fn review_results(&self, input: ReviewResultsInput) -> Result<CommandOutcome, String> {
+    pub fn review_results(
+        &self,
+        input: ReviewResultsInput,
+    ) -> Result<CommandOutcome, CompositionError> {
         let track_id = resolve_track_id_or_branch(input.track_id, &input.items_dir)?;
 
         let limit = if input.limit == 0 { None } else { Some(input.limit) };
@@ -473,7 +507,8 @@ impl CliApp {
             limit,
             &input.round_type,
             input.no_hint,
-        )?;
+        )
+        .map_err(CompositionError::Usecase)?;
 
         Ok(CommandOutcome::success(Some(output)))
     }
@@ -492,17 +527,19 @@ impl CliApp {
         paths: Vec<String>,
         track_id: Option<String>,
         items_dir: PathBuf,
-    ) -> Result<CommandOutcome, String> {
+    ) -> Result<CommandOutcome, CompositionError> {
         use usecase::review_v2::ScopeQueryService as _;
 
         let track_id = resolve_track_id_or_branch(track_id, &items_dir)?;
 
         validate_all_paths(&paths)?;
 
-        let interactor = build_scope_query_interactor_no_diff_str(&track_id, &items_dir)?;
+        let interactor = build_scope_query_interactor_no_diff_str(&track_id, &items_dir)
+            .map_err(|e| CompositionError::WiringFailed(e.to_string()))?;
 
-        let classifications =
-            interactor.classify_by_strings(paths).map_err(|e| format!("classify failed: {e}"))?;
+        let classifications = interactor
+            .classify_by_strings(paths)
+            .map_err(|e| CompositionError::Usecase(format!("classify failed: {e}")))?;
 
         let mut out = String::new();
         for entry in &classifications {
@@ -528,22 +565,28 @@ impl CliApp {
         scope: String,
         track_id: Option<String>,
         items_dir: PathBuf,
-    ) -> Result<CommandOutcome, String> {
+    ) -> Result<CommandOutcome, CompositionError> {
         use usecase::review_v2::{ScopeQueryError, ScopeQueryService as _};
 
         let track_id = resolve_track_id_or_branch(track_id, &items_dir)?;
 
-        validate_scope_for_track_str(&track_id, &items_dir, &scope)?;
+        validate_scope_for_track_str(&track_id, &items_dir, &scope)
+            .map_err(CompositionError::WiringFailed)?;
 
-        let interactor = build_scope_query_interactor_str(&track_id, &items_dir)?;
+        let interactor = build_scope_query_interactor_str(&track_id, &items_dir)
+            .map_err(|e| CompositionError::WiringFailed(e.to_string()))?;
         let files = interactor.files_by_string(scope).map_err(|err| match err {
-            ScopeQueryError::DiffGet(inner) => format!("diff getter failed: {inner}"),
-            ScopeQueryError::UnknownScope(s) => format!("Unknown scope: {s}"),
+            ScopeQueryError::DiffGet(inner) => {
+                CompositionError::Usecase(format!("diff getter failed: {inner}"))
+            }
+            ScopeQueryError::UnknownScope(s) => {
+                CompositionError::Usecase(format!("Unknown scope: {s}"))
+            }
             ScopeQueryError::InvalidPath { path, reason } => {
-                format!("invalid path '{path}': {reason}")
+                CompositionError::Usecase(format!("invalid path '{path}': {reason}"))
             }
             ScopeQueryError::InvalidScopeName { name, reason } => {
-                format!("invalid scope name '{name}': {reason}")
+                CompositionError::Usecase(format!("invalid scope name '{name}': {reason}"))
             }
         })?;
 
@@ -568,9 +611,10 @@ impl CliApp {
         scope: String,
         track_id: Option<String>,
         items_dir: PathBuf,
-    ) -> Result<CommandOutcome, String> {
+    ) -> Result<CommandOutcome, CompositionError> {
         let track_id = resolve_track_id_or_branch(track_id, &items_dir)?;
-        validate_scope_for_track_str(&track_id, &items_dir, &scope)?;
+        validate_scope_for_track_str(&track_id, &items_dir, &scope)
+            .map_err(CompositionError::WiringFailed)?;
         Ok(CommandOutcome::success(None))
     }
 
@@ -587,9 +631,10 @@ impl CliApp {
         scope: String,
         track_id: Option<String>,
         items_dir: PathBuf,
-    ) -> Result<CommandOutcome, String> {
+    ) -> Result<CommandOutcome, CompositionError> {
         let track_id = resolve_track_id_or_branch(track_id, &items_dir)?;
-        let maybe_path = get_briefing_for_scope_str(&scope, &track_id, &items_dir)?;
+        let maybe_path = get_briefing_for_scope_str(&scope, &track_id, &items_dir)
+            .map_err(CompositionError::Infrastructure)?;
         Ok(CommandOutcome::success(maybe_path))
     }
 
@@ -607,9 +652,10 @@ impl CliApp {
         &self,
         track_id: Option<String>,
         items_dir: PathBuf,
-    ) -> Result<CommandOutcome, String> {
+    ) -> Result<CommandOutcome, CompositionError> {
         let track_id = resolve_track_id_or_branch(track_id, &items_dir)?;
-        let head_sha = persist_commit_hash_for_track(&track_id)?;
+        let head_sha =
+            persist_commit_hash_for_track(&track_id).map_err(CompositionError::Infrastructure)?;
         eprintln!("[review] Recorded .commit_hash: {head_sha}");
         Ok(CommandOutcome::success(None))
     }
@@ -713,7 +759,7 @@ mod tests {
 
     #[test]
     fn test_review_telemetry_for_outcome_skipped_returns_zero_findings_without_subprocess() {
-        let run_result =
+        let run_result: Result<super::CodexReviewOutcome, super::shared::ReviewSharedError> =
             Ok(super::CodexReviewOutcome::Skipped { scope_label: "cli_composition".to_owned() });
 
         let telemetry = super::review_telemetry_for_outcome(&run_result, "fast").unwrap();
@@ -915,7 +961,7 @@ exit 0
         let _cwd_guard = CwdGuard::save_current();
         std::env::set_current_dir(repo._dir.path()).unwrap();
 
-        let outcome = crate::CliApp::new()
+        let outcome = crate::review_v2::ReviewCompositionRoot::new()
             .review_run_codex(crate::review_v2::ReviewRunCodexInput {
                 model: "codex-review-model".to_owned(),
                 timeout_seconds: 10,
@@ -947,7 +993,7 @@ exit 0
         let _cwd_guard = CwdGuard::save_current();
         std::env::set_current_dir(repo._dir.path()).unwrap();
 
-        let outcome = crate::CliApp::new()
+        let outcome = crate::review_v2::ReviewCompositionRoot::new()
             .review_run_claude(crate::review_v2::ReviewRunClaudeInput {
                 model: "claude-review-model".to_owned(),
                 timeout_seconds: 10,
@@ -980,7 +1026,7 @@ exit 0
         let _cwd_guard = CwdGuard::save_current();
         std::env::set_current_dir(repo._dir.path()).unwrap();
 
-        let outcome = crate::CliApp::new()
+        let outcome = crate::review_v2::ReviewCompositionRoot::new()
             .review_run_local(crate::review_v2::ReviewRunLocalInput {
                 model: None,
                 timeout_seconds: 10,
@@ -1022,8 +1068,9 @@ exit 0
         let _cwd_guard = CwdGuard::save_current();
         std::env::set_current_dir(dir.path()).unwrap();
 
-        let outcome =
-            crate::CliApp::new().review_run_fix_local(run_review_fix_input(briefing)).unwrap();
+        let outcome = crate::review_v2::ReviewCompositionRoot::new()
+            .review_run_fix_local(run_review_fix_input(briefing))
+            .unwrap();
 
         assert_eq!(outcome.stdout.as_deref(), Some("REVIEW_FIX_STATUS: completed"));
         assert_eq!(outcome.stderr, None);
@@ -1043,10 +1090,11 @@ exit 0
         let _cwd_guard = CwdGuard::save_current();
         std::env::set_current_dir(dir.path()).unwrap();
 
-        let result = crate::CliApp::new().review_run_fix_local(run_review_fix_input(briefing));
+        let result = crate::review_v2::ReviewCompositionRoot::new()
+            .review_run_fix_local(run_review_fix_input(briefing));
 
         assert!(result.is_err(), "expected unsupported provider error, got: {result:?}");
-        let msg = result.unwrap_err();
+        let msg = result.unwrap_err().to_string();
         assert!(
             msg.contains("unsupported review-fix-lead provider 'claude'"),
             "expected unsupported provider error, got: {msg}"
@@ -1065,8 +1113,8 @@ exit 0
         let items_dir = dir.path().join("track/items");
         fs::create_dir_all(&items_dir).unwrap();
 
-        let result =
-            crate::CliApp::new().review_run_claude(crate::review_v2::ReviewRunClaudeInput {
+        let result = crate::review_v2::ReviewCompositionRoot::new().review_run_claude(
+            crate::review_v2::ReviewRunClaudeInput {
                 model: "test-model".to_owned(),
                 timeout_seconds: 10,
                 briefing_file: None,
@@ -1075,10 +1123,11 @@ exit 0
                 round_type: "fast".to_owned(),
                 group: "cli_composition".to_owned(),
                 items_dir,
-            });
+            },
+        );
 
         assert!(result.is_err(), "expected Err on non-track branch, got Ok");
-        let msg = result.unwrap_err();
+        let msg = result.unwrap_err().to_string();
         assert!(
             msg.contains("not a track branch") || msg.contains("main"),
             "expected branch error, got: {msg}"
@@ -1093,19 +1142,21 @@ exit 0
         let _cwd_guard = CwdGuard::save_current();
         std::env::set_current_dir(repo._dir.path()).unwrap();
 
-        let result = crate::CliApp::new().review_run_local(crate::review_v2::ReviewRunLocalInput {
-            model: None,
-            timeout_seconds: 10,
-            briefing_file: None,
-            prompt: Some("Review.".to_owned()),
-            track_id: Some(repo.track_id.clone()),
-            round_type: "fast".to_owned(),
-            group: "cli_composition".to_owned(),
-            items_dir: repo.items_dir.clone(),
-        });
+        let result = crate::review_v2::ReviewCompositionRoot::new().review_run_local(
+            crate::review_v2::ReviewRunLocalInput {
+                model: None,
+                timeout_seconds: 10,
+                briefing_file: None,
+                prompt: Some("Review.".to_owned()),
+                track_id: Some(repo.track_id.clone()),
+                round_type: "fast".to_owned(),
+                group: "cli_composition".to_owned(),
+                items_dir: repo.items_dir.clone(),
+            },
+        );
 
         assert!(result.is_err(), "expected unsupported provider error, got: {result:?}");
-        let msg = result.unwrap_err();
+        let msg = result.unwrap_err().to_string();
         assert!(
             msg.contains("unsupported reviewer provider 'gemini'"),
             "expected unsupported provider error, got: {msg}"
@@ -1121,7 +1172,7 @@ exit 0
         let result =
             super::helpers::resolve_track_id_from_branch(std::path::Path::new("wrong/path"));
         assert!(result.is_err(), "expected error for non-canonical items_dir, got: {result:?}");
-        let msg = result.unwrap_err();
+        let msg = result.unwrap_err().to_string();
         assert!(msg.contains("track/items"), "error should mention 'track/items', got: {msg}");
     }
 
@@ -1161,7 +1212,7 @@ exit 0
         let result = super::helpers::resolve_track_id_from_branch(&items_dir);
 
         assert!(result.is_err());
-        let msg = result.unwrap_err();
+        let msg = result.unwrap_err().to_string();
         // The error must mention the branch name, not a git-discovery failure.
         assert!(
             msg.contains("not a track branch") || msg.contains("main"),
@@ -1182,7 +1233,7 @@ exit 0
     fn validate_all_paths_rejects_absolute_paths() {
         let result = super::helpers::validate_all_paths(&["/etc/passwd".to_owned()]);
         assert!(result.is_err());
-        assert!(result.unwrap_err().contains("absolute paths"));
+        assert!(result.unwrap_err().to_string().contains("absolute paths"));
     }
 
     #[test]
@@ -1190,7 +1241,7 @@ exit 0
         for raw in ["C:", "C:foo", "C:/foo", "C:\\foo", "z:relative"] {
             let result = super::helpers::validate_all_paths(&[raw.to_owned()]);
             assert!(result.is_err(), "expected drive-prefixed path to be rejected: {raw}");
-            assert!(result.unwrap_err().contains("absolute paths"));
+            assert!(result.unwrap_err().to_string().contains("absolute paths"));
         }
     }
 
@@ -1198,7 +1249,7 @@ exit 0
     fn validate_all_paths_rejects_traversal_components() {
         let result = super::helpers::validate_all_paths(&["../../etc/passwd".to_owned()]);
         assert!(result.is_err());
-        assert!(result.unwrap_err().contains("traversal"));
+        assert!(result.unwrap_err().to_string().contains("traversal"));
     }
 
     #[test]
@@ -1243,7 +1294,7 @@ exit 0
             std::path::Path::new("wrong/path/here"),
         );
         assert!(result.is_err());
-        let msg = result.unwrap_err();
+        let msg = result.unwrap_err().to_string();
         assert!(msg.contains("track/items"), "expected items-dir error, got: {msg}");
     }
 
@@ -1271,7 +1322,7 @@ exit 0
         let items_dir = dir.path().join("track/items");
         fs::create_dir_all(&items_dir).unwrap();
 
-        let app = crate::CliApp::new();
+        let app = crate::review_v2::ReviewCompositionRoot::new();
         let input = crate::review_v2::ReviewRunCodexInput {
             model: "test-model".to_owned(),
             timeout_seconds: 10,
@@ -1286,7 +1337,7 @@ exit 0
         let result = app.review_run_codex(input);
 
         assert!(result.is_err(), "expected Err on non-track branch, got Ok");
-        let msg = result.unwrap_err();
+        let msg = result.unwrap_err().to_string();
         // The error must be a branch error ("not a track branch", "main", or similar)
         // rather than a git-discovery error ("failed to run git", "No such file", etc.).
         assert!(
