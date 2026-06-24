@@ -6162,7 +6162,7 @@
               "ty": "&std::path::Path"
             }
           ],
-          "returns": "Result<String, TelemetryAggregateServiceError>",
+          "returns": "Result<TelemetryReportOutput, TelemetryAggregateServiceError>",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
@@ -6205,7 +6205,7 @@
         "Sync"
       ],
       "module_path": "telemetry",
-      "docs": "Driver-facing aggregate/application service for the telemetry command family. Composes the TelemetryReportPort-based aggregation path with archived telemetry emission so TelemetryDriver holds one Arc<dyn TelemetryAggregateService>. report returns Result<String, TelemetryAggregateServiceError> as the rendered telemetry report string. emit_archived returns Result<(), TelemetryAggregateServiceError>.",
+      "docs": "Driver-facing aggregate/application service for the telemetry command family. Composes the TelemetryReportPort-based aggregation path with archived telemetry emission so TelemetryDriver holds one Arc<dyn TelemetryAggregateService>. report returns Result<TelemetryReportOutput, TelemetryAggregateServiceError> as the structured telemetry DTO; presentation formatting (the final report string) is the responsibility of the cli_driver layer. emit_archived returns Result<(), TelemetryAggregateServiceError>.",
       "spec_refs": [
         {
           "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",

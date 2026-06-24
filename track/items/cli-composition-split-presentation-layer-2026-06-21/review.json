@@ -1,854 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e28ac3318e04d63783ef38ac9844dcfcabdb086c275834c6e22dc028ded27673",
-          "at": "2026-06-21T21:14:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3556d2ed316058f76cbccdc6ec972d8ba2fa977661052046f7d183fb9a0ff43a",
-          "at": "2026-06-21T22:23:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3556d2ed316058f76cbccdc6ec972d8ba2fa977661052046f7d183fb9a0ff43a",
-          "at": "2026-06-21T22:50:04Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cdacf57707cdba6811f8b059db885fb741a4eb6a76e9553bc04b95b857173b1f",
-          "at": "2026-06-21T23:48:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cdacf57707cdba6811f8b059db885fb741a4eb6a76e9553bc04b95b857173b1f",
-          "at": "2026-06-21T23:52:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bde8477585f3c7768b3a40dcf1b40002317f57131097c753de592710d74b17ca",
-          "at": "2026-06-22T00:28:42Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bde8477585f3c7768b3a40dcf1b40002317f57131097c753de592710d74b17ca",
-          "at": "2026-06-22T00:32:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`run_catalog_spec_chain` and `run_impl_catalog_chain` swallow `signal_check_layer_chain_with_strict(...)` errors by converting `Err(e)` into `CommandOutcome::failure(Some(e))` and then `Ok(SignalChainOutput)`. That means `SignalGateInteractor::run_gate` can no longer surface `SignalGateError::ChainExecutionFailed` for chains ②/③, so infrastructure/configuration failures are reported as ordinary gate failures instead of propagating to the outer `signal_check_gate` error mapping. The composition layer should propagate the `Err` here and only map it once at the CLI boundary.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/signal.rs",
-              "line": 587,
-              "category": "application logic in composition"
-            }
-          ],
-          "hash": "rvw1:sha256:4c456bf942cde00b7e3fcb78370187df350ae21dcea0c88d6e64ca2c50be174e",
-          "at": "2026-06-22T02:14:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1048baec2a2d1b81ca5468b0fda5bf896208003059b2b58ff51e3b49b0cefd5c",
-          "at": "2026-06-22T02:20:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`signal_check_gate` now derives `items_dir` and `TrackId` from the resolved `spec_json_path`, then passes only those into `SignalGateCommand`. That drops the exact `--spec-json` override path: an override like `/tmp/custom.json` is reinterpreted as `items_dir=/`, `track_id=tmp`, so chain ① will evaluate `/tmp/spec.json` or reject the parent name instead of the requested file. This path interpretation/validation belongs in the usecase boundary or should preserve the resolved spec path in the adapter/command, per the CLI-as-composition-root/usecase purity rule.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/signal.rs",
-              "line": 493,
-              "category": "application logic in composition"
-            }
-          ],
-          "hash": "rvw1:sha256:1048baec2a2d1b81ca5468b0fda5bf896208003059b2b58ff51e3b49b0cefd5c",
-          "at": "2026-06-22T02:30:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dffbb930eb161c2a6073d521d6de5d2e7dca087793e9fb2db924ca99430a0fee",
-          "at": "2026-06-22T02:36:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a50e92b92514f63202f2efaad239c39a66cabd2d3aa4f35b71614bb6a9236084",
-          "at": "2026-06-22T03:04:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a50e92b92514f63202f2efaad239c39a66cabd2d3aa4f35b71614bb6a9236084",
-          "at": "2026-06-22T03:11:21Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:24aa0a89c7f0bccf20d81db310220e880a7b3554eb600b9ce1a34c1b7843d5fc",
-          "at": "2026-06-22T03:49:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:24aa0a89c7f0bccf20d81db310220e880a7b3554eb600b9ce1a34c1b7843d5fc",
-          "at": "2026-06-22T03:55:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:578f075e84d55731ec821ad7fd0d64399ef848915e85bedd2ae723f541ea4b9a",
-          "at": "2026-06-22T04:08:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:578f075e84d55731ec821ad7fd0d64399ef848915e85bedd2ae723f541ea4b9a",
-          "at": "2026-06-22T04:12:21Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`max_iterations` is derived with floor division here, so any call where `timeout < interval` (or `interval == 0`) becomes `0` iterations and returns `Timeout` without ever polling GitHub. The previous deadline-based loop always performed an initial poll when `timeout > 0`, so this changes behavior for valid CLI inputs and can miss an already-completed review.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/pr.rs",
-              "line": 308,
-              "category": "application logic in composition"
-            }
-          ],
-          "hash": "rvw1:sha256:5a637f48b5159538239f6b3b197b711aeddb3bd3a56d5d19bf0277f90c41eb55",
-          "at": "2026-06-22T05:48:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2122a017e58b5076c8349ef747e9f45a97226dd76504ae8dad8d0ab00ef47eb1",
-          "at": "2026-06-22T05:56:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new module-level `allow(dead_code)` keeps the old `poll_review_for_cycle` compiled in production even though it is no longer called. That helper still contains the full PR polling orchestration, GitHub calls, zero-findings branching, sleeps, and stderr output, so the T008 delegation is incomplete for this scope. Delete it or gate it behind `#[cfg(test)]` and move the remaining coverage to the usecase interactor tests.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/pr/poll.rs",
-              "line": 11,
-              "category": "orchestration leak"
-            },
-            {
-              "message": "`FsDryCorpusMetaAdapter` still owns the corpus-manifest policy: it branches on manifest presence, chooses `canonical_root` vs `repo_root`, swallows manifest-resolution errors into an `eprintln!` fallback, and computes the selected fingerprint. The briefing says this corpus manifest logic should move out of `cli_composition` with the dry-gate extraction; keeping it here makes composition more than flat adapter wiring. Move the policy into the usecase interactor and leave this layer with primitive adapter calls only.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
-              "line": 91,
-              "category": "application logic in composition"
-            }
-          ],
-          "hash": "rvw1:sha256:2122a017e58b5076c8349ef747e9f45a97226dd76504ae8dad8d0ab00ef47eb1",
-          "at": "2026-06-22T06:31:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4869c835f330a904626de0490b11ffafd21745aefb1b31e610948b9c900c643e",
-          "at": "2026-06-22T06:51:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The pre-extraction `poll_review_for_cycle` remains compiled in production; `#![allow(dead_code)]` only hides the warning. This function still performs the full PR polling orchestration in `cli_composition` by calling review/reaction/comment ports, applying zero-findings and timeout-recovery branching, and emitting polling side effects. T008 expects that flow to live only in `PrReviewPollingInteractor`, so this leaves duplicate production orchestration in the composition layer that can drift from the wired usecase path. Move it under `#[cfg(test)]` or retarget the tests to the usecase interactor.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/pr/poll.rs",
-              "line": 234,
-              "category": "orchestration_leak"
-            }
-          ],
-          "hash": "rvw1:sha256:4869c835f330a904626de0490b11ffafd21745aefb1b31e610948b9c900c643e",
-          "at": "2026-06-22T07:14:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1261b9892fe86daec24fb67d89a177c61b8d4c629e0a51c779a287ce03f44dda",
-          "at": "2026-06-22T07:19:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:898823b28991f4f6a2a5067c515ffce37252681f478bf24cfb9392cf8a5ae847",
-          "at": "2026-06-22T07:44:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:898823b28991f4f6a2a5067c515ffce37252681f478bf24cfb9392cf8a5ae847",
-          "at": "2026-06-22T07:51:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:99a4a06cd7c7e7a83fe3091bae7f019f1117ad20a20b1dfd1c5e831b15bbb7b0",
-          "at": "2026-06-22T08:09:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:99a4a06cd7c7e7a83fe3091bae7f019f1117ad20a20b1dfd1c5e831b15bbb7b0",
-          "at": "2026-06-22T08:13:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:35859523f2637305087d7612a88c0dc77579ed9390a27cadd68b0f3b1b5be6c5",
-          "at": "2026-06-22T09:10:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:35859523f2637305087d7612a88c0dc77579ed9390a27cadd68b0f3b1b5be6c5",
-          "at": "2026-06-22T09:16:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fd72bb2707201b0fb41a7adc194582618a92fb79abb43a7a5a887e7909a723d8",
-          "at": "2026-06-22T09:34:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fd72bb2707201b0fb41a7adc194582618a92fb79abb43a7a5a887e7909a723d8",
-          "at": "2026-06-22T09:38:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:db55f17e2d5543cd0bddcd27259bf6fd58079a7fb706cc4a5bee270384518887",
-          "at": "2026-06-22T09:57:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:db55f17e2d5543cd0bddcd27259bf6fd58079a7fb706cc4a5bee270384518887",
-          "at": "2026-06-22T10:03:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e72167b2807db810f4e9fe6d89995da00f2c5561e70239c3698f596762008a16",
-          "at": "2026-06-22T10:14:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e72167b2807db810f4e9fe6d89995da00f2c5561e70239c3698f596762008a16",
-          "at": "2026-06-22T10:18:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c724e4cbe339c4b26831bf6ff7a681b52e80c0de3ef6446e78dc5c5a6afdf27a",
-          "at": "2026-06-22T10:25:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c724e4cbe339c4b26831bf6ff7a681b52e80c0de3ef6446e78dc5c5a6afdf27a",
-          "at": "2026-06-22T10:28:42Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:20cec6db95a49874616fbadbc8c59f576ede689c3ede854e1f0c147daba625a8",
-          "at": "2026-06-22T10:53:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:20cec6db95a49874616fbadbc8c59f576ede689c3ede854e1f0c147daba625a8",
-          "at": "2026-06-22T10:59:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ae7d1ad4a6a1a0246d2f9fdf94f1476e9aeb291cb0917a8990b1d53a4ac997b4",
-          "at": "2026-06-22T13:29:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-05 is still violated here: `VerifyCompositionRoot` keeps public helper methods returning `Result<Option<String>, String>` (`verify_ci_resolve_track_id` and the `_from_root` variant). Since `VerifyCompositionRoot` is publicly re-exported from `lib.rs`, these remain part of the cli_composition public surface after the CliApp removal. Convert them to `CompositionError` or make them crate-private so callers do not keep depending on stringly typed composition errors.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/verify.rs",
-              "line": 403,
-              "category": "architecture_violation"
-            },
-            {
-              "message": "AC-05 also remains open in `GitCompositionRoot::current_branch_track_id_strict`: the method is public on the re-exported composition root and still returns `Result<Option<String>, String>`. This leaves a public string-error boundary in cli_composition despite the typed `CompositionError` migration, so the helper should either return `CompositionError` or stop being public.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/git.rs",
-              "line": 284,
-              "category": "architecture_violation"
-            }
-          ],
-          "hash": "rvw1:sha256:ae7d1ad4a6a1a0246d2f9fdf94f1476e9aeb291cb0917a8990b1d53a4ac997b4",
-          "at": "2026-06-22T13:34:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b24d1bf878392350d05ab5f116929c035354f1a059cb7086bc99add8fc09597f",
-          "at": "2026-06-22T13:39:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6569c3b32a264c93d64336542109e9edaa1640baf438a1eac282493a670c2808",
-          "at": "2026-06-22T14:21:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`telemetry_emit_archived_track_subcommand` constructs the archived-track interactor and immediately calls `emit` inside `cli_composition`. Per the CLI composition policy, this layer should only wire the adapter/interactor graph and inject it into a driver; invoking the use case here is an invoke leak that belongs in `cli_driver` or another driving adapter.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/telemetry.rs",
-              "line": 132,
-              "category": "invoke leak"
-            },
-            {
-              "message": "`format_report` assembles the user-facing telemetry report text inside `cli_composition`. Rendering and output formatting are `cli_driver` responsibilities under ADR D2/D3, so this composition root should wire the report dependency into a driver/formatter rather than building stdout strings itself.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/telemetry.rs",
-              "line": 145,
-              "category": "render leak"
-            },
-            {
-              "message": "The production rustdoc still documents the old `ArchivedTrackTelemetryCommand { subcommand }` constructor shape. The implementation now supplies `track_id`, so this public wiring comment should be updated to include both fields to avoid documenting the stale archived telemetry contract.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/telemetry.rs",
-              "line": 88,
-              "category": "stale production doc"
-            }
-          ],
-          "hash": "rvw1:sha256:6569c3b32a264c93d64336542109e9edaa1640baf438a1eac282493a670c2808",
-          "at": "2026-06-22T14:25:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6569c3b32a264c93d64336542109e9edaa1640baf438a1eac282493a670c2808",
-          "at": "2026-06-22T14:29:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fc46f7ecf6f40f4c0602788b0775def53352fe3b4feeaa2bdcad789d9c33d556",
-          "at": "2026-06-22T15:42:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fc46f7ecf6f40f4c0602788b0775def53352fe3b4feeaa2bdcad789d9c33d556",
-          "at": "2026-06-22T15:45:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TrackServiceImpl::init` is the only `TrackServiceImpl` method that does not delegate to `TrackCompositionRoot`: it constructs `FsTrackStore`/`SaveTrackUseCase`, calls `uc.execute(&track)`, and formats user-facing success/error strings in `cli_composition`. The scope policy only accepts these internal service adapters when they wrap composition-root methods; direct infrastructure/use-case invocation and rendering in the composition root violates ADR D2/D7 wiring-only boundaries. Add a `TrackCompositionRoot::track_init` path (or move the rendering/invocation into the appropriate usecase/cli_driver layer) and have this adapter delegate like the other methods.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/service_impl.rs",
-              "line": 41,
-              "category": "invoke leak"
-            }
-          ],
-          "hash": "rvw1:sha256:ae945b5e469f022b025b4bd3c731146ebc8bf1e18c496edc564d862278a2face",
-          "at": "2026-06-22T18:33:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`track_init` is new production composition-root logic that constructs `SaveTrackUseCase` and invokes `uc.execute(...)`, then renders the success message itself. Under the cli_composition scope policy, this layer should only wire adapters/use cases into a driver; invoking use cases and formatting user-facing output belongs in usecase/cli_driver, so this reintroduces an invoke/render leak rather than a pure DI factory path.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/mod.rs",
-              "line": 214,
-              "category": "invoke leak"
-            }
-          ],
-          "hash": "rvw1:sha256:bf8f924dbaf11606127c30523be2c03b20dd50f5b5b96460dcfea7325fcbb584",
-          "at": "2026-06-22T18:41:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TrackCompositionRoot::track_init()` still builds `FsTrackStore`/`SaveTrackUseCase`, calls `uc.execute(&track)`, and formats the success string into a `CommandOutcome`. `TrackServiceImpl::init()` now routes through this helper, so the `track` path still performs use-case execution and rendering inside `cli_composition` instead of keeping this layer wiring-only.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/track/mod.rs",
-              "line": 199,
-              "category": "invoke leak"
-            }
-          ],
-          "hash": "rvw1:sha256:c20215a3d560790958822c4b5cf2651c25dd29be63d441e8351a92159cf7ae5f",
-          "at": "2026-06-22T19:23:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TrackServiceImpl::init` now ignores all inputs and always returns exit code 1, so the `track_driver()` path can never initialize a track. The briefing says this should delegate to a `TrackCompositionRoot::track_init()` factory; as written, the factory returns a driver with a broken production subcommand.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/service_impl.rs",
-              "line": 38,
-              "category": "wiring correctness"
-            },
-            {
-              "message": "`RefVerifyAggregateServiceImpl` is a usecase port implementation defined inside `cli_composition`, and it directly constructs `FsRefVerifyRunAdapter` / `FsRefVerifyCheckApprovedAdapter`. This violates the scope rule that secondary adapter implementations belong in infrastructure; the composition root should only wire an adapter/service that is already implemented elsewhere.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/ref_verify.rs",
-              "line": 119,
-              "category": "adapter defined here"
-            },
-            {
-              "message": "`TelemetryAggregateServiceImpl::report` still formats the user-facing telemetry report in `cli_composition` by calling `format_report`. That keeps output templating in the composition layer instead of the `cli_driver` layer, so the new driver path still has a render leak.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/telemetry.rs",
-              "line": 65,
-              "category": "render leak"
-            }
-          ],
-          "hash": "rvw1:sha256:6d12cfae886b4fa515cf992bd37c2da4bafd1af42c6d8472772015cd2025b9f6",
-          "at": "2026-06-22T19:58:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`track_init` still assembles user-facing output inside `cli_composition` by formatting the `[OK] Initialized track...` line and appending `sync_views_to_stdout(...)`. That keeps presentation work in the composition root path instead of leaving it to the `cli_driver` boundary, so the round-2 render-leak fix is not complete.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/track/mod.rs",
-              "line": 223,
-              "category": "render leak"
-            }
-          ],
-          "hash": "rvw1:sha256:f747b6051ba91cc1843f55899521ec7bece5f267d408095f0bd77561ca17a637",
-          "at": "2026-06-22T20:58:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7ceeb3d74dffe2528303d4f26cc3981f6ae3a705bb024508f18aae675d84b719",
-          "at": "2026-06-22T21:05:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7ceeb3d74dffe2528303d4f26cc3981f6ae3a705bb024508f18aae675d84b719",
-          "at": "2026-06-22T21:10:49Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:470e49e7098d7e33d9fdf1ab6e3ebade152ebf118957cc33ff99eb0cf7a2dbd2",
-          "at": "2026-06-23T05:34:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:470e49e7098d7e33d9fdf1ab6e3ebade152ebf118957cc33ff99eb0cf7a2dbd2",
-          "at": "2026-06-23T05:40:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TelemetryAggregateServiceImpl` is a `usecase::TelemetryAggregateService` implementation inside `cli_composition`, and its `report` path constructs `FsTelemetryReportAdapter` and formats the report instead of only wiring/delegating. The scope policy only accepts internal service/driver adapters that wrap composition-root methods; a usecase port implementation with infrastructure and rendering behavior belongs outside the composition root per ADR D7/D2-D3.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/telemetry.rs",
-              "line": 62,
-              "category": "adapter defined here"
-            },
-            {
-              "message": "These driver-adapter modules are exported as public crate API even though the briefing only accepts them as internal cli_composition bridge adapters. As public modules, external callers can depend on `DryDriverAdapter` / `SemanticDupDriverAdapter` as concrete usecase port implementations from the composition layer, violating the composition root's public-face boundary and ADR D7. Keep these modules private or `pub(crate)` and expose only the bounded composition roots.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/lib.rs",
-              "line": 33,
-              "category": "adapter defined here"
-            }
-          ],
-          "hash": "rvw1:sha256:da52a1001d3d37cf2642d086214e0947e91b4ce7070a0f987c59b0f1ac48f5d2",
-          "at": "2026-06-23T06:59:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:da52a1001d3d37cf2642d086214e0947e91b4ce7070a0f987c59b0f1ac48f5d2",
-          "at": "2026-06-23T07:07:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0184a69260793704254d17ff733ef4aca00dc4e26a8def39ecdaa1023a78b8a6",
-          "at": "2026-06-23T11:45:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0184a69260793704254d17ff733ef4aca00dc4e26a8def39ecdaa1023a78b8a6",
-          "at": "2026-06-23T11:52:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ed537b810a993be37665fad91be73d8e253639b7b8da8455ae61409049f9a83b",
-          "at": "2026-06-23T23:15:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1 adapter defined here: `GhListReviewsAdapter`, `GhListReactionsAdapter`, and `GhListIssueCommentsAdapter` are secondary adapters in `cli_composition` that implement `usecase::pr_review_polling::*Port` traits and wrap `GhClient`. ADR D7 requires port implementations to live in `libs/infrastructure`; this module should only wire infrastructure adapters into `PrReviewPollingInteractor`.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/pr/poll_adapters.rs",
-              "line": 10,
-              "category": "adapter defined here"
-            },
-            {
-              "message": "P1 adapter defined here: `FsDiffBaseResolverAdapter` and `FsDryApprovalFactoryAdapter` implement usecase dry-gate ports inside `cli_composition` and build/read infrastructure resources there. Per ADR D7, these secondary adapter implementations belong in `libs/infrastructure`, leaving this composition module to instantiate and inject them only.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
-              "line": 58,
-              "category": "adapter defined here"
-            },
-            {
-              "message": "P1 adapter defined here: the local `AdrChainAdapter`, `SpecAdrChainAdapter`, and `LayerChainAdapter` structs implement signal-gate usecase ports inside a composition method. ADR D7 keeps secondary adapter implementations in `libs/infrastructure`; `cli_composition` should wire prebuilt adapters rather than define these port implementations inline.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/signal/gate_check.rs",
-              "line": 76,
-              "category": "adapter defined here"
-            }
-          ],
-          "hash": "rvw1:sha256:ed537b810a993be37665fad91be73d8e253639b7b8da8455ae61409049f9a83b",
-          "at": "2026-06-23T23:21:42Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ed537b810a993be37665fad91be73d8e253639b7b8da8455ae61409049f9a83b",
-          "at": "2026-06-23T23:28:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:506bbecea7db40d8a2d7d857e3315f098e4b569d6fe83b305df53d8628c553ac",
-          "at": "2026-06-24T03:56:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:506bbecea7db40d8a2d7d857e3315f098e4b569d6fe83b305df53d8628c553ac",
-          "at": "2026-06-24T04:18:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:506bbecea7db40d8a2d7d857e3315f098e4b569d6fe83b305df53d8628c553ac",
-          "at": "2026-06-24T04:20:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:506bbecea7db40d8a2d7d857e3315f098e4b569d6fe83b305df53d8628c553ac",
-          "at": "2026-06-24T04:32:49Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:506bbecea7db40d8a2d7d857e3315f098e4b569d6fe83b305df53d8628c553ac",
-          "at": "2026-06-24T04:41:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:506bbecea7db40d8a2d7d857e3315f098e4b569d6fe83b305df53d8628c553ac",
-          "at": "2026-06-24T05:07:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8bf7bfce4ba78847252cf6f539eb5debc3318e567bdfe71f71785a04c4acead1",
-          "at": "2026-06-24T05:42:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8bf7bfce4ba78847252cf6f539eb5debc3318e567bdfe71f71785a04c4acead1",
-          "at": "2026-06-24T05:46:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2db5427ab381f4c7e529a1f985a5236cbf4674b477a8ffaec11f7210ae622b13",
-          "at": "2026-06-24T06:26:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2db5427ab381f4c7e529a1f985a5236cbf4674b477a8ffaec11f7210ae622b13",
-          "at": "2026-06-24T06:29:16Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b9e9de89980862ac21b94d4753662a5620b0d5032d33acde08cc02da10743468",
-          "at": "2026-06-24T08:08:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b9e9de89980862ac21b94d4753662a5620b0d5032d33acde08cc02da10743468",
-          "at": "2026-06-24T08:11:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4c4e49680fcc3e7b72d82d5159c4169154978f6db0c21287ca017974f350def2",
-          "at": "2026-06-24T08:32:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9d21dfa5d243e0141c5a3b6acb3e62a07355b8e71135dd3890d05b332dffd4de",
-          "at": "2026-06-24T08:51:21Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9d21dfa5d243e0141c5a3b6acb3e62a07355b8e71135dd3890d05b332dffd4de",
-          "at": "2026-06-24T08:51:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9d21dfa5d243e0141c5a3b6acb3e62a07355b8e71135dd3890d05b332dffd4de",
-          "at": "2026-06-24T08:55:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:68c775d58c315b4e4858ee44abf82ee0123f0c1e4ca05e97b7a2bb5c8f7c95a6",
-          "at": "2026-06-24T09:34:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:68c775d58c315b4e4858ee44abf82ee0123f0c1e4ca05e97b7a2bb5c8f7c95a6",
-          "at": "2026-06-24T09:37:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This timeout arm is assembling a user-facing stderr string inside `PrCompositionRoot`, which is a render leak for the composition layer. `cli_driver` should own the message formatting; here the composition root should return a typed failure and let the output boundary decide how to present the timeout hint. The same pattern is repeated in the `PollReviewResult::Timeout` arm below.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/pr.rs",
-              "line": 466,
-              "category": "render leak"
-            }
-          ],
-          "hash": "rvw1:sha256:5650ed2227b032b2a28ea01032ade65797e2e591b10bde4651ea7f565ec0d789",
-          "at": "2026-06-24T09:52:21Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:90f210153939ec9fb0cae458870f701a2933b9a916c7c6071d0e1b72f83343ee",
-          "at": "2026-06-24T09:56:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`pr_poll_review` is still executing the PR polling use case inside the composition root by constructing a `PrReviewPollingCommand` and calling `interactor.poll(cmd)`. Under the cli_composition policy this layer should only wire the use case into a driver/service boundary; direct use-case invocation in `cli_composition` is an invoke leak (ADR D2 / hexagonal CLI composition-root rule). Move this execution behind the appropriate usecase service injected into the driver instead of running it from the composition method.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/pr.rs",
-              "line": 453,
-              "category": "invoke leak"
-            },
-            {
-              "message": "`pr_review_cycle` repeats the same invoke leak for the review-cycle path: it builds a polling interactor and directly calls `interactor.poll(poll_cmd)` from `cli_composition`. This keeps orchestration/execution in the composition root instead of limiting it to adapter/usecase/driver wiring, so the `review-cycle` command still bypasses the intended driver-owned execution boundary.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/pr.rs",
-              "line": 537,
-              "category": "invoke leak"
-            }
-          ],
-          "hash": "rvw1:sha256:90f210153939ec9fb0cae458870f701a2933b9a916c7c6071d0e1b72f83343ee",
-          "at": "2026-06-24T10:00:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`PrCommandServiceImpl` is executing the polling use case from inside `cli_composition` via `self.polling.poll(cmd)`. The scope policy allows composition roots to construct adapters/interactors and inject them into drivers, but not to invoke use-case services at wiring/runtime inside this layer; the briefing's ServiceImpl deviation only covers delegating to CompositionRoot methods, not embedding the polling use-case call here. This should stay behind the driver/usecase boundary per ADR D2 and `hexagonal-architecture.md` §CLI as Composition Root.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/pr.rs",
-              "line": 437,
-              "category": "invoke leak"
-            },
-            {
-              "message": "`review_cycle_outcome` now assembles CLI-facing output in `cli_composition` (`=== PR Review Result: PASS ===`) and continues into `format_review_summary`. Rendering belongs in `cli_driver`; keeping this formatting in the composition-root service leaks presentation responsibility contrary to ADR D2/D3.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/pr.rs",
-              "line": 538,
-              "category": "render leak"
-            }
-          ],
-          "hash": "rvw1:sha256:34ce239c4b061f3de1573912043f5a1e9c3d48715d5a48e91ebce5ac68d7cb8b",
-          "at": "2026-06-24T10:08:05Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1abcd5c7bfcdb09417f4d903ef520f39185d4163a83bfca9d0baa4df2c1b6f14",
-          "at": "2026-06-24T10:31:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`pr_driver()` constructs a `PrReviewPollingInteractor` but then executes it from the PollReview command closure via `polling_for_poll.poll(cmd)`. For this scope, cli_composition is the composition root and must only wire use cases into drivers; invoking `PrReviewPollingService::poll` here keeps use-case execution in the wiring layer instead of behind an injected driver/service boundary (ADR D2, hexagonal-architecture.md §CLI as Composition Root).",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/pr.rs",
-              "line": 106,
-              "category": "invoke leak"
-            },
-            {
-              "message": "The review-cycle closure created by `pr_driver()` has the same invoke leak: `polling_for_cycle.poll(cmd)` directly invokes the PR review polling use case from cli_composition. This path should delegate through an injected service/driver boundary so the composition root only constructs the object graph (ADR D2, hexagonal-architecture.md §CLI as Composition Root).",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/pr.rs",
-              "line": 143,
-              "category": "invoke leak"
-            }
-          ],
-          "hash": "rvw1:sha256:1abcd5c7bfcdb09417f4d903ef520f39185d4163a83bfca9d0baa4df2c1b6f14",
-          "at": "2026-06-24T10:35:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ef8718f493fb9bf271380959c298fdc42208ee1dbdfd0b577b560cb29eef0f12",
-          "at": "2026-06-24T10:42:45Z"
-        }
-      ]
-    },
     "cli_driver": {
       "rounds": [
         {
@@ -1241,6 +393,296 @@
           "findings": [],
           "hash": "rvw1:sha256:c734663f6801ef45c9c7abc4cb1c2e4245fe76b8bc6f9db91b99d76034a09277",
           "at": "2026-06-24T14:54:22Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0afb17369331799c041597c1ca1625be2a140e93f5c35f48b5ed9e47aca55932",
+          "at": "2026-06-22T08:09:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0afb17369331799c041597c1ca1625be2a140e93f5c35f48b5ed9e47aca55932",
+          "at": "2026-06-22T08:12:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7b82814b51cc4aa728b1eb99be2459391969216905e27d46638d6fbba227c74f",
+          "at": "2026-06-22T09:04:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7b82814b51cc4aa728b1eb99be2459391969216905e27d46638d6fbba227c74f",
+          "at": "2026-06-22T09:15:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:90f7c74cc696a99c19af8045fbfd45f3bd760da70eb81457472ff4b07c1e4f9a",
+          "at": "2026-06-22T13:28:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:90f7c74cc696a99c19af8045fbfd45f3bd760da70eb81457472ff4b07c1e4f9a",
+          "at": "2026-06-22T13:32:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4b6762eab1c6f4fb2f2ee08f423a73cea625edf6e16f184cbd792fd0602f4caf",
+          "at": "2026-06-22T14:46:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4b6762eab1c6f4fb2f2ee08f423a73cea625edf6e16f184cbd792fd0602f4caf",
+          "at": "2026-06-22T14:49:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The archived-track integration test no longer proves the fix: `assert!(duration_ms < 60_000)` still passes when `duration_ms` is 0, so a regression that drops duration propagation would remain undetected. The assertion should explicitly reject zero (or otherwise check that the duration was actually recorded).",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/main.rs",
+              "line": 798,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:cf8a7f4df3f6927a3deea1e600345dd461cced9a8f62b496d4795402b7ab69e4",
+          "at": "2026-06-22T15:43:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:af5cd58292170037ce85de9cfc881ee98925c80f35b6e3befc743c0fe856c103",
+          "at": "2026-06-22T15:46:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:af5cd58292170037ce85de9cfc881ee98925c80f35b6e3befc743c0fe856c103",
+          "at": "2026-06-22T15:49:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "These track CLI helpers now always return `Ok(ExitCode::from(outcome.exit_code))` after `driver.handle(...)`, even when the driver reports a failure. That means `dispatch_track_cmd`/`execute_with_error_chain()` will treat failing track subcommands as success paths, so the structured error chain and `NonZeroExit.error_chain` telemetry are dropped. Preserve an `Err(CliError::Message(...))` on driver failures or change the dispatcher to consume the outcome directly.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/track/state_ops.rs",
+              "line": 18,
+              "category": "missing error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:987b8543a15d48f0f38e6b0adf8537922e12504684aba986b8d6745cae53e354",
+          "at": "2026-06-22T18:24:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:442f7b1105a19536995a582c0b308dd39f263f84475dcb5b893e0ec73ccb756d",
+          "at": "2026-06-22T18:35:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c4ce0d3546ce20afb7f48c161aaf483f7eded630087307ac601a00b01c7fd9e1",
+          "at": "2026-06-23T11:40:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "PR command dispatch still calls legacy `PrCompositionRoot` methods such as `app.pr_push(...)` instead of obtaining `pr_driver()` and calling `handle(PrInput::...)`. That leaves the bin layer on the old composition API after the call-site flip and violates the ADR D5 thin-bin driver boundary.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/pr.rs",
+              "line": 98,
+              "category": "driver coordinate in bin violated"
+            },
+            {
+              "message": "Review local dispatch still bypasses `ReviewDriver` by calling `ReviewCompositionRoot::new().review_run_codex(input)` directly. The review driver already exposes `ReviewInput::RunCodex`, so this command remains outside the required parse -> driver.handle(input) boundary from ADR D5.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/codex_local.rs",
+              "line": 41,
+              "category": "driver coordinate in bin violated"
+            },
+            {
+              "message": "Verify dispatch still routes every subcommand through direct `VerifyCompositionRoot` methods like `app.verify_tech_stack(...)` rather than `verify_driver().handle(VerifyInput::...)`. This preserves business dispatch in the bin layer and misses the T023 driver-coordinate flip required by ADR D5.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify.rs",
+              "line": 183,
+              "category": "driver coordinate in bin violated"
+            },
+            {
+              "message": "Track branch handlers still call `track_branch_create` / `track_branch_switch` directly and emit stdout in the command handler. `TrackInput::BranchCreate` and `TrackInput::BranchSwitch` exist, so these handlers should delegate through `track_driver().handle(...)` and central outcome emission per ADR D5/D8.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/branch_ops.rs",
+              "line": 47,
+              "category": "driver coordinate in bin violated"
+            }
+          ],
+          "hash": "rvw1:sha256:c4ce0d3546ce20afb7f48c161aaf483f7eded630087307ac601a00b01c7fd9e1",
+          "at": "2026-06-23T11:45:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_find_similar` and `execute_dup_check` still perform application-level work in the CLI before dispatching: `execute_find_similar` reads `--file` contents into `fragment_text`, while `execute_dup_check` opens `--files-from`, parses lines, filters empties, and converts them to paths before calling `semantic_dup_driver().handle(...)`. Under the CLI thin-bin policy, handlers should only parse arguments into typed driver input and emit the resulting `CommandOutcome`; file I/O and input normalization belong behind the driver/usecase boundary. This violates ADR D5/D8 and the CLI-as-composition-root rule.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/semantic_dup.rs",
+              "line": 43,
+              "category": "direct I/O/business logic in bin"
+            }
+          ],
+          "hash": "rvw1:sha256:3b95ffaf65e01b996bbb00e44403482df6e1058ed175b3dc9827482377a3f373",
+          "at": "2026-06-23T11:56:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3b95ffaf65e01b996bbb00e44403482df6e1058ed175b3dc9827482377a3f373",
+          "at": "2026-06-23T12:04:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:32aa91f57a34690ba0d05b537173b2c0546f53e2d20f6265a90afb4fa1fd87bf",
+          "at": "2026-06-23T23:16:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:32aa91f57a34690ba0d05b537173b2c0546f53e2d20f6265a90afb4fa1fd87bf",
+          "at": "2026-06-23T23:22:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2062f4f41b77a69286675ec0aeac0c555de991b2bf880d98444f898e8f5e450f",
+          "at": "2026-06-24T03:53:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2062f4f41b77a69286675ec0aeac0c555de991b2bf880d98444f898e8f5e450f",
+          "at": "2026-06-24T04:15:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2062f4f41b77a69286675ec0aeac0c555de991b2bf880d98444f898e8f5e450f",
+          "at": "2026-06-24T04:18:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2062f4f41b77a69286675ec0aeac0c555de991b2bf880d98444f898e8f5e450f",
+          "at": "2026-06-24T04:31:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2062f4f41b77a69286675ec0aeac0c555de991b2bf880d98444f898e8f5e450f",
+          "at": "2026-06-24T04:35:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2062f4f41b77a69286675ec0aeac0c555de991b2bf880d98444f898e8f5e450f",
+          "at": "2026-06-24T04:52:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`file write-atomic` still reads the application payload from `stdin` and enforces the byte limit inside the bin handler before dispatching to `FileDriver`. Under ADR D5/D8 and the CLI scope policy, `apps/cli` should only parse CLI args, obtain the composition-root driver, call `driver.handle(input)`, and emit the `CommandOutcome`; this stdin I/O/input validation needs to move behind the driver/usecase boundary.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/file.rs",
+              "line": 43,
+              "category": "direct I/O in bin"
+            }
+          ],
+          "hash": "rvw1:sha256:2062f4f41b77a69286675ec0aeac0c555de991b2bf880d98444f898e8f5e450f",
+          "at": "2026-06-24T04:57:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2062f4f41b77a69286675ec0aeac0c555de991b2bf880d98444f898e8f5e450f",
+          "at": "2026-06-24T05:00:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`chrono` and `serde_json` were moved out of the bin crate's normal dependencies, but `apps/cli/src/commands/pr.rs` still uses both in production code (`serde_json::Value`/`serde_json::to_string` and `chrono::DateTime` parsing). That makes the `sotp` binary fail to compile until `pr.rs` is also extracted or these crates stay in `[dependencies]`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/Cargo.toml",
+              "line": 16,
+              "category": "build"
+            }
+          ],
+          "hash": "rvw1:sha256:cc523790858b4c415997bd85afff38e805b7f2a1680ca0166080419837bec340",
+          "at": "2026-06-24T05:41:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e6690c8ad475db8ed6148e1b72991d46f282cb06a7efd006dd616d137d8664d1",
+          "at": "2026-06-24T05:45:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e6690c8ad475db8ed6148e1b72991d46f282cb06a7efd006dd616d137d8664d1",
+          "at": "2026-06-24T05:49:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bf3505c66d04600e3b051de7aa82f13ecfe2a540f20d6a30af5c682a02aedf83",
+          "at": "2026-06-24T05:57:49Z"
         }
       ]
     },
@@ -2104,6 +1546,24 @@
         }
       ]
     },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0b670f06751d59f6bce29ab13b2962a5c388a96430146e5024559ee21dc897f3",
+          "at": "2026-06-24T16:04:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0b670f06751d59f6bce29ab13b2962a5c388a96430146e5024559ee21dc897f3",
+          "at": "2026-06-24T16:06:53Z"
+        }
+      ]
+    },
     "usecase": {
       "rounds": [
         {
@@ -2656,293 +2116,851 @@
         }
       ]
     },
-    "cli": {
+    "cli_composition": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0afb17369331799c041597c1ca1625be2a140e93f5c35f48b5ed9e47aca55932",
-          "at": "2026-06-22T08:09:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0afb17369331799c041597c1ca1625be2a140e93f5c35f48b5ed9e47aca55932",
-          "at": "2026-06-22T08:12:15Z"
+          "hash": "rvw1:sha256:e28ac3318e04d63783ef38ac9844dcfcabdb086c275834c6e22dc028ded27673",
+          "at": "2026-06-21T21:14:34Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7b82814b51cc4aa728b1eb99be2459391969216905e27d46638d6fbba227c74f",
-          "at": "2026-06-22T09:04:59Z"
+          "hash": "rvw1:sha256:3556d2ed316058f76cbccdc6ec972d8ba2fa977661052046f7d183fb9a0ff43a",
+          "at": "2026-06-21T22:23:36Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7b82814b51cc4aa728b1eb99be2459391969216905e27d46638d6fbba227c74f",
-          "at": "2026-06-22T09:15:54Z"
+          "hash": "rvw1:sha256:3556d2ed316058f76cbccdc6ec972d8ba2fa977661052046f7d183fb9a0ff43a",
+          "at": "2026-06-21T22:50:04Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:90f7c74cc696a99c19af8045fbfd45f3bd760da70eb81457472ff4b07c1e4f9a",
-          "at": "2026-06-22T13:28:36Z"
+          "hash": "rvw1:sha256:cdacf57707cdba6811f8b059db885fb741a4eb6a76e9553bc04b95b857173b1f",
+          "at": "2026-06-21T23:48:31Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:90f7c74cc696a99c19af8045fbfd45f3bd760da70eb81457472ff4b07c1e4f9a",
-          "at": "2026-06-22T13:32:56Z"
+          "hash": "rvw1:sha256:cdacf57707cdba6811f8b059db885fb741a4eb6a76e9553bc04b95b857173b1f",
+          "at": "2026-06-21T23:52:24Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4b6762eab1c6f4fb2f2ee08f423a73cea625edf6e16f184cbd792fd0602f4caf",
-          "at": "2026-06-22T14:46:06Z"
+          "hash": "rvw1:sha256:bde8477585f3c7768b3a40dcf1b40002317f57131097c753de592710d74b17ca",
+          "at": "2026-06-22T00:28:42Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4b6762eab1c6f4fb2f2ee08f423a73cea625edf6e16f184cbd792fd0602f4caf",
-          "at": "2026-06-22T14:49:14Z"
+          "hash": "rvw1:sha256:bde8477585f3c7768b3a40dcf1b40002317f57131097c753de592710d74b17ca",
+          "at": "2026-06-22T00:32:32Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The archived-track integration test no longer proves the fix: `assert!(duration_ms < 60_000)` still passes when `duration_ms` is 0, so a regression that drops duration propagation would remain undetected. The assertion should explicitly reject zero (or otherwise check that the duration was actually recorded).",
+              "message": "`run_catalog_spec_chain` and `run_impl_catalog_chain` swallow `signal_check_layer_chain_with_strict(...)` errors by converting `Err(e)` into `CommandOutcome::failure(Some(e))` and then `Ok(SignalChainOutput)`. That means `SignalGateInteractor::run_gate` can no longer surface `SignalGateError::ChainExecutionFailed` for chains ②/③, so infrastructure/configuration failures are reported as ordinary gate failures instead of propagating to the outer `signal_check_gate` error mapping. The composition layer should propagate the `Err` here and only map it once at the CLI boundary.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/main.rs",
-              "line": 798,
-              "category": "testing"
+              "file": "apps/cli-composition/src/signal.rs",
+              "line": 587,
+              "category": "application logic in composition"
             }
           ],
-          "hash": "rvw1:sha256:cf8a7f4df3f6927a3deea1e600345dd461cced9a8f62b496d4795402b7ab69e4",
-          "at": "2026-06-22T15:43:35Z"
+          "hash": "rvw1:sha256:4c456bf942cde00b7e3fcb78370187df350ae21dcea0c88d6e64ca2c50be174e",
+          "at": "2026-06-22T02:14:32Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:af5cd58292170037ce85de9cfc881ee98925c80f35b6e3befc743c0fe856c103",
-          "at": "2026-06-22T15:46:57Z"
+          "hash": "rvw1:sha256:1048baec2a2d1b81ca5468b0fda5bf896208003059b2b58ff51e3b49b0cefd5c",
+          "at": "2026-06-22T02:20:56Z"
         },
         {
           "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:af5cd58292170037ce85de9cfc881ee98925c80f35b6e3befc743c0fe856c103",
-          "at": "2026-06-22T15:49:23Z"
-        },
-        {
-          "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "These track CLI helpers now always return `Ok(ExitCode::from(outcome.exit_code))` after `driver.handle(...)`, even when the driver reports a failure. That means `dispatch_track_cmd`/`execute_with_error_chain()` will treat failing track subcommands as success paths, so the structured error chain and `NonZeroExit.error_chain` telemetry are dropped. Preserve an `Err(CliError::Message(...))` on driver failures or change the dispatcher to consume the outcome directly.",
+              "message": "`signal_check_gate` now derives `items_dir` and `TrackId` from the resolved `spec_json_path`, then passes only those into `SignalGateCommand`. That drops the exact `--spec-json` override path: an override like `/tmp/custom.json` is reinterpreted as `items_dir=/`, `track_id=tmp`, so chain ① will evaluate `/tmp/spec.json` or reject the parent name instead of the requested file. This path interpretation/validation belongs in the usecase boundary or should preserve the resolved spec path in the adapter/command, per the CLI-as-composition-root/usecase purity rule.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/track/state_ops.rs",
-              "line": 18,
-              "category": "missing error handling"
+              "file": "apps/cli-composition/src/signal.rs",
+              "line": 493,
+              "category": "application logic in composition"
             }
           ],
-          "hash": "rvw1:sha256:987b8543a15d48f0f38e6b0adf8537922e12504684aba986b8d6745cae53e354",
-          "at": "2026-06-22T18:24:07Z"
+          "hash": "rvw1:sha256:1048baec2a2d1b81ca5468b0fda5bf896208003059b2b58ff51e3b49b0cefd5c",
+          "at": "2026-06-22T02:30:21Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:442f7b1105a19536995a582c0b308dd39f263f84475dcb5b893e0ec73ccb756d",
-          "at": "2026-06-22T18:35:44Z"
+          "hash": "rvw1:sha256:dffbb930eb161c2a6073d521d6de5d2e7dca087793e9fb2db924ca99430a0fee",
+          "at": "2026-06-22T02:36:41Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:c4ce0d3546ce20afb7f48c161aaf483f7eded630087307ac601a00b01c7fd9e1",
-          "at": "2026-06-23T11:40:50Z"
+          "hash": "rvw1:sha256:a50e92b92514f63202f2efaad239c39a66cabd2d3aa4f35b71614bb6a9236084",
+          "at": "2026-06-22T03:04:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a50e92b92514f63202f2efaad239c39a66cabd2d3aa4f35b71614bb6a9236084",
+          "at": "2026-06-22T03:11:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:24aa0a89c7f0bccf20d81db310220e880a7b3554eb600b9ce1a34c1b7843d5fc",
+          "at": "2026-06-22T03:49:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:24aa0a89c7f0bccf20d81db310220e880a7b3554eb600b9ce1a34c1b7843d5fc",
+          "at": "2026-06-22T03:55:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:578f075e84d55731ec821ad7fd0d64399ef848915e85bedd2ae723f541ea4b9a",
+          "at": "2026-06-22T04:08:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:578f075e84d55731ec821ad7fd0d64399ef848915e85bedd2ae723f541ea4b9a",
+          "at": "2026-06-22T04:12:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`max_iterations` is derived with floor division here, so any call where `timeout < interval` (or `interval == 0`) becomes `0` iterations and returns `Timeout` without ever polling GitHub. The previous deadline-based loop always performed an initial poll when `timeout > 0`, so this changes behavior for valid CLI inputs and can miss an already-completed review.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/pr.rs",
+              "line": 308,
+              "category": "application logic in composition"
+            }
+          ],
+          "hash": "rvw1:sha256:5a637f48b5159538239f6b3b197b711aeddb3bd3a56d5d19bf0277f90c41eb55",
+          "at": "2026-06-22T05:48:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2122a017e58b5076c8349ef747e9f45a97226dd76504ae8dad8d0ab00ef47eb1",
+          "at": "2026-06-22T05:56:14Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "PR command dispatch still calls legacy `PrCompositionRoot` methods such as `app.pr_push(...)` instead of obtaining `pr_driver()` and calling `handle(PrInput::...)`. That leaves the bin layer on the old composition API after the call-site flip and violates the ADR D5 thin-bin driver boundary.",
+              "message": "The new module-level `allow(dead_code)` keeps the old `poll_review_for_cycle` compiled in production even though it is no longer called. That helper still contains the full PR polling orchestration, GitHub calls, zero-findings branching, sleeps, and stderr output, so the T008 delegation is incomplete for this scope. Delete it or gate it behind `#[cfg(test)]` and move the remaining coverage to the usecase interactor tests.",
               "severity": "P1",
-              "file": "apps/cli/src/commands/pr.rs",
-              "line": 98,
-              "category": "driver coordinate in bin violated"
+              "file": "apps/cli-composition/src/pr/poll.rs",
+              "line": 11,
+              "category": "orchestration leak"
             },
             {
-              "message": "Review local dispatch still bypasses `ReviewDriver` by calling `ReviewCompositionRoot::new().review_run_codex(input)` directly. The review driver already exposes `ReviewInput::RunCodex`, so this command remains outside the required parse -> driver.handle(input) boundary from ADR D5.",
+              "message": "`FsDryCorpusMetaAdapter` still owns the corpus-manifest policy: it branches on manifest presence, chooses `canonical_root` vs `repo_root`, swallows manifest-resolution errors into an `eprintln!` fallback, and computes the selected fingerprint. The briefing says this corpus manifest logic should move out of `cli_composition` with the dry-gate extraction; keeping it here makes composition more than flat adapter wiring. Move the policy into the usecase interactor and leave this layer with primitive adapter calls only.",
               "severity": "P1",
-              "file": "apps/cli/src/commands/review/codex_local.rs",
+              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+              "line": 91,
+              "category": "application logic in composition"
+            }
+          ],
+          "hash": "rvw1:sha256:2122a017e58b5076c8349ef747e9f45a97226dd76504ae8dad8d0ab00ef47eb1",
+          "at": "2026-06-22T06:31:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4869c835f330a904626de0490b11ffafd21745aefb1b31e610948b9c900c643e",
+          "at": "2026-06-22T06:51:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The pre-extraction `poll_review_for_cycle` remains compiled in production; `#![allow(dead_code)]` only hides the warning. This function still performs the full PR polling orchestration in `cli_composition` by calling review/reaction/comment ports, applying zero-findings and timeout-recovery branching, and emitting polling side effects. T008 expects that flow to live only in `PrReviewPollingInteractor`, so this leaves duplicate production orchestration in the composition layer that can drift from the wired usecase path. Move it under `#[cfg(test)]` or retarget the tests to the usecase interactor.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/pr/poll.rs",
+              "line": 234,
+              "category": "orchestration_leak"
+            }
+          ],
+          "hash": "rvw1:sha256:4869c835f330a904626de0490b11ffafd21745aefb1b31e610948b9c900c643e",
+          "at": "2026-06-22T07:14:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1261b9892fe86daec24fb67d89a177c61b8d4c629e0a51c779a287ce03f44dda",
+          "at": "2026-06-22T07:19:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:898823b28991f4f6a2a5067c515ffce37252681f478bf24cfb9392cf8a5ae847",
+          "at": "2026-06-22T07:44:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:898823b28991f4f6a2a5067c515ffce37252681f478bf24cfb9392cf8a5ae847",
+          "at": "2026-06-22T07:51:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:99a4a06cd7c7e7a83fe3091bae7f019f1117ad20a20b1dfd1c5e831b15bbb7b0",
+          "at": "2026-06-22T08:09:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:99a4a06cd7c7e7a83fe3091bae7f019f1117ad20a20b1dfd1c5e831b15bbb7b0",
+          "at": "2026-06-22T08:13:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:35859523f2637305087d7612a88c0dc77579ed9390a27cadd68b0f3b1b5be6c5",
+          "at": "2026-06-22T09:10:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:35859523f2637305087d7612a88c0dc77579ed9390a27cadd68b0f3b1b5be6c5",
+          "at": "2026-06-22T09:16:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fd72bb2707201b0fb41a7adc194582618a92fb79abb43a7a5a887e7909a723d8",
+          "at": "2026-06-22T09:34:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fd72bb2707201b0fb41a7adc194582618a92fb79abb43a7a5a887e7909a723d8",
+          "at": "2026-06-22T09:38:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:db55f17e2d5543cd0bddcd27259bf6fd58079a7fb706cc4a5bee270384518887",
+          "at": "2026-06-22T09:57:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:db55f17e2d5543cd0bddcd27259bf6fd58079a7fb706cc4a5bee270384518887",
+          "at": "2026-06-22T10:03:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e72167b2807db810f4e9fe6d89995da00f2c5561e70239c3698f596762008a16",
+          "at": "2026-06-22T10:14:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e72167b2807db810f4e9fe6d89995da00f2c5561e70239c3698f596762008a16",
+          "at": "2026-06-22T10:18:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c724e4cbe339c4b26831bf6ff7a681b52e80c0de3ef6446e78dc5c5a6afdf27a",
+          "at": "2026-06-22T10:25:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c724e4cbe339c4b26831bf6ff7a681b52e80c0de3ef6446e78dc5c5a6afdf27a",
+          "at": "2026-06-22T10:28:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:20cec6db95a49874616fbadbc8c59f576ede689c3ede854e1f0c147daba625a8",
+          "at": "2026-06-22T10:53:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:20cec6db95a49874616fbadbc8c59f576ede689c3ede854e1f0c147daba625a8",
+          "at": "2026-06-22T10:59:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ae7d1ad4a6a1a0246d2f9fdf94f1476e9aeb291cb0917a8990b1d53a4ac997b4",
+          "at": "2026-06-22T13:29:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-05 is still violated here: `VerifyCompositionRoot` keeps public helper methods returning `Result<Option<String>, String>` (`verify_ci_resolve_track_id` and the `_from_root` variant). Since `VerifyCompositionRoot` is publicly re-exported from `lib.rs`, these remain part of the cli_composition public surface after the CliApp removal. Convert them to `CompositionError` or make them crate-private so callers do not keep depending on stringly typed composition errors.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/verify.rs",
+              "line": 403,
+              "category": "architecture_violation"
+            },
+            {
+              "message": "AC-05 also remains open in `GitCompositionRoot::current_branch_track_id_strict`: the method is public on the re-exported composition root and still returns `Result<Option<String>, String>`. This leaves a public string-error boundary in cli_composition despite the typed `CompositionError` migration, so the helper should either return `CompositionError` or stop being public.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/git.rs",
+              "line": 284,
+              "category": "architecture_violation"
+            }
+          ],
+          "hash": "rvw1:sha256:ae7d1ad4a6a1a0246d2f9fdf94f1476e9aeb291cb0917a8990b1d53a4ac997b4",
+          "at": "2026-06-22T13:34:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b24d1bf878392350d05ab5f116929c035354f1a059cb7086bc99add8fc09597f",
+          "at": "2026-06-22T13:39:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6569c3b32a264c93d64336542109e9edaa1640baf438a1eac282493a670c2808",
+          "at": "2026-06-22T14:21:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`telemetry_emit_archived_track_subcommand` constructs the archived-track interactor and immediately calls `emit` inside `cli_composition`. Per the CLI composition policy, this layer should only wire the adapter/interactor graph and inject it into a driver; invoking the use case here is an invoke leak that belongs in `cli_driver` or another driving adapter.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/telemetry.rs",
+              "line": 132,
+              "category": "invoke leak"
+            },
+            {
+              "message": "`format_report` assembles the user-facing telemetry report text inside `cli_composition`. Rendering and output formatting are `cli_driver` responsibilities under ADR D2/D3, so this composition root should wire the report dependency into a driver/formatter rather than building stdout strings itself.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/telemetry.rs",
+              "line": 145,
+              "category": "render leak"
+            },
+            {
+              "message": "The production rustdoc still documents the old `ArchivedTrackTelemetryCommand { subcommand }` constructor shape. The implementation now supplies `track_id`, so this public wiring comment should be updated to include both fields to avoid documenting the stale archived telemetry contract.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/telemetry.rs",
+              "line": 88,
+              "category": "stale production doc"
+            }
+          ],
+          "hash": "rvw1:sha256:6569c3b32a264c93d64336542109e9edaa1640baf438a1eac282493a670c2808",
+          "at": "2026-06-22T14:25:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6569c3b32a264c93d64336542109e9edaa1640baf438a1eac282493a670c2808",
+          "at": "2026-06-22T14:29:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fc46f7ecf6f40f4c0602788b0775def53352fe3b4feeaa2bdcad789d9c33d556",
+          "at": "2026-06-22T15:42:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fc46f7ecf6f40f4c0602788b0775def53352fe3b4feeaa2bdcad789d9c33d556",
+          "at": "2026-06-22T15:45:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TrackServiceImpl::init` is the only `TrackServiceImpl` method that does not delegate to `TrackCompositionRoot`: it constructs `FsTrackStore`/`SaveTrackUseCase`, calls `uc.execute(&track)`, and formats user-facing success/error strings in `cli_composition`. The scope policy only accepts these internal service adapters when they wrap composition-root methods; direct infrastructure/use-case invocation and rendering in the composition root violates ADR D2/D7 wiring-only boundaries. Add a `TrackCompositionRoot::track_init` path (or move the rendering/invocation into the appropriate usecase/cli_driver layer) and have this adapter delegate like the other methods.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/service_impl.rs",
               "line": 41,
-              "category": "driver coordinate in bin violated"
+              "category": "invoke leak"
+            }
+          ],
+          "hash": "rvw1:sha256:ae945b5e469f022b025b4bd3c731146ebc8bf1e18c496edc564d862278a2face",
+          "at": "2026-06-22T18:33:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track_init` is new production composition-root logic that constructs `SaveTrackUseCase` and invokes `uc.execute(...)`, then renders the success message itself. Under the cli_composition scope policy, this layer should only wire adapters/use cases into a driver; invoking use cases and formatting user-facing output belongs in usecase/cli_driver, so this reintroduces an invoke/render leak rather than a pure DI factory path.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/mod.rs",
+              "line": 214,
+              "category": "invoke leak"
+            }
+          ],
+          "hash": "rvw1:sha256:bf8f924dbaf11606127c30523be2c03b20dd50f5b5b96460dcfea7325fcbb584",
+          "at": "2026-06-22T18:41:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TrackCompositionRoot::track_init()` still builds `FsTrackStore`/`SaveTrackUseCase`, calls `uc.execute(&track)`, and formats the success string into a `CommandOutcome`. `TrackServiceImpl::init()` now routes through this helper, so the `track` path still performs use-case execution and rendering inside `cli_composition` instead of keeping this layer wiring-only.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/track/mod.rs",
+              "line": 199,
+              "category": "invoke leak"
+            }
+          ],
+          "hash": "rvw1:sha256:c20215a3d560790958822c4b5cf2651c25dd29be63d441e8351a92159cf7ae5f",
+          "at": "2026-06-22T19:23:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TrackServiceImpl::init` now ignores all inputs and always returns exit code 1, so the `track_driver()` path can never initialize a track. The briefing says this should delegate to a `TrackCompositionRoot::track_init()` factory; as written, the factory returns a driver with a broken production subcommand.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/service_impl.rs",
+              "line": 38,
+              "category": "wiring correctness"
             },
             {
-              "message": "Verify dispatch still routes every subcommand through direct `VerifyCompositionRoot` methods like `app.verify_tech_stack(...)` rather than `verify_driver().handle(VerifyInput::...)`. This preserves business dispatch in the bin layer and misses the T023 driver-coordinate flip required by ADR D5.",
+              "message": "`RefVerifyAggregateServiceImpl` is a usecase port implementation defined inside `cli_composition`, and it directly constructs `FsRefVerifyRunAdapter` / `FsRefVerifyCheckApprovedAdapter`. This violates the scope rule that secondary adapter implementations belong in infrastructure; the composition root should only wire an adapter/service that is already implemented elsewhere.",
               "severity": "P1",
-              "file": "apps/cli/src/commands/verify.rs",
-              "line": 183,
-              "category": "driver coordinate in bin violated"
+              "file": "apps/cli-composition/src/ref_verify.rs",
+              "line": 119,
+              "category": "adapter defined here"
             },
             {
-              "message": "Track branch handlers still call `track_branch_create` / `track_branch_switch` directly and emit stdout in the command handler. `TrackInput::BranchCreate` and `TrackInput::BranchSwitch` exist, so these handlers should delegate through `track_driver().handle(...)` and central outcome emission per ADR D5/D8.",
+              "message": "`TelemetryAggregateServiceImpl::report` still formats the user-facing telemetry report in `cli_composition` by calling `format_report`. That keeps output templating in the composition layer instead of the `cli_driver` layer, so the new driver path still has a render leak.",
               "severity": "P1",
-              "file": "apps/cli/src/commands/track/branch_ops.rs",
-              "line": 47,
-              "category": "driver coordinate in bin violated"
+              "file": "apps/cli-composition/src/telemetry.rs",
+              "line": 65,
+              "category": "render leak"
             }
           ],
-          "hash": "rvw1:sha256:c4ce0d3546ce20afb7f48c161aaf483f7eded630087307ac601a00b01c7fd9e1",
-          "at": "2026-06-23T11:45:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`execute_find_similar` and `execute_dup_check` still perform application-level work in the CLI before dispatching: `execute_find_similar` reads `--file` contents into `fragment_text`, while `execute_dup_check` opens `--files-from`, parses lines, filters empties, and converts them to paths before calling `semantic_dup_driver().handle(...)`. Under the CLI thin-bin policy, handlers should only parse arguments into typed driver input and emit the resulting `CommandOutcome`; file I/O and input normalization belong behind the driver/usecase boundary. This violates ADR D5/D8 and the CLI-as-composition-root rule.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/semantic_dup.rs",
-              "line": 43,
-              "category": "direct I/O/business logic in bin"
-            }
-          ],
-          "hash": "rvw1:sha256:3b95ffaf65e01b996bbb00e44403482df6e1058ed175b3dc9827482377a3f373",
-          "at": "2026-06-23T11:56:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3b95ffaf65e01b996bbb00e44403482df6e1058ed175b3dc9827482377a3f373",
-          "at": "2026-06-23T12:04:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:32aa91f57a34690ba0d05b537173b2c0546f53e2d20f6265a90afb4fa1fd87bf",
-          "at": "2026-06-23T23:16:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:32aa91f57a34690ba0d05b537173b2c0546f53e2d20f6265a90afb4fa1fd87bf",
-          "at": "2026-06-23T23:22:05Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2062f4f41b77a69286675ec0aeac0c555de991b2bf880d98444f898e8f5e450f",
-          "at": "2026-06-24T03:53:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2062f4f41b77a69286675ec0aeac0c555de991b2bf880d98444f898e8f5e450f",
-          "at": "2026-06-24T04:15:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2062f4f41b77a69286675ec0aeac0c555de991b2bf880d98444f898e8f5e450f",
-          "at": "2026-06-24T04:18:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2062f4f41b77a69286675ec0aeac0c555de991b2bf880d98444f898e8f5e450f",
-          "at": "2026-06-24T04:31:42Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2062f4f41b77a69286675ec0aeac0c555de991b2bf880d98444f898e8f5e450f",
-          "at": "2026-06-24T04:35:36Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2062f4f41b77a69286675ec0aeac0c555de991b2bf880d98444f898e8f5e450f",
-          "at": "2026-06-24T04:52:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`file write-atomic` still reads the application payload from `stdin` and enforces the byte limit inside the bin handler before dispatching to `FileDriver`. Under ADR D5/D8 and the CLI scope policy, `apps/cli` should only parse CLI args, obtain the composition-root driver, call `driver.handle(input)`, and emit the `CommandOutcome`; this stdin I/O/input validation needs to move behind the driver/usecase boundary.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/file.rs",
-              "line": 43,
-              "category": "direct I/O in bin"
-            }
-          ],
-          "hash": "rvw1:sha256:2062f4f41b77a69286675ec0aeac0c555de991b2bf880d98444f898e8f5e450f",
-          "at": "2026-06-24T04:57:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2062f4f41b77a69286675ec0aeac0c555de991b2bf880d98444f898e8f5e450f",
-          "at": "2026-06-24T05:00:55Z"
+          "hash": "rvw1:sha256:6d12cfae886b4fa515cf992bd37c2da4bafd1af42c6d8472772015cd2025b9f6",
+          "at": "2026-06-22T19:58:41Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`chrono` and `serde_json` were moved out of the bin crate's normal dependencies, but `apps/cli/src/commands/pr.rs` still uses both in production code (`serde_json::Value`/`serde_json::to_string` and `chrono::DateTime` parsing). That makes the `sotp` binary fail to compile until `pr.rs` is also extracted or these crates stay in `[dependencies]`.",
+              "message": "`track_init` still assembles user-facing output inside `cli_composition` by formatting the `[OK] Initialized track...` line and appending `sync_views_to_stdout(...)`. That keeps presentation work in the composition root path instead of leaving it to the `cli_driver` boundary, so the round-2 render-leak fix is not complete.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/Cargo.toml",
-              "line": 16,
-              "category": "build"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/track/mod.rs",
+              "line": 223,
+              "category": "render leak"
             }
           ],
-          "hash": "rvw1:sha256:cc523790858b4c415997bd85afff38e805b7f2a1680ca0166080419837bec340",
-          "at": "2026-06-24T05:41:33Z"
+          "hash": "rvw1:sha256:f747b6051ba91cc1843f55899521ec7bece5f267d408095f0bd77561ca17a637",
+          "at": "2026-06-22T20:58:29Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:e6690c8ad475db8ed6148e1b72991d46f282cb06a7efd006dd616d137d8664d1",
-          "at": "2026-06-24T05:45:57Z"
+          "hash": "rvw1:sha256:7ceeb3d74dffe2528303d4f26cc3981f6ae3a705bb024508f18aae675d84b719",
+          "at": "2026-06-22T21:05:45Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:e6690c8ad475db8ed6148e1b72991d46f282cb06a7efd006dd616d137d8664d1",
-          "at": "2026-06-24T05:49:59Z"
+          "hash": "rvw1:sha256:7ceeb3d74dffe2528303d4f26cc3981f6ae3a705bb024508f18aae675d84b719",
+          "at": "2026-06-22T21:10:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:470e49e7098d7e33d9fdf1ab6e3ebade152ebf118957cc33ff99eb0cf7a2dbd2",
+          "at": "2026-06-23T05:34:08Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:bf3505c66d04600e3b051de7aa82f13ecfe2a540f20d6a30af5c682a02aedf83",
-          "at": "2026-06-24T05:57:49Z"
+          "hash": "rvw1:sha256:470e49e7098d7e33d9fdf1ab6e3ebade152ebf118957cc33ff99eb0cf7a2dbd2",
+          "at": "2026-06-23T05:40:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TelemetryAggregateServiceImpl` is a `usecase::TelemetryAggregateService` implementation inside `cli_composition`, and its `report` path constructs `FsTelemetryReportAdapter` and formats the report instead of only wiring/delegating. The scope policy only accepts internal service/driver adapters that wrap composition-root methods; a usecase port implementation with infrastructure and rendering behavior belongs outside the composition root per ADR D7/D2-D3.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/telemetry.rs",
+              "line": 62,
+              "category": "adapter defined here"
+            },
+            {
+              "message": "These driver-adapter modules are exported as public crate API even though the briefing only accepts them as internal cli_composition bridge adapters. As public modules, external callers can depend on `DryDriverAdapter` / `SemanticDupDriverAdapter` as concrete usecase port implementations from the composition layer, violating the composition root's public-face boundary and ADR D7. Keep these modules private or `pub(crate)` and expose only the bounded composition roots.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/lib.rs",
+              "line": 33,
+              "category": "adapter defined here"
+            }
+          ],
+          "hash": "rvw1:sha256:da52a1001d3d37cf2642d086214e0947e91b4ce7070a0f987c59b0f1ac48f5d2",
+          "at": "2026-06-23T06:59:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da52a1001d3d37cf2642d086214e0947e91b4ce7070a0f987c59b0f1ac48f5d2",
+          "at": "2026-06-23T07:07:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0184a69260793704254d17ff733ef4aca00dc4e26a8def39ecdaa1023a78b8a6",
+          "at": "2026-06-23T11:45:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0184a69260793704254d17ff733ef4aca00dc4e26a8def39ecdaa1023a78b8a6",
+          "at": "2026-06-23T11:52:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ed537b810a993be37665fad91be73d8e253639b7b8da8455ae61409049f9a83b",
+          "at": "2026-06-23T23:15:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1 adapter defined here: `GhListReviewsAdapter`, `GhListReactionsAdapter`, and `GhListIssueCommentsAdapter` are secondary adapters in `cli_composition` that implement `usecase::pr_review_polling::*Port` traits and wrap `GhClient`. ADR D7 requires port implementations to live in `libs/infrastructure`; this module should only wire infrastructure adapters into `PrReviewPollingInteractor`.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/pr/poll_adapters.rs",
+              "line": 10,
+              "category": "adapter defined here"
+            },
+            {
+              "message": "P1 adapter defined here: `FsDiffBaseResolverAdapter` and `FsDryApprovalFactoryAdapter` implement usecase dry-gate ports inside `cli_composition` and build/read infrastructure resources there. Per ADR D7, these secondary adapter implementations belong in `libs/infrastructure`, leaving this composition module to instantiate and inject them only.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+              "line": 58,
+              "category": "adapter defined here"
+            },
+            {
+              "message": "P1 adapter defined here: the local `AdrChainAdapter`, `SpecAdrChainAdapter`, and `LayerChainAdapter` structs implement signal-gate usecase ports inside a composition method. ADR D7 keeps secondary adapter implementations in `libs/infrastructure`; `cli_composition` should wire prebuilt adapters rather than define these port implementations inline.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/signal/gate_check.rs",
+              "line": 76,
+              "category": "adapter defined here"
+            }
+          ],
+          "hash": "rvw1:sha256:ed537b810a993be37665fad91be73d8e253639b7b8da8455ae61409049f9a83b",
+          "at": "2026-06-23T23:21:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ed537b810a993be37665fad91be73d8e253639b7b8da8455ae61409049f9a83b",
+          "at": "2026-06-23T23:28:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:506bbecea7db40d8a2d7d857e3315f098e4b569d6fe83b305df53d8628c553ac",
+          "at": "2026-06-24T03:56:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:506bbecea7db40d8a2d7d857e3315f098e4b569d6fe83b305df53d8628c553ac",
+          "at": "2026-06-24T04:18:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:506bbecea7db40d8a2d7d857e3315f098e4b569d6fe83b305df53d8628c553ac",
+          "at": "2026-06-24T04:20:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:506bbecea7db40d8a2d7d857e3315f098e4b569d6fe83b305df53d8628c553ac",
+          "at": "2026-06-24T04:32:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:506bbecea7db40d8a2d7d857e3315f098e4b569d6fe83b305df53d8628c553ac",
+          "at": "2026-06-24T04:41:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:506bbecea7db40d8a2d7d857e3315f098e4b569d6fe83b305df53d8628c553ac",
+          "at": "2026-06-24T05:07:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8bf7bfce4ba78847252cf6f539eb5debc3318e567bdfe71f71785a04c4acead1",
+          "at": "2026-06-24T05:42:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8bf7bfce4ba78847252cf6f539eb5debc3318e567bdfe71f71785a04c4acead1",
+          "at": "2026-06-24T05:46:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2db5427ab381f4c7e529a1f985a5236cbf4674b477a8ffaec11f7210ae622b13",
+          "at": "2026-06-24T06:26:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2db5427ab381f4c7e529a1f985a5236cbf4674b477a8ffaec11f7210ae622b13",
+          "at": "2026-06-24T06:29:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b9e9de89980862ac21b94d4753662a5620b0d5032d33acde08cc02da10743468",
+          "at": "2026-06-24T08:08:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b9e9de89980862ac21b94d4753662a5620b0d5032d33acde08cc02da10743468",
+          "at": "2026-06-24T08:11:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4c4e49680fcc3e7b72d82d5159c4169154978f6db0c21287ca017974f350def2",
+          "at": "2026-06-24T08:32:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9d21dfa5d243e0141c5a3b6acb3e62a07355b8e71135dd3890d05b332dffd4de",
+          "at": "2026-06-24T08:51:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9d21dfa5d243e0141c5a3b6acb3e62a07355b8e71135dd3890d05b332dffd4de",
+          "at": "2026-06-24T08:51:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9d21dfa5d243e0141c5a3b6acb3e62a07355b8e71135dd3890d05b332dffd4de",
+          "at": "2026-06-24T08:55:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:68c775d58c315b4e4858ee44abf82ee0123f0c1e4ca05e97b7a2bb5c8f7c95a6",
+          "at": "2026-06-24T09:34:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:68c775d58c315b4e4858ee44abf82ee0123f0c1e4ca05e97b7a2bb5c8f7c95a6",
+          "at": "2026-06-24T09:37:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This timeout arm is assembling a user-facing stderr string inside `PrCompositionRoot`, which is a render leak for the composition layer. `cli_driver` should own the message formatting; here the composition root should return a typed failure and let the output boundary decide how to present the timeout hint. The same pattern is repeated in the `PollReviewResult::Timeout` arm below.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/pr.rs",
+              "line": 466,
+              "category": "render leak"
+            }
+          ],
+          "hash": "rvw1:sha256:5650ed2227b032b2a28ea01032ade65797e2e591b10bde4651ea7f565ec0d789",
+          "at": "2026-06-24T09:52:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:90f210153939ec9fb0cae458870f701a2933b9a916c7c6071d0e1b72f83343ee",
+          "at": "2026-06-24T09:56:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`pr_poll_review` is still executing the PR polling use case inside the composition root by constructing a `PrReviewPollingCommand` and calling `interactor.poll(cmd)`. Under the cli_composition policy this layer should only wire the use case into a driver/service boundary; direct use-case invocation in `cli_composition` is an invoke leak (ADR D2 / hexagonal CLI composition-root rule). Move this execution behind the appropriate usecase service injected into the driver instead of running it from the composition method.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/pr.rs",
+              "line": 453,
+              "category": "invoke leak"
+            },
+            {
+              "message": "`pr_review_cycle` repeats the same invoke leak for the review-cycle path: it builds a polling interactor and directly calls `interactor.poll(poll_cmd)` from `cli_composition`. This keeps orchestration/execution in the composition root instead of limiting it to adapter/usecase/driver wiring, so the `review-cycle` command still bypasses the intended driver-owned execution boundary.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/pr.rs",
+              "line": 537,
+              "category": "invoke leak"
+            }
+          ],
+          "hash": "rvw1:sha256:90f210153939ec9fb0cae458870f701a2933b9a916c7c6071d0e1b72f83343ee",
+          "at": "2026-06-24T10:00:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`PrCommandServiceImpl` is executing the polling use case from inside `cli_composition` via `self.polling.poll(cmd)`. The scope policy allows composition roots to construct adapters/interactors and inject them into drivers, but not to invoke use-case services at wiring/runtime inside this layer; the briefing's ServiceImpl deviation only covers delegating to CompositionRoot methods, not embedding the polling use-case call here. This should stay behind the driver/usecase boundary per ADR D2 and `hexagonal-architecture.md` §CLI as Composition Root.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/pr.rs",
+              "line": 437,
+              "category": "invoke leak"
+            },
+            {
+              "message": "`review_cycle_outcome` now assembles CLI-facing output in `cli_composition` (`=== PR Review Result: PASS ===`) and continues into `format_review_summary`. Rendering belongs in `cli_driver`; keeping this formatting in the composition-root service leaks presentation responsibility contrary to ADR D2/D3.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/pr.rs",
+              "line": 538,
+              "category": "render leak"
+            }
+          ],
+          "hash": "rvw1:sha256:34ce239c4b061f3de1573912043f5a1e9c3d48715d5a48e91ebce5ac68d7cb8b",
+          "at": "2026-06-24T10:08:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1abcd5c7bfcdb09417f4d903ef520f39185d4163a83bfca9d0baa4df2c1b6f14",
+          "at": "2026-06-24T10:31:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`pr_driver()` constructs a `PrReviewPollingInteractor` but then executes it from the PollReview command closure via `polling_for_poll.poll(cmd)`. For this scope, cli_composition is the composition root and must only wire use cases into drivers; invoking `PrReviewPollingService::poll` here keeps use-case execution in the wiring layer instead of behind an injected driver/service boundary (ADR D2, hexagonal-architecture.md §CLI as Composition Root).",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/pr.rs",
+              "line": 106,
+              "category": "invoke leak"
+            },
+            {
+              "message": "The review-cycle closure created by `pr_driver()` has the same invoke leak: `polling_for_cycle.poll(cmd)` directly invokes the PR review polling use case from cli_composition. This path should delegate through an injected service/driver boundary so the composition root only constructs the object graph (ADR D2, hexagonal-architecture.md §CLI as Composition Root).",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/pr.rs",
+              "line": 143,
+              "category": "invoke leak"
+            }
+          ],
+          "hash": "rvw1:sha256:1abcd5c7bfcdb09417f4d903ef520f39185d4163a83bfca9d0baa4df2c1b6f14",
+          "at": "2026-06-24T10:35:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ef8718f493fb9bf271380959c298fdc42208ee1dbdfd0b577b560cb29eef0f12",
+          "at": "2026-06-24T10:42:45Z"
         }
       ]
     },
@@ -5833,24 +5851,20 @@
           "findings": [],
           "hash": "rvw1:sha256:31dd3a94b73412a7db8da53cd9768517567504a202e430f3fb3ffec16c8919be",
           "at": "2026-06-24T15:11:19Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0b670f06751d59f6bce29ab13b2962a5c388a96430146e5024559ee21dc897f3",
-          "at": "2026-06-24T16:04:40Z"
+          "hash": "rvw1:sha256:03a46f0a223427fec8bb96b79ce5f9cfe9ebd603bccb5d46a3fdde8e13b594aa",
+          "at": "2026-06-24T16:58:28Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0b670f06751d59f6bce29ab13b2962a5c388a96430146e5024559ee21dc897f3",
-          "at": "2026-06-24T16:06:53Z"
+          "hash": "rvw1:sha256:03a46f0a223427fec8bb96b79ce5f9cfe9ebd603bccb5d46a3fdde8e13b594aa",
+          "at": "2026-06-24T17:00:39Z"
         }
       ]
     }

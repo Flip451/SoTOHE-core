@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "c1ac1f68529b4b67fc6c76847604e78ae0cc6361b4f43779d5a2c06be9e3aa5c",
+  "catalogue_declaration_hash": "bacfd9d996123fdd6a19b98d7e76c2bab3bf2c76d0cad46b529d67b1dfcd06bb",
   "signals": [
     {
       "type_name": "ArchPortError",
@@ -745,7 +745,7 @@
     {
       "type_name": "TelemetryAggregateService",
       "signal": "blue",
-      "entry_hash": "6ad53f9e2949b997fcc61f2303352abcf63ab7bb08c59ab7d12ab5de8cf0d988"
+      "entry_hash": "c28c5e9914b0a9c614b1021d870ee8565a9473edd115969fd4c647d507fdcd2e"
     },
     {
       "type_name": "TelemetryEmitDynamicPort",

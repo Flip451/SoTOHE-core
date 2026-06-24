@@ -6745,6 +6745,14 @@
         "kind": "pass",
         "citation": "usecase secondary port コントラクトの新設・修正、および aggregate service の追加。新規 port（`SchemaExporterPort`、`ShellParserPort` など）と aggregate service（`TelemetryReportService` など）を usecase 層に定義する。secondary port の infrastructure adapter 実装は infrastructure 層に配置し、aggregate/application service の実装は usecase 層に置いて ports を注入される。port／service が返すエラーは IN-13 に準拠した typed error 型とする。"
       }
+    },
+    {
+      "claim_hash": "c28c5e9914b0a9c614b1021d870ee8565a9473edd115969fd4c647d507fdcd2e",
+      "evidence_hash": "0c1f42c44ace7dc8e5f6f2d065bc03fb79b2d9a2327f78c4645bb7db3b145607",
+      "verdict": {
+        "kind": "pass",
+        "citation": "新規 port（`SchemaExporterPort`、`ShellParserPort` など）と aggregate service（`TelemetryReportService` など）を usecase 層に定義する。... aggregate/application service の実装は usecase 層に置いて ports を注入される。port／service が返すエラーは IN-13 に準拠した typed error 型とする。"
+      }
     }
   ]
 }

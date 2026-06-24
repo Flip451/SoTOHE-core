@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-24T16:08:01Z",
-  "declaration_hash": "c1ac1f68529b4b67fc6c76847604e78ae0cc6361b4f43779d5a2c06be9e3aa5c",
+  "generated_at": "2026-06-24T17:01:46Z",
+  "declaration_hash": "bacfd9d996123fdd6a19b98d7e76c2bab3bf2c76d0cad46b529d67b1dfcd06bb",
   "signals": [
     {
       "type_name": "AdrChainRunnerPort",
@@ -1125,7 +1125,7 @@
     {
       "type_name": "TelemetryAggregateService",
       "kind_tag": "application_service",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
