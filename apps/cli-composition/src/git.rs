@@ -62,7 +62,7 @@ impl GitCompositionRoot {
             SystemGitRepo::discover().map_err(|e| CompositionError::AdapterInit(e.to_string()))?;
         let path = repo.resolve_path(&path);
 
-        let stage_paths = load_stage_paths(&path).map_err(CompositionError::WiringFailed)?;
+        let stage_paths = load_stage_paths(&path)?;
 
         let mut owned_args = vec!["add".to_owned(), "--".to_owned()];
         owned_args.extend(stage_paths);
@@ -101,8 +101,7 @@ impl GitCompositionRoot {
             SystemGitRepo::discover().map_err(|e| CompositionError::AdapterInit(e.to_string()))?;
         let path = repo.resolve_path(&path);
 
-        ensure_existing_nonempty_file(&path, "commit message file")
-            .map_err(CompositionError::WiringFailed)?;
+        ensure_existing_nonempty_file(&path, "commit message file")?;
 
         let explicit_track = track_dir
             .map(|td| {
@@ -191,8 +190,7 @@ impl GitCompositionRoot {
         let repo =
             SystemGitRepo::discover().map_err(|e| CompositionError::AdapterInit(e.to_string()))?;
         let path = repo.resolve_path(&path);
-        ensure_existing_nonempty_file(&path, "git note file")
-            .map_err(CompositionError::WiringFailed)?;
+        ensure_existing_nonempty_file(&path, "git note file")?;
         let path_str = path.to_string_lossy().into_owned();
         let code = repo
             .status(&["notes", "add", "-f", "-F", path_str.as_str(), "HEAD"])
@@ -313,30 +311,38 @@ impl GitCompositionRoot {
     }
 }
 
-fn ensure_existing_nonempty_file(path: &Path, label: &str) -> Result<(), String> {
+fn ensure_existing_nonempty_file(path: &Path, label: &str) -> Result<(), CompositionError> {
     if !path.is_file() {
-        return Err(format!("Missing {label}: {}", path.display()));
+        return Err(CompositionError::WiringFailed(format!("Missing {label}: {}", path.display())));
     }
-    let content = fs::read_to_string(path)
-        .map_err(|err| format!("failed to read {label} {}: {err}", path.display()))?;
+    let content = fs::read_to_string(path).map_err(|err| {
+        CompositionError::WiringFailed(format!("failed to read {label} {}: {err}", path.display()))
+    })?;
     if content.trim().is_empty() {
-        return Err(format!("{label} is empty: {}", path.display()));
+        return Err(CompositionError::WiringFailed(format!(
+            "{label} is empty: {}",
+            path.display()
+        )));
     }
     Ok(())
 }
 
-fn load_stage_paths(path: &Path) -> Result<Vec<String>, String> {
+fn load_stage_paths(path: &Path) -> Result<Vec<String>, CompositionError> {
     ensure_existing_nonempty_file(path, "stage path list file")?;
 
-    let content = fs::read_to_string(path)
-        .map_err(|err| format!("failed to read stage path list {}: {err}", path.display()))?;
+    let content = fs::read_to_string(path).map_err(|err| {
+        CompositionError::Infrastructure(format!(
+            "failed to read stage path list {}: {err}",
+            path.display()
+        ))
+    })?;
     use usecase::git_workflow::validate_stage_path_entries;
     validate_stage_path_entries(content.lines()).map_err(|err| {
         let msg = err.to_string();
         if msg == "Stage path list file has no usable entries" {
-            format!("{msg}: {}", path.display())
+            CompositionError::WiringFailed(format!("{msg}: {}", path.display()))
         } else {
-            msg
+            CompositionError::WiringFailed(msg)
         }
     })
 }
@@ -372,6 +378,6 @@ mod tests {
 
         let err = load_stage_paths(&list).unwrap_err();
 
-        assert!(err.contains("transient automation"));
+        assert!(err.to_string().contains("transient automation"));
     }
 }

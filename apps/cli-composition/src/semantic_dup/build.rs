@@ -83,7 +83,10 @@ fn is_tool_owned_index(dir: &Path) -> bool {
 /// Returns `Err` if the symlink guard fires, if the path-overlap guard fires,
 /// if `canonicalize` fails, or if the directory exists but is not a recognizable
 /// LanceDB index.
-fn validate_db_path_for_rebuild(db_path: &Path, workspace_root: &Path) -> Result<(), String> {
+fn validate_db_path_for_rebuild(
+    db_path: &Path,
+    workspace_root: &Path,
+) -> Result<(), CompositionError> {
     // Guard 0: reject a symlinked --db-path.  The atomic swap in
     // `commit_rebuilt_index` renames the db_path ENTRY itself, so a symlink
     // would be moved aside and the new index installed at the link path —
@@ -93,45 +96,51 @@ fn validate_db_path_for_rebuild(db_path: &Path, workspace_root: &Path) -> Result
     // not exist yet (fresh build).
     if let Ok(meta) = std::fs::symlink_metadata(db_path) {
         if meta.file_type().is_symlink() {
-            return Err(format!(
+            return Err(CompositionError::WiringFailed(format!(
                 "--db-path '{}' is a symlink; point it at a real directory instead \
                  (rebuild renames the path entry, which would replace the link rather \
                  than its target)",
                 db_path.display(),
-            ));
+            )));
         }
     }
 
     if !db_path.exists() {
         return Ok(());
     }
-    let canonical_db = db_path
-        .canonicalize()
-        .map_err(|e| format!("failed to resolve index path {}: {e}", db_path.display()))?;
+    let canonical_db = db_path.canonicalize().map_err(|e| {
+        CompositionError::Infrastructure(format!(
+            "failed to resolve index path {}: {e}",
+            db_path.display()
+        ))
+    })?;
     let canonical_workspace = workspace_root.canonicalize().map_err(|e| {
-        format!("failed to resolve workspace root {}: {e}", workspace_root.display())
+        CompositionError::Infrastructure(format!(
+            "failed to resolve workspace root {}: {e}",
+            workspace_root.display()
+        ))
     })?;
     // Reject if db_path is an ancestor of (or equal to) the workspace root.
     if canonical_workspace.starts_with(&canonical_db) {
-        return Err(format!(
+        return Err(CompositionError::WiringFailed(format!(
             "--db-path '{}' overlaps with the workspace root '{}'; \
              refusing to overwrite it to prevent data loss",
             db_path.display(),
             workspace_root.display(),
-        ));
+        )));
     }
     // Reject if the directory exists but is not a recognizable LanceDB index.
     // A typo'd --db-path pointing at an unrelated directory must never be
     // silently and recursively deleted or replaced.
     if !is_recognizable_lancedb_index(db_path) {
-        return Err(format!(
+        return Err(CompositionError::WiringFailed(format!(
             "--db-path '{}' exists but does not appear to be a LanceDB index \
              (missing '{}' marker); refusing to overwrite it to prevent data loss. \
              If this is a new path, remove the directory manually first or \
              choose a path that does not exist yet.",
             db_path.display(),
             LANCEDB_TABLE_MARKER,
-        ));
+        )));
     }
     Ok(())
 }
@@ -141,14 +150,22 @@ fn validate_db_path_for_rebuild(db_path: &Path, workspace_root: &Path) -> Result
 /// The temp dir is a hidden sibling of `db_path` (same parent directory, so a
 /// rename is same-filesystem and therefore atomic).  Using a deterministic name
 /// means we can detect and clean up leftovers from a previously crashed run.
-fn temp_build_path(db_path: &Path) -> Result<PathBuf, String> {
+fn temp_build_path(db_path: &Path) -> Result<PathBuf, CompositionError> {
     let file_name = db_path
         .file_name()
-        .ok_or_else(|| format!("--db-path '{}' has no file name component", db_path.display()))?
+        .ok_or_else(|| {
+            CompositionError::WiringFailed(format!(
+                "--db-path '{}' has no file name component",
+                db_path.display()
+            ))
+        })?
         .to_string_lossy();
-    let parent = db_path
-        .parent()
-        .ok_or_else(|| format!("--db-path '{}' has no parent directory", db_path.display()))?;
+    let parent = db_path.parent().ok_or_else(|| {
+        CompositionError::WiringFailed(format!(
+            "--db-path '{}' has no parent directory",
+            db_path.display()
+        ))
+    })?;
     Ok(parent.join(format!(".{file_name}.tmp-build")))
 }
 
@@ -158,14 +175,22 @@ fn temp_build_path(db_path: &Path) -> Result<PathBuf, String> {
 /// filesystem).  Using a deterministic name means we can detect and recover
 /// from a crash that happened between moving the original index aside and
 /// completing the rename of the new build into place.
-fn backup_path_for(db_path: &Path) -> Result<PathBuf, String> {
+fn backup_path_for(db_path: &Path) -> Result<PathBuf, CompositionError> {
     let file_name = db_path
         .file_name()
-        .ok_or_else(|| format!("--db-path '{}' has no file name component", db_path.display()))?
+        .ok_or_else(|| {
+            CompositionError::WiringFailed(format!(
+                "--db-path '{}' has no file name component",
+                db_path.display()
+            ))
+        })?
         .to_string_lossy();
-    let parent = db_path
-        .parent()
-        .ok_or_else(|| format!("--db-path '{}' has no parent directory", db_path.display()))?;
+    let parent = db_path.parent().ok_or_else(|| {
+        CompositionError::WiringFailed(format!(
+            "--db-path '{}' has no parent directory",
+            db_path.display()
+        ))
+    })?;
     Ok(parent.join(format!(".{file_name}.old")))
 }
 
@@ -184,7 +209,7 @@ fn backup_path_for(db_path: &Path) -> Result<PathBuf, String> {
 /// best-effort restore of the backup is attempted so `db_path` is left intact
 /// (non-destructive rebuild guarantee).  A best-effort backup-removal failure
 /// after a successful swap is silently ignored (the new index is already live).
-fn commit_rebuilt_index(temp_path: &Path, db_path: &Path) -> Result<(), String> {
+fn commit_rebuilt_index(temp_path: &Path, db_path: &Path) -> Result<(), CompositionError> {
     if db_path.exists() {
         let backup_path = backup_path_for(db_path)?;
 
@@ -203,7 +228,7 @@ fn commit_rebuilt_index(temp_path: &Path, db_path: &Path) -> Result<(), String> 
         // the symlink entry — an unrelated user artefact.
         if std::fs::symlink_metadata(&backup_path).is_ok() {
             if !is_tool_owned_index(&backup_path) {
-                return Err(format!(
+                return Err(CompositionError::WiringFailed(format!(
                     "the path '{}' already exists but is not owned by this tool \
                      (missing '{}' ownership marker); refusing to overwrite it to \
                      prevent data loss. \
@@ -211,10 +236,13 @@ fn commit_rebuilt_index(temp_path: &Path, db_path: &Path) -> Result<(), String> 
                     backup_path.display(),
                     OWNERSHIP_MARKER,
                     backup_path.display(),
-                ));
+                )));
             }
             std::fs::remove_dir_all(&backup_path).map_err(|e| {
-                format!("failed to remove stale backup at {}: {e}", backup_path.display())
+                CompositionError::Infrastructure(format!(
+                    "failed to remove stale backup at {}: {e}",
+                    backup_path.display()
+                ))
             })?;
         }
 
@@ -230,16 +258,19 @@ fn commit_rebuilt_index(temp_path: &Path, db_path: &Path) -> Result<(), String> 
         // an unowned backup left on disk after a crash would not be restored by
         // Step 1b, breaking the non-destructive rebuild guarantee.
         std::fs::write(db_path.join(OWNERSHIP_MARKER), b"sotp-semantic-dup\n").map_err(|e| {
-            format!("failed to write ownership marker in existing index {}: {e}", db_path.display())
+            CompositionError::Infrastructure(format!(
+                "failed to write ownership marker in existing index {}: {e}",
+                db_path.display()
+            ))
         })?;
 
         // Rename current index → backup.
         std::fs::rename(db_path, &backup_path).map_err(|e| {
-            format!(
+            CompositionError::Infrastructure(format!(
                 "failed to rename existing index {} to backup {}: {e}",
                 db_path.display(),
                 backup_path.display()
-            )
+            ))
         })?;
 
         // Rename temp build → final location (atomic on same filesystem).
@@ -250,15 +281,15 @@ fn commit_rebuilt_index(temp_path: &Path, db_path: &Path) -> Result<(), String> 
             // both failures so the user knows the backup location.
             match std::fs::rename(&backup_path, db_path) {
                 Ok(()) => {
-                    return Err(format!(
+                    return Err(CompositionError::Infrastructure(format!(
                         "failed to rename temp build {} to {} (original index restored from {}): {e}",
                         temp_path.display(),
                         db_path.display(),
                         backup_path.display(),
-                    ));
+                    )));
                 }
                 Err(restore_err) => {
-                    return Err(format!(
+                    return Err(CompositionError::Infrastructure(format!(
                         "failed to rename temp build {} to {}: {e}; \
                          additionally, failed to restore backup {} to {}: {restore_err}; \
                          original index is at backup path {}",
@@ -267,7 +298,7 @@ fn commit_rebuilt_index(temp_path: &Path, db_path: &Path) -> Result<(), String> 
                         backup_path.display(),
                         db_path.display(),
                         backup_path.display(),
-                    ));
+                    )));
                 }
             }
         }
@@ -278,11 +309,11 @@ fn commit_rebuilt_index(temp_path: &Path, db_path: &Path) -> Result<(), String> 
     } else {
         // No existing index — just move temp into place.
         std::fs::rename(temp_path, db_path).map_err(|e| {
-            format!(
+            CompositionError::Infrastructure(format!(
                 "failed to rename temp build {} to {}: {e}",
                 temp_path.display(),
                 db_path.display()
-            )
+            ))
         })?;
     }
     Ok(())
@@ -317,8 +348,7 @@ impl SemanticDupCompositionRoot {
         input: DupIndexBuildInput,
     ) -> Result<CommandOutcome, CompositionError> {
         // Step 1: Validate that db_path is safe to overwrite — no deletions yet.
-        validate_db_path_for_rebuild(&input.db_path, &input.workspace_root)
-            .map_err(CompositionError::WiringFailed)?;
+        validate_db_path_for_rebuild(&input.db_path, &input.workspace_root)?;
 
         // Step 1b: Recover from a crash that occurred between the two renames in
         // `commit_rebuilt_index`.  If `db_path` is absent but the deterministic
@@ -332,8 +362,7 @@ impl SemanticDupCompositionRoot {
         // `.{name}.old` path must NOT be restored into `db_path`.  If `.old`
         // exists but is NOT tool-owned, leave it completely untouched — an
         // absent `db_path` is a valid fresh-build state in that case.
-        let crash_backup =
-            backup_path_for(&input.db_path).map_err(CompositionError::WiringFailed)?;
+        let crash_backup = backup_path_for(&input.db_path)?;
         if !input.db_path.exists()
             && std::fs::symlink_metadata(&crash_backup).is_ok()
             && is_tool_owned_index(&crash_backup)
@@ -349,7 +378,7 @@ impl SemanticDupCompositionRoot {
         }
 
         // Step 2: Derive the temp build path (sibling of db_path).
-        let temp_path = temp_build_path(&input.db_path).map_err(CompositionError::WiringFailed)?;
+        let temp_path = temp_build_path(&input.db_path)?;
 
         // Step 3: Remove any leftover temp dir from a prior crashed run.
         //
@@ -405,7 +434,7 @@ impl SemanticDupCompositionRoot {
             Err(e) => {
                 // Best-effort cleanup of the temp build dir; ignore cleanup errors.
                 let _ = std::fs::remove_dir_all(&temp_path);
-                return Err(CompositionError::Infrastructure(e));
+                return Err(e);
             }
         };
 
@@ -421,8 +450,7 @@ impl SemanticDupCompositionRoot {
         }
 
         // Step 5: Atomic swap — promote temp_path to db_path.
-        commit_rebuilt_index(&temp_path, &input.db_path)
-            .map_err(CompositionError::Infrastructure)?;
+        commit_rebuilt_index(&temp_path, &input.db_path)?;
 
         Ok(CommandOutcome::success(Some(format!(
             "Indexed {fragment_count} fragment(s) (extracted: {fragment_count})"
@@ -436,9 +464,14 @@ impl SemanticDupCompositionRoot {
     /// The LanceDB adapter is explicitly dropped before this function returns
     /// so that all data is committed and no open handles remain when the caller
     /// performs the atomic rename.
-    fn do_build_into(&self, workspace_root: &Path, temp_path: &Path) -> Result<usize, String> {
-        let fragments = extract_code_fragments(workspace_root)
-            .map_err(|e| format!("fragment extraction failed: {e}"))?;
+    fn do_build_into(
+        &self,
+        workspace_root: &Path,
+        temp_path: &Path,
+    ) -> Result<usize, CompositionError> {
+        let fragments = extract_code_fragments(workspace_root).map_err(|e| {
+            CompositionError::Infrastructure(format!("fragment extraction failed: {e}"))
+        })?;
 
         if fragments.is_empty() {
             return Ok(0);
@@ -459,29 +492,39 @@ impl SemanticDupCompositionRoot {
         // early-return above exits before this point, so no marker is written (and
         // no `temp_path` is created) when there is nothing to build.
         std::fs::create_dir_all(temp_path).map_err(|e| {
-            format!("failed to create temp build directory {}: {e}", temp_path.display())
+            CompositionError::Infrastructure(format!(
+                "failed to create temp build directory {}: {e}",
+                temp_path.display()
+            ))
         })?;
         std::fs::write(temp_path.join(OWNERSHIP_MARKER), b"sotp-semantic-dup\n").map_err(|e| {
-            format!("failed to write ownership marker in {}: {e}", temp_path.display())
+            CompositionError::Infrastructure(format!(
+                "failed to write ownership marker in {}: {e}",
+                temp_path.display()
+            ))
         })?;
 
-        let embedding_port = Arc::new(
-            FastEmbedAdapter::new().map_err(|e| format!("failed to load embedding model: {e}"))?,
-        );
+        let embedding_port = Arc::new(FastEmbedAdapter::new().map_err(|e| {
+            CompositionError::Infrastructure(format!("failed to load embedding model: {e}"))
+        })?);
 
         // Build into temp_path.  The adapter is scoped here so it is dropped
         // (connection closed, data flushed) before the rename swap below.
         {
-            let index_port =
-                Arc::new(LanceDbSemanticIndexAdapter::new(temp_path.to_path_buf()).map_err(
-                    |e| format!("failed to open temp index at {}: {e}", temp_path.display()),
-                )?);
+            let index_port = Arc::new(
+                LanceDbSemanticIndexAdapter::new(temp_path.to_path_buf()).map_err(|e| {
+                    CompositionError::Infrastructure(format!(
+                        "failed to open temp index at {}: {e}",
+                        temp_path.display()
+                    ))
+                })?,
+            );
 
             use usecase::semantic_dup::BuildIndexInteractor;
             let interactor = BuildIndexInteractor::new(embedding_port, index_port);
             interactor
                 .build_index(&BuildIndexCommand { fragments })
-                .map_err(|e| format!("build-index failed: {e}"))
+                .map_err(|e| CompositionError::Infrastructure(format!("build-index failed: {e}")))
         }?; // `index_port` (and the Arc inside) is dropped here.
 
         Ok(fragment_count)
@@ -522,7 +565,7 @@ mod tests {
         let db_path = workspace_root.clone();
         let result = validate_db_path_for_rebuild(&db_path, &workspace_root);
         assert!(result.is_err(), "db_path == workspace_root must be rejected");
-        let msg = result.unwrap_err();
+        let msg = result.unwrap_err().to_string();
         assert!(msg.contains("overlaps"), "error message must mention 'overlaps', got: {msg}");
         // workspace_root must not have been deleted.
         assert!(workspace_root.exists(), "workspace_root must not be deleted by validate");
@@ -537,7 +580,7 @@ mod tests {
         let db_path = dir.path().to_path_buf(); // parent of workspace_root
         let result = validate_db_path_for_rebuild(&db_path, &workspace_root);
         assert!(result.is_err(), "db_path ancestor of workspace_root must be rejected");
-        let msg = result.unwrap_err();
+        let msg = result.unwrap_err().to_string();
         assert!(msg.contains("overlaps"), "error message must mention 'overlaps', got: {msg}");
         // db_path (the parent dir) must not have been deleted.
         assert!(db_path.exists(), "db_path must not be deleted by validate");
@@ -574,7 +617,7 @@ mod tests {
 
         let result = validate_db_path_for_rebuild(&db_path, &workspace_root);
         assert!(result.is_err(), "non-index directory must be rejected");
-        let msg = result.unwrap_err();
+        let msg = result.unwrap_err().to_string();
         assert!(
             msg.contains("does not appear to be a LanceDB index"),
             "error message must explain the rejection, got: {msg}"
@@ -624,7 +667,7 @@ mod tests {
 
         let result = validate_db_path_for_rebuild(&db_path, &workspace_root);
         assert!(result.is_err(), "a symlinked db_path must be rejected");
-        let msg = result.unwrap_err();
+        let msg = result.unwrap_err().to_string();
         assert!(msg.contains("symlink"), "error message must mention 'symlink', got: {msg}");
     }
 
@@ -652,7 +695,7 @@ mod tests {
 
         let result = validate_db_path_for_rebuild(&db_path, &workspace_root);
         assert!(result.is_err(), "a broken-symlink db_path must be rejected");
-        let msg = result.unwrap_err();
+        let msg = result.unwrap_err().to_string();
         assert!(msg.contains("symlink"), "error message must mention 'symlink', got: {msg}");
     }
 
@@ -1190,7 +1233,7 @@ mod tests {
             result.is_err(),
             "commit_rebuilt_index must return Err for recognizable-but-unowned backup_path"
         );
-        let msg = result.unwrap_err();
+        let msg = result.unwrap_err().to_string();
         assert!(
             msg.contains("not owned by this tool"),
             "error message must mention ownership, got: {msg}"

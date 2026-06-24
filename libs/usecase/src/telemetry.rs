@@ -123,6 +123,16 @@ pub trait TelemetryReportPort: Send + Sync {
     ) -> Result<TelemetryReportOutput, TelemetryReportError>;
 }
 
+// ── TelemetryReportServiceError ───────────────────────────────────────────────
+
+/// Error type for [`TelemetryReportService::report`].
+#[derive(Debug, thiserror::Error)]
+pub enum TelemetryReportServiceError {
+    /// The track was not found or an I/O error occurred while aggregating data.
+    #[error("{0}")]
+    Unavailable(String),
+}
+
 /// Application service for telemetry reporting.
 ///
 /// Used by `cli_driver::TelemetryDriver` to aggregate and format telemetry data.
@@ -130,8 +140,13 @@ pub trait TelemetryReportService: Send + Sync {
     /// Aggregate and return a formatted telemetry report string for `track_id`.
     ///
     /// # Errors
-    /// Returns an error string when the track is not found or an I/O error occurs.
-    fn report(&self, track_id: &str, items_dir: &Path) -> Result<String, String>;
+    /// Returns [`TelemetryReportServiceError::Unavailable`] when the track is
+    /// not found or an I/O error occurs.
+    fn report(
+        &self,
+        track_id: &str,
+        items_dir: &Path,
+    ) -> Result<String, TelemetryReportServiceError>;
 }
 
 // ── TelemetryAggregateService ─────────────────────────────────────────────────
@@ -196,11 +211,14 @@ impl TelemetryReportInteractor {
 }
 
 impl TelemetryReportService for TelemetryReportInteractor {
-    fn report(&self, track_id: &str, items_dir: &Path) -> Result<String, String> {
-        let output = self
-            .port
-            .aggregate(track_id, items_dir)
-            .map_err(|e| format!("telemetry report: {e}"))?;
+    fn report(
+        &self,
+        track_id: &str,
+        items_dir: &Path,
+    ) -> Result<String, TelemetryReportServiceError> {
+        let output = self.port.aggregate(track_id, items_dir).map_err(|e| {
+            TelemetryReportServiceError::Unavailable(format!("telemetry report: {e}"))
+        })?;
         Ok(format_report(track_id, &output))
     }
 }

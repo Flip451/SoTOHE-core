@@ -369,7 +369,7 @@ fn run_codex_local_cleans_auto_managed_artifacts_when_spawn_fails() {
         items_dir: PathBuf::from("track/items"),
     };
 
-    let err = run_codex_local(&args).unwrap_err();
+    let err = run_codex_local(&args).unwrap_err().to_string();
     assert!(err.contains("failed to spawn"));
 
     // Auto-managed artifacts (output-last-message, output-schema) should be cleaned up.
@@ -862,7 +862,7 @@ fn test_validate_auto_record_args_invalid_track_id_returns_error() {
         make_codex_local_args_for_validation("Not A Valid ID", CodexRoundTypeArg::Fast, "cli");
     let result = validate_auto_record_args(&args);
     assert!(result.is_err());
-    assert!(result.unwrap_err().contains("--track-id"));
+    assert!(result.unwrap_err().to_string().contains("--track-id"));
 }
 
 // ---------------------------------------------------------------------------
@@ -892,7 +892,7 @@ fn build_review_v2_rejects_items_dir_outside_repo_root() {
     let result =
         cli_composition::review_v2::build_review_v2_str("test-track", std::path::Path::new("/tmp"));
     assert!(result.is_err(), "build_review_v2_str should reject items_dir outside repo root");
-    let err = result.err().expect("checked is_err above");
+    let err = result.err().expect("checked is_err above").to_string();
     assert!(
         err.contains("outside the repository root") || err.contains("git discover"),
         "error should mention path traversal guard: {err}"
@@ -912,7 +912,7 @@ fn build_review_v2_rejects_traversal_items_dir_outside_repo_root() {
     let traversal_path = PathBuf::from("items/../../../tmp");
     let result = cli_composition::review_v2::build_review_v2_str("test-track", &traversal_path);
     assert!(result.is_err(), "items_dir outside repo should be rejected");
-    let err = result.err().expect("checked is_err above");
+    let err = result.err().expect("checked is_err above").to_string();
     assert!(
         err.contains("outside the repository root"),
         "error should mention containment violation: {err}"
@@ -1205,7 +1205,7 @@ fn resolve_reviewer_fails_closed_when_reviewer_capability_missing() {
     );
     let result = resolve_reviewer_for_test(&path, super::CodexRoundTypeArg::Fast);
     assert!(result.is_err(), "expected error when reviewer capability is missing");
-    let err = result.unwrap_err();
+    let err = result.unwrap_err().to_string();
     assert!(
         err.contains("reviewer capability not defined"),
         "error must explain that reviewer capability is missing; got: {err}"
@@ -1229,7 +1229,7 @@ fn resolve_reviewer_fails_closed_when_provider_is_unsupported() {
     );
     let result = resolve_reviewer_for_test(&path, super::CodexRoundTypeArg::Final);
     assert!(result.is_err(), "expected error for unsupported provider");
-    let err = result.unwrap_err();
+    let err = result.unwrap_err().to_string();
     assert!(
         err.contains("unsupported reviewer provider") && err.contains("gemini"),
         "error must name the unsupported provider; got: {err}"
@@ -1389,7 +1389,10 @@ fn validate_claude_auto_record_args_invalid_track_id_returns_error() {
     let args = make_claude_local_args("Not A Valid ID!!", super::CodexRoundTypeArg::Fast, "cli");
     let result = validate_claude_auto_record_args(&args);
     assert!(result.is_err(), "expected error for invalid track-id");
-    assert!(result.unwrap_err().contains("--track-id"), "error must mention --track-id");
+    assert!(
+        result.unwrap_err().to_string().contains("--track-id"),
+        "error must mention --track-id"
+    );
 }
 
 #[test]
@@ -1399,7 +1402,7 @@ fn validate_claude_auto_record_args_invalid_group_returns_error() {
     let args = make_claude_local_args("my-track-2026-05-24", super::CodexRoundTypeArg::Fast, "   ");
     let result = validate_claude_auto_record_args(&args);
     assert!(result.is_err(), "expected error for whitespace-only group name");
-    assert!(result.unwrap_err().contains("--group"), "error must mention --group");
+    assert!(result.unwrap_err().to_string().contains("--group"), "error must mention --group");
 }
 
 #[test]

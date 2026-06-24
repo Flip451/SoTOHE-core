@@ -6,6 +6,7 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 use clap::{ArgGroup, Args, Subcommand};
+use cli_driver::review::ReviewInput;
 #[cfg(test)]
 use usecase::review_v2::{ReviewApprovalDecision, ReviewApprovalOutput};
 #[cfg(test)]
@@ -191,19 +192,19 @@ pub(super) struct ValidatedAutoRecordArgs {
 /// `validate_claude_auto_record_args` (ClaudeLocalArgs).
 ///
 /// # Errors
-/// Returns a human-readable error string if args are invalid.
+/// Returns `CliError` if args are invalid.
 pub(super) fn validate_auto_record_args_raw(
     track_id: &str,
     group: &str,
     round_type: CodexRoundTypeArg,
     items_dir: PathBuf,
-) -> Result<ValidatedAutoRecordArgs, String> {
+) -> Result<ValidatedAutoRecordArgs, crate::CliError> {
     // Validate track ID format via cli_composition helper (no domain import needed).
     cli_composition::review_v2::validate_track_id_str(track_id)
-        .map_err(|e| format!("invalid --track-id: {e}"))?;
+        .map_err(|e| crate::CliError::Message(format!("invalid --track-id: {e}")))?;
     // Validate group name format via cli_composition helper.
     cli_composition::review_v2::validate_review_group_name_str(group)
-        .map_err(|e| format!("invalid --group: {e}"))?;
+        .map_err(|e| crate::CliError::Message(format!("invalid --group: {e}")))?;
 
     let round_type_str = match round_type {
         CodexRoundTypeArg::Fast => "fast",
@@ -236,12 +237,12 @@ pub(super) fn validate_auto_record_args_raw(
 /// git branch (CN-01, AC-01).
 ///
 /// # Errors
-/// Returns a human-readable error string if args are invalid.
+/// Returns `CliError` if args are invalid.
 pub(super) fn validate_auto_record_args(
     args: &CodexLocalArgs,
-) -> Result<ValidatedAutoRecordArgs, String> {
-    let track_id =
-        crate::commands::track::resolve_track_id(args.track_id.clone(), &args.items_dir)?;
+) -> Result<ValidatedAutoRecordArgs, crate::CliError> {
+    let track_id = crate::commands::track::resolve_track_id(args.track_id.clone(), &args.items_dir)
+        .map_err(|e| crate::CliError::Message(e.to_string()))?;
     validate_auto_record_args_raw(&track_id, &args.group, args.round_type, args.items_dir.clone())
 }
 
@@ -251,12 +252,12 @@ pub(super) fn validate_auto_record_args(
 /// git branch (CN-01, AC-01).
 ///
 /// # Errors
-/// Returns a human-readable error string if args are invalid.
+/// Returns `CliError` if args are invalid.
 pub(super) fn validate_claude_auto_record_args(
     args: &ClaudeLocalArgs,
-) -> Result<ValidatedAutoRecordArgs, String> {
-    let track_id =
-        crate::commands::track::resolve_track_id(args.track_id.clone(), &args.items_dir)?;
+) -> Result<ValidatedAutoRecordArgs, crate::CliError> {
+    let track_id = crate::commands::track::resolve_track_id(args.track_id.clone(), &args.items_dir)
+        .map_err(|e| crate::CliError::Message(e.to_string()))?;
     validate_auto_record_args_raw(&track_id, &args.group, args.round_type, args.items_dir.clone())
 }
 
@@ -436,18 +437,14 @@ fn execute_check_approved(args: &CheckApprovedArgs) -> ExitCode {
                 return ExitCode::FAILURE;
             }
         };
-    match cli_composition::ReviewCompositionRoot::new()
-        .review_check_approved(Some(track_id), args.items_dir.clone())
-    {
-        Ok(outcome) => {
-            if let Some(msg) = &outcome.stderr {
-                eprintln!("{msg}");
-            }
-            ExitCode::from(outcome.exit_code)
-        }
-        Err(msg) => {
-            eprintln!("{msg}");
-            ExitCode::FAILURE
-        }
+    let outcome = cli_composition::ReviewCompositionRoot::new()
+        .review_driver()
+        .handle(ReviewInput::CheckApproved { track_id, items_dir: args.items_dir.clone() });
+    if let Some(msg) = &outcome.stdout {
+        println!("{msg}");
     }
+    if let Some(msg) = &outcome.stderr {
+        eprintln!("{msg}");
+    }
+    ExitCode::from(outcome.exit_code)
 }

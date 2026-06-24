@@ -10,13 +10,30 @@
 //!   `insert_batch` no-ops while forwarding `delete_by_source_path` and `search`
 //!   to the wrapped [`LanceDbSemanticIndexAdapter`].
 
-use std::path::Path;
+use std::path::{Component, Path, PathBuf};
 use std::sync::Arc;
 
 use domain::semantic_dup::{CodeFragment, SimilarFragment, TopK};
 use usecase::semantic_dup::{SemanticIndexError, SemanticIndexPort};
 
 use crate::semantic_dup::index::LanceDbSemanticIndexAdapter;
+
+// ── PersistentIndexLockError ──────────────────────────────────────────────────
+
+/// Error type for [`acquire_persistent_index_lock`].
+#[derive(Debug, thiserror::Error)]
+pub enum PersistentIndexLockError {
+    #[error("{0}")]
+    LockFailed(String),
+}
+
+impl PersistentIndexLockError {
+    pub fn contains(&self, s: &str) -> bool {
+        match self {
+            PersistentIndexLockError::LockFailed(msg) => msg.contains(s),
+        }
+    }
+}
 
 // ── PersistentIndexLock ───────────────────────────────────────────────────────
 
@@ -41,41 +58,49 @@ pub struct PersistentIndexLock {
 ///
 /// # Errors
 ///
-/// Returns a human-readable `String` when the parent directory cannot be created,
-/// the lock file cannot be opened, or `flock` fails.
+/// Returns [`PersistentIndexLockError`] when the parent directory cannot be created,
+/// a symlink is found in the lock path, the lock file cannot be opened, or `flock` fails.
 ///
 /// This function is `pub` for use by `cli_composition` callers; it is not part of
 /// the infrastructure crate's public API contract and is excluded from the TDDD
 /// catalogue.
 #[doc(hidden)]
-pub fn acquire_persistent_index_lock(db_path: &Path) -> Result<PersistentIndexLock, String> {
+pub fn acquire_persistent_index_lock(
+    db_path: &Path,
+) -> Result<PersistentIndexLock, PersistentIndexLockError> {
     use fs4::fs_std::FileExt as _;
 
-    let lock_path = persistent_index_lock_path(db_path);
+    let (lock_path, trusted_root) = resolve_lock_path_with_trusted_root(db_path)?;
+    reject_lock_path_symlinks(&lock_path, &trusted_root)?;
     if let Some(parent) = lock_path.parent() {
         if !parent.as_os_str().is_empty() {
-            std::fs::create_dir_all(parent)
-                .map_err(|e| format!("failed to create index lock parent dir: {e}"))?;
+            std::fs::create_dir_all(parent).map_err(|e| {
+                PersistentIndexLockError::LockFailed(format!(
+                    "failed to create index lock parent dir: {e}"
+                ))
+            })?;
         }
     }
-    match std::fs::symlink_metadata(&lock_path) {
-        Ok(metadata) if metadata.file_type().is_symlink() => {
-            return Err(format!("index cache lock {} is a symlink", lock_path.display()));
-        }
-        Ok(_) => {}
-        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {}
-        Err(e) => {
-            return Err(format!("failed to inspect index lock {}: {e}", lock_path.display()));
-        }
+    reject_lock_path_symlinks(&lock_path, &trusted_root)?;
+    let mut open_options = std::fs::OpenOptions::new();
+    open_options.create(true).write(true).truncate(false);
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::OpenOptionsExt as _;
+        open_options.custom_flags(libc::O_NOFOLLOW | libc::O_CLOEXEC);
     }
-    let file = std::fs::OpenOptions::new()
-        .create(true)
-        .write(true)
-        .truncate(false)
-        .open(&lock_path)
-        .map_err(|e| format!("failed to open index lock {}: {e}", lock_path.display()))?;
-    file.lock_exclusive()
-        .map_err(|e| format!("failed to lock index cache {}: {e}", lock_path.display()))?;
+    let file = open_options.open(&lock_path).map_err(|e| {
+        PersistentIndexLockError::LockFailed(format!(
+            "failed to open index lock {}: {e}",
+            lock_path.display()
+        ))
+    })?;
+    file.lock_exclusive().map_err(|e| {
+        PersistentIndexLockError::LockFailed(format!(
+            "failed to lock index cache {}: {e}",
+            lock_path.display()
+        ))
+    })?;
 
     Ok(PersistentIndexLock { _file: file })
 }
@@ -93,6 +118,57 @@ fn persistent_index_suffixed_path(db_path: &Path, suffix: &str) -> std::path::Pa
     let mut path = db_path.as_os_str().to_owned();
     path.push(suffix);
     std::path::PathBuf::from(path)
+}
+
+fn resolve_lock_path_with_trusted_root(
+    db_path: &Path,
+) -> Result<(PathBuf, PathBuf), PersistentIndexLockError> {
+    if db_path.as_os_str().is_empty() {
+        return Err(PersistentIndexLockError::LockFailed(
+            "index cache path must not be empty".to_owned(),
+        ));
+    }
+    if db_path.components().any(|component| matches!(component, Component::ParentDir)) {
+        return Err(PersistentIndexLockError::LockFailed(format!(
+            "index cache path cannot escape its trusted root: {}",
+            db_path.display()
+        )));
+    }
+
+    let (resolved_db_path, trusted_root) = if db_path.is_absolute() {
+        (db_path.to_path_buf(), PathBuf::from("/"))
+    } else {
+        let current_dir = std::env::current_dir().map_err(|e| {
+            PersistentIndexLockError::LockFailed(format!(
+                "failed to resolve current directory for index cache path {}: {e}",
+                db_path.display()
+            ))
+        })?;
+        (current_dir.join(db_path), current_dir)
+    };
+    if !resolved_db_path.starts_with(&trusted_root) {
+        return Err(PersistentIndexLockError::LockFailed(format!(
+            "index cache path must stay within trusted root {}: {}",
+            trusted_root.display(),
+            db_path.display()
+        )));
+    }
+
+    Ok((persistent_index_lock_path(&resolved_db_path), trusted_root))
+}
+
+fn reject_lock_path_symlinks(
+    lock_path: &Path,
+    trusted_root: &Path,
+) -> Result<(), PersistentIndexLockError> {
+    crate::track::symlink_guard::reject_symlinks_below(lock_path, trusted_root).map(|_| ()).map_err(
+        |e| {
+            PersistentIndexLockError::LockFailed(format!(
+                "index cache lock path {} rejected before use: {e}",
+                lock_path.display()
+            ))
+        },
+    )
 }
 
 // ── NullInsertIndexProxy ──────────────────────────────────────────────────────
@@ -146,7 +222,7 @@ impl SemanticIndexPort for NullInsertIndexProxy {
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod tests {
-    use std::path::PathBuf;
+    use std::path::{Path, PathBuf};
     use std::sync::Arc;
 
     use domain::semantic_dup::CodeFragment;
@@ -155,6 +231,13 @@ mod tests {
     use crate::semantic_dup::index::LanceDbSemanticIndexAdapter;
 
     use super::{NullInsertIndexProxy, acquire_persistent_index_lock, persistent_index_lock_path};
+
+    fn repo_tempdir() -> tempfile::TempDir {
+        tempfile::Builder::new()
+            .prefix("sotp-index-lock-")
+            .tempdir_in(std::env::current_dir().unwrap())
+            .unwrap()
+    }
 
     fn make_fragment(path: &str) -> CodeFragment {
         CodeFragment::new(PathBuf::from(path), "fn f() {}".to_owned(), 1, 1).unwrap()
@@ -165,7 +248,7 @@ mod tests {
     /// insert() returns Ok(()) without performing any write to the underlying adapter.
     #[test]
     fn test_null_insert_index_proxy_insert_is_noop() {
-        let dir = tempfile::tempdir().unwrap();
+        let dir = repo_tempdir();
         let db_path = dir.path().join("idx");
         let adapter = Arc::new(LanceDbSemanticIndexAdapter::new(db_path.clone()).unwrap());
         let lock = acquire_persistent_index_lock(&db_path).unwrap();
@@ -179,7 +262,7 @@ mod tests {
     /// insert_batch() returns Ok(()) for non-empty items without writing to the adapter.
     #[test]
     fn test_null_insert_index_proxy_insert_batch_is_noop() {
-        let dir = tempfile::tempdir().unwrap();
+        let dir = repo_tempdir();
         let db_path = dir.path().join("idx");
         let adapter = Arc::new(LanceDbSemanticIndexAdapter::new(db_path.clone()).unwrap());
         let lock = acquire_persistent_index_lock(&db_path).unwrap();
@@ -193,7 +276,7 @@ mod tests {
     /// delete_by_source_path() forwards to the inner adapter (not swallowed by proxy).
     #[test]
     fn test_null_insert_index_proxy_delete_by_source_path_forwards_to_inner() {
-        let dir = tempfile::tempdir().unwrap();
+        let dir = repo_tempdir();
         let db_path = dir.path().join("idx");
         let adapter = Arc::new(LanceDbSemanticIndexAdapter::new(db_path.clone()).unwrap());
         let lock = acquire_persistent_index_lock(&db_path).unwrap();
@@ -214,7 +297,7 @@ mod tests {
     /// acquire_persistent_index_lock() creates the lock sidecar file.
     #[test]
     fn test_acquire_persistent_index_lock_creates_lock_sidecar() {
-        let dir = tempfile::tempdir().unwrap();
+        let dir = repo_tempdir();
         let db_path = dir.path().join("idx");
         let lock_path = persistent_index_lock_path(&db_path);
 
@@ -223,11 +306,32 @@ mod tests {
         assert!(lock_path.exists(), "lock acquisition must create the lock sidecar");
     }
 
+    #[test]
+    fn test_acquire_persistent_index_lock_allows_absolute_temp_path() {
+        let dir = tempfile::tempdir().unwrap();
+        let db_path = dir.path().join("idx");
+        let lock_path = persistent_index_lock_path(&db_path);
+
+        let _lock = acquire_persistent_index_lock(&db_path).unwrap();
+
+        assert!(lock_path.exists(), "absolute cache paths must be supported");
+    }
+
+    #[test]
+    fn test_acquire_persistent_index_lock_with_parent_dir_escape_returns_error() {
+        let result = acquire_persistent_index_lock(Path::new("../idx"));
+
+        assert!(
+            result.is_err_and(|error| error.to_string().contains("cannot escape")),
+            "lock acquisition must reject parent-directory escapes"
+        );
+    }
+
     /// acquire_persistent_index_lock() rejects a symlinked lock sidecar.
     #[cfg(unix)]
     #[test]
     fn test_acquire_persistent_index_lock_with_symlink_sidecar_returns_error() {
-        let dir = tempfile::tempdir().unwrap();
+        let dir = repo_tempdir();
         let db_path = dir.path().join("idx");
         let lock_path = persistent_index_lock_path(&db_path);
         let target_path = dir.path().join("outside-lock-target");
@@ -236,8 +340,26 @@ mod tests {
         let result = acquire_persistent_index_lock(&db_path);
 
         assert!(
-            result.is_err_and(|error| error.contains("is a symlink")),
+            result.is_err_and(|error| error.to_string().contains("symlink")),
             "lock acquisition must reject symlink sidecars"
+        );
+    }
+
+    /// acquire_persistent_index_lock() rejects a symlinked lock parent.
+    #[cfg(unix)]
+    #[test]
+    fn test_acquire_persistent_index_lock_with_symlink_parent_returns_error() {
+        let dir = repo_tempdir();
+        let outside = tempfile::tempdir().unwrap();
+        let link_parent = dir.path().join("cache-link");
+        std::os::unix::fs::symlink(outside.path(), &link_parent).unwrap();
+        let db_path = link_parent.join("idx");
+
+        let result = acquire_persistent_index_lock(&db_path);
+
+        assert!(
+            result.is_err_and(|error| error.to_string().contains("symlink")),
+            "lock acquisition must reject symlinked parent directories"
         );
     }
 }

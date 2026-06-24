@@ -6,14 +6,6 @@
       "evidence_hash": "4b23721aa52292f3a86ac4eb7e417ca679ed33cc61ba161f3b2581897dacb65a",
       "verdict": {
         "kind": "pass",
-        "citation": "`apps/cli-driver`（crate 名 `cli_driver`）を新設し、**driving adapter（primary adapter / controller）**とする。注入された use case を保持し、request を受けて use case を呼び（invoke）、結果を整形して（render）`CommandOutcome` を返す。"
-      }
-    },
-    {
-      "claim_hash": "b2a9091bb61c01c6129fb340c3e65e5770c62c5d1e2574110c05909ff8e031cc",
-      "evidence_hash": "4b23721aa52292f3a86ac4eb7e417ca679ed33cc61ba161f3b2581897dacb65a",
-      "verdict": {
-        "kind": "pass",
         "citation": "`cli_driver` の各 driving adapter は **注入された use case を保持**し、`handle(input)` で **use case を呼び（invoke）、続けて結果を整形して（render）`CommandOutcome` を返す**。 ... controller 型（invoke + render）にすることで、bin は driver を呼んで `CommandOutcome` を emit するだけで済み、thin-bin が保たれる（D5）。"
       }
     },
@@ -238,23 +230,7 @@
       "evidence_hash": "4b23721aa52292f3a86ac4eb7e417ca679ed33cc61ba161f3b2581897dacb65a",
       "verdict": {
         "kind": "pass",
-        "citation": "`apps/cli-driver`（crate 名 `cli_driver`）を新設し、**driving adapter（primary adapter / controller）**とする。注入された use case を保持し、request を受けて use case を呼び（invoke）、結果を整形して（render）`CommandOutcome` を返す。`CommandOutcome` 型・render 関数群もこの層に置く（render は層内 module であり別 crate にしない）。`cli_driver → usecase`。"
-      }
-    },
-    {
-      "claim_hash": "d502c4a30cc47563b15cb5bb5076d267a0f0fd73363493b997b2aa4822edd765",
-      "evidence_hash": "4b23721aa52292f3a86ac4eb7e417ca679ed33cc61ba161f3b2581897dacb65a",
-      "verdict": {
-        "kind": "pass",
         "citation": "`cli_driver` の各 driving adapter は **注入された use case を保持**し、`handle(input)` で **use case を呼び（invoke）、続けて結果を整形して（render）`CommandOutcome` を返す**。"
-      }
-    },
-    {
-      "claim_hash": "7e0de2953bf2aebff5c9718778a935fb3ef5aba1ae9d7dc2b4303e4197975045",
-      "evidence_hash": "4b23721aa52292f3a86ac4eb7e417ca679ed33cc61ba161f3b2581897dacb65a",
-      "verdict": {
-        "kind": "pass",
-        "citation": "`cli_composition` の責務を **DI（object graph の組み立て）のみ**に絞る。\n\n- secondary adapter（infrastructure）→ interactor（usecase）→ driving adapter（cli_driver）を構築し、use case を driving adapter に**注入**する。**use case を invoke しない**（invoke は cli_driver の責務）。\n- god-facade `CliApp`（51 メソッド/27 ファイルの unit struct）を廃止し、bounded-context 別の `CompositionRoot` 構造（各 context の driver を構築する wiring）に分解する。"
       }
     },
     {
@@ -279,14 +255,6 @@
       "verdict": {
         "kind": "pass",
         "citation": "`cli_composition` の責務を **DI（object graph の組み立て）のみ**に絞る。\n\n- 戻り値のエラーは stringly-typed をやめ、**typed `CompositionError`** を新設する（構築・配線の失敗を表す）。"
-      }
-    },
-    {
-      "claim_hash": "e76f285e075b4023ea36dea86a5babdfa600d169aaf0ad6a8db5eb695dc07495",
-      "evidence_hash": "4b23721aa52292f3a86ac4eb7e417ca679ed33cc61ba161f3b2581897dacb65a",
-      "verdict": {
-        "kind": "pass",
-        "citation": "`apps/cli-driver`（crate 名 `cli_driver`）を新設し、**driving adapter（primary adapter / controller）**とする。注入された use case を保持し、request を受けて use case を呼び（invoke）、結果を整形して（render）`CommandOutcome` を返す。`CommandOutcome` 型・render 関数群もこの層に置く（render は層内 module であり別 crate にしない）。`cli_driver → usecase`。"
       }
     },
     {
@@ -342,14 +310,6 @@
       "evidence_hash": "4b23721aa52292f3a86ac4eb7e417ca679ed33cc61ba161f3b2581897dacb65a",
       "verdict": {
         "kind": "pass",
-        "citation": "「apps/cli-driver（crate 名 `cli_driver`）を新設し」; 「`cli_driver → usecase`」"
-      }
-    },
-    {
-      "claim_hash": "5666f65821ae07c899f18cfda169f0f4ed5293dfe9fa141627d5de7f2532d934",
-      "evidence_hash": "4b23721aa52292f3a86ac4eb7e417ca679ed33cc61ba161f3b2581897dacb65a",
-      "verdict": {
-        "kind": "pass",
         "citation": "re-export shim で CI 緑を保ちつつ family 単位で移し、**最終 commit で String 境界の廃止・`architecture-rules.json` / `deny.toml` / `Cargo.toml` の依存グラフ更新を一括 flip** する。"
       }
     },
@@ -367,22 +327,6 @@
       "verdict": {
         "kind": "pass",
         "citation": "専用の 1 track 内で、(a) `cli-driver` crate 新設、(b) command-family 単位で composition から invoke / 整形を cli_driver へ移動、(c) orchestration の usecase 移譲、(d) `CompositionError` 導入、(e) `CliApp` の `CompositionRoot` / `Driver` への分解、(f) port 実装 adapter の infrastructure 移設（D7）、(g) cli bin の直接 I/O 撤去（D8）、(h) reviewer severity policy（`.harness/custom/review-prompts/`）の整備、を段階 commit で進める。"
-      }
-    },
-    {
-      "claim_hash": "583c52a556c535643da8b40d17fab6aa7c19063b478022160aecfc726c9207c9",
-      "evidence_hash": "11ac115d0c10ce9306d1491de31c1425b03f09a63dbd4d5a3e32462953513997",
-      "verdict": {
-        "kind": "pass",
-        "citation": "本 ADR は分解 ADR（`1328`）の完了を前提とするため、`tddd.enabled` のフリップと catalogue 起草は分解後の 3 層構造（純 DI composition root / primary adapter / typed `CompositionError`）に対して行う。"
-      }
-    },
-    {
-      "claim_hash": "583c52a556c535643da8b40d17fab6aa7c19063b478022160aecfc726c9207c9",
-      "evidence_hash": "11ac115d0c10ce9306d1491de31c1425b03f09a63dbd4d5a3e32462953513997",
-      "verdict": {
-        "kind": "pass",
-        "citation": "この定義を `KindLayerConstraint` ルール群として lint config（`.harness/catalogue-lint/`）に展開する。"
       }
     },
     {
@@ -422,30 +366,6 @@
       "evidence_hash": "4b23721aa52292f3a86ac4eb7e417ca679ed33cc61ba161f3b2581897dacb65a",
       "verdict": {
         "kind": "pass",
-        "citation": "「注入された use case を保持し、request を受けて use case を呼び（invoke）」"
-      }
-    },
-    {
-      "claim_hash": "c99d3006979f74f82398e96f6b7836095f0629d46a421fd004d72f019570128d",
-      "evidence_hash": "4b23721aa52292f3a86ac4eb7e417ca679ed33cc61ba161f3b2581897dacb65a",
-      "verdict": {
-        "kind": "pass",
-        "citation": "secondary adapter（infrastructure）→ interactor（usecase）→ driving adapter（cli_driver）を構築し、use case を driving adapter に注入する。use case を invoke しない（invoke は cli_driver の責務）。"
-      }
-    },
-    {
-      "claim_hash": "1ab6878d3e4f6191b3de83f83e81ba66198feaaedaa6ade3b40923b03a78ec1f",
-      "evidence_hash": "4b23721aa52292f3a86ac4eb7e417ca679ed33cc61ba161f3b2581897dacb65a",
-      "verdict": {
-        "kind": "pass",
-        "citation": "`cli_driver → usecase`"
-      }
-    },
-    {
-      "claim_hash": "1ab6878d3e4f6191b3de83f83e81ba66198feaaedaa6ade3b40923b03a78ec1f",
-      "evidence_hash": "4b23721aa52292f3a86ac4eb7e417ca679ed33cc61ba161f3b2581897dacb65a",
-      "verdict": {
-        "kind": "pass",
         "citation": "secondary adapter（infrastructure）→ interactor（usecase）→ driving adapter（cli_driver）を構築し、use case を driving adapter に注入する。use case を invoke しない（invoke は cli_driver の責務）。"
       }
     },
@@ -462,23 +382,7 @@
       "evidence_hash": "4b23721aa52292f3a86ac4eb7e417ca679ed33cc61ba161f3b2581897dacb65a",
       "verdict": {
         "kind": "pass",
-        "citation": "`apps/cli-driver`（crate 名 `cli_driver`）を新設し、**driving adapter（primary adapter / controller）**とする。注入された use case を保持し、request を受けて use case を呼び（invoke）、結果を整形して（render）`CommandOutcome` を返す。`CommandOutcome` 型・render 関数群もこの層に置く（render は層内 module であり別 crate にしない）。`cli_driver → usecase`。"
-      }
-    },
-    {
-      "claim_hash": "4e9c7815aab30167f0ab8234a6953ffebc6094218be8853d008e20247d7f9158",
-      "evidence_hash": "4b23721aa52292f3a86ac4eb7e417ca679ed33cc61ba161f3b2581897dacb65a",
-      "verdict": {
-        "kind": "pass",
         "citation": "「use case を driving adapter に注入する。use case を invoke しない」"
-      }
-    },
-    {
-      "claim_hash": "3691e1772324db026de943704fece53e74807a11fe1703a3b5ae66ef6e1a80bc",
-      "evidence_hash": "4b23721aa52292f3a86ac4eb7e417ca679ed33cc61ba161f3b2581897dacb65a",
-      "verdict": {
-        "kind": "pass",
-        "citation": "注入された use case を保持し、request を受けて use case を呼び（invoke）、結果を整形して（render）`CommandOutcome` を返す。`CommandOutcome` 型・render 関数群もこの層に置く（render は層内 module であり別 crate にしない）。`cli_driver → usecase`。"
       }
     },
     {
@@ -494,23 +398,7 @@
       "evidence_hash": "4b23721aa52292f3a86ac4eb7e417ca679ed33cc61ba161f3b2581897dacb65a",
       "verdict": {
         "kind": "fail",
-        "reason": "New design constraint: the evidence only establishes a new primary adapter `cli-driver` that depends on and invokes injected use cases (`cli_driver → usecase`); it does not back the claim's usecase-layer design commitments to define secondary `*Port`/`*Service` traits and `*Interactor` implementations under `libs/usecase/src/`, require `Send + Sync`, or normalize errors as `Result<_, *Error>`."
-      }
-    },
-    {
-      "claim_hash": "051c89b549693e66d0c6a0ab4d3dc120e5f5347b131b0af2437d2f61bf7be1a9",
-      "evidence_hash": "4b23721aa52292f3a86ac4eb7e417ca679ed33cc61ba161f3b2581897dacb65a",
-      "verdict": {
-        "kind": "fail",
         "reason": "New design constraint: the ADR only decides that cli_driver driving adapters hold an injected use case, invoke it in handle(input), render the result, and return CommandOutcome. It does not back defining secondary port/application service traits and Interactor structs under libs/usecase/src, nor the Send + Sync bounds or normalized Result<_, *Error> error constraint."
-      }
-    },
-    {
-      "claim_hash": "3d3596d5fd9c9d4288c4286ef26df6e22f5cd4964f43d9ba2718f8c0dd54353c",
-      "evidence_hash": "4b23721aa52292f3a86ac4eb7e417ca679ed33cc61ba161f3b2581897dacb65a",
-      "verdict": {
-        "kind": "fail",
-        "reason": "New behavioral commitment / new design constraint: the evidence only decides to add a primary adapter layer `cli-driver` that invokes use cases and renders `CommandOutcome`; it does not back infrastructure-layer secondary adapters implementing usecase secondary ports, trusted-root validation, or String-based error boundary conversion. The reference is therefore unrelated to the claim's core intent."
       }
     },
     {
@@ -526,22 +414,6 @@
       "evidence_hash": "4b23721aa52292f3a86ac4eb7e417ca679ed33cc61ba161f3b2581897dacb65a",
       "verdict": {
         "kind": "pass",
-        "citation": "注入された use case を保持し、request を受けて use case を呼び（invoke）、結果を整形して（render）`CommandOutcome` を返す。"
-      }
-    },
-    {
-      "claim_hash": "f5014940e853bd2c5f1942df7a56d20dd4b47d5c31d612b7cf4e1c4b9c50ed5a",
-      "evidence_hash": "4b23721aa52292f3a86ac4eb7e417ca679ed33cc61ba161f3b2581897dacb65a",
-      "verdict": {
-        "kind": "pass",
-        "citation": "use case を driving adapter に注入する。invoke は cli_driver の責務。"
-      }
-    },
-    {
-      "claim_hash": "f5014940e853bd2c5f1942df7a56d20dd4b47d5c31d612b7cf4e1c4b9c50ed5a",
-      "evidence_hash": "4b23721aa52292f3a86ac4eb7e417ca679ed33cc61ba161f3b2581897dacb65a",
-      "verdict": {
-        "kind": "pass",
         "citation": "`handle(input)` で **use case を呼び（invoke）、続けて結果を整形して（render）`CommandOutcome` を返す**"
       }
     },
@@ -550,7 +422,7 @@
       "evidence_hash": "4b23721aa52292f3a86ac4eb7e417ca679ed33cc61ba161f3b2581897dacb65a",
       "verdict": {
         "kind": "pass",
-        "citation": "「複数ステップのオーケストレーション・統合ロジックは application レベルの関心事であり、composition / driver ではなく **usecase の application service** に置く。driving adapter（cli_driver）は単一 use case の invoke + render に留め、複数ステップの統合は usecase が担う。」"
+        "citation": "secondary adapter（infrastructure）→ interactor（usecase）→ driving adapter（cli_driver）を構築し、use case を driving adapter に**注入**する。**use case を invoke しない**（invoke は cli_driver の責務）。"
       }
     },
     {
@@ -562,35 +434,11 @@
       }
     },
     {
-      "claim_hash": "9092fa9518c04c504243b83c5e6e4169347c38f058e3024e4d5ecefd4705196b",
-      "evidence_hash": "4b23721aa52292f3a86ac4eb7e417ca679ed33cc61ba161f3b2581897dacb65a",
-      "verdict": {
-        "kind": "pass",
-        "citation": "secondary adapter（infrastructure）→ interactor（usecase）→ driving adapter（cli_driver）を構築し、use case を driving adapter に**注入**する。**use case を invoke しない**（invoke は cli_driver の責務）。"
-      }
-    },
-    {
-      "claim_hash": "4a4ddec6ac660bbb281aab8835921010554a7a92ac43406a306e7c072b1430ce",
-      "evidence_hash": "4b23721aa52292f3a86ac4eb7e417ca679ed33cc61ba161f3b2581897dacb65a",
-      "verdict": {
-        "kind": "pass",
-        "citation": "secondary adapter（infrastructure）→ interactor（usecase）→ driving adapter（cli_driver）を構築し、use case を driving adapter に**注入**する。**use case を invoke しない**（invoke は cli_driver の責務）。"
-      }
-    },
-    {
       "claim_hash": "4a4ddec6ac660bbb281aab8835921010554a7a92ac43406a306e7c072b1430ce",
       "evidence_hash": "4b23721aa52292f3a86ac4eb7e417ca679ed33cc61ba161f3b2581897dacb65a",
       "verdict": {
         "kind": "pass",
         "citation": "複数ステップのオーケストレーション・統合ロジックは application レベルの関心事であり、composition / driver ではなく **usecase の application service** に置く。"
-      }
-    },
-    {
-      "claim_hash": "603a854fa6fb33d357da459c010333fad57bc2c7d1616ecb060a66d333828802",
-      "evidence_hash": "4b23721aa52292f3a86ac4eb7e417ca679ed33cc61ba161f3b2581897dacb65a",
-      "verdict": {
-        "kind": "pass",
-        "citation": "「複数ステップのオーケストレーション・統合ロジックは application レベルの関心事であり、composition / driver ではなく usecase の application service に置く。」"
       }
     },
     {
@@ -606,15 +454,855 @@
       "evidence_hash": "4b23721aa52292f3a86ac4eb7e417ca679ed33cc61ba161f3b2581897dacb65a",
       "verdict": {
         "kind": "pass",
+        "citation": "「複数ステップのオーケストレーション・統合ロジックは application レベルの関心事であり、composition / driver ではなく usecase の application service に置く。」"
+      }
+    },
+    {
+      "claim_hash": "d3d3b1be363d5115428e00a2e0c6f5900d8d1cc8738b41215ec81e8d096d31c8",
+      "evidence_hash": "4b23721aa52292f3a86ac4eb7e417ca679ed33cc61ba161f3b2581897dacb65a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`merge_outcomes` や signal layer chain のような複数ステップのオーケストレーション・統合ロジックは application レベルの関心事であり、composition / driver ではなく **usecase の application service** に置く。driving adapter（cli_driver）は単一 use case の invoke + render に留め、複数ステップの統合は usecase が担う。"
+      }
+    },
+    {
+      "claim_hash": "f5eeae84e02f903f656e5c3dc9b3ebdfee347f5bc9c5280f526fb278fb37c50c",
+      "evidence_hash": "4b23721aa52292f3a86ac4eb7e417ca679ed33cc61ba161f3b2581897dacb65a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "secondary adapter（infrastructure）→ interactor（usecase）→ driving adapter（cli_driver）を構築し、use case を driving adapter に**注入**する。**use case を invoke しない**（invoke は cli_driver の責務）。"
+      }
+    },
+    {
+      "claim_hash": "f356553f4b235f4e24d4849a2216b76e942d8835cfffe554a207003e1b3eec99",
+      "evidence_hash": "4b23721aa52292f3a86ac4eb7e417ca679ed33cc61ba161f3b2581897dacb65a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "純 DI 化（D2）に伴い、cli_composition 内に定義された port 実装 adapter（secondary port を impl する struct）を libs/infrastructure へ移設する。composition root は adapter を **wire** するが **定義** はしない。"
+      }
+    },
+    {
+      "claim_hash": "de9875dec86aa46f857f81706f749a38db70e4646ed1d10651d82b977fed91c7",
+      "evidence_hash": "4b23721aa52292f3a86ac4eb7e417ca679ed33cc61ba161f3b2581897dacb65a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "複数ステップのオーケストレーション・統合ロジックは application レベルの関心事であり、composition / driver ではなく **usecase の application service** に置く。driving adapter（cli_driver）は単一 use case の invoke + render に留め、複数ステップの統合は usecase が担う。"
+      }
+    },
+    {
+      "claim_hash": "e6406716f7f7d9162241f4da3f21323313e61ff1be8e88fcdf1cd029f9c2a4d0",
+      "evidence_hash": "4b23721aa52292f3a86ac4eb7e417ca679ed33cc61ba161f3b2581897dacb65a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "純 DI 化（D2）に伴い、cli_composition 内に定義された port 実装 adapter（secondary port を impl する struct）を libs/infrastructure へ移設する。composition root は adapter を **wire** するが **定義** はしない。"
+      }
+    },
+    {
+      "claim_hash": "3fe92f78837294b466b8579dde2c12702b196b0f24caecf89458cfa4857e7513",
+      "evidence_hash": "4b23721aa52292f3a86ac4eb7e417ca679ed33cc61ba161f3b2581897dacb65a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`merge_outcomes` や signal layer chain のような複数ステップのオーケストレーション・統合ロジックは application レベルの関心事であり、composition / driver ではなく **usecase の application service** に置く。"
+      }
+    },
+    {
+      "claim_hash": "4a86be20ee0a5cadbd65ecdfaa10675aa005e472649fd72495e21ce82fe47c6c",
+      "evidence_hash": "4b23721aa52292f3a86ac4eb7e417ca679ed33cc61ba161f3b2581897dacb65a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「port を実装する adapter（secondary port を impl する struct）を libs/infrastructure へ移設する。composition root は adapter を wire するが 定義はしない。」"
+      }
+    },
+    {
+      "claim_hash": "ce0f9a0cf33b1c4f2642263f494ac964c517ab4a0e32bd80111746bf48fe45e1",
+      "evidence_hash": "4b23721aa52292f3a86ac4eb7e417ca679ed33cc61ba161f3b2581897dacb65a",
+      "verdict": {
+        "kind": "fail",
+        "reason": "New design constraint: the claim mandates typed `thiserror` error enums, bans `Result<_, String>`, and requires adapter `map_err` conversion, while the ADR only decides that multi-step orchestration belongs in the usecase application service rather than composition/driver; it does not mention or imply this error-type policy."
+      }
+    },
+    {
+      "claim_hash": "b2a9091bb61c01c6129fb340c3e65e5770c62c5d1e2574110c05909ff8e031cc",
+      "evidence_hash": "8d4c8cd4ceee45acbc65053fa9626f584ef8d8b78449c759d518b6f9d9f443c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_driver` の各 driving adapter は **注入された use case を保持**し、`handle(input)` で **use case を呼び（invoke）、続けて結果を整形して（render）`CommandOutcome` を返す**。invoke と render はリクエストごとに対になる同じ adapter の双方向変換なので、同一層に置く（別 crate に分けない）。DI はしない（注入される側）。 ... bin は driver を呼んで `CommandOutcome` を emit するだけで済み、thin-bin が保たれる"
+      }
+    },
+    {
+      "claim_hash": "8aba0cd5dbecd2a4ba28fc6f1d24634486e9bb809b37c5c04a0ee79f8ae7fd45",
+      "evidence_hash": "8d4c8cd4ceee45acbc65053fa9626f584ef8d8b78449c759d518b6f9d9f443c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` の責務を **DI（object graph の組み立て）のみ**に絞る。"
+      }
+    },
+    {
+      "claim_hash": "3143c4ee16fda652eb037b3c26e8bc2122db553e136109190ea46a97e0951373",
+      "evidence_hash": "8d4c8cd4ceee45acbc65053fa9626f584ef8d8b78449c759d518b6f9d9f443c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`merge_outcomes` や signal layer chain のような複数ステップのオーケストレーション・統合ロジックは application レベルの関心事であり、composition / driver ではなく **usecase の application service** に置く。driving adapter（cli_driver）は単一 use case の invoke + render に留め、複数ステップの統合は usecase が担う。"
+      }
+    },
+    {
+      "claim_hash": "5f3bf158af77bcccf39358500ef8fda4edd765f9f96348f2a217f0a214a6c6d7",
+      "evidence_hash": "8d4c8cd4ceee45acbc65053fa9626f584ef8d8b78449c759d518b6f9d9f443c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "純 DI 化（D2）に伴い、cli_composition 内に定義された port 実装 adapter（secondary port を impl する struct）を libs/infrastructure へ移設する。composition root は adapter を **wire** するが **定義** はしない。... `LazyBranchReader`（`BranchReaderPort` の UFCS 回避用の二重 adapter）— 呼び出し側の trait 曖昧性解消で除去し、infrastructure の `SystemGitRepo` 実装に一本化する"
+      }
+    },
+    {
+      "claim_hash": "0b708950c90ca2020e79db5aba4249b55ea867e36ebe677cbf2b3603fd0b1054",
+      "evidence_hash": "8d4c8cd4ceee45acbc65053fa9626f584ef8d8b78449c759d518b6f9d9f443c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli/src/main.rs` の `emit_archived_track_subcommand` は bin 内で `std::fs` / `serde_json` / `chrono::Utc::now()` を直接使って telemetry を永続化しており、thin-bin の原則（`2026-05-27-0110` D3 / `2026-04-30-0848` / 本 ADR D5）に反する。telemetry 永続化を infrastructure の adapter（時刻取得・fs 書き込み）として切り出し、composition が wire して driver 経由で呼ぶ経路にする。bin は parse + dispatch + emit のみに戻す。"
+      }
+    },
+    {
+      "claim_hash": "cfeb28639653cd2ecb749303819aba5ea6a3ae507d29379ef69a40cce48e6f5a",
+      "evidence_hash": "8d4c8cd4ceee45acbc65053fa9626f584ef8d8b78449c759d518b6f9d9f443c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli-driver`（crate 名 `cli_driver`）を新設し、**driving adapter（primary adapter / controller）**とする。注入された use case を保持し、request を受けて use case を呼び（invoke）、結果を整形して（render）`CommandOutcome` を返す。`CommandOutcome` 型・render 関数群もこの層に置く（render は層内 module であり別 crate にしない）。"
+      }
+    },
+    {
+      "claim_hash": "d7074da1d1545ff09f0ec2654c7928398b6e506db85440b448af82b9806494b3",
+      "evidence_hash": "8d4c8cd4ceee45acbc65053fa9626f584ef8d8b78449c759d518b6f9d9f443c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「注入された use case を保持し、request を受けて use case を呼び（invoke）、結果を整形して（render）`CommandOutcome` を返す。… `cli_driver → usecase`。」"
+      }
+    },
+    {
+      "claim_hash": "fde36f306f5f79e93d276ba5aedf461b1e88eccb050dc87e855e84766c96abc9",
+      "evidence_hash": "8d4c8cd4ceee45acbc65053fa9626f584ef8d8b78449c759d518b6f9d9f443c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` の責務を **DI（object graph の組み立て）のみ**に絞る。- secondary adapter（infrastructure）→ interactor（usecase）→ driving adapter（cli_driver）を構築し、use case を driving adapter に**注入**する。**use case を invoke しない**"
+      }
+    },
+    {
+      "claim_hash": "9d8b095d6053c3f1d4ff8fdc3490d1d1ffd0326724355cd9bfba80f949520c4d",
+      "evidence_hash": "8d4c8cd4ceee45acbc65053fa9626f584ef8d8b78449c759d518b6f9d9f443c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "戻り値のエラーは stringly-typed をやめ、typed `CompositionError` を新設する（構築・配線の失敗を表す）。"
+      }
+    },
+    {
+      "claim_hash": "d7e81366e3b3c3fe8d8aa71e62281e188079c8c35474af0c7d6e8d3d345df581",
+      "evidence_hash": "8d4c8cd4ceee45acbc65053fa9626f584ef8d8b78449c759d518b6f9d9f443c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "god-facade `CliApp`（51 メソッド/27 ファイルの unit struct）を廃止し、bounded-context 別の `CompositionRoot` 構造に分解する。`CliApp` という単一型は残さない。"
+      }
+    },
+    {
+      "claim_hash": "de572309dacae730e6e793dae84427950a028b3e8ca12d1b0c8f0d00db49e748",
+      "evidence_hash": "8d4c8cd4ceee45acbc65053fa9626f584ef8d8b78449c759d518b6f9d9f443c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「invoke と render を同一層に置く（別 crate に分けない）」「bin は driver を呼んで CommandOutcome を emit するだけ」"
+      }
+    },
+    {
+      "claim_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "evidence_hash": "8d4c8cd4ceee45acbc65053fa9626f584ef8d8b78449c759d518b6f9d9f443c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "複数ステップのオーケストレーション・統合ロジックは application レベルの関心事であり、composition / driver ではなく usecase の application service に置く。"
+      }
+    },
+    {
+      "claim_hash": "8769708ccf55f1e10d9643a9fa321ee29723e7aeccc46f96c7bbe5ea7a65174d",
+      "evidence_hash": "8d4c8cd4ceee45acbc65053fa9626f584ef8d8b78449c759d518b6f9d9f443c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "driving adapter が呼ぶ use case の出力（render の入力）は、**usecase の出力 DTO（application の出力契約）を流用**する（`2026-04-30-0848-cli-via-usecase-only.md` で多くが既存）。bin は composition root から driving adapter を受け取り、`driver.handle(input)` を呼んで `CommandOutcome` を emit するのみで、`usecase` / `domain` を import しない（thin-bin）。"
+      }
+    },
+    {
+      "claim_hash": "71843a39f5a01277aacf82a1173168539fc8eb34339b6ceeac6d73ecaef52fb0",
+      "evidence_hash": "8d4c8cd4ceee45acbc65053fa9626f584ef8d8b78449c759d518b6f9d9f443c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "専用の 1 track 内で、... を段階 commit で進める。re-export shim で CI 緑を保ちつつ family 単位で移し、**最終 commit で String 境界の廃止・`architecture-rules.json` / `deny.toml` / `Cargo.toml` の依存グラフ更新を一括 flip** する。中間状態は main にマージしない"
+      }
+    },
+    {
+      "claim_hash": "7823ac711f841f2149c5d3df134e3a287b3581186158f71866050d54a9d6f711",
+      "evidence_hash": "8d4c8cd4ceee45acbc65053fa9626f584ef8d8b78449c759d518b6f9d9f443c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「（h）reviewer severity policy（`.harness/custom/review-prompts/`）の整備」「`cli_driver.md`（新設）」「`cli.md`（更新）」「`cli_composition.md`（更新）」"
+      }
+    },
+    {
+      "claim_hash": "57a875ca5ed94acf4c5092abb938977c1cfb33a9ebbb26ce122bb05720b9e53f",
+      "evidence_hash": "8d4c8cd4ceee45acbc65053fa9626f584ef8d8b78449c759d518b6f9d9f443c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "純 DI 化（D2）に伴い、cli_composition 内に定義された port 実装 adapter（secondary port を impl する struct）を libs/infrastructure へ移設する。... `FsReviewGateStateAdapter` / `FsRefVerifyGateStateAdapter` ... `RecordingDryAgent` ... `NullInsertIndexProxy` ... `NoopSemanticIndexPort` / `NoOpDryApprovalService` ... `LazyBranchReader` ... infrastructure の `SystemGitRepo` 実装に一本化する"
+      }
+    },
+    {
+      "claim_hash": "3fcc8acc89942c850edcccbf2ebcb945f635c105484678cd688c1c042dfa279c",
+      "evidence_hash": "8d4c8cd4ceee45acbc65053fa9626f584ef8d8b78449c759d518b6f9d9f443c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "telemetry 永続化を infrastructure の adapter（時刻取得・fs 書き込み）として切り出し、composition が wire して driver 経由で呼ぶ経路にする。bin は parse + dispatch + emit のみに戻す。"
+      }
+    },
+    {
+      "claim_hash": "4f62c253561ee3076be87516a311c16d6cac732ffe887a127492f6176dd8d4cf",
+      "evidence_hash": "8d4c8cd4ceee45acbc65053fa9626f584ef8d8b78449c759d518b6f9d9f443c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate / application service が返すエラーは `thiserror` 派生の typed error enum（または単一バリアントの enum）に統一する。`Result<_, String>` を廃止し、各 port／service のエラーバリアントを usecase 層内で定義する。infrastructure 層の secondary adapter は `map_err` チェーン経由で usecase 層の typed error variant へ変換して boundary を越える。"
+      }
+    },
+    {
+      "claim_hash": "0c1f42c44ace7dc8e5f6f2d065bc03fb79b2d9a2327f78c4645bb7db3b145607",
+      "evidence_hash": "8d4c8cd4ceee45acbc65053fa9626f584ef8d8b78449c759d518b6f9d9f443c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- **usecase 層の secondary port および aggregate / application service** が返すエラーは `thiserror` 派生の typed error enum（または単一バリアントの enum）に統一する。`Result<_, String>` を廃止し、各 port／service のエラーバリアントを usecase 層内で定義する。\n- **infrastructure 層の secondary adapter** は `map_err` チェーン経由で usecase 層の typed error variant へ変換して boundary を越える。infrastructure 層が usecase 層のエラー型を参照するのは adapter の責務として許容される。"
+      }
+    },
+    {
+      "claim_hash": "4cd212fbfc321547fccf5b93c4e4f086540afe36c3896bc15ca0f710c825ae70",
+      "evidence_hash": "8d4c8cd4ceee45acbc65053fa9626f584ef8d8b78449c759d518b6f9d9f443c1",
+      "verdict": {
+        "kind": "fail",
+        "reason": "New design constraint: D7 supports moving port-implementing adapters from cli_composition to libs/infrastructure, but it does not mention or imply introducing typed error enums such as DemoRunError / TrackBranchError / PersistentIndexLockError or changing git_cli/demo free function signatures to return Result<_, TypedError>."
+      }
+    },
+    {
+      "claim_hash": "41abd8d1db059062f3574b3ffa65a4ead7ed8891e45bddfb2ca05b303a89d290",
+      "evidence_hash": "8d4c8cd4ceee45acbc65053fa9626f584ef8d8b78449c759d518b6f9d9f443c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「専用の 1 track 内で ... 最終 commit で ... 一括 flip」"
+      }
+    },
+    {
+      "claim_hash": "cc138ac145e953477c35a1017dc691027679a85dfb5f5680dca40bc1e4909c37",
+      "evidence_hash": "8d4c8cd4ceee45acbc65053fa9626f584ef8d8b78449c759d518b6f9d9f443c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "invoke と render はリクエストごとに対になる同じ adapter の双方向変換なので、同一層に置く（別 crate に分けない）。"
+      }
+    },
+    {
+      "claim_hash": "ec01d608be3a84b8cd7c5cb7a19b767d20fd945bdf96691bcca432f1dba3c82d",
+      "evidence_hash": "8d4c8cd4ceee45acbc65053fa9626f584ef8d8b78449c759d518b6f9d9f443c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "bin は composition root から driving adapter を受け取り、`driver.handle(input)` を呼んで `CommandOutcome` を emit するのみで、`usecase` / `domain` を import しない（thin-bin）"
+      }
+    },
+    {
+      "claim_hash": "da3c2e9651346ca1836b9aec8782020f2d7a49bd861525d9b6fc232b14a2660c",
+      "evidence_hash": "8d4c8cd4ceee45acbc65053fa9626f584ef8d8b78449c759d518b6f9d9f443c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli-driver`（crate 名 `cli_driver`）を新設し、**driving adapter（primary adapter / controller）**とする。注入された use case を保持し、request を受けて use case を呼び（invoke）、結果を整形して（render）`CommandOutcome` を返す。`CommandOutcome` 型・render 関数群もこの層に置く（render は層内 module であり別 crate にしない）。`cli_driver → usecase`。"
+      }
+    },
+    {
+      "claim_hash": "dc02414b8e4301c21c1be42ccfd36377b7a27336adc7a6b151bae2b486a660a4",
+      "evidence_hash": "8d4c8cd4ceee45acbc65053fa9626f584ef8d8b78449c759d518b6f9d9f443c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` の責務を **DI（object graph の組み立て）のみ**に絞る。... **use case を invoke しない**（invoke は `cli_driver` の責務）。"
+      }
+    },
+    {
+      "claim_hash": "a7cfec0d3ced28af7f8e3bebe26ca08e6c71cb9acde0900b8f623fdd6cd3b8fd",
+      "evidence_hash": "8d4c8cd4ceee45acbc65053fa9626f584ef8d8b78449c759d518b6f9d9f443c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "戻り値のエラーは stringly-typed をやめ、**typed `CompositionError`** を新設する（構築・配線の失敗を表す）。"
+      }
+    },
+    {
+      "claim_hash": "5f8066a77e510cc007246a82cb37b6e9944ae18a7beabad78b8831b4dd07d85d",
+      "evidence_hash": "8d4c8cd4ceee45acbc65053fa9626f584ef8d8b78449c759d518b6f9d9f443c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "bin は composition root から driving adapter を受け取り、`driver.handle(input)` を呼んで `CommandOutcome` を emit するのみで、`usecase` / `domain` を import しない（thin-bin）。"
+      }
+    },
+    {
+      "claim_hash": "388eeaef245590de5f54b5860a4a0b5b720cbe45c6bca95af095a9299e8c944f",
+      "evidence_hash": "8d4c8cd4ceee45acbc65053fa9626f584ef8d8b78449c759d518b6f9d9f443c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「port を実装する adapter を libs/infrastructure へ移設する」「composition root は adapter を wire するが 定義 はしない」「infrastructure の companion stub にするか、infra 非依存なら usecase 提供の test-double にする」"
+      }
+    },
+    {
+      "claim_hash": "981d6fb51056b9435ce3274eebb7d97395c9cedd8a860fb523118e127db1f339",
+      "evidence_hash": "8d4c8cd4ceee45acbc65053fa9626f584ef8d8b78449c759d518b6f9d9f443c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "re-export shim で CI 緑を保ちつつ family 単位で移し、最終 commit で `architecture-rules.json` / `deny.toml` / `Cargo.toml` の依存グラフ更新を一括 flip"
+      }
+    },
+    {
+      "claim_hash": "a425cb25b341819d488eb925a8226f03957f002d0165b56db13ffabc3f481bb1",
+      "evidence_hash": "8d4c8cd4ceee45acbc65053fa9626f584ef8d8b78449c759d518b6f9d9f443c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「複数ステップのオーケストレーション・統合ロジックは application レベルの関心事であり、composition / driver ではなく usecase の application service に置く。driving adapter（cli_driver）は単一 use case の invoke + render に留める」"
+      }
+    },
+    {
+      "claim_hash": "d20dcc5c2703ed4ae86ec50f0ad78a137928a0f1daa83dcfe974d8a4b0796db7",
+      "evidence_hash": "8d4c8cd4ceee45acbc65053fa9626f584ef8d8b78449c759d518b6f9d9f443c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`std::fs` / `serde_json` / `chrono::Utc::now()` を直接使って telemetry を永続化しており"
+      }
+    },
+    {
+      "claim_hash": "5b2bfa809b65c249898fd280589400da918b105a123b0bf53620caf92d4fdab7",
+      "evidence_hash": "8d4c8cd4ceee45acbc65053fa9626f584ef8d8b78449c759d518b6f9d9f443c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli-driver`（crate 名 `cli_driver`）を新設し、**driving adapter（primary adapter / controller）**とする。… `cli_driver → usecase`。"
+      }
+    },
+    {
+      "claim_hash": "d502c4a30cc47563b15cb5bb5076d267a0f0fd73363493b997b2aa4822edd765",
+      "evidence_hash": "8d4c8cd4ceee45acbc65053fa9626f584ef8d8b78449c759d518b6f9d9f443c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_driver` の各 driving adapter は **注入された use case を保持**し、`handle(input)` で **use case を呼び（invoke）、続けて結果を整形して（render）`CommandOutcome` を返す**。invoke と render はリクエストごとに対になる同じ adapter の双方向変換なので、同一層に置く（別 crate に分けない）。"
+      }
+    },
+    {
+      "claim_hash": "7e0de2953bf2aebff5c9718778a935fb3ef5aba1ae9d7dc2b4303e4197975045",
+      "evidence_hash": "8d4c8cd4ceee45acbc65053fa9626f584ef8d8b78449c759d518b6f9d9f443c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`merge_outcomes` や signal layer chain のような複数ステップのオーケストレーション・統合ロジックは application レベルの関心事であり、composition / driver ではなく **usecase の application service** に置く。"
+      }
+    },
+    {
+      "claim_hash": "d921dab26b7d2a5dd5043f9c80f61f31af654dfbeb4dd5722abacf5b095a0203",
+      "evidence_hash": "8d4c8cd4ceee45acbc65053fa9626f584ef8d8b78449c759d518b6f9d9f443c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "god-facade `CliApp`（51 メソッド/27 ファイルの unit struct）を廃止し、bounded-context 別の `CompositionRoot` 構造（各 context の driver を構築する wiring）に分解する。`CliApp` という単一型は残さない。"
+      }
+    },
+    {
+      "claim_hash": "75f97158f0f315a4769a40e81e8adedffccaa2b33d4f60ad32d0b88e11efb293",
+      "evidence_hash": "8d4c8cd4ceee45acbc65053fa9626f584ef8d8b78449c759d518b6f9d9f443c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` の責務を **DI（object graph の組み立て）のみ**に絞る。\n\n- secondary adapter（infrastructure）→ interactor（usecase）→ driving adapter（cli_driver）を構築し、use case を driving adapter に**注入**する。**use case を invoke しない**（invoke は cli_driver の責務）。\n- 戻り値のエラーは stringly-typed をやめ、**typed `CompositionError`** を新設する（構築・配線の失敗を表す）。\n- **god-facade `CliApp`（51 メソッド/27 ファイルの unit struct）を廃止**し、bounded-context 別の `CompositionRoot` 構造（各 context の driver を構築する wiring）に分解する。`CliApp` という単一型は残さない。"
+      }
+    },
+    {
+      "claim_hash": "e76f285e075b4023ea36dea86a5babdfa600d169aaf0ad6a8db5eb695dc07495",
+      "evidence_hash": "8d4c8cd4ceee45acbc65053fa9626f584ef8d8b78449c759d518b6f9d9f443c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「invoke と render を同一層に置く」「bin は driver を呼んで `CommandOutcome` を emit するだけで済み、thin-bin が保たれる」"
+      }
+    },
+    {
+      "claim_hash": "9ffb7e8c8e57699c842e3e5a649e0d76da137d08cb3e6fbfc61cefcefbaaa0a0",
+      "evidence_hash": "8d4c8cd4ceee45acbc65053fa9626f584ef8d8b78449c759d518b6f9d9f443c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`merge_outcomes` や signal layer chain のような複数ステップのオーケストレーション・統合ロジックは application レベルの関心事であり、composition / driver ではなく **usecase の application service** に置く。driving adapter（cli_driver）は単一 use case の invoke + render に留め、複数ステップの統合は usecase が担う。"
+      }
+    },
+    {
+      "claim_hash": "f189250cb11c4b09fd041ba4894af7b0c29be68e8b5a312f4dfd683965daf19a",
+      "evidence_hash": "8d4c8cd4ceee45acbc65053fa9626f584ef8d8b78449c759d518b6f9d9f443c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "bin は composition root から driving adapter を受け取り、`driver.handle(input)` を呼んで `CommandOutcome` を emit するのみで、`usecase` / `domain` を import しない（thin-bin）。"
+      }
+    },
+    {
+      "claim_hash": "1988e73d1768a9595d0261fd21a4740454ef9099b9e053bb4b1246f40bc03143",
+      "evidence_hash": "8d4c8cd4ceee45acbc65053fa9626f584ef8d8b78449c759d518b6f9d9f443c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「cli_composition 内に定義された port 実装 adapter ... を libs/infrastructure へ移設する」 / 「LazyBranchReader（BranchReaderPort の UFCS 回避用の二重 adapter）— 呼び出し側の trait 曖昧性解消で除去し」"
+      }
+    },
+    {
+      "claim_hash": "6d59add287fc0094243346dd18947d43d1727e90eb9de6118cc270761a016299",
+      "evidence_hash": "8d4c8cd4ceee45acbc65053fa9626f584ef8d8b78449c759d518b6f9d9f443c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli/src/main.rs` の `emit_archived_track_subcommand` は bin 内で `std::fs` / `serde_json` / `chrono::Utc::now()` を直接使って telemetry を永続化しており、thin-bin の原則 ... に反する。telemetry 永続化を infrastructure の adapter（時刻取得・fs 書き込み）として切り出し、composition が wire して driver 経由で呼ぶ経路にする。bin は parse + dispatch + emit のみに戻す。"
+      }
+    },
+    {
+      "claim_hash": "555ceb48beafc602fe5d15aa94ac3338fc8afa82b9e05dcea929580c13d3a3bb",
+      "evidence_hash": "8d4c8cd4ceee45acbc65053fa9626f584ef8d8b78449c759d518b6f9d9f443c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "層構成の変更に伴い、レイヤー別 reviewer briefing（`.harness/custom/review-prompts/<layer>.md`、利用者所有の severity policy。`2026-06-18-1406-review-prompts-relocation-per-layer-briefings.md`）を新構成に追従させる。各決定（D2/D3/D5/D7/D8）の review 観点をそのまま severity policy に落とす。\n- **`cli_composition.md`（更新）**: 純 DI composition root 用に改める。\n- **`cli_driver.md`（新設）**: primary adapter（invoke + render）用。\n- **`cli.md`（更新）**: thin bin 用。"
+      }
+    },
+    {
+      "claim_hash": "5666f65821ae07c899f18cfda169f0f4ed5293dfe9fa141627d5de7f2532d934",
+      "evidence_hash": "8d4c8cd4ceee45acbc65053fa9626f584ef8d8b78449c759d518b6f9d9f443c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "専用の 1 track 内で、(a) `cli-driver` crate 新設、(b) command-family 単位で composition から invoke / 整形を cli_driver へ移動、(c) orchestration の usecase 移譲、(d) `CompositionError` 導入、(e) `CliApp` の `CompositionRoot` / `Driver` への分解、(f) port 実装 adapter の infrastructure 移設（D7）、(g) cli bin の直接 I/O 撤去（D8）、(h) reviewer severity policy（`.harness/custom/review-prompts/`）の整備、を段階 commit で進める。re-export shim で CI 緑を保ちつつ family 単位で移し、**最終 commit で String 境界の廃止・`architecture-rules.json` / `deny.toml` / `Cargo.toml` の依存グラフ更新を一括 flip** する。"
+      }
+    },
+    {
+      "claim_hash": "e1ef8ead950dbf84f2909b58bc0245b33c7f669fb2316298f7b18dd6d7860a18",
+      "evidence_hash": "8d4c8cd4ceee45acbc65053fa9626f584ef8d8b78449c759d518b6f9d9f443c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "re-export shim で CI 緑を保ちつつ family 単位で移し、**最終 commit で String 境界の廃止・`architecture-rules.json` / `deny.toml` / `Cargo.toml` の依存グラフ更新を一括 flip** する。中間状態は main にマージしない"
+      }
+    },
+    {
+      "claim_hash": "5f41fbc4c62dafd62bbb5bfc016a786daaab02946562b2884d5fd3a5cd35a410",
+      "evidence_hash": "8d4c8cd4ceee45acbc65053fa9626f584ef8d8b78449c759d518b6f9d9f443c1",
+      "verdict": {
+        "kind": "fail",
+        "reason": "The reference is not semantically grounded in this evidence. The claim excludes updating `hexagonal-architecture.md` and says the track implements requirements only while deferring convention-doc wording updates, but D6 does not mention `hexagonal-architecture.md` or convention-doc wording updates, nor does it decide to keep that work separate from the implementation track. The closest passage concerns review-prompts, not this convention document."
+      }
+    },
+    {
+      "claim_hash": "a6e0751d89875020bb137e66dd7443933e67a70459ba7bf5fcabeea35a231a65",
+      "evidence_hash": "8d4c8cd4ceee45acbc65053fa9626f584ef8d8b78449c759d518b6f9d9f443c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "infrastructure 層内部に閉じた free function（例: `infrastructure::demo` / `infrastructure::git_cli` の内部 helper 等）も同様に typed error enum（`DemoRunError` / `TrackBranchError` 等）に変更する。`Result<_, String>` を返す公開 free function は認めない。"
+      }
+    },
+    {
+      "claim_hash": "b2a9091bb61c01c6129fb340c3e65e5770c62c5d1e2574110c05909ff8e031cc",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli-driver`（crate 名 `cli_driver`）を新設し、**driving adapter（primary adapter / controller）**とする。注入された use case を保持し、request を受けて use case を呼び（invoke）、結果を整形して（render）`CommandOutcome` を返す。"
+      }
+    },
+    {
+      "claim_hash": "b2a9091bb61c01c6129fb340c3e65e5770c62c5d1e2574110c05909ff8e031cc",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_driver` の各 driving adapter は **注入された use case を保持**し、`handle(input)` で **use case を呼び（invoke）、続けて結果を整形して（render）`CommandOutcome` を返す**。invoke と render はリクエストごとに対になる同じ adapter の双方向変換なので、同一層に置く（別 crate に分けない）。DI はしない（注入される側）。"
+      }
+    },
+    {
+      "claim_hash": "8aba0cd5dbecd2a4ba28fc6f1d24634486e9bb809b37c5c04a0ee79f8ae7fd45",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` の責務を **DI（object graph の組み立て）のみ**に絞る。 - secondary adapter（infrastructure）→ interactor（usecase）→ driving adapter（cli_driver）を構築し、use case を driving adapter に**注入**する。**use case を invoke しない**（invoke は cli_driver の責務）。 - **god-facade `CliApp`（51 メソッド/27 ファイルの unit struct）を廃止**し、bounded-context 別の `CompositionRoot` 構造（各 context の driver を構築する wiring）に分解する。`CliApp` という単一型は残さない。"
+      }
+    },
+    {
+      "claim_hash": "3143c4ee16fda652eb037b3c26e8bc2122db553e136109190ea46a97e0951373",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「複数ステップのオーケストレーション・統合ロジックは application レベルの関心事であり、composition / driver ではなく **usecase の application service** に置く。driving adapter（cli_driver）は単一 use case の invoke + render に留め、複数ステップの統合は usecase が担う。」"
+      }
+    },
+    {
+      "claim_hash": "5f3bf158af77bcccf39358500ef8fda4edd765f9f96348f2a217f0a214a6c6d7",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「port 実装 adapter ... を libs/infrastructure へ移設する」 / 「LazyBranchReader ... infrastructure の SystemGitRepo 実装に一本化する」"
+      }
+    },
+    {
+      "claim_hash": "0b708950c90ca2020e79db5aba4249b55ea867e36ebe677cbf2b3603fd0b1054",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "telemetry 永続化を infrastructure の adapter（時刻取得・fs 書き込み）として切り出し、bin は parse + dispatch + emit のみに戻す。"
+      }
+    },
+    {
+      "claim_hash": "cfeb28639653cd2ecb749303819aba5ea6a3ae507d29379ef69a40cce48e6f5a",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli-driver`（crate 名 `cli_driver`）を新設し、**driving adapter（primary adapter / controller）**とする。注入された use case を保持し、request を受けて use case を呼び（invoke）、結果を整形して（render）`CommandOutcome` を返す。`CommandOutcome` 型・render 関数群もこの層に置く（render は層内 module であり別 crate にしない）。"
+      }
+    },
+    {
+      "claim_hash": "d7074da1d1545ff09f0ec2654c7928398b6e506db85440b448af82b9806494b3",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_driver → usecase`。"
+      }
+    },
+    {
+      "claim_hash": "fde36f306f5f79e93d276ba5aedf461b1e88eccb050dc87e855e84766c96abc9",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
         "citation": "`cli_composition` の責務を **DI（object graph の組み立て）のみ**に絞る。\n\n- secondary adapter（infrastructure）→ interactor（usecase）→ driving adapter（cli_driver）を構築し、use case を driving adapter に**注入**する。**use case を invoke しない**（invoke は cli_driver の責務）。"
       }
     },
     {
-      "claim_hash": "9595ee651ddb95fa585cdc4e9c55f6a049031587e676f7416e2ed8ef74dd3b9b",
-      "evidence_hash": "4b23721aa52292f3a86ac4eb7e417ca679ed33cc61ba161f3b2581897dacb65a",
+      "claim_hash": "9d8b095d6053c3f1d4ff8fdc3490d1d1ffd0326724355cd9bfba80f949520c4d",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
       "verdict": {
         "kind": "pass",
-        "citation": "「複数ステップのオーケストレーション・統合ロジックは application レベルの関心事であり、composition / driver ではなく usecase の application service に置く。」"
+        "citation": "- 戻り値のエラーは stringly-typed をやめ、**typed `CompositionError`** を新設する（構築・配線の失敗を表す）。"
+      }
+    },
+    {
+      "claim_hash": "d7e81366e3b3c3fe8d8aa71e62281e188079c8c35474af0c7d6e8d3d345df581",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- **god-facade `CliApp`（51 メソッド/27 ファイルの unit struct）を廃止**し、bounded-context 別の `CompositionRoot` 構造（各 context の driver を構築する wiring）に分解する。`CliApp` という単一型は残さない。"
+      }
+    },
+    {
+      "claim_hash": "de572309dacae730e6e793dae84427950a028b3e8ca12d1b0c8f0d00db49e748",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_driver` の各 driving adapter は **注入された use case を保持**し、`handle(input)` で **use case を呼び（invoke）、続けて結果を整形して（render）`CommandOutcome` を返す**。invoke と render はリクエストごとに対になる同じ adapter の双方向変換なので、同一層に置く（別 crate に分けない）。"
+      }
+    },
+    {
+      "claim_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`merge_outcomes` や signal layer chain のような複数ステップのオーケストレーション・統合ロジックは application レベルの関心事であり、composition / driver ではなく **usecase の application service** に置く。driving adapter（cli_driver）は単一 use case の invoke + render に留め、複数ステップの統合は usecase が担う。」"
+      }
+    },
+    {
+      "claim_hash": "8769708ccf55f1e10d9643a9fa321ee29723e7aeccc46f96c7bbe5ea7a65174d",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「usecase の出力 DTO を流用し、bin は thin を維持する」"
+      }
+    },
+    {
+      "claim_hash": "71843a39f5a01277aacf82a1173168539fc8eb34339b6ceeac6d73ecaef52fb0",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "re-export shim で CI 緑を保ちつつ family 単位で移し"
+      }
+    },
+    {
+      "claim_hash": "7823ac711f841f2149c5d3df134e3a287b3581186158f71866050d54a9d6f711",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "専用の 1 track 内で、... (h) reviewer severity policy（`.harness/custom/review-prompts/`）の整備、を段階 commit で進める。"
+      }
+    },
+    {
+      "claim_hash": "57a875ca5ed94acf4c5092abb938977c1cfb33a9ebbb26ce122bb05720b9e53f",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "純 DI 化（D2）に伴い、cli_composition 内に定義された port 実装 adapter（secondary port を impl する struct）を libs/infrastructure へ移設する。composition root は adapter を **wire** するが **定義** はしない。... `FsReviewGateStateAdapter` / `FsRefVerifyGateStateAdapter`（filesystem で review / ref-verify gate 状態を読む）— high\n- `RecordingDryAgent`（`DryCheckAgentPort` の telemetry decorator）/ `NullInsertIndexProxy`（`SemanticIndexPort` の insert 抑止 proxy + LanceDB lock 管理）— medium\n- `NoopSemanticIndexPort` / `NoOpDryApprovalService`（null-object stub）— low。infrastructure の companion stub にするか、infra 非依存なら usecase 提供の test-double にする\n- `LazyBranchReader`（`BranchReaderPort` の UFCS 回避用の二重 adapter）— 呼び出し側の trait 曖昧性解消で除去し、infrastructure の `SystemGitRepo` 実装に一本化する"
+      }
+    },
+    {
+      "claim_hash": "3fcc8acc89942c850edcccbf2ebcb945f635c105484678cd688c1c042dfa279c",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「telemetry 永続化を infrastructure の adapter（時刻取得・fs 書き込み）として切り出し、composition が wire して driver 経由で呼ぶ経路にする。bin は parse + dispatch + emit のみに戻す。」"
+      }
+    },
+    {
+      "claim_hash": "4f62c253561ee3076be87516a311c16d6cac732ffe887a127492f6176dd8d4cf",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- usecase 層の secondary port および aggregate / application service が返すエラーを `thiserror` 派生の typed error enum に統一する。`Result<_, String>` を廃止し、各 port／service のエラー variant を usecase 層内で定義する。\n- infrastructure 層の secondary adapter は `map_err` チェーン経由で typed variant へ変換して boundary を越える。"
+      }
+    },
+    {
+      "claim_hash": "0c1f42c44ace7dc8e5f6f2d065bc03fb79b2d9a2327f78c4645bb7db3b145607",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`secondary adapter（infrastructure）→ interactor（usecase）→ driving adapter（cli_driver）を構築し、use case を driving adapter に**注入**する。use case を invoke しない（invoke は cli_driver の責務）。` そして `戻り値のエラーは stringly-typed をやめ、**typed `CompositionError`** を新設する`"
+      }
+    },
+    {
+      "claim_hash": "0c1f42c44ace7dc8e5f6f2d065bc03fb79b2d9a2327f78c4645bb7db3b145607",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`merge_outcomes` や signal layer chain のような複数ステップのオーケストレーション・統合ロジックは application レベルの関心事であり、composition / driver ではなく **usecase の application service** に置く。"
+      }
+    },
+    {
+      "claim_hash": "0c1f42c44ace7dc8e5f6f2d065bc03fb79b2d9a2327f78c4645bb7db3b145607",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- usecase 層の secondary port および aggregate / application service が返すエラーを `thiserror` 派生の typed error enum に統一する。`Result<_, String>` を廃止し、各 port／service のエラー variant を usecase 層内で定義する。\n- infrastructure 層の secondary adapter は `map_err` チェーン経由で typed variant へ変換して boundary を越える。"
+      }
+    },
+    {
+      "claim_hash": "a6e0751d89875020bb137e66dd7443933e67a70459ba7bf5fcabeea35a231a65",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「infrastructure 層内部に閉じた free function ... も同様に typed error enum（`DemoRunError` / `TrackBranchError` / `PersistentIndexLockError` 等）に変更する」"
+      }
+    },
+    {
+      "claim_hash": "41abd8d1db059062f3574b3ffa65a4ead7ed8891e45bddfb2ca05b303a89d290",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「最終 commit で String 境界の廃止・`architecture-rules.json` / `deny.toml` / `Cargo.toml` の依存グラフ更新を一括 flip」"
+      }
+    },
+    {
+      "claim_hash": "cc138ac145e953477c35a1017dc691027679a85dfb5f5680dca40bc1e4909c37",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "invoke と render はリクエストごとに対になる同じ adapter の双方向変換なので、同一層に置く（別 crate に分けない）。"
+      }
+    },
+    {
+      "claim_hash": "ec01d608be3a84b8cd7c5cb7a19b767d20fd945bdf96691bcca432f1dba3c82d",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "bin は composition root から driving adapter を受け取り、`driver.handle(input)` を呼んで `CommandOutcome` を emit するのみで、`usecase` / `domain` を import しない（thin-bin）。"
+      }
+    },
+    {
+      "claim_hash": "da3c2e9651346ca1836b9aec8782020f2d7a49bd861525d9b6fc232b14a2660c",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「注入された use case を保持し、request を受けて use case を呼び（invoke）、結果を整形して（render）`CommandOutcome` を返す。... `cli_driver → usecase`。」"
+      }
+    },
+    {
+      "claim_hash": "dc02414b8e4301c21c1be42ccfd36377b7a27336adc7a6b151bae2b486a660a4",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` の責務を **DI（object graph の組み立て）のみ**に絞る。\n\n- secondary adapter（infrastructure）→ interactor（usecase）→ driving adapter（cli_driver）を構築し、use case を driving adapter に**注入**する。**use case を invoke しない**（invoke は cli_driver の責務）。"
+      }
+    },
+    {
+      "claim_hash": "a7cfec0d3ced28af7f8e3bebe26ca08e6c71cb9acde0900b8f623fdd6cd3b8fd",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- 戻り値のエラーは stringly-typed をやめ、**typed `CompositionError`** を新設する（構築・配線の失敗を表す）。"
+      }
+    },
+    {
+      "claim_hash": "5f8066a77e510cc007246a82cb37b6e9944ae18a7beabad78b8831b4dd07d85d",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "bin は composition root から driving adapter を受け取り、`driver.handle(input)` を呼んで `CommandOutcome` を emit するのみで、`usecase` / `domain` を import しない（thin-bin）。"
+      }
+    },
+    {
+      "claim_hash": "388eeaef245590de5f54b5860a4a0b5b720cbe45c6bca95af095a9299e8c944f",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "純 DI 化（D2）に伴い、cli_composition 内に定義された port 実装 adapter（secondary port を impl する struct）を libs/infrastructure へ移設する。composition root は adapter を **wire** するが **定義** はしない。... `NoopSemanticIndexPort` / `NoOpDryApprovalService`（null-object stub）— low。infrastructure の companion stub にするか、infra 非依存なら usecase 提供の test-double にする"
+      }
+    },
+    {
+      "claim_hash": "981d6fb51056b9435ce3274eebb7d97395c9cedd8a860fb523118e127db1f339",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "re-export shim で CI 緑を保ちつつ family 単位で移し、**最終 commit で String 境界の廃止・`architecture-rules.json` / `deny.toml` / `Cargo.toml` の依存グラフ更新を一括 flip** する。"
+      }
+    },
+    {
+      "claim_hash": "a425cb25b341819d488eb925a8226f03957f002d0165b56db13ffabc3f481bb1",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`merge_outcomes` や signal layer chain のような複数ステップのオーケストレーション・統合ロジックは application レベルの関心事であり、composition / driver ではなく **usecase の application service** に置く。driving adapter（cli_driver）は単一 use case の invoke + render に留め、複数ステップの統合は usecase が担う。"
+      }
+    },
+    {
+      "claim_hash": "d20dcc5c2703ed4ae86ec50f0ad78a137928a0f1daa83dcfe974d8a4b0796db7",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli/src/main.rs` の `emit_archived_track_subcommand` は bin 内で `std::fs` / `serde_json` / `chrono::Utc::now()` を直接使って telemetry を永続化しており、thin-bin の原則に反する。telemetry 永続化を infrastructure の adapter（時刻取得・fs 書き込み）として切り出し、composition が wire して driver 経由で呼ぶ経路にする。bin は parse + dispatch + emit のみに戻す。"
+      }
+    },
+    {
+      "claim_hash": "5b2bfa809b65c249898fd280589400da918b105a123b0bf53620caf92d4fdab7",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli-driver`（crate 名 `cli_driver`）を新設し、**driving adapter（primary adapter / controller）**とする。注入された use case を保持し、request を受けて use case を呼び（invoke）、結果を整形して（render）`CommandOutcome` を返す。`cli_driver → usecase`。"
+      }
+    },
+    {
+      "claim_hash": "d502c4a30cc47563b15cb5bb5076d267a0f0fd73363493b997b2aa4822edd765",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "注入された use case を保持し、request を受けて use case を呼び（invoke）、結果を整形して（render）`CommandOutcome` を返す。`CommandOutcome` 型・render 関数群もこの層に置く（render は層内 module であり別 crate にしない）。`cli_driver → usecase`。"
+      }
+    },
+    {
+      "claim_hash": "d502c4a30cc47563b15cb5bb5076d267a0f0fd73363493b997b2aa4822edd765",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_driver` の各 driving adapter は **注入された use case を保持**し、`handle(input)` で **use case を呼び（invoke）、続けて結果を整形して（render）`CommandOutcome` を返す**。invoke と render はリクエストごとに対になる同じ adapter の双方向変換なので、同一層に置く"
+      }
+    },
+    {
+      "claim_hash": "7e0de2953bf2aebff5c9718778a935fb3ef5aba1ae9d7dc2b4303e4197975045",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` を純 DI composition root にする（wire のみ・invoke しない）\n\n- secondary adapter（infrastructure）→ interactor（usecase）→ driving adapter（cli_driver）を構築し、use case を driving adapter に注入する。use case を invoke しない（invoke は cli_driver の責務）。"
+      }
+    },
+    {
+      "claim_hash": "7e0de2953bf2aebff5c9718778a935fb3ef5aba1ae9d7dc2b4303e4197975045",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "composition / driver ではなく **usecase の application service** に置く。driving adapter（cli_driver）は単一 use case の invoke + render に留め"
+      }
+    },
+    {
+      "claim_hash": "d921dab26b7d2a5dd5043f9c80f61f31af654dfbeb4dd5722abacf5b095a0203",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "god-facade `CliApp`（51 メソッド/27 ファイルの unit struct）を廃止し、bounded-context 別の `CompositionRoot` 構造（各 context の driver を構築する wiring）に分解する。`CliApp` という単一型は残さない。"
+      }
+    },
+    {
+      "claim_hash": "75f97158f0f315a4769a40e81e8adedffccaa2b33d4f60ad32d0b88e11efb293",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "戻り値のエラーは stringly-typed をやめ、typed `CompositionError` を新設する"
+      }
+    },
+    {
+      "claim_hash": "e76f285e075b4023ea36dea86a5babdfa600d169aaf0ad6a8db5eb695dc07495",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli-driver`（crate 名 `cli_driver`）を新設し、**driving adapter（primary adapter / controller）**とする。注入された use case を保持し、request を受けて use case を呼び（invoke）、結果を整形して（render）`CommandOutcome` を返す。`CommandOutcome` 型・render 関数群もこの層に置く"
+      }
+    },
+    {
+      "claim_hash": "e76f285e075b4023ea36dea86a5babdfa600d169aaf0ad6a8db5eb695dc07495",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_driver` の各 driving adapter は **注入された use case を保持**し、`handle(input)` で **use case を呼び（invoke）、続けて結果を整形して（render）`CommandOutcome` を返す**。 ... これにより bin は driver を呼んで `CommandOutcome` を emit するだけで済み、thin-bin が保たれる"
+      }
+    },
+    {
+      "claim_hash": "9ffb7e8c8e57699c842e3e5a649e0d76da137d08cb3e6fbfc61cefcefbaaa0a0",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "composition / driver ではなく **usecase の application service** に置く"
+      }
+    },
+    {
+      "claim_hash": "f189250cb11c4b09fd041ba4894af7b0c29be68e8b5a312f4dfd683965daf19a",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "bin は composition root から driving adapter を受け取り、`driver.handle(input)` を呼び出すのみで、`usecase` / `domain` を import しない（thin-bin）"
+      }
+    },
+    {
+      "claim_hash": "1988e73d1768a9595d0261fd21a4740454ef9099b9e053bb4b1246f40bc03143",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「port 実装 adapter を libs/infrastructure へ移設する」; 「LazyBranchReader ... 呼び出し側の trait 曖昧性解消で除去」"
+      }
+    },
+    {
+      "claim_hash": "6d59add287fc0094243346dd18947d43d1727e90eb9de6118cc270761a016299",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli/src/main.rs` の `emit_archived_track_subcommand` は bin 内で `std::fs` / `serde_json` / `chrono::Utc::now()` を直接使って telemetry を永続化しており... telemetry 永続化を infrastructure の adapter（時刻取得・fs 書き込み）として切り出し、composition が wire して driver 経由で呼ぶ経路にする。bin は parse + dispatch + emit のみに戻す。"
+      }
+    },
+    {
+      "claim_hash": "555ceb48beafc602fe5d15aa94ac3338fc8afa82b9e05dcea929580c13d3a3bb",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_driver.md`（新設）; `cli.md`（更新）; `cli_composition.md`（更新）; D2/D3/D5/D7/D8 の review 観点を severity policy に落とす。"
+      }
+    },
+    {
+      "claim_hash": "5666f65821ae07c899f18cfda169f0f4ed5293dfe9fa141627d5de7f2532d934",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli-driver`（crate 名 `cli_driver`）を新設し、**driving adapter（primary adapter / controller）**とする。注入された use case を保持し、request を受けて use case を呼び（invoke）、結果を整形して（render）`CommandOutcome` を返す。`CommandOutcome` 型・render 関数群もこの層に置く（render は層内 module であり別 crate にしない）。`cli_driver → usecase`。"
+      }
+    },
+    {
+      "claim_hash": "5666f65821ae07c899f18cfda169f0f4ed5293dfe9fa141627d5de7f2532d934",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "re-export shim で CI 緑を保ちつつ family 単位で移し、最終 commit で String 境界の廃止・`architecture-rules.json` / `deny.toml` / `Cargo.toml` の依存グラフ更新を一括 flip する。"
+      }
+    },
+    {
+      "claim_hash": "e1ef8ead950dbf84f2909b58bc0245b33c7f669fb2316298f7b18dd6d7860a18",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「re-export shim で CI 緑を保ちつつ family 単位で移し、**最終 commit で String 境界の廃止・`architecture-rules.json` / `deny.toml` / `Cargo.toml` の依存グラフ更新を一括 flip** する。中間状態は main にマージしない」"
+      }
+    },
+    {
+      "claim_hash": "5f41fbc4c62dafd62bbb5bfc016a786daaab02946562b2884d5fd3a5cd35a410",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "SoTOHE 自身は dogfooding として上記を整備する。実ファイルの更新は新層 crate の追加と同じ実装 track で行う（本 ADR は要件のみ記録）。"
       }
     }
   ]

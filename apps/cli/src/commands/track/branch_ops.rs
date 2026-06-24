@@ -6,9 +6,11 @@
 use std::process::ExitCode;
 
 use cli_composition::TrackCompositionRoot;
+use cli_driver::track::TrackInput;
 
 use crate::CliError;
 
+use super::state_ops::track_driver_outcome_to_result;
 use super::{
     BranchAction, BranchArgs, resolve_project_root, validate_track_branch_str,
     validate_track_id_str,
@@ -40,16 +42,12 @@ fn execute_branch_create(args: BranchArgs) -> Result<ExitCode, CliError> {
 
     validate_track_branch_str(&branch_name)
         .map_err(|err| CliError::Message(format!("invalid track branch: {err}")))?;
-    resolve_project_root(&items_dir).map_err(CliError::Message)?;
+    resolve_project_root(&items_dir).map_err(|e| CliError::Message(e.to_string()))?;
 
-    let app = TrackCompositionRoot::new();
-    let outcome = app
-        .track_branch_create(items_dir, track_id)
-        .map_err(|e| CliError::Message(e.to_string()))?;
-    if let Some(ref s) = outcome.stdout {
-        println!("{s}");
-    }
-    Ok(ExitCode::from(outcome.exit_code))
+    let outcome = TrackCompositionRoot::new()
+        .track_driver()
+        .handle(TrackInput::BranchCreate { items_dir, track_id });
+    track_driver_outcome_to_result(outcome)
 }
 
 /// Switches to an existing `track/<track-id>` branch.
@@ -70,16 +68,12 @@ fn execute_branch_switch(args: BranchArgs) -> Result<ExitCode, CliError> {
 
     validate_track_branch_str(&branch_name)
         .map_err(|err| CliError::Message(format!("invalid track branch: {err}")))?;
-    resolve_project_root(&items_dir).map_err(CliError::Message)?;
+    resolve_project_root(&items_dir).map_err(|e| CliError::Message(e.to_string()))?;
 
-    let app = TrackCompositionRoot::new();
-    let outcome = app
-        .track_branch_switch(items_dir, track_id)
-        .map_err(|e| CliError::Message(e.to_string()))?;
-    if let Some(ref s) = outcome.stdout {
-        println!("{s}");
-    }
-    Ok(ExitCode::from(outcome.exit_code))
+    let outcome = TrackCompositionRoot::new()
+        .track_driver()
+        .handle(TrackInput::BranchSwitch { items_dir, track_id });
+    track_driver_outcome_to_result(outcome)
 }
 
 #[cfg(test)]
@@ -95,6 +89,10 @@ mod tests {
 
     use super::super::resolve_project_root;
     use std::path::Path;
+
+    #[derive(Debug, thiserror::Error)]
+    #[error("{0}")]
+    pub(super) struct BranchTestError(String);
 
     // ---------------------------------------------------------------------------
     // Git helper functions — test-only (only called from this test module)
@@ -112,21 +110,21 @@ mod tests {
     pub(super) fn branch_exists(
         repo: &impl GitRepository,
         branch_name: &str,
-    ) -> Result<bool, String> {
+    ) -> Result<bool, BranchTestError> {
         let output = repo
             .output(&["rev-parse", "--verify", "--quiet", branch_name])
-            .map_err(|e| e.to_string())?;
+            .map_err(|e| BranchTestError(e.to_string()))?;
         Ok(output.status.success())
     }
 
     pub(super) fn rev_parse_oid(
         repo: &impl GitRepository,
         rev: &str,
-    ) -> Result<Option<String>, String> {
+    ) -> Result<Option<String>, BranchTestError> {
         let spec = format!("{rev}^{{commit}}");
         let output = repo
             .output(&["rev-parse", "--verify", "--quiet", spec.as_str()])
-            .map_err(|e| e.to_string())?;
+            .map_err(|e| BranchTestError(e.to_string()))?;
         if !output.status.success() {
             return Ok(None);
         }
@@ -137,24 +135,28 @@ mod tests {
         repo: &impl GitRepository,
         branch_name: &str,
         exists: bool,
-    ) -> Result<(), String> {
+    ) -> Result<(), BranchTestError> {
         if !exists {
             return Ok(());
         }
 
-        if repo.current_branch().map_err(|e| e.to_string())?.as_deref() == Some(branch_name) {
+        if repo.current_branch().map_err(|e| BranchTestError(e.to_string()))?.as_deref()
+            == Some(branch_name)
+        {
             return Ok(());
         }
 
-        let current_head = rev_parse_oid(repo, "HEAD")?
-            .ok_or_else(|| "cannot resolve current HEAD for activation preflight".to_owned())?;
-        let branch_head = rev_parse_oid(repo, branch_name)?
-            .ok_or_else(|| format!("cannot resolve existing branch '{branch_name}'"))?;
+        let current_head = rev_parse_oid(repo, "HEAD")?.ok_or_else(|| {
+            BranchTestError("cannot resolve current HEAD for activation preflight".to_owned())
+        })?;
+        let branch_head = rev_parse_oid(repo, branch_name)?.ok_or_else(|| {
+            BranchTestError(format!("cannot resolve existing branch '{branch_name}'"))
+        })?;
 
         if current_head != branch_head {
-            return Err(format!(
+            return Err(BranchTestError(format!(
                 "branch '{branch_name}' exists but does not point at the current HEAD; refuse to activate onto a stale/divergent branch"
-            ));
+            )));
         }
 
         Ok(())
@@ -164,7 +166,7 @@ mod tests {
         repo: &impl GitRepository,
         branch_name: &str,
         require_alignment: bool,
-    ) -> Result<bool, String> {
+    ) -> Result<bool, BranchTestError> {
         let exists = branch_exists(repo, branch_name)?;
         if require_alignment {
             reject_stale_or_divergent_branch(repo, branch_name, exists)?;
@@ -183,25 +185,30 @@ mod tests {
     pub(super) fn branch_create_execute(
         repo: &impl GitRepository,
         branch_name: &str,
-    ) -> Result<(), String> {
-        let current = repo.current_branch().map_err(|err| err.to_string())?;
+    ) -> Result<(), BranchTestError> {
+        let current = repo.current_branch().map_err(|err| BranchTestError(err.to_string()))?;
         if current.as_deref() != Some("main") {
-            return Err(format!(
+            return Err(BranchTestError(format!(
                 "branch create must start from 'main'; current branch is {}",
                 current.as_deref().unwrap_or("<detached>")
-            ));
+            )));
         }
 
         if branch_exists(repo, branch_name)? {
-            return Err(format!("branch '{branch_name}' already exists"));
+            return Err(BranchTestError(format!("branch '{branch_name}' already exists")));
         }
 
         for command in branch_create_git_commands(branch_name) {
             let args: Vec<&str> = command.iter().map(String::as_str).collect();
             match repo.status(&args) {
                 Ok(0) => {}
-                Ok(_) => return Err(format!("git {} failed", args.join(" "))),
-                Err(err) => return Err(format!("failed to run git {}: {err}", args.join(" "))),
+                Ok(_) => return Err(BranchTestError(format!("git {} failed", args.join(" ")))),
+                Err(err) => {
+                    return Err(BranchTestError(format!(
+                        "failed to run git {}: {err}",
+                        args.join(" ")
+                    )));
+                }
             }
         }
         Ok(())
@@ -300,7 +307,7 @@ mod tests {
     fn resolve_project_root_rejects_non_standard_layout() {
         assert!(matches!(
             resolve_project_root(Path::new("repo/custom-items")),
-            Err(err) if err.contains("track/items")
+            Err(err) if err.to_string().contains("track/items")
         ));
     }
 
@@ -381,7 +388,7 @@ mod tests {
             status_calls: Mutex::new(Vec::new()),
         };
 
-        let err = branch_create_execute(&repo, "track/demo").unwrap_err();
+        let err = branch_create_execute(&repo, "track/demo").unwrap_err().to_string();
         assert!(err.contains("must start from 'main'"));
         assert!(
             repo.status_calls.lock().unwrap().is_empty(),
@@ -405,7 +412,7 @@ mod tests {
             status_calls: Mutex::new(Vec::new()),
         };
 
-        let err = branch_create_execute(&repo, "track/demo").unwrap_err();
+        let err = branch_create_execute(&repo, "track/demo").unwrap_err().to_string();
         assert!(err.contains("already exists"));
         assert!(
             repo.status_calls.lock().unwrap().is_empty(),
@@ -448,7 +455,7 @@ mod tests {
             ]),
         };
 
-        let err = preflight_branch_operation(&repo, "track/demo", true).unwrap_err();
+        let err = preflight_branch_operation(&repo, "track/demo", true).unwrap_err().to_string();
 
         assert!(err.contains("stale/divergent"));
     }
@@ -548,7 +555,7 @@ mod tests {
             ]),
         };
 
-        let err = preflight_branch_operation(&repo, "track/demo", true).unwrap_err();
+        let err = preflight_branch_operation(&repo, "track/demo", true).unwrap_err().to_string();
 
         assert!(err.contains("stale/divergent"));
     }

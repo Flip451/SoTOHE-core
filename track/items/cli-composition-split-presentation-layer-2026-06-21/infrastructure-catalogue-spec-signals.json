@@ -1,11 +1,16 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "4416fe979a3b202d18ab4d3e8c1953878c9cf85dc65d267b1edda1c60ebae79f",
+  "catalogue_declaration_hash": "c072208a67fa296ab20e812e8f1e26a446806abfd09d601517669162a71a1df3",
   "signals": [
     {
       "type_name": "CodeFragmentExtractorAdapter",
       "signal": "blue",
-      "entry_hash": "72467b17a93234387cbc8c68a466d6eb0794b72cca95ea7d21ad55d5416edf82"
+      "entry_hash": "b95ec12c9132e206c8199f0667d1e5196a278287e95501429170b748232d1ce3"
+    },
+    {
+      "type_name": "DemoRunError",
+      "signal": "blue",
+      "entry_hash": "9eed65c2011bde24dbc69370ab7c2eb9a49d26450541aeb57434338d67dc4b9e"
     },
     {
       "type_name": "FsArchAdapter",
@@ -108,6 +113,11 @@
       "entry_hash": "ad737c4546c1e117b229c53dcc855c822d941334cba74b6597e3a63890e1301e"
     },
     {
+      "type_name": "PersistentIndexLockError",
+      "signal": "blue",
+      "entry_hash": "a5d34c02c2502b07d1da3678424fa26b0a84bafa6dee755535588934651dd179"
+    },
+    {
       "type_name": "RecordingDryAgent",
       "signal": "blue",
       "entry_hash": "b7218e695c2e257911eaec0d357374d8004bdc87aaacea42f73b59bc411b9b2e"
@@ -115,7 +125,32 @@
     {
       "type_name": "SystemSleepAdapter",
       "signal": "blue",
-      "entry_hash": "ce5d616e9b7e266b04f82b43dae6b515733088a2fe77ca6dcca62dc55e66c274"
+      "entry_hash": "04c8255edeea9411ae3e9cbe0e801f06ae85fd1c8d0a01e1c3a5f71a3116c81f"
+    },
+    {
+      "type_name": "TrackBranchError",
+      "signal": "blue",
+      "entry_hash": "552941c9114ae8d9daad42900eab6705ad42eb16fc231bfd2272476b50678432"
+    },
+    {
+      "type_name": "infrastructure::demo::run_example_demo",
+      "signal": "blue",
+      "entry_hash": "c9711e7b6c94c7dd8a05da85a6f715c5c515dcec4cfd75a64ea56a07824431bb"
+    },
+    {
+      "type_name": "infrastructure::git_cli::collect_track_branch_claims",
+      "signal": "blue",
+      "entry_hash": "92c0ffe22fa3b72405cdf02dca4e059a2a6e53f31b040e6e604e10c8fd1617a8"
+    },
+    {
+      "type_name": "infrastructure::git_cli::load_explicit_track_branch",
+      "signal": "blue",
+      "entry_hash": "d3ae00c84255fce11f37b88e8f939f08af28edde97ff7b25b4fea98225029768"
+    },
+    {
+      "type_name": "infrastructure::git_cli::load_explicit_track_branch_from_items_dir",
+      "signal": "blue",
+      "entry_hash": "4760ce1d38249ccb28025fb78e34d25e8baf08c49bbd7e646f04013f2717f878"
     }
   ]
 }

@@ -10,6 +10,7 @@
 
 use domain::semantic_dup::CodeFragment;
 use usecase::dry_check::CodeFragmentExtractorPort;
+use usecase::dry_check::fragment_pipeline::CodeFragmentExtractorError;
 
 use super::extractor::extract_code_fragments;
 
@@ -29,7 +30,11 @@ impl CodeFragmentExtractorAdapter {
 }
 
 impl CodeFragmentExtractorPort for CodeFragmentExtractorAdapter {
-    fn extract(&self, workspace_root: &std::path::Path) -> Result<Vec<CodeFragment>, String> {
-        extract_code_fragments(workspace_root).map_err(|e| e.to_string())
+    fn extract(
+        &self,
+        workspace_root: &std::path::Path,
+    ) -> Result<Vec<CodeFragment>, CodeFragmentExtractorError> {
+        extract_code_fragments(workspace_root)
+            .map_err(|e| CodeFragmentExtractorError::ExtractionFailed(e.to_string()))
     }
 }

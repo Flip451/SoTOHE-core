@@ -51,8 +51,7 @@ impl DomainCompositionRoot {
         use infrastructure::schema_export::RustdocSchemaExporter;
         use usecase::export_schema::ExportSchemaInteractor;
 
-        let workspace_root =
-            discover_workspace_root().map_err(crate::error::CompositionError::AdapterInit)?;
+        let workspace_root = discover_workspace_root()?;
         let exporter = Arc::new(RustdocSchemaExporter::new(workspace_root));
         let file_port = Arc::new(FsFileWriteAdapter::new());
         let service = Arc::new(ExportSchemaInteractor::new(exporter, file_port));
@@ -87,20 +86,21 @@ impl DomainCompositionRoot {
 // Private helpers
 // ---------------------------------------------------------------------------
 
-fn discover_workspace_root() -> Result<PathBuf, String> {
+fn discover_workspace_root() -> Result<PathBuf, CompositionError> {
     let output = std::process::Command::new("cargo")
         .args(["locate-project", "--workspace", "--message-format", "plain"])
         .output()
-        .map_err(|e| format!("cargo locate-project failed: {e}"))?;
+        .map_err(|e| CompositionError::AdapterInit(format!("cargo locate-project failed: {e}")))?;
 
     if !output.status.success() {
-        return Err("failed to locate workspace root via cargo".to_owned());
+        return Err(CompositionError::AdapterInit(
+            "failed to locate workspace root via cargo".to_owned(),
+        ));
     }
 
     let manifest = String::from_utf8_lossy(&output.stdout);
     let manifest_path = PathBuf::from(manifest.trim());
-    manifest_path
-        .parent()
-        .map(|p| p.to_owned())
-        .ok_or_else(|| "workspace manifest has no parent directory".to_owned())
+    manifest_path.parent().map(|p| p.to_owned()).ok_or_else(|| {
+        CompositionError::AdapterInit("workspace manifest has no parent directory".to_owned())
+    })
 }

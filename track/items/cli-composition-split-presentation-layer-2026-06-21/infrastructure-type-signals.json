@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-23T08:03:27Z",
-  "declaration_hash": "4416fe979a3b202d18ab4d3e8c1953878c9cf85dc65d267b1edda1c60ebae79f",
+  "generated_at": "2026-06-24T02:48:51Z",
+  "declaration_hash": "c072208a67fa296ab20e812e8f1e26a446806abfd09d601517669162a71a1df3",
   "signals": [
     {
       "type_name": "CodeFragmentExtractorAdapter",
@@ -12,6 +12,17 @@
         "CodeFragmentExtractorPort",
         "core::default::Default",
         "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "DemoRunError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
       ]
     },
     {
@@ -209,6 +220,17 @@
       ]
     },
     {
+      "type_name": "PersistentIndexLockError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
       "type_name": "RecordingDryAgent",
       "kind_tag": "secondary_adapter",
       "signal": "blue",
@@ -229,6 +251,41 @@
         "core::fmt::Debug",
         "core::marker::Copy"
       ]
+    },
+    {
+      "type_name": "TrackBranchError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "infrastructure::demo::run_example_demo",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::git_cli::collect_track_branch_claims",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::git_cli::load_explicit_track_branch",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::git_cli::load_explicit_track_branch_from_items_dir",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
     }
   ]
 }

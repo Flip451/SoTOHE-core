@@ -10,6 +10,7 @@ use std::sync::Arc;
 
 use usecase::commit_hash_persistence::CommitHashPersistenceError;
 use usecase::review_v2::aggregate_service::{ReviewRunFixInput, ReviewRunInput, ReviewService};
+use usecase::review_v2::review_aux::ReviewAuxError;
 use usecase::review_v2::{
     ReviewApprovalOutput, ReviewCheckApprovedError, ReviewRunLocalOutput, RunReviewError,
     RunReviewFixError, RunReviewFixOutput, RunReviewOutput,
@@ -189,7 +190,7 @@ impl ReviewService for ReviewServiceImpl {
         limit: u32,
         round_type: String,
         no_hint: bool,
-    ) -> Result<String, String> {
+    ) -> Result<String, ReviewAuxError> {
         let root = ReviewCompositionRoot::new();
         let effective_limit = if all { u32::MAX } else { limit };
         let input = super::ReviewResultsInput {
@@ -201,7 +202,9 @@ impl ReviewService for ReviewServiceImpl {
             round_type,
             no_hint,
         };
-        root.review_results(input).map(|o| o.stdout.unwrap_or_default()).map_err(|e| e.to_string())
+        root.review_results(input)
+            .map(|o| o.stdout.unwrap_or_default())
+            .map_err(|e| ReviewAuxError::Failed(e.to_string()))
     }
 
     fn classify(
@@ -209,7 +212,7 @@ impl ReviewService for ReviewServiceImpl {
         paths: Vec<String>,
         track_id: Option<String>,
         items_dir: PathBuf,
-    ) -> Result<Vec<(String, String)>, String> {
+    ) -> Result<Vec<(String, String)>, ReviewAuxError> {
         let root = ReviewCompositionRoot::new();
         root.review_classify(paths, track_id, items_dir)
             .map(|outcome| {
@@ -224,7 +227,7 @@ impl ReviewService for ReviewServiceImpl {
                     })
                     .collect()
             })
-            .map_err(|e| e.to_string())
+            .map_err(|e| ReviewAuxError::Failed(e.to_string()))
     }
 
     fn files(
@@ -232,14 +235,14 @@ impl ReviewService for ReviewServiceImpl {
         scope: String,
         track_id: Option<String>,
         items_dir: PathBuf,
-    ) -> Result<Vec<String>, String> {
+    ) -> Result<Vec<String>, ReviewAuxError> {
         let root = ReviewCompositionRoot::new();
         root.review_files(scope, track_id, items_dir)
             .map(|outcome| {
                 let stdout = outcome.stdout.unwrap_or_default();
                 stdout.lines().map(str::to_owned).collect()
             })
-            .map_err(|e| e.to_string())
+            .map_err(|e| ReviewAuxError::Failed(e.to_string()))
     }
 
     fn validate_scope(
@@ -247,11 +250,11 @@ impl ReviewService for ReviewServiceImpl {
         scope: String,
         track_id: Option<String>,
         items_dir: PathBuf,
-    ) -> Result<(), String> {
+    ) -> Result<(), ReviewAuxError> {
         let root = ReviewCompositionRoot::new();
         root.review_validate_scope(scope, track_id, items_dir)
             .map(|_| ())
-            .map_err(|e| e.to_string())
+            .map_err(|e| ReviewAuxError::Failed(e.to_string()))
     }
 
     fn get_briefing(
@@ -259,11 +262,11 @@ impl ReviewService for ReviewServiceImpl {
         scope: String,
         track_id: Option<String>,
         items_dir: PathBuf,
-    ) -> Result<Option<String>, String> {
+    ) -> Result<Option<String>, ReviewAuxError> {
         let root = ReviewCompositionRoot::new();
         root.review_get_briefing(scope, track_id, items_dir)
             .map(|outcome| outcome.stdout)
-            .map_err(|e| e.to_string())
+            .map_err(|e| ReviewAuxError::Failed(e.to_string()))
     }
 
     fn persist_commit_hash(

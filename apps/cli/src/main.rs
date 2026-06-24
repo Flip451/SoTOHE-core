@@ -333,8 +333,8 @@ fn execute_hook_with_telemetry(cmd: commands::hook::HookCommand) -> ExitCode {
             }
             ExitCode::from(outcome.exit_code)
         }
-        Err(msg) => {
-            eprintln!("{msg}");
+        Err(e) => {
+            eprintln!("{e}");
             // Fail-closed for hooks: internal error → block (exit 2).
             // Emit HookBlock so internal failures are visible in telemetry
             // (same as a deliberate block verdict from the dispatch logic).
@@ -735,22 +735,25 @@ mod tests {
     /// entrypoint and dispatch through `run_cli` to the report command.
     #[test]
     fn test_telemetry_report_dispatch_via_run_cli_succeeds_with_existing_track() {
+        let _guard = process_env_lock().lock().unwrap();
         let dir = TempDir::new().unwrap();
+        let root = dir.path();
         let track_id = "telemetry-route-track";
-        fs::create_dir_all(dir.path().join(track_id)).unwrap();
-        let items_dir = dir.path().to_str().unwrap();
+        seed_repo(root, &format!("track/{track_id}"));
+        fs::create_dir_all(root.join("track").join("items").join(track_id)).unwrap();
 
-        let cli = Cli::try_parse_from([
-            "sotp",
-            "telemetry",
-            "report",
-            track_id,
-            "--items-dir",
-            items_dir,
-        ])
-        .unwrap();
-
-        let exit = run_cli(cli, |_cmd| ExitCode::FAILURE);
+        let exit = run_in_dir(root, || {
+            let cli = Cli::try_parse_from([
+                "sotp",
+                "telemetry",
+                "report",
+                track_id,
+                "--items-dir",
+                "track/items",
+            ])
+            .unwrap();
+            run_cli(cli, |_cmd| ExitCode::FAILURE)
+        });
         assert_eq!(exit, ExitCode::SUCCESS);
     }
 

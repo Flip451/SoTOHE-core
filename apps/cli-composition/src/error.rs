@@ -1,7 +1,7 @@
 //! Typed error boundary for all `CliApp` public methods.
 //!
-//! `CompositionError` replaces the stringly-typed `Result<CommandOutcome, String>`
-//! boundary (ADR 2026-06-21-1328 D2 / spec AC-05). Every variant wraps a
+//! `CompositionError` replaces the stringly-typed `CommandOutcome` boundary
+//! (ADR 2026-06-21-1328 D2 / spec AC-05). Every variant wraps a
 //! human-readable `String` message so that callers can always convert to a plain
 //! string with `.to_string()` when needed (e.g. `CliError::Message` in apps/cli).
 

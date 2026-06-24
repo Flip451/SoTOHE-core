@@ -10,6 +10,9 @@ use thiserror::Error;
 pub enum ReviewWorkflowError {
     #[error("failed to serialize reviewer final payload: {0}")]
     Serialize(#[from] serde_json::Error),
+    /// The review payload failed semantic validation.
+    #[error("invalid review payload: {0}")]
+    Validation(String),
 }
 
 pub const REVIEW_OUTPUT_SCHEMA_JSON: &str = r##"{
@@ -127,7 +130,7 @@ pub fn parse_review_final_message(content: Option<&str>) -> ReviewFinalMessageSt
         Ok(()) => match serde_json::from_str::<ReviewFinalPayload>(content) {
             Ok(payload) => match validate_review_payload(payload) {
                 Ok(payload) => ReviewFinalMessageState::Parsed(payload),
-                Err(reason) => ReviewFinalMessageState::Invalid { reason },
+                Err(e) => ReviewFinalMessageState::Invalid { reason: e.to_string() },
             },
             Err(err) => ReviewFinalMessageState::Invalid {
                 reason: format!("expected review JSON object: {err}"),
@@ -210,41 +213,55 @@ pub fn render_review_payload(payload: &ReviewFinalPayload) -> Result<String, Rev
 
 pub(crate) fn validate_review_payload(
     payload: ReviewFinalPayload,
-) -> Result<ReviewFinalPayload, String> {
+) -> Result<ReviewFinalPayload, ReviewWorkflowError> {
     if payload.findings.iter().any(|finding| finding.message.trim().is_empty()) {
-        return Err("findings entries must include a non-empty `message`".to_owned());
+        return Err(ReviewWorkflowError::Validation(
+            "findings entries must include a non-empty `message`".to_owned(),
+        ));
     }
     if payload
         .findings
         .iter()
         .any(|finding| finding.severity.as_deref().is_some_and(|value| value.trim().is_empty()))
     {
-        return Err("findings entries must use `severity: null` or a non-empty string".to_owned());
+        return Err(ReviewWorkflowError::Validation(
+            "findings entries must use `severity: null` or a non-empty string".to_owned(),
+        ));
     }
     if payload
         .findings
         .iter()
         .any(|finding| finding.file.as_deref().is_some_and(|value| value.trim().is_empty()))
     {
-        return Err("findings entries must use `file: null` or a non-empty string".to_owned());
+        return Err(ReviewWorkflowError::Validation(
+            "findings entries must use `file: null` or a non-empty string".to_owned(),
+        ));
     }
     if payload.findings.iter().any(|finding| finding.line == Some(0)) {
-        return Err("findings entries must use `line: null` or a 1-based line number".to_owned());
+        return Err(ReviewWorkflowError::Validation(
+            "findings entries must use `line: null` or a 1-based line number".to_owned(),
+        ));
     }
     if payload
         .findings
         .iter()
         .any(|finding| finding.category.as_deref().is_some_and(|value| value.trim().is_empty()))
     {
-        return Err("findings entries must use `category: null` or a non-empty string".to_owned());
+        return Err(ReviewWorkflowError::Validation(
+            "findings entries must use `category: null` or a non-empty string".to_owned(),
+        ));
     }
 
     match payload.verdict {
         ReviewPayloadVerdict::ZeroFindings if !payload.findings.is_empty() => {
-            Err("`zero_findings` payload must use an empty `findings` array".to_owned())
+            Err(ReviewWorkflowError::Validation(
+                "`zero_findings` payload must use an empty `findings` array".to_owned(),
+            ))
         }
         ReviewPayloadVerdict::FindingsRemain if payload.findings.is_empty() => {
-            Err("`findings_remain` payload must include at least one finding".to_owned())
+            Err(ReviewWorkflowError::Validation(
+                "`findings_remain` payload must include at least one finding".to_owned(),
+            ))
         }
         _ => Ok(payload),
     }

@@ -120,6 +120,17 @@ subgraph usecase["usecase"]
   end
   subgraph usecase_usecase_module_dry_check["usecase::dry_check"]
     direction TB
+  subgraph T42_usecase_usecase_CodeFragmentExtractorError["dry_check::fragment_pipeline::CodeFragmentExtractorError"]
+    direction TB
+    T42_usecase_usecase_CodeFragmentExtractorError__self[CodeFragmentExtractorError]
+    T42_usecase_usecase_CodeFragmentExtractorError_ExtractionFailed[ExtractionFailed]
+  end
+  subgraph T35_usecase_usecase_DryCheckSharedError["dry_check::shared::DryCheckSharedError"]
+    direction TB
+    T35_usecase_usecase_DryCheckSharedError__self[DryCheckSharedError]
+    T35_usecase_usecase_DryCheckSharedError_InvalidContentHash[InvalidContentHash]
+    T35_usecase_usecase_DryCheckSharedError_InvalidSourcePath[InvalidSourcePath]
+  end
   subgraph T42_usecase_usecase_DryFragmentPipelineCommand["dry_check::fragment_pipeline::DryFragmentPipelineCommand"]
     direction TB
     T42_usecase_usecase_DryFragmentPipelineCommand__self[DryFragmentPipelineCommand]
@@ -158,6 +169,7 @@ subgraph usecase["usecase"]
     R42_usecase_usecase_DryFragmentPipelineService__self[DryFragmentPipelineService]
     R42_usecase_usecase_DryFragmentPipelineService_derive_current_refs([derive_current_refs])
   end
+  F59_usecase_usecase_usecase__dry_check__shared__fragment_ref_of[[fragment_ref_of]]
   end
   subgraph usecase_usecase_module_dry_driver["usecase::dry_driver"]
     direction TB
@@ -220,6 +232,16 @@ subgraph usecase["usecase"]
     T38_usecase_usecase_ExportSchemaInteractor__self[ExportSchemaInteractor]
     T38_usecase_usecase_ExportSchemaInteractor_new([new])
   end
+  subgraph T35_usecase_usecase_SchemaExporterError["export_schema::SchemaExporterError"]
+    direction TB
+    T35_usecase_usecase_SchemaExporterError__self[SchemaExporterError]
+    T35_usecase_usecase_SchemaExporterError_ExportFailed[ExportFailed]
+  end
+  subgraph R34_usecase_usecase_SchemaExporterPort["export_schema::SchemaExporterPort"]
+    direction TB
+    R34_usecase_usecase_SchemaExporterPort__self[SchemaExporterPort]
+    R34_usecase_usecase_SchemaExporterPort_export_as_json([export_as_json])
+  end
   end
   subgraph usecase_usecase_module_file["usecase::file"]
     direction TB
@@ -236,6 +258,16 @@ subgraph usecase["usecase"]
   end
   subgraph usecase_usecase_module_fixpoint_resolve["usecase::fixpoint_resolve"]
     direction TB
+  subgraph T37_usecase_usecase_DiffBaseResolverError["fixpoint_resolve::DiffBaseResolverError"]
+    direction TB
+    T37_usecase_usecase_DiffBaseResolverError__self[DiffBaseResolverError]
+    T37_usecase_usecase_DiffBaseResolverError_Unavailable[Unavailable]
+  end
+  subgraph T34_usecase_usecase_DryCorpusMetaError["fixpoint_resolve::DryCorpusMetaError"]
+    direction TB
+    T34_usecase_usecase_DryCorpusMetaError__self[DryCorpusMetaError]
+    T34_usecase_usecase_DryCorpusMetaError_Unavailable[Unavailable]
+  end
   subgraph T38_usecase_usecase_FixpointDryGateCommand["fixpoint_resolve::FixpointDryGateCommand"]
     direction TB
     T38_usecase_usecase_FixpointDryGateCommand__self[FixpointDryGateCommand]
@@ -312,6 +344,19 @@ subgraph usecase["usecase"]
     R34_usecase_usecase_GitWorkflowService_current_branch_track_id([current_branch_track_id])
   end
   end
+  subgraph usecase_usecase_module_guard["usecase::guard"]
+    direction TB
+  subgraph T32_usecase_usecase_ShellParserError["guard::ShellParserError"]
+    direction TB
+    T32_usecase_usecase_ShellParserError__self[ShellParserError]
+    T32_usecase_usecase_ShellParserError_ParseFailed[ParseFailed]
+  end
+  subgraph R31_usecase_usecase_ShellParserPort["guard::ShellParserPort"]
+    direction TB
+    R31_usecase_usecase_ShellParserPort__self[ShellParserPort]
+    R31_usecase_usecase_ShellParserPort_split_shell([split_shell])
+  end
+  end
   subgraph usecase_usecase_module_hook_dispatch["usecase::hook_dispatch"]
     direction TB
   subgraph T35_usecase_usecase_HookDispatchCommand["hook_dispatch::HookDispatchCommand"]
@@ -368,50 +413,60 @@ subgraph usecase["usecase"]
     R32_usecase_usecase_PrCommandService_review_cycle([review_cycle])
   end
   end
-  subgraph usecase_usecase_module_pr_review["usecase::pr_review"]
+  subgraph usecase_usecase_module_pr_review_polling["usecase::pr_review_polling"]
     direction TB
-  subgraph T38_usecase_usecase_PrReviewPollingCommand["pr_review::PrReviewPollingCommand"]
+  subgraph T28_usecase_usecase_PrGhApiError["pr_review_polling::PrGhApiError"]
+    direction TB
+    T28_usecase_usecase_PrGhApiError__self[PrGhApiError]
+    T28_usecase_usecase_PrGhApiError_ApiFailure[ApiFailure]
+  end
+  subgraph T30_usecase_usecase_PrRepoNwoError["pr_review_polling::PrRepoNwoError"]
+    direction TB
+    T30_usecase_usecase_PrRepoNwoError__self[PrRepoNwoError]
+    T30_usecase_usecase_PrRepoNwoError_Unavailable[Unavailable]
+  end
+  subgraph T38_usecase_usecase_PrReviewPollingCommand["pr_review_polling::PrReviewPollingCommand"]
     direction TB
     T38_usecase_usecase_PrReviewPollingCommand__self[PrReviewPollingCommand]
   end
-  subgraph T41_usecase_usecase_PrReviewPollingInteractor["pr_review::PrReviewPollingInteractor"]
+  subgraph T41_usecase_usecase_PrReviewPollingInteractor["pr_review_polling::PrReviewPollingInteractor"]
     direction TB
     T41_usecase_usecase_PrReviewPollingInteractor__self[PrReviewPollingInteractor]
     T41_usecase_usecase_PrReviewPollingInteractor_new([new])
   end
-  subgraph T37_usecase_usecase_PrReviewPollingOutput["pr_review::PrReviewPollingOutput"]
+  subgraph T37_usecase_usecase_PrReviewPollingOutput["pr_review_polling::PrReviewPollingOutput"]
     direction TB
     T37_usecase_usecase_PrReviewPollingOutput__self[PrReviewPollingOutput]
     T37_usecase_usecase_PrReviewPollingOutput_ReviewFound[ReviewFound]
     T37_usecase_usecase_PrReviewPollingOutput_ZeroFindings[ZeroFindings]
     T37_usecase_usecase_PrReviewPollingOutput_Timeout[Timeout]
   end
-  subgraph R39_usecase_usecase_PrListIssueCommentsPort["pr_review::PrListIssueCommentsPort"]
+  subgraph R39_usecase_usecase_PrListIssueCommentsPort["pr_review_polling::PrListIssueCommentsPort"]
     direction TB
     R39_usecase_usecase_PrListIssueCommentsPort__self[PrListIssueCommentsPort]
     R39_usecase_usecase_PrListIssueCommentsPort_list_issue_comments([list_issue_comments])
   end
-  subgraph R35_usecase_usecase_PrListReactionsPort["pr_review::PrListReactionsPort"]
+  subgraph R35_usecase_usecase_PrListReactionsPort["pr_review_polling::PrListReactionsPort"]
     direction TB
     R35_usecase_usecase_PrListReactionsPort__self[PrListReactionsPort]
     R35_usecase_usecase_PrListReactionsPort_list_reactions([list_reactions])
   end
-  subgraph R33_usecase_usecase_PrListReviewsPort["pr_review::PrListReviewsPort"]
+  subgraph R33_usecase_usecase_PrListReviewsPort["pr_review_polling::PrListReviewsPort"]
     direction TB
     R33_usecase_usecase_PrListReviewsPort__self[PrListReviewsPort]
     R33_usecase_usecase_PrListReviewsPort_list_reviews([list_reviews])
   end
-  subgraph R29_usecase_usecase_PrRepoNwoPort["pr_review::PrRepoNwoPort"]
+  subgraph R29_usecase_usecase_PrRepoNwoPort["pr_review_polling::PrRepoNwoPort"]
     direction TB
     R29_usecase_usecase_PrRepoNwoPort__self[PrRepoNwoPort]
     R29_usecase_usecase_PrRepoNwoPort_repo_nwo([repo_nwo])
   end
-  subgraph R38_usecase_usecase_PrReviewPollingService["pr_review::PrReviewPollingService"]
+  subgraph R38_usecase_usecase_PrReviewPollingService["pr_review_polling::PrReviewPollingService"]
     direction TB
     R38_usecase_usecase_PrReviewPollingService__self[PrReviewPollingService]
     R38_usecase_usecase_PrReviewPollingService_poll([poll])
   end
-  subgraph R25_usecase_usecase_SleepPort["pr_review::SleepPort"]
+  subgraph R25_usecase_usecase_SleepPort["pr_review_polling::SleepPort"]
     direction TB
     R25_usecase_usecase_SleepPort__self[SleepPort]
     R25_usecase_usecase_SleepPort_sleep([sleep])
@@ -479,6 +534,11 @@ subgraph usecase["usecase"]
   end
   subgraph usecase_usecase_module_review_v2["usecase::review_v2"]
     direction TB
+  subgraph T30_usecase_usecase_ReviewAuxError["review_v2::review_aux::ReviewAuxError"]
+    direction TB
+    T30_usecase_usecase_ReviewAuxError__self[ReviewAuxError]
+    T30_usecase_usecase_ReviewAuxError_Failed[Failed]
+  end
   subgraph T40_usecase_usecase_ReviewClassifyInteractor["review_v2::review_aux::ReviewClassifyInteractor"]
     direction TB
     T40_usecase_usecase_ReviewClassifyInteractor__self[ReviewClassifyInteractor]
@@ -494,6 +554,18 @@ subgraph usecase["usecase"]
   subgraph T39_usecase_usecase_ReviewResultsInteractor["review_v2::review_aux::ReviewResultsInteractor"]
     direction TB
     T39_usecase_usecase_ReviewResultsInteractor__self[ReviewResultsInteractor]
+  end
+  subgraph T31_usecase_usecase_ReviewRoundType["review_v2::run_review::ReviewRoundType"]
+    direction TB
+    T31_usecase_usecase_ReviewRoundType__self[ReviewRoundType]
+    T31_usecase_usecase_ReviewRoundType_Fast[Fast]
+    T31_usecase_usecase_ReviewRoundType_Final[Final]
+    T31_usecase_usecase_ReviewRoundType_parse([parse])
+  end
+  subgraph T36_usecase_usecase_ReviewRoundTypeError["review_v2::run_review::ReviewRoundTypeError"]
+    direction TB
+    T36_usecase_usecase_ReviewRoundTypeError__self[ReviewRoundTypeError]
+    T36_usecase_usecase_ReviewRoundTypeError_InvalidValue[InvalidValue]
   end
   subgraph T33_usecase_usecase_ReviewRunFixInput["review_v2::aggregate_service::ReviewRunFixInput"]
     direction TB
@@ -561,6 +633,15 @@ subgraph usecase["usecase"]
     R42_usecase_usecase_ReviewValidateScopeService_validate_scope([validate_scope])
   end
   end
+  subgraph usecase_usecase_module_review_workflow["usecase::review_workflow"]
+    direction TB
+  subgraph T35_usecase_usecase_ReviewWorkflowError["review_workflow::ReviewWorkflowError"]
+    direction TB
+    T35_usecase_usecase_ReviewWorkflowError__self[ReviewWorkflowError]
+    T35_usecase_usecase_ReviewWorkflowError_Serialize[Serialize]
+    T35_usecase_usecase_ReviewWorkflowError_Validation[Validation]
+  end
+  end
   subgraph usecase_usecase_module_semantic_dup["usecase::semantic_dup"]
     direction TB
   subgraph R33_usecase_usecase_SemanticIndexPort["semantic_dup::ports::SemanticIndexPort"]
@@ -617,6 +698,11 @@ subgraph usecase["usecase"]
   end
   subgraph usecase_usecase_module_signal_gate["usecase::signal_gate"]
     direction TB
+  subgraph T32_usecase_usecase_ChainRunnerError["signal_gate::ChainRunnerError"]
+    direction TB
+    T32_usecase_usecase_ChainRunnerError__self[ChainRunnerError]
+    T32_usecase_usecase_ChainRunnerError_ExecutionFailed[ExecutionFailed]
+  end
   subgraph T33_usecase_usecase_SignalChainOutput["signal_gate::SignalChainOutput"]
     direction TB
     T33_usecase_usecase_SignalChainOutput__self[SignalChainOutput]
@@ -782,6 +868,11 @@ subgraph usecase["usecase"]
     direction TB
     T37_usecase_usecase_TelemetryReportOutput__self[TelemetryReportOutput]
   end
+  subgraph T43_usecase_usecase_TelemetryReportServiceError["telemetry::TelemetryReportServiceError"]
+    direction TB
+    T43_usecase_usecase_TelemetryReportServiceError__self[TelemetryReportServiceError]
+    T43_usecase_usecase_TelemetryReportServiceError_Unavailable[Unavailable]
+  end
   subgraph R42_usecase_usecase_ArchivedTrackTelemetryPort["telemetry::ArchivedTrackTelemetryPort"]
     direction TB
     R42_usecase_usecase_ArchivedTrackTelemetryPort__self[ArchivedTrackTelemetryPort]
@@ -911,10 +1002,16 @@ subgraph infrastructure["infrastructure"]
   end
   subgraph infrastructure_infrastructure_module_demo["infrastructure::demo"]
     direction TB
+  subgraph T42_infrastructure_infrastructure_DemoRunError["demo::DemoRunError"]
+    direction TB
+    T42_infrastructure_infrastructure_DemoRunError__self[DemoRunError]
+    T42_infrastructure_infrastructure_DemoRunError_Unavailable[Unavailable]
+  end
   subgraph T43_infrastructure_infrastructure_FsDemoAdapter["demo::FsDemoAdapter"]
     direction TB
     T43_infrastructure_infrastructure_FsDemoAdapter__self[FsDemoAdapter]
   end
+  F68_infrastructure_infrastructure_infrastructure__demo__run_example_demo[[run_example_demo]]
   end
   subgraph infrastructure_infrastructure_module_dry_check["infrastructure::dry_check"]
     direction TB
@@ -949,6 +1046,15 @@ subgraph infrastructure["infrastructure"]
     direction TB
     T50_infrastructure_infrastructure_FsGitWorkflowAdapter__self[FsGitWorkflowAdapter]
   end
+  subgraph T46_infrastructure_infrastructure_TrackBranchError["git_cli::TrackBranchError"]
+    direction TB
+    T46_infrastructure_infrastructure_TrackBranchError__self[TrackBranchError]
+    T46_infrastructure_infrastructure_TrackBranchError_LoadFailed[LoadFailed]
+    T46_infrastructure_infrastructure_TrackBranchError_contains([contains])
+  end
+  F82_infrastructure_infrastructure_infrastructure__git_cli__collect_track_branch_claims[[collect_track_branch_claims]]
+  F81_infrastructure_infrastructure_infrastructure__git_cli__load_explicit_track_branch[[load_explicit_track_branch]]
+  F96_infrastructure_infrastructure_infrastructure__git_cli__load_explicit_track_branch_from_items_dir[[load_explicit_track_branch_from_items_dir]]
   end
   subgraph infrastructure_infrastructure_module_pr_review["infrastructure::pr_review"]
     direction TB
@@ -987,6 +1093,12 @@ subgraph infrastructure["infrastructure"]
     direction TB
     T50_infrastructure_infrastructure_NullInsertIndexProxy__self[NullInsertIndexProxy]
     T50_infrastructure_infrastructure_NullInsertIndexProxy_new([new])
+  end
+  subgraph T54_infrastructure_infrastructure_PersistentIndexLockError["semantic_dup::null_insert_proxy::PersistentIndexLockError"]
+    direction TB
+    T54_infrastructure_infrastructure_PersistentIndexLockError__self[PersistentIndexLockError]
+    T54_infrastructure_infrastructure_PersistentIndexLockError_LockFailed[LockFailed]
+    T54_infrastructure_infrastructure_PersistentIndexLockError_contains([contains])
   end
   end
   subgraph infrastructure_infrastructure_module_spec["infrastructure::spec"]
@@ -1053,9 +1165,11 @@ R34_usecase_usecase_ConventionsService_verify_index --> T33_usecase_usecase_Veri
 R24_usecase_usecase_DemoPort_run --> T29_usecase_usecase_DemoPortError__self
 R27_usecase_usecase_DemoService_run --> T29_usecase_usecase_DemoPortError__self
 T45_usecase_usecase_DryFragmentPipelineInteractor_new --> T45_usecase_usecase_DryFragmentPipelineInteractor__self
+R41_usecase_usecase_CodeFragmentExtractorPort_extract --> T42_usecase_usecase_CodeFragmentExtractorError__self
 R42_usecase_usecase_DryFragmentPipelineService_derive_current_refs --o T42_usecase_usecase_DryFragmentPipelineCommand__self
 R42_usecase_usecase_DryFragmentPipelineService_derive_current_refs --> T36_usecase_usecase_D4OrchestrationError__self
 R42_usecase_usecase_DryFragmentPipelineService_derive_current_refs --> T41_usecase_usecase_DryFragmentPipelineOutput__self
+F59_usecase_usecase_usecase__dry_check__shared__fragment_ref_of --> T35_usecase_usecase_DryCheckSharedError__self
 R29_usecase_usecase_DryDriverPort_dry_write --o T35_usecase_usecase_DryWriteDriverInput__self
 R29_usecase_usecase_DryDriverPort_dry_write --> T32_usecase_usecase_DryDriverOutcome__self
 R29_usecase_usecase_DryDriverPort_dry_results --o T37_usecase_usecase_DryResultsDriverInput__self
@@ -1074,8 +1188,11 @@ R32_usecase_usecase_DryDriverService_dry_fix_local --o T38_usecase_usecase_DryFi
 R32_usecase_usecase_DryDriverService_dry_fix_local --> T32_usecase_usecase_DryDriverOutcome__self
 T33_usecase_usecase_ExportSchemaError_FileWriteFailed --o T29_usecase_usecase_FilePortError__self
 T38_usecase_usecase_ExportSchemaInteractor_new --> T38_usecase_usecase_ExportSchemaInteractor__self
+R34_usecase_usecase_SchemaExporterPort_export_as_json --> T35_usecase_usecase_SchemaExporterError__self
 R29_usecase_usecase_FileWritePort_write_atomic --> T29_usecase_usecase_FilePortError__self
 T41_usecase_usecase_FixpointDryGateInteractor_new --> T41_usecase_usecase_FixpointDryGateInteractor__self
+R36_usecase_usecase_DiffBaseResolverPort_resolve_diff_base --> T37_usecase_usecase_DiffBaseResolverError__self
+R33_usecase_usecase_DryCorpusMetaPort_resolve_corpus_meta --> T34_usecase_usecase_DryCorpusMetaError__self
 R38_usecase_usecase_FixpointDryGateService_resolve_dry_gate --o T38_usecase_usecase_FixpointDryGateCommand__self
 R38_usecase_usecase_FixpointDryGateService_resolve_dry_gate --> T36_usecase_usecase_D4OrchestrationError__self
 R38_usecase_usecase_FixpointDryGateService_resolve_dry_gate --> T37_usecase_usecase_FixpointDryGateOutput__self
@@ -1086,6 +1203,7 @@ R34_usecase_usecase_GitWorkflowService_note_from_file --> T33_usecase_usecase_Gi
 R34_usecase_usecase_GitWorkflowService_switch_and_pull --> T33_usecase_usecase_GitWorkflowResult__self
 R34_usecase_usecase_GitWorkflowService_unstage --> T33_usecase_usecase_GitWorkflowResult__self
 R34_usecase_usecase_GitWorkflowService_current_branch_track_id --> T33_usecase_usecase_GitWorkflowResult__self
+R31_usecase_usecase_ShellParserPort_split_shell --> T32_usecase_usecase_ShellParserError__self
 T38_usecase_usecase_HookDispatchInteractor_new --> T38_usecase_usecase_HookDispatchInteractor__self
 T33_usecase_usecase_HookVerdictOutput__self --o|decision| T35_usecase_usecase_HookVerdictDecision__self
 R35_usecase_usecase_HookDispatchService_dispatch --o T35_usecase_usecase_HookDispatchCommand__self
@@ -1099,6 +1217,10 @@ R32_usecase_usecase_PrCommandService_trigger_review --> T31_usecase_usecase_PrCo
 R32_usecase_usecase_PrCommandService_poll_review --> T31_usecase_usecase_PrCommandOutput__self
 R32_usecase_usecase_PrCommandService_review_cycle --> T31_usecase_usecase_PrCommandOutput__self
 T41_usecase_usecase_PrReviewPollingInteractor_new --> T41_usecase_usecase_PrReviewPollingInteractor__self
+R39_usecase_usecase_PrListIssueCommentsPort_list_issue_comments --> T28_usecase_usecase_PrGhApiError__self
+R35_usecase_usecase_PrListReactionsPort_list_reactions --> T28_usecase_usecase_PrGhApiError__self
+R33_usecase_usecase_PrListReviewsPort_list_reviews --> T28_usecase_usecase_PrGhApiError__self
+R29_usecase_usecase_PrRepoNwoPort_repo_nwo --> T30_usecase_usecase_PrRepoNwoError__self
 R38_usecase_usecase_PrReviewPollingService_poll --o T38_usecase_usecase_PrReviewPollingCommand__self
 R38_usecase_usecase_PrReviewPollingService_poll --> T36_usecase_usecase_D4OrchestrationError__self
 R38_usecase_usecase_PrReviewPollingService_poll --> T37_usecase_usecase_PrReviewPollingOutput__self
@@ -1111,11 +1233,23 @@ R51_usecase_usecase_RefVerifyCheckApprovedDriverService_check_approved --> T36_u
 R45_usecase_usecase_RefVerifyCheckApprovedService_check_approved --> T36_usecase_usecase_CheckApprovedOutcome__self
 R35_usecase_usecase_RefVerifyRunService_run --> T36_usecase_usecase_RefVerifyDriverError__self
 R35_usecase_usecase_RefVerifyRunService_run --> T35_usecase_usecase_RefVerifyRunOutcome__self
+T31_usecase_usecase_ReviewRoundType_parse --> T36_usecase_usecase_ReviewRoundTypeError__self
+T31_usecase_usecase_ReviewRoundType_parse --> T31_usecase_usecase_ReviewRoundType__self
+R37_usecase_usecase_ReviewClassifyService_classify --> T30_usecase_usecase_ReviewAuxError__self
+R34_usecase_usecase_ReviewFilesService_files --> T30_usecase_usecase_ReviewAuxError__self
+R40_usecase_usecase_ReviewGetBriefingService_get_briefing --> T30_usecase_usecase_ReviewAuxError__self
+R36_usecase_usecase_ReviewResultsService_results --> T30_usecase_usecase_ReviewAuxError__self
 R37_usecase_usecase_ReviewRunLocalService_run_local --> T36_usecase_usecase_ReviewRunLocalOutput__self
 R29_usecase_usecase_ReviewService_run_codex --o T30_usecase_usecase_ReviewRunInput__self
 R29_usecase_usecase_ReviewService_run_claude --o T30_usecase_usecase_ReviewRunInput__self
 R29_usecase_usecase_ReviewService_run_local --> T36_usecase_usecase_ReviewRunLocalOutput__self
 R29_usecase_usecase_ReviewService_run_fix_local --o T33_usecase_usecase_ReviewRunFixInput__self
+R29_usecase_usecase_ReviewService_results --> T30_usecase_usecase_ReviewAuxError__self
+R29_usecase_usecase_ReviewService_classify --> T30_usecase_usecase_ReviewAuxError__self
+R29_usecase_usecase_ReviewService_files --> T30_usecase_usecase_ReviewAuxError__self
+R29_usecase_usecase_ReviewService_validate_scope --> T30_usecase_usecase_ReviewAuxError__self
+R29_usecase_usecase_ReviewService_get_briefing --> T30_usecase_usecase_ReviewAuxError__self
+R42_usecase_usecase_ReviewValidateScopeService_validate_scope --> T30_usecase_usecase_ReviewAuxError__self
 R37_usecase_usecase_SemanticDupDriverPort_find_similar --o T38_usecase_usecase_FindSimilarDriverInput__self
 R37_usecase_usecase_SemanticDupDriverPort_find_similar --> T40_usecase_usecase_SemanticDupDriverOutcome__self
 R37_usecase_usecase_SemanticDupDriverPort_index_build --o T37_usecase_usecase_IndexBuildDriverInput__self
@@ -1134,12 +1268,16 @@ R40_usecase_usecase_SemanticDupDriverService_dup_check --o T35_usecase_usecase_D
 R40_usecase_usecase_SemanticDupDriverService_dup_check --> T40_usecase_usecase_SemanticDupDriverOutcome__self
 T36_usecase_usecase_SignalGateInteractor_new --> T36_usecase_usecase_SignalGateInteractor__self
 T32_usecase_usecase_SignalGateOutput__self --o|chain_outputs| T33_usecase_usecase_SignalChainOutput__self
+R34_usecase_usecase_AdrChainRunnerPort_run_adr_chain --> T32_usecase_usecase_ChainRunnerError__self
 R34_usecase_usecase_AdrChainRunnerPort_run_adr_chain --> T33_usecase_usecase_SignalChainOutput__self
+R36_usecase_usecase_LayerChainRunnerPort_run_catalog_spec_chain --> T32_usecase_usecase_ChainRunnerError__self
 R36_usecase_usecase_LayerChainRunnerPort_run_catalog_spec_chain --> T33_usecase_usecase_SignalChainOutput__self
+R36_usecase_usecase_LayerChainRunnerPort_run_impl_catalog_chain --> T32_usecase_usecase_ChainRunnerError__self
 R36_usecase_usecase_LayerChainRunnerPort_run_impl_catalog_chain --> T33_usecase_usecase_SignalChainOutput__self
 R33_usecase_usecase_SignalGateService_run_gate --o T33_usecase_usecase_SignalGateCommand__self
 R33_usecase_usecase_SignalGateService_run_gate --> T31_usecase_usecase_SignalGateError__self
 R33_usecase_usecase_SignalGateService_run_gate --> T32_usecase_usecase_SignalGateOutput__self
+R38_usecase_usecase_SpecAdrChainRunnerPort_run_spec_adr_chain --> T32_usecase_usecase_ChainRunnerError__self
 R38_usecase_usecase_SpecAdrChainRunnerPort_run_spec_adr_chain --> T33_usecase_usecase_SignalChainOutput__self
 R29_usecase_usecase_SignalService_calc_adr_user --> T35_usecase_usecase_SignalCommandOutput__self
 R29_usecase_usecase_SignalService_check_adr_user --o T30_usecase_usecase_SignalGateName__self
@@ -1173,6 +1311,7 @@ R41_usecase_usecase_TelemetryAggregateService_emit_archived --> T46_usecase_usec
 R40_usecase_usecase_TelemetryEmitDynamicPort_emit_archived --> T45_usecase_usecase_TelemetryEmitDynamicPortError__self
 R35_usecase_usecase_TelemetryReportPort_aggregate --> T36_usecase_usecase_TelemetryReportError__self
 R35_usecase_usecase_TelemetryReportPort_aggregate --> T37_usecase_usecase_TelemetryReportOutput__self
+R38_usecase_usecase_TelemetryReportService_report --> T43_usecase_usecase_TelemetryReportServiceError__self
 F49_usecase_usecase_usecase__telemetry__format_report --o T37_usecase_usecase_TelemetryReportOutput__self
 R28_usecase_usecase_TrackService_init --> T34_usecase_usecase_TrackCommandOutput__self
 R28_usecase_usecase_TrackService_transition --> T34_usecase_usecase_TrackCommandOutput__self
@@ -1233,7 +1372,11 @@ T32_usecase_usecase_VerifyInteractor__self -.impl.-> R29_usecase_usecase_VerifyS
 T41_usecase_usecase_TelemetryReportInteractor__self -.impl.-> R38_usecase_usecase_TelemetryReportService__self
 T44_usecase_usecase_TelemetryAggregateInteractor__self -.impl.-> R41_usecase_usecase_TelemetryAggregateService__self
 T38_usecase_usecase_HookDispatchInteractor__self -.impl.-> R35_usecase_usecase_HookDispatchService__self
+F68_infrastructure_infrastructure_infrastructure__demo__run_example_demo --> T42_infrastructure_infrastructure_DemoRunError__self
 T47_infrastructure_infrastructure_RecordingDryAgent_new --> T47_infrastructure_infrastructure_RecordingDryAgent__self
+F82_infrastructure_infrastructure_infrastructure__git_cli__collect_track_branch_claims --> T46_infrastructure_infrastructure_TrackBranchError__self
+F81_infrastructure_infrastructure_infrastructure__git_cli__load_explicit_track_branch --> T46_infrastructure_infrastructure_TrackBranchError__self
+F96_infrastructure_infrastructure_infrastructure__git_cli__load_explicit_track_branch_from_items_dir --> T46_infrastructure_infrastructure_TrackBranchError__self
 T58_infrastructure_infrastructure_CodeFragmentExtractorAdapter_new --> T58_infrastructure_infrastructure_CodeFragmentExtractorAdapter__self
 T50_infrastructure_infrastructure_NullInsertIndexProxy_new --> T50_infrastructure_infrastructure_NullInsertIndexProxy__self
 T53_infrastructure_infrastructure_FsSpecFileWriterAdapter_new --> T53_infrastructure_infrastructure_FsSpecFileWriterAdapter__self
@@ -1299,6 +1442,11 @@ class R24_usecase_usecase_DemoPort_run method_node
 class R24_usecase_usecase_DemoPort__self secondary_port
 class R27_usecase_usecase_DemoService_run method_node
 class R27_usecase_usecase_DemoService__self app_service
+class T42_usecase_usecase_CodeFragmentExtractorError_ExtractionFailed variant_node
+class T42_usecase_usecase_CodeFragmentExtractorError__self error_type
+class T35_usecase_usecase_DryCheckSharedError_InvalidContentHash variant_node
+class T35_usecase_usecase_DryCheckSharedError_InvalidSourcePath variant_node
+class T35_usecase_usecase_DryCheckSharedError__self error_type
 class T42_usecase_usecase_DryFragmentPipelineCommand__self command
 class T45_usecase_usecase_DryFragmentPipelineInteractor_new method_node
 class T45_usecase_usecase_DryFragmentPipelineInteractor__self interactor
@@ -1313,6 +1461,8 @@ class R34_usecase_usecase_DryCheckDiffSource_list_changed_hunks method_node
 class R34_usecase_usecase_DryCheckDiffSource__self secondary_port
 class R42_usecase_usecase_DryFragmentPipelineService_derive_current_refs method_node
 class R42_usecase_usecase_DryFragmentPipelineService__self app_service
+class F59_usecase_usecase_usecase__dry_check__shared__fragment_ref_of free_function
+class F59_usecase_usecase_usecase__dry_check__shared__fragment_ref_of function_node
 class T43_usecase_usecase_DryCheckApprovedDriverInput__self dto
 class T35_usecase_usecase_DryDriverInteractor__self interactor
 class T32_usecase_usecase_DryDriverOutcome__self dto
@@ -1336,10 +1486,18 @@ class T33_usecase_usecase_ExportSchemaError_FileWriteFailed variant_node
 class T33_usecase_usecase_ExportSchemaError__self error_type
 class T38_usecase_usecase_ExportSchemaInteractor_new method_node
 class T38_usecase_usecase_ExportSchemaInteractor__self interactor
+class T35_usecase_usecase_SchemaExporterError_ExportFailed variant_node
+class T35_usecase_usecase_SchemaExporterError__self error_type
+class R34_usecase_usecase_SchemaExporterPort_export_as_json method_node
+class R34_usecase_usecase_SchemaExporterPort__self secondary_port
 class T29_usecase_usecase_FilePortError_Unavailable variant_node
 class T29_usecase_usecase_FilePortError__self error_type
 class R29_usecase_usecase_FileWritePort_write_atomic method_node
 class R29_usecase_usecase_FileWritePort__self secondary_port
+class T37_usecase_usecase_DiffBaseResolverError_Unavailable variant_node
+class T37_usecase_usecase_DiffBaseResolverError__self error_type
+class T34_usecase_usecase_DryCorpusMetaError_Unavailable variant_node
+class T34_usecase_usecase_DryCorpusMetaError__self error_type
 class T38_usecase_usecase_FixpointDryGateCommand__self command
 class T41_usecase_usecase_FixpointDryGateInteractor_new method_node
 class T41_usecase_usecase_FixpointDryGateInteractor__self interactor
@@ -1373,6 +1531,10 @@ class R34_usecase_usecase_GitWorkflowService_switch_and_pull method_node
 class R34_usecase_usecase_GitWorkflowService_unstage method_node
 class R34_usecase_usecase_GitWorkflowService_current_branch_track_id method_node
 class R34_usecase_usecase_GitWorkflowService__self secondary_port
+class T32_usecase_usecase_ShellParserError_ParseFailed variant_node
+class T32_usecase_usecase_ShellParserError__self error_type
+class R31_usecase_usecase_ShellParserPort_split_shell method_node
+class R31_usecase_usecase_ShellParserPort__self secondary_port
 class T35_usecase_usecase_HookDispatchCommand__self command
 class T33_usecase_usecase_HookDispatchError_UnknownHookName variant_node
 class T33_usecase_usecase_HookDispatchError_HandlerFailed variant_node
@@ -1396,6 +1558,10 @@ class R32_usecase_usecase_PrCommandService_trigger_review method_node
 class R32_usecase_usecase_PrCommandService_poll_review method_node
 class R32_usecase_usecase_PrCommandService_review_cycle method_node
 class R32_usecase_usecase_PrCommandService__self app_service
+class T28_usecase_usecase_PrGhApiError_ApiFailure variant_node
+class T28_usecase_usecase_PrGhApiError__self error_type
+class T30_usecase_usecase_PrRepoNwoError_Unavailable variant_node
+class T30_usecase_usecase_PrRepoNwoError__self error_type
 class T38_usecase_usecase_PrReviewPollingCommand__self command
 class T41_usecase_usecase_PrReviewPollingInteractor_new method_node
 class T41_usecase_usecase_PrReviewPollingInteractor__self interactor
@@ -1442,10 +1608,18 @@ class R45_usecase_usecase_RefVerifyCheckApprovedService_check_approved method_no
 class R45_usecase_usecase_RefVerifyCheckApprovedService__self app_service
 class R35_usecase_usecase_RefVerifyRunService_run method_node
 class R35_usecase_usecase_RefVerifyRunService__self secondary_port
+class T30_usecase_usecase_ReviewAuxError_Failed variant_node
+class T30_usecase_usecase_ReviewAuxError__self error_type
 class T40_usecase_usecase_ReviewClassifyInteractor__self interactor
 class T37_usecase_usecase_ReviewFilesInteractor__self interactor
 class T43_usecase_usecase_ReviewGetBriefingInteractor__self interactor
 class T39_usecase_usecase_ReviewResultsInteractor__self interactor
+class T31_usecase_usecase_ReviewRoundType_Fast variant_node
+class T31_usecase_usecase_ReviewRoundType_Final variant_node
+class T31_usecase_usecase_ReviewRoundType_parse method_node
+class T31_usecase_usecase_ReviewRoundType__self value_object
+class T36_usecase_usecase_ReviewRoundTypeError_InvalidValue variant_node
+class T36_usecase_usecase_ReviewRoundTypeError__self error_type
 class T33_usecase_usecase_ReviewRunFixInput__self dto
 class T30_usecase_usecase_ReviewRunInput__self dto
 class T40_usecase_usecase_ReviewRunLocalInteractor__self interactor
@@ -1475,6 +1649,9 @@ class R29_usecase_usecase_ReviewService_persist_commit_hash method_node
 class R29_usecase_usecase_ReviewService__self app_service
 class R42_usecase_usecase_ReviewValidateScopeService_validate_scope method_node
 class R42_usecase_usecase_ReviewValidateScopeService__self app_service
+class T35_usecase_usecase_ReviewWorkflowError_Serialize variant_node
+class T35_usecase_usecase_ReviewWorkflowError_Validation variant_node
+class T35_usecase_usecase_ReviewWorkflowError__self error_type
 class R33_usecase_usecase_SemanticIndexPort_insert method_node
 class R33_usecase_usecase_SemanticIndexPort_insert_batch method_node
 class R33_usecase_usecase_SemanticIndexPort_delete_by_source_path method_node
@@ -1496,6 +1673,8 @@ class R40_usecase_usecase_SemanticDupDriverService_index_build method_node
 class R40_usecase_usecase_SemanticDupDriverService_index_measure_quality method_node
 class R40_usecase_usecase_SemanticDupDriverService_dup_check method_node
 class R40_usecase_usecase_SemanticDupDriverService__self app_service
+class T32_usecase_usecase_ChainRunnerError_ExecutionFailed variant_node
+class T32_usecase_usecase_ChainRunnerError__self error_type
 class T33_usecase_usecase_SignalChainOutput__self dto
 class T33_usecase_usecase_SignalGateCommand__self command
 class T31_usecase_usecase_SignalGateError_ChainExecutionFailed variant_node
@@ -1562,6 +1741,8 @@ class T36_usecase_usecase_TelemetryReportError_ReportUnavailable variant_node
 class T36_usecase_usecase_TelemetryReportError__self error_type
 class T41_usecase_usecase_TelemetryReportInteractor__self interactor
 class T37_usecase_usecase_TelemetryReportOutput__self dto
+class T43_usecase_usecase_TelemetryReportServiceError_Unavailable variant_node
+class T43_usecase_usecase_TelemetryReportServiceError__self error_type
 class R42_usecase_usecase_ArchivedTrackTelemetryPort_emit method_node
 class R42_usecase_usecase_ArchivedTrackTelemetryPort__self secondary_port
 class R45_usecase_usecase_ArchivedTrackTelemetryService_emit method_node
@@ -1623,7 +1804,11 @@ class R29_usecase_usecase_VerifyService_verify_catalogue_spec_refs method_node
 class R29_usecase_usecase_VerifyService__self app_service
 class T43_infrastructure_infrastructure_FsArchAdapter__self secondary_adapter
 class T50_infrastructure_infrastructure_FsConventionsAdapter__self secondary_adapter
+class T42_infrastructure_infrastructure_DemoRunError_Unavailable variant_node
+class T42_infrastructure_infrastructure_DemoRunError__self error_type
 class T43_infrastructure_infrastructure_FsDemoAdapter__self secondary_adapter
+class F68_infrastructure_infrastructure_infrastructure__demo__run_example_demo free_function
+class F68_infrastructure_infrastructure_infrastructure__demo__run_example_demo function_node
 class T52_infrastructure_infrastructure_FsDryCorpusMetaAdapter__self secondary_adapter
 class T51_infrastructure_infrastructure_GitDryCheckDiffGetter__self secondary_adapter
 class T52_infrastructure_infrastructure_NoOpDryApprovalService__self secondary_adapter
@@ -1631,6 +1816,15 @@ class T47_infrastructure_infrastructure_RecordingDryAgent_new method_node
 class T47_infrastructure_infrastructure_RecordingDryAgent__self secondary_adapter
 class T48_infrastructure_infrastructure_FsFileWriteAdapter__self secondary_adapter
 class T50_infrastructure_infrastructure_FsGitWorkflowAdapter__self secondary_adapter
+class T46_infrastructure_infrastructure_TrackBranchError_LoadFailed variant_node
+class T46_infrastructure_infrastructure_TrackBranchError_contains method_node
+class T46_infrastructure_infrastructure_TrackBranchError__self error_type
+class F82_infrastructure_infrastructure_infrastructure__git_cli__collect_track_branch_claims free_function
+class F82_infrastructure_infrastructure_infrastructure__git_cli__collect_track_branch_claims function_node
+class F81_infrastructure_infrastructure_infrastructure__git_cli__load_explicit_track_branch free_function
+class F81_infrastructure_infrastructure_infrastructure__git_cli__load_explicit_track_branch function_node
+class F96_infrastructure_infrastructure_infrastructure__git_cli__load_explicit_track_branch_from_items_dir free_function
+class F96_infrastructure_infrastructure_infrastructure__git_cli__load_explicit_track_branch_from_items_dir function_node
 class T48_infrastructure_infrastructure_SystemSleepAdapter__self secondary_adapter
 class T57_infrastructure_infrastructure_FsRefVerifyAggregateAdapter__self secondary_adapter
 class T61_infrastructure_infrastructure_FsRefVerifyCheckApprovedAdapter__self secondary_adapter
@@ -1640,6 +1834,9 @@ class T58_infrastructure_infrastructure_CodeFragmentExtractorAdapter__self secon
 class T51_infrastructure_infrastructure_NoopSemanticIndexPort__self secondary_adapter
 class T50_infrastructure_infrastructure_NullInsertIndexProxy_new method_node
 class T50_infrastructure_infrastructure_NullInsertIndexProxy__self secondary_adapter
+class T54_infrastructure_infrastructure_PersistentIndexLockError_LockFailed variant_node
+class T54_infrastructure_infrastructure_PersistentIndexLockError_contains method_node
+class T54_infrastructure_infrastructure_PersistentIndexLockError__self error_type
 class T53_infrastructure_infrastructure_FsSpecFileWriterAdapter_new method_node
 class T53_infrastructure_infrastructure_FsSpecFileWriterAdapter__self secondary_adapter
 class T61_infrastructure_infrastructure_FsArchivedTrackTelemetryAdapter_new method_node

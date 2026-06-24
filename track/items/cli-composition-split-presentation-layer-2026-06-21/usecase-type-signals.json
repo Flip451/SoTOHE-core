@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-23T08:03:24Z",
-  "declaration_hash": "ad424f87c3e9356e320083d283c8c91b4eb6dd89ec30dbd72122ae0d35e6da5b",
+  "generated_at": "2026-06-24T02:48:48Z",
+  "declaration_hash": "07beceaf46078d43f83cfafeac2bac7cadcd8bc9bec4479876becc74dc2edcc0",
   "signals": [
     {
       "type_name": "AdrChainRunnerPort",
@@ -80,6 +80,18 @@
       "found_type": true
     },
     {
+      "type_name": "ChainRunnerError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
       "type_name": "CheckApprovedOutcome",
       "kind_tag": "enum",
       "signal": "blue",
@@ -89,6 +101,17 @@
         "core::cmp::Eq",
         "core::cmp::PartialEq",
         "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "CodeFragmentExtractorError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
       ]
     },
     {
@@ -174,6 +197,18 @@
       "found_type": true
     },
     {
+      "type_name": "DiffBaseResolverError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
       "type_name": "DiffBaseResolverPort",
       "kind_tag": "secondary_port",
       "signal": "blue",
@@ -200,6 +235,29 @@
       "kind_tag": "secondary_port",
       "signal": "blue",
       "found_type": true
+    },
+    {
+      "type_name": "DryCheckSharedError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "DryCorpusMetaError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
     },
     {
       "type_name": "DryCorpusMetaPort",
@@ -543,6 +601,17 @@
       "found_type": true
     },
     {
+      "type_name": "PrGhApiError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
       "type_name": "PrListIssueCommentsPort",
       "kind_tag": "secondary_port",
       "signal": "blue",
@@ -559,6 +628,17 @@
       "kind_tag": "secondary_port",
       "signal": "blue",
       "found_type": true
+    },
+    {
+      "type_name": "PrRepoNwoError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
     },
     {
       "type_name": "PrRepoNwoPort",
@@ -679,6 +759,17 @@
       "found_type": true
     },
     {
+      "type_name": "ReviewAuxError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
       "type_name": "ReviewClassifyInteractor",
       "kind_tag": "interactor",
       "signal": "yellow",
@@ -739,6 +830,30 @@
       "found_type": true
     },
     {
+      "type_name": "ReviewRoundType",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "ReviewRoundTypeError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display",
+        "core::ops::deref::Deref"
+      ]
+    },
+    {
       "type_name": "ReviewRunFixInput",
       "kind_tag": "dto",
       "signal": "blue",
@@ -793,6 +908,35 @@
       "found_type": true
     },
     {
+      "type_name": "ReviewWorkflowError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::convert::From<Error>",
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "SchemaExporterError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "SchemaExporterPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
       "type_name": "SemanticDupDriverInteractor",
       "kind_tag": "interactor",
       "signal": "yellow",
@@ -820,6 +964,23 @@
     {
       "type_name": "SemanticDupDriverService",
       "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ShellParserError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "ShellParserPort",
+      "kind_tag": "secondary_port",
       "signal": "blue",
       "found_type": true
     },
@@ -1088,6 +1249,17 @@
       "found_type": true
     },
     {
+      "type_name": "TelemetryReportServiceError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
       "type_name": "TrackCommandOutput",
       "kind_tag": "dto",
       "signal": "yellow",
@@ -1146,6 +1318,12 @@
       "kind_tag": "application_service",
       "signal": "yellow",
       "found_type": false
+    },
+    {
+      "type_name": "usecase::dry_check::shared::fragment_ref_of",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "usecase::telemetry::format_report",

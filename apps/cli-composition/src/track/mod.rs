@@ -17,11 +17,13 @@ use std::sync::Arc;
 ///
 /// This is the single slug validator for the `cli_composition` crate; all internal
 /// callers route through here so the rule lives in exactly one place (`domain::TrackId`).
-pub(crate) fn validate_track_id_str(value: &str) -> Result<(), String> {
-    domain::TrackId::try_new(value).map(|_| ()).map_err(|e| e.to_string())
+pub(crate) fn validate_track_id_str(value: &str) -> Result<(), CompositionError> {
+    domain::TrackId::try_new(value)
+        .map(|_| ())
+        .map_err(|e| CompositionError::WiringFailed(e.to_string()))
 }
 /// Resolves `<project-root>/track/items` → `<project-root>`.
-pub(crate) fn resolve_project_root(items_dir: &Path) -> Result<PathBuf, String> {
+pub(crate) fn resolve_project_root(items_dir: &Path) -> Result<PathBuf, CompositionError> {
     let items_name = items_dir.file_name().and_then(|n| n.to_str());
     let track_dir = items_dir.parent();
     let track_name = track_dir.and_then(Path::file_name).and_then(|n| n.to_str());
@@ -34,17 +36,17 @@ pub(crate) fn resolve_project_root(items_dir: &Path) -> Result<PathBuf, String> 
                 Ok(root.to_path_buf())
             }
         }
-        _ => Err(format!(
+        _ => Err(CompositionError::WiringFailed(format!(
             "--items-dir must point to '<project-root>/track/items'; got {}",
             items_dir.display()
-        )),
+        ))),
     }
 }
 /// Resolve track ID for READ (explicit overrides discovery).
 pub(crate) fn resolve_track_id(
     explicit_id: Option<String>,
     items_dir: &Path,
-) -> Result<String, String> {
+) -> Result<String, CompositionError> {
     if let Some(id) = explicit_id {
         return Ok(id);
     }
@@ -55,14 +57,14 @@ pub(crate) fn resolve_track_id(
 pub(crate) fn resolve_track_id_from_root(
     explicit_id: Option<String>,
     workspace_root: &Path,
-) -> Result<String, String> {
+) -> Result<String, CompositionError> {
     resolve_track_id_inner(explicit_id, workspace_root, false)
 }
 /// Resolve track ID for WRITE (branch always read, explicit must match).
 fn resolve_track_id_for_write(
     explicit_id: Option<String>,
     items_dir: &Path,
-) -> Result<String, String> {
+) -> Result<String, CompositionError> {
     let project_root = resolve_project_root(items_dir)?;
     resolve_track_id_inner(explicit_id, &project_root, true)
 }
@@ -70,7 +72,7 @@ fn resolve_track_id_inner(
     explicit_id: Option<String>,
     anchor: &Path,
     write_mode: bool,
-) -> Result<String, String> {
+) -> Result<String, CompositionError> {
     use usecase::track_resolution::{ActiveTrackResolveInteractor, ActiveTrackResolveService as _};
     if !write_mode {
         if let Some(id) = explicit_id {
@@ -83,23 +85,31 @@ fn resolve_track_id_inner(
             validate_track_id_str(id)?;
             let repo =
                 infrastructure::git_cli::SystemGitRepo::discover_from(anchor).map_err(|e| {
-                    format!(
+                    CompositionError::AdapterInit(format!(
                         "cannot discover git repository from {}: {e} \
                          (write operations require a git repository)",
                         anchor.display()
-                    )
+                    ))
                 })?;
             let interactor = ActiveTrackResolveInteractor::new(Arc::new(repo));
-            return interactor.resolve_for_write(explicit_id).map_err(|e| e.to_string());
+            return interactor
+                .resolve_for_write(explicit_id)
+                .map_err(|e| CompositionError::AdapterInit(e.to_string()));
         }
     }
-    let repo = infrastructure::git_cli::SystemGitRepo::discover_from(anchor)
-        .map_err(|e| format!("cannot discover git repository from {}: {e}", anchor.display()))?;
+    let repo = infrastructure::git_cli::SystemGitRepo::discover_from(anchor).map_err(|e| {
+        CompositionError::AdapterInit(format!(
+            "cannot discover git repository from {}: {e}",
+            anchor.display()
+        ))
+    })?;
     let interactor = ActiveTrackResolveInteractor::new(Arc::new(repo));
     if write_mode {
-        interactor.resolve_for_write(explicit_id).map_err(|e| e.to_string())
+        interactor
+            .resolve_for_write(explicit_id)
+            .map_err(|e| CompositionError::AdapterInit(e.to_string()))
     } else {
-        interactor.resolve_for_read(None).map_err(|e| e.to_string())
+        interactor.resolve_for_read(None).map_err(|e| CompositionError::AdapterInit(e.to_string()))
     }
 }
 fn build_branch_reader(
@@ -134,53 +144,70 @@ fn run_git_mv(
     repo_root: &Path,
     src: &Path,
     dst: &Path,
-) -> Result<(), String> {
+) -> Result<(), CompositionError> {
     let src_arg = repo_relative_arg(repo_root, src);
     let dst_arg = repo_relative_arg(repo_root, dst);
     let output = repo
         .output(&["mv", &src_arg, &dst_arg])
-        .map_err(|e| format!("failed to run git mv: {e}"))?;
+        .map_err(|e| CompositionError::Infrastructure(format!("failed to run git mv: {e}")))?;
     if output.status.success() {
         return Ok(());
     }
     let stderr = String::from_utf8_lossy(&output.stderr).trim().to_owned();
     let code = output.status.code().unwrap_or(-1);
-    Err(format!("git mv failed (exit {code}): {stderr}"))
+    Err(CompositionError::Infrastructure(format!("git mv failed (exit {code}): {stderr}")))
 }
 fn rollback_archive_contents_after_logs_error(
     repo: &impl GitRepository,
     repo_root: &Path,
     src_dir: &Path,
     dst_dir: &Path,
-) -> Result<(), String> {
+) -> Result<(), CompositionError> {
     if !dst_dir.exists() {
         return Ok(());
     }
-    std::fs::create_dir_all(src_dir)
-        .map_err(|e| format!("failed to recreate source directory {}: {e}", src_dir.display()))?;
+    std::fs::create_dir_all(src_dir).map_err(|e| {
+        CompositionError::Infrastructure(format!(
+            "failed to recreate source directory {}: {e}",
+            src_dir.display()
+        ))
+    })?;
     let entries = std::fs::read_dir(dst_dir)
-        .map_err(|e| format!("failed to read archive directory {}: {e}", dst_dir.display()))?
+        .map_err(|e| {
+            CompositionError::Infrastructure(format!(
+                "failed to read archive directory {}: {e}",
+                dst_dir.display()
+            ))
+        })?
         .map(|entry| entry.map(|entry| (entry.path(), entry.file_name())))
         .collect::<Result<Vec<_>, _>>()
-        .map_err(|e| format!("failed to read archive directory {}: {e}", dst_dir.display()))?;
+        .map_err(|e| {
+            CompositionError::Infrastructure(format!(
+                "failed to read archive directory {}: {e}",
+                dst_dir.display()
+            ))
+        })?;
     for (dst_child, file_name) in entries {
         let src_child = src_dir.join(file_name);
         run_git_mv(repo, repo_root, &dst_child, &src_child).map_err(|e| {
-            format!(
+            CompositionError::Infrastructure(format!(
                 "failed to roll back archive move from {} to {}: {e}",
                 dst_child.display(),
                 src_child.display()
-            )
+            ))
         })?;
     }
     if dst_dir.exists() {
         std::fs::remove_dir(dst_dir).map_err(|e| {
-            format!("failed to remove empty archive directory {}: {e}", dst_dir.display())
+            CompositionError::Infrastructure(format!(
+                "failed to remove empty archive directory {}: {e}",
+                dst_dir.display()
+            ))
         })?;
     }
     Ok(())
 }
-fn describe_archive_rollback(result: Result<(), String>) -> String {
+fn describe_archive_rollback(result: Result<(), CompositionError>) -> String {
     match result {
         Ok(()) => "archive move was rolled back".to_owned(),
         Err(rollback_err) => {
@@ -207,10 +234,9 @@ impl TrackCompositionRoot {
         use domain::TrackWriter as _;
         use infrastructure::track::fs_store::FsTrackStore;
 
-        validate_track_id_str(&track_id).map_err(CompositionError::WiringFailed)?;
+        validate_track_id_str(&track_id)?;
 
-        let project_root =
-            resolve_project_root(&items_dir).map_err(CompositionError::WiringFailed)?;
+        let project_root = resolve_project_root(&items_dir)?;
 
         let id = domain::TrackId::try_new(&track_id)
             .map_err(|e| CompositionError::WiringFailed(format!("invalid track ID: {e}")))?;
@@ -240,12 +266,10 @@ impl TrackCompositionRoot {
     ) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::track::fs_store::FsTrackStore;
         use usecase::task_ops::TaskOperationService as _;
-        let effective_track_id = resolve_track_id_for_write(track_id, &items_dir)
-            .map_err(CompositionError::AdapterInit)?;
-        validate_track_id_str(&effective_track_id).map_err(CompositionError::WiringFailed)?;
+        let effective_track_id = resolve_track_id_for_write(track_id, &items_dir)?;
+        validate_track_id_str(&effective_track_id)?;
         let repo_dir = items_dir.clone();
-        let project_root =
-            resolve_project_root(&repo_dir).map_err(CompositionError::WiringFailed)?;
+        let project_root = resolve_project_root(&repo_dir)?;
         let store = Arc::new(FsTrackStore::new(items_dir.clone()));
         let branch_reader = build_branch_reader(&project_root);
         let service =
@@ -276,9 +300,9 @@ impl TrackCompositionRoot {
         track_id: String,
     ) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::git_cli::GitRepository;
-        validate_track_id_str(&track_id).map_err(CompositionError::WiringFailed)?;
+        validate_track_id_str(&track_id)?;
         let branch_name = format!("track/{track_id}");
-        resolve_project_root(&items_dir).map_err(CompositionError::WiringFailed)?;
+        resolve_project_root(&items_dir)?;
         let repo = infrastructure::git_cli::SystemGitRepo::discover().map_err(|e| {
             CompositionError::AdapterInit(format!("failed to discover git repository: {e}"))
         })?;
@@ -320,9 +344,9 @@ impl TrackCompositionRoot {
         track_id: String,
     ) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::git_cli::GitRepository;
-        validate_track_id_str(&track_id).map_err(CompositionError::WiringFailed)?;
+        validate_track_id_str(&track_id)?;
         let branch_name = format!("track/{track_id}");
-        resolve_project_root(&items_dir).map_err(CompositionError::WiringFailed)?;
+        resolve_project_root(&items_dir)?;
         let repo = infrastructure::git_cli::SystemGitRepo::discover().map_err(|e| {
             CompositionError::AdapterInit(format!("failed to discover git repository: {e}"))
         })?;
@@ -353,12 +377,9 @@ impl TrackCompositionRoot {
     ) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::track::fs_store::FsTrackStore;
         use usecase::track_phase::TrackPhaseService as _;
-        resolve_project_root(&items_dir).map_err(CompositionError::WiringFailed)?;
-        let effective_track_id = resolve_track_id(track_id, &items_dir)
-            .map_err(|e| CompositionError::WiringFailed(format!("resolve failed: {e}")))?;
-        validate_track_id_str(&effective_track_id).map_err(|e| {
-            CompositionError::WiringFailed(format!("resolve failed: invalid track id: {e}"))
-        })?;
+        resolve_project_root(&items_dir)?;
+        let effective_track_id = resolve_track_id(track_id, &items_dir)?;
+        validate_track_id_str(&effective_track_id)?;
         let store = Arc::new(FsTrackStore::new(items_dir.clone()));
         let service = usecase::track_phase::TrackPhaseInteractor::new(Arc::clone(&store));
         let info = service
@@ -400,10 +421,7 @@ impl TrackCompositionRoot {
         let resolved_track_id = match track_id {
             Some(id) => {
                 // WRITE guard: verify explicit id matches the current branch
-                Some(
-                    resolve_track_id_inner(Some(id), &project_root, true)
-                        .map_err(CompositionError::WiringFailed)?,
-                )
+                Some(resolve_track_id_inner(Some(id), &project_root, true)?)
             }
             None => {
                 // Auto-detect from branch — fall back to None for registry-only mode
@@ -446,12 +464,10 @@ impl TrackCompositionRoot {
     ) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::track::fs_store::FsTrackStore;
         use usecase::task_ops::TaskOperationService as _;
-        let effective_track_id = resolve_track_id_for_write(track_id, &items_dir)
-            .map_err(CompositionError::AdapterInit)?;
-        validate_track_id_str(&effective_track_id).map_err(CompositionError::WiringFailed)?;
+        let effective_track_id = resolve_track_id_for_write(track_id, &items_dir)?;
+        validate_track_id_str(&effective_track_id)?;
         let repo_dir = items_dir.clone();
-        let project_root =
-            resolve_project_root(&repo_dir).map_err(CompositionError::WiringFailed)?;
+        let project_root = resolve_project_root(&repo_dir)?;
         let store = Arc::new(FsTrackStore::new(items_dir.clone()));
         let branch_reader = build_branch_reader(&project_root);
         let service =
@@ -503,12 +519,10 @@ impl TrackCompositionRoot {
     ) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::track::fs_store::FsTrackStore;
         use usecase::task_ops::TaskOperationService as _;
-        let effective_track_id = resolve_track_id_for_write(track_id, &items_dir)
-            .map_err(CompositionError::AdapterInit)?;
-        validate_track_id_str(&effective_track_id).map_err(CompositionError::WiringFailed)?;
+        let effective_track_id = resolve_track_id_for_write(track_id, &items_dir)?;
+        validate_track_id_str(&effective_track_id)?;
         let repo_dir = items_dir.clone();
-        let project_root =
-            resolve_project_root(&repo_dir).map_err(CompositionError::WiringFailed)?;
+        let project_root = resolve_project_root(&repo_dir)?;
         let store = Arc::new(FsTrackStore::new(items_dir.clone()));
         let branch_reader = build_branch_reader(&project_root);
         let service =
@@ -539,12 +553,10 @@ impl TrackCompositionRoot {
     ) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::track::fs_store::FsTrackStore;
         use usecase::task_ops::TaskOperationService as _;
-        let effective_track_id = resolve_track_id_for_write(track_id, &items_dir)
-            .map_err(CompositionError::AdapterInit)?;
-        validate_track_id_str(&effective_track_id).map_err(CompositionError::WiringFailed)?;
+        let effective_track_id = resolve_track_id_for_write(track_id, &items_dir)?;
+        validate_track_id_str(&effective_track_id)?;
         let repo_dir = items_dir.clone();
-        let project_root =
-            resolve_project_root(&repo_dir).map_err(CompositionError::WiringFailed)?;
+        let project_root = resolve_project_root(&repo_dir)?;
         let store = Arc::new(FsTrackStore::new(items_dir.clone()));
         let branch_reader = build_branch_reader(&project_root);
         let service =
@@ -571,8 +583,7 @@ impl TrackCompositionRoot {
     ) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::track::fs_store::FsTrackStore;
         use usecase::task_ops::TaskQueryService as _;
-        let effective_track_id =
-            resolve_track_id(track_id, &items_dir).map_err(CompositionError::WiringFailed)?;
+        let effective_track_id = resolve_track_id(track_id, &items_dir)?;
         let store = Arc::new(FsTrackStore::new(items_dir.clone()));
         let service = usecase::task_ops::TaskQueryInteractor::new(Arc::clone(&store));
         let next = service
@@ -606,8 +617,7 @@ impl TrackCompositionRoot {
         items_dir: PathBuf,
         track_id: Option<String>,
     ) -> Result<CommandOutcome, CompositionError> {
-        let effective_track_id =
-            resolve_track_id(track_id, &items_dir).map_err(CompositionError::WiringFailed)?;
+        let effective_track_id = resolve_track_id(track_id, &items_dir)?;
         self.track_task_counts_resolved(items_dir, effective_track_id)
     }
     /// Archive a completed track and preserve gitignored telemetry logs when present.
@@ -618,9 +628,8 @@ impl TrackCompositionRoot {
         items_dir: PathBuf,
         track_id: String,
     ) -> Result<CommandOutcome, CompositionError> {
-        validate_track_id_str(&track_id).map_err(CompositionError::WiringFailed)?;
-        let project_root =
-            resolve_project_root(&items_dir).map_err(CompositionError::WiringFailed)?;
+        validate_track_id_str(&track_id)?;
+        let project_root = resolve_project_root(&items_dir)?;
         let repo =
             infrastructure::git_cli::SystemGitRepo::discover_from(&project_root).map_err(|e| {
                 CompositionError::AdapterInit(format!("failed to discover git repository: {e}"))
@@ -649,8 +658,7 @@ impl TrackCompositionRoot {
         })?;
         let src_logs = src_dir.join("logs");
         let logs_was_dir = src_logs.is_dir();
-        run_git_mv(&repo, &repo_root, &src_dir, &dst_dir)
-            .map_err(CompositionError::Infrastructure)?;
+        run_git_mv(&repo, &repo_root, &src_dir, &dst_dir)?;
         let dst_logs = dst_dir.join("logs");
         if logs_was_dir && !dst_logs.is_dir() {
             if !src_logs.is_dir() {
@@ -735,7 +743,7 @@ mod tests {
     fn resolve_project_root_rejects_non_canonical_path() {
         let result = resolve_project_root(Path::new("wrong/path"));
         assert!(result.is_err());
-        let msg = result.unwrap_err();
+        let msg = result.unwrap_err().to_string();
         assert!(msg.contains("track/items"), "error should mention 'track/items': {msg}");
     }
 
@@ -755,7 +763,7 @@ mod tests {
             "expected Err when git discovery fails with explicit track id, got Ok({:?})",
             result.ok()
         );
-        let msg = result.unwrap_err();
+        let msg = result.unwrap_err().to_string();
         assert!(
             msg.contains("cannot discover git repository")
                 || msg.contains("write operations require a git repository")

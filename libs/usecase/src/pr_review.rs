@@ -441,22 +441,23 @@ mod tests {
     use std::time::Duration;
 
     use crate::pr_review_polling::{
-        PrListIssueCommentsPort, PrListReactionsPort, PrListReviewsPort, PrReviewPollingCommand,
-        PrReviewPollingInteractor, PrReviewPollingOutput, PrReviewPollingService, SleepPort,
+        PrGhApiError, PrListIssueCommentsPort, PrListReactionsPort, PrListReviewsPort,
+        PrReviewPollingCommand, PrReviewPollingInteractor, PrReviewPollingOutput,
+        PrReviewPollingService, SleepPort,
     };
 
     // ── Test doubles ─────────────────────────────────────────────────────────
 
     struct StubReviews(String);
     impl PrListReviewsPort for StubReviews {
-        fn list_reviews(&self, _repo: &str, _pr: &str) -> Result<String, String> {
+        fn list_reviews(&self, _repo: &str, _pr: &str) -> Result<String, PrGhApiError> {
             Ok(self.0.clone())
         }
     }
 
     struct SequencedReviews(Mutex<Vec<String>>);
     impl PrListReviewsPort for SequencedReviews {
-        fn list_reviews(&self, _repo: &str, _pr: &str) -> Result<String, String> {
+        fn list_reviews(&self, _repo: &str, _pr: &str) -> Result<String, PrGhApiError> {
             let mut responses = self.0.lock().unwrap();
             if responses.is_empty() {
                 return Ok("[]".to_owned());
@@ -467,36 +468,36 @@ mod tests {
 
     struct FailingReviews;
     impl PrListReviewsPort for FailingReviews {
-        fn list_reviews(&self, _repo: &str, _pr: &str) -> Result<String, String> {
-            Err("reviews unavailable".to_owned())
+        fn list_reviews(&self, _repo: &str, _pr: &str) -> Result<String, PrGhApiError> {
+            Err(PrGhApiError::ApiFailure("reviews unavailable".to_owned()))
         }
     }
 
     struct StubReactions(String);
     impl PrListReactionsPort for StubReactions {
-        fn list_reactions(&self, _repo: &str, _pr: &str) -> Result<String, String> {
+        fn list_reactions(&self, _repo: &str, _pr: &str) -> Result<String, PrGhApiError> {
             Ok(self.0.clone())
         }
     }
 
     struct FailingReactions;
     impl PrListReactionsPort for FailingReactions {
-        fn list_reactions(&self, _repo: &str, _pr: &str) -> Result<String, String> {
-            Err("reactions unavailable".to_owned())
+        fn list_reactions(&self, _repo: &str, _pr: &str) -> Result<String, PrGhApiError> {
+            Err(PrGhApiError::ApiFailure("reactions unavailable".to_owned()))
         }
     }
 
     struct StubComments(String);
     impl PrListIssueCommentsPort for StubComments {
-        fn list_issue_comments(&self, _repo: &str, _pr: &str) -> Result<String, String> {
+        fn list_issue_comments(&self, _repo: &str, _pr: &str) -> Result<String, PrGhApiError> {
             Ok(self.0.clone())
         }
     }
 
     struct FailingComments;
     impl PrListIssueCommentsPort for FailingComments {
-        fn list_issue_comments(&self, _repo: &str, _pr: &str) -> Result<String, String> {
-            Err("comments unavailable".to_owned())
+        fn list_issue_comments(&self, _repo: &str, _pr: &str) -> Result<String, PrGhApiError> {
+            Err(PrGhApiError::ApiFailure("comments unavailable".to_owned()))
         }
     }
 

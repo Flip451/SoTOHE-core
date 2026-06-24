@@ -26,10 +26,10 @@ pub use cycle::ReviewCycle;
 pub use error::{DiffGetError, ReviewCycleError, ReviewHasherError, ReviewerError};
 pub use ports::{DiffGetter, ReviewHasher, Reviewer};
 pub use review_aux::{
-    ReviewClassifyInteractor, ReviewClassifyService, ReviewFilesInteractor, ReviewFilesService,
-    ReviewGetBriefingInteractor, ReviewGetBriefingService, ReviewResultsInteractor,
-    ReviewResultsService, ReviewRunLocalInteractor, ReviewRunLocalOutput, ReviewRunLocalService,
-    ReviewValidateScopeInteractor, ReviewValidateScopeService,
+    ReviewAuxError, ReviewClassifyInteractor, ReviewClassifyService, ReviewFilesInteractor,
+    ReviewFilesService, ReviewGetBriefingInteractor, ReviewGetBriefingService,
+    ReviewResultsInteractor, ReviewResultsService, ReviewRunLocalInteractor, ReviewRunLocalOutput,
+    ReviewRunLocalService, ReviewValidateScopeInteractor, ReviewValidateScopeService,
 };
 pub use run_review::{
     ReviewRoundType, RunReviewCommand, RunReviewError, RunReviewInteractor, RunReviewOutput,

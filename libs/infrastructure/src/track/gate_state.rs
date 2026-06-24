@@ -39,6 +39,22 @@ use domain::track_phase::ReviewScopeSet;
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 
+#[derive(Debug)]
+struct GateStateError(String);
+
+impl std::fmt::Display for GateStateError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.0.fmt(f)
+    }
+}
+
+impl GateStateError {
+    #[allow(dead_code)]
+    fn contains(&self, s: &str) -> bool {
+        self.0.contains(s)
+    }
+}
+
 struct GatePathContext {
     canonical_root: PathBuf,
     canonical_items_dir: PathBuf,
@@ -50,20 +66,24 @@ struct RepoCwdGuard {
 }
 
 impl RepoCwdGuard {
-    fn change_to(repo_root: &Path) -> Result<Self, String> {
+    fn change_to(repo_root: &Path) -> Result<Self, GateStateError> {
         let original = std::env::current_dir()
-            .map_err(|e| format!("failed to read current directory: {e}"))?;
-        std::env::set_current_dir(repo_root)
-            .map_err(|e| format!("failed to enter repo root {}: {e}", repo_root.display()))?;
+            .map_err(|e| GateStateError(format!("failed to read current directory: {e}")))?;
+        std::env::set_current_dir(repo_root).map_err(|e| {
+            GateStateError(format!("failed to enter repo root {}: {e}", repo_root.display()))
+        })?;
         Ok(Self { original, restored: false })
     }
 
-    fn restore(&mut self) -> Result<(), String> {
+    fn restore(&mut self) -> Result<(), GateStateError> {
         if self.restored {
             return Ok(());
         }
         std::env::set_current_dir(&self.original).map_err(|e| {
-            format!("failed to restore current directory {}: {e}", self.original.display())
+            GateStateError(format!(
+                "failed to restore current directory {}: {e}",
+                self.original.display()
+            ))
         })?;
         self.restored = true;
         Ok(())
@@ -76,7 +96,10 @@ impl Drop for RepoCwdGuard {
     }
 }
 
-fn with_repo_cwd<T>(repo_root: &Path, f: impl FnOnce() -> Result<T, String>) -> Result<T, String> {
+fn with_repo_cwd<T>(
+    repo_root: &Path,
+    f: impl FnOnce() -> Result<T, GateStateError>,
+) -> Result<T, GateStateError> {
     let mut guard = RepoCwdGuard::change_to(repo_root)?;
     let result = f();
     if let Err(e) = guard.restore() {
@@ -89,7 +112,7 @@ fn with_repo_cwd<T>(repo_root: &Path, f: impl FnOnce() -> Result<T, String>) -> 
 ///
 /// Mirrors `apps/cli-composition::track::resolve_project_root`; kept private so
 /// the infrastructure crate does not export a duplicate.
-fn resolve_project_root_from_items_dir(items_dir: &Path) -> Result<PathBuf, String> {
+fn resolve_project_root_from_items_dir(items_dir: &Path) -> Result<PathBuf, GateStateError> {
     let items_name = items_dir.file_name().and_then(|n| n.to_str());
     let track_dir = items_dir.parent();
     let track_name = track_dir.and_then(Path::file_name).and_then(|n| n.to_str());
@@ -102,21 +125,22 @@ fn resolve_project_root_from_items_dir(items_dir: &Path) -> Result<PathBuf, Stri
                 Ok(root.to_path_buf())
             }
         }
-        _ => Err(format!(
+        _ => Err(GateStateError(format!(
             "items_dir must point to '<project-root>/track/items'; got {}",
             items_dir.display()
-        )),
+        ))),
     }
 }
 
-fn resolve_gate_path_context(items_dir: &Path) -> Result<GatePathContext, String> {
+fn resolve_gate_path_context(items_dir: &Path) -> Result<GatePathContext, GateStateError> {
     // Use the caller's current repository as the primary trust anchor.
     // Absolute `items_dir` values are still untrusted input; discovering from
     // them first can select a nested checkout instead of the caller's repo.
-    let caller_git = SystemGitRepo::discover().map_err(|e| format!("git discover: {e}"))?;
+    let caller_git =
+        SystemGitRepo::discover().map_err(|e| GateStateError(format!("git discover: {e}")))?;
 
     let canonical_repo_root = caller_git.root().canonicalize().map_err(|e| {
-        format!("cannot canonicalize git root {}: {e}", caller_git.root().display())
+        GateStateError(format!("cannot canonicalize git root {}: {e}", caller_git.root().display()))
     })?;
 
     let items_dir_abs = if items_dir.is_absolute() {
@@ -129,51 +153,57 @@ fn resolve_gate_path_context(items_dir: &Path) -> Result<GatePathContext, String
     // and would otherwise appear safe only after `canonicalize()`.
     crate::track::symlink_guard::reject_symlinks_below(&items_dir_abs, &canonical_repo_root)
         .map_err(|e| {
-            format!("symlink guard: refusing to use items_dir {}: {e}", items_dir.display())
+            GateStateError(format!(
+                "symlink guard: refusing to use items_dir {}: {e}",
+                items_dir.display()
+            ))
         })?;
     match items_dir_abs.symlink_metadata() {
         Ok(meta) if meta.file_type().is_symlink() => {
-            return Err(format!(
+            return Err(GateStateError(format!(
                 "symlink guard: refusing to use symlinked items_dir: {}",
                 items_dir.display()
-            ));
+            )));
         }
         Ok(_) => {}
         Err(e) => {
-            return Err(format!(
+            return Err(GateStateError(format!(
                 "symlink guard: cannot stat items_dir {}: {e}",
                 items_dir.display()
-            ));
+            )));
         }
     }
     let canonical_items_dir = items_dir_abs.canonicalize().map_err(|_| {
-        format!(
+        GateStateError(format!(
             "items_dir '{}' is outside the repository root '{}' or does not exist",
             items_dir.display(),
             canonical_repo_root.display()
-        )
+        ))
     })?;
     if !canonical_items_dir.starts_with(&canonical_repo_root) {
-        return Err(format!(
+        return Err(GateStateError(format!(
             "items_dir '{}' resolves outside the repository root '{}'",
             items_dir.display(),
             canonical_repo_root.display()
-        ));
+        )));
     }
     if !canonical_items_dir.is_dir() {
-        return Err(format!("items_dir '{}' is not a directory", items_dir.display()));
+        return Err(GateStateError(format!(
+            "items_dir '{}' is not a directory",
+            items_dir.display()
+        )));
     }
 
     let project_root = resolve_project_root_from_items_dir(&canonical_items_dir)?;
     let canonical_root = project_root
         .canonicalize()
-        .map_err(|e| format!("cannot canonicalize project root: {e}"))?;
+        .map_err(|e| GateStateError(format!("cannot canonicalize project root: {e}")))?;
     if !canonical_items_dir.starts_with(&canonical_root) {
-        return Err(format!(
+        return Err(GateStateError(format!(
             "items_dir '{}' resolves outside the project root '{}'",
             items_dir.display(),
             canonical_root.display()
-        ));
+        )));
     }
 
     Ok(GatePathContext { canonical_root, canonical_items_dir })
@@ -267,20 +297,21 @@ impl ReviewGateStatePort for FsReviewGateStateAdapter {
                 Ok(Some(hash)) => Ok(hash),
                 Ok(None) | Err(_) => {
                     // Fallback: git rev-parse main (same as build_v2_shared in cli_composition).
-                    let git =
-                        SystemGitRepo::discover().map_err(|e| format!("git discover: {e}"))?;
+                    let git = SystemGitRepo::discover()
+                        .map_err(|e| GateStateError(format!("git discover: {e}")))?;
                     let output = git
                         .output(&["rev-parse", "main"])
-                        .map_err(|e| format!("git rev-parse main: {e}"))?;
+                        .map_err(|e| GateStateError(format!("git rev-parse main: {e}")))?;
                     if !output.status.success() {
-                        return Err("git rev-parse main failed".to_owned());
+                        return Err(GateStateError("git rev-parse main failed".to_owned()));
                     }
                     let sha = String::from_utf8_lossy(&output.stdout).trim().to_owned();
-                    domain::CommitHash::try_new(&sha).map_err(|e| format!("invalid main SHA: {e}"))
+                    domain::CommitHash::try_new(&sha)
+                        .map_err(|e| GateStateError(format!("invalid main SHA: {e}")))
                 }
             }
         })
-        .map_err(gate_err)?;
+        .map_err(|e| gate_err(e.to_string()))?;
 
         // Build ReviewCycle with NullReviewer (we only call evaluate_approval).
         let cycle =
@@ -297,9 +328,9 @@ impl ReviewGateStatePort for FsReviewGateStateAdapter {
         let verdict = with_repo_cwd(&canonical_root, || {
             cycle
                 .evaluate_approval(&review_store, review_json_exists)
-                .map_err(|e| format!("review approval evaluation failed: {e}"))
+                .map_err(|e| GateStateError(format!("review approval evaluation failed: {e}")))
         })
-        .map_err(gate_err)?;
+        .map_err(|e| gate_err(e.to_string()))?;
 
         match verdict {
             domain::review_v2::ReviewApprovalVerdict::Approved

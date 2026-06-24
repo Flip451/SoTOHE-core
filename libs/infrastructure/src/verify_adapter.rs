@@ -49,6 +49,49 @@ fn reject_symlinked_trusted_root(label: &str, root: &Path) -> Option<VerifyOutco
     })
 }
 
+fn reject_unsafe_items_dir(
+    label: &str,
+    items_dir: &Path,
+    workspace_root: &Path,
+) -> Option<VerifyOutcome> {
+    let absolute_workspace_root = crate::verify::path_safety::lexical_normalize(
+        &crate::verify::trusted_root::absolutize(workspace_root),
+    );
+    let absolute_items_dir =
+        crate::verify::path_safety::lexical_normalize(&if items_dir.is_absolute() {
+            items_dir.to_path_buf()
+        } else {
+            absolute_workspace_root.join(items_dir)
+        });
+
+    if !absolute_items_dir.starts_with(&absolute_workspace_root) {
+        return Some(VerifyOutcome {
+            stdout: None,
+            stderr: Some(format!(
+                "{label}: items_dir '{}' resolves outside workspace root '{}'",
+                items_dir.display(),
+                workspace_root.display()
+            )),
+            exit_code: 1,
+        });
+    }
+
+    match crate::track::symlink_guard::reject_symlinks_below(
+        &absolute_items_dir,
+        &absolute_workspace_root,
+    ) {
+        Ok(_) => None,
+        Err(e) => Some(VerifyOutcome {
+            stdout: None,
+            stderr: Some(format!(
+                "{label}: items_dir rejected before verification at '{}': {e}",
+                items_dir.display()
+            )),
+            exit_code: 1,
+        }),
+    }
+}
+
 fn sibling_spec_json(spec_path: &Path) -> Option<PathBuf> {
     spec_path
         .parent()
@@ -106,23 +149,32 @@ fn reject_unsafe_sibling_spec_json(label: &str, spec_path: &Path) -> Option<Veri
 // Git-resolution helpers (mirrors cli_composition/src/verify.rs)
 // ---------------------------------------------------------------------------
 
-fn resolve_ci_verify_track_id() -> Result<Option<String>, String> {
+#[derive(Debug)]
+struct VerifyAdapterError(String);
+
+impl std::fmt::Display for VerifyAdapterError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.0.fmt(f)
+    }
+}
+
+fn resolve_ci_verify_track_id() -> Result<Option<String>, VerifyAdapterError> {
     let repo = crate::git_cli::SystemGitRepo::discover()
-        .map_err(|e| format!("cannot discover git repository: {e}"))?;
+        .map_err(|e| VerifyAdapterError(format!("cannot discover git repository: {e}")))?;
     resolve_ci_verify_track_id_with_reader(Arc::new(repo))
 }
 
 fn resolve_ci_verify_track_id_from_root(
     workspace_root: &std::path::Path,
-) -> Result<Option<String>, String> {
+) -> Result<Option<String>, VerifyAdapterError> {
     let repo = crate::git_cli::SystemGitRepo::discover_from(workspace_root)
-        .map_err(|e| format!("cannot discover git repository: {e}"))?;
+        .map_err(|e| VerifyAdapterError(format!("cannot discover git repository: {e}")))?;
     resolve_ci_verify_track_id_with_reader(Arc::new(repo))
 }
 
 fn resolve_ci_verify_track_id_with_reader(
     branch_reader: Arc<dyn usecase::track_resolution::BranchReaderPort>,
-) -> Result<Option<String>, String> {
+) -> Result<Option<String>, VerifyAdapterError> {
     use usecase::track_resolution::{
         ActiveTrackResolveError, ActiveTrackResolveInteractor, ActiveTrackResolveService as _,
         TrackResolutionError,
@@ -136,7 +188,7 @@ fn resolve_ci_verify_track_id_with_reader(
             | TrackResolutionError::DetachedHead
             | TrackResolutionError::NoBranch,
         )) => Ok(None),
-        Err(e) => Err(e.to_string()),
+        Err(e) => Err(VerifyAdapterError(e.to_string())),
     }
 }
 
@@ -389,6 +441,11 @@ impl VerifyPort for FsVerifyAdapter {
         {
             return outcome;
         }
+        if let Some(outcome) =
+            reject_unsafe_items_dir("verify catalogue-spec-refs", items_dir, workspace_root)
+        {
+            return outcome;
+        }
 
         if track_id.is_none() {
             match resolve_ci_verify_track_id_from_root(workspace_root) {
@@ -545,6 +602,29 @@ mod tests {
         assert_eq!(outcome.exit_code, 1);
         let stderr = outcome.stderr.unwrap_or_default();
         assert!(stderr.contains("sibling spec.json rejected before verification"), "{stderr}");
+        assert!(stderr.contains("refusing to follow symlink"), "{stderr}");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_verify_catalogue_spec_refs_rejects_symlinked_items_dir_ancestor() {
+        let workspace = tempfile::tempdir().unwrap();
+        let real_track = workspace.path().join("real-track");
+        let track_link = workspace.path().join("track");
+        std::fs::create_dir_all(real_track.join("items/some-track")).unwrap();
+        std::os::unix::fs::symlink(&real_track, &track_link).unwrap();
+
+        let items_dir = track_link.join("items");
+        let outcome = FsVerifyAdapter::new().verify_catalogue_spec_refs(
+            Some("some-track"),
+            &items_dir,
+            workspace.path(),
+            false,
+        );
+
+        assert_eq!(outcome.exit_code, 1);
+        let stderr = outcome.stderr.unwrap_or_default();
+        assert!(stderr.contains("items_dir rejected before verification"), "{stderr}");
         assert!(stderr.contains("refusing to follow symlink"), "{stderr}");
     }
 }

@@ -161,7 +161,7 @@ pub fn update_convention_index(root: &Path) -> Result<(), ConventionDocsError> {
     let new_block =
         render_index_block(root, &conventions_dir).map_err(|e| ConventionDocsError::Io {
             path: "knowledge/conventions".to_owned(),
-            source: std::io::Error::other(e),
+            source: std::io::Error::other(e.to_string()),
         })?;
 
     let updated = replace_marker_block(&content, &new_block);
@@ -256,7 +256,7 @@ pub fn verify_convention_index(root: &Path) -> VerifyOutcome {
     let expected = match render_index_block(root, &conventions_dir) {
         Ok(block) => block,
         Err(e) => {
-            return VerifyOutcome::from_findings(vec![VerifyFinding::error(e)]);
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(e.to_string())]);
         }
     };
 
@@ -444,26 +444,45 @@ fn build_template(title: &str, summary: Option<&str>) -> String {
     )
 }
 
+/// Error returned by [`render_index_block`].
+#[derive(Debug, thiserror::Error)]
+enum ConventionIndexRenderError {
+    /// I/O or symlink-guard failure while reading the conventions directory.
+    #[error("{0}")]
+    Unavailable(String),
+}
+
 /// Render the full marker block (including `INDEX_START` / `INDEX_END`) from
 /// the current files in `conventions_dir`.
 ///
 /// # Errors
 ///
-/// Returns an error string when `conventions_dir` cannot be read or a
-/// convention document file cannot be read.
-fn render_index_block(root: &Path, conventions_dir: &Path) -> Result<String, String> {
+/// Returns [`ConventionIndexRenderError`] when `conventions_dir` cannot be
+/// read or a convention document file cannot be read.
+fn render_index_block(
+    root: &Path,
+    conventions_dir: &Path,
+) -> Result<String, ConventionIndexRenderError> {
     let mut entries: Vec<(String, String)> = Vec::new();
 
-    crate::track::symlink_guard::reject_symlinks_below(conventions_dir, root)
-        .map_err(|e| format!("Cannot validate directory knowledge/conventions: {e}"))?;
+    crate::track::symlink_guard::reject_symlinks_below(conventions_dir, root).map_err(|e| {
+        ConventionIndexRenderError::Unavailable(format!(
+            "Cannot validate directory knowledge/conventions: {e}"
+        ))
+    })?;
     if conventions_dir.is_dir() {
-        let read_dir = std::fs::read_dir(conventions_dir)
-            .map_err(|e| format!("Cannot read directory knowledge/conventions: {e}"))?;
+        let read_dir = std::fs::read_dir(conventions_dir).map_err(|e| {
+            ConventionIndexRenderError::Unavailable(format!(
+                "Cannot read directory knowledge/conventions: {e}"
+            ))
+        })?;
 
         let mut paths: Vec<std::path::PathBuf> = Vec::new();
         for entry_result in read_dir {
             let entry = entry_result.map_err(|e| {
-                format!("Cannot read directory entry in knowledge/conventions: {e}")
+                ConventionIndexRenderError::Unavailable(format!(
+                    "Cannot read directory entry in knowledge/conventions: {e}"
+                ))
             })?;
             let name = entry.file_name();
             let name_str = name.to_string_lossy();
@@ -478,10 +497,14 @@ fn render_index_block(root: &Path, conventions_dir: &Path) -> Result<String, Str
             let file_name =
                 path.file_name().map(|n| n.to_string_lossy().to_string()).unwrap_or_default();
             crate::track::symlink_guard::reject_symlinks_below(path, root).map_err(|e| {
-                format!("Cannot validate convention doc knowledge/conventions/{file_name}: {e}")
+                ConventionIndexRenderError::Unavailable(format!(
+                    "Cannot validate convention doc knowledge/conventions/{file_name}: {e}"
+                ))
             })?;
             let heading = extract_heading(path).map_err(|e| {
-                format!("Cannot read convention doc knowledge/conventions/{file_name}: {e}")
+                ConventionIndexRenderError::Unavailable(format!(
+                    "Cannot read convention doc knowledge/conventions/{file_name}: {e}"
+                ))
             })?;
             entries.push((file_name, heading));
         }

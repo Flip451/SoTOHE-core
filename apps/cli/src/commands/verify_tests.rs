@@ -77,8 +77,7 @@ fn test_project_root_flag_is_respected() {
 #[test]
 fn test_print_outcome_returns_success_for_pass() {
     // CommandOutcome::success maps to ExitCode::SUCCESS (exit_code=0).
-    let outcome =
-        cli_composition::CommandOutcome::success(Some("[OK] All checks passed.".to_owned()));
+    let outcome = cli_driver::CommandOutcome::success(Some("[OK] All checks passed.".to_owned()));
     let exit = print_outcome(&outcome);
     assert_eq!(exit, ExitCode::SUCCESS);
 }
@@ -86,7 +85,7 @@ fn test_print_outcome_returns_success_for_pass() {
 #[test]
 fn test_print_outcome_returns_failure_for_errors() {
     // CommandOutcome with exit_code=1 maps to ExitCode::FAILURE.
-    let outcome = cli_composition::CommandOutcome::failure(Some("something broke".to_owned()));
+    let outcome = cli_driver::CommandOutcome::failure(Some("something broke".to_owned()));
     let exit = print_outcome(&outcome);
     assert_eq!(exit, ExitCode::FAILURE);
 }
@@ -94,7 +93,7 @@ fn test_print_outcome_returns_failure_for_errors() {
 #[test]
 fn test_print_outcome_returns_success_for_warnings_only() {
     // A CommandOutcome with exit_code=0 but non-empty stdout maps to SUCCESS.
-    let outcome = cli_composition::CommandOutcome::success(Some("[WARN] note this".to_owned()));
+    let outcome = cli_driver::CommandOutcome::success(Some("[WARN] note this".to_owned()));
     let exit = print_outcome(&outcome);
     assert_eq!(exit, ExitCode::SUCCESS);
 }
@@ -380,7 +379,9 @@ impl usecase::track_resolution::BranchReaderPort for StubVerifyBranchReader {
 }
 
 /// Helper: call the testable inner function with a stub reader.
-fn ci_verify_resolve(reader: StubVerifyBranchReader) -> Result<Option<String>, String> {
+fn ci_verify_resolve(
+    reader: StubVerifyBranchReader,
+) -> Result<Option<String>, cli_composition::CompositionError> {
     resolve_ci_verify_track_id_with_reader(std::sync::Arc::new(reader))
 }
 
@@ -492,13 +493,13 @@ fn test_print_skip_returns_success() {
 // dispatch helpers. A regression in skip detection would fail the corresponding test.
 
 // Helper: return Ok(None) from the resolver (simulates a non-track branch).
-fn non_track_resolver() -> Result<Option<String>, String> {
+fn non_track_resolver() -> Result<Option<String>, cli_composition::CompositionError> {
     Ok(None)
 }
 
 // Helper: return Err (simulates a BranchRead I/O error).
-fn err_resolver() -> Result<Option<String>, String> {
-    Err("git not found".to_owned())
+fn err_resolver() -> Result<Option<String>, cli_composition::CompositionError> {
+    Err(cli_composition::CompositionError::WiringFailed("git not found".to_owned()))
 }
 
 // --- PlanArtifactRefs dispatch ---

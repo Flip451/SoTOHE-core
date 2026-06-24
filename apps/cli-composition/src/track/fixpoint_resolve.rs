@@ -24,7 +24,7 @@ use usecase::dry_check::{
     DryCheckApprovalInteractor, DryCheckApprovalService, DryFragmentPipelineInteractor,
 };
 use usecase::fixpoint_resolve::{
-    DiffBaseResolverPort, DryApprovalFactoryPort, FixpointDryGateCommand,
+    DiffBaseResolverError, DiffBaseResolverPort, DryApprovalFactoryPort, FixpointDryGateCommand,
     FixpointDryGateInteractor, FixpointDryGateService as _, FixpointResolveCommand,
     FixpointResolveInteractor, FixpointResolveService as _, RefVerifyGateStatePort,
     ReviewGateStatePort,
@@ -63,7 +63,7 @@ impl DiffBaseResolverPort for FsDiffBaseResolverAdapter {
         track_dir: &std::path::Path,
         canonical_root: &std::path::Path,
         repo_root: &std::path::Path,
-    ) -> Result<CommitHash, String> {
+    ) -> Result<CommitHash, DiffBaseResolverError> {
         let commit_hash_path = track_dir.join(".commit_hash");
         crate::dry::resolve_dry_diff_base_from_store(
             &commit_hash_path,
@@ -71,6 +71,7 @@ impl DiffBaseResolverPort for FsDiffBaseResolverAdapter {
             Some(repo_root),
             "fixpoint-resolve",
         )
+        .map_err(|e| DiffBaseResolverError::Unavailable(e.to_string()))
     }
 }
 
@@ -267,7 +268,9 @@ impl TrackCompositionRoot {
         // was absolute or relative.
         let canonical_root = resolve_project_root(&canonical_items_dir)
             .and_then(|p| {
-                p.canonicalize().map_err(|e| format!("cannot canonicalize project root: {e}"))
+                p.canonicalize().map_err(|e| {
+                    CompositionError::WiringFailed(format!("cannot canonicalize project root: {e}"))
+                })
             })
             .map_err(|e| {
                 CompositionError::WiringFailed(format!(

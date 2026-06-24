@@ -104,6 +104,17 @@ impl std::fmt::Display for SignalGateError {
 
 impl std::error::Error for SignalGateError {}
 
+/// Error returned by chain runner ports (`AdrChainRunnerPort`, `SpecAdrChainRunnerPort`, `LayerChainRunnerPort`).
+///
+/// Represents a catastrophic infrastructure failure when executing a chain verifier
+/// (not a gate-level pass/fail, which is represented in `SignalChainOutput::passed`).
+#[derive(Debug, Clone, thiserror::Error)]
+pub enum ChainRunnerError {
+    /// The chain verifier process or infrastructure call failed.
+    #[error("{0}")]
+    ExecutionFailed(String),
+}
+
 // ── Secondary ports ────────────────────────────────────────────────────────────
 
 /// Secondary port for chain ⓪ (ADR → user): runs the ADR signal scan for a
@@ -114,13 +125,13 @@ impl std::error::Error for SignalGateError {}
 pub trait AdrChainRunnerPort: Send + Sync {
     /// Run chain ⓪ for the given project root with the resolved strictness.
     ///
-    /// Returns `Ok(SignalChainOutput)` on success (pass or fail); `Err` only on
-    /// a catastrophic infrastructure failure (not a gate failure).
+    /// Returns `Ok(SignalChainOutput)` on success (pass or fail); returns
+    /// [`ChainRunnerError`] on catastrophic infrastructure failure.
     fn run_adr_chain(
         &self,
         project_root: PathBuf,
         strict: bool,
-    ) -> Result<SignalChainOutput, String>;
+    ) -> Result<SignalChainOutput, ChainRunnerError>;
 }
 
 /// Secondary port for chain ① (spec → ADR): reads and evaluates the spec.json
@@ -131,13 +142,13 @@ pub trait AdrChainRunnerPort: Send + Sync {
 pub trait SpecAdrChainRunnerPort: Send + Sync {
     /// Run chain ① for the given spec.json path with the resolved strictness.
     ///
-    /// Returns `Ok(SignalChainOutput)` on success (pass or fail); `Err` only on
-    /// a catastrophic infrastructure failure (not a gate failure).
+    /// Returns `Ok(SignalChainOutput)` on success (pass or fail); returns
+    /// [`ChainRunnerError`] on catastrophic infrastructure failure.
     fn run_spec_adr_chain(
         &self,
         spec_json_path: PathBuf,
         strict: bool,
-    ) -> Result<SignalChainOutput, String>;
+    ) -> Result<SignalChainOutput, ChainRunnerError>;
 }
 
 /// Secondary port for chains ② and ③ (catalog-spec / impl-catalog): runs the
@@ -148,18 +159,22 @@ pub trait SpecAdrChainRunnerPort: Send + Sync {
 /// sequence all four chains without importing infrastructure.
 pub trait LayerChainRunnerPort: Send + Sync {
     /// Run the catalog-spec chain (chain ②) with the resolved strictness.
+    ///
+    /// Returns [`ChainRunnerError`] on catastrophic infrastructure failure.
     fn run_catalog_spec_chain(
         &self,
         strict: bool,
         signal_reader: &dyn SignalLayerReader,
-    ) -> Result<SignalChainOutput, String>;
+    ) -> Result<SignalChainOutput, ChainRunnerError>;
 
     /// Run the impl-catalog chain (chain ③) with the resolved strictness.
+    ///
+    /// Returns [`ChainRunnerError`] on catastrophic infrastructure failure.
     fn run_impl_catalog_chain(
         &self,
         strict: bool,
         signal_reader: &dyn SignalLayerReader,
-    ) -> Result<SignalChainOutput, String>;
+    ) -> Result<SignalChainOutput, ChainRunnerError>;
 }
 
 // ── Application service trait ──────────────────────────────────────────────────
@@ -252,38 +267,38 @@ impl SignalGateService for SignalGateInteractor {
             self.gate_matrix.resolve(ChainId::ImplCatalog, gate_kind) == Strictness::Strict;
 
         // Chain ⓪: adr-user (live scan via AdrChainRunnerPort).
-        let chain0 =
-            self.adr_runner.run_adr_chain(workspace_root, adr_strict).map_err(|reason| {
-                SignalGateError::ChainExecutionFailed {
-                    chain: "signal check-adr-user".to_owned(),
-                    reason,
-                }
-            })?;
+        let chain0 = self.adr_runner.run_adr_chain(workspace_root, adr_strict).map_err(|e| {
+            SignalGateError::ChainExecutionFailed {
+                chain: "signal check-adr-user".to_owned(),
+                reason: e.to_string(),
+            }
+        })?;
 
         // Chain ①: spec-adr (spec.json evaluation via SpecAdrChainRunnerPort).
-        let chain1 = self.spec_adr_runner.run_spec_adr_chain(spec_json_path, spec_strict).map_err(
-            |reason| SignalGateError::ChainExecutionFailed {
-                chain: "signal check-spec-adr".to_owned(),
-                reason,
-            },
-        )?;
+        let chain1 =
+            self.spec_adr_runner.run_spec_adr_chain(spec_json_path, spec_strict).map_err(|e| {
+                SignalGateError::ChainExecutionFailed {
+                    chain: "signal check-spec-adr".to_owned(),
+                    reason: e.to_string(),
+                }
+            })?;
 
         // Chain ②: catalog-spec (via LayerChainRunnerPort).
         let chain2 = self
             .layer_chain_runner
             .run_catalog_spec_chain(catalog_strict, self.signal_layer_reader.as_ref())
-            .map_err(|reason| SignalGateError::ChainExecutionFailed {
+            .map_err(|e| SignalGateError::ChainExecutionFailed {
                 chain: "signal check-catalog-spec".to_owned(),
-                reason,
+                reason: e.to_string(),
             })?;
 
         // Chain ③: impl-catalog (via LayerChainRunnerPort).
         let chain3 = self
             .layer_chain_runner
             .run_impl_catalog_chain(impl_strict, self.signal_layer_reader.as_ref())
-            .map_err(|reason| SignalGateError::ChainExecutionFailed {
+            .map_err(|e| SignalGateError::ChainExecutionFailed {
                 chain: "signal check-impl-catalog".to_owned(),
-                reason,
+                reason: e.to_string(),
             })?;
 
         let chains = vec![chain0, chain1, chain2, chain3];
@@ -350,7 +365,7 @@ mod tests {
     }
 
     struct MockAdrRunner {
-        result: Result<SignalChainOutput, String>,
+        result: Result<SignalChainOutput, ChainRunnerError>,
     }
 
     impl MockAdrRunner {
@@ -377,7 +392,9 @@ mod tests {
         }
 
         fn err() -> Self {
-            Self { result: Err("adr runner I/O failure".to_owned()) }
+            Self {
+                result: Err(ChainRunnerError::ExecutionFailed("adr runner I/O failure".to_owned())),
+            }
         }
     }
 
@@ -386,13 +403,13 @@ mod tests {
             &self,
             _project_root: PathBuf,
             _strict: bool,
-        ) -> Result<SignalChainOutput, String> {
+        ) -> Result<SignalChainOutput, ChainRunnerError> {
             self.result.clone()
         }
     }
 
     struct MockSpecAdrRunner {
-        result: Result<SignalChainOutput, String>,
+        result: Result<SignalChainOutput, ChainRunnerError>,
     }
 
     impl MockSpecAdrRunner {
@@ -421,7 +438,11 @@ mod tests {
 
         #[allow(dead_code)]
         fn err() -> Self {
-            Self { result: Err("spec-adr runner I/O failure".to_owned()) }
+            Self {
+                result: Err(ChainRunnerError::ExecutionFailed(
+                    "spec-adr runner I/O failure".to_owned(),
+                )),
+            }
         }
     }
 
@@ -430,14 +451,14 @@ mod tests {
             &self,
             _spec_json_path: PathBuf,
             _strict: bool,
-        ) -> Result<SignalChainOutput, String> {
+        ) -> Result<SignalChainOutput, ChainRunnerError> {
             self.result.clone()
         }
     }
 
     struct MockLayerChainRunner {
-        catalog_result: Result<SignalChainOutput, String>,
-        impl_result: Result<SignalChainOutput, String>,
+        catalog_result: Result<SignalChainOutput, ChainRunnerError>,
+        impl_result: Result<SignalChainOutput, ChainRunnerError>,
     }
 
     impl MockLayerChainRunner {
@@ -483,7 +504,9 @@ mod tests {
                     stdout: Some("[OK]".to_owned()),
                     stderr: None,
                 }),
-                impl_result: Err("impl-catalog runner I/O failure".to_owned()),
+                impl_result: Err(ChainRunnerError::ExecutionFailed(
+                    "impl-catalog runner I/O failure".to_owned(),
+                )),
             }
         }
     }
@@ -493,7 +516,7 @@ mod tests {
             &self,
             _strict: bool,
             _reader: &dyn SignalLayerReader,
-        ) -> Result<SignalChainOutput, String> {
+        ) -> Result<SignalChainOutput, ChainRunnerError> {
             self.catalog_result.clone()
         }
 
@@ -501,7 +524,7 @@ mod tests {
             &self,
             _strict: bool,
             _reader: &dyn SignalLayerReader,
-        ) -> Result<SignalChainOutput, String> {
+        ) -> Result<SignalChainOutput, ChainRunnerError> {
             self.impl_result.clone()
         }
     }
@@ -653,7 +676,7 @@ mod tests {
                 &self,
                 spec_json_path: PathBuf,
                 _strict: bool,
-            ) -> Result<SignalChainOutput, String> {
+            ) -> Result<SignalChainOutput, ChainRunnerError> {
                 *self.0.lock().unwrap() = Some(spec_json_path);
                 Ok(SignalChainOutput {
                     chain_label: "signal check-spec-adr".to_owned(),

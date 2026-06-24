@@ -17,6 +17,7 @@ use infrastructure::track::{
 use usecase::dry_check::fragment_ref_of;
 
 use super::shared::normalize_fragment_paths;
+use crate::error::CompositionError;
 
 pub(super) const DRY_CORPUS_ROOT_MANIFEST_FILE: &str = "dry-check-corpus-root.json";
 
@@ -89,21 +90,21 @@ pub(super) fn validate_dry_corpus_root(
     raw_root: &Path,
     repo_root: &Path,
     manifest_path: &Path,
-) -> Result<PathBuf, String> {
+) -> Result<PathBuf, CompositionError> {
     let absolute_root =
         if raw_root.is_absolute() { raw_root.to_path_buf() } else { repo_root.join(raw_root) };
     let canonical_root = absolute_root.canonicalize().map_err(|e| {
-        format!(
+        CompositionError::WiringFailed(format!(
             "dry corpus root manifest '{}' points to a non-canonicalizable workspace root '{}': {e}",
             manifest_path.display(),
             raw_root.display()
-        )
+        ))
     })?;
     if !canonical_root.is_dir() || !canonical_root.starts_with(repo_root) {
-        return Err(format!(
+        return Err(CompositionError::WiringFailed(format!(
             "dry corpus root manifest '{}' must point to an existing directory under the repository root",
             manifest_path.display()
-        ));
+        )));
     }
     Ok(canonical_root)
 }
@@ -112,85 +113,103 @@ pub(super) fn write_dry_corpus_root_manifest(
     track_dir: &Path,
     workspace_root: &Path,
     repo_root: &Path,
-) -> Result<(), String> {
+) -> Result<(), CompositionError> {
     let manifest = DryCorpusRootManifest {
         schema_version: 1,
         workspace_root: workspace_root_for_manifest(workspace_root, repo_root),
     };
     let manifest_path = dry_corpus_root_manifest_path(track_dir);
     let content = serde_json::to_vec_pretty(&manifest).map_err(|e| {
-        format!("failed to serialize dry corpus root manifest '{}': {e}", manifest_path.display())
+        CompositionError::Infrastructure(format!(
+            "failed to serialize dry corpus root manifest '{}': {e}",
+            manifest_path.display()
+        ))
     })?;
     if let Some(parent) = manifest_path.parent() {
         if !parent.as_os_str().is_empty() {
             reject_symlinks_below(parent, repo_root).map_err(|e| {
-                format!("symlink guard dry corpus root manifest parent '{}': {e}", parent.display())
+                CompositionError::Infrastructure(format!(
+                    "symlink guard dry corpus root manifest parent '{}': {e}",
+                    parent.display()
+                ))
             })?;
             std::fs::create_dir_all(parent).map_err(|e| {
-                format!(
+                CompositionError::Infrastructure(format!(
                     "failed to create dry corpus root manifest parent '{}': {e}",
                     parent.display()
-                )
+                ))
             })?;
         }
     }
     reject_symlinks_below(&manifest_path, repo_root).map_err(|e| {
-        format!("symlink guard dry corpus root manifest '{}': {e}", manifest_path.display())
+        CompositionError::Infrastructure(format!(
+            "symlink guard dry corpus root manifest '{}': {e}",
+            manifest_path.display()
+        ))
     })?;
     atomic_write_file(&manifest_path, &content).map_err(|e| {
-        format!("failed to write dry corpus root manifest '{}': {e}", manifest_path.display())
+        CompositionError::Infrastructure(format!(
+            "failed to write dry corpus root manifest '{}': {e}",
+            manifest_path.display()
+        ))
     })
 }
 
 pub(crate) fn resolve_dry_corpus_fingerprint_root(
     track_dir: &Path,
     repo_root: &Path,
-) -> Result<PathBuf, String> {
+) -> Result<PathBuf, CompositionError> {
     let manifest_path = dry_corpus_root_manifest_path(track_dir);
     match std::fs::symlink_metadata(&manifest_path) {
         Ok(_) => {
             reject_symlinks_below(&manifest_path, repo_root).map_err(|e| {
-                format!("symlink guard dry corpus root manifest '{}': {e}", manifest_path.display())
+                CompositionError::Infrastructure(format!(
+                    "symlink guard dry corpus root manifest '{}': {e}",
+                    manifest_path.display()
+                ))
             })?;
         }
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
             if let Some(parent) = manifest_path.parent() {
                 reject_symlinks_below(parent, repo_root).map_err(|e| {
-                    format!(
+                    CompositionError::Infrastructure(format!(
                         "symlink guard dry corpus root manifest parent '{}': {e}",
                         parent.display()
-                    )
+                    ))
                 })?;
             }
             return Ok(repo_root.to_path_buf());
         }
         Err(e) => {
-            return Err(format!(
+            return Err(CompositionError::Infrastructure(format!(
                 "failed to stat dry corpus root manifest '{}': {e}",
                 manifest_path.display()
-            ));
+            )));
         }
     }
     let content = match std::fs::read_to_string(&manifest_path) {
         Ok(content) => content,
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(repo_root.to_path_buf()),
         Err(e) => {
-            return Err(format!(
+            return Err(CompositionError::Infrastructure(format!(
                 "failed to read dry corpus root manifest '{}': {e}",
                 manifest_path.display()
-            ));
+            )));
         }
     };
 
     let manifest: DryCorpusRootManifest = serde_json::from_str(&content).map_err(|e| {
-        format!("failed to parse dry corpus root manifest '{}': {e}", manifest_path.display())
+        CompositionError::Infrastructure(format!(
+            "failed to parse dry corpus root manifest '{}': {e}",
+            manifest_path.display()
+        ))
     })?;
     if manifest.schema_version != 1 {
-        return Err(format!(
+        return Err(CompositionError::Infrastructure(format!(
             "unsupported dry corpus root manifest schema_version {} in '{}'",
             manifest.schema_version,
             manifest_path.display()
-        ));
+        )));
     }
 
     validate_dry_corpus_root(&manifest.workspace_root, repo_root, &manifest_path)

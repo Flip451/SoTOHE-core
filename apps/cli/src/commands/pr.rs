@@ -7,8 +7,9 @@ use std::process::ExitCode;
 
 use clap::{Args, Subcommand};
 use cli_composition::PrCompositionRoot;
+use cli_driver::pr::PrInput;
 
-use super::outcome_to_exit;
+use super::driver_outcome_to_exit;
 
 #[derive(Debug, Subcommand)]
 pub enum PrCommand {
@@ -91,29 +92,39 @@ pub struct ReviewCycleArgs {
     pub resume: bool,
 }
 
-/// Dispatch a `PrCommand` to the appropriate `PrCompositionRoot` method.
+/// Dispatch a `PrCommand` through the wired PR driver.
 pub fn execute(cmd: PrCommand) -> ExitCode {
-    let app = PrCompositionRoot::new();
+    let driver = PrCompositionRoot::new().pr_driver();
     match cmd {
-        PrCommand::Push(args) => outcome_to_exit(app.pr_push(args.track_id)),
-        PrCommand::EnsurePr(args) => outcome_to_exit(app.pr_ensure(args.track_id, args.base)),
-        PrCommand::Status(args) => outcome_to_exit(app.pr_status(args.pr)),
-        PrCommand::WaitAndMerge(args) => outcome_to_exit(app.pr_wait_and_merge(
-            args.pr,
-            args.interval,
-            args.timeout,
-            args.method,
-        )),
-        PrCommand::TriggerReview(args) => outcome_to_exit(app.pr_trigger_review(args.pr)),
-        PrCommand::PollReview(args) => outcome_to_exit(app.pr_poll_review(
-            args.pr,
-            args.trigger_timestamp,
-            args.interval,
-            args.timeout,
-        )),
-        PrCommand::ReviewCycle(args) => {
-            outcome_to_exit(app.pr_review_cycle(args.track_id, args.resume))
+        PrCommand::Push(args) => {
+            driver_outcome_to_exit(driver.handle(PrInput::Push { track_id: args.track_id }))
         }
+        PrCommand::EnsurePr(args) => driver_outcome_to_exit(
+            driver.handle(PrInput::Ensure { track_id: args.track_id, base: args.base }),
+        ),
+        PrCommand::Status(args) => {
+            driver_outcome_to_exit(driver.handle(PrInput::Status { pr: args.pr }))
+        }
+        PrCommand::WaitAndMerge(args) => {
+            driver_outcome_to_exit(driver.handle(PrInput::WaitAndMerge {
+                pr: args.pr,
+                interval: args.interval,
+                timeout: args.timeout,
+                method: args.method,
+            }))
+        }
+        PrCommand::TriggerReview(args) => {
+            driver_outcome_to_exit(driver.handle(PrInput::TriggerReview { pr: args.pr }))
+        }
+        PrCommand::PollReview(args) => driver_outcome_to_exit(driver.handle(PrInput::PollReview {
+            pr: args.pr,
+            trigger_timestamp: args.trigger_timestamp,
+            interval: args.interval,
+            timeout: args.timeout,
+        })),
+        PrCommand::ReviewCycle(args) => driver_outcome_to_exit(
+            driver.handle(PrInput::ReviewCycle { track_id: args.track_id, resume: args.resume }),
+        ),
     }
 }
 
@@ -136,6 +147,10 @@ mod test_helpers {
 
     use infrastructure::gh_cli::{GhClient, PrCheckRecord};
     use usecase::pr_review;
+
+    #[derive(Debug, thiserror::Error)]
+    #[error("{0}")]
+    pub struct PrTestError(String);
     use usecase::pr_workflow::{
         CheckSummary, PrBranchContext, PrCheckStatus, PrCheckView, WaitDecision,
         decide_wait_action, pr_body, pr_title, summarize_checks,
@@ -306,10 +321,11 @@ mod test_helpers {
         repo: &str,
         pr: &str,
         trigger_dt: chrono::DateTime<chrono::FixedOffset>,
-    ) -> Result<bool, String> {
-        let reactions_json = client.list_reactions(repo, pr).map_err(|e| e.to_string())?;
+    ) -> Result<bool, PrTestError> {
+        let reactions_json =
+            client.list_reactions(repo, pr).map_err(|e| PrTestError(e.to_string()))?;
         let reactions = pr_review::parse_paginated_json(&reactions_json)
-            .map_err(|e| format!("failed to parse reactions JSON: {e}"))?;
+            .map_err(|e| PrTestError(format!("failed to parse reactions JSON: {e}")))?;
         for reaction in &reactions {
             let content = reaction.get("content").and_then(|c| c.as_str()).unwrap_or("");
             if content != "+1" {
@@ -329,7 +345,7 @@ mod test_helpers {
             }
             let created_str = created_raw.replace('Z', "+00:00");
             let created_dt = chrono::DateTime::parse_from_rfc3339(&created_str)
-                .map_err(|e| format!("invalid reaction created_at: {e}"))?;
+                .map_err(|e| PrTestError(format!("invalid reaction created_at: {e}")))?;
             if created_dt >= trigger_dt {
                 return Ok(true);
             }
@@ -342,10 +358,11 @@ mod test_helpers {
         repo: &str,
         pr: &str,
         trigger_dt: chrono::DateTime<chrono::FixedOffset>,
-    ) -> Result<bool, String> {
-        let comments_json = client.list_issue_comments(repo, pr).map_err(|e| e.to_string())?;
+    ) -> Result<bool, PrTestError> {
+        let comments_json =
+            client.list_issue_comments(repo, pr).map_err(|e| PrTestError(e.to_string()))?;
         let comments = pr_review::parse_paginated_json(&comments_json)
-            .map_err(|e| format!("failed to parse comments JSON: {e}"))?;
+            .map_err(|e| PrTestError(format!("failed to parse comments JSON: {e}")))?;
         for comment in &comments {
             let author = comment
                 .get("user")
@@ -361,7 +378,7 @@ mod test_helpers {
             }
             let created_str = created_raw.replace('Z', "+00:00");
             let created_dt = chrono::DateTime::parse_from_rfc3339(&created_str)
-                .map_err(|e| format!("invalid comment created_at: {e}"))?;
+                .map_err(|e| PrTestError(format!("invalid comment created_at: {e}")))?;
             if created_dt < trigger_dt {
                 continue;
             }
@@ -382,16 +399,16 @@ mod test_helpers {
         client: &C,
         sleep: &Sleep,
         head_commit: Option<&str>,
-    ) -> Result<PollReviewResult, String>
+    ) -> Result<PollReviewResult, PrTestError>
     where
         C: GhClient,
         Sleep: Fn(Duration),
     {
         let trigger_time = trigger_timestamp.replace('Z', "+00:00");
         let trigger_dt = chrono::DateTime::parse_from_rfc3339(&trigger_time)
-            .map_err(|e| format!("invalid trigger timestamp: {e}"))?;
+            .map_err(|e| PrTestError(format!("invalid trigger timestamp: {e}")))?;
 
-        let repo_nwo = client.repo_nwo().map_err(|e| e.to_string())?;
+        let repo_nwo = client.repo_nwo().map_err(|e| PrTestError(e.to_string()))?;
         let deadline = Instant::now() + Duration::from_secs(timeout.min(86400));
         let mut any_bot_activity = false;
 
@@ -404,9 +421,10 @@ mod test_helpers {
                 break;
             }
 
-            let reviews_json = client.list_reviews(&repo_nwo, pr).map_err(|e| e.to_string())?;
+            let reviews_json =
+                client.list_reviews(&repo_nwo, pr).map_err(|e| PrTestError(e.to_string()))?;
             let reviews = pr_review::parse_paginated_json(&reviews_json)
-                .map_err(|e| format!("failed to parse reviews JSON: {e}"))?;
+                .map_err(|e| PrTestError(format!("failed to parse reviews JSON: {e}")))?;
 
             // Collect all qualifying Codex bot reviews (post-trigger, terminal state),
             // then pick the latest one by submitted_at (AC-05 / CN-02).
@@ -427,7 +445,7 @@ mod test_helpers {
                 }
                 let submitted_str = submitted_raw.replace('Z', "+00:00");
                 let submitted_dt = chrono::DateTime::parse_from_rfc3339(&submitted_str)
-                    .map_err(|e| format!("invalid review submitted_at: {e}"))?;
+                    .map_err(|e| PrTestError(format!("invalid review submitted_at: {e}")))?;
                 if submitted_dt >= trigger_dt {
                     any_bot_activity = true;
                     let state = review.get("state").and_then(|s| s.as_str()).unwrap_or("");
@@ -465,10 +483,11 @@ mod test_helpers {
                 }
 
                 let has_stale_reaction = {
-                    let reactions_json =
-                        client.list_reactions(&repo_nwo, pr).map_err(|e| e.to_string())?;
+                    let reactions_json = client
+                        .list_reactions(&repo_nwo, pr)
+                        .map_err(|e| PrTestError(e.to_string()))?;
                     let reactions = pr_review::parse_paginated_json(&reactions_json)
-                        .map_err(|e| format!("failed to parse reactions JSON: {e}"))?;
+                        .map_err(|e| PrTestError(format!("failed to parse reactions JSON: {e}")))?;
                     reactions.iter().any(|r| {
                         let content = r.get("content").and_then(|c| c.as_str()).unwrap_or("");
                         let author = r
@@ -489,10 +508,11 @@ mod test_helpers {
             }
 
             if !any_bot_activity {
-                let comments_json =
-                    client.list_issue_comments(&repo_nwo, pr).map_err(|e| e.to_string())?;
+                let comments_json = client
+                    .list_issue_comments(&repo_nwo, pr)
+                    .map_err(|e| PrTestError(e.to_string()))?;
                 let comments = pr_review::parse_paginated_json(&comments_json)
-                    .map_err(|e| format!("failed to parse comments JSON: {e}"))?;
+                    .map_err(|e| PrTestError(format!("failed to parse comments JSON: {e}")))?;
                 for comment in &comments {
                     let author = comment
                         .get("user")
@@ -509,7 +529,7 @@ mod test_helpers {
                     }
                     let created_str = created_raw.replace('Z', "+00:00");
                     let created_dt = chrono::DateTime::parse_from_rfc3339(&created_str)
-                        .map_err(|e| format!("invalid comment created_at: {e}"))?;
+                        .map_err(|e| PrTestError(format!("invalid comment created_at: {e}")))?;
                     if created_dt >= trigger_dt {
                         any_bot_activity = true;
                         break;
@@ -524,11 +544,11 @@ mod test_helpers {
 
         // Timeout recovery
         if let Some(expected_commit) = head_commit {
-            let recovery_nwo = client.repo_nwo().map_err(|e| e.to_string())?;
+            let recovery_nwo = client.repo_nwo().map_err(|e| PrTestError(e.to_string()))?;
             let recovery_reviews_json =
-                client.list_reviews(&recovery_nwo, pr).map_err(|e| e.to_string())?;
+                client.list_reviews(&recovery_nwo, pr).map_err(|e| PrTestError(e.to_string()))?;
             let recovery_reviews = pr_review::parse_paginated_json(&recovery_reviews_json)
-                .map_err(|e| format!("recovery: failed to parse reviews JSON: {e}"))?;
+                .map_err(|e| PrTestError(format!("recovery: failed to parse reviews JSON: {e}")))?;
             let recovery_refs: Vec<&serde_json::Value> = recovery_reviews
                 .iter()
                 .filter(|r| {
@@ -584,7 +604,7 @@ mod test_helpers {
         client: &C,
         sleep: &Sleep,
         head_commit: Option<&str>,
-    ) -> Result<ExitCode, String>
+    ) -> Result<ExitCode, PrTestError>
     where
         C: GhClient,
         Sleep: Fn(Duration),

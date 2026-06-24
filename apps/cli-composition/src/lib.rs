@@ -43,8 +43,10 @@ pub mod semantic_dup_driver_adapter;
 pub mod telemetry_wiring;
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 pub(crate) mod test_support {
-    use std::path::PathBuf;
+    use std::path::{Path, PathBuf};
+    use std::process::Command;
     use std::sync::{Mutex, OnceLock};
 
     pub(crate) fn process_env_lock() -> &'static Mutex<()> {
@@ -64,6 +66,36 @@ pub(crate) mod test_support {
         use std::os::unix::fs::PermissionsExt;
         let result = std::fs::set_permissions(script, std::fs::Permissions::from_mode(0o755));
         assert!(result.is_ok(), "failed to make {} executable: {result:?}", script.display());
+    }
+
+    pub(crate) fn run_in_dir<T>(path: &Path, run: impl FnOnce() -> T) -> T {
+        let original = std::env::current_dir().unwrap();
+        std::env::set_current_dir(path).unwrap();
+        let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(run));
+        std::env::set_current_dir(original).unwrap();
+        match result {
+            Ok(value) => value,
+            Err(payload) => std::panic::resume_unwind(payload),
+        }
+    }
+
+    fn run_git(path: &Path, args: &[&str]) {
+        let status = Command::new("git")
+            .args(args)
+            .current_dir(path)
+            .env("GIT_AUTHOR_NAME", "Test")
+            .env("GIT_AUTHOR_EMAIL", "test@test.com")
+            .env("GIT_COMMITTER_NAME", "Test")
+            .env("GIT_COMMITTER_EMAIL", "test@test.com")
+            .status()
+            .unwrap();
+        assert!(status.success(), "git {args:?} failed with {status}");
+    }
+
+    pub(crate) fn seed_repo(path: &Path, branch: &str) {
+        run_git(path, &["init", "-q"]);
+        run_git(path, &["checkout", "-B", branch]);
+        run_git(path, &["commit", "--allow-empty", "-m", "init", "--no-gpg-sign"]);
     }
 }
 

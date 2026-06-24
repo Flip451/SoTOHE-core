@@ -6,6 +6,8 @@
 
 use std::process::ExitCode;
 
+use cli_driver::review::ReviewInput;
+
 use super::{ResultsArgs, ResultsLimit, RoundTypeFilter};
 
 pub(super) fn execute_results(args: &ResultsArgs) -> ExitCode {
@@ -14,16 +16,16 @@ pub(super) fn execute_results(args: &ResultsArgs) -> ExitCode {
             print!("{output}");
             ExitCode::SUCCESS
         }
-        Err(msg) => {
-            eprintln!("{msg}");
+        Err(e) => {
+            eprintln!("{e}");
             ExitCode::FAILURE
         }
     }
 }
 
-fn run_results(args: &ResultsArgs) -> Result<String, String> {
-    let track_id =
-        crate::commands::track::resolve_track_id(args.track_id.clone(), &args.items_dir)?;
+fn run_results(args: &ResultsArgs) -> Result<String, crate::CliError> {
+    let track_id = crate::commands::track::resolve_track_id(args.track_id.clone(), &args.items_dir)
+        .map_err(|e| crate::CliError::Message(e.to_string()))?;
 
     // Map ResultsLimit to u32 (CliApp convention: 0 = state summary only,
     // u32::MAX = all rounds, n = up to n rounds).
@@ -40,7 +42,7 @@ fn run_results(args: &ResultsArgs) -> Result<String, String> {
         RoundTypeFilter::Any => "any".to_owned(),
     };
 
-    let input = cli_composition::ReviewResultsInput {
+    let input = ReviewInput::Results {
         track_id: Some(track_id),
         items_dir: args.items_dir.clone(),
         scope: args.scope.clone(),
@@ -50,10 +52,15 @@ fn run_results(args: &ResultsArgs) -> Result<String, String> {
         no_hint: args.no_hint,
     };
 
-    let outcome = cli_composition::ReviewCompositionRoot::new()
-        .review_results(input)
-        .map_err(|e| e.to_string())?;
-    outcome.stdout.ok_or_else(|| "review results returned no output".to_owned())
+    let outcome = cli_composition::ReviewCompositionRoot::new().review_driver().handle(input);
+    if outcome.exit_code != 0 {
+        return Err(crate::CliError::Message(
+            outcome.stderr.unwrap_or_else(|| "review results failed".to_owned()),
+        ));
+    }
+    outcome
+        .stdout
+        .ok_or_else(|| crate::CliError::Message("review results returned no output".to_owned()))
 }
 
 #[cfg(test)]

@@ -38,27 +38,30 @@ fn render_skip(label: &str, reason: &str) -> CommandOutcome {
 /// - `Ok(Some(track_id))` when on a valid `track/<id>` branch.
 /// - `Ok(None)` when on a non-track branch (skip path — AC-16).
 /// - `Err(msg)` for real infrastructure failures (fail-closed).
-fn resolve_ci_verify_track_id() -> Result<Option<String>, String> {
+fn resolve_ci_verify_track_id() -> Result<Option<String>, CompositionError> {
     use std::sync::Arc;
 
-    let repo = infrastructure::git_cli::SystemGitRepo::discover()
-        .map_err(|e| format!("cannot discover git repository: {e}"))?;
+    let repo = infrastructure::git_cli::SystemGitRepo::discover().map_err(|e| {
+        CompositionError::AdapterInit(format!("cannot discover git repository: {e}"))
+    })?;
     resolve_ci_verify_track_id_with_reader(Arc::new(repo))
 }
 
 fn resolve_ci_verify_track_id_from_root(
     workspace_root: &std::path::Path,
-) -> Result<Option<String>, String> {
+) -> Result<Option<String>, CompositionError> {
     use std::sync::Arc;
 
-    let repo = infrastructure::git_cli::SystemGitRepo::discover_from(workspace_root)
-        .map_err(|e| format!("cannot discover git repository: {e}"))?;
+    let repo =
+        infrastructure::git_cli::SystemGitRepo::discover_from(workspace_root).map_err(|e| {
+            CompositionError::AdapterInit(format!("cannot discover git repository: {e}"))
+        })?;
     resolve_ci_verify_track_id_with_reader(Arc::new(repo))
 }
 
 fn resolve_ci_verify_track_id_with_reader(
     branch_reader: std::sync::Arc<dyn usecase::track_resolution::BranchReaderPort>,
-) -> Result<Option<String>, String> {
+) -> Result<Option<String>, CompositionError> {
     use usecase::track_resolution::{
         ActiveTrackResolveError, ActiveTrackResolveInteractor, ActiveTrackResolveService as _,
         TrackResolutionError,
@@ -72,7 +75,7 @@ fn resolve_ci_verify_track_id_with_reader(
             | TrackResolutionError::DetachedHead
             | TrackResolutionError::NoBranch,
         )) => Ok(None),
-        Err(e) => Err(e.to_string()),
+        Err(e) => Err(CompositionError::AdapterInit(e.to_string())),
     }
 }
 
@@ -332,9 +335,7 @@ impl VerifyCompositionRoot {
     ) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::verify::VerifyFinding;
 
-        if track_dir.is_none()
-            && resolve_ci_verify_track_id().map_err(CompositionError::AdapterInit)?.is_none()
-        {
+        if track_dir.is_none() && resolve_ci_verify_track_id()?.is_none() {
             return Ok(render_skip("verify plan artifact refs", "not on a track branch; skipping"));
         }
 
@@ -374,11 +375,7 @@ impl VerifyCompositionRoot {
         workspace_root: PathBuf,
         skip_stale: bool,
     ) -> Result<CommandOutcome, CompositionError> {
-        if track_id.is_none()
-            && resolve_ci_verify_track_id_from_root(&workspace_root)
-                .map_err(CompositionError::AdapterInit)?
-                .is_none()
-        {
+        if track_id.is_none() && resolve_ci_verify_track_id_from_root(&workspace_root)?.is_none() {
             return Ok(render_skip(
                 "verify catalogue-spec-refs",
                 "not on a track branch; skipping",
@@ -389,8 +386,7 @@ impl VerifyCompositionRoot {
             Some(id) => id,
             None => {
                 use crate::track::resolve_track_id_from_root;
-                resolve_track_id_from_root(None, &workspace_root)
-                    .map_err(CompositionError::WiringFailed)?
+                resolve_track_id_from_root(None, &workspace_root)?
             }
         };
 
@@ -410,7 +406,7 @@ impl VerifyCompositionRoot {
     /// # Errors
     /// Returns a typed composition error for non-skip failures.
     pub fn verify_ci_resolve_track_id(&self) -> Result<Option<String>, CompositionError> {
-        resolve_ci_verify_track_id().map_err(CompositionError::Infrastructure)
+        resolve_ci_verify_track_id()
     }
 
     /// Resolve the active track ID using workspace_root for git discovery.
@@ -422,7 +418,6 @@ impl VerifyCompositionRoot {
         workspace_root: PathBuf,
     ) -> Result<Option<String>, CompositionError> {
         resolve_ci_verify_track_id_from_root(&workspace_root)
-            .map_err(CompositionError::Infrastructure)
     }
 
     /// Resolve the active track directory from the current git branch.

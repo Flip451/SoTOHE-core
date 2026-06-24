@@ -5,7 +5,9 @@
   "types": {
     "FsReviewGateStateAdapter": {
       "action": "add",
-      "role": { "SecondaryAdapter": {} },
+      "role": {
+        "SecondaryAdapter": {}
+      },
       "kind": {
         "kind": "struct",
         "shape": {
@@ -18,15 +20,26 @@
       "module_path": "track::gate_state",
       "docs": "Filesystem adapter implementing ReviewGateStatePort. Reads review gate approval state from the items_dir using the existing review-v2 approval infrastructure. Relocated from cli_composition::track::fixpoint_resolve per ADR 1328 D7.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-11" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-05" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-09" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-11"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "CN-05"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-09"
+        }
       ],
       "informal_grounds": []
     },
     "FsRefVerifyGateStateAdapter": {
       "action": "add",
-      "role": { "SecondaryAdapter": {} },
+      "role": {
+        "SecondaryAdapter": {}
+      },
       "kind": {
         "kind": "struct",
         "shape": {
@@ -39,15 +52,26 @@
       "module_path": "track::gate_state",
       "docs": "Filesystem adapter implementing RefVerifyGateStatePort. Reads ref-verify gate approval state from the items_dir. Relocated from cli_composition::track::fixpoint_resolve per ADR 1328 D7.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-11" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-05" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-09" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-11"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "CN-05"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-09"
+        }
       ],
       "informal_grounds": []
     },
     "RecordingDryAgent": {
       "action": "add",
-      "role": { "SecondaryAdapter": {} },
+      "role": {
+        "SecondaryAdapter": {}
+      },
       "kind": {
         "kind": "struct",
         "shape": {
@@ -60,15 +84,26 @@
       "module_path": "dry_check::recording_agent",
       "docs": "Telemetry-wrapping decorator adapter implementing DryCheckAgentPort. Wraps an inner DryCheckAgentPort implementor, intercepts judge() calls to record per-tier telemetry counters, then delegates to the inner agent. The constructor takes only the inner agent and returns both the adapter and a TieredDryAgentRecorder; private fields hold the inner agent plus fast/final recorders. Relocated from cli_composition::dry::tier_telemetry per ADR 1328 D7.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-11" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-05" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-09" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-11"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "CN-05"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-09"
+        }
       ],
       "informal_grounds": []
     },
     "NullInsertIndexProxy": {
       "action": "add",
-      "role": { "SecondaryAdapter": {} },
+      "role": {
+        "SecondaryAdapter": {}
+      },
       "kind": {
         "kind": "struct",
         "shape": {
@@ -81,15 +116,26 @@
       "module_path": "semantic_dup::null_insert_proxy",
       "docs": "Null-insert proxy adapter implementing SemanticIndexPort. Wraps a LanceDbSemanticIndexAdapter (inner private field) and suppresses insert/insert_batch calls while delegating search and delete_by_source_path. Also holds a PersistentIndexLock private field for LanceDB state management. Relocated from cli_composition::dry::persistent_index per ADR 1328 D7.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-11" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-05" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-09" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-11"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "CN-05"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-09"
+        }
       ],
       "informal_grounds": []
     },
     "NoopSemanticIndexPort": {
       "action": "add",
-      "role": { "SecondaryAdapter": {} },
+      "role": {
+        "SecondaryAdapter": {}
+      },
       "kind": {
         "kind": "struct",
         "shape": {
@@ -100,15 +146,26 @@
       "module_path": "semantic_dup::noop_adapter",
       "docs": "Null-object adapter implementing SemanticIndexPort. All methods are no-ops: insert/insert_batch return Ok(()), search returns Ok(vec![]), delete_by_source_path returns Ok(()). Companion stub for production wiring when semantic index is disabled. Relocated from cli_composition::semantic_dup::measure_quality per ADR 1328 D7.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-11" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-05" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-09" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-11"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "CN-05"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-09"
+        }
       ],
       "informal_grounds": []
     },
     "NoOpDryApprovalService": {
       "action": "add",
-      "role": { "SecondaryAdapter": {} },
+      "role": {
+        "SecondaryAdapter": {}
+      },
       "kind": {
         "kind": "struct",
         "shape": {
@@ -119,15 +176,26 @@
       "module_path": "dry_check::noop_approval",
       "docs": "Null-object adapter implementing DryCheckApprovalService. Returns DryCheckApprovalVerdict::Approved unconditionally. Used when dry-check is disabled at composition time. Relocated from cli_composition::track::fixpoint_resolve per ADR 1328 D7.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-11" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-05" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-09" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-11"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "CN-05"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-09"
+        }
       ],
       "informal_grounds": []
     },
     "FsArchivedTrackTelemetryAdapter": {
       "action": "add",
-      "role": { "SecondaryAdapter": {} },
+      "role": {
+        "SecondaryAdapter": {}
+      },
       "kind": {
         "kind": "struct",
         "shape": {
@@ -140,15 +208,26 @@
       "module_path": "telemetry::archived_track",
       "docs": "Infrastructure adapter implementing ArchivedTrackTelemetryPort. Uses std::fs, serde_json, and chrono::Utc::now() to persist a telemetry event when an archived-track subcommand is dispatched. The telemetry directory is injected via new(telemetry_dir: std::path::PathBuf); timestamp capture stays inside this infrastructure adapter. Extracted from apps/cli/src/main.rs:247-294 per ADR 1328 D8.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-12" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-08" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-10" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-12"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "CN-08"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-10"
+        }
       ],
       "informal_grounds": []
     },
     "CodeFragmentExtractorAdapter": {
       "action": "add",
-      "role": { "SecondaryAdapter": {} },
+      "role": {
+        "SecondaryAdapter": {}
+      },
       "kind": {
         "kind": "struct",
         "shape": {
@@ -157,16 +236,24 @@
       },
       "methods": [],
       "module_path": "semantic_dup::fragment_extractor_adapter",
-      "docs": "Infrastructure adapter implementing usecase::dry_check::fragment_pipeline::CodeFragmentExtractorPort. Delegates to infrastructure::semantic_dup::extractor::extract_code_fragments and maps ExtractError to String at the usecase boundary. Stateless unit struct.",
+      "docs": "Infrastructure adapter implementing usecase::dry_check::fragment_pipeline::CodeFragmentExtractorPort. Delegates to infrastructure::semantic_dup::extractor::extract_code_fragments and maps ExtractError to CodeFragmentExtractorError at the usecase boundary. Stateless unit struct.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-07" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-07"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-07"
+        }
       ],
       "informal_grounds": []
     },
     "GitDryCheckDiffGetter": {
       "action": "modify",
-      "role": { "SecondaryAdapter": {} },
+      "role": {
+        "SecondaryAdapter": {}
+      },
       "kind": {
         "kind": "struct",
         "shape": {
@@ -177,14 +264,22 @@
       "module_path": "dry_check::diff_getter",
       "docs": "Git-backed adapter implementing usecase::dry_check::ports::DryCheckDiffSource. T007 updates list_changed_hunks to receive repo_root explicitly and bind git discovery with SystemGitRepo::discover_from(repo_root), removing the previous ambient CWD dependency from the diff-fragment pipeline boundary.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-07" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-07"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-07"
+        }
       ],
       "informal_grounds": []
     },
     "FsDryCorpusMetaAdapter": {
       "action": "add",
-      "role": { "SecondaryAdapter": {} },
+      "role": {
+        "SecondaryAdapter": {}
+      },
       "kind": {
         "kind": "struct",
         "shape": {
@@ -195,15 +290,26 @@
       "module_path": "dry_check::corpus_meta",
       "docs": "Infrastructure adapter implementing usecase::fixpoint_resolve::DryCorpusMetaPort. Reads the dry-check-corpus-root.json sidecar when present, validates the recorded workspace root under repo_root, and computes the current dry-check corpus fingerprint while keeping filesystem access out of FixpointDryGateInteractor.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-07" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-07" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-07"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "CN-07"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-07"
+        }
       ],
       "informal_grounds": []
     },
     "FsSpecFileWriterAdapter": {
       "action": "add",
-      "role": { "SecondaryAdapter": {} },
+      "role": {
+        "SecondaryAdapter": {}
+      },
       "kind": {
         "kind": "struct",
         "shape": {
@@ -214,14 +320,22 @@
       "module_path": "spec::writer",
       "docs": "Infrastructure adapter implementing usecase::spec_adr_signal::SpecFileWriterPort. Uses std::fs::read_to_string and infrastructure::track::atomic_write::atomic_write_file to read and atomically write spec.json files. Stateless unit struct; all file paths are passed per-call.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-07" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-07"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-07"
+        }
       ],
       "informal_grounds": []
     },
     "SystemSleepAdapter": {
       "action": "add",
-      "role": { "SecondaryAdapter": {} },
+      "role": {
+        "SecondaryAdapter": {}
+      },
       "kind": {
         "kind": "struct",
         "shape": {
@@ -230,160 +344,522 @@
       },
       "methods": [],
       "module_path": "pr_review",
-      "docs": "Infrastructure adapter implementing usecase::pr_review::SleepPort via std::thread::sleep. Stateless unit struct; used in production wiring of PrReviewPollingInteractor. Tests inject a mock SleepPort (RecordingSleep) to verify sleep calls without blocking.",
+      "docs": "Infrastructure adapter implementing usecase::pr_review_polling::SleepPort via std::thread::sleep. Stateless unit struct; used in production wiring of PrReviewPollingInteractor. Tests inject a mock SleepPort (RecordingSleep) to verify sleep calls without blocking.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-07" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-07" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-07" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-07"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "CN-07"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-07"
+        }
       ],
       "informal_grounds": []
     },
     "FsArchAdapter": {
       "action": "add",
-      "role": { "SecondaryAdapter": {} },
-      "kind": { "kind": "struct", "shape": { "kind": "unit" } },
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
       "methods": [],
       "module_path": "arch",
       "docs": "Filesystem adapter implementing usecase::arch::ArchPort. Delegates to bin/sotp arch subcommands via subprocess calls. Placed in libs/infrastructure per CN-05; wired by cli_composition per IN-03.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-11" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-05" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-11"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "CN-05"
+        }
       ],
       "informal_grounds": []
     },
     "FsConventionsAdapter": {
       "action": "add",
-      "role": { "SecondaryAdapter": {} },
-      "kind": { "kind": "struct", "shape": { "kind": "unit" } },
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
       "methods": [],
       "module_path": "conventions",
       "docs": "Filesystem adapter implementing usecase::conventions::ConventionsPort. Delegates to bin/sotp conventions subcommands. Placed in libs/infrastructure per CN-05; wired by cli_composition per IN-03.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-11" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-05" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-11"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "CN-05"
+        }
       ],
       "informal_grounds": []
     },
     "FsDemoAdapter": {
       "action": "add",
-      "role": { "SecondaryAdapter": {} },
-      "kind": { "kind": "struct", "shape": { "kind": "unit" } },
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
       "methods": [],
       "module_path": "demo",
       "docs": "Filesystem adapter implementing usecase::demo::DemoPort. Runs the built-in demo. Placed in libs/infrastructure per CN-05; wired by cli_composition per IN-03.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-05" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "CN-05"
+        }
       ],
       "informal_grounds": []
     },
     "FsFileWriteAdapter": {
       "action": "add",
-      "role": { "SecondaryAdapter": {} },
-      "kind": { "kind": "struct", "shape": { "kind": "unit" } },
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
       "methods": [],
       "module_path": "file_port",
       "docs": "Filesystem adapter implementing usecase::file::FileWritePort. Uses atomic_write for safe file writes. Placed in libs/infrastructure per CN-05; wired by cli_composition per IN-03.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-05" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "CN-05"
+        }
       ],
       "informal_grounds": []
     },
     "FsGitWorkflowAdapter": {
       "action": "add",
-      "role": { "SecondaryAdapter": {} },
-      "kind": { "kind": "struct", "shape": { "kind": "unit" } },
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
       "methods": [],
       "module_path": "git_cli::workflow_adapter",
       "docs": "Filesystem adapter implementing usecase::git_workflow::GitWorkflowService. Delegates to SystemGitRepo for guarded local git operations. Placed in libs/infrastructure per CN-05; wired by cli_composition per IN-03.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-11" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-05" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-11"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "CN-05"
+        }
       ],
       "informal_grounds": []
     },
     "FsRefVerifyRunAdapter": {
       "action": "add",
-      "role": { "SecondaryAdapter": {} },
-      "kind": { "kind": "struct", "shape": { "kind": "unit" } },
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
       "methods": [],
       "module_path": "ref_verify::driver_adapter",
       "docs": "Filesystem adapter implementing usecase::ref_verify::driver_service::RefVerifyRunService. Delegates to the ref_verify run workflow. Placed in libs/infrastructure per CN-05; wired by cli_composition per IN-03.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-11" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-05" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-11"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "CN-05"
+        }
       ],
       "informal_grounds": []
     },
     "FsRefVerifyCheckApprovedAdapter": {
       "action": "add",
-      "role": { "SecondaryAdapter": {} },
-      "kind": { "kind": "struct", "shape": { "kind": "unit" } },
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
       "methods": [],
       "module_path": "ref_verify::driver_adapter",
       "docs": "Filesystem adapter implementing usecase::ref_verify::driver_service::RefVerifyCheckApprovedDriverService. Delegates to the ref_verify check-approved workflow. Placed in libs/infrastructure per CN-05; wired by cli_composition per IN-03.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-11" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-05" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-11"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "CN-05"
+        }
       ],
       "informal_grounds": []
     },
     "FsTelemetryEmitDynamicAdapter": {
       "action": "add",
-      "role": { "SecondaryAdapter": {} },
-      "kind": { "kind": "struct", "shape": { "kind": "unit" } },
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
       "methods": [],
       "module_path": "telemetry::report_adapter",
       "docs": "Filesystem adapter implementing usecase::telemetry::TelemetryEmitDynamicPort. Emits archived-track telemetry by discovering the repo root dynamically. Extracted from apps/cli/src/main.rs per IN-12/CN-08; placed in libs/infrastructure per CN-05.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-12" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-08" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-10" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-12"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "CN-08"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-10"
+        }
       ],
       "informal_grounds": []
     },
     "FsTelemetryReportAdapter": {
       "action": "add",
-      "role": { "SecondaryAdapter": {} },
-      "kind": { "kind": "struct", "shape": { "kind": "unit" } },
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
       "methods": [],
       "module_path": "telemetry::report_adapter",
       "docs": "Filesystem adapter implementing usecase::telemetry::TelemetryReportPort. Aggregates telemetry JSONL data from the items directory. Extracted from apps/cli/src/main.rs per IN-12/CN-08; placed in libs/infrastructure per CN-05.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-12" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-08" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "AC-10" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-12"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "CN-08"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "AC-10"
+        }
       ],
       "informal_grounds": []
     },
     "FsVerifyAdapter": {
       "action": "add",
-      "role": { "SecondaryAdapter": {} },
-      "kind": { "kind": "struct", "shape": { "kind": "unit" } },
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
       "methods": [],
       "module_path": "verify_adapter",
       "docs": "Filesystem adapter implementing usecase::verify::VerifyPort. Delegates each verify_* method to the corresponding infrastructure::verify submodule. Placed in libs/infrastructure per CN-05; wired by cli_composition per IN-03.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-11" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-05" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-11"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "CN-05"
+        }
       ],
       "informal_grounds": []
     },
     "FsRefVerifyAggregateAdapter": {
       "action": "add",
-      "role": { "SecondaryAdapter": {} },
-      "kind": { "kind": "struct", "shape": { "kind": "unit" } },
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
       "methods": [],
       "module_path": "ref_verify::driver_adapter",
       "docs": "Filesystem-backed aggregate adapter implementing the ref_verify secondary port for run/check-approved operations. Composition may wrap this adapter with the usecase-owned RefVerifyAggregateInteractor, but the adapter itself remains an infrastructure secondary adapter per CN-05.",
       "spec_refs": [
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "IN-11" },
-        { "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json", "anchor": "CN-05" }
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-11"
+        },
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "CN-05"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DemoRunError": {
+      "action": "add",
+      "role": {
+        "ErrorType": {}
+      },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Unavailable",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "String"
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "demo",
+      "docs": "Error returned by the run_example_demo free function. Single variant Unavailable(String) covers track creation and persistence failures.",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-15"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "TrackBranchError": {
+      "action": "add",
+      "role": {
+        "ErrorType": {}
+      },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "LoadFailed",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "String"
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [
+        {
+          "name": "contains",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "s",
+              "ty": "&str"
+            }
+          ],
+          "returns": "bool",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "git_cli",
+      "docs": "Error returned by track-branch resolution free functions (load_explicit_track_branch, load_explicit_track_branch_from_items_dir, collect_track_branch_claims). thiserror-derived enum with a single LoadFailed(String) variant covering directory traversal, metadata read/parse, and existence-check failures. The contains() method delegates to the variant's String payload for use in test assertions.",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-15"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "PersistentIndexLockError": {
+      "action": "add",
+      "role": {
+        "ErrorType": {}
+      },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "LockFailed",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "String"
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [
+        {
+          "name": "contains",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "s",
+              "ty": "&str"
+            }
+          ],
+          "returns": "bool",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "semantic_dup::null_insert_proxy",
+      "docs": "Error returned by acquire_persistent_index_lock. thiserror-derived enum with a single LockFailed(String) variant covering directory creation, file open, lock acquisition, and symlink rejection failures. The contains() method delegates to the variant's String payload for use in test assertions. Annotated #[doc(hidden)] but remains pub for cli_composition callers.",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-15"
+        }
       ],
       "informal_grounds": []
     }
   },
   "traits": {},
-  "functions": {},
+  "functions": {
+    "infrastructure::demo::run_example_demo": {
+      "action": "modify",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "Result<String, DemoRunError>",
+      "is_async": false,
+      "docs": "Runs the example track state machine demo. Creates an in-memory track, persists it via SaveTrackUseCase, derives its status, and returns a display string. Returns DemoRunError if track creation or persistence fails.",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-15"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::git_cli::load_explicit_track_branch": {
+      "action": "modify",
+      "role": "FreeFunction",
+      "params": [
+        {
+          "name": "root",
+          "ty": "&std::path::Path"
+        },
+        {
+          "name": "track_dir",
+          "ty": "&std::path::Path"
+        }
+      ],
+      "returns": "Result<TrackBranchRecord, TrackBranchError>",
+      "is_async": false,
+      "docs": "Loads the explicit track-branch record for a single track directory from the repo root. Returns TrackBranchError if the branch file cannot be read or parsed.",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-15"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::git_cli::load_explicit_track_branch_from_items_dir": {
+      "action": "modify",
+      "role": "FreeFunction",
+      "params": [
+        {
+          "name": "root",
+          "ty": "&std::path::Path"
+        },
+        {
+          "name": "items_dir",
+          "ty": "&std::path::Path"
+        },
+        {
+          "name": "track_dir",
+          "ty": "&std::path::Path"
+        }
+      ],
+      "returns": "Result<TrackBranchRecord, TrackBranchError>",
+      "is_async": false,
+      "docs": "Loads the explicit track-branch record for a single track directory given an explicit items_dir. Returns TrackBranchError if the branch file cannot be read or parsed.",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-15"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::git_cli::collect_track_branch_claims": {
+      "action": "modify",
+      "role": "FreeFunction",
+      "params": [
+        {
+          "name": "root",
+          "ty": "&std::path::Path"
+        }
+      ],
+      "returns": "Result<Vec<TrackBranchRecord>, TrackBranchError>",
+      "is_async": false,
+      "docs": "Collects all explicit track-branch records from the default items directory under the repo root. Returns TrackBranchError if any branch file cannot be read or parsed.",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
+          "anchor": "IN-15"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
   "inherent_impls": [
     {
       "type_name": "FsReviewGateStateAdapter",
@@ -391,7 +867,12 @@
         {
           "name": "new",
           "receiver": null,
-          "params": [{ "name": "items_dir", "ty": "std::path::PathBuf" }],
+          "params": [
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
           "returns": "Self",
           "is_async": false,
           "generics": [],
@@ -406,7 +887,12 @@
         {
           "name": "new",
           "receiver": null,
-          "params": [{ "name": "items_dir", "ty": "std::path::PathBuf" }],
+          "params": [
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
           "returns": "Self",
           "is_async": false,
           "generics": [],
@@ -417,13 +903,20 @@
     },
     {
       "type_name": "RecordingDryAgent",
-      "impl_generics": [{ "name": "A" }],
+      "impl_generics": [
+        {
+          "name": "A"
+        }
+      ],
       "methods": [
         {
           "name": "new",
           "receiver": null,
           "params": [
-            { "name": "inner", "ty": "A" }
+            {
+              "name": "inner",
+              "ty": "A"
+            }
           ],
           "returns": "(Self, infrastructure::dry_check::recording_agent::TieredDryAgentRecorder)",
           "is_async": false,
@@ -440,8 +933,14 @@
           "name": "new",
           "receiver": null,
           "params": [
-            { "name": "inner", "ty": "std::sync::Arc<infrastructure::semantic_dup::index::LanceDbSemanticIndexAdapter>" },
-            { "name": "cache_lock", "ty": "infrastructure::semantic_dup::null_insert_proxy::PersistentIndexLock" }
+            {
+              "name": "inner",
+              "ty": "std::sync::Arc<infrastructure::semantic_dup::index::LanceDbSemanticIndexAdapter>"
+            },
+            {
+              "name": "cache_lock",
+              "ty": "infrastructure::semantic_dup::null_insert_proxy::PersistentIndexLock"
+            }
           ],
           "returns": "Self",
           "is_async": false,
@@ -458,7 +957,10 @@
           "name": "new",
           "receiver": null,
           "params": [
-            { "name": "telemetry_dir", "ty": "std::path::PathBuf" }
+            {
+              "name": "telemetry_dir",
+              "ty": "std::path::PathBuf"
+            }
           ],
           "returns": "Self",
           "is_async": false,
@@ -585,7 +1087,7 @@
     },
     {
       "action": "add",
-      "trait_ref": "usecase::pr_review::SleepPort",
+      "trait_ref": "usecase::pr_review_polling::SleepPort",
       "for_type": "SystemSleepAdapter"
     },
     {
@@ -722,6 +1224,51 @@
       "action": "add",
       "trait_ref": "core::default::Default",
       "for_type": "FsRefVerifyAggregateAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "DemoRunError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "DemoRunError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "DemoRunError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "TrackBranchError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "TrackBranchError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "TrackBranchError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "PersistentIndexLockError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "PersistentIndexLockError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "PersistentIndexLockError"
     }
   ]
 }

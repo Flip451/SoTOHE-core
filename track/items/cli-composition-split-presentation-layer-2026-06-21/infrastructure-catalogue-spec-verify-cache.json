@@ -985,6 +985,398 @@
         "kind": "pass",
         "citation": "port を実装する struct（secondary adapter）は `libs/infrastructure` に定義しなければならない。`cli_composition` は adapter を wire するが定義はしない。"
       }
+    },
+    {
+      "claim_hash": "168eff29ebb287cc4cf8cdcac879e75c45409dc6e47044cad900ed40b6082ba4",
+      "evidence_hash": "f5eeae84e02f903f656e5c3dc9b3ebdfee347f5bc9c5280f526fb278fb37c50c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "infrastructure 層の `DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` など、adapter に固有の typed error enum も同様にこの scope で管理される."
+      }
+    },
+    {
+      "claim_hash": "2b7a04ec850556de5b70573c4403f0cf2c56ce4818defb3a231f4ccd7877f48a",
+      "evidence_hash": "f5eeae84e02f903f656e5c3dc9b3ebdfee347f5bc9c5280f526fb278fb37c50c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "secondary port の infrastructure adapter 実装は infrastructure 層に配置し、... infrastructure 層の `DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` など、adapter に固有の typed error enum も同様にこの scope で管理される。"
+      }
+    },
+    {
+      "claim_hash": "abfc43ac4918910530911b9a73af7e6e5097e232937b9512367f35e942b19e4a",
+      "evidence_hash": "f5eeae84e02f903f656e5c3dc9b3ebdfee347f5bc9c5280f526fb278fb37c50c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "secondary port の infrastructure adapter 実装は infrastructure 層に配置し、... infrastructure 層の `DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` など、adapter に固有の typed error enum も同様にこの scope で管理される。"
+      }
+    },
+    {
+      "claim_hash": "00122d099b9c15159282572f52bc88454fa07e5102120192b30e53b3cc9023b6",
+      "evidence_hash": "f5eeae84e02f903f656e5c3dc9b3ebdfee347f5bc9c5280f526fb278fb37c50c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "secondary port の infrastructure adapter 実装は infrastructure 層に配置し... infrastructure 層の `DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` など、adapter に固有の typed error enum も同様にこの scope で管理される。"
+      }
+    },
+    {
+      "claim_hash": "bd3aa42cfbdead7dc0c4006a45b514c02b41393756e2027b288c5512037d6e5d",
+      "evidence_hash": "f5eeae84e02f903f656e5c3dc9b3ebdfee347f5bc9c5280f526fb278fb37c50c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "infrastructure 層の `DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` など、adapter に固有の typed error enum も同様にこの scope で管理される。"
+      }
+    },
+    {
+      "claim_hash": "b930addcbfb7fb91113421c974747ce610848ee391a645e8d68810f3cdb85ae2",
+      "evidence_hash": "f5eeae84e02f903f656e5c3dc9b3ebdfee347f5bc9c5280f526fb278fb37c50c",
+      "verdict": {
+        "kind": "fail",
+        "reason": "Contradiction: the evidence explicitly places infrastructure adapter-specific `TrackBranchError` under managed `typed error enum` errors, while the claim declares `TrackBranchError` as a tuple struct newtype over `String` rather than an enum."
+      }
+    },
+    {
+      "claim_hash": "8b74eb7f5cb5807ee4451edf3d507c371ce5326daf735e7be92e8431e716bd3e",
+      "evidence_hash": "f5eeae84e02f903f656e5c3dc9b3ebdfee347f5bc9c5280f526fb278fb37c50c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "infrastructure 層の `DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` など、adapter に固有の typed error enum も同様にこの scope で管理される。"
+      }
+    },
+    {
+      "claim_hash": "168eff29ebb287cc4cf8cdcac879e75c45409dc6e47044cad900ed40b6082ba4",
+      "evidence_hash": "de9875dec86aa46f857f81706f749a38db70e4646ed1d10651d82b977fed91c7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "infrastructure 層の `DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` など、adapter に固有の typed error 型も同様にこの scope で管理される。"
+      }
+    },
+    {
+      "claim_hash": "bd3aa42cfbdead7dc0c4006a45b514c02b41393756e2027b288c5512037d6e5d",
+      "evidence_hash": "de9875dec86aa46f857f81706f749a38db70e4646ed1d10651d82b977fed91c7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "infrastructure 層の `DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` など、adapter に固有の typed error 型も同様にこの scope で管理される。"
+      }
+    },
+    {
+      "claim_hash": "b930addcbfb7fb91113421c974747ce610848ee391a645e8d68810f3cdb85ae2",
+      "evidence_hash": "de9875dec86aa46f857f81706f749a38db70e4646ed1d10651d82b977fed91c7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "infrastructure 層の `DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` など、adapter に固有の typed error 型も同様にこの scope で管理される。"
+      }
+    },
+    {
+      "claim_hash": "8b74eb7f5cb5807ee4451edf3d507c371ce5326daf735e7be92e8431e716bd3e",
+      "evidence_hash": "de9875dec86aa46f857f81706f749a38db70e4646ed1d10651d82b977fed91c7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "infrastructure 層の DemoRunError・TrackBranchError・PersistentIndexLockError など、adapter に固有の typed error 型も同様にこの scope で管理される。"
+      }
+    },
+    {
+      "claim_hash": "2b7a04ec850556de5b70573c4403f0cf2c56ce4818defb3a231f4ccd7877f48a",
+      "evidence_hash": "de9875dec86aa46f857f81706f749a38db70e4646ed1d10651d82b977fed91c7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "secondary port の infrastructure adapter 実装は infrastructure 層に配置し、aggregate/application service の実装は usecase 層に置いて ports を注入される。port／service が返すエラーは IN-13 に準拠した `thiserror` 派生 typed error 型（enum もしくは単一バリアントの tuple newtype struct を含む）とする。infrastructure 層の `DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` など、adapter に固有の typed error 型も同様にこの scope で管理される。"
+      }
+    },
+    {
+      "claim_hash": "abfc43ac4918910530911b9a73af7e6e5097e232937b9512367f35e942b19e4a",
+      "evidence_hash": "de9875dec86aa46f857f81706f749a38db70e4646ed1d10651d82b977fed91c7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "secondary port の infrastructure adapter 実装は infrastructure 層に配置し、... infrastructure 層の `DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` など、adapter に固有の typed error 型も同様にこの scope で管理される。"
+      }
+    },
+    {
+      "claim_hash": "00122d099b9c15159282572f52bc88454fa07e5102120192b30e53b3cc9023b6",
+      "evidence_hash": "de9875dec86aa46f857f81706f749a38db70e4646ed1d10651d82b977fed91c7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "secondary port の infrastructure adapter 実装は infrastructure 層に配置し、aggregate/application service の実装は usecase 層に置いて ports を注入される。port／service が返すエラーは IN-13 に準拠した `thiserror` 派生 typed error 型（enum もしくは単一バリアントの tuple newtype struct を含む）とする。infrastructure 層の `DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` など、adapter に固有の typed error 型も同様にこの scope で管理される。"
+      }
+    },
+    {
+      "claim_hash": "9f029fc3c16b619ef429f7886abe29a00409d1980d06c4a08c40ca48239a2c1a",
+      "evidence_hash": "f5eeae84e02f903f656e5c3dc9b3ebdfee347f5bc9c5280f526fb278fb37c50c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port／service が返すエラーは IN-13 に準拠した typed enum とする。infrastructure 層の `DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` など、adapter に固有の typed error enum も同様にこの scope で管理される。"
+      }
+    },
+    {
+      "claim_hash": "0110dc279b46f2f6a4d96c511b09467f5f74880655e36b59e588f55f62b24705",
+      "evidence_hash": "f5eeae84e02f903f656e5c3dc9b3ebdfee347f5bc9c5280f526fb278fb37c50c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "infrastructure 層の `DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` など、adapter に固有の typed error enum も同様にこの scope で管理される。"
+      }
+    },
+    {
+      "claim_hash": "b95ec12c9132e206c8199f0667d1e5196a278287e95501429170b748232d1ce3",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "b95ec12c9132e206c8199f0667d1e5196a278287e95501429170b748232d1ce3",
+      "evidence_hash": "9ffb7e8c8e57699c842e3e5a649e0d76da137d08cb3e6fbfc61cefcefbaaa0a0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各オーケストレーション（signal chain sequencing / diff-fragment pipeline / dry_write メトリクス集計 / dry_check_approved fragment-ref derivation など）が usecase application service に移設されている。"
+      }
+    },
+    {
+      "claim_hash": "303dd457f4ebc67222ce1c1f994d0976395fe7067c5ba81b01963f7828014d89",
+      "evidence_hash": "57a875ca5ed94acf4c5092abb938977c1cfb33a9ebbb26ce122bb05720b9e53f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` 内の adapter-outside-infrastructure 7 件を解消する。FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService の 6 件は `libs/infrastructure` へ移設する。"
+      }
+    },
+    {
+      "claim_hash": "04c8255edeea9411ae3e9cbe0e801f06ae85fd1c8d0a01e1c3a5f71a3116c81f",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "04c8255edeea9411ae3e9cbe0e801f06ae85fd1c8d0a01e1c3a5f71a3116c81f",
+      "evidence_hash": "a425cb25b341819d488eb925a8226f03957f002d0165b56db13ffabc3f481bb1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション（signal chain sequencing / diff-fragment pipeline / PR polling など）は driving adapter（`cli_driver`）ではなく usecase の application service に置かなければならない。driving adapter は単一 use case の invoke + render に留める。"
+      }
+    },
+    {
+      "claim_hash": "04c8255edeea9411ae3e9cbe0e801f06ae85fd1c8d0a01e1c3a5f71a3116c81f",
+      "evidence_hash": "9ffb7e8c8e57699c842e3e5a649e0d76da137d08cb3e6fbfc61cefcefbaaa0a0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各オーケストレーション（signal chain sequencing / diff-fragment pipeline / dry_write メトリクス集計 / dry_check_approved fragment-ref derivation など）が usecase application service に移設されている。"
+      }
+    },
+    {
+      "claim_hash": "190ea2a20b1b2c7ea679670a977b77e2679988a134804e22f650fa23a90b7479",
+      "evidence_hash": "57a875ca5ed94acf4c5092abb938977c1cfb33a9ebbb26ce122bb05720b9e53f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`LazyBranchReader` は UFCS 回避用の二重 adapter であり、呼び出し側の trait 曖昧性解消で除去して infrastructure の `SystemGitRepo` 実装に一本化する。"
+      }
+    },
+    {
+      "claim_hash": "a1b9b085af66ead8d6853e8208748cd30850f926c8b99b605239d2ca5e6fe8da",
+      "evidence_hash": "57a875ca5ed94acf4c5092abb938977c1cfb33a9ebbb26ce122bb05720b9e53f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`LazyBranchReader` は UFCS 回避用の二重 adapter であり、呼び出し側の trait 曖昧性解消で除去して infrastructure の `SystemGitRepo` 実装に一本化する。"
+      }
+    },
+    {
+      "claim_hash": "3f6bdd00192366e27acd18ead6f90732ceeb9538941017965fb56dee92feb6e3",
+      "evidence_hash": "57a875ca5ed94acf4c5092abb938977c1cfb33a9ebbb26ce122bb05720b9e53f",
+      "verdict": {
+        "kind": "fail",
+        "reason": "New behavioral commitment: DemoRunError defines an outward error contract for run_example_demo covering track creation and persistence failures, but IN-11 only concerns relocating/removing cli_composition infrastructure adapters and does not motivate any demo API error type."
+      }
+    },
+    {
+      "claim_hash": "e117adf6675c8013b92ecfa1f14db9c763c2e82a4dc841ec7f6395421282bcd6",
+      "evidence_hash": "57a875ca5ed94acf4c5092abb938977c1cfb33a9ebbb26ce122bb05720b9e53f",
+      "verdict": {
+        "kind": "fail",
+        "reason": "The referenced evidence is unrelated: IN-11 commits to resolving adapter-outside-infrastructure items in cli_composition by moving six named adapters to libs/infrastructure and removing LazyBranchReader, while the claim defines an error type for track-branch resolution free functions. This introduces a behavioral/design concern not grounded by the evidence."
+      }
+    },
+    {
+      "claim_hash": "886ba27e891c97825b8375cbdca9b100562e40dea4144d8a6ea261e3dc0ba6ed",
+      "evidence_hash": "57a875ca5ed94acf4c5092abb938977c1cfb33a9ebbb26ce122bb05720b9e53f",
+      "verdict": {
+        "kind": "fail",
+        "reason": "New behavioral commitment / wrong reference: the claim defines a demo runner that creates and persists an in-memory track and returns a display string, while IN-11 only commits to moving specific adapter implementations into libs/infrastructure and removing LazyBranchReader by resolving trait ambiguity. The evidence motivates no part of the demo-running behavior."
+      }
+    },
+    {
+      "claim_hash": "9bcb4d09a9a86530cc07a16f86cd43801b56931449e2d926f10b6311f558dc6f",
+      "evidence_hash": "57a875ca5ed94acf4c5092abb938977c1cfb33a9ebbb26ce122bb05720b9e53f",
+      "verdict": {
+        "kind": "fail",
+        "reason": "New behavioral commitment: the claim defines collecting and parsing explicit track-branch records from a default items directory and returning TrackBranchError on read/parse failures, but IN-11 only commits to moving six adapter types to libs/infrastructure and removing LazyBranchReader by consolidating behavior into SystemGitRepo. The cited evidence does not motivate this record-collection responsibility."
+      }
+    },
+    {
+      "claim_hash": "9eed65c2011bde24dbc69370ab7c2eb9a49d26450541aeb57434338d67dc4b9e",
+      "evidence_hash": "4a86be20ee0a5cadbd65ecdfaa10675aa005e472649fd72495e21ce82fe47c6c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` 等の typed error enum を infrastructure 層に新設し、`git_cli` / `demo` の free function が `Result<_, TypedError>` を返すよう変更する。"
+      }
+    },
+    {
+      "claim_hash": "a5d34c02c2502b07d1da3678424fa26b0a84bafa6dee755535588934651dd179",
+      "evidence_hash": "4a86be20ee0a5cadbd65ecdfaa10675aa005e472649fd72495e21ce82fe47c6c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` 等の typed error enum を infrastructure 層に新設し、`git_cli` / `demo` の free function が `Result<_, TypedError>` を返すよう変更する。"
+      }
+    },
+    {
+      "claim_hash": "552941c9114ae8d9daad42900eab6705ad42eb16fc231bfd2272476b50678432",
+      "evidence_hash": "4a86be20ee0a5cadbd65ecdfaa10675aa005e472649fd72495e21ce82fe47c6c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "infrastructure adapter 移設に伴う typed error enum の導入と free function シグネチャの変更。`DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` 等の typed error enum を infrastructure 層に新設し、`git_cli` / `demo` の free function が `Result<_, TypedError>` を返すよう変更する。"
+      }
+    },
+    {
+      "claim_hash": "c9711e7b6c94c7dd8a05da85a6f715c5c515dcec4cfd75a64ea56a07824431bb",
+      "evidence_hash": "4a86be20ee0a5cadbd65ecdfaa10675aa005e472649fd72495e21ce82fe47c6c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` 等の typed error enum を infrastructure 層に新設し、`git_cli` / `demo` の free function が `Result<_, TypedError>` を返すよう変更する。"
+      }
+    },
+    {
+      "claim_hash": "92c0ffe22fa3b72405cdf02dca4e059a2a6e53f31b040e6e604e10c8fd1617a8",
+      "evidence_hash": "4a86be20ee0a5cadbd65ecdfaa10675aa005e472649fd72495e21ce82fe47c6c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` 等の typed error enum を infrastructure 層に新設し、`git_cli` / `demo` の free function が `Result<_, TypedError>` を返すよう変更する。"
+      }
+    },
+    {
+      "claim_hash": "d3ae00c84255fce11f37b88e8f939f08af28edde97ff7b25b4fea98225029768",
+      "evidence_hash": "4a86be20ee0a5cadbd65ecdfaa10675aa005e472649fd72495e21ce82fe47c6c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` 等の typed error enum を infrastructure 層に新設し、`git_cli` / `demo` の free function が `Result<_, TypedError>` を返すよう変更する。"
+      }
+    },
+    {
+      "claim_hash": "4760ce1d38249ccb28025fb78e34d25e8baf08c49bbd7e646f04013f2717f878",
+      "evidence_hash": "4a86be20ee0a5cadbd65ecdfaa10675aa005e472649fd72495e21ce82fe47c6c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "infrastructure adapter 移設に伴う typed error enum の導入と free function シグネチャの変更。`DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` 等の typed error enum を infrastructure 層に新設し、`git_cli` / `demo` の free function が `Result<_, TypedError>` を返すよう変更する。"
+      }
+    },
+    {
+      "claim_hash": "9eed65c2011bde24dbc69370ab7c2eb9a49d26450541aeb57434338d67dc4b9e",
+      "evidence_hash": "4cd212fbfc321547fccf5b93c4e4f086540afe36c3896bc15ca0f710c825ae70",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` 等の typed error enum を infrastructure 層に新設し、`git_cli` / `demo` の free function が `Result<_, TypedError>` を返すよう変更する。"
+      }
+    },
+    {
+      "claim_hash": "a5d34c02c2502b07d1da3678424fa26b0a84bafa6dee755535588934651dd179",
+      "evidence_hash": "4cd212fbfc321547fccf5b93c4e4f086540afe36c3896bc15ca0f710c825ae70",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` 等の typed error enum を infrastructure 層に新設し、`git_cli` / `demo` の free function が `Result<_, TypedError>` を返すよう変更する。"
+      }
+    },
+    {
+      "claim_hash": "552941c9114ae8d9daad42900eab6705ad42eb16fc231bfd2272476b50678432",
+      "evidence_hash": "4cd212fbfc321547fccf5b93c4e4f086540afe36c3896bc15ca0f710c825ae70",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` 等の typed error enum を infrastructure 層に新設し、`git_cli` / `demo` の free function が `Result<_, TypedError>` を返すよう変更する。"
+      }
+    },
+    {
+      "claim_hash": "c9711e7b6c94c7dd8a05da85a6f715c5c515dcec4cfd75a64ea56a07824431bb",
+      "evidence_hash": "4cd212fbfc321547fccf5b93c4e4f086540afe36c3896bc15ca0f710c825ae70",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` 等の typed error enum を infrastructure 層に新設し、`git_cli` / `demo` の free function が `Result<_, TypedError>` を返すよう変更する。"
+      }
+    },
+    {
+      "claim_hash": "92c0ffe22fa3b72405cdf02dca4e059a2a6e53f31b040e6e604e10c8fd1617a8",
+      "evidence_hash": "4cd212fbfc321547fccf5b93c4e4f086540afe36c3896bc15ca0f710c825ae70",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` 等の typed error enum を infrastructure 層に新設し、`git_cli` / `demo` の free function が `Result<_, TypedError>` を返すよう変更する。"
+      }
+    },
+    {
+      "claim_hash": "d3ae00c84255fce11f37b88e8f939f08af28edde97ff7b25b4fea98225029768",
+      "evidence_hash": "4cd212fbfc321547fccf5b93c4e4f086540afe36c3896bc15ca0f710c825ae70",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` 等の typed error enum を infrastructure 層に新設し、`git_cli` / `demo` の free function が `Result<_, TypedError>` を返すよう変更する。"
+      }
+    },
+    {
+      "claim_hash": "4760ce1d38249ccb28025fb78e34d25e8baf08c49bbd7e646f04013f2717f878",
+      "evidence_hash": "4cd212fbfc321547fccf5b93c4e4f086540afe36c3896bc15ca0f710c825ae70",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` 等の typed error enum を infrastructure 層に新設し、`git_cli` / `demo` の free function が `Result<_, TypedError>` を返すよう変更する。"
+      }
+    },
+    {
+      "claim_hash": "9eed65c2011bde24dbc69370ab7c2eb9a49d26450541aeb57434338d67dc4b9e",
+      "evidence_hash": "a6e0751d89875020bb137e66dd7443933e67a70459ba7bf5fcabeea35a231a65",
+      "verdict": {
+        "kind": "pass",
+        "citation": "infrastructure adapter 移設に伴う typed error enum の導入と free function シグネチャの変更。`DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` 等の typed error enum を infrastructure 層に新設し、`git_cli` / `demo` の free function が `Result<_, TypedError>` を返すよう変更する。"
+      }
+    },
+    {
+      "claim_hash": "a5d34c02c2502b07d1da3678424fa26b0a84bafa6dee755535588934651dd179",
+      "evidence_hash": "a6e0751d89875020bb137e66dd7443933e67a70459ba7bf5fcabeea35a231a65",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` 等の typed error enum を infrastructure 層に新設し、`git_cli` / `demo` の free function が `Result<_, TypedError>` を返すよう変更する。"
+      }
+    },
+    {
+      "claim_hash": "552941c9114ae8d9daad42900eab6705ad42eb16fc231bfd2272476b50678432",
+      "evidence_hash": "a6e0751d89875020bb137e66dd7443933e67a70459ba7bf5fcabeea35a231a65",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` 等の typed error enum を infrastructure 層に新設し、`git_cli` / `demo` の free function が `Result<_, TypedError>` を返すよう変更する。"
+      }
+    },
+    {
+      "claim_hash": "c9711e7b6c94c7dd8a05da85a6f715c5c515dcec4cfd75a64ea56a07824431bb",
+      "evidence_hash": "a6e0751d89875020bb137e66dd7443933e67a70459ba7bf5fcabeea35a231a65",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` 等の typed error enum を infrastructure 層に新設し、`git_cli` / `demo` の free function が `Result<_, TypedError>` を返すよう変更する。"
+      }
+    },
+    {
+      "claim_hash": "92c0ffe22fa3b72405cdf02dca4e059a2a6e53f31b040e6e604e10c8fd1617a8",
+      "evidence_hash": "a6e0751d89875020bb137e66dd7443933e67a70459ba7bf5fcabeea35a231a65",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` 等の typed error enum を infrastructure 層に新設し、`git_cli` / `demo` の free function が `Result<_, TypedError>` を返すよう変更する。"
+      }
+    },
+    {
+      "claim_hash": "d3ae00c84255fce11f37b88e8f939f08af28edde97ff7b25b4fea98225029768",
+      "evidence_hash": "a6e0751d89875020bb137e66dd7443933e67a70459ba7bf5fcabeea35a231a65",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` 等の typed error enum を infrastructure 層に新設し、`git_cli` / `demo` の free function が `Result<_, TypedError>` を返すよう変更する。"
+      }
+    },
+    {
+      "claim_hash": "4760ce1d38249ccb28025fb78e34d25e8baf08c49bbd7e646f04013f2717f878",
+      "evidence_hash": "a6e0751d89875020bb137e66dd7443933e67a70459ba7bf5fcabeea35a231a65",
+      "verdict": {
+        "kind": "pass",
+        "citation": "infrastructure adapter 移設に伴う typed error enum の導入と free function シグネチャの変更。`DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` 等の typed error enum を infrastructure 層に新設し、`git_cli` / `demo` の free function が `Result<_, TypedError>` を返すよう変更する。"
+      }
     }
   ]
 }

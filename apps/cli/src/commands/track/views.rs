@@ -25,7 +25,7 @@ pub(super) fn execute_views(action: ViewAction) -> Result<ExitCode, CliError> {
                 Some(id) => {
                     let validated_id =
                         resolve_track_id_from_root_for_write(Some(id), &project_root)
-                            .map_err(CliError::Message)?;
+                            .map_err(|e| CliError::Message(e.to_string()))?;
                     Some(validated_id)
                 }
                 None => detect_active_track_from_branch(&project_root),

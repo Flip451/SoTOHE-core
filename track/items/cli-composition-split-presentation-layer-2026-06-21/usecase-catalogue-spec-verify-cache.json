@@ -5313,6 +5313,1166 @@
         "kind": "pass",
         "citation": "`apps/cli/src/main.rs` の `emit_archived_track_subcommand`（`std::fs` / `serde_json` / `chrono::Utc::now()`）を infrastructure adapter（時刻取得・fs 書き込み）として切り出し、composition が wire して driver 経由で呼ぶ経路にする。"
       }
+    },
+    {
+      "claim_hash": "9d174af8c44c258d8e4fdb19e9fed01fbed8c245493a9fd553067f2f57671993",
+      "evidence_hash": "d3d3b1be363d5115428e00a2e0c6f5900d8d1cc8738b41215ec81e8d096d31c8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の型付き enum（`ErrorType` ロール）に統一する。`Result<_, String>` による stringly-typed エラーは廃止し、各 port／service のエラー variant は usecase 層内で定義する。"
+      }
+    },
+    {
+      "claim_hash": "1a8bd3041a77e58a439430f2bf39bec21286b8ddaeccb268b512864a7f94341f",
+      "evidence_hash": "d3d3b1be363d5115428e00a2e0c6f5900d8d1cc8738b41215ec81e8d096d31c8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の型付き enum（`ErrorType` ロール）に統一する。`Result<_, String>` による stringly-typed エラーは廃止し、各 port／service のエラー variant は usecase 層内で定義する。infrastructure adapter は `map_err` チェーン経由で具体エラーを typed variant へ変換して usecase boundary を越える。"
+      }
+    },
+    {
+      "claim_hash": "daf8b07fe4825b72a6a19e67f86c1b2782a0c80afeb8dc8f6274fd18e762e8a4",
+      "evidence_hash": "d3d3b1be363d5115428e00a2e0c6f5900d8d1cc8738b41215ec81e8d096d31c8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の型付き enum（`ErrorType` ロール）に統一する。`Result<_, String>` による stringly-typed エラーは廃止し、各 port／service のエラー variant は usecase 層内で定義する。"
+      }
+    },
+    {
+      "claim_hash": "15d8e1cfc6310ca3b320fa9258b3cd04314a45c3f04f382a3b6ac2b144f1c639",
+      "evidence_hash": "d3d3b1be363d5115428e00a2e0c6f5900d8d1cc8738b41215ec81e8d096d31c8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の型付き enum（`ErrorType` ロール）に統一する。`Result<_, String>` による stringly-typed エラーは廃止し、各 port／service のエラー variant は usecase 層内で定義する。"
+      }
+    },
+    {
+      "claim_hash": "68c679bb1bd49f51e1470121db2520c5ba9ba27d3faf74585729269b4dd10341",
+      "evidence_hash": "d3d3b1be363d5115428e00a2e0c6f5900d8d1cc8738b41215ec81e8d096d31c8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の型付き enum（`ErrorType` ロール）に統一する。`Result<_, String>` による stringly-typed エラーは廃止し、各 port／service のエラー variant は usecase 層内で定義する。"
+      }
+    },
+    {
+      "claim_hash": "ab0a1db4d2ab325c13222576a3745c80f5ada0543092924fbd7a0e8a6074902b",
+      "evidence_hash": "d3d3b1be363d5115428e00a2e0c6f5900d8d1cc8738b41215ec81e8d096d31c8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の型付き enum（`ErrorType` ロール）に統一する。`Result<_, String>` による stringly-typed エラーは廃止し、各 port／service のエラー variant は usecase 層内で定義する。infrastructure adapter は `map_err` チェーン経由で具体エラーを typed variant へ変換して usecase boundary を越える。"
+      }
+    },
+    {
+      "claim_hash": "cd947591dfeea0f4b6175de6db6ce1c3683ea1b341cc656149cf0b2b928ae2e7",
+      "evidence_hash": "d3d3b1be363d5115428e00a2e0c6f5900d8d1cc8738b41215ec81e8d096d31c8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の型付き enum（`ErrorType` ロール）に統一する。`Result<_, String>` による stringly-typed エラーは廃止し、各 port／service のエラー variant は usecase 層内で定義する。"
+      }
+    },
+    {
+      "claim_hash": "393f206412b29c71d3110def8513fb7bf6878f4958cd2c0b40227265f5885926",
+      "evidence_hash": "d3d3b1be363d5115428e00a2e0c6f5900d8d1cc8738b41215ec81e8d096d31c8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の型付き enum（`ErrorType` ロール）に統一する。`Result<_, String>` による stringly-typed エラーは廃止し"
+      }
+    },
+    {
+      "claim_hash": "535a68762fe4eaaeddf071e99042aa7492f6deec1507f87e3ab6ea2e36f025c4",
+      "evidence_hash": "d3d3b1be363d5115428e00a2e0c6f5900d8d1cc8738b41215ec81e8d096d31c8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Result<_, String> による stringly-typed エラーは廃止し、各 port／service のエラー variant は usecase 層内で定義する。"
+      }
+    },
+    {
+      "claim_hash": "a6e0329497c17b5eef7bbf9a7dfd55ec0ac6f619df1b3f7f338c81e541f5c6fa",
+      "evidence_hash": "d3d3b1be363d5115428e00a2e0c6f5900d8d1cc8738b41215ec81e8d096d31c8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の型付き enum（`ErrorType` ロール）に統一する。`Result<_, String>` による stringly-typed エラーは廃止し、各 port／service のエラー variant は usecase 層内で定義する。"
+      }
+    },
+    {
+      "claim_hash": "ebef9f6422436f65b365b1d46c9bc66268f38ae7d4ea4438c3a3a0718604c27f",
+      "evidence_hash": "d3d3b1be363d5115428e00a2e0c6f5900d8d1cc8738b41215ec81e8d096d31c8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の型付き enum（`ErrorType` ロール）に統一する。`Result<_, String>` による stringly-typed エラーは廃止し、各 port／service のエラー variant は usecase 層内で定義する。infrastructure adapter は `map_err` チェーン経由で具体エラーを typed variant へ変換して usecase boundary を越える。"
+      }
+    },
+    {
+      "claim_hash": "75d2d9b40808b680a3a350edd08387d5e7ac590af0edbcfb6d694ec5500e1f89",
+      "evidence_hash": "d3d3b1be363d5115428e00a2e0c6f5900d8d1cc8738b41215ec81e8d096d31c8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の型付き enum（`ErrorType` ロール）に統一する。`Result<_, String>` による stringly-typed エラーは廃止し、各 port／service のエラー variant は usecase 層内で定義する。"
+      }
+    },
+    {
+      "claim_hash": "7106a6983e146bbb22ca8584bfd333fc09a99a706e88a61c65ce20d9b090daf1",
+      "evidence_hash": "d3d3b1be363d5115428e00a2e0c6f5900d8d1cc8738b41215ec81e8d096d31c8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の型付き enum（`ErrorType` ロール）に統一する。`Result<_, String>` による stringly-typed エラーは廃止し、各 port／service のエラー variant は usecase 層内で定義する。"
+      }
+    },
+    {
+      "claim_hash": "9a0f5bf6a6cca8fe47260d773f27a1b176cee651518c88ab82fcc27b944efb47",
+      "evidence_hash": "d3d3b1be363d5115428e00a2e0c6f5900d8d1cc8738b41215ec81e8d096d31c8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の型付き enum（`ErrorType` ロール）に統一する。`Result<_, String>` による stringly-typed エラーは廃止し、各 port／service のエラー variant は usecase 層内で定義する。"
+      }
+    },
+    {
+      "claim_hash": "f712fa6fa758252de7c04cbc075d86c3cc94d84cf524f82fea46256813fb4a7b",
+      "evidence_hash": "d3d3b1be363d5115428e00a2e0c6f5900d8d1cc8738b41215ec81e8d096d31c8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の型付き enum（`ErrorType` ロール）に統一する。`Result<_, String>` による stringly-typed エラーは廃止し、各 port／service のエラー variant は usecase 層内で定義する。infrastructure adapter は `map_err` チェーン経由で具体エラーを typed variant へ変換して usecase boundary を越える。"
+      }
+    },
+    {
+      "claim_hash": "517a49780df0dd69cfb2bf574b9734ba53b262747d7c1570e239248535833b03",
+      "evidence_hash": "d3d3b1be363d5115428e00a2e0c6f5900d8d1cc8738b41215ec81e8d096d31c8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の型付き enum（`ErrorType` ロール）に統一する。`Result<_, String>` による stringly-typed エラーは廃止し、各 port／service のエラー variant は usecase 層内で定義する。"
+      }
+    },
+    {
+      "claim_hash": "981c4e19daa4c84f22fc5b8c848deda20c7ab7cdb1888f4e2d04991883024fce",
+      "evidence_hash": "d3d3b1be363d5115428e00a2e0c6f5900d8d1cc8738b41215ec81e8d096d31c8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`Result<_, String>` による stringly-typed エラーは廃止し、各 port／service のエラー variant は usecase 層内で定義する。"
+      }
+    },
+    {
+      "claim_hash": "02b5ce81d8a488a40bbe949ebdd3c532f2c7e06f3a6b074382e115fdd99a4e87",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "406faff6500e5782565ebb20d66c92c1c37db5f0a587b1002f331d40d70ac1f8",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲"
+      }
+    },
+    {
+      "claim_hash": "baba7c872fbee3d1013d5d7df26219b89ef49091a49b571d1062e942236a4d6b",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "6ee7b05568e7c6b247c99033420cdf2e1ab807ec978648169e7d43b27ce4080f",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "582d9b4c97e97eed7f608566ab515f6c2a922c999123ef70dec05b3005475bcf",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "7e7e23409a3b6a0fe87c3d7a42dc62f972a317c4a7b49b51569c77a383e85328",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "7e7e23409a3b6a0fe87c3d7a42dc62f972a317c4a7b49b51569c77a383e85328",
+      "evidence_hash": "9ffb7e8c8e57699c842e3e5a649e0d76da137d08cb3e6fbfc61cefcefbaaa0a0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step-orchestration カテゴリ（audit: 6 件）が cli_composition から除去されており、各オーケストレーション（signal chain sequencing / diff-fragment pipeline / dry_write メトリクス集計 / dry_check_approved fragment-ref derivation など）が usecase application service に移設されている。"
+      }
+    },
+    {
+      "claim_hash": "aec0760832bf231b2cd4cb3eabb74822729a1d74edad605b1808eeaa32d40ea2",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "aec0760832bf231b2cd4cb3eabb74822729a1d74edad605b1808eeaa32d40ea2",
+      "evidence_hash": "a425cb25b341819d488eb925a8226f03957f002d0165b56db13ffabc3f481bb1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション（signal chain sequencing / diff-fragment pipeline / PR polling など）は driving adapter（`cli_driver`）ではなく usecase の application service に置かなければならない。driving adapter は単一 use case の invoke + render に留める。"
+      }
+    },
+    {
+      "claim_hash": "aec0760832bf231b2cd4cb3eabb74822729a1d74edad605b1808eeaa32d40ea2",
+      "evidence_hash": "9ffb7e8c8e57699c842e3e5a649e0d76da137d08cb3e6fbfc61cefcefbaaa0a0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step-orchestration カテゴリ（audit: 6 件）が cli_composition から除去されており、各オーケストレーション（signal chain sequencing / diff-fragment pipeline / dry_write メトリクス集計 / dry_check_approved fragment-ref derivation など）が usecase application service に移設されている。"
+      }
+    },
+    {
+      "claim_hash": "c554c6b1e995d0cc3d505f2bd0455dd74a5c1bd130403e61f95ea76a424ea242",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "c554c6b1e995d0cc3d505f2bd0455dd74a5c1bd130403e61f95ea76a424ea242",
+      "evidence_hash": "9ffb7e8c8e57699c842e3e5a649e0d76da137d08cb3e6fbfc61cefcefbaaa0a0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各オーケストレーション（signal chain sequencing / diff-fragment pipeline / dry_write メトリクス集計 / dry_check_approved fragment-ref derivation など）が usecase application service に移設されている。"
+      }
+    },
+    {
+      "claim_hash": "3eb1fe9379bba40ff0be0eb8e8af702813ba2dfeb672ace87df47fa22d1a0c16",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "72db1afd449f75a5600d21366a472701d851b505bf9a6532f0ef25dcbbe9f283",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "2a92e48a32823b912caf4fbe57660b250b47a8d3f41b49b7e47141bc764f8f71",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "7894dc9d971d8f02a8e7fa5f874ba5481a00418078c987a32c3e116982a9df7e",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "0dbe2ec96ce93f44250d6befff8279587a4a08afbe3de181a0d4b5e7c96c717c",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "0dbe2ec96ce93f44250d6befff8279587a4a08afbe3de181a0d4b5e7c96c717c",
+      "evidence_hash": "9ffb7e8c8e57699c842e3e5a649e0d76da137d08cb3e6fbfc61cefcefbaaa0a0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各オーケストレーション（signal chain sequencing / diff-fragment pipeline / dry_write メトリクス集計 / dry_check_approved fragment-ref derivation など）が usecase application service に移設されている。"
+      }
+    },
+    {
+      "claim_hash": "50662efeb194cef160884f9c846524a3e799e2a60442c9d6dcd041185a36a0d8",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "50662efeb194cef160884f9c846524a3e799e2a60442c9d6dcd041185a36a0d8",
+      "evidence_hash": "9ffb7e8c8e57699c842e3e5a649e0d76da137d08cb3e6fbfc61cefcefbaaa0a0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step-orchestration カテゴリ（audit: 6 件）が cli_composition から除去されており、各オーケストレーション（signal chain sequencing / diff-fragment pipeline / dry_write メトリクス集計 / dry_check_approved fragment-ref derivation など）が usecase application service に移設されている。"
+      }
+    },
+    {
+      "claim_hash": "1785cc4fde0c4d96a1d30ebc1476caa8c27c5c16f011f349dd78b7847ed22b43",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "1785cc4fde0c4d96a1d30ebc1476caa8c27c5c16f011f349dd78b7847ed22b43",
+      "evidence_hash": "a425cb25b341819d488eb925a8226f03957f002d0165b56db13ffabc3f481bb1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション（signal chain sequencing / diff-fragment pipeline / PR polling など）は driving adapter（`cli_driver`）ではなく usecase の application service に置かなければならない。driving adapter は単一 use case の invoke + render に留める。"
+      }
+    },
+    {
+      "claim_hash": "5501dcec48993fcbd9347464522011b5985b3672e2d7b395d91c20909bc6dc13",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "5501dcec48993fcbd9347464522011b5985b3672e2d7b395d91c20909bc6dc13",
+      "evidence_hash": "a425cb25b341819d488eb925a8226f03957f002d0165b56db13ffabc3f481bb1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション（signal chain sequencing / diff-fragment pipeline / PR polling など）は driving adapter（`cli_driver`）ではなく usecase の application service に置かなければならない。driving adapter は単一 use case の invoke + render に留める。"
+      }
+    },
+    {
+      "claim_hash": "39f702eeae0de49ab30cebb8502a75b893d0b3577a3348e45b9ed46d16ae67d3",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "39f702eeae0de49ab30cebb8502a75b893d0b3577a3348e45b9ed46d16ae67d3",
+      "evidence_hash": "9ffb7e8c8e57699c842e3e5a649e0d76da137d08cb3e6fbfc61cefcefbaaa0a0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各オーケストレーション（signal chain sequencing / diff-fragment pipeline / dry_write メトリクス集計 / dry_check_approved fragment-ref derivation など）が usecase application service に移設されている。"
+      }
+    },
+    {
+      "claim_hash": "b951c1f79db633df32b997bbd08a25fe1520a8896bcbfdd0e1b431f943ca4ab9",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "b951c1f79db633df32b997bbd08a25fe1520a8896bcbfdd0e1b431f943ca4ab9",
+      "evidence_hash": "a425cb25b341819d488eb925a8226f03957f002d0165b56db13ffabc3f481bb1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション（signal chain sequencing / diff-fragment pipeline / PR polling など）は driving adapter（`cli_driver`）ではなく usecase の application service に置かなければならない。driving adapter は単一 use case の invoke + render に留める。"
+      }
+    },
+    {
+      "claim_hash": "677a71f87d157cc452149d6a63d35cf6d0f8bb7d9e8640dbd91620633ceb558d",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "677a71f87d157cc452149d6a63d35cf6d0f8bb7d9e8640dbd91620633ceb558d",
+      "evidence_hash": "a425cb25b341819d488eb925a8226f03957f002d0165b56db13ffabc3f481bb1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション（signal chain sequencing / diff-fragment pipeline / PR polling など）は driving adapter（`cli_driver`）ではなく usecase の application service に置かなければならない。driving adapter は単一 use case の invoke + render に留める。"
+      }
+    },
+    {
+      "claim_hash": "d0de2e42539f63a0265ee179e0c2b7b3b351ec87e83a4b27f7db21ed54d899ba",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "d0de2e42539f63a0265ee179e0c2b7b3b351ec87e83a4b27f7db21ed54d899ba",
+      "evidence_hash": "a425cb25b341819d488eb925a8226f03957f002d0165b56db13ffabc3f481bb1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション（signal chain sequencing / diff-fragment pipeline / PR polling など）は driving adapter（`cli_driver`）ではなく usecase の application service に置かなければならない。driving adapter は単一 use case の invoke + render に留める。"
+      }
+    },
+    {
+      "claim_hash": "b4e9ce18a8026b8c46d7cfa644d3c386134a13ba3971186baf60013dda308a46",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "b4e9ce18a8026b8c46d7cfa644d3c386134a13ba3971186baf60013dda308a46",
+      "evidence_hash": "a425cb25b341819d488eb925a8226f03957f002d0165b56db13ffabc3f481bb1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション（signal chain sequencing / diff-fragment pipeline / PR polling など）は driving adapter（`cli_driver`）ではなく usecase の application service に置かなければならない。"
+      }
+    },
+    {
+      "claim_hash": "ee3e2c19d9ef22a3a00a475de461727ed57fbff6e59eec8e3b6c87f0ff0028fa",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "ee3e2c19d9ef22a3a00a475de461727ed57fbff6e59eec8e3b6c87f0ff0028fa",
+      "evidence_hash": "a425cb25b341819d488eb925a8226f03957f002d0165b56db13ffabc3f481bb1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション（signal chain sequencing / diff-fragment pipeline / PR polling など）は driving adapter（`cli_driver`）ではなく usecase の application service に置かなければならない。driving adapter は単一 use case の invoke + render に留める。"
+      }
+    },
+    {
+      "claim_hash": "ee3e2c19d9ef22a3a00a475de461727ed57fbff6e59eec8e3b6c87f0ff0028fa",
+      "evidence_hash": "9ffb7e8c8e57699c842e3e5a649e0d76da137d08cb3e6fbfc61cefcefbaaa0a0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step-orchestration カテゴリ（audit: 6 件）が cli_composition から除去されており、各オーケストレーション（signal chain sequencing / diff-fragment pipeline / dry_write メトリクス集計 / dry_check_approved fragment-ref derivation など）が usecase application service に移設されている。"
+      }
+    },
+    {
+      "claim_hash": "27652c3b065c46f72cda58bb226181921e3a7499926da8016b065d4bd8bd4d80",
+      "evidence_hash": "fde36f306f5f79e93d276ba5aedf461b1e88eccb050dc87e855e84766c96abc9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "secondary adapter → interactor → driving adapter を構築し、use case を driving adapter に注入して返す。use case を invoke しない。"
+      }
+    },
+    {
+      "claim_hash": "5fa77c5feec6bc5a8036dc9b4173e77892665aece64d20beaf77ef65760e6312",
+      "evidence_hash": "fde36f306f5f79e93d276ba5aedf461b1e88eccb050dc87e855e84766c96abc9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`secondary adapter → interactor → driving adapter` を構築し、`use case` を `driving adapter` に注入して返す。"
+      }
+    },
+    {
+      "claim_hash": "d8f72e3381da86753dec945675ef3501586f7dfeda9b1b092e2c273e8a8aef5c",
+      "evidence_hash": "fde36f306f5f79e93d276ba5aedf461b1e88eccb050dc87e855e84766c96abc9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "secondary adapter → interactor → driving adapter を構築し、use case を driving adapter に注入して返す。use case を invoke しない。"
+      }
+    },
+    {
+      "claim_hash": "377c52718acf309cacdc2c2f77365128081c2eb3db591150ad5c56cfe2e70cae",
+      "evidence_hash": "fde36f306f5f79e93d276ba5aedf461b1e88eccb050dc87e855e84766c96abc9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition` の責務を DI（object graph の組み立て）のみに絞る。secondary adapter → interactor → driving adapter を構築し、use case を driving adapter に注入して返す。use case を invoke しない。"
+      }
+    },
+    {
+      "claim_hash": "84d45ac65399de733ae40882155e05fcd4dbac49134f9474dbe4bc38cdaee26d",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "84d45ac65399de733ae40882155e05fcd4dbac49134f9474dbe4bc38cdaee26d",
+      "evidence_hash": "a425cb25b341819d488eb925a8226f03957f002d0165b56db13ffabc3f481bb1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション（signal chain sequencing / diff-fragment pipeline / PR polling など）は driving adapter（`cli_driver`）ではなく usecase の application service に置かなければならない。driving adapter は単一 use case の invoke + render に留める。"
+      }
+    },
+    {
+      "claim_hash": "ea053a095d55fcf40d627c5758fa329747b83e606e7e7481164a79129575f5cb",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "ea053a095d55fcf40d627c5758fa329747b83e606e7e7481164a79129575f5cb",
+      "evidence_hash": "9ffb7e8c8e57699c842e3e5a649e0d76da137d08cb3e6fbfc61cefcefbaaa0a0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各オーケストレーション（signal chain sequencing / diff-fragment pipeline / dry_write メトリクス集計 / dry_check_approved fragment-ref derivation など）が usecase application service に移設されている。"
+      }
+    },
+    {
+      "claim_hash": "ddd19b0a88631d097c04418e25c840198af401c701f7c549d535c7ce27bb571a",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "0a1edf996a5243e4a0caef7d29b0aef7c4a45e6329a358723513b15eca9a98ca",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "5858cd8bd0a4204a9f5b3dd4e14870ed697e92dbd658221d16d329c3e0504a67",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "02cf36723181c4dd67b1f1cb03041a5f93a27516f03996f6eb7a806554613c67",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "fail",
+        "reason": "New behavioral commitment: the evidence only commits to delegating multi-step orchestration/integration logic to a usecase application service, while the claim adds a crate JSON schema export failure contract for SchemaExporterPort::export_as_json that is not mentioned by, nor naturally derivable from, this evidence."
+      }
+    },
+    {
+      "claim_hash": "8261baebc50c6a1a2de9bd253ef5eb4523388080667b3f19ad8ddaa13889b1cc",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "fail",
+        "reason": "New behavioral commitment: the claim defines a POSIX shell token-splitting error contract for ShellParserPort::split_shell, while the evidence only commits to delegating multi-step orchestration/integration logic to a usecase application service and does not motivate shell parsing or its parse-failure behavior."
+      }
+    },
+    {
+      "claim_hash": "891562d06f33eee1fb4ebe1f949a8d2b32b85a065d2192dcb9ad53b83b517a9a",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "042187a727f92b65179bf7119be9c06ac773be6b81eaf01f2ed9b1820bd20dc6",
+      "evidence_hash": "fde36f306f5f79e93d276ba5aedf461b1e88eccb050dc87e855e84766c96abc9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "secondary adapter → interactor → driving adapter を構築し、use case を driving adapter に注入して返す。use case を invoke しない。"
+      }
+    },
+    {
+      "claim_hash": "3fe88cf3f0b0abc24711f06c4c3b2b67e368afb2c617e7b69f7d082ed8dc33d2",
+      "evidence_hash": "fde36f306f5f79e93d276ba5aedf461b1e88eccb050dc87e855e84766c96abc9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "secondary adapter → interactor → driving adapter を構築し、use case を driving adapter に注入して返す。use case を invoke しない。"
+      }
+    },
+    {
+      "claim_hash": "209cd8a4b3f016fc86bb747c602b94cd33e0b4e42b5cbee3e8fad9ebab914418",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "9aaf263623ad03baa4c0a67c2aa246cd141790e37e027b9d113d8d64fe75721f",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲"
+      }
+    },
+    {
+      "claim_hash": "cd1decabcc06297543b653fdce8703e4809cd54b8ac9016f30b5747d0c70a0ef",
+      "evidence_hash": "fde36f306f5f79e93d276ba5aedf461b1e88eccb050dc87e855e84766c96abc9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "secondary adapter → interactor → driving adapter を構築し、use case を driving adapter に注入して返す。use case を invoke しない。"
+      }
+    },
+    {
+      "claim_hash": "9d174af8c44c258d8e4fdb19e9fed01fbed8c245493a9fd553067f2f57671993",
+      "evidence_hash": "ce0f9a0cf33b1c4f2642263f494ac964c517ab4a0e32bd80111746bf48fe45e1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の typed error enum に統一する。`Result<_, String>` を廃止し、各 port／service のエラーバリアントを usecase 層内で定義する。infrastructure adapter は `map_err` チェーン経由で typed variant へ変換して boundary を越える。"
+      }
+    },
+    {
+      "claim_hash": "1a8bd3041a77e58a439430f2bf39bec21286b8ddaeccb268b512864a7f94341f",
+      "evidence_hash": "ce0f9a0cf33b1c4f2642263f494ac964c517ab4a0e32bd80111746bf48fe45e1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の typed error enum に統一する。`Result<_, String>` を廃止し、各 port／service のエラーバリアントを usecase 層内で定義する。infrastructure adapter は `map_err` チェーン経由で typed variant へ変換して boundary を越える。"
+      }
+    },
+    {
+      "claim_hash": "daf8b07fe4825b72a6a19e67f86c1b2782a0c80afeb8dc8f6274fd18e762e8a4",
+      "evidence_hash": "ce0f9a0cf33b1c4f2642263f494ac964c517ab4a0e32bd80111746bf48fe45e1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の typed error enum に統一する。`Result<_, String>` を廃止し、各 port／service のエラーバリアントを usecase 層内で定義する。"
+      }
+    },
+    {
+      "claim_hash": "15d8e1cfc6310ca3b320fa9258b3cd04314a45c3f04f382a3b6ac2b144f1c639",
+      "evidence_hash": "ce0f9a0cf33b1c4f2642263f494ac964c517ab4a0e32bd80111746bf48fe45e1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の typed error enum に統一する。`Result<_, String>` を廃止し、各 port／service のエラーバリアントを usecase 層内で定義する。infrastructure adapter は `map_err` チェーン経由で typed variant へ変換して boundary を越える。"
+      }
+    },
+    {
+      "claim_hash": "68c679bb1bd49f51e1470121db2520c5ba9ba27d3faf74585729269b4dd10341",
+      "evidence_hash": "ce0f9a0cf33b1c4f2642263f494ac964c517ab4a0e32bd80111746bf48fe45e1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の typed error enum に統一する。`Result<_, String>` を廃止し、各 port／service のエラーバリアントを usecase 層内で定義する。infrastructure adapter は `map_err` チェーン経由で typed variant へ変換して boundary を越える。"
+      }
+    },
+    {
+      "claim_hash": "ab0a1db4d2ab325c13222576a3745c80f5ada0543092924fbd7a0e8a6074902b",
+      "evidence_hash": "ce0f9a0cf33b1c4f2642263f494ac964c517ab4a0e32bd80111746bf48fe45e1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の typed error enum に統一する。`Result<_, String>` を廃止し、各 port／service のエラーバリアントを usecase 層内で定義する。"
+      }
+    },
+    {
+      "claim_hash": "cd947591dfeea0f4b6175de6db6ce1c3683ea1b341cc656149cf0b2b928ae2e7",
+      "evidence_hash": "ce0f9a0cf33b1c4f2642263f494ac964c517ab4a0e32bd80111746bf48fe45e1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の typed error enum に統一する。`Result<_, String>` を廃止し、各 port／service のエラーバリアントを usecase 層内で定義する。"
+      }
+    },
+    {
+      "claim_hash": "e0e85e0b9a173503ace8814f9e086c784f73a9b1d2a776ac669d61fe91e59100",
+      "evidence_hash": "ce0f9a0cf33b1c4f2642263f494ac964c517ab4a0e32bd80111746bf48fe45e1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の typed error enum に統一する。`Result<_, String>` を廃止し、各 port／service のエラーバリアントを usecase 層内で定義する。infrastructure adapter は `map_err` チェーン経由で typed variant へ変換して boundary を越える。"
+      }
+    },
+    {
+      "claim_hash": "a6e0329497c17b5eef7bbf9a7dfd55ec0ac6f619df1b3f7f338c81e541f5c6fa",
+      "evidence_hash": "ce0f9a0cf33b1c4f2642263f494ac964c517ab4a0e32bd80111746bf48fe45e1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の typed error enum に統一する。`Result<_, String>` を廃止し、各 port／service のエラーバリアントを usecase 層内で定義する。infrastructure adapter は `map_err` チェーン経由で typed variant へ変換して boundary を越える。"
+      }
+    },
+    {
+      "claim_hash": "ebef9f6422436f65b365b1d46c9bc66268f38ae7d4ea4438c3a3a0718604c27f",
+      "evidence_hash": "ce0f9a0cf33b1c4f2642263f494ac964c517ab4a0e32bd80111746bf48fe45e1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の typed error enum に統一する。`Result<_, String>` を廃止し、各 port／service のエラーバリアントを usecase 層内で定義する。infrastructure adapter は `map_err` チェーン経由で typed variant へ変換して boundary を越える。"
+      }
+    },
+    {
+      "claim_hash": "75d2d9b40808b680a3a350edd08387d5e7ac590af0edbcfb6d694ec5500e1f89",
+      "evidence_hash": "ce0f9a0cf33b1c4f2642263f494ac964c517ab4a0e32bd80111746bf48fe45e1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の typed error enum に統一する。`Result<_, String>` を廃止し、各 port／service のエラーバリアントを usecase 層内で定義する。"
+      }
+    },
+    {
+      "claim_hash": "7106a6983e146bbb22ca8584bfd333fc09a99a706e88a61c65ce20d9b090daf1",
+      "evidence_hash": "ce0f9a0cf33b1c4f2642263f494ac964c517ab4a0e32bd80111746bf48fe45e1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の typed error enum に統一する。`Result<_, String>` を廃止し、各 port／service のエラーバリアントを usecase 層内で定義する。"
+      }
+    },
+    {
+      "claim_hash": "27dc8295105cf324775217ac3dc49c710940b5376b0bd448e08b0d73fc24b803",
+      "evidence_hash": "3fe92f78837294b466b8579dde2c12702b196b0f24caecf89458cfa4857e7513",
+      "verdict": {
+        "kind": "pass",
+        "citation": "新規 port（`SchemaExporterPort`、`ShellParserPort` など）を usecase 層に定義する。secondary port の infrastructure adapter 実装は infrastructure 層に配置し、... port／service が返すエラーは IN-13 に準拠した typed error 型とする。"
+      }
+    },
+    {
+      "claim_hash": "7d3026bc730d14fd09d82a8f944a8e723c33986bc11cf9c42ed42fe47fa4dd22",
+      "evidence_hash": "3fe92f78837294b466b8579dde2c12702b196b0f24caecf89458cfa4857e7513",
+      "verdict": {
+        "kind": "pass",
+        "citation": "新規 port（`SchemaExporterPort`、`ShellParserPort` など）と aggregate service（`TelemetryReportService` など）を usecase 層に定義する。secondary port の infrastructure adapter 実装は infrastructure 層に配置し、aggregate/application service の実装は usecase 層に置いて ports を注入される。port／service が返すエラーは IN-13 に準拠した typed error 型とする。"
+      }
+    },
+    {
+      "claim_hash": "981c4e19daa4c84f22fc5b8c848deda20c7ab7cdb1888f4e2d04991883024fce",
+      "evidence_hash": "ce0f9a0cf33b1c4f2642263f494ac964c517ab4a0e32bd80111746bf48fe45e1",
+      "verdict": {
+        "kind": "fail",
+        "reason": "Contradiction: the evidence requires usecase-layer port/service errors to be unified as a `thiserror`-derived typed error enum and to abolish `Result<_, String>`, while the claim defines a transparent tuple struct over `String` specifically for `ReviewRoundType::parse`, not a typed error enum or variant."
+      }
+    },
+    {
+      "claim_hash": "9d174af8c44c258d8e4fdb19e9fed01fbed8c245493a9fd553067f2f57671993",
+      "evidence_hash": "4f62c253561ee3076be87516a311c16d6cac732ffe887a127492f6176dd8d4cf",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の typed error enum に統一する。`Result<_, String>` を廃止し、各 port／service のエラーバリアントを usecase 層内で定義する。infrastructure adapter は `map_err` チェーン経由で typed variant へ変換して boundary を越える。"
+      }
+    },
+    {
+      "claim_hash": "1a8bd3041a77e58a439430f2bf39bec21286b8ddaeccb268b512864a7f94341f",
+      "evidence_hash": "4f62c253561ee3076be87516a311c16d6cac732ffe887a127492f6176dd8d4cf",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の typed error enum に統一する。`Result<_, String>` を廃止し、各 port／service のエラーバリアントを usecase 層内で定義する。infrastructure adapter は `map_err` チェーン経由で typed variant へ変換して boundary を越える。"
+      }
+    },
+    {
+      "claim_hash": "daf8b07fe4825b72a6a19e67f86c1b2782a0c80afeb8dc8f6274fd18e762e8a4",
+      "evidence_hash": "4f62c253561ee3076be87516a311c16d6cac732ffe887a127492f6176dd8d4cf",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の typed error enum に統一する。`Result<_, String>` を廃止し、各 port／service のエラーバリアントを usecase 層内で定義する。infrastructure adapter は `map_err` チェーン経由で typed variant へ変換して boundary を越える。"
+      }
+    },
+    {
+      "claim_hash": "15d8e1cfc6310ca3b320fa9258b3cd04314a45c3f04f382a3b6ac2b144f1c639",
+      "evidence_hash": "4f62c253561ee3076be87516a311c16d6cac732ffe887a127492f6176dd8d4cf",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の typed error enum に統一する。`Result<_, String>` を廃止し、各 port／service のエラーバリアントを usecase 層内で定義する。infrastructure adapter は `map_err` チェーン経由で typed variant へ変換して boundary を越える。"
+      }
+    },
+    {
+      "claim_hash": "68c679bb1bd49f51e1470121db2520c5ba9ba27d3faf74585729269b4dd10341",
+      "evidence_hash": "4f62c253561ee3076be87516a311c16d6cac732ffe887a127492f6176dd8d4cf",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の typed error enum に統一する。`Result<_, String>` を廃止し、各 port／service のエラーバリアントを usecase 層内で定義する。infrastructure adapter は `map_err` チェーン経由で typed variant へ変換して boundary を越える。"
+      }
+    },
+    {
+      "claim_hash": "ab0a1db4d2ab325c13222576a3745c80f5ada0543092924fbd7a0e8a6074902b",
+      "evidence_hash": "4f62c253561ee3076be87516a311c16d6cac732ffe887a127492f6176dd8d4cf",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の typed error enum に統一する。`Result<_, String>` を廃止し、各 port／service のエラーバリアントを usecase 層内で定義する。infrastructure adapter は `map_err` チェーン経由で typed variant へ変換して boundary を越える。"
+      }
+    },
+    {
+      "claim_hash": "cd947591dfeea0f4b6175de6db6ce1c3683ea1b341cc656149cf0b2b928ae2e7",
+      "evidence_hash": "4f62c253561ee3076be87516a311c16d6cac732ffe887a127492f6176dd8d4cf",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の typed error enum に統一する。`Result<_, String>` を廃止し、各 port／service のエラーバリアントを usecase 層内で定義する。"
+      }
+    },
+    {
+      "claim_hash": "e0e85e0b9a173503ace8814f9e086c784f73a9b1d2a776ac669d61fe91e59100",
+      "evidence_hash": "4f62c253561ee3076be87516a311c16d6cac732ffe887a127492f6176dd8d4cf",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の typed error enum に統一する。`Result<_, String>` を廃止し、各 port／service のエラーバリアントを usecase 層内で定義する。"
+      }
+    },
+    {
+      "claim_hash": "a6e0329497c17b5eef7bbf9a7dfd55ec0ac6f619df1b3f7f338c81e541f5c6fa",
+      "evidence_hash": "4f62c253561ee3076be87516a311c16d6cac732ffe887a127492f6176dd8d4cf",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の typed error enum に統一する。`Result<_, String>` を廃止し、各 port／service のエラーバリアントを usecase 層内で定義する。"
+      }
+    },
+    {
+      "claim_hash": "ebef9f6422436f65b365b1d46c9bc66268f38ae7d4ea4438c3a3a0718604c27f",
+      "evidence_hash": "4f62c253561ee3076be87516a311c16d6cac732ffe887a127492f6176dd8d4cf",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の typed error enum に統一する。`Result<_, String>` を廃止し、各 port／service のエラーバリアントを usecase 層内で定義する。infrastructure adapter は `map_err` チェーン経由で typed variant へ変換して boundary を越える。"
+      }
+    },
+    {
+      "claim_hash": "75d2d9b40808b680a3a350edd08387d5e7ac590af0edbcfb6d694ec5500e1f89",
+      "evidence_hash": "4f62c253561ee3076be87516a311c16d6cac732ffe887a127492f6176dd8d4cf",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の typed error enum に統一する。`Result<_, String>` を廃止し、各 port／service のエラーバリアントを usecase 層内で定義する。"
+      }
+    },
+    {
+      "claim_hash": "7106a6983e146bbb22ca8584bfd333fc09a99a706e88a61c65ce20d9b090daf1",
+      "evidence_hash": "4f62c253561ee3076be87516a311c16d6cac732ffe887a127492f6176dd8d4cf",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の typed error enum に統一する。`Result<_, String>` を廃止し、各 port／service のエラーバリアントを usecase 層内で定義する。"
+      }
+    },
+    {
+      "claim_hash": "27dc8295105cf324775217ac3dc49c710940b5376b0bd448e08b0d73fc24b803",
+      "evidence_hash": "0c1f42c44ace7dc8e5f6f2d065bc03fb79b2d9a2327f78c4645bb7db3b145607",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase secondary port コントラクトの新設・修正、および aggregate service の追加。新規 port（`SchemaExporterPort`、`ShellParserPort` など）と aggregate service（`TelemetryReportService` など）を usecase 層に定義する。secondary port の infrastructure adapter 実装は infrastructure 層に配置し、aggregate/application service の実装は usecase 層に置いて ports を注入される。port／service が返すエラーは IN-13 に準拠した typed error 型とする。"
+      }
+    },
+    {
+      "claim_hash": "7d3026bc730d14fd09d82a8f944a8e723c33986bc11cf9c42ed42fe47fa4dd22",
+      "evidence_hash": "0c1f42c44ace7dc8e5f6f2d065bc03fb79b2d9a2327f78c4645bb7db3b145607",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase secondary port コントラクトの新設・修正、および aggregate service の追加。新規 port（`SchemaExporterPort`、`ShellParserPort` など）と aggregate service（`TelemetryReportService` など）を usecase 層に定義する。secondary port の infrastructure adapter 実装は infrastructure 層に配置し、aggregate/application service の実装は usecase 層に置いて ports を注入される。port／service が返すエラーは IN-13 に準拠した typed error 型とする。"
+      }
+    },
+    {
+      "claim_hash": "981c4e19daa4c84f22fc5b8c848deda20c7ab7cdb1888f4e2d04991883024fce",
+      "evidence_hash": "4f62c253561ee3076be87516a311c16d6cac732ffe887a127492f6176dd8d4cf",
+      "verdict": {
+        "kind": "fail",
+        "reason": "Contradiction: the evidence requires usecase secondary port and aggregate service errors to be unified as `thiserror`-derived typed error enums and to abolish `Result<_, String>`, but the claim declares `ReviewRoundTypeError` as a tuple struct transparent newtype over `String` rather than a typed error enum."
+      }
+    },
+    {
+      "claim_hash": "6e2aed6be8095c56e39e394b2f2f0c188ad59ec1e8a1f477c6b00c2c12186882",
+      "evidence_hash": "4f62c253561ee3076be87516a311c16d6cac732ffe887a127492f6176dd8d4cf",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の typed error enum に統一する。`Result<_, String>` を廃止し、各 port／service のエラーバリアントを usecase 層内で定義する。infrastructure adapter は `map_err` チェーン経由で typed variant へ変換して boundary を越える。"
+      }
+    },
+    {
+      "claim_hash": "761e680e552367e9c2db767de8b8f64cc917041740d1036cb9f1104eaa52fb91",
+      "evidence_hash": "4f62c253561ee3076be87516a311c16d6cac732ffe887a127492f6176dd8d4cf",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の typed error enum に統一する。`Result<_, String>` を廃止し、各 port／service のエラーバリアントを usecase 層内で定義する。infrastructure adapter は `map_err` チェーン経由で typed variant へ変換して boundary を越える。"
+      }
+    },
+    {
+      "claim_hash": "761e680e552367e9c2db767de8b8f64cc917041740d1036cb9f1104eaa52fb91",
+      "evidence_hash": "0c1f42c44ace7dc8e5f6f2d065bc03fb79b2d9a2327f78c4645bb7db3b145607",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port／service が返すエラーは IN-13 に準拠した typed error 型とする。"
+      }
+    },
+    {
+      "claim_hash": "8ff9615d26036f5f09ac7a5e7e817291529401c549e98b3e6cf4192e7019dc9b",
+      "evidence_hash": "4f62c253561ee3076be87516a311c16d6cac732ffe887a127492f6176dd8d4cf",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の typed error enum に統一する。`Result<_, String>` を廃止し、各 port／service のエラーバリアントを usecase 層内で定義する。infrastructure adapter は `map_err` チェーン経由で typed variant へ変換して boundary を越える。"
+      }
+    },
+    {
+      "claim_hash": "8ff9615d26036f5f09ac7a5e7e817291529401c549e98b3e6cf4192e7019dc9b",
+      "evidence_hash": "0c1f42c44ace7dc8e5f6f2d065bc03fb79b2d9a2327f78c4645bb7db3b145607",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port／service が返すエラーは IN-13 に準拠した typed error 型とする。"
+      }
+    },
+    {
+      "claim_hash": "d8bc9d7f96a6d5ce98388887a3c7e2e46d5acf9c201a102cecc104805c9c5859",
+      "evidence_hash": "4f62c253561ee3076be87516a311c16d6cac732ffe887a127492f6176dd8d4cf",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の typed error enum に統一する。`Result<_, String>` を廃止し、各 port／service のエラーバリアントを usecase 層内で定義する。"
+      }
+    },
+    {
+      "claim_hash": "d8bc9d7f96a6d5ce98388887a3c7e2e46d5acf9c201a102cecc104805c9c5859",
+      "evidence_hash": "0c1f42c44ace7dc8e5f6f2d065bc03fb79b2d9a2327f78c4645bb7db3b145607",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port／service が返すエラーは IN-13 に準拠した typed error 型とする。"
+      }
+    },
+    {
+      "claim_hash": "858a1b57c58b50ad1e6d2a2b0a37e13221dd7d58b5a45ab5e397b2f68d63f601",
+      "evidence_hash": "4f62c253561ee3076be87516a311c16d6cac732ffe887a127492f6176dd8d4cf",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の typed error enum に統一する。`Result<_, String>` を廃止し、各 port／service のエラーバリアントを usecase 層内で定義する。infrastructure adapter は `map_err` チェーン経由で typed variant へ変換して boundary を越える。"
+      }
+    },
+    {
+      "claim_hash": "858a1b57c58b50ad1e6d2a2b0a37e13221dd7d58b5a45ab5e397b2f68d63f601",
+      "evidence_hash": "0c1f42c44ace7dc8e5f6f2d065bc03fb79b2d9a2327f78c4645bb7db3b145607",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port／service が返すエラーは IN-13 に準拠した typed error 型とする。"
+      }
+    },
+    {
+      "claim_hash": "e86df1a4dd5970b178d38bb5f1d8508b272ff0417424ea86b3312c3fe74a43f3",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "e86df1a4dd5970b178d38bb5f1d8508b272ff0417424ea86b3312c3fe74a43f3",
+      "evidence_hash": "4f62c253561ee3076be87516a311c16d6cac732ffe887a127492f6176dd8d4cf",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の typed error enum に統一する。`Result<_, String>` を廃止し、各 port／service のエラーバリアントを usecase 層内で定義する。infrastructure adapter は `map_err` チェーン経由で typed variant へ変換して boundary を越える。"
+      }
+    },
+    {
+      "claim_hash": "e86df1a4dd5970b178d38bb5f1d8508b272ff0417424ea86b3312c3fe74a43f3",
+      "evidence_hash": "0c1f42c44ace7dc8e5f6f2d065bc03fb79b2d9a2327f78c4645bb7db3b145607",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port／service が返すエラーは IN-13 に準拠した typed error 型とする。"
+      }
+    },
+    {
+      "claim_hash": "d7e117c5e3c2ff21ee73d277c41c877da85ab66ffdfa170c2af9a367f9d671a6",
+      "evidence_hash": "4f62c253561ee3076be87516a311c16d6cac732ffe887a127492f6176dd8d4cf",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の typed error enum に統一する。`Result<_, String>` を廃止し、各 port／service のエラーバリアントを usecase 層内で定義する。infrastructure adapter は `map_err` チェーン経由で typed variant へ変換して boundary を越える。"
+      }
+    },
+    {
+      "claim_hash": "d7e117c5e3c2ff21ee73d277c41c877da85ab66ffdfa170c2af9a367f9d671a6",
+      "evidence_hash": "0c1f42c44ace7dc8e5f6f2d065bc03fb79b2d9a2327f78c4645bb7db3b145607",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port／service が返すエラーは IN-13 に準拠した typed error 型とする。"
+      }
+    },
+    {
+      "claim_hash": "d4c388227f9c37b3217a39e51c2db384bb8d52c1f2d8d979977f06ba39391d1c",
+      "evidence_hash": "4f62c253561ee3076be87516a311c16d6cac732ffe887a127492f6176dd8d4cf",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の typed error enum に統一する。`Result<_, String>` を廃止し、各 port／service のエラーバリアントを usecase 層内で定義する。infrastructure adapter は `map_err` チェーン経由で typed variant へ変換して boundary を越える。"
+      }
+    },
+    {
+      "claim_hash": "d4c388227f9c37b3217a39e51c2db384bb8d52c1f2d8d979977f06ba39391d1c",
+      "evidence_hash": "0c1f42c44ace7dc8e5f6f2d065bc03fb79b2d9a2327f78c4645bb7db3b145607",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port／service が返すエラーは IN-13 に準拠した typed error 型とする。"
+      }
+    },
+    {
+      "claim_hash": "07d011b9310bd5944a6a87fbe305a9df91a9737173a77ac0e1a1a38ac15b351a",
+      "evidence_hash": "4f62c253561ee3076be87516a311c16d6cac732ffe887a127492f6176dd8d4cf",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の typed error enum に統一する。`Result<_, String>` を廃止し、各 port／service のエラーバリアントを usecase 層内で定義する。"
+      }
+    },
+    {
+      "claim_hash": "07d011b9310bd5944a6a87fbe305a9df91a9737173a77ac0e1a1a38ac15b351a",
+      "evidence_hash": "0c1f42c44ace7dc8e5f6f2d065bc03fb79b2d9a2327f78c4645bb7db3b145607",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port／service が返すエラーは IN-13 に準拠した typed error 型とする。"
+      }
+    },
+    {
+      "claim_hash": "c01bddcc2b561b3f68c3eae56e6bf41f5c9ee1258e467107e827bbeaae2746fb",
+      "evidence_hash": "4f62c253561ee3076be87516a311c16d6cac732ffe887a127492f6176dd8d4cf",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の typed error enum に統一する。`Result<_, String>` を廃止し、各 port／service のエラーバリアントを usecase 層内で定義する。"
+      }
+    },
+    {
+      "claim_hash": "c01bddcc2b561b3f68c3eae56e6bf41f5c9ee1258e467107e827bbeaae2746fb",
+      "evidence_hash": "0c1f42c44ace7dc8e5f6f2d065bc03fb79b2d9a2327f78c4645bb7db3b145607",
+      "verdict": {
+        "kind": "pass",
+        "citation": "新規 port（`SchemaExporterPort`、`ShellParserPort` など）と aggregate service（`TelemetryReportService` など）を usecase 層に定義する。... port／service が返すエラーは IN-13 に準拠した typed error 型とする。"
+      }
+    },
+    {
+      "claim_hash": "fbc666cff9951d909cf795291cc51df7712d5fb13a2225cce661974f089ea6d4",
+      "evidence_hash": "4f62c253561ee3076be87516a311c16d6cac732ffe887a127492f6176dd8d4cf",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の typed error enum に統一する。`Result<_, String>` を廃止し、各 port／service のエラーバリアントを usecase 層内で定義する。infrastructure adapter は `map_err` チェーン経由で typed variant へ変換して boundary を越える。"
+      }
+    },
+    {
+      "claim_hash": "fbc666cff9951d909cf795291cc51df7712d5fb13a2225cce661974f089ea6d4",
+      "evidence_hash": "0c1f42c44ace7dc8e5f6f2d065bc03fb79b2d9a2327f78c4645bb7db3b145607",
+      "verdict": {
+        "kind": "pass",
+        "citation": "新規 port（`SchemaExporterPort`、`ShellParserPort` など）を usecase 層に定義する。... port／service が返すエラーは IN-13 に準拠した typed error 型とする。"
+      }
+    },
+    {
+      "claim_hash": "457de0df1fd84618c205d47c14c807699e18976e523c71ebda0282156722e4b7",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "457de0df1fd84618c205d47c14c807699e18976e523c71ebda0282156722e4b7",
+      "evidence_hash": "0c1f42c44ace7dc8e5f6f2d065bc03fb79b2d9a2327f78c4645bb7db3b145607",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase secondary port コントラクトの新設・修正、および aggregate service の追加。新規 port（`SchemaExporterPort`、`ShellParserPort` など）と aggregate service（`TelemetryReportService` など）を usecase 層に定義する。"
+      }
+    },
+    {
+      "claim_hash": "423b825c30c5932a8037b8c75a416c496a42ff45aaf33f4fb12c7b6f91722ae9",
+      "evidence_hash": "3fcc8acc89942c850edcccbf2ebcb945f635c105484678cd688c1c042dfa279c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli/src/main.rs` の `emit_archived_track_subcommand`（`std::fs` / `serde_json` / `chrono::Utc::now()`）を infrastructure adapter（時刻取得・fs 書き込み）として切り出し、composition が wire して driver 経由で呼ぶ経路にする。bin は parse + dispatch + emit のみに戻す。"
+      }
+    },
+    {
+      "claim_hash": "423b825c30c5932a8037b8c75a416c496a42ff45aaf33f4fb12c7b6f91722ae9",
+      "evidence_hash": "4f62c253561ee3076be87516a311c16d6cac732ffe887a127492f6176dd8d4cf",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の typed error enum に統一する。`Result<_, String>` を廃止し、各 port／service のエラーバリアントを usecase 層内で定義する。"
+      }
+    },
+    {
+      "claim_hash": "423b825c30c5932a8037b8c75a416c496a42ff45aaf33f4fb12c7b6f91722ae9",
+      "evidence_hash": "0c1f42c44ace7dc8e5f6f2d065bc03fb79b2d9a2327f78c4645bb7db3b145607",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase secondary port コントラクトの新設・修正、および aggregate service の追加。新規 port（`SchemaExporterPort`、`ShellParserPort` など）と aggregate service（`TelemetryReportService` など）を usecase 層に定義する。... port／service が返すエラーは IN-13 に準拠した typed error 型とする。"
+      }
+    },
+    {
+      "claim_hash": "bf5210f379074e230a40553ae352e8413cb0357d6a0d136b419a69a25e18c4cc",
+      "evidence_hash": "3fcc8acc89942c850edcccbf2ebcb945f635c105484678cd688c1c042dfa279c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli/src/main.rs` の `emit_archived_track_subcommand`（`std::fs` / `serde_json` / `chrono::Utc::now()`）を infrastructure adapter（時刻取得・fs 書き込み）として切り出し、composition が wire して driver 経由で呼ぶ経路にする。bin は parse + dispatch + emit のみに戻す。"
+      }
+    },
+    {
+      "claim_hash": "bf5210f379074e230a40553ae352e8413cb0357d6a0d136b419a69a25e18c4cc",
+      "evidence_hash": "4f62c253561ee3076be87516a311c16d6cac732ffe887a127492f6176dd8d4cf",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の typed error enum に統一する。`Result<_, String>` を廃止し、各 port／service のエラーバリアントを usecase 層内で定義する。infrastructure adapter は `map_err` チェーン経由で typed variant へ変換して boundary を越える。"
+      }
+    },
+    {
+      "claim_hash": "bf5210f379074e230a40553ae352e8413cb0357d6a0d136b419a69a25e18c4cc",
+      "evidence_hash": "0c1f42c44ace7dc8e5f6f2d065bc03fb79b2d9a2327f78c4645bb7db3b145607",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port／service が返すエラーは IN-13 に準拠した typed error 型とする。"
+      }
+    },
+    {
+      "claim_hash": "3ea69ef44dfb5f1febbc19fefcae2ce414012884068d812e69d1eb49ab3c683d",
+      "evidence_hash": "3fcc8acc89942c850edcccbf2ebcb945f635c105484678cd688c1c042dfa279c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli/src/main.rs` の `emit_archived_track_subcommand`（`std::fs` / `serde_json` / `chrono::Utc::now()`）を infrastructure adapter（時刻取得・fs 書き込み）として切り出し、composition が wire して driver 経由で呼ぶ経路にする。bin は parse + dispatch + emit のみに戻す。"
+      }
+    },
+    {
+      "claim_hash": "3ea69ef44dfb5f1febbc19fefcae2ce414012884068d812e69d1eb49ab3c683d",
+      "evidence_hash": "4f62c253561ee3076be87516a311c16d6cac732ffe887a127492f6176dd8d4cf",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の typed error enum に統一する。`Result<_, String>` を廃止し、各 port／service のエラーバリアントを usecase 層内で定義する。infrastructure adapter は `map_err` チェーン経由で typed variant へ変換して boundary を越える。"
+      }
+    },
+    {
+      "claim_hash": "3ea69ef44dfb5f1febbc19fefcae2ce414012884068d812e69d1eb49ab3c683d",
+      "evidence_hash": "0c1f42c44ace7dc8e5f6f2d065bc03fb79b2d9a2327f78c4645bb7db3b145607",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port／service が返すエラーは IN-13 に準拠した typed error 型とする。"
+      }
+    },
+    {
+      "claim_hash": "d3557997d4bdee1193071fa4bc789759145e9bbee04c84cff46d043557b8c5ae",
+      "evidence_hash": "4f62c253561ee3076be87516a311c16d6cac732ffe887a127492f6176dd8d4cf",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の typed error enum に統一する。`Result<_, String>` を廃止し、各 port／service のエラーバリアントを usecase 層内で定義する。"
+      }
+    },
+    {
+      "claim_hash": "d3557997d4bdee1193071fa4bc789759145e9bbee04c84cff46d043557b8c5ae",
+      "evidence_hash": "0c1f42c44ace7dc8e5f6f2d065bc03fb79b2d9a2327f78c4645bb7db3b145607",
+      "verdict": {
+        "kind": "pass",
+        "citation": "新規 port（`SchemaExporterPort`、`ShellParserPort` など）と aggregate service（`TelemetryReportService` など）を usecase 層に定義する。... port／service が返すエラーは IN-13 に準拠した typed error 型とする。"
+      }
+    },
+    {
+      "claim_hash": "f8ffdf7b9ee387d6227da1b626a4ad422b9483d61422e7e1181b070de015db4f",
+      "evidence_hash": "fde36f306f5f79e93d276ba5aedf461b1e88eccb050dc87e855e84766c96abc9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "secondary adapter → interactor → driving adapter を構築し、use case を driving adapter に注入して返す。use case を invoke しない。"
+      }
+    },
+    {
+      "claim_hash": "22ae92849ad557072acd995e66bfc38a462ce3d6f896839c6fe3118e43ccadf4",
+      "evidence_hash": "0c1f42c44ace7dc8e5f6f2d065bc03fb79b2d9a2327f78c4645bb7db3b145607",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase secondary port コントラクトの新設・修正、および aggregate service の追加。新規 port（`SchemaExporterPort`、`ShellParserPort` など）と aggregate service（`TelemetryReportService` など）を usecase 層に定義する。secondary port の infrastructure adapter 実装は infrastructure 層に配置し、aggregate/application service の実装は usecase 層に置いて ports を注入される。port／service が返すエラーは IN-13 に準拠した typed error 型とする。"
+      }
+    },
+    {
+      "claim_hash": "0e93110c649367066334a1589374decc9c468b709cd87ed8ecd632163f5f0252",
+      "evidence_hash": "0c1f42c44ace7dc8e5f6f2d065bc03fb79b2d9a2327f78c4645bb7db3b145607",
+      "verdict": {
+        "kind": "pass",
+        "citation": "新規 port（`SchemaExporterPort`、`ShellParserPort` など）と aggregate service（`TelemetryReportService` など）を usecase 層に定義する。… port／service が返すエラーは IN-13 に準拠した typed error 型とする。"
+      }
+    },
+    {
+      "claim_hash": "457de0df1fd84618c205d47c14c807699e18976e523c71ebda0282156722e4b7",
+      "evidence_hash": "4f62c253561ee3076be87516a311c16d6cac732ffe887a127492f6176dd8d4cf",
+      "verdict": {
+        "kind": "fail",
+        "reason": "New behavioral commitment / wrong reference: the claim defines a signal-gate per-chain output DTO with chain_label, passed, stdout, and stderr, while IN-13 only commits to replacing usecase-layer `Result<_, String>` errors with `thiserror` typed error enums and adapter `map_err` conversion. The evidence motivates no part of this DTO's outward output contract."
+      }
+    },
+    {
+      "claim_hash": "c1fe5dab5f70c77b672f7d5b5a8fd9ed690c97d2320932d236829e3ad60f92f9",
+      "evidence_hash": "d7074da1d1545ff09f0ec2654c7928398b6e506db85440b448af82b9806494b3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_driver` 層が `usecase` のみに依存すること（`cli_driver → usecase`）。DI はしない（注入される側）。"
+      }
+    },
+    {
+      "claim_hash": "997c043d1ebf76cb99c749226207b1dc62701b1fee624b55f476413319f74d24",
+      "evidence_hash": "4f62c253561ee3076be87516a311c16d6cac732ffe887a127492f6176dd8d4cf",
+      "verdict": {
+        "kind": "fail",
+        "reason": "New behavioral commitment: the claim introduces a telemetry report presentation formatter returning String, while the evidence only commits to typed usecase error enums and replacing Result<_, String>; report formatting is not mentioned or naturally derived from that error-handling requirement."
+      }
+    },
+    {
+      "claim_hash": "997c043d1ebf76cb99c749226207b1dc62701b1fee624b55f476413319f74d24",
+      "evidence_hash": "0c1f42c44ace7dc8e5f6f2d065bc03fb79b2d9a2327f78c4645bb7db3b145607",
+      "verdict": {
+        "kind": "fail",
+        "reason": "New behavioral commitment: the claim catalogs a presentation formatter in the usecase layer and adds a T024 migration/deletion obligation, while IN-14 only grounds usecase secondary port contracts and aggregate services such as TelemetryReportService, not presentation formatting as a usecase API responsibility."
+      }
     }
   ]
 }

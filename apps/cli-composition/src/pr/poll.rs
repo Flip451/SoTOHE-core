@@ -11,6 +11,8 @@ use std::path::PathBuf;
 #[cfg(test)]
 use std::time::{Duration, Instant};
 
+use crate::error::CompositionError;
+
 // ---------------------------------------------------------------------------
 // Known Codex bot login names (case-insensitive comparison).
 // ---------------------------------------------------------------------------
@@ -54,28 +56,37 @@ pub(super) fn trigger_state_path(track_id: &str) -> PathBuf {
     root.join("tmp/pr-review-state").join(format!("{track_id}.json"))
 }
 
-pub(super) fn save_trigger_state(state: &TriggerState) -> Result<(), String> {
+pub(super) fn save_trigger_state(state: &TriggerState) -> Result<(), CompositionError> {
     let path = trigger_state_path(&state.track_id);
     if let Some(parent) = path.parent() {
-        fs::create_dir_all(parent)
-            .map_err(|e| format!("failed to create dir {}: {e}", parent.display()))?;
+        fs::create_dir_all(parent).map_err(|e| {
+            CompositionError::Infrastructure(format!(
+                "failed to create dir {}: {e}",
+                parent.display()
+            ))
+        })?;
     }
-    let json = serde_json::to_string_pretty(state)
-        .map_err(|e| format!("failed to serialize trigger state: {e}"))?;
-    fs::write(&path, json).map_err(|e| format!("failed to write {}: {e}", path.display()))?;
+    let json = serde_json::to_string_pretty(state).map_err(|e| {
+        CompositionError::Infrastructure(format!("failed to serialize trigger state: {e}"))
+    })?;
+    fs::write(&path, json).map_err(|e| {
+        CompositionError::Infrastructure(format!("failed to write {}: {e}", path.display()))
+    })?;
     println!("[OK] Saved trigger state to {}", path.display());
     Ok(())
 }
 
-pub(super) fn load_trigger_state(track_id: &str) -> Result<Option<TriggerState>, String> {
+pub(super) fn load_trigger_state(track_id: &str) -> Result<Option<TriggerState>, CompositionError> {
     let path = trigger_state_path(track_id);
     if !path.exists() {
         return Ok(None);
     }
-    let json =
-        fs::read_to_string(&path).map_err(|e| format!("failed to read {}: {e}", path.display()))?;
-    let state: TriggerState =
-        serde_json::from_str(&json).map_err(|e| format!("failed to parse trigger state: {e}"))?;
+    let json = fs::read_to_string(&path).map_err(|e| {
+        CompositionError::Infrastructure(format!("failed to read {}: {e}", path.display()))
+    })?;
+    let state: TriggerState = serde_json::from_str(&json).map_err(|e| {
+        CompositionError::Infrastructure(format!("failed to parse trigger state: {e}"))
+    })?;
     Ok(Some(state))
 }
 
@@ -90,14 +101,18 @@ pub(super) fn cleanup_trigger_state(track_id: &str) {
 
 pub(super) fn resolve_branch_context(
     explicit_track_id: Option<&str>,
-) -> Result<usecase::pr_workflow::PrBranchContext, String> {
+) -> Result<usecase::pr_workflow::PrBranchContext, CompositionError> {
     use infrastructure::git_cli::{GitRepository as _, SystemGitRepo};
-    let repo = SystemGitRepo::discover().map_err(|e| e.to_string())?;
+    let repo =
+        SystemGitRepo::discover().map_err(|e| CompositionError::AdapterInit(e.to_string()))?;
     let branch = repo
         .current_branch()
-        .map_err(|e| e.to_string())?
-        .ok_or_else(|| "could not determine current branch".to_owned())?;
-    usecase::pr_workflow::resolve_pr_branch(&branch, explicit_track_id).map_err(|e| e.to_string())
+        .map_err(|e| CompositionError::Infrastructure(e.to_string()))?
+        .ok_or_else(|| {
+            CompositionError::WiringFailed("could not determine current branch".to_owned())
+        })?;
+    usecase::pr_workflow::resolve_pr_branch(&branch, explicit_track_id)
+        .map_err(|e| CompositionError::WiringFailed(e.to_string()))
 }
 
 pub(super) fn normalize_check_status(
@@ -129,26 +144,30 @@ pub(super) fn checks_summary(
 
 pub(super) fn ensure_pr_body_file(
     ctx: &usecase::pr_workflow::PrBranchContext,
-) -> Result<PathBuf, String> {
+) -> Result<PathBuf, CompositionError> {
     use std::io::Write as _;
     use usecase::pr_workflow::pr_body;
 
     let body_dir = PathBuf::from("tmp");
-    fs::create_dir_all(&body_dir).map_err(|e| format!("failed to create tmp dir: {e}"))?;
-    let meta =
-        fs::symlink_metadata(&body_dir).map_err(|e| format!("failed to stat tmp dir: {e}"))?;
+    fs::create_dir_all(&body_dir)
+        .map_err(|e| CompositionError::Infrastructure(format!("failed to create tmp dir: {e}")))?;
+    let meta = fs::symlink_metadata(&body_dir)
+        .map_err(|e| CompositionError::Infrastructure(format!("failed to stat tmp dir: {e}")))?;
     if meta.file_type().is_symlink() {
-        return Err("tmp/ is a symlink — refusing to write PR body".to_owned());
+        return Err(CompositionError::WiringFailed(
+            "tmp/ is a symlink — refusing to write PR body".to_owned(),
+        ));
     }
     let body_file = body_dir.join(format!("pr-body-{}.md", std::process::id()));
     let _ = fs::remove_file(&body_file);
     let body_text = pr_body(ctx);
-    let mut f = fs::OpenOptions::new()
-        .write(true)
-        .create_new(true)
-        .open(&body_file)
-        .map_err(|e| format!("failed to create PR body file: {e}"))?;
-    f.write_all(body_text.as_bytes()).map_err(|e| format!("failed to write PR body file: {e}"))?;
+    let mut f =
+        fs::OpenOptions::new().write(true).create_new(true).open(&body_file).map_err(|e| {
+            CompositionError::Infrastructure(format!("failed to create PR body file: {e}"))
+        })?;
+    f.write_all(body_text.as_bytes()).map_err(|e| {
+        CompositionError::Infrastructure(format!("failed to write PR body file: {e}"))
+    })?;
     Ok(body_file)
 }
 
@@ -157,15 +176,21 @@ pub(super) fn ensure_pr_body_file(
 // ---------------------------------------------------------------------------
 
 #[cfg(test)]
+#[derive(Debug, thiserror::Error)]
+#[error("{0}")]
+pub(super) struct PollTestError(String);
+
+#[cfg(test)]
 pub(super) fn check_reaction_zero_findings<C: infrastructure::gh_cli::GhClient>(
     client: &C,
     repo: &str,
     pr: &str,
     trigger_dt: chrono::DateTime<chrono::FixedOffset>,
-) -> Result<bool, String> {
-    let reactions_json = client.list_reactions(repo, pr).map_err(|e| e.to_string())?;
+) -> Result<bool, PollTestError> {
+    let reactions_json =
+        client.list_reactions(repo, pr).map_err(|e| PollTestError(e.to_string()))?;
     let reactions = usecase::pr_review::parse_paginated_json(&reactions_json)
-        .map_err(|e| format!("failed to parse reactions JSON: {e}"))?;
+        .map_err(|e| PollTestError(format!("failed to parse reactions JSON: {e}")))?;
     for reaction in &reactions {
         let content = reaction.get("content").and_then(|c| c.as_str()).unwrap_or("");
         if content != "+1" {
@@ -185,7 +210,7 @@ pub(super) fn check_reaction_zero_findings<C: infrastructure::gh_cli::GhClient>(
         }
         let created_str = created_raw.replace('Z', "+00:00");
         let created_dt = chrono::DateTime::parse_from_rfc3339(&created_str)
-            .map_err(|e| format!("invalid reaction created_at: {e}"))?;
+            .map_err(|e| PollTestError(format!("invalid reaction created_at: {e}")))?;
         if created_dt >= trigger_dt {
             return Ok(true);
         }
@@ -199,10 +224,11 @@ pub(super) fn check_comment_zero_findings<C: infrastructure::gh_cli::GhClient>(
     repo: &str,
     pr: &str,
     trigger_dt: chrono::DateTime<chrono::FixedOffset>,
-) -> Result<bool, String> {
-    let comments_json = client.list_issue_comments(repo, pr).map_err(|e| e.to_string())?;
+) -> Result<bool, PollTestError> {
+    let comments_json =
+        client.list_issue_comments(repo, pr).map_err(|e| PollTestError(e.to_string()))?;
     let comments = usecase::pr_review::parse_paginated_json(&comments_json)
-        .map_err(|e| format!("failed to parse comments JSON: {e}"))?;
+        .map_err(|e| PollTestError(format!("failed to parse comments JSON: {e}")))?;
     for comment in &comments {
         let author =
             comment.get("user").and_then(|u| u.get("login")).and_then(|l| l.as_str()).unwrap_or("");
@@ -215,7 +241,7 @@ pub(super) fn check_comment_zero_findings<C: infrastructure::gh_cli::GhClient>(
         }
         let created_str = created_raw.replace('Z', "+00:00");
         let created_dt = chrono::DateTime::parse_from_rfc3339(&created_str)
-            .map_err(|e| format!("invalid comment created_at: {e}"))?;
+            .map_err(|e| PollTestError(format!("invalid comment created_at: {e}")))?;
         if created_dt < trigger_dt {
             continue;
         }
@@ -241,16 +267,16 @@ pub(super) fn poll_review_for_cycle<C, Sleep>(
     client: &C,
     sleep: &Sleep,
     head_commit: Option<&str>,
-) -> Result<PollReviewResult, String>
+) -> Result<PollReviewResult, PollTestError>
 where
     C: infrastructure::gh_cli::GhClient,
     Sleep: Fn(Duration),
 {
     let trigger_time = trigger_timestamp.replace('Z', "+00:00");
     let trigger_dt = chrono::DateTime::parse_from_rfc3339(&trigger_time)
-        .map_err(|e| format!("invalid trigger timestamp: {e}"))?;
+        .map_err(|e| PollTestError(format!("invalid trigger timestamp: {e}")))?;
 
-    let repo_nwo = client.repo_nwo().map_err(|e| e.to_string())?;
+    let repo_nwo = client.repo_nwo().map_err(|e| PollTestError(e.to_string()))?;
     let deadline = Instant::now() + Duration::from_secs(timeout.min(86400));
     let mut any_bot_activity = false;
 
@@ -261,9 +287,10 @@ where
             break;
         }
 
-        let reviews_json = client.list_reviews(&repo_nwo, pr).map_err(|e| e.to_string())?;
+        let reviews_json =
+            client.list_reviews(&repo_nwo, pr).map_err(|e| PollTestError(e.to_string()))?;
         let reviews = usecase::pr_review::parse_paginated_json(&reviews_json)
-            .map_err(|e| format!("failed to parse reviews JSON: {e}"))?;
+            .map_err(|e| PollTestError(format!("failed to parse reviews JSON: {e}")))?;
 
         // Collect all qualifying Codex bot reviews from this iteration (post-trigger,
         // with a terminal state), then pick the latest one by submitted_at (AC-05 / CN-02).
@@ -283,7 +310,7 @@ where
             }
             let submitted_str = submitted_raw.replace('Z', "+00:00");
             let submitted_dt = chrono::DateTime::parse_from_rfc3339(&submitted_str)
-                .map_err(|e| format!("invalid review submitted_at: {e}"))?;
+                .map_err(|e| PollTestError(format!("invalid review submitted_at: {e}")))?;
             if submitted_dt >= trigger_dt {
                 any_bot_activity = true;
                 let state = review.get("state").and_then(|s| s.as_str()).unwrap_or("");
@@ -306,10 +333,11 @@ where
             }
 
             let has_stale_reaction = {
-                let reactions_json =
-                    client.list_reactions(&repo_nwo, pr).map_err(|e| e.to_string())?;
+                let reactions_json = client
+                    .list_reactions(&repo_nwo, pr)
+                    .map_err(|e| PollTestError(e.to_string()))?;
                 let reactions = usecase::pr_review::parse_paginated_json(&reactions_json)
-                    .map_err(|e| format!("failed to parse reactions JSON: {e}"))?;
+                    .map_err(|e| PollTestError(format!("failed to parse reactions JSON: {e}")))?;
                 reactions.iter().any(|r| {
                     let content = r.get("content").and_then(|c| c.as_str()).unwrap_or("");
                     let author = r
@@ -329,10 +357,11 @@ where
         }
 
         if !any_bot_activity {
-            let comments_json =
-                client.list_issue_comments(&repo_nwo, pr).map_err(|e| e.to_string())?;
+            let comments_json = client
+                .list_issue_comments(&repo_nwo, pr)
+                .map_err(|e| PollTestError(e.to_string()))?;
             let comments = usecase::pr_review::parse_paginated_json(&comments_json)
-                .map_err(|e| format!("failed to parse comments JSON: {e}"))?;
+                .map_err(|e| PollTestError(format!("failed to parse comments JSON: {e}")))?;
             for comment in &comments {
                 let author = comment
                     .get("user")
@@ -348,7 +377,7 @@ where
                 }
                 let created_str = created_raw.replace('Z', "+00:00");
                 let created_dt = chrono::DateTime::parse_from_rfc3339(&created_str)
-                    .map_err(|e| format!("invalid comment created_at: {e}"))?;
+                    .map_err(|e| PollTestError(format!("invalid comment created_at: {e}")))?;
                 if created_dt >= trigger_dt {
                     any_bot_activity = true;
                     break;
@@ -370,11 +399,11 @@ where
     // reviews from prior cycles even though `commit_id == expected_commit` proves
     // they cover the exact HEAD being reviewed.
     if let Some(expected_commit) = head_commit {
-        let recovery_nwo = client.repo_nwo().map_err(|e| e.to_string())?;
+        let recovery_nwo = client.repo_nwo().map_err(|e| PollTestError(e.to_string()))?;
         let recovery_reviews_json =
-            client.list_reviews(&recovery_nwo, pr).map_err(|e| e.to_string())?;
+            client.list_reviews(&recovery_nwo, pr).map_err(|e| PollTestError(e.to_string()))?;
         let recovery_reviews = usecase::pr_review::parse_paginated_json(&recovery_reviews_json)
-            .map_err(|e| format!("recovery: failed to parse reviews JSON: {e}"))?;
+            .map_err(|e| PollTestError(format!("recovery: failed to parse reviews JSON: {e}")))?;
         let recovery_refs: Vec<&serde_json::Value> = recovery_reviews
             .iter()
             .filter(|r| {
@@ -434,7 +463,7 @@ pub(super) fn ensure_pr_for_cycle<C: infrastructure::gh_cli::GhClient>(
     ctx: &usecase::pr_workflow::PrBranchContext,
     base: &str,
     client: &C,
-) -> Result<Option<String>, String> {
+) -> Result<Option<String>, CompositionError> {
     match client.find_open_pr(&ctx.branch, base) {
         Ok(Some(pr)) => {
             println!("[OK] Reusing existing PR #{pr}");
@@ -442,7 +471,9 @@ pub(super) fn ensure_pr_for_cycle<C: infrastructure::gh_cli::GhClient>(
         }
         Ok(None) => {}
         Err(err) => {
-            return Err(format!("failed to look up open PR: {err}"));
+            return Err(CompositionError::Infrastructure(format!(
+                "failed to look up open PR: {err}"
+            )));
         }
     }
 
@@ -457,7 +488,7 @@ pub(super) fn ensure_pr_for_cycle<C: infrastructure::gh_cli::GhClient>(
         }
         Err(err) => {
             let _ = fs::remove_file(&body_file);
-            Err(format!("failed to create PR: {err}"))
+            Err(CompositionError::Infrastructure(format!("failed to create PR: {err}")))
         }
     }
 }
@@ -471,7 +502,7 @@ pub(super) fn parse_review<C: infrastructure::gh_cli::GhClient>(
     review: &serde_json::Value,
     repo_nwo: &str,
     client: &C,
-) -> Result<usecase::pr_review::PrReviewResult, String> {
+) -> Result<usecase::pr_review::PrReviewResult, CompositionError> {
     let review_id = review.get("id").and_then(|v| v.as_u64()).unwrap_or(0);
     let state = review.get("state").and_then(|s| s.as_str()).unwrap_or("COMMENTED").to_owned();
     let raw_body = review.get("body").and_then(|s| s.as_str()).unwrap_or("");
@@ -482,10 +513,12 @@ pub(super) fn parse_review<C: infrastructure::gh_cli::GhClient>(
     let mut inline_count: u32 = 0;
 
     let review_id_str = review_id.to_string();
-    let comments_json =
-        client.list_review_comments(repo_nwo, pr, &review_id_str).map_err(|e| e.to_string())?;
-    let comments = usecase::pr_review::parse_paginated_json(&comments_json)
-        .map_err(|e| format!("failed to parse comments JSON: {e}"))?;
+    let comments_json = client
+        .list_review_comments(repo_nwo, pr, &review_id_str)
+        .map_err(|e| CompositionError::Infrastructure(e.to_string()))?;
+    let comments = usecase::pr_review::parse_paginated_json(&comments_json).map_err(|e| {
+        CompositionError::Infrastructure(format!("failed to parse comments JSON: {e}"))
+    })?;
     for comment in &comments {
         inline_count += 1;
         let comment_body = usecase::pr_review::sanitize_text(
@@ -562,17 +595,18 @@ pub(super) fn format_review_summary(
 
 pub(super) fn resume_trigger_state(
     track_id: &str,
-) -> Result<(String, String, Option<String>), String> {
+) -> Result<(String, String, Option<String>), CompositionError> {
     use infrastructure::git_cli::{GitRepository as _, SystemGitRepo};
 
     let state = load_trigger_state(track_id)?.ok_or_else(|| {
-        format!(
+        CompositionError::WiringFailed(format!(
             "no trigger state file found for track '{track_id}'. \
              Run without --resume to start a new review cycle."
-        )
+        ))
     })?;
 
-    let repo = SystemGitRepo::discover().map_err(|e| e.to_string())?;
+    let repo =
+        SystemGitRepo::discover().map_err(|e| CompositionError::AdapterInit(e.to_string()))?;
     let current_head = repo
         .output(&["rev-parse", "HEAD"])
         .ok()
@@ -581,11 +615,11 @@ pub(super) fn resume_trigger_state(
     if let (Some(saved), Some(current)) = (&state.head_hash, &current_head) {
         if saved != current {
             cleanup_trigger_state(track_id);
-            return Err(format!(
+            return Err(CompositionError::WiringFailed(format!(
                 "HEAD has changed since trigger was posted \
                  (saved={saved}, current={current}). \
                  Run without --resume to start a new review cycle."
-            ));
+            )));
         }
     }
 
@@ -601,14 +635,15 @@ pub(super) fn trigger_new_review(
     explicit_track_id: Option<&str>,
     track_id: &str,
     client: &infrastructure::gh_cli::SystemGhClient,
-) -> Result<Option<(String, String, Option<String>)>, String> {
+) -> Result<Option<(String, String, Option<String>)>, CompositionError> {
     use infrastructure::gh_cli::GhClient as _;
     use infrastructure::git_cli::{GitRepository as _, SystemGitRepo};
 
     let ctx = resolve_branch_context(explicit_track_id)?;
-    let repo = SystemGitRepo::discover().map_err(|e| e.to_string())?;
+    let repo =
+        SystemGitRepo::discover().map_err(|e| CompositionError::AdapterInit(e.to_string()))?;
     println!("Pushing {} to origin...", ctx.branch);
-    repo.push_branch(&ctx.branch).map_err(|e| e.to_string())?;
+    repo.push_branch(&ctx.branch).map_err(|e| CompositionError::Infrastructure(e.to_string()))?;
     println!("[OK] Pushed {}", ctx.branch);
 
     let pr_number = match ensure_pr_for_cycle(&ctx, "main", client)? {
@@ -616,9 +651,10 @@ pub(super) fn trigger_new_review(
         None => return Ok(None),
     };
 
-    let nwo = client.repo_nwo().map_err(|e| e.to_string())?;
-    let response =
-        client.post_issue_comment(&nwo, &pr_number, "@codex review").map_err(|e| e.to_string())?;
+    let nwo = client.repo_nwo().map_err(|e| CompositionError::Infrastructure(e.to_string()))?;
+    let response = client
+        .post_issue_comment(&nwo, &pr_number, "@codex review")
+        .map_err(|e| CompositionError::Infrastructure(e.to_string()))?;
     let trigger_timestamp = serde_json::from_str::<serde_json::Value>(&response)
         .ok()
         .and_then(|v| v.get("created_at")?.as_str().map(String::from))
@@ -626,7 +662,9 @@ pub(super) fn trigger_new_review(
     println!("[OK] Posted '@codex review' on PR #{pr_number} at {trigger_timestamp}");
 
     if trigger_timestamp.is_empty() {
-        return Err("could not determine trigger timestamp from API response".to_owned());
+        return Err(CompositionError::Infrastructure(
+            "could not determine trigger timestamp from API response".to_owned(),
+        ));
     }
 
     let head_hash = repo

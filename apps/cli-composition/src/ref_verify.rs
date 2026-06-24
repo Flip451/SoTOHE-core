@@ -57,36 +57,42 @@ struct RefVerifyCommandContext {
 fn resolve_ref_verify_context(
     items_dir: &Path,
     track_id: &str,
-) -> Result<RefVerifyCommandContext, String> {
+) -> Result<RefVerifyCommandContext, CompositionError> {
     let project_root = super::track::resolve_project_root(items_dir)
-        .map_err(|e| format!("cannot resolve project root: {e}"))?;
-    let canonical_root = project_root
-        .canonicalize()
-        .map_err(|e| format!("cannot canonicalize project root: {e}"))?;
+        .map_err(|e| CompositionError::WiringFailed(format!("cannot resolve project root: {e}")))?;
+    let canonical_root = project_root.canonicalize().map_err(|e| {
+        CompositionError::WiringFailed(format!("cannot canonicalize project root: {e}"))
+    })?;
     super::track::validate_track_id_str(track_id)
-        .map_err(|e| format!("invalid --track-id: {e}"))?;
+        .map_err(|e| CompositionError::WiringFailed(format!("invalid --track-id: {e}")))?;
     let track_id = domain::TrackId::try_new(track_id.to_owned())
-        .map_err(|e| format!("invalid track ID: {e}"))?;
+        .map_err(|e| CompositionError::WiringFailed(format!("invalid track ID: {e}")))?;
     Ok(RefVerifyCommandContext { canonical_root, track_id })
 }
 
 fn load_ref_verify_config(
     project_root: &std::path::Path,
-) -> Result<usecase::ref_verify::RefVerifyConfig, String> {
+) -> Result<usecase::ref_verify::RefVerifyConfig, CompositionError> {
     let config_path = project_root.join(REF_VERIFY_CONFIG_PATH);
-    if !config_path
-        .try_exists()
-        .map_err(|e| format!("cannot inspect ref-verify config path: {e}"))?
-    {
+    if !config_path.try_exists().map_err(|e| {
+        CompositionError::ConfigLoad(format!("cannot inspect ref-verify config path: {e}"))
+    })? {
         return Ok(usecase::ref_verify::RefVerifyConfig::default());
     }
 
     let text = std::fs::read_to_string(&config_path).map_err(|e| {
-        format!("cannot read ref-verify config at '{}': {e}", config_path.display())
+        CompositionError::ConfigLoad(format!(
+            "cannot read ref-verify config at '{}': {e}",
+            config_path.display()
+        ))
     })?;
 
-    let dto: RefVerifyConfigDto = serde_json::from_str(&text)
-        .map_err(|e| format!("invalid ref-verify config at '{}': {e}", config_path.display()))?;
+    let dto: RefVerifyConfigDto = serde_json::from_str(&text).map_err(|e| {
+        CompositionError::ConfigLoad(format!(
+            "invalid ref-verify config at '{}': {e}",
+            config_path.display()
+        ))
+    })?;
     let defaults = usecase::ref_verify::RefVerifyConfig::default();
     let injection = dto
         .known_bad_injection_rate_percent
@@ -96,17 +102,22 @@ fn load_ref_verify_config(
         .unwrap_or_else(|| defaults.known_bad_detection_threshold_percent.as_u8());
     let parallelism = dto.max_parallelism.unwrap_or_else(|| defaults.max_parallelism.as_usize());
 
-    usecase::ref_verify::RefVerifyConfig::try_new(injection, threshold, parallelism)
-        .map_err(|e| format!("ref-verify config validation failed: {e}"))
+    usecase::ref_verify::RefVerifyConfig::try_new(injection, threshold, parallelism).map_err(|e| {
+        CompositionError::ConfigLoad(format!("ref-verify config validation failed: {e}"))
+    })
 }
 
-fn current_git_branch(project_root: &Path) -> Result<String, String> {
+fn current_git_branch(project_root: &Path) -> Result<String, CompositionError> {
     use infrastructure::git_cli::{GitRepository as _, SystemGitRepo};
     SystemGitRepo::discover_from(project_root)
-        .map_err(|e| format!("cannot discover git repo: {e}"))?
+        .map_err(|e| CompositionError::Infrastructure(format!("cannot discover git repo: {e}")))?
         .current_branch()
-        .map_err(|e| format!("cannot read current branch: {e}"))?
-        .ok_or_else(|| "cannot read current branch: HEAD is detached".to_owned())
+        .map_err(|e| CompositionError::Infrastructure(format!("cannot read current branch: {e}")))?
+        .ok_or_else(|| {
+            CompositionError::Infrastructure(
+                "cannot read current branch: HEAD is detached".to_owned(),
+            )
+        })
 }
 
 impl RefVerifyCompositionRoot {
@@ -133,11 +144,9 @@ impl RefVerifyCompositionRoot {
         use usecase::ref_verify::{RefVerifyApplicationService as _, VerifySemanticRefsInteractor};
 
         let RefVerifyCommandContext { canonical_root, track_id } =
-            resolve_ref_verify_context(&input.items_dir, &input.track_id)
-                .map_err(CompositionError::WiringFailed)?;
+            resolve_ref_verify_context(&input.items_dir, &input.track_id)?;
 
-        let current_branch =
-            current_git_branch(&canonical_root).map_err(CompositionError::Infrastructure)?;
+        let current_branch = current_git_branch(&canonical_root)?;
 
         // Existence-based scope resolution (IN-01): the Chain1 / Chain2 / All
         // pair-set derivation follows from which track artifacts exist on
@@ -147,8 +156,7 @@ impl RefVerifyCompositionRoot {
             CompositionError::WiringFailed(format!("ref-verify scope resolution failed: {e}"))
         })?;
 
-        let config =
-            load_ref_verify_config(&canonical_root).map_err(CompositionError::ConfigLoad)?;
+        let config = load_ref_verify_config(&canonical_root)?;
 
         let pair_source =
             Arc::new(RefVerifyPairSourceAdapter::new(canonical_root.clone())) as Arc<_>;
@@ -213,8 +221,7 @@ impl RefVerifyCompositionRoot {
         };
 
         let RefVerifyCommandContext { canonical_root, track_id } =
-            resolve_ref_verify_context(&input.items_dir, &input.track_id)
-                .map_err(CompositionError::WiringFailed)?;
+            resolve_ref_verify_context(&input.items_dir, &input.track_id)?;
 
         // check-approved is the commit gate's read-only verification surface;
         // the scope derives from artifact existence like every other run.
@@ -223,8 +230,7 @@ impl RefVerifyCompositionRoot {
             CompositionError::WiringFailed(format!("ref-verify scope resolution failed: {e}"))
         })?;
 
-        let current_branch =
-            current_git_branch(&canonical_root).map_err(CompositionError::Infrastructure)?;
+        let current_branch = current_git_branch(&canonical_root)?;
         let expected_branch = format!("track/{}", track_id.as_ref());
         if current_branch != expected_branch {
             return Err(CompositionError::WiringFailed(format!(
@@ -474,12 +480,16 @@ mod tests {
             .unwrap();
     }
 
+    #[derive(Debug, thiserror::Error)]
+    #[error("{0}")]
+    struct RefVerifyTestError(String);
+
     fn ref_verify_chain1_cmd(
         track_id: &str,
-    ) -> Result<usecase::ref_verify::RefVerifyCommand, String> {
+    ) -> Result<usecase::ref_verify::RefVerifyCommand, RefVerifyTestError> {
         Ok(usecase::ref_verify::RefVerifyCommand {
             track_id: domain::TrackId::try_new(track_id.to_owned())
-                .map_err(|e| format!("invalid track ID: {e}"))?,
+                .map_err(|e| RefVerifyTestError(format!("invalid track ID: {e}")))?,
             scope: usecase::ref_verify::RefVerifyScope::Chain1,
             current_branch: format!("track/{track_id}"),
         })
@@ -706,7 +716,7 @@ exit 64
         std::fs::create_dir_all(&cfg_dir).unwrap();
         std::fs::write(cfg_dir.join("ref-verify.json"), r#"{"unknown_field": 1}"#).unwrap();
         let err = super::load_ref_verify_config(dir.path()).unwrap_err();
-        assert!(err.contains("invalid ref-verify config"));
+        assert!(err.to_string().contains("invalid ref-verify config"));
     }
 
     #[test]
@@ -720,7 +730,7 @@ exit 64
         )
         .unwrap();
         let err = super::load_ref_verify_config(dir.path()).unwrap_err();
-        assert!(err.contains("ref-verify config validation failed"));
+        assert!(err.to_string().contains("ref-verify config validation failed"));
     }
 
     #[test]
@@ -730,7 +740,7 @@ exit 64
         std::fs::create_dir_all(&cfg_dir).unwrap();
         std::fs::write(cfg_dir.join("ref-verify.json"), r#"{"max_parallelism": 0}"#).unwrap();
         let err = super::load_ref_verify_config(dir.path()).unwrap_err();
-        assert!(err.contains("ref-verify config validation failed"));
+        assert!(err.to_string().contains("ref-verify config validation failed"));
     }
 
     // ── ref_verify_check_approved ────────────────────────────────────────────

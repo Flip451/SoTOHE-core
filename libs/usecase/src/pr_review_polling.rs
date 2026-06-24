@@ -22,6 +22,16 @@ pub trait SleepPort: Send + Sync {
     fn sleep(&self, duration: Duration);
 }
 
+// ── PrGhApiError ──────────────────────────────────────────────────────────────
+
+/// Error type for GitHub PR API ports (`PrListReviewsPort`, `PrListReactionsPort`, `PrListIssueCommentsPort`).
+#[derive(Debug, thiserror::Error)]
+pub enum PrGhApiError {
+    /// The GitHub API call failed.
+    #[error("{0}")]
+    ApiFailure(String),
+}
+
 // ── PrListReviewsPort ─────────────────────────────────────────────────────────
 
 /// Secondary port for listing GitHub PR reviews.
@@ -33,8 +43,8 @@ pub trait PrListReviewsPort: Send + Sync {
     ///
     /// # Errors
     ///
-    /// Returns a `String` error description on API failure.
-    fn list_reviews(&self, repo_nwo: &str, pr: &str) -> Result<String, String>;
+    /// Returns [`PrGhApiError`] on API failure.
+    fn list_reviews(&self, repo_nwo: &str, pr: &str) -> Result<String, PrGhApiError>;
 }
 
 // ── PrListReactionsPort ───────────────────────────────────────────────────────
@@ -45,8 +55,8 @@ pub trait PrListReactionsPort: Send + Sync {
     ///
     /// # Errors
     ///
-    /// Returns a `String` error description on API failure.
-    fn list_reactions(&self, repo_nwo: &str, pr: &str) -> Result<String, String>;
+    /// Returns [`PrGhApiError`] on API failure.
+    fn list_reactions(&self, repo_nwo: &str, pr: &str) -> Result<String, PrGhApiError>;
 }
 
 // ── PrListIssueCommentsPort ───────────────────────────────────────────────────
@@ -57,8 +67,18 @@ pub trait PrListIssueCommentsPort: Send + Sync {
     ///
     /// # Errors
     ///
-    /// Returns a `String` error description on API failure.
-    fn list_issue_comments(&self, repo_nwo: &str, pr: &str) -> Result<String, String>;
+    /// Returns [`PrGhApiError`] on API failure.
+    fn list_issue_comments(&self, repo_nwo: &str, pr: &str) -> Result<String, PrGhApiError>;
+}
+
+// ── PrRepoNwoError ────────────────────────────────────────────────────────────
+
+/// Error type for [`PrRepoNwoPort::repo_nwo`].
+#[derive(Debug, thiserror::Error)]
+pub enum PrRepoNwoError {
+    /// NWO resolution failed.
+    #[error("{0}")]
+    Unavailable(String),
 }
 
 // ── PrRepoNwoPort ────────────────────────────────────────────────────────────
@@ -69,8 +89,8 @@ pub trait PrRepoNwoPort: Send + Sync {
     ///
     /// # Errors
     ///
-    /// Returns a `String` error description when NWO resolution fails.
-    fn repo_nwo(&self) -> Result<String, String>;
+    /// Returns [`PrRepoNwoError`] when NWO resolution fails.
+    fn repo_nwo(&self) -> Result<String, PrRepoNwoError>;
 }
 
 // ── Known Codex bot logins ─────────────────────────────────────────────────────
@@ -227,10 +247,9 @@ impl PrReviewPollingService for PrReviewPollingInteractor {
             }
             iterations += 1;
 
-            let reviews_json = self
-                .reviews
-                .list_reviews(&repo_nwo, &pr)
-                .map_err(crate::d4_orchestration::D4OrchestrationError::PrPolling)?;
+            let reviews_json = self.reviews.list_reviews(&repo_nwo, &pr).map_err(|e| {
+                crate::d4_orchestration::D4OrchestrationError::PrPolling(e.to_string())
+            })?;
             let reviews = parse_paginated_json(&reviews_json).map_err(|e| {
                 crate::d4_orchestration::D4OrchestrationError::PrPolling(format!(
                     "failed to parse reviews JSON: {e}"
@@ -279,10 +298,10 @@ impl PrReviewPollingService for PrReviewPollingInteractor {
                 }
 
                 // Check stale-reaction + comment text fallback.
-                let reactions_json = self
-                    .reactions
-                    .list_reactions(&repo_nwo, &pr)
-                    .map_err(crate::d4_orchestration::D4OrchestrationError::PrPolling)?;
+                let reactions_json =
+                    self.reactions.list_reactions(&repo_nwo, &pr).map_err(|e| {
+                        crate::d4_orchestration::D4OrchestrationError::PrPolling(e.to_string())
+                    })?;
                 let reactions = parse_paginated_json(&reactions_json).map_err(|e| {
                     crate::d4_orchestration::D4OrchestrationError::PrPolling(format!(
                         "failed to parse reactions JSON: {e}"
@@ -306,10 +325,10 @@ impl PrReviewPollingService for PrReviewPollingInteractor {
             }
 
             if !any_bot_activity {
-                let comments_json = self
-                    .comments
-                    .list_issue_comments(&repo_nwo, &pr)
-                    .map_err(crate::d4_orchestration::D4OrchestrationError::PrPolling)?;
+                let comments_json =
+                    self.comments.list_issue_comments(&repo_nwo, &pr).map_err(|e| {
+                        crate::d4_orchestration::D4OrchestrationError::PrPolling(e.to_string())
+                    })?;
                 let comment_list = parse_paginated_json(&comments_json).map_err(|e| {
                     crate::d4_orchestration::D4OrchestrationError::PrPolling(format!(
                         "failed to parse comments JSON: {e}"
@@ -352,10 +371,9 @@ impl PrReviewPollingService for PrReviewPollingInteractor {
 
         // Timeout recovery: look for a review on the exact HEAD commit SHA.
         if let Some(ref expected_commit) = head_commit {
-            let recovery_reviews_json = self
-                .reviews
-                .list_reviews(&repo_nwo, &pr)
-                .map_err(crate::d4_orchestration::D4OrchestrationError::PrPolling)?;
+            let recovery_reviews_json = self.reviews.list_reviews(&repo_nwo, &pr).map_err(|e| {
+                crate::d4_orchestration::D4OrchestrationError::PrPolling(e.to_string())
+            })?;
             let recovery_reviews = parse_paginated_json(&recovery_reviews_json).map_err(|e| {
                 crate::d4_orchestration::D4OrchestrationError::PrPolling(format!(
                     "recovery: failed to parse reviews JSON: {e}"
@@ -395,7 +413,7 @@ impl PrReviewPollingInteractor {
         let reactions_json = self
             .reactions
             .list_reactions(repo_nwo, pr)
-            .map_err(crate::d4_orchestration::D4OrchestrationError::PrPolling)?;
+            .map_err(|e| crate::d4_orchestration::D4OrchestrationError::PrPolling(e.to_string()))?;
         let reactions = parse_paginated_json(&reactions_json).map_err(|e| {
             crate::d4_orchestration::D4OrchestrationError::PrPolling(format!(
                 "failed to parse reactions JSON: {e}"
@@ -440,7 +458,7 @@ impl PrReviewPollingInteractor {
         let comments_json = self
             .comments
             .list_issue_comments(repo_nwo, pr)
-            .map_err(crate::d4_orchestration::D4OrchestrationError::PrPolling)?;
+            .map_err(|e| crate::d4_orchestration::D4OrchestrationError::PrPolling(e.to_string()))?;
         let comments = parse_paginated_json(&comments_json).map_err(|e| {
             crate::d4_orchestration::D4OrchestrationError::PrPolling(format!(
                 "failed to parse comments JSON: {e}"

@@ -29,7 +29,7 @@ pub(crate) fn check_approved_str(
         .map_err(|e| ReviewCheckApprovedError::InvalidTrackId(e.to_string()))?;
 
     let comp = build_review_v2(&track_id, items_dir)
-        .map_err(ReviewCheckApprovedError::ReviewStoreError)?;
+        .map_err(|e| ReviewCheckApprovedError::ReviewStoreError(e.to_string()))?;
 
     let review_json_exists = comp
         .review_store

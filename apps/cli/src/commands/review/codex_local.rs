@@ -8,26 +8,25 @@ use std::process::ExitCode;
 #[cfg(test)]
 use std::time::Duration;
 
-use cli_composition::ReviewRunCodexInput;
+use cli_driver::review::ReviewInput;
 
 use super::{CodexLocalArgs, validate_auto_record_args};
 
 pub(super) fn execute_codex_local(args: &CodexLocalArgs) -> ExitCode {
     match run_execute_codex_local(args) {
         Ok(code) => ExitCode::from(code),
-        Err(msg) => {
-            eprintln!("{msg}");
+        Err(e) => {
+            eprintln!("{e}");
             ExitCode::from(1)
         }
     }
 }
 
-fn run_execute_codex_local(args: &CodexLocalArgs) -> Result<u8, String> {
+fn run_execute_codex_local(args: &CodexLocalArgs) -> Result<u8, crate::CliError> {
     // Step 1: Validate record args before delegating to CliApp (fail fast).
     let validated = validate_auto_record_args(args)?;
 
-    // Step 2: Build DTO and delegate to CliApp.review_run_codex.
-    let input = ReviewRunCodexInput {
+    let input = ReviewInput::RunCodex {
         model: args.model.clone(),
         timeout_seconds: args.timeout_seconds,
         briefing_file: args.briefing_file.clone(),
@@ -38,12 +37,16 @@ fn run_execute_codex_local(args: &CodexLocalArgs) -> Result<u8, String> {
         items_dir: validated.items_dir,
     };
 
-    let outcome = cli_composition::ReviewCompositionRoot::new()
-        .review_run_codex(input)
-        .map_err(|e| e.to_string())?;
+    let outcome = cli_composition::ReviewCompositionRoot::new().review_driver().handle(input);
 
-    emit_outcome_output(outcome.stdout.as_deref(), outcome.exit_code)
+    emit_outcome_output(outcome.stdout.as_deref(), outcome.stderr.as_deref(), outcome.exit_code)
 }
+
+/// Typed error for test-only subprocess helper functions.
+#[cfg(test)]
+#[derive(Debug, thiserror::Error)]
+#[error("{0}")]
+pub(super) struct CodexLocalError(String);
 
 /// Builds the base prompt from CLI args (briefing file or inline prompt).
 ///
@@ -53,16 +56,16 @@ fn run_execute_codex_local(args: &CodexLocalArgs) -> Result<u8, String> {
 /// # Errors
 /// Returns an error if the briefing file does not exist or neither arg is provided.
 #[cfg(test)]
-pub(super) fn build_base_prompt(args: &CodexLocalArgs) -> Result<String, String> {
+pub(super) fn build_base_prompt(args: &CodexLocalArgs) -> Result<String, CodexLocalError> {
     if let Some(path) = &args.briefing_file {
         if !path.is_file() {
-            return Err(format!("briefing file not found: {}", path.display()));
+            return Err(CodexLocalError(format!("briefing file not found: {}", path.display())));
         }
         Ok(format!("Read {} and perform the task described there.", path.display()))
     } else {
-        args.prompt
-            .clone()
-            .ok_or_else(|| "either --briefing-file or --prompt is required".to_owned())
+        args.prompt.clone().ok_or_else(|| {
+            CodexLocalError("either --briefing-file or --prompt is required".to_owned())
+        })
     }
 }
 
@@ -86,7 +89,7 @@ pub(super) fn append_scope_briefing_reference(
     scope_name: &str,
     track_id: &str,
     items_dir: &std::path::Path,
-) -> Result<(), String> {
+) -> Result<(), CodexLocalError> {
     cli_composition::review_v2::append_scope_briefing_reference_str(
         prompt,
         scope_name,
@@ -94,6 +97,7 @@ pub(super) fn append_scope_briefing_reference(
         items_dir,
         is_safe_briefing_path,
     )
+    .map_err(CodexLocalError)
 }
 
 /// Returns `true` if `path` is safe to reference as a repo-relative briefing
@@ -143,10 +147,17 @@ pub(super) fn is_safe_briefing_path(path: &str) -> bool {
     true
 }
 
-/// Emits the review outcome to stdout and returns the exit code.
-fn emit_outcome_output(stdout: Option<&str>, exit_code: u8) -> Result<u8, String> {
+/// Emits the review outcome and returns the exit code.
+fn emit_outcome_output(
+    stdout: Option<&str>,
+    stderr: Option<&str>,
+    exit_code: u8,
+) -> Result<u8, crate::CliError> {
     if let Some(line) = stdout {
-        writeln!(io::stdout(), "{line}").map_err(|e| format!("failed to write stdout: {e}"))?;
+        writeln!(io::stdout(), "{line}").map_err(crate::CliError::Io)?;
+    }
+    if let Some(line) = stderr {
+        eprintln!("{line}");
     }
     Ok(exit_code)
 }
@@ -186,7 +197,9 @@ fn codex_bin() -> std::ffi::OsString {
 }
 
 #[cfg(test)]
-pub(super) fn run_codex_local(args: &CodexLocalArgs) -> Result<super::ReviewRunResult, String> {
+pub(super) fn run_codex_local(
+    args: &CodexLocalArgs,
+) -> Result<super::ReviewRunResult, CodexLocalError> {
     let prompt = build_base_prompt(args)?;
 
     let output_last_message_path = prepare_output_last_message(args)?;
@@ -201,9 +214,9 @@ pub(super) fn run_codex_local(args: &CodexLocalArgs) -> Result<super::ReviewRunR
     let _cleanup = TestArtifactCleanup(cleanup_paths);
 
     std::fs::write(&output_last_message_path.path, "")
-        .map_err(|e| format!("failed to init output-last-message: {e}"))?;
+        .map_err(|e| CodexLocalError(format!("failed to init output-last-message: {e}")))?;
     std::fs::write(&output_schema_path, usecase::review_workflow::REVIEW_OUTPUT_SCHEMA_JSON)
-        .map_err(|e| format!("failed to write output-schema: {e}"))?;
+        .map_err(|e| CodexLocalError(format!("failed to write output-schema: {e}")))?;
 
     let invocation = build_codex_invocation(
         &args.model,
@@ -222,12 +235,13 @@ pub(super) fn run_codex_local(args: &CodexLocalArgs) -> Result<super::ReviewRunR
 #[cfg(test)]
 fn prepare_output_last_message(
     args: &CodexLocalArgs,
-) -> Result<super::OutputLastMessagePath, String> {
+) -> Result<super::OutputLastMessagePath, CodexLocalError> {
     if let Some(path) = &args.output_last_message {
-        let parent =
-            path.parent().ok_or_else(|| format!("path has no parent: {}", path.display()))?;
+        let parent = path
+            .parent()
+            .ok_or_else(|| CodexLocalError(format!("path has no parent: {}", path.display())))?;
         std::fs::create_dir_all(parent)
-            .map_err(|e| format!("failed to create {}: {e}", parent.display()))?;
+            .map_err(|e| CodexLocalError(format!("failed to create {}: {e}", parent.display())))?;
         return Ok(super::OutputLastMessagePath { path: path.clone(), auto_managed: false });
     }
     let path = prepare_timestamped_path("codex-last-message", "txt")?;
@@ -235,17 +249,22 @@ fn prepare_output_last_message(
 }
 
 #[cfg(test)]
-fn prepare_timestamped_path(prefix: &str, ext: &str) -> Result<std::path::PathBuf, String> {
+fn prepare_timestamped_path(
+    prefix: &str,
+    ext: &str,
+) -> Result<std::path::PathBuf, CodexLocalError> {
     use std::time::{SystemTime, UNIX_EPOCH};
     let ts = SystemTime::now()
         .duration_since(UNIX_EPOCH)
-        .map_err(|e| format!("timestamp error: {e}"))?
+        .map_err(|e| CodexLocalError(format!("timestamp error: {e}")))?
         .as_millis();
     let path = std::path::PathBuf::from(super::REVIEW_RUNTIME_DIR)
         .join(format!("{prefix}-{}-{ts}.{ext}", std::process::id()));
-    let parent = path.parent().ok_or_else(|| format!("path has no parent: {}", path.display()))?;
+    let parent = path
+        .parent()
+        .ok_or_else(|| CodexLocalError(format!("path has no parent: {}", path.display())))?;
     std::fs::create_dir_all(parent)
-        .map_err(|e| format!("failed to create {}: {e}", parent.display()))?;
+        .map_err(|e| CodexLocalError(format!("failed to create {}: {e}", parent.display())))?;
     Ok(path)
 }
 
@@ -267,13 +286,13 @@ fn run_codex_invocation(
     timeout: Duration,
     output_last_message: super::OutputLastMessagePath,
     session_log_path: &std::path::Path,
-) -> Result<super::ReviewRunResult, String> {
+) -> Result<super::ReviewRunResult, CodexLocalError> {
     use std::io::BufRead;
     use std::process::{Command, Stdio};
     use std::thread;
 
     let log_file = std::fs::File::create(session_log_path)
-        .map_err(|e| format!("failed to create session log: {e}"))?;
+        .map_err(|e| CodexLocalError(format!("failed to create session log: {e}")))?;
 
     let mut command = Command::new(&invocation.bin);
     command
@@ -288,9 +307,9 @@ fn run_codex_invocation(
         command.process_group(0);
     }
 
-    let mut child = command
-        .spawn()
-        .map_err(|e| format!("failed to spawn {}: {e}", invocation.bin.to_string_lossy()))?;
+    let mut child = command.spawn().map_err(|e| {
+        CodexLocalError(format!("failed to spawn {}: {e}", invocation.bin.to_string_lossy()))
+    })?;
 
     let stderr_pipe = child.stderr.take();
     let tee_handle = stderr_pipe.map(|pipe| {
@@ -323,14 +342,17 @@ fn poll_child_with_timeout(
     tee_handle: Option<std::thread::JoinHandle<()>>,
     timeout: Duration,
     _session_log_path: &std::path::Path,
-) -> Result<(bool, bool), String> {
+) -> Result<(bool, bool), CodexLocalError> {
     use std::thread;
     let start = std::time::Instant::now();
     let mut timed_out = false;
     let mut exit_success = false;
 
     loop {
-        match child.try_wait().map_err(|e| format!("failed to poll reviewer child: {e}"))? {
+        match child
+            .try_wait()
+            .map_err(|e| CodexLocalError(format!("failed to poll reviewer child: {e}")))?
+        {
             Some(status) => {
                 exit_success = status.success();
                 break;
@@ -339,7 +361,9 @@ fn poll_child_with_timeout(
                 if start.elapsed() >= timeout {
                     timed_out = true;
                     terminate_child(child)?;
-                    child.wait().map_err(|e| format!("failed to reap child: {e}"))?;
+                    child
+                        .wait()
+                        .map_err(|e| CodexLocalError(format!("failed to reap child: {e}")))?;
                     break;
                 }
                 thread::sleep(crate::commands::POLL_INTERVAL);
@@ -360,11 +384,11 @@ fn parse_codex_output(
     session_log_path: &std::path::Path,
     timed_out: bool,
     exit_success: bool,
-) -> Result<super::ReviewRunResult, String> {
+) -> Result<super::ReviewRunResult, CodexLocalError> {
     let raw_content = match std::fs::read_to_string(&output_last_message.path) {
         Ok(c) => usecase::review_workflow::normalize_final_message(&c),
         Err(e) if e.kind() == io::ErrorKind::NotFound => None,
-        Err(e) => return Err(format!("failed to read output-last-message: {e}")),
+        Err(e) => return Err(CodexLocalError(format!("failed to read output-last-message: {e}"))),
     };
 
     let final_message_state =
@@ -392,9 +416,10 @@ fn parse_codex_output(
     };
 
     let final_message = match &final_message_state {
-        usecase::review_workflow::ReviewFinalMessageState::Parsed(p) => {
-            Some(usecase::review_workflow::render_review_payload(p).map_err(|e| e.to_string())?)
-        }
+        usecase::review_workflow::ReviewFinalMessageState::Parsed(p) => Some(
+            usecase::review_workflow::render_review_payload(p)
+                .map_err(|e| CodexLocalError(e.to_string()))?,
+        ),
         _ => raw_content,
     };
     let verdict = usecase::review_workflow::classify_review_verdict(
@@ -420,9 +445,9 @@ fn parse_codex_output(
 
 #[cfg(unix)]
 #[cfg(test)]
-fn terminate_child(child: &mut std::process::Child) -> Result<(), String> {
+fn terminate_child(child: &mut std::process::Child) -> Result<(), CodexLocalError> {
     let pid = i32::try_from(child.id())
-        .map_err(|_| format!("child pid does not fit i32: {}", child.id()))?;
+        .map_err(|_| CodexLocalError(format!("child pid does not fit i32: {}", child.id())))?;
     // Safety: killpg sends SIGKILL to the process group created by process_group(0) above.
     let result = unsafe { libc::killpg(pid, libc::SIGKILL) };
     if result == 0 {
@@ -432,16 +457,20 @@ fn terminate_child(child: &mut std::process::Child) -> Result<(), String> {
         if err.raw_os_error() == Some(libc::ESRCH) {
             Ok(())
         } else {
-            Err(format!("failed to kill reviewer process group {pid}: {err}"))
+            Err(CodexLocalError(format!("failed to kill reviewer process group {pid}: {err}")))
         }
     }
 }
 
 #[cfg(windows)]
 #[cfg(test)]
-fn terminate_child(child: &mut std::process::Child) -> Result<(), String> {
+fn terminate_child(child: &mut std::process::Child) -> Result<(), CodexLocalError> {
     use std::process::{Command, Stdio};
-    if child.try_wait().map_err(|e| format!("failed to poll child: {e}"))?.is_some() {
+    if child
+        .try_wait()
+        .map_err(|e| CodexLocalError(format!("failed to poll child: {e}")))?
+        .is_some()
+    {
         return Ok(());
     }
     let status = Command::new("taskkill")
@@ -450,18 +479,22 @@ fn terminate_child(child: &mut std::process::Child) -> Result<(), String> {
         .stdout(Stdio::null())
         .stderr(Stdio::null())
         .status()
-        .map_err(|e| format!("taskkill failed: {e}"))?;
+        .map_err(|e| CodexLocalError(format!("taskkill failed: {e}")))?;
     if status.success() {
         Ok(())
-    } else if child.try_wait().map_err(|e| format!("poll after taskkill: {e}"))?.is_some() {
+    } else if child
+        .try_wait()
+        .map_err(|e| CodexLocalError(format!("poll after taskkill: {e}")))?
+        .is_some()
+    {
         Ok(())
     } else {
-        Err(format!("failed to terminate child {} via taskkill", child.id()))
+        Err(CodexLocalError(format!("failed to terminate child {} via taskkill", child.id())))
     }
 }
 
 #[cfg(all(not(unix), not(windows)))]
 #[cfg(test)]
-fn terminate_child(child: &mut std::process::Child) -> Result<(), String> {
-    child.kill().map_err(|e| format!("failed to kill child: {e}"))
+fn terminate_child(child: &mut std::process::Child) -> Result<(), CodexLocalError> {
+    child.kill().map_err(|e| CodexLocalError(format!("failed to kill child: {e}")))
 }

@@ -14,6 +14,20 @@
 use std::path::PathBuf;
 use std::sync::Arc;
 
+// ── ReviewAuxError ────────────────────────────────────────────────────────────
+
+/// Error type for review auxiliary service operations.
+///
+/// Used by [`ReviewClassifyService`], [`ReviewFilesService`],
+/// [`ReviewResultsService`], [`ReviewValidateScopeService`], and
+/// [`ReviewGetBriefingService`].
+#[derive(Debug, thiserror::Error)]
+pub enum ReviewAuxError {
+    /// The operation failed (scope invalid, briefing not found, I/O failure, etc.).
+    #[error("{0}")]
+    Failed(String),
+}
+
 // ── ReviewClassifyService ─────────────────────────────────────────────────────
 
 /// Application service (primary port) for `sotp review classify`.
@@ -26,14 +40,18 @@ pub trait ReviewClassifyService: Send + Sync {
         paths: Vec<String>,
         track_id: Option<String>,
         items_dir: PathBuf,
-    ) -> Result<Vec<(String, String)>, String>;
+    ) -> Result<Vec<(String, String)>, ReviewAuxError>;
 }
 
 /// Function-pointer interactor implementing [`ReviewClassifyService`].
 pub struct ReviewClassifyInteractor {
     #[allow(clippy::type_complexity)]
     run_fn: Arc<
-        dyn Fn(Vec<String>, Option<String>, PathBuf) -> Result<Vec<(String, String)>, String>
+        dyn Fn(
+                Vec<String>,
+                Option<String>,
+                PathBuf,
+            ) -> Result<Vec<(String, String)>, ReviewAuxError>
             + Send
             + Sync,
     >,
@@ -45,7 +63,11 @@ impl ReviewClassifyInteractor {
     #[allow(clippy::type_complexity)]
     pub fn new(
         run_fn: Arc<
-            dyn Fn(Vec<String>, Option<String>, PathBuf) -> Result<Vec<(String, String)>, String>
+            dyn Fn(
+                    Vec<String>,
+                    Option<String>,
+                    PathBuf,
+                ) -> Result<Vec<(String, String)>, ReviewAuxError>
                 + Send
                 + Sync,
         >,
@@ -60,7 +82,7 @@ impl ReviewClassifyService for ReviewClassifyInteractor {
         paths: Vec<String>,
         track_id: Option<String>,
         items_dir: PathBuf,
-    ) -> Result<Vec<(String, String)>, String> {
+    ) -> Result<Vec<(String, String)>, ReviewAuxError> {
         (self.run_fn)(paths, track_id, items_dir)
     }
 }
@@ -75,14 +97,17 @@ pub trait ReviewFilesService: Send + Sync {
         scope: String,
         track_id: Option<String>,
         items_dir: PathBuf,
-    ) -> Result<Vec<String>, String>;
+    ) -> Result<Vec<String>, ReviewAuxError>;
 }
 
 /// Function-pointer interactor implementing [`ReviewFilesService`].
 pub struct ReviewFilesInteractor {
     #[allow(clippy::type_complexity)]
-    run_fn:
-        Arc<dyn Fn(String, Option<String>, PathBuf) -> Result<Vec<String>, String> + Send + Sync>,
+    run_fn: Arc<
+        dyn Fn(String, Option<String>, PathBuf) -> Result<Vec<String>, ReviewAuxError>
+            + Send
+            + Sync,
+    >,
 }
 
 impl ReviewFilesInteractor {
@@ -91,7 +116,9 @@ impl ReviewFilesInteractor {
     #[allow(clippy::type_complexity)]
     pub fn new(
         run_fn: Arc<
-            dyn Fn(String, Option<String>, PathBuf) -> Result<Vec<String>, String> + Send + Sync,
+            dyn Fn(String, Option<String>, PathBuf) -> Result<Vec<String>, ReviewAuxError>
+                + Send
+                + Sync,
         >,
     ) -> Self {
         Self { run_fn }
@@ -104,7 +131,7 @@ impl ReviewFilesService for ReviewFilesInteractor {
         scope: String,
         track_id: Option<String>,
         items_dir: PathBuf,
-    ) -> Result<Vec<String>, String> {
+    ) -> Result<Vec<String>, ReviewAuxError> {
         (self.run_fn)(scope, track_id, items_dir)
     }
 }
@@ -115,7 +142,7 @@ impl ReviewFilesService for ReviewFilesInteractor {
 pub trait ReviewResultsService: Send + Sync {
     /// Render review results output.
     ///
-    /// Returns the rendered output string or an error message.
+    /// Returns the rendered output string or an error.
     #[allow(clippy::too_many_arguments)]
     fn results(
         &self,
@@ -126,7 +153,7 @@ pub trait ReviewResultsService: Send + Sync {
         limit: u32,
         round_type: String,
         no_hint: bool,
-    ) -> Result<String, String>;
+    ) -> Result<String, ReviewAuxError>;
 }
 
 /// Function-pointer interactor implementing [`ReviewResultsService`].
@@ -141,7 +168,7 @@ pub struct ReviewResultsInteractor {
                 u32,
                 String,
                 bool,
-            ) -> Result<String, String>
+            ) -> Result<String, ReviewAuxError>
             + Send
             + Sync,
     >,
@@ -161,7 +188,7 @@ impl ReviewResultsInteractor {
                     u32,
                     String,
                     bool,
-                ) -> Result<String, String>
+                ) -> Result<String, ReviewAuxError>
                 + Send
                 + Sync,
         >,
@@ -181,7 +208,7 @@ impl ReviewResultsService for ReviewResultsInteractor {
         limit: u32,
         round_type: String,
         no_hint: bool,
-    ) -> Result<String, String> {
+    ) -> Result<String, ReviewAuxError> {
         (self.run_fn)(track_id, items_dir, scope, all, limit, round_type, no_hint)
     }
 }
@@ -192,19 +219,20 @@ impl ReviewResultsService for ReviewResultsInteractor {
 pub trait ReviewValidateScopeService: Send + Sync {
     /// Validate a scope name for the given track.
     ///
-    /// Returns `Ok(())` on success or an error message string on failure.
+    /// Returns `Ok(())` on success or an error on failure.
     fn validate_scope(
         &self,
         scope: String,
         track_id: Option<String>,
         items_dir: PathBuf,
-    ) -> Result<(), String>;
+    ) -> Result<(), ReviewAuxError>;
 }
 
 /// Function-pointer interactor implementing [`ReviewValidateScopeService`].
 pub struct ReviewValidateScopeInteractor {
     #[allow(clippy::type_complexity)]
-    run_fn: Arc<dyn Fn(String, Option<String>, PathBuf) -> Result<(), String> + Send + Sync>,
+    run_fn:
+        Arc<dyn Fn(String, Option<String>, PathBuf) -> Result<(), ReviewAuxError> + Send + Sync>,
 }
 
 impl ReviewValidateScopeInteractor {
@@ -212,7 +240,9 @@ impl ReviewValidateScopeInteractor {
     #[must_use]
     #[allow(clippy::type_complexity)]
     pub fn new(
-        run_fn: Arc<dyn Fn(String, Option<String>, PathBuf) -> Result<(), String> + Send + Sync>,
+        run_fn: Arc<
+            dyn Fn(String, Option<String>, PathBuf) -> Result<(), ReviewAuxError> + Send + Sync,
+        >,
     ) -> Self {
         Self { run_fn }
     }
@@ -224,7 +254,7 @@ impl ReviewValidateScopeService for ReviewValidateScopeInteractor {
         scope: String,
         track_id: Option<String>,
         items_dir: PathBuf,
-    ) -> Result<(), String> {
+    ) -> Result<(), ReviewAuxError> {
         (self.run_fn)(scope, track_id, items_dir)
     }
 }
@@ -241,14 +271,16 @@ pub trait ReviewGetBriefingService: Send + Sync {
         scope: String,
         track_id: Option<String>,
         items_dir: PathBuf,
-    ) -> Result<Option<String>, String>;
+    ) -> Result<Option<String>, ReviewAuxError>;
 }
 
 /// Function-pointer interactor implementing [`ReviewGetBriefingService`].
 pub struct ReviewGetBriefingInteractor {
     #[allow(clippy::type_complexity)]
     run_fn: Arc<
-        dyn Fn(String, Option<String>, PathBuf) -> Result<Option<String>, String> + Send + Sync,
+        dyn Fn(String, Option<String>, PathBuf) -> Result<Option<String>, ReviewAuxError>
+            + Send
+            + Sync,
     >,
 }
 
@@ -258,7 +290,9 @@ impl ReviewGetBriefingInteractor {
     #[allow(clippy::type_complexity)]
     pub fn new(
         run_fn: Arc<
-            dyn Fn(String, Option<String>, PathBuf) -> Result<Option<String>, String> + Send + Sync,
+            dyn Fn(String, Option<String>, PathBuf) -> Result<Option<String>, ReviewAuxError>
+                + Send
+                + Sync,
         >,
     ) -> Self {
         Self { run_fn }
@@ -271,7 +305,7 @@ impl ReviewGetBriefingService for ReviewGetBriefingInteractor {
         scope: String,
         track_id: Option<String>,
         items_dir: PathBuf,
-    ) -> Result<Option<String>, String> {
+    ) -> Result<Option<String>, ReviewAuxError> {
         (self.run_fn)(scope, track_id, items_dir)
     }
 }

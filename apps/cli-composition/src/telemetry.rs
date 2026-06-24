@@ -170,8 +170,7 @@ impl TelemetryCompositionRoot {
         };
 
         // Derive the project root, then discover the repo to get an absolute root path.
-        let project_root = crate::track::resolve_project_root(items_dir)
-            .map_err(CompositionError::Infrastructure)?;
+        let project_root = crate::track::resolve_project_root(items_dir)?;
         let repo =
             infrastructure::git_cli::SystemGitRepo::discover_from(&project_root).map_err(|e| {
                 CompositionError::Infrastructure(format!("failed to discover git repository: {e}"))
@@ -208,14 +207,21 @@ mod tests {
 
     use super::*;
 
-    fn write_jsonl_fixture(tmp: &tempfile::TempDir, track_id: &str, lines: &[&str]) {
-        let logs_dir = tmp.path().join(track_id).join("logs");
+    fn write_jsonl_fixture(items_dir: &std::path::Path, track_id: &str, lines: &[&str]) {
+        let logs_dir = items_dir.join(track_id).join("logs");
         std::fs::create_dir_all(&logs_dir).unwrap();
         let mut file = std::fs::File::create(logs_dir.join("telemetry.jsonl")).unwrap();
         for line in lines {
             file.write_all(line.as_bytes()).unwrap();
             file.write_all(b"\n").unwrap();
         }
+    }
+
+    fn setup_repo_with_items(track_id: &str) -> tempfile::TempDir {
+        let tmp = tempfile::TempDir::new().unwrap();
+        crate::test_support::seed_repo(tmp.path(), &format!("track/{track_id}"));
+        std::fs::create_dir_all(tmp.path().join("track").join("items").join(track_id)).unwrap();
+        tmp
     }
 
     const SUBCOMMAND_LINE: &str = r#"{"event_type":"TrackSubcommand","schema_version":1,"track_id":"t","command":"track spec-design","exit_code":0,"duration_ms":1200,"timestamp":"2026-06-10T00:00:00Z"}"#;
@@ -226,14 +232,23 @@ mod tests {
 
     #[test]
     fn test_telemetry_report_happy_path_exits_zero_with_output() {
-        let tmp = tempfile::TempDir::new().unwrap();
-        write_jsonl_fixture(&tmp, "t", &[SUBCOMMAND_LINE, NON_ZERO_EXIT_LINE, HOOK_BLOCK_LINE]);
+        let _guard = crate::test_support::process_env_lock().lock().unwrap();
+        let tmp = setup_repo_with_items("t");
+        let items_dir = tmp.path().join("track").join("items");
+        write_jsonl_fixture(
+            &items_dir,
+            "t",
+            &[SUBCOMMAND_LINE, NON_ZERO_EXIT_LINE, HOOK_BLOCK_LINE],
+        );
 
-        let result = TelemetryCompositionRoot::new().telemetry_report(TelemetryReportInput {
-            track_id: "t".to_owned(),
-            items_dir: tmp.path().to_path_buf(),
+        let outcome = crate::test_support::run_in_dir(tmp.path(), || {
+            TelemetryCompositionRoot::new()
+                .telemetry_report(TelemetryReportInput {
+                    track_id: "t".to_owned(),
+                    items_dir: std::path::PathBuf::from("track/items"),
+                })
+                .unwrap()
         });
-        let outcome = result.unwrap();
         assert_eq!(outcome.exit_code, 0);
 
         let text = outcome.stdout.unwrap();
@@ -248,15 +263,19 @@ mod tests {
 
     #[test]
     fn test_telemetry_report_shows_skipped_line_count_when_nonzero() {
-        let tmp = tempfile::TempDir::new().unwrap();
-        write_jsonl_fixture(&tmp, "t", &[SUBCOMMAND_LINE, "not valid json", HOOK_BLOCK_LINE]);
+        let _guard = crate::test_support::process_env_lock().lock().unwrap();
+        let tmp = setup_repo_with_items("t");
+        let items_dir = tmp.path().join("track").join("items");
+        write_jsonl_fixture(&items_dir, "t", &[SUBCOMMAND_LINE, "not valid json", HOOK_BLOCK_LINE]);
 
-        let outcome = TelemetryCompositionRoot::new()
-            .telemetry_report(TelemetryReportInput {
-                track_id: "t".to_owned(),
-                items_dir: tmp.path().to_path_buf(),
-            })
-            .unwrap();
+        let outcome = crate::test_support::run_in_dir(tmp.path(), || {
+            TelemetryCompositionRoot::new()
+                .telemetry_report(TelemetryReportInput {
+                    track_id: "t".to_owned(),
+                    items_dir: std::path::PathBuf::from("track/items"),
+                })
+                .unwrap()
+        });
 
         assert_eq!(outcome.exit_code, 0, "skipped lines must not fail the command (AC-09)");
         let text = outcome.stdout.unwrap();
@@ -267,15 +286,17 @@ mod tests {
 
     #[test]
     fn test_telemetry_report_missing_log_exits_zero_with_empty_report() {
-        let tmp = tempfile::TempDir::new().unwrap();
-        std::fs::create_dir_all(tmp.path().join("t")).unwrap();
+        let _guard = crate::test_support::process_env_lock().lock().unwrap();
+        let tmp = setup_repo_with_items("t");
 
-        let outcome = TelemetryCompositionRoot::new()
-            .telemetry_report(TelemetryReportInput {
-                track_id: "t".to_owned(),
-                items_dir: tmp.path().to_path_buf(),
-            })
-            .unwrap();
+        let outcome = crate::test_support::run_in_dir(tmp.path(), || {
+            TelemetryCompositionRoot::new()
+                .telemetry_report(TelemetryReportInput {
+                    track_id: "t".to_owned(),
+                    items_dir: std::path::PathBuf::from("track/items"),
+                })
+                .unwrap()
+        });
 
         assert_eq!(outcome.exit_code, 0);
         let text = outcome.stdout.unwrap();
@@ -287,11 +308,16 @@ mod tests {
 
     #[test]
     fn test_telemetry_report_track_not_found_returns_err() {
+        let _guard = crate::test_support::process_env_lock().lock().unwrap();
         let tmp = tempfile::TempDir::new().unwrap();
+        crate::test_support::seed_repo(tmp.path(), "track/main-init");
+        std::fs::create_dir_all(tmp.path().join("track").join("items")).unwrap();
 
-        let result = TelemetryCompositionRoot::new().telemetry_report(TelemetryReportInput {
-            track_id: "does-not-exist".to_owned(),
-            items_dir: tmp.path().to_path_buf(),
+        let result = crate::test_support::run_in_dir(tmp.path(), || {
+            TelemetryCompositionRoot::new().telemetry_report(TelemetryReportInput {
+                track_id: "does-not-exist".to_owned(),
+                items_dir: std::path::PathBuf::from("track/items"),
+            })
         });
 
         assert!(result.is_err(), "missing track must return Err");

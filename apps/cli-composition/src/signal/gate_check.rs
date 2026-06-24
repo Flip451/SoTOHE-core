@@ -23,8 +23,8 @@ impl SignalCompositionRoot {
         use infrastructure::signal_layer_reader::LocalSignalLayerReaderAdapter;
         use usecase::signal::SignalLayerReader as _;
         use usecase::signal_gate::{
-            AdrChainRunnerPort, LayerChainRunnerPort, SignalChainOutput, SignalGateCommand,
-            SignalGateInteractor, SignalGateService, SpecAdrChainRunnerPort,
+            AdrChainRunnerPort, ChainRunnerError, LayerChainRunnerPort, SignalChainOutput,
+            SignalGateCommand, SignalGateInteractor, SignalGateService, SpecAdrChainRunnerPort,
         };
 
         let matrix = match load_gate_matrix(workspace_root.as_deref()) {
@@ -82,7 +82,7 @@ impl SignalCompositionRoot {
                 &self,
                 _project_root: PathBuf,
                 strict: bool,
-            ) -> Result<SignalChainOutput, String> {
+            ) -> Result<SignalChainOutput, ChainRunnerError> {
                 let outcome =
                     infrastructure::verify::adr_signals::execute_verify_adr_signals_with_strict(
                         &self.project_root,
@@ -107,7 +107,7 @@ impl SignalCompositionRoot {
                 &self,
                 _spec_json_path: PathBuf,
                 strict: bool,
-            ) -> Result<SignalChainOutput, String> {
+            ) -> Result<SignalChainOutput, ChainRunnerError> {
                 let spec_json_path = self.spec_json_path.clone();
                 let outcome = match infrastructure::verify::trusted_root::resolve_trusted_root(
                     &spec_json_path,
@@ -143,7 +143,7 @@ impl SignalCompositionRoot {
                 &self,
                 strict: bool,
                 _signal_reader: &dyn usecase::signal::SignalLayerReader,
-            ) -> Result<SignalChainOutput, String> {
+            ) -> Result<SignalChainOutput, ChainRunnerError> {
                 let cmd_outcome = signal_check_layer_chain_with_strict(
                     strict,
                     self.workspace_root.clone(),
@@ -160,7 +160,7 @@ impl SignalCompositionRoot {
                         usecase::signal::check_catalog_spec(reader, per_layer_fn)
                     },
                 )
-                .map_err(|e| e.to_string())?;
+                .map_err(|e| ChainRunnerError::ExecutionFailed(e.to_string()))?;
                 Ok(SignalChainOutput {
                     chain_label: "signal check-catalog-spec".to_owned(),
                     passed: cmd_outcome.exit_code == 0,
@@ -173,7 +173,7 @@ impl SignalCompositionRoot {
                 &self,
                 strict: bool,
                 _signal_reader: &dyn usecase::signal::SignalLayerReader,
-            ) -> Result<SignalChainOutput, String> {
+            ) -> Result<SignalChainOutput, ChainRunnerError> {
                 let cmd_outcome = signal_check_layer_chain_with_strict(
                     strict,
                     self.workspace_root.clone(),
@@ -192,7 +192,7 @@ impl SignalCompositionRoot {
                         usecase::signal::check_impl_catalog(reader, per_layer_fn)
                     },
                 )
-                .map_err(|e| e.to_string())?;
+                .map_err(|e| ChainRunnerError::ExecutionFailed(e.to_string()))?;
                 Ok(SignalChainOutput {
                     chain_label: "signal check-impl-catalog".to_owned(),
                     passed: cmd_outcome.exit_code == 0,

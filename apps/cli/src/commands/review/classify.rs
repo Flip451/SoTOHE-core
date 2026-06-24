@@ -10,6 +10,7 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 use clap::Args;
+use cli_driver::review::ReviewInput;
 
 /// CLI arguments for `sotp review classify`.
 #[derive(Debug, Args)]
@@ -34,23 +35,34 @@ pub(super) fn execute_classify(args: &ClassifyArgs) -> ExitCode {
             print!("{output}");
             ExitCode::SUCCESS
         }
-        Err(msg) => {
-            eprintln!("{msg}");
+        Err(e) => {
+            eprintln!("{e}");
             ExitCode::FAILURE
         }
     }
 }
 
-fn run_classify(args: &ClassifyArgs) -> Result<String, String> {
+fn run_classify(args: &ClassifyArgs) -> Result<String, crate::CliError> {
     // READ resolution: anchors git discovery to the repo owning args.items_dir so that
     // track ID resolution uses the same repository as the scope config (AC-19 / CN-02).
-    let track_id =
-        crate::commands::track::resolve_track_id(args.track_id.clone(), &args.items_dir)?;
+    let track_id = crate::commands::track::resolve_track_id(args.track_id.clone(), &args.items_dir)
+        .map_err(|e| crate::CliError::Message(e.to_string()))?;
 
-    let outcome = cli_composition::ReviewCompositionRoot::new()
-        .review_classify(args.paths.clone(), Some(track_id), args.items_dir.clone())
-        .map_err(|e| e.to_string())?;
-    outcome.stdout.ok_or_else(|| "review classify returned no output".to_owned())
+    let outcome = cli_composition::ReviewCompositionRoot::new().review_driver().handle(
+        ReviewInput::Classify {
+            paths: args.paths.clone(),
+            track_id: Some(track_id),
+            items_dir: args.items_dir.clone(),
+        },
+    );
+    if outcome.exit_code != 0 {
+        return Err(crate::CliError::Message(
+            outcome.stderr.unwrap_or_else(|| "review classify failed".to_owned()),
+        ));
+    }
+    outcome
+        .stdout
+        .ok_or_else(|| crate::CliError::Message("review classify returned no output".to_owned()))
 }
 
 #[cfg(test)]

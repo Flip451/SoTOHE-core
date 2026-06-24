@@ -10,7 +10,7 @@ use infrastructure::dry_check::{
 };
 use infrastructure::semantic_dup::extractor::extract_code_fragments;
 
-use crate::CommandOutcome;
+use crate::{CommandOutcome, error::CompositionError};
 
 /// Resolve the diff base commit using the three-branch fail-closed policy.
 ///
@@ -34,9 +34,10 @@ pub(super) fn resolve_dry_diff_base(
     base_commit_override: Option<&str>,
     commit_hash_path: &Path,
     trusted_root: &Path,
-) -> Result<CommitHash, String> {
+) -> Result<CommitHash, CompositionError> {
     if let Some(s) = base_commit_override {
-        return CommitHash::try_new(s).map_err(|e| format!("invalid --base-commit: {e}"));
+        return CommitHash::try_new(s)
+            .map_err(|e| CompositionError::Infrastructure(format!("invalid --base-commit: {e}")));
     }
 
     resolve_dry_diff_base_from_store(commit_hash_path, trusted_root, None, "dry-check")
@@ -66,7 +67,7 @@ pub(crate) fn resolve_dry_diff_base_from_store(
     trusted_root: &Path,
     git_discovery_root: Option<&Path>,
     warning_prefix: &str,
-) -> Result<CommitHash, String> {
+) -> Result<CommitHash, CompositionError> {
     let store =
         FsDryCheckCommitHashStore::new(commit_hash_path.to_path_buf(), trusted_root.to_path_buf());
     match store.read() {
@@ -96,22 +97,26 @@ pub(crate) fn resolve_dry_diff_base_from_store(
 ///
 /// Returns `Err` when git cannot be discovered, the command fails, or the
 /// output is not a valid commit hash.
-pub(crate) fn git_rev_parse_main_at(discovery_root: Option<&Path>) -> Result<CommitHash, String> {
+pub(crate) fn git_rev_parse_main_at(
+    discovery_root: Option<&Path>,
+) -> Result<CommitHash, CompositionError> {
     use infrastructure::git_cli::{GitRepository, SystemGitRepo};
 
     let git = match discovery_root {
-        Some(root) => {
-            SystemGitRepo::discover_from(root).map_err(|e| format!("git discover: {e}"))?
-        }
-        None => SystemGitRepo::discover().map_err(|e| format!("git discover: {e}"))?,
+        Some(root) => SystemGitRepo::discover_from(root)
+            .map_err(|e| CompositionError::Infrastructure(format!("git discover: {e}")))?,
+        None => SystemGitRepo::discover()
+            .map_err(|e| CompositionError::Infrastructure(format!("git discover: {e}")))?,
     };
-    let output =
-        git.output(&["rev-parse", "main"]).map_err(|e| format!("git rev-parse main: {e}"))?;
+    let output = git
+        .output(&["rev-parse", "main"])
+        .map_err(|e| CompositionError::Infrastructure(format!("git rev-parse main: {e}")))?;
     if !output.status.success() {
-        return Err("git rev-parse main failed".to_owned());
+        return Err(CompositionError::Infrastructure("git rev-parse main failed".to_owned()));
     }
     let sha = String::from_utf8_lossy(&output.stdout).trim().to_owned();
-    CommitHash::try_new(&sha).map_err(|e| format!("invalid main SHA: {e}"))
+    CommitHash::try_new(&sha)
+        .map_err(|e| CompositionError::Infrastructure(format!("invalid main SHA: {e}")))
 }
 
 /// Build `diff_fragments` using the hunk-scope pipeline.
@@ -127,19 +132,21 @@ pub(super) fn build_diff_and_corpus_fragments(
     base: &CommitHash,
     workspace_root: &Path,
     repo_root: &Path,
-) -> Result<(Vec<CodeFragment>, Vec<CodeFragment>), String> {
+) -> Result<(Vec<CodeFragment>, Vec<CodeFragment>), CompositionError> {
     use usecase::dry_check::DryCheckDiffSource as _;
 
     let getter = GitDryCheckDiffGetter;
     let changed_hunks = getter
         .list_changed_hunks(base, repo_root)
-        .map_err(|e| format!("list_changed_hunks failed: {e}"))?;
+        .map_err(|e| CompositionError::Infrastructure(format!("list_changed_hunks failed: {e}")))?;
 
-    let raw_fragments = extract_code_fragments(workspace_root)
-        .map_err(|e| format!("fragment extraction failed: {e}"))?;
+    let raw_fragments = extract_code_fragments(workspace_root).map_err(|e| {
+        CompositionError::Infrastructure(format!("fragment extraction failed: {e}"))
+    })?;
 
-    let normalized_fragments = normalize_fragment_paths(raw_fragments, repo_root)
-        .map_err(|e| format!("fragment path normalization failed: {e}"))?;
+    let normalized_fragments = normalize_fragment_paths(raw_fragments, repo_root).map_err(|e| {
+        CompositionError::Infrastructure(format!("fragment path normalization failed: {e}"))
+    })?;
 
     let changed_paths: std::collections::HashSet<String> =
         changed_hunks.iter().map(|h| h.path().as_str().to_owned()).collect();
@@ -169,7 +176,7 @@ pub(super) fn build_diff_and_corpus_fragments(
 pub(super) fn normalize_fragment_paths(
     fragments: Vec<CodeFragment>,
     repo_root: &Path,
-) -> Result<Vec<CodeFragment>, String> {
+) -> Result<Vec<CodeFragment>, CompositionError> {
     let mut result = Vec::with_capacity(fragments.len());
     for frag in fragments {
         let rel_path = frag
@@ -185,7 +192,10 @@ pub(super) fn normalize_fragment_paths(
             frag.end_line(),
         )
         .map_err(|e| {
-            format!("failed to rebuild fragment from '{}': {e}", frag.source_path.display())
+            CompositionError::Infrastructure(format!(
+                "failed to rebuild fragment from '{}': {e}",
+                frag.source_path.display()
+            ))
         })?;
         result.push(rebuilt);
     }
@@ -203,31 +213,32 @@ pub(super) fn resolve_existing_dir_under_repo(
     repo_root: &Path,
     canonical_root: &Path,
     label: &str,
-) -> Result<PathBuf, String> {
+) -> Result<PathBuf, CompositionError> {
     let absolute_path = if input_path.is_absolute() {
         input_path.to_path_buf()
     } else {
         repo_root.join(input_path)
     };
     let canonical_path = absolute_path.canonicalize().map_err(|_| {
-        format!(
+        CompositionError::WiringFailed(format!(
             "{label} '{}' must be an existing directory under the repository root",
             input_path.display()
-        )
+        ))
     })?;
 
     if !canonical_path.is_dir() || !canonical_path.starts_with(canonical_root) {
-        return Err(format!(
+        return Err(CompositionError::WiringFailed(format!(
             "{label} '{}' must be an existing directory under the repository root",
             input_path.display()
-        ));
+        )));
     }
 
     Ok(canonical_path)
 }
 
-pub(super) fn parse_dry_track_id(raw: &str) -> Result<TrackId, String> {
-    TrackId::try_new(raw).map_err(|e| format!("invalid --track-id: {e}"))
+pub(super) fn parse_dry_track_id(raw: &str) -> Result<TrackId, CompositionError> {
+    TrackId::try_new(raw)
+        .map_err(|e| CompositionError::WiringFailed(format!("invalid --track-id: {e}")))
 }
 
 /// Parse a verdict filter string to `VerdictFilter`.
@@ -237,15 +248,15 @@ pub(super) fn parse_dry_track_id(raw: &str) -> Result<TrackId, String> {
 /// # Errors
 ///
 /// Returns `Err` for unrecognized values.
-pub(super) fn parse_verdict_filter(s: &str) -> Result<VerdictFilter, String> {
+pub(super) fn parse_verdict_filter(s: &str) -> Result<VerdictFilter, CompositionError> {
     match s.to_ascii_lowercase().as_str() {
         "all" => Ok(VerdictFilter::All),
         "not-a-violation" => Ok(VerdictFilter::NotAViolation),
         "accepted" => Ok(VerdictFilter::Accepted),
         "violation" => Ok(VerdictFilter::Violation),
-        other => Err(format!(
+        other => Err(CompositionError::WiringFailed(format!(
             "invalid --filter '{other}' (expected: all / not-a-violation / accepted / violation)"
-        )),
+        ))),
     }
 }
 

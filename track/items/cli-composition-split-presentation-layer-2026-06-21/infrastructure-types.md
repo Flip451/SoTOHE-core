@@ -1,5 +1,13 @@
 <!-- Generated from infrastructure-types.json — DO NOT EDIT DIRECTLY -->
 
+## Error Types
+
+| Name | Kind | Action | Details | Signal | Cat-Spec |
+|------|------|--------|---------|--------|----------|
+| DemoRunError | error_type | — | Unavailable | 🔵 | 🔵 |
+| PersistentIndexLockError | error_type | — | LockFailed | 🔵 | 🔵 |
+| TrackBranchError | error_type | — | LoadFailed | 🔵 | 🔵 |
+
 ## Secondary Adapters
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
@@ -27,4 +35,13 @@
 | NullInsertIndexProxy | secondary_adapter | — | impl SemanticIndexPort | 🔵 | 🔵 |
 | RecordingDryAgent | secondary_adapter | — | impl DryCheckAgentPort | 🔵 | 🔵 |
 | SystemSleepAdapter | secondary_adapter | — | impl SleepPort, impl Debug, impl Clone, impl Copy, impl Default | 🔵 | 🔵 |
+
+## Free Functions
+
+| Name | Kind | Action | Details | Signal | Cat-Spec |
+|------|------|--------|---------|--------|----------|
+| infrastructure::demo::run_example_demo | free_function | modify | fn() -> Result<String, DemoRunError> | 🔵 | 🔵 |
+| infrastructure::git_cli::collect_track_branch_claims | free_function | modify | fn(root: &std::path::Path) -> Result<Vec<TrackBranchRecord>, TrackBranchError> | 🔵 | 🔵 |
+| infrastructure::git_cli::load_explicit_track_branch | free_function | modify | fn(root: &std::path::Path, track_dir: &std::path::Path) -> Result<TrackBranchRecord, TrackBranchError> | 🔵 | 🔵 |
+| infrastructure::git_cli::load_explicit_track_branch_from_items_dir | free_function | modify | fn(root: &std::path::Path, items_dir: &std::path::Path, track_dir: &std::path::Path) -> Result<TrackBranchRecord, TrackBranchError> | 🔵 | 🔵 |
 

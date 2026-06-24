@@ -66,12 +66,18 @@ pub trait ShellParserPort: Send + Sync {
     /// returned strings on whitespace. Shell quoting and multi-word arguments
     /// are **not preserved** through this interface.
     ///
-    /// Returns an `Err(String)` on parse failure.
-    ///
     /// # Errors
     ///
-    /// Returns a `String` describing the parse failure.
-    fn split_shell(&self, input: &str) -> Result<Vec<String>, String>;
+    /// Returns [`ShellParserError`] describing the parse failure.
+    fn split_shell(&self, input: &str) -> Result<Vec<String>, ShellParserError>;
+}
+
+/// Error returned by [`ShellParserPort::split_shell`].
+#[derive(Debug, thiserror::Error)]
+pub enum ShellParserError {
+    /// Shell command parsing failed.
+    #[error("{0}")]
+    ParseFailed(String),
 }
 
 // ---------------------------------------------------------------------------
@@ -133,11 +139,11 @@ struct ShellParserPortAdapter<'a> {
 
 impl ShellParserPortAdapter<'_> {
     /// Parses the command string via the port and converts it to a list of
-    /// [`SimpleCommand`] values, or returns the raw error string on failure.
+    /// [`SimpleCommand`] values, or returns [`ShellParserError`] on failure.
     ///
     /// The returned `SimpleCommand` values only carry `argv` information; see the
     /// type-level doc for the accepted limitation on redirect/heredoc detection.
-    fn parse(&self, input: &str) -> Result<Vec<SimpleCommand>, String> {
+    fn parse(&self, input: &str) -> Result<Vec<SimpleCommand>, ShellParserError> {
         let command_strings = self.port.split_shell(input)?;
         Ok(command_strings
             .into_iter()
@@ -184,9 +190,9 @@ impl GuardCheckService for GuardCheckInteractor {
             Ok(commands) => policy::check_commands(&commands),
             Err(err) => {
                 // Fail-closed: any parse failure becomes a Block verdict.
-                // The error string from ShellParserPort is propagated as the
-                // block reason so callers receive the actual parse failure
-                // description rather than a misattributed category.
+                // The error from ShellParserPort is propagated as the block
+                // reason so callers receive the actual parse failure description
+                // rather than a misattributed category.
                 GuardVerdict::block(format!("unparseable command: {err}"))
             }
         };
@@ -215,7 +221,7 @@ mod tests {
     struct StubShellParserPort;
 
     impl ShellParserPort for StubShellParserPort {
-        fn split_shell(&self, input: &str) -> Result<Vec<String>, String> {
+        fn split_shell(&self, input: &str) -> Result<Vec<String>, ShellParserError> {
             Ok(input.split(';').map(|s| s.trim().to_owned()).filter(|s| !s.is_empty()).collect())
         }
     }
@@ -272,8 +278,8 @@ mod tests {
     fn test_guard_check_with_parse_error_blocks_fail_closed() {
         struct FailingShellParserPort;
         impl ShellParserPort for FailingShellParserPort {
-            fn split_shell(&self, _input: &str) -> Result<Vec<String>, String> {
-                Err("unmatched quote".to_owned())
+            fn split_shell(&self, _input: &str) -> Result<Vec<String>, ShellParserError> {
+                Err(ShellParserError::ParseFailed("unmatched quote".to_owned()))
             }
         }
 

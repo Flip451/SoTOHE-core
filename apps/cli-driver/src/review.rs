@@ -438,7 +438,7 @@ impl ReviewDriver {
     ) -> CommandOutcome {
         match self.service.results(track_id, items_dir, scope, all, limit, round_type, no_hint) {
             Ok(output) => CommandOutcome::success(Some(output)),
-            Err(e) => CommandOutcome::failure(Some(e)),
+            Err(e) => CommandOutcome::failure(Some(e.to_string())),
         }
     }
 
@@ -456,7 +456,7 @@ impl ReviewDriver {
                     .collect();
                 CommandOutcome::success(Some(output))
             }
-            Err(e) => CommandOutcome::failure(Some(e)),
+            Err(e) => CommandOutcome::failure(Some(e.to_string())),
         }
     }
 
@@ -471,7 +471,7 @@ impl ReviewDriver {
                 let output: String = files.into_iter().map(|f| format!("{f}\n")).collect();
                 CommandOutcome::success(Some(output))
             }
-            Err(e) => CommandOutcome::failure(Some(e)),
+            Err(e) => CommandOutcome::failure(Some(e.to_string())),
         }
     }
 
@@ -483,7 +483,7 @@ impl ReviewDriver {
     ) -> CommandOutcome {
         match self.service.validate_scope(scope, track_id, items_dir) {
             Ok(()) => CommandOutcome::success(None),
-            Err(e) => CommandOutcome::failure(Some(e)),
+            Err(e) => CommandOutcome::failure(Some(e.to_string())),
         }
     }
 
@@ -495,7 +495,7 @@ impl ReviewDriver {
     ) -> CommandOutcome {
         match self.service.get_briefing(scope, track_id, items_dir) {
             Ok(maybe_path) => CommandOutcome::success(maybe_path),
-            Err(e) => CommandOutcome::failure(Some(e)),
+            Err(e) => CommandOutcome::failure(Some(e.to_string())),
         }
     }
 

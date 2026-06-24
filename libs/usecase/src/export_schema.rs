@@ -15,6 +15,14 @@ use crate::file::{FilePortError, FileWritePort};
 
 // ── SchemaExporterPort ────────────────────────────────────────────────────────
 
+/// Error returned by [`SchemaExporterPort::export_as_json`].
+#[derive(Debug, thiserror::Error)]
+pub enum SchemaExporterError {
+    /// Export or serialization failed.
+    #[error("{0}")]
+    ExportFailed(String),
+}
+
 /// Secondary port (driven port) for domain schema export.
 ///
 /// Accepts a crate name and returns the serialized JSON schema string, using
@@ -30,8 +38,8 @@ pub trait SchemaExporterPort: Send + Sync {
     ///
     /// # Errors
     ///
-    /// Returns an `Err(String)` describing the export or serialization failure.
-    fn export_as_json(&self, crate_name: &str) -> Result<String, String>;
+    /// Returns [`SchemaExporterError`] describing the export or serialization failure.
+    fn export_as_json(&self, crate_name: &str) -> Result<String, SchemaExporterError>;
 }
 
 // ── ExportSchemaCommand ───────────────────────────────────────────────────────
@@ -118,16 +126,17 @@ impl ExportSchemaInteractor {
 impl ExportSchemaService for ExportSchemaInteractor {
     fn export(&self, command: ExportSchemaCommand) -> Result<String, ExportSchemaError> {
         let json = self.port.export_as_json(&command.crate_name).map_err(|e| {
-            // The `SchemaExporterPort` contract returns a single `String` error.
+            // The `SchemaExporterPort` contract returns `SchemaExporterError::ExportFailed(msg)`.
             // Infrastructure adapters that perform a two-step operation
             // (export then JSON-serialize) prefix serialization failures with
             // "JSON serialization failed:" per `schema_export_codec::SchemaExportCodecError`.
             // Detect that prefix to route to the correct error variant; all
             // other errors are considered export failures.
-            if e.starts_with("JSON serialization failed") {
-                ExportSchemaError::SerializationFailed(e)
+            let msg = e.to_string();
+            if msg.starts_with("JSON serialization failed") {
+                ExportSchemaError::SerializationFailed(msg)
             } else {
-                ExportSchemaError::ExportFailed(e)
+                ExportSchemaError::ExportFailed(msg)
             }
         })?;
 
@@ -156,7 +165,7 @@ mod tests {
     }
 
     impl SchemaExporterPort for OkPort {
-        fn export_as_json(&self, _crate_name: &str) -> Result<String, String> {
+        fn export_as_json(&self, _crate_name: &str) -> Result<String, SchemaExporterError> {
             Ok(self.json.clone())
         }
     }
@@ -166,8 +175,8 @@ mod tests {
     }
 
     impl SchemaExporterPort for FailPort {
-        fn export_as_json(&self, _crate_name: &str) -> Result<String, String> {
-            Err(self.message.clone())
+        fn export_as_json(&self, _crate_name: &str) -> Result<String, SchemaExporterError> {
+            Err(SchemaExporterError::ExportFailed(self.message.clone()))
         }
     }
 

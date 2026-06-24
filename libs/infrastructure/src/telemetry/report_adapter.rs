@@ -6,7 +6,7 @@
 //! Maps infra output types to the usecase boundary types so that `cli_driver`
 //! never imports infrastructure directly.
 
-use std::path::{Path, PathBuf};
+use std::path::{Component, Path, PathBuf};
 use std::sync::Arc;
 
 use usecase::telemetry::{
@@ -22,6 +22,16 @@ use usecase::{
 };
 
 use crate::telemetry::report::{TelemetryReport, TelemetryReportError as InfraError};
+
+#[derive(Debug)]
+#[allow(dead_code)]
+struct TelemetryAdapterError(String);
+
+impl std::fmt::Display for TelemetryAdapterError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.0.fmt(f)
+    }
+}
 
 /// Filesystem adapter implementing [`TelemetryReportPort`].
 ///
@@ -49,9 +59,10 @@ impl TelemetryReportPort for FsTelemetryReportAdapter {
         track_id: &str,
         items_dir: &Path,
     ) -> Result<TelemetryReportOutput, UsecaseError> {
-        ensure_trusted_items_dir_root(items_dir).map_err(UsecaseError::ReportUnavailable)?;
+        let trusted_items_dir = resolve_items_dir_under_current_repo(items_dir)
+            .map_err(|e| UsecaseError::ReportUnavailable(e.to_string()))?;
 
-        let report = TelemetryReport::new(items_dir.to_path_buf());
+        let report = TelemetryReport::new(trusted_items_dir);
         let infra_output = report.aggregate(track_id).map_err(|e| match e {
             InfraError::TrackNotFound { track_id: tid, .. } => UsecaseError::TrackNotFound(tid),
             InfraError::Io { path, message } => {
@@ -134,14 +145,15 @@ impl TelemetryEmitDynamicPort for FsTelemetryEmitDynamicAdapter {
         use crate::telemetry::archived_track::FsArchivedTrackTelemetryAdapter;
 
         let project_root = resolve_project_root_from_items_dir(items_dir)
-            .map_err(TelemetryEmitDynamicPortError::EmitUnavailable)?;
+            .map_err(|e| TelemetryEmitDynamicPortError::EmitUnavailable(e.to_string()))?;
         let repo = SystemGitRepo::discover_from(&project_root).map_err(|e| {
             TelemetryEmitDynamicPortError::EmitUnavailable(format!(
                 "failed to discover git repository: {e}"
             ))
         })?;
         let repo_root = repo.root().to_path_buf();
-        ensure_trusted_root(&repo_root).map_err(TelemetryEmitDynamicPortError::EmitUnavailable)?;
+        ensure_trusted_root(&repo_root)
+            .map_err(|e| TelemetryEmitDynamicPortError::EmitUnavailable(e.to_string()))?;
 
         let valid_track_id = domain::TrackId::try_new(track_id.to_owned()).map_err(|e| {
             TelemetryEmitDynamicPortError::EmitUnavailable(format!("invalid track ID: {e}"))
@@ -183,7 +195,9 @@ impl TelemetryEmitDynamicPort for FsTelemetryEmitDynamicAdapter {
     }
 }
 
-fn resolve_project_root_from_items_dir(items_dir: &Path) -> Result<PathBuf, String> {
+fn resolve_project_root_from_items_dir(items_dir: &Path) -> Result<PathBuf, TelemetryAdapterError> {
+    reject_items_dir_escape(items_dir)?;
+
     let items_name = items_dir.file_name().and_then(|n| n.to_str());
     let track_dir = items_dir.parent();
     let track_name = track_dir.and_then(Path::file_name).and_then(|n| n.to_str());
@@ -196,14 +210,17 @@ fn resolve_project_root_from_items_dir(items_dir: &Path) -> Result<PathBuf, Stri
             crate::track::symlink_guard::reject_symlinks_below(items_dir, &root)
                 .map(|_| ())
                 .map_err(|e| {
-                    format!("items_dir path rejected before use at '{}': {e}", items_dir.display())
+                    TelemetryAdapterError(format!(
+                        "items_dir path rejected before use at '{}': {e}",
+                        items_dir.display()
+                    ))
                 })?;
-            Ok(root)
+            ensure_current_repo_root(&root)
         }
-        _ => Err(format!(
+        _ => Err(TelemetryAdapterError(format!(
             "--items-dir must point to '<project-root>/track/items'; got {}",
             items_dir.display()
-        )),
+        ))),
     }
 }
 
@@ -211,39 +228,142 @@ fn normalize_project_root(root: &Path) -> PathBuf {
     if root.as_os_str().is_empty() { PathBuf::from(".") } else { root.to_path_buf() }
 }
 
-fn ensure_trusted_root(root: &Path) -> Result<(), String> {
+fn resolve_items_dir_under_current_repo(
+    items_dir: &Path,
+) -> Result<PathBuf, TelemetryAdapterError> {
+    use crate::git_cli::{GitRepository as _, SystemGitRepo};
+
+    reject_items_dir_escape(items_dir)?;
+
+    let repo = SystemGitRepo::discover().map_err(|e| {
+        TelemetryAdapterError(format!("cannot discover current git repository: {e}"))
+    })?;
+    let repo_root = repo.root().canonicalize().map_err(|e| {
+        TelemetryAdapterError(format!(
+            "failed to canonicalize current repository root {}: {e}",
+            repo.root().display()
+        ))
+    })?;
+    ensure_trusted_root(&repo_root)?;
+
+    let absolute_items_dir =
+        if items_dir.is_absolute() { items_dir.to_path_buf() } else { repo_root.join(items_dir) };
+    if !absolute_items_dir.starts_with(&repo_root) {
+        return Err(TelemetryAdapterError(format!(
+            "--items-dir must resolve inside the current repository root {}; got {}",
+            repo_root.display(),
+            items_dir.display()
+        )));
+    }
+
+    crate::track::symlink_guard::reject_symlinks_below(&absolute_items_dir, &repo_root)
+        .map(|_| ())
+        .map_err(|e| {
+            TelemetryAdapterError(format!(
+                "items_dir path rejected before use at '{}': {e}",
+                items_dir.display()
+            ))
+        })?;
+
+    let canonical_items_dir = absolute_items_dir.canonicalize().map_err(|e| {
+        TelemetryAdapterError(format!(
+            "failed to canonicalize items_dir {}: {e}",
+            items_dir.display()
+        ))
+    })?;
+    if !canonical_items_dir.starts_with(&repo_root) {
+        return Err(TelemetryAdapterError(format!(
+            "--items-dir resolves outside the current repository root {}; got {}",
+            repo_root.display(),
+            canonical_items_dir.display()
+        )));
+    }
+    if !canonical_items_dir.is_dir() {
+        return Err(TelemetryAdapterError(format!(
+            "--items-dir is not a directory: {}",
+            items_dir.display()
+        )));
+    }
+
+    Ok(canonical_items_dir)
+}
+
+fn reject_items_dir_escape(items_dir: &Path) -> Result<(), TelemetryAdapterError> {
+    if items_dir.as_os_str().is_empty() {
+        return Err(TelemetryAdapterError("--items-dir must not be empty".to_owned()));
+    }
+    if items_dir
+        .components()
+        .any(|component| matches!(component, Component::ParentDir | Component::Prefix(_)))
+    {
+        return Err(TelemetryAdapterError(format!(
+            "--items-dir cannot escape the current repository root: {}",
+            items_dir.display()
+        )));
+    }
+    Ok(())
+}
+
+fn ensure_trusted_root(root: &Path) -> Result<(), TelemetryAdapterError> {
     match root.symlink_metadata() {
-        Ok(meta) if meta.file_type().is_symlink() => {
-            Err(format!("refusing to use symlinked repository root: {}", root.display()))
-        }
+        Ok(meta) if meta.file_type().is_symlink() => Err(TelemetryAdapterError(format!(
+            "refusing to use symlinked repository root: {}",
+            root.display()
+        ))),
         Ok(_) => Ok(()),
-        Err(err) => Err(format!("failed to stat repository root {}: {err}", root.display())),
+        Err(err) => Err(TelemetryAdapterError(format!(
+            "failed to stat repository root {}: {err}",
+            root.display()
+        ))),
     }
 }
 
-fn ensure_trusted_items_dir_root(items_dir: &Path) -> Result<(), String> {
-    let absolute_items_dir = if items_dir.is_absolute() {
-        items_dir.to_path_buf()
-    } else {
-        std::env::current_dir()
-            .map_err(|e| format!("failed to resolve items_dir {}: {e}", items_dir.display()))?
-            .join(items_dir)
-    };
+fn ensure_current_repo_root(root: &Path) -> Result<PathBuf, TelemetryAdapterError> {
+    use crate::git_cli::{GitRepository as _, SystemGitRepo};
 
-    crate::track::symlink_guard::reject_symlinks_below(&absolute_items_dir, Path::new("/"))
-        .map(|_| ())
-        .map_err(|e| {
-            format!("items_dir path rejected before use at '{}': {e}", items_dir.display())
-        })
+    let canonical_root = root.canonicalize().map_err(|e| {
+        TelemetryAdapterError(format!(
+            "failed to canonicalize project root {}: {e}",
+            root.display()
+        ))
+    })?;
+    let repo = SystemGitRepo::discover().map_err(|e| {
+        TelemetryAdapterError(format!("cannot discover current git repository: {e}"))
+    })?;
+    let canonical_repo_root = repo.root().canonicalize().map_err(|e| {
+        TelemetryAdapterError(format!(
+            "failed to canonicalize current repository root {}: {e}",
+            repo.root().display()
+        ))
+    })?;
+    if canonical_root != canonical_repo_root {
+        return Err(TelemetryAdapterError(format!(
+            "--items-dir must resolve to the current repository root {}; got {}",
+            canonical_repo_root.display(),
+            canonical_root.display()
+        )));
+    }
+    Ok(canonical_root)
 }
 
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod tests {
+    use std::path::Path;
+
     use super::{
-        FsTelemetryReportAdapter, ensure_trusted_root, resolve_project_root_from_items_dir,
+        FsTelemetryReportAdapter, ensure_trusted_root, resolve_items_dir_under_current_repo,
+        resolve_project_root_from_items_dir,
     };
+    use crate::git_cli::GitRepository as _;
     use usecase::telemetry::{TelemetryReportError as UsecaseError, TelemetryReportPort as _};
+
+    fn tempdir_in_current_repo() -> tempfile::TempDir {
+        let repo = crate::git_cli::SystemGitRepo::discover().unwrap();
+        let target_dir = repo.root().join("target").join("telemetry-report-adapter-tests");
+        std::fs::create_dir_all(&target_dir).unwrap();
+        tempfile::Builder::new().prefix("items-").tempdir_in(target_dir).unwrap()
+    }
 
     #[cfg(unix)]
     #[test]
@@ -255,7 +375,16 @@ mod tests {
 
         let err = ensure_trusted_root(&root_link).unwrap_err();
 
-        assert!(err.contains("refusing to use symlinked repository root"), "{err}");
+        assert!(err.to_string().contains("refusing to use symlinked repository root"), "{err}");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn resolve_project_root_from_items_dir_rejects_parent_dir_escape() {
+        let err =
+            resolve_project_root_from_items_dir(Path::new("../other/track/items")).unwrap_err();
+
+        assert!(err.to_string().contains("cannot escape the current repository root"), "{err}");
     }
 
     #[cfg(unix)]
@@ -269,7 +398,7 @@ mod tests {
 
         let err = resolve_project_root_from_items_dir(&items_dir).unwrap_err();
 
-        assert!(err.contains("refusing to use symlinked repository root"), "{err}");
+        assert!(err.to_string().contains("refusing to use symlinked repository root"), "{err}");
     }
 
     #[cfg(unix)]
@@ -284,17 +413,73 @@ mod tests {
 
         let err = resolve_project_root_from_items_dir(&items_dir).unwrap_err();
 
-        assert!(err.contains("items_dir path rejected before use"), "{err}");
-        assert!(err.contains("refusing to follow symlink"), "{err}");
+        assert!(err.to_string().contains("items_dir path rejected before use"), "{err}");
+        assert!(err.to_string().contains("refusing to follow symlink"), "{err}");
+    }
+
+    #[test]
+    fn resolve_project_root_from_items_dir_rejects_non_current_repo_root() {
+        let tmp = tempfile::tempdir().unwrap();
+        let items_dir = tmp.path().join("track").join("items");
+        std::fs::create_dir_all(&items_dir).unwrap();
+
+        let err = resolve_project_root_from_items_dir(&items_dir).unwrap_err();
+
+        assert!(err.to_string().contains("current repository root"), "{err}");
+    }
+
+    #[test]
+    fn aggregate_rejects_parent_dir_escape() {
+        let err = FsTelemetryReportAdapter::new()
+            .aggregate("some-track", Path::new("../other/track/items"))
+            .unwrap_err();
+
+        let message = err.to_string();
+        assert!(message.contains("cannot escape the current repository root"), "{message}");
+    }
+
+    #[test]
+    fn aggregate_accepts_supplied_absolute_items_dir_inside_current_repo() {
+        let tmp = tempdir_in_current_repo();
+        std::fs::create_dir_all(tmp.path().join("some-track")).unwrap();
+
+        let output = FsTelemetryReportAdapter::new().aggregate("some-track", tmp.path()).unwrap();
+
+        assert!(output.phase_durations.is_empty());
+        assert!(output.errors.is_empty());
+        assert!(output.hook_blocks.is_empty());
+        assert_eq!(output.skipped_lines, 0);
+    }
+
+    #[test]
+    fn aggregate_rejects_supplied_absolute_items_dir_outside_current_repo() {
+        let tmp = tempfile::tempdir().unwrap();
+        std::fs::create_dir_all(tmp.path().join("some-track")).unwrap();
+
+        let err = FsTelemetryReportAdapter::new().aggregate("some-track", tmp.path()).unwrap_err();
+
+        let message = err.to_string();
+        assert!(message.contains("inside the current repository root"), "{message}");
+    }
+
+    #[test]
+    fn resolve_items_dir_under_current_repo_rejects_absolute_outside_current_repo() {
+        let tmp = tempfile::tempdir().unwrap();
+
+        let err = resolve_items_dir_under_current_repo(tmp.path()).unwrap_err();
+
+        assert!(err.to_string().contains("inside the current repository root"), "{err}");
     }
 
     #[cfg(unix)]
     #[test]
     fn aggregate_rejects_symlinked_items_dir_root() {
-        let real_items = tempfile::tempdir().unwrap();
-        let link_parent = tempfile::tempdir().unwrap();
-        let items_link = link_parent.path().join("items-link");
-        std::os::unix::fs::symlink(real_items.path(), &items_link).unwrap();
+        let tmp = tempdir_in_current_repo();
+        let outside = tempfile::tempdir().unwrap();
+        let track_dir = tmp.path().join("track");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        let items_link = track_dir.join("items");
+        std::os::unix::fs::symlink(outside.path(), &items_link).unwrap();
 
         let err = FsTelemetryReportAdapter::new().aggregate("some-track", &items_link).unwrap_err();
 
@@ -310,13 +495,12 @@ mod tests {
     #[cfg(unix)]
     #[test]
     fn aggregate_rejects_symlinked_items_dir_ancestor() {
-        let real_parent = tempfile::tempdir().unwrap();
-        let real_items = real_parent.path().join("items");
-        std::fs::create_dir(&real_items).unwrap();
-        let link_parent = tempfile::tempdir().unwrap();
-        let parent_link = link_parent.path().join("parent-link");
-        std::os::unix::fs::symlink(real_parent.path(), &parent_link).unwrap();
-        let items_dir = parent_link.join("items");
+        let tmp = tempdir_in_current_repo();
+        let outside = tempfile::tempdir().unwrap();
+        std::fs::create_dir_all(outside.path().join("items")).unwrap();
+        let track_link = tmp.path().join("track");
+        std::os::unix::fs::symlink(outside.path(), &track_link).unwrap();
+        let items_dir = track_link.join("items");
 
         let err = FsTelemetryReportAdapter::new().aggregate("some-track", &items_dir).unwrap_err();
 

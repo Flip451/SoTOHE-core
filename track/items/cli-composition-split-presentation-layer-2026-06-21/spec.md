@@ -1,7 +1,7 @@
 <!-- Generated from spec.json — DO NOT EDIT DIRECTLY -->
 ---
 version: "1.0"
-signals: { blue: 42, yellow: 0, red: 0 }
+signals: { blue: 45, yellow: 0, red: 0 }
 ---
 
 # CLI delivery 側の責務分離 — composition root と primary adapter への分解
@@ -29,6 +29,9 @@ signals: { blue: 42, yellow: 0, red: 0 }
 - [IN-10] reviewer severity policy（`.harness/custom/review-prompts/`）の整備: `cli_driver.md` 新設、`cli.md` と `cli_composition.md` の更新を実装 track 内で実施する。 [adr: knowledge/adr/2026-06-21-1328-cli-composition-split-presentation-layer.md#D6] [tasks: T022]
 - [IN-11] `cli_composition` 内の adapter-outside-infrastructure 7 件を解消する。FsReviewGateStateAdapter / FsRefVerifyGateStateAdapter / RecordingDryAgent / NullInsertIndexProxy / NoopSemanticIndexPort / NoOpDryApprovalService の 6 件は `libs/infrastructure` へ移設する。`LazyBranchReader` は UFCS 回避用の二重 adapter であり、呼び出し側の trait 曖昧性解消で除去して infrastructure の `SystemGitRepo` 実装に一本化する。 [adr: knowledge/adr/2026-06-21-1328-cli-composition-split-presentation-layer.md#D7] [tasks: T002, T003, T004]
 - [IN-12] `apps/cli/src/main.rs` の `emit_archived_track_subcommand`（`std::fs` / `serde_json` / `chrono::Utc::now()`）を infrastructure adapter（時刻取得・fs 書き込み）として切り出し、composition が wire して driver 経由で呼ぶ経路にする。bin は parse + dispatch + emit のみに戻す。 [adr: knowledge/adr/2026-06-21-1328-cli-composition-split-presentation-layer.md#D8] [tasks: T001, T009, T021, T023]
+- [IN-13] usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の typed error enum に統一する。`Result<_, String>` を廃止し、各 port／service のエラーバリアントを usecase 層内で定義する。infrastructure adapter は `map_err` チェーン経由で typed variant へ変換して boundary を越える。 [adr: knowledge/adr/2026-06-21-1328-cli-composition-split-presentation-layer.md#D9] [tasks: T026]
+- [IN-14] usecase secondary port コントラクトの新設・修正、および aggregate service の追加。新規 port（`SchemaExporterPort`、`ShellParserPort` など）と aggregate service（`TelemetryReportService` など）を usecase 層に定義する。secondary port の infrastructure adapter 実装は infrastructure 層に配置し、aggregate/application service の実装は usecase 層に置いて ports を注入される。port／service が返すエラーは IN-13 に準拠した typed error 型とする。 [adr: knowledge/adr/2026-06-21-1328-cli-composition-split-presentation-layer.md#D2, knowledge/adr/2026-06-21-1328-cli-composition-split-presentation-layer.md#D4, knowledge/adr/2026-06-21-1328-cli-composition-split-presentation-layer.md#D9] [tasks: T026]
+- [IN-15] infrastructure adapter 移設に伴う typed error enum の導入と free function シグネチャの変更。`DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` 等の typed error enum を infrastructure 層に新設し、`git_cli` / `demo` の free function が `Result<_, TypedError>` を返すよう変更する。 [adr: knowledge/adr/2026-06-21-1328-cli-composition-split-presentation-layer.md#D9] [tasks: T026]
 
 ### Out of Scope
 - [OS-01] 以下の項目は本 track（1328）のスコープ外であり、後続 track（1420）で対応する。
@@ -69,7 +72,7 @@ signals: { blue: 42, yellow: 0, red: 0 }
 - [ ] [AC-10] `apps/cli/src/main.rs` に `std::fs` / `serde_json` / `chrono::Utc::now()` を使った直接 I/O が存在しない。cli-bin-business-logic カテゴリ（audit: `main.rs:247-294`）の 1 件が解消されており、telemetry 永続化が infrastructure adapter 経由の driver 呼び出しになっている。 [adr: knowledge/adr/2026-06-21-1328-cli-composition-split-presentation-layer.md#D8] [tasks: T001, T009, T021, T023]
 - [ ] [AC-11] reviewer severity policy が新 3 層構成に追従している: `cli_driver.md` が新設され、`cli.md` と `cli_composition.md` が更新されており、各ファイルに ADR D2/D3/D5/D7/D8 の review 観点が記述されている。 [adr: knowledge/adr/2026-06-21-1328-cli-composition-split-presentation-layer.md#D6] [tasks: T022]
 - [ ] [AC-12] 最終 flip commit において `architecture-rules.json` の `layers` に `cli_driver` エントリが追加され、`cli_composition` の `may_depend_on` に `cli_driver` が追加され、`cli` の `may_depend_on` に `cli_driver` が追加されており、`cargo make deny` および `cargo make check-layers` が pass する。 [adr: knowledge/adr/2026-06-21-1328-cli-composition-split-presentation-layer.md#D1, knowledge/adr/2026-06-21-1328-cli-composition-split-presentation-layer.md#D6] [tasks: T021]
-- [ ] [AC-13] `cargo make ci`（fmt-check + clippy + nextest + deny + check-layers + verify-*）が pass する。移行の各段階 commit でも CI が緑を維持している（broken 中間状態が main にマージされていない）。 [adr: knowledge/adr/2026-06-21-1328-cli-composition-split-presentation-layer.md#D6] [tasks: T001, T002, T003, T004, T005, T006, T007, T008, T009, T010, T011, T012, T013, T014, T015, T016, T017, T018, T019, T020, T021, T022, T023, T024, T025]
+- [ ] [AC-13] `cargo make ci`（fmt-check + clippy + nextest + deny + check-layers + verify-*）が pass する。移行の各段階 commit でも CI が緑を維持している（broken 中間状態が main にマージされていない）。 [adr: knowledge/adr/2026-06-21-1328-cli-composition-split-presentation-layer.md#D6] [tasks: T001, T002, T003, T004, T005, T006, T007, T008, T009, T010, T011, T012, T013, T014, T015, T016, T017, T018, T019, T020, T021, T022, T023, T024, T025, T026]
 
 ## Related Conventions (Required Reading)
 - knowledge/conventions/hexagonal-architecture.md#CLI as Composition Root
@@ -84,5 +87,5 @@ signals: { blue: 42, yellow: 0, red: 0 }
 ## Signal Summary
 
 ### Stage 1: Spec Signals
-🔵 42  🟡 0  🔴 0
+🔵 45  🟡 0  🔴 0
 

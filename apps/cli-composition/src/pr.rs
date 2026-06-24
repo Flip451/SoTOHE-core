@@ -137,8 +137,7 @@ impl PrCompositionRoot {
     pub fn pr_push(&self, track_id: Option<String>) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::git_cli::{GitRepository as _, SystemGitRepo};
 
-        let ctx =
-            resolve_branch_context(track_id.as_deref()).map_err(CompositionError::WiringFailed)?;
+        let ctx = resolve_branch_context(track_id.as_deref())?;
         let repo =
             SystemGitRepo::discover().map_err(|e| CompositionError::AdapterInit(e.to_string()))?;
         println!("Pushing {} to origin...", ctx.branch);
@@ -160,8 +159,7 @@ impl PrCompositionRoot {
         use infrastructure::gh_cli::{GhClient as _, SystemGhClient};
         use usecase::pr_workflow::pr_title;
 
-        let ctx =
-            resolve_branch_context(track_id.as_deref()).map_err(CompositionError::WiringFailed)?;
+        let ctx = resolve_branch_context(track_id.as_deref())?;
         let client = SystemGhClient;
 
         match client.find_open_pr(&ctx.branch, &base) {
@@ -179,7 +177,7 @@ impl PrCompositionRoot {
 
         let body_file = ensure_pr_body_file(&ctx).map_err(|e| {
             eprintln!("[ERROR] {e}");
-            CompositionError::Infrastructure(e)
+            e
         })?;
         let title = pr_title(&ctx);
         match client.create_pr(&ctx.branch, &base, &title, &body_file) {
@@ -510,11 +508,9 @@ impl PrCompositionRoot {
         let client = SystemGhClient;
 
         let (pr_number, trigger_timestamp, head_ref_owned) = if resume {
-            resume_trigger_state(&active_track_id).map_err(CompositionError::Infrastructure)?
+            resume_trigger_state(&active_track_id)?
         } else {
-            match trigger_new_review(track_id.as_deref(), &active_track_id, &client)
-                .map_err(CompositionError::Infrastructure)?
-            {
+            match trigger_new_review(track_id.as_deref(), &active_track_id, &client)? {
                 Some(tuple) => tuple,
                 None => return Ok(CommandOutcome::failure(None)),
             }
@@ -558,8 +554,7 @@ impl PrCompositionRoot {
             }
             PollReviewResult::Timeout => Ok(CommandOutcome::failure(None)),
             PollReviewResult::ReviewFound(review) => {
-                let parsed = parse_review(&pr_number, &review, &nwo, &client)
-                    .map_err(CompositionError::Infrastructure)?;
+                let parsed = parse_review(&pr_number, &review, &nwo, &client)?;
                 let summary = format_review_summary(&pr_number, &parsed);
                 // ReviewFound always exits 0 (D1/AC-09): pass/fail judgment is
                 // delegated to the calling agent; Rust no longer gates on findings.

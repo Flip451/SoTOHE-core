@@ -5,7 +5,7 @@
 //! [`FsRefVerifyCheckApprovedAdapter`] implements
 //! [`usecase::ref_verify::RefVerifyCheckApprovedDriverService`].
 
-use std::path::{Path, PathBuf};
+use std::path::{Component, Path, PathBuf};
 use std::sync::Arc;
 
 use usecase::ref_verify::{
@@ -22,6 +22,22 @@ use crate::agent_profiles::{AGENT_PROFILES_PATH, AgentProfiles};
 
 const REF_VERIFY_CONFIG_PATH: &str = ".harness/config/ref-verify.json";
 
+#[derive(Debug)]
+struct RefVerifyAdapterError(String);
+
+impl std::fmt::Display for RefVerifyAdapterError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.0.fmt(f)
+    }
+}
+
+impl RefVerifyAdapterError {
+    #[allow(dead_code)]
+    fn contains(&self, s: &str) -> bool {
+        self.0.contains(s)
+    }
+}
+
 #[derive(Debug, serde::Deserialize)]
 #[serde(deny_unknown_fields)]
 struct RefVerifyConfigDto {
@@ -30,7 +46,9 @@ struct RefVerifyConfigDto {
     max_parallelism: Option<usize>,
 }
 
-fn resolve_project_root(items_dir: &Path) -> Result<PathBuf, String> {
+fn resolve_project_root(items_dir: &Path) -> Result<PathBuf, RefVerifyAdapterError> {
+    reject_items_dir_escape(items_dir)?;
+
     // items_dir must be `<project_root>/track/items`
     let items_name = items_dir.file_name().and_then(|n| n.to_str());
     let track_dir = items_dir.parent();
@@ -41,12 +59,12 @@ fn resolve_project_root(items_dir: &Path) -> Result<PathBuf, String> {
             let root = normalize_project_root(root);
             ensure_trusted_project_root(&root)?;
             reject_items_dir_symlinks(items_dir, &root)?;
-            Ok(root)
+            ensure_current_repo_root(&root)
         }
-        _ => Err(format!(
+        _ => Err(RefVerifyAdapterError(format!(
             "--items-dir must point to '<project-root>/track/items'; got {}",
             items_dir.display()
-        )),
+        ))),
     }
 }
 
@@ -54,53 +72,126 @@ fn normalize_project_root(root: &Path) -> PathBuf {
     if root.as_os_str().is_empty() { PathBuf::from(".") } else { root.to_path_buf() }
 }
 
-fn ensure_trusted_project_root(root: &Path) -> Result<(), String> {
+fn reject_items_dir_escape(items_dir: &Path) -> Result<(), RefVerifyAdapterError> {
+    if items_dir.as_os_str().is_empty() {
+        return Err(RefVerifyAdapterError("--items-dir must not be empty".to_owned()));
+    }
+    if items_dir
+        .components()
+        .any(|component| matches!(component, Component::ParentDir | Component::Prefix(_)))
+    {
+        return Err(RefVerifyAdapterError(format!(
+            "--items-dir cannot escape the current repository root: {}",
+            items_dir.display()
+        )));
+    }
+    Ok(())
+}
+
+fn ensure_trusted_project_root(root: &Path) -> Result<(), RefVerifyAdapterError> {
     match root.symlink_metadata() {
-        Ok(meta) if meta.file_type().is_symlink() => {
-            Err(format!("refusing to use symlinked project root: {}", root.display()))
-        }
+        Ok(meta) if meta.file_type().is_symlink() => Err(RefVerifyAdapterError(format!(
+            "refusing to use symlinked project root: {}",
+            root.display()
+        ))),
         Ok(_) => Ok(()),
-        Err(e) => Err(format!("failed to stat project root {}: {e}", root.display())),
+        Err(e) => Err(RefVerifyAdapterError(format!(
+            "failed to stat project root {}: {e}",
+            root.display()
+        ))),
     }
 }
 
-fn reject_items_dir_symlinks(items_dir: &Path, project_root: &Path) -> Result<(), String> {
+fn ensure_current_repo_root(root: &Path) -> Result<PathBuf, RefVerifyAdapterError> {
+    use crate::git_cli::{GitRepository as _, SystemGitRepo};
+
+    let canonical_root = root.canonicalize().map_err(|e| {
+        RefVerifyAdapterError(format!(
+            "failed to canonicalize project root {}: {e}",
+            root.display()
+        ))
+    })?;
+    let repo = SystemGitRepo::discover().map_err(|e| {
+        RefVerifyAdapterError(format!("cannot discover current git repository: {e}"))
+    })?;
+    let canonical_repo_root = repo.root().canonicalize().map_err(|e| {
+        RefVerifyAdapterError(format!(
+            "failed to canonicalize current repository root {}: {e}",
+            repo.root().display()
+        ))
+    })?;
+    if canonical_root != canonical_repo_root {
+        return Err(RefVerifyAdapterError(format!(
+            "--items-dir must resolve to the current repository root {}; got {}",
+            canonical_repo_root.display(),
+            canonical_root.display()
+        )));
+    }
+    Ok(canonical_root)
+}
+
+fn reject_items_dir_symlinks(
+    items_dir: &Path,
+    project_root: &Path,
+) -> Result<(), RefVerifyAdapterError> {
     crate::track::symlink_guard::reject_symlinks_below(items_dir, project_root).map(|_| ()).map_err(
-        |e| format!("items_dir path rejected before use at '{}': {e}", items_dir.display()),
+        |e| {
+            RefVerifyAdapterError(format!(
+                "items_dir path rejected before use at '{}': {e}",
+                items_dir.display()
+            ))
+        },
     )
 }
 
-fn validate_track_id(track_id: &str) -> Result<domain::TrackId, String> {
-    domain::TrackId::try_new(track_id.to_owned()).map_err(|e| format!("invalid --track-id: {e}"))
+fn validate_track_id(track_id: &str) -> Result<domain::TrackId, RefVerifyAdapterError> {
+    domain::TrackId::try_new(track_id.to_owned())
+        .map_err(|e| RefVerifyAdapterError(format!("invalid --track-id: {e}")))
 }
 
-fn reject_workspace_symlinks(path: &Path, trusted_root: &Path, label: &str) -> Result<(), String> {
-    crate::track::symlink_guard::reject_symlinks_below(path, trusted_root)
-        .map(|_| ())
-        .map_err(|e| format!("{label} path rejected before read at '{}': {e}", path.display()))
+fn reject_workspace_symlinks(
+    path: &Path,
+    trusted_root: &Path,
+    label: &str,
+) -> Result<(), RefVerifyAdapterError> {
+    crate::track::symlink_guard::reject_symlinks_below(path, trusted_root).map(|_| ()).map_err(
+        |e| {
+            RefVerifyAdapterError(format!(
+                "{label} path rejected before read at '{}': {e}",
+                path.display()
+            ))
+        },
+    )
 }
 
 fn load_ref_verify_config(
     project_root: &Path,
-) -> Result<usecase::ref_verify::RefVerifyConfig, String> {
+) -> Result<usecase::ref_verify::RefVerifyConfig, RefVerifyAdapterError> {
     let config_path = project_root.join(REF_VERIFY_CONFIG_PATH);
     if !crate::track::symlink_guard::reject_symlinks_below(&config_path, project_root).map_err(
         |e| {
-            format!(
+            RefVerifyAdapterError(format!(
                 "ref-verify config path rejected before read at '{}': {e}",
                 config_path.display()
-            )
+            ))
         },
     )? {
         return Ok(usecase::ref_verify::RefVerifyConfig::default());
     }
 
     let text = std::fs::read_to_string(&config_path).map_err(|e| {
-        format!("cannot read ref-verify config at '{}': {e}", config_path.display())
+        RefVerifyAdapterError(format!(
+            "cannot read ref-verify config at '{}': {e}",
+            config_path.display()
+        ))
     })?;
 
-    let dto: RefVerifyConfigDto = serde_json::from_str(&text)
-        .map_err(|e| format!("invalid ref-verify config at '{}': {e}", config_path.display()))?;
+    let dto: RefVerifyConfigDto = serde_json::from_str(&text).map_err(|e| {
+        RefVerifyAdapterError(format!(
+            "invalid ref-verify config at '{}': {e}",
+            config_path.display()
+        ))
+    })?;
     let defaults = usecase::ref_verify::RefVerifyConfig::default();
     let injection = dto
         .known_bad_injection_rate_percent
@@ -111,22 +202,25 @@ fn load_ref_verify_config(
     let parallelism = dto.max_parallelism.unwrap_or_else(|| defaults.max_parallelism.as_usize());
 
     usecase::ref_verify::RefVerifyConfig::try_new(injection, threshold, parallelism)
-        .map_err(|e| format!("ref-verify config validation failed: {e}"))
+        .map_err(|e| RefVerifyAdapterError(format!("ref-verify config validation failed: {e}")))
 }
 
-fn load_agent_profiles(project_root: &Path) -> Result<AgentProfiles, String> {
+fn load_agent_profiles(project_root: &Path) -> Result<AgentProfiles, RefVerifyAdapterError> {
     let profiles_path = project_root.join(AGENT_PROFILES_PATH);
     reject_workspace_symlinks(&profiles_path, project_root, "agent-profiles.json")?;
-    AgentProfiles::load(&profiles_path).map_err(|e| format!("cannot load agent-profiles.json: {e}"))
+    AgentProfiles::load(&profiles_path)
+        .map_err(|e| RefVerifyAdapterError(format!("cannot load agent-profiles.json: {e}")))
 }
 
-fn current_git_branch(project_root: &Path) -> Result<String, String> {
+fn current_git_branch(project_root: &Path) -> Result<String, RefVerifyAdapterError> {
     use crate::git_cli::{GitRepository as _, SystemGitRepo};
     SystemGitRepo::discover_from(project_root)
-        .map_err(|e| format!("cannot discover git repo: {e}"))?
+        .map_err(|e| RefVerifyAdapterError(format!("cannot discover git repo: {e}")))?
         .current_branch()
-        .map_err(|e| format!("cannot read current branch: {e}"))?
-        .ok_or_else(|| "cannot read current branch: HEAD is detached".to_owned())
+        .map_err(|e| RefVerifyAdapterError(format!("cannot read current branch: {e}")))?
+        .ok_or_else(|| {
+            RefVerifyAdapterError("cannot read current branch: HEAD is detached".to_owned())
+        })
 }
 
 // ── FsRefVerifyRunAdapter ─────────────────────────────────────────────────────
@@ -158,30 +252,32 @@ impl RefVerifyRunService for FsRefVerifyRunAdapter {
     ) -> Result<RefVerifyRunOutcome, RefVerifyDriverError> {
         use usecase::ref_verify::VerifySemanticRefsInteractor;
 
-        let project_root = resolve_project_root(items_dir).map_err(RefVerifyDriverError::Wiring)?;
+        let project_root = resolve_project_root(items_dir)
+            .map_err(|e| RefVerifyDriverError::Wiring(e.to_string()))?;
         let canonical_root = project_root.canonicalize().map_err(|e| {
             RefVerifyDriverError::Wiring(format!("cannot canonicalize project root: {e}"))
         })?;
 
-        let track_id = validate_track_id(track_id_str).map_err(RefVerifyDriverError::Wiring)?;
+        let track_id = validate_track_id(track_id_str)
+            .map_err(|e| RefVerifyDriverError::Wiring(e.to_string()))?;
 
-        let current_branch =
-            current_git_branch(&canonical_root).map_err(RefVerifyDriverError::Unavailable)?;
+        let current_branch = current_git_branch(&canonical_root)
+            .map_err(|e| RefVerifyDriverError::Unavailable(e.to_string()))?;
 
         let resolver = RefVerifyScopeResolver::new(canonical_root.clone());
         let scope = resolver.resolve(track_id.as_ref()).map_err(|e| {
             RefVerifyDriverError::Wiring(format!("ref-verify scope resolution failed: {e}"))
         })?;
 
-        let config =
-            load_ref_verify_config(&canonical_root).map_err(RefVerifyDriverError::Unavailable)?;
+        let config = load_ref_verify_config(&canonical_root)
+            .map_err(|e| RefVerifyDriverError::Unavailable(e.to_string()))?;
 
         let pair_source =
             Arc::new(RefVerifyPairSourceAdapter::new(canonical_root.clone())) as Arc<_>;
         let cache = Arc::new(RefVerifyCacheAdapter::new(canonical_root.clone())) as Arc<_>;
 
-        let profiles =
-            load_agent_profiles(&canonical_root).map_err(RefVerifyDriverError::Unavailable)?;
+        let profiles = load_agent_profiles(&canonical_root)
+            .map_err(|e| RefVerifyDriverError::Unavailable(e.to_string()))?;
         let profiles = Arc::new(profiles);
 
         let runner = make_ref_verifier_process_runner(canonical_root.clone());
@@ -274,15 +370,17 @@ impl RefVerifyCheckApprovedDriverService for FsRefVerifyCheckApprovedAdapter {
         track_id_str: &str,
         items_dir: &Path,
     ) -> Result<RefVerifyCheckApprovedOutcome, RefVerifyDriverError> {
-        let project_root = resolve_project_root(items_dir).map_err(RefVerifyDriverError::Wiring)?;
+        let project_root = resolve_project_root(items_dir)
+            .map_err(|e| RefVerifyDriverError::Wiring(e.to_string()))?;
         let canonical_root = project_root.canonicalize().map_err(|e| {
             RefVerifyDriverError::Wiring(format!("cannot canonicalize project root: {e}"))
         })?;
 
-        let track_id = validate_track_id(track_id_str).map_err(RefVerifyDriverError::Wiring)?;
+        let track_id = validate_track_id(track_id_str)
+            .map_err(|e| RefVerifyDriverError::Wiring(e.to_string()))?;
 
-        let current_branch =
-            current_git_branch(&canonical_root).map_err(RefVerifyDriverError::Unavailable)?;
+        let current_branch = current_git_branch(&canonical_root)
+            .map_err(|e| RefVerifyDriverError::Unavailable(e.to_string()))?;
 
         let expected_branch = format!("track/{}", track_id.as_ref());
         if current_branch != expected_branch {
@@ -331,6 +429,14 @@ mod tests {
 
     #[cfg(unix)]
     #[test]
+    fn test_resolve_project_root_rejects_parent_dir_escape() {
+        let err = resolve_project_root(Path::new("../other/track/items")).unwrap_err();
+
+        assert!(err.contains("cannot escape the current repository root"), "{err}");
+    }
+
+    #[cfg(unix)]
+    #[test]
     fn test_resolve_project_root_rejects_symlinked_project_root() {
         let real_root = tempfile::tempdir().unwrap();
         let link_parent = tempfile::tempdir().unwrap();
@@ -357,6 +463,17 @@ mod tests {
 
         assert!(err.contains("items_dir path rejected before use"), "{err}");
         assert!(err.contains("refusing to follow symlink"), "{err}");
+    }
+
+    #[test]
+    fn test_resolve_project_root_rejects_non_current_repo_root() {
+        let tmp = tempfile::tempdir().unwrap();
+        let items_dir = tmp.path().join("track").join("items");
+        std::fs::create_dir_all(&items_dir).unwrap();
+
+        let err = resolve_project_root(&items_dir).unwrap_err();
+
+        assert!(err.contains("current repository root"), "{err}");
     }
 
     #[cfg(unix)]

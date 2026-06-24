@@ -35,10 +35,9 @@ impl TrackCompositionRoot {
         use infrastructure::track::fs_store::FsTrackStore;
         use usecase::task_ops::TaskOperationService as _;
 
-        validate_track_id_str(&track_id).map_err(CompositionError::WiringFailed)?;
+        validate_track_id_str(&track_id)?;
 
-        let project_root =
-            resolve_project_root(&items_dir).map_err(CompositionError::WiringFailed)?;
+        let project_root = resolve_project_root(&items_dir)?;
 
         let store = Arc::new(FsTrackStore::new(items_dir.clone()));
         let branch_reader = build_branch_reader(&project_root);
@@ -98,10 +97,9 @@ impl TrackCompositionRoot {
         use infrastructure::track::fs_store::FsTrackStore;
         use usecase::task_ops::TaskOperationService as _;
 
-        validate_track_id_str(&track_id).map_err(CompositionError::WiringFailed)?;
+        validate_track_id_str(&track_id)?;
 
-        let project_root =
-            resolve_project_root(&items_dir).map_err(CompositionError::WiringFailed)?;
+        let project_root = resolve_project_root(&items_dir)?;
 
         let store = Arc::new(FsTrackStore::new(items_dir.clone()));
         let branch_reader = build_branch_reader(&project_root);
@@ -139,10 +137,9 @@ impl TrackCompositionRoot {
         use infrastructure::track::fs_store::FsTrackStore;
         use usecase::task_ops::TaskOperationService as _;
 
-        validate_track_id_str(&track_id).map_err(CompositionError::WiringFailed)?;
+        validate_track_id_str(&track_id)?;
 
-        let project_root =
-            resolve_project_root(&items_dir).map_err(CompositionError::WiringFailed)?;
+        let project_root = resolve_project_root(&items_dir)?;
 
         let store = Arc::new(FsTrackStore::new(items_dir.clone()));
         let branch_reader = build_branch_reader(&project_root);

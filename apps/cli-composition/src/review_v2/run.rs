@@ -343,8 +343,8 @@ where
     R: Reviewer,
 {
     let (scope_config, review_store, _commit_hash_store, base) =
-        build_v2_shared(track_id, items_dir)?;
-    let repo_root = repo_root_from_items_dir(items_dir)?;
+        build_v2_shared(track_id, items_dir).map_err(|e| e.to_string())?;
+    let repo_root = repo_root_from_items_dir(items_dir).map_err(|e| e.to_string())?;
     let (reviewer, findings_recorder) = FindingsCountReviewer::new(reviewer);
     let cycle = ReviewCycle::new(base, scope_config, reviewer, GitDiffGetter, SystemReviewHasher);
     Ok((cycle, review_store, findings_recorder, repo_root))
@@ -372,14 +372,20 @@ where
     D: DiffGetter,
     B: FnOnce(&TrackId) -> Result<ReviewDispatchParts<R, H, D>, String>,
 {
+    use super::shared::ReviewSharedError;
+
     let track_id =
         TrackId::try_new(track_id_str).map_err(|e| format!("[ERROR] invalid track id: {e}"))?;
     let (cycle, review_store, findings_recorder, repo_root) =
         builder(&track_id).map_err(|e| format!("[ERROR] v2 composition failed: {e}"))?;
     with_repo_cwd(&repo_root, || {
         dispatch_review_cycle(group_str, round_type_str, cycle, review_store, findings_recorder)
+            .map_err(|e: String| ReviewSharedError::Git(e))
     })
-    .map_err(|e| if e.starts_with("[ERROR]") { e } else { format!("[ERROR] {e}") })
+    .map_err(|e| {
+        let s = e.to_string();
+        if s.starts_with("[ERROR]") { s } else { format!("[ERROR] {s}") }
+    })
 }
 
 // ---------------------------------------------------------------------------
@@ -770,7 +776,7 @@ mod tests {
         );
         assert!(result.is_err(), "invalid track id must be rejected");
         // Use .err().unwrap() to extract the error string without requiring T: Debug.
-        let msg = result.err().unwrap();
+        let msg = result.err().unwrap().to_string();
         assert!(
             msg.contains("invalid --track-id"),
             "error must mention invalid --track-id, got: {msg}"
@@ -795,7 +801,7 @@ mod tests {
             build_review_v2_with_claude_reviewer(&track_id, &items_dir, make_claude_reviewer());
         assert!(result.is_err(), "missing track directory must be rejected");
         // Use .err().unwrap() to extract the error string without requiring T: Debug.
-        let msg = result.err().unwrap();
+        let msg = result.err().unwrap().to_string();
         assert!(
             msg.contains("does not exist"),
             "error must mention missing track directory, got: {msg}"

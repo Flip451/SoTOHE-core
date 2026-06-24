@@ -58,8 +58,8 @@ struct ReviewTelemetry<'a> {
     subprocess_started_at: Option<Instant>,
 }
 
-fn review_telemetry_for_outcome<'a>(
-    run_result: &'a Result<CodexReviewOutcome, String>,
+fn review_telemetry_for_outcome<'a, E>(
+    run_result: &'a Result<CodexReviewOutcome, E>,
     requested_round_type: &'a str,
 ) -> Option<ReviewTelemetry<'a>> {
     match run_result {
@@ -119,8 +119,7 @@ impl ReviewCompositionRoot {
         &self,
         input: ReviewRunCodexInput,
     ) -> Result<CommandOutcome, CompositionError> {
-        let track_id = resolve_track_id_or_branch_write(input.track_id, &input.items_dir)
-            .map_err(CompositionError::WiringFailed)?;
+        let track_id = resolve_track_id_or_branch_write(input.track_id, &input.items_dir)?;
 
         validate_track_id_str(&track_id)
             .map_err(|e| CompositionError::WiringFailed(format!("invalid --track-id: {e}")))?;
@@ -140,8 +139,7 @@ impl ReviewCompositionRoot {
             }
         }
 
-        let mut base_prompt = build_base_prompt_from_input(input.briefing_file, input.prompt)
-            .map_err(CompositionError::Infrastructure)?;
+        let mut base_prompt = build_base_prompt_from_input(input.briefing_file, input.prompt)?;
         append_scope_briefing_reference_str(
             &mut base_prompt,
             &group,
@@ -191,7 +189,6 @@ impl ReviewCompositionRoot {
         }
 
         outcome_to_command_outcome(run_result.map_err(CompositionError::Usecase)?)
-            .map_err(CompositionError::Usecase)
     }
 
     /// Run the local Claude-backed reviewer and auto-record verdict to review.json.
@@ -207,8 +204,7 @@ impl ReviewCompositionRoot {
         &self,
         input: ReviewRunClaudeInput,
     ) -> Result<CommandOutcome, CompositionError> {
-        let track_id = resolve_track_id_or_branch_write(input.track_id, &input.items_dir)
-            .map_err(CompositionError::WiringFailed)?;
+        let track_id = resolve_track_id_or_branch_write(input.track_id, &input.items_dir)?;
 
         validate_track_id_str(&track_id)
             .map_err(|e| CompositionError::WiringFailed(format!("invalid --track-id: {e}")))?;
@@ -228,8 +224,7 @@ impl ReviewCompositionRoot {
             }
         }
 
-        let mut base_prompt = build_base_prompt_from_input(input.briefing_file, input.prompt)
-            .map_err(CompositionError::Infrastructure)?;
+        let mut base_prompt = build_base_prompt_from_input(input.briefing_file, input.prompt)?;
         append_scope_briefing_reference_str(
             &mut base_prompt,
             &group,
@@ -276,7 +271,6 @@ impl ReviewCompositionRoot {
         }
 
         outcome_to_command_outcome(run_result.map_err(CompositionError::Usecase)?)
-            .map_err(CompositionError::Usecase)
     }
 
     /// Run the local reviewer with provider auto-resolved from agent-profiles.json.
@@ -294,9 +288,9 @@ impl ReviewCompositionRoot {
         input: ReviewRunLocalInput,
     ) -> Result<CommandOutcome, CompositionError> {
         let profiles = shared::load_agent_profiles_from_repo(Some(&input.items_dir))
-            .map_err(CompositionError::ConfigLoad)?;
-        let infra_round_type =
-            shared::parse_round_type(&input.round_type).map_err(CompositionError::WiringFailed)?;
+            .map_err(|e| CompositionError::ConfigLoad(e.to_string()))?;
+        let infra_round_type = shared::parse_round_type(&input.round_type)
+            .map_err(|e| CompositionError::WiringFailed(e.to_string()))?;
         let mut resolved =
             profiles.resolve_execution("reviewer", infra_round_type).ok_or_else(|| {
                 CompositionError::ConfigLoad(
@@ -314,8 +308,7 @@ impl ReviewCompositionRoot {
             resolved.model.as_deref().unwrap_or("<none>")
         );
 
-        let track_id = resolve_track_id_or_branch_write(input.track_id, &input.items_dir)
-            .map_err(CompositionError::WiringFailed)?;
+        let track_id = resolve_track_id_or_branch_write(input.track_id, &input.items_dir)?;
         let group = input.group.trim().to_owned();
 
         validate_track_id_str(&track_id)
@@ -334,8 +327,7 @@ impl ReviewCompositionRoot {
             }
         }
 
-        let mut base_prompt = build_base_prompt_from_input(input.briefing_file, input.prompt)
-            .map_err(CompositionError::Infrastructure)?;
+        let mut base_prompt = build_base_prompt_from_input(input.briefing_file, input.prompt)?;
         append_scope_briefing_reference_str(
             &mut base_prompt,
             &group,
@@ -422,7 +414,6 @@ impl ReviewCompositionRoot {
         }
 
         outcome_to_command_outcome(run_result.map_err(CompositionError::Usecase)?)
-            .map_err(CompositionError::Usecase)
     }
 
     /// Run the review-fix-lead fixer with provider auto-resolved from agent-profiles.json.
@@ -457,8 +448,7 @@ impl ReviewCompositionRoot {
     ) -> Result<CommandOutcome, CompositionError> {
         use usecase::review_v2::ReviewApprovalDecision;
 
-        let track_id = resolve_track_id_or_branch(track_id, &items_dir)
-            .map_err(CompositionError::WiringFailed)?;
+        let track_id = resolve_track_id_or_branch(track_id, &items_dir)?;
         let output = check_approved_str(&track_id, &items_dir)
             .map_err(|e| CompositionError::Usecase(format!("{e}")))?;
 
@@ -506,8 +496,7 @@ impl ReviewCompositionRoot {
         &self,
         input: ReviewResultsInput,
     ) -> Result<CommandOutcome, CompositionError> {
-        let track_id = resolve_track_id_or_branch(input.track_id, &input.items_dir)
-            .map_err(CompositionError::WiringFailed)?;
+        let track_id = resolve_track_id_or_branch(input.track_id, &input.items_dir)?;
 
         let limit = if input.limit == 0 { None } else { Some(input.limit) };
 
@@ -541,13 +530,12 @@ impl ReviewCompositionRoot {
     ) -> Result<CommandOutcome, CompositionError> {
         use usecase::review_v2::ScopeQueryService as _;
 
-        let track_id = resolve_track_id_or_branch(track_id, &items_dir)
-            .map_err(CompositionError::WiringFailed)?;
+        let track_id = resolve_track_id_or_branch(track_id, &items_dir)?;
 
-        validate_all_paths(&paths).map_err(CompositionError::WiringFailed)?;
+        validate_all_paths(&paths)?;
 
         let interactor = build_scope_query_interactor_no_diff_str(&track_id, &items_dir)
-            .map_err(CompositionError::WiringFailed)?;
+            .map_err(|e| CompositionError::WiringFailed(e.to_string()))?;
 
         let classifications = interactor
             .classify_by_strings(paths)
@@ -580,14 +568,13 @@ impl ReviewCompositionRoot {
     ) -> Result<CommandOutcome, CompositionError> {
         use usecase::review_v2::{ScopeQueryError, ScopeQueryService as _};
 
-        let track_id = resolve_track_id_or_branch(track_id, &items_dir)
-            .map_err(CompositionError::WiringFailed)?;
+        let track_id = resolve_track_id_or_branch(track_id, &items_dir)?;
 
         validate_scope_for_track_str(&track_id, &items_dir, &scope)
             .map_err(CompositionError::WiringFailed)?;
 
         let interactor = build_scope_query_interactor_str(&track_id, &items_dir)
-            .map_err(CompositionError::WiringFailed)?;
+            .map_err(|e| CompositionError::WiringFailed(e.to_string()))?;
         let files = interactor.files_by_string(scope).map_err(|err| match err {
             ScopeQueryError::DiffGet(inner) => {
                 CompositionError::Usecase(format!("diff getter failed: {inner}"))
@@ -625,8 +612,7 @@ impl ReviewCompositionRoot {
         track_id: Option<String>,
         items_dir: PathBuf,
     ) -> Result<CommandOutcome, CompositionError> {
-        let track_id = resolve_track_id_or_branch(track_id, &items_dir)
-            .map_err(CompositionError::WiringFailed)?;
+        let track_id = resolve_track_id_or_branch(track_id, &items_dir)?;
         validate_scope_for_track_str(&track_id, &items_dir, &scope)
             .map_err(CompositionError::WiringFailed)?;
         Ok(CommandOutcome::success(None))
@@ -646,8 +632,7 @@ impl ReviewCompositionRoot {
         track_id: Option<String>,
         items_dir: PathBuf,
     ) -> Result<CommandOutcome, CompositionError> {
-        let track_id = resolve_track_id_or_branch(track_id, &items_dir)
-            .map_err(CompositionError::WiringFailed)?;
+        let track_id = resolve_track_id_or_branch(track_id, &items_dir)?;
         let maybe_path = get_briefing_for_scope_str(&scope, &track_id, &items_dir)
             .map_err(CompositionError::Infrastructure)?;
         Ok(CommandOutcome::success(maybe_path))
@@ -668,8 +653,7 @@ impl ReviewCompositionRoot {
         track_id: Option<String>,
         items_dir: PathBuf,
     ) -> Result<CommandOutcome, CompositionError> {
-        let track_id = resolve_track_id_or_branch(track_id, &items_dir)
-            .map_err(CompositionError::WiringFailed)?;
+        let track_id = resolve_track_id_or_branch(track_id, &items_dir)?;
         let head_sha =
             persist_commit_hash_for_track(&track_id).map_err(CompositionError::Infrastructure)?;
         eprintln!("[review] Recorded .commit_hash: {head_sha}");
@@ -775,7 +759,7 @@ mod tests {
 
     #[test]
     fn test_review_telemetry_for_outcome_skipped_returns_zero_findings_without_subprocess() {
-        let run_result =
+        let run_result: Result<super::CodexReviewOutcome, super::shared::ReviewSharedError> =
             Ok(super::CodexReviewOutcome::Skipped { scope_label: "cli_composition".to_owned() });
 
         let telemetry = super::review_telemetry_for_outcome(&run_result, "fast").unwrap();
@@ -1188,7 +1172,7 @@ exit 0
         let result =
             super::helpers::resolve_track_id_from_branch(std::path::Path::new("wrong/path"));
         assert!(result.is_err(), "expected error for non-canonical items_dir, got: {result:?}");
-        let msg = result.unwrap_err();
+        let msg = result.unwrap_err().to_string();
         assert!(msg.contains("track/items"), "error should mention 'track/items', got: {msg}");
     }
 
@@ -1228,7 +1212,7 @@ exit 0
         let result = super::helpers::resolve_track_id_from_branch(&items_dir);
 
         assert!(result.is_err());
-        let msg = result.unwrap_err();
+        let msg = result.unwrap_err().to_string();
         // The error must mention the branch name, not a git-discovery failure.
         assert!(
             msg.contains("not a track branch") || msg.contains("main"),
@@ -1249,7 +1233,7 @@ exit 0
     fn validate_all_paths_rejects_absolute_paths() {
         let result = super::helpers::validate_all_paths(&["/etc/passwd".to_owned()]);
         assert!(result.is_err());
-        assert!(result.unwrap_err().contains("absolute paths"));
+        assert!(result.unwrap_err().to_string().contains("absolute paths"));
     }
 
     #[test]
@@ -1257,7 +1241,7 @@ exit 0
         for raw in ["C:", "C:foo", "C:/foo", "C:\\foo", "z:relative"] {
             let result = super::helpers::validate_all_paths(&[raw.to_owned()]);
             assert!(result.is_err(), "expected drive-prefixed path to be rejected: {raw}");
-            assert!(result.unwrap_err().contains("absolute paths"));
+            assert!(result.unwrap_err().to_string().contains("absolute paths"));
         }
     }
 
@@ -1265,7 +1249,7 @@ exit 0
     fn validate_all_paths_rejects_traversal_components() {
         let result = super::helpers::validate_all_paths(&["../../etc/passwd".to_owned()]);
         assert!(result.is_err());
-        assert!(result.unwrap_err().contains("traversal"));
+        assert!(result.unwrap_err().to_string().contains("traversal"));
     }
 
     #[test]
@@ -1310,7 +1294,7 @@ exit 0
             std::path::Path::new("wrong/path/here"),
         );
         assert!(result.is_err());
-        let msg = result.unwrap_err();
+        let msg = result.unwrap_err().to_string();
         assert!(msg.contains("track/items"), "expected items-dir error, got: {msg}");
     }
 

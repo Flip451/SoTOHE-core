@@ -30,6 +30,9 @@ decisions:
   - id: D8
     user_decision_ref: "chat_segment:adr-add-cli-composition-split-presentation:2026-06-21"
     status: proposed
+  - id: D9
+    user_decision_ref: "chat_segment:adr-add-cli-composition-split-presentation:2026-06-21"
+    status: proposed
 ---
 # CLI delivery 側の責務分離 — composition root(wire) と primary adapter(invoke+render) への分解
 
@@ -154,6 +157,18 @@ review-prompts は reviewer capability が層別 review 時に読む利用者所
 ### D8: cli bin の直接 I/O を撤去する（telemetry の infrastructure adapter 化）
 
 `apps/cli/src/main.rs` の `emit_archived_track_subcommand` は bin 内で `std::fs` / `serde_json` / `chrono::Utc::now()` を直接使って telemetry を永続化しており、thin-bin の原則（`2026-05-27-0110` D3 / `2026-04-30-0848` / 本 ADR D5）に反する。telemetry 永続化を infrastructure の adapter（時刻取得・fs 書き込み）として切り出し、composition が wire して driver 経由で呼ぶ経路にする。bin は parse + dispatch + emit のみに戻す。
+
+### D9: Result<_, String> 廃止と usecase / infrastructure の typed error 化
+
+D2 は `cli_composition` の boundary で `Result<_, String>` を廃止し `CompositionError` に移行することを定めたが、typed error の要件は composition boundary だけに留まらない。`2026-05-27-0110` D2 が String 境界を採用した背景には、stringly-typed を層の境界全体に許容する設計があった。本決定はその前提を usecase / infrastructure 層まで拡張して廃止する。
+
+- usecase 層の secondary port および aggregate / application service が返すエラーを `thiserror` 派生の typed error enum に統一する。`Result<_, String>` を廃止し、各 port／service のエラー variant を usecase 層内で定義する。
+- infrastructure 層の secondary adapter は `map_err` チェーン経由で typed variant へ変換して boundary を越える。
+- infrastructure 層内部に閉じた free function（例: `infrastructure::demo::run_example_demo` / `infrastructure::git_cli::load_explicit_track_branch` 等）も同様に typed error enum（`DemoRunError` / `TrackBranchError` / `PersistentIndexLockError` 等）に変更する。`Result<_, String>` を返す pub free function は認めない。
+- `cli_composition` の境界では D2 / D6 の `CompositionError` パターンを踏襲する（既存方針の延長）。
+- 適用範囲は本 track（1328）で触れた track-touched scope のみとする。プロジェクト全体への適用は後続 track（または機械ゲート）で扱う。
+
+一段階で typed error 化と層分解を同時に行うことは二段階移行より総コストが低い（適用済みの adapter 移設と error 型変更を 1 つの commit にまとめられるため）。`2026-05-27-0110` D2 が String 境界を許容したのはその時点での scope 設定であり、本決定はその方針を本 track scope で supersede する。
 
 ## Rejected Alternatives
 

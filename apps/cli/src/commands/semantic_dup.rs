@@ -165,20 +165,26 @@ pub fn execute_dup_check(args: DupCheckArgs) -> ExitCode {
 ///
 /// # Errors
 ///
-/// Returns an error string when neither nor both arguments are provided, or
+/// Returns `CliError` when neither nor both arguments are provided, or
 /// when the file cannot be read.
-fn resolve_fragment_text(inline: Option<String>, file: Option<PathBuf>) -> Result<String, String> {
+fn resolve_fragment_text(
+    inline: Option<String>,
+    file: Option<PathBuf>,
+) -> Result<String, crate::CliError> {
     match (inline, file) {
         (Some(text), None) => Ok(text),
-        (None, Some(path)) => std::fs::read_to_string(&path)
-            .map_err(|e| format!("cannot read fragment file {}: {e}", path.display())),
-        (None, None) => {
-            Err("sotp find-similar: provide either an inline fragment argument or --file <path>"
-                .to_owned())
-        }
+        (None, Some(path)) => std::fs::read_to_string(&path).map_err(|e| {
+            crate::CliError::Message(format!("cannot read fragment file {}: {e}", path.display()))
+        }),
+        (None, None) => Err(crate::CliError::Message(
+            "sotp find-similar: provide either an inline fragment argument or --file <path>"
+                .to_owned(),
+        )),
         (Some(_), Some(_)) => {
             // Clap's `conflicts_with` prevents this but keep a safe fallback.
-            Err("sotp find-similar: --file and inline fragment are mutually exclusive".to_owned())
+            Err(crate::CliError::Message(
+                "sotp find-similar: --file and inline fragment are mutually exclusive".to_owned(),
+            ))
         }
     }
 }
@@ -189,14 +195,14 @@ fn resolve_fragment_text(inline: Option<String>, file: Option<PathBuf>) -> Resul
 ///
 /// # Errors
 ///
-/// Returns an error string when the file cannot be opened or read.
-fn read_lines_file(path: &Path) -> Result<Vec<String>, String> {
-    let file = std::fs::File::open(path)
-        .map_err(|e| format!("cannot open --files-from file {}: {e}", path.display()))?;
+/// Returns `CliError` when the file cannot be opened or read.
+fn read_lines_file(path: &Path) -> Result<Vec<String>, crate::CliError> {
+    let file = std::fs::File::open(path).map_err(|e| {
+        crate::CliError::Message(format!("cannot open --files-from file {}: {e}", path.display()))
+    })?;
     let reader = std::io::BufReader::new(file);
-    let lines: Vec<String> = reader
-        .lines()
-        .collect::<Result<Vec<_>, _>>()
-        .map_err(|e| format!("error reading --files-from file {}: {e}", path.display()))?;
+    let lines: Vec<String> = reader.lines().collect::<Result<Vec<_>, _>>().map_err(|e| {
+        crate::CliError::Message(format!("error reading --files-from file {}: {e}", path.display()))
+    })?;
     Ok(lines.into_iter().filter(|l| !l.trim().is_empty()).collect())
 }

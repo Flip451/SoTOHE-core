@@ -365,6 +365,14 @@ impl FixpointResolveService for FixpointResolveInteractor {
 
 // ── DiffBaseResolverPort ──────────────────────────────────────────────────────
 
+/// Error returned by [`DiffBaseResolverPort::resolve_diff_base`].
+#[derive(Debug, Clone, thiserror::Error)]
+pub enum DiffBaseResolverError {
+    /// `.commit_hash` is corrupt and the `git rev-parse main` fallback also failed.
+    #[error("{0}")]
+    Unavailable(String),
+}
+
 /// Secondary port for resolving the dry-check diff-base commit for a track.
 ///
 /// Abstracts the filesystem + git logic that reads the per-track `.commit_hash`
@@ -375,17 +383,25 @@ pub trait DiffBaseResolverPort: Send + Sync {
     ///
     /// # Errors
     ///
-    /// Returns a `String` error description when `.commit_hash` is corrupt and
+    /// Returns [`DiffBaseResolverError`] when `.commit_hash` is corrupt and
     /// the `git rev-parse main` fallback also fails.
     fn resolve_diff_base(
         &self,
         track_dir: &std::path::Path,
         canonical_root: &std::path::Path,
         repo_root: &std::path::Path,
-    ) -> Result<CommitHash, String>;
+    ) -> Result<CommitHash, DiffBaseResolverError>;
 }
 
 // ── DryCorpusMetaPort ─────────────────────────────────────────────────────────
+
+/// Error returned by [`DryCorpusMetaPort::resolve_corpus_meta`].
+#[derive(Debug, Clone, thiserror::Error)]
+pub enum DryCorpusMetaError {
+    /// The manifest exists but its workspace root cannot be resolved.
+    #[error("{0}")]
+    Unavailable(String),
+}
 
 /// Secondary port for resolving the corpus workspace root and current corpus
 /// fingerprint given the track's `dry-check-corpus-root.json` manifest state.
@@ -406,14 +422,14 @@ pub trait DryCorpusMetaPort: Send + Sync {
     ///
     /// # Errors
     ///
-    /// Returns a `String` error description when the manifest exists but its
+    /// Returns [`DryCorpusMetaError`] when the manifest exists but its
     /// workspace root cannot be resolved.
     fn resolve_corpus_meta(
         &self,
         track_dir: &std::path::Path,
         canonical_root: &std::path::Path,
         repo_root: &std::path::Path,
-    ) -> Result<(PathBuf, DryCheckCorpusFingerprint), String>;
+    ) -> Result<(PathBuf, DryCheckCorpusFingerprint), DryCorpusMetaError>;
 }
 
 // ── DryApprovalFactoryPort ────────────────────────────────────────────────────
@@ -964,7 +980,7 @@ mod tests {
     // ── Test doubles for FixpointDryGate ─────────────────────────────────────
 
     struct StubDiffBaseResolver {
-        result: Result<domain::CommitHash, String>,
+        result: Result<domain::CommitHash, DiffBaseResolverError>,
     }
 
     impl DiffBaseResolverPort for StubDiffBaseResolver {
@@ -973,13 +989,13 @@ mod tests {
             _track_dir: &std::path::Path,
             _canonical_root: &std::path::Path,
             _repo_root: &std::path::Path,
-        ) -> Result<domain::CommitHash, String> {
+        ) -> Result<domain::CommitHash, DiffBaseResolverError> {
             self.result.clone()
         }
     }
 
     struct StubCorpusMeta {
-        result: Result<(PathBuf, DryCheckCorpusFingerprint), String>,
+        result: Result<(PathBuf, DryCheckCorpusFingerprint), DryCorpusMetaError>,
     }
 
     impl DryCorpusMetaPort for StubCorpusMeta {
@@ -988,7 +1004,7 @@ mod tests {
             _track_dir: &std::path::Path,
             _canonical_root: &std::path::Path,
             _repo_root: &std::path::Path,
-        ) -> Result<(PathBuf, DryCheckCorpusFingerprint), String> {
+        ) -> Result<(PathBuf, DryCheckCorpusFingerprint), DryCorpusMetaError> {
             self.result.clone()
         }
     }
@@ -1067,8 +1083,8 @@ mod tests {
     }
 
     fn make_gate_interactor(
-        diff_base: Result<domain::CommitHash, String>,
-        corpus_meta: Result<(PathBuf, DryCheckCorpusFingerprint), String>,
+        diff_base: Result<domain::CommitHash, DiffBaseResolverError>,
+        corpus_meta: Result<(PathBuf, DryCheckCorpusFingerprint), DryCorpusMetaError>,
         pipeline_result: Result<
             DryFragmentPipelineOutput,
             crate::d4_orchestration::D4OrchestrationError,
@@ -1152,7 +1168,7 @@ mod tests {
     #[test]
     fn fixpoint_dry_gate_diff_base_failure_returns_dry_gate_error() {
         let interactor = make_gate_interactor(
-            Err("git rev-parse main failed".to_owned()),
+            Err(DiffBaseResolverError::Unavailable("git rev-parse main failed".to_owned())),
             Ok((PathBuf::from("/project"), make_corpus_fingerprint())),
             Ok(DryFragmentPipelineOutput {
                 fragment_refs: BTreeSet::new(),
@@ -1177,7 +1193,7 @@ mod tests {
     fn fixpoint_dry_gate_corpus_meta_failure_returns_dry_gate_error() {
         let interactor = make_gate_interactor(
             Ok(make_commit_hash()),
-            Err("corpus root manifest not found".to_owned()),
+            Err(DryCorpusMetaError::Unavailable("corpus root manifest not found".to_owned())),
             Ok(DryFragmentPipelineOutput {
                 fragment_refs: BTreeSet::new(),
                 records_before: 0,

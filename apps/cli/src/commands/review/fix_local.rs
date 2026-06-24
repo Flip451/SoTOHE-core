@@ -81,12 +81,12 @@ pub(super) fn execute_fix_local(args: &FixLocalArgs) -> ExitCode {
 ///
 /// # Errors
 /// Returns `Err` if writing to stdout fails.
-fn emit_fix_local_outcome(outcome: &cli_driver::CommandOutcome) -> Result<(), String> {
+fn emit_fix_local_outcome(outcome: &cli_driver::CommandOutcome) -> Result<(), crate::CliError> {
     if let Some(msg) = &outcome.stderr {
         eprintln!("{msg}");
     }
     if let Some(line) = &outcome.stdout {
-        writeln!(io::stdout(), "{line}").map_err(|e| format!("failed to write stdout: {e}"))?;
+        writeln!(io::stdout(), "{line}").map_err(crate::CliError::Io)?;
     }
     Ok(())
 }

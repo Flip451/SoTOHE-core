@@ -89,7 +89,7 @@ impl GitWorkflowService for FsGitWorkflowAdapter {
             .map(|td| {
                 let resolved_td = resolve_repo_file_path(repo.root(), td, "track directory path")?;
                 load_explicit_track_branch(repo.root(), &resolved_td)
-                    .map_err(GitWorkflowError::Unavailable)
+                    .map_err(|e| GitWorkflowError::Unavailable(e.to_string()))
                     .map(|metadata| ExplicitTrackBranch {
                         display_path: metadata.display_path,
                         expected_branch: metadata.branch,
@@ -132,7 +132,7 @@ impl GitWorkflowService for FsGitWorkflowAdapter {
             let current =
                 repo.current_branch().map_err(|e| GitWorkflowError::Unavailable(e.to_string()))?;
             let claims = collect_track_branch_claims(repo.root())
-                .map_err(GitWorkflowError::Unavailable)?
+                .map_err(|e| GitWorkflowError::Unavailable(e.to_string()))?
                 .into_iter()
                 .map(|claim| TrackBranchClaim {
                     track_name: claim.track_name,

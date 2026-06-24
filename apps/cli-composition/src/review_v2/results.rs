@@ -37,7 +37,7 @@ pub(crate) fn render_review_results_str(
     use std::fmt::Write as _;
 
     let track_id = TrackId::try_new(track_id_str).map_err(|e| format!("invalid track id: {e}"))?;
-    let comp = build_review_v2(&track_id, items_dir)?;
+    let comp = build_review_v2(&track_id, items_dir).map_err(|e| e.to_string())?;
 
     let states = comp
         .cycle

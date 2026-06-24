@@ -10,6 +10,7 @@
 use std::path::PathBuf;
 
 use crate::commit_hash_persistence::CommitHashPersistenceError;
+use crate::review_v2::review_aux::ReviewAuxError;
 use crate::review_v2::{
     ReviewApprovalOutput, ReviewCheckApprovedError, ReviewRunLocalOutput, RunReviewError,
     RunReviewFixError, RunReviewFixOutput, RunReviewOutput,
@@ -94,7 +95,7 @@ pub trait ReviewService: Send + Sync {
         limit: u32,
         round_type: String,
         no_hint: bool,
-    ) -> Result<String, String>;
+    ) -> Result<String, ReviewAuxError>;
 
     /// Classify each path string into its review scope(s).
     fn classify(
@@ -102,7 +103,7 @@ pub trait ReviewService: Send + Sync {
         paths: Vec<String>,
         track_id: Option<String>,
         items_dir: PathBuf,
-    ) -> Result<Vec<(String, String)>, String>;
+    ) -> Result<Vec<(String, String)>, ReviewAuxError>;
 
     /// List the diff files belonging to the given scope.
     fn files(
@@ -110,7 +111,7 @@ pub trait ReviewService: Send + Sync {
         scope: String,
         track_id: Option<String>,
         items_dir: PathBuf,
-    ) -> Result<Vec<String>, String>;
+    ) -> Result<Vec<String>, ReviewAuxError>;
 
     /// Validate a scope name for the given track.
     fn validate_scope(
@@ -118,7 +119,7 @@ pub trait ReviewService: Send + Sync {
         scope: String,
         track_id: Option<String>,
         items_dir: PathBuf,
-    ) -> Result<(), String>;
+    ) -> Result<(), ReviewAuxError>;
 
     /// Get the briefing file path for the given scope.
     fn get_briefing(
@@ -126,7 +127,7 @@ pub trait ReviewService: Send + Sync {
         scope: String,
         track_id: Option<String>,
         items_dir: PathBuf,
-    ) -> Result<Option<String>, String>;
+    ) -> Result<Option<String>, ReviewAuxError>;
 
     /// Persist the HEAD SHA to `.commit_hash` for the given track.
     fn persist_commit_hash(

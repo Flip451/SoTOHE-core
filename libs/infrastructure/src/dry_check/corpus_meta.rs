@@ -14,11 +14,23 @@ use std::path::{Path, PathBuf};
 use domain::dry_check::DryCheckCorpusFingerprint;
 use domain::semantic_dup::CodeFragment;
 use usecase::dry_check::fragment_ref_of;
-use usecase::fixpoint_resolve::DryCorpusMetaPort;
+use usecase::fixpoint_resolve::{DryCorpusMetaError, DryCorpusMetaPort};
 
 use crate::dry_check::corpus::sha256_hex;
 use crate::semantic_dup::extractor::extract_code_fragments;
 use crate::track::symlink_guard::reject_symlinks_below;
+
+// ── Internal error type ───────────────────────────────────────────────────────
+
+#[derive(Debug)]
+#[allow(dead_code)]
+struct CorpusMetaInternalError(String);
+
+impl std::fmt::Display for CorpusMetaInternalError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.0.fmt(f)
+    }
+}
 
 // ── Manifest types ────────────────────────────────────────────────────────────
 
@@ -66,7 +78,7 @@ impl DryCorpusMetaPort for FsDryCorpusMetaAdapter {
         track_dir: &Path,
         canonical_root: &Path,
         repo_root: &Path,
-    ) -> Result<(PathBuf, DryCheckCorpusFingerprint), String> {
+    ) -> Result<(PathBuf, DryCheckCorpusFingerprint), DryCorpusMetaError> {
         let manifest_path = dry_corpus_root_manifest_path(track_dir);
 
         match std::fs::symlink_metadata(&manifest_path) {
@@ -108,42 +120,44 @@ impl DryCorpusMetaPort for FsDryCorpusMetaAdapter {
 
 /// Read the `dry-check-corpus-root.json` sidecar and return the validated
 /// canonical absolute workspace root path.
-///
-/// # Errors
-///
-/// Returns a human-readable `String` error when:
-/// - A symlink is detected at or below the manifest path.
-/// - The manifest cannot be read or parsed.
-/// - The recorded workspace root is not a directory under `repo_root`.
 fn resolve_workspace_root_from_manifest(
     manifest_path: &Path,
     repo_root: &Path,
-) -> Result<PathBuf, String> {
+) -> Result<PathBuf, CorpusMetaInternalError> {
     // Symlink guard on the manifest file itself.
     reject_symlinks_below(manifest_path, repo_root).map_err(|e| {
-        format!("symlink guard on corpus-root manifest '{}': {e}", manifest_path.display())
+        CorpusMetaInternalError(format!(
+            "symlink guard on corpus-root manifest '{}': {e}",
+            manifest_path.display()
+        ))
     })?;
 
     let content = std::fs::read_to_string(manifest_path).map_err(|e| {
-        format!("failed to read corpus-root manifest '{}': {e}", manifest_path.display())
+        CorpusMetaInternalError(format!(
+            "failed to read corpus-root manifest '{}': {e}",
+            manifest_path.display()
+        ))
     })?;
 
     let envelope: SchemaVersionEnvelope = serde_json::from_str(&content).map_err(|e| {
-        format!(
+        CorpusMetaInternalError(format!(
             "failed to parse corpus-root manifest schema_version '{}': {e}",
             manifest_path.display()
-        )
+        ))
     })?;
     if envelope.schema_version != 1 {
-        return Err(format!(
+        return Err(CorpusMetaInternalError(format!(
             "unsupported corpus-root manifest schema_version {} in '{}'",
             envelope.schema_version,
             manifest_path.display()
-        ));
+        )));
     }
 
     let manifest: DryCorpusRootManifest = serde_json::from_str(&content).map_err(|e| {
-        format!("failed to parse corpus-root manifest '{}': {e}", manifest_path.display())
+        CorpusMetaInternalError(format!(
+            "failed to parse corpus-root manifest '{}': {e}",
+            manifest_path.display()
+        ))
     })?;
 
     validate_workspace_root(&manifest.workspace_root, repo_root, manifest_path)
@@ -154,27 +168,30 @@ fn validate_workspace_root(
     raw_root: &Path,
     repo_root: &Path,
     manifest_path: &Path,
-) -> Result<PathBuf, String> {
+) -> Result<PathBuf, CorpusMetaInternalError> {
     let absolute_root =
         if raw_root.is_absolute() { raw_root.to_path_buf() } else { repo_root.join(raw_root) };
 
     reject_symlinks_below(&absolute_root, repo_root).map_err(|e| {
-        format!("symlink guard on corpus-root workspace root '{}': {e}", raw_root.display())
+        CorpusMetaInternalError(format!(
+            "symlink guard on corpus-root workspace root '{}': {e}",
+            raw_root.display()
+        ))
     })?;
 
     let canonical_root = absolute_root.canonicalize().map_err(|e| {
-        format!(
+        CorpusMetaInternalError(format!(
             "corpus-root manifest '{}' points to a non-canonicalizable workspace root '{}': {e}",
             manifest_path.display(),
             raw_root.display()
-        )
+        ))
     })?;
 
     if !canonical_root.is_dir() || !canonical_root.starts_with(repo_root) {
-        return Err(format!(
+        return Err(CorpusMetaInternalError(format!(
             "corpus-root manifest '{}' must point to an existing directory under the repository root",
             manifest_path.display()
-        ));
+        )));
     }
 
     Ok(canonical_root)
@@ -198,7 +215,7 @@ fn compute_dry_write_corpus_fingerprint(
 fn normalize_fragment_paths(
     fragments: Vec<CodeFragment>,
     repo_root: &Path,
-) -> Result<Vec<CodeFragment>, String> {
+) -> Result<Vec<CodeFragment>, CorpusMetaInternalError> {
     let mut normalized = Vec::with_capacity(fragments.len());
     for fragment in fragments {
         let relative_path = fragment
@@ -213,7 +230,7 @@ fn normalize_fragment_paths(
             fragment.start_line(),
             fragment.end_line(),
         )
-        .map_err(|e| format!("fragment rebuild failed: {e}"))?;
+        .map_err(|e| CorpusMetaInternalError(format!("fragment rebuild failed: {e}")))?;
         normalized.push(rebuilt);
     }
     Ok(normalized)

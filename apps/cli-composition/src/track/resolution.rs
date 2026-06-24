@@ -27,7 +27,7 @@ impl TrackCompositionRoot {
         explicit_id: Option<String>,
         items_dir: PathBuf,
     ) -> Result<String, CompositionError> {
-        resolve_track_id(explicit_id, &items_dir).map_err(CompositionError::WiringFailed)
+        resolve_track_id(explicit_id, &items_dir)
     }
 
     /// Resolve a track ID for a READ operation, anchored to `workspace_root`.
@@ -40,7 +40,6 @@ impl TrackCompositionRoot {
         workspace_root: PathBuf,
     ) -> Result<String, CompositionError> {
         resolve_track_id_from_root(explicit_id, &workspace_root)
-            .map_err(CompositionError::WiringFailed)
     }
 
     /// Resolve a track ID for a WRITE operation, anchored to `items_dir`.
@@ -54,7 +53,7 @@ impl TrackCompositionRoot {
         explicit_id: Option<String>,
         items_dir: PathBuf,
     ) -> Result<String, CompositionError> {
-        resolve_track_id_for_write(explicit_id, &items_dir).map_err(CompositionError::WiringFailed)
+        resolve_track_id_for_write(explicit_id, &items_dir)
     }
 
     /// Resolve a track ID for a WRITE operation, anchored to `workspace_root`.
@@ -67,7 +66,6 @@ impl TrackCompositionRoot {
         workspace_root: PathBuf,
     ) -> Result<String, CompositionError> {
         resolve_track_id_inner(explicit_id, &workspace_root, true)
-            .map_err(CompositionError::WiringFailed)
     }
 
     /// Validate a track ID string (lowercase slug format).
@@ -75,7 +73,7 @@ impl TrackCompositionRoot {
     /// # Errors
     /// Returns [`CompositionError`] when the slug format is invalid.
     pub fn track_validate_id(&self, value: &str) -> Result<(), CompositionError> {
-        validate_track_id_str(value).map_err(CompositionError::WiringFailed)
+        validate_track_id_str(value)
     }
 
     /// Resolve the project root from an items_dir path (`<root>/track/items`).
@@ -86,6 +84,6 @@ impl TrackCompositionRoot {
         &self,
         items_dir: PathBuf,
     ) -> Result<PathBuf, CompositionError> {
-        resolve_project_root(&items_dir).map_err(CompositionError::WiringFailed)
+        resolve_project_root(&items_dir)
     }
 }

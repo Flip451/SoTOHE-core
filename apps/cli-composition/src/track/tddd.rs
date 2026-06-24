@@ -35,8 +35,7 @@ impl TrackCompositionRoot {
         };
 
         let items_dir = workspace_root.join("track").join("items");
-        let resolved_id = super::resolve_track_id_for_write(track_id, &items_dir)
-            .map_err(CompositionError::AdapterInit)?;
+        let resolved_id = super::resolve_track_id_for_write(track_id, &items_dir)?;
 
         // Resolve the current git branch for the CN-07 guard (TypeSignalsInteractor requires it).
         let branch = SystemGitRepo::discover_from(&workspace_root)
@@ -112,18 +111,14 @@ impl TrackCompositionRoot {
         };
         use usecase::{LayerId, TrackId};
 
-        let resolved_id = super::resolve_track_id_for_write(track_id, &items_dir)
-            .map_err(CompositionError::AdapterInit)?;
+        let resolved_id = super::resolve_track_id_for_write(track_id, &items_dir)?;
 
         let typed_track_id = TrackId::try_new(resolved_id.clone()).map_err(|e| {
             CompositionError::WiringFailed(format!("invalid track ID '{resolved_id}': {e}"))
         })?;
 
-        let layer_filter_parsed: Option<Vec<LayerId>> = layers
-            .as_deref()
-            .map(parse_layer_filter_ids)
-            .transpose()
-            .map_err(CompositionError::WiringFailed)?;
+        let layer_filter_parsed: Option<Vec<LayerId>> =
+            layers.as_deref().map(parse_layer_filter_ids).transpose()?;
 
         let rules_path = workspace_root.join("architecture-rules.json");
         let loader =
@@ -170,18 +165,14 @@ impl TrackCompositionRoot {
         };
         use usecase::{LayerId, TrackId};
 
-        let resolved_id = super::resolve_track_id_for_write(track_id, &items_dir)
-            .map_err(CompositionError::AdapterInit)?;
+        let resolved_id = super::resolve_track_id_for_write(track_id, &items_dir)?;
 
         let typed_track_id = TrackId::try_new(resolved_id.clone()).map_err(|e| {
             CompositionError::WiringFailed(format!("invalid track ID '{resolved_id}': {e}"))
         })?;
 
-        let layer_filter_parsed: Option<Vec<LayerId>> = layers
-            .as_deref()
-            .map(parse_layer_filter_ids)
-            .transpose()
-            .map_err(CompositionError::WiringFailed)?;
+        let layer_filter_parsed: Option<Vec<LayerId>> =
+            layers.as_deref().map(parse_layer_filter_ids).transpose()?;
 
         let rules_path = workspace_root.join("architecture-rules.json");
         let loader = FsCatalogueLoader::new(items_dir.clone(), rules_path, workspace_root.clone());
@@ -224,8 +215,7 @@ impl TrackCompositionRoot {
         use infrastructure::verify::tddd_layers::{LoadTdddLayersError, load_tddd_layers};
         use usecase::TrackId;
 
-        let resolved_id = super::resolve_track_id_for_write(track_id, &items_dir)
-            .map_err(CompositionError::AdapterInit)?;
+        let resolved_id = super::resolve_track_id_for_write(track_id, &items_dir)?;
 
         // Validate track_id format (CN-01 / AC-03). Must happen before any filesystem access.
         TrackId::try_new(&resolved_id).map_err(|e| {
@@ -372,10 +362,9 @@ impl TrackCompositionRoot {
         track_id: Option<String>,
         anchor: Option<String>,
     ) -> Result<CommandOutcome, CompositionError> {
-        let resolved_id = super::resolve_track_id(track_id, &items_dir)
-            .map_err(CompositionError::WiringFailed)?;
+        let resolved_id = super::resolve_track_id(track_id, &items_dir)?;
 
-        super::validate_track_id_str(&resolved_id).map_err(CompositionError::WiringFailed)?;
+        super::validate_track_id_str(&resolved_id)?;
 
         let hashes = infrastructure::track::spec_element_hash::compute_spec_element_hashes(
             items_dir,
@@ -425,8 +414,7 @@ impl TrackCompositionRoot {
         };
 
         let items_dir = workspace_root.join("track").join("items");
-        let resolved_id = super::resolve_track_id_for_write(track_id, &items_dir)
-            .map_err(CompositionError::AdapterInit)?;
+        let resolved_id = super::resolve_track_id_for_write(track_id, &items_dir)?;
 
         let symlink_guard = Arc::new(FsSymlinkGuard::new());
         let layer_bindings = Arc::new(FsTdddLayerBindingsAdapter::new());
@@ -466,8 +454,7 @@ impl TrackCompositionRoot {
             RunCatalogueLintInteractor,
         };
 
-        let resolved_id = super::resolve_track_id_from_root(track_id, &workspace_root)
-            .map_err(CompositionError::WiringFailed)?;
+        let resolved_id = super::resolve_track_id_from_root(track_id, &workspace_root)?;
 
         // Resolve the config file path: --rules-file overrides the default location.
         let config_path = rules_file
@@ -542,8 +529,7 @@ impl TrackCompositionRoot {
             CatalogueImplSignalsInteractor, CatalogueImplSignalsService,
         };
 
-        let resolved_id = super::resolve_track_id_from_root(track_id, &workspace_root)
-            .map_err(CompositionError::WiringFailed)?;
+        let resolved_id = super::resolve_track_id_from_root(track_id, &workspace_root)?;
 
         let catalogue_loader = Arc::new(FsCatalogueDocumentLoader::new());
         let ext_crate_codec = Arc::new(CatalogueToExtendedCrateCodec::new());
@@ -578,15 +564,16 @@ impl TrackCompositionRoot {
 ///
 /// # Errors
 /// Returns `Err` if any token is not a valid `LayerId`.
-fn parse_layer_filter_ids(raw: &str) -> Result<Vec<usecase::LayerId>, String> {
+fn parse_layer_filter_ids(raw: &str) -> Result<Vec<usecase::LayerId>, CompositionError> {
     let mut layers = Vec::new();
     for token in raw.split(',') {
         let trimmed = token.trim();
         if trimmed.is_empty() {
             continue;
         }
-        let id = usecase::LayerId::try_new(trimmed)
-            .map_err(|e| format!("invalid layer id '{trimmed}': {e}"))?;
+        let id = usecase::LayerId::try_new(trimmed).map_err(|e| {
+            CompositionError::WiringFailed(format!("invalid layer id '{trimmed}': {e}"))
+        })?;
         layers.push(id);
     }
     Ok(layers)

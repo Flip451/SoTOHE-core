@@ -3,15 +3,25 @@
 use std::path::{Path, PathBuf};
 
 use cli_composition::TrackCompositionRoot;
+use thiserror::Error;
+
+/// Typed error for track validation and resolution helpers.
+#[derive(Debug, Error, PartialEq)]
+pub(crate) enum TrackValidateError {
+    #[error("{0}")]
+    Unavailable(String),
+}
 
 /// Validates a track ID string by delegating to the canonical domain rule via
 /// cli_composition.
 ///
 /// # Errors
 ///
-/// Returns an error string describing the failure.
-pub(crate) fn validate_track_id_str(value: &str) -> Result<(), String> {
-    TrackCompositionRoot::new().track_validate_id(value).map_err(|e| e.to_string())
+/// Returns `TrackValidateError` describing the failure.
+pub(crate) fn validate_track_id_str(value: &str) -> Result<(), TrackValidateError> {
+    TrackCompositionRoot::new()
+        .track_validate_id(value)
+        .map_err(|e| TrackValidateError::Unavailable(e.to_string()))
 }
 
 /// Validates a track branch name string (`track/<valid-track-id>`).
@@ -21,12 +31,17 @@ pub(crate) fn validate_track_id_str(value: &str) -> Result<(), String> {
 ///
 /// # Errors
 ///
-/// Returns an error string describing the failure.
-pub(crate) fn validate_track_branch_str(value: &str) -> Result<(), String> {
+/// Returns `TrackValidateError` describing the failure.
+pub(crate) fn validate_track_branch_str(value: &str) -> Result<(), TrackValidateError> {
     match value.strip_prefix("track/") {
-        Some(slug) => validate_track_id_str(slug)
-            .map_err(|_| format!("invalid track branch: '{value}' (slug part is invalid)")),
-        None => Err(format!("invalid track branch: '{value}' (must be in 'track/<id>' form)")),
+        Some(slug) => validate_track_id_str(slug).map_err(|_| {
+            TrackValidateError::Unavailable(format!(
+                "invalid track branch: '{value}' (slug part is invalid)"
+            ))
+        }),
+        None => Err(TrackValidateError::Unavailable(format!(
+            "invalid track branch: '{value}' (must be in 'track/<id>' form)"
+        ))),
     }
 }
 
@@ -43,28 +58,28 @@ pub(crate) fn validate_track_branch_str(value: &str) -> Result<(), String> {
 ///
 /// # Errors
 ///
-/// Returns a human-readable error string on failure.
+/// Returns `TrackValidateError` on failure.
 pub(crate) fn resolve_track_id(
     explicit_id: Option<String>,
     items_dir: &std::path::Path,
-) -> Result<String, String> {
+) -> Result<String, TrackValidateError> {
     TrackCompositionRoot::new()
         .track_resolve_id(explicit_id, items_dir.to_path_buf())
-        .map_err(|e| e.to_string())
+        .map_err(|e| TrackValidateError::Unavailable(e.to_string()))
 }
 
 /// Resolves a track ID for a READ operation, anchored to `workspace_root`.
 ///
 /// # Errors
 ///
-/// Returns a human-readable error string on failure.
+/// Returns `TrackValidateError` on failure.
 pub(crate) fn resolve_track_id_from_root(
     explicit_id: Option<String>,
     workspace_root: &Path,
-) -> Result<String, String> {
+) -> Result<String, TrackValidateError> {
     TrackCompositionRoot::new()
         .track_resolve_id_from_root(explicit_id, workspace_root.to_path_buf())
-        .map_err(|e| e.to_string())
+        .map_err(|e| TrackValidateError::Unavailable(e.to_string()))
 }
 
 /// Resolves a track ID for a WRITE operation, anchored to `items_dir`.
@@ -75,31 +90,33 @@ pub(crate) fn resolve_track_id_from_root(
 ///
 /// # Errors
 ///
-/// Returns a human-readable error string on failure.
+/// Returns `TrackValidateError` on failure.
 pub(crate) fn resolve_track_id_for_write(
     explicit_id: Option<String>,
     items_dir: &std::path::Path,
-) -> Result<String, String> {
+) -> Result<String, TrackValidateError> {
     TrackCompositionRoot::new()
         .track_resolve_id_for_write(explicit_id, items_dir.to_path_buf())
-        .map_err(|e| e.to_string())
+        .map_err(|e| TrackValidateError::Unavailable(e.to_string()))
 }
 
 /// Resolves a track ID for a WRITE operation, anchored to `workspace_root`.
 ///
 /// # Errors
 ///
-/// Returns a human-readable error string on failure.
+/// Returns `TrackValidateError` on failure.
 pub(crate) fn resolve_track_id_from_root_for_write(
     explicit_id: Option<String>,
     workspace_root: &Path,
-) -> Result<String, String> {
+) -> Result<String, TrackValidateError> {
     TrackCompositionRoot::new()
         .track_resolve_id_from_root_for_write(explicit_id, workspace_root.to_path_buf())
-        .map_err(|e| e.to_string())
+        .map_err(|e| TrackValidateError::Unavailable(e.to_string()))
 }
 
-pub(crate) fn resolve_project_root(items_dir: &std::path::Path) -> Result<PathBuf, String> {
+pub(crate) fn resolve_project_root(
+    items_dir: &std::path::Path,
+) -> Result<PathBuf, TrackValidateError> {
     let items_name = items_dir.file_name().and_then(|name| name.to_str());
     let track_dir = items_dir.parent();
     let track_name = track_dir.and_then(std::path::Path::file_name).and_then(|name| name.to_str());
@@ -119,9 +136,9 @@ pub(crate) fn resolve_project_root(items_dir: &std::path::Path) -> Result<PathBu
                 Ok(root.to_path_buf())
             }
         }
-        _ => Err(format!(
+        _ => Err(TrackValidateError::Unavailable(format!(
             "--items-dir must point to '<project-root>/track/items'; got {}",
             items_dir.display()
-        )),
+        ))),
     }
 }

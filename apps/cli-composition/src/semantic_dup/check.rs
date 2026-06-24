@@ -10,7 +10,8 @@ use infrastructure::semantic_dup::{
 use usecase::semantic_dup::{DupCheckCommand, DupCheckInteractor, DupCheckService as _};
 
 use super::SemanticDupCompositionRoot;
-use crate::{CommandOutcome, error::CompositionError};
+use crate::CommandOutcome;
+use crate::error::CompositionError;
 
 use super::common::{LANCEDB_TABLE_MARKER, is_recognizable_lancedb_index, truncate_snippet};
 
@@ -37,7 +38,7 @@ pub struct DupCheckInput {
 /// Read the ack-set (a newline-separated list of SHA-256 hex hashes) from `path`.
 ///
 /// Returns an empty set when the file does not exist yet (first run).
-fn read_ack_set(path: &Path) -> Result<std::collections::HashSet<String>, String> {
+fn read_ack_set(path: &Path) -> Result<std::collections::HashSet<String>, CompositionError> {
     match std::fs::read_to_string(path) {
         Ok(contents) => Ok(contents
             .lines()
@@ -46,17 +47,24 @@ fn read_ack_set(path: &Path) -> Result<std::collections::HashSet<String>, String
             .map(str::to_owned)
             .collect()),
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(std::collections::HashSet::new()),
-        Err(e) => Err(format!("cannot read ack file {}: {e}", path.display())),
+        Err(e) => Err(CompositionError::Infrastructure(format!(
+            "cannot read ack file {}: {e}",
+            path.display()
+        ))),
     }
 }
 
 /// Write the ack-set to `path`.
-fn write_ack_set(path: &Path, set: &std::collections::HashSet<String>) -> Result<(), String> {
+fn write_ack_set(
+    path: &Path,
+    set: &std::collections::HashSet<String>,
+) -> Result<(), CompositionError> {
     let mut sorted: Vec<&str> = set.iter().map(String::as_str).collect();
     sorted.sort_unstable();
     let contents = sorted.join("\n") + "\n";
-    std::fs::write(path, contents)
-        .map_err(|e| format!("cannot write ack file {}: {e}", path.display()))
+    std::fs::write(path, contents).map_err(|e| {
+        CompositionError::Infrastructure(format!("cannot write ack file {}: {e}", path.display()))
+    })
 }
 
 /// Compute a stable, collision-resistant content hash for a fragment.
@@ -133,7 +141,7 @@ impl SemanticDupCompositionRoot {
         // Load the ack set (empty on first run).
         let ack_path_opt = input.ack_file.as_deref();
         let ack_set = match ack_path_opt {
-            Some(p) => read_ack_set(p).map_err(CompositionError::Infrastructure)?,
+            Some(p) => read_ack_set(p)?,
             None => std::collections::HashSet::new(),
         };
 
@@ -212,7 +220,7 @@ impl SemanticDupCompositionRoot {
                 for h in &warn_hashes {
                     updated_ack_set.insert(h.clone());
                 }
-                write_ack_set(p, &updated_ack_set).map_err(CompositionError::Infrastructure)?;
+                write_ack_set(p, &updated_ack_set)?;
             }
         }
 

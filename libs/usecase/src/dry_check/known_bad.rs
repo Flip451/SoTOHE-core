@@ -8,6 +8,18 @@ use std::path::PathBuf;
 
 use domain::semantic_dup::CodeFragment;
 
+// ── KnownBadProbeError ────────────────────────────────────────────────────────
+
+/// Error type for [`known_bad_probe_pairs`].
+#[derive(Debug, thiserror::Error)]
+pub enum KnownBadProbeError {
+    /// A probe's `CodeFragment` could not be constructed (e.g. empty content or
+    /// invalid line span). Callers should treat this as an internal fixture error
+    /// and abort the calibration run.
+    #[error("known-bad probe fixture invalid: {0}")]
+    FixtureInvalid(String),
+}
+
 /// A single known-bad probe: a pair where the correct verdict is `Violation`.
 pub struct KnownBadProbePair {
     /// The changed (diff-side) fragment — identical content to candidate in all probes.
@@ -25,11 +37,11 @@ pub struct KnownBadProbePair {
 ///
 /// # Errors
 ///
-/// Returns a `String` describing the failure when a probe's `CodeFragment` cannot
-/// be constructed (e.g. empty content or invalid line span).  Callers should treat
-/// this as an internal fixture error and abort the calibration run rather than
-/// silently reducing the probe count.
-pub fn known_bad_probe_pairs() -> Result<Vec<KnownBadProbePair>, String> {
+/// Returns [`KnownBadProbeError::FixtureInvalid`] when a probe's `CodeFragment`
+/// cannot be constructed (e.g. empty content or invalid line span). Callers should
+/// treat this as an internal fixture error and abort the calibration run rather
+/// than silently reducing the probe count.
+pub fn known_bad_probe_pairs() -> Result<Vec<KnownBadProbePair>, KnownBadProbeError> {
     let pairs: &[(&str, &str, &str, &str)] = &[
         // (changed_path, changed_content, candidate_path, candidate_content)
         (
@@ -55,10 +67,13 @@ pub fn known_bad_probe_pairs() -> Result<Vec<KnownBadProbePair>, String> {
     let mut result = Vec::with_capacity(pairs.len());
     for (idx, (ch_path, ch_content, ca_path, ca_content)) in pairs.iter().enumerate() {
         let changed = CodeFragment::new(PathBuf::from(ch_path), (*ch_content).to_owned(), 1, 1)
-            .map_err(|e| format!("known-bad probe[{idx}] changed fragment invalid: {e}"))?;
-        let candidate =
-            CodeFragment::new(PathBuf::from(ca_path), (*ca_content).to_owned(), 1, 1)
-                .map_err(|e| format!("known-bad probe[{idx}] candidate fragment invalid: {e}"))?;
+            .map_err(|e| {
+                KnownBadProbeError::FixtureInvalid(format!("probe[{idx}] changed fragment: {e}"))
+            })?;
+        let candidate = CodeFragment::new(PathBuf::from(ca_path), (*ca_content).to_owned(), 1, 1)
+            .map_err(|e| {
+            KnownBadProbeError::FixtureInvalid(format!("probe[{idx}] candidate fragment: {e}"))
+        })?;
         result.push(KnownBadProbePair { changed, candidate });
     }
     Ok(result)

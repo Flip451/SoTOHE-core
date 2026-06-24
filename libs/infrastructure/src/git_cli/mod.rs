@@ -266,6 +266,21 @@ pub fn resolve_repo_path(root: &Path, path: &Path) -> PathBuf {
     if path.is_absolute() { path.to_path_buf() } else { root.join(path) }
 }
 
+/// Error type for track-branch loading operations.
+#[derive(Debug, Error)]
+pub enum TrackBranchError {
+    #[error("{0}")]
+    LoadFailed(String),
+}
+
+impl TrackBranchError {
+    pub fn contains(&self, s: &str) -> bool {
+        match self {
+            TrackBranchError::LoadFailed(msg) => msg.contains(s),
+        }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TrackBranchRecord {
     pub display_path: String,
@@ -283,7 +298,7 @@ struct BranchMetadata {
 pub fn load_explicit_track_branch(
     root: &Path,
     track_dir: &Path,
-) -> Result<TrackBranchRecord, String> {
+) -> Result<TrackBranchRecord, TrackBranchError> {
     load_explicit_track_branch_from_items_dir(root, &root.join("track/items"), track_dir)
 }
 
@@ -291,33 +306,60 @@ pub fn load_explicit_track_branch_from_items_dir(
     root: &Path,
     items_dir: &Path,
     track_dir: &Path,
-) -> Result<TrackBranchRecord, String> {
-    if !track_dir.is_dir() {
-        return Err(format!("Track directory not found: {}", track_dir.display()));
+) -> Result<TrackBranchRecord, TrackBranchError> {
+    if !is_existing_track_branch_dir(track_dir, root)? {
+        return Err(TrackBranchError::LoadFailed(format!(
+            "Track directory not found: {}",
+            track_dir.display()
+        )));
     }
+    reject_track_branch_symlinks(items_dir, root)?;
 
+    let trusted_root = root.canonicalize().map_err(|err| {
+        TrackBranchError::LoadFailed(format!(
+            "repository root {} is unavailable: {err}",
+            root.display()
+        ))
+    })?;
     let repo_items_dir = items_dir.canonicalize().map_err(|err| {
-        format!(
+        TrackBranchError::LoadFailed(format!(
             "{}/ resolves outside the repository root or is unavailable: {err}",
             items_dir.display()
-        )
+        ))
     })?;
     let resolved = track_dir.canonicalize().map_err(|err| {
-        format!("failed to resolve track directory {}: {err}", track_dir.display())
+        TrackBranchError::LoadFailed(format!(
+            "failed to resolve track directory {}: {err}",
+            track_dir.display()
+        ))
     })?;
+    if !repo_items_dir.starts_with(&trusted_root) {
+        return Err(TrackBranchError::LoadFailed(format!(
+            "{}/ resolves outside the repository root: {}",
+            items_dir.display(),
+            trusted_root.display()
+        )));
+    }
+    if !resolved.starts_with(&trusted_root) {
+        return Err(TrackBranchError::LoadFailed(format!(
+            "Track directory resolves outside the repository root: {}",
+            track_dir.display()
+        )));
+    }
     if resolved.parent() != Some(repo_items_dir.as_path()) {
-        return Err(format!(
+        return Err(TrackBranchError::LoadFailed(format!(
             "Track directory must be exactly {}/<id>: {}",
             items_dir.display(),
             track_dir.display()
-        ));
+        )));
     }
 
-    let metadata = read_metadata(&track_dir.join("metadata.json"))?;
-    let display_path = resolved.strip_prefix(root).unwrap_or(track_dir).display().to_string();
+    let metadata = read_metadata(&resolved.join("metadata.json"), &trusted_root)?;
+    let display_path =
+        resolved.strip_prefix(&trusted_root).unwrap_or(track_dir).display().to_string();
     Ok(TrackBranchRecord {
         display_path,
-        track_name: track_dir
+        track_name: resolved
             .file_name()
             .and_then(|name| name.to_str())
             .unwrap_or_default()
@@ -327,19 +369,21 @@ pub fn load_explicit_track_branch_from_items_dir(
     })
 }
 
-pub fn collect_track_branch_claims(root: &Path) -> Result<Vec<TrackBranchRecord>, String> {
+pub fn collect_track_branch_claims(
+    root: &Path,
+) -> Result<Vec<TrackBranchRecord>, TrackBranchError> {
     let mut claims = Vec::new();
     for relative_root in ["track/items", "track/archive"] {
         let claims_root = root.join(relative_root);
-        if !claims_root.is_dir() {
+        if !is_existing_track_branch_dir(&claims_root, root)? {
             continue;
         }
-        for entry in read_directories(&claims_root)? {
+        for entry in read_directories(&claims_root, root)? {
             let metadata_path = entry.join("metadata.json");
-            if !metadata_path.is_file() {
+            if !is_existing_track_branch_file(&metadata_path, root)? {
                 continue;
             }
-            let metadata = match read_metadata(&metadata_path) {
+            let metadata = match read_metadata(&metadata_path, root) {
                 Ok(m) => m,
                 Err(e) => {
                     eprintln!("warning: skipping {}: {e}", metadata_path.display());
@@ -361,26 +405,78 @@ pub fn collect_track_branch_claims(root: &Path) -> Result<Vec<TrackBranchRecord>
     Ok(claims)
 }
 
-fn read_directories(root: &Path) -> Result<Vec<PathBuf>, String> {
+fn read_directories(root: &Path, trusted_root: &Path) -> Result<Vec<PathBuf>, TrackBranchError> {
     let mut dirs = Vec::new();
-    for entry in fs::read_dir(root)
-        .map_err(|err| format!("failed to read directory {}: {err}", root.display()))?
-    {
-        let entry = entry.map_err(|err| format!("failed to read directory entry: {err}"))?;
-        if entry.path().is_dir() {
-            dirs.push(entry.path());
+    for entry in fs::read_dir(root).map_err(|err| {
+        TrackBranchError::LoadFailed(format!("failed to read directory {}: {err}", root.display()))
+    })? {
+        let entry = entry.map_err(|err| {
+            TrackBranchError::LoadFailed(format!("failed to read directory entry: {err}"))
+        })?;
+        let path = entry.path();
+        if is_existing_track_branch_dir(&path, trusted_root)? {
+            dirs.push(path);
         }
     }
     dirs.sort();
     Ok(dirs)
 }
 
-fn read_metadata(path: &Path) -> Result<BranchMetadata, String> {
+fn read_metadata(path: &Path, trusted_root: &Path) -> Result<BranchMetadata, TrackBranchError> {
+    reject_track_branch_symlinks(path, trusted_root)?;
     let content = fs::read_to_string(path).map_err(|err| {
-        format!("Cannot read or parse metadata.json in {}: {err}", path.display())
+        TrackBranchError::LoadFailed(format!(
+            "Cannot read or parse metadata.json in {}: {err}",
+            path.display()
+        ))
     })?;
-    serde_json::from_str(&content)
-        .map_err(|err| format!("Cannot read or parse metadata.json in {}: {err}", path.display()))
+    serde_json::from_str(&content).map_err(|err| {
+        TrackBranchError::LoadFailed(format!(
+            "Cannot read or parse metadata.json in {}: {err}",
+            path.display()
+        ))
+    })
+}
+
+fn is_existing_track_branch_dir(
+    path: &Path,
+    trusted_root: &Path,
+) -> Result<bool, TrackBranchError> {
+    if !reject_track_branch_symlinks(path, trusted_root)? {
+        return Ok(false);
+    }
+    let metadata = path.symlink_metadata().map_err(|err| {
+        TrackBranchError::LoadFailed(format!(
+            "failed to inspect directory {}: {err}",
+            path.display()
+        ))
+    })?;
+    Ok(metadata.file_type().is_dir())
+}
+
+fn is_existing_track_branch_file(
+    path: &Path,
+    trusted_root: &Path,
+) -> Result<bool, TrackBranchError> {
+    if !reject_track_branch_symlinks(path, trusted_root)? {
+        return Ok(false);
+    }
+    let metadata = path.symlink_metadata().map_err(|err| {
+        TrackBranchError::LoadFailed(format!("failed to inspect file {}: {err}", path.display()))
+    })?;
+    Ok(metadata.file_type().is_file())
+}
+
+fn reject_track_branch_symlinks(
+    path: &Path,
+    trusted_root: &Path,
+) -> Result<bool, TrackBranchError> {
+    crate::track::symlink_guard::reject_symlinks_below(path, trusted_root).map_err(|err| {
+        TrackBranchError::LoadFailed(format!(
+            "track branch path rejected before use at {}: {err}",
+            path.display()
+        ))
+    })
 }
 
 #[cfg(test)]
@@ -526,6 +622,21 @@ mod tests {
     }
 
     #[test]
+    fn load_explicit_track_branch_from_items_dir_rejects_outside_custom_items_root() {
+        let dir = tempfile::tempdir().unwrap();
+        let outside = tempfile::tempdir().unwrap();
+        let items_dir = outside.path().join("track/items");
+        let track_dir = items_dir.join("example");
+        fs::create_dir_all(&track_dir).unwrap();
+        fs::write(track_dir.join("metadata.json"), r#"{"branch":"track/example"}"#).unwrap();
+
+        let err = load_explicit_track_branch_from_items_dir(dir.path(), &items_dir, &track_dir)
+            .unwrap_err();
+
+        assert!(err.contains("outside the repository root"), "{err}");
+    }
+
+    #[test]
     fn collect_track_branch_claims_includes_items_and_archive() {
         let dir = tempfile::tempdir().unwrap();
         let active = dir.path().join("track/items/active");
@@ -566,6 +677,43 @@ mod tests {
         let claims = collect_track_branch_claims(dir.path()).unwrap();
         assert_eq!(claims.len(), 1);
         assert_eq!(claims[0].track_name, "valid");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn collect_track_branch_claims_rejects_symlinked_track_directory() {
+        let dir = tempfile::tempdir().unwrap();
+        let outside = tempfile::tempdir().unwrap();
+        let items_dir = dir.path().join("track/items");
+        let outside_track = outside.path().join("active");
+        fs::create_dir_all(&items_dir).unwrap();
+        fs::create_dir_all(&outside_track).unwrap();
+        fs::write(
+            outside_track.join("metadata.json"),
+            "{\"branch\":\"track/active\",\"status\":\"in_progress\"}",
+        )
+        .unwrap();
+        std::os::unix::fs::symlink(&outside_track, items_dir.join("active")).unwrap();
+
+        let err = collect_track_branch_claims(dir.path()).unwrap_err();
+
+        assert!(err.contains("symlink"), "expected symlink rejection, got: {err}");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn collect_track_branch_claims_rejects_symlinked_metadata_file() {
+        let dir = tempfile::tempdir().unwrap();
+        let outside = tempfile::tempdir().unwrap();
+        let track_dir = dir.path().join("track/items/active");
+        fs::create_dir_all(&track_dir).unwrap();
+        let outside_metadata = outside.path().join("metadata.json");
+        fs::write(&outside_metadata, "{\"branch\":\"track/active\"}").unwrap();
+        std::os::unix::fs::symlink(&outside_metadata, track_dir.join("metadata.json")).unwrap();
+
+        let err = collect_track_branch_claims(dir.path()).unwrap_err();
+
+        assert!(err.contains("symlink"), "expected symlink rejection, got: {err}");
     }
 
     // ── BranchReaderPort tests ────────────────────────────────────────────────

@@ -13,7 +13,7 @@ use conch_parser::lexer::Lexer;
 use conch_parser::parse::DefaultParser;
 
 use domain::guard::{ParseError, ShellParser, SimpleCommand};
-use usecase::guard::ShellParserPort;
+use usecase::guard::{ShellParserError, ShellParserPort};
 use usecase::hook_dispatch::HookShellParserPort;
 
 use super::flatten::{
@@ -74,8 +74,9 @@ impl ShellParserPort for ConchShellParser {
     ///
     /// Returns a `String` describing the parse failure if the shell command
     /// cannot be parsed (e.g. nesting depth exceeded or unmatched quote).
-    fn split_shell(&self, input: &str) -> Result<Vec<String>, String> {
-        let commands = split_shell_inner(input, 0).map_err(|e| e.to_string())?;
+    fn split_shell(&self, input: &str) -> Result<Vec<String>, ShellParserError> {
+        let commands = split_shell_inner(input, 0)
+            .map_err(|e| ShellParserError::ParseFailed(e.to_string()))?;
         Ok(commands.into_iter().map(|cmd| cmd.argv.join(" ")).filter(|s| !s.is_empty()).collect())
     }
 }
@@ -652,7 +653,7 @@ mod tests {
         }
         let result = ShellParserPort::split_shell(&parser(), &cmd);
         assert!(result.is_err(), "expected Err for nesting depth exceeded");
-        let msg = result.unwrap_err();
+        let msg = result.unwrap_err().to_string();
         assert!(!msg.is_empty(), "error message should be non-empty");
     }
 }

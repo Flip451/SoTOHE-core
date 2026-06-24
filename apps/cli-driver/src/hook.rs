@@ -92,6 +92,22 @@ fn is_git_process_hook(hook_name: &str) -> bool {
 // JSON envelope parsing helpers (manual — no serde derive)
 // ---------------------------------------------------------------------------
 
+/// Typed error for JSON envelope parsing failures.
+#[derive(Debug)]
+enum HookParseError {
+    InvalidJson(String),
+    MissingField(String),
+}
+
+impl std::fmt::Display for HookParseError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::InvalidJson(msg) => write!(f, "{msg}"),
+            Self::MissingField(msg) => write!(f, "{msg}"),
+        }
+    }
+}
+
 /// Parsed data from a Claude Code PreToolUse hook JSON envelope.
 struct ParsedHookEnvelope {
     tool_name: String,
@@ -102,15 +118,17 @@ struct ParsedHookEnvelope {
 
 /// Parse a Claude Code PreToolUse hook JSON envelope from `raw`.
 ///
-/// Returns `Err(String)` when `tool_name` is missing or the JSON is invalid.
-fn parse_hook_envelope(raw: &str) -> Result<ParsedHookEnvelope, String> {
-    let value: serde_json::Value =
-        serde_json::from_str(raw).map_err(|e| format!("failed to parse hook JSON: {e}"))?;
+/// Returns `Err(HookParseError)` when `tool_name` is missing or the JSON is invalid.
+fn parse_hook_envelope(raw: &str) -> Result<ParsedHookEnvelope, HookParseError> {
+    let value: serde_json::Value = serde_json::from_str(raw)
+        .map_err(|e| HookParseError::InvalidJson(format!("failed to parse hook JSON: {e}")))?;
 
     let tool_name = value
         .get("tool_name")
         .and_then(|v| v.as_str())
-        .ok_or_else(|| "hook JSON missing required field 'tool_name'".to_owned())?
+        .ok_or_else(|| {
+            HookParseError::MissingField("hook JSON missing required field 'tool_name'".to_owned())
+        })?
         .to_owned();
 
     let tool_input = value.get("tool_input");
@@ -278,7 +296,7 @@ impl HookDriver {
                     content: parsed.content,
                     git_hook_args: vec![],
                 },
-                Err(e) => return make_hook_error(is_post, &e),
+                Err(e) => return make_hook_error(is_post, &e.to_string()),
             }
         };
 

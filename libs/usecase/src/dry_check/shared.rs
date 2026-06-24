@@ -13,6 +13,20 @@ use domain::semantic_dup::{CodeFragment, SimilarityScore, SimilarityThreshold, T
 use super::errors::DryCheckCycleError;
 use crate::semantic_dup::{EmbeddingError, EmbeddingPort, SemanticIndexError, SemanticIndexPort};
 
+// ── DryCheckSharedError ───────────────────────────────────────────────────────
+
+/// Error type for shared dry-check helper functions (`content_hash_of`,
+/// `fragment_ref_of`).
+#[derive(Debug, thiserror::Error)]
+pub enum DryCheckSharedError {
+    /// The content hash could not be constructed from the SHA-256 digest.
+    #[error("content hash invalid: {0}")]
+    InvalidContentHash(String),
+    /// The fragment source path was rejected (e.g. absolute path or traversal).
+    #[error("invalid source path: {0}")]
+    InvalidSourcePath(String),
+}
+
 /// Candidate pair produced by the shared threshold-boundary search pipeline.
 pub(crate) struct CandidatePair {
     pub(crate) candidate_fragment: CodeFragment,
@@ -24,13 +38,15 @@ pub(crate) struct CandidatePair {
 ///
 /// # Errors
 ///
-/// Returns a [`String`] error description when [`FragmentContentHash::new`] rejects
-/// the hex string (should not happen in practice for a well-formed SHA-256 digest,
-/// but propagated as an error to keep production code panic-free).
-pub(crate) fn content_hash_of(content: &str) -> Result<FragmentContentHash, String> {
+/// Returns [`DryCheckSharedError::InvalidContentHash`] when
+/// [`FragmentContentHash::new`] rejects the hex string (should not happen in
+/// practice for a well-formed SHA-256 digest, but propagated as an error to
+/// keep production code panic-free).
+pub(crate) fn content_hash_of(content: &str) -> Result<FragmentContentHash, DryCheckSharedError> {
     let digest = sha2::Sha256::digest(content.as_bytes());
     let hex = format!("{digest:x}");
-    FragmentContentHash::new(hex).map_err(|e| format!("content hash: {e}"))
+    FragmentContentHash::new(hex)
+        .map_err(|e| DryCheckSharedError::InvalidContentHash(e.to_string()))
 }
 
 /// Build a [`FragmentRef`] from a [`CodeFragment`].
@@ -41,11 +57,13 @@ pub(crate) fn content_hash_of(content: &str) -> Result<FragmentContentHash, Stri
 ///
 /// # Errors
 ///
-/// Returns a [`String`] error description when `FilePath::new` rejects the
-/// path (e.g., absolute path or traversal) or when `content_hash_of` fails.
-pub fn fragment_ref_of(fragment: &CodeFragment) -> Result<FragmentRef, String> {
+/// Returns [`DryCheckSharedError::InvalidSourcePath`] when `FilePath::new`
+/// rejects the path (e.g., absolute path or traversal), or
+/// [`DryCheckSharedError::InvalidContentHash`] when `content_hash_of` fails.
+pub fn fragment_ref_of(fragment: &CodeFragment) -> Result<FragmentRef, DryCheckSharedError> {
     let path_str = fragment.source_path.to_string_lossy().into_owned();
-    let file_path = FilePath::new(path_str).map_err(|e| format!("invalid source_path: {e}"))?;
+    let file_path = FilePath::new(path_str)
+        .map_err(|e| DryCheckSharedError::InvalidSourcePath(e.to_string()))?;
     let content_hash = content_hash_of(fragment.content())?;
     Ok(FragmentRef::new(file_path, content_hash))
 }

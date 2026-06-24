@@ -179,6 +179,44 @@
             "anchor": "D8"
           }
         ]
+      },
+      {
+        "id": "IN-13",
+        "text": "usecase 層の secondary port および aggregate service が返すエラーを `thiserror` 派生の typed error enum に統一する。`Result<_, String>` を廃止し、各 port／service のエラーバリアントを usecase 層内で定義する。infrastructure adapter は `map_err` チェーン経由で typed variant へ変換して boundary を越える。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-21-1328-cli-composition-split-presentation-layer.md",
+            "anchor": "D9"
+          }
+        ]
+      },
+      {
+        "id": "IN-14",
+        "text": "usecase secondary port コントラクトの新設・修正、および aggregate service の追加。新規 port（`SchemaExporterPort`、`ShellParserPort` など）と aggregate service（`TelemetryReportService` など）を usecase 層に定義する。secondary port の infrastructure adapter 実装は infrastructure 層に配置し、aggregate/application service の実装は usecase 層に置いて ports を注入される。port／service が返すエラーは IN-13 に準拠した typed error 型とする。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-21-1328-cli-composition-split-presentation-layer.md",
+            "anchor": "D2"
+          },
+          {
+            "file": "knowledge/adr/2026-06-21-1328-cli-composition-split-presentation-layer.md",
+            "anchor": "D4"
+          },
+          {
+            "file": "knowledge/adr/2026-06-21-1328-cli-composition-split-presentation-layer.md",
+            "anchor": "D9"
+          }
+        ]
+      },
+      {
+        "id": "IN-15",
+        "text": "infrastructure adapter 移設に伴う typed error enum の導入と free function シグネチャの変更。`DemoRunError`・`TrackBranchError`・`PersistentIndexLockError` 等の typed error enum を infrastructure 層に新設し、`git_cli` / `demo` の free function が `Result<_, TypedError>` を返すよう変更する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-21-1328-cli-composition-split-presentation-layer.md",
+            "anchor": "D9"
+          }
+        ]
       }
     ],
     "out_of_scope": [
@@ -489,7 +527,7 @@
     }
   ],
   "signals": {
-    "blue": 42,
+    "blue": 45,
     "yellow": 0,
     "red": 0
   }

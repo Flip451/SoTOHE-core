@@ -164,6 +164,11 @@ pub struct DryCheckApprovedInput {
 // code paths (which now use the persistent index via
 // `open_persistent_index_with_corpus`), so they are cfg(test) only.
 #[cfg(test)]
+#[derive(Debug, thiserror::Error)]
+#[error("{0}")]
+struct DryTestError(String);
+
+#[cfg(test)]
 fn ephemeral_index_parent(db_path: &Path, fallback_parent: &Path) -> PathBuf {
     match db_path.parent() {
         Some(parent) if !parent.as_os_str().is_empty() && parent.is_dir() => parent.to_path_buf(),
@@ -175,24 +180,27 @@ fn ephemeral_index_parent(db_path: &Path, fallback_parent: &Path) -> PathBuf {
 fn create_ephemeral_index_dir(
     db_path: &Path,
     fallback_parent: &Path,
-) -> Result<tempfile::TempDir, String> {
+) -> Result<tempfile::TempDir, DryTestError> {
     let parent = ephemeral_index_parent(db_path, fallback_parent);
     tempfile::Builder::new()
         .prefix("sotp-dry-index-")
         .tempdir_in(&parent)
-        .map_err(|e| format!("failed to create ephemeral index dir: {e}"))
+        .map_err(|e| DryTestError(format!("failed to create ephemeral index dir: {e}")))
 }
 
 #[cfg(test)]
 fn create_ephemeral_index_adapter(
     db_path: &Path,
     fallback_parent: &Path,
-) -> Result<(tempfile::TempDir, LanceDbSemanticIndexAdapter), String> {
+) -> Result<(tempfile::TempDir, LanceDbSemanticIndexAdapter), DryTestError> {
     let temp_index_dir = create_ephemeral_index_dir(db_path, fallback_parent)?;
     let ephemeral_db_path = temp_index_dir.path().to_path_buf();
     let index_adapter =
         LanceDbSemanticIndexAdapter::new(ephemeral_db_path.clone()).map_err(|e| {
-            format!("failed to open ephemeral index at {}: {e}", ephemeral_db_path.display())
+            DryTestError(format!(
+                "failed to open ephemeral index at {}: {e}",
+                ephemeral_db_path.display()
+            ))
         })?;
 
     Ok((temp_index_dir, index_adapter))
@@ -245,8 +253,7 @@ impl DryCompositionRoot {
         let canonical_root = root.canonicalize().map_err(|e| {
             CompositionError::AdapterInit(format!("failed to canonicalize repo root: {e}"))
         })?;
-        let track_id =
-            parse_dry_track_id(&input.track_id).map_err(CompositionError::WiringFailed)?;
+        let track_id = parse_dry_track_id(&input.track_id)?;
         let telemetry_writer =
             resolve_dry_write_telemetry_writer(&input.items_dir, track_id.as_ref());
         let dry_checker_config = if input.model.is_none() {
@@ -260,8 +267,7 @@ impl DryCompositionRoot {
 
         // Locate per-track directory.
         let items_dir_abs =
-            resolve_existing_dir_under_repo(&input.items_dir, &root, &canonical_root, "items_dir")
-                .map_err(CompositionError::WiringFailed)?;
+            resolve_existing_dir_under_repo(&input.items_dir, &root, &canonical_root, "items_dir")?;
         let track_dir = items_dir_abs.join(track_id.as_ref());
 
         let (fast_model, effective_model, fast_reasoning_effort, final_reasoning_effort) =
@@ -278,9 +284,11 @@ impl DryCompositionRoot {
         let dry_check_coverage_path = track_dir.join("dry-check-coverage.json");
 
         // Resolve diff base (fail-closed three-branch policy).
-        let base =
-            resolve_dry_diff_base(input.base_commit.as_deref(), &commit_hash_path, &canonical_root)
-                .map_err(CompositionError::WiringFailed)?;
+        let base = resolve_dry_diff_base(
+            input.base_commit.as_deref(),
+            &commit_hash_path,
+            &canonical_root,
+        )?;
 
         // Always load infra config for max_parallelism (D3 / T010); --threshold overrides its threshold.
         let config_path = root.join(".harness/config/dry-check.json");
@@ -303,13 +311,11 @@ impl DryCompositionRoot {
             &root,
             &canonical_root,
             "workspace_root",
-        )
-        .map_err(CompositionError::WiringFailed)?;
+        )?;
 
         // Build diff_fragments + corpus_fragments via shared hunk-scope pipeline.
         let (diff_fragments, corpus_fragments) =
-            build_diff_and_corpus_fragments(&base, &workspace_root, &canonical_root)
-                .map_err(CompositionError::Infrastructure)?;
+            build_diff_and_corpus_fragments(&base, &workspace_root, &canonical_root)?;
         let diff_fragments_processed = diff_fragments.len();
         let corpus_fingerprint = compute_dry_corpus_fingerprint_from_fragments(&corpus_fragments);
 
@@ -347,8 +353,7 @@ impl DryCompositionRoot {
             &input.db_path,
             corpus_fragments,
             embedding_port.as_ref(),
-        )
-        .map_err(CompositionError::Infrastructure)?;
+        )?;
 
         // Resolve the stored fingerprint using the safe-approval rule:
         // - If the effective threshold is stricter or equal to the file config threshold,
@@ -361,8 +366,7 @@ impl DryCompositionRoot {
 
         // D5: persist the corpus root beside coverage so pure-read approval paths
         // can recompute the same fragment-snapshot fingerprint.
-        write_dry_corpus_root_manifest(&track_dir, &workspace_root, &canonical_root)
-            .map_err(CompositionError::Infrastructure)?;
+        write_dry_corpus_root_manifest(&track_dir, &workspace_root, &canonical_root)?;
 
         let interactor = DryCheckInteractor::new(
             embedding_port,
@@ -456,20 +460,18 @@ impl DryCompositionRoot {
         let canonical_repo_root = root.canonicalize().map_err(|e| {
             CompositionError::AdapterInit(format!("failed to canonicalize repo root: {e}"))
         })?;
-        let track_id =
-            parse_dry_track_id(&input.track_id).map_err(CompositionError::WiringFailed)?;
+        let track_id = parse_dry_track_id(&input.track_id)?;
 
         let items_dir_abs = resolve_existing_dir_under_repo(
             &input.items_dir,
             &root,
             &canonical_repo_root,
             "items_dir",
-        )
-        .map_err(CompositionError::WiringFailed)?;
+        )?;
         let track_dir = items_dir_abs.join(track_id.as_ref());
         let dry_check_json_path = track_dir.join("dry-check.json");
 
-        let filter = parse_verdict_filter(&input.filter).map_err(CompositionError::WiringFailed)?;
+        let filter = parse_verdict_filter(&input.filter)?;
 
         let store = Arc::new(FsDryCheckStore::new(dry_check_json_path, canonical_repo_root));
         let interactor = DryCheckResultsInteractor::new(store);
@@ -540,8 +542,7 @@ impl DryCompositionRoot {
         let canonical_repo_root = root.canonicalize().map_err(|e| {
             CompositionError::AdapterInit(format!("failed to canonicalize repo root: {e}"))
         })?;
-        let track_id =
-            parse_dry_track_id(&input.track_id).map_err(CompositionError::WiringFailed)?;
+        let track_id = parse_dry_track_id(&input.track_id)?;
 
         // Validate items_dir containment before loading config so that security /
         // input-validation errors are always raised regardless of `enabled`.
@@ -550,8 +551,7 @@ impl DryCompositionRoot {
             &root,
             &canonical_repo_root,
             "items_dir",
-        )
-        .map_err(CompositionError::WiringFailed)?;
+        )?;
 
         // T006 CLI composition early-return: load config and short-circuit when
         // `enabled` is false — avoids all diff/corpus/embedding work.
@@ -581,8 +581,7 @@ impl DryCompositionRoot {
             input.base_commit.as_deref(),
             &commit_hash_path,
             &canonical_repo_root,
-        )
-        .map_err(CompositionError::WiringFailed)?;
+        )?;
 
         // D5 / IN-05 (T005): pure-read gate — diff fragments only.
         // Reuse the workspace root recorded by `dry write` so a scoped run
@@ -608,8 +607,7 @@ impl DryCompositionRoot {
                 }
             };
         let (diff_fragments, _corpus_fragments) =
-            build_diff_and_corpus_fragments(&base, &approval_workspace_root, &canonical_repo_root)
-                .map_err(CompositionError::Infrastructure)?;
+            build_diff_and_corpus_fragments(&base, &approval_workspace_root, &canonical_repo_root)?;
 
         let mut current_fragment_refs: BTreeSet<domain::dry_check::FragmentRef> = BTreeSet::new();
         for fragment in &diff_fragments {
@@ -839,7 +837,7 @@ mod tests {
 
         let result = resolve_dry_diff_base(Some("not-a-hash"), &commit_hash_path, &trusted_root);
         assert!(result.is_err(), "invalid override must return Err");
-        let msg = result.unwrap_err();
+        let msg = result.unwrap_err().to_string();
         assert!(msg.contains("--base-commit"), "error must mention --base-commit, got: {msg}");
     }
 
@@ -875,7 +873,8 @@ mod tests {
         // Key invariant: if git is available, result is Ok. If git fails, Err is OK.
         // What must NOT happen: a direct propagation of the Format error.
         let result = resolve_dry_diff_base(None, &commit_hash_path, &trusted_root);
-        if let Err(ref msg) = result {
+        if let Err(ref e) = result {
+            let msg = e.to_string();
             assert!(
                 !msg.contains("invalid commit hash"),
                 "Format error must be absorbed, not propagated. Got: {msg}"
@@ -1707,7 +1706,9 @@ exit 0
     ///
     /// The caller must hold `process_env_lock()` before calling this helper.
     #[cfg(unix)]
-    fn run_dry_fix_with_fake_codex(script: &str) -> Result<crate::CommandOutcome, String> {
+    fn run_dry_fix_with_fake_codex(
+        script: &str,
+    ) -> Result<crate::CommandOutcome, crate::error::CompositionError> {
         let dir = tempfile::tempdir().unwrap();
         let fake_codex = write_fake_codex_runner(dir.path(), script);
         let _codex_bin = EnvGuard::set("CODEX_BIN", fake_codex.as_os_str().to_os_string());
@@ -1795,7 +1796,7 @@ exit 0
 "#,
         );
 
-        let message = result.unwrap_err();
+        let message = result.unwrap_err().to_string();
         assert!(
             message.contains("no DRY_FIX_STATUS sentinel"),
             "missing sentinel must return a diagnostic error, got: {message}"
@@ -2857,7 +2858,7 @@ exit 0
         std::fs::create_dir_all(&index_dir).unwrap();
         std::fs::write(index_dir.join("user-data.txt"), b"must survive").unwrap();
 
-        let message = clear_persistent_index_dir(&index_dir).unwrap_err();
+        let message = clear_persistent_index_dir(&index_dir).unwrap_err().to_string();
 
         assert!(
             message.contains("refusing to clear unmarked semantic index directory"),
@@ -2888,7 +2889,7 @@ exit 0
         std::os::unix::fs::symlink(&spoof_marker, persistent_index_marker_path(&index_dir))
             .unwrap();
 
-        let message = clear_persistent_index_dir(&index_dir).unwrap_err();
+        let message = clear_persistent_index_dir(&index_dir).unwrap_err().to_string();
 
         assert!(
             message.contains("index cache marker") && message.contains("symlink"),
@@ -2909,7 +2910,7 @@ exit 0
         let marker = persistent_index_marker_path(&db_path);
         std::fs::create_dir_all(&marker).unwrap();
 
-        let message = write_persistent_index_marker(&db_path).unwrap_err();
+        let message = write_persistent_index_marker(&db_path).unwrap_err().to_string();
 
         assert!(
             message.contains("failed to write index cache marker"),
@@ -3100,7 +3101,7 @@ exit 0
 
         let message = match result {
             Ok(_) => panic!("unmarked existing index directory must fail closed"),
-            Err(message) => message,
+            Err(message) => message.to_string(),
         };
         assert!(
             message.contains("refusing to use unmarked semantic index directory"),
@@ -3187,7 +3188,7 @@ exit 0
         let result = open_persistent_index_with_corpus(&db_path, corpus, &embed);
 
         assert!(result.is_err(), "mismatched embedding count must fail");
-        let message = result.err().unwrap();
+        let message = result.err().unwrap().to_string();
         assert!(
             message.contains("full rebuild embed_batch returned 0 embeddings for 1 fragments")
                 || message.contains("0 embeddings"),

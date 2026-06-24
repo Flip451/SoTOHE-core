@@ -33,6 +33,14 @@ use crate::dry_check::shared::fragment_ref_of;
 
 // ── CodeFragmentExtractorPort ─────────────────────────────────────────────────
 
+/// Error returned by [`CodeFragmentExtractorPort::extract`].
+#[derive(Debug, thiserror::Error)]
+pub enum CodeFragmentExtractorError {
+    /// I/O or parse failure during code fragment extraction.
+    #[error("{0}")]
+    ExtractionFailed(String),
+}
+
 /// Secondary port for extracting code fragments from a workspace root.
 ///
 /// Abstracts `infrastructure::semantic_dup::extractor::extract_code_fragments`
@@ -42,8 +50,11 @@ pub trait CodeFragmentExtractorPort: Send + Sync {
     ///
     /// # Errors
     ///
-    /// Returns a `String` error description on I/O or parse failure.
-    fn extract(&self, workspace_root: &std::path::Path) -> Result<Vec<CodeFragment>, String>;
+    /// Returns [`CodeFragmentExtractorError`] on I/O or parse failure.
+    fn extract(
+        &self,
+        workspace_root: &std::path::Path,
+    ) -> Result<Vec<CodeFragment>, CodeFragmentExtractorError>;
 }
 
 // ── DryFragmentPipelineCommand ────────────────────────────────────────────────
@@ -248,7 +259,10 @@ mod tests {
     mock! {
         pub MockExtractor {}
         impl CodeFragmentExtractorPort for MockExtractor {
-            fn extract(&self, workspace_root: &std::path::Path) -> Result<Vec<CodeFragment>, String>;
+            fn extract(
+                &self,
+                workspace_root: &std::path::Path,
+            ) -> Result<Vec<CodeFragment>, CodeFragmentExtractorError>;
         }
     }
 
@@ -423,7 +437,9 @@ mod tests {
         diff_source.expect_list_changed_hunks().times(1).returning(|_, _| Ok(vec![]));
 
         let mut extractor = MockMockExtractor::new();
-        extractor.expect_extract().times(1).returning(|_| Err("extraction failed".to_owned()));
+        extractor.expect_extract().times(1).returning(|_| {
+            Err(CodeFragmentExtractorError::ExtractionFailed("extraction failed".to_owned()))
+        });
 
         let interactor = make_interactor(diff_source, extractor);
         let cmd = DryFragmentPipelineCommand { canonical_root, repo_root, base };
