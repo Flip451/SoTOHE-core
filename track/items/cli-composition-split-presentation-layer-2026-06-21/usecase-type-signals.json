@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-24T10:43:32Z",
-  "declaration_hash": "674cc4dbefd98d3ba65c539c0f26a4c269a5139789fb15e12e7a9095ecf0cb17",
+  "generated_at": "2026-06-24T11:54:12Z",
+  "declaration_hash": "eee3b011adf89d8d723ba364e9af2c18d07f4fdf9cd8c884630e0cf3e0990edf",
   "signals": [
     {
       "type_name": "AdrChainRunnerPort",

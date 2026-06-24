@@ -3236,6 +3236,10 @@
             {
               "name": "output_path",
               "ty": "Option<std::path::PathBuf>"
+            },
+            {
+              "name": "pretty",
+              "ty": "bool"
             }
           ],
           "has_stripped_fields": false
@@ -3243,11 +3247,11 @@
       },
       "methods": [],
       "module_path": "export_schema",
-      "docs": "CQRS command for the schema export use case. Carries crate name and optional output file path; when output_path is Some, the interactor writes via FileWritePort instead of returning the JSON string.",
+      "docs": "CQRS command for the schema export use case extracted from cli into the usecase application service. Carries the inputs the CLI passes when invoking the service.",
       "spec_refs": [
         {
           "file": "track/items/cli-composition-split-presentation-layer-2026-06-21/spec.json",
-          "anchor": "IN-12"
+          "anchor": "IN-07"
         }
       ],
       "informal_grounds": []

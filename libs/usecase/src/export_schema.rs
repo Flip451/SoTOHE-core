@@ -55,6 +55,11 @@ pub struct ExportSchemaCommand {
     pub crate_name: String,
     /// When `Some`, write the JSON output to this path via [`FileWritePort`].
     pub output_path: Option<PathBuf>,
+    /// When `false`, compact the JSON before returning or writing. When
+    /// `true`, keep the exporter's native indented output. Defaults to
+    /// `false` (compact) so `sotp domain export-schema` produces compact
+    /// JSON unless `--pretty` is passed explicitly.
+    pub pretty: bool,
 }
 
 // ── ExportSchemaError ─────────────────────────────────────────────────────────
@@ -125,7 +130,7 @@ impl ExportSchemaInteractor {
 
 impl ExportSchemaService for ExportSchemaInteractor {
     fn export(&self, command: ExportSchemaCommand) -> Result<String, ExportSchemaError> {
-        let json = self.port.export_as_json(&command.crate_name).map_err(|e| {
+        let raw_json = self.port.export_as_json(&command.crate_name).map_err(|e| {
             // The `SchemaExporterPort` contract returns `SchemaExporterError::ExportFailed(msg)`.
             // Infrastructure adapters that perform a two-step operation
             // (export then JSON-serialize) prefix serialization failures with
@@ -139,6 +144,17 @@ impl ExportSchemaService for ExportSchemaInteractor {
                 ExportSchemaError::ExportFailed(msg)
             }
         })?;
+
+        // Apply compact/pretty transformation BEFORE deciding stdout vs. file,
+        // so `--output FILE` honors `--pretty=false` (compact) just like stdout.
+        let json = if command.pretty {
+            raw_json
+        } else {
+            let parsed: serde_json::Value = serde_json::from_str(&raw_json)
+                .map_err(|e| ExportSchemaError::SerializationFailed(e.to_string()))?;
+            serde_json::to_string(&parsed)
+                .map_err(|e| ExportSchemaError::SerializationFailed(e.to_string()))?
+        };
 
         if let Some(path) = command.output_path {
             self.file_port.write_atomic(&path, json.as_bytes())?;
@@ -198,7 +214,11 @@ mod tests {
         let port = Arc::new(OkPort { json: r#"{"types":[]}"#.to_owned() });
         let interactor = ExportSchemaInteractor::new(port, noop_file_port());
         let result = interactor
-            .export(ExportSchemaCommand { crate_name: "domain".to_owned(), output_path: None })
+            .export(ExportSchemaCommand {
+                crate_name: "domain".to_owned(),
+                output_path: None,
+                pretty: false,
+            })
             .unwrap();
         assert_eq!(result, r#"{"types":[]}"#);
     }
@@ -208,7 +228,11 @@ mod tests {
         let port = Arc::new(FailPort { message: "nightly not found".to_owned() });
         let interactor = ExportSchemaInteractor::new(port, noop_file_port());
         let err = interactor
-            .export(ExportSchemaCommand { crate_name: "domain".to_owned(), output_path: None })
+            .export(ExportSchemaCommand {
+                crate_name: "domain".to_owned(),
+                output_path: None,
+                pretty: false,
+            })
             .unwrap_err();
         assert!(matches!(err, ExportSchemaError::ExportFailed(_)));
     }
@@ -221,7 +245,11 @@ mod tests {
         });
         let interactor = ExportSchemaInteractor::new(port, noop_file_port());
         let err = interactor
-            .export(ExportSchemaCommand { crate_name: "domain".to_owned(), output_path: None })
+            .export(ExportSchemaCommand {
+                crate_name: "domain".to_owned(),
+                output_path: None,
+                pretty: false,
+            })
             .unwrap_err();
         assert!(matches!(err, ExportSchemaError::SerializationFailed(_)));
     }
@@ -250,6 +278,7 @@ mod tests {
             .export(ExportSchemaCommand {
                 crate_name: "domain".to_owned(),
                 output_path: Some(PathBuf::from("/tmp/schema.json")),
+                pretty: false,
             })
             .unwrap();
 

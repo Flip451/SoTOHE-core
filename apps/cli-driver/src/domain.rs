@@ -58,10 +58,14 @@ impl DomainDriver {
     fn domain_export_schema(&self, input: ExportSchemaInput) -> CommandOutcome {
         let output_path = input.output.clone();
 
-        let raw_json = match self
-            .export_schema_service
-            .export(ExportSchemaCommand { crate_name: input.crate_name, output_path: input.output })
-        {
+        // The service handles both the compact/pretty transformation and the
+        // optional file write so `--output FILE` honors `--pretty=false`
+        // (compact) identically to stdout output.
+        let json = match self.export_schema_service.export(ExportSchemaCommand {
+            crate_name: input.crate_name,
+            output_path: input.output,
+            pretty: input.pretty,
+        }) {
             Ok(json) => json,
             Err(e) => return CommandOutcome::failure(Some(e.to_string())),
         };
@@ -74,22 +78,6 @@ impl DomainDriver {
                 exit_code: 0,
             };
         }
-
-        // No output path: compact if not pretty, then print to stdout.
-        let json = if input.pretty {
-            raw_json
-        } else {
-            match serde_json::from_str::<serde_json::Value>(&raw_json)
-                .and_then(|v| serde_json::to_string(&v))
-            {
-                Ok(compact) => compact,
-                Err(e) => {
-                    return CommandOutcome::failure(Some(format!(
-                        "failed to compact schema JSON: {e}"
-                    )));
-                }
-            }
-        };
 
         CommandOutcome::success(Some(json))
     }

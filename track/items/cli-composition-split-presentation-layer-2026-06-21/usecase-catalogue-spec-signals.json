@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "674cc4dbefd98d3ba65c539c0f26a4c269a5139789fb15e12e7a9095ecf0cb17",
+  "catalogue_declaration_hash": "eee3b011adf89d8d723ba364e9af2c18d07f4fdf9cd8c884630e0cf3e0990edf",
   "signals": [
     {
       "type_name": "ArchInteractor",
@@ -135,7 +135,7 @@
     {
       "type_name": "ExportSchemaCommand",
       "signal": "blue",
-      "entry_hash": "cf95515f3072efeba958787f8ca34000ed52f0c81aa43a744751da24be61da8b"
+      "entry_hash": "36a0e12a56544fd945ef981388e3a1d2765701f154ce113d28bf13ab77ad6130"
     },
     {
       "type_name": "ExportSchemaError",

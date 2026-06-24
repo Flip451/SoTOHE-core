@@ -6569,6 +6569,38 @@
         "kind": "pass",
         "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
       }
+    },
+    {
+      "claim_hash": "03abf91907e71799fa06e02903bf9c0a00eed3639eb77b705a4066f5cd77b1d5",
+      "evidence_hash": "3fcc8acc89942c850edcccbf2ebcb945f635c105484678cd688c1c042dfa279c",
+      "verdict": {
+        "kind": "fail",
+        "reason": "New behavioral commitment: the claim defines a schema export command with crate_name, optional output_path, pretty/compact JSON behavior, and FileWritePort handling, but the evidence is about extracting emit_archived_track_subcommand infrastructure concerns for archived-track emission; it does not motivate a schema export use case or its output/pretty contract."
+      }
+    },
+    {
+      "claim_hash": "a7dc75d862223da1cc7da50eec18d1a5a19dde900ea321946c99bfc7a63fc17d",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "fail",
+        "reason": "New behavioral commitment: IN-07 only requires moving multi-step orchestration/integration logic to a usecase application service, but the catalogue entry adds schema-export-specific behavior for output_path, FileWritePort writing versus returning JSON, and pretty/compact formatting semantics that are not mentioned by or naturally derivable from this evidence."
+      }
+    },
+    {
+      "claim_hash": "36a0e12a56544fd945ef981388e3a1d2765701f154ce113d28bf13ab77ad6130",
+      "evidence_hash": "0408a3e8666e60b26d4c216c419d370047be76dfc538bab00af23886e0e3c65c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "multi-step オーケストレーション・統合ロジック（signal chain sequencing、diff-fragment pipeline、PR polling loop など）の usecase application service への移譲。"
+      }
+    },
+    {
+      "claim_hash": "f165dc87d690797bd3809fb754dad05adc0c0a04cc581b27601e167b68b32bc3",
+      "evidence_hash": "3fcc8acc89942c850edcccbf2ebcb945f635c105484678cd688c1c042dfa279c",
+      "verdict": {
+        "kind": "fail",
+        "reason": "New behavioral commitment / wrong reference: the evidence is about extracting `emit_archived_track_subcommand` into infrastructure adapters and wiring it through composition/driver, while the claim declares a CQRS command for a separate schema export use case with schema-export inputs. The evidence does not motivate that outward schema export responsibility."
+      }
     }
   ]
 }
