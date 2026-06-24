@@ -1,0 +1,53 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 overstates the benefit: `max_over_layers(ceil(layer_work / ceiling_for_layer))` is not guaranteed to be smaller than the per-task serial `N` rounds, and the later Negative section already says a single-layer feature can become the bottleneck. This should be phrased as a typical reduction, not a universal one.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-22-1327-feature-batch-default-inversion.md",
+              "line": 51,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9a15c4380edf6a1a6efb8b74ded095d09c32a465510b5942a4b70ac78b63c71e",
+          "at": "2026-06-24T17:31:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D5 says `/track:implement` already performs multi-task parallel implementation plus a single review and a single commit, but `implement.md` only covers implementation and task transitions. The review/commit steps belong to `/track:full-cycle` and `/track:commit`, so this rationale is built on the wrong command behavior.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/knowledge/adr/2026-06-22-1327-feature-batch-default-inversion.md",
+              "line": 61,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:8c864135abd77775aae8267bae735955e8333f59e5e1112ef0909c8c3ce662a3",
+          "at": "2026-06-24T17:35:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fac22fa392d666036af07238d12ce6ba54d8cfe613d27f37bf743bda47c08b4c",
+          "at": "2026-06-24T17:39:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fac22fa392d666036af07238d12ce6ba54d8cfe613d27f37bf743bda47c08b4c",
+          "at": "2026-06-24T17:41:57Z"
+        }
+      ]
+    }
+  }
+}
