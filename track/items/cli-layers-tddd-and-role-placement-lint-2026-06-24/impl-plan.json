@@ -34,7 +34,8 @@
     {
       "id": "T006",
       "description": "Baseline capture and CI gate. Capture rustdoc JSON baselines for cli, cli_composition, and cli_driver layers: run bin/sotp track baseline-capture (or the equivalent cargo make workflow) for each of the three layers now that tddd.enabled is true in architecture-rules.json. Handle the [[bin]] target edge case for cli: verify that the sotp signal calc-impl-catalog command can resolve the cli bin crate's rustdoc output and produce a signal. Fix any baseline-capture issues specific to [[bin]] targets. Run cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) and fix all remaining issues. sotp track lint must pass for all six active catalogues (domain, usecase, infrastructure, cli, cli_composition, cli_driver); the infrastructure catalogue includes the thin-bin refactor's CodexPlannerAdapter and must lint cleanly. Run sotp verify plan-artifact-refs as the final gate. Depends on T005 and T007-T013.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "9d72f770225961b3258d0cd4365b848db24d8fa6"
     },
     {
       "id": "T007",
@@ -75,7 +76,8 @@
     {
       "id": "T013",
       "description": "ApplicationService / Interactor pair for Planner (driver and composition layers) — after T007 and T012, update apps/cli-driver/src/plan.rs: introduce PlanDriver struct (PrimaryAdapter role) holding Arc<dyn PlannerService> with handle(PlanInput) -> CommandOutcome; PlanInput enum (Dto) with RunCodexLocal variant carrying model/timeout_seconds/briefing_file/prompt fields. Update apps/cli/src/commands/plan/codex_local.rs: strip application-level logic (prompt resolution, briefing-file existence check) so only clap args -> PlanInput conversion and dispatch to PlanCompositionRoot remain. Create apps/cli-composition/src/plan.rs: PlanCompositionRoot (CompositionRoot role) with new(runtime_dir) and plan_driver() wiring CodexPlannerAdapter -> PlannerInteractor -> PlanDriver. Remove or encapsulate any subprocess / I/O logic remaining in apps/cli-composition/src/ that was part of the pre-refactor plan flow. cargo make ci must pass after this task. Expected diff: ~150-280 lines across cli_driver/cli/cli_composition. Depends on T007 and T012.",
-      "status": "todo"
+      "status": "done",
+      "commit_hash": "9d72f770225961b3258d0cd4365b848db24d8fa6"
     }
   ],
   "plan": {
