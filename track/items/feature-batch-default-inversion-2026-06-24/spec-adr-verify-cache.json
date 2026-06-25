@@ -1,0 +1,285 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "1a753bbf1721089d828f6d5e3fc64542f14766322eb713872ae3ccc8402a8005",
+      "evidence_hash": "99c4547b8e46794361362c5aff11dbf8b4655b53d832ae7200d8d6909991b3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "full-cycle の既定を per-task 直列から **feature バッチ**へ反転する。1つの feature を構成するタスク群（例: domain → usecase → infrastructure と層ごとに分割した T001/T002/T003）を、依存に従った**実装順序**で同一 working tree に一括実装し、その間に commit を挟まない。commit は per-task ではなく、次のいずれかで切る: (a) feature の完了、または (b) 次に実装するタスクが、すでに差分のあるいずれかのレイヤーの累積差分を D3 の上限超過に至らせるとき"
+      }
+    },
+    {
+      "claim_hash": "7bf1bc53cfe931b37c8a3a383b2de0c600d99b770fcad53d8fb72ddcb7552483",
+      "evidence_hash": "99c4547b8e46794361362c5aff11dbf8b4655b53d832ae7200d8d6909991b3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「バッチ実装後、その差分に既存の `/track:review` を1回走らせる。差分が複数の scope（層）に跨る場合、それらが同時に埋まるので scope 独立の並列レビューがその並列度をフルに発揮する。新しいレビュー機構は作らない — 既存の review は scope 独立並列であり、必要なのは機構の追加ではなく『1 feature 分の差分をまとめて与え、ラウンドへの分断を避ける』ことだけである。」"
+      }
+    },
+    {
+      "claim_hash": "822b1a03934262d62fa1e33dcf32a6c33b921af65e15481f1cba2a48f5e2d5b4",
+      "evidence_hash": "99c4547b8e46794361362c5aff11dbf8b4655b53d832ae7200d8d6909991b3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "レビューは scope（層）独立で**並列**に走るので、O(N²) のコスト天井は **per-commit ではなく per-layer-scope** に課す。天井値はコードに焼き込まず、`.harness/config/review-scope.json` に設定する。"
+      }
+    },
+    {
+      "claim_hash": "bcf9e7f14a36533b5fbfb9736b51c8a6c9a885e7b35e4cdb7420dd3ecf6a8ad7",
+      "evidence_hash": "99c4547b8e46794361362c5aff11dbf8b4655b53d832ae7200d8d6909991b3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "バッチは1 commit にまとめ、その commit hash をバッチ内の全タスクに同一 hash で記録する"
+      }
+    },
+    {
+      "claim_hash": "048991089531757af802e9a2325287083db129e7e308f1330e4b3e25460b4a66",
+      "evidence_hash": "99c4547b8e46794361362c5aff11dbf8b4655b53d832ae7200d8d6909991b3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "full-cycle の既定を per-task 直列から **feature バッチ**へ反転する。1つの feature を構成するタスク群を、依存に従った**実装順序**で同一 working tree に一括実装し、その間に commit を挟まない。commit は per-task ではなく、次のいずれかで切る: (a) feature の完了、または (b) 次に実装するタスクが、すでに差分のあるいずれかのレイヤーの累積差分を D3 の上限超過に至らせるとき"
+      }
+    },
+    {
+      "claim_hash": "6e12417eed7f08eed4216dfc94c85d95ac1cfd997d0fdc969bce3583a1963b4b",
+      "evidence_hash": "99c4547b8e46794361362c5aff11dbf8b4655b53d832ae7200d8d6909991b3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "full-cycle の既定を per-task 直列から **feature バッチ**へ反転する。... commit は per-task ではなく、次のいずれかで切る: (a) feature の完了、または (b) 次に実装するタスクが、すでに差分のあるいずれかのレイヤーの累積差分を D3 の上限超過に至らせるとき（その直前で現バッチを commit し、以降を新バッチに）。"
+      }
+    },
+    {
+      "claim_hash": "2bd1ef41a1f577fd58432a06cbbb4930571be8fb8a21502b471ce1e05a0f544c",
+      "evidence_hash": "99c4547b8e46794361362c5aff11dbf8b4655b53d832ae7200d8d6909991b3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「バッチ実装後、その差分に既存の `/track:review` を1回走らせる。」「新しいレビュー機構は作らない」"
+      }
+    },
+    {
+      "claim_hash": "14037943fc6ac2a7f1e0e3f34c608fe5416e22fffe6b348ce27a9c4fc8e1d82b",
+      "evidence_hash": "99c4547b8e46794361362c5aff11dbf8b4655b53d832ae7200d8d6909991b3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「天井値はコードに焼き込まず、`.harness/config/review-scope.json` に設定する」…「planner はこの設定値を読んでバッチを sizing し、ある層の累積差分が天井を超える場合は、その層の作業を**計画段階で複数バッチに細分化**する」"
+      }
+    },
+    {
+      "claim_hash": "3c1f29d2091bcdff148d280fc13b0fb87e9fccb773756437feb56bdfebd333c6",
+      "evidence_hash": "99c4547b8e46794361362c5aff11dbf8b4655b53d832ae7200d8d6909991b3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`.harness/config/review-scope.json` に設定する」および「グローバル既定（目安 ~500 行）を持ちつつ、scope（層）ごとに上書き可能とする」"
+      }
+    },
+    {
+      "claim_hash": "3c777ac88d025031b7237913eac6ae77cee6ae84d596b13852d6a52a0ecaafed",
+      "evidence_hash": "99c4547b8e46794361362c5aff11dbf8b4655b53d832ae7200d8d6909991b3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "バッチは1 commitにまとめ、そのcommit hashをバッチ内の全タスクに**同一 hash**で記録する（`bin/sotp track transition <id> done --commit-hash <hash>` を各タスクに適用）。`TaskStatus::Done` は commit_hash を所有すれば足り、hash の unique 制約は無い（確認済み）。"
+      }
+    },
+    {
+      "claim_hash": "b456051c2946eb5af811a05811d2b51511519672cf16b0c87ea12cf14df3469a",
+      "evidence_hash": "99c4547b8e46794361362c5aff11dbf8b4655b53d832ae7200d8d6909991b3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- 変更面は `full-cycle.md` のループ構造（`:28/:37/:53/:58`）、`adr2pr.md:41` の既定反転、`review-scope.json` からの天井設定読み出し、および D4 の hash 記録。\n- 典型の単一 feature では **schema 追加も `layer`/`feature` タグも新スケジューラも不要**。"
+      }
+    },
+    {
+      "claim_hash": "6c8c2ff5acbebde766a64853854d63c46833654d4ebedd1f3090a6c801fc5dd5",
+      "evidence_hash": "99c4547b8e46794361362c5aff11dbf8b4655b53d832ae7200d8d6909991b3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "1トラックに複数の独立 feature が同居する場合のバッチ境界 grouping は本 ADR の対象外（将来課題、Reassess 参照）。\n- 典型の単一 feature では **schema 追加も `layer`/`feature` タグも新スケジューラも不要**。"
+      }
+    },
+    {
+      "claim_hash": "72a82c2091ac25fba877f0cd9207898e41fabfb94513afbd5348adde095653a2",
+      "evidence_hash": "99c4547b8e46794361362c5aff11dbf8b4655b53d832ae7200d8d6909991b3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「新しいレビュー機構は作らない」 / 「既存の /track:review を1回走らせる」"
+      }
+    },
+    {
+      "claim_hash": "213f3d1059e473340e46cd2be4a1c65e1872d035bed1ee8527309872d29dc438",
+      "evidence_hash": "99c4547b8e46794361362c5aff11dbf8b4655b53d832ae7200d8d6909991b3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実装面は既存資産の再利用と既定反転に限定する: ... 典型の単一 feature では **schema 追加も `layer`/`feature` タグも新スケジューラも不要**。"
+      }
+    },
+    {
+      "claim_hash": "47c9e32fd596492dbe74d3fb2537b107ef7fa2ea2b8abe3ba363a0afd103c4e8",
+      "evidence_hash": "99c4547b8e46794361362c5aff11dbf8b4655b53d832ae7200d8d6909991b3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "full-cycle の既定を per-task 直列から **feature バッチ**へ反転する。1つの feature を構成するタスク群（例: domain → usecase → infrastructure と層ごとに分割した T001/T002/T003）を、依存に従った**実装順序**で同一 working tree に一括実装し、その間に commit を挟まない。commit は per-task ではなく、次のいずれかで切る: (a) feature の完了, または (b) 次に実装するタスクが、すでに差分のあるいずれかのレイヤーの累積差分を D3 の上限超過に至らせるとき"
+      }
+    },
+    {
+      "claim_hash": "172167e30ac8d0c57ed93546a87dcdf0f3f2e329d67e722ec3a9a8247895efe9",
+      "evidence_hash": "99c4547b8e46794361362c5aff11dbf8b4655b53d832ae7200d8d6909991b3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "必要なのは `/track:full-cycle` がこれら既存コマンドを per-task ではなく feature バッチ単位で1回ずつ呼ぶようにすることだけで、**空回りを止めるだけ**で機構は足りる。"
+      }
+    },
+    {
+      "claim_hash": "3977b4b779b7589deea3eee129d10f708f3270715bb67ab33d7d78708e82a0ba",
+      "evidence_hash": "99c4547b8e46794361362c5aff11dbf8b4655b53d832ae7200d8d6909991b3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "次に実装するタスクが、すでに差分のあるいずれかのレイヤーの累積差分を D3 の上限超過に至らせるとき（その直前で現バッチを commit し、以降を新バッチに）。あるレイヤーが上限に達しても、控えているタスクが別レイヤーならそのレイヤーの累積は増えないので、継ぎ足しを続けてよい。"
+      }
+    },
+    {
+      "claim_hash": "3977b4b779b7589deea3eee129d10f708f3270715bb67ab33d7d78708e82a0ba",
+      "evidence_hash": "99c4547b8e46794361362c5aff11dbf8b4655b53d832ae7200d8d6909991b3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "O(N²) のコスト天井は **per-commit ではなく per-layer-scope** に課す。... ある層の累積差分が天井を超える場合は、その層の作業を**計画段階で複数バッチに細分化**する"
+      }
+    },
+    {
+      "claim_hash": "6aa582d75d314569c3c24948acbb352c0fb5f80bfc95cd527b79c8cb3ac48f53",
+      "evidence_hash": "99c4547b8e46794361362c5aff11dbf8b4655b53d832ae7200d8d6909991b3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「天井値はコードに焼き込まず、`.harness/config/review-scope.json` に設定する。グローバル既定（目安 ~500 行）を持ちつつ、scope（層）ごとに上書き可能とする。」"
+      }
+    },
+    {
+      "claim_hash": "96fc047752afd36c479b0952a132944a046b5b78c963c02d013e854f488d2167",
+      "evidence_hash": "99c4547b8e46794361362c5aff11dbf8b4655b53d832ae7200d8d6909991b3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "バッチは1 commit にまとめ、その commit hash をバッチ内の全タスクに**同一 hash**で記録する（`bin/sotp track transition <id> done --commit-hash <hash>` を各タスクに適用）。`TaskStatus::Done` は commit_hash を所有すれば足り、hash の unique 制約は無い（確認済み）。"
+      }
+    },
+    {
+      "claim_hash": "5d57c03349fc6a05bd5130b056332c2cc55e4de8e24b509e092605a44cf7314f",
+      "evidence_hash": "99c4547b8e46794361362c5aff11dbf8b4655b53d832ae7200d8d6909991b3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「必要なのは `/track:full-cycle` がこれら既存コマンドを per-task ではなく feature バッチ単位で1回ずつ呼ぶようにすることだけ」"
+      }
+    },
+    {
+      "claim_hash": "922d51453785a0884e135624bb85baeb186808d154d8d0cf2ad0dfdf14fb5ee6",
+      "evidence_hash": "99c4547b8e46794361362c5aff11dbf8b4655b53d832ae7200d8d6909991b3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "1つの feature を構成するタスク群（例: domain → usecase → infrastructure と層ごとに分割した T001/T002/T003）を、依存に従った**実装順序**で同一 working tree に一括実装し、その間に commit を挟まない。"
+      }
+    },
+    {
+      "claim_hash": "21c339cf3507faec960fd0c367254e0fb778d730366f5f3ceede82ed25b67be4",
+      "evidence_hash": "99c4547b8e46794361362c5aff11dbf8b4655b53d832ae7200d8d6909991b3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「1つの feature を構成するタスク群を、依存に従った実装順序で同一 working tree に一括実装し、その間に commit を挟まない。commit は per-task ではなく、次のいずれかで切る」"
+      }
+    },
+    {
+      "claim_hash": "ce87223bace0be191c22be6c033e97708f9925c4a07ad168a632c8a13192e159",
+      "evidence_hash": "99c4547b8e46794361362c5aff11dbf8b4655b53d832ae7200d8d6909991b3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "バッチ実装後、その差分に既存の `/track:review` を1回走らせる。差分が複数の scope（層）に跨る場合、それらが同時に埋まるので scope 独立の並列レビューがその並列度をフルに発揮する。**新しいレビュー機構は作らない** — 既存の review は scope 独立並列であり、必要なのは機構の追加ではなく「1 feature 分の差分をまとめて与え、ラウンドへの分断を避ける」ことだけである。"
+      }
+    },
+    {
+      "claim_hash": "f66f5d63f890bb7ea5ab63a4e5fbf5f9dcf01cc2b719228aee40c8a68bbf4e0e",
+      "evidence_hash": "99c4547b8e46794361362c5aff11dbf8b4655b53d832ae7200d8d6909991b3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「scope（層）独立で並列に走るので」および「ある層の累積差分が天井を超える場合は、その層の作業を計画段階で複数バッチに細分化」"
+      }
+    },
+    {
+      "claim_hash": "a63a976468717939561f6a973d9904f5b6db60f1db17163c18e757c756874750",
+      "evidence_hash": "99c4547b8e46794361362c5aff11dbf8b4655b53d832ae7200d8d6909991b3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「天井値はコードに焼き込まず、`.harness/config/review-scope.json` に設定する」「グローバル既定（目安 ~500 行）を持ちつつ、scope（層）ごとに上書き可能とする。」"
+      }
+    },
+    {
+      "claim_hash": "5b92da75aa7ae12ae584f5aa3cfb8aadaa397ecdc0058b91f5362c105ab92faf",
+      "evidence_hash": "99c4547b8e46794361362c5aff11dbf8b4655b53d832ae7200d8d6909991b3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "バッチは1 commit にまとめ、その commit hash をバッチ内の全タスクに**同一 hash**で記録する（`bin/sotp track transition <id> done --commit-hash <hash>` を各タスクに適用）。"
+      }
+    },
+    {
+      "claim_hash": "b14259581c22dda3ef4b80945b772605fbd4de4be896f54470a4fa6168163153",
+      "evidence_hash": "99c4547b8e46794361362c5aff11dbf8b4655b53d832ae7200d8d6909991b3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "full-cycle の既定を per-task 直列から **feature バッチ**へ反転する。"
+      }
+    },
+    {
+      "claim_hash": "e2d722cf753aa68d5c3c1b4de4ebcba92e9020e716236224076c0daa079a3802",
+      "evidence_hash": "99c4547b8e46794361362c5aff11dbf8b4655b53d832ae7200d8d6909991b3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "full-cycle の既定を per-task 直列から **feature バッチ**へ反転する。1つの feature を構成するタスク群（例: domain → usecase → infrastructure と層ごとに分割した T001/T002/T003）を、依存に従った**実装順序**で同一 working tree に一括実装し、その間に commit を挟まない。commit は per-task ではなく"
+      }
+    },
+    {
+      "claim_hash": "e2d722cf753aa68d5c3c1b4de4ebcba92e9020e716236224076c0daa079a3802",
+      "evidence_hash": "99c4547b8e46794361362c5aff11dbf8b4655b53d832ae7200d8d6909991b3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「バッチ実装後、その差分に既存の `/track:review` を1回走らせる。差分が複数の scope（層）に跨る場合、それらが同時に埋まるので scope 独立の並列レビューがその並列度をフルに発揮する。**新しいレビュー機構は作らない** — 既存の review は scope 独立並列であり、必要なのは機構の追加ではなく「1 feature 分の差分をまとめて与え、ラウンドへの分断を避ける」ことだけである。"
+      }
+    },
+    {
+      "claim_hash": "80eefec914f633a09079682f11e81d0ca58f3dd8d04c42159497783f7ecc2042",
+      "evidence_hash": "99c4547b8e46794361362c5aff11dbf8b4655b53d832ae7200d8d6909991b3cc",
+      "verdict": {
+        "kind": "fail",
+        "reason": "Contradiction: the claim says the change set is closed to three items, but the evidence explicitly includes an additional change area, “D4 の hash 記録,” alongside the full-cycle loop, adr2pr default inversion, and review-scope ceiling readout."
+      }
+    },
+    {
+      "claim_hash": "ffd8540af9849b78dd2a72011e867a6bb53249a4551bd22a4babc5d88cd5c6f5",
+      "evidence_hash": "99c4547b8e46794361362c5aff11dbf8b4655b53d832ae7200d8d6909991b3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "変更面は `full-cycle.md` のループ構造（`:28/:37/:53/:58`）、`adr2pr.md:41` の既定反転、`review-scope.json` からの天井設定読み出し、および D4 の hash 記録。\n- 典型の単一 feature では **schema 追加も `layer`/`feature` タグも新スケジューラも不要**。"
+      }
+    },
+    {
+      "claim_hash": "5165065d08e7a7a830965d8b13e466fea0bcb0378f421dddb2c40e64fe75b929",
+      "evidence_hash": "99c4547b8e46794361362c5aff11dbf8b4655b53d832ae7200d8d6909991b3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "full-cycle の既定を per-task 直列から **feature バッチ**へ反転する。1つの feature を構成するタスク群（例: domain → usecase → infrastructure と層ごとに分割した T001/T002/T003）を、依存に従った**実装順序**で同一 working tree に一括実装し、その間に commit を挟まない。commit は per-task ではなく、次のいずれかで切る: (a) feature の完了、または (b) 次に実装するタスクが、すでに差分のあるいずれかのレイヤーの累積差分を D3 の上限超過に至らせるとき"
+      }
+    },
+    {
+      "claim_hash": "42b4a908f26a27bd39a0ecd982ef5e76c058a6d306753693aea359cf1c82ef45",
+      "evidence_hash": "99c4547b8e46794361362c5aff11dbf8b4655b53d832ae7200d8d6909991b3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "full-cycle の既定を per-task 直列から **feature バッチ**へ反転する。1つの feature を構成するタスク群...を、依存に従った**実装順序**で同一 working tree に一括実装し、その間に commit を挟まない。commit は per-task ではなく、次のいずれかで切る: (a) feature の完了、または (b) 次に実装するタスクが、すでに差分のあるいずれかのレイヤーの累積差分を D3 の上限超過に至らせるとき"
+      }
+    },
+    {
+      "claim_hash": "dc60f2d9569842de2cbf55590cc8e8c58a56b0490db0d5a38251978f52713061",
+      "evidence_hash": "99c4547b8e46794361362c5aff11dbf8b4655b53d832ae7200d8d6909991b3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「review-scope.json は既に per-group（層）設定を持つので、per-scope 天井の自然な置き場所になる。グローバル既定（目安 ~500 行）を持ちつつ、scope（層）ごとに上書き可能とする。planner はこの設定値を読んでバッチを sizing し、ある層の累積差分が天井を超える場合は、その層の作業を計画段階で複数バッチに細分化する」"
+      }
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "layer": "infrastructure",
+  "entries": [
+    {
+      "claim_hash": "4039e1074984100062994ab1f807d43f90ee68bc3f238e82bfb2cf0183a7eeb7",
+      "evidence_hash": "3c1f29d2091bcdff148d280fc13b0fb87e9fccb773756437feb56bdfebd333c6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "グローバル既定（目安 ~500 行）を持ちつつ、scope（層）ごとに上書き可能とする。設定フォーマットは既存の per-group 設定に追記する形とし、新しい設定ファイルは作らない。"
+      }
+    },
+    {
+      "claim_hash": "4039e1074984100062994ab1f807d43f90ee68bc3f238e82bfb2cf0183a7eeb7",
+      "evidence_hash": "6aa582d75d314569c3c24948acbb352c0fb5f80bfc95cd527b79c8cb3ac48f53",
+      "verdict": {
+        "kind": "pass",
+        "citation": "review コスト天井は `.harness/config/review-scope.json` から注入する。コードに直接焼き込まない。グローバル既定を持ちつつ scope（層）ごとに上書き可能とし、プロジェクト・層ごとのチューニングはコード変更なしで設定ファイルの更新のみで行える。"
+      }
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-06-25T01:20:59Z",
+  "declaration_hash": "862ad6e5cae77c98c971293e7f4c72f267adf46bfa732e40988895f75e9d3b4c",
+  "signals": [
+    {
+      "type_name": "infrastructure::review_v2::scope_config_loader::load_v2_scope_config",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

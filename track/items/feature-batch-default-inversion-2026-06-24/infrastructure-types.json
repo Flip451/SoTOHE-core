@@ -1,0 +1,30 @@
+{
+  "schema_version": 5,
+  "crate_name": "infrastructure",
+  "layer": "infrastructure",
+  "types": {},
+  "traits": {},
+  "functions": {
+    "infrastructure::review_v2::scope_config_loader::load_v2_scope_config": {
+      "action": "modify",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "review_scope_path", "ty": "&std::path::Path" },
+        { "name": "track_id", "ty": "&domain::TrackId" },
+        { "name": "trusted_root", "ty": "&std::path::Path" }
+      ],
+      "returns": "Result<domain::review_v2::ReviewScopeConfig, ScopeConfigLoadError>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Loads review-scope.json into a v2 ReviewScopeConfig. After this track: reads the new optional `default_diff_ceiling_lines: Option<u32>` top-level field and per-group optional `diff_ceiling_lines: Option<u32>` from the JSON DTO, then passes both to `ReviewScopeConfig::new` as the `default_diff_ceiling` parameter and per-entry ceiling element. The public function signature is unchanged; the new ceiling data is extracted from the JSON DTO internally (D3 / IN-05 / CN-02).",
+      "spec_refs": [
+        { "file": "track/items/feature-batch-default-inversion-2026-06-24/spec.json", "anchor": "IN-05" },
+        { "file": "track/items/feature-batch-default-inversion-2026-06-24/spec.json", "anchor": "CN-02" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "inherent_impls": [],
+  "trait_impls": []
+}

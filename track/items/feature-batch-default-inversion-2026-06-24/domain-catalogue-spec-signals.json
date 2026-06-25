@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "04b6d4037f7849b75c47dc09204c0da4e68c194939c8f0913133ff33d000f0d8",
+  "signals": [
+    {
+      "type_name": "ReviewScopeConfig",
+      "signal": "blue",
+      "entry_hash": "19d82a2da231b11758c1dfb888382d72b31a11689a2604e7290e33dd4abeaef3"
+    }
+  ]
+}

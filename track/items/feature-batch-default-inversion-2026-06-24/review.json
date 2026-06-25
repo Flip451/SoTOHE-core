@@ -46,6 +46,83 @@
           "findings": [],
           "hash": "rvw1:sha256:fac22fa392d666036af07238d12ce6ba54d8cfe613d27f37bf743bda47c08b4c",
           "at": "2026-06-24T17:41:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ca0d6a6f1fc5b8989067b9cb8c910950f9096e8de5220788fcd82fa393f173ab",
+          "at": "2026-06-25T00:58:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-01 says the batch commits as soon as any layer's cumulative diff reaches the per-scope ceiling, but CN-01/AC-03 later say a layer may be at the ceiling and still continue adding tasks from other layers; the split is only required when the next task would make some layer exceed its ceiling. This leaves the plan with conflicting batch-boundary semantics and can make T005 implement an unnecessarily early split, reducing the intended round aggregation.",
+              "severity": "P1",
+              "file": "track/items/feature-batch-default-inversion-2026-06-24/spec.json",
+              "line": 51,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ca0d6a6f1fc5b8989067b9cb8c910950f9096e8de5220788fcd82fa393f173ab",
+          "at": "2026-06-25T01:03:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-04 requires the ceiling values to be adjustable by changing `.harness/config/review-scope.json` only, but its coverage maps solely to T002, which only adds/configures the JSON fields. The runtime pieces that make the setting effective are T003 (`ReviewScopeConfig` stores/returns the effective ceiling) and T004 (loader reads the JSON fields), so the coverage/rendered task list lets AC-04 be considered satisfied without the loader/domain support that the acceptance criterion itself requires.",
+              "severity": "P1",
+              "file": "track/items/feature-batch-default-inversion-2026-06-24/task-coverage.json",
+              "line": 30,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:096b1b64774c568730c9abd031a0c45fe576b06d8d3be3eadc0f785cbdfd198a",
+          "at": "2026-06-25T01:09:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`diff_ceiling_for_scope` is documented as returning the global default whenever a scope has no per-scope override, but T003 also requires `ScopeName::Other` to always return `None`. With `default_diff_ceiling` set, those two contracts conflict, so the implementation and tests for `Other` cannot satisfy both artifacts. Clarify whether the global default applies only to configured review scopes or whether `Other` should inherit it.",
+              "severity": "P1",
+              "file": "track/items/feature-batch-default-inversion-2026-06-24/domain-types.json",
+              "line": 109,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:7320f83ad0bf4e76f9721b2cb0a1f098946a6975edf685f90d1f39b2d0d32ea3",
+          "at": "2026-06-25T01:13:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fc7cf96d000b73db44e1ae5f29f52a2c4c1311827e3c1f8ed3e62371bc28ebf3",
+          "at": "2026-06-25T01:18:26Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:60d17ddfd2660f05f41e81d0fb1bc149752010f2763bc0e76c773f661c2e4e2f",
+          "at": "2026-06-25T00:53:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:60d17ddfd2660f05f41e81d0fb1bc149752010f2763bc0e76c773f661c2e4e2f",
+          "at": "2026-06-25T00:56:18Z"
         }
       ]
     }

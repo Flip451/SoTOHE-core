@@ -38,7 +38,6 @@ fn record_instant_once(slot: &Mutex<Option<Instant>>) {
 /// This type is `pub` for use by `cli_composition` callers; it is not part of
 /// the infrastructure crate's public API contract and is excluded from the TDDD
 /// catalogue.
-#[doc(hidden)]
 #[derive(Clone)]
 pub struct DryAgentRunRecorder {
     completed: Arc<AtomicBool>,
@@ -123,7 +122,6 @@ impl Default for DryAgentRunRecorder {
 /// This type is `pub` for use by `cli_composition` callers; it is not part of
 /// the infrastructure crate's public API contract and is excluded from the TDDD
 /// catalogue.
-#[doc(hidden)]
 pub struct TieredDryAgentRecorder {
     pub fast: DryAgentRunRecorder,
     pub final_: DryAgentRunRecorder,

@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "layer": "domain",
+  "entries": [
+    {
+      "claim_hash": "d35301220029a6e3211a234cd8f07f6787df18a5a8580b701f111dbb34f60105",
+      "evidence_hash": "14037943fc6ac2a7f1e0e3f34c608fe5416e22fffe6b348ce27a9c4fc8e1d82b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`/track:full-cycle` が `.harness/config/review-scope.json` の per-scope 天井設定を読み取り、次に実装するタスクを追加したときにいずれかのレイヤーの累積差分が天井に達するか否かを判定するバッチ sizing ロジックを組み込む。天井未達なら継ぎ足しを継続し、天井超過が不可避になった時点で現バッチを commit して新バッチを開始する。"
+      }
+    },
+    {
+      "claim_hash": "d35301220029a6e3211a234cd8f07f6787df18a5a8580b701f111dbb34f60105",
+      "evidence_hash": "3c1f29d2091bcdff148d280fc13b0fb87e9fccb773756437feb56bdfebd333c6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/config/review-scope.json` に per-scope の diff 天井値フィールドを追加できるよう拡張する。グローバル既定（目安 ~500 行）を持ちつつ、scope（層）ごとに上書き可能とする。設定フォーマットは既存の per-group 設定に追記する形とし、新しい設定ファイルは作らない。`"
+      }
+    },
+    {
+      "claim_hash": "d35301220029a6e3211a234cd8f07f6787df18a5a8580b701f111dbb34f60105",
+      "evidence_hash": "6aa582d75d314569c3c24948acbb352c0fb5f80bfc95cd527b79c8cb3ac48f53",
+      "verdict": {
+        "kind": "pass",
+        "citation": "review コスト天井は `.harness/config/review-scope.json` から注入する。コードに直接焼き込まない。グローバル既定を持ちつつ scope（層）ごとに上書き可能とし、プロジェクト・層ごとのチューニングはコード変更なしで設定ファイルの更新のみで行える。"
+      }
+    },
+    {
+      "claim_hash": "19d82a2da231b11758c1dfb888382d72b31a11689a2604e7290e33dd4abeaef3",
+      "evidence_hash": "dc60f2d9569842de2cbf55590cc8e8c58a56b0490db0d5a38251978f52713061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`/track:full-cycle` が `.harness/config/review-scope.json` の per-scope 天井設定を読み取り、次に実装するタスクを追加したときにいずれかのレイヤーの累積差分が天井を超過するか否かを判定するバッチ sizing ロジックを組み込む。天井未達なら継ぎ足しを継続し、天井超過が不可避になった時点で現バッチを commit して新バッチを開始する。"
+      }
+    },
+    {
+      "claim_hash": "19d82a2da231b11758c1dfb888382d72b31a11689a2604e7290e33dd4abeaef3",
+      "evidence_hash": "3c1f29d2091bcdff148d280fc13b0fb87e9fccb773756437feb56bdfebd333c6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/config/review-scope.json` に per-scope の diff 天井値フィールドを追加できるよう拡張する。グローバル既定（目安 ~500 行）を持ちつつ、scope（層）ごとに上書き可能とする。設定フォーマットは既存の per-group 設定に追記する形とし、新しい設定ファイルは作らない。"
+      }
+    },
+    {
+      "claim_hash": "19d82a2da231b11758c1dfb888382d72b31a11689a2604e7290e33dd4abeaef3",
+      "evidence_hash": "6aa582d75d314569c3c24948acbb352c0fb5f80bfc95cd527b79c8cb3ac48f53",
+      "verdict": {
+        "kind": "pass",
+        "citation": "review コスト天井は `.harness/config/review-scope.json` から注入する。コードに直接焼き込まない。グローバル既定を持ちつつ scope（層）ごとに上書き可能とし、プロジェクト・層ごとのチューニングはコード変更なしで設定ファイルの更新のみで行える。"
+      }
+    }
+  ]
+}
