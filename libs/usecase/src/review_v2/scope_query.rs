@@ -346,11 +346,12 @@ mod tests {
         ReviewScopeConfig::new(
             &track_id(),
             vec![
-                ("domain".to_owned(), vec!["libs/domain/**".to_owned()], None),
-                ("usecase".to_owned(), vec!["libs/usecase/**".to_owned()], None),
+                ("domain".to_owned(), vec!["libs/domain/**".to_owned()], None, None),
+                ("usecase".to_owned(), vec!["libs/usecase/**".to_owned()], None, None),
             ],
             vec!["track/**".to_owned()],
             vec![],
+            None,
         )
         .unwrap()
     }
@@ -502,11 +503,12 @@ mod tests {
         let cfg = ReviewScopeConfig::new(
             &track_id(),
             vec![
-                ("alpha".to_owned(), vec!["shared/**".to_owned()], None),
-                ("beta".to_owned(), vec!["shared/**".to_owned()], None),
+                ("alpha".to_owned(), vec!["shared/**".to_owned()], None, None),
+                ("beta".to_owned(), vec!["shared/**".to_owned()], None, None),
             ],
             vec![],
             vec![],
+            None,
         )
         .unwrap();
         let interactor = ScopeQueryInteractor::new(cfg, MockDiffGetter::new(&[]), base_commit());

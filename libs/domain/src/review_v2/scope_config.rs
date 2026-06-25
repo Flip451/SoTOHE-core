@@ -23,18 +23,28 @@ pub struct ReviewScopeConfig {
     /// Used to post-filter: a path matches other_track only if it does NOT
     /// start with this prefix.
     current_track_prefix: String,
+    /// Global default for per-scope diff ceiling (lines), used by
+    /// [`Self::diff_ceiling_for_scope`] when a configured scope has no per-scope
+    /// override. `None` means no global default — scopes without an override
+    /// return `None` (unconstrained).
+    default_diff_ceiling: Option<u32>,
 }
 
-/// One named scope's classification matchers and optional briefing file.
+/// One named scope's classification matchers, optional briefing file, and
+/// optional per-scope diff ceiling override.
 ///
 /// Crate-private. Access the briefing path externally via
-/// [`ReviewScopeConfig::briefing_file_for_scope`].
+/// [`ReviewScopeConfig::briefing_file_for_scope`] and the effective ceiling via
+/// [`ReviewScopeConfig::diff_ceiling_for_scope`].
 #[derive(Debug)]
 struct ScopeEntry {
     matchers: Vec<GlobMatcher>,
     /// Workspace-relative path to a scope-specific briefing markdown file.
     /// `None` means no scope-specific briefing (the reviewer uses the main briefing only).
     briefing_file: Option<String>,
+    /// Per-scope override for diff ceiling (lines). `None` means inherit the
+    /// global default (`ReviewScopeConfig::default_diff_ceiling`).
+    diff_ceiling: Option<u32>,
 }
 
 impl ReviewScopeConfig {
@@ -45,23 +55,33 @@ impl ReviewScopeConfig {
     /// `<other-track>` is expanded to `*` (broad wildcard); post-filtered to
     /// exclude the current track.
     ///
-    /// Each entry in `entries` is `(name, patterns, briefing_file)`; the
-    /// optional `briefing_file` is a workspace-relative path to a
-    /// scope-specific severity policy markdown file. The loader does not
-    /// read the file — it is fetched by the reviewer's own Read tool at
-    /// review time (ADR 2026-04-18-1354 §D4).
+    /// Each entry in `entries` is `(name, patterns, briefing_file, diff_ceiling)`.
+    /// `briefing_file` is a workspace-relative path to a scope-specific
+    /// severity policy markdown file; the loader does not read the file — it
+    /// is fetched by the reviewer's own Read tool at review time (ADR
+    /// 2026-04-18-1354 §D4). `diff_ceiling` is the optional per-scope batch
+    /// sizing ceiling (lines) used by [`Self::diff_ceiling_for_scope`]; `None`
+    /// means inherit `default_diff_ceiling`.
+    ///
+    /// `default_diff_ceiling` is the global fallback used when a configured
+    /// scope has no per-scope override. `None` means no global default (the
+    /// resulting `diff_ceiling_for_scope` is unconstrained for scopes without
+    /// an override). The implicit `ScopeName::Other` never inherits this
+    /// default (see `diff_ceiling_for_scope`).
     ///
     /// # Errors
     /// Returns `ScopeConfigError` on invalid scope names or glob patterns.
+    #[allow(clippy::type_complexity)] // entries tuple is the loader↔domain seam; a newtype would force a public schema migration disproportionate to its value here.
     pub fn new(
         track_id: &TrackId,
-        entries: Vec<(String, Vec<String>, Option<String>)>,
+        entries: Vec<(String, Vec<String>, Option<String>, Option<u32>)>,
         operational: Vec<String>,
         other_track: Vec<String>,
+        default_diff_ceiling: Option<u32>,
     ) -> Result<Self, ScopeConfigError> {
         // Build named scopes
         let mut scopes = HashMap::new();
-        for (name, patterns, briefing_file) in entries {
+        for (name, patterns, briefing_file, diff_ceiling) in entries {
             let scope_name = MainScopeName::new(name)?;
             let matchers = patterns
                 .iter()
@@ -73,7 +93,7 @@ impl ReviewScopeConfig {
                     })
                 })
                 .collect::<Result<Vec<_>, _>>()?;
-            scopes.insert(scope_name, ScopeEntry { matchers, briefing_file });
+            scopes.insert(scope_name, ScopeEntry { matchers, briefing_file, diff_ceiling });
         }
 
         // Compile operational matchers with placeholder expansion
@@ -100,7 +120,35 @@ impl ReviewScopeConfig {
 
         let current_track_prefix = format!("track/items/{}/", track_id.as_ref());
 
-        Ok(Self { scopes, operational, other_track_matchers, current_track_prefix })
+        Ok(Self {
+            scopes,
+            operational,
+            other_track_matchers,
+            current_track_prefix,
+            default_diff_ceiling,
+        })
+    }
+
+    /// Returns the effective diff ceiling (lines) for the given scope.
+    ///
+    /// Returns the per-scope override if set; otherwise returns the global
+    /// default supplied to [`Self::new`]. Returns `None` if neither is
+    /// configured (unconstrained batch sizing for that scope).
+    ///
+    /// `ScopeName::Other` always returns `None`: the implicit Other scope is
+    /// not a configured review scope and cannot carry a per-scope ceiling, nor
+    /// does it inherit the global default. Callers that need a ceiling for
+    /// `Other` should treat its absence as "no ceiling applied" (D3 / IN-04 /
+    /// IN-05 / AC-03).
+    #[must_use]
+    pub fn diff_ceiling_for_scope(&self, scope: &ScopeName) -> Option<u32> {
+        match scope {
+            ScopeName::Other => None,
+            ScopeName::Main(name) => self
+                .scopes
+                .get(name)
+                .and_then(|entry| entry.diff_ceiling.or(self.default_diff_ceiling)),
+        }
     }
 
     /// Classifies files into scopes.

@@ -1,6 +1,107 @@
 {
   "schema_version": 2,
   "scopes": {
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5be831bf4b4227330ca2b537bc06aeafec08c963ddcbeda04199a6c3b39680f0",
+          "at": "2026-06-25T01:40:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5be831bf4b4227330ca2b537bc06aeafec08c963ddcbeda04199a6c3b39680f0",
+          "at": "2026-06-25T01:42:54Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:874b9f1ae1d319d07f649a5dfa9e6ebee6c158204a94f8051c31c41746e1d3fa",
+          "at": "2026-06-25T01:42:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:874b9f1ae1d319d07f649a5dfa9e6ebee6c158204a94f8051c31c41746e1d3fa",
+          "at": "2026-06-25T01:45:26Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:67536beebb00bcdc2861108af26f0d6a9113da3f5c992e00484ccf9ac331a4ed",
+          "at": "2026-06-25T01:40:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:67536beebb00bcdc2861108af26f0d6a9113da3f5c992e00484ccf9ac331a4ed",
+          "at": "2026-06-25T01:42:31Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:60d17ddfd2660f05f41e81d0fb1bc149752010f2763bc0e76c773f661c2e4e2f",
+          "at": "2026-06-25T00:53:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:60d17ddfd2660f05f41e81d0fb1bc149752010f2763bc0e76c773f661c2e4e2f",
+          "at": "2026-06-25T00:56:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`briefing_file` is only checked for symlinks after `trusted_root.join(briefing)`, but the joined path is never validated to stay under `trusted_root`. A config value like `../outside.md` or `/etc/passwd` can therefore bypass this loader-level boundary check even when no symlink is present. This should fail closed using the same absolute/`..` containment rules as `is_safe_briefing_path` and the CN-04 trusted-root pattern.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/review_v2/scope_config_loader.rs",
+              "line": 149,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:802af23742be1e5ec11621234e44b4ded9c4d5efb2eba822092d4f2d982f98cc",
+          "at": "2026-06-25T01:42:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:706b0f5eccfa886de2d2bad9319ac6249dd1f3e69cc8940ace744c23eb511d4b",
+          "at": "2026-06-25T01:52:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:706b0f5eccfa886de2d2bad9319ac6249dd1f3e69cc8940ace744c23eb511d4b",
+          "at": "2026-06-25T01:55:34Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -105,24 +206,53 @@
           "findings": [],
           "hash": "rvw1:sha256:fc7cf96d000b73db44e1ae5f29f52a2c4c1311827e3c1f8ed3e62371bc28ebf3",
           "at": "2026-06-25T01:18:26Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "S2 still says `T001-T004` are in the same commit, but S1 already marks `T001` as done with commit hash `5c159af139735232dc538b54b8fd886c34702fc1`. That makes the Batch A grouping internally inconsistent: T001 is no longer part of the same implementation commit as T002-T004.",
+              "severity": "P1",
+              "file": "track/items/feature-batch-default-inversion-2026-06-24/impl-plan.json",
+              "line": 62,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:7464260f72373c4dd91d3c511cd5b98915801c72017bdb5c8b35ad576e866cd4",
+          "at": "2026-06-25T01:43:38Z"
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:60d17ddfd2660f05f41e81d0fb1bc149752010f2763bc0e76c773f661c2e4e2f",
-          "at": "2026-06-25T00:53:58Z"
+          "hash": "rvw1:sha256:d6c57ddb4e6870da85889ba846486c71e3ddc02b9b91eec7f5b0507ffa6f25e6",
+          "at": "2026-06-25T01:51:31Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:60d17ddfd2660f05f41e81d0fb1bc149752010f2763bc0e76c773f661c2e4e2f",
-          "at": "2026-06-25T00:56:18Z"
+          "hash": "rvw1:sha256:d6c57ddb4e6870da85889ba846486c71e3ddc02b9b91eec7f5b0507ffa6f25e6",
+          "at": "2026-06-25T01:55:17Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a8fab42e2c4853dc1297bb4ee08c6dd3717f4b6837882d59274e23b987ed0815",
+          "at": "2026-06-25T01:40:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a8fab42e2c4853dc1297bb4ee08c6dd3717f4b6837882d59274e23b987ed0815",
+          "at": "2026-06-25T01:43:10Z"
         }
       ]
     }
