@@ -1,126 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`tee_stderr_to_file` now lives in `apps/cli`, so the bin layer itself owns the Codex subprocess stderr tee and log-file write. That is direct application I/O outside the driver/composition boundary; this helper should stay behind `cli_composition`/`infrastructure` instead of being implemented in the CLI command module.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/plan/codex_local.rs",
-              "line": 247,
-              "category": "direct I/O in bin"
-            }
-          ],
-          "hash": "rvw1:sha256:bb2108532c0147822e678268302d3481db48b92c70bfceae0006a966f3740cb5",
-          "at": "2026-06-25T04:59:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`build_prompt` still performs a filesystem probe with `Path::is_file()` in bin-layer production code. That keeps application I/O in `apps/cli` instead of flowing through the driver/composition boundary, which violates the thin-bin contract for this scope.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/plan/codex_local.rs",
-              "line": 57,
-              "category": "direct I/O in bin"
-            }
-          ],
-          "hash": "rvw1:sha256:618d5be35b666653743368729e62a603548c0f16e024d338f3ad3e844ea95425",
-          "at": "2026-06-25T06:29:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:723da4c35adff49829239808c166392a3289b521dfd7975537a5a2c0722f21b2",
-          "at": "2026-06-25T06:37:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:723da4c35adff49829239808c166392a3289b521dfd7975537a5a2c0722f21b2",
-          "at": "2026-06-25T06:41:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`execute_codex_local` now builds the prompt with `resolve_prompt` instead of the validated `build_prompt` path, so production no longer checks that `--briefing-file` exists before launching the planner. A typoed briefing path will now proceed into Codex and fail later, which regresses the CLI's early validation behavior.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/plan/codex_local.rs",
-              "line": 24,
-              "category": "business logic in bin"
-            }
-          ],
-          "hash": "rvw1:sha256:d40ee0b9a22d13314bdf4fe5d8ab6c66ccfb5ddcb4c77de1f436185d456d96ad",
-          "at": "2026-06-25T07:49:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8e4cee10d3aa87564f0c49a84ab75b52125a966fca7db921112a44953208237a",
-          "at": "2026-06-25T07:57:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Removing `apps/cli/src/commands/plan/tests.rs` leaves the public `PlanCommand::execute` / `execute_codex_local` path with no CLI-layer coverage in this scope. The new wrapper still has user-visible branching (`--briefing-file` vs `--prompt`, file-existence validation) plus driver dispatch, so a regression here can now slip through undetected.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/plan/mod.rs",
-              "line": 46,
-              "category": "testing"
-            },
-            {
-              "message": "`ReviewCommand::CodexLocal` no longer has any tests that exercise `execute_codex_local` itself. `review/tests.rs` still covers helpers, but not the `CodexLocalArgs -> ReviewInput::RunCodex -> outcome emission` path, so regressions in the new thin dispatch would not be caught.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/review/codex_local.rs",
-              "line": 17,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:7ba7c48a739f7e5139f198e9c3ed48be0e9efa2ac2c746d8eeb6374d0d1b137c",
-          "at": "2026-06-25T11:30:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5cd36ceee84bf5a0294e33a3e9c34b4c0a4b6d8655929093e6b147c17f0d211c",
-          "at": "2026-06-25T11:44:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5cd36ceee84bf5a0294e33a3e9c34b4c0a4b6d8655929093e6b147c17f0d211c",
-          "at": "2026-06-25T11:50:16Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a1706e075c3a91637dcbaa3cb00a0c743e9cd8da1b2dcb2801cf41fccc03932d",
-          "at": "2026-06-25T20:30:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a1706e075c3a91637dcbaa3cb00a0c743e9cd8da1b2dcb2801cf41fccc03932d",
-          "at": "2026-06-25T20:33:30Z"
-        }
-      ]
-    },
     "cli_driver": {
       "rounds": [
         {
@@ -525,122 +405,35 @@
           "findings": [],
           "hash": "rvw1:sha256:e7e6f7d26817a303a5f7c375d4b99327af68604bcbae904d9071a1822d5f9004",
           "at": "2026-06-25T21:14:37Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ec1cc7545d6c620f9bcb712e2e9e0b5d406e958ce6972dddad23852bf485ad50",
-          "at": "2026-06-25T04:57:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ec1cc7545d6c620f9bcb712e2e9e0b5d406e958ce6972dddad23852bf485ad50",
-          "at": "2026-06-25T05:01:02Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a52ad321414e427bb5d7ff0401fa2c7c2d0ac4dd05d322496a12edfd8327543f",
-          "at": "2026-06-25T06:23:17Z"
+          "hash": "rvw1:sha256:9c61369bfdc4cf1f38e47c45b3921a1a84127174d00c851991ad2590aac2f908",
+          "at": "2026-06-25T21:32:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`allow_outside_workspace` is derived from `configured_dir.is_absolute()`, but the `cargo metadata target_directory` path passed into this helper is already absolutized by Cargo. That means a workspace config such as `target-dir = \"../outside\"` can arrive here as an absolute path outside the trusted root and be accepted, bypassing the intended CN-04 fail-closed relative-escape rejection. Preserve the original source/origin or keep metadata-derived paths confined unless they came from an explicitly absolute `CARGO_TARGET_DIR`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/schema_export/path_resolution.rs",
+              "line": 49,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:9c61369bfdc4cf1f38e47c45b3921a1a84127174d00c851991ad2590aac2f908",
+          "at": "2026-06-25T21:36:28Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a52ad321414e427bb5d7ff0401fa2c7c2d0ac4dd05d322496a12edfd8327543f",
-          "at": "2026-06-25T06:26:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:547f6f8112ebecfbde85550b6894f9ac8a3cfec48e34f42c8d589cb2c31b06a3",
-          "at": "2026-06-25T07:43:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:547f6f8112ebecfbde85550b6894f9ac8a3cfec48e34f42c8d589cb2c31b06a3",
-          "at": "2026-06-25T07:47:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5fba8627ce3c3208bae7aaa2d2853d7febde6ad55ae3a47dc1857da3aeb20ef6",
-          "at": "2026-06-25T18:46:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5fba8627ce3c3208bae7aaa2d2853d7febde6ad55ae3a47dc1857da3aeb20ef6",
-          "at": "2026-06-25T18:49:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fc8d528d26ea45259171d7c30a4e3ab46512f6e84a84e5e2e508d37238cda39c",
-          "at": "2026-06-25T18:58:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fc8d528d26ea45259171d7c30a4e3ab46512f6e84a84e5e2e508d37238cda39c",
-          "at": "2026-06-25T19:01:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:134ffb64f250f5c9053daa81d110e34cf6684eb36e8a55084b976342ccec7689",
-          "at": "2026-06-25T19:12:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:134ffb64f250f5c9053daa81d110e34cf6684eb36e8a55084b976342ccec7689",
-          "at": "2026-06-25T19:15:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:db01e8ae94821cbc0ba70b35adac89d4aa0201094e5c29e35a224b6e2fecde18",
-          "at": "2026-06-25T19:39:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:db01e8ae94821cbc0ba70b35adac89d4aa0201094e5c29e35a224b6e2fecde18",
-          "at": "2026-06-25T19:42:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:668f58c233581d2a8282599d4e6b6b1aae633d585361450c54528dfbb1d4edb9",
-          "at": "2026-06-25T20:29:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:668f58c233581d2a8282599d4e6b6b1aae633d585361450c54528dfbb1d4edb9",
-          "at": "2026-06-25T20:32:44Z"
+          "hash": "rvw1:sha256:6e020c8e9188401be0d68508c5ad5d945e51930f17c2f740bfc504529c3179d1",
+          "at": "2026-06-25T21:41:51Z"
         }
       ]
     },
@@ -892,53 +685,6 @@
           "findings": [],
           "hash": "rvw1:sha256:392290ed8e97b411613476fbc26775b88e452ce27f10a4302ff3fa95a075c441",
           "at": "2026-06-25T21:11:31Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This capability reference is now stale: it still says `role` must be one of the 15 type-section values and that `RoleKind` covers `15 + 4 = 19` variants, but the updated kind-selection convention in `knowledge/conventions/type-designer-kind-selection.md` now defines 17 `DataRole` variants. The harness surface now has two incompatible SSoTs for the same catalogue schema, so agents following this doc will continue to reject `CompositionRoot` / `PrimaryAdapter` updates.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/.harness/capabilities/type-designer.md",
-              "line": 266,
-              "category": "convention contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:ffc46f16ce0edf5550c6247530a8abf756ab0760fcab6c99ed57f3fed81977a0",
-          "at": "2026-06-25T03:12:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f3f3fdbcddc2f873d08b7461aa7d6999ee8f9b7d9fb3659864f14fe49dd9a22c",
-          "at": "2026-06-25T03:21:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f3f3fdbcddc2f873d08b7461aa7d6999ee8f9b7d9fb3659864f14fe49dd9a22c",
-          "at": "2026-06-25T03:26:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:50f5a7727f23ad56172eb307e9d89bcc0d28dbe21022a2840c872630aebd17d3",
-          "at": "2026-06-25T18:32:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:50f5a7727f23ad56172eb307e9d89bcc0d28dbe21022a2840c872630aebd17d3",
-          "at": "2026-06-25T18:34:22Z"
         }
       ]
     },
@@ -1732,6 +1478,289 @@
           "findings": [],
           "hash": "rvw1:sha256:e7f1716e0039bd36f3105b9ec7ed53214cab0b3825ea01a8f10d74a57bee87bf",
           "at": "2026-06-25T20:53:07Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`tee_stderr_to_file` now lives in `apps/cli`, so the bin layer itself owns the Codex subprocess stderr tee and log-file write. That is direct application I/O outside the driver/composition boundary; this helper should stay behind `cli_composition`/`infrastructure` instead of being implemented in the CLI command module.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/plan/codex_local.rs",
+              "line": 247,
+              "category": "direct I/O in bin"
+            }
+          ],
+          "hash": "rvw1:sha256:bb2108532c0147822e678268302d3481db48b92c70bfceae0006a966f3740cb5",
+          "at": "2026-06-25T04:59:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`build_prompt` still performs a filesystem probe with `Path::is_file()` in bin-layer production code. That keeps application I/O in `apps/cli` instead of flowing through the driver/composition boundary, which violates the thin-bin contract for this scope.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/plan/codex_local.rs",
+              "line": 57,
+              "category": "direct I/O in bin"
+            }
+          ],
+          "hash": "rvw1:sha256:618d5be35b666653743368729e62a603548c0f16e024d338f3ad3e844ea95425",
+          "at": "2026-06-25T06:29:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:723da4c35adff49829239808c166392a3289b521dfd7975537a5a2c0722f21b2",
+          "at": "2026-06-25T06:37:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:723da4c35adff49829239808c166392a3289b521dfd7975537a5a2c0722f21b2",
+          "at": "2026-06-25T06:41:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_codex_local` now builds the prompt with `resolve_prompt` instead of the validated `build_prompt` path, so production no longer checks that `--briefing-file` exists before launching the planner. A typoed briefing path will now proceed into Codex and fail later, which regresses the CLI's early validation behavior.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/plan/codex_local.rs",
+              "line": 24,
+              "category": "business logic in bin"
+            }
+          ],
+          "hash": "rvw1:sha256:d40ee0b9a22d13314bdf4fe5d8ab6c66ccfb5ddcb4c77de1f436185d456d96ad",
+          "at": "2026-06-25T07:49:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8e4cee10d3aa87564f0c49a84ab75b52125a966fca7db921112a44953208237a",
+          "at": "2026-06-25T07:57:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Removing `apps/cli/src/commands/plan/tests.rs` leaves the public `PlanCommand::execute` / `execute_codex_local` path with no CLI-layer coverage in this scope. The new wrapper still has user-visible branching (`--briefing-file` vs `--prompt`, file-existence validation) plus driver dispatch, so a regression here can now slip through undetected.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/plan/mod.rs",
+              "line": 46,
+              "category": "testing"
+            },
+            {
+              "message": "`ReviewCommand::CodexLocal` no longer has any tests that exercise `execute_codex_local` itself. `review/tests.rs` still covers helpers, but not the `CodexLocalArgs -> ReviewInput::RunCodex -> outcome emission` path, so regressions in the new thin dispatch would not be caught.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/codex_local.rs",
+              "line": 17,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:7ba7c48a739f7e5139f198e9c3ed48be0e9efa2ac2c746d8eeb6374d0d1b137c",
+          "at": "2026-06-25T11:30:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5cd36ceee84bf5a0294e33a3e9c34b4c0a4b6d8655929093e6b147c17f0d211c",
+          "at": "2026-06-25T11:44:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5cd36ceee84bf5a0294e33a3e9c34b4c0a4b6d8655929093e6b147c17f0d211c",
+          "at": "2026-06-25T11:50:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a1706e075c3a91637dcbaa3cb00a0c743e9cd8da1b2dcb2801cf41fccc03932d",
+          "at": "2026-06-25T20:30:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a1706e075c3a91637dcbaa3cb00a0c743e9cd8da1b2dcb2801cf41fccc03932d",
+          "at": "2026-06-25T20:33:30Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This capability reference is now stale: it still says `role` must be one of the 15 type-section values and that `RoleKind` covers `15 + 4 = 19` variants, but the updated kind-selection convention in `knowledge/conventions/type-designer-kind-selection.md` now defines 17 `DataRole` variants. The harness surface now has two incompatible SSoTs for the same catalogue schema, so agents following this doc will continue to reject `CompositionRoot` / `PrimaryAdapter` updates.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/.harness/capabilities/type-designer.md",
+              "line": 266,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ffc46f16ce0edf5550c6247530a8abf756ab0760fcab6c99ed57f3fed81977a0",
+          "at": "2026-06-25T03:12:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f3f3fdbcddc2f873d08b7461aa7d6999ee8f9b7d9fb3659864f14fe49dd9a22c",
+          "at": "2026-06-25T03:21:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f3f3fdbcddc2f873d08b7461aa7d6999ee8f9b7d9fb3659864f14fe49dd9a22c",
+          "at": "2026-06-25T03:26:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:50f5a7727f23ad56172eb307e9d89bcc0d28dbe21022a2840c872630aebd17d3",
+          "at": "2026-06-25T18:32:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:50f5a7727f23ad56172eb307e9d89bcc0d28dbe21022a2840c872630aebd17d3",
+          "at": "2026-06-25T18:34:22Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ec1cc7545d6c620f9bcb712e2e9e0b5d406e958ce6972dddad23852bf485ad50",
+          "at": "2026-06-25T04:57:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ec1cc7545d6c620f9bcb712e2e9e0b5d406e958ce6972dddad23852bf485ad50",
+          "at": "2026-06-25T05:01:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a52ad321414e427bb5d7ff0401fa2c7c2d0ac4dd05d322496a12edfd8327543f",
+          "at": "2026-06-25T06:23:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a52ad321414e427bb5d7ff0401fa2c7c2d0ac4dd05d322496a12edfd8327543f",
+          "at": "2026-06-25T06:26:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:547f6f8112ebecfbde85550b6894f9ac8a3cfec48e34f42c8d589cb2c31b06a3",
+          "at": "2026-06-25T07:43:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:547f6f8112ebecfbde85550b6894f9ac8a3cfec48e34f42c8d589cb2c31b06a3",
+          "at": "2026-06-25T07:47:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5fba8627ce3c3208bae7aaa2d2853d7febde6ad55ae3a47dc1857da3aeb20ef6",
+          "at": "2026-06-25T18:46:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5fba8627ce3c3208bae7aaa2d2853d7febde6ad55ae3a47dc1857da3aeb20ef6",
+          "at": "2026-06-25T18:49:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fc8d528d26ea45259171d7c30a4e3ab46512f6e84a84e5e2e508d37238cda39c",
+          "at": "2026-06-25T18:58:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fc8d528d26ea45259171d7c30a4e3ab46512f6e84a84e5e2e508d37238cda39c",
+          "at": "2026-06-25T19:01:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:134ffb64f250f5c9053daa81d110e34cf6684eb36e8a55084b976342ccec7689",
+          "at": "2026-06-25T19:12:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:134ffb64f250f5c9053daa81d110e34cf6684eb36e8a55084b976342ccec7689",
+          "at": "2026-06-25T19:15:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:db01e8ae94821cbc0ba70b35adac89d4aa0201094e5c29e35a224b6e2fecde18",
+          "at": "2026-06-25T19:39:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:db01e8ae94821cbc0ba70b35adac89d4aa0201094e5c29e35a224b6e2fecde18",
+          "at": "2026-06-25T19:42:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:668f58c233581d2a8282599d4e6b6b1aae633d585361450c54528dfbb1d4edb9",
+          "at": "2026-06-25T20:29:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:668f58c233581d2a8282599d4e6b6b1aae633d585361450c54528dfbb1d4edb9",
+          "at": "2026-06-25T20:32:44Z"
         }
       ]
     }

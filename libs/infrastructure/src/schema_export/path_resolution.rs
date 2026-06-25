@@ -46,18 +46,40 @@ pub(super) fn resolve_configured_target_dir(
     configured_dir: PathBuf,
     source: &str,
 ) -> Result<PathBuf, SchemaExportError> {
+    let allow_outside_workspace = source == "CARGO_TARGET_DIR" && configured_dir.is_absolute();
     let target_dir = if configured_dir.is_relative() {
         workspace_root.join(configured_dir)
     } else {
         configured_dir
     };
-    ensure_target_dir_within_workspace(workspace_root, &target_dir, source)
+    ensure_target_dir_within_workspace(workspace_root, &target_dir, source, allow_outside_workspace)
 }
 
+/// Validate a resolved Cargo target directory.
+///
+/// The `allow_outside_workspace` flag is `true` only for an explicit absolute
+/// `CARGO_TARGET_DIR` (e.g., `/cargo-target` in CI containers — see the
+/// Dockerfile's `IMAGE_CARGO_TARGET_DIR`). Cargo itself accepts arbitrary
+/// `--target-dir` locations, and rejecting the raw environment configuration
+/// here would make the new TDDD-enabled CLI crates unusable in supported CI
+/// configurations.
+///
+/// Behavior matrix:
+/// - **In-workspace target dirs** (the default `<workspace>/target`, or a relative
+///   `CARGO_TARGET_DIR` like `target-w1`) go through the full symlink guard
+///   relative to `trusted_root`. This catches silent tamper attempts where an
+///   in-workspace symlink would redirect rustdoc JSON output.
+/// - **Relative paths that escape the workspace** (e.g., `CARGO_TARGET_DIR=../outside`)
+///   are rejected: a relative escape is a path-traversal attack pattern, not a
+///   legitimate CI configuration.
+/// - **Absolute paths outside the workspace** are honored when explicitly
+///   configured. As a minimal defensive measure, the target directory's leaf
+///   is still rejected if it is itself a symlink.
 fn ensure_target_dir_within_workspace(
     workspace_root: &Path,
     target_dir: &Path,
     source: &str,
+    allow_outside_workspace: bool,
 ) -> Result<PathBuf, SchemaExportError> {
     let trusted_root = checked_workspace_root(workspace_root)?;
     let target_abs = absolutize_for_target_guard(target_dir)?;
@@ -65,6 +87,16 @@ fn ensure_target_dir_within_workspace(
 
     if normalized_target.starts_with(&trusted_root) {
         reject_symlinks_for_rustdoc_path(&normalized_target, &trusted_root, source)?;
+        Ok(normalized_target)
+    } else if allow_outside_workspace {
+        if let Ok(meta) = normalized_target.symlink_metadata() {
+            if meta.file_type().is_symlink() {
+                return Err(SchemaExportError::RustdocFailed(format!(
+                    "{source} target directory is a symlink (rejected for tamper-resistance): {}",
+                    normalized_target.display()
+                )));
+            }
+        }
         Ok(normalized_target)
     } else {
         Err(SchemaExportError::RustdocFailed(format!(
