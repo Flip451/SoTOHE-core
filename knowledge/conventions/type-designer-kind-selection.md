@@ -32,35 +32,37 @@
 > **v5 schema (schema_version=5) の対応**: 現行 catalogue は `schema_version: 5` で、 **role 軸 × kind 軸** の 2 軸構造を採る。 type-designer は v5 format で `<layer>-types.json` を起草する。 本マトリクスの「role」列は **role フィールドの値** に対応する (`DataRole` / `ContractRole` / `FunctionRole` の variant 名)。 type-designer は role と layer の組合せを本マトリクスで確認する。
 >
 > - v5 wire format: `schema_version: 5`, `crate_name`, `layer`, `types: {}` (TypeEntry), `traits: {}` (TraitEntry), `functions: {}` (FunctionEntry), `inherent_impls: []` / `trait_impls: []` の 2 つの top-level array。 `trait_impls` は `action` / `trait_ref` / `for_type` を持つ独立 entry (`TraitImplDeclV2`); `inherent_impls` は `action` を持たず `type_name` / `impl_generics` / `impl_where_predicates` / `methods` を持つ (`InherentImplDeclV2`、 target type への帰属で識別される)。 codec は v1–v4 を fail-closed で reject する (v4 は `SchemaVersionRequiresMigration` で migration prompt を返す)。
-> - v5 roles: `types` エントリは `role: DataRole` (**15 値**: `ValueObject` / `Entity` / `AggregateRoot` / `DomainService` / `UseCase` / `EventPolicy` / `DomainEvent` / `Specification` / `Factory` / `Interactor` / `Command` / `Query` / `Dto` / `ErrorType` / `SecondaryAdapter`)、 `traits` エントリは `role: ContractRole` (**4 値**: `SpecificationPort` / `ApplicationService` / `SecondaryPort` / `Repository`)、 `functions` エントリは `role: FunctionRole` (2 値: `FreeFunction` / `UseCaseFunction`)。 `DataRole` / `ContractRole` のうち `ValueObject` / `Entity` / `AggregateRoot` / `DomainService` / `UseCase` / `EventPolicy` / `Repository` は **data-carrying variant** (payload field を持つ) で、 wire format は discriminated-object 形式 (例: `{ "EventPolicy": { "reacts_to": ["OrderPlaced"] } }`)。 旧 plain-string 形式 (`"role": "ValueObject"`) は codec が parse error として reject。
+> - v5 roles: `types` エントリは `role: DataRole` (**17 値**: `ValueObject` / `Entity` / `AggregateRoot` / `DomainService` / `UseCase` / `EventPolicy` / `DomainEvent` / `Specification` / `Factory` / `Interactor` / `Command` / `Query` / `Dto` / `ErrorType` / `SecondaryAdapter` / `CompositionRoot` / `PrimaryAdapter`)、 `traits` エントリは `role: ContractRole` (**4 値**: `SpecificationPort` / `ApplicationService` / `SecondaryPort` / `Repository`)、 `functions` エントリは `role: FunctionRole` (2 値: `FreeFunction` / `UseCaseFunction`)。 `DataRole` / `ContractRole` のうち `ValueObject` / `Entity` / `AggregateRoot` / `DomainService` / `UseCase` / `EventPolicy` / `Repository` は **data-carrying variant** (payload field を持つ) で、 wire format は discriminated-object 形式 (例: `{ "EventPolicy": { "reacts_to": ["OrderPlaced"] } }`)。 旧 plain-string 形式 (`"role": "ValueObject"`) は codec が parse error として reject。
 > - v5 kind (構造軸): `types` は `kind: { "kind": "struct" | "enum" | "type_alias", ... }` で記述する
 > - 旧 v2 の `type_definitions` / `TypeDefinitionKind` は廃止済み (ADR `knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md`)
 >
 > 本マトリクスは **層配置** の制約のみを規定する。各 role / entry に必要な具体的フィールド (`kind`, `methods` 等) および top-level の `trait_impls` / `inherent_impls` (impl block を独立 entry として持つ array) の定義は `libs/domain/src/tddd/catalogue_v2/` の `TypeEntry` / `TraitEntry` / `FunctionEntry` / `TraitImplDeclV2` / `InherentImplDeclV2` / `CatalogueDocument` を正本とする。
 
-| role (v5) | domain | usecase | infrastructure | 配置根拠 |
-|---|---|---|---|---|
-| `ValueObject` (DataRole) | ✓ | △ | △ | "validated value" は domain 概念。layer-flexible だが domain 外配置は要根拠 |
-| `Entity` (DataRole) | ✓ | ✗ | ✗ | entity は domain 概念。他層での使用は domain leak |
-| `AggregateRoot` (DataRole) | ✓ | ✗ | ✗ | aggregate root は domain 概念 |
-| `DomainService` (DataRole) | ✓ | △ | ✗ | domain knowledge を集約する behavior 中心 struct。usecase は trans-domain な application logic で要根拠 |
-| `EventPolicy` (DataRole) | **✓ ONLY** | ✗ | ✗ | event-driven policy。 domain 層のみ許可 (ADR D16: `KindLayerConstraint` で強制)。 payload に `reacts_to: NonEmptyVec<TypeRef>` を持ち、 DomainEvent 役の型のみ参照可 |
-| `DomainEvent` (DataRole) | **✓ ONLY** | ✗ | ✗ | aggregate が emit する事実。 domain 層のみ (ADR D9 / D16)。 enum 形 / unit struct どちらも可。 mutation surface (`&mut self` / public field) は linter が禁止 |
-| `Specification` (DataRole) | ✓ | ✗ | ✗ | domain predicate。他層は domain leak |
-| `Factory` (DataRole) | ✓ | ✓ | △ | 集約 / entity factory。infrastructure に置くのは要根拠 |
-| `UseCase` (DataRole) | ✗ | **✓ ONLY** | ✗ | name と意味が usecase 層を表す。他層は役割違反 |
-| `Interactor` (DataRole) | ✗ | **✓ ONLY** | ✗ | ApplicationService trait の実装。usecase 層 |
-| `Command` (DataRole) | ✗ | **✓ ONLY** | ✗ | CQRS command。usecase 層が受け取る入力 |
-| `Query` (DataRole) | ✗ | **✓ ONLY** | ✗ | CQRS query。usecase 層が受け取る入力 |
-| `Dto` (DataRole) | ✗ | △ | **✓** | serde 境界 = infrastructure (CN-05: domain は serde-free)。usecase は要根拠 |
-| `ErrorType` (DataRole) | ✓ | ✓ | ✓ | layer-flexible (各層がそれぞれの責務に応じた error 型を持つ) |
-| `SecondaryAdapter` (DataRole) | ✗ | ✗ | **✓ ONLY** | secondary port の実装 = infrastructure (CN-05) |
-| `SpecificationPort` (ContractRole) | ✓ | ✗ | ✗ | driven port は domain (hexagonal) |
-| `SecondaryPort` (ContractRole) | ✓ | ✓ | ✗ | hexagonal: driven port は domain または usecase (CN-05; usecase port 例: `Reviewer`, `DiffGetter`) |
-| `ApplicationService` (ContractRole) | ✗ | **✓ ONLY** | ✗ | hexagonal: driving port (use-case interface) は usecase layer |
-| `Repository` (ContractRole) | ✓ | ✓ | ✗ | aggregate root の永続化 port (data-carrying: payload に `aggregate: TypeRef` を持ち、 参照先は AggregateRoot 役で宣言)。 domain または usecase に置く |
-| `FreeFunction` (FunctionRole) | ✓ | ✓ | ✓ | layer-flexible (top-level pub fn) |
-| `UseCaseFunction` (FunctionRole) | ✗ | **✓ ONLY** | ✗ | use-case entrypoint function。usecase 層 |
+| role (v5) | domain | usecase | infrastructure | cli | cli_composition | cli_driver | 配置根拠 |
+|---|---|---|---|---|---|---|---|
+| `ValueObject` (DataRole) | ✓ | △ | △ | ✗ | ✗ | ✗ | "validated value" は domain 概念。layer-flexible だが domain 外配置は要根拠 |
+| `Entity` (DataRole) | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ | entity は domain 概念。他層での使用は domain leak |
+| `AggregateRoot` (DataRole) | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ | aggregate root は domain 概念 |
+| `DomainService` (DataRole) | ✓ | △ | ✗ | ✗ | ✗ | ✗ | domain knowledge を集約する behavior 中心 struct。usecase は trans-domain な application logic で要根拠 |
+| `EventPolicy` (DataRole) | **✓ ONLY** | ✗ | ✗ | ✗ | ✗ | ✗ | event-driven policy。 domain 層のみ許可 (ADR D16: `KindLayerConstraint` で強制)。 payload に `reacts_to: NonEmptyVec<TypeRef>` を持ち、 DomainEvent 役の型のみ参照可 |
+| `DomainEvent` (DataRole) | **✓ ONLY** | ✗ | ✗ | ✗ | ✗ | ✗ | aggregate が emit する事実。 domain 層のみ (ADR D9 / D16)。 enum 形 / unit struct どちらも可。 mutation surface (`&mut self` / public field) は linter が禁止 |
+| `Specification` (DataRole) | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ | domain predicate。他層は domain leak |
+| `Factory` (DataRole) | ✓ | ✓ | △ | ✗ | ✗ | ✗ | 集約 / entity factory。infrastructure に置くのは要根拠 |
+| `UseCase` (DataRole) | ✗ | **✓ ONLY** | ✗ | ✗ | ✗ | ✗ | name と意味が usecase 層を表す。他層は役割違反 |
+| `Interactor` (DataRole) | ✗ | **✓ ONLY** | ✗ | ✗ | ✗ | ✗ | ApplicationService trait の実装。usecase 層 |
+| `Command` (DataRole) | ✗ | **✓ ONLY** | ✗ | ✗ | ✗ | ✗ | CQRS command。usecase 層が受け取る入力 |
+| `Query` (DataRole) | ✗ | **✓ ONLY** | ✗ | ✗ | ✗ | ✗ | CQRS query。usecase 層が受け取る入力 |
+| `Dto` (DataRole) | ✗ | △ | **✓** | ✓ | ✗ | ✓ | serde 境界 = infrastructure (CN-05: domain は serde-free)。usecase は要根拠。cli / cli_driver では clap args・input DTO・出力 DTO に使用 |
+| `ErrorType` (DataRole) | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ | layer-flexible (各層がそれぞれの責務に応じた error 型を持つ)。cli_driver は handle が常に CommandOutcome を返すため ErrorType を持たない |
+| `SecondaryAdapter` (DataRole) | ✗ | ✗ | **✓ ONLY** | ✗ | ✗ | ✗ | secondary port の実装 = infrastructure (CN-05) |
+| `CompositionRoot` (DataRole) | ✗ | ✗ | ✗ | ✗ | **✓ ONLY** | ✗ | object graph を組む純 DI の住所。cli_composition 層のみ (ADR 1420 D2: KindLayerConstraint で強制) |
+| `PrimaryAdapter` (DataRole) | ✗ | ✗ | ✗ | ✗ | ✗ | **✓ ONLY** | driving adapter (invoke+render)。cli_driver 層のみ (ADR 1420 D2: KindLayerConstraint で強制)。domain/usecase 固有ロールをメソッドシグネチャに出さない (NoRoleInMethodSignature で強制) |
+| `SpecificationPort` (ContractRole) | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ | driven port は domain (hexagonal) |
+| `SecondaryPort` (ContractRole) | ✓ | ✓ | ✗ | ✗ | ✗ | ✗ | hexagonal: driven port は domain または usecase (CN-05; usecase port 例: `Reviewer`, `DiffGetter`) |
+| `ApplicationService` (ContractRole) | ✗ | **✓ ONLY** | ✗ | ✗ | ✗ | ✗ | hexagonal: driving port (use-case interface) は usecase layer |
+| `Repository` (ContractRole) | ✓ | ✓ | ✗ | ✗ | ✗ | ✗ | aggregate root の永続化 port (data-carrying: payload に `aggregate: TypeRef` を持ち、 参照先は AggregateRoot 役で宣言)。 domain または usecase に置く |
+| `FreeFunction` (FunctionRole) | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | layer-flexible (top-level pub fn)。cli_composition は配線を CompositionRoot のメソッドとして書くため pub free function が生じない |
+| `UseCaseFunction` (FunctionRole) | ✗ | **✓ ONLY** | ✗ | ✗ | ✗ | ✗ | use-case entrypoint function。usecase 層 |
 
 凡例: `✓` = OK, `△` = 要根拠 (default ではない、docs フィールドに根拠を記録)、`✗` = forbidden, `**ONLY**` = この層以外で使うことを禁止
 

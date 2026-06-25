@@ -1,0 +1,271 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-06-25T23:10:55Z",
+  "declaration_hash": "5860f25fc90a4c7e9fa5cf9c21646d26e5ca7d832aa94e747bbb45d96b4d7778",
+  "signals": [
+    {
+      "type_name": "ArchDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ConventionsDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "FileDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "PlanDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "PlanInput",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "VerifyDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ArchInput",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CommandOutcome",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ConventionsInput",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "DemoDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "DemoInput",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "DomainDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "DomainInput",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "DryDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "DryInput",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ExportSchemaInput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "FileInput",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "GitDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "GitInput",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "GuardDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "GuardInput",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "HookDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "HookInput",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "HookName",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "PrDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "PrInput",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "RefVerifyCheckApprovedInput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "RefVerifyDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "RefVerifyInput",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "RefVerifyRunInput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ReviewDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ReviewInput",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "SemanticDupDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "SemanticDupInput",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "SignalDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "SignalGateName",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "SignalInput",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TelemetryDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TelemetryInput",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TelemetryReportInput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TrackDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TrackInput",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "VerifyInput",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli_driver::ref_verify::format_pair_status",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

@@ -42,6 +42,8 @@ pub(crate) fn data_role_kind_tag(role: &DataRole, kind: &TypeKindV2) -> &'static
         DataRole::SecondaryAdapter => "secondary_adapter",
         DataRole::EventPolicy { .. } => "event_policy",
         DataRole::DomainEvent => "domain_event",
+        DataRole::CompositionRoot => "composition_root",
+        DataRole::PrimaryAdapter => "primary_adapter",
     }
 }
 

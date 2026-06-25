@@ -86,7 +86,7 @@ pub struct CatalogueSpecRefsArgs {
 /// Arguments for plan-artifact-refs verify subcommand.
 #[derive(Args)]
 pub struct PlanArtifactRefsArgs {
-    /// Path to the track directory (e.g., track/items/<id>).
+    /// Path to the track directory (e.g., `track/items/<track-id>`).
     /// When omitted, the active track is resolved from the current branch name.
     #[arg(long)]
     track_dir: Option<PathBuf>,

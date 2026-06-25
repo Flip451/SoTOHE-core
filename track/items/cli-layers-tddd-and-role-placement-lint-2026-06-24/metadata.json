@@ -1,0 +1,8 @@
+{
+  "branch": "track/cli-layers-tddd-and-role-placement-lint-2026-06-24",
+  "created_at": "2026-06-24T17:23:23Z",
+  "id": "cli-layers-tddd-and-role-placement-lint-2026-06-24",
+  "schema_version": 5,
+  "title": "cli 系 3 層への TDDD 適用と既存 linter によるロール配置制約の設定",
+  "updated_at": "2026-06-24T17:23:23Z"
+}

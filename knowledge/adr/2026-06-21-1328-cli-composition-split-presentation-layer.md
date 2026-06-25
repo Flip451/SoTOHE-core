@@ -117,7 +117,9 @@ controller 型（invoke + render）にすることで、bin は driver を呼ん
 
 ### D4: orchestration を usecase の application service へ移す
 
-`merge_outcomes` や signal layer chain のような複数ステップのオーケストレーション・統合ロジックは application レベルの関心事であり、composition / driver ではなく **usecase の application service** に置く。driving adapter（cli_driver）は単一 use case の invoke + render に留め、複数ステップの統合は usecase が担う。
+アプリケーションレベルのオーケストレーション・統合ロジックは、ステップ数によらず、composition / driver ではなく **usecase の application service** に置く。`merge_outcomes` や signal layer chain はその典型例だが、単一ポートへの pass-through であっても同様に application service を経由する。driving adapter（cli_driver）の責務は **application service を invoke し、結果を render する**ことに限定され、オーケストレーションの形状（単ステップか複数ステップかを問わず）はすべて usecase が担う。
+
+この方針は SRP（primary adapter の責務を presentation/translation に限定し orchestration を持たせない）と DIP（primary adapter は infrastructure 形状の `SecondaryPort` ではなく application の offered contract である `ApplicationService` に依存する）の両方から導かれる。pass-through の段階であっても `ApplicationService` を経由する構造を取ることで、後続の検証・複数 adapter 対応・キャッシュ等の追加を primary adapter に触れることなく application layer で吸収できる。
 
 ### D5: 出力 DTO は usecase 出力 DTO を流用し、bin は thin を維持する
 

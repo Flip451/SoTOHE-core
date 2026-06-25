@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-06-25T23:10:50Z",
+  "declaration_hash": "84b9fdbcc6a03f593de668862c4b86cc3a8f15b818e235bc015f659735293357",
+  "signals": [
+    {
+      "type_name": "DataRole",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::fmt::Display",
+        "core::str::traits::FromStr"
+      ]
+    },
+    {
+      "type_name": "RoleKind",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::hash::Hash",
+        "core::marker::Copy"
+      ]
+    }
+  ]
+}

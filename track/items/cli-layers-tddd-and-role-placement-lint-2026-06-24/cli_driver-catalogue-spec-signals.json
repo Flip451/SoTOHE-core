@@ -1,0 +1,226 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "5860f25fc90a4c7e9fa5cf9c21646d26e5ca7d832aa94e747bbb45d96b4d7778",
+  "signals": [
+    {
+      "type_name": "ArchDriver",
+      "signal": "blue",
+      "entry_hash": "795cfdbeff3e4b0f0c202c8775411aa41d38913451458719fe4a05994ea49f31"
+    },
+    {
+      "type_name": "ArchInput",
+      "signal": "blue",
+      "entry_hash": "674eb92e2c3987ea39a7807b609ae9c1b439bf9a4e494eb77240347aef3ec724"
+    },
+    {
+      "type_name": "CommandOutcome",
+      "signal": "blue",
+      "entry_hash": "f204ff1930ddd47457315daf634cf1749c4ec548384b1a94a66e9fc428eb1721"
+    },
+    {
+      "type_name": "ConventionsDriver",
+      "signal": "blue",
+      "entry_hash": "6a02a6b30ade1a00d51d8de5721ba95fa2fb9876e52c7dbbd6b73bab4c432ffa"
+    },
+    {
+      "type_name": "ConventionsInput",
+      "signal": "blue",
+      "entry_hash": "fb6d5d7c21144c169b71de237048d27025b788544064101602ce81e6b6bcb94b"
+    },
+    {
+      "type_name": "DemoDriver",
+      "signal": "blue",
+      "entry_hash": "d4e5c43ac620f330e16a20e1841d57e4fd503472529cdbacb7b5dabc5c995155"
+    },
+    {
+      "type_name": "DemoInput",
+      "signal": "blue",
+      "entry_hash": "9dcbaa66ae5c12e80ff19203190cd1b264d795da10d57af4fb73a158af3db8b4"
+    },
+    {
+      "type_name": "DomainDriver",
+      "signal": "blue",
+      "entry_hash": "db8897b5849371f271cf3be97179ade312f5d3639362418bd7e512d92e9600d0"
+    },
+    {
+      "type_name": "DomainInput",
+      "signal": "blue",
+      "entry_hash": "857bc81fbfcb46cb4be14f5218028f3d75f95ce5df769d76a4b73e95a58b5233"
+    },
+    {
+      "type_name": "DryDriver",
+      "signal": "blue",
+      "entry_hash": "b34d5152f2a3af8e3258b3b8c7035335bfc9ac83a8feb44eb552b4ae30674b5c"
+    },
+    {
+      "type_name": "DryInput",
+      "signal": "blue",
+      "entry_hash": "80c5ceec5b40099ff0e8847c1364194841b18a1676e5b1026392a7c90a4dcf63"
+    },
+    {
+      "type_name": "ExportSchemaInput",
+      "signal": "blue",
+      "entry_hash": "2525120916bb081f8812d4b154757cd09036139c3f1422319fe7287f10b5da58"
+    },
+    {
+      "type_name": "FileDriver",
+      "signal": "blue",
+      "entry_hash": "f5aaa05019d7b8591993c8bd8cad33b865b20ab6c000967748b6527508b0980c"
+    },
+    {
+      "type_name": "FileInput",
+      "signal": "blue",
+      "entry_hash": "7696ad66f830d9496acf60c93a516ed465af1136c000fd2a30977d98d3acd66b"
+    },
+    {
+      "type_name": "GitDriver",
+      "signal": "blue",
+      "entry_hash": "a6f530821fccaaa4071add4759a7c669b8a6875cdaead980cc3d7d910381517b"
+    },
+    {
+      "type_name": "GitInput",
+      "signal": "blue",
+      "entry_hash": "83ba0aac8e59f3cc8ff1c71a9f770513643f5bbeabbdbba1c3616254c3c0c9e5"
+    },
+    {
+      "type_name": "GuardDriver",
+      "signal": "blue",
+      "entry_hash": "f65356777a3c6fc650fefdb3b2bba00a55590bb0a214058439726d00e9248ed8"
+    },
+    {
+      "type_name": "GuardInput",
+      "signal": "blue",
+      "entry_hash": "03a6290ce5e69dd1cab9792547243b81821bb5811f045a4c55ad0e6a9a143076"
+    },
+    {
+      "type_name": "HookDriver",
+      "signal": "blue",
+      "entry_hash": "90762f121093efd3e12f773ef091d6fdda7b1a4340e3e95a1150b2685775e509"
+    },
+    {
+      "type_name": "HookInput",
+      "signal": "blue",
+      "entry_hash": "d9b2e67c0a66abfc5a76e3bb3a36622ff2d0afe1ffe39c460989b50094a076b1"
+    },
+    {
+      "type_name": "HookName",
+      "signal": "blue",
+      "entry_hash": "57d4fe21b261018adf646480953b56a2b178d1705547d14e6102c84c8aa83d7a"
+    },
+    {
+      "type_name": "PlanDriver",
+      "signal": "blue",
+      "entry_hash": "5cf97a92f323c9672d2d11d216ff191b4fff2079390cfe147ce1ed0151ebf722"
+    },
+    {
+      "type_name": "PlanInput",
+      "signal": "blue",
+      "entry_hash": "bfc6d27f1d387a3918fda773ec6a96a8a89b2c880666b06ecc2ffd75782067a3"
+    },
+    {
+      "type_name": "PrDriver",
+      "signal": "blue",
+      "entry_hash": "be5c86e2689debda14ce6963e6896f7d43bc703c3190b0a7d4910747271a3779"
+    },
+    {
+      "type_name": "PrInput",
+      "signal": "blue",
+      "entry_hash": "7c669c595bb631450ac857050a9cf6cb370d72ecf7948618c54c8ff592bd1e0e"
+    },
+    {
+      "type_name": "RefVerifyCheckApprovedInput",
+      "signal": "blue",
+      "entry_hash": "dad807a86addb83df3d1713c2d05888ec2d311de98ec4cc90fed76191bac9d15"
+    },
+    {
+      "type_name": "RefVerifyDriver",
+      "signal": "blue",
+      "entry_hash": "1461e528d3a34382f7f15082e1aa8b97fb13ea608837c149104d4fa9c85f53b4"
+    },
+    {
+      "type_name": "RefVerifyInput",
+      "signal": "blue",
+      "entry_hash": "747602e0d8437f403dad6284dd5802337a33da9a3299499d1e888c5867ade26b"
+    },
+    {
+      "type_name": "RefVerifyRunInput",
+      "signal": "blue",
+      "entry_hash": "38b27ab83e8ef1bc783d5d913987b8bf4946f84ac70b6c9a15e92efd64ca2d9e"
+    },
+    {
+      "type_name": "ReviewDriver",
+      "signal": "blue",
+      "entry_hash": "dfeef9fbc9050da6fa67060728ef15026f5b5057706c79959c6fb07f94205413"
+    },
+    {
+      "type_name": "ReviewInput",
+      "signal": "blue",
+      "entry_hash": "f5674bdf3a35439f9cb69885379baf4a5769def8bea31328a1881630351aed65"
+    },
+    {
+      "type_name": "SemanticDupDriver",
+      "signal": "blue",
+      "entry_hash": "9e0d2fb9266a91a3af28d1d16ef0d9b030828d4c595f1e27b69990ef75e524dd"
+    },
+    {
+      "type_name": "SemanticDupInput",
+      "signal": "blue",
+      "entry_hash": "e0247dcb245914576c22a8b8944e6eef8cd5703bf0638471f8f74d918a6083e6"
+    },
+    {
+      "type_name": "SignalDriver",
+      "signal": "blue",
+      "entry_hash": "61b72701a9fb3ae261fe9de05ad049a63010233f996ad0a5f25c22f2e884338e"
+    },
+    {
+      "type_name": "SignalGateName",
+      "signal": "blue",
+      "entry_hash": "d686bfa8d83935b911b7477aa401e1eff9272bada5ca39502b16617f55a32637"
+    },
+    {
+      "type_name": "SignalInput",
+      "signal": "blue",
+      "entry_hash": "d5fe38bb9cab07df276e29ea5b6054543f584911fe50fef3f3c25af1b4cc1335"
+    },
+    {
+      "type_name": "TelemetryDriver",
+      "signal": "blue",
+      "entry_hash": "5baffa56149b61d65c3abc02483a59ae4b189d4d33f9a76c6e9a0bc15b20c8ec"
+    },
+    {
+      "type_name": "TelemetryInput",
+      "signal": "blue",
+      "entry_hash": "3e483db417bbe9695e3543a52a61fbe41f5e8afe7eb3070b0aad58d5336a9e9e"
+    },
+    {
+      "type_name": "TelemetryReportInput",
+      "signal": "blue",
+      "entry_hash": "cb5b60f7ab413b445e14a384192254077759095ed1e906f416c3de747604e075"
+    },
+    {
+      "type_name": "TrackDriver",
+      "signal": "blue",
+      "entry_hash": "a3e778101502cbbff3eb62900028b9f4d43fe81e982f92d29912095aa8100571"
+    },
+    {
+      "type_name": "TrackInput",
+      "signal": "blue",
+      "entry_hash": "8926f547c64174d2a97f50ecb68069cf46112edb4c9af31d9e3db2a8e3384404"
+    },
+    {
+      "type_name": "VerifyDriver",
+      "signal": "blue",
+      "entry_hash": "a34dbe41c43dbaa92b1094f79eea1abf859c74ed182e9dd3a9ff86fa1df6d6af"
+    },
+    {
+      "type_name": "VerifyInput",
+      "signal": "blue",
+      "entry_hash": "4f5885ec8df88d2e73de6e86963dcef2f8e35689ae5f9a34f01fecdd24a3d82c"
+    },
+    {
+      "type_name": "cli_driver::ref_verify::format_pair_status",
+      "signal": "blue",
+      "entry_hash": "7386623fce31d2b0b23f5af2b0da8f78e4c98e0bae536e2f6a518a54ffa98335"
+    }
+  ]
+}

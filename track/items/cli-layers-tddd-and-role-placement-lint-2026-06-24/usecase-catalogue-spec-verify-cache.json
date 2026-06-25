@@ -1,0 +1,286 @@
+{
+  "schema_version": 1,
+  "layer": "usecase",
+  "entries": [
+    {
+      "claim_hash": "bc93240dcee8babc7a1dc8ab8d58f611ba9aa7d67f0f29d5752a28aabf19c855",
+      "evidence_hash": "41e90ce38fc93b78c98c4519b052f7c751ff0b848e77554f1634384d84e80b6d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「DataRole breaking migration・新ロール追加・lint config 展開・型カタログ起草・R1 マトリクス更新のすべてが完了した状態で CI がグリーンになる。」"
+      }
+    },
+    {
+      "claim_hash": "605a0134c749a248976bbf63d442dd655a49a333d7f6bf0208ee11d7686f20e4",
+      "evidence_hash": "41e90ce38fc93b78c98c4519b052f7c751ff0b848e77554f1634384d84e80b6d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole` breaking migration・新ロール追加・lint config 展開・型カタログ起草・R1 マトリクス更新のすべてが完了した状態で CI がグリーンになる。"
+      }
+    },
+    {
+      "claim_hash": "b2db6ffd60b309c10608fc812519b3da275180a107ab89e630fd60375f0bc813",
+      "evidence_hash": "41e90ce38fc93b78c98c4519b052f7c751ff0b848e77554f1634384d84e80b6d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "型カタログ起草・R1 マトリクス更新のすべてが完了した状態で CI がグリーンになる。"
+      }
+    },
+    {
+      "claim_hash": "05f940da7230ceb8cffc2218b509de61f1b278de53d571f063e86c6f13bd6ff1",
+      "evidence_hash": "a6cc42479d205a4120bcfb8ffb5eb5f8bf46f0e76080045b78679691549efec9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli` カタログのサブプロセス関連型（`Command` / `Stdio` / `Child` 等）が消え、allowlist 内に収まる"
+      }
+    },
+    {
+      "claim_hash": "05f940da7230ceb8cffc2218b509de61f1b278de53d571f063e86c6f13bd6ff1",
+      "evidence_hash": "d811c5c796fcc9372e7cbb1d93558fc75519e1c924a43e5e48a04a0337de0e5d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/infrastructure/src/codex_planner.rs` が `PlannerPort` を実装する `CodexPlannerAdapter` を定義し、サブプロセス起動・stderr tee・ログファイル書き込みロジックを内包する。"
+      }
+    },
+    {
+      "claim_hash": "51d63513888726f4d03e44043eeb3352d19c18b3b492163e25781f9e634d8090",
+      "evidence_hash": "a6cc42479d205a4120bcfb8ffb5eb5f8bf46f0e76080045b78679691549efec9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/usecase` に `PlannerPort`（SecondaryPort）を宣言し、インフラ漏洩のないプランナー概念エラー variant（`MissingPromptSource` / `PlannerUnavailable` / `PlannerTimeout` / `PlannerFailed`）を定義する。"
+      }
+    },
+    {
+      "claim_hash": "51d63513888726f4d03e44043eeb3352d19c18b3b492163e25781f9e634d8090",
+      "evidence_hash": "d811c5c796fcc9372e7cbb1d93558fc75519e1c924a43e5e48a04a0337de0e5d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/usecase/src/planner.rs` に `PlannerPort`（SecondaryPort 役）と プランナー概念エラー variant（`MissingPromptSource` / `PlannerUnavailable` / `PlannerTimeout` / `PlannerFailed`）が定義されており、ポートのシグネチャに `PathBuf` / `Command` / `Child` 等のインフラ型が現れない。"
+      }
+    },
+    {
+      "claim_hash": "05e434aad35515b07993f0fdc7b280c1ac28ff310ee990c9cd7b86ee27d73f73",
+      "evidence_hash": "a6cc42479d205a4120bcfb8ffb5eb5f8bf46f0e76080045b78679691549efec9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「libs/usecase に `PlannerPort`（SecondaryPort）を宣言し」"
+      }
+    },
+    {
+      "claim_hash": "05e434aad35515b07993f0fdc7b280c1ac28ff310ee990c9cd7b86ee27d73f73",
+      "evidence_hash": "d811c5c796fcc9372e7cbb1d93558fc75519e1c924a43e5e48a04a0337de0e5d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/usecase/src/planner.rs` に `PlannerPort`（SecondaryPort 役）と プランナー概念エラー variant（`MissingPromptSource` / `PlannerUnavailable` / `PlannerTimeout` / `PlannerFailed`）が定義されており、ポートのシグネチャに `PathBuf` / `Command` / `Child` 等のインフラ型が現れない。"
+      }
+    },
+    {
+      "claim_hash": "f24187beece0c9a0ee8b3abef8192bc089fac93baffd54a7730820ffe69202b7",
+      "evidence_hash": "f20032983a8f070a63507d9ef065b2e6764b99694c114159c018c794ec8cad91",
+      "verdict": {
+        "kind": "pass",
+        "citation": "5 つの driver↔port ペアそれぞれについて、`libs/usecase` に `*Service` trait（`ApplicationService` ロール）と `*Interactor` struct（`Interactor` ロール）を新設する。`*Service` は `*Driver` が依存する application-level contract であり、`*Interactor` がそれを実装し、`SecondaryPort` trait への委譲を内部で行う。対象の 5 ペアは次のとおり: `ArchDriver ↔ ArchPort`（→ `ArchService` + `ArchInteractor`）"
+      }
+    },
+    {
+      "claim_hash": "f24187beece0c9a0ee8b3abef8192bc089fac93baffd54a7730820ffe69202b7",
+      "evidence_hash": "9de8571c52f4c5ff880933320a4bf34376785fef8e409eaeaf4701117b4e50aa",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/usecase` に `ArchService` trait（`ApplicationService` ロール）と `ArchInteractor` struct（`Interactor` ロール）が新設されており、`ArchDriver` フィールド型が `Arc<dyn ArchPort>` から `Arc<dyn ArchService>` に変更されている。"
+      }
+    },
+    {
+      "claim_hash": "326f4b1d4e952d505fcaf63a26f8d6e54a8667d5fa0e2933b3f71d26a9a87ff8",
+      "evidence_hash": "f20032983a8f070a63507d9ef065b2e6764b99694c114159c018c794ec8cad91",
+      "verdict": {
+        "kind": "pass",
+        "citation": "5 つの driver↔port ペアそれぞれについて、`libs/usecase` に `*Service` trait（`ApplicationService` ロール）と `*Interactor` struct（`Interactor` ロール）を新設する。`*Service` は `*Driver` が依存する application-level contract であり、`*Interactor` がそれを実装し、`SecondaryPort` trait への委譲を内部で行う。... `ConventionsDriver ↔ ConventionsPort`（→ `ConventionsService` + `ConventionsInteractor`）"
+      }
+    },
+    {
+      "claim_hash": "326f4b1d4e952d505fcaf63a26f8d6e54a8667d5fa0e2933b3f71d26a9a87ff8",
+      "evidence_hash": "9de8571c52f4c5ff880933320a4bf34376785fef8e409eaeaf4701117b4e50aa",
+      "verdict": {
+        "kind": "pass",
+        "citation": "(2) `libs/usecase` に `ConventionsService` trait（`ApplicationService`）と `ConventionsInteractor` struct（`Interactor`）が新設されており、`ConventionsDriver` フィールド型が `Arc<dyn ConventionsPort>` から `Arc<dyn ConventionsService>` に変更されている。"
+      }
+    },
+    {
+      "claim_hash": "d4b96e2666ca4fcb167972352a4228a98e6d08f86f1224e0b55a5407df5311bc",
+      "evidence_hash": "f20032983a8f070a63507d9ef065b2e6764b99694c114159c018c794ec8cad91",
+      "verdict": {
+        "kind": "pass",
+        "citation": "5 つの driver↔port ペアそれぞれについて、`libs/usecase` に `*Service` trait（`ApplicationService` ロール）と `*Interactor` struct（`Interactor` ロール）を新設する。`*Service` は `*Driver` が依存する application-level contract であり、`*Interactor` がそれを実装し、`SecondaryPort` trait への委譲を内部で行う。"
+      }
+    },
+    {
+      "claim_hash": "d4b96e2666ca4fcb167972352a4228a98e6d08f86f1224e0b55a5407df5311bc",
+      "evidence_hash": "9de8571c52f4c5ff880933320a4bf34376785fef8e409eaeaf4701117b4e50aa",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/usecase` に `FileService` trait（`ApplicationService`）と `FileInteractor` struct（`Interactor`）が新設されており、`FileDriver` フィールド型が `Arc<dyn FileWritePort>` から `Arc<dyn FileService>` に変更されている。"
+      }
+    },
+    {
+      "claim_hash": "05f940da7230ceb8cffc2218b509de61f1b278de53d571f063e86c6f13bd6ff1",
+      "evidence_hash": "d0850d8e69e74f5440be5ab67b3210afe249efa2b6dc3cf5f46b8e7519b0fc53",
+      "verdict": {
+        "kind": "pass",
+        "citation": "planner のサブプロセス管理・stderr tee・セッションログ書き込みを `apps/cli` から移設し、ヘキサゴナル・ペアとして配置する。... `libs/infrastructure` が `CodexPlannerAdapter`（SecondaryAdapter）として `PlannerPort` を実装し、サブプロセス起動・stderr tee・ログファイル書き込みの全 I/O を担う。"
+      }
+    },
+    {
+      "claim_hash": "05f940da7230ceb8cffc2218b509de61f1b278de53d571f063e86c6f13bd6ff1",
+      "evidence_hash": "b5e73bb566f52126f92d6723a9a04228fd8955b94ef4e2500f0c009fa9cb8bde",
+      "verdict": {
+        "kind": "pass",
+        "citation": "(3) `libs/infrastructure/src/codex_planner.rs` が `PlannerPort` を実装する `CodexPlannerAdapter` を定義し、サブプロセス起動・stderr tee・ログファイル書き込みロジックを内包する。"
+      }
+    },
+    {
+      "claim_hash": "a79c896ec0ea522e623d132991f585a9d623d3d0cb90896da2ce84411f3dc4d7",
+      "evidence_hash": "f20032983a8f070a63507d9ef065b2e6764b99694c114159c018c794ec8cad91",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`plan_input_from_args` も `PlannerInteractor` に吸収し"
+      }
+    },
+    {
+      "claim_hash": "a79c896ec0ea522e623d132991f585a9d623d3d0cb90896da2ce84411f3dc4d7",
+      "evidence_hash": "9de8571c52f4c5ff880933320a4bf34376785fef8e409eaeaf4701117b4e50aa",
+      "verdict": {
+        "kind": "pass",
+        "citation": "apps/cli/src/commands/plan/codex_local.rs に残る production コードは clap 引数 → `PlanInput` の変換 + `PlanDriver.handle()` の呼び出しのみであり、prompt 解決・briefing ファイル存在確認などのアプリケーションレベルのロジックは `PlannerInteractor` 内に移設されている。"
+      }
+    },
+    {
+      "claim_hash": "51d63513888726f4d03e44043eeb3352d19c18b3b492163e25781f9e634d8090",
+      "evidence_hash": "d0850d8e69e74f5440be5ab67b3210afe249efa2b6dc3cf5f46b8e7519b0fc53",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/usecase` に `PlannerPort`（SecondaryPort）を宣言し、インフラ漏洩のないプランナー概念エラー variant（`MissingPromptSource` / `PlannerUnavailable` / `PlannerTimeout` / `PlannerFailed`）を定義する。"
+      }
+    },
+    {
+      "claim_hash": "51d63513888726f4d03e44043eeb3352d19c18b3b492163e25781f9e634d8090",
+      "evidence_hash": "b5e73bb566f52126f92d6723a9a04228fd8955b94ef4e2500f0c009fa9cb8bde",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/usecase/src/planner.rs` に `PlannerPort`（SecondaryPort 役）、`PlannerService`（ApplicationService 役）、`PlannerInteractor`（Interactor 役）、およびプランナー概念エラー variant（`MissingPromptSource` / `PlannerUnavailable` / `PlannerTimeout` / `PlannerFailed`）が定義されている。"
+      }
+    },
+    {
+      "claim_hash": "9b5590f1491621c32dc322ed3101b71ef87c399c6a44dd359deacf1fb1163a6f",
+      "evidence_hash": "f20032983a8f070a63507d9ef065b2e6764b99694c114159c018c794ec8cad91",
+      "verdict": {
+        "kind": "pass",
+        "citation": "5 つの driver↔port ペアそれぞれについて、`libs/usecase` に `*Service` trait（`ApplicationService` ロール）と `*Interactor` struct（`Interactor` ロール）を新設する。`*Service` は `*Driver` が依存する application-level contract であり、`*Interactor` がそれを実装し、`SecondaryPort` trait への委譲を内部で行う。... `VerifyDriver ↔ VerifyPort`（→ `VerifyService` + `VerifyInteractor`）"
+      }
+    },
+    {
+      "claim_hash": "9b5590f1491621c32dc322ed3101b71ef87c399c6a44dd359deacf1fb1163a6f",
+      "evidence_hash": "9de8571c52f4c5ff880933320a4bf34376785fef8e409eaeaf4701117b4e50aa",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/usecase` に `VerifyService` trait（`ApplicationService`）と `VerifyInteractor` struct（`Interactor`）が新設されており、`VerifyDriver` フィールド型が `Arc<dyn VerifyPort>` から `Arc<dyn VerifyService>` に変更されている。"
+      }
+    },
+    {
+      "claim_hash": "ee42fefb56e418a3a1cf23954de4ea18f62c3f6895b2b51d8c18747a715fffe0",
+      "evidence_hash": "f20032983a8f070a63507d9ef065b2e6764b99694c114159c018c794ec8cad91",
+      "verdict": {
+        "kind": "pass",
+        "citation": "5 つの driver↔port ペアそれぞれについて、`libs/usecase` に `*Service` trait（`ApplicationService` ロール）と `*Interactor` struct（`Interactor` ロール）を新設する。`*Service` は `*Driver` が依存する application-level contract であり、`*Interactor` がそれを実装し、`SecondaryPort` trait への委譲を内部で行う。... `ArchDriver ↔ ArchPort`（→ `ArchService` + `ArchInteractor`）"
+      }
+    },
+    {
+      "claim_hash": "ee42fefb56e418a3a1cf23954de4ea18f62c3f6895b2b51d8c18747a715fffe0",
+      "evidence_hash": "9de8571c52f4c5ff880933320a4bf34376785fef8e409eaeaf4701117b4e50aa",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`libs/usecase` に `ArchService` trait（`ApplicationService` ロール）と `ArchInteractor` struct（`Interactor` ロール）が新設されており、`ArchDriver` フィールド型が `Arc<dyn ArchPort>` から `Arc<dyn ArchService>` に変更されている。」"
+      }
+    },
+    {
+      "claim_hash": "a4e4305138303245938bf3458e2496212cabd253a9cb715e198d5abba446e401",
+      "evidence_hash": "f20032983a8f070a63507d9ef065b2e6764b99694c114159c018c794ec8cad91",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「5 つの driver↔port ペアそれぞれについて、`libs/usecase` に `*Service` trait（`ApplicationService` ロール）と `*Interactor` struct（`Interactor` ロール）を新設する。`*Service` は `*Driver` が依存する application-level contract であり、`*Interactor` がそれを実装し、`SecondaryPort` trait への委譲を内部で行う。... `ConventionsDriver ↔ ConventionsPort`（→ `ConventionsService` + `ConventionsInteractor`）」、「DIP 観点では primary adapter は `SecondaryPort`（インフラ契約）ではなく application が提供する契約（`ApplicationService`）に依存しなければならない。」"
+      }
+    },
+    {
+      "claim_hash": "a4e4305138303245938bf3458e2496212cabd253a9cb715e198d5abba446e401",
+      "evidence_hash": "9de8571c52f4c5ff880933320a4bf34376785fef8e409eaeaf4701117b4e50aa",
+      "verdict": {
+        "kind": "pass",
+        "citation": "libs/usecase に `ConventionsService` trait（`ApplicationService`）と `ConventionsInteractor` struct（`Interactor`）が新設されており、`ConventionsDriver` フィールド型が `Arc<dyn ConventionsPort>` から `Arc<dyn ConventionsService>` に変更されている。"
+      }
+    },
+    {
+      "claim_hash": "2d1a4cd576e307c941123533af6de79fdd81090d0d9616ed92c26eecc690ebd6",
+      "evidence_hash": "f20032983a8f070a63507d9ef065b2e6764b99694c114159c018c794ec8cad91",
+      "verdict": {
+        "kind": "pass",
+        "citation": "5 つの driver↔port ペアそれぞれについて、`libs/usecase` に `*Service` trait（`ApplicationService` ロール）と `*Interactor` struct（`Interactor` ロール）を新設する。`*Service` は `*Driver` が依存する application-level contract であり、`*Interactor` がそれを実装し、`SecondaryPort` trait への委譲を内部で行う。"
+      }
+    },
+    {
+      "claim_hash": "2d1a4cd576e307c941123533af6de79fdd81090d0d9616ed92c26eecc690ebd6",
+      "evidence_hash": "9de8571c52f4c5ff880933320a4bf34376785fef8e409eaeaf4701117b4e50aa",
+      "verdict": {
+        "kind": "pass",
+        "citation": "(3) `libs/usecase` に `FileService` trait（`ApplicationService`）と `FileInteractor` struct（`Interactor`）が新設されており、`FileDriver` フィールド型が `Arc<dyn FileWritePort>` から `Arc<dyn FileService>` に変更されている。"
+      }
+    },
+    {
+      "claim_hash": "05e434aad35515b07993f0fdc7b280c1ac28ff310ee990c9cd7b86ee27d73f73",
+      "evidence_hash": "d0850d8e69e74f5440be5ab67b3210afe249efa2b6dc3cf5f46b8e7519b0fc53",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/usecase` に `PlannerPort`（SecondaryPort）を宣言し... `PlannerInteractor` が prompt 解決・briefing ファイル存在確認などのアプリケーションレベル処理を担ったうえで、`PlannerPort` へ委譲する。"
+      }
+    },
+    {
+      "claim_hash": "05e434aad35515b07993f0fdc7b280c1ac28ff310ee990c9cd7b86ee27d73f73",
+      "evidence_hash": "b5e73bb566f52126f92d6723a9a04228fd8955b94ef4e2500f0c009fa9cb8bde",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/usecase/src/planner.rs` に `PlannerPort`（SecondaryPort 役）... が定義されている。ポートのシグネチャに `PathBuf` / `Command` / `Child` 等のインフラ型が現れず"
+      }
+    },
+    {
+      "claim_hash": "b0a5ff2315bca81cc78c8e10fe6e6800ddb778812aadb3569c80026baaecc794",
+      "evidence_hash": "f20032983a8f070a63507d9ef065b2e6764b99694c114159c018c794ec8cad91",
+      "verdict": {
+        "kind": "pass",
+        "citation": "5 つの driver↔port ペアそれぞれについて、`libs/usecase` に `*Service` trait（`ApplicationService` ロール）と `*Interactor` struct（`Interactor` ロール）を新設する。`*Service` は `*Driver` が依存する application-level contract であり、`*Interactor` がそれを実装し、`SecondaryPort` trait への委譲を内部で行う。"
+      }
+    },
+    {
+      "claim_hash": "b0a5ff2315bca81cc78c8e10fe6e6800ddb778812aadb3569c80026baaecc794",
+      "evidence_hash": "9de8571c52f4c5ff880933320a4bf34376785fef8e409eaeaf4701117b4e50aa",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/usecase` に `PlannerService` trait（`ApplicationService`）と `PlannerInteractor` struct（`Interactor`）が新設されており、新設される `PlanDriver` は `Arc<dyn PlannerPort>` を露出せず最初から `Arc<dyn PlannerService>` を保持する。`apps/cli/src/commands/plan/codex_local.rs` に残る production コードは clap 引数 → `PlanInput` の変換 + `PlanDriver.handle()` の呼び出しのみであり、prompt 解決・briefing ファイル存在確認などのアプリケーションレベルのロジックは `PlannerInteractor` 内に移設されている。"
+      }
+    },
+    {
+      "claim_hash": "ef97629c5ad9d12bf290e50e0c8463c3a5b19034984ee44936172d74fcbd0107",
+      "evidence_hash": "f20032983a8f070a63507d9ef065b2e6764b99694c114159c018c794ec8cad91",
+      "verdict": {
+        "kind": "pass",
+        "citation": "5 つの driver↔port ペアそれぞれについて、`libs/usecase` に `*Service` trait（`ApplicationService` ロール）と `*Interactor` struct（`Interactor` ロール）を新設する。`*Service` は `*Driver` が依存する application-level contract であり、`*Interactor` がそれを実装し、`SecondaryPort` trait への委譲を内部で行う。... `VerifyDriver ↔ VerifyPort`（→ `VerifyService` + `VerifyInteractor`）"
+      }
+    },
+    {
+      "claim_hash": "ef97629c5ad9d12bf290e50e0c8463c3a5b19034984ee44936172d74fcbd0107",
+      "evidence_hash": "9de8571c52f4c5ff880933320a4bf34376785fef8e409eaeaf4701117b4e50aa",
+      "verdict": {
+        "kind": "pass",
+        "citation": "(5) `libs/usecase` に `VerifyService` trait（`ApplicationService`）と `VerifyInteractor` struct（`Interactor`）が新設されており、`VerifyDriver` フィールド型が `Arc<dyn VerifyPort>` から `Arc<dyn VerifyService>` に変更されている。 ... これにより `*Driver` は `ApplicationService` に依存し、`*Interactor` が内部で `SecondaryPort` に委譲する構造として lint が整合する。"
+      }
+    }
+  ]
+}

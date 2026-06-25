@@ -197,6 +197,8 @@ const V3_EXTRA_SECTIONS: &[Section] = &[
     Section { heading: "## Repositories", kind_tag: "repository" },
     Section { heading: "## Event Policies", kind_tag: "event_policy" },
     Section { heading: "## Domain Events", kind_tag: "domain_event" },
+    Section { heading: "## Composition Roots", kind_tag: "composition_root" },
+    Section { heading: "## Primary Adapters", kind_tag: "primary_adapter" },
 ];
 
 /// Maps a section `kind_tag` (a real v3 role tag, as produced by
@@ -284,6 +286,8 @@ fn data_role_display_tag(role: &DataRole) -> &'static str {
         DataRole::SecondaryAdapter => "secondary_adapter",
         DataRole::EventPolicy { .. } => "event_policy",
         DataRole::DomainEvent => "domain_event",
+        DataRole::CompositionRoot => "composition_root",
+        DataRole::PrimaryAdapter => "primary_adapter",
     }
 }
 
@@ -309,7 +313,7 @@ fn function_role_display_tag(role: FunctionRole) -> &'static str {
 fn v3_action_tag(action: domain::tddd::catalogue_v2::ItemAction) -> &'static str {
     use domain::tddd::catalogue_v2::ItemAction;
     match action {
-        ItemAction::Add => "\u{2014}", // — (default; omitted)
+        ItemAction::Add => "add",
         ItemAction::Modify => "modify",
         ItemAction::Reference => "reference",
         ItemAction::Delete => "delete",

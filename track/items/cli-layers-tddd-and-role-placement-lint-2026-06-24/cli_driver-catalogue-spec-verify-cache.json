@@ -1,0 +1,182 @@
+{
+  "schema_version": 1,
+  "layer": "cli_driver",
+  "entries": [
+    {
+      "claim_hash": "f11afb84c764a0c778eeda64a247b7816014e97a2c5c82c324c524dc87ffcbb3",
+      "evidence_hash": "dea61c5b84589c7119025c49caf6ad3f062f83a98eb77879965bc1266592c2c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各層の既存 public 型が allowlist 内のロール（`cli`: `Dto` / `ErrorType` / `FreeFunction`、`cli_composition`: `CompositionRoot` / `ErrorType`、`cli_driver`: `PrimaryAdapter` / `Dto` / `FreeFunction`）で宣言されている。"
+      }
+    },
+    {
+      "claim_hash": "f03580b514c2e46b752743b964dee0334a60baf9d19e2e74e74483bc3e0e593f",
+      "evidence_hash": "dea61c5b84589c7119025c49caf6ad3f062f83a98eb77879965bc1266592c2c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各層の既存 public 型が allowlist 内のロール（`cli`: `Dto` / `ErrorType` / `FreeFunction`、`cli_composition`: `CompositionRoot` / `ErrorType`、`cli_driver`: `PrimaryAdapter` / `Dto` / `FreeFunction`）で宣言されている。"
+      }
+    },
+    {
+      "claim_hash": "cd46569552265b2860580a144cd5b6a44c60dee66588ce79e42918d75b912ac4",
+      "evidence_hash": "a6cc42479d205a4120bcfb8ffb5eb5f8bf46f0e76080045b78679691549efec9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli-driver` の `PlanDriver`（PrimaryAdapter）は `Arc<dyn PlannerPort>` を依存注入で保持し `handle(PlanInput) -> CommandOutcome` を公開する。"
+      }
+    },
+    {
+      "claim_hash": "cd46569552265b2860580a144cd5b6a44c60dee66588ce79e42918d75b912ac4",
+      "evidence_hash": "d811c5c796fcc9372e7cbb1d93558fc75519e1c924a43e5e48a04a0337de0e5d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "(4) `apps/cli-driver/src/plan.rs` が `PlanDriver`（PrimaryAdapter 役）を定義し、`Arc<dyn PlannerPort>` を保持して `handle(PlanInput) -> CommandOutcome` を公開する。"
+      }
+    },
+    {
+      "claim_hash": "7ad566e3f000db61bbee640b74824fc634184f5f0857fe5cce02214e13f16d5d",
+      "evidence_hash": "a6cc42479d205a4120bcfb8ffb5eb5f8bf46f0e76080045b78679691549efec9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli-driver` の `PlanDriver`（PrimaryAdapter）は `Arc<dyn PlannerPort>` を依存注入で保持し `handle(PlanInput) -> CommandOutcome` を公開する。"
+      }
+    },
+    {
+      "claim_hash": "7ad566e3f000db61bbee640b74824fc634184f5f0857fe5cce02214e13f16d5d",
+      "evidence_hash": "d811c5c796fcc9372e7cbb1d93558fc75519e1c924a43e5e48a04a0337de0e5d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "(4) `apps/cli-driver/src/plan.rs` が `PlanDriver`（PrimaryAdapter 役）を定義し、`Arc<dyn PlannerPort>` を保持して `handle(PlanInput) -> CommandOutcome` を公開する。"
+      }
+    },
+    {
+      "claim_hash": "795cfdbeff3e4b0f0c202c8775411aa41d38913451458719fe4a05994ea49f31",
+      "evidence_hash": "f20032983a8f070a63507d9ef065b2e6764b99694c114159c018c794ec8cad91",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存 4 `*Driver` のフィールド型は `Arc<dyn *Port>` から `Arc<dyn *Service>` へ変更し、新設する `PlanDriver` は最初から `Arc<dyn PlannerService>` を保持する。SRP 観点では primary adapter の責務を presentation / translation に限定し orchestration を持たせない。"
+      }
+    },
+    {
+      "claim_hash": "795cfdbeff3e4b0f0c202c8775411aa41d38913451458719fe4a05994ea49f31",
+      "evidence_hash": "9de8571c52f4c5ff880933320a4bf34376785fef8e409eaeaf4701117b4e50aa",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/usecase` に `ArchService` trait（`ApplicationService` ロール）と `ArchInteractor` struct（`Interactor` ロール）が新設されており、`ArchDriver` フィールド型が `Arc<dyn ArchPort>` から `Arc<dyn ArchService>` に変更されている。"
+      }
+    },
+    {
+      "claim_hash": "6a02a6b30ade1a00d51d8de5721ba95fa2fb9876e52c7dbbd6b73bab4c432ffa",
+      "evidence_hash": "f20032983a8f070a63507d9ef065b2e6764b99694c114159c018c794ec8cad91",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ConventionsDriver ↔ ConventionsPort`（→ `ConventionsService` + `ConventionsInteractor`）; 既存 4 `*Driver` のフィールド型は `Arc<dyn *Port>` から `Arc<dyn *Service>` へ変更"
+      }
+    },
+    {
+      "claim_hash": "6a02a6b30ade1a00d51d8de5721ba95fa2fb9876e52c7dbbd6b73bab4c432ffa",
+      "evidence_hash": "9de8571c52f4c5ff880933320a4bf34376785fef8e409eaeaf4701117b4e50aa",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/usecase` に `ConventionsService` trait（`ApplicationService`）と `ConventionsInteractor` struct（`Interactor`）が新設されており、`ConventionsDriver` フィールド型が `Arc<dyn ConventionsPort>` から `Arc<dyn ConventionsService>` に変更されている。 ... `apps/cli-composition` が `Arc<dyn *Service>` を `*Driver` に注入している。"
+      }
+    },
+    {
+      "claim_hash": "f5aaa05019d7b8591993c8bd8cad33b865b20ab6c000967748b6527508b0980c",
+      "evidence_hash": "f20032983a8f070a63507d9ef065b2e6764b99694c114159c018c794ec8cad91",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`FileDriver` ↔ `FileWritePort`（→ `FileService` + `FileInteractor`）"
+      }
+    },
+    {
+      "claim_hash": "f5aaa05019d7b8591993c8bd8cad33b865b20ab6c000967748b6527508b0980c",
+      "evidence_hash": "9de8571c52f4c5ff880933320a4bf34376785fef8e409eaeaf4701117b4e50aa",
+      "verdict": {
+        "kind": "pass",
+        "citation": "(3) `libs/usecase` に `FileService` trait（`ApplicationService`）と `FileInteractor` struct（`Interactor`）が新設されており、`FileDriver` フィールド型が `Arc<dyn FileWritePort>` から `Arc<dyn FileService>` に変更されている。"
+      }
+    },
+    {
+      "claim_hash": "5cf97a92f323c9672d2d11d216ff191b4fff2079390cfe147ce1ed0151ebf722",
+      "evidence_hash": "d0850d8e69e74f5440be5ab67b3210afe249efa2b6dc3cf5f46b8e7519b0fc53",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli-driver` の `PlanDriver`（PrimaryAdapter）は `Arc<dyn PlannerService>` を依存注入で保持し `handle(PlanInput) -> CommandOutcome` を公開する。"
+      }
+    },
+    {
+      "claim_hash": "5cf97a92f323c9672d2d11d216ff191b4fff2079390cfe147ce1ed0151ebf722",
+      "evidence_hash": "f20032983a8f070a63507d9ef065b2e6764b99694c114159c018c794ec8cad91",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Plan command については `PlanDriver` / `PlanInput` がまだ存在せず ... 本 track で `PlanDriver` ↔ `PlannerPort` ペアとして新設する。... 新設する `PlanDriver` は最初から `Arc<dyn PlannerService>` を保持する。"
+      }
+    },
+    {
+      "claim_hash": "5cf97a92f323c9672d2d11d216ff191b4fff2079390cfe147ce1ed0151ebf722",
+      "evidence_hash": "b5e73bb566f52126f92d6723a9a04228fd8955b94ef4e2500f0c009fa9cb8bde",
+      "verdict": {
+        "kind": "pass",
+        "citation": "(4) `apps/cli-driver/src/plan.rs` が `PlanDriver`（PrimaryAdapter 役）を定義し、`Arc<dyn PlannerService>` を保持して `handle(PlanInput) -> CommandOutcome` を公開する。"
+      }
+    },
+    {
+      "claim_hash": "5cf97a92f323c9672d2d11d216ff191b4fff2079390cfe147ce1ed0151ebf722",
+      "evidence_hash": "9de8571c52f4c5ff880933320a4bf34376785fef8e409eaeaf4701117b4e50aa",
+      "verdict": {
+        "kind": "pass",
+        "citation": "(4) `libs/usecase` に `PlannerService` trait（`ApplicationService`）と `PlannerInteractor` struct（`Interactor`）が新設されており、新設される `PlanDriver` は `Arc<dyn PlannerPort>` を露出せず最初から `Arc<dyn PlannerService>` を保持する。`apps/cli/src/commands/plan/codex_local.rs` に残る production コードは clap 引数 → `PlanInput` の変換 + `PlanDriver.handle()` の呼び出しのみであり、prompt 解決・briefing ファイル存在確認などのアプリケーションレベルのロジックは `PlannerInteractor` 内に移設されている。"
+      }
+    },
+    {
+      "claim_hash": "bfc6d27f1d387a3918fda773ec6a96a8a89b2c880666b06ecc2ffd75782067a3",
+      "evidence_hash": "d0850d8e69e74f5440be5ab67b3210afe249efa2b6dc3cf5f46b8e7519b0fc53",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli-driver` の `PlanDriver`（PrimaryAdapter）は `Arc<dyn PlannerService>` を依存注入で保持し `handle(PlanInput) -> CommandOutcome` を公開する。`apps/cli-composition` の `PlanCompositionRoot`（CompositionRoot）が `CodexPlannerAdapter → PlannerInteractor → PlanDriver` の wire chain を構築し、`apps/cli` はその `PlanDriver` を受け取って dispatch するだけでよい。"
+      }
+    },
+    {
+      "claim_hash": "bfc6d27f1d387a3918fda773ec6a96a8a89b2c880666b06ecc2ffd75782067a3",
+      "evidence_hash": "f20032983a8f070a63507d9ef065b2e6764b99694c114159c018c794ec8cad91",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli/src/commands/plan/codex_local.rs` が prompt 解決・briefing ファイル存在確認などのアプリケーションレベルのロジックと planner 実行境界を担っているため、本 track で `PlanDriver ↔ PlannerPort` ペアとして新設する。… `plan_input_from_args`（prompt 解決・briefing ファイル存在確認などのアプリケーションレベルのロジックを含む）も `PlannerInteractor` に吸収し、`apps/cli` に残る production コードは clap 引数→DriverInput の変換 + CompositionRoot への dispatch のみとする"
+      }
+    },
+    {
+      "claim_hash": "bfc6d27f1d387a3918fda773ec6a96a8a89b2c880666b06ecc2ffd75782067a3",
+      "evidence_hash": "b5e73bb566f52126f92d6723a9a04228fd8955b94ef4e2500f0c009fa9cb8bde",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「apps/cli/src/commands/{plan,review}/codex_local.rs の本番パスは clap 引数→入力変換と composition root への dispatch のみを含み」および「prompt 解決・briefing ファイル存在確認などのアプリケーションレベル処理は `PlannerInteractor` が担う」"
+      }
+    },
+    {
+      "claim_hash": "bfc6d27f1d387a3918fda773ec6a96a8a89b2c880666b06ecc2ffd75782067a3",
+      "evidence_hash": "9de8571c52f4c5ff880933320a4bf34376785fef8e409eaeaf4701117b4e50aa",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli/src/commands/plan/codex_local.rs` に残る production コードは clap 引数 → `PlanInput` の変換 + `PlanDriver.handle()` の呼び出しのみであり、prompt 解決・briefing ファイル存在確認などのアプリケーションレベルのロジックは `PlannerInteractor` 内に移設されている。"
+      }
+    },
+    {
+      "claim_hash": "a34dbe41c43dbaa92b1094f79eea1abf859c74ed182e9dd3a9ff86fa1df6d6af",
+      "evidence_hash": "f20032983a8f070a63507d9ef065b2e6764b99694c114159c018c794ec8cad91",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存 4 `*Driver` のフィールド型は `Arc<dyn *Port>` から `Arc<dyn *Service>` へ変更し、新設する `PlanDriver` は最初から `Arc<dyn PlannerService>` を保持する。"
+      }
+    },
+    {
+      "claim_hash": "a34dbe41c43dbaa92b1094f79eea1abf859c74ed182e9dd3a9ff86fa1df6d6af",
+      "evidence_hash": "9de8571c52f4c5ff880933320a4bf34376785fef8e409eaeaf4701117b4e50aa",
+      "verdict": {
+        "kind": "pass",
+        "citation": "(`libs/usecase` に `VerifyService` trait（`ApplicationService`）と `VerifyInteractor` struct（`Interactor`）が新設されており、`VerifyDriver` フィールド型が `Arc<dyn VerifyPort>` から `Arc<dyn VerifyService>` に変更されている。) ... これにより `*Driver` は `ApplicationService` に依存し、`*Interactor` が内部で `SecondaryPort` に委譲する構造として lint が整合する。"
+      }
+    }
+  ]
+}

@@ -1,0 +1,375 @@
+{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "DataRole": {
+      "action": "modify",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ValueObject",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "invariants", "ty": "Vec<InvariantDecl>" }
+              ]
+            }
+          },
+          {
+            "name": "Entity",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "identity", "ty": "IdentityAccessor" },
+                { "name": "invariants", "ty": "Vec<InvariantDecl>" }
+              ]
+            }
+          },
+          {
+            "name": "AggregateRoot",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "identity", "ty": "IdentityAccessor" },
+                { "name": "invariants", "ty": "Vec<InvariantDecl>" },
+                { "name": "exclusive_members", "ty": "Vec<TypeRef>" },
+                { "name": "shared_value_objects", "ty": "Vec<TypeRef>" },
+                { "name": "emits", "ty": "Vec<TypeRef>" }
+              ]
+            }
+          },
+          {
+            "name": "DomainService",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "emits", "ty": "Vec<TypeRef>" }
+              ]
+            }
+          },
+          {
+            "name": "Specification",
+            "payload": { "kind": "unit" }
+          },
+          {
+            "name": "Factory",
+            "payload": { "kind": "unit" }
+          },
+          {
+            "name": "UseCase",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "handles", "ty": "Vec<TypeRef>" }
+              ]
+            }
+          },
+          {
+            "name": "Interactor",
+            "payload": { "kind": "unit" }
+          },
+          {
+            "name": "Command",
+            "payload": { "kind": "unit" }
+          },
+          {
+            "name": "Query",
+            "payload": { "kind": "unit" }
+          },
+          {
+            "name": "Dto",
+            "payload": { "kind": "unit" }
+          },
+          {
+            "name": "ErrorType",
+            "payload": { "kind": "unit" }
+          },
+          {
+            "name": "SecondaryAdapter",
+            "payload": { "kind": "unit" }
+          },
+          {
+            "name": "DomainEvent",
+            "payload": { "kind": "unit" }
+          },
+          {
+            "name": "EventPolicy",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "reacts_to", "ty": "NonEmptyVec<TypeRef>" }
+              ]
+            }
+          },
+          {
+            "name": "CompositionRoot",
+            "payload": { "kind": "unit" }
+          },
+          {
+            "name": "PrimaryAdapter",
+            "payload": { "kind": "unit" }
+          }
+        ]
+      },
+      "methods": [
+        {
+          "name": "value_object",
+          "receiver": null,
+          "params": [],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Creates the canonical empty-payload ValueObject role."
+        },
+        {
+          "name": "entity",
+          "receiver": null,
+          "params": [],
+          "returns": "Result<Self, IdentifierError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Creates a minimal Entity role with the conventional identity accessor."
+        },
+        {
+          "name": "aggregate_root",
+          "receiver": null,
+          "params": [],
+          "returns": "Result<Self, IdentifierError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Creates a minimal AggregateRoot role with the conventional identity accessor and empty optional vectors."
+        },
+        {
+          "name": "domain_service",
+          "receiver": null,
+          "params": [],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Creates the canonical empty-payload DomainService role."
+        },
+        {
+          "name": "use_case",
+          "receiver": null,
+          "params": [],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Creates the canonical empty-payload UseCase role."
+        },
+        {
+          "name": "variant_name",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&'static str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns the payload-free role name used for display, parsing, and method reference signatures."
+        }
+      ],
+      "module_path": "tddd::catalogue_v2::roles",
+      "docs": "Role enum for TypeEntry (struct / enum / type alias). Declares the DDD / Clean Architecture role of a data type. Breaking change from prior track: CompositionRoot (unit) and PrimaryAdapter (unit) variants added (17 variants total). CompositionRoot is restricted to cli_composition layer only (KindLayerConstraint). PrimaryAdapter is restricted to cli_driver layer only (KindLayerConstraint + NoRoleInMethodSignature). All 15 pre-existing variants are unchanged in shape; the 6 public constructor/accessor methods are unchanged in signature and constructor semantics. Only variant_name / string conversion logic and exhaustive consumers must gain arms for the 2 new unit variants.",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-02"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-03"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-06"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RoleKind": {
+      "action": "modify",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "ValueObject",        "payload": { "kind": "unit" } },
+          { "name": "Entity",             "payload": { "kind": "unit" } },
+          { "name": "AggregateRoot",      "payload": { "kind": "unit" } },
+          { "name": "DomainService",      "payload": { "kind": "unit" } },
+          { "name": "Specification",      "payload": { "kind": "unit" } },
+          { "name": "Factory",            "payload": { "kind": "unit" } },
+          { "name": "UseCase",            "payload": { "kind": "unit" } },
+          { "name": "Interactor",         "payload": { "kind": "unit" } },
+          { "name": "Command",            "payload": { "kind": "unit" } },
+          { "name": "Query",              "payload": { "kind": "unit" } },
+          { "name": "Dto",                "payload": { "kind": "unit" } },
+          { "name": "ErrorType",          "payload": { "kind": "unit" } },
+          { "name": "SecondaryAdapter",   "payload": { "kind": "unit" } },
+          { "name": "DomainEvent",        "payload": { "kind": "unit" } },
+          { "name": "EventPolicy",        "payload": { "kind": "unit" } },
+          { "name": "SpecificationPort",  "payload": { "kind": "unit" } },
+          { "name": "ApplicationService", "payload": { "kind": "unit" } },
+          { "name": "SecondaryPort",      "payload": { "kind": "unit" } },
+          { "name": "Repository",         "payload": { "kind": "unit" } },
+          { "name": "CompositionRoot",    "payload": { "kind": "unit" } },
+          { "name": "PrimaryAdapter",     "payload": { "kind": "unit" } },
+          { "name": "FreeFunction",       "payload": { "kind": "unit" } },
+          { "name": "UseCaseFunction",    "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [
+        {
+          "name": "from_data_role",
+          "receiver": null,
+          "params": [
+            { "name": "role", "ty": "&DataRole" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns the payload-free discriminant for a DataRole."
+        },
+        {
+          "name": "from_contract_role",
+          "receiver": null,
+          "params": [
+            { "name": "role", "ty": "&ContractRole" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns the payload-free discriminant for a ContractRole."
+        },
+        {
+          "name": "from_function_role",
+          "receiver": null,
+          "params": [
+            { "name": "role", "ty": "&FunctionRole" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns the payload-free discriminant for a FunctionRole."
+        },
+        {
+          "name": "variant_name",
+          "receiver": "self",
+          "params": [],
+          "returns": "&'static str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns a stable display name for this discriminant."
+        }
+      ],
+      "module_path": "tddd::catalogue_linter",
+      "docs": "Payload-free discriminant enum spanning all DataRole (17 variants after this track), ContractRole (4 variants), and FunctionRole (2 variants) variants — 23 total. Breaking change: CompositionRoot and PrimaryAdapter discriminants added (both unit variants), and FunctionRole discriminants FreeFunction / UseCaseFunction are included so role-targeted lint rules can apply to FunctionEntry items. from_data_role, from_contract_role, from_function_role, and variant_name match arms must cover all variants. The pub(crate) ALL, DATA_ROLES, CONTRACT_ROLES, and FUNCTION_ROLES array constants are not part of the public API surface and require no catalogue entry.",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-02"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-03"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-06"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [],
+  "trait_impls": [
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "DataRole"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "DataRole"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "DataRole"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "DataRole"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "DataRole"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::str::traits::FromStr",
+      "for_type": "DataRole"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::convert::TryFrom<&str>",
+      "for_type": "DataRole"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "RoleKind"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "RoleKind"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::marker::Copy",
+      "for_type": "RoleKind"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "RoleKind"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "RoleKind"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::hash::Hash",
+      "for_type": "RoleKind"
+    }
+  ]
+}

@@ -1,12 +1,12 @@
 //! `verify` command family — primary adapter driver.
 //!
-//! `VerifyDriver` holds an injected [`usecase::verify::VerifyPort`] and exposes
+//! `VerifyDriver` holds an injected [`usecase::verify::VerifyService`] and exposes
 //! `handle(input) -> CommandOutcome`.
 
 use std::path::PathBuf;
 use std::sync::Arc;
 
-use usecase::verify::VerifyPort;
+use usecase::verify::VerifyService;
 
 use crate::render::CommandOutcome;
 
@@ -115,73 +115,73 @@ pub enum VerifyInput {
 
 /// Primary adapter driver for the `verify` command family.
 ///
-/// Holds an injected [`VerifyPort`]; exposes `handle(input) -> CommandOutcome`.
+/// Holds an injected [`VerifyService`]; exposes `handle(input) -> CommandOutcome`.
 pub struct VerifyDriver {
-    port: Arc<dyn VerifyPort>,
+    service: Arc<dyn VerifyService>,
 }
 
 impl VerifyDriver {
-    /// Create a new `VerifyDriver` with the given port.
-    pub fn new(port: Arc<dyn VerifyPort>) -> Self {
-        Self { port }
+    /// Create a new `VerifyDriver` with the given service.
+    pub fn new(service: Arc<dyn VerifyService>) -> Self {
+        Self { service }
     }
 
     /// Handle a verify command.
     pub fn handle(&self, input: VerifyInput) -> CommandOutcome {
         match input {
             VerifyInput::TechStack { project_root } => {
-                map_result(self.port.verify_tech_stack(&project_root))
+                map_result(self.service.verify_tech_stack(project_root))
             }
             VerifyInput::LatestTrack { project_root } => {
-                map_result(self.port.verify_latest_track(&project_root))
+                map_result(self.service.verify_latest_track(project_root))
             }
             VerifyInput::ArchDocs { project_root } => {
-                map_result(self.port.verify_arch_docs(&project_root))
+                map_result(self.service.verify_arch_docs(project_root))
             }
             VerifyInput::Layers { project_root } => {
-                map_result(self.port.verify_layers(&project_root))
+                map_result(self.service.verify_layers(project_root))
             }
             VerifyInput::HooksPath { project_root } => {
-                map_result(self.port.verify_hooks_path(&project_root))
+                map_result(self.service.verify_hooks_path(project_root))
             }
             VerifyInput::SpecAttribution { spec_path } => {
-                map_result(self.port.verify_spec_attribution(&spec_path))
+                map_result(self.service.verify_spec_attribution(spec_path))
             }
             VerifyInput::SpecFrontmatter { spec_path } => {
-                map_result(self.port.verify_spec_frontmatter(&spec_path))
+                map_result(self.service.verify_spec_frontmatter(spec_path))
             }
             VerifyInput::CanonicalModules { project_root } => {
-                map_result(self.port.verify_canonical_modules(&project_root))
+                map_result(self.service.verify_canonical_modules(project_root))
             }
             VerifyInput::ModuleSize { project_root } => {
-                map_result(self.port.verify_module_size(&project_root))
+                map_result(self.service.verify_module_size(project_root))
             }
             VerifyInput::DomainPurity { project_root } => {
-                map_result(self.port.verify_domain_purity(&project_root))
+                map_result(self.service.verify_domain_purity(project_root))
             }
             VerifyInput::DomainStrings { project_root } => {
-                map_result(self.port.verify_domain_strings(&project_root))
+                map_result(self.service.verify_domain_strings(project_root))
             }
             VerifyInput::UsecasePurity { project_root } => {
-                map_result(self.port.verify_usecase_purity(&project_root))
+                map_result(self.service.verify_usecase_purity(project_root))
             }
             VerifyInput::DocLinks { project_root } => {
-                map_result(self.port.verify_doc_links(&project_root))
+                map_result(self.service.verify_doc_links(project_root))
             }
             VerifyInput::ViewFreshness { project_root } => {
-                map_result(self.port.verify_view_freshness(&project_root))
+                map_result(self.service.verify_view_freshness(project_root))
             }
             VerifyInput::SpecSignals { spec_path } => {
-                map_result(self.port.verify_spec_signals(&spec_path))
+                map_result(self.service.verify_spec_signals(spec_path))
             }
             VerifyInput::PlanArtifactRefs { track_dir } => {
-                map_result(self.port.verify_plan_artifact_refs(track_dir.as_deref()))
+                map_result(self.service.verify_plan_artifact_refs(track_dir))
             }
             VerifyInput::CatalogueSpecRefs { track_id, items_dir, workspace_root, skip_stale } => {
-                map_result(self.port.verify_catalogue_spec_refs(
-                    track_id.as_deref(),
-                    &items_dir,
-                    &workspace_root,
+                map_result(self.service.verify_catalogue_spec_refs(
+                    track_id,
+                    items_dir,
+                    workspace_root,
                     skip_stale,
                 ))
             }

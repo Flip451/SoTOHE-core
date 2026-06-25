@@ -1,0 +1,542 @@
+{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "cli 系 3 層への TDDD 適用と既存 linter によるロール配置制約の設定",
+  "goal": [
+    {
+      "id": "GO-01",
+      "text": "`architecture-rules.json` の `cli` / `cli_composition` / `cli_driver` レイヤーの `tddd.enabled` を `true` にし、delivery 側 3 層（bin / composition root / primary adapter）を型カタログ検査（catalogue_spec_signal + schema_export）の対象に加えることで、delivery 側全体の dead angle（型・ロール・配置の機械検査外域）を解消する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "GO-02",
+      "text": "`CompositionRoot`（wire 専用）と `PrimaryAdapter`（invoke + render 専用）の 2 新ロールを `DataRole` に追加し、分解後の `cli_composition` / `cli_driver` 各層が canonical な役割ラベルと独自の機械検査ルール（`KindLayerConstraint` + `NoRoleInMethodSignature`）を持てるようにする。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "GO-03",
+      "text": "cli 系 3 層の per-layer 使用可能ロール（allowlist）を既存の `KindLayerConstraint` ルール群として `.harness/catalogue-lint/` に展開し、delivery 側でのロール配置違反（domain / usecase 固有ロールの混入など）を `sotp track lint` で機械的に検出できるようにする。また `type-designer-kind-selection.md` R1 マトリクスに cli / cli_composition / cli_driver の 3 列と `CompositionRoot` / `PrimaryAdapter` 行を追加し、新ロールの層配置を規約として明文化する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md",
+          "anchor": "D3"
+        }
+      ]
+    }
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "id": "IN-01",
+        "text": "`architecture-rules.json` の `cli` / `cli_composition` / `cli_driver` 各レイヤーエントリの `tddd.enabled` を `false` から `true` にフリップし、`catalogue_file`・`catalogue_spec_signal`・`schema_export` ブロックを追加する。`cli` は workspace で初めて `[[bin]]` crate を TDDD 対象にする事例となる。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-02",
+        "text": "`DataRole` に `CompositionRoot` variant（新設）を追加する。`CompositionRoot` は object graph を組む純 DI の住所であり、invoke しない。独自の機械検査ルールとして `KindLayerConstraint { permitted_layers: [\"cli_composition\"] }` を持つ。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-03",
+        "text": "`DataRole` に `PrimaryAdapter` variant（新設）を追加する。`PrimaryAdapter` は注入された use case を保持し handle で呼んで整形する driving adapter（controller）の住所であり、DI しない。独自の機械検査ルールとして `KindLayerConstraint { permitted_layers: [\"cli_driver\"] }` と `NoRoleInMethodSignature { forbidden_roles: [\"Entity\", \"AggregateRoot\", \"ValueObject\", \"Repository\", \"SecondaryPort\", \"UseCase\", \"Interactor\", \"Command\", \"Query\"] }` を持つ。`KindLayerConstraint`（`permitted_layers: [\"usecase\"]` を持つ `ApplicationService` 向けルール）は宣言場所制約（どの層で宣言できるか）を担い、`NoRoleInMethodSignature` はシグネチャ依存制約（自身のメソッドシグネチャにどのロールの型を出してよいか）を担う。この 2 つの lint は補完的かつ意図的に非対称である。`ApplicationService` は宣言場所としては `usecase` 層のみに制限されるが、`cli_driver` PrimaryAdapter のシグネチャからの依存は許可される（hexagonal architecture の DIP 要件により、PrimaryAdapter は `SecondaryPort` ではなく application-level contract である `ApplicationService` に依存しなければならないため）。`NoRoleInMethodSignature.forbidden_roles` の残るロール（`SecondaryPort` / `UseCase` / `Interactor` / `Command` / `Query` と domain ロール群）の禁止は、PrimaryAdapter が `ApplicationService` を迂回して `SecondaryPort` や usecase 内部実装ロールに直接依存すること、および usecase 内部契約 DTO をシグネチャに漏洩させることを防ぐ（ADR 1420 D3 新設説明段落 / ADR 1328 D4 参照）。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md",
+            "anchor": "D2"
+          },
+          {
+            "file": "knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md",
+            "anchor": "D3"
+          },
+          {
+            "file": "knowledge/adr/2026-06-21-1328-cli-composition-split-presentation-layer.md",
+            "anchor": "D4"
+          }
+        ]
+      },
+      {
+        "id": "IN-04",
+        "text": "cli 系 3 層の per-layer 使用可能ロール（allowlist）を次のとおり定義し、`KindLayerConstraint` ルール群として lint config（`.harness/catalogue-lint/`）に展開する。`cli`（bin）: `Dto` / `ErrorType` / `FreeFunction`。`cli_composition`（wire）: `CompositionRoot` / `ErrorType`。`cli_driver`（invoke+render）: `PrimaryAdapter` / `Dto` / `FreeFunction`。この allowlist は action が `add` / `modify` / `reference` の live/current catalogue entries に適用し、`action: delete` entries は baseline に存在した型・関数の削除証跡であって current role placement ではない。domain / usecase / infrastructure 固有のロール（`Entity` / `AggregateRoot` / `UseCase` / `Interactor` / `Command` / `Query` / `SecondaryAdapter` / `SecondaryPort` / `ApplicationService` / `Repository` 等）は cli 系 3 層のいずれの allowlist にも含まれず、`KindLayerConstraint` により当該 3 層での宣言が禁じられる（`ApplicationService` を含む。ただし `cli_driver` PrimaryAdapter シグネチャから `usecase` 層で宣言された `ApplicationService` トレイトへ依存することは別ルール `NoRoleInMethodSignature` で許可される — IN-03 / ADR 1420 D3 参照）。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "IN-05",
+        "text": "`type-designer-kind-selection.md` R1 マトリクスに cli / cli_composition / cli_driver の 3 列と `CompositionRoot` / `PrimaryAdapter` 行を追加して同期する。マトリクスは本 ADR の決定の写しであり、決定の場ではない。各新ロールの層配置（`CompositionRoot` は `cli_composition` のみ、`PrimaryAdapter` は `cli_driver` のみ）を明記する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "IN-06",
+        "text": "新ロール追加（`CompositionRoot` / `PrimaryAdapter`）に伴う `DataRole` の breaking migration を実施する。`Copy` が外れ、strum 文字列変換・codec・signal evaluator・renderer・全 `role ==` 比較を更新する。アクティブトラックのカタログのみを移行対象とし、非アクティブトラックのカタログは移行対象外とする。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-07",
+        "text": "cli 系 3 層それぞれの TDDD 型カタログ（`cli-types.json` / `cli_composition-types.json` / `cli_driver-types.json`）を起草する。各層の既存 public 型を allowlist に従うロールで宣言し、`schema_export`（rustdoc JSON）でベースラインを確立する。`cli` は `[[bin]]` crate を `schema_export` 対象にする初事例であり、bin target での rustdoc 挙動に留意する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-08",
+        "text": "thin-bin 制約（ADR 1328 D5）の下では `cli` の TDDD カタログを `{Dto, ErrorType, FreeFunction}` の allowlist 内に収めなければならない（AC-06）。これを充足するための前提条件として、planner のサブプロセス管理・stderr tee・セッションログ書き込みを `apps/cli` から移設し、ヘキサゴナル・ペアとして配置する。具体的な移設先は次のとおり: `libs/usecase` に `PlannerPort`（SecondaryPort）を宣言し、インフラ漏洩のないプランナー概念エラー variant（`MissingPromptSource` / `PlannerUnavailable` / `PlannerTimeout` / `PlannerFailed`）を定義する。同じ `libs/usecase` に `PlannerService`（ApplicationService）と `PlannerInteractor`（Interactor）を置き、`PlannerInteractor` が prompt 解決・briefing ファイル存在確認などのアプリケーションレベル処理を担ったうえで `PlannerPort` へ委譲する。`libs/infrastructure` が `CodexPlannerAdapter`（SecondaryAdapter）として `PlannerPort` を実装し、サブプロセス起動・stderr tee・ログファイル書き込みの全 I/O を担う。`apps/cli-driver` の `PlanDriver`（PrimaryAdapter）は `Arc<dyn PlannerService>` を依存注入で保持し `handle(PlanInput) -> CommandOutcome` を公開する。`apps/cli-composition` の `PlanCompositionRoot`（CompositionRoot）が `CodexPlannerAdapter → PlannerInteractor → PlanDriver` の wire chain を構築し、`apps/cli` はその `PlanDriver` を受け取って dispatch するだけでよい。このヘキサゴナル・ペアがあることで `cli` カタログのサブプロセス関連型（`Command` / `Stdio` / `Child` 等）が消え、allowlist 内に収まる。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md",
+            "anchor": "D1"
+          },
+          {
+            "file": "knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md",
+            "anchor": "D3"
+          },
+          {
+            "file": "knowledge/adr/2026-06-21-1328-cli-composition-split-presentation-layer.md",
+            "anchor": "D4"
+          },
+          {
+            "file": "knowledge/adr/2026-06-21-1328-cli-composition-split-presentation-layer.md",
+            "anchor": "D5"
+          }
+        ],
+        "convention_refs": [
+          {
+            "file": "knowledge/conventions/hexagonal-architecture.md",
+            "anchor": "Layer Dependencies"
+          },
+          {
+            "file": "knowledge/conventions/hexagonal-architecture.md",
+            "anchor": "Port Placement Rules"
+          }
+        ]
+      },
+      {
+        "id": "IN-09",
+        "text": "現在 `cli_driver` の 4 つの既存 `*Driver` primary adapter（`ArchDriver` / `ConventionsDriver` / `FileDriver` / `VerifyDriver`）は、それぞれ `libs/usecase` に定義された `ArchPort` / `ConventionsPort` / `FileWritePort` / `VerifyPort` を `Arc<dyn *Port>` フィールドとして保持し、コンストラクタ `new(Arc<dyn *Port>)` でその型をメソッドパラメータに露出している。Plan command については `PlanDriver` / `PlanInput` がまだ存在せず、現状の `apps/cli/src/commands/plan/codex_local.rs` が prompt 解決・briefing ファイル存在確認などのアプリケーションレベルのロジックと planner 実行境界を担っているため、本 track で `PlanDriver ↔ PlannerPort` ペアとして新設する。TDDD カタログが有効化されると、ADR 1420 D2/D3 で定義した `PrimaryAdapter` 向け `NoRoleInMethodSignature` lint が `new()` シグネチャを走査し、`SecondaryPort` ロールとして登録された型がパラメータに含まれれば違反となる。既存 4 driver の `Arc<dyn *Port>` 露出は直接違反になり、PlanDriver も `PlannerPort` へ直接依存する形で新設すると同じ違反を作る。ADR 1328 D4（改訂）は「ステップ数によらず、pass-through であっても application service を経由する」と明示する。SRP 観点では primary adapter の責務を presentation / translation に限定し orchestration を持たせない。DIP 観点では primary adapter は `SecondaryPort`（インフラ契約）ではなく application が提供する契約（`ApplicationService`）に依存しなければならない。これを満たすため、本 track の実装フェーズで以下の作業を行う。5 つの driver↔port ペアそれぞれについて、`libs/usecase` に `*Service` trait（`ApplicationService` ロール）と `*Interactor` struct（`Interactor` ロール）を新設する。`*Service` は `*Driver` が依存する application-level contract であり、`*Interactor` がそれを実装し、`SecondaryPort` trait への委譲を内部で行う。既存 4 `*Driver` のフィールド型は `Arc<dyn *Port>` から `Arc<dyn *Service>` へ変更し、新設する `PlanDriver` は最初から `Arc<dyn PlannerService>` を保持する。`*CompositionRoot` の wire chain は `InfraAdapter → *Interactor → *Driver` の順に延びる。対象の 5 ペアは次のとおり: `ArchDriver ↔ ArchPort`（→ `ArchService` + `ArchInteractor`）、`ConventionsDriver ↔ ConventionsPort`（→ `ConventionsService` + `ConventionsInteractor`）、`FileDriver ↔ FileWritePort`（→ `FileService` + `FileInteractor`）、`PlanDriver ↔ PlannerPort`（`PlanDriver` / `PlanInput` を新設し、→ `PlannerService` + `PlannerInteractor`）、`VerifyDriver ↔ VerifyPort`（→ `VerifyService` + `VerifyInteractor`）。`PlanDriver` については、現在 `apps/cli/src/commands/plan/codex_local.rs` にある `plan_input_from_args`（prompt 解決・briefing ファイル存在確認などのアプリケーションレベルのロジックを含む）も `PlannerInteractor` に吸収し、`apps/cli` に残る production コードは clap 引数→DriverInput の変換 + CompositionRoot への dispatch のみとする（AC-12 参照）。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md",
+            "anchor": "D2"
+          },
+          {
+            "file": "knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md",
+            "anchor": "D3"
+          },
+          {
+            "file": "knowledge/adr/2026-06-21-1328-cli-composition-split-presentation-layer.md",
+            "anchor": "D4"
+          }
+        ],
+        "convention_refs": [
+          {
+            "file": "knowledge/conventions/hexagonal-architecture.md",
+            "anchor": "Port Placement Rules"
+          }
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "id": "OS-01",
+        "text": "render を `cli_driver` から独立した presentation 層（`cli_presentation`）として分離し cli 系を 4 層にする案は対象外。invoke と render は primary adapter の双方向変換の表裏であり、`1328` が層レベルで統合を決定している。本 ADR はその 3 層構造の上に型・ロール・allowlist を載せる。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md",
+            "anchor": "D1"
+          },
+          {
+            "file": "knowledge/adr/2026-06-21-1328-cli-composition-split-presentation-layer.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "OS-02",
+        "text": "per-layer allowlist を直接表現する新 primitive（例: `LayerRoleAllowlist` variant）を `CatalogueLinterRuleKind` に追加する案は対象外。既存の `KindLayerConstraint`（ロール → 許可層）で cli 系 3 層の配置制約は表現でき、新 primitive はコード変更や SSoT 二重化を招くため却下。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "OS-03",
+        "text": "`CompositionRoot` を新設せず単一の `PrimaryAdapter` ロールで wire（DI）と invoke+render を兼ねさせる案は対象外。`1328` が wire と invoke を層レベルで分離した以上、`CompositionRoot`（wire のみ）と `PrimaryAdapter`（invoke+render のみ）の 2 ロールを独立させないと「PrimaryAdapter が DI を担う」非 canonical な混在をカタログ上で追認することになる。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "OS-04",
+        "text": "cli / cli_composition のみを TDDD 対象にし cli_driver（primary adapter）を対象外にする 2 層案は対象外。分解で invoke + render が独立 delivery 層になった以上、対象外にすると delivery 側の invoke / 出力面に機械検査の死角が残る。3 層を揃えて検査・制約する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OS-05",
+        "text": "T005 で起草する cli 系 3 層の初期カタログ範囲を超える per-type ロール再設計（将来追加される型、private helper、allowlist から外れた既存型の責務再分解など）は対象外。現時点で存在する cli / cli_composition / cli_driver の public 型は、本 track の実装フェーズで allowlist に従って初期カタログへ宣言する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "OS-06",
+        "text": "web / gRPC など 2 つ目の entry point の追加、およびそれに伴うロール配置制約の再定義は対象外。本 ADR の allowlist は cli 系 3 層の現構造（cli / cli_composition / cli_driver）に対して定義される。別 entry point が追加された場合は Reassess When 条件として別 ADR で扱う。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "OS-07",
+        "text": "IN-09 の `ApplicationService` / `Interactor` 導入は、本 track 開始時点の codebase 監査（`apps/cli-driver/` 配下の既存 `*Driver` と plan command 経路を実地走査）によって特定された 5 ペアに適用される。既存 driver のうち `ArchDriver` / `ConventionsDriver` / `FileDriver` / `VerifyDriver` の 4 個は現状 `Arc<dyn *Port>` を直接保持しているため、ADR 1328 D4（「ステップ数・pass-through に関わらず application logic はすべて `ApplicationService` を経由する」）の要件と ADR 1420 D3 の `PrimaryAdapter` 向け `NoRoleInMethodSignature` lint を同時に満たすために `ApplicationService` を介する形へ移行する必要がある。Plan command は既存 `PlanDriver` の修正ではなく、`apps/cli` に残る planner application logic を `PlannerInteractor` へ移し、`PlanDriver` / `PlanInput` / `PlanCompositionRoot` を新設して `PlanDriver ↔ PlannerPort` ペアを同じヘキサゴナル形で追加する作業である。残りの既存 `*Driver` は監査時点で既に `Arc<dyn *Service>` を保持しており、追加変更を必要としない。この 5 ペアという数字は track-imposed scope limit ではなく codebase 現状からの finding（4 つの既存 direct-port driver と、thin-bin 化に必要な plan pair 新設）である。将来追加される `*Driver` も同一パターン（`Arc<dyn *Service>` を保持し、対応する `*Interactor` が `SecondaryPort` を内部で呼ぶ）に従うことが期待されるが、それらは本 track の作業範囲ではない（現時点で存在しないコードへの作業はできない）。なお `apps/cli/src/commands/review/codex_local.rs` の `review_input_from_args` は clap 引数 → `ReviewInput` の純変換のみで application-level ロジックを含まないため、`cli` 層の `FreeFunction` として allowlist 内に留まり、移設対象ではない（IN-09 と整合）。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-21-1328-cli-composition-split-presentation-layer.md",
+            "anchor": "D4"
+          },
+          {
+            "file": "knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md",
+            "anchor": "D1"
+          },
+          {
+            "file": "knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md",
+            "anchor": "D3"
+          }
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "id": "CN-01",
+      "text": "`tddd.enabled` フリップは分解 ADR（`1328`）の完了（`cli_driver` crate が実体として存在し、3 層構造が完成した状態）を前提とする。分解前の layer 構造（`cli_composition` が invoke + wire + render を兼ねる状態）に対して TDDD 有効化を行わない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-06-21-1328-cli-composition-split-presentation-layer.md",
+          "anchor": "D6"
+        }
+      ]
+    },
+    {
+      "id": "CN-02",
+      "text": "`CompositionRoot` と `PrimaryAdapter` は独自の機械検査ルールを持つ場合のみ追加するという admission 原則を満たす。`CompositionRoot` は `KindLayerConstraint`（cli_composition のみ）を持ち、`PrimaryAdapter` は `KindLayerConstraint`（cli_driver のみ）と `NoRoleInMethodSignature`（domain/usecase 固有ロール型を公開シグネチャに出さない）を持つ。DDD 語彙を enum に追加するだけの拡張（独自の機械検査ルールを持たない variant 追加）は行わない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md",
+          "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-03",
+      "text": "allowlist の定義と `KindLayerConstraint` ルール群への展開は新たな lint 機構を増やさずに行う。既存の `CatalogueLinterRuleKind::KindLayerConstraint` variant と `.harness/catalogue-lint/` 配下の lint config / preset ファイルだけで cli 系 3 層の配置制約を表現する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md",
+          "anchor": "D3"
+        },
+        {
+          "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+          "anchor": "D15"
+        }
+      ]
+    },
+    {
+      "id": "CN-04",
+      "text": "`CompositionRoot` は `cli_composition` 層のみに配置できる（他層には置かない）。`PrimaryAdapter` は `cli_driver` 層のみに配置できる（他層には置かない）。互いの層・他の delivery 層・内側 3 層（domain / usecase / infrastructure）にも置かない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "CN-05",
+      "text": "`cli_driver` の primary adapter は handle が常に `CommandOutcome` を返す（use case エラーも整形して返す）ため `ErrorType` を持たない。`cli_composition` の配線は `CompositionRoot` struct の build メソッドとして書かれ、pub free function が生じないため live/current entry としての `FreeFunction` は allowlist に不要。baseline から削除された `CommandOutcome` や legacy helper は `action: delete` tombstone として残せるが、これは削除完了を照合するための historical record であり live/current entry ではない。`cli_driver` の `render_*` と `cli` の dispatch は stateless な pub free function であり `FreeFunction` を許可する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "CN-06",
+      "text": "`DataRole` の breaking migration（`CompositionRoot` / `PrimaryAdapter` variant 追加）は既存の migration パターンに従う。`Copy` が外れ、strum 文字列変換・codec・signal evaluator・renderer・全 `role ==` 比較を一斉に更新する必要がある。アクティブトラックのカタログのみを移行し、非アクティブトラックのカタログはライトプロテクトして移行対象外とする。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md",
+          "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "CN-07",
+      "text": "`architecture-rules.json` は層定義と TDDD ブロックの SSoT であり、`tddd.enabled` のフリップはこのファイルへの直接書き換えで実体化される。`deny.toml` / `Cargo.toml` との整合を保ち、`sotp verify layers`（実在 crate との照合）が pass する状態で flip する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md",
+          "anchor": "D1"
+        }
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-01",
+      "text": "`architecture-rules.json` の `cli` / `cli_composition` / `cli_driver` レイヤーエントリが `\"tddd\": { \"enabled\": true, \"catalogue_file\": \"<layer>-types.json\", \"catalogue_spec_signal\": { \"enabled\": true }, \"schema_export\": { \"method\": \"rustdoc\", \"targets\": [\"<crate_name>\"] } }` を持ち、`cargo make ci` が pass する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-02",
+      "text": "`DataRole` に `CompositionRoot` variant と `PrimaryAdapter` variant が追加されている。各 variant が strum 文字列変換・codec・signal evaluator・renderer・`role ==` 比較で正常に動作し、`cargo make ci` が pass する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-03",
+      "text": "`.harness/catalogue-lint/config.json`（または対応するプリセットファイル）に、`CompositionRoot` → `cli_composition` 限定、`PrimaryAdapter` → `cli_driver` 限定、`Dto` → `usecase` + `infrastructure` + `cli` + `cli_driver` 許可（`domain` / `cli_composition` は許可しない）、`FreeFunction` → `domain` + `usecase` + `infrastructure` + `cli` + `cli_driver` 許可（`cli_composition` は許可しない）、`ErrorType` → `domain` + `usecase` + `infrastructure` + `cli` + `cli_composition` 許可（`cli_driver` は許可しない）の `KindLayerConstraint` ルール群が記述されている。`sotp track lint` でこれらのルールが live/current entries に適用され、`action: delete` entries は削除証跡として role-placement 判定から除外される。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "AC-04",
+      "text": "`PrimaryAdapter` に対する `NoRoleInMethodSignature { forbidden_roles: [\"Entity\", \"AggregateRoot\", \"ValueObject\", \"Repository\", \"SecondaryPort\", \"UseCase\", \"Interactor\", \"Command\", \"Query\"] }` ルールが lint config に記述されており、`sotp track lint` で適用される。`ApplicationService` はこのリストに含まれない（`cli_driver` PrimaryAdapter が DIP 上で依存する application-level contract であるため — ADR 1420 D3 / IN-03 参照）。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md",
+          "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "AC-05",
+      "text": "`type-designer-kind-selection.md` R1 マトリクスに `cli` / `cli_composition` / `cli_driver` の 3 列が追加され、`CompositionRoot`（`cli_composition` のみ許可）と `PrimaryAdapter`（`cli_driver` のみ許可）の 2 行が追加されている。既存行（`Dto` / `ErrorType` / `FreeFunction` 等）にも cli 系 3 層の列が埋まっている。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "AC-06",
+      "text": "cli 系 3 層それぞれの型カタログ（`cli-types.json` / `cli_composition-types.json` / `cli_driver-types.json`）が起草されており、各層の live/current public 型が allowlist 内のロール（`cli`: `Dto` / `ErrorType` / `FreeFunction`、`cli_composition`: `CompositionRoot` / `ErrorType`、`cli_driver`: `PrimaryAdapter` / `Dto` / `FreeFunction`）で宣言されている。baseline から削除された型・関数は `action: delete` tombstone として残せるが、current role placement ではない。`cargo make ci` が pass する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "AC-07",
+      "text": "`sotp track lint` が cli 系 3 層のカタログに対して実行され、domain / usecase 固有ロール（`Entity` / `AggregateRoot` / `UseCase` / `Interactor` / `Command` / `Query` / `SecondaryAdapter` / `SecondaryPort` / `ApplicationService` / `Repository`）の cli 系 3 層への混入がゼロである（既存カタログがあれば lint を pass する）。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "AC-08",
+      "text": "`CompositionRoot` が `cli_driver` または他の delivery 層に誤配置されたカタログエントリに対し `sotp track lint` が違反を報告する（`KindLayerConstraint` の enforcement 確認）。同様に `PrimaryAdapter` が `cli_composition` または他の層に誤配置された場合も違反が報告される。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-09",
+      "text": "`cli`（bin crate）の `schema_export`（rustdoc JSON 生成）が `[[bin]]` target に対して正常に動作し、`bin/sotp signal calc-impl-catalog` が cli 層のカタログと rustdoc 出力を照合して signal を返せる。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-10",
+      "text": "`cargo make ci`（fmt-check + clippy + nextest + deny + check-layers + verify-*）が pass する。`DataRole` breaking migration・新ロール追加・lint config 展開・型カタログ起草・R1 マトリクス更新のすべてが完了した状態で CI がグリーンになる。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md",
+          "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "AC-11",
+      "text": "thin-bin ヘキサゴナル・ペア（IN-08）の実装が次の観察可能な証跡を備えている。(1) `apps/cli/src/commands/{plan,review}/codex_local.rs` の本番パスは clap 引数→入力変換と composition root への dispatch のみを含み、`Command::new` / `Stdio::piped` / tee / ログファイル書き込み / `spawn` を本番コードに持たない。(2) `libs/usecase/src/planner.rs` に `PlannerPort`（SecondaryPort 役）、`PlannerService`（ApplicationService 役）、`PlannerInteractor`（Interactor 役）、およびプランナー概念エラー variant（`MissingPromptSource` / `PlannerUnavailable` / `PlannerTimeout` / `PlannerFailed`）が定義されている。ポートのシグネチャに `PathBuf` / `Command` / `Child` 等のインフラ型が現れず、prompt 解決・briefing ファイル存在確認などのアプリケーションレベル処理は `PlannerInteractor` が担う。(3) `libs/infrastructure/src/codex_planner.rs` が `PlannerPort` を実装する `CodexPlannerAdapter` を定義し、サブプロセス起動・stderr tee・ログファイル書き込みロジックを内包する。(4) `apps/cli-driver/src/plan.rs` が `PlanDriver`（PrimaryAdapter 役）を定義し、`Arc<dyn PlannerService>` を保持して `handle(PlanInput) -> CommandOutcome` を公開する。(5) `apps/cli-composition/src/plan.rs` が `PlanCompositionRoot`（CompositionRoot 役）を定義し、`CodexPlannerAdapter → PlannerInteractor → PlanDriver` の wire chain を構築して返す。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md",
+          "anchor": "D3"
+        },
+        {
+          "file": "knowledge/adr/2026-06-21-1328-cli-composition-split-presentation-layer.md",
+          "anchor": "D4"
+        },
+        {
+          "file": "knowledge/adr/2026-06-21-1328-cli-composition-split-presentation-layer.md",
+          "anchor": "D5"
+        }
+      ],
+      "convention_refs": [
+        {
+          "file": "knowledge/conventions/hexagonal-architecture.md",
+          "anchor": "Layer Dependencies"
+        },
+        {
+          "file": "knowledge/conventions/hexagonal-architecture.md",
+          "anchor": "Port Placement Rules"
+        }
+      ]
+    },
+    {
+      "id": "AC-12",
+      "text": "5 つの driver↔port ペアすべてで `ApplicationService` / `Interactor` の実体が導入されており、`sotp track lint` が `cli_driver` カタログに対して `NoRoleInMethodSignature` 違反ゼロで pass する。観察可能な証跡は次のとおり。(1) `libs/usecase` に `ArchService` trait（`ApplicationService` ロール）と `ArchInteractor` struct（`Interactor` ロール）が新設されており、`ArchDriver` フィールド型が `Arc<dyn ArchPort>` から `Arc<dyn ArchService>` に変更されている。(2) `libs/usecase` に `ConventionsService` trait（`ApplicationService`）と `ConventionsInteractor` struct（`Interactor`）が新設されており、`ConventionsDriver` フィールド型が `Arc<dyn ConventionsPort>` から `Arc<dyn ConventionsService>` に変更されている。(3) `libs/usecase` に `FileService` trait（`ApplicationService`）と `FileInteractor` struct（`Interactor`）が新設されており、`FileDriver` フィールド型が `Arc<dyn FileWritePort>` から `Arc<dyn FileService>` に変更されている。(4) `libs/usecase` に `PlannerService` trait（`ApplicationService`）と `PlannerInteractor` struct（`Interactor`）が新設されており、新設される `PlanDriver` は `Arc<dyn PlannerPort>` を露出せず最初から `Arc<dyn PlannerService>` を保持する。`apps/cli/src/commands/plan/codex_local.rs` に残る production コードは clap 引数 → `PlanInput` の変換 + `PlanDriver.handle()` の呼び出しのみであり、prompt 解決・briefing ファイル存在確認などのアプリケーションレベルのロジックは `PlannerInteractor` 内に移設されている。(5) `libs/usecase` に `VerifyService` trait（`ApplicationService`）と `VerifyInteractor` struct（`Interactor`）が新設されており、`VerifyDriver` フィールド型が `Arc<dyn VerifyPort>` から `Arc<dyn VerifyService>` に変更されている。各 `*CompositionRoot` の wire chain が `InfraAdapter → *Interactor → *Driver` の形になっており、`apps/cli-composition` が `Arc<dyn *Service>` を `*Driver` に注入している。usecase 層の `*Interactor` エントリは対応する `*Service` trait（`ApplicationService`）を `trait_impls` に宣言し、infrastructure 層の `SecondaryAdapter` は対応する `*Port`（`SecondaryPort`）だけを実装する。これにより `*Driver` は `ApplicationService` に依存し、`*Interactor` が内部で `SecondaryPort` に委譲する構造として lint が整合する。`cargo make ci` が pass する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md",
+          "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md",
+          "anchor": "D3"
+        },
+        {
+          "file": "knowledge/adr/2026-06-21-1328-cli-composition-split-presentation-layer.md",
+          "anchor": "D4"
+        }
+      ]
+    }
+  ],
+  "related_conventions": [
+    {
+      "file": "knowledge/conventions/hexagonal-architecture.md",
+      "anchor": "Layer Dependencies"
+    },
+    {
+      "file": "knowledge/conventions/type-designer-kind-selection.md",
+      "anchor": "R1"
+    },
+    {
+      "file": "knowledge/conventions/prefer-type-safe-abstractions.md",
+      "anchor": "Rule"
+    },
+    {
+      "file": "knowledge/conventions/coding-principles.md",
+      "anchor": "No Panics in Library Code"
+    },
+    {
+      "file": "knowledge/conventions/source-attribution.md",
+      "anchor": "Source Tag Types"
+    }
+  ],
+  "signals": {
+    "blue": 38,
+    "yellow": 0,
+    "red": 0
+  }
+}

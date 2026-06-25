@@ -1,12 +1,12 @@
 //! `conventions` command family — primary adapter driver.
 //!
-//! `ConventionsDriver` holds an injected [`usecase::conventions::ConventionsPort`]
+//! `ConventionsDriver` holds an injected [`usecase::conventions::ConventionsService`]
 //! and exposes `handle(input) -> CommandOutcome`.
 
 use std::path::PathBuf;
 use std::sync::Arc;
 
-use usecase::conventions::ConventionsPort;
+use usecase::conventions::ConventionsService;
 
 use crate::render::CommandOutcome;
 
@@ -47,15 +47,15 @@ pub enum ConventionsInput {
 
 /// Primary adapter driver for the `conventions` command family.
 ///
-/// Holds an injected [`ConventionsPort`]; exposes `handle(input) -> CommandOutcome`.
+/// Holds an injected [`ConventionsService`]; exposes `handle(input) -> CommandOutcome`.
 pub struct ConventionsDriver {
-    port: Arc<dyn ConventionsPort>,
+    service: Arc<dyn ConventionsService>,
 }
 
 impl ConventionsDriver {
-    /// Create a new `ConventionsDriver` with the given port.
-    pub fn new(port: Arc<dyn ConventionsPort>) -> Self {
-        Self { port }
+    /// Create a new `ConventionsDriver` with the given `ConventionsService`.
+    pub fn new(service: Arc<dyn ConventionsService>) -> Self {
+        Self { service }
     }
 
     /// Handle a conventions command.
@@ -81,27 +81,21 @@ impl ConventionsDriver {
         title: Option<String>,
         summary: Option<String>,
     ) -> CommandOutcome {
-        match self.port.add_convention(
-            project_root.as_path(),
-            &name,
-            slug.as_deref(),
-            title.as_deref(),
-            summary.as_deref(),
-        ) {
+        match self.service.add_convention(project_root, name, slug, title, summary) {
             Ok(msg) => CommandOutcome::success(Some(msg)),
             Err(e) => CommandOutcome::failure(Some(e.to_string())),
         }
     }
 
     fn conventions_update_index(&self, project_root: PathBuf) -> CommandOutcome {
-        match self.port.update_index(project_root.as_path()) {
+        match self.service.update_index(project_root) {
             Ok(msg) => CommandOutcome::success(Some(msg)),
             Err(e) => CommandOutcome::failure(Some(e.to_string())),
         }
     }
 
     fn conventions_verify_index(&self, project_root: PathBuf) -> CommandOutcome {
-        match self.port.verify_index(project_root.as_path()) {
+        match self.service.verify_index(project_root) {
             Err(e) => CommandOutcome::failure(Some(e.to_string())),
             Ok(result) => {
                 if result.ok {

@@ -45,6 +45,8 @@ pub(super) enum DataRoleDto {
         reacts_to: Vec<String>,
     },
     DomainEvent {},
+    CompositionRoot {},
+    PrimaryAdapter {},
 }
 
 #[derive(Debug, Serialize, Deserialize)]

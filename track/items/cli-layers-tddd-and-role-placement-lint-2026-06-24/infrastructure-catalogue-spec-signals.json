@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "56208bfd249a56f462a4011291436cd725f924d2608000be37d955d4fb45f206",
+  "signals": [
+    {
+      "type_name": "CodexPlannerAdapter",
+      "signal": "blue",
+      "entry_hash": "5b9c2273bcb9808be0a02f83113e7ab459a8b735b276febfb66bb5234e136092"
+    }
+  ]
+}

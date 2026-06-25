@@ -8,8 +8,8 @@ use std::sync::Arc;
 
 /// Composition root for the `arch` command family.
 ///
-/// This family has no injectable adapter dependencies; adapters are
-/// constructed inline inside each method (infrastructure::arch::* functions).
+/// Wires the `ArchPort` adapter into `ArchInteractor`, then injects
+/// `ArchInteractor` into `ArchDriver`.
 pub struct ArchCompositionRoot;
 
 impl ArchCompositionRoot {
@@ -27,10 +27,14 @@ impl Default for ArchCompositionRoot {
 
 impl ArchCompositionRoot {
     /// Build a wired [`cli_driver::arch::ArchDriver`] for the arch family.
+    ///
+    /// Wire chain: `FsArchAdapter` → `ArchInteractor` → `ArchDriver`.
     pub fn arch_driver(&self) -> cli_driver::arch::ArchDriver {
         use infrastructure::arch::FsArchAdapter;
+        use usecase::arch::{ArchInteractor, ArchPort};
 
-        let port = Arc::new(FsArchAdapter::new());
-        cli_driver::arch::ArchDriver::new(port)
+        let adapter = Arc::new(FsArchAdapter::new());
+        let interactor = Arc::new(ArchInteractor::new(adapter as Arc<dyn ArchPort>));
+        cli_driver::arch::ArchDriver::new(interactor)
     }
 }

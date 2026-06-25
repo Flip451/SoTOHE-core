@@ -1,0 +1,2915 @@
+{
+  "schema_version": 5,
+  "crate_name": "cli_driver",
+  "layer": "cli_driver",
+  "types": {
+    "CommandOutcome": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            {
+              "name": "stdout",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "stderr",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "exit_code",
+              "ty": "u8"
+            }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "render",
+      "docs": "Unified return type for all driver command methods. bin reads stdout/stderr and emits them, then exits with exit_code.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "ArchInput": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Tree",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "project_root",
+                  "ty": "PathBuf"
+                }
+              ]
+            }
+          },
+          {
+            "name": "TreeFull",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "project_root",
+                  "ty": "PathBuf"
+                }
+              ]
+            }
+          },
+          {
+            "name": "Members",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "project_root",
+                  "ty": "PathBuf"
+                }
+              ]
+            }
+          },
+          {
+            "name": "DirectChecks",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "project_root",
+                  "ty": "PathBuf"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "arch",
+      "docs": "Typed input for the arch command family.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "ArchDriver": {
+      "action": "modify",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [
+        {
+          "name": "handle",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "input",
+              "ty": "ArchInput"
+            }
+          ],
+          "returns": "CommandOutcome",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Handle an arch command"
+        }
+      ],
+      "module_path": "arch",
+      "docs": "Primary adapter driver for the arch command family. Holds an injected ArchService; exposes handle(input) -> CommandOutcome.",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-09"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "AC-12"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "ConventionsInput": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Add",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "project_root",
+                  "ty": "PathBuf"
+                },
+                {
+                  "name": "name",
+                  "ty": "String"
+                },
+                {
+                  "name": "slug",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "title",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "summary",
+                  "ty": "Option<String>"
+                }
+              ]
+            }
+          },
+          {
+            "name": "UpdateIndex",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "project_root",
+                  "ty": "PathBuf"
+                }
+              ]
+            }
+          },
+          {
+            "name": "VerifyIndex",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "project_root",
+                  "ty": "PathBuf"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "conventions",
+      "docs": "Typed input for the conventions command family.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "ConventionsDriver": {
+      "action": "modify",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [
+        {
+          "name": "handle",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "input",
+              "ty": "ConventionsInput"
+            }
+          ],
+          "returns": "CommandOutcome",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Handle a conventions command"
+        }
+      ],
+      "module_path": "conventions",
+      "docs": "Primary adapter driver for the conventions command family. Holds an injected ConventionsService; exposes handle(input) -> CommandOutcome.",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-09"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "AC-12"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DemoInput": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Run",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "demo",
+      "docs": "Typed input for the demo command family.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "DemoDriver": {
+      "action": "reference",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [
+        {
+          "name": "handle",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "input",
+              "ty": "DemoInput"
+            }
+          ],
+          "returns": "CommandOutcome",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Handle a demo command"
+        }
+      ],
+      "module_path": "demo",
+      "docs": "Primary adapter driver for the demo command family. Holds an injected DemoService; exposes handle(input) -> CommandOutcome.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "ExportSchemaInput": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            {
+              "name": "crate_name",
+              "ty": "String"
+            },
+            {
+              "name": "pretty",
+              "ty": "bool"
+            },
+            {
+              "name": "output",
+              "ty": "Option<PathBuf>"
+            }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "domain",
+      "docs": "Input DTO for the domain export-schema command.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "DomainInput": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ExportSchema",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "ExportSchemaInput"
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "domain",
+      "docs": "Typed input for the domain command family.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "DomainDriver": {
+      "action": "reference",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [
+        {
+          "name": "handle",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "input",
+              "ty": "DomainInput"
+            }
+          ],
+          "returns": "CommandOutcome",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Handle a domain command"
+        }
+      ],
+      "module_path": "domain",
+      "docs": "Primary adapter driver for the domain command family. Holds an injected ExportSchemaService; exposes handle(input) -> CommandOutcome.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "DryInput": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Write",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "track_id",
+                  "ty": "String"
+                },
+                {
+                  "name": "base_commit",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "db_path",
+                  "ty": "PathBuf"
+                },
+                {
+                  "name": "threshold",
+                  "ty": "Option<f32>"
+                },
+                {
+                  "name": "workspace_root",
+                  "ty": "PathBuf"
+                },
+                {
+                  "name": "items_dir",
+                  "ty": "PathBuf"
+                },
+                {
+                  "name": "model",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "capability_name",
+                  "ty": "String"
+                }
+              ]
+            }
+          },
+          {
+            "name": "Results",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "track_id",
+                  "ty": "String"
+                },
+                {
+                  "name": "filter",
+                  "ty": "String"
+                },
+                {
+                  "name": "items_dir",
+                  "ty": "PathBuf"
+                }
+              ]
+            }
+          },
+          {
+            "name": "CheckApproved",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "track_id",
+                  "ty": "String"
+                },
+                {
+                  "name": "base_commit",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "items_dir",
+                  "ty": "PathBuf"
+                }
+              ]
+            }
+          },
+          {
+            "name": "FixLocal",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "track_id",
+                  "ty": "String"
+                },
+                {
+                  "name": "briefing_file",
+                  "ty": "PathBuf"
+                },
+                {
+                  "name": "model",
+                  "ty": "Option<String>"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "dry",
+      "docs": "Typed input for the dry command family.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "DryDriver": {
+      "action": "reference",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [
+        {
+          "name": "handle",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "input",
+              "ty": "DryInput"
+            }
+          ],
+          "returns": "CommandOutcome",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Handle a dry command"
+        }
+      ],
+      "module_path": "dry",
+      "docs": "Primary adapter driver for the dry command family. Holds an injected DryDriverService; exposes handle(input) -> CommandOutcome.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "FileInput": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "WriteAtomic",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "PathBuf"
+                },
+                {
+                  "name": "content",
+                  "ty": "Vec<u8>"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "file",
+      "docs": "Typed input for the file command family.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "FileDriver": {
+      "action": "modify",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [
+        {
+          "name": "handle",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "input",
+              "ty": "FileInput"
+            }
+          ],
+          "returns": "CommandOutcome",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Handle a file command"
+        }
+      ],
+      "module_path": "file",
+      "docs": "Primary adapter driver for the file command family. Holds an injected FileService; exposes handle(input) -> CommandOutcome.",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-09"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "AC-12"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "GitInput": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "AddAll",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "AddFromFile",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "PathBuf"
+                },
+                {
+                  "name": "cleanup",
+                  "ty": "bool"
+                }
+              ]
+            }
+          },
+          {
+            "name": "CommitFromFile",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "PathBuf"
+                },
+                {
+                  "name": "cleanup",
+                  "ty": "bool"
+                },
+                {
+                  "name": "track_dir",
+                  "ty": "Option<PathBuf>"
+                }
+              ]
+            }
+          },
+          {
+            "name": "NoteFromFile",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "PathBuf"
+                },
+                {
+                  "name": "cleanup",
+                  "ty": "bool"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SwitchAndPull",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "branch",
+                  "ty": "String"
+                }
+              ]
+            }
+          },
+          {
+            "name": "Unstage",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "paths",
+                  "ty": "Vec<PathBuf>"
+                }
+              ]
+            }
+          },
+          {
+            "name": "CurrentBranchTrackIdStrict",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "git",
+      "docs": "Typed input for the git command family.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "GitDriver": {
+      "action": "reference",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [
+        {
+          "name": "handle",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "input",
+              "ty": "GitInput"
+            }
+          ],
+          "returns": "CommandOutcome",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Handle a git command"
+        }
+      ],
+      "module_path": "git",
+      "docs": "Primary adapter driver for the git command family. Holds an injected GitWorkflowService; exposes handle(input) -> CommandOutcome.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "GuardInput": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Check",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "command",
+                  "ty": "String"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "guard",
+      "docs": "Typed input for the guard command family.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "GuardDriver": {
+      "action": "reference",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [
+        {
+          "name": "handle",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "input",
+              "ty": "GuardInput"
+            }
+          ],
+          "returns": "CommandOutcome",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Handle a guard command"
+        }
+      ],
+      "module_path": "guard",
+      "docs": "Primary adapter driver for the guard command family. Holds an injected GuardCheckService; exposes handle(input) -> CommandOutcome.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "HookName": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "HooksPathSetup",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "BlockDirectGitOps",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "BlockTestFileDeletion",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "GitRefUpdate",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "GitPrePush",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "SkillCompliance",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "hook",
+      "docs": "Known hook names for the hook dispatch subcommand.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "HookInput": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Dispatch",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "hook",
+                  "ty": "HookName"
+                },
+                {
+                  "name": "git_hook_args",
+                  "ty": "Vec<String>"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "hook",
+      "docs": "Typed input for the hook command family.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "HookDriver": {
+      "action": "reference",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [
+        {
+          "name": "handle",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "input",
+              "ty": "HookInput"
+            }
+          ],
+          "returns": "CommandOutcome",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Handle a hook command"
+        }
+      ],
+      "module_path": "hook",
+      "docs": "Primary adapter driver for the hook command family. Holds injected use-case interactors; exposes handle(input) -> CommandOutcome.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "PrInput": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Push",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "track_id",
+                  "ty": "Option<String>"
+                }
+              ]
+            }
+          },
+          {
+            "name": "Ensure",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "track_id",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "base",
+                  "ty": "String"
+                }
+              ]
+            }
+          },
+          {
+            "name": "Status",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "pr",
+                  "ty": "String"
+                }
+              ]
+            }
+          },
+          {
+            "name": "WaitAndMerge",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "pr",
+                  "ty": "String"
+                },
+                {
+                  "name": "interval",
+                  "ty": "u64"
+                },
+                {
+                  "name": "timeout",
+                  "ty": "u64"
+                },
+                {
+                  "name": "method",
+                  "ty": "String"
+                }
+              ]
+            }
+          },
+          {
+            "name": "TriggerReview",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "pr",
+                  "ty": "String"
+                }
+              ]
+            }
+          },
+          {
+            "name": "PollReview",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "pr",
+                  "ty": "String"
+                },
+                {
+                  "name": "trigger_timestamp",
+                  "ty": "String"
+                },
+                {
+                  "name": "interval",
+                  "ty": "u64"
+                },
+                {
+                  "name": "timeout",
+                  "ty": "u64"
+                }
+              ]
+            }
+          },
+          {
+            "name": "ReviewCycle",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "track_id",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "resume",
+                  "ty": "bool"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "pr",
+      "docs": "Typed input for the pr command family.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "PrDriver": {
+      "action": "reference",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [
+        {
+          "name": "handle",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "input",
+              "ty": "PrInput"
+            }
+          ],
+          "returns": "CommandOutcome",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Handle a pr command"
+        }
+      ],
+      "module_path": "pr",
+      "docs": "Primary adapter driver for the pr command family. Holds an injected PrCommandService; exposes handle(input) -> CommandOutcome.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "RefVerifyRunInput": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            {
+              "name": "track_id",
+              "ty": "String"
+            },
+            {
+              "name": "items_dir",
+              "ty": "PathBuf"
+            }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "ref_verify",
+      "docs": "Input DTO for sotp ref-verify run.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "RefVerifyCheckApprovedInput": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            {
+              "name": "track_id",
+              "ty": "String"
+            },
+            {
+              "name": "items_dir",
+              "ty": "PathBuf"
+            }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "ref_verify",
+      "docs": "Input DTO for sotp ref-verify check-approved.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "RefVerifyInput": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Run",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "RefVerifyRunInput"
+              ]
+            }
+          },
+          {
+            "name": "CheckApproved",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "RefVerifyCheckApprovedInput"
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "ref_verify",
+      "docs": "Typed input for the ref_verify command family.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "RefVerifyDriver": {
+      "action": "reference",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [
+        {
+          "name": "handle",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "input",
+              "ty": "RefVerifyInput"
+            }
+          ],
+          "returns": "CommandOutcome",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Handle a ref_verify command"
+        }
+      ],
+      "module_path": "ref_verify",
+      "docs": "Primary adapter driver for the ref_verify command family. Holds a single injected RefVerifyAggregateService; exposes handle(input) -> CommandOutcome.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "ReviewInput": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "RunCodex",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "model",
+                  "ty": "String"
+                },
+                {
+                  "name": "timeout_seconds",
+                  "ty": "u64"
+                },
+                {
+                  "name": "briefing_file",
+                  "ty": "Option<PathBuf>"
+                },
+                {
+                  "name": "prompt",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "round_type",
+                  "ty": "String"
+                },
+                {
+                  "name": "group",
+                  "ty": "String"
+                },
+                {
+                  "name": "items_dir",
+                  "ty": "PathBuf"
+                }
+              ]
+            }
+          },
+          {
+            "name": "RunClaude",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "model",
+                  "ty": "String"
+                },
+                {
+                  "name": "timeout_seconds",
+                  "ty": "u64"
+                },
+                {
+                  "name": "briefing_file",
+                  "ty": "Option<PathBuf>"
+                },
+                {
+                  "name": "prompt",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "round_type",
+                  "ty": "String"
+                },
+                {
+                  "name": "group",
+                  "ty": "String"
+                },
+                {
+                  "name": "items_dir",
+                  "ty": "PathBuf"
+                }
+              ]
+            }
+          },
+          {
+            "name": "RunLocal",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "model",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "timeout_seconds",
+                  "ty": "u64"
+                },
+                {
+                  "name": "briefing_file",
+                  "ty": "Option<PathBuf>"
+                },
+                {
+                  "name": "prompt",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "round_type",
+                  "ty": "String"
+                },
+                {
+                  "name": "group",
+                  "ty": "String"
+                },
+                {
+                  "name": "items_dir",
+                  "ty": "PathBuf"
+                }
+              ]
+            }
+          },
+          {
+            "name": "RunFixLocal",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "scope",
+                  "ty": "String"
+                },
+                {
+                  "name": "briefing_file",
+                  "ty": "PathBuf"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "String"
+                },
+                {
+                  "name": "round_type",
+                  "ty": "String"
+                },
+                {
+                  "name": "model",
+                  "ty": "Option<String>"
+                }
+              ]
+            }
+          },
+          {
+            "name": "CheckApproved",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "track_id",
+                  "ty": "String"
+                },
+                {
+                  "name": "items_dir",
+                  "ty": "PathBuf"
+                }
+              ]
+            }
+          },
+          {
+            "name": "Results",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "track_id",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "items_dir",
+                  "ty": "PathBuf"
+                },
+                {
+                  "name": "scope",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "all",
+                  "ty": "bool"
+                },
+                {
+                  "name": "limit",
+                  "ty": "u32"
+                },
+                {
+                  "name": "round_type",
+                  "ty": "String"
+                },
+                {
+                  "name": "no_hint",
+                  "ty": "bool"
+                }
+              ]
+            }
+          },
+          {
+            "name": "Classify",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "paths",
+                  "ty": "Vec<String>"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "items_dir",
+                  "ty": "PathBuf"
+                }
+              ]
+            }
+          },
+          {
+            "name": "Files",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "scope",
+                  "ty": "String"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "items_dir",
+                  "ty": "PathBuf"
+                }
+              ]
+            }
+          },
+          {
+            "name": "ValidateScope",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "scope",
+                  "ty": "String"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "items_dir",
+                  "ty": "PathBuf"
+                }
+              ]
+            }
+          },
+          {
+            "name": "GetBriefing",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "scope",
+                  "ty": "String"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "items_dir",
+                  "ty": "PathBuf"
+                }
+              ]
+            }
+          },
+          {
+            "name": "PersistCommitHash",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "track_id",
+                  "ty": "String"
+                },
+                {
+                  "name": "workspace_root",
+                  "ty": "PathBuf"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "review",
+      "docs": "Typed input for the review command family.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "ReviewDriver": {
+      "action": "reference",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [
+        {
+          "name": "handle",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "input",
+              "ty": "ReviewInput"
+            }
+          ],
+          "returns": "CommandOutcome",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Handle a review command"
+        }
+      ],
+      "module_path": "review",
+      "docs": "Primary adapter driver for the review command family. Holds a single injected ReviewService aggregate; exposes handle(input) -> CommandOutcome.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "SemanticDupInput": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "FindSimilar",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "fragment_text",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "file_path",
+                  "ty": "Option<PathBuf>"
+                },
+                {
+                  "name": "top_k",
+                  "ty": "usize"
+                },
+                {
+                  "name": "db_path",
+                  "ty": "PathBuf"
+                }
+              ]
+            }
+          },
+          {
+            "name": "IndexBuild",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "workspace_root",
+                  "ty": "PathBuf"
+                },
+                {
+                  "name": "db_path",
+                  "ty": "PathBuf"
+                }
+              ]
+            }
+          },
+          {
+            "name": "IndexMeasureQuality",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "workspace_root",
+                  "ty": "PathBuf"
+                }
+              ]
+            }
+          },
+          {
+            "name": "DupCheck",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "files_from",
+                  "ty": "PathBuf"
+                },
+                {
+                  "name": "threshold",
+                  "ty": "f32"
+                },
+                {
+                  "name": "db_path",
+                  "ty": "PathBuf"
+                },
+                {
+                  "name": "ack_file",
+                  "ty": "Option<PathBuf>"
+                },
+                {
+                  "name": "ack",
+                  "ty": "bool"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "semantic_dup",
+      "docs": "Typed input for the semantic_dup command family.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "SemanticDupDriver": {
+      "action": "reference",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [
+        {
+          "name": "handle",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "input",
+              "ty": "SemanticDupInput"
+            }
+          ],
+          "returns": "CommandOutcome",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Handle a semantic_dup command"
+        }
+      ],
+      "module_path": "semantic_dup",
+      "docs": "Primary adapter driver for the semantic_dup command family. Holds an injected SemanticDupDriverService; exposes handle(input) -> CommandOutcome.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "SignalGateName": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Commit",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Merge",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "signal",
+      "docs": "Selects the gate context when resolving strictness from signal-gates.json. Mirrors cli_composition::signal::SignalGateName.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "SignalInput": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "CalcAdrUser",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "project_root",
+                  "ty": "PathBuf"
+                }
+              ]
+            }
+          },
+          {
+            "name": "CheckAdrUser",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "project_root",
+                  "ty": "PathBuf"
+                },
+                {
+                  "name": "strict_override",
+                  "ty": "bool"
+                },
+                {
+                  "name": "gate",
+                  "ty": "Option<SignalGateName>"
+                },
+                {
+                  "name": "workspace_root",
+                  "ty": "Option<PathBuf>"
+                }
+              ]
+            }
+          },
+          {
+            "name": "CalcSpecAdr",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "spec_json_path",
+                  "ty": "Option<PathBuf>"
+                },
+                {
+                  "name": "workspace_root",
+                  "ty": "Option<PathBuf>"
+                }
+              ]
+            }
+          },
+          {
+            "name": "CheckSpecAdr",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "spec_json_path",
+                  "ty": "Option<PathBuf>"
+                },
+                {
+                  "name": "strict_override",
+                  "ty": "bool"
+                },
+                {
+                  "name": "gate",
+                  "ty": "Option<SignalGateName>"
+                },
+                {
+                  "name": "workspace_root",
+                  "ty": "Option<PathBuf>"
+                }
+              ]
+            }
+          },
+          {
+            "name": "CalcCatalogSpec",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "CheckCatalogSpec",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "strict_override",
+                  "ty": "bool"
+                },
+                {
+                  "name": "gate",
+                  "ty": "Option<SignalGateName>"
+                },
+                {
+                  "name": "workspace_root",
+                  "ty": "Option<PathBuf>"
+                }
+              ]
+            }
+          },
+          {
+            "name": "CalcImplCatalog",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "CheckImplCatalog",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "strict_override",
+                  "ty": "bool"
+                },
+                {
+                  "name": "gate",
+                  "ty": "Option<SignalGateName>"
+                },
+                {
+                  "name": "workspace_root",
+                  "ty": "Option<PathBuf>"
+                }
+              ]
+            }
+          },
+          {
+            "name": "CheckGate",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "project_root",
+                  "ty": "Option<PathBuf>"
+                },
+                {
+                  "name": "spec_json_path",
+                  "ty": "Option<PathBuf>"
+                },
+                {
+                  "name": "gate",
+                  "ty": "SignalGateName"
+                },
+                {
+                  "name": "workspace_root",
+                  "ty": "Option<PathBuf>"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "signal",
+      "docs": "Typed input for the signal command family.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "SignalDriver": {
+      "action": "reference",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [
+        {
+          "name": "handle",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "input",
+              "ty": "SignalInput"
+            }
+          ],
+          "returns": "CommandOutcome",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Handle a signal command"
+        }
+      ],
+      "module_path": "signal",
+      "docs": "Primary adapter driver for the signal command family. Holds an injected SignalService; exposes handle(input) -> CommandOutcome.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "TelemetryReportInput": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            {
+              "name": "track_id",
+              "ty": "String"
+            },
+            {
+              "name": "items_dir",
+              "ty": "PathBuf"
+            }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "telemetry",
+      "docs": "Input DTO for sotp telemetry report.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "TelemetryInput": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Report",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "TelemetryReportInput"
+              ]
+            }
+          },
+          {
+            "name": "EmitArchivedTrackSubcommand",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "items_dir",
+                  "ty": "PathBuf"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "String"
+                },
+                {
+                  "name": "subcommand",
+                  "ty": "String"
+                },
+                {
+                  "name": "exit_code",
+                  "ty": "i32"
+                },
+                {
+                  "name": "duration_ms",
+                  "ty": "u64"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "telemetry",
+      "docs": "Typed input for the telemetry command family.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "TelemetryDriver": {
+      "action": "reference",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [
+        {
+          "name": "handle",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "input",
+              "ty": "TelemetryInput"
+            }
+          ],
+          "returns": "CommandOutcome",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Handle a telemetry command"
+        }
+      ],
+      "module_path": "telemetry",
+      "docs": "Primary adapter driver for the telemetry command family. Holds a single injected TelemetryAggregateService; exposes handle(input) -> CommandOutcome.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "TrackInput": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Init",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "items_dir",
+                  "ty": "PathBuf"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "String"
+                },
+                {
+                  "name": "description",
+                  "ty": "String"
+                }
+              ]
+            }
+          },
+          {
+            "name": "Transition",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "items_dir",
+                  "ty": "PathBuf"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "task_id",
+                  "ty": "String"
+                },
+                {
+                  "name": "target_status",
+                  "ty": "String"
+                },
+                {
+                  "name": "commit_hash",
+                  "ty": "Option<String>"
+                }
+              ]
+            }
+          },
+          {
+            "name": "Resolve",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "items_dir",
+                  "ty": "PathBuf"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "Option<String>"
+                }
+              ]
+            }
+          },
+          {
+            "name": "BranchCreate",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "items_dir",
+                  "ty": "PathBuf"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "String"
+                }
+              ]
+            }
+          },
+          {
+            "name": "BranchSwitch",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "items_dir",
+                  "ty": "PathBuf"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "String"
+                }
+              ]
+            }
+          },
+          {
+            "name": "ViewsValidate",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "project_root",
+                  "ty": "PathBuf"
+                }
+              ]
+            }
+          },
+          {
+            "name": "ViewsSync",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "project_root",
+                  "ty": "PathBuf"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "Option<String>"
+                }
+              ]
+            }
+          },
+          {
+            "name": "AddTask",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "items_dir",
+                  "ty": "PathBuf"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "description",
+                  "ty": "String"
+                },
+                {
+                  "name": "section",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "after",
+                  "ty": "Option<String>"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SetOverride",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "items_dir",
+                  "ty": "PathBuf"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "status",
+                  "ty": "String"
+                },
+                {
+                  "name": "reason",
+                  "ty": "String"
+                }
+              ]
+            }
+          },
+          {
+            "name": "ClearOverride",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "items_dir",
+                  "ty": "PathBuf"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "Option<String>"
+                }
+              ]
+            }
+          },
+          {
+            "name": "NextTask",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "items_dir",
+                  "ty": "PathBuf"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "Option<String>"
+                }
+              ]
+            }
+          },
+          {
+            "name": "TaskCounts",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "items_dir",
+                  "ty": "PathBuf"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "Option<String>"
+                }
+              ]
+            }
+          },
+          {
+            "name": "Archive",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "items_dir",
+                  "ty": "PathBuf"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "String"
+                }
+              ]
+            }
+          },
+          {
+            "name": "DetectActive",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "project_root",
+                  "ty": "PathBuf"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "track",
+      "docs": "Typed input for the track command family.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "TrackDriver": {
+      "action": "reference",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [
+        {
+          "name": "handle",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "input",
+              "ty": "TrackInput"
+            }
+          ],
+          "returns": "CommandOutcome",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Handle a track command"
+        }
+      ],
+      "module_path": "track",
+      "docs": "Primary adapter driver for the track command family. Holds an injected TrackService; exposes handle(input) -> CommandOutcome.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "VerifyInput": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "TechStack",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "project_root",
+                  "ty": "PathBuf"
+                }
+              ]
+            }
+          },
+          {
+            "name": "LatestTrack",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "project_root",
+                  "ty": "PathBuf"
+                }
+              ]
+            }
+          },
+          {
+            "name": "ArchDocs",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "project_root",
+                  "ty": "PathBuf"
+                }
+              ]
+            }
+          },
+          {
+            "name": "Layers",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "project_root",
+                  "ty": "PathBuf"
+                }
+              ]
+            }
+          },
+          {
+            "name": "HooksPath",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "project_root",
+                  "ty": "PathBuf"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SpecAttribution",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "spec_path",
+                  "ty": "PathBuf"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SpecFrontmatter",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "spec_path",
+                  "ty": "PathBuf"
+                }
+              ]
+            }
+          },
+          {
+            "name": "CanonicalModules",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "project_root",
+                  "ty": "PathBuf"
+                }
+              ]
+            }
+          },
+          {
+            "name": "ModuleSize",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "project_root",
+                  "ty": "PathBuf"
+                }
+              ]
+            }
+          },
+          {
+            "name": "DomainPurity",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "project_root",
+                  "ty": "PathBuf"
+                }
+              ]
+            }
+          },
+          {
+            "name": "DomainStrings",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "project_root",
+                  "ty": "PathBuf"
+                }
+              ]
+            }
+          },
+          {
+            "name": "UsecasePurity",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "project_root",
+                  "ty": "PathBuf"
+                }
+              ]
+            }
+          },
+          {
+            "name": "DocLinks",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "project_root",
+                  "ty": "PathBuf"
+                }
+              ]
+            }
+          },
+          {
+            "name": "ViewFreshness",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "project_root",
+                  "ty": "PathBuf"
+                }
+              ]
+            }
+          },
+          {
+            "name": "SpecSignals",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "spec_path",
+                  "ty": "PathBuf"
+                }
+              ]
+            }
+          },
+          {
+            "name": "PlanArtifactRefs",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "track_dir",
+                  "ty": "Option<PathBuf>"
+                }
+              ]
+            }
+          },
+          {
+            "name": "CatalogueSpecRefs",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "track_id",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "items_dir",
+                  "ty": "PathBuf"
+                },
+                {
+                  "name": "workspace_root",
+                  "ty": "PathBuf"
+                },
+                {
+                  "name": "skip_stale",
+                  "ty": "bool"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "verify",
+      "docs": "Typed input for the verify command family.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "VerifyDriver": {
+      "action": "modify",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [
+        {
+          "name": "handle",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "input",
+              "ty": "VerifyInput"
+            }
+          ],
+          "returns": "CommandOutcome",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Handle a verify command"
+        }
+      ],
+      "module_path": "verify",
+      "docs": "Primary adapter driver for the verify command family. Holds an injected VerifyService; exposes handle(input) -> CommandOutcome.",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-09"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "AC-12"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "PlanInput": {
+      "action": "add",
+      "role": {
+        "Dto": {}
+      },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "RunCodexLocal",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "model",
+                  "ty": "String"
+                },
+                {
+                  "name": "timeout_seconds",
+                  "ty": "u64"
+                },
+                {
+                  "name": "briefing_file",
+                  "ty": "Option<std::path::PathBuf>"
+                },
+                {
+                  "name": "prompt",
+                  "ty": "Option<String>"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "plan",
+      "docs": "Typed input for the plan command family. Carries raw (unresolved) CLI args; prompt resolution and briefing-file validation are performed by PlannerInteractor.",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-08"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-09"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "AC-11"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "AC-12"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "PlanDriver": {
+      "action": "add",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [
+        {
+          "name": "handle",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "input",
+              "ty": "PlanInput"
+            }
+          ],
+          "returns": "CommandOutcome",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Handle a plan command."
+        }
+      ],
+      "module_path": "plan",
+      "docs": "Primary adapter driver for the plan command family. Holds an injected PlannerService; exposes handle(PlanInput) -> CommandOutcome.",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-08"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-09"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "AC-11"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "AC-12"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {
+    "cli_driver::ref_verify::format_pair_status": {
+      "action": "reference",
+      "role": "FreeFunction",
+      "params": [
+        {
+          "name": "claim_hex",
+          "ty": "&str"
+        },
+        {
+          "name": "evidence_hex",
+          "ty": "&str"
+        },
+        {
+          "name": "reason",
+          "ty": "&str"
+        }
+      ],
+      "returns": "String",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Format a missing-or-non-pass pair entry as a bracketed status string.",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "inherent_impls": [
+    {
+      "type_name": "ArchDriver",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            {
+              "name": "service",
+              "ty": "std::sync::Arc<dyn usecase::arch::ArchService>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Create a new ArchDriver with the given ArchService."
+        }
+      ]
+    },
+    {
+      "type_name": "ConventionsDriver",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            {
+              "name": "service",
+              "ty": "std::sync::Arc<dyn usecase::conventions::ConventionsService>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Create a new ConventionsDriver with the given ConventionsService."
+        }
+      ]
+    },
+    {
+      "type_name": "FileDriver",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            {
+              "name": "service",
+              "ty": "std::sync::Arc<dyn usecase::file::FileService>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Create a new FileDriver with the given FileService."
+        }
+      ]
+    },
+    {
+      "type_name": "PlanDriver",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            {
+              "name": "service",
+              "ty": "std::sync::Arc<dyn usecase::planner::PlannerService>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Create a new PlanDriver with the given PlannerService."
+        }
+      ]
+    },
+    {
+      "type_name": "VerifyDriver",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            {
+              "name": "service",
+              "ty": "std::sync::Arc<dyn usecase::verify::VerifyService>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Create a new VerifyDriver with the given VerifyService."
+        }
+      ]
+    }
+  ],
+  "trait_impls": []
+}

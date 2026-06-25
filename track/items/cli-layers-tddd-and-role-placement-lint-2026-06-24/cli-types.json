@@ -1,0 +1,2408 @@
+{
+  "schema_version": 5,
+  "crate_name": "cli",
+  "layer": "cli",
+  "types": {
+    "CliError": {
+      "action": "reference",
+      "role": {
+        "ErrorType": {}
+      },
+      "module_path": "error",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Message",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Io",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "ArchCommand": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::arch",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Tree",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "TreeFull",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Members",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "DirectChecks",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "ConventionsCommand": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::conventions",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Add",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "UpdateIndex",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "VerifyIndex",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "DomainCommand": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::domain",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ExportSchema",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "ExportSchemaArgs": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::domain",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "DryCommand": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::dry",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Write",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Results",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "CheckApproved",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "FixLocal",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "VerdictFilterArg": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::dry",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "All",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "NotAViolation",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Accepted",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Violation",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "DryWriteArgs": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::dry",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            {
+              "name": "track_id",
+              "ty": "String"
+            },
+            {
+              "name": "base_commit",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "db_path",
+              "ty": "PathBuf"
+            },
+            {
+              "name": "threshold",
+              "ty": "Option<f32>"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "PathBuf"
+            },
+            {
+              "name": "items_dir",
+              "ty": "PathBuf"
+            },
+            {
+              "name": "model",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "capability_name",
+              "ty": "String"
+            }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "DryResultsArgs": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::dry",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            {
+              "name": "track_id",
+              "ty": "String"
+            },
+            {
+              "name": "filter",
+              "ty": "VerdictFilterArg"
+            },
+            {
+              "name": "items_dir",
+              "ty": "PathBuf"
+            }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "DryCheckApprovedArgs": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::dry",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            {
+              "name": "track_id",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "base_commit",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "items_dir",
+              "ty": "PathBuf"
+            }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "DryFixLocalArgs": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::dry",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            {
+              "name": "track_id",
+              "ty": "String"
+            },
+            {
+              "name": "briefing_file",
+              "ty": "PathBuf"
+            },
+            {
+              "name": "model",
+              "ty": "Option<String>"
+            }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "FileCommand": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::file",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "WriteAtomic",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "GitCommand": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::git",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "AddAll",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "AddPaths",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "CommitFromFile",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "SwitchAndPull",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Unstage",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "FileArgs": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::git",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "CommitFromFileArgs": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::git",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "SwitchAndPullArgs": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::git",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "UnstageArgs": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::git",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "GuardCommand": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::guard",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Check",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "CliHookName": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::hook",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "HooksPathSetup",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "BlockDirectGitOps",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "BlockTestFileDeletion",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "GitRefUpdate",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "GitPrePush",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "SkillCompliance",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "HookCommand": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::hook",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Dispatch",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "PlanCommand": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::plan",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "CodexLocal",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "PlanCodexLocalArgs": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::plan",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "PrCommand": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::pr",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Push",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "EnsurePr",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Status",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "WaitAndMerge",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "TriggerReview",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "PollReview",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "ReviewCycle",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "PushArgs": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::pr",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "EnsurePrArgs": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::pr",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "StatusArgs": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::pr",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "WaitAndMergeArgs": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::pr",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "TriggerReviewArgs": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::pr",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "PollReviewArgs": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::pr",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "ReviewCycleArgs": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::pr",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "RefVerifyCommand": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::ref_verify",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Run",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "CheckApproved",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "RunArgs": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::ref_verify",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "CheckApprovedArgs": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::ref_verify",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "ReviewCommand": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::review",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "CodexLocal",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "ClaudeLocal",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Local",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "FixLocal",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "CheckApproved",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Results",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Classify",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Files",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "CodexRoundTypeArg": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::review",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Fast",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Final",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "RoundTypeFilter": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::review",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Fast",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Final",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Any",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "ResultsLimit": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::review",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Zero",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Count",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "All",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "CodexLocalArgs": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::review",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "ClaudeLocalArgs": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::review",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "ResultsArgs": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::review",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "FindSimilarArgs": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::semantic_dup",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "DupIndexCommand": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::semantic_dup",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Build",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "MeasureQuality",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "DupIndexBuildArgs": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::semantic_dup",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "DupIndexMeasureQualityArgs": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::semantic_dup",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "DupCheckArgs": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::semantic_dup",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "GateArg": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::signal",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Commit",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Merge",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "CheckFlags": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::signal",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            {
+              "name": "strict",
+              "ty": "bool"
+            },
+            {
+              "name": "gate",
+              "ty": "Option<GateArg>"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "Option<PathBuf>"
+            }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "SignalCheckArgs": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::signal",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            {
+              "name": "gate",
+              "ty": "GateArg"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "Option<PathBuf>"
+            },
+            {
+              "name": "project_root",
+              "ty": "Option<PathBuf>"
+            },
+            {
+              "name": "spec_json",
+              "ty": "Option<PathBuf>"
+            }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "SignalCommand": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::signal",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "CalcAdrUser",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "CheckAdrUser",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "CalcSpecAdr",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "CheckSpecAdr",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "CalcCatalogSpec",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "CheckCatalogSpec",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "CalcImplCatalog",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "CheckImplCatalog",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Check",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "CalcAdrUserArgs": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::signal",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "CalcSpecAdrArgs": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::signal",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "CalcCatalogSpecArgs": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::signal",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "CalcImplCatalogArgs": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::signal",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "CheckAdrUserArgs": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::signal",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "CheckSpecAdrArgs": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::signal",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "CheckCatalogSpecArgs": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::signal",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "CheckImplCatalogArgs": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::signal",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "TelemetryCommand": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::telemetry",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Report",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "ReportArgs": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::telemetry",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "TrackCommand": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::track",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Archive",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Transition",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Branch",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Resolve",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Views",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "AddTask",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "SetOverride",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "ClearOverride",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "NextTask",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "TaskCounts",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "TypeGraph",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "BaselineGraph",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "ContractMap",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "SpecElementHash",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "BaselineCapture",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "FixpointResolve",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "SetCommitHash",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Lint",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "CatalogueImplSignals",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "BranchAction": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::track",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Create",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Switch",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "BranchArgs": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::track",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "ResolveArgs": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::track",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "ViewAction": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::track",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Validate",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Sync",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "SetCommitHashArgs": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::track",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            {
+              "name": "track_id",
+              "ty": "Option<String>"
+            }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "FixpointResolveArgs": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::track::fixpoint_resolve",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            {
+              "name": "items_dir",
+              "ty": "PathBuf"
+            },
+            {
+              "name": "track_id",
+              "ty": "String"
+            },
+            {
+              "name": "current_branch",
+              "ty": "String"
+            }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "VerifyCommand": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::verify",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "TechStack",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "LatestTrack",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "ArchDocs",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Layers",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "HooksPath",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "SpecAttribution",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "SpecFrontmatter",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "CanonicalModules",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "ModuleSize",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "DomainPurity",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "DomainStrings",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "UsecasePurity",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "DocLinks",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "ViewFreshness",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "SpecSignals",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "PlanArtifactRefs",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "CatalogueSpecRefs",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "SpecVerifyArgs": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::verify",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "CatalogueSpecRefsArgs": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::verify",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "PlanArtifactRefsArgs": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::verify",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "VerifyArgs": {
+      "action": "reference",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::verify",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "CodexInvocation": {
+      "action": "delete",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::plan",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-08"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "AC-11"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "PlanRunResult": {
+      "action": "delete",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::plan",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-08"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "AC-11"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {
+    "cli::commands::plan::codex_local::build_prompt": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "Result<String, String>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Pre-track test shim for prompt resolution. Removed entirely in this track — both the #[cfg(test)] shim and the underlying production helpers are gone.",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-08"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "AC-11"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "cli::commands::plan::codex_local::build_codex_invocation": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "super::CodexInvocation",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Pre-track test shim for Codex argv construction. Removed entirely — subprocess argv construction lives in infrastructure::codex_planner.",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-08"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "AC-11"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "cli::commands::plan::codex_local::run_codex_local_invocation": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "Result<super::PlanRunResult, String>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Pre-track test shim for subprocess lifecycle. Removed entirely — subprocess orchestration lives in infrastructure::codex_planner.",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-08"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "AC-11"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "cli::commands::plan::codex_local::codex_bin": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "std::ffi::OsString",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Pre-track test shim for codex binary path resolution. Removed entirely with the test shim block.",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-08"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "AC-11"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "cli::commands::plan::codex_local::configure_child_process_group": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "()",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Pre-track test shim for child process group configuration. Removed entirely.",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-08"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "AC-11"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "cli::commands::plan::codex_local::prepare_session_log_path": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "Result<std::path::PathBuf, String>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Pre-track test shim for session log path preparation. Removed entirely.",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-08"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "AC-11"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "cli::commands::plan::codex_local::run_codex_child": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "Result<super::PlanRunResult, String>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Pre-track test shim for running the Codex child process. Removed entirely.",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-08"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "AC-11"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "cli::commands::plan::codex_local::spawn_codex": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "Result<std::process::Child, String>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Pre-track test shim for spawning the Codex process. Removed entirely.",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-08"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "AC-11"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "cli::commands::plan::codex_local::terminate_planner_child": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "Result<(), String>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Pre-track test shim for terminating the planner child process. Removed entirely.",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-08"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "AC-11"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "cli::commands::plan::codex_local::run_execute_codex_local": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        {
+          "name": "args",
+          "ty": "&PlanCodexLocalArgs"
+        },
+        {
+          "name": "handle",
+          "ty": "impl FnOnce(cli_driver::plan::PlanInput) -> cli_driver::render::CommandOutcome"
+        }
+      ],
+      "returns": "std::process::ExitCode",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Test-injectable dispatcher: takes a closure for handling the PlanInput, allowing tests to mock the driver. Production caller is execute_codex_local. New in this track (thin-bin refactor, ADR 1420 D1 / ADR 1328 D5).",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-08"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "AC-11"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "cli::commands::plan::codex_local::plan_input_from_args": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        {
+          "name": "args",
+          "ty": "&PlanCodexLocalArgs"
+        }
+      ],
+      "returns": "cli_driver::plan::PlanInput",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Convert clap args to PlanInput. Infallible — application-level prompt resolution and briefing-file existence checks moved to PlannerInteractor.run_codex_local in libs/usecase/src/planner.rs (T012). Test-callable private helper.",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-08"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "AC-11"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "cli::commands::review::codex_local::review_input_from_args": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        {
+          "name": "args",
+          "ty": "&CodexLocalArgs"
+        }
+      ],
+      "returns": "Result<cli_driver::review::ReviewInput, crate::CliError>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Build ReviewInput from clap args and validated record args. Test-callable private helper introduced by thin-bin refactor.",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-08"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "AC-11"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "cli::commands::review::codex_local::emit_outcome_output_to": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        {
+          "name": "stdout_text",
+          "ty": "Option<&str>"
+        },
+        {
+          "name": "stderr_text",
+          "ty": "Option<&str>"
+        },
+        {
+          "name": "exit_code",
+          "ty": "u8"
+        },
+        {
+          "name": "writer",
+          "ty": "&mut W"
+        }
+      ],
+      "returns": "Result<u8, crate::CliError>",
+      "is_async": false,
+      "generics": [
+        {
+          "name": "W"
+        }
+      ],
+      "where_predicates": [
+        {
+          "lhs": "W",
+          "rhs": [
+            "std::io::Write"
+          ]
+        }
+      ],
+      "docs": "Generic over Write so tests can capture output without spawning stdout. Renamed from emit_outcome_output (which is action: delete, see existing entry).",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-08"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "AC-11"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "cli::commands::review::codex_local::run_execute_codex_local": {
+      "action": "modify",
+      "role": "FreeFunction",
+      "params": [
+        {
+          "name": "args",
+          "ty": "&CodexLocalArgs"
+        },
+        {
+          "name": "handle",
+          "ty": "impl FnOnce(cli_driver::review::ReviewInput) -> cli_driver::render::CommandOutcome"
+        }
+      ],
+      "returns": "std::process::ExitCode",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Test-injectable dispatcher: takes a closure for handling ReviewInput, allowing tests to mock the driver. Production caller is execute_codex_local. New in this track (thin-bin refactor, ADR 1420 D1 / ADR 1328 D5).",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-08"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "AC-11"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "inherent_impls": [],
+  "trait_impls": []
+}

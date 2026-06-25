@@ -1,6 +1,5 @@
 //! CLI subcommands for local planner workflow wrappers.
 
-use std::ffi::OsString;
 use std::path::PathBuf;
 use std::process::ExitCode;
 
@@ -15,8 +14,6 @@ use codex_local::execute_codex_local;
 const DEFAULT_TIMEOUT_SECONDS: u64 = 600;
 
 pub(crate) const PLAN_RUNTIME_DIR: &str = "tmp/planner-runtime";
-#[cfg(test)]
-pub(crate) const CODEX_BIN_ENV: &str = "SOTP_CODEX_BIN";
 
 #[derive(Debug, Subcommand)]
 pub enum PlanCommand {
@@ -46,20 +43,6 @@ pub struct PlanCodexLocalArgs {
     /// Inline prompt for the planner.
     #[arg(long)]
     pub(super) prompt: Option<String>,
-}
-
-/// Result of a Codex planner subprocess invocation.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub(super) struct PlanRunResult {
-    /// Raw exit code from the Codex subprocess.
-    pub(super) exit_code: u8,
-}
-
-/// Codex invocation configuration.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub(super) struct CodexInvocation {
-    pub(super) bin: OsString,
-    pub(super) args: Vec<OsString>,
 }
 
 pub fn execute(cmd: PlanCommand) -> ExitCode {

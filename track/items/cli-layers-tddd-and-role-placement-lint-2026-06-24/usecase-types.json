@@ -1,0 +1,1053 @@
+{
+  "schema_version": 5,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {
+    "PlanRunOutput": {
+      "action": "add",
+      "role": {
+        "Dto": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            {
+              "name": "exit_code",
+              "ty": "u8"
+            }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "planner",
+      "docs": "Output from a single planner subprocess run.",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-08"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "AC-11"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "PlannerPortError": {
+      "action": "add",
+      "role": {
+        "ErrorType": {}
+      },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "MissingPromptSource",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "PlannerUnavailable",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "reason",
+                  "ty": "String"
+                }
+              ]
+            }
+          },
+          {
+            "name": "PlannerTimeout",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "elapsed_seconds",
+                  "ty": "u64"
+                }
+              ]
+            }
+          },
+          {
+            "name": "PlannerFailed",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "exit_code",
+                  "ty": "u8"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "planner",
+      "docs": "Error type for planner port failures. Variants describe planner-level failure concepts only.",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-08"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "AC-11"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "ArchInteractor": {
+      "action": "add",
+      "role": {
+        "Interactor": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "arch",
+      "docs": "Interactor that implements ArchService by delegating to the injected ArchPort.",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-09"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "AC-12"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "ConventionsInteractor": {
+      "action": "add",
+      "role": {
+        "Interactor": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "conventions",
+      "docs": "Interactor that implements ConventionsService by delegating to the injected ConventionsPort.",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-09"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "AC-12"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "FileInteractor": {
+      "action": "add",
+      "role": {
+        "Interactor": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "file",
+      "docs": "Interactor that implements FileService by delegating to the injected FileWritePort.",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-09"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "AC-12"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "PlannerInteractor": {
+      "action": "add",
+      "role": {
+        "Interactor": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "planner",
+      "docs": "Interactor that implements PlannerService. Resolves the prompt from a briefing file path or an inline string, then delegates execution to the injected PlannerPort. Absorbs the plan_input_from_args application logic (briefing-file existence check and prompt construction).",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-09"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "AC-12"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "VerifyInteractor": {
+      "action": "add",
+      "role": {
+        "Interactor": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "verify",
+      "docs": "Interactor that implements VerifyService by delegating to the injected VerifyPort.",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-09"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "AC-12"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {
+    "PlannerPort": {
+      "action": "add",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "module_path": "planner",
+      "docs": "Secondary port — executes a planner request and returns the exit code.",
+      "methods": [
+        {
+          "name": "run",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "model",
+              "ty": "&str"
+            },
+            {
+              "name": "prompt",
+              "ty": "&str"
+            },
+            {
+              "name": "timeout_seconds",
+              "ty": "u64"
+            }
+          ],
+          "returns": "Result<PlanRunOutput, PlannerPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Execute a planner request and return the result."
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-08"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "AC-11"
+        }
+      ],
+      "informal_grounds": [],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "ArchService": {
+      "action": "add",
+      "role": {
+        "ApplicationService": {}
+      },
+      "module_path": "arch",
+      "docs": "Application-level contract for workspace architecture rendering. PrimaryAdapter (ArchDriver) depends on this interface rather than directly on ArchPort (DIP). ArchInteractor implements this service by delegating to the injected ArchPort.",
+      "methods": [
+        {
+          "name": "render_tree",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Result<String, ArchPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Render the workspace tree (crate paths only)."
+        },
+        {
+          "name": "render_tree_full",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Result<String, ArchPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Render the workspace tree including extra_dirs."
+        },
+        {
+          "name": "render_members",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Result<String, ArchPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "List workspace member paths (one per line)."
+        },
+        {
+          "name": "render_direct_checks",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Result<String, ArchPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Print the direct dependency check matrix."
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-09"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "AC-12"
+        }
+      ],
+      "informal_grounds": [],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "ConventionsService": {
+      "action": "add",
+      "role": {
+        "ApplicationService": {}
+      },
+      "module_path": "conventions",
+      "docs": "Application-level contract for convention document management. PrimaryAdapter (ConventionsDriver) depends on this interface rather than directly on ConventionsPort (DIP). ConventionsInteractor implements this service by delegating to the injected ConventionsPort.",
+      "methods": [
+        {
+          "name": "add_convention",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "root",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "name",
+              "ty": "String"
+            },
+            {
+              "name": "slug",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "title",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "summary",
+              "ty": "Option<String>"
+            }
+          ],
+          "returns": "Result<String, ConventionsPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Create a new convention document and update the README index."
+        },
+        {
+          "name": "update_index",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Result<String, ConventionsPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Regenerate the README.md index from current convention documents."
+        },
+        {
+          "name": "verify_index",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Result<VerifyIndexResult, ConventionsPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Verify that the README.md indexes all convention documents."
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-09"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "AC-12"
+        }
+      ],
+      "informal_grounds": [],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "FileService": {
+      "action": "add",
+      "role": {
+        "ApplicationService": {}
+      },
+      "module_path": "file",
+      "docs": "Application-level contract for atomic file write operations. PrimaryAdapter (FileDriver) depends on this interface rather than directly on FileWritePort (DIP). FileInteractor implements this service by delegating to the injected FileWritePort.",
+      "methods": [
+        {
+          "name": "write_atomic",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "path",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "content",
+              "ty": "Vec<u8>"
+            }
+          ],
+          "returns": "Result<(), FilePortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Atomically write content to path (tmp + fsync + rename)."
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-09"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "AC-12"
+        }
+      ],
+      "informal_grounds": [],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "PlannerService": {
+      "action": "add",
+      "role": {
+        "ApplicationService": {}
+      },
+      "module_path": "planner",
+      "docs": "Application-level contract for the planner capability. PrimaryAdapter (PlanDriver) depends on this interface rather than directly on PlannerPort (DIP). PlannerInteractor implements this service, absorbing the prompt-resolution logic (briefing-file existence check and prompt construction from plan_input_from_args) before delegating to the injected PlannerPort.",
+      "methods": [
+        {
+          "name": "run_codex_local",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "model",
+              "ty": "String"
+            },
+            {
+              "name": "briefing_file",
+              "ty": "Option<std::path::PathBuf>"
+            },
+            {
+              "name": "prompt",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "timeout_seconds",
+              "ty": "u64"
+            }
+          ],
+          "returns": "Result<PlanRunOutput, PlannerPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Resolve the prompt from briefing_file or inline prompt, then execute the planner. Returns MissingPromptSource if neither is provided."
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-09"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "AC-12"
+        }
+      ],
+      "informal_grounds": [],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "VerifyService": {
+      "action": "add",
+      "role": {
+        "ApplicationService": {}
+      },
+      "module_path": "verify",
+      "docs": "Application-level contract for all verify subcommands. PrimaryAdapter (VerifyDriver) depends on this interface rather than directly on VerifyPort (DIP). VerifyInteractor implements this service by delegating to the injected VerifyPort.",
+      "methods": [
+        {
+          "name": "verify_tech_stack",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Check tech-stack.md for unresolved TODO markers."
+        },
+        {
+          "name": "verify_latest_track",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Check latest track artifacts for completeness."
+        },
+        {
+          "name": "verify_arch_docs",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Check architecture docs synchronization and text patterns."
+        },
+        {
+          "name": "verify_layers",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Check workspace layer dependency rules via cargo metadata."
+        },
+        {
+          "name": "verify_hooks_path",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Check local Git config uses .githooks as core.hooksPath."
+        },
+        {
+          "name": "verify_spec_attribution",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "spec_path",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Check spec.md requirement lines for [source: ...] attribution."
+        },
+        {
+          "name": "verify_spec_frontmatter",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "spec_path",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Check spec.md YAML frontmatter for required fields."
+        },
+        {
+          "name": "verify_canonical_modules",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Check canonical module ownership."
+        },
+        {
+          "name": "verify_module_size",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Check Rust source file sizes against module_limits thresholds."
+        },
+        {
+          "name": "verify_domain_purity",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Check libs/domain/src/ for hexagonal purity violations."
+        },
+        {
+          "name": "verify_domain_strings",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Check libs/domain/src/ for pub String fields."
+        },
+        {
+          "name": "verify_usecase_purity",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Check libs/usecase/src/ for hexagonal purity violations."
+        },
+        {
+          "name": "verify_doc_links",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Check that local file links in Markdown documents resolve to existing files."
+        },
+        {
+          "name": "verify_view_freshness",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Check that plan.md files are up-to-date with metadata.json renderings."
+        },
+        {
+          "name": "verify_spec_signals",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "spec_path",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Check spec.md source tag signals match frontmatter and red == 0 gate."
+        },
+        {
+          "name": "verify_plan_artifact_refs",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "track_dir",
+              "ty": "Option<std::path::PathBuf>"
+            }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Validate structured-ref fields per ADR 2026-04-19-1242."
+        },
+        {
+          "name": "verify_catalogue_spec_refs",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "skip_stale",
+              "ty": "bool"
+            }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Verify catalogue-spec ref integrity (SoT Chain binary gate)."
+        }
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-09"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "AC-12"
+        }
+      ],
+      "informal_grounds": [],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    }
+  },
+  "functions": {},
+  "inherent_impls": [
+    {
+      "type_name": "ArchInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            {
+              "name": "port",
+              "ty": "std::sync::Arc<dyn ArchPort>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Create a new ArchInteractor wrapping the given ArchPort."
+        }
+      ]
+    },
+    {
+      "type_name": "ConventionsInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            {
+              "name": "port",
+              "ty": "std::sync::Arc<dyn ConventionsPort>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Create a new ConventionsInteractor wrapping the given ConventionsPort."
+        }
+      ]
+    },
+    {
+      "type_name": "FileInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            {
+              "name": "port",
+              "ty": "std::sync::Arc<dyn FileWritePort>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Create a new FileInteractor wrapping the given FileWritePort."
+        }
+      ]
+    },
+    {
+      "type_name": "PlannerInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            {
+              "name": "port",
+              "ty": "std::sync::Arc<dyn PlannerPort>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Create a new PlannerInteractor wrapping the given PlannerPort."
+        }
+      ]
+    },
+    {
+      "type_name": "VerifyInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            {
+              "name": "port",
+              "ty": "std::sync::Arc<dyn VerifyPort>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Create a new VerifyInteractor wrapping the given VerifyPort."
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "PlanRunOutput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "PlanRunOutput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "PlanRunOutput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "PlanRunOutput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "PlannerPortError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "PlannerPortError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "PlannerPortError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "ArchService",
+      "for_type": "ArchInteractor"
+    },
+    {
+      "action": "add",
+      "trait_ref": "ConventionsService",
+      "for_type": "ConventionsInteractor"
+    },
+    {
+      "action": "add",
+      "trait_ref": "FileService",
+      "for_type": "FileInteractor"
+    },
+    {
+      "action": "add",
+      "trait_ref": "PlannerService",
+      "for_type": "PlannerInteractor"
+    },
+    {
+      "action": "add",
+      "trait_ref": "VerifyService",
+      "for_type": "VerifyInteractor"
+    }
+  ]
+}

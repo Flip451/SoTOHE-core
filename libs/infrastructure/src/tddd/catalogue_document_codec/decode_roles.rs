@@ -69,6 +69,8 @@ pub(super) fn data_role_from_dto(
             Ok(DataRole::EventPolicy { reacts_to })
         }
         DataRoleDto::DomainEvent {} => Ok(DataRole::DomainEvent),
+        DataRoleDto::CompositionRoot {} => Ok(DataRole::CompositionRoot),
+        DataRoleDto::PrimaryAdapter {} => Ok(DataRole::PrimaryAdapter),
     }
 }
 

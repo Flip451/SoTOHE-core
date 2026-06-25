@@ -165,14 +165,29 @@ pub(super) fn build_type_trait_identity_map(krate: &Crate) -> BTreeMap<String, I
 
 /// Build a `(function_path_string, Id)` map for free function items in a `rustdoc_types::Crate`.
 ///
-/// Identity key: `FunctionPath` = path segments joined by `"::"` (e.g.
-/// `"my_crate::module::fn_name"`), looked up from `Crate::paths`.
+/// Identity key: canonical `FunctionPath` = path segments joined by `"::"`, looked up
+/// from `Crate::paths`.
+///
+/// For normal library/catalogue graphs the full path is preserved
+/// (`"cli::module::fn_name"` stays `"cli::module::fn_name"`). For the workspace's
+/// `cli` package, rustdoc for the `[[bin]]` target names the crate root after the binary
+/// (`"sotp::module::fn_name"`). That single bin-root alias is rewritten to the package
+/// crate root (`"cli::module::fn_name"`) so bin rustdoc entries still match catalogue
+/// `FunctionPath` keys without making every function identity rootless.
 ///
 /// Only **free** functions are included.  Associated methods (belonging to a
 /// `Trait` or `Impl` `items` list) are explicitly excluded even when they
 /// appear in `Crate::paths`: trait-method structural equality is captured at
 /// the trait/impl level, and duplicating methods here would cause spurious or
 /// double-counted Phase 2 signals.
+///
+/// Visibility is intentionally NOT filtered here: every function rustdoc surfaces
+/// for the local crate is recorded so the catalogue can declare it (with the
+/// action that reflects reality — `Add` / `Modify` / `Delete` / `Reference`).
+/// `[[bin]]` targets surface even private `fn` items because `rustdoc --bin`
+/// has no external-API consumer to hide them from; if the catalogue does not
+/// want to track such an item it must still declare a row for it so the
+/// trade-off is visible in source, not implicit in a framework filter.
 pub(super) fn build_function_identity_map(krate: &Crate) -> BTreeMap<String, Id> {
     use std::collections::HashSet;
     // Build the set of all method Ids that belong to a trait or impl's items list.
@@ -198,16 +213,36 @@ pub(super) fn build_function_identity_map(krate: &Crate) -> BTreeMap<String, Id>
         if method_ids.contains(id) {
             continue;
         }
-        if matches!(item.inner, ItemEnum::Function(_)) {
-            if let Some(summary) = krate.paths.get(id) {
-                let path_str = summary.path.join("::");
-                if !path_str.is_empty() {
-                    map.insert(path_str, *id);
-                }
-            }
+        if !matches!(item.inner, ItemEnum::Function(_)) {
+            continue;
+        }
+        let Some(summary) = krate.paths.get(id) else { continue };
+        let identity_key = function_identity_key(&summary.path);
+        if !identity_key.is_empty() {
+            map.insert(identity_key, *id);
         }
     }
     map
+}
+
+fn function_identity_key(path: &[String]) -> String {
+    let Some((root, rest)) = path.split_first() else {
+        return String::new();
+    };
+    let mut segments = Vec::with_capacity(path.len());
+    segments.push(canonical_function_root_segment(root).to_owned());
+    segments.extend(rest.iter().cloned());
+    segments.join("::")
+}
+
+fn canonical_function_root_segment(root: &str) -> &str {
+    match root {
+        // apps/cli is package `cli` with bin target `sotp`. rustdoc --bin uses
+        // the bin name as the root segment, while catalogues use the package
+        // crate name in FunctionPath keys.
+        "sotp" => "cli",
+        other => other,
+    }
 }
 
 /// Returns `true` if the item is a type (Struct/Enum/TypeAlias) or a Trait.

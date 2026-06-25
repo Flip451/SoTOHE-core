@@ -106,7 +106,15 @@
       ],
       "deny_reason": "CLI primary adapter holds injected use cases, invokes them and renders the result into CommandOutcome.",
       "tddd": {
-        "enabled": false
+        "enabled": true,
+        "catalogue_file": "cli_driver-types.json",
+        "catalogue_spec_signal": {
+          "enabled": true
+        },
+        "schema_export": {
+          "method": "rustdoc",
+          "targets": ["cli_driver"]
+        }
       }
     },
     {
@@ -118,7 +126,16 @@
       ],
       "deny_reason": "",
       "tddd": {
-        "enabled": false
+        "enabled": true,
+        "catalogue_file": "cli-types.json",
+        "catalogue_spec_signal": {
+          "enabled": true
+        },
+        "schema_export": {
+          "method": "rustdoc",
+          "targets": ["cli"],
+          "notes": "[[bin]] target (crate-type bin); T006 routes bin-target schema export through libs/infrastructure/src/schema_export/bin_target.rs before invoking nightly rustdoc --output-format json"
+        }
       }
     },
     {
@@ -132,7 +149,15 @@
       ],
       "deny_reason": "CLI composition root owns domain/usecase/infrastructure wiring for the CLI delivery adapter.",
       "tddd": {
-        "enabled": false
+        "enabled": true,
+        "catalogue_file": "cli_composition-types.json",
+        "catalogue_spec_signal": {
+          "enabled": true
+        },
+        "schema_export": {
+          "method": "rustdoc",
+          "targets": ["cli_composition"]
+        }
       }
     }
   ]

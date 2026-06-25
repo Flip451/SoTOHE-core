@@ -1,0 +1,682 @@
+{
+  "schema_version": 5,
+  "crate_name": "cli_composition",
+  "layer": "cli_composition",
+  "types": {
+    "CommandOutcome": {
+      "action": "delete",
+      "role": {
+        "Dto": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            {
+              "name": "stdout",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "stderr",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "exit_code",
+              "ty": "u8"
+            }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "lib",
+      "docs": "Unified return type for all driver command methods. Existed in baseline as a locally-defined struct in cli_composition::lib; this track moved the canonical definition to cli_driver::render and re-exports it via pub use cli_driver::CommandOutcome. The definition no longer lives in cli_composition — hence action: delete from cli_composition's owned type space.",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-08"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "AC-11"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "CompositionError": {
+      "action": "reference",
+      "role": {
+        "ErrorType": {}
+      },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ConfigLoad",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "String"
+              ]
+            }
+          },
+          {
+            "name": "AdapterInit",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "String"
+              ]
+            }
+          },
+          {
+            "name": "WiringFailed",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "String"
+              ]
+            }
+          },
+          {
+            "name": "Usecase",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "String"
+              ]
+            }
+          },
+          {
+            "name": "Infrastructure",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "String"
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "error",
+      "docs": "Typed error for construction and wiring failures at the cli_composition boundary.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "ArchCompositionRoot": {
+      "action": "modify",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Create a new ArchCompositionRoot."
+        },
+        {
+          "name": "arch_driver",
+          "receiver": "&self",
+          "params": [],
+          "returns": "cli_driver::arch::ArchDriver",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Build a wired ArchDriver. Wire chain: FsArchAdapter -> ArchInteractor -> ArchDriver."
+        }
+      ],
+      "module_path": "arch",
+      "docs": "Composition root for the arch command family — wires ArchPort adapter into ArchInteractor, then injects ArchInteractor into ArchDriver.",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-09"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "AC-12"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "ConventionsCompositionRoot": {
+      "action": "modify",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Create a new ConventionsCompositionRoot."
+        },
+        {
+          "name": "conventions_driver",
+          "receiver": "&self",
+          "params": [],
+          "returns": "cli_driver::conventions::ConventionsDriver",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Build a wired ConventionsDriver. Wire chain: FsConventionsAdapter -> ConventionsInteractor -> ConventionsDriver."
+        }
+      ],
+      "module_path": "conventions",
+      "docs": "Composition root for the conventions command family — wires ConventionsPort adapter into ConventionsInteractor, then injects ConventionsInteractor into ConventionsDriver.",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-09"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "AC-12"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DemoCompositionRoot": {
+      "action": "reference",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "demo",
+      "docs": "Composition root for the demo command family.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "DomainCompositionRoot": {
+      "action": "reference",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "domain",
+      "docs": "Composition root for the domain command family — wires ExportSchemaService.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "DryCompositionRoot": {
+      "action": "reference",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "dry",
+      "docs": "Composition root for the dry command family.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "DryFixRunnerCompositionRoot": {
+      "action": "reference",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "dry_fix_runner",
+      "docs": "Composition root for the dry fix runner (fix-local flow).",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "FileCompositionRoot": {
+      "action": "modify",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Create a new FileCompositionRoot."
+        },
+        {
+          "name": "file_driver",
+          "receiver": "&self",
+          "params": [],
+          "returns": "cli_driver::file::FileDriver",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Build a wired FileDriver. Wire chain: FsFileWriteAdapter -> FileInteractor -> FileDriver."
+        }
+      ],
+      "module_path": "file",
+      "docs": "Composition root for the file command family — wires FileWritePort adapter into FileInteractor, then injects FileInteractor into FileDriver.",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-09"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "AC-12"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "GitCompositionRoot": {
+      "action": "reference",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "git",
+      "docs": "Composition root for the git command family — wires GitWorkflowService.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "GuardCompositionRoot": {
+      "action": "reference",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "guard",
+      "docs": "Composition root for the guard command family.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "HookCompositionRoot": {
+      "action": "reference",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "hook",
+      "docs": "Composition root for the hook command family.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "PrCompositionRoot": {
+      "action": "reference",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "pr",
+      "docs": "Composition root for the pr command family.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "RefVerifyCompositionRoot": {
+      "action": "reference",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "ref_verify",
+      "docs": "Composition root for the ref-verify command family.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "ReviewCompositionRoot": {
+      "action": "reference",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "review_v2",
+      "docs": "Composition root for the review command family (v2 workflow).",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "SemanticDupCompositionRoot": {
+      "action": "reference",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "semantic_dup",
+      "docs": "Composition root for the semantic-dup command family.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "SignalCompositionRoot": {
+      "action": "reference",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "signal",
+      "docs": "Composition root for the signal command family.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "TelemetryCompositionRoot": {
+      "action": "reference",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "telemetry",
+      "docs": "Composition root for the telemetry command family.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "TrackCompositionRoot": {
+      "action": "reference",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "track::composition_root",
+      "docs": "Composition root for the track command family.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "VerifyCompositionRoot": {
+      "action": "modify",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Create a new VerifyCompositionRoot."
+        },
+        {
+          "name": "verify_driver",
+          "receiver": "&self",
+          "params": [],
+          "returns": "cli_driver::verify::VerifyDriver",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Build a wired VerifyDriver. Wire chain: FsVerifyAdapter -> VerifyInteractor -> VerifyDriver."
+        }
+      ],
+      "module_path": "verify",
+      "docs": "Composition root for the verify command family — wires VerifyPort adapter into VerifyInteractor, then injects VerifyInteractor into VerifyDriver.",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-09"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "AC-12"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "PlanCompositionRoot": {
+      "action": "add",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            {
+              "name": "runtime_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Create a new PlanCompositionRoot."
+        },
+        {
+          "name": "plan_driver",
+          "receiver": "&self",
+          "params": [],
+          "returns": "cli_driver::plan::PlanDriver",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Build a wired PlanDriver. Wire chain: CodexPlannerAdapter -> PlannerInteractor -> PlanDriver."
+        }
+      ],
+      "module_path": "plan",
+      "docs": "Composition root for the plan command family — wires CodexPlannerAdapter into PlannerInteractor, then injects PlannerInteractor into PlanDriver. The session log directory is supplied at construction time.",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-08"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-09"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "AC-11"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "AC-12"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {
+    "cli_composition::build_codex_read_only_invocation": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "Vec<std::ffi::OsString>",
+      "is_async": false,
+      "generics": [],
+      "docs": "Proxy to infrastructure::codex_common::build_codex_read_only_invocation. Existed in baseline as a pub fn re-export wrapper; removed from cli_composition in this track.",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-08"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "AC-11"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "cli_composition::tee_stderr_to_file": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [
+        {
+          "name": "pipe",
+          "ty": "std::process::ChildStderr"
+        },
+        {
+          "name": "log_file",
+          "ty": "std::fs::File"
+        }
+      ],
+      "returns": "()",
+      "is_async": false,
+      "generics": [],
+      "docs": "Public helper that teed child stderr to a log file while printing to inherited stderr. Existed in baseline; removed from cli_composition in this track (moved to infrastructure::codex_planner).",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-08"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "AC-11"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "inherent_impls": [],
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "ArchCompositionRoot",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "action": "reference",
+      "for_type": "ConventionsCompositionRoot",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "action": "reference",
+      "for_type": "FileCompositionRoot",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "action": "reference",
+      "for_type": "VerifyCompositionRoot",
+      "trait_ref": "core::default::Default"
+    }
+  ]
+}

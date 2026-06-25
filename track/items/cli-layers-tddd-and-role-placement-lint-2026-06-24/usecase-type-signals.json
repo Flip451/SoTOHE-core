@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-06-25T23:10:51Z",
+  "declaration_hash": "c0ee63835b90ebb8d0ff107a55968714da1b15cf8ff6813f91e1a8d998563500",
+  "signals": [
+    {
+      "type_name": "ArchInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "ArchService"
+      ]
+    },
+    {
+      "type_name": "ArchService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ConventionsInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "ConventionsService"
+      ]
+    },
+    {
+      "type_name": "ConventionsService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "FileInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "FileService"
+      ]
+    },
+    {
+      "type_name": "FileService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "PlanRunOutput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "PlannerInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "PlannerService"
+      ]
+    },
+    {
+      "type_name": "PlannerPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "PlannerPortError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "PlannerService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "VerifyInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "VerifyService"
+      ]
+    },
+    {
+      "type_name": "VerifyService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

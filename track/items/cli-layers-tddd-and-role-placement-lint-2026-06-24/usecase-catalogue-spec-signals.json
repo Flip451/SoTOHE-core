@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "c0ee63835b90ebb8d0ff107a55968714da1b15cf8ff6813f91e1a8d998563500",
+  "signals": [
+    {
+      "type_name": "ArchInteractor",
+      "signal": "blue",
+      "entry_hash": "f24187beece0c9a0ee8b3abef8192bc089fac93baffd54a7730820ffe69202b7"
+    },
+    {
+      "type_name": "ConventionsInteractor",
+      "signal": "blue",
+      "entry_hash": "326f4b1d4e952d505fcaf63a26f8d6e54a8667d5fa0e2933b3f71d26a9a87ff8"
+    },
+    {
+      "type_name": "FileInteractor",
+      "signal": "blue",
+      "entry_hash": "d4b96e2666ca4fcb167972352a4228a98e6d08f86f1224e0b55a5407df5311bc"
+    },
+    {
+      "type_name": "PlanRunOutput",
+      "signal": "blue",
+      "entry_hash": "05f940da7230ceb8cffc2218b509de61f1b278de53d571f063e86c6f13bd6ff1"
+    },
+    {
+      "type_name": "PlannerInteractor",
+      "signal": "blue",
+      "entry_hash": "a79c896ec0ea522e623d132991f585a9d623d3d0cb90896da2ce84411f3dc4d7"
+    },
+    {
+      "type_name": "PlannerPortError",
+      "signal": "blue",
+      "entry_hash": "51d63513888726f4d03e44043eeb3352d19c18b3b492163e25781f9e634d8090"
+    },
+    {
+      "type_name": "VerifyInteractor",
+      "signal": "blue",
+      "entry_hash": "9b5590f1491621c32dc322ed3101b71ef87c399c6a44dd359deacf1fb1163a6f"
+    },
+    {
+      "type_name": "ArchService",
+      "signal": "blue",
+      "entry_hash": "ee42fefb56e418a3a1cf23954de4ea18f62c3f6895b2b51d8c18747a715fffe0"
+    },
+    {
+      "type_name": "ConventionsService",
+      "signal": "blue",
+      "entry_hash": "a4e4305138303245938bf3458e2496212cabd253a9cb715e198d5abba446e401"
+    },
+    {
+      "type_name": "FileService",
+      "signal": "blue",
+      "entry_hash": "2d1a4cd576e307c941123533af6de79fdd81090d0d9616ed92c26eecc690ebd6"
+    },
+    {
+      "type_name": "PlannerPort",
+      "signal": "blue",
+      "entry_hash": "05e434aad35515b07993f0fdc7b280c1ac28ff310ee990c9cd7b86ee27d73f73"
+    },
+    {
+      "type_name": "PlannerService",
+      "signal": "blue",
+      "entry_hash": "b0a5ff2315bca81cc78c8e10fe6e6800ddb778812aadb3569c80026baaecc794"
+    },
+    {
+      "type_name": "VerifyService",
+      "signal": "blue",
+      "entry_hash": "ef97629c5ad9d12bf290e50e0c8463c3a5b19034984ee44936172d74fcbd0107"
+    }
+  ]
+}

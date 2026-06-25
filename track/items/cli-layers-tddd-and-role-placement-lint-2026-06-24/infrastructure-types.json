@@ -1,0 +1,62 @@
+{
+  "schema_version": 5,
+  "crate_name": "infrastructure",
+  "layer": "infrastructure",
+  "types": {
+    "CodexPlannerAdapter": {
+      "action": "add",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            {
+              "name": "runtime_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Create a new CodexPlannerAdapter. runtime_dir is the directory where session log files are written."
+        }
+      ],
+      "module_path": "codex_planner",
+      "docs": "Infrastructure adapter that runs the Codex planner as a subprocess. Implements PlannerPort. stdout is forwarded (inherited) so the user sees Codex output in real time. stderr is teed to a timestamped session log file inside runtime_dir.",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "IN-08"
+        },
+        {
+          "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+          "anchor": "AC-11"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [],
+  "trait_impls": [
+    {
+      "action": "add",
+      "trait_ref": "usecase::planner::PlannerPort",
+      "for_type": "CodexPlannerAdapter"
+    }
+  ]
+}

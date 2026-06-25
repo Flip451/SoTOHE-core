@@ -25,23 +25,25 @@
 //! `knowledge/adr/2026-04-14-1531-…` forbids serde inside `libs/domain`;
 //! codec / serde support lives in the infrastructure codec.
 
-use crate::tddd::catalogue_v2::roles::{ContractRole, DataRole, NonEmptyVec, SelfReceiver};
+use crate::tddd::catalogue_v2::roles::{
+    ContractRole, DataRole, FunctionRole, NonEmptyVec, SelfReceiver,
+};
 use crate::tddd::layer_id::LayerId;
 
 // ---------------------------------------------------------------------------
 // RoleKind — payload-free role discriminant
 // ---------------------------------------------------------------------------
 
-/// Payload-free discriminant that covers every `DataRole` and `ContractRole`
-/// variant (D15 / D17).
+/// Payload-free discriminant that covers every `DataRole`, `ContractRole`, and
+/// `FunctionRole` variant (D15 / D17).
 ///
 /// Used in [`RuleTarget`] and in rule kind payloads such as
 /// [`CatalogueLinterRuleKind::NoRoleInMethodSignature`] where the rule must
-/// reference a role across both `DataRole` and `ContractRole` (e.g.
-/// `RoleKind::Repository` is a `ContractRole` variant, not a `DataRole`).
+/// reference a role across all role enums (e.g. `RoleKind::Repository` is a
+/// `ContractRole` variant; `RoleKind::FreeFunction` is a `FunctionRole` variant).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum RoleKind {
-    // --- DataRole variants (15) ---
+    // --- DataRole variants (17) ---
     /// `DataRole::ValueObject`
     ValueObject,
     /// `DataRole::Entity`
@@ -72,6 +74,10 @@ pub enum RoleKind {
     EventPolicy,
     /// `DataRole::DomainEvent`
     DomainEvent,
+    /// `DataRole::CompositionRoot`
+    CompositionRoot,
+    /// `DataRole::PrimaryAdapter`
+    PrimaryAdapter,
     // --- ContractRole variants (4) ---
     /// `ContractRole::SpecificationPort`
     SpecificationPort,
@@ -81,11 +87,16 @@ pub enum RoleKind {
     SecondaryPort,
     /// `ContractRole::Repository`
     Repository,
+    // --- FunctionRole variants (2) ---
+    /// `FunctionRole::FreeFunction`
+    FreeFunction,
+    /// `FunctionRole::UseCaseFunction`
+    UseCaseFunction,
 }
 
 impl RoleKind {
     /// Every role discriminant that a rule target can name.
-    pub(crate) const ALL: [Self; 19] = [
+    pub(crate) const ALL: [Self; 23] = [
         Self::ValueObject,
         Self::Entity,
         Self::AggregateRoot,
@@ -101,14 +112,18 @@ impl RoleKind {
         Self::SecondaryAdapter,
         Self::EventPolicy,
         Self::DomainEvent,
+        Self::CompositionRoot,
+        Self::PrimaryAdapter,
         Self::SpecificationPort,
         Self::ApplicationService,
         Self::SecondaryPort,
         Self::Repository,
+        Self::FreeFunction,
+        Self::UseCaseFunction,
     ];
 
     /// All `DataRole` discriminants that a type-entry field rule can scan.
-    pub(crate) const DATA_ROLES: [Self; 15] = [
+    pub(crate) const DATA_ROLES: [Self; 17] = [
         Self::ValueObject,
         Self::Entity,
         Self::AggregateRoot,
@@ -124,7 +139,12 @@ impl RoleKind {
         Self::SecondaryAdapter,
         Self::EventPolicy,
         Self::DomainEvent,
+        Self::CompositionRoot,
+        Self::PrimaryAdapter,
     ];
+
+    /// All `FunctionRole` discriminants.
+    pub(crate) const FUNCTION_ROLES: [Self; 2] = [Self::FreeFunction, Self::UseCaseFunction];
 
     /// Returns the payload-free discriminant for a `DataRole`.
     #[must_use]
@@ -145,6 +165,8 @@ impl RoleKind {
             DataRole::SecondaryAdapter => Self::SecondaryAdapter,
             DataRole::EventPolicy { .. } => Self::EventPolicy,
             DataRole::DomainEvent => Self::DomainEvent,
+            DataRole::CompositionRoot => Self::CompositionRoot,
+            DataRole::PrimaryAdapter => Self::PrimaryAdapter,
         }
     }
 
@@ -156,6 +178,15 @@ impl RoleKind {
             ContractRole::ApplicationService => Self::ApplicationService,
             ContractRole::SecondaryPort => Self::SecondaryPort,
             ContractRole::Repository { .. } => Self::Repository,
+        }
+    }
+
+    /// Returns the payload-free discriminant for a `FunctionRole`.
+    #[must_use]
+    pub fn from_function_role(role: &FunctionRole) -> Self {
+        match role {
+            FunctionRole::FreeFunction => Self::FreeFunction,
+            FunctionRole::UseCaseFunction => Self::UseCaseFunction,
         }
     }
 
@@ -178,10 +209,14 @@ impl RoleKind {
             Self::SecondaryAdapter => "SecondaryAdapter",
             Self::EventPolicy => "EventPolicy",
             Self::DomainEvent => "DomainEvent",
+            Self::CompositionRoot => "CompositionRoot",
+            Self::PrimaryAdapter => "PrimaryAdapter",
             Self::SpecificationPort => "SpecificationPort",
             Self::ApplicationService => "ApplicationService",
             Self::SecondaryPort => "SecondaryPort",
             Self::Repository => "Repository",
+            Self::FreeFunction => "FreeFunction",
+            Self::UseCaseFunction => "UseCaseFunction",
         }
     }
 
@@ -463,16 +498,30 @@ impl CatalogueLinterRule {
     ///
     /// Returns [`CatalogueLinterRuleError::InvalidRuleConfig`] when `kind` is
     /// `ForbiddenMethodReceiver` and `forbidden_receiver` is not a canonical
-    /// `SelfReceiver` form (`"self"`, `"&self"`, `"&mut self"`).
-    ///
-    /// For the remaining `kind` variants (`KindLayerConstraint`,
-    /// `TraitImplRequired`, `NoRoleInMethodSignature`, `NoPublicField`) this
-    /// function always succeeds, because their payloads are either unit or backed
-    /// by `NonEmptyVec` (validated at variant-construction time).
+    /// `SelfReceiver` form (`"self"`, `"&self"`, `"&mut self"`), or when
+    /// `NoRoleInMethodSignature` tries to forbid a `FunctionRole` discriminant
+    /// that method-signature scanning cannot enforce, or when a rule other
+    /// than `KindLayerConstraint` targets a `FunctionRole` discriminant.
     pub fn new(
         target: RuleTarget,
         kind: CatalogueLinterRuleKind,
     ) -> Result<Self, CatalogueLinterRuleError> {
+        if !matches!(&kind, CatalogueLinterRuleKind::KindLayerConstraint { .. }) {
+            if let Some(function_role) = target
+                .target_roles()
+                .iter()
+                .copied()
+                .find(|role| RoleKind::FUNCTION_ROLES.contains(role))
+            {
+                return Err(CatalogueLinterRuleError::InvalidRuleConfig(format!(
+                    "{} cannot target FunctionRole '{}'; \
+                     only KindLayerConstraint supports function entries",
+                    kind.discriminant_name(),
+                    function_role.variant_name()
+                )));
+            }
+        }
+
         // Validate per-kind invariants.
         match &kind {
             CatalogueLinterRuleKind::FieldEmpty { target_field }
@@ -510,8 +559,20 @@ impl CatalogueLinterRule {
             CatalogueLinterRuleKind::KindLayerConstraint { .. } => {}
             // TraitImplRequired — required_traits is NonEmptyVec, already validated.
             CatalogueLinterRuleKind::TraitImplRequired { .. } => {}
-            // NoRoleInMethodSignature — forbidden_roles is NonEmptyVec, already validated.
-            CatalogueLinterRuleKind::NoRoleInMethodSignature { .. } => {}
+            CatalogueLinterRuleKind::NoRoleInMethodSignature { forbidden_roles } => {
+                if let Some(function_role) = forbidden_roles
+                    .as_slice()
+                    .iter()
+                    .copied()
+                    .find(|role| RoleKind::FUNCTION_ROLES.contains(role))
+                {
+                    return Err(CatalogueLinterRuleError::InvalidRuleConfig(format!(
+                        "NoRoleInMethodSignature cannot forbid FunctionRole '{}'; \
+                         method signatures are checked against type and trait catalogue entries",
+                        function_role.variant_name()
+                    )));
+                }
+            }
             // NoPublicField has no extra invariants — it is a unit variant.
             CatalogueLinterRuleKind::NoPublicField => {}
         }
@@ -622,7 +683,7 @@ pub use eval::evaluate_catalogue_lint;
 #[allow(clippy::unwrap_used, clippy::indexing_slicing, clippy::panic)]
 mod tests {
     use super::*;
-    use crate::tddd::catalogue_v2::roles::NonEmptyVec;
+    use crate::tddd::catalogue_v2::roles::{FunctionRole, NonEmptyVec};
     use crate::tddd::layer_id::LayerId;
 
     fn layer(name: &str) -> LayerId {
@@ -630,7 +691,7 @@ mod tests {
     }
 
     // ------------------------------------------------------------------
-    // RoleKind — from_data_role covers all 15 DataRole variants
+    // RoleKind — from_data_role covers all 17 DataRole variants
     // ------------------------------------------------------------------
 
     #[test]
@@ -652,8 +713,10 @@ mod tests {
             ("SecondaryAdapter", RoleKind::SecondaryAdapter),
             ("EventPolicy", RoleKind::EventPolicy),
             ("DomainEvent", RoleKind::DomainEvent),
+            ("CompositionRoot", RoleKind::CompositionRoot),
+            ("PrimaryAdapter", RoleKind::PrimaryAdapter),
         ];
-        assert_eq!(cases.len(), 15, "must cover all 15 DataRole variants");
+        assert_eq!(cases.len(), 17, "must cover all 17 DataRole variants");
         for (name, expected) in &cases {
             let role: crate::tddd::catalogue_v2::roles::DataRole = name.parse().unwrap();
             assert_eq!(
@@ -687,6 +750,24 @@ mod tests {
                 *expected,
                 "from_contract_role mismatch for {:?}",
                 role.variant_name()
+            );
+        }
+    }
+
+    #[test]
+    fn test_role_kind_from_function_role_covers_all_variants() {
+        let cases = vec![
+            (FunctionRole::FreeFunction, RoleKind::FreeFunction),
+            (FunctionRole::UseCaseFunction, RoleKind::UseCaseFunction),
+        ];
+
+        assert_eq!(cases.len(), 2, "must cover all 2 FunctionRole variants");
+        for (role, expected) in &cases {
+            assert_eq!(
+                RoleKind::from_function_role(role),
+                *expected,
+                "from_function_role mismatch for {:?}",
+                role
             );
         }
     }
@@ -794,6 +875,18 @@ mod tests {
     }
 
     #[test]
+    fn test_linter_rule_new_kind_layer_constraint_accepts_function_role_target() {
+        let permitted = NonEmptyVec::new(layer("cli_driver"), vec![]);
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::new(vec![RoleKind::FreeFunction]),
+            CatalogueLinterRuleKind::KindLayerConstraint { permitted_layers: permitted },
+        )
+        .unwrap();
+
+        assert_eq!(rule.target().target_roles(), &[RoleKind::FreeFunction]);
+    }
+
+    #[test]
     fn test_linter_rule_new_no_public_field_succeeds_as_unit_variant() {
         let rule = CatalogueLinterRule::new(
             RuleTarget::new(vec![RoleKind::DomainEvent, RoleKind::ValueObject]),
@@ -801,6 +894,23 @@ mod tests {
         )
         .unwrap();
         assert_eq!(rule.kind().discriminant_name(), "NoPublicField");
+    }
+
+    #[test]
+    fn test_linter_rule_new_no_public_field_rejects_function_role_target() {
+        let result = CatalogueLinterRule::new(
+            RuleTarget::new(vec![RoleKind::UseCaseFunction]),
+            CatalogueLinterRuleKind::NoPublicField,
+        );
+
+        assert!(
+            matches!(
+                &result,
+                Err(CatalogueLinterRuleError::InvalidRuleConfig(msg))
+                    if msg.contains("NoPublicField") && msg.contains("UseCaseFunction")
+            ),
+            "expected InvalidRuleConfig for FunctionRole target, got: {result:?}"
+        );
     }
 
     #[test]
@@ -1007,8 +1117,8 @@ mod tests {
 
     #[test]
     fn test_linter_rule_new_no_role_in_method_signature_succeeds_with_non_empty_vec() {
-        // NonEmptyVec enforces non-emptiness at construction; CatalogueLinterRule::new
-        // always succeeds for NoRoleInMethodSignature.
+        // NonEmptyVec enforces non-emptiness at construction; data and contract
+        // roles are valid for method-signature checks.
         let forbidden_roles = NonEmptyVec::new(RoleKind::Repository, vec![RoleKind::SecondaryPort]);
         let rule = CatalogueLinterRule::new(
             RuleTarget::new(vec![RoleKind::ValueObject, RoleKind::Entity]),
@@ -1016,6 +1126,24 @@ mod tests {
         )
         .unwrap();
         assert_eq!(rule.kind().discriminant_name(), "NoRoleInMethodSignature");
+    }
+
+    #[test]
+    fn test_linter_rule_new_no_role_in_method_signature_rejects_function_role() {
+        let forbidden_roles = NonEmptyVec::new(RoleKind::FreeFunction, vec![]);
+        let result = CatalogueLinterRule::new(
+            RuleTarget::new(vec![RoleKind::ValueObject]),
+            CatalogueLinterRuleKind::NoRoleInMethodSignature { forbidden_roles },
+        );
+
+        assert!(
+            matches!(
+                &result,
+                Err(CatalogueLinterRuleError::InvalidRuleConfig(msg))
+                    if msg.contains("FreeFunction")
+            ),
+            "expected InvalidRuleConfig for FunctionRole forbidden role, got: {result:?}"
+        );
     }
 
     // ------------------------------------------------------------------
@@ -1097,10 +1225,12 @@ mod tests {
 
     use crate::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
     use crate::tddd::catalogue_v2::document::CatalogueDocument;
-    use crate::tddd::catalogue_v2::entries::{InherentImplDeclV2, TraitEntry, TypeEntry};
+    use crate::tddd::catalogue_v2::entries::{
+        FunctionEntry, InherentImplDeclV2, TraitEntry, TypeEntry,
+    };
     use crate::tddd::catalogue_v2::identifiers::{
-        CrateName, FieldName, InvariantName, MethodName, ModulePath, ParamName, TraitName,
-        TypeName, TypeRef,
+        CrateName, FieldName, FunctionName, FunctionPath, InvariantName, MethodName, ModulePath,
+        ParamName, TraitName, TypeName, TypeRef,
     };
     use crate::tddd::catalogue_v2::methods::{MethodDeclaration, ParamDeclaration};
     use crate::tddd::catalogue_v2::roles::{
@@ -1174,6 +1304,21 @@ mod tests {
             generics: vec![],
             where_predicates: vec![],
             module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        }
+    }
+
+    fn make_function_entry(role: FunctionRole) -> FunctionEntry {
+        FunctionEntry {
+            action: ItemAction::Add,
+            role,
+            params: vec![],
+            returns: TypeRef::new("()").unwrap(),
+            is_async: false,
+            generics: vec![],
+            where_predicates: vec![],
             docs: None,
             spec_refs: vec![],
             informal_grounds: vec![],
@@ -1488,6 +1633,34 @@ mod tests {
                 "expected message to mention layer {disallowed_layer}"
             );
         }
+    }
+
+    #[test]
+    fn test_kind_layer_constraint_violation_when_function_layer_is_not_permitted() {
+        let mut doc = make_doc("usecase");
+        let function_path = FunctionPath::at_root(
+            CrateName::new("domain").unwrap(),
+            FunctionName::new("register_user").unwrap(),
+        );
+        doc.functions
+            .insert(function_path.clone(), make_function_entry(FunctionRole::FreeFunction));
+
+        let violations = run_rule(
+            &doc,
+            RuleTarget::new(vec![RoleKind::FreeFunction]),
+            CatalogueLinterRuleKind::KindLayerConstraint {
+                permitted_layers: NonEmptyVec::new(layer("domain"), vec![]),
+            },
+        );
+
+        assert_eq!(violations.len(), 1, "expected 1 violation for FreeFunction in usecase layer");
+        assert_eq!(violations[0].rule_kind(), "KindLayerConstraint");
+        let function_path_name = function_path.to_string();
+        assert_eq!(violations[0].entry_name(), function_path_name.as_str());
+        assert!(
+            violations[0].message().contains("usecase"),
+            "expected message to mention disallowed layer"
+        );
     }
 
     // ===========================================================================
