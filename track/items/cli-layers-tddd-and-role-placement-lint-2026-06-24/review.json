@@ -16,6 +16,260 @@
           "findings": [],
           "hash": "rvw1:sha256:b9fac4dc4d5a6a2a5f557aa00adb1a367752a22df10c37041dba10e2e5a1c4a8",
           "at": "2026-06-24T17:29:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T005 assigns `FreeFunction` roles to `cli_composition` helpers (`tee_stderr_to_file`, `build_codex_read_only_invocation`), but the spec's CN-05/AC-06 says `cli_composition` should not have public free functions and should not allow `FreeFunction` there. That makes the new layer plan inconsistent with the accepted allowlist.",
+              "severity": "P1",
+              "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/plan.md",
+              "line": 52,
+              "category": "contradiction"
+            },
+            {
+              "message": "T006's final lint gate omits the new `cli` catalogue: it lists only domain/usecase/infrastructure/cli-composition/cli-driver, even though T005 adds `cli-types.json` and IN-07/AC-07 require validation of all three cli-system layers. As written, the plan can finish without ever linting the new `cli` layer.",
+              "severity": "P1",
+              "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/plan.md",
+              "line": 62,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:71ba303f1e15f4e9707e5b46fafa9878915330149447b84a178b28c5d83efd11",
+          "at": "2026-06-24T18:18:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ErrorType` is inconsistent across the artifacts: `spec.json:288` says the lint allowlist should be only `cli` + `cli_composition`, but this task broadens it to `domain/usecase/infrastructure/cli/cli_composition` (and the S3 summary at `impl-plan.json:75` says the rule only adds `cli` + `cli_composition`). As written, the plan cannot satisfy both the spec and the task description.",
+              "severity": "P1",
+              "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/impl-plan.json",
+              "line": 18,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:af203989e88ad0a3ac48ee83ae573e30eb467b614cd4cede7b0bb62a3a96cfff",
+          "at": "2026-06-24T18:24:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:de97d311bce449a1d069c97a476a396478ad0aca08b3147866606a100015c87f",
+          "at": "2026-06-24T18:30:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-03 requires an ErrorType KindLayerConstraint with permitted layers only cli and cli_composition, and T003 repeats that rule. Because KindLayerConstraint is role-global, this would also forbid ErrorType in the existing domain/usecase/infrastructure layers, contradicting the plan's R1 update that preserves ErrorType's existing layer-flexible placements and only adds cli and cli_composition while excluding cli_driver. The lint rule needs to include the existing permitted layers as well, or it will make the plan internally inconsistent and cause catalogue linting to reject valid existing ErrorType entries.",
+              "severity": "P1",
+              "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+              "line": 288,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:de97d311bce449a1d069c97a476a396478ad0aca08b3147866606a100015c87f",
+          "at": "2026-06-24T18:34:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "OS-05 says per-type role assignment work such as declaring `*Args`/`*Command` structs as `Dto` is out of scope and will be finalized by a later implementation track, but the same spec makes catalogue authoring in scope in IN-07/AC-06 and T005 requires this track to declare each existing public CLI-layer type with an allowlisted role. That leaves implementers with the same work both required and excluded, so the plan is semantically inconsistent until OS-05 is narrowed or the catalogue-authoring tasks are moved out of scope.",
+              "severity": "P1",
+              "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.md",
+              "line": 31,
+              "category": "contradiction"
+            },
+            {
+              "message": "AC-03 defines the global `Dto` `KindLayerConstraint` permitted layers as only `infrastructure`, `cli`, and `cli_driver`. That conflicts with the existing R1 convention/usecase-output-DTO design that allows justified usecase DTOs, and it also conflicts with T004's framing that the existing `Dto` row should only gain CLI-layer columns. If implemented literally, the new global lint rule would make legitimate usecase DTO catalogue entries illegal, so the permitted layer list needs to preserve the existing usecase allowance or the plan must explicitly update the convention and downstream assumptions.",
+              "severity": "P1",
+              "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.md",
+              "line": 46,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f2dac4f0cb6930ecdc4d03eddb0c3960bde7d461a5c83483f414804658eb0017",
+          "at": "2026-06-24T18:40:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T005 requires `cli_composition::CommandOutcome` to be listed in the `cli-composition-types.json` catalogue, but the spec's allowlist for `cli_composition` only permits `CompositionRoot` and `ErrorType` (see `IN-04` / `AC-06`). Since `CommandOutcome` is a DTO-style data carrier in the same task narrative, following T005 would force a `Dto` entry into a layer where the plan later requires `sotp track lint` to pass with zero allowlist violations. This makes the catalogue-authoring and lint-gate tasks mutually unsatisfiable unless the plan either removes/privatizes that public type before cataloguing or explicitly changes the `cli_composition` allowlist.",
+              "severity": "P1",
+              "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/impl-plan.json",
+              "line": 104,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:2bd7bcb2e78a65d20e3777b3e7cfa580cef15f88994ad7bd3561f7461781f40f",
+          "at": "2026-06-24T18:44:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 is ordered before the cli/cli_composition/cli_driver catalogues and rustdoc baselines are created, but it still requires a full `cargo make ci` immediately after enabling TDDD and adding `catalogue_file`/`schema_export` blocks. Those dependent artifacts are explicitly deferred to T005/T006, so the plan asks implementers to reach a standalone CI-green state at a point where the TDDD-enabled layers are not yet fully materialized. Narrow T002 to the layer flip verification, or move the catalogue/baseline work before the full CI gate.",
+              "severity": "P1",
+              "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/impl-plan.json",
+              "line": 12,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:6768f410534588857495f57ba91ab9eefb6642b73dc4536809268f3556bfc9c8",
+          "at": "2026-06-24T18:48:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5d8653844999df7eb4b928af67b57557ea00345eb1205d36f8d72114ac901591",
+          "at": "2026-06-24T18:54:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T005`'s `cli_driver` catalogue only assigns `Dto` and `PrimaryAdapter` roles, but `CN-05` and `AC-06` require `cli_driver` to admit `FreeFunction` as well and explicitly call out public `render_*` functions. Without cataloguing those functions, the plan cannot satisfy the declared allowlist for that layer, so the T006 lint gate is not achievable as written.",
+              "severity": "P1",
+              "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/plan.md",
+              "line": 47,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:99634916f878d03ec9d81fa6cf33221912b35c0cfa763109d6821aa203f865be",
+          "at": "2026-06-25T00:37:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8264a188e3755c899b90ed5c4f25370a87d61c8360f0c61ae3911e116573f414",
+          "at": "2026-06-25T00:52:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "OS-03 rejects an alternative that \"does not add `PrimaryAdapter`\" while also describing that same alternative as a single `PrimaryAdapter` role covering wire and invoke/render. This contradicts the rest of the spec, which consistently requires adding `PrimaryAdapter` and `CompositionRoot` as two roles, and it also contradicts the referenced ADR's rejected alternative, which is not adding `CompositionRoot` and letting `PrimaryAdapter` cover both responsibilities. Update the first role name in OS-03 to `CompositionRoot` so the rejected alternative is semantically coherent.",
+              "severity": "P1",
+              "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+              "line": 137,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:8264a188e3755c899b90ed5c4f25370a87d61c8360f0c61ae3911e116573f414",
+          "at": "2026-06-25T00:57:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006 says `sotp track lint` should cover “all five active catalogues” and that infrastructure is absent until a later restore, but this same plan-artifacts scope already includes `infrastructure-types.json` for the `infrastructure` layer. Treating infrastructure as absent contradicts the Phase 2 artifact set and can make the implementation skip lint/coverage for an enabled catalogue rather than validating the empty infrastructure catalogue that was generated for this track.",
+              "severity": "P1",
+              "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/plan.md",
+              "line": 57,
+              "category": "contradiction"
+            },
+            {
+              "message": "CN-03 constrains the lint-rule implementation to `.harness/catalogue-lint/config.json` “only”, while AC-03 and T003 allow or directly require updating the corresponding preset file. These are conflicting instructions for the same T003 work item, so an implementer following the constraint could reject the preset update that the task/acceptance criteria require.",
+              "severity": "P1",
+              "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.md",
+              "line": 37,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a2843fe48b5718ff0c200ea15db428b35141f78a8b2e8901d8c821ffc465adea",
+          "at": "2026-06-25T01:04:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-04's `NoRoleInMethodSignature` list does not match the stated rule in CN-02 that `PrimaryAdapter` must keep domain/usecase roles out of public signatures. The catalogue declares additional domain/usecase `RoleKind` variants such as `DomainService`, `Specification`, `Factory`, `DomainEvent`, `EventPolicy`, and `SpecificationPort`, but they are absent from the forbidden list, so implementing this plan would still allow those inner roles to leak through `PrimaryAdapter` method signatures.",
+              "severity": "P1",
+              "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+              "line": 298,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:23eca0b165e88be78c181f2995eae6032bc734fc9baefb9e2fb39bcbc2459e2a",
+          "at": "2026-06-25T01:11:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 promises to extend the `FreeFunction` `KindLayerConstraint`, but the type plan for `RoleKind` only covers DataRole + ContractRole variants and adds no FunctionRole/FreeFunction discriminant or conversion path. Because the lint rule targets are expressed through `RoleKind`, this plan cannot actually enforce the AC-03 FreeFunction layer constraint; `sotp track lint` would still have no role target for FreeFunction entries. Add FunctionRole support to the RoleKind/linter migration or remove the FreeFunction enforcement claim.",
+              "severity": "P1",
+              "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/plan.md",
+              "line": 31,
+              "category": "infeasibility"
+            },
+            {
+              "message": "T005's cli catalogue instructions list only `CliError` and public free functions for `apps/cli`, but AC-06 requires each layer's existing public types to be catalogued under the layer allowlist, and the ADR/spec identify cli `Dto` entries as part of that allowlist. As written, implementers can complete T005 while omitting the cli clap/input DTO types entirely, leaving the cli layer catalogue incomplete against the acceptance criteria. Include the cli DTO/public command or args types in T005 or explicitly justify why none are public/cataloguable.",
+              "severity": "P1",
+              "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/plan.md",
+              "line": 51,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:fdbcef3f65e05b7ae7c81cd23784810c749286a825c24cc2f2a0d4c65417c610",
+          "at": "2026-06-25T01:17:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`DataRole`'s catalogue text says all six public constructor/accessor methods have match arms that must be extended for `CompositionRoot` and `PrimaryAdapter`, but five of those methods are simple constructors (`value_object`, `entity`, `aggregate_root`, `domain_service`, `use_case`) with no match arms and no relationship to the new unit variants. Only `variant_name`/string conversion and exhaustive consumers need variant arms. Leaving this wording in the authoritative type catalogue can send T001 implementers toward unnecessary or nonsensical constructor changes instead of the actual migration surface.",
+              "severity": "P1",
+              "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/domain-types.json",
+              "line": 186,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:466203eab9d8b49d1c1e2ad16231933b518fd723db77703332c7f9cd647461a0",
+          "at": "2026-06-25T01:27:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e5cc8b0b99ae99fc77388a905a84bebbf1b20ccd9856c5d505930e63d2f51168",
+          "at": "2026-06-25T01:32:50Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:60d17ddfd2660f05f41e81d0fb1bc149752010f2763bc0e76c773f661c2e4e2f",
+          "at": "2026-06-25T00:32:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:60d17ddfd2660f05f41e81d0fb1bc149752010f2763bc0e76c773f661c2e4e2f",
+          "at": "2026-06-25T00:34:18Z"
         }
       ]
     }

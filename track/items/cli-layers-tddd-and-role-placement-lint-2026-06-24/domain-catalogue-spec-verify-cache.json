@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "layer": "domain",
+  "entries": [
+    {
+      "claim_hash": "baff8b7eb5aad1f494768a3cd648c4ad486e8ae950db46139aaa5160dc431af3",
+      "evidence_hash": "b76cb636a4a0a56190b7c0c94175d3f6734433ca27d811de71aa004660db0c95",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole` に `CompositionRoot` variant（新設）を追加する。`CompositionRoot` は object graph を組む純 DI の住所であり、invoke しない。独自の機械検査ルールとして `KindLayerConstraint { permitted_layers: [\"cli_composition\"] }` を持つ。"
+      }
+    },
+    {
+      "claim_hash": "baff8b7eb5aad1f494768a3cd648c4ad486e8ae950db46139aaa5160dc431af3",
+      "evidence_hash": "f75757605d632aa366af0b4845d3121d8b1da9d9c9ae287dd233f32e4d1b5a7f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole` に `PrimaryAdapter` variant（新設）を追加する。`PrimaryAdapter` は注入された use case を保持し handle で呼んで整形する driving adapter（controller）の住所であり、DI しない。独自の機械検査ルールとして `KindLayerConstraint { permitted_layers: [\"cli_driver\"] }` と `NoRoleInMethodSignature { forbidden_roles: [\"Entity\", \"AggregateRoot\", \"ValueObject\", \"Repository\", \"SecondaryPort\", \"UseCase\", \"Interactor\", \"Command\", \"Query\", \"ApplicationService\"] }` を持つ。"
+      }
+    },
+    {
+      "claim_hash": "baff8b7eb5aad1f494768a3cd648c4ad486e8ae950db46139aaa5160dc431af3",
+      "evidence_hash": "9929671a6b6e6bab1d3741a0fc89d8caef366423346e19cc6485e9489cf8ff10",
+      "verdict": {
+        "kind": "pass",
+        "citation": "新ロール追加（`CompositionRoot` / `PrimaryAdapter`）に伴う `DataRole` の breaking migration を実施する。`Copy` が外れ、strum 文字列変換・codec・signal evaluator・renderer・全 `role ==` 比較を更新する。"
+      }
+    },
+    {
+      "claim_hash": "c842a20d91e2bd988be11d64d939e256319fa8c187206df78eeeeb8b4e0d96f8",
+      "evidence_hash": "b76cb636a4a0a56190b7c0c94175d3f6734433ca27d811de71aa004660db0c95",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole` に `CompositionRoot` variant（新設）を追加する。`CompositionRoot` は object graph を組む純 DI の住所であり、invoke しない。"
+      }
+    },
+    {
+      "claim_hash": "c842a20d91e2bd988be11d64d939e256319fa8c187206df78eeeeb8b4e0d96f8",
+      "evidence_hash": "f75757605d632aa366af0b4845d3121d8b1da9d9c9ae287dd233f32e4d1b5a7f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole` に `PrimaryAdapter` variant（新設）を追加する。`PrimaryAdapter` は注入された use case を保持し handle で呼んで整形する driving adapter（controller）の住所であり、DI しない。"
+      }
+    },
+    {
+      "claim_hash": "c842a20d91e2bd988be11d64d939e256319fa8c187206df78eeeeb8b4e0d96f8",
+      "evidence_hash": "9929671a6b6e6bab1d3741a0fc89d8caef366423346e19cc6485e9489cf8ff10",
+      "verdict": {
+        "kind": "pass",
+        "citation": "新ロール追加（`CompositionRoot` / `PrimaryAdapter`）に伴う `DataRole` の breaking migration を実施する。`Copy` が外れ、strum 文字列変換・codec・signal evaluator・renderer・全 `role ==` 比較を更新する。"
+      }
+    },
+    {
+      "claim_hash": "324bd66d1e1c26b527570f468014bc055782f489d181c6b8e9aa7b47a8c2a080",
+      "evidence_hash": "b76cb636a4a0a56190b7c0c94175d3f6734433ca27d811de71aa004660db0c95",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole` に `CompositionRoot` variant（新設）を追加する。`CompositionRoot` は object graph を組む純 DI の住所であり、invoke しない。独自の機械検査ルールとして `KindLayerConstraint { permitted_layers: [\"cli_composition\"] }` を持つ。"
+      }
+    },
+    {
+      "claim_hash": "324bd66d1e1c26b527570f468014bc055782f489d181c6b8e9aa7b47a8c2a080",
+      "evidence_hash": "c13fd8609b9013a4d3cad697efec014d2d7768bf8c1a972408f2a9da5cfc08dd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole` に `PrimaryAdapter` variant（新設）を追加する。`PrimaryAdapter` は注入された use case を保持し handle で呼んで整形する driving adapter（controller）の住所であり、DI しない。独自の機械検査ルールとして `KindLayerConstraint { permitted_layers: [\"cli_driver\"] }` と `NoRoleInMethodSignature { forbidden_roles: [\"Entity\", \"AggregateRoot\", \"ValueObject\", \"DomainService\", \"Specification\", \"Factory\", \"DomainEvent\", \"EventPolicy\", \"Repository\", \"SecondaryPort\", \"SpecificationPort\", \"UseCase\", \"Interactor\", \"Command\", \"Query\", \"ApplicationService\"] }` を持つ。"
+      }
+    },
+    {
+      "claim_hash": "324bd66d1e1c26b527570f468014bc055782f489d181c6b8e9aa7b47a8c2a080",
+      "evidence_hash": "9929671a6b6e6bab1d3741a0fc89d8caef366423346e19cc6485e9489cf8ff10",
+      "verdict": {
+        "kind": "pass",
+        "citation": "新ロール追加（`CompositionRoot` / `PrimaryAdapter`）に伴う `DataRole` の breaking migration を実施する。`Copy` が外れ、strum 文字列変換・codec・signal evaluator・renderer・全 `role ==` 比較を更新する。"
+      }
+    },
+    {
+      "claim_hash": "ba018083fc572fe141008206a3566c1177da1dcfe41aa75c5c31059058b8db4a",
+      "evidence_hash": "b76cb636a4a0a56190b7c0c94175d3f6734433ca27d811de71aa004660db0c95",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole` に `CompositionRoot` variant（新設）を追加する。`CompositionRoot` は object graph を組む純 DI の住所であり、invoke しない。独自の機械検査ルールとして `KindLayerConstraint { permitted_layers: [\"cli_composition\"] }` を持つ。"
+      }
+    },
+    {
+      "claim_hash": "ba018083fc572fe141008206a3566c1177da1dcfe41aa75c5c31059058b8db4a",
+      "evidence_hash": "c13fd8609b9013a4d3cad697efec014d2d7768bf8c1a972408f2a9da5cfc08dd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole` に `PrimaryAdapter` variant（新設）を追加する。`PrimaryAdapter` は注入された use case を保持し handle で呼んで整形する driving adapter（controller）の住所であり、DI しない。"
+      }
+    },
+    {
+      "claim_hash": "ba018083fc572fe141008206a3566c1177da1dcfe41aa75c5c31059058b8db4a",
+      "evidence_hash": "9929671a6b6e6bab1d3741a0fc89d8caef366423346e19cc6485e9489cf8ff10",
+      "verdict": {
+        "kind": "pass",
+        "citation": "新ロール追加（`CompositionRoot` / `PrimaryAdapter`）に伴う `DataRole` の breaking migration を実施する。`Copy` が外れ、strum 文字列変換・codec・signal evaluator・renderer・全 `role ==` 比較を更新する。"
+      }
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "84b9fdbcc6a03f593de668862c4b86cc3a8f15b818e235bc015f659735293357",
+  "signals": [
+    {
+      "type_name": "DataRole",
+      "signal": "blue",
+      "entry_hash": "324bd66d1e1c26b527570f468014bc055782f489d181c6b8e9aa7b47a8c2a080"
+    },
+    {
+      "type_name": "RoleKind",
+      "signal": "blue",
+      "entry_hash": "ba018083fc572fe141008206a3566c1177da1dcfe41aa75c5c31059058b8db4a"
+    }
+  ]
+}

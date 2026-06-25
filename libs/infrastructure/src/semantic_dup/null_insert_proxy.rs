@@ -45,7 +45,6 @@ impl PersistentIndexLockError {
 /// This type is `pub` for use by `cli_composition` callers; it is not part of
 /// the infrastructure crate's public API contract and is excluded from the TDDD
 /// catalogue.
-#[doc(hidden)]
 pub struct PersistentIndexLock {
     _file: std::fs::File,
 }
@@ -64,7 +63,6 @@ pub struct PersistentIndexLock {
 /// This function is `pub` for use by `cli_composition` callers; it is not part of
 /// the infrastructure crate's public API contract and is excluded from the TDDD
 /// catalogue.
-#[doc(hidden)]
 pub fn acquire_persistent_index_lock(
     db_path: &Path,
 ) -> Result<PersistentIndexLock, PersistentIndexLockError> {
@@ -109,7 +107,6 @@ pub fn acquire_persistent_index_lock(
 ///
 /// This function is `pub` for internal use within the infrastructure crate;
 /// it is not part of the public API contract and is excluded from the TDDD catalogue.
-#[doc(hidden)]
 pub fn persistent_index_lock_path(db_path: &Path) -> std::path::PathBuf {
     persistent_index_suffixed_path(db_path, ".lock")
 }

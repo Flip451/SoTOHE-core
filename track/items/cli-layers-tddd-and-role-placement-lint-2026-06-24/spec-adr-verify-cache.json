@@ -1,0 +1,389 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "0c9c24b33c66cd5cc9391ce9ed512d85ce2218d2785d072505665817b4b82503",
+      "evidence_hash": "11ac115d0c10ce9306d1491de31c1425b03f09a63dbd4d5a3e32462953513997",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`architecture-rules.json` の `cli` / `cli_composition` / `cli_driver` レイヤーの `tddd.enabled` を `true` にし、3 層を型カタログ検査の対象に含める。各層とも `catalogue_spec_signal`（SoT Chain ②）と `schema_export`（SoT Chain ③）を有効化した完全 TDDD 層とする。"
+      }
+    },
+    {
+      "claim_hash": "24724f2c70e22a7c0d9724573bcd0924f33b1ea14420a680f6dab9aa683c2231",
+      "evidence_hash": "11ac115d0c10ce9306d1491de31c1425b03f09a63dbd4d5a3e32462953513997",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「CompositionRoot ロールと PrimaryAdapter ロールを新設する」"
+      }
+    },
+    {
+      "claim_hash": "a1947b23b520debe29ccea80cee5ec32b0508ee10da99b418fb8f2f110af93d3",
+      "evidence_hash": "11ac115d0c10ce9306d1491de31c1425b03f09a63dbd4d5a3e32462953513997",
+      "verdict": {
+        "kind": "pass",
+        "citation": "per-layer allowlist を直接表現する新 primitive は追加せず、既存の `KindLayerConstraint` で表現する。この定義を `KindLayerConstraint` ルール群として lint config（`.harness/catalogue-lint/`）に展開する。`type-designer-kind-selection.md` R1 マトリクスは本決定を反映して cli / cli_composition / cli_driver の 3 列と `CompositionRoot` / `PrimaryAdapter` 行を追加・同期する"
+      }
+    },
+    {
+      "claim_hash": "434684d93cce15d6beeba3a6c96b0f0b1efe7c9a04a7ecb07fb05c247e96f6f0",
+      "evidence_hash": "11ac115d0c10ce9306d1491de31c1425b03f09a63dbd4d5a3e32462953513997",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`architecture-rules.json` の `cli` / `cli_composition` / `cli_driver` レイヤーの `tddd.enabled` を `true` にし、3 層を型カタログ検査の対象に含める。各層とも `catalogue_spec_signal`（SoT Chain ②）と `schema_export`（SoT Chain ③）を有効化した完全 TDDD 層とする。`cli` は workspace で初めて `[[bin]]` crate を TDDD 対象にする事例である。"
+      }
+    },
+    {
+      "claim_hash": "b76cb636a4a0a56190b7c0c94175d3f6734433ca27d811de71aa004660db0c95",
+      "evidence_hash": "11ac115d0c10ce9306d1491de31c1425b03f09a63dbd4d5a3e32462953513997",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- **`CompositionRoot`**（DataRole 新設）: object graph を組む純 DI の住所。`cli_composition` の wiring 構造（driver を構築し use case を注入する）が取る。**invoke しない**。\n\n`CompositionRoot` は `KindLayerConstraint`（cli_composition のみ）"
+      }
+    },
+    {
+      "claim_hash": "f75757605d632aa366af0b4845d3121d8b1da9d9c9ae287dd233f32e4d1b5a7f",
+      "evidence_hash": "11ac115d0c10ce9306d1491de31c1425b03f09a63dbd4d5a3e32462953513997",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- **`PrimaryAdapter`**（DataRole 新設）: driving adapter（controller）の住所。`cli_driver` の、注入された use case を保持し handle で呼んで整形する構造が取る。**DI しない**（注入される側）。\n\n`PrimaryAdapter` は `KindLayerConstraint`（`cli_driver` のみ）+ `NoRoleInMethodSignature`（domain/usecase 固有ロール型を公開 signature に出さない）という独自の機械検査を持つ"
+      }
+    },
+    {
+      "claim_hash": "a8d98d98e27d4d19971965fbbbac22eb81df89abd21d5bb6a493fb8f4f442324",
+      "evidence_hash": "11ac115d0c10ce9306d1491de31c1425b03f09a63dbd4d5a3e32462953513997",
+      "verdict": {
+        "kind": "pass",
+        "citation": "per-layer allowlist を直接表現する新 primitive は追加せず、既存の `KindLayerConstraint`（ロール → 許可層）で表現する。各層の使用可能ロールは本 ADR で次のように **定義する**（先送りしない）。... | `cli`（bin） | `Dto` / `ErrorType` / `FreeFunction` | ... | `cli_composition`（wire） | `CompositionRoot` / `ErrorType` | ... | `cli_driver`（invoke+render） | `PrimaryAdapter` / `Dto` / `FreeFunction` | ... - domain / usecase / infrastructure 固有のロール（`Entity` / `AggregateRoot` / `UseCase` / `Interactor` / `Command` / `Query` / `SecondaryAdapter` / `SecondaryPort` / `ApplicationService` / `Repository` 等）は cli 系 3 層のいずれでも forbidden とする。"
+      }
+    },
+    {
+      "claim_hash": "6a2e0bf315886991fae63b0b9927b4ea2066acd8837da9370e18f01805cb3108",
+      "evidence_hash": "11ac115d0c10ce9306d1491de31c1425b03f09a63dbd4d5a3e32462953513997",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- `CompositionRoot` は `cli_composition` 限定、`PrimaryAdapter` は `cli_driver` 限定（互いの層・他層には置かない）。\n- `type-designer-kind-selection.md` R1 マトリクスは **本決定を反映**して cli / cli_composition / cli_driver の 3 列と `CompositionRoot` / `PrimaryAdapter` 行を追加・同期する（マトリクスは決定の写しであり、決定の場ではない）。"
+      }
+    },
+    {
+      "claim_hash": "9929671a6b6e6bab1d3741a0fc89d8caef366423346e19cc6485e9489cf8ff10",
+      "evidence_hash": "11ac115d0c10ce9306d1491de31c1425b03f09a63dbd4d5a3e32462953513997",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`CompositionRoot`（DataRole 新設）」「`PrimaryAdapter`（DataRole 新設）」"
+      }
+    },
+    {
+      "claim_hash": "c299afd0aa5ca71e60a1431c003ff22b32f3ba0b3e76ddcd661d5c70a427dffd",
+      "evidence_hash": "11ac115d0c10ce9306d1491de31c1425b03f09a63dbd4d5a3e32462953513997",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各層とも `catalogue_spec_signal`（SoT Chain ②）と `schema_export`（SoT Chain ③）を有効化した完全 TDDD 層とする。`cli` は workspace で初めて `[[bin]]` crate を TDDD 対象にする事例である。"
+      }
+    },
+    {
+      "claim_hash": "5b74f4bb57378d2f61060a1576e33662c0320cf1e76db1ef86535c82e852353e",
+      "evidence_hash": "11ac115d0c10ce9306d1491de31c1425b03f09a63dbd4d5a3e32462953513997",
+      "verdict": {
+        "kind": "pass",
+        "citation": "candidate_selection: from:[two-layers,three-layers-with-driver,four-layers-with-presentation] chose:three-layers-with-driver\n\n本 ADR は分解 ADR（`1328`）の完了を前提とするため、`tddd.enabled` のフリップと catalogue 起草は分解後の 3 層構造（純 DI composition root / primary adapter / typed `CompositionError`）に対して行う。"
+      }
+    },
+    {
+      "claim_hash": "5b74f4bb57378d2f61060a1576e33662c0320cf1e76db1ef86535c82e852353e",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "invoke と render を同一層に置く（別 crate に分けない）"
+      }
+    },
+    {
+      "claim_hash": "2810f7c72e5033e6a8b92be5b94e711c4a0f5634cfb1e9938c5dfcdbf6083afb",
+      "evidence_hash": "11ac115d0c10ce9306d1491de31c1425b03f09a63dbd4d5a3e32462953513997",
+      "verdict": {
+        "kind": "pass",
+        "citation": "per-layer allowlist を直接表現する新 primitive は追加せず、既存の `KindLayerConstraint`（ロール → 許可層）で表現する。"
+      }
+    },
+    {
+      "claim_hash": "f79ccf28bf84e1c09245d2bd107d66d2c2e9ba5948eece9fd1cba36b09d2eb26",
+      "evidence_hash": "11ac115d0c10ce9306d1491de31c1425b03f09a63dbd4d5a3e32462953513997",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「分解後、wire（DI）と invoke+render は別の層に分離される。それぞれに canonical な役割を与える。」「`CompositionRoot`（DataRole 新設）: object graph を組む純 DI の住所。… **invoke しない**。」「`PrimaryAdapter`（DataRole 新設）: driving adapter（controller）の住所。… **DI しない**（注入される側）。」「`PrimaryAdapter` 単独で wire まで兼ねると composition root と driving adapter の責務混在になり canonical でない」"
+      }
+    },
+    {
+      "claim_hash": "385c55543b4154097f3b8a8ca773f15b28828ffca4746d28c2fe30707632bc27",
+      "evidence_hash": "11ac115d0c10ce9306d1491de31c1425b03f09a63dbd4d5a3e32462953513997",
+      "verdict": {
+        "kind": "pass",
+        "citation": "cli / cli_composition / cli_driver の 3 層を TDDD 有効化する"
+      }
+    },
+    {
+      "claim_hash": "839cceea01ac07565ca52f6abd0e161a595e6b03059480bf3e64e76a5c6d0451",
+      "evidence_hash": "11ac115d0c10ce9306d1491de31c1425b03f09a63dbd4d5a3e32462953513997",
+      "verdict": {
+        "kind": "pass",
+        "citation": "先送りするのは個々の型のロール割り当て（per-type 作業）のみで、上記 allowlist の枠内で実装 track の type-designer が確定する。"
+      }
+    },
+    {
+      "claim_hash": "399075a9c2551aaee035d19f1eb902d568eb2104920c48dc609f790d71652c58",
+      "evidence_hash": "11ac115d0c10ce9306d1491de31c1425b03f09a63dbd4d5a3e32462953513997",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「cli 系 3 層の per-layer 使用可能ロールを既存の `KindLayerConstraint` で定義する」および「各層の使用可能ロールは本 ADR で次のように **定義する**（先送りしない）」。"
+      }
+    },
+    {
+      "claim_hash": "702d5fce6fb38a29ecb8c60a9a5d25382fa5519021df875e761ec31ea11f59fe",
+      "evidence_hash": "11ac115d0c10ce9306d1491de31c1425b03f09a63dbd4d5a3e32462953513997",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本 ADR は分解 ADR（`1328`）の完了を前提とするため、`tddd.enabled` のフリップと catalogue 起草は分解後の 3 層構造（純 DI composition root / primary adapter / typed `CompositionError`）に対して行う。"
+      }
+    },
+    {
+      "claim_hash": "702d5fce6fb38a29ecb8c60a9a5d25382fa5519021df875e761ec31ea11f59fe",
+      "evidence_hash": "8ac8e5460cb7eefb7815cdb33ee88cd587a0e765bde1ab9ff59690de0467f47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「専用の 1 track 内で、(a) `cli-driver` crate 新設 ... を段階 commit で進める。... **最終 commit で ... 一括 flip** する。中間状態は main にマージしない」"
+      }
+    },
+    {
+      "claim_hash": "092331474eb08b0b2faffd5272486687c8cbfaf7c971563334c1a8fe3f45bffd",
+      "evidence_hash": "11ac115d0c10ce9306d1491de31c1425b03f09a63dbd4d5a3e32462953513997",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`CompositionRoot` は `KindLayerConstraint`（cli_composition のみ）、`PrimaryAdapter` は `KindLayerConstraint`（cli_driver のみ）+ `NoRoleInMethodSignature`（domain/usecase 固有ロール型を公開 signature に出さない）という独自の機械検査を持つため、「ロールは独自検査を持つ場合のみ追加」原則を満たす。"
+      }
+    },
+    {
+      "claim_hash": "092331474eb08b0b2faffd5272486687c8cbfaf7c971563334c1a8fe3f45bffd",
+      "evidence_hash": "b59efcabce608f742cec4f74492aa9bb1efcd96087f44ca627811fa47bce634c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「独自の機械検査ルールを持つパターンのみを追加する」という絞り込み原則"
+      }
+    },
+    {
+      "claim_hash": "c3490001faf8698bad775b4057e6530db9810278cb3d0cae3452b2e7407c7d25",
+      "evidence_hash": "11ac115d0c10ce9306d1491de31c1425b03f09a63dbd4d5a3e32462953513997",
+      "verdict": {
+        "kind": "pass",
+        "citation": "per-layer allowlist を直接表現する新 primitive は追加せず、既存の `KindLayerConstraint`（ロール → 許可層）で表現する。 ... この定義を `KindLayerConstraint` ルール群として lint config（`.harness/catalogue-lint/`）に展開する。"
+      }
+    },
+    {
+      "claim_hash": "c3490001faf8698bad775b4057e6530db9810278cb3d0cae3452b2e7407c7d25",
+      "evidence_hash": "b59efcabce608f742cec4f74492aa9bb1efcd96087f44ca627811fa47bce634c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ルールの組み合わせを設定ファイルで管理することで、採用者ごとに適用ルールを選ぶことができる。... `CatalogueLinterRuleKind` ... `KindLayerConstraint { permitted_layers: Vec<LayerId> }` — 既存: entry の layer が許可リストに含まれるか"
+      }
+    },
+    {
+      "claim_hash": "eba2f99af43aa154be28b15b706c14a819025cd634b6071f16fd0cf312ba5e31",
+      "evidence_hash": "11ac115d0c10ce9306d1491de31c1425b03f09a63dbd4d5a3e32462953513997",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- `CompositionRoot` は `cli_composition` 限定、`PrimaryAdapter` は `cli_driver` 限定（互いの層・他層には置かない）.\n- domain / usecase / infrastructure 固有のロール（`Entity` / `AggregateRoot` / `UseCase` / `Interactor` / `Command` / `Query` / `SecondaryAdapter` / `SecondaryPort` / `ApplicationService` / `Repository` 等）は cli 系 3 層のいずれでも forbidden とする。"
+      }
+    },
+    {
+      "claim_hash": "1c153e90f3005e818e3cc5f796b9697e689577f61e50ffc6085399a40a37722c",
+      "evidence_hash": "11ac115d0c10ce9306d1491de31c1425b03f09a63dbd4d5a3e32462953513997",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_driver`（primary adapter）は handle が常に `CommandOutcome` を返す（use case エラーも整形して返す）ため `ErrorType` を持たない。"
+      }
+    },
+    {
+      "claim_hash": "c58cfcf27f74168bd471e2ba61e297da7405473ba54c02d6ef69610c9c1f8177",
+      "evidence_hash": "11ac115d0c10ce9306d1491de31c1425b03f09a63dbd4d5a3e32462953513997",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`CompositionRoot`（DataRole 新設）: object graph を組む純 DI の住所。」「`PrimaryAdapter`（DataRole 新設）: driving adapter（controller）の住所。」"
+      }
+    },
+    {
+      "claim_hash": "c58cfcf27f74168bd471e2ba61e297da7405473ba54c02d6ef69610c9c1f8177",
+      "evidence_hash": "b59efcabce608f742cec4f74492aa9bb1efcd96087f44ca627811fa47bce634c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "1 variant でも data を持つと `Copy` が外れ、strum・codec・signal evaluator・renderer・すべての `role ==` 比較を一斉に更新する必要がある"
+      }
+    },
+    {
+      "claim_hash": "0e5d9e9d2aaee79bbf51bf46361700c41d9b71d8ee4ff1e7d1c4a3e8decdc5af",
+      "evidence_hash": "11ac115d0c10ce9306d1491de31c1425b03f09a63dbd4d5a3e32462953513997",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`architecture-rules.json` の `cli` / `cli_composition` / `cli_driver` レイヤーの `tddd.enabled` を `true` にし、3 層を型カタログ検査の対象に含める。"
+      }
+    },
+    {
+      "claim_hash": "a375464777856226f2d7d7a0f4b8bbfb54fbbb0f2805c1b681e1cd97fa44bbe1",
+      "evidence_hash": "11ac115d0c10ce9306d1491de31c1425b03f09a63dbd4d5a3e32462953513997",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`architecture-rules.json` の `cli` / `cli_composition` / `cli_driver` レイヤーの `tddd.enabled` を `true` にし、3 層を型カタログ検査の対象に含める。各層とも `catalogue_spec_signal`（SoT Chain ②）と `schema_export`（SoT Chain ③）を有効化した完全 TDDD 層とする。"
+      }
+    },
+    {
+      "claim_hash": "3355a81a7dd2825b310ba07e286effb5c39bf11f63710ffc837f8fcf84d88f04",
+      "evidence_hash": "11ac115d0c10ce9306d1491de31c1425b03f09a63dbd4d5a3e32462953513997",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D2: `CompositionRoot` ロールと `PrimaryAdapter` ロールを新設する\n- **`CompositionRoot`**（DataRole 新設）: object graph を組む純 DI の住所。\n- **`PrimaryAdapter`**（DataRole 新設）: driving adapter（controller）の住所。"
+      }
+    },
+    {
+      "claim_hash": "6d7ef273854db8d472374a733b72a3752d407b2a0565b16eb268f8842d540b69",
+      "evidence_hash": "11ac115d0c10ce9306d1491de31c1425b03f09a63dbd4d5a3e32462953513997",
+      "verdict": {
+        "kind": "pass",
+        "citation": "| `cli` (bin) | `Dto` / `ErrorType` / `FreeFunction` |\n| `cli_composition` (wire) | `CompositionRoot` / `ErrorType` |\n| `cli_driver` (invoke+render) | `PrimaryAdapter` / `Dto` / `FreeFunction` |\n- `CompositionRoot` は `cli_composition` 限定、`PrimaryAdapter` は `cli_driver` 限定（互いの層・他層には置かない）。\n- enforcement は既存の `sotp track lint` + `.harness/catalogue-lint/` に乗る。"
+      }
+    },
+    {
+      "claim_hash": "5386401feae6e2be9690bc109591d5c079728a319a60f69e3633d6417f10d8a5",
+      "evidence_hash": "11ac115d0c10ce9306d1491de31c1425b03f09a63dbd4d5a3e32462953513997",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`PrimaryAdapter` は `KindLayerConstraint`（cli_driver のみ）+ `NoRoleInMethodSignature`（domain/usecase 固有ロール型を公開 signature に出さない）という独自の機械検査を持つ"
+      }
+    },
+    {
+      "claim_hash": "7b5a53edd0a40f34bfe72c482c97d7ef0c68b63b4d61d58391aa571fb95e08de",
+      "evidence_hash": "11ac115d0c10ce9306d1491de31c1425b03f09a63dbd4d5a3e32462953513997",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`type-designer-kind-selection.md` R1 マトリクスは **本決定を反映**して cli / cli_composition / cli_driver の 3 列と `CompositionRoot` / `PrimaryAdapter` 行を追加・同期する"
+      }
+    },
+    {
+      "claim_hash": "dea61c5b84589c7119025c49caf6ad3f062f83a98eb77879965bc1266592c2c1",
+      "evidence_hash": "11ac115d0c10ce9306d1491de31c1425b03f09a63dbd4d5a3e32462953513997",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`architecture-rules.json` の `cli` / `cli_composition` / `cli_driver` レイヤーの `tddd.enabled` を `true` にし、3 層を型カタログ検査の対象に含める。各層とも `catalogue_spec_signal`（SoT Chain ②）と `schema_export`（SoT Chain ③）を有効化した完全 TDDD 層とする。... 本 ADR は ... `tddd.enabled` のフリップと catalogue 起草は分解後の 3 層構造（純 DI composition root / primary adapter / typed `CompositionError`）に対して行う。"
+      }
+    },
+    {
+      "claim_hash": "dea61c5b84589c7119025c49caf6ad3f062f83a98eb77879965bc1266592c2c1",
+      "evidence_hash": "11ac115d0c10ce9306d1491de31c1425b03f09a63dbd4d5a3e32462953513997",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各層の使用可能ロールは本 ADR で次のように **定義する**（先送りしない）。allowlist は分解後の各層の責務に基づく。\n\n| 層 | 使用可能ロール（allowlist） | 主な型 |\n|---|---|---|\n| `cli`（bin） | `Dto` / `ErrorType` / `FreeFunction` |\n| `cli_composition`（wire） | `CompositionRoot` / `ErrorType` |\n| `cli_driver`（invoke+render） | `PrimaryAdapter` / `Dto` / `FreeFunction` |\n\nこの定義を `KindLayerConstraint` ルール群として lint config（`.harness/catalogue-lint/`）に展開する。\n\n`type-designer-kind-selection.md` R1 マトリクスは **本決定を反映**して cli / cli_composition / cli_driver の 3 列と `CompositionRoot` / `PrimaryAdapter` 行を追加・同期する"
+      }
+    },
+    {
+      "claim_hash": "cea6a46ee60e9804e3397fa20072bceefd0a714e6850e9d214772e07b3fe3121",
+      "evidence_hash": "11ac115d0c10ce9306d1491de31c1425b03f09a63dbd4d5a3e32462953513997",
+      "verdict": {
+        "kind": "pass",
+        "citation": "domain / usecase / infrastructure 固有のロール（`Entity` / `AggregateRoot` / `UseCase` / `Interactor` / `Command` / `Query` / `SecondaryAdapter` / `SecondaryPort` / `ApplicationService` / `Repository` 等）は cli 系 3 層のいずれでも forbidden とする。 ... enforcement は既存の `sotp track lint` + `.harness/catalogue-lint/` に乗る。"
+      }
+    },
+    {
+      "claim_hash": "226cca2f9844c45f05007741ffdde38bff2de7512493ed530270f6fb6101b8a3",
+      "evidence_hash": "11ac115d0c10ce9306d1491de31c1425b03f09a63dbd4d5a3e32462953513997",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`CompositionRoot` は `KindLayerConstraint`（`cli_composition` のみ）、`PrimaryAdapter` は `KindLayerConstraint`（`cli_driver` のみ）+ `NoRoleInMethodSignature`"
+      }
+    },
+    {
+      "claim_hash": "19f7edab12f18f12c7cce5e413bec6b7fe9b3d0d37b17476a99a5bb9fc249f6b",
+      "evidence_hash": "11ac115d0c10ce9306d1491de31c1425b03f09a63dbd4d5a3e32462953513997",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各層とも `catalogue_spec_signal`（SoT Chain ②）と `schema_export`（SoT Chain ③）を有効化した完全 TDDD 層とする。`cli` は workspace で初めて `[[bin]]` crate を TDDD 対象にする事例である。"
+      }
+    },
+    {
+      "claim_hash": "41e90ce38fc93b78c98c4519b052f7c751ff0b848e77554f1634384d84e80b6d",
+      "evidence_hash": "11ac115d0c10ce9306d1491de31c1425b03f09a63dbd4d5a3e32462953513997",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`architecture-rules.json` の `cli` / `cli_composition` / `cli_driver` レイヤーの `tddd.enabled` を `true` にし、3 層を型カタログ検査の対象に含める。"
+      }
+    },
+    {
+      "claim_hash": "41e90ce38fc93b78c98c4519b052f7c751ff0b848e77554f1634384d84e80b6d",
+      "evidence_hash": "11ac115d0c10ce9306d1491de31c1425b03f09a63dbd4d5a3e32462953513997",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「分解後、wire（DI）と invoke+render は別の層に分離される。それぞれに canonical な役割を与える。」「CompositionRoot（DataRole 新設）: object graph を組む純 DI の住所。」「PrimaryAdapter（DataRole 新設）: driving adapter（controller）の住所。」"
+      }
+    },
+    {
+      "claim_hash": "41e90ce38fc93b78c98c4519b052f7c751ff0b848e77554f1634384d84e80b6d",
+      "evidence_hash": "11ac115d0c10ce9306d1491de31c1425b03f09a63dbd4d5a3e32462953513997",
+      "verdict": {
+        "kind": "pass",
+        "citation": "この定義を `KindLayerConstraint` ルール群として lint config（`.harness/catalogue-lint/`）に展開する。"
+      }
+    },
+    {
+      "claim_hash": "8df89a417901a2bf04155082e7565fdb845b6761a8f47342a9ec6e25dca89c89",
+      "evidence_hash": "11ac115d0c10ce9306d1491de31c1425b03f09a63dbd4d5a3e32462953513997",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「先送りするのは個々の型のロール割り当て（per-type 作業）のみで、上記 allowlist の枠内で実装 track の type-designer が確定する。」「この定義を `KindLayerConstraint` ルール群として lint config（`.harness/catalogue-lint/`）に展開する。」"
+      }
+    },
+    {
+      "claim_hash": "77629e9a5b07ab49d1dc00b0b02edc8cac49fa8f2894171e107c725651c91f7b",
+      "evidence_hash": "11ac115d0c10ce9306d1491de31c1425b03f09a63dbd4d5a3e32462953513997",
+      "verdict": {
+        "kind": "pass",
+        "citation": "| `cli`（bin） | `Dto` / `ErrorType` / `FreeFunction` | ... | `cli_composition`（wire） | `CompositionRoot` / `ErrorType` | ... | `cli_driver`（invoke+render） | `PrimaryAdapter` / `Dto` / `FreeFunction` |\n- `CompositionRoot` は `cli_composition` 限定、`PrimaryAdapter` は `cli_driver` 限定（互いの層・他層には置かない）。\n- この定義を `KindLayerConstraint` ルール群として lint config（`.harness/catalogue-lint/`）に展開する。\n- enforcement は既存の `sotp track lint` + `.harness/catalogue-lint/` に乗る。"
+      }
+    },
+    {
+      "claim_hash": "c13fd8609b9013a4d3cad697efec014d2d7768bf8c1a972408f2a9da5cfc08dd",
+      "evidence_hash": "11ac115d0c10ce9306d1491de31c1425b03f09a63dbd4d5a3e32462953513997",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`PrimaryAdapter`（DataRole 新設）: driving adapter（controller）の住所。`cli_driver` の、注入された use case を保持し handle で呼んで整形する構造が取る。"
+      }
+    },
+    {
+      "claim_hash": "25ce200ba94f5f0db12cad74827700fb3e4aa3edb5fa8ce77b7fb0d0c50b90bb",
+      "evidence_hash": "11ac115d0c10ce9306d1491de31c1425b03f09a63dbd4d5a3e32462953513997",
+      "verdict": {
+        "kind": "pass",
+        "citation": "分解後、wire（DI）と invoke+render は別の層に分離される。それぞれに canonical な役割を与える。\n\n- `CompositionRoot`（DataRole 新設）: object graph を組む純 DI の住所。`cli_composition` の wiring 構造（driver を構築し use case を注入する）が取る。**invoke しない**。\n- `PrimaryAdapter`（DataRole 新設）: driving adapter（controller）の住所。`cli_driver` の、注入された use case を保持し handle で呼んで整形する構造が取る。**DI しない**（注入される側）。\n\n一方 invoke と render は primary adapter の双方向変換の表裏なので分けず、`PrimaryAdapter` が両方を担う。`PrimaryAdapter` 単独で wire まで兼ねると composition root と driving adapter の責務混在になり canonical でない"
+      }
+    },
+    {
+      "claim_hash": "f2ad7d432d4561fd5040c29c16e12c30d05fe8ee90c4095d9f1972cc492646fb",
+      "evidence_hash": "11ac115d0c10ce9306d1491de31c1425b03f09a63dbd4d5a3e32462953513997",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「新 primitive は追加せず、既存の `KindLayerConstraint` で表現する」「この定義を `KindLayerConstraint` ルール群として lint config（`.harness/catalogue-lint/`）に展開する。」"
+      }
+    },
+    {
+      "claim_hash": "f2ad7d432d4561fd5040c29c16e12c30d05fe8ee90c4095d9f1972cc492646fb",
+      "evidence_hash": "b59efcabce608f742cec4f74492aa9bb1efcd96087f44ca627811fa47bce634c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「rule list を core の評価関数（evaluator）に渡す形は維持する」「`KindLayerConstraint` ... 既存 variant 流用」「配布 config ファイル（`.harness/catalogue-lint/presets/ddd-strict.json`）として提供する」"
+      }
+    },
+    {
+      "claim_hash": "f1aeda2614cf25499ab9afeed5f60d505ecd1475a4d04bae9119a361374e087d",
+      "evidence_hash": "11ac115d0c10ce9306d1491de31c1425b03f09a63dbd4d5a3e32462953513997",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`PrimaryAdapter` は `KindLayerConstraint`（cli_driver のみ）+ `NoRoleInMethodSignature`（domain/usecase 固有ロール型を公開 signature に出さない）という独自の機械検査を持つ"
+      }
+    }
+  ]
+}
