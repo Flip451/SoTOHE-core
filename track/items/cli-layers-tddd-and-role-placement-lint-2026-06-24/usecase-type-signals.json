@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-25T19:05:22Z",
+  "generated_at": "2026-06-25T19:26:11Z",
   "declaration_hash": "c0ee63835b90ebb8d0ff107a55968714da1b15cf8ff6813f91e1a8d998563500",
   "signals": [
     {
@@ -36,17 +36,17 @@
     {
       "type_name": "FileInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "FileService"
       ]
     },
     {
       "type_name": "FileService",
       "kind_tag": "application_service",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "PlanRunOutput",

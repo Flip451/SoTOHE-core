@@ -39,22 +39,25 @@
     {
       "id": "T007",
       "description": "Lint config fix — normalize PrimaryAdapter NoRoleInMethodSignature.forbidden_roles in .harness/catalogue-lint/presets/ddd-strict.json and .harness/catalogue-lint/config.json to the exact ADR 1420 D3 / IN-03 / AC-04 list: [\"Entity\", \"AggregateRoot\", \"ValueObject\", \"Repository\", \"SecondaryPort\", \"UseCase\", \"Interactor\", \"Command\", \"Query\"]. Remove the legacy extra entries \"DomainService\", \"Specification\", \"Factory\", \"DomainEvent\", \"EventPolicy\", \"SpecificationPort\", and \"ApplicationService\" from that rule. Per updated ADR 1420 D3, ApplicationService is NOT forbidden in PrimaryAdapter method signatures: cli_driver PrimaryAdapter must depend on ApplicationService (the application-level contract) rather than SecondaryPort per DIP. The KindLayerConstraint on ApplicationService (permitted only in usecase) already prevents ApplicationService from being declared in cli_driver; NoRoleInMethodSignature must not block the legitimate signature dependency. After this fix, sotp track lint must pass for ArchDriver/ConventionsDriver/FileDriver/PlanDriver/VerifyDriver (all take Arc<dyn *Service> in new()), and AC-04 is satisfied. Expected diff size: one forbidden_roles list update in each of the two config files. Depends on T003 (which introduced the broader rule list).",
-      "status": "todo"
+      "status": "done",
+      "commit_hash": "0c6fa0c8e26868a77cdf21cd9c60efa0a24f431f"
     },
     {
       "id": "T008",
       "description": "ApplicationService / Interactor pair for Arch — implement in libs/usecase/src/arch.rs: ArchService trait (ApplicationService role) with render_tree/render_tree_full/render_members/render_direct_checks methods, and ArchInteractor struct (Interactor role) holding Arc<dyn ArchPort> and implementing ArchService by delegating to the port. Update apps/cli-driver/src/arch.rs: change ArchDriver's field from Arc<dyn ArchPort> to Arc<dyn ArchService> and update new() accordingly. Update apps/cli-composition/src/arch.rs: update ArchCompositionRoot.arch_driver() wire chain to FsArchAdapter -> ArchInteractor -> ArchDriver. All three files must compile and cargo make ci must pass after this task. Expected diff: ~80-150 lines total across usecase/cli_driver/cli_composition. Depends on T007 (lint config must accept Arc<dyn ArchService> in ArchDriver::new before sotp track lint passes).",
-      "status": "todo"
+      "status": "done",
+      "commit_hash": "b30db8973249e04d69ebb95b6bdc40867f849f83"
     },
     {
       "id": "T009",
       "description": "ApplicationService / Interactor pair for Conventions — implement in libs/usecase/src/conventions.rs: ConventionsService trait (ApplicationService role) with add_convention/update_index/verify_index methods, and ConventionsInteractor struct (Interactor role) holding Arc<dyn ConventionsPort> and implementing ConventionsService by delegating. Update apps/cli-driver/src/conventions.rs: change ConventionsDriver's field from Arc<dyn ConventionsPort> to Arc<dyn ConventionsService> and update new(). Update apps/cli-composition/src/conventions.rs: update ConventionsCompositionRoot.conventions_driver() wire chain to FsConventionsAdapter -> ConventionsInteractor -> ConventionsDriver. All three files must compile and cargo make ci must pass after this task. Expected diff: ~80-150 lines total. Depends on T007.",
-      "status": "todo"
+      "status": "done",
+      "commit_hash": "29d91ed5c6edfdf3bfd8c8c53334964b5aa6a1d9"
     },
     {
       "id": "T010",
       "description": "ApplicationService / Interactor pair for File — implement in libs/usecase/src/file.rs: FileService trait (ApplicationService role) with write_atomic method, and FileInteractor struct (Interactor role) holding Arc<dyn FileWritePort> and implementing FileService by delegating. Update apps/cli-driver/src/file.rs: change FileDriver's field from Arc<dyn FileWritePort> to Arc<dyn FileService> and update new(). Update apps/cli-composition/src/file.rs: update FileCompositionRoot.file_driver() wire chain to FsFileWriteAdapter -> FileInteractor -> FileDriver. All three files must compile and cargo make ci must pass after this task. Expected diff: ~80-130 lines total. Depends on T007.",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T011",

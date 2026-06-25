@@ -50,7 +50,7 @@
 | DemoDriver | primary_adapter | reference | — | 🔵 | 🔵 |
 | DomainDriver | primary_adapter | reference | — | 🔵 | 🔵 |
 | DryDriver | primary_adapter | reference | — | 🔵 | 🔵 |
-| FileDriver | primary_adapter | modify | — | 🟡 | 🔵 |
+| FileDriver | primary_adapter | modify | — | 🔵 | 🔵 |
 | GitDriver | primary_adapter | reference | — | 🔵 | 🔵 |
 | GuardDriver | primary_adapter | reference | — | 🔵 | 🔵 |
 | HookDriver | primary_adapter | reference | — | 🔵 | 🔵 |
