@@ -28,12 +28,14 @@
     {
       "id": "T005",
       "description": "`.claude/commands/track/full-cycle.md` のループ構造を feature バッチ消化モデルへ書き換える。現在の「各タスクについて implement → DFP → review → commit をループ」構造を「feature 内の全 todo/in_progress タスクを依存順に一括実装 → review → commit」へ反転する。具体的には: (1) 実装フェーズを per-task から batch (全タスクを依存順に `/track:implement` へ一括委譲) に変更する; (2) DFP フェーズをバッチ実装後に 1 回呼ぶ; (3) review フェーズをバッチ全体の差分に対して 1 回呼ぶ; (4) commit フェーズでバッチを 1 commit にまとめる; (5) D4 hash 記録ステップ (`bin/sotp track transition <id> done --commit-hash <hash>` をバッチ内の全タスクに適用) を commit 直後に追加する; (6) per-scope 天井による分割ロジック (バッチ sizing: 次タスクを追加したときいずれかのレイヤーの累積差分が `diff_ceiling_for_scope` の天井を超過する場合は現バッチを commit して新バッチを開始) を記述する。CN-01 の「別レイヤーのみのタスクが控えている場合は天井超過済みレイヤーの累積は増えないため継ぎ足しを続けてよい」という観点を明示する。`done` with non-null `commit_hash` / `skipped` タスクのスキップ条件は維持する。T006 と同一 commit (Batch B) にまとめる。[guardrail] 本タスクは markdown のみの変更であり Rust コードを変更しない。Rust コードを変更する場合は新たな `#[doc(hidden)]` を一切導入してはならない。",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "635f0b6fc33916e80537b62c56e5dfd3c1f4f9d5"
     },
     {
       "id": "T006",
       "description": "`.claude/commands/track/adr2pr.md` の Constraint 3 (line 41) を既定反転する。現行: 「CI-driven bundling allowed. `/track:full-cycle` is per-task by default; when tightly-coupled tasks cannot pass `cargo make ci` individually, bundling them into a single implement → review → commit cycle is permitted.」を「Batch-first execution. `/track:full-cycle` implements the full feature batch (all tasks in dependency order) before review and commit by default. Per-task commit split is the exception, triggered only when a layer's cumulative diff would exceed its per-scope ceiling (configured in `.harness/config/review-scope.json`).」相当の文言に書き換える。T005 と同一 commit (Batch B) にまとめる。[guardrail] 本タスクは markdown のみの変更であり Rust コードを変更しない。Rust コードを変更する場合は新たな `#[doc(hidden)]` を一切導入してはならない。",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "635f0b6fc33916e80537b62c56e5dfd3c1f4f9d5"
     }
   ],
   "plan": {

@@ -66,119 +66,6 @@
         }
       ]
     },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a8fab42e2c4853dc1297bb4ee08c6dd3717f4b6837882d59274e23b987ed0815",
-          "at": "2026-06-25T01:40:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a8fab42e2c4853dc1297bb4ee08c6dd3717f4b6837882d59274e23b987ed0815",
-          "at": "2026-06-25T01:43:10Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:67536beebb00bcdc2861108af26f0d6a9113da3f5c992e00484ccf9ac331a4ed",
-          "at": "2026-06-25T01:40:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:67536beebb00bcdc2861108af26f0d6a9113da3f5c992e00484ccf9ac331a4ed",
-          "at": "2026-06-25T01:42:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 0b now only carries forward `todo` / `in_progress` tasks and skips `done` tasks only when they already have a non-null `commit_hash`. That drops the supported `DonePending` state (`commit_hash: null`) from the batch loop, so those tasks will never be backfilled via `track transition ... done --commit-hash` and can leave the track stuck with unresolved completion state. The existing task-completion convention expects that backfill path to remain available.",
-              "severity": "P1",
-              "file": ".claude/commands/track/full-cycle.md",
-              "line": 51,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:f029827841177dffef4b7116f7129afa0448301c9a25a97e497bb1ef3df5724c",
-          "at": "2026-06-25T02:08:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`markdown-only` is not a safe fallback scope here. `.harness/config/review-scope.json` routes `knowledge/adr/**` and `track/items/<track-id>/**` to `plan-artifacts`, not `harness-policy`, so this heuristic will mis-bucket ADR/plan-artifact tasks and can choose the wrong per-scope ceiling / severity policy for a batch.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.claude/commands/track/full-cycle.md",
-              "line": 60,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:b7d95a7f4d1854cb6c6a264f14d464ad5aa8595135ee528cd298e5bc7bb6c405",
-          "at": "2026-06-25T02:16:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`Step 0b` only opens a new batch when the next task would push an already-touched layer over its ceiling. That misses the case where the next task is the first touch for a layer but its own diff already exceeds the configured ceiling, so this planner can still emit an over-ceiling batch and violate D3.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.claude/commands/track/full-cycle.md",
-              "line": 65,
-              "category": "convention contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:e460b8c293a906640555e1bb06128d1359bad497267dde8732d1fec6b8423cdd",
-          "at": "2026-06-25T02:24:36Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f4b4038cfe8a0d82c420e6b9a4e6664ba3fc08d2a002f3602fbf7e00b01ecad3",
-          "at": "2026-06-25T02:31:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f4b4038cfe8a0d82c420e6b9a4e6664ba3fc08d2a002f3602fbf7e00b01ecad3",
-          "at": "2026-06-25T02:37:09Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5be831bf4b4227330ca2b537bc06aeafec08c963ddcbeda04199a6c3b39680f0",
-          "at": "2026-06-25T01:40:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5be831bf4b4227330ca2b537bc06aeafec08c963ddcbeda04199a6c3b39680f0",
-          "at": "2026-06-25T01:42:54Z"
-        }
-      ]
-    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -326,6 +213,169 @@
           "findings": [],
           "hash": "rvw1:sha256:3a140895568337eee6ff9e08942c5466223a7e0ff06f04ea698eca5ca300757a",
           "at": "2026-06-25T02:07:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c01a3816204e16612e4bcb75a4d98f9ae269d7def21e7f984abcea7c70a8ff01",
+          "at": "2026-06-25T02:52:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c01a3816204e16612e4bcb75a4d98f9ae269d7def21e7f984abcea7c70a8ff01",
+          "at": "2026-06-25T02:54:08Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a8fab42e2c4853dc1297bb4ee08c6dd3717f4b6837882d59274e23b987ed0815",
+          "at": "2026-06-25T01:40:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a8fab42e2c4853dc1297bb4ee08c6dd3717f4b6837882d59274e23b987ed0815",
+          "at": "2026-06-25T01:43:10Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5be831bf4b4227330ca2b537bc06aeafec08c963ddcbeda04199a6c3b39680f0",
+          "at": "2026-06-25T01:40:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5be831bf4b4227330ca2b537bc06aeafec08c963ddcbeda04199a6c3b39680f0",
+          "at": "2026-06-25T01:42:54Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:67536beebb00bcdc2861108af26f0d6a9113da3f5c992e00484ccf9ac331a4ed",
+          "at": "2026-06-25T01:40:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:67536beebb00bcdc2861108af26f0d6a9113da3f5c992e00484ccf9ac331a4ed",
+          "at": "2026-06-25T01:42:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 0b now only carries forward `todo` / `in_progress` tasks and skips `done` tasks only when they already have a non-null `commit_hash`. That drops the supported `DonePending` state (`commit_hash: null`) from the batch loop, so those tasks will never be backfilled via `track transition ... done --commit-hash` and can leave the track stuck with unresolved completion state. The existing task-completion convention expects that backfill path to remain available.",
+              "severity": "P1",
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 51,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:f029827841177dffef4b7116f7129afa0448301c9a25a97e497bb1ef3df5724c",
+          "at": "2026-06-25T02:08:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`markdown-only` is not a safe fallback scope here. `.harness/config/review-scope.json` routes `knowledge/adr/**` and `track/items/<track-id>/**` to `plan-artifacts`, not `harness-policy`, so this heuristic will mis-bucket ADR/plan-artifact tasks and can choose the wrong per-scope ceiling / severity policy for a batch.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.claude/commands/track/full-cycle.md",
+              "line": 60,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:b7d95a7f4d1854cb6c6a264f14d464ad5aa8595135ee528cd298e5bc7bb6c405",
+          "at": "2026-06-25T02:16:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Step 0b` only opens a new batch when the next task would push an already-touched layer over its ceiling. That misses the case where the next task is the first touch for a layer but its own diff already exceeds the configured ceiling, so this planner can still emit an over-ceiling batch and violate D3.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.claude/commands/track/full-cycle.md",
+              "line": 65,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e460b8c293a906640555e1bb06128d1359bad497267dde8732d1fec6b8423cdd",
+          "at": "2026-06-25T02:24:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f4b4038cfe8a0d82c420e6b9a4e6664ba3fc08d2a002f3602fbf7e00b01ecad3",
+          "at": "2026-06-25T02:31:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f4b4038cfe8a0d82c420e6b9a4e6664ba3fc08d2a002f3602fbf7e00b01ecad3",
+          "at": "2026-06-25T02:37:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This hard-cap check only uses `git diff --numstat`, so it ignores brand-new untracked files. A batch that adds a large new file can still look within the ceiling even though the real scope diff is over limit, which defeats the guard. The diff source needs to include untracked additions as well.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.claude/commands/track/full-cycle.md",
+              "line": 116,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "The ceiling guard only runs before DFP, but DFP is itself a code-editing phase. If dry-fix edits push the batch past a scope ceiling, the workflow still proceeds to Review because there is no guard after DFP and before Step 2. Re-run the actual-diff guard after DFP mutations, or move it to the final pre-review boundary.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.claude/commands/track/full-cycle.md",
+              "line": 169,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:5b335d7a8fd1c9c3a4ce46f3b3c8db07072bb0c91b06db8fb9e51ecd0410f9d7",
+          "at": "2026-06-25T02:56:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ea7db9f1a38f062cea1930eec4745242e248df15b67e33ac0a6aeac4adcdf6ac",
+          "at": "2026-06-25T03:02:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ea7db9f1a38f062cea1930eec4745242e248df15b67e33ac0a6aeac4adcdf6ac",
+          "at": "2026-06-25T03:06:25Z"
         }
       ]
     }

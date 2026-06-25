@@ -105,7 +105,46 @@ For each batch produced by Step 0b, in order:
    Step 0c order. Do NOT commit between tasks in the same batch — accumulate all changes in the
    working tree.
 
-1b. **DRY fix phase (DFP, once per batch)**: execute `/track:dry-check` once for the
+1b. **Actual-diff guard (hard cap on Step 0b estimates)**: measure the **actual** per-scope
+    diff against the ceilings loaded in Step 0a. Step 0b is a planning heuristic over per-task
+    *estimates*; this step is the hard cap that prevents an underestimated batch from silently
+    bypassing the configured ceilings. Run it at both pre-review mutation boundaries:
+    - after implementation finishes and before DFP, to catch underestimated implementation
+      batches early; and
+    - after DFP returns `skipped` / `completed` and before Review, because DFP can edit files
+      and push the same batch over a scope ceiling.
+
+    Procedure:
+
+    1. Compute the actual diff (`additions + deletions`) for each configured scope by
+       intersecting the scope's file list (`bin/sotp review files --scope <scope>`) with the
+       union of:
+       - `git diff --numstat <batch-base> --`, which covers tracked committed, staged, and
+         unstaged worktree changes relative to the batch base; and
+       - untracked additions from `git ls-files --others --exclude-standard`, counted as
+         additions for their full file line count with zero deletions.
+
+       Do this for every scope listed in `.harness/config/review-scope.json` `groups`.
+       `<batch-base>` is the HEAD commit at which the current batch started (the prior
+       batch's commit, or the track's first commit if this is the first batch). Use the same
+       `<batch-base>` for the post-DFP rerun so implementation and DFP mutations are measured
+       as one batch diff. The implicit `ScopeName::Other` is exempt (no ceiling, by Step 0a).
+    2. Compare each scope's actual line count to its `diff_ceiling_for_scope` value. When the
+       ceiling is `None` for a scope, skip the comparison for that scope.
+    3. If any scope's actual diff exceeds its ceiling, **halt the batch loop immediately**:
+       - Do NOT proceed to DFP, Review, or Commit for this batch.
+       - Report the overflowing scopes with their actual line counts and ceiling values.
+       - The estimator in Step 0b underestimated this batch; the correct response is one of:
+         (a) refine the offending task's description in `impl-plan.json` and re-split via a
+         smaller follow-up `impl-plan` revision, (b) raise the ceiling explicitly in
+         `.harness/config/review-scope.json` with a justification, or (c) revert / shelf the
+         offending edits and re-implement them as a separate batch.
+       - This is a hard cap that protects the per-scope review-cost ceiling property of D3 /
+         AC-04. Skipping it defeats the workflow's main guarantee.
+    4. If every scope is within its ceiling, continue to the next phase: Step 1c (DFP) for the
+       post-implementation run, or Step 2 (Review) for the post-DFP/pre-review run.
+
+1c. **DRY fix phase (DFP, once per batch)**: execute `/track:dry-check` once for the
     accumulated batch diff. This runs the whole-codebase DRY gate (single scope, D13) via the
     `dry-fix-lead` (dfl) agent — `sotp dry write` → fix DRY violations → `sotp dry
     check-approved` until the gate passes. DFP runs **before** Review (RFP) and is **loosely
@@ -116,10 +155,11 @@ For each batch produced by Step 0b, in order:
     `skipped`, `blocked`, and `failed` into one branch):
     - **`skipped`** — `/track:dry-check` Step 0a detected
       `.harness/config/dry-check.json.enabled: false` (or file missing) and did not run dfl.
-      Treat as a pass-through equivalent to `completed` and proceed to Review (Step 2). The
-      single SSoT for the opt-out lives in `/track:dry-check`; do NOT duplicate the config
-      probe here.
-    - **`completed`** — the DRY gate is Approved. Proceed to Review (Step 2).
+      Treat as a pass-through equivalent to `completed`, then re-run Step 1b as the
+      post-DFP/pre-review guard before proceeding to Review (Step 2). The single SSoT for the
+      opt-out lives in `/track:dry-check`; do NOT duplicate the config probe here.
+    - **`completed`** — the DRY gate is Approved. Re-run Step 1b as the post-DFP/pre-review
+      guard, then proceed to Review (Step 2) only if the batch still fits its ceilings.
     - **`blocked`** — DRY violations remain that dfl could not resolve autonomously (the loop
       exhausted its fix attempts). This is a **DRY-gate outcome, NOT a tooling error**. Halt
       the batch loop immediately, surface the unresolved DRY violation pairs (`bin/sotp dry
@@ -137,8 +177,11 @@ For each batch produced by Step 0b, in order:
    Review must reach full-model `zero_findings` in every required scope.
 
    **Back-edge (RFP → DFP fixpoint)**: review fixes (RFP) edit code, which can reintroduce
-   duplication. After Review reaches `zero_findings`, **re-run Step 1b (DFP)**. Iterate
-   DFP ⇄ RFP until **both** gates are clean in the same pass (the DRY gate stays Approved and
+   duplication AND can grow the per-scope diff past its ceiling. After Review reaches
+   `zero_findings`, **re-run Step 1b (Actual-diff guard), Step 1c (DFP), and the post-DFP
+   Step 1b guard before returning to Review or Commit**. Iterate `Actual-diff guard` → DFP →
+   `Actual-diff guard` ⇄ RFP until **all three** gates are clean in the same pass (the actual
+   diff stays within ceiling after both RFP and DFP mutations, the DRY gate stays Approved, and
    review stays `zero_findings` with no new edits) — that fixpoint is the precondition for
    Commit.
 
