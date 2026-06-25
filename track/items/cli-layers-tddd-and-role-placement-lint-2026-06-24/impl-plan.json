@@ -70,7 +70,7 @@
       "id": "T012",
       "description": "ApplicationService / Interactor pair for Planner (usecase layer) — implement in libs/usecase/src/planner.rs: PlannerPort trait (SecondaryPort role) with run(model, prompt, timeout_seconds) method returning Result<PlanRunOutput, PlannerPortError>; PlanRunOutput struct (Dto); PlannerPortError enum (ErrorType) with MissingPromptSource/PlannerUnavailable/PlannerTimeout/PlannerFailed variants; PlannerService trait (ApplicationService role) with run_codex_local(model, briefing_file, prompt, timeout_seconds) method; PlannerInteractor struct (Interactor role) holding Arc<dyn PlannerPort> and implementing PlannerService — absorbs prompt-resolution logic (briefing-file existence check and prompt construction currently in apps/cli/src/commands/plan/codex_local.rs plan_input_from_args) so that the resolution happens inside PlannerInteractor.run_codex_local before delegating to PlannerPort.run. Also implement CodexPlannerAdapter in libs/infrastructure/src/codex_planner.rs implementing PlannerPort: contains the subprocess spawn, stderr tee, and log-file write logic currently in apps/cli-composition/src/plan.rs or apps/cli/src/commands/plan/codex_local.rs. cargo make ci must pass after this task. Expected diff: ~200-350 lines across usecase/infrastructure. Depends on T001 (PlannerPort SecondaryPort and ApplicationService roles must be in DataRole/RoleKind).",
       "status": "done",
-      "commit_hash": null
+      "commit_hash": "bc800dd7d1cc33c2ea1e135f546e20ca58d9f78a"
     },
     {
       "id": "T013",

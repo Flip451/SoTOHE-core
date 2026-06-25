@@ -14,7 +14,7 @@
 | GuardInput | enum | reference | Check | 🔵 | 🔵 |
 | HookInput | enum | reference | Dispatch | 🔵 | 🔵 |
 | HookName | enum | reference | HooksPathSetup, BlockDirectGitOps, BlockTestFileDeletion, GitRefUpdate, GitPrePush, SkillCompliance | 🔵 | 🔵 |
-| PlanInput | enum | add | RunCodexLocal | 🟡 | 🔵 |
+| PlanInput | enum | add | RunCodexLocal | 🔵 | 🔵 |
 | PrInput | enum | reference | Push, Ensure, Status, WaitAndMerge, TriggerReview, PollReview, ReviewCycle | 🔵 | 🔵 |
 | RefVerifyInput | enum | reference | Run, CheckApproved | 🔵 | 🔵 |
 | ReviewInput | enum | reference | RunCodex, RunClaude, RunLocal, RunFixLocal, CheckApproved, Results, Classify, Files, ValidateScope, GetBriefing, PersistCommitHash | 🔵 | 🔵 |
@@ -54,7 +54,7 @@
 | GitDriver | primary_adapter | reference | — | 🔵 | 🔵 |
 | GuardDriver | primary_adapter | reference | — | 🔵 | 🔵 |
 | HookDriver | primary_adapter | reference | — | 🔵 | 🔵 |
-| PlanDriver | primary_adapter | add | — | 🟡 | 🔵 |
+| PlanDriver | primary_adapter | add | — | 🔵 | 🔵 |
 | PrDriver | primary_adapter | reference | — | 🔵 | 🔵 |
 | RefVerifyDriver | primary_adapter | reference | — | 🔵 | 🔵 |
 | ReviewDriver | primary_adapter | reference | — | 🔵 | 🔵 |

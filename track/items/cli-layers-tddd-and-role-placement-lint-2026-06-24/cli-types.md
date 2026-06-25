@@ -96,7 +96,7 @@
 | cli::commands::plan::codex_local::build_prompt | free_function | delete | fn() -> Result<String, String> | 🔵 | 🔵 |
 | cli::commands::plan::codex_local::codex_bin | free_function | delete | fn() -> std::ffi::OsString | 🔵 | 🔵 |
 | cli::commands::plan::codex_local::configure_child_process_group | free_function | delete | fn() -> () | 🔵 | 🔵 |
-| cli::commands::plan::codex_local::plan_input_from_args | free_function | add | fn(args: &PlanCodexLocalArgs) -> Result<cli_driver::plan::PlanInput, crate::CliError> | 🔵 | 🔵 |
+| cli::commands::plan::codex_local::plan_input_from_args | free_function | add | fn(args: &PlanCodexLocalArgs) -> cli_driver::plan::PlanInput | 🔵 | 🔵 |
 | cli::commands::plan::codex_local::prepare_session_log_path | free_function | delete | fn() -> Result<std::path::PathBuf, String> | 🔵 | 🔵 |
 | cli::commands::plan::codex_local::run_codex_child | free_function | delete | fn() -> Result<super::PlanRunResult, String> | 🔵 | 🔵 |
 | cli::commands::plan::codex_local::run_codex_local_invocation | free_function | delete | fn() -> Result<super::PlanRunResult, String> | 🔵 | 🔵 |

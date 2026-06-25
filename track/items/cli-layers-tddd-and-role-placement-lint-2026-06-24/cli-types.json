@@ -2280,11 +2280,11 @@
           "ty": "&PlanCodexLocalArgs"
         }
       ],
-      "returns": "Result<cli_driver::plan::PlanInput, crate::CliError>",
+      "returns": "cli_driver::plan::PlanInput",
       "is_async": false,
       "generics": [],
       "where_predicates": [],
-      "docs": "Validate clap args and construct PlanInput; returns typed CliError on missing inputs. Test-callable private helper introduced by thin-bin refactor.",
+      "docs": "Convert clap args to PlanInput. Infallible — application-level prompt resolution and briefing-file existence checks moved to PlannerInteractor.run_codex_local in libs/usecase/src/planner.rs (T012). Test-callable private helper.",
       "spec_refs": [
         {
           "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",

@@ -1,12 +1,13 @@
 //! `plan` command family — primary adapter driver.
 //!
-//! `PlanDriver` holds an injected `PlannerPort` and exposes
+//! `PlanDriver` holds an injected [`usecase::planner::PlannerService`] and exposes
 //! `handle(PlanInput) -> CommandOutcome`. All planner execution is
-//! delegated to the port; no I/O work is performed here.
+//! delegated to the service; no I/O work is performed here.
 
+use std::path::PathBuf;
 use std::sync::Arc;
 
-use usecase::planner::PlannerPort;
+use usecase::planner::PlannerService;
 
 use crate::render::CommandOutcome;
 
@@ -15,6 +16,9 @@ use crate::render::CommandOutcome;
 // ---------------------------------------------------------------------------
 
 /// Typed input for the `plan` command family.
+///
+/// Carries raw (unresolved) CLI args; prompt resolution and briefing-file
+/// validation are performed by `PlannerInteractor`.
 pub enum PlanInput {
     /// Run the local Codex-backed planner.
     RunCodexLocal {
@@ -22,8 +26,10 @@ pub enum PlanInput {
         model: String,
         /// Timeout for the planner execution in seconds.
         timeout_seconds: u64,
-        /// Full prompt string (already resolved from briefing file or inline).
-        prompt: String,
+        /// Optional path to a briefing file (mutually exclusive with `prompt`).
+        briefing_file: Option<PathBuf>,
+        /// Optional inline prompt string (mutually exclusive with `briefing_file`).
+        prompt: Option<String>,
     },
 }
 
@@ -33,20 +39,24 @@ pub enum PlanInput {
 
 /// Primary adapter driver for the `plan` command family.
 ///
-/// Holds a single injected `PlannerPort`; exposes
+/// Holds a single injected [`PlannerService`]; exposes
 /// `handle(PlanInput) -> CommandOutcome`. No I/O is performed here —
-/// planner execution is delegated to the port (D5 thin-bin / ADR 1328).
+/// planner execution is delegated to the service (D5 thin-bin / ADR 1328).
 pub struct PlanDriver {
-    /// Injected planner port — the only way to perform planner execution.
-    pub planner: Arc<dyn PlannerPort>,
+    service: Arc<dyn PlannerService>,
 }
 
 impl PlanDriver {
+    /// Create a new `PlanDriver` with the given `PlannerService`.
+    pub fn new(service: Arc<dyn PlannerService>) -> Self {
+        Self { service }
+    }
+
     /// Handle a plan command.
     pub fn handle(&self, input: PlanInput) -> CommandOutcome {
         match input {
-            PlanInput::RunCodexLocal { model, timeout_seconds, prompt } => {
-                self.run_codex_local(model, timeout_seconds, prompt)
+            PlanInput::RunCodexLocal { model, timeout_seconds, briefing_file, prompt } => {
+                self.run_codex_local(model, timeout_seconds, briefing_file, prompt)
             }
         }
     }
@@ -59,9 +69,10 @@ impl PlanDriver {
         &self,
         model: String,
         timeout_seconds: u64,
-        prompt: String,
+        briefing_file: Option<PathBuf>,
+        prompt: Option<String>,
     ) -> CommandOutcome {
-        match self.planner.run(&model, &prompt, timeout_seconds) {
+        match self.service.run_codex_local(model, briefing_file, prompt, timeout_seconds) {
             Ok(output) => {
                 CommandOutcome { stdout: None, stderr: None, exit_code: output.exit_code }
             }

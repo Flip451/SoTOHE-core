@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-25T20:19:04Z",
-  "declaration_hash": "bc4182246bcbc3958eda40c9029d685bc251b10633f6c3488469a7a61cffbf5a",
+  "generated_at": "2026-06-25T20:43:38Z",
+  "declaration_hash": "ef3eb3bdbf586479d9bf0b97cde80728cff3a24aa39b76eeeb54f90d7b9ce9b0",
   "signals": [
     {
       "type_name": "cli::commands::plan::codex_local::plan_input_from_args",

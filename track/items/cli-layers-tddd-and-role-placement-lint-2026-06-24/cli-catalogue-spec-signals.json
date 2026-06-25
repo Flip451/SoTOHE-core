@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "bc4182246bcbc3958eda40c9029d685bc251b10633f6c3488469a7a61cffbf5a",
+  "catalogue_declaration_hash": "ef3eb3bdbf586479d9bf0b97cde80728cff3a24aa39b76eeeb54f90d7b9ce9b0",
   "signals": [
     {
       "type_name": "ArchCommand",
@@ -390,7 +390,7 @@
     {
       "type_name": "cli::commands::plan::codex_local::plan_input_from_args",
       "signal": "blue",
-      "entry_hash": "f1e9cdd7291f6d23e0b64c8be26f27178d931948f9f88df1ebc8242d42ed7f35"
+      "entry_hash": "bbab15b11b5d54e1cd0af5484ccfa8e4f7508798bc49701ad02b790f40e7fca6"
     },
     {
       "type_name": "cli::commands::plan::codex_local::prepare_session_log_path",

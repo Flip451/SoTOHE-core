@@ -753,6 +753,22 @@
         "kind": "pass",
         "citation": "thin-bin 制約（ADR 1328 D5）の下では `cli` の TDDD カタログを `{Dto, ErrorType, FreeFunction}` の allowlist 内に収めなければならない"
       }
+    },
+    {
+      "claim_hash": "bbab15b11b5d54e1cd0af5484ccfa8e4f7508798bc49701ad02b790f40e7fca6",
+      "evidence_hash": "d0850d8e69e74f5440be5ab67b3210afe249efa2b6dc3cf5f46b8e7519b0fc53",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli-driver` の `PlanDriver`（PrimaryAdapter）は `Arc<dyn PlannerService>` を依存注入で保持し `handle(PlanInput) -> CommandOutcome` を公開する。`apps/cli` はその `PlanDriver` を受け取って dispatch するだけでよい。"
+      }
+    },
+    {
+      "claim_hash": "bbab15b11b5d54e1cd0af5484ccfa8e4f7508798bc49701ad02b790f40e7fca6",
+      "evidence_hash": "b5e73bb566f52126f92d6723a9a04228fd8955b94ef4e2500f0c009fa9cb8bde",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli/src/commands/{plan,review}/codex_local.rs` の本番パスは clap 引数→入力変換と composition root への dispatch のみを含み、`Command::new` / `Stdio::piped` / tee / ログファイル書き込み / `spawn` を本番コードに持たない。 ... prompt 解決・briefing ファイル存在確認などのアプリケーションレベル処理は `PlannerInteractor` が担う。"
+      }
     }
   ]
 }
