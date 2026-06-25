@@ -7,8 +7,8 @@
 use super::{CatalogueLinterError, RoleKind, RuleTarget};
 use crate::tddd::catalogue_v2::CatalogueDocument;
 use crate::tddd::catalogue_v2::composite::{StructKind, StructShape};
-use crate::tddd::catalogue_v2::entries::{TraitEntry, TypeEntry};
-use crate::tddd::catalogue_v2::identifiers::{TraitName, TypeName, TypeRef};
+use crate::tddd::catalogue_v2::entries::{FunctionEntry, TraitEntry, TypeEntry};
+use crate::tddd::catalogue_v2::identifiers::{FunctionPath, TraitName, TypeName, TypeRef};
 use crate::tddd::catalogue_v2::methods::MethodDeclaration;
 use crate::tddd::catalogue_v2::roles::{ContractRole, DataRole, ItemAction};
 
@@ -54,6 +54,22 @@ pub(super) fn trait_entries_for_target<'a>(
     catalogue.traits.iter().filter(move |(_name, entry)| {
         entry.action != ItemAction::Delete
             && target_matches(target, RoleKind::from_contract_role(&entry.role))
+    })
+}
+
+/// Iterates over `(function_path, entry)` pairs in `catalogue.functions` where
+/// the entry's `FunctionRole` matches the rule's `RuleTarget`.
+///
+/// Entries with `action: Delete` are excluded so that fail-closed semantics
+/// are preserved: a delete-marked entry is treated as absent and no lint rule
+/// is applied against it.
+pub(super) fn function_entries_for_target<'a>(
+    catalogue: &'a CatalogueDocument,
+    target: &RuleTarget,
+) -> impl Iterator<Item = (&'a FunctionPath, &'a FunctionEntry)> {
+    catalogue.functions.iter().filter(move |(_path, entry)| {
+        entry.action != ItemAction::Delete
+            && target_matches(target, RoleKind::from_function_role(&entry.role))
     })
 }
 

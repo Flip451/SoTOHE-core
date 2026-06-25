@@ -130,6 +130,8 @@ fn data_role_to_dto(role: &DataRole) -> DataRoleDto {
             reacts_to: reacts_to.as_slice().iter().map(|r| r.as_str().to_owned()).collect(),
         },
         DataRole::DomainEvent => DataRoleDto::DomainEvent {},
+        DataRole::CompositionRoot => DataRoleDto::CompositionRoot {},
+        DataRole::PrimaryAdapter => DataRoleDto::PrimaryAdapter {},
     }
 }
 

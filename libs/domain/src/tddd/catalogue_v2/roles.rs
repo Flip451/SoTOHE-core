@@ -38,10 +38,11 @@ pub use strum::IntoStaticStr;
 /// accepts `DataRole`; attaching `ContractRole` or `FunctionRole` to a `TypeEntry`
 /// is a parse-time type error (ADR 1 D2).
 ///
-/// 15 values covering domain layer through infrastructure layer roles:
+/// 17 values covering domain layer through delivery layer roles:
 /// `ValueObject`, `Entity`, `AggregateRoot`, `DomainService`, `Specification`,
 /// `Factory`, `UseCase`, `Interactor`, `Command`, `Query`, `Dto`,
-/// `ErrorType`, `SecondaryAdapter`, `EventPolicy`, `DomainEvent`.
+/// `ErrorType`, `SecondaryAdapter`, `EventPolicy`, `DomainEvent`,
+/// `CompositionRoot`, `PrimaryAdapter`.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum DataRole {
     /// A value object — immutable, equality by value (DDD).
@@ -80,6 +81,10 @@ pub enum DataRole {
     EventPolicy { reacts_to: NonEmptyVec<TypeRef> },
     /// A domain event — a record that something significant occurred in the domain.
     DomainEvent,
+    /// A composition root — wires the object graph via dependency injection (cli_composition only).
+    CompositionRoot,
+    /// A primary adapter — invokes an injected use case and renders its result (cli_driver only).
+    PrimaryAdapter,
 }
 
 impl DataRole {
@@ -142,6 +147,8 @@ impl DataRole {
             Self::SecondaryAdapter => "SecondaryAdapter",
             Self::EventPolicy { .. } => "EventPolicy",
             Self::DomainEvent => "DomainEvent",
+            Self::CompositionRoot => "CompositionRoot",
+            Self::PrimaryAdapter => "PrimaryAdapter",
         }
     }
 
@@ -184,6 +191,8 @@ impl FromStr for DataRole {
                 Ok(Self::EventPolicy { reacts_to: NonEmptyVec::new(event, Vec::new()) })
             }
             "DomainEvent" => Ok(Self::DomainEvent),
+            "CompositionRoot" => Ok(Self::CompositionRoot),
+            "PrimaryAdapter" => Ok(Self::PrimaryAdapter),
             _ => Err(strum::ParseError::VariantNotFound),
         }
     }
@@ -489,6 +498,8 @@ mod tests {
         "SecondaryAdapter",
         "EventPolicy",
         "DomainEvent",
+        "CompositionRoot",
+        "PrimaryAdapter",
     ];
 
     const ALL_CONTRACT_ROLE_NAMES: &[&str] =
@@ -508,8 +519,8 @@ mod tests {
     // -----------------------------------------------------------------------
 
     #[test]
-    fn test_data_role_has_15_variants() {
-        assert_eq!(ALL_DATA_ROLE_NAMES.len(), 15);
+    fn test_data_role_has_17_variants() {
+        assert_eq!(ALL_DATA_ROLE_NAMES.len(), 17);
     }
 
     #[test]

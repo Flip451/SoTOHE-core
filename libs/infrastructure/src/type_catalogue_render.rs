@@ -197,6 +197,8 @@ const V3_EXTRA_SECTIONS: &[Section] = &[
     Section { heading: "## Repositories", kind_tag: "repository" },
     Section { heading: "## Event Policies", kind_tag: "event_policy" },
     Section { heading: "## Domain Events", kind_tag: "domain_event" },
+    Section { heading: "## Composition Roots", kind_tag: "composition_root" },
+    Section { heading: "## Primary Adapters", kind_tag: "primary_adapter" },
 ];
 
 /// Maps a section `kind_tag` (a real v3 role tag, as produced by
@@ -284,6 +286,8 @@ fn data_role_display_tag(role: &DataRole) -> &'static str {
         DataRole::SecondaryAdapter => "secondary_adapter",
         DataRole::EventPolicy { .. } => "event_policy",
         DataRole::DomainEvent => "domain_event",
+        DataRole::CompositionRoot => "composition_root",
+        DataRole::PrimaryAdapter => "primary_adapter",
     }
 }
 

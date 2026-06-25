@@ -252,6 +252,83 @@
           "findings": [],
           "hash": "rvw1:sha256:e5cc8b0b99ae99fc77388a905a84bebbf1b20ccd9856c5d505930e63d2f51168",
           "at": "2026-06-25T01:32:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ba6fd2aa50b91a42a99190e82cb9836916712e5ed816cdc51b72f63fc4fa94a0",
+          "at": "2026-06-25T02:06:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ba6fd2aa50b91a42a99190e82cb9836916712e5ed816cdc51b72f63fc4fa94a0",
+          "at": "2026-06-25T02:08:51Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`RoleKind` now admits `FunctionRole` variants, but `NoRoleInMethodSignature` still only scans type and trait entries. That means a config like `forbidden_roles: [FreeFunction]` or `UseCaseFunction` parses successfully and then becomes a silent no-op instead of being rejected or enforced.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 291,
+              "category": "typestate / parse-don't-validate gap"
+            }
+          ],
+          "hash": "rvw1:sha256:814703d06caa5d2dc6b43d97517f5a879f2f5bfcd08dc7987c4aa12fa1bed6c1",
+          "at": "2026-06-25T02:16:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Adding `FunctionRole` to `RoleKind::ALL` makes `RuleTarget` able to name `FreeFunction`/`UseCaseFunction`, but only `KindLayerConstraint` was wired to inspect `catalogue.functions`. The other rule kinds still iterate only `type_entries_for_target`/`trait_entries_for_target`, so a function-only target now constructs successfully and then silently no-ops instead of being rejected. Either validate unsupported function-role targets up front or make the other branches function-aware.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 167,
+              "category": "typestate / parse-don't-validate gap"
+            }
+          ],
+          "hash": "rvw1:sha256:ea606781a90920ed2e12c419097754bc168819f5856e3f8ddf2f149200febdcd",
+          "at": "2026-06-25T02:27:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `KindLayerConstraint` function-entry path is not exercised by any test, and `RoleKind::from_function_role` has no unit coverage. If the `FunctionPath` filtering or role mapping regresses, CI will still pass because nothing asserts that a forbidden-layer `FunctionEntry` produces a violation.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 187,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:af0117de5eb6a1723a8fcd2200f492f4bab8eb6483ffdc1da541f98f3ecac700",
+          "at": "2026-06-25T02:40:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4e7500640a692c670a32a9f6001b1635e8da6b14ae81abcde784b914be35951a",
+          "at": "2026-06-25T02:48:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4e7500640a692c670a32a9f6001b1635e8da6b14ae81abcde784b914be35951a",
+          "at": "2026-06-25T02:53:03Z"
         }
       ]
     },
@@ -270,6 +347,38 @@
           "findings": [],
           "hash": "rvw1:sha256:60d17ddfd2660f05f41e81d0fb1bc149752010f2763bc0e76c773f661c2e4e2f",
           "at": "2026-06-25T00:34:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7a627a4e1e6652fde248c3f861cef7827a32a35a3e7091a657937236c4b18f70",
+          "at": "2026-06-25T02:10:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7a627a4e1e6652fde248c3f861cef7827a32a35a3e7091a657937236c4b18f70",
+          "at": "2026-06-25T02:14:27Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f326695d8e9541b6620a06eec00d0e7c71276f964e07426371290d08585956e9",
+          "at": "2026-06-25T02:06:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f326695d8e9541b6620a06eec00d0e7c71276f964e07426371290d08585956e9",
+          "at": "2026-06-25T02:08:28Z"
         }
       ]
     }

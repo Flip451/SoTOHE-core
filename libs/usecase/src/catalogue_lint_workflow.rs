@@ -416,6 +416,10 @@ fn parse_role_kind(s: &str) -> Result<RoleKind, CatalogueLintError> {
         "ApplicationService" => Ok(RoleKind::ApplicationService),
         "SecondaryPort" => Ok(RoleKind::SecondaryPort),
         "Repository" => Ok(RoleKind::Repository),
+        "CompositionRoot" => Ok(RoleKind::CompositionRoot),
+        "PrimaryAdapter" => Ok(RoleKind::PrimaryAdapter),
+        "FreeFunction" => Ok(RoleKind::FreeFunction),
+        "UseCaseFunction" => Ok(RoleKind::UseCaseFunction),
         other => Err(CatalogueLintError(format!("unknown role kind: '{other}'"))),
     }
 }

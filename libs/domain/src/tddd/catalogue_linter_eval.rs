@@ -11,9 +11,10 @@ use std::collections::BTreeMap;
 
 use super::helpers::{
     bare_name_in_type_ref, collect_methods_for_type, contract_role_type_ref, entry_role_kind,
-    field_type_refs, field_vec_is_empty, has_trait_impl, identity_accessor_name,
-    invariants_for_role, struct_has_public_fields, trait_entries_for_target,
-    type_entries_for_target, validate_contract_role_field, validate_data_role_field,
+    field_type_refs, field_vec_is_empty, function_entries_for_target, has_trait_impl,
+    identity_accessor_name, invariants_for_role, struct_has_public_fields,
+    trait_entries_for_target, type_entries_for_target, validate_contract_role_field,
+    validate_data_role_field,
 };
 use super::{
     CatalogueLintViolation, CatalogueLinterError, CatalogueLinterRule, CatalogueLinterRuleKind,
@@ -180,6 +181,16 @@ pub fn evaluate_catalogue_lint(
                         violations.push(CatalogueLintViolation::new(
                             rule.kind().discriminant_name(),
                             name.as_str(),
+                            format!(
+                                "entry is declared in layer '{}' which is not in permitted layers",
+                                doc_layer.as_ref()
+                            ),
+                        ));
+                    }
+                    for (path, _entry) in function_entries_for_target(catalogue, rule.target()) {
+                        violations.push(CatalogueLintViolation::new(
+                            rule.kind().discriminant_name(),
+                            path.to_string(),
                             format!(
                                 "entry is declared in layer '{}' which is not in permitted layers",
                                 doc_layer.as_ref()

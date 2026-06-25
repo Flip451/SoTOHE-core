@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-25T01:34:16Z",
+  "generated_at": "2026-06-25T02:54:23Z",
   "declaration_hash": "84b9fdbcc6a03f593de668862c4b86cc3a8f15b818e235bc015f659735293357",
   "signals": [
     {
       "type_name": "DataRole",
       "kind_tag": "enum",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",
@@ -20,7 +20,7 @@
     {
       "type_name": "RoleKind",
       "kind_tag": "enum",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",
