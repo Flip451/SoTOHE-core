@@ -1,0 +1,132 @@
+{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "ReviewScopeConfig": {
+      "action": "modify",
+      "role": { "DomainService": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "track_id", "ty": "&TrackId" },
+            { "name": "entries", "ty": "Vec<(String, Vec<String>, Option<String>, Option<u32>)>" },
+            { "name": "operational", "ty": "Vec<String>" },
+            { "name": "other_track", "ty": "Vec<String>" },
+            { "name": "default_diff_ceiling", "ty": "Option<u32>" }
+          ],
+          "returns": "Result<ReviewScopeConfig, ScopeConfigError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Builds a scope config from review-scope.json data. The `entries` tuple now carries an optional per-scope diff ceiling (lines) as its fourth element. `default_diff_ceiling` is the global fallback used when a configured review scope has no per-scope override (D3 / IN-05 / CN-02)."
+        },
+        {
+          "name": "classify",
+          "receiver": "&self",
+          "params": [
+            { "name": "files", "ty": "&[FilePath]" }
+          ],
+          "returns": "std::collections::HashMap<ScopeName, Vec<FilePath>>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "get_scope_names",
+          "receiver": "&self",
+          "params": [
+            { "name": "files", "ty": "&[FilePath]" }
+          ],
+          "returns": "std::collections::HashSet<ScopeName>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "contains_scope",
+          "receiver": "&self",
+          "params": [
+            { "name": "scope", "ty": "&ScopeName" }
+          ],
+          "returns": "bool",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "all_scope_names",
+          "receiver": "&self",
+          "params": [],
+          "returns": "std::collections::HashSet<ScopeName>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "briefing_file_for_scope",
+          "receiver": "&self",
+          "params": [
+            { "name": "scope", "ty": "&ScopeName" }
+          ],
+          "returns": "Option<&str>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "diff_ceiling_for_scope",
+          "receiver": "&self",
+          "params": [
+            { "name": "scope", "ty": "&ScopeName" }
+          ],
+          "returns": "Option<u32>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns the effective diff ceiling (lines) for the given configured review scope. Returns the per-scope override if set, otherwise the global default. Returns None if neither is configured, and always returns None for ScopeName::Other because Other is not a configured review scope (unconstrained batch sizing). Used by the full-cycle orchestrator to compute batch split points (D3 / IN-04 / IN-05 / AC-03)."
+        }
+      ],
+      "module_path": "review_v2::scope_config",
+      "docs": "Domain service for scope classification in the review workflow. Holds compiled glob matchers and ceiling configuration; classifies file paths into review scopes. After this track: stores per-scope diff ceiling and global diff ceiling default, both sourced from review-scope.json via the infrastructure loader (D3 / IN-05 / CN-02). The `new` constructor gains a new `entries` tuple field (ceiling per scope) and a `default_diff_ceiling` parameter.",
+      "spec_refs": [
+        { "file": "track/items/feature-batch-default-inversion-2026-06-24/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/feature-batch-default-inversion-2026-06-24/spec.json", "anchor": "IN-05" },
+        { "file": "track/items/feature-batch-default-inversion-2026-06-24/spec.json", "anchor": "CN-02" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [],
+  "trait_impls": [
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "ReviewScopeConfig"
+    }
+  ]
+}

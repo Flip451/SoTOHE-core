@@ -1,0 +1,440 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5be831bf4b4227330ca2b537bc06aeafec08c963ddcbeda04199a6c3b39680f0",
+          "at": "2026-06-25T01:40:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5be831bf4b4227330ca2b537bc06aeafec08c963ddcbeda04199a6c3b39680f0",
+          "at": "2026-06-25T01:42:54Z"
+        }
+      ]
+    },
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 overstates the benefit: `max_over_layers(ceil(layer_work / ceiling_for_layer))` is not guaranteed to be smaller than the per-task serial `N` rounds, and the later Negative section already says a single-layer feature can become the bottleneck. This should be phrased as a typical reduction, not a universal one.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-22-1327-feature-batch-default-inversion.md",
+              "line": 51,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9a15c4380edf6a1a6efb8b74ded095d09c32a465510b5942a4b70ac78b63c71e",
+          "at": "2026-06-24T17:31:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D5 says `/track:implement` already performs multi-task parallel implementation plus a single review and a single commit, but `implement.md` only covers implementation and task transitions. The review/commit steps belong to `/track:full-cycle` and `/track:commit`, so this rationale is built on the wrong command behavior.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/knowledge/adr/2026-06-22-1327-feature-batch-default-inversion.md",
+              "line": 61,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:8c864135abd77775aae8267bae735955e8333f59e5e1112ef0909c8c3ce662a3",
+          "at": "2026-06-24T17:35:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fac22fa392d666036af07238d12ce6ba54d8cfe613d27f37bf743bda47c08b4c",
+          "at": "2026-06-24T17:39:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fac22fa392d666036af07238d12ce6ba54d8cfe613d27f37bf743bda47c08b4c",
+          "at": "2026-06-24T17:41:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ca0d6a6f1fc5b8989067b9cb8c910950f9096e8de5220788fcd82fa393f173ab",
+          "at": "2026-06-25T00:58:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-01 says the batch commits as soon as any layer's cumulative diff reaches the per-scope ceiling, but CN-01/AC-03 later say a layer may be at the ceiling and still continue adding tasks from other layers; the split is only required when the next task would make some layer exceed its ceiling. This leaves the plan with conflicting batch-boundary semantics and can make T005 implement an unnecessarily early split, reducing the intended round aggregation.",
+              "severity": "P1",
+              "file": "track/items/feature-batch-default-inversion-2026-06-24/spec.json",
+              "line": 51,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ca0d6a6f1fc5b8989067b9cb8c910950f9096e8de5220788fcd82fa393f173ab",
+          "at": "2026-06-25T01:03:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-04 requires the ceiling values to be adjustable by changing `.harness/config/review-scope.json` only, but its coverage maps solely to T002, which only adds/configures the JSON fields. The runtime pieces that make the setting effective are T003 (`ReviewScopeConfig` stores/returns the effective ceiling) and T004 (loader reads the JSON fields), so the coverage/rendered task list lets AC-04 be considered satisfied without the loader/domain support that the acceptance criterion itself requires.",
+              "severity": "P1",
+              "file": "track/items/feature-batch-default-inversion-2026-06-24/task-coverage.json",
+              "line": 30,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:096b1b64774c568730c9abd031a0c45fe576b06d8d3be3eadc0f785cbdfd198a",
+          "at": "2026-06-25T01:09:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`diff_ceiling_for_scope` is documented as returning the global default whenever a scope has no per-scope override, but T003 also requires `ScopeName::Other` to always return `None`. With `default_diff_ceiling` set, those two contracts conflict, so the implementation and tests for `Other` cannot satisfy both artifacts. Clarify whether the global default applies only to configured review scopes or whether `Other` should inherit it.",
+              "severity": "P1",
+              "file": "track/items/feature-batch-default-inversion-2026-06-24/domain-types.json",
+              "line": 109,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:7320f83ad0bf4e76f9721b2cb0a1f098946a6975edf685f90d1f39b2d0d32ea3",
+          "at": "2026-06-25T01:13:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fc7cf96d000b73db44e1ae5f29f52a2c4c1311827e3c1f8ed3e62371bc28ebf3",
+          "at": "2026-06-25T01:18:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "S2 still says `T001-T004` are in the same commit, but S1 already marks `T001` as done with commit hash `5c159af139735232dc538b54b8fd886c34702fc1`. That makes the Batch A grouping internally inconsistent: T001 is no longer part of the same implementation commit as T002-T004.",
+              "severity": "P1",
+              "file": "track/items/feature-batch-default-inversion-2026-06-24/impl-plan.json",
+              "line": 62,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:7464260f72373c4dd91d3c511cd5b98915801c72017bdb5c8b35ad576e866cd4",
+          "at": "2026-06-25T01:43:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d6c57ddb4e6870da85889ba846486c71e3ddc02b9b91eec7f5b0507ffa6f25e6",
+          "at": "2026-06-25T01:51:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d6c57ddb4e6870da85889ba846486c71e3ddc02b9b91eec7f5b0507ffa6f25e6",
+          "at": "2026-06-25T01:55:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3a140895568337eee6ff9e08942c5466223a7e0ff06f04ea698eca5ca300757a",
+          "at": "2026-06-25T02:05:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3a140895568337eee6ff9e08942c5466223a7e0ff06f04ea698eca5ca300757a",
+          "at": "2026-06-25T02:07:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c01a3816204e16612e4bcb75a4d98f9ae269d7def21e7f984abcea7c70a8ff01",
+          "at": "2026-06-25T02:52:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c01a3816204e16612e4bcb75a4d98f9ae269d7def21e7f984abcea7c70a8ff01",
+          "at": "2026-06-25T02:54:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3206c04c6a951c3054042a04f1bc4601bfcf08eea31370bdadefeb305bb0c889",
+          "at": "2026-06-25T03:58:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3206c04c6a951c3054042a04f1bc4601bfcf08eea31370bdadefeb305bb0c889",
+          "at": "2026-06-25T04:00:37Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:67536beebb00bcdc2861108af26f0d6a9113da3f5c992e00484ccf9ac331a4ed",
+          "at": "2026-06-25T01:40:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:67536beebb00bcdc2861108af26f0d6a9113da3f5c992e00484ccf9ac331a4ed",
+          "at": "2026-06-25T01:42:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 0b now only carries forward `todo` / `in_progress` tasks and skips `done` tasks only when they already have a non-null `commit_hash`. That drops the supported `DonePending` state (`commit_hash: null`) from the batch loop, so those tasks will never be backfilled via `track transition ... done --commit-hash` and can leave the track stuck with unresolved completion state. The existing task-completion convention expects that backfill path to remain available.",
+              "severity": "P1",
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 51,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:f029827841177dffef4b7116f7129afa0448301c9a25a97e497bb1ef3df5724c",
+          "at": "2026-06-25T02:08:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`markdown-only` is not a safe fallback scope here. `.harness/config/review-scope.json` routes `knowledge/adr/**` and `track/items/<track-id>/**` to `plan-artifacts`, not `harness-policy`, so this heuristic will mis-bucket ADR/plan-artifact tasks and can choose the wrong per-scope ceiling / severity policy for a batch.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.claude/commands/track/full-cycle.md",
+              "line": 60,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:b7d95a7f4d1854cb6c6a264f14d464ad5aa8595135ee528cd298e5bc7bb6c405",
+          "at": "2026-06-25T02:16:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Step 0b` only opens a new batch when the next task would push an already-touched layer over its ceiling. That misses the case where the next task is the first touch for a layer but its own diff already exceeds the configured ceiling, so this planner can still emit an over-ceiling batch and violate D3.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.claude/commands/track/full-cycle.md",
+              "line": 65,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e460b8c293a906640555e1bb06128d1359bad497267dde8732d1fec6b8423cdd",
+          "at": "2026-06-25T02:24:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f4b4038cfe8a0d82c420e6b9a4e6664ba3fc08d2a002f3602fbf7e00b01ecad3",
+          "at": "2026-06-25T02:31:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f4b4038cfe8a0d82c420e6b9a4e6664ba3fc08d2a002f3602fbf7e00b01ecad3",
+          "at": "2026-06-25T02:37:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This hard-cap check only uses `git diff --numstat`, so it ignores brand-new untracked files. A batch that adds a large new file can still look within the ceiling even though the real scope diff is over limit, which defeats the guard. The diff source needs to include untracked additions as well.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.claude/commands/track/full-cycle.md",
+              "line": 116,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "The ceiling guard only runs before DFP, but DFP is itself a code-editing phase. If dry-fix edits push the batch past a scope ceiling, the workflow still proceeds to Review because there is no guard after DFP and before Step 2. Re-run the actual-diff guard after DFP mutations, or move it to the final pre-review boundary.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.claude/commands/track/full-cycle.md",
+              "line": 169,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:5b335d7a8fd1c9c3a4ce46f3b3c8db07072bb0c91b06db8fb9e51ecd0410f9d7",
+          "at": "2026-06-25T02:56:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ea7db9f1a38f062cea1930eec4745242e248df15b67e33ac0a6aeac4adcdf6ac",
+          "at": "2026-06-25T03:02:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ea7db9f1a38f062cea1930eec4745242e248df15b67e33ac0a6aeac4adcdf6ac",
+          "at": "2026-06-25T03:06:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d555134fdfa151b3f37e5b9d9e215dda18ab0a58398eb68aad6c99d6011793c1",
+          "at": "2026-06-25T03:25:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 4 tells the operator to commit the post-commit D4 backfill by running `cargo make track-commit-message`, but that wrapper runs `bin/sotp review check-approved` before committing. After Step 3 mutates `impl-plan.json`/`plan.md`, the plan-artifacts review hash is stale and `review.json` already exists, so the PR-review bypass cannot apply; the documented tail-commit path will block instead of recording the hash backfill. The workflow needs to explicitly refresh/record the required review state for this tail diff or use a guarded lifecycle commit path that is compatible with the review gate.",
+              "severity": "P1",
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 235,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:d555134fdfa151b3f37e5b9d9e215dda18ab0a58398eb68aad6c99d6011793c1",
+          "at": "2026-06-25T03:29:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4b81f901126534a158236b0336f707640507b8d438b4cddb0f188a567c4ed64e",
+          "at": "2026-06-25T03:35:55Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:60d17ddfd2660f05f41e81d0fb1bc149752010f2763bc0e76c773f661c2e4e2f",
+          "at": "2026-06-25T00:53:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:60d17ddfd2660f05f41e81d0fb1bc149752010f2763bc0e76c773f661c2e4e2f",
+          "at": "2026-06-25T00:56:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`briefing_file` is only checked for symlinks after `trusted_root.join(briefing)`, but the joined path is never validated to stay under `trusted_root`. A config value like `../outside.md` or `/etc/passwd` can therefore bypass this loader-level boundary check even when no symlink is present. This should fail closed using the same absolute/`..` containment rules as `is_safe_briefing_path` and the CN-04 trusted-root pattern.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/review_v2/scope_config_loader.rs",
+              "line": 149,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:802af23742be1e5ec11621234e44b4ded9c4d5efb2eba822092d4f2d982f98cc",
+          "at": "2026-06-25T01:42:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:706b0f5eccfa886de2d2bad9319ac6249dd1f3e69cc8940ace744c23eb511d4b",
+          "at": "2026-06-25T01:52:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:706b0f5eccfa886de2d2bad9319ac6249dd1f3e69cc8940ace744c23eb511d4b",
+          "at": "2026-06-25T01:55:34Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a8fab42e2c4853dc1297bb4ee08c6dd3717f4b6837882d59274e23b987ed0815",
+          "at": "2026-06-25T01:40:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a8fab42e2c4853dc1297bb4ee08c6dd3717f4b6837882d59274e23b987ed0815",
+          "at": "2026-06-25T01:43:10Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:874b9f1ae1d319d07f649a5dfa9e6ebee6c158204a94f8051c31c41746e1d3fa",
+          "at": "2026-06-25T01:42:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:874b9f1ae1d319d07f649a5dfa9e6ebee6c158204a94f8051c31c41746e1d3fa",
+          "at": "2026-06-25T01:45:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bd44c3718fdb19eae5c7c37b92cff954d5d797da6fc8f7483b343e03b616324f",
+          "at": "2026-06-25T03:53:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bd44c3718fdb19eae5c7c37b92cff954d5d797da6fc8f7483b343e03b616324f",
+          "at": "2026-06-25T03:55:45Z"
+        }
+      ]
+    }
+  }
+}

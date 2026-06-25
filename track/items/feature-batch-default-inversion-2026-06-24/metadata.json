@@ -1,0 +1,8 @@
+{
+  "branch": "track/feature-batch-default-inversion-2026-06-24",
+  "created_at": "2026-06-24T17:24:36Z",
+  "id": "feature-batch-default-inversion-2026-06-24",
+  "schema_version": 5,
+  "title": "feature バッチ消化への既定反転 — per-layer 並列レビューを始動させる",
+  "updated_at": "2026-06-24T17:24:36Z"
+}

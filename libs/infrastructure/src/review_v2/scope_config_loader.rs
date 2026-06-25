@@ -6,7 +6,7 @@
 use std::path::Path;
 
 use domain::TrackId;
-use domain::review_v2::{ReviewScopeConfig, ScopeConfigError};
+use domain::review_v2::{FilePath, ReviewScopeConfig, ScopeConfigError};
 
 /// Errors from loading review-scope.json for v2.
 #[derive(Debug, thiserror::Error)]
@@ -32,6 +32,14 @@ struct ReviewScopeJsonV2 {
     review_operational: Vec<String>,
     #[serde(default)]
     other_track: Vec<String>,
+    /// Global default per-scope diff ceiling (lines), used by
+    /// `ReviewScopeConfig::diff_ceiling_for_scope` when a scope has no
+    /// per-group override. `None` (field absent) means no global default —
+    /// scopes without per-group `diff_ceiling_lines` return None
+    /// (unconstrained). Introduced by the feature-batch default-inversion
+    /// track (D3 / IN-05 / CN-02).
+    #[serde(default)]
+    default_diff_ceiling_lines: Option<u32>,
     // planning_only and normalize are v1 fields — rejected by deny_unknown_fields
 }
 
@@ -48,6 +56,12 @@ struct GroupEntry {
     /// before this field was introduced.
     #[serde(default)]
     briefing_file: Option<String>,
+    /// Per-group override for the diff ceiling (lines). `None` (field absent)
+    /// means inherit the global `default_diff_ceiling_lines`. Used by the
+    /// full-cycle orchestrator to compute feature-batch split points (D3 /
+    /// IN-04 / IN-05).
+    #[serde(default)]
+    diff_ceiling_lines: Option<u32>,
 }
 
 /// Loads `review-scope.json` into a v2 `ReviewScopeConfig`.
@@ -122,8 +136,9 @@ pub fn load_v2_scope_config(
         });
     }
 
-    // Validate briefing_file paths: each configured briefing_file must resolve to
-    // a non-symlink path under the trusted root. This protects against an attacker
+    // Validate briefing_file paths: each configured briefing_file must be a
+    // repo-relative, traversal-free, non-symlink path under the trusted root.
+    // This protects against an attacker
     // committing `track/review-prompts/policy.md -> /etc/passwd` alongside a
     // review-scope.json change, which would otherwise smuggle workspace-external
     // file reads into the reviewer's Read-tool call (threat model: PR author is
@@ -132,6 +147,14 @@ pub fn load_v2_scope_config(
     // Follows knowledge/conventions/security.md §Symlink rejection.
     for (name, entry) in &doc.groups {
         if let Some(ref briefing) = entry.briefing_file {
+            FilePath::new(briefing.as_str()).map_err(|source| {
+                ScopeConfigLoadError::InvalidField {
+                    path: path_display.clone(),
+                    detail: format!(
+                        "invalid briefing_file for group '{name}': '{briefing}' ({source})"
+                    ),
+                }
+            })?;
             let briefing_path = trusted_root.join(briefing);
             reject_symlinks_below(&briefing_path, trusted_root).map_err(|source| {
                 if source.kind() == std::io::ErrorKind::InvalidInput {
@@ -149,13 +172,20 @@ pub fn load_v2_scope_config(
         }
     }
 
-    let entries: Vec<(String, Vec<String>, Option<String>)> = doc
+    #[allow(clippy::type_complexity)] // matches the ReviewScopeConfig::new entries seam.
+    let entries: Vec<(String, Vec<String>, Option<String>, Option<u32>)> = doc
         .groups
         .into_iter()
-        .map(|(name, entry)| (name, entry.patterns, entry.briefing_file))
+        .map(|(name, entry)| (name, entry.patterns, entry.briefing_file, entry.diff_ceiling_lines))
         .collect();
 
-    Ok(ReviewScopeConfig::new(track_id, entries, doc.review_operational, doc.other_track)?)
+    Ok(ReviewScopeConfig::new(
+        track_id,
+        entries,
+        doc.review_operational,
+        doc.other_track,
+        doc.default_diff_ceiling_lines,
+    )?)
 }
 
 #[cfg(test)]
@@ -450,6 +480,60 @@ mod tests {
     }
 
     #[test]
+    fn test_load_rejects_absolute_briefing_file() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = write_scope_json(
+            dir.path(),
+            r#"{
+                "version": 2,
+                "groups": {
+                    "plan-artifacts": {
+                        "patterns": ["track/items/**"],
+                        "briefing_file": "/etc/passwd"
+                    }
+                }
+            }"#,
+        );
+        let track_id = TrackId::try_new("test-track").unwrap();
+        let err = load_v2_scope_config(&path, &track_id, dir.path()).unwrap_err();
+        assert!(
+            matches!(
+                &err,
+                ScopeConfigLoadError::InvalidField { detail, .. }
+                    if detail.contains("briefing_file") && detail.contains("repo-relative")
+            ),
+            "expected InvalidField for absolute briefing_file, got: {err}"
+        );
+    }
+
+    #[test]
+    fn test_load_rejects_traversal_briefing_file() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = write_scope_json(
+            dir.path(),
+            r#"{
+                "version": 2,
+                "groups": {
+                    "plan-artifacts": {
+                        "patterns": ["track/items/**"],
+                        "briefing_file": "../outside.md"
+                    }
+                }
+            }"#,
+        );
+        let track_id = TrackId::try_new("test-track").unwrap();
+        let err = load_v2_scope_config(&path, &track_id, dir.path()).unwrap_err();
+        assert!(
+            matches!(
+                &err,
+                ScopeConfigLoadError::InvalidField { detail, .. }
+                    if detail.contains("briefing_file") && detail.contains("traversal")
+            ),
+            "expected InvalidField for traversal briefing_file, got: {err}"
+        );
+    }
+
+    #[test]
     #[cfg(unix)]
     fn test_load_rejects_symlink_briefing_file() {
         // Attack model: PR author commits review-scope.json with a briefing_file
@@ -489,5 +573,76 @@ mod tests {
             ),
             "expected InvalidField with briefing_file symlink detail, got: {err}"
         );
+    }
+
+    // ── feature-batch ceiling fields (D3 / IN-04 / IN-05 / CN-02) ──────
+
+    #[test]
+    fn test_load_per_scope_diff_ceiling_overrides_default() {
+        // A group with `diff_ceiling_lines` set must surface its override via
+        // diff_ceiling_for_scope, regardless of the global default.
+        let dir = tempfile::tempdir().unwrap();
+        let path = write_scope_json(
+            dir.path(),
+            r#"{
+                "version": 2,
+                "default_diff_ceiling_lines": 500,
+                "groups": {
+                    "domain": { "patterns": ["libs/domain/**"], "diff_ceiling_lines": 200 }
+                }
+            }"#,
+        );
+        let track_id = TrackId::try_new("test-track").unwrap();
+        let config = load_v2_scope_config(&path, &track_id, dir.path()).unwrap();
+        let domain = domain::review_v2::ScopeName::Main(
+            domain::review_v2::MainScopeName::new("domain").unwrap(),
+        );
+        assert_eq!(config.diff_ceiling_for_scope(&domain), Some(200));
+    }
+
+    #[test]
+    fn test_load_default_diff_ceiling_applies_to_overrideless_scope() {
+        // A group without `diff_ceiling_lines` must inherit the top-level
+        // `default_diff_ceiling_lines`.
+        let dir = tempfile::tempdir().unwrap();
+        let path = write_scope_json(
+            dir.path(),
+            r#"{
+                "version": 2,
+                "default_diff_ceiling_lines": 500,
+                "groups": {
+                    "domain": { "patterns": ["libs/domain/**"] }
+                }
+            }"#,
+        );
+        let track_id = TrackId::try_new("test-track").unwrap();
+        let config = load_v2_scope_config(&path, &track_id, dir.path()).unwrap();
+        let domain = domain::review_v2::ScopeName::Main(
+            domain::review_v2::MainScopeName::new("domain").unwrap(),
+        );
+        assert_eq!(config.diff_ceiling_for_scope(&domain), Some(500));
+    }
+
+    #[test]
+    fn test_load_without_ceiling_fields_is_backward_compatible() {
+        // A review-scope.json that predates both ceiling fields must load,
+        // and diff_ceiling_for_scope returns None for every scope (since both
+        // serde defaults resolve to None).
+        let dir = tempfile::tempdir().unwrap();
+        let path = write_scope_json(
+            dir.path(),
+            r#"{
+                "version": 2,
+                "groups": {
+                    "domain": { "patterns": ["libs/domain/**"] }
+                }
+            }"#,
+        );
+        let track_id = TrackId::try_new("test-track").unwrap();
+        let config = load_v2_scope_config(&path, &track_id, dir.path()).unwrap();
+        let domain = domain::review_v2::ScopeName::Main(
+            domain::review_v2::MainScopeName::new("domain").unwrap(),
+        );
+        assert!(config.diff_ceiling_for_scope(&domain).is_none());
     }
 }

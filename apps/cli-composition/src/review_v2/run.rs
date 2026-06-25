@@ -944,9 +944,10 @@ mod tests {
         let track_id = domain::TrackId::try_new("my-test-track-2026").unwrap();
         let scope_config = domain::review_v2::ReviewScopeConfig::new(
             &track_id,
-            vec![("infra".to_owned(), vec!["src/**".to_owned()], None)],
+            vec![("infra".to_owned(), vec!["src/**".to_owned()], None, None)],
             vec![],
             vec![],
+            None,
         )
         .unwrap();
         let base = domain::CommitHash::try_new("0".repeat(40)).unwrap();

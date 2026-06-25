@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "default_diff_ceiling_lines": 500,
   "groups": {
     "domain": {
       "patterns": ["libs/domain/**"],

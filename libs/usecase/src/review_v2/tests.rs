@@ -205,9 +205,10 @@ fn base_commit() -> CommitHash {
 fn basic_config() -> ReviewScopeConfig {
     ReviewScopeConfig::new(
         &track_id(),
-        vec![("domain".to_owned(), vec!["libs/domain/**".to_owned()], None)],
+        vec![("domain".to_owned(), vec!["libs/domain/**".to_owned()], None, None)],
         vec![],
         vec![],
+        None,
     )
     .unwrap()
 }
@@ -450,11 +451,12 @@ fn two_scope_config() -> ReviewScopeConfig {
     ReviewScopeConfig::new(
         &track_id(),
         vec![
-            ("domain".to_owned(), vec!["libs/domain/**".to_owned()], None),
-            ("usecase".to_owned(), vec!["libs/usecase/**".to_owned()], None),
+            ("domain".to_owned(), vec!["libs/domain/**".to_owned()], None, None),
+            ("usecase".to_owned(), vec!["libs/usecase/**".to_owned()], None, None),
         ],
         vec![],
         vec![],
+        None,
     )
     .unwrap()
 }

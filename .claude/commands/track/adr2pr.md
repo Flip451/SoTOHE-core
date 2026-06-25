@@ -20,7 +20,7 @@ Use `TaskCreate` to register the following steps as tasks (in order), then execu
 6. `/track:review` — review the plan artifacts.
 7. Stage: run `cargo make add-all` after the final review round.
 8. `/track:commit <message>` — commit the plan artifacts. Generate the commit message yourself per Constraint 2.
-9. `/track:full-cycle` — per-task implement → review → commit.
+9. `/track:full-cycle` — feature-batch implement → DRY check → review → commit.
 10. `/track:pr-review` — final PR-based review (whole track branch vs `main`).
 
 ## Step 0 (before executing any step): build the execution plan
@@ -38,7 +38,7 @@ Read every referenced sub-command definition (`/track:init`, `/track:review`, `/
 
 1. **No merge.** The chain stops at `/track:pr-review`. Never invoke `/track:merge` / `cargo make track-pr-merge`. Leave the PR open for the user to merge.
 2. **Fully autonomous.** Never pause for user confirmation at any step; run to the end. Decide all commit messages yourself (no candidate presentation).
-3. **CI-driven bundling allowed.** `/track:full-cycle` is per-task by default; when tightly-coupled tasks cannot pass `cargo make ci` individually, bundling them into a single implement → review → commit cycle is permitted.
+3. **Batch-first execution.** `/track:full-cycle` implements the full feature batch (all `todo` / `in_progress` tasks in dependency order, accumulated in the same working tree) before review and commit by default. Per-task commit split is the exception: triggered only when a layer's cumulative diff is about to exceed its per-scope ceiling (configured in `.harness/config/review-scope.json` via `default_diff_ceiling_lines` and per-group `diff_ceiling_lines`). When a split is taken, all tasks that landed in the same commit are recorded with the same `commit_hash` via `bin/sotp track transition <id> done --commit-hash <hash>` (ADR `2026-06-22-1327-feature-batch-default-inversion` §D1 / §D3 / §D4).
 4. **Signals must be resolved — non-negotiable.** Resolve every 🔴 at the phase where it surfaces, following the escalation rules in `/track:plan`'s loop sections. For 🟡 (yellow): `/track:plan` allows 🟡 to advance with a warning, but this adr2pr chain requires 🟡 to be resolved before step 9 (`/track:full-cycle`) begins — any remaining 🟡 at step 10 (`/track:pr-review`) will surface as a merge blocker for the user, so clearing all 🟡 before full-cycle is mandatory. If Phase 1 or Phase 2 returns 🟡 after all reds are cleared, re-invoke the relevant writer to address the yellow before proceeding to the next step.
 
 ## Behavior
@@ -47,5 +47,5 @@ After execution, summarize:
 
 1. Each step's gate verdict and the commits produced.
 2. The PR URL and the final `/track:pr-review` result (confirming **no merge** was performed).
-3. Any CI-driven task-bundling decisions made during full-cycle.
+3. Any per-scope ceiling batch split decisions made during full-cycle.
 4. Confirmation that all 🔴/🟡 signals are resolved.
