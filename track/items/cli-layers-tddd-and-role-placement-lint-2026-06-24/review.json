@@ -1,6 +1,66 @@
 {
   "schema_version": 2,
   "scopes": {
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ec1cc7545d6c620f9bcb712e2e9e0b5d406e958ce6972dddad23852bf485ad50",
+          "at": "2026-06-25T04:57:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ec1cc7545d6c620f9bcb712e2e9e0b5d406e958ce6972dddad23852bf485ad50",
+          "at": "2026-06-25T05:01:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a52ad321414e427bb5d7ff0401fa2c7c2d0ac4dd05d322496a12edfd8327543f",
+          "at": "2026-06-25T06:23:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a52ad321414e427bb5d7ff0401fa2c7c2d0ac4dd05d322496a12edfd8327543f",
+          "at": "2026-06-25T06:26:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:547f6f8112ebecfbde85550b6894f9ac8a3cfec48e34f42c8d589cb2c31b06a3",
+          "at": "2026-06-25T07:43:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:547f6f8112ebecfbde85550b6894f9ac8a3cfec48e34f42c8d589cb2c31b06a3",
+          "at": "2026-06-25T07:47:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5fba8627ce3c3208bae7aaa2d2853d7febde6ad55ae3a47dc1857da3aeb20ef6",
+          "at": "2026-06-25T18:46:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5fba8627ce3c3208bae7aaa2d2853d7febde6ad55ae3a47dc1857da3aeb20ef6",
+          "at": "2026-06-25T18:49:09Z"
+        }
+      ]
+    },
     "cli": {
       "rounds": [
         {
@@ -104,52 +164,6 @@
           "findings": [],
           "hash": "rvw1:sha256:5cd36ceee84bf5a0294e33a3e9c34b4c0a4b6d8655929093e6b147c17f0d211c",
           "at": "2026-06-25T11:50:16Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ec1cc7545d6c620f9bcb712e2e9e0b5d406e958ce6972dddad23852bf485ad50",
-          "at": "2026-06-25T04:57:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ec1cc7545d6c620f9bcb712e2e9e0b5d406e958ce6972dddad23852bf485ad50",
-          "at": "2026-06-25T05:01:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a52ad321414e427bb5d7ff0401fa2c7c2d0ac4dd05d322496a12edfd8327543f",
-          "at": "2026-06-25T06:23:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a52ad321414e427bb5d7ff0401fa2c7c2d0ac4dd05d322496a12edfd8327543f",
-          "at": "2026-06-25T06:26:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:547f6f8112ebecfbde85550b6894f9ac8a3cfec48e34f42c8d589cb2c31b06a3",
-          "at": "2026-06-25T07:43:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:547f6f8112ebecfbde85550b6894f9ac8a3cfec48e34f42c8d589cb2c31b06a3",
-          "at": "2026-06-25T07:47:51Z"
         }
       ]
     },
@@ -381,50 +395,104 @@
         }
       ]
     },
-    "harness-policy": {
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4bd9fdd09d99d350bb517b0d6788a5ac5989f3551d5b1a31a130718708cb5645",
+          "at": "2026-06-25T06:27:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4bd9fdd09d99d350bb517b0d6788a5ac5989f3551d5b1a31a130718708cb5645",
+          "at": "2026-06-25T06:29:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8c8ff5416d6b5ef9fbbcbf334a086ba38013c10e8d28098d18d2a228ebfd9d68",
+          "at": "2026-06-25T07:46:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8c8ff5416d6b5ef9fbbcbf334a086ba38013c10e8d28098d18d2a228ebfd9d68",
+          "at": "2026-06-25T07:50:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1b1174c6b47a876c5ba1a0c22b9b7e187225597ad42ab5f3de33aaf3b7cc7348",
+          "at": "2026-06-25T18:46:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1b1174c6b47a876c5ba1a0c22b9b7e187225597ad42ab5f3de33aaf3b7cc7348",
+          "at": "2026-06-25T18:48:43Z"
+        }
+      ]
+    },
+    "other": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "This capability reference is now stale: it still says `role` must be one of the 15 type-section values and that `RoleKind` covers `15 + 4 = 19` variants, but the updated kind-selection convention in `knowledge/conventions/type-designer-kind-selection.md` now defines 17 `DataRole` variants. The harness surface now has two incompatible SSoTs for the same catalogue schema, so agents following this doc will continue to reject `CompositionRoot` / `PrimaryAdapter` updates.",
+              "message": "The `cli` layer’s `schema_export.notes` does not include the required explicit hint that T006 routes bin targets through `libs/infrastructure/src/schema_export/bin_target.rs`. It only says nightly rustdoc supports bin targets, so the architecture SSoT is still missing the documented handoff to the bin-target export path.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/.harness/capabilities/type-designer.md",
-              "line": 266,
-              "category": "convention contradiction"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/architecture-rules.json",
+              "line": 137,
+              "category": "correctness"
             }
           ],
-          "hash": "rvw1:sha256:ffc46f16ce0edf5550c6247530a8abf756ab0760fcab6c99ed57f3fed81977a0",
-          "at": "2026-06-25T03:12:30Z"
+          "hash": "rvw1:sha256:f30409d5330849551cbd18945cbc127123c84dd5eda6ce11299210eff12024d6",
+          "at": "2026-06-25T04:57:50Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:f3f3fdbcddc2f873d08b7461aa7d6999ee8f9b7d9fb3659864f14fe49dd9a22c",
-          "at": "2026-06-25T03:21:53Z"
+          "hash": "rvw1:sha256:f12ebe9705ac92b401b31676c3bbaab996c038bc45309cc5addc10fb13a8352d",
+          "at": "2026-06-25T05:01:22Z"
         },
         {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f3f3fdbcddc2f873d08b7461aa7d6999ee8f9b7d9fb3659864f14fe49dd9a22c",
-          "at": "2026-06-25T03:26:17Z"
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`bin/sotp review local --round-type final --group other --track-id cli-layers-tddd-and-role-placement-lint-2026-06-24 --briefing-file tmp/reviewer-runtime/briefing-other.md` could not complete in this read-only workspace because the reviewer failed to initialize `output-last-message` (`Read-only file system (os error 30)`). As a result, the required final round was not recorded; `bin/sotp review results` only shows the previously recorded fast zero_findings entry.",
+              "severity": "P1",
+              "file": null,
+              "line": null,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:f12ebe9705ac92b401b31676c3bbaab996c038bc45309cc5addc10fb13a8352d",
+          "at": "2026-06-25T06:26:06Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:50f5a7727f23ad56172eb307e9d89bcc0d28dbe21022a2840c872630aebd17d3",
-          "at": "2026-06-25T18:32:11Z"
+          "hash": "rvw1:sha256:f12ebe9705ac92b401b31676c3bbaab996c038bc45309cc5addc10fb13a8352d",
+          "at": "2026-06-25T06:29:41Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:50f5a7727f23ad56172eb307e9d89bcc0d28dbe21022a2840c872630aebd17d3",
-          "at": "2026-06-25T18:34:22Z"
+          "hash": "rvw1:sha256:f12ebe9705ac92b401b31676c3bbaab996c038bc45309cc5addc10fb13a8352d",
+          "at": "2026-06-25T06:32:47Z"
         }
       ]
     },
@@ -1045,6 +1113,142 @@
           "findings": [],
           "hash": "rvw1:sha256:22053ddb5e8a5204557f2939a69d2f04d4404b940d4687095f5870dbed761b5f",
           "at": "2026-06-25T18:34:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d1031ceefcdab9037f963abc3eec552d36a2276a77adaef333210825f96ffc9d",
+          "at": "2026-06-25T18:46:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d1031ceefcdab9037f963abc3eec552d36a2276a77adaef333210825f96ffc9d",
+          "at": "2026-06-25T18:48:56Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f326695d8e9541b6620a06eec00d0e7c71276f964e07426371290d08585956e9",
+          "at": "2026-06-25T02:06:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f326695d8e9541b6620a06eec00d0e7c71276f964e07426371290d08585956e9",
+          "at": "2026-06-25T02:08:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:28e580f0bf6bfbcd91bb9433e5b4073956931d8f163c8c4fc6d0f693a1f061e4",
+          "at": "2026-06-25T06:30:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The usecase port signature exposes the adapter's filesystem/session-log concern by requiring callers to pass a concrete `PathBuf` runtime directory. The briefing calls out file paths as infrastructure details that must not appear in this SecondaryPort signature, and the usecase purity rules keep runtime/file effects at the CLI or infrastructure edge. Make the port contract use application-level DTO data only, or keep session-log path selection entirely inside the infrastructure adapter/composition wiring.",
+              "severity": "P1",
+              "file": "libs/usecase/src/planner.rs",
+              "line": 56,
+              "category": "purity violation by trait"
+            },
+            {
+              "message": "`PlannerPortError::Subprocess(String)` makes the usecase boundary expose the infrastructure mechanism and raw adapter error text instead of a usecase-level planner failure concept. That breaks the error abstraction described by the usecase severity policy: callers now need to know that the planner is a subprocess and may receive subprocess-shaped details. Map these failures to conceptual variants such as planner unavailable/timed out/failed without leaking the underlying I/O/process wording.",
+              "severity": "P1",
+              "file": "libs/usecase/src/planner.rs",
+              "line": 32,
+              "category": "error type confusion"
+            }
+          ],
+          "hash": "rvw1:sha256:28e580f0bf6bfbcd91bb9433e5b4073956931d8f163c8c4fc6d0f693a1f061e4",
+          "at": "2026-06-25T06:34:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a6b507129827acc956c0a064fac61bd2a2792f8fa44132a21731144d89e4403",
+          "at": "2026-06-25T07:46:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a6b507129827acc956c0a064fac61bd2a2792f8fa44132a21731144d89e4403",
+          "at": "2026-06-25T07:51:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4d37378c0e0bc44db7b658787b9c17e56e2d9e42d95eaafeb9fec100d4cff3a8",
+          "at": "2026-06-25T18:45:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4d37378c0e0bc44db7b658787b9c17e56e2d9e42d95eaafeb9fec100d4cff3a8",
+          "at": "2026-06-25T18:47:31Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This capability reference is now stale: it still says `role` must be one of the 15 type-section values and that `RoleKind` covers `15 + 4 = 19` variants, but the updated kind-selection convention in `knowledge/conventions/type-designer-kind-selection.md` now defines 17 `DataRole` variants. The harness surface now has two incompatible SSoTs for the same catalogue schema, so agents following this doc will continue to reject `CompositionRoot` / `PrimaryAdapter` updates.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/.harness/capabilities/type-designer.md",
+              "line": 266,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ffc46f16ce0edf5550c6247530a8abf756ab0760fcab6c99ed57f3fed81977a0",
+          "at": "2026-06-25T03:12:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f3f3fdbcddc2f873d08b7461aa7d6999ee8f9b7d9fb3659864f14fe49dd9a22c",
+          "at": "2026-06-25T03:21:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f3f3fdbcddc2f873d08b7461aa7d6999ee8f9b7d9fb3659864f14fe49dd9a22c",
+          "at": "2026-06-25T03:26:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:50f5a7727f23ad56172eb307e9d89bcc0d28dbe21022a2840c872630aebd17d3",
+          "at": "2026-06-25T18:32:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:50f5a7727f23ad56172eb307e9d89bcc0d28dbe21022a2840c872630aebd17d3",
+          "at": "2026-06-25T18:34:22Z"
         }
       ]
     },
@@ -1108,154 +1312,6 @@
           "findings": [],
           "hash": "rvw1:sha256:4e7500640a692c670a32a9f6001b1635e8da6b14ae81abcde784b914be35951a",
           "at": "2026-06-25T02:53:03Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f326695d8e9541b6620a06eec00d0e7c71276f964e07426371290d08585956e9",
-          "at": "2026-06-25T02:06:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f326695d8e9541b6620a06eec00d0e7c71276f964e07426371290d08585956e9",
-          "at": "2026-06-25T02:08:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:28e580f0bf6bfbcd91bb9433e5b4073956931d8f163c8c4fc6d0f693a1f061e4",
-          "at": "2026-06-25T06:30:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The usecase port signature exposes the adapter's filesystem/session-log concern by requiring callers to pass a concrete `PathBuf` runtime directory. The briefing calls out file paths as infrastructure details that must not appear in this SecondaryPort signature, and the usecase purity rules keep runtime/file effects at the CLI or infrastructure edge. Make the port contract use application-level DTO data only, or keep session-log path selection entirely inside the infrastructure adapter/composition wiring.",
-              "severity": "P1",
-              "file": "libs/usecase/src/planner.rs",
-              "line": 56,
-              "category": "purity violation by trait"
-            },
-            {
-              "message": "`PlannerPortError::Subprocess(String)` makes the usecase boundary expose the infrastructure mechanism and raw adapter error text instead of a usecase-level planner failure concept. That breaks the error abstraction described by the usecase severity policy: callers now need to know that the planner is a subprocess and may receive subprocess-shaped details. Map these failures to conceptual variants such as planner unavailable/timed out/failed without leaking the underlying I/O/process wording.",
-              "severity": "P1",
-              "file": "libs/usecase/src/planner.rs",
-              "line": 32,
-              "category": "error type confusion"
-            }
-          ],
-          "hash": "rvw1:sha256:28e580f0bf6bfbcd91bb9433e5b4073956931d8f163c8c4fc6d0f693a1f061e4",
-          "at": "2026-06-25T06:34:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1a6b507129827acc956c0a064fac61bd2a2792f8fa44132a21731144d89e4403",
-          "at": "2026-06-25T07:46:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1a6b507129827acc956c0a064fac61bd2a2792f8fa44132a21731144d89e4403",
-          "at": "2026-06-25T07:51:04Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The `cli` layer’s `schema_export.notes` does not include the required explicit hint that T006 routes bin targets through `libs/infrastructure/src/schema_export/bin_target.rs`. It only says nightly rustdoc supports bin targets, so the architecture SSoT is still missing the documented handoff to the bin-target export path.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/architecture-rules.json",
-              "line": 137,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:f30409d5330849551cbd18945cbc127123c84dd5eda6ce11299210eff12024d6",
-          "at": "2026-06-25T04:57:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f12ebe9705ac92b401b31676c3bbaab996c038bc45309cc5addc10fb13a8352d",
-          "at": "2026-06-25T05:01:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`bin/sotp review local --round-type final --group other --track-id cli-layers-tddd-and-role-placement-lint-2026-06-24 --briefing-file tmp/reviewer-runtime/briefing-other.md` could not complete in this read-only workspace because the reviewer failed to initialize `output-last-message` (`Read-only file system (os error 30)`). As a result, the required final round was not recorded; `bin/sotp review results` only shows the previously recorded fast zero_findings entry.",
-              "severity": "P1",
-              "file": null,
-              "line": null,
-              "category": "workflow"
-            }
-          ],
-          "hash": "rvw1:sha256:f12ebe9705ac92b401b31676c3bbaab996c038bc45309cc5addc10fb13a8352d",
-          "at": "2026-06-25T06:26:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f12ebe9705ac92b401b31676c3bbaab996c038bc45309cc5addc10fb13a8352d",
-          "at": "2026-06-25T06:29:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f12ebe9705ac92b401b31676c3bbaab996c038bc45309cc5addc10fb13a8352d",
-          "at": "2026-06-25T06:32:47Z"
-        }
-      ]
-    },
-    "cli_driver": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4bd9fdd09d99d350bb517b0d6788a5ac5989f3551d5b1a31a130718708cb5645",
-          "at": "2026-06-25T06:27:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4bd9fdd09d99d350bb517b0d6788a5ac5989f3551d5b1a31a130718708cb5645",
-          "at": "2026-06-25T06:29:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8c8ff5416d6b5ef9fbbcbf334a086ba38013c10e8d28098d18d2a228ebfd9d68",
-          "at": "2026-06-25T07:46:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8c8ff5416d6b5ef9fbbcbf334a086ba38013c10e8d28098d18d2a228ebfd9d68",
-          "at": "2026-06-25T07:50:04Z"
         }
       ]
     }

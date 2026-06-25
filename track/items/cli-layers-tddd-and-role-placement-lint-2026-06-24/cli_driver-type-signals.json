@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-25T18:35:22Z",
+  "generated_at": "2026-06-25T18:50:03Z",
   "declaration_hash": "5860f25fc90a4c7e9fa5cf9c21646d26e5ca7d832aa94e747bbb45d96b4d7778",
   "signals": [
     {
       "type_name": "ArchDriver",
       "kind_tag": "primary_adapter",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {

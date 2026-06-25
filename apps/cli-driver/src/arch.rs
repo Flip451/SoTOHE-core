@@ -1,12 +1,12 @@
 //! `arch` command family — primary adapter driver.
 //!
-//! `ArchDriver` holds an injected [`usecase::arch::ArchPort`] and exposes
+//! `ArchDriver` holds an injected [`usecase::arch::ArchService`] and exposes
 //! `handle(input) -> CommandOutcome`.
 
 use std::path::PathBuf;
 use std::sync::Arc;
 
-use usecase::arch::ArchPort;
+use usecase::arch::ArchService;
 
 use crate::render::CommandOutcome;
 
@@ -44,15 +44,15 @@ pub enum ArchInput {
 
 /// Primary adapter driver for the `arch` command family.
 ///
-/// Holds an injected [`ArchPort`]; exposes `handle(input) -> CommandOutcome`.
+/// Holds an injected [`ArchService`]; exposes `handle(input) -> CommandOutcome`.
 pub struct ArchDriver {
-    port: Arc<dyn ArchPort>,
+    service: Arc<dyn ArchService>,
 }
 
 impl ArchDriver {
-    /// Create a new `ArchDriver` with the given port.
-    pub fn new(port: Arc<dyn ArchPort>) -> Self {
-        Self { port }
+    /// Create a new `ArchDriver` with the given `ArchService`.
+    pub fn new(service: Arc<dyn ArchService>) -> Self {
+        Self { service }
     }
 
     /// Handle an arch command.
@@ -66,28 +66,28 @@ impl ArchDriver {
     }
 
     fn arch_tree(&self, project_root: PathBuf) -> CommandOutcome {
-        match self.port.render_tree(project_root.as_path()) {
+        match self.service.render_tree(project_root) {
             Ok(output) => CommandOutcome::success(Some(output)),
             Err(e) => CommandOutcome::failure(Some(e.to_string())),
         }
     }
 
     fn arch_tree_full(&self, project_root: PathBuf) -> CommandOutcome {
-        match self.port.render_tree_full(project_root.as_path()) {
+        match self.service.render_tree_full(project_root) {
             Ok(output) => CommandOutcome::success(Some(output)),
             Err(e) => CommandOutcome::failure(Some(e.to_string())),
         }
     }
 
     fn arch_members(&self, project_root: PathBuf) -> CommandOutcome {
-        match self.port.render_members(project_root.as_path()) {
+        match self.service.render_members(project_root) {
             Ok(output) => CommandOutcome::success(Some(output)),
             Err(e) => CommandOutcome::failure(Some(e.to_string())),
         }
     }
 
     fn arch_direct_checks(&self, project_root: PathBuf) -> CommandOutcome {
-        match self.port.render_direct_checks(project_root.as_path()) {
+        match self.service.render_direct_checks(project_root) {
             Ok(output) => CommandOutcome::success(Some(output)),
             Err(e) => CommandOutcome::failure(Some(e.to_string())),
         }

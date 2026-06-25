@@ -1,35 +1,35 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-25T18:35:25Z",
+  "generated_at": "2026-06-25T18:50:06Z",
   "declaration_hash": "bc4182246bcbc3958eda40c9029d685bc251b10633f6c3488469a7a61cffbf5a",
   "signals": [
     {
-      "type_name": "commands::plan::codex_local::plan_input_from_args",
-      "kind_tag": "unknown",
+      "type_name": "cli::commands::plan::codex_local::plan_input_from_args",
+      "kind_tag": "free_function",
       "signal": "blue",
       "found_type": true
     },
     {
-      "type_name": "commands::plan::codex_local::run_execute_codex_local",
-      "kind_tag": "unknown",
+      "type_name": "cli::commands::plan::codex_local::run_execute_codex_local",
+      "kind_tag": "free_function",
       "signal": "blue",
       "found_type": true
     },
     {
-      "type_name": "commands::review::codex_local::emit_outcome_output_to",
-      "kind_tag": "unknown",
+      "type_name": "cli::commands::review::codex_local::emit_outcome_output_to",
+      "kind_tag": "free_function",
       "signal": "blue",
       "found_type": true
     },
     {
-      "type_name": "commands::review::codex_local::review_input_from_args",
-      "kind_tag": "unknown",
+      "type_name": "cli::commands::review::codex_local::review_input_from_args",
+      "kind_tag": "free_function",
       "signal": "blue",
       "found_type": true
     },
     {
-      "type_name": "commands::review::codex_local::run_execute_codex_local",
-      "kind_tag": "unknown",
+      "type_name": "cli::commands::review::codex_local::run_execute_codex_local",
+      "kind_tag": "free_function",
       "signal": "blue",
       "found_type": true
     },
@@ -46,56 +46,56 @@
       "found_type": false
     },
     {
-      "type_name": "commands::plan::codex_local::build_codex_invocation",
-      "kind_tag": "unknown",
+      "type_name": "cli::commands::plan::codex_local::build_codex_invocation",
+      "kind_tag": "free_function",
       "signal": "blue",
       "found_type": false
     },
     {
-      "type_name": "commands::plan::codex_local::build_prompt",
-      "kind_tag": "unknown",
+      "type_name": "cli::commands::plan::codex_local::build_prompt",
+      "kind_tag": "free_function",
       "signal": "blue",
       "found_type": false
     },
     {
-      "type_name": "commands::plan::codex_local::codex_bin",
-      "kind_tag": "unknown",
+      "type_name": "cli::commands::plan::codex_local::codex_bin",
+      "kind_tag": "free_function",
       "signal": "blue",
       "found_type": false
     },
     {
-      "type_name": "commands::plan::codex_local::configure_child_process_group",
-      "kind_tag": "unknown",
+      "type_name": "cli::commands::plan::codex_local::configure_child_process_group",
+      "kind_tag": "free_function",
       "signal": "blue",
       "found_type": false
     },
     {
-      "type_name": "commands::plan::codex_local::prepare_session_log_path",
-      "kind_tag": "unknown",
+      "type_name": "cli::commands::plan::codex_local::prepare_session_log_path",
+      "kind_tag": "free_function",
       "signal": "blue",
       "found_type": false
     },
     {
-      "type_name": "commands::plan::codex_local::run_codex_child",
-      "kind_tag": "unknown",
+      "type_name": "cli::commands::plan::codex_local::run_codex_child",
+      "kind_tag": "free_function",
       "signal": "blue",
       "found_type": false
     },
     {
-      "type_name": "commands::plan::codex_local::run_codex_local_invocation",
-      "kind_tag": "unknown",
+      "type_name": "cli::commands::plan::codex_local::run_codex_local_invocation",
+      "kind_tag": "free_function",
       "signal": "blue",
       "found_type": false
     },
     {
-      "type_name": "commands::plan::codex_local::spawn_codex",
-      "kind_tag": "unknown",
+      "type_name": "cli::commands::plan::codex_local::spawn_codex",
+      "kind_tag": "free_function",
       "signal": "blue",
       "found_type": false
     },
     {
-      "type_name": "commands::plan::codex_local::terminate_planner_child",
-      "kind_tag": "unknown",
+      "type_name": "cli::commands::plan::codex_local::terminate_planner_child",
+      "kind_tag": "free_function",
       "signal": "blue",
       "found_type": false
     },
@@ -522,90 +522,6 @@
     {
       "type_name": "WaitAndMergeArgs",
       "kind_tag": "dto",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "cli::commands::plan::codex_local::build_codex_invocation",
-      "kind_tag": "free_function",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "cli::commands::plan::codex_local::build_prompt",
-      "kind_tag": "free_function",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "cli::commands::plan::codex_local::codex_bin",
-      "kind_tag": "free_function",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "cli::commands::plan::codex_local::configure_child_process_group",
-      "kind_tag": "free_function",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "cli::commands::plan::codex_local::plan_input_from_args",
-      "kind_tag": "free_function",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "cli::commands::plan::codex_local::prepare_session_log_path",
-      "kind_tag": "free_function",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "cli::commands::plan::codex_local::run_codex_child",
-      "kind_tag": "free_function",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "cli::commands::plan::codex_local::run_codex_local_invocation",
-      "kind_tag": "free_function",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "cli::commands::plan::codex_local::run_execute_codex_local",
-      "kind_tag": "free_function",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "cli::commands::plan::codex_local::spawn_codex",
-      "kind_tag": "free_function",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "cli::commands::plan::codex_local::terminate_planner_child",
-      "kind_tag": "free_function",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "cli::commands::review::codex_local::emit_outcome_output_to",
-      "kind_tag": "free_function",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "cli::commands::review::codex_local::review_input_from_args",
-      "kind_tag": "free_function",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "cli::commands::review::codex_local::run_execute_codex_local",
-      "kind_tag": "free_function",
       "signal": "blue",
       "found_type": true
     }

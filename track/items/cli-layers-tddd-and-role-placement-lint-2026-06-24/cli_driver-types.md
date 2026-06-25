@@ -45,7 +45,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| ArchDriver | primary_adapter | modify | — | 🟡 | 🔵 |
+| ArchDriver | primary_adapter | modify | — | 🔵 | 🔵 |
 | ConventionsDriver | primary_adapter | modify | — | 🟡 | 🔵 |
 | DemoDriver | primary_adapter | reference | — | 🔵 | 🔵 |
 | DomainDriver | primary_adapter | reference | — | 🔵 | 🔵 |

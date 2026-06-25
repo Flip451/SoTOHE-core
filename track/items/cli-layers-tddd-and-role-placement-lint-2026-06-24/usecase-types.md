@@ -16,7 +16,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| ArchService | application_service | add | fn render_tree(&self, project_root: std::path::PathBuf) -> Result<String, ArchPortError>, fn render_tree_full(&self, project_root: std::path::PathBuf) -> Result<String, ArchPortError>, fn render_members(&self, project_root: std::path::PathBuf) -> Result<String, ArchPortError>, fn render_direct_checks(&self, project_root: std::path::PathBuf) -> Result<String, ArchPortError> | 🟡 | 🔵 |
+| ArchService | application_service | add | fn render_tree(&self, project_root: std::path::PathBuf) -> Result<String, ArchPortError>, fn render_tree_full(&self, project_root: std::path::PathBuf) -> Result<String, ArchPortError>, fn render_members(&self, project_root: std::path::PathBuf) -> Result<String, ArchPortError>, fn render_direct_checks(&self, project_root: std::path::PathBuf) -> Result<String, ArchPortError> | 🔵 | 🔵 |
 | ConventionsService | application_service | add | fn add_convention(&self, root: std::path::PathBuf, name: String, slug: Option<String>, title: Option<String>, summary: Option<String>) -> Result<String, ConventionsPortError>, fn update_index(&self, root: std::path::PathBuf) -> Result<String, ConventionsPortError>, fn verify_index(&self, root: std::path::PathBuf) -> Result<VerifyIndexResult, ConventionsPortError> | 🟡 | 🔵 |
 | FileService | application_service | add | fn write_atomic(&self, path: std::path::PathBuf, content: Vec<u8>) -> Result<(), FilePortError> | 🟡 | 🔵 |
 | PlannerService | application_service | add | fn run_codex_local(&self, model: String, briefing_file: Option<std::path::PathBuf>, prompt: Option<String>, timeout_seconds: u64) -> Result<PlanRunOutput, PlannerPortError> | 🟡 | 🔵 |
@@ -26,7 +26,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| ArchInteractor | interactor | add | — | 🟡 | 🔵 |
+| ArchInteractor | interactor | add | — | 🔵 | 🔵 |
 | ConventionsInteractor | interactor | add | — | 🟡 | 🔵 |
 | FileInteractor | interactor | add | — | 🟡 | 🔵 |
 | PlannerInteractor | interactor | add | — | 🟡 | 🔵 |

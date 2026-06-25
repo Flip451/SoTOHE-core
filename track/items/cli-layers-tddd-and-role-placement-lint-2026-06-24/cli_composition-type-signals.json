@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-25T18:35:27Z",
+  "generated_at": "2026-06-25T18:50:08Z",
   "declaration_hash": "7f8450bb6d368cfa2884fcec489abb26bdd43d7dc82f827333b152f68306adba",
   "signals": [
     {
@@ -40,14 +40,14 @@
       "found_type": false
     },
     {
-      "type_name": "build_codex_read_only_invocation",
-      "kind_tag": "unknown",
+      "type_name": "cli_composition::build_codex_read_only_invocation",
+      "kind_tag": "free_function",
       "signal": "blue",
       "found_type": false
     },
     {
-      "type_name": "tee_stderr_to_file",
-      "kind_tag": "unknown",
+      "type_name": "cli_composition::tee_stderr_to_file",
+      "kind_tag": "free_function",
       "signal": "blue",
       "found_type": false
     },
@@ -138,18 +138,6 @@
     {
       "type_name": "TrackCompositionRoot",
       "kind_tag": "composition_root",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "cli_composition::build_codex_read_only_invocation",
-      "kind_tag": "free_function",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "cli_composition::tee_stderr_to_file",
-      "kind_tag": "free_function",
       "signal": "blue",
       "found_type": true
     }
