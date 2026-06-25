@@ -193,28 +193,76 @@ fn run_planner_child(
     Ok(PlanRunOutput { exit_code: raw_exit_code })
 }
 
-fn configure_child_process_group(_command: &mut Command) {
-    // Process group isolation (killpg) requires `unsafe` which is forbidden
-    // in this crate (`#[forbid(unsafe_code)]`). The direct child is terminated
-    // via `child.kill()` in `terminate_planner_child`. This is consistent with
-    // the reviewer adapter policy (see `codex_reviewer::terminate_reviewer_child`).
+#[cfg(unix)]
+fn configure_child_process_group(command: &mut Command) {
+    // `std::os::unix::process::CommandExt::process_group` is a stable safe API
+    // (Rust 1.64+) that wraps `setpgid(2)`. Setting pgroup=0 makes the child the
+    // leader of a new process group, so killing `-child.id()` terminates the
+    // child plus every descendant it spawns. Restores the process-tree
+    // termination guarantee that the pre-refactor CLI helper provided.
+    use std::os::unix::process::CommandExt;
+    command.process_group(0);
 }
 
-/// Terminates the planner child process.
+#[cfg(not(unix))]
+fn configure_child_process_group(_command: &mut Command) {
+    // Windows uses `taskkill /T /F` for process-tree termination; no pre-spawn
+    // configuration is required.
+}
+
+/// Terminates the planner child process and (on supported platforms) every
+/// descendant it spawned.
 ///
-/// Uses `child.kill()` (safe cross-platform API) to kill the direct child only.
-/// Descendant processes spawned by the child are NOT terminated here.
+/// On Unix, sends `SIGKILL` to the process group `-child.id()` by shelling out
+/// to `/bin/kill`. This avoids the `unsafe` required by `libc::killpg(2)`
+/// (`#[forbid(unsafe_code)]` is set on this crate) while still tearing down the
+/// entire process tree the Codex planner may have spawned. On Windows, uses
+/// `taskkill /T /F` for equivalent process-tree termination.
 ///
-/// # Why no process group kill
-///
-/// `killpg(2)` requires `unsafe` which is `#[forbid(unsafe_code)]` in this crate.
-/// Process group termination is intentionally deferred to the CLI layer
-/// (`apps/cli`) where `unsafe` is permitted. This is an accepted architectural
-/// constraint — see the `#[forbid(unsafe_code)]` policy for infrastructure crate.
+/// If the group / taskkill path fails for any reason, falls back to
+/// `child.kill()` so the direct child is still terminated.
+#[cfg(unix)]
 fn terminate_planner_child(child: &mut Child) -> Result<(), PlannerPortError> {
-    child.kill().map_err(|e| PlannerPortError::PlannerUnavailable {
-        reason: format!("failed to terminate planner process: {e}"),
-    })
+    let pid = child.id();
+    let group_target = format!("-{pid}");
+    let status = Command::new("kill")
+        .args(["-KILL", &group_target])
+        .stdin(Stdio::null())
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .status();
+    match status {
+        Ok(s) if s.success() => Ok(()),
+        _ => child.kill().map_err(|e| PlannerPortError::PlannerUnavailable {
+            reason: format!("failed to terminate planner process: {e}"),
+        }),
+    }
+}
+
+#[cfg(not(unix))]
+fn terminate_planner_child(child: &mut Child) -> Result<(), PlannerPortError> {
+    if child
+        .try_wait()
+        .map_err(|e| PlannerPortError::PlannerUnavailable {
+            reason: format!("failed to poll planner child: {e}"),
+        })?
+        .is_some()
+    {
+        return Ok(());
+    }
+
+    let status = Command::new("taskkill")
+        .args(["/PID", &child.id().to_string(), "/T", "/F"])
+        .stdin(Stdio::null())
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .status();
+    match status {
+        Ok(s) if s.success() => Ok(()),
+        _ => child.kill().map_err(|e| PlannerPortError::PlannerUnavailable {
+            reason: format!("failed to terminate planner process: {e}"),
+        }),
+    }
 }
 
 #[cfg(test)]

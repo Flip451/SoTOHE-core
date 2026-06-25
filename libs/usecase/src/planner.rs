@@ -131,6 +131,9 @@ impl PlannerService for PlannerInteractor {
         timeout_seconds: u64,
     ) -> Result<PlanRunOutput, PlannerPortError> {
         let resolved_prompt = if let Some(path) = briefing_file {
+            if !path.is_file() {
+                return Err(PlannerPortError::MissingPromptSource);
+            }
             format!("Read {} and perform the task described there.", path.display())
         } else if let Some(inline) = prompt {
             inline
