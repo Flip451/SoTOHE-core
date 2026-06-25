@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-25T19:51:27Z",
+  "generated_at": "2026-06-25T20:18:57Z",
   "declaration_hash": "c0ee63835b90ebb8d0ff107a55968714da1b15cf8ff6813f91e1a8d998563500",
   "signals": [
     {
@@ -63,9 +63,9 @@
     {
       "type_name": "PlannerInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "PlannerService"
       ]
     },
@@ -89,8 +89,8 @@
     {
       "type_name": "PlannerService",
       "kind_tag": "application_service",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "VerifyInteractor",

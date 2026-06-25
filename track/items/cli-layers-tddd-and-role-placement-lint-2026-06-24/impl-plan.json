@@ -63,12 +63,14 @@
     {
       "id": "T011",
       "description": "ApplicationService / Interactor pair for Verify — implement in libs/usecase/src/verify.rs: VerifyService trait (ApplicationService role) with all verify_* methods (verify_tech_stack, verify_latest_track, verify_arch_docs, verify_layers, verify_hooks_path, verify_spec_attribution, verify_spec_frontmatter, verify_canonical_modules, verify_module_size, verify_domain_purity, verify_domain_strings, verify_usecase_purity, verify_doc_links, verify_view_freshness, verify_spec_signals, verify_plan_artifact_refs, verify_catalogue_spec_refs), and VerifyInteractor struct (Interactor role) holding Arc<dyn VerifyPort> and implementing VerifyService by delegating each method. Update apps/cli-driver/src/verify.rs: change VerifyDriver's field from Arc<dyn VerifyPort> to Arc<dyn VerifyService> and update new(). Update apps/cli-composition/src/verify.rs: update VerifyCompositionRoot.verify_driver() wire chain to FsVerifyAdapter -> VerifyInteractor -> VerifyDriver. All three files must compile and cargo make ci must pass after this task. Expected diff: ~150-250 lines total (VerifyService has many methods). Depends on T007.",
-      "status": "todo"
+      "status": "done",
+      "commit_hash": "f116876483b256a48408379c843c916ad00daaa2"
     },
     {
       "id": "T012",
       "description": "ApplicationService / Interactor pair for Planner (usecase layer) — implement in libs/usecase/src/planner.rs: PlannerPort trait (SecondaryPort role) with run(model, prompt, timeout_seconds) method returning Result<PlanRunOutput, PlannerPortError>; PlanRunOutput struct (Dto); PlannerPortError enum (ErrorType) with MissingPromptSource/PlannerUnavailable/PlannerTimeout/PlannerFailed variants; PlannerService trait (ApplicationService role) with run_codex_local(model, briefing_file, prompt, timeout_seconds) method; PlannerInteractor struct (Interactor role) holding Arc<dyn PlannerPort> and implementing PlannerService — absorbs prompt-resolution logic (briefing-file existence check and prompt construction currently in apps/cli/src/commands/plan/codex_local.rs plan_input_from_args) so that the resolution happens inside PlannerInteractor.run_codex_local before delegating to PlannerPort.run. Also implement CodexPlannerAdapter in libs/infrastructure/src/codex_planner.rs implementing PlannerPort: contains the subprocess spawn, stderr tee, and log-file write logic currently in apps/cli-composition/src/plan.rs or apps/cli/src/commands/plan/codex_local.rs. cargo make ci must pass after this task. Expected diff: ~200-350 lines across usecase/infrastructure. Depends on T001 (PlannerPort SecondaryPort and ApplicationService roles must be in DataRole/RoleKind).",
-      "status": "todo"
+      "status": "done",
+      "commit_hash": null
     },
     {
       "id": "T013",
