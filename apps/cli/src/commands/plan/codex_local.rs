@@ -38,6 +38,14 @@ pub(super) fn run_execute_codex_local(
     handle: impl FnOnce(PlanInput) -> cli_driver::CommandOutcome,
 ) -> ExitCode {
     let input = plan_input_from_args(args);
+    // Early-fail on missing briefing file before spawning Codex.
+    // Filesystem I/O lives here in the cli layer to keep `libs/usecase` pure.
+    if let PlanInput::RunCodexLocal { briefing_file: Some(path), .. } = &input {
+        if !path.is_file() {
+            eprintln!("briefing file not found: {}", path.display());
+            return ExitCode::FAILURE;
+        }
+    }
     driver_outcome_to_exit(handle(input))
 }
 

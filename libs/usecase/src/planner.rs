@@ -130,10 +130,10 @@ impl PlannerService for PlannerInteractor {
         prompt: Option<String>,
         timeout_seconds: u64,
     ) -> Result<PlanRunOutput, PlannerPortError> {
+        // Pure prompt construction; no filesystem I/O (hexagonal purity).
+        // Briefing-file existence validation is the caller's responsibility
+        // and lives in the cli layer (`apps/cli/src/commands/plan/codex_local.rs`).
         let resolved_prompt = if let Some(path) = briefing_file {
-            if !path.is_file() {
-                return Err(PlannerPortError::MissingPromptSource);
-            }
             format!("Read {} and perform the task described there.", path.display())
         } else if let Some(inline) = prompt {
             inline

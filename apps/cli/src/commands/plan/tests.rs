@@ -57,24 +57,21 @@ fn test_codex_local_briefing_file_dispatches_raw_path() {
 }
 
 #[test]
-fn test_codex_local_nonexistent_briefing_file_still_dispatches() {
-    // Prompt resolution and file existence checks now live in PlannerInteractor,
-    // not in the cli layer. The thin-bin dispatcher forwards raw args unconditionally.
+fn test_codex_local_nonexistent_briefing_file_fails_early_without_dispatch() {
+    // Briefing-file existence validation lives in the cli layer to preserve
+    // hexagonal purity of `libs/usecase` (no filesystem I/O in the interactor).
+    // When the path does not point to a regular file, the dispatcher returns
+    // ExitCode::FAILURE without calling into the composition root.
     let args = fake_args(None, Some(PathBuf::from("/nonexistent/briefing.md")));
 
     let mut called = false;
-    let exit = run_execute_codex_local(&args, |input| {
+    let exit = run_execute_codex_local(&args, |_input| {
         called = true;
-        match input {
-            PlanInput::RunCodexLocal { briefing_file, .. } => {
-                assert_eq!(briefing_file, Some(PathBuf::from("/nonexistent/briefing.md")));
-            }
-        }
-        CommandOutcome { stdout: None, stderr: None, exit_code: 1 }
+        CommandOutcome { stdout: None, stderr: None, exit_code: 0 }
     });
 
-    assert!(called, "handler must be called — cli layer no longer validates file existence");
-    assert_eq!(exit, ExitCode::from(1));
+    assert!(!called, "handler must NOT be called — cli early-fails on missing briefing file");
+    assert_eq!(exit, ExitCode::FAILURE);
 }
 
 #[test]
