@@ -225,8 +225,11 @@ fn configure_child_process_group(_command: &mut Command) {
 fn terminate_planner_child(child: &mut Child) -> Result<(), PlannerPortError> {
     let pid = child.id();
     let group_target = format!("-{pid}");
+    // `--` separates `-KILL` (signal spec) from the negative pid operand. Without
+    // it, `kill` parses `-<pid>` as another signal flag and silently no-ops; the
+    // existing ref-verify runner uses the same pattern.
     let status = Command::new("kill")
-        .args(["-KILL", &group_target])
+        .args(["-KILL", "--", &group_target])
         .stdin(Stdio::null())
         .stdout(Stdio::null())
         .stderr(Stdio::null())
