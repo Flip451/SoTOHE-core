@@ -115,20 +115,33 @@ fn check_nightly_available() -> Result<(), SchemaExportError> {
     Ok(())
 }
 
+/// Validate that a computed rustdoc JSON path is safely rooted at `target_dir`.
+///
+/// `target_dir` is the resolved Cargo target directory (from `resolve_target_dir`),
+/// which may legitimately live outside the workspace when callers set an absolute
+/// `CARGO_TARGET_DIR` (e.g., `/cargo-target` in CI containers — see the
+/// Dockerfile's `IMAGE_CARGO_TARGET_DIR`). The workspace root is not the
+/// authoritative trust boundary for the JSON path; the target directory is.
+///
+/// Checks:
+/// 1. `target_dir` itself is not a symlink (delegated to `checked_workspace_root`).
+/// 2. The normalized JSON path stays beneath `target_dir` (catches escapes via
+///    crafted relative segments).
+/// 3. No symlinks beneath `target_dir` redirect the JSON path elsewhere.
 pub(super) fn ensure_rustdoc_json_path_safe(
-    workspace_root: &Path,
+    target_dir: &Path,
     json_path: &Path,
     source: &str,
 ) -> Result<(), SchemaExportError> {
-    let trusted_root = checked_workspace_root(workspace_root)?;
+    let trusted_root = checked_workspace_root(target_dir)?;
     let json_abs = absolutize_for_target_guard(json_path)?;
     let normalized_json = crate::verify::path_safety::lexical_normalize(&json_abs);
 
     if !normalized_json.starts_with(&trusted_root) {
         return Err(SchemaExportError::RustdocFailed(format!(
-            "{source} resolves rustdoc JSON outside workspace root: {} (workspace root: {})",
+            "{source} resolves rustdoc JSON outside target directory: {} (target dir: {})",
             json_path.display(),
-            workspace_root.display()
+            target_dir.display()
         )));
     }
 

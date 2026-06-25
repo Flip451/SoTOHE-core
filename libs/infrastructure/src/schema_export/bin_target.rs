@@ -34,7 +34,7 @@ pub(super) fn run_rustdoc(
         let dir = resolve_target_dir(workspace_root)?;
         let name = rustdoc_artifact_name(crate_name);
         let path = dir.join("doc").join(format!("{name}.json"));
-        super::ensure_rustdoc_json_path_safe(workspace_root, &path, "rustdoc --lib")?;
+        super::ensure_rustdoc_json_path_safe(&dir, &path, "rustdoc --lib")?;
         return if path.is_file() {
             Ok(path)
         } else {
@@ -73,7 +73,7 @@ pub(super) fn run_rustdoc(
     let dir = resolve_target_dir(workspace_root)?;
     let artifact_name = rustdoc_artifact_name(&bin_name);
     let path = dir.join("doc").join(format!("{artifact_name}.json"));
-    super::ensure_rustdoc_json_path_safe(workspace_root, &path, "rustdoc --bin")?;
+    super::ensure_rustdoc_json_path_safe(&dir, &path, "rustdoc --bin")?;
     if path.is_file() {
         Ok(path)
     } else {
