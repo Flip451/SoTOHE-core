@@ -1,68 +1,145 @@
 {
   "schema_version": 2,
   "scopes": {
-    "domain": {
+    "harness-policy": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:874b9f1ae1d319d07f649a5dfa9e6ebee6c158204a94f8051c31c41746e1d3fa",
-          "at": "2026-06-25T01:42:54Z"
+          "hash": "rvw1:sha256:67536beebb00bcdc2861108af26f0d6a9113da3f5c992e00484ccf9ac331a4ed",
+          "at": "2026-06-25T01:40:06Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:874b9f1ae1d319d07f649a5dfa9e6ebee6c158204a94f8051c31c41746e1d3fa",
-          "at": "2026-06-25T01:45:26Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:60d17ddfd2660f05f41e81d0fb1bc149752010f2763bc0e76c773f661c2e4e2f",
-          "at": "2026-06-25T00:53:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:60d17ddfd2660f05f41e81d0fb1bc149752010f2763bc0e76c773f661c2e4e2f",
-          "at": "2026-06-25T00:56:18Z"
+          "hash": "rvw1:sha256:67536beebb00bcdc2861108af26f0d6a9113da3f5c992e00484ccf9ac331a4ed",
+          "at": "2026-06-25T01:42:31Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`briefing_file` is only checked for symlinks after `trusted_root.join(briefing)`, but the joined path is never validated to stay under `trusted_root`. A config value like `../outside.md` or `/etc/passwd` can therefore bypass this loader-level boundary check even when no symlink is present. This should fail closed using the same absolute/`..` containment rules as `is_safe_briefing_path` and the CN-04 trusted-root pattern.",
+              "message": "Step 0b now only carries forward `todo` / `in_progress` tasks and skips `done` tasks only when they already have a non-null `commit_hash`. That drops the supported `DonePending` state (`commit_hash: null`) from the batch loop, so those tasks will never be backfilled via `track transition ... done --commit-hash` and can leave the track stuck with unresolved completion state. The existing task-completion convention expects that backfill path to remain available.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/review_v2/scope_config_loader.rs",
-              "line": 149,
-              "category": "trusted-root violation"
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 51,
+              "category": "command wiring breakage"
             }
           ],
-          "hash": "rvw1:sha256:802af23742be1e5ec11621234e44b4ded9c4d5efb2eba822092d4f2d982f98cc",
-          "at": "2026-06-25T01:42:20Z"
+          "hash": "rvw1:sha256:f029827841177dffef4b7116f7129afa0448301c9a25a97e497bb1ef3df5724c",
+          "at": "2026-06-25T02:08:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`markdown-only` is not a safe fallback scope here. `.harness/config/review-scope.json` routes `knowledge/adr/**` and `track/items/<track-id>/**` to `plan-artifacts`, not `harness-policy`, so this heuristic will mis-bucket ADR/plan-artifact tasks and can choose the wrong per-scope ceiling / severity policy for a batch.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.claude/commands/track/full-cycle.md",
+              "line": 60,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:b7d95a7f4d1854cb6c6a264f14d464ad5aa8595135ee528cd298e5bc7bb6c405",
+          "at": "2026-06-25T02:16:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Step 0b` only opens a new batch when the next task would push an already-touched layer over its ceiling. That misses the case where the next task is the first touch for a layer but its own diff already exceeds the configured ceiling, so this planner can still emit an over-ceiling batch and violate D3.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.claude/commands/track/full-cycle.md",
+              "line": 65,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e460b8c293a906640555e1bb06128d1359bad497267dde8732d1fec6b8423cdd",
+          "at": "2026-06-25T02:24:36Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:706b0f5eccfa886de2d2bad9319ac6249dd1f3e69cc8940ace744c23eb511d4b",
-          "at": "2026-06-25T01:52:47Z"
+          "hash": "rvw1:sha256:f4b4038cfe8a0d82c420e6b9a4e6664ba3fc08d2a002f3602fbf7e00b01ecad3",
+          "at": "2026-06-25T02:31:54Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:706b0f5eccfa886de2d2bad9319ac6249dd1f3e69cc8940ace744c23eb511d4b",
-          "at": "2026-06-25T01:55:34Z"
+          "hash": "rvw1:sha256:f4b4038cfe8a0d82c420e6b9a4e6664ba3fc08d2a002f3602fbf7e00b01ecad3",
+          "at": "2026-06-25T02:37:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This hard-cap check only uses `git diff --numstat`, so it ignores brand-new untracked files. A batch that adds a large new file can still look within the ceiling even though the real scope diff is over limit, which defeats the guard. The diff source needs to include untracked additions as well.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.claude/commands/track/full-cycle.md",
+              "line": 116,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "The ceiling guard only runs before DFP, but DFP is itself a code-editing phase. If dry-fix edits push the batch past a scope ceiling, the workflow still proceeds to Review because there is no guard after DFP and before Step 2. Re-run the actual-diff guard after DFP mutations, or move it to the final pre-review boundary.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.claude/commands/track/full-cycle.md",
+              "line": 169,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:5b335d7a8fd1c9c3a4ce46f3b3c8db07072bb0c91b06db8fb9e51ecd0410f9d7",
+          "at": "2026-06-25T02:56:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ea7db9f1a38f062cea1930eec4745242e248df15b67e33ac0a6aeac4adcdf6ac",
+          "at": "2026-06-25T03:02:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ea7db9f1a38f062cea1930eec4745242e248df15b67e33ac0a6aeac4adcdf6ac",
+          "at": "2026-06-25T03:06:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d555134fdfa151b3f37e5b9d9e215dda18ab0a58398eb68aad6c99d6011793c1",
+          "at": "2026-06-25T03:25:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 4 tells the operator to commit the post-commit D4 backfill by running `cargo make track-commit-message`, but that wrapper runs `bin/sotp review check-approved` before committing. After Step 3 mutates `impl-plan.json`/`plan.md`, the plan-artifacts review hash is stale and `review.json` already exists, so the PR-review bypass cannot apply; the documented tail-commit path will block instead of recording the hash backfill. The workflow needs to explicitly refresh/record the required review state for this tail diff or use a guarded lifecycle commit path that is compatible with the review gate.",
+              "severity": "P1",
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 235,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:d555134fdfa151b3f37e5b9d9e215dda18ab0a58398eb68aad6c99d6011793c1",
+          "at": "2026-06-25T03:29:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4b81f901126534a158236b0336f707640507b8d438b4cddb0f188a567c4ed64e",
+          "at": "2026-06-25T03:35:55Z"
         }
       ]
     },
@@ -230,6 +307,71 @@
         }
       ]
     },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:874b9f1ae1d319d07f649a5dfa9e6ebee6c158204a94f8051c31c41746e1d3fa",
+          "at": "2026-06-25T01:42:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:874b9f1ae1d319d07f649a5dfa9e6ebee6c158204a94f8051c31c41746e1d3fa",
+          "at": "2026-06-25T01:45:26Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:60d17ddfd2660f05f41e81d0fb1bc149752010f2763bc0e76c773f661c2e4e2f",
+          "at": "2026-06-25T00:53:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:60d17ddfd2660f05f41e81d0fb1bc149752010f2763bc0e76c773f661c2e4e2f",
+          "at": "2026-06-25T00:56:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`briefing_file` is only checked for symlinks after `trusted_root.join(briefing)`, but the joined path is never validated to stay under `trusted_root`. A config value like `../outside.md` or `/etc/passwd` can therefore bypass this loader-level boundary check even when no symlink is present. This should fail closed using the same absolute/`..` containment rules as `is_safe_briefing_path` and the CN-04 trusted-root pattern.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/review_v2/scope_config_loader.rs",
+              "line": 149,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:802af23742be1e5ec11621234e44b4ded9c4d5efb2eba822092d4f2d982f98cc",
+          "at": "2026-06-25T01:42:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:706b0f5eccfa886de2d2bad9319ac6249dd1f3e69cc8940ace744c23eb511d4b",
+          "at": "2026-06-25T01:52:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:706b0f5eccfa886de2d2bad9319ac6249dd1f3e69cc8940ace744c23eb511d4b",
+          "at": "2026-06-25T01:55:34Z"
+        }
+      ]
+    },
     "usecase": {
       "rounds": [
         {
@@ -263,119 +405,6 @@
           "findings": [],
           "hash": "rvw1:sha256:5be831bf4b4227330ca2b537bc06aeafec08c963ddcbeda04199a6c3b39680f0",
           "at": "2026-06-25T01:42:54Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:67536beebb00bcdc2861108af26f0d6a9113da3f5c992e00484ccf9ac331a4ed",
-          "at": "2026-06-25T01:40:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:67536beebb00bcdc2861108af26f0d6a9113da3f5c992e00484ccf9ac331a4ed",
-          "at": "2026-06-25T01:42:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 0b now only carries forward `todo` / `in_progress` tasks and skips `done` tasks only when they already have a non-null `commit_hash`. That drops the supported `DonePending` state (`commit_hash: null`) from the batch loop, so those tasks will never be backfilled via `track transition ... done --commit-hash` and can leave the track stuck with unresolved completion state. The existing task-completion convention expects that backfill path to remain available.",
-              "severity": "P1",
-              "file": ".claude/commands/track/full-cycle.md",
-              "line": 51,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:f029827841177dffef4b7116f7129afa0448301c9a25a97e497bb1ef3df5724c",
-          "at": "2026-06-25T02:08:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`markdown-only` is not a safe fallback scope here. `.harness/config/review-scope.json` routes `knowledge/adr/**` and `track/items/<track-id>/**` to `plan-artifacts`, not `harness-policy`, so this heuristic will mis-bucket ADR/plan-artifact tasks and can choose the wrong per-scope ceiling / severity policy for a batch.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.claude/commands/track/full-cycle.md",
-              "line": 60,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:b7d95a7f4d1854cb6c6a264f14d464ad5aa8595135ee528cd298e5bc7bb6c405",
-          "at": "2026-06-25T02:16:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`Step 0b` only opens a new batch when the next task would push an already-touched layer over its ceiling. That misses the case where the next task is the first touch for a layer but its own diff already exceeds the configured ceiling, so this planner can still emit an over-ceiling batch and violate D3.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.claude/commands/track/full-cycle.md",
-              "line": 65,
-              "category": "convention contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:e460b8c293a906640555e1bb06128d1359bad497267dde8732d1fec6b8423cdd",
-          "at": "2026-06-25T02:24:36Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f4b4038cfe8a0d82c420e6b9a4e6664ba3fc08d2a002f3602fbf7e00b01ecad3",
-          "at": "2026-06-25T02:31:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f4b4038cfe8a0d82c420e6b9a4e6664ba3fc08d2a002f3602fbf7e00b01ecad3",
-          "at": "2026-06-25T02:37:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This hard-cap check only uses `git diff --numstat`, so it ignores brand-new untracked files. A batch that adds a large new file can still look within the ceiling even though the real scope diff is over limit, which defeats the guard. The diff source needs to include untracked additions as well.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.claude/commands/track/full-cycle.md",
-              "line": 116,
-              "category": "command wiring breakage"
-            },
-            {
-              "message": "The ceiling guard only runs before DFP, but DFP is itself a code-editing phase. If dry-fix edits push the batch past a scope ceiling, the workflow still proceeds to Review because there is no guard after DFP and before Step 2. Re-run the actual-diff guard after DFP mutations, or move it to the final pre-review boundary.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.claude/commands/track/full-cycle.md",
-              "line": 169,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:5b335d7a8fd1c9c3a4ce46f3b3c8db07072bb0c91b06db8fb9e51ecd0410f9d7",
-          "at": "2026-06-25T02:56:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ea7db9f1a38f062cea1930eec4745242e248df15b67e33ac0a6aeac4adcdf6ac",
-          "at": "2026-06-25T03:02:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ea7db9f1a38f062cea1930eec4745242e248df15b67e33ac0a6aeac4adcdf6ac",
-          "at": "2026-06-25T03:06:25Z"
         }
       ]
     }

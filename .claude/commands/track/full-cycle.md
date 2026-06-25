@@ -205,9 +205,74 @@ For each batch produced by Step 0b, in order:
 
 If any step fails, stop the loop and report the failure.
 
+## Step 4 (after all batches): Lifecycle tail commit
+
+D4 same-hash recording (Step 3) writes the batch commit hash to `impl-plan.json` *after*
+the batch commit has been created — the commit hash cannot exist before the commit.
+
+For every batch except the last, those `commit_hash` writes land naturally in the next
+batch's commit (the next batch always re-stages plan-artifacts as part of its own diff).
+For the **last batch**, no successor batch exists to capture them, so without an explicit
+tail commit the workflow would finish with:
+
+- `impl-plan.json` and the rendered `plan.md` modified in the working tree (the D4
+  backfill from the last batch).
+- The pushed PR / committed track still showing the last batch's tasks as
+  `in_progress` despite their actual `done` state in the working tree.
+- AC-05 / D4's traceability requirement effectively unmet for the last batch.
+
+Procedure (after Step 3 of the **last** batch returns):
+
+1. Inspect the working tree with `git status --short`. Expect modifications limited to
+   `track/items/<track-id>/impl-plan.json` and `track/items/<track-id>/plan.md` (and
+   nothing else — the lifecycle tail commit must stay narrow).
+2. If those (and only those) files are modified, refresh the review gate for this
+   tail diff before committing:
+   - Run `/track:review` once more. The expected required scope is `plan-artifacts`
+     because the tail diff is only the generated D4 backfill in the current track's
+     plan artifacts.
+   - Continue only after `/track:review` Step 6 reports `bin/sotp review
+     check-approved` success and:
+     ```bash
+     bin/sotp review results --track-id <track-id> --scope plan-artifacts --round-type final --limit 1
+     ```
+     shows a recorded final `findings: zero_findings` round for the tail diff.
+
+   This review refresh is mandatory: `cargo make track-commit-message` runs
+   `bin/sotp review check-approved` before committing. After Step 3 mutates
+   `impl-plan.json` / `plan.md`, the previous `plan-artifacts` review hash is stale
+   and `review.json` already exists, so the PR-review bypass cannot make the guarded
+   commit pass.
+3. After the tail review refresh succeeds, stage and commit the lifecycle diff:
+   ```bash
+   cargo make add-all
+   # write tmp/track-commit/commit-message.txt with a message such as:
+   #   ops(track): D4 hash backfill for batch <name> (post-commit lifecycle)
+   cargo make track-commit-message
+   # optional but recommended: attach a git note via cargo make track-note
+   ```
+   Review-operational artifacts produced by the refresh (`review.json` and generated
+   signal/cache files) may be staged with the tail commit; source, command, or unrelated
+   track changes are still unexpected dirty state and must stop the loop.
+
+   The tail commit carries **no impl-plan task** and therefore has no `bin/sotp track
+   transition` follow-up — it is a pure lifecycle operation that exists solely to make
+   the pushed PR / track history reflect the true `done` state of the last batch's tasks.
+4. If no `impl-plan.json` / `plan.md` modifications are present (every batch already had
+   a successor that captured its D4 backfill, or the last batch had no transitions to
+   record), skip this step.
+5. If the initial `git status --short` check shows files outside the two expected paths,
+   **stop and report** — unexpected dirty state must be investigated before declaring the loop
+   complete (it usually indicates that a Step 1b / 1c / 2 fix left files unstaged).
+
+A `/track:full-cycle` run completes only when `git status --short` is empty (after this
+step). Leaving the dirty traceability artifacts on disk defeats AC-05 and produces a
+PR / track-history record that misrepresents the actual completion state.
+
 ## Post-loop
 
-After all batches are committed, create or append to `track/items/<id>/observations.md`
+After all batches are committed (and the optional Step 4 lifecycle tail commit has
+been recorded), create or append to `track/items/<id>/observations.md`
 **only** when one of the following holds:
 
 - (a) any task produced machine-non-verifiable observations (wall-time measurements, UX
