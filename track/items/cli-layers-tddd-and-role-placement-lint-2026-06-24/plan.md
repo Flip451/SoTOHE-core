@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # cli 系 3 層への TDDD 適用と既存 linter によるロール配置制約の設定
 
-## Tasks (4/13 resolved)
+## Tasks (5/13 resolved)
 
 ### S1 — DataRole breaking migration — CompositionRoot and PrimaryAdapter variants
 
@@ -18,7 +18,7 @@
 > sotp verify layers must pass after the flip (real crate names vs architecture-rules.json entries are verified by the existing check-layers gate). Full cargo make ci is deferred to T006 after the cli-layer catalogues and rustdoc baselines exist.
 > Depends on T001 (DataRole codec must handle the new variants before any TDDD signal evaluation is attempted on the new layers).
 
-- [~] **T002**: architecture-rules.json TDDD flip — set tddd.enabled: true for cli, cli_composition, and cli_driver layers. Add catalogue_file, catalogue_spec_signal, and schema_export blocks for each layer: cli uses crate name 'cli' with [[bin]] target (first [[bin]] TDDD instance in the workspace; verify rustdoc --document-private-items or equivalent bin-target flag is not required — bin targets are supported by rustdoc JSON nightly; note in the schema_export.targets value). Confirm sotp verify layers passes after the flip (layer definitions vs Cargo.toml workspace members). Full cargo make ci is deferred to T006 after the cli-layer catalogues and rustdoc baselines exist. Depends on T001.
+- [x] **T002**: architecture-rules.json TDDD flip — set tddd.enabled: true for cli, cli_composition, and cli_driver layers. Add catalogue_file, catalogue_spec_signal, and schema_export blocks for each layer: cli uses crate name 'cli' with [[bin]] target (first [[bin]] TDDD instance in the workspace; verify rustdoc --document-private-items or equivalent bin-target flag is not required — bin targets are supported by rustdoc JSON nightly; note in the schema_export.targets value). Confirm sotp verify layers passes after the flip (layer definitions vs Cargo.toml workspace members). Full cargo make ci is deferred to T006 after the cli-layer catalogues and rustdoc baselines exist. Depends on T001. (`3cd31834434dca48c5806049696a223e6af7a97f`)
 
 ### S3 — Lint config — initial expansion and forbidden-role correction
 
@@ -45,7 +45,7 @@
 > The catalogue files are considered complete for Phase 3. Source files implementing these types are authored in T008-T013.
 > Depends on T002 and T003.
 
-- [x] **T005**: Type catalogue authoring for cli, cli_composition, and cli_driver layers (completed by Phase 2 type-designer). All three layer catalogues (cli-types.json, cli_composition-types.json, cli_driver-types.json) have been drafted at schema_version 5. cli catalogue: CliError (ErrorType), all public clap command/args/filter types as Dto, pub free functions as FreeFunction. cli_composition catalogue: CompositionError (ErrorType), all per-context *CompositionRoot structs (CompositionRoot), action:delete tombstones for CommandOutcome/tee_stderr_to_file/build_codex_read_only_invocation removed from this layer. cli_driver catalogue: CommandOutcome (Dto), *Driver structs (PrimaryAdapter), *Input types (Dto), format_pair_status (FreeFunction). New additions from IN-08/IN-09 type-designer pass: PlanInput (add, Dto) and PlanDriver (add, PrimaryAdapter) in cli_driver; PlanCompositionRoot (add, CompositionRoot) in cli_composition; ArchDriver/ConventionsDriver/FileDriver/VerifyDriver (modify, from Arc<*Port> to Arc<*Service> dependency); ArchCompositionRoot/ConventionsCompositionRoot/FileCompositionRoot/VerifyCompositionRoot (modify, updated wire chain). Depends on T002 and T003.
+- [x] **T005**: Type catalogue authoring for cli, cli_composition, and cli_driver layers (completed by Phase 2 type-designer). All three layer catalogues (cli-types.json, cli_composition-types.json, cli_driver-types.json) have been drafted at schema_version 5. cli catalogue: CliError (ErrorType), all public clap command/args/filter types as Dto, pub free functions as FreeFunction. cli_composition catalogue: CompositionError (ErrorType), all per-context *CompositionRoot structs (CompositionRoot), action:delete tombstones for CommandOutcome/tee_stderr_to_file/build_codex_read_only_invocation removed from this layer. cli_driver catalogue: CommandOutcome (Dto), *Driver structs (PrimaryAdapter), *Input types (Dto), format_pair_status (FreeFunction). New additions from IN-08/IN-09 type-designer pass: PlanInput (add, Dto) and PlanDriver (add, PrimaryAdapter) in cli_driver; PlanCompositionRoot (add, CompositionRoot) in cli_composition; ArchDriver/ConventionsDriver/FileDriver/VerifyDriver (modify, from Arc<*Port> to Arc<*Service> dependency); ArchCompositionRoot/ConventionsCompositionRoot/FileCompositionRoot/VerifyCompositionRoot (modify, updated wire chain). Depends on T002 and T003. (`3cd31834434dca48c5806049696a223e6af7a97f`)
 
 ### S6 — ApplicationService / Interactor implementation — five driver-port pairs
 

@@ -108,8 +108,7 @@
             "UseCase",
             "Interactor",
             "Command",
-            "Query",
-            "ApplicationService"
+            "Query"
           ]
         }
       }
