@@ -793,8 +793,8 @@ fn test_phase1_error_dangling_id_after_delete_yields_dangling_id_error() {
 
 #[test]
 fn test_function_identity_uses_function_path() {
-    // A has function at "my_crate::module::compute" (Add); B has no such function;
-    // C has the same function → SIntersectC_Match_Add.
+    // A has function at path ["my_crate", "module", "compute"] (Add); B has no such
+    // function; C has the same function → SIntersectC_Match_Add.
     let fn_path = &["my_crate", "module", "compute"];
     let a_krate = simple_crate_with_fn("my_crate", fn_path);
     let fn_id = Id(1);
@@ -808,10 +808,57 @@ fn test_function_identity_uses_function_path() {
     let evaluator = SignalEvaluatorV2::new();
     let report = evaluator.evaluate(a, b, c).unwrap();
 
-    let fn_path_str = fn_path.join("::");
+    let normalised_key = "my_crate::module::compute";
     let signals: Vec<_> = report.iter().collect();
-    let signal = signals.iter().find(|s| s.item_name() == fn_path_str);
-    assert!(signal.is_some(), "Expected function signal '{fn_path_str}' in report");
+    let signal = signals.iter().find(|s| s.item_name() == normalised_key);
+    assert!(signal.is_some(), "Expected function signal '{normalised_key}' in report");
+    assert_eq!(signal.unwrap().region(), SignalRegion::SIntersectC_Match_Add);
+}
+
+#[test]
+fn test_function_identity_bin_root_alias_matches_crate_root_path() {
+    // Catalogue A uses the package crate root (`cli`), while rustdoc C for the
+    // package's [[bin]] target uses the binary root (`sotp`). The identity key
+    // keeps the canonical catalogue FunctionPath rather than dropping the root.
+    let a_fn_path = &["cli", "commands", "run"];
+    let c_fn_path = &["sotp", "commands", "run"];
+    let a_krate = simple_crate_with_fn("cli", a_fn_path);
+    let fn_id = Id(1);
+    let mut a_actions = BTreeMap::new();
+    a_actions.insert(fn_id, ItemAction::Add);
+    let a = ExtendedCrate::new(a_krate, a_actions);
+
+    let b = empty_crate();
+    let c = simple_crate_with_fn("sotp", c_fn_path);
+
+    let evaluator = SignalEvaluatorV2::new();
+    let report = evaluator.evaluate(a, b, c).unwrap();
+
+    let canonical_key = "cli::commands::run";
+    let signal = report.iter().find(|s| s.item_name() == canonical_key);
+
+    assert!(signal.is_some(), "Expected function signal '{canonical_key}' in report");
+    assert_eq!(signal.unwrap().region(), SignalRegion::SIntersectC_Match_Add);
+}
+
+#[test]
+fn test_function_identity_one_segment_path_reports_root_function() {
+    let fn_path = &["compute"];
+    let a_krate = simple_crate_with_fn("my_crate", fn_path);
+    let fn_id = Id(1);
+    let mut a_actions = BTreeMap::new();
+    a_actions.insert(fn_id, ItemAction::Add);
+    let a = ExtendedCrate::new(a_krate, a_actions);
+
+    let b = empty_crate();
+    let c = simple_crate_with_fn("my_crate", fn_path);
+
+    let evaluator = SignalEvaluatorV2::new();
+    let report = evaluator.evaluate(a, b, c).unwrap();
+
+    let signal = report.iter().find(|s| s.item_name() == "compute");
+
+    assert!(signal.is_some(), "Expected root function signal 'compute' in report");
     assert_eq!(signal.unwrap().region(), SignalRegion::SIntersectC_Match_Add);
 }
 

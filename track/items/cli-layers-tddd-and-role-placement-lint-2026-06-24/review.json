@@ -1,69 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`RoleKind` now admits `FunctionRole` variants, but `NoRoleInMethodSignature` still only scans type and trait entries. That means a config like `forbidden_roles: [FreeFunction]` or `UseCaseFunction` parses successfully and then becomes a silent no-op instead of being rejected or enforced.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/domain/src/tddd/catalogue_linter_eval.rs",
-              "line": 291,
-              "category": "typestate / parse-don't-validate gap"
-            }
-          ],
-          "hash": "rvw1:sha256:814703d06caa5d2dc6b43d97517f5a879f2f5bfcd08dc7987c4aa12fa1bed6c1",
-          "at": "2026-06-25T02:16:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Adding `FunctionRole` to `RoleKind::ALL` makes `RuleTarget` able to name `FreeFunction`/`UseCaseFunction`, but only `KindLayerConstraint` was wired to inspect `catalogue.functions`. The other rule kinds still iterate only `type_entries_for_target`/`trait_entries_for_target`, so a function-only target now constructs successfully and then silently no-ops instead of being rejected. Either validate unsupported function-role targets up front or make the other branches function-aware.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/domain/src/tddd/catalogue_linter_eval.rs",
-              "line": 167,
-              "category": "typestate / parse-don't-validate gap"
-            }
-          ],
-          "hash": "rvw1:sha256:ea606781a90920ed2e12c419097754bc168819f5856e3f8ddf2f149200febdcd",
-          "at": "2026-06-25T02:27:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new `KindLayerConstraint` function-entry path is not exercised by any test, and `RoleKind::from_function_role` has no unit coverage. If the `FunctionPath` filtering or role mapping regresses, CI will still pass because nothing asserts that a forbidden-layer `FunctionEntry` produces a violation.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
-              "line": 187,
-              "category": "test coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:af0117de5eb6a1723a8fcd2200f492f4bab8eb6483ffdc1da541f98f3ecac700",
-          "at": "2026-06-25T02:40:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4e7500640a692c670a32a9f6001b1635e8da6b14ae81abcde784b914be35951a",
-          "at": "2026-06-25T02:48:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4e7500640a692c670a32a9f6001b1635e8da6b14ae81abcde784b914be35951a",
-          "at": "2026-06-25T02:53:03Z"
-        }
-      ]
-    },
     "harness-policy": {
       "rounds": [
         {
@@ -376,24 +313,499 @@
           "findings": [],
           "hash": "rvw1:sha256:15527f50f641f017f10f1fb2737aa107256452982069a4738db9ae2cb083278f",
           "at": "2026-06-25T03:11:41Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T005` still instructs creation of the deleted hyphenated artifacts (`cli-composition-types.json` / `cli-driver-types.json`) instead of the canonical underscore-named files, so the plan is pointing at the wrong artifact set. The same mismatch is repeated in [impl-plan.json](/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/impl-plan.json#L29).",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/plan.md",
+              "line": 51,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:47ff79a3e96f9735549513adba3a0bf56460f686b9163eb766242bebcec535ab",
+          "at": "2026-06-25T05:00:39Z"
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:f326695d8e9541b6620a06eec00d0e7c71276f964e07426371290d08585956e9",
-          "at": "2026-06-25T02:06:23Z"
+          "hash": "rvw1:sha256:093ad30b5d17ff644839a6ba1b479d965fd733acda98657f2ba7159fa6af2a7f",
+          "at": "2026-06-25T05:08:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006 says the infrastructure catalogue is expected to remain empty, but this plan bundle also adds `CodexPlannerAdapter` to `infrastructure-types.json` and renders that node in the contract map. The acceptance criterion is therefore internally inconsistent.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/plan.md",
+              "line": 57,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:786e81ada77a67d865014293fabd57e39c12bd0b14a24b54f9bef15f7d253ae7",
+          "at": "2026-06-25T06:31:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan.md` still describes the `cli_driver` catalogue as containing public `render_*` helpers from `apps/cli-driver/src/render.rs`, but the rendered artefacts only surface one `FreeFunction`: `cli_driver::ref_verify::format_pair_status` in the `ref_verify` module. That makes the phase plan and the generated catalogue disagree about where the free-function boundary actually is, so later reviewers will be looking in the wrong place.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/plan.md",
+              "line": 47,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:37a77a3930cc31f3b3f7807cda0fbb37e40b4b858c9cf9c509ca589fd3e004d6",
+          "at": "2026-06-25T06:42:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`PlannerPortError` and the surrounding usecase contract are still mechanism-specific: the port docs say it executes a subprocess, and the error enum exposes `BriefingFileNotFound` and `Subprocess(String)` instead of planner-level failures. That leaks infrastructure detail across the usecase boundary, so the adapter will have to surface subprocess/path wording to higher layers. Recast these as conceptual planner errors and keep process/file details inside the infrastructure adapter.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/usecase-types.json",
+              "line": 27,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:58d63b5ca8cee8a1e37af7fc51de451428eec98a69e40a1e7d6c45f261edc127",
+          "at": "2026-06-25T06:52:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`PlanCompositionRoot` is marked `modify` here, but the track plan says newly declared types in this round must use `add`, and it explicitly treats the plan composition root as a new addition. That makes the catalogue state inconsistent with the rest of the plan-artifacts set.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/cli_composition-types.json",
+              "line": 206,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:33a95162bd38cf3e7753a54fc4b2cda721dc66e5c4ff94246e1e4a686fa0ea5f",
+          "at": "2026-06-25T07:47:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`spec.json` / `spec.md` still refer to `cli-composition-types.json` and `cli-driver-types.json` in IN-07 and AC-06, but the rest of this plan-artifacts bundle uses the underscore filenames `cli_composition-types.json` and `cli_driver-types.json`. That makes the acceptance criterion point at the wrong catalog files and breaks the cross-document reference.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+              "line": 342,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:ee3c4699912f993073849d5ad943640a5de8528de4534c9f67736947f70bacd9",
+          "at": "2026-06-25T11:29:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0d57edecc62c1c42f6f7ec9aee727af46c3b0915d56cf9d1283aa262d23c9388",
+          "at": "2026-06-25T11:37:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The rendered catalogue view drops the `action: add` marker for newly introduced entries: `PlanCompositionRoot` is shown with action `—` here even though `cli_composition-types.json` declares it as `add`, and the same mismatch appears for `PlanInput`/`PlanDriver`, `PlannerPort`/`PlanRunOutput`/`PlannerPortError`, and `CodexPlannerAdapter` in the other rendered type views. This contradicts the catalogue source and the plan's rule that newly declared types use `action: add`, making the plan artifacts misstate which entries are new.",
+              "severity": "P1",
+              "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/cli_composition-types.md",
+              "line": 36,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0d57edecc62c1c42f6f7ec9aee727af46c3b0915d56cf9d1283aa262d23c9388",
+          "at": "2026-06-25T11:42:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2794e44bf8a59f368114c6d69b75515f47b82789f28cbdbea871779745c7789",
+          "at": "2026-06-25T12:29:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cli_composition` is still rendered with DTO and FreeFunction catalogue rows (`CommandOutcome`, `build_codex_read_only_invocation`, `tee_stderr_to_file`) even though the spec/plan define the layer allowlist as only `CompositionRoot` and `ErrorType` and explicitly say no DTO or FreeFunction entries are declared for this layer. If these delete tombstones are intended, the plan contract needs to qualify that it means non-delete entries only; otherwise the catalogue/view contradicts the D3 allowlist it claims to satisfy.",
+              "severity": "P1",
+              "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/cli_composition-types.md",
+              "line": 13,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f2794e44bf8a59f368114c6d69b75515f47b82789f28cbdbea871779745c7789",
+          "at": "2026-06-25T12:35:58Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:f326695d8e9541b6620a06eec00d0e7c71276f964e07426371290d08585956e9",
-          "at": "2026-06-25T02:08:28Z"
+          "hash": "rvw1:sha256:09ee9ab287369750fd82811e1fc343e9de5b317e9b2665933c23d1ec92f5a6de",
+          "at": "2026-06-25T12:45:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:118f13ddcfaf6bef9b004b88331b6b4b0866b2fe7ff578175c3ce25e17d727e4",
+          "at": "2026-06-25T13:34:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The plan says `PrimaryAdapter` holds an injected use case and that `SecondaryPort` must not be mixed into the cli-system catalogues, but the new `PlanDriver` primary adapter is catalogued with a `planner: Arc<dyn usecase::planner::PlannerPort>` field. That makes the thin-bin plan contradict its own role-placement semantics and bypasses the promised separation between primary adapters and usecase/secondary-port roles.",
+              "severity": "P1",
+              "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/cli_driver-types.json",
+              "line": 2689,
+              "category": "contradiction"
+            },
+            {
+              "message": "`cli` catalogue entries are supposed to cover public command/args DTOs and public dispatch free functions, while private helpers are explicitly not catalogued. These live `FreeFunction` additions describe `plan_input_from_args` and `review_input_from_args` as “private helper” functions, so the catalogue is blessing private test helpers as current cli-layer free-function surface contrary to the plan’s own public-surface rule.",
+              "severity": "P1",
+              "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/cli-types.json",
+              "line": 2274,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:118f13ddcfaf6bef9b004b88331b6b4b0866b2fe7ff578175c3ce25e17d727e4",
+          "at": "2026-06-25T13:40:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`IN-08` still specifies a direct `PlanDriver -> PlannerPort` wiring, but `IN-09` requires the final state to be `PlanDriver -> PlannerService -> PlannerInteractor -> PlannerPort`. The same mismatch is repeated later in `AC-11` vs `AC-12`, so the spec currently asks for two incompatible planner topologies.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+              "line": 118,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:7f9430e75da2dfb4c0bfb5f0121f961411bdc2715d1074741a3216decd6e8521",
+          "at": "2026-06-25T15:40:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-12 says the `*Service` trait_impls live under infrastructure `SecondaryAdapter` entries, but the actual catalogue places those implementations on the `*Interactor` types in `libs/usecase` (`ArchInteractor`, `ConventionsInteractor`, `FileInteractor`, `PlannerInteractor`, `VerifyInteractor`). That makes the acceptance criterion self-contradictory and points implementers at the wrong layer.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.md",
+              "line": 58,
+              "category": "contradiction"
+            },
+            {
+              "message": "`VerifyCompositionRoot` still exposes `verify_hooks_path(project_root) -> Result<CommandOutcome, CompositionError>` under the `CompositionRoot` role. ADR 1328 D2 says composition roots are wire-only and must not invoke use cases, so this leaves a command entry point in a type that is supposed to be pure composition and duplicates `VerifyDriver`'s responsibility.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/cli_composition-types.json",
+              "line": 528,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:cfaef2907fd3443f406e01f514e43e357724a863c8f4a301afe0136299c6380e",
+          "at": "2026-06-25T16:41:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`S6` attributes the \"keep the diff under 500 lines\" rationale to `CN-04`, but `CN-04` in this scope is the `CompositionRoot`/`PrimaryAdapter` placement rule, not a size-budget constraint. This mislabels the constraint in both `plan.md` and the mirrored `impl-plan.json` text, so readers will look at the wrong rule when checking the task split.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/plan.md",
+              "line": 53,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:794fd4e37c74686a9e423db557d3633e342dbb6e46028b5e4c8e0eaa7ee0ff12",
+          "at": "2026-06-25T16:52:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4802780bc0be6bdadf5e7a3b33c024c07c17e03f09b7045111f008270860085a",
+          "at": "2026-06-25T17:01:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T013 lists only T012 as its dependency, but the S6 section says all T008-T013 tasks depend on T007, and T013 is the task that introduces the PlanDriver PrimaryAdapter signature using `Arc<dyn PlannerService>`. As written, the dependency graph permits T013 before the lint-config correction that allows `ApplicationService` in PrimaryAdapter signatures, contradicting the section-level ordering and making that path fail the stated lint gate. Add T007 to T013's dependency text or clarify the ordering consistently.",
+              "severity": "P1",
+              "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/impl-plan.json",
+              "line": 70,
+              "category": "contradiction"
+            },
+            {
+              "message": "IN-09 describes `PlanDriver` as one of the current five `cli_driver` primary adapters already holding `Arc<dyn PlannerPort>`, but the same plan set treats `PlanDriver`/`PlanInput` as new additions to be introduced in T013 and the cli_driver catalogue marks `PlanDriver` as `action: add`. That makes the audit finding and implementation scope disagree: the four existing drivers need modification, while the Plan pair is creation work. Rephrase the Plan pair as planned/add work or align the catalogue/task status with the audit claim.",
+              "severity": "P1",
+              "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+              "line": 151,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:4802780bc0be6bdadf5e7a3b33c024c07c17e03f09b7045111f008270860085a",
+          "at": "2026-06-25T17:07:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T007 says AC-04 will be satisfied by removing only `ApplicationService` from the PrimaryAdapter forbidden-role list, but T003 records the current rule as also containing `DomainService`, `Specification`, `Factory`, `DomainEvent`, `EventPolicy`, and `SpecificationPort`, while AC-04/IN-03 require the shorter exact list. Following T007 as written leaves those extra roles in place, so the plan does not actually reach its own AC-04 rule shape.",
+              "severity": "P1",
+              "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/impl-plan.json",
+              "line": 40,
+              "category": "contradiction"
+            },
+            {
+              "message": "AC-12 says `PlanDriver` changes its field from `Arc<dyn PlannerPort>` to `Arc<dyn PlannerService>`, but IN-09 says `PlanDriver`/`PlanInput` do not yet exist and the new `PlanDriver` is introduced from the start with `Arc<dyn PlannerService>`; T013 says the same. That makes AC-12's PlanDriver evidence impossible to satisfy as a real before/after change and contradicts the rest of the plan.",
+              "severity": "P1",
+              "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+              "line": 498,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:473930f98b573035b799e30a8175d69f4c994297c02dfe3236ee5735ebff6d2a",
+          "at": "2026-06-25T17:13:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR D3's lint-rule block omits `usecase` from the `Dto` `permitted_layers`, but the generated spec's AC-03 requires `Dto` to be permitted in `usecase` as well as `infrastructure`, `cli`, and `cli_driver`. Both passages describe the lint config to be implemented, so this leaves an executor with conflicting role-placement requirements for existing usecase DTOs.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md",
+              "line": 70,
+              "category": "contradiction"
+            },
+            {
+              "message": "`IN-03` now includes the exact `NoRoleInMethodSignature` forbidden-role list and the `ApplicationService` exception, but task coverage still maps it only to `T001`, which only adds the `PrimaryAdapter` role machinery. The task that actually normalizes that rule is `T007`, so the coverage artifact contradicts the spec/plan and can mark IN-03 covered without scheduling the required lint-config fix.",
+              "severity": "P1",
+              "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/task-coverage.json",
+              "line": 6,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:54cb4d59fb43917f39ffe0a1e7b3ba163f400b7a255ee4182bdf440bd028675a",
+          "at": "2026-06-25T17:23:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "S6 states that every task in the section, including T012, depends on T007, but the T012 task description later says it depends only on T001. That gives two conflicting execution orders for the planner usecase/infrastructure work: either T012 is blocked behind the lint-config fix, or it can proceed once DataRole/RoleKind exist. The plan should make this dependency explicit one way or the other so implementers do not follow different task ordering.",
+              "severity": "P1",
+              "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/impl-plan.json",
+              "line": 147,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:d806785bcdb3df166197c8e3e77c1ffba55f83f1bf5fa9ce12c411e75d2d5d49",
+          "at": "2026-06-25T17:28:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:64bc4000b076967569441cda3d1ab234561e684fc68a77af5f706adeaaf43831",
+          "at": "2026-06-25T17:33:52Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`RoleKind` now admits `FunctionRole` variants, but `NoRoleInMethodSignature` still only scans type and trait entries. That means a config like `forbidden_roles: [FreeFunction]` or `UseCaseFunction` parses successfully and then becomes a silent no-op instead of being rejected or enforced.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 291,
+              "category": "typestate / parse-don't-validate gap"
+            }
+          ],
+          "hash": "rvw1:sha256:814703d06caa5d2dc6b43d97517f5a879f2f5bfcd08dc7987c4aa12fa1bed6c1",
+          "at": "2026-06-25T02:16:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Adding `FunctionRole` to `RoleKind::ALL` makes `RuleTarget` able to name `FreeFunction`/`UseCaseFunction`, but only `KindLayerConstraint` was wired to inspect `catalogue.functions`. The other rule kinds still iterate only `type_entries_for_target`/`trait_entries_for_target`, so a function-only target now constructs successfully and then silently no-ops instead of being rejected. Either validate unsupported function-role targets up front or make the other branches function-aware.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 167,
+              "category": "typestate / parse-don't-validate gap"
+            }
+          ],
+          "hash": "rvw1:sha256:ea606781a90920ed2e12c419097754bc168819f5856e3f8ddf2f149200febdcd",
+          "at": "2026-06-25T02:27:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `KindLayerConstraint` function-entry path is not exercised by any test, and `RoleKind::from_function_role` has no unit coverage. If the `FunctionPath` filtering or role mapping regresses, CI will still pass because nothing asserts that a forbidden-layer `FunctionEntry` produces a violation.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "line": 187,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:af0117de5eb6a1723a8fcd2200f492f4bab8eb6483ffdc1da541f98f3ecac700",
+          "at": "2026-06-25T02:40:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4e7500640a692c670a32a9f6001b1635e8da6b14ae81abcde784b914be35951a",
+          "at": "2026-06-25T02:48:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4e7500640a692c670a32a9f6001b1635e8da6b14ae81abcde784b914be35951a",
+          "at": "2026-06-25T02:53:03Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`tee_stderr_to_file` now lives in `apps/cli`, so the bin layer itself owns the Codex subprocess stderr tee and log-file write. That is direct application I/O outside the driver/composition boundary; this helper should stay behind `cli_composition`/`infrastructure` instead of being implemented in the CLI command module.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/plan/codex_local.rs",
+              "line": 247,
+              "category": "direct I/O in bin"
+            }
+          ],
+          "hash": "rvw1:sha256:bb2108532c0147822e678268302d3481db48b92c70bfceae0006a966f3740cb5",
+          "at": "2026-06-25T04:59:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`build_prompt` still performs a filesystem probe with `Path::is_file()` in bin-layer production code. That keeps application I/O in `apps/cli` instead of flowing through the driver/composition boundary, which violates the thin-bin contract for this scope.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/plan/codex_local.rs",
+              "line": 57,
+              "category": "direct I/O in bin"
+            }
+          ],
+          "hash": "rvw1:sha256:618d5be35b666653743368729e62a603548c0f16e024d338f3ad3e844ea95425",
+          "at": "2026-06-25T06:29:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:723da4c35adff49829239808c166392a3289b521dfd7975537a5a2c0722f21b2",
+          "at": "2026-06-25T06:37:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:723da4c35adff49829239808c166392a3289b521dfd7975537a5a2c0722f21b2",
+          "at": "2026-06-25T06:41:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_codex_local` now builds the prompt with `resolve_prompt` instead of the validated `build_prompt` path, so production no longer checks that `--briefing-file` exists before launching the planner. A typoed briefing path will now proceed into Codex and fail later, which regresses the CLI's early validation behavior.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/plan/codex_local.rs",
+              "line": 24,
+              "category": "business logic in bin"
+            }
+          ],
+          "hash": "rvw1:sha256:d40ee0b9a22d13314bdf4fe5d8ab6c66ccfb5ddcb4c77de1f436185d456d96ad",
+          "at": "2026-06-25T07:49:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8e4cee10d3aa87564f0c49a84ab75b52125a966fca7db921112a44953208237a",
+          "at": "2026-06-25T07:57:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Removing `apps/cli/src/commands/plan/tests.rs` leaves the public `PlanCommand::execute` / `execute_codex_local` path with no CLI-layer coverage in this scope. The new wrapper still has user-visible branching (`--briefing-file` vs `--prompt`, file-existence validation) plus driver dispatch, so a regression here can now slip through undetected.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/plan/mod.rs",
+              "line": 46,
+              "category": "testing"
+            },
+            {
+              "message": "`ReviewCommand::CodexLocal` no longer has any tests that exercise `execute_codex_local` itself. `review/tests.rs` still covers helpers, but not the `CodexLocalArgs -> ReviewInput::RunCodex -> outcome emission` path, so regressions in the new thin dispatch would not be caught.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/codex_local.rs",
+              "line": 17,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:7ba7c48a739f7e5139f198e9c3ed48be0e9efa2ac2c746d8eeb6374d0d1b137c",
+          "at": "2026-06-25T11:30:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5cd36ceee84bf5a0294e33a3e9c34b4c0a4b6d8655929093e6b147c17f0d211c",
+          "at": "2026-06-25T11:44:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5cd36ceee84bf5a0294e33a3e9c34b4c0a4b6d8655929093e6b147c17f0d211c",
+          "at": "2026-06-25T11:50:16Z"
         }
       ]
     },
@@ -426,6 +838,396 @@
           "findings": [],
           "hash": "rvw1:sha256:7a627a4e1e6652fde248c3f861cef7827a32a35a3e7091a657937236c4b18f70",
           "at": "2026-06-25T02:14:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_bin_target_name` silently returns the first `kind == \"bin\"` target from `cargo metadata`, and it ignores `default_run` and the presence of multiple `[[bin]]` entries. For any package with more than one binary target, this can export the wrong rustdoc JSON depending on metadata ordering instead of failing closed or selecting the canonical binary explicitly.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/schema_export/bin_target.rs",
+              "line": 105,
+              "category": "non-fail-closed config"
+            }
+          ],
+          "hash": "rvw1:sha256:55aa698036ad8bdd0128a6d69645c29f0057c8b1c0bd68de7d920ec717b6bf2a",
+          "at": "2026-06-25T05:06:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f85020cc65fc755db9068a468682166bc2fb905c53579346d90e356052b6f0d5",
+          "at": "2026-06-25T06:32:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f85020cc65fc755db9068a468682166bc2fb905c53579346d90e356052b6f0d5",
+          "at": "2026-06-25T06:35:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_target_dir` accepts a relative `CARGO_TARGET_DIR` and blindly joins it to `workspace_root`. A value like `../outside` escapes the trusted root, so the rustdoc adapter can operate outside the workspace without the containment check used elsewhere (`is_safe_briefing_path` / CN-04 fail-closed).",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/schema_export.rs",
+              "line": 107,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:c4842350f0e425dae7aeaed8a6a036e04ef2bbc9b005944c730ea751e0d3f74c",
+          "at": "2026-06-25T07:50:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Timeout handling can deadlock here: the code kills only the direct child, then always `join()`s the stderr tee thread. If Codex spawns descendants that keep the stderr pipe open, `join()` never returns; and if the child exits between `try_wait()` and `kill()`, the `?` turns a timeout into a spurious `PlannerUnavailable`. The established reviewer/dry-check adapters avoid both failure modes by ignoring the kill race and not joining drain threads on timeout.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/codex_planner.rs",
+              "line": 149,
+              "category": "timeout handling"
+            },
+            {
+              "message": "This target-dir guard is only lexical; it never rejects symlinked roots before `parse_rustdoc_json()` later calls `read_to_string()` on the resolved path. A symlinked `workspace_root` or `CARGO_TARGET_DIR` can therefore redirect the read outside the trusted workspace, which conflicts with the repo's existing symlink-rejection boundary pattern.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/schema_export.rs",
+              "line": 151,
+              "category": "symlink boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:40cb875f8aa8065e0bb643413800c448da29d3e515f5bf548c0ea869c6f26ccf",
+          "at": "2026-06-25T11:31:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: On the timeout path this suppresses `child.kill()` failures and then always calls `child.wait()`. If the child cannot be terminated (or the kill race loses in a way that leaves it running), `wait()` can block indefinitely, so the adapter no longer fails closed on timeout. The previous code surfaced `PlannerUnavailable` immediately instead of hanging.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/codex_planner.rs",
+              "line": 148,
+              "category": "missing error handling"
+            },
+            {
+              "message": "P1: This now drops any function whose rustdoc path has only one segment. The existing baseline renderer already treats `[item_name]` as a valid degenerate path, so root-level free functions can exist; with this guard they disappear from Phase 2 entirely instead of being evaluated and reported. That silently omits legitimate items from the signal report.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/tddd/signal_evaluator_v2/mod.rs",
+              "line": 218,
+              "category": "contract regression"
+            }
+          ],
+          "hash": "rvw1:sha256:86f9fe034dfb6b3f4a20a94c08c24aba89b3f1753391b969ef228589a859dba8",
+          "at": "2026-06-25T12:03:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9ed4930a174c453c89f392727974cdc34d77b603dd482b0b466bd47aeb14d6e7",
+          "at": "2026-06-25T12:15:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9ed4930a174c453c89f392727974cdc34d77b603dd482b0b466bd47aeb14d6e7",
+          "at": "2026-06-25T12:20:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`prepare_session_log_path()` only combines the PID with a millisecond timestamp, so two `run()` calls in the same millisecond can generate the same log filename and `File::create` will truncate the earlier session log. The existing collision-safe pattern in [codex_common.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/codex_common.rs) uses an atomic counter for exactly this reason.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/codex_planner.rs",
+              "line": 86,
+              "category": "correctness"
+            },
+            {
+              "message": "The bin-target path lookup uses `format!(\"{bin_name}.json\")` verbatim, unlike the lib path which normalizes `-` to `_`. A valid `[[bin]]` target with a hyphenated name will look for a nonexistent artifact and fail even though `cargo rustdoc --bin` succeeded.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/schema_export/bin_target.rs",
+              "line": 74,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:f840e11039edf754a1bf2ad0f629a7754ca18ea81ffde6252f02c765797da081",
+          "at": "2026-06-25T13:37:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ec16f5bf51dfa40b6141fce5102033cb63bd3dd6b4edd0f2a7d65cfa6164c460",
+          "at": "2026-06-25T13:49:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`build_function_identity_map` now strips the first path segment for every function (`skip(1)`), so a lib function like `cli::module::compute` collapses to `module::compute` just like a bin target. That makes the canonical function identity non-canonical and will mis-key or duplicate function signals unless every downstream caller has been updated to the same shortened form. If the goal was only to normalize `[[bin]]` targets, gate this on target kind instead of applying it unconditionally.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/tddd/signal_evaluator_v2/mod.rs",
+              "line": 218,
+              "category": "fingerprint or hash drift"
+            }
+          ],
+          "hash": "rvw1:sha256:ec16f5bf51dfa40b6141fce5102033cb63bd3dd6b4edd0f2a7d65cfa6164c460",
+          "at": "2026-06-25T15:38:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`load_catalogue_spec_signals_for_view` rejects a symlinked leaf, but it still calls `read_to_string` on the path after only checking `symlink_metadata()` for the final component. If the track directory or any ancestor is a symlink, the loader will follow it and can read a file outside the intended track root; this should use the repo's full symlink-rejection pattern (`reject_symlinks_below`/trusted-root validation) instead of leaf-only checking.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/type_catalogue_render.rs",
+              "line": 114,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:41b1d3efa08eb93104e6a40c84da679e358aaa06ff482630273167ec18655983",
+          "at": "2026-06-25T16:03:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:af5c9ba381ebab9b4b10483ca805ec6f6c119e42cde089607e9ff19dbf0762aa",
+          "at": "2026-06-25T16:17:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3e2c67d95047368297a7cf8cd89bad8eac446bc32448aca33bb64222654f2936",
+          "at": "2026-06-25T16:31:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3e2c67d95047368297a7cf8cd89bad8eac446bc32448aca33bb64222654f2936",
+          "at": "2026-06-25T16:37:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:41b1d3efa08eb93104e6a40c84da679e358aaa06ff482630273167ec18655983",
+          "at": "2026-06-25T17:55:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:41b1d3efa08eb93104e6a40c84da679e358aaa06ff482630273167ec18655983",
+          "at": "2026-06-25T17:59:47Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ec1cc7545d6c620f9bcb712e2e9e0b5d406e958ce6972dddad23852bf485ad50",
+          "at": "2026-06-25T04:57:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ec1cc7545d6c620f9bcb712e2e9e0b5d406e958ce6972dddad23852bf485ad50",
+          "at": "2026-06-25T05:01:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a52ad321414e427bb5d7ff0401fa2c7c2d0ac4dd05d322496a12edfd8327543f",
+          "at": "2026-06-25T06:23:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a52ad321414e427bb5d7ff0401fa2c7c2d0ac4dd05d322496a12edfd8327543f",
+          "at": "2026-06-25T06:26:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:547f6f8112ebecfbde85550b6894f9ac8a3cfec48e34f42c8d589cb2c31b06a3",
+          "at": "2026-06-25T07:43:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:547f6f8112ebecfbde85550b6894f9ac8a3cfec48e34f42c8d589cb2c31b06a3",
+          "at": "2026-06-25T07:47:51Z"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4bd9fdd09d99d350bb517b0d6788a5ac5989f3551d5b1a31a130718708cb5645",
+          "at": "2026-06-25T06:27:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4bd9fdd09d99d350bb517b0d6788a5ac5989f3551d5b1a31a130718708cb5645",
+          "at": "2026-06-25T06:29:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8c8ff5416d6b5ef9fbbcbf334a086ba38013c10e8d28098d18d2a228ebfd9d68",
+          "at": "2026-06-25T07:46:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8c8ff5416d6b5ef9fbbcbf334a086ba38013c10e8d28098d18d2a228ebfd9d68",
+          "at": "2026-06-25T07:50:04Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f326695d8e9541b6620a06eec00d0e7c71276f964e07426371290d08585956e9",
+          "at": "2026-06-25T02:06:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f326695d8e9541b6620a06eec00d0e7c71276f964e07426371290d08585956e9",
+          "at": "2026-06-25T02:08:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:28e580f0bf6bfbcd91bb9433e5b4073956931d8f163c8c4fc6d0f693a1f061e4",
+          "at": "2026-06-25T06:30:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The usecase port signature exposes the adapter's filesystem/session-log concern by requiring callers to pass a concrete `PathBuf` runtime directory. The briefing calls out file paths as infrastructure details that must not appear in this SecondaryPort signature, and the usecase purity rules keep runtime/file effects at the CLI or infrastructure edge. Make the port contract use application-level DTO data only, or keep session-log path selection entirely inside the infrastructure adapter/composition wiring.",
+              "severity": "P1",
+              "file": "libs/usecase/src/planner.rs",
+              "line": 56,
+              "category": "purity violation by trait"
+            },
+            {
+              "message": "`PlannerPortError::Subprocess(String)` makes the usecase boundary expose the infrastructure mechanism and raw adapter error text instead of a usecase-level planner failure concept. That breaks the error abstraction described by the usecase severity policy: callers now need to know that the planner is a subprocess and may receive subprocess-shaped details. Map these failures to conceptual variants such as planner unavailable/timed out/failed without leaking the underlying I/O/process wording.",
+              "severity": "P1",
+              "file": "libs/usecase/src/planner.rs",
+              "line": 32,
+              "category": "error type confusion"
+            }
+          ],
+          "hash": "rvw1:sha256:28e580f0bf6bfbcd91bb9433e5b4073956931d8f163c8c4fc6d0f693a1f061e4",
+          "at": "2026-06-25T06:34:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a6b507129827acc956c0a064fac61bd2a2792f8fa44132a21731144d89e4403",
+          "at": "2026-06-25T07:46:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a6b507129827acc956c0a064fac61bd2a2792f8fa44132a21731144d89e4403",
+          "at": "2026-06-25T07:51:04Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `cli` layer’s `schema_export.notes` does not include the required explicit hint that T006 routes bin targets through `libs/infrastructure/src/schema_export/bin_target.rs`. It only says nightly rustdoc supports bin targets, so the architecture SSoT is still missing the documented handoff to the bin-target export path.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/architecture-rules.json",
+              "line": 137,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:f30409d5330849551cbd18945cbc127123c84dd5eda6ce11299210eff12024d6",
+          "at": "2026-06-25T04:57:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f12ebe9705ac92b401b31676c3bbaab996c038bc45309cc5addc10fb13a8352d",
+          "at": "2026-06-25T05:01:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`bin/sotp review local --round-type final --group other --track-id cli-layers-tddd-and-role-placement-lint-2026-06-24 --briefing-file tmp/reviewer-runtime/briefing-other.md` could not complete in this read-only workspace because the reviewer failed to initialize `output-last-message` (`Read-only file system (os error 30)`). As a result, the required final round was not recorded; `bin/sotp review results` only shows the previously recorded fast zero_findings entry.",
+              "severity": "P1",
+              "file": null,
+              "line": null,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:f12ebe9705ac92b401b31676c3bbaab996c038bc45309cc5addc10fb13a8352d",
+          "at": "2026-06-25T06:26:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f12ebe9705ac92b401b31676c3bbaab996c038bc45309cc5addc10fb13a8352d",
+          "at": "2026-06-25T06:29:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f12ebe9705ac92b401b31676c3bbaab996c038bc45309cc5addc10fb13a8352d",
+          "at": "2026-06-25T06:32:47Z"
         }
       ]
     }

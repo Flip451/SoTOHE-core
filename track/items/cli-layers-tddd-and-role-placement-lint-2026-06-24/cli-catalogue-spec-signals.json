@@ -1,0 +1,441 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "bc4182246bcbc3958eda40c9029d685bc251b10633f6c3488469a7a61cffbf5a",
+  "signals": [
+    {
+      "type_name": "ArchCommand",
+      "signal": "blue",
+      "entry_hash": "73c35c3f1400fecca31902ee6910dae3d0a01b5a3c067ba8aa1d0f98b6de0d21"
+    },
+    {
+      "type_name": "BranchAction",
+      "signal": "blue",
+      "entry_hash": "445ce2cdaac559d2c301f17b6099922cc6d010933cb26589dd8af78cd1b3a6b3"
+    },
+    {
+      "type_name": "BranchArgs",
+      "signal": "blue",
+      "entry_hash": "b237d44336cf87449e3ff02b9a0fd10b0334766f5cb8defda709618921809f07"
+    },
+    {
+      "type_name": "CalcAdrUserArgs",
+      "signal": "blue",
+      "entry_hash": "ace5b595ce0bad863885d06d8603d23d99bbf90f1a2753cdfed172f19f794a7c"
+    },
+    {
+      "type_name": "CalcCatalogSpecArgs",
+      "signal": "blue",
+      "entry_hash": "ace5b595ce0bad863885d06d8603d23d99bbf90f1a2753cdfed172f19f794a7c"
+    },
+    {
+      "type_name": "CalcImplCatalogArgs",
+      "signal": "blue",
+      "entry_hash": "ace5b595ce0bad863885d06d8603d23d99bbf90f1a2753cdfed172f19f794a7c"
+    },
+    {
+      "type_name": "CalcSpecAdrArgs",
+      "signal": "blue",
+      "entry_hash": "ace5b595ce0bad863885d06d8603d23d99bbf90f1a2753cdfed172f19f794a7c"
+    },
+    {
+      "type_name": "CatalogueSpecRefsArgs",
+      "signal": "blue",
+      "entry_hash": "d9eb783fc5b26d4fd2d430274ca755e01c2fa524b80e7d0b30739e6c036a9e6e"
+    },
+    {
+      "type_name": "CheckAdrUserArgs",
+      "signal": "blue",
+      "entry_hash": "ace5b595ce0bad863885d06d8603d23d99bbf90f1a2753cdfed172f19f794a7c"
+    },
+    {
+      "type_name": "CheckApprovedArgs",
+      "signal": "blue",
+      "entry_hash": "bba40dc1754d0ad4325a0027aa48945349e8d672a6bd3c21800ade9ea1adf7c8"
+    },
+    {
+      "type_name": "CheckCatalogSpecArgs",
+      "signal": "blue",
+      "entry_hash": "ace5b595ce0bad863885d06d8603d23d99bbf90f1a2753cdfed172f19f794a7c"
+    },
+    {
+      "type_name": "CheckFlags",
+      "signal": "blue",
+      "entry_hash": "dbfb42aa5d6907bc3bb0e57310dd13997d0dd2c6a9aaa45a3e3c36375d88db0a"
+    },
+    {
+      "type_name": "CheckImplCatalogArgs",
+      "signal": "blue",
+      "entry_hash": "ace5b595ce0bad863885d06d8603d23d99bbf90f1a2753cdfed172f19f794a7c"
+    },
+    {
+      "type_name": "CheckSpecAdrArgs",
+      "signal": "blue",
+      "entry_hash": "ace5b595ce0bad863885d06d8603d23d99bbf90f1a2753cdfed172f19f794a7c"
+    },
+    {
+      "type_name": "ClaudeLocalArgs",
+      "signal": "blue",
+      "entry_hash": "b17a25e89837b9e871751d65420118e26db3cf597678d255bd3c12cd538966bf"
+    },
+    {
+      "type_name": "CliError",
+      "signal": "blue",
+      "entry_hash": "83b14021607262b7a453117ecd6010edab0717dc227dac691c3cd742dd719b4e"
+    },
+    {
+      "type_name": "CliHookName",
+      "signal": "blue",
+      "entry_hash": "39bbe9ca1693bd9e009f5d4bbf422dc1cabe883ef64de929b1e2a3928813c2bf"
+    },
+    {
+      "type_name": "CodexInvocation",
+      "signal": "blue",
+      "entry_hash": "45203367d5f0b0fcfc0e9792db2b65d2d96fbdb4181e324d490b65fe28d26093"
+    },
+    {
+      "type_name": "CodexLocalArgs",
+      "signal": "blue",
+      "entry_hash": "b17a25e89837b9e871751d65420118e26db3cf597678d255bd3c12cd538966bf"
+    },
+    {
+      "type_name": "CodexRoundTypeArg",
+      "signal": "blue",
+      "entry_hash": "ba0d8bc0e24fb6efeaaa4f8f0a83be39565141dd01a020f0750b417feb38a82e"
+    },
+    {
+      "type_name": "CommitFromFileArgs",
+      "signal": "blue",
+      "entry_hash": "a9e7a0acbdf9fa2f4ba1293405626fbb1fc277482e1927fe64b71d9d82d0ddd6"
+    },
+    {
+      "type_name": "ConventionsCommand",
+      "signal": "blue",
+      "entry_hash": "ce55a6660a1c667f896ea8fc9d55ad26d22446c182e59ad821b73861e42dbf9c"
+    },
+    {
+      "type_name": "DomainCommand",
+      "signal": "blue",
+      "entry_hash": "6c9a3129e2dd08b4e24dca3686c734db333cdc6ad5420f663677177ae3b33c8f"
+    },
+    {
+      "type_name": "DryCheckApprovedArgs",
+      "signal": "blue",
+      "entry_hash": "83ab47a1513d3eef0002a66d86face5bdd54b50eea56d0811e10225bb69ab0bf"
+    },
+    {
+      "type_name": "DryCommand",
+      "signal": "blue",
+      "entry_hash": "61684a20f41d1fa8a68d6f035b1ae4090c637849acde197f0913cc0b3f456111"
+    },
+    {
+      "type_name": "DryFixLocalArgs",
+      "signal": "blue",
+      "entry_hash": "a713f89f2fc1fd1334041593176a4c121cb0c8417650c8b908125b5dacefce97"
+    },
+    {
+      "type_name": "DryResultsArgs",
+      "signal": "blue",
+      "entry_hash": "957a5100ab82d615854b8e4e1102dd26e15f0c9728322805f02e623d622eef1c"
+    },
+    {
+      "type_name": "DryWriteArgs",
+      "signal": "blue",
+      "entry_hash": "225e656b6fcc3074acb8c75c45f8706ef361c2b886797a7f97d20d9e069d7142"
+    },
+    {
+      "type_name": "DupCheckArgs",
+      "signal": "blue",
+      "entry_hash": "a9b91aee3a49f305fa4f277e39669cd1754f92bd228e87977fef8954e7584c8f"
+    },
+    {
+      "type_name": "DupIndexBuildArgs",
+      "signal": "blue",
+      "entry_hash": "a9b91aee3a49f305fa4f277e39669cd1754f92bd228e87977fef8954e7584c8f"
+    },
+    {
+      "type_name": "DupIndexCommand",
+      "signal": "blue",
+      "entry_hash": "2bb6b174fd06c87492c87ef0e5c2757208f50b3a876f3b1815db851347d18b61"
+    },
+    {
+      "type_name": "DupIndexMeasureQualityArgs",
+      "signal": "blue",
+      "entry_hash": "a9b91aee3a49f305fa4f277e39669cd1754f92bd228e87977fef8954e7584c8f"
+    },
+    {
+      "type_name": "EnsurePrArgs",
+      "signal": "blue",
+      "entry_hash": "d8a71228f87c7020ae28cd90df346c73d9d0b1ea7724cc7d67aeff0509cca71e"
+    },
+    {
+      "type_name": "ExportSchemaArgs",
+      "signal": "blue",
+      "entry_hash": "f3dd719faf1e7ae3e8369b98a81cc4137a39f2ea0b587374b2b6adc22ae5a319"
+    },
+    {
+      "type_name": "FileArgs",
+      "signal": "blue",
+      "entry_hash": "a9e7a0acbdf9fa2f4ba1293405626fbb1fc277482e1927fe64b71d9d82d0ddd6"
+    },
+    {
+      "type_name": "FileCommand",
+      "signal": "blue",
+      "entry_hash": "83d99c5679722fac7325ee7a38e027777f4200bc60d323ade22d8dcd44101988"
+    },
+    {
+      "type_name": "FindSimilarArgs",
+      "signal": "blue",
+      "entry_hash": "a9b91aee3a49f305fa4f277e39669cd1754f92bd228e87977fef8954e7584c8f"
+    },
+    {
+      "type_name": "FixpointResolveArgs",
+      "signal": "blue",
+      "entry_hash": "3d04f850a92632ce81d2bd741508f71ddcfd03f43229644d6954cef91d3fceac"
+    },
+    {
+      "type_name": "GateArg",
+      "signal": "blue",
+      "entry_hash": "dc60f37d614cb3ad1cac948a203ab062311d180b95c33beefdb868324d6da811"
+    },
+    {
+      "type_name": "GitCommand",
+      "signal": "blue",
+      "entry_hash": "26e5c770a5209e357b70c21612901bf06052bb8a69d4ab7de245d3344e064607"
+    },
+    {
+      "type_name": "GuardCommand",
+      "signal": "blue",
+      "entry_hash": "434c9306296da85bbd2c67c913542b141513fe7d168081211a51edea2598b9b5"
+    },
+    {
+      "type_name": "HookCommand",
+      "signal": "blue",
+      "entry_hash": "a301fc32d5aa25ffe682a96b7c6f42965bb1fe147bd36b6463b9b05d74baa9e2"
+    },
+    {
+      "type_name": "PlanArtifactRefsArgs",
+      "signal": "blue",
+      "entry_hash": "d9eb783fc5b26d4fd2d430274ca755e01c2fa524b80e7d0b30739e6c036a9e6e"
+    },
+    {
+      "type_name": "PlanCodexLocalArgs",
+      "signal": "blue",
+      "entry_hash": "3bf01715133838f4a3dbe5cdd676dcef5f6db41f852d87314f8d369816dd177a"
+    },
+    {
+      "type_name": "PlanCommand",
+      "signal": "blue",
+      "entry_hash": "8c3c92421c07688c96758cbce743e13c59fe3a8563be644abb9d41eff6b17714"
+    },
+    {
+      "type_name": "PlanRunResult",
+      "signal": "blue",
+      "entry_hash": "45203367d5f0b0fcfc0e9792db2b65d2d96fbdb4181e324d490b65fe28d26093"
+    },
+    {
+      "type_name": "PollReviewArgs",
+      "signal": "blue",
+      "entry_hash": "d8a71228f87c7020ae28cd90df346c73d9d0b1ea7724cc7d67aeff0509cca71e"
+    },
+    {
+      "type_name": "PrCommand",
+      "signal": "blue",
+      "entry_hash": "52fed1b636f07f881973043fbe4aef9f6342ec5bb64b1c3a0020787528e63b1c"
+    },
+    {
+      "type_name": "PushArgs",
+      "signal": "blue",
+      "entry_hash": "d8a71228f87c7020ae28cd90df346c73d9d0b1ea7724cc7d67aeff0509cca71e"
+    },
+    {
+      "type_name": "RefVerifyCommand",
+      "signal": "blue",
+      "entry_hash": "210cf8b903d60bd9fd20b889ea562a5d128d24e5f554597f034ff059e481b37f"
+    },
+    {
+      "type_name": "ReportArgs",
+      "signal": "blue",
+      "entry_hash": "16f6bf0a7182c9b85cd7ab1797b550a66f4f21c14cc974ad01a8d2a7de3124c3"
+    },
+    {
+      "type_name": "ResolveArgs",
+      "signal": "blue",
+      "entry_hash": "b237d44336cf87449e3ff02b9a0fd10b0334766f5cb8defda709618921809f07"
+    },
+    {
+      "type_name": "ResultsArgs",
+      "signal": "blue",
+      "entry_hash": "b17a25e89837b9e871751d65420118e26db3cf597678d255bd3c12cd538966bf"
+    },
+    {
+      "type_name": "ResultsLimit",
+      "signal": "blue",
+      "entry_hash": "e44bee49c6a57bb4ac66a831d3567dd0e6f95961acd71d3b3af41361f15e6975"
+    },
+    {
+      "type_name": "ReviewCommand",
+      "signal": "blue",
+      "entry_hash": "a907cb0408589bebb860f63e1f251f32e6e99ef935263860c42734ab6276c8e4"
+    },
+    {
+      "type_name": "ReviewCycleArgs",
+      "signal": "blue",
+      "entry_hash": "d8a71228f87c7020ae28cd90df346c73d9d0b1ea7724cc7d67aeff0509cca71e"
+    },
+    {
+      "type_name": "RoundTypeFilter",
+      "signal": "blue",
+      "entry_hash": "bd2ae8fe1636a8141f900ca416722ac61e4799390173086971e1fef149cdb359"
+    },
+    {
+      "type_name": "RunArgs",
+      "signal": "blue",
+      "entry_hash": "bba40dc1754d0ad4325a0027aa48945349e8d672a6bd3c21800ade9ea1adf7c8"
+    },
+    {
+      "type_name": "SetCommitHashArgs",
+      "signal": "blue",
+      "entry_hash": "c758b04ce90182b1dd8b42d8ead7db258e8bb089ed7ab9281ccec73545340c83"
+    },
+    {
+      "type_name": "SignalCheckArgs",
+      "signal": "blue",
+      "entry_hash": "1c92e235bbb4d5a2ed9e797cdaa3b953c8c5aba21dfbffc094906333fcb530fc"
+    },
+    {
+      "type_name": "SignalCommand",
+      "signal": "blue",
+      "entry_hash": "ef0a77279f14bf9cd5f95d8ce6aca51fcbdf9aa76b16a3205c8a251fb8cfdc44"
+    },
+    {
+      "type_name": "SpecVerifyArgs",
+      "signal": "blue",
+      "entry_hash": "d9eb783fc5b26d4fd2d430274ca755e01c2fa524b80e7d0b30739e6c036a9e6e"
+    },
+    {
+      "type_name": "StatusArgs",
+      "signal": "blue",
+      "entry_hash": "d8a71228f87c7020ae28cd90df346c73d9d0b1ea7724cc7d67aeff0509cca71e"
+    },
+    {
+      "type_name": "SwitchAndPullArgs",
+      "signal": "blue",
+      "entry_hash": "a9e7a0acbdf9fa2f4ba1293405626fbb1fc277482e1927fe64b71d9d82d0ddd6"
+    },
+    {
+      "type_name": "TelemetryCommand",
+      "signal": "blue",
+      "entry_hash": "7af3b2d421077efe140c855d9e3b13f4ced226ea308fc4197b6e6fefe101ad52"
+    },
+    {
+      "type_name": "TrackCommand",
+      "signal": "blue",
+      "entry_hash": "fcb9c1fbf076f3cdc143aa45ab8aa9072b1f6ea3364c79a2f60de321973b4b4f"
+    },
+    {
+      "type_name": "TriggerReviewArgs",
+      "signal": "blue",
+      "entry_hash": "d8a71228f87c7020ae28cd90df346c73d9d0b1ea7724cc7d67aeff0509cca71e"
+    },
+    {
+      "type_name": "UnstageArgs",
+      "signal": "blue",
+      "entry_hash": "a9e7a0acbdf9fa2f4ba1293405626fbb1fc277482e1927fe64b71d9d82d0ddd6"
+    },
+    {
+      "type_name": "VerdictFilterArg",
+      "signal": "blue",
+      "entry_hash": "82ddb9cf0403ff7a9a268d7ef03392ad32ad12e44b9211ece295228958efa2f0"
+    },
+    {
+      "type_name": "VerifyArgs",
+      "signal": "blue",
+      "entry_hash": "d9eb783fc5b26d4fd2d430274ca755e01c2fa524b80e7d0b30739e6c036a9e6e"
+    },
+    {
+      "type_name": "VerifyCommand",
+      "signal": "blue",
+      "entry_hash": "3b078021e2bb7db3ec61955ff9e69fece75f65536f6bcb1ef0d1a2cb7324ef72"
+    },
+    {
+      "type_name": "ViewAction",
+      "signal": "blue",
+      "entry_hash": "b82278d69c86ce603603f97d5a2b78e5a59c5f3f706ce5c90f9e6d72798e4e7d"
+    },
+    {
+      "type_name": "WaitAndMergeArgs",
+      "signal": "blue",
+      "entry_hash": "d8a71228f87c7020ae28cd90df346c73d9d0b1ea7724cc7d67aeff0509cca71e"
+    },
+    {
+      "type_name": "cli::commands::plan::codex_local::build_codex_invocation",
+      "signal": "blue",
+      "entry_hash": "7f256c43b887dc6d543049769ce0b7c03d2c9103e0db8e12c720398857b3b35e"
+    },
+    {
+      "type_name": "cli::commands::plan::codex_local::build_prompt",
+      "signal": "blue",
+      "entry_hash": "e4a958dd9035704c4fe2d75bc320c2d4f590f2c9b95ac3d2e04b40940489de92"
+    },
+    {
+      "type_name": "cli::commands::plan::codex_local::codex_bin",
+      "signal": "blue",
+      "entry_hash": "2728a665468ecec4cf0b3f401c216399a17cd68d4455c7360aeffb4b69d2f82d"
+    },
+    {
+      "type_name": "cli::commands::plan::codex_local::configure_child_process_group",
+      "signal": "blue",
+      "entry_hash": "4dbd0d38f5391bd8db3a6b430c5887aeda912d46684850e3ada637ff7305a14f"
+    },
+    {
+      "type_name": "cli::commands::plan::codex_local::plan_input_from_args",
+      "signal": "blue",
+      "entry_hash": "f1e9cdd7291f6d23e0b64c8be26f27178d931948f9f88df1ebc8242d42ed7f35"
+    },
+    {
+      "type_name": "cli::commands::plan::codex_local::prepare_session_log_path",
+      "signal": "blue",
+      "entry_hash": "3a8eadaac7351e57fa07454048df5587bf4b3578a7ec275a36e9ab47bbbe33c0"
+    },
+    {
+      "type_name": "cli::commands::plan::codex_local::run_codex_child",
+      "signal": "blue",
+      "entry_hash": "fcd3dcf497b0db39f94b97cb847d47451109a3a3ecd275df773d1008f1919172"
+    },
+    {
+      "type_name": "cli::commands::plan::codex_local::run_codex_local_invocation",
+      "signal": "blue",
+      "entry_hash": "2334aa1de60f1815c750d85f41d9cc164fdcd4852e8495fb6951778b7b153292"
+    },
+    {
+      "type_name": "cli::commands::plan::codex_local::run_execute_codex_local",
+      "signal": "blue",
+      "entry_hash": "adbf1cc474dc3beb96a40fe99f8e3bc30bd47bbc1622f537e00c41b44818869a"
+    },
+    {
+      "type_name": "cli::commands::plan::codex_local::spawn_codex",
+      "signal": "blue",
+      "entry_hash": "ba57d2a9b96d8f87bd84e0f967fad159f8e12f6782ac153f4b1e943a41eea671"
+    },
+    {
+      "type_name": "cli::commands::plan::codex_local::terminate_planner_child",
+      "signal": "blue",
+      "entry_hash": "20018f40d8c591fc9231daedeac7a9d1222e2dd2518de83b0f5c17af48bcbc1d"
+    },
+    {
+      "type_name": "cli::commands::review::codex_local::emit_outcome_output_to",
+      "signal": "blue",
+      "entry_hash": "df06552fb29ac6decef918e3f4d1a3ce24be3ac2c3bf62d9a5a2f7ac70002d4e"
+    },
+    {
+      "type_name": "cli::commands::review::codex_local::review_input_from_args",
+      "signal": "blue",
+      "entry_hash": "0f21248d5f859fd6fd18b0b132f2bcdee01db1f918cc07c2d33437371a86a58c"
+    },
+    {
+      "type_name": "cli::commands::review::codex_local::run_execute_codex_local",
+      "signal": "blue",
+      "entry_hash": "ca6d981bc398de7d5c86ea84c80c89592815e0b9c9c320f50ea3a94298483109"
+    }
+  ]
+}

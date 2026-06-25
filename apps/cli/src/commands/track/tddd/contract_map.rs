@@ -20,11 +20,11 @@ use crate::CliError;
 
 /// Render the Contract Map for a single track.
 ///
-/// Thin CLI adapter: delegates all orchestration to [`cli_composition::CliApp`].
+/// Thin CLI adapter: delegates all orchestration to the composition root in `cli_composition`.
 ///
 /// # Errors
 ///
-/// Returns `CliError` when the underlying `CliApp` composition fails.
+/// Returns `CliError` when the underlying composition fails.
 pub fn execute_contract_map(
     items_dir: PathBuf,
     track_id: String,

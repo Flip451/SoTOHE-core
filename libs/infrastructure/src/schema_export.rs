@@ -18,13 +18,31 @@ use domain::schema::{
     FunctionInfo, ImplInfo, SchemaExport, SchemaExportError, SchemaExporter, TraitInfo, TypeInfo,
     TypeKind,
 };
-use domain::tddd::catalogue::{MemberDeclaration, ParamDeclaration};
-use domain::tddd::catalogue_v2::identifiers::{ParamName, TypeRef};
-use rustdoc_types::{ItemEnum, Type, Variant, VariantKind, Visibility};
+use rustdoc_types::{ItemEnum, Visibility};
 
 #[path = "schema_export/format_helpers.rs"]
 mod format_helpers;
-use format_helpers::{collect_type_names, format_type};
+
+#[path = "schema_export/bin_target.rs"]
+mod bin_target;
+
+#[path = "schema_export/extract.rs"]
+mod extract;
+use extract::{
+    extract_enum_variants, extract_methods, extract_module_path, extract_params,
+    extract_return_type_names, extract_struct_fields, format_return,
+};
+
+#[path = "schema_export/trait_origins.rs"]
+mod trait_origins;
+use trait_origins::build_trait_origins;
+
+#[path = "schema_export/path_resolution.rs"]
+mod path_resolution;
+use path_resolution::{
+    absolutize_for_target_guard, checked_workspace_root, parse_rustdoc_json,
+    reject_symlinks_for_rustdoc_path,
+};
 
 /// Adapter implementing `SchemaExporter` via rustdoc JSON.
 pub struct RustdocSchemaExporter {
@@ -58,14 +76,14 @@ impl RustdocSchemaExporter {
         crate_name: &str,
     ) -> Result<std::path::PathBuf, SchemaExportError> {
         check_nightly_available()?;
-        run_rustdoc(&self.workspace_root, crate_name)
+        bin_target::run_rustdoc(&self.workspace_root, crate_name)
     }
 }
 
 impl SchemaExporter for RustdocSchemaExporter {
     fn export(&self, crate_name: &str) -> Result<SchemaExport, SchemaExportError> {
         check_nightly_available()?;
-        let json_path = run_rustdoc(&self.workspace_root, crate_name)?;
+        let json_path = bin_target::run_rustdoc(&self.workspace_root, crate_name)?;
         let krate = parse_rustdoc_json(&json_path)?;
         build_schema_export(crate_name, &krate)
     }
@@ -97,82 +115,25 @@ fn check_nightly_available() -> Result<(), SchemaExportError> {
     Ok(())
 }
 
-fn run_rustdoc(workspace_root: &Path, crate_name: &str) -> Result<PathBuf, SchemaExportError> {
-    let output = Command::new("cargo")
-        .args([
-            "+nightly",
-            "rustdoc",
-            "-p",
-            crate_name,
-            "--lib",
-            "--",
-            "-Z",
-            "unstable-options",
-            "--output-format",
-            "json",
-        ])
-        .current_dir(workspace_root)
-        .output()
-        .map_err(|e| SchemaExportError::RustdocFailed(e.to_string()))?;
+pub(super) fn ensure_rustdoc_json_path_safe(
+    workspace_root: &Path,
+    json_path: &Path,
+    source: &str,
+) -> Result<(), SchemaExportError> {
+    let trusted_root = checked_workspace_root(workspace_root)?;
+    let json_abs = absolutize_for_target_guard(json_path)?;
+    let normalized_json = crate::verify::path_safety::lexical_normalize(&json_abs);
 
-    if !output.status.success() {
-        let stderr = String::from_utf8_lossy(&output.stderr);
-        if stderr.contains("did not match any packages")
-            || (stderr.contains("package(s) `") && stderr.contains("not found in workspace"))
-        {
-            return Err(SchemaExportError::CrateNotFound(crate_name.to_owned()));
-        }
-        return Err(SchemaExportError::RustdocFailed(stderr.into_owned()));
-    }
-
-    let target_dir = resolve_target_dir(workspace_root)?;
-    let artifact_name = crate_name.replace('-', "_");
-    let json_path = target_dir.join("doc").join(format!("{artifact_name}.json"));
-
-    if !json_path.is_file() {
+    if !normalized_json.starts_with(&trusted_root) {
         return Err(SchemaExportError::RustdocFailed(format!(
-            "expected rustdoc JSON at {} but file not found",
-            json_path.display()
+            "{source} resolves rustdoc JSON outside workspace root: {} (workspace root: {})",
+            json_path.display(),
+            workspace_root.display()
         )));
     }
 
-    Ok(json_path)
-}
-
-/// Resolves the Cargo target directory, respecting `CARGO_TARGET_DIR` and workspace config.
-fn resolve_target_dir(workspace_root: &Path) -> Result<PathBuf, SchemaExportError> {
-    if let Ok(dir) = std::env::var("CARGO_TARGET_DIR") {
-        let path = PathBuf::from(dir);
-        if path.is_relative() {
-            return Ok(workspace_root.join(path));
-        }
-        return Ok(path);
-    }
-    let output = Command::new("cargo")
-        .args(["metadata", "--format-version", "1", "--no-deps"])
-        .current_dir(workspace_root)
-        .output()
-        .map_err(|e| SchemaExportError::RustdocFailed(format!("cargo metadata failed: {e}")))?;
-
-    if !output.status.success() {
-        return Ok(workspace_root.join("target"));
-    }
-
-    let stdout = String::from_utf8_lossy(&output.stdout);
-    if let Ok(meta) = serde_json::from_str::<serde_json::Value>(&stdout) {
-        if let Some(dir) = meta.get("target_directory").and_then(|v| v.as_str()) {
-            return Ok(PathBuf::from(dir));
-        }
-    }
-
-    Ok(workspace_root.join("target"))
-}
-
-fn parse_rustdoc_json(path: &Path) -> Result<rustdoc_types::Crate, SchemaExportError> {
-    let content = std::fs::read_to_string(path)
-        .map_err(|e| SchemaExportError::ParseFailed(format!("read error: {e}")))?;
-    serde_json::from_str(&content)
-        .map_err(|e| SchemaExportError::ParseFailed(format!("JSON parse error: {e}")))
+    reject_symlinks_for_rustdoc_path(&normalized_json, &trusted_root, source)?;
+    Ok(())
 }
 
 fn build_schema_export(
@@ -210,7 +171,7 @@ fn build_schema_export(
             if i.is_synthetic || i.blanket_impl.is_some() || i.is_negative {
                 continue;
             }
-            let target = format_type(&i.for_);
+            let target = format_helpers::format_type(&i.for_);
             let (trait_name, trait_def_path) = match &i.trait_ {
                 Some(p) => {
                     let short = p.path.rsplit("::").next().unwrap_or(&p.path).to_string();
@@ -335,351 +296,6 @@ fn build_schema_export(
     ))
 }
 
-/// Builds a map of trait def_path → defining crate name from rustdoc metadata.
-///
-/// For each impl block that implements a named trait, looks up the trait's `Id`
-/// in `krate.paths` to find its `crate_id`, then resolves the crate name from
-/// `krate.external_crates`. `crate_id == 0` means the trait is defined in the
-/// current crate (`crate_name`).
-///
-/// The map key is the trait's **stable fully-qualified definition path** from
-/// `krate.paths` (e.g., `"std::fmt::Display"`), not the short name.  Keying
-/// by def_path avoids aliasing when two distinct traits share the same short
-/// name (e.g., a local `Display` and `std::fmt::Display`): both get their own
-/// entry, so `code_profile_builder` can resolve each impl independently via
-/// `ImplInfo::trait_def_path`.
-///
-/// When a trait id is absent from `krate.paths` the use-site `Path.path`
-/// string is used as a fallback key so the entry is still reachable.
-fn build_trait_origins(
-    crate_name: &str,
-    krate: &rustdoc_types::Crate,
-) -> std::collections::HashMap<String, String> {
-    // Keyed by def_path (stable); BTreeMap for deterministic iteration.
-    let mut by_def_path: std::collections::BTreeMap<String, String> =
-        std::collections::BTreeMap::new();
-
-    for item in krate.index.values() {
-        let ItemEnum::Impl(i) = &item.inner else { continue };
-        if i.is_synthetic || i.blanket_impl.is_some() || i.is_negative {
-            continue;
-        }
-        let trait_path = match &i.trait_ {
-            Some(p) => p,
-            None => continue,
-        };
-        // Use the definition path from krate.paths (stable, canonical) as the
-        // key. Fall back to the use-site path only when the trait id is not
-        // present in the paths table.
-        let def_path = krate
-            .paths
-            .get(&trait_path.id)
-            .map(|s| s.path.join("::"))
-            .unwrap_or_else(|| trait_path.path.clone());
-        if by_def_path.contains_key(&def_path) {
-            // Already recorded (same trait, different use-site spelling).
-            continue;
-        }
-        let origin = resolve_trait_origin(crate_name, &trait_path.id, krate);
-        by_def_path.insert(def_path, origin);
-    }
-
-    // Return def_path → origin directly (no collapse to short_name).
-    by_def_path.into_iter().collect()
-}
-
-/// Resolves the origin crate name for a trait `Id`.
-///
-/// Returns `crate_name` when the trait is defined in the current crate
-/// (`crate_id == 0`), the external crate name from `external_crates` otherwise,
-/// or `""` when the `Id` is not found in `paths`.
-fn resolve_trait_origin(
-    crate_name: &str,
-    trait_id: &rustdoc_types::Id,
-    krate: &rustdoc_types::Crate,
-) -> String {
-    let summary = match krate.paths.get(trait_id) {
-        Some(s) => s,
-        None => return String::new(),
-    };
-    if summary.crate_id == 0 {
-        return crate_name.to_string();
-    }
-    krate.external_crates.get(&summary.crate_id).map(|ec| ec.name.clone()).unwrap_or_default()
-}
-
-/// Extract public fields from a struct as `MemberDeclaration::Field`.
-fn extract_struct_fields(
-    s: &rustdoc_types::Struct,
-    krate: &rustdoc_types::Crate,
-) -> Vec<MemberDeclaration> {
-    match &s.kind {
-        rustdoc_types::StructKind::Plain { fields, .. } => fields
-            .iter()
-            .filter_map(|id| krate.index.get(id))
-            .filter(|item| matches!(item.visibility, Visibility::Public))
-            .filter_map(|item| {
-                let name = item.name.clone()?;
-                if let ItemEnum::StructField(ty) = &item.inner {
-                    Some(MemberDeclaration::field(name, format_type(ty)))
-                } else {
-                    None
-                }
-            })
-            .collect(),
-        rustdoc_types::StructKind::Tuple(fields) => fields
-            .iter()
-            .enumerate()
-            .filter_map(|(i, opt)| {
-                let id = opt.as_ref()?;
-                let item = krate.index.get(id)?;
-                if let ItemEnum::StructField(ty) = &item.inner {
-                    Some(MemberDeclaration::field(i.to_string(), format_type(ty)))
-                } else {
-                    None
-                }
-            })
-            .collect(),
-        rustdoc_types::StructKind::Unit => Vec::new(),
-    }
-}
-
-/// Extract enum variants as `MemberDeclaration::Variant`.
-///
-/// Each variant's payload types are extracted from its `VariantKind`:
-/// - `Plain` → unit variant, empty payload
-/// - `Tuple(fields)` → tuple variant, payload types from struct-field items
-/// - `Struct { fields, .. }` → struct variant, payload types from struct-field items
-///
-/// # Errors
-/// Returns `Err(SchemaExportError::ParseFailed)` when a variant has stripped
-/// (private/hidden) payload fields, since the resulting `payload_types` would be
-/// silently incomplete.
-fn extract_enum_variants(
-    e: &rustdoc_types::Enum,
-    krate: &rustdoc_types::Crate,
-) -> Result<Vec<MemberDeclaration>, SchemaExportError> {
-    let mut out = Vec::new();
-    for id in &e.variants {
-        let item = krate.index.get(id).ok_or_else(|| {
-            SchemaExportError::ParseFailed(format!(
-                "enum variant id {id:?} not found in rustdoc index; \
-                 the exported JSON may be partial or stripped"
-            ))
-        })?;
-        let name = item.name.clone().ok_or_else(|| {
-            SchemaExportError::ParseFailed(format!(
-                "enum variant id {id:?} has no name in rustdoc index; \
-                 the exported JSON may be partial or stripped"
-            ))
-        })?;
-        if let ItemEnum::Variant(v) = &item.inner {
-            let payload_types = extract_variant_payload_types(v, krate, &name)?;
-            out.push(MemberDeclaration::variant(name, payload_types));
-        } else {
-            return Err(SchemaExportError::ParseFailed(format!(
-                "enum variant id {id:?} (name '{name}') resolves to non-Variant item; \
-                 the exported JSON may be malformed or partial — \
-                 payload extraction must be fail-closed (T001 ADR 2026-05-02-0316)"
-            )));
-        }
-    }
-    Ok(out)
-}
-
-/// Extract the payload type list from a single enum variant.
-///
-/// Unit variants (`Plain`) produce an empty `Vec`. Tuple and struct variants
-/// produce a `Vec` of L1 short-name type strings by looking up each field id
-/// in `krate.index` and formatting its `StructField` type via `format_type`.
-///
-/// # Errors
-/// Returns `Err(SchemaExportError::ParseFailed)` (fail-closed) when:
-/// - A `Tuple` variant has a `None` slot — the corresponding field was stripped
-///   from the rustdoc JSON (private or `#[doc(hidden)]`), so the payload list
-///   would be silently shorter than the actual tuple arity.
-/// - A `Struct` variant has `has_stripped_fields == true` — one or more fields
-///   are hidden, so the field list is incomplete.
-fn extract_variant_payload_types(
-    v: &Variant,
-    krate: &rustdoc_types::Crate,
-    variant_name: &str,
-) -> Result<Vec<String>, SchemaExportError> {
-    match &v.kind {
-        VariantKind::Plain => Ok(vec![]),
-        VariantKind::Tuple(fields) => {
-            let mut out = Vec::with_capacity(fields.len());
-            for (i, opt_id) in fields.iter().enumerate() {
-                let id = opt_id.as_ref().ok_or_else(|| {
-                    SchemaExportError::ParseFailed(format!(
-                        "variant '{}' tuple field at index {} is stripped (private/hidden); \
-                         payload_types would be incomplete",
-                        variant_name, i
-                    ))
-                })?;
-                let item = krate.index.get(id).ok_or_else(|| {
-                    SchemaExportError::ParseFailed(format!(
-                        "variant '{}' tuple field at index {} id not found in rustdoc index",
-                        variant_name, i
-                    ))
-                })?;
-                if let ItemEnum::StructField(ty) = &item.inner {
-                    out.push(format_type(ty));
-                } else {
-                    return Err(SchemaExportError::ParseFailed(format!(
-                        "variant '{}' tuple field at index {} is not a StructField in rustdoc \
-                         index",
-                        variant_name, i
-                    )));
-                }
-            }
-            Ok(out)
-        }
-        VariantKind::Struct { fields, has_stripped_fields } => {
-            if *has_stripped_fields {
-                return Err(SchemaExportError::ParseFailed(format!(
-                    "variant '{}' struct has stripped fields; payload_types would be incomplete",
-                    variant_name
-                )));
-            }
-            let mut out = Vec::with_capacity(fields.len());
-            for (i, id) in fields.iter().enumerate() {
-                let item = krate.index.get(id).ok_or_else(|| {
-                    SchemaExportError::ParseFailed(format!(
-                        "variant '{}' struct field at index {} id not found in rustdoc index",
-                        variant_name, i
-                    ))
-                })?;
-                if let ItemEnum::StructField(ty) = &item.inner {
-                    out.push(format_type(ty));
-                } else {
-                    return Err(SchemaExportError::ParseFailed(format!(
-                        "variant '{}' struct field at index {} is not a StructField in rustdoc \
-                         index",
-                        variant_name, i
-                    )));
-                }
-            }
-            Ok(out)
-        }
-    }
-}
-
-/// Extract the module path for a type from the rustdoc `paths` table.
-fn extract_module_path(id: &rustdoc_types::Id, krate: &rustdoc_types::Crate) -> Option<String> {
-    let summary = krate.paths.get(id)?;
-    summary
-        .path
-        .get(..summary.path.len().saturating_sub(1))
-        .filter(|parent| !parent.is_empty())
-        .map(|parent| parent.join("::"))
-}
-
-/// Returns the self-receiver form (`"&self"` / `"&mut self"` / `"self"`), or
-/// `None` if the first input is not a self receiver.
-fn extract_receiver(sig: &rustdoc_types::FunctionSignature) -> Option<String> {
-    let (name, ty) = sig.inputs.first()?;
-    if name != "self" {
-        return None;
-    }
-    match ty {
-        Type::BorrowedRef { is_mutable: false, .. } => Some("&self".to_string()),
-        Type::BorrowedRef { is_mutable: true, .. } => Some("&mut self".to_string()),
-        _ => Some("self".to_string()),
-    }
-}
-
-/// Returns `true` if the function signature's first parameter is a self receiver.
-fn has_self_param(sig: &rustdoc_types::FunctionSignature) -> bool {
-    sig.inputs.first().map(|(name, _)| name == "self").unwrap_or(false)
-}
-
-/// Extract the ordered parameter list from a function signature, excluding
-/// the self receiver if present.
-///
-/// # Errors
-/// Returns `SchemaExportError::ParseFailed` when a parameter name or type cannot be
-/// converted to the V2 newtype (e.g. empty name or type string).
-fn extract_params(
-    sig: &rustdoc_types::FunctionSignature,
-) -> Result<Vec<ParamDeclaration>, SchemaExportError> {
-    let mut out = Vec::new();
-    for (name, ty) in sig.inputs.iter().filter(|(n, _)| n != "self") {
-        let param_name = ParamName::new(name.as_str()).map_err(|e| {
-            SchemaExportError::ParseFailed(format!(
-                "param name '{}' is not a valid identifier: {e}",
-                name
-            ))
-        })?;
-        let ty_str = format_type(ty);
-        let ty_ref = TypeRef::new(&ty_str).map_err(|e| {
-            SchemaExportError::ParseFailed(format!(
-                "param '{}' type '{}' is not valid: {e}",
-                name, ty_str
-            ))
-        })?;
-        out.push(ParamDeclaration::new(param_name, ty_ref));
-    }
-    Ok(out)
-}
-
-/// Format the return type. `Option<Type>::None` is rendered as `"()"`.
-fn format_return(sig: &rustdoc_types::FunctionSignature) -> String {
-    sig.output.as_ref().map_or_else(|| "()".to_string(), format_type)
-}
-
-/// Extract method `FunctionInfo`s from a list of item Ids.
-/// Accepts both `Public` and `Default` visibility (trait associated items use `Default`).
-///
-/// # Errors
-/// Returns `SchemaExportError::ParseFailed` when `extract_params` fails for any method.
-fn extract_methods(
-    ids: &[rustdoc_types::Id],
-    krate: &rustdoc_types::Crate,
-) -> Result<Vec<FunctionInfo>, SchemaExportError> {
-    let mut out = Vec::new();
-    for id in ids {
-        let item = match krate.index.get(id) {
-            Some(i) => i,
-            None => continue,
-        };
-        if !matches!(item.visibility, Visibility::Public | Visibility::Default) {
-            continue;
-        }
-        let name = match &item.name {
-            Some(n) => n,
-            None => continue,
-        };
-        if let ItemEnum::Function(f) = &item.inner {
-            let return_type_names = extract_return_type_names(&f.sig);
-            let has_self = has_self_param(&f.sig);
-            let receiver = extract_receiver(&f.sig);
-            let params = extract_params(&f.sig)?;
-            let returns = format_return(&f.sig);
-            out.push(FunctionInfo::new(
-                name.clone(),
-                item.docs.clone(),
-                return_type_names,
-                has_self,
-                params,
-                returns,
-                receiver,
-                f.header.is_async,
-            ));
-        }
-    }
-    Ok(out)
-}
-
-/// Extract the list of type names from the return type of a function signature.
-fn extract_return_type_names(sig: &rustdoc_types::FunctionSignature) -> Vec<String> {
-    sig.output.as_ref().map_or_else(Vec::new, |ty| {
-        let mut names = Vec::new();
-        collect_type_names(ty, &mut names);
-        names
-    })
-}
-
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::indexing_slicing)]
 mod tests {
@@ -687,11 +303,15 @@ mod tests {
         FunctionHeader, FunctionPointer, FunctionSignature, GenericArg, GenericArgs,
     };
 
+    use super::extract::{extract_enum_variants, extract_params, extract_receiver, format_return};
+    use super::format_helpers::{collect_type_names, format_type};
+    use super::path_resolution::resolve_configured_target_dir;
+    use super::trait_origins::{build_trait_origins, resolve_trait_origin};
     use super::*;
 
     /// Helper: build a `ResolvedPath` type with optional generic args.
-    fn resolved(name: &str, args: Option<Vec<GenericArg>>) -> Type {
-        Type::ResolvedPath(rustdoc_types::Path {
+    fn resolved(name: &str, args: Option<Vec<GenericArg>>) -> rustdoc_types::Type {
+        rustdoc_types::Type::ResolvedPath(rustdoc_types::Path {
             path: name.to_string(),
             id: rustdoc_types::Id(0),
             args: args
@@ -699,12 +319,99 @@ mod tests {
         })
     }
 
-    fn type_arg(ty: Type) -> GenericArg {
+    fn type_arg(ty: rustdoc_types::Type) -> GenericArg {
         GenericArg::Type(ty)
     }
 
-    fn simple(name: &str) -> Type {
+    fn simple(name: &str) -> rustdoc_types::Type {
         resolved(name, None)
+    }
+
+    #[test]
+    fn test_resolve_configured_target_dir_relative_inside_workspace_returns_target() {
+        let workspace = tempfile::tempdir().unwrap();
+
+        let target = resolve_configured_target_dir(
+            workspace.path(),
+            PathBuf::from("target"),
+            "CARGO_TARGET_DIR",
+        )
+        .unwrap();
+
+        assert_eq!(target, workspace.path().join("target"));
+    }
+
+    #[test]
+    fn test_resolve_configured_target_dir_relative_escape_returns_error() {
+        let workspace = tempfile::tempdir().unwrap();
+
+        let err = resolve_configured_target_dir(
+            workspace.path(),
+            PathBuf::from("../outside"),
+            "CARGO_TARGET_DIR",
+        )
+        .unwrap_err();
+
+        assert!(matches!(err, SchemaExportError::RustdocFailed(_)));
+        assert!(err.to_string().contains("outside workspace root"));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_resolve_configured_target_dir_symlinked_workspace_returns_error() {
+        let parent = tempfile::tempdir().unwrap();
+        let workspace = parent.path().join("workspace");
+        let workspace_link = parent.path().join("workspace-link");
+        std::fs::create_dir(&workspace).unwrap();
+        std::os::unix::fs::symlink(&workspace, &workspace_link).unwrap();
+
+        let err = resolve_configured_target_dir(
+            &workspace_link,
+            PathBuf::from("target"),
+            "CARGO_TARGET_DIR",
+        )
+        .unwrap_err();
+
+        assert!(matches!(err, SchemaExportError::RustdocFailed(_)));
+        assert!(err.to_string().contains("symlink guard"));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_resolve_configured_target_dir_symlinked_target_returns_error() {
+        let workspace = tempfile::tempdir().unwrap();
+        let outside = tempfile::tempdir().unwrap();
+        let target_link = workspace.path().join("target");
+        std::os::unix::fs::symlink(outside.path(), &target_link).unwrap();
+
+        let err = resolve_configured_target_dir(
+            workspace.path(),
+            PathBuf::from("target"),
+            "CARGO_TARGET_DIR",
+        )
+        .unwrap_err();
+
+        assert!(matches!(err, SchemaExportError::RustdocFailed(_)));
+        assert!(err.to_string().contains("symlink guard"));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_ensure_rustdoc_json_path_safe_symlinked_leaf_returns_error() {
+        let workspace = tempfile::tempdir().unwrap();
+        let outside = tempfile::tempdir().unwrap();
+        let doc_dir = workspace.path().join("target/doc");
+        let outside_json = outside.path().join("cli.json");
+        let json_link = doc_dir.join("cli.json");
+        std::fs::create_dir_all(&doc_dir).unwrap();
+        std::fs::write(&outside_json, "{}").unwrap();
+        std::os::unix::fs::symlink(&outside_json, &json_link).unwrap();
+
+        let err = ensure_rustdoc_json_path_safe(workspace.path(), &json_link, "rustdoc --lib")
+            .unwrap_err();
+
+        assert!(matches!(err, SchemaExportError::RustdocFailed(_)));
+        assert!(err.to_string().contains("symlink guard"));
     }
 
     fn trait_bound(name: &str) -> rustdoc_types::GenericBound {
@@ -787,7 +494,7 @@ mod tests {
 
     #[test]
     fn test_collect_type_names_borrowed_ref_unwraps_inner() {
-        let ty = Type::BorrowedRef {
+        let ty = rustdoc_types::Type::BorrowedRef {
             lifetime: None,
             is_mutable: false,
             type_: Box::new(simple("Draft")),
@@ -799,7 +506,7 @@ mod tests {
 
     #[test]
     fn test_collect_type_names_tuple_does_not_expand() {
-        let ty = Type::Tuple(vec![simple("A"), simple("B")]);
+        let ty = rustdoc_types::Type::Tuple(vec![simple("A"), simple("B")]);
         let mut out = Vec::new();
         collect_type_names(&ty, &mut out);
         assert!(out.is_empty());
@@ -837,30 +544,37 @@ mod tests {
 
     #[test]
     fn format_type_renders_borrowed_ref() {
-        let ty =
-            Type::BorrowedRef { lifetime: None, is_mutable: false, type_: Box::new(simple("str")) };
+        let ty = rustdoc_types::Type::BorrowedRef {
+            lifetime: None,
+            is_mutable: false,
+            type_: Box::new(simple("str")),
+        };
         assert_eq!(format_type(&ty), "&str");
 
-        let mut_ty =
-            Type::BorrowedRef { lifetime: None, is_mutable: true, type_: Box::new(simple("User")) };
+        let mut_ty = rustdoc_types::Type::BorrowedRef {
+            lifetime: None,
+            is_mutable: true,
+            type_: Box::new(simple("User")),
+        };
         assert_eq!(format_type(&mut_ty), "&mut User");
     }
 
     #[test]
     fn format_type_renders_unit_tuple() {
-        let ty = Type::Tuple(vec![]);
+        let ty = rustdoc_types::Type::Tuple(vec![]);
         assert_eq!(format_type(&ty), "()");
     }
 
     #[test]
     fn format_type_preserves_impl_trait_bound_order_for_schema_export() {
-        let ty = Type::ImplTrait(vec![trait_bound("crate::B"), trait_bound("crate::A")]);
+        let ty =
+            rustdoc_types::Type::ImplTrait(vec![trait_bound("crate::B"), trait_bound("crate::A")]);
         assert_eq!(format_type(&ty), "impl B + A");
     }
 
     #[test]
     fn format_type_preserves_dyn_trait_bound_order_for_schema_export() {
-        let ty = Type::DynTrait(rustdoc_types::DynTrait {
+        let ty = rustdoc_types::Type::DynTrait(rustdoc_types::DynTrait {
             traits: vec![poly_trait("crate::B"), poly_trait("crate::A")],
             lifetime: Some("'a".to_owned()),
         });
@@ -869,7 +583,7 @@ mod tests {
 
     #[test]
     fn format_type_ignores_associated_type_constraints_for_schema_export() {
-        let ty = Type::ResolvedPath(rustdoc_types::Path {
+        let ty = rustdoc_types::Type::ResolvedPath(rustdoc_types::Path {
             path: "Iterator".to_owned(),
             id: rustdoc_types::Id(0),
             args: Some(Box::new(GenericArgs::AngleBracketed {
@@ -888,7 +602,7 @@ mod tests {
 
     #[test]
     fn format_type_renders_function_pointer_for_schema_export() {
-        let ty = Type::FunctionPointer(Box::new(FunctionPointer {
+        let ty = rustdoc_types::Type::FunctionPointer(Box::new(FunctionPointer {
             sig: FunctionSignature {
                 inputs: vec![("_".to_string(), simple("Input"))],
                 output: Some(simple("Output")),
@@ -902,7 +616,7 @@ mod tests {
 
     #[test]
     fn format_type_renders_pattern_base_type_for_schema_export() {
-        let ty = Type::Pat {
+        let ty = rustdoc_types::Type::Pat {
             type_: Box::new(simple("NonZero")),
             __pat_unstable_do_not_use: "1..".to_string(),
         };
@@ -911,9 +625,9 @@ mod tests {
 
     #[test]
     fn format_type_renders_qualified_path_for_schema_export() {
-        let ty = Type::QualifiedPath {
+        let ty = rustdoc_types::Type::QualifiedPath {
             name: "Item".to_string(),
-            self_type: Box::new(Type::Generic("T".to_string())),
+            self_type: Box::new(rustdoc_types::Type::Generic("T".to_string())),
             trait_: Some(rustdoc_types::Path {
                 path: "core::iter::Iterator".to_string(),
                 id: rustdoc_types::Id(0),
@@ -943,7 +657,7 @@ mod tests {
 
     #[test]
     fn extract_receiver_detects_ref_self() {
-        let self_ty = Type::BorrowedRef {
+        let self_ty = rustdoc_types::Type::BorrowedRef {
             lifetime: None,
             is_mutable: false,
             type_: Box::new(simple("Self")),
@@ -978,7 +692,7 @@ mod tests {
 
     #[test]
     fn extract_params_skips_self_receiver() {
-        let self_ty = Type::BorrowedRef {
+        let self_ty = rustdoc_types::Type::BorrowedRef {
             lifetime: None,
             is_mutable: false,
             type_: Box::new(simple("Self")),
@@ -1039,7 +753,7 @@ mod tests {
             generics: rustdoc_types::Generics { params: vec![], where_predicates: vec![] },
             provided_trait_methods: vec![],
             trait_: Some(trait_path),
-            for_: Type::Primitive("()".to_string()),
+            for_: rustdoc_types::Type::Primitive("()".to_string()),
             items: vec![],
             is_negative: false,
             blanket_impl: None,

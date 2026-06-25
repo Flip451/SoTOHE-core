@@ -1,4 +1,4 @@
-//! `dry` command family — composition logic and [`crate::CliApp`] impl.
+//! `dry` command family — composition logic for the DRY subcommands.
 //!
 //! Provides the three `sotp dry` subcommand implementations:
 //! - `write`: run the DRY-check write cycle (detect new violations, record results).

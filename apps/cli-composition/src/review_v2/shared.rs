@@ -151,7 +151,7 @@ pub enum CodexReviewOutcome {
 /// Returns `(scope_config, review_store, commit_hash_store, base)`.
 ///
 /// # Errors
-/// Returns [`ReviewSharedError`] on failure.
+/// Returns `ReviewSharedError` on failure.
 pub(super) fn build_v2_shared(
     track_id: &TrackId,
     items_dir: &Path,
@@ -310,7 +310,7 @@ pub(super) fn resolve_diff_base(
 /// Builds the v2 review composition with a real `CodexReviewer`.
 ///
 /// # Errors
-/// Returns [`ReviewSharedError`] on failure.
+/// Returns `ReviewSharedError` on failure.
 #[allow(dead_code)]
 pub(crate) fn build_review_v2_with_reviewer(
     track_id: &TrackId,
@@ -334,7 +334,7 @@ pub(crate) fn build_review_v2_with_reviewer(
 /// 6. Returns `ReviewCycle` with `NullReviewer` (status/check-approved only)
 ///
 /// # Errors
-/// Returns [`ReviewSharedError`] on failure.
+/// Returns `ReviewSharedError` on failure.
 pub(crate) fn build_review_v2(
     track_id: &TrackId,
     items_dir: &Path,
@@ -357,7 +357,7 @@ pub(crate) fn build_review_v2(
 /// import `domain::TrackId` use this entry point (CN-01 / AC-03).
 ///
 /// # Errors
-/// Returns [`ReviewSharedError`] on failure.
+/// Returns `ReviewSharedError` on failure.
 pub fn build_review_v2_str(
     track_id_str: &str,
     items_dir: &Path,
@@ -370,7 +370,7 @@ pub fn build_review_v2_str(
 /// Builds the v2 review composition with a real `ClaudeReviewer`.
 ///
 /// # Errors
-/// Returns [`ReviewSharedError`] on failure.
+/// Returns `ReviewSharedError` on failure.
 pub(crate) fn build_review_v2_with_claude_reviewer(
     track_id: &TrackId,
     items_dir: &Path,
@@ -389,7 +389,7 @@ pub(crate) fn build_review_v2_with_claude_reviewer(
 /// import `domain::TrackId` use this entry point (CN-01 / AC-03).
 ///
 /// # Errors
-/// Returns [`ReviewSharedError`] on failure.
+/// Returns `ReviewSharedError` on failure.
 #[allow(dead_code)] // used in run.rs tests only
 pub(crate) fn build_review_v2_with_claude_reviewer_str(
     track_id_str: &str,
@@ -404,7 +404,7 @@ pub(crate) fn build_review_v2_with_claude_reviewer_str(
 /// Resolves the diff base + diff getter for `sotp review files`.
 ///
 /// # Errors
-/// Returns [`ReviewSharedError`] on failure.
+/// Returns `ReviewSharedError` on failure.
 pub(crate) fn resolve_diff_base_and_getter(
     track_id: &TrackId,
     items_dir: &Path,
@@ -420,7 +420,7 @@ pub(crate) fn resolve_diff_base_and_getter(
 /// this entry point (CN-01 / AC-03).
 ///
 /// # Errors
-/// Returns [`ReviewSharedError`] on failure.
+/// Returns `ReviewSharedError` on failure.
 pub(crate) fn build_scope_query_interactor_str(
     track_id_str: &str,
     items_dir: &Path,

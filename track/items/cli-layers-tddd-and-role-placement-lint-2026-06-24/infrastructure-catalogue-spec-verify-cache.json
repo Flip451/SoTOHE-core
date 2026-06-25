@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "layer": "infrastructure",
+  "entries": [
+    {
+      "claim_hash": "5294778a143ce295ed03423b493159cb280a8d2c836bb85a7abd34118c935cf3",
+      "evidence_hash": "41e90ce38fc93b78c98c4519b052f7c751ff0b848e77554f1634384d84e80b6d",
+      "verdict": {
+        "kind": "fail",
+        "reason": "New behavioral commitment: the claim defines an infrastructure adapter that runs the Codex planner as a subprocess and implements PlannerPort, but AC-10 only commits to `cargo make ci` passing after migration, role/lint/catalogue/matrix work is complete; it does not motivate or require this adapter behavior."
+      }
+    },
+    {
+      "claim_hash": "40fe4dd81e078a6465dfc885f4c9dddb153a91e0bee7ac14c460479141760086",
+      "evidence_hash": "dea61c5b84589c7119025c49caf6ad3f062f83a98eb77879965bc1266592c2c1",
+      "verdict": {
+        "kind": "fail",
+        "reason": "New behavioral commitment: the claim defines an infrastructure adapter that runs the Codex planner subprocess and handles stdout/stderr logging, while AC-06 only requires CLI layer type catalogues and allowlisted role declarations plus `cargo make ci` passing; the evidence does not motivate this adapter responsibility."
+      }
+    },
+    {
+      "claim_hash": "5b9c2273bcb9808be0a02f83113e7ab459a8b735b276febfb66bb5234e136092",
+      "evidence_hash": "a6cc42479d205a4120bcfb8ffb5eb5f8bf46f0e76080045b78679691549efec9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/infrastructure` が `CodexPlannerAdapter`（SecondaryAdapter）として `PlannerPort` を実装し、サブプロセス起動・stderr tee・ログファイル書き込みの全 I/O を担う。"
+      }
+    },
+    {
+      "claim_hash": "5b9c2273bcb9808be0a02f83113e7ab459a8b735b276febfb66bb5234e136092",
+      "evidence_hash": "d811c5c796fcc9372e7cbb1d93558fc75519e1c924a43e5e48a04a0337de0e5d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "(3) `libs/infrastructure/src/codex_planner.rs` が `PlannerPort` を実装する `CodexPlannerAdapter` を定義し、サブプロセス起動・stderr tee・ログファイル書き込みロジックを内包する。"
+      }
+    },
+    {
+      "claim_hash": "5b9c2273bcb9808be0a02f83113e7ab459a8b735b276febfb66bb5234e136092",
+      "evidence_hash": "d0850d8e69e74f5440be5ab67b3210afe249efa2b6dc3cf5f46b8e7519b0fc53",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/infrastructure` が `CodexPlannerAdapter`（SecondaryAdapter）として `PlannerPort` を実装し、サブプロセス起動・stderr tee・ログファイル書き込みの全 I/O を担う。"
+      }
+    },
+    {
+      "claim_hash": "5b9c2273bcb9808be0a02f83113e7ab459a8b735b276febfb66bb5234e136092",
+      "evidence_hash": "b5e73bb566f52126f92d6723a9a04228fd8955b94ef4e2500f0c009fa9cb8bde",
+      "verdict": {
+        "kind": "pass",
+        "citation": "(3) `libs/infrastructure/src/codex_planner.rs` が `PlannerPort` を実装する `CodexPlannerAdapter` を定義し、サブプロセス起動・stderr tee・ログファイル書き込みロジックを内包する。"
+      }
+    }
+  ]
+}

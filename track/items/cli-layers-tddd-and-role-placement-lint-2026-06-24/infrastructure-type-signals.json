@@ -1,6 +1,16 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-25T03:27:32Z",
-  "declaration_hash": "8a67a3deba2ea29f8af165503a64f69bd6c56eef7ceb1bbe814a9094c6a644ee",
-  "signals": []
+  "generated_at": "2026-06-25T18:00:23Z",
+  "declaration_hash": "56208bfd249a56f462a4011291436cd725f924d2608000be37d955d4fb45f206",
+  "signals": [
+    {
+      "type_name": "CodexPlannerAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "PlannerPort"
+      ]
+    }
+  ]
 }

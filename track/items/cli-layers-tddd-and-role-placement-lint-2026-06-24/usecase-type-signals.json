@@ -1,6 +1,111 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-25T03:27:28Z",
-  "declaration_hash": "c8fd4419b0780a9640cd05ccc4368f18b6288763a45301640c13f65800c6745f",
-  "signals": []
+  "generated_at": "2026-06-25T18:00:18Z",
+  "declaration_hash": "c0ee63835b90ebb8d0ff107a55968714da1b15cf8ff6813f91e1a8d998563500",
+  "signals": [
+    {
+      "type_name": "ArchInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "ArchService"
+      ]
+    },
+    {
+      "type_name": "ArchService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "ConventionsInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "ConventionsService"
+      ]
+    },
+    {
+      "type_name": "ConventionsService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "FileInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "FileService"
+      ]
+    },
+    {
+      "type_name": "FileService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "PlanRunOutput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "PlannerInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "PlannerService"
+      ]
+    },
+    {
+      "type_name": "PlannerPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "PlannerPortError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "PlannerService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "VerifyInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "VerifyService"
+      ]
+    },
+    {
+      "type_name": "VerifyService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": false
+    }
+  ]
 }

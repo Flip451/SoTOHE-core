@@ -1,6 +1,6 @@
 //! `sotp track baseline-capture` — capture TypeGraph snapshot as baseline.
 //!
-//! Thin CLI adapter: delegates all orchestration to [`cli_composition::CliApp`].
+//! Thin CLI adapter: delegates all orchestration to the composition root in `cli_composition`.
 
 use std::path::PathBuf;
 use std::process::ExitCode;

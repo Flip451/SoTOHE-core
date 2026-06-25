@@ -6,6 +6,7 @@ pub mod agent_profiles;
 pub mod arch;
 pub mod code_profile_builder;
 pub mod codex_common;
+pub mod codex_planner;
 pub mod conventions;
 pub mod demo;
 pub mod dry_check;

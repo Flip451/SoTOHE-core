@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "7f8450bb6d368cfa2884fcec489abb26bdd43d7dc82f827333b152f68306adba",
+  "signals": [
+    {
+      "type_name": "ArchCompositionRoot",
+      "signal": "blue",
+      "entry_hash": "eada930ad377877c2bf587b7e1cd020b955809f5a24c4a3bfa6659a6c8021f56"
+    },
+    {
+      "type_name": "CommandOutcome",
+      "signal": "blue",
+      "entry_hash": "737e0d45dd836f9193c282c0310a90912f4af82b243053c82f039af5a1253693"
+    },
+    {
+      "type_name": "CompositionError",
+      "signal": "blue",
+      "entry_hash": "0b2f84cd7611d5a1658b5aae98c4dabc1260fff374ccf8e974332832bc20f9dd"
+    },
+    {
+      "type_name": "ConventionsCompositionRoot",
+      "signal": "blue",
+      "entry_hash": "da7168859f099b71046b294b4a68e4108871523d03f11829122170cdc6e2b799"
+    },
+    {
+      "type_name": "DemoCompositionRoot",
+      "signal": "blue",
+      "entry_hash": "fa52f2c71e64200cd01bf09974835799b8da9cba51d2453adec0538f6bc014ad"
+    },
+    {
+      "type_name": "DomainCompositionRoot",
+      "signal": "blue",
+      "entry_hash": "cef3deb00e88e7e423f41c22398e230df2ccc47bae346e92e15ac8ed0e7e1f30"
+    },
+    {
+      "type_name": "DryCompositionRoot",
+      "signal": "blue",
+      "entry_hash": "97bc1d35b81e96f8a214c517775cca1c09638110c76ed5aec24ae9d2d79ea54f"
+    },
+    {
+      "type_name": "DryFixRunnerCompositionRoot",
+      "signal": "blue",
+      "entry_hash": "0ab53ecdb046b28d180a3ef13ba93c1b1748d1b3bf3cd896e3f6d2b102186fc0"
+    },
+    {
+      "type_name": "FileCompositionRoot",
+      "signal": "blue",
+      "entry_hash": "f863d36b1c6f966fbd621e7a754102ece1d09695cfd16733f61036b2d41d9895"
+    },
+    {
+      "type_name": "GitCompositionRoot",
+      "signal": "blue",
+      "entry_hash": "ffb18ca7d4f42560962621fdc37ff346e55e79bd9d4beb8b3d0be90fecb0fbed"
+    },
+    {
+      "type_name": "GuardCompositionRoot",
+      "signal": "blue",
+      "entry_hash": "17a7c56a72ea4e84a6a415bd9d8acbcf1e58a53e06c1f32f55c86028b9f40dc7"
+    },
+    {
+      "type_name": "HookCompositionRoot",
+      "signal": "blue",
+      "entry_hash": "058a1fb7def14c860d937b5ad6640a2144160113a95958a96e78c6d9bb69a7d5"
+    },
+    {
+      "type_name": "PlanCompositionRoot",
+      "signal": "blue",
+      "entry_hash": "a4a993a958c54da8c68d27a07f6b444439ab6153cf0d18f76ad137a472d3abbf"
+    },
+    {
+      "type_name": "PrCompositionRoot",
+      "signal": "blue",
+      "entry_hash": "3670d7bfc384486cad12f3008d415c83bd781e14e9b61a3e88ae3ce6acae4f87"
+    },
+    {
+      "type_name": "RefVerifyCompositionRoot",
+      "signal": "blue",
+      "entry_hash": "da3e6124ccdc4757c67c97fb370bc767f14a731c2b933c1408d5f4587f9782ad"
+    },
+    {
+      "type_name": "ReviewCompositionRoot",
+      "signal": "blue",
+      "entry_hash": "ef08ab75de7ec20432eb77bf587b48332c2710e3f8c99a9940071718cfb7d502"
+    },
+    {
+      "type_name": "SemanticDupCompositionRoot",
+      "signal": "blue",
+      "entry_hash": "87ddf4b6718d8b59d6657c42420f0760ae3279d6a3190a446f1a3719eaa44d02"
+    },
+    {
+      "type_name": "SignalCompositionRoot",
+      "signal": "blue",
+      "entry_hash": "7ad842e8668107eaea6838076c3e45d4f1eb260a33acecca001f6ba700ab6c69"
+    },
+    {
+      "type_name": "TelemetryCompositionRoot",
+      "signal": "blue",
+      "entry_hash": "21d86a07691fe06fdc739e06f546a4d2e9ce8b107ecee506ac70d9ca72e11022"
+    },
+    {
+      "type_name": "TrackCompositionRoot",
+      "signal": "blue",
+      "entry_hash": "58ac40c4097c339bfcaedf59ec401bf2a346358e557d5168cf1d98508e4c0892"
+    },
+    {
+      "type_name": "VerifyCompositionRoot",
+      "signal": "blue",
+      "entry_hash": "2cbb21dfeeac5c98d7a7ca103c3f7bdbb87e205c723ab823a6ce6c987408fdee"
+    },
+    {
+      "type_name": "cli_composition::build_codex_read_only_invocation",
+      "signal": "blue",
+      "entry_hash": "ca78d4c1ddfae1b15e276b9a2031b080c99580e3655c385a993678052bc3b6b7"
+    },
+    {
+      "type_name": "cli_composition::tee_stderr_to_file",
+      "signal": "blue",
+      "entry_hash": "f3b22e3e87b359eca8edeec68b451ade6985495da81618307fe4c0d0c1470ff0"
+    }
+  ]
+}

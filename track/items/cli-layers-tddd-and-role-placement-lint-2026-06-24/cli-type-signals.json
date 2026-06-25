@@ -1,0 +1,613 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-06-25T18:00:26Z",
+  "declaration_hash": "bc4182246bcbc3958eda40c9029d685bc251b10633f6c3488469a7a61cffbf5a",
+  "signals": [
+    {
+      "type_name": "commands::plan::codex_local::plan_input_from_args",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "commands::plan::codex_local::run_execute_codex_local",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "commands::review::codex_local::emit_outcome_output_to",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "commands::review::codex_local::review_input_from_args",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "commands::review::codex_local::run_execute_codex_local",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CodexInvocation",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "PlanRunResult",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "commands::plan::codex_local::build_codex_invocation",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "commands::plan::codex_local::build_prompt",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "commands::plan::codex_local::codex_bin",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "commands::plan::codex_local::configure_child_process_group",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "commands::plan::codex_local::prepare_session_log_path",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "commands::plan::codex_local::run_codex_child",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "commands::plan::codex_local::run_codex_local_invocation",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "commands::plan::codex_local::spawn_codex",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "commands::plan::codex_local::terminate_planner_child",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "ArchCommand",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "BranchAction",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "BranchArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CalcAdrUserArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CalcCatalogSpecArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CalcImplCatalogArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CalcSpecAdrArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CatalogueSpecRefsArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CheckAdrUserArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CheckApprovedArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CheckCatalogSpecArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CheckFlags",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CheckImplCatalogArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CheckSpecAdrArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ClaudeLocalArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CliError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CliHookName",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CodexLocalArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CodexRoundTypeArg",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CommitFromFileArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ConventionsCommand",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "DomainCommand",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "DryCheckApprovedArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "DryCommand",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "DryFixLocalArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "DryResultsArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "DryWriteArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "DupCheckArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "DupIndexBuildArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "DupIndexCommand",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "DupIndexMeasureQualityArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "EnsurePrArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ExportSchemaArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "FileArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "FileCommand",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "FindSimilarArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "FixpointResolveArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "GateArg",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "GitCommand",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "GuardCommand",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "HookCommand",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "PlanArtifactRefsArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "PlanCodexLocalArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "PlanCommand",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "PollReviewArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "PrCommand",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "PushArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "RefVerifyCommand",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ReportArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ResolveArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ResultsArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ResultsLimit",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ReviewCommand",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ReviewCycleArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "RoundTypeFilter",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "RunArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "SetCommitHashArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "SignalCheckArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "SignalCommand",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "SpecVerifyArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "StatusArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "SwitchAndPullArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TelemetryCommand",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TrackCommand",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TriggerReviewArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "UnstageArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "VerdictFilterArg",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "VerifyArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "VerifyCommand",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ViewAction",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "WaitAndMergeArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::plan::codex_local::build_codex_invocation",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::plan::codex_local::build_prompt",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::plan::codex_local::codex_bin",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::plan::codex_local::configure_child_process_group",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::plan::codex_local::plan_input_from_args",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::plan::codex_local::prepare_session_log_path",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::plan::codex_local::run_codex_child",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::plan::codex_local::run_codex_local_invocation",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::plan::codex_local::run_execute_codex_local",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::plan::codex_local::spawn_codex",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::plan::codex_local::terminate_planner_child",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::review::codex_local::emit_outcome_output_to",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::review::codex_local::review_input_from_args",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::review::codex_local::run_execute_codex_local",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

@@ -1,0 +1,758 @@
+{
+  "schema_version": 1,
+  "layer": "cli",
+  "entries": [
+    {
+      "claim_hash": "230cc3e8b7d92a583c8fedae9f5e25be9ee83e8da6d0edd27263b0fa9ca6001e",
+      "evidence_hash": "dea61c5b84589c7119025c49caf6ad3f062f83a98eb77879965bc1266592c2c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "cli 系 3 層それぞれの型カタログ（`cli-types.json` / `cli-composition-types.json` / `cli-driver-types.json`）が起草されており、各層の既存 public 型が allowlist 内のロール（`cli`: `Dto` / `ErrorType` / `FreeFunction`、`cli_composition`: `CompositionRoot` / `ErrorType`、`cli_driver`: `PrimaryAdapter` / `Dto` / `FreeFunction`）で宣言されている。"
+      }
+    },
+    {
+      "claim_hash": "ed1363235069e05eb955f047648b8863d5bcff6d25665e168b6169eac25a4b3e",
+      "evidence_hash": "dea61c5b84589c7119025c49caf6ad3f062f83a98eb77879965bc1266592c2c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "cli 系 3 層それぞれの型カタログ（`cli-types.json` / `cli-composition-types.json` / `cli-driver-types.json`）が起草されており、各層の既存 public 型が allowlist 内のロール（`cli`: `Dto` / `ErrorType` / `FreeFunction`、`cli_composition`: `CompositionRoot` / `ErrorType`、`cli_driver`: `PrimaryAdapter` / `Dto` / `FreeFunction`）で宣言されている。"
+      }
+    },
+    {
+      "claim_hash": "c15257a99400a33e2b76e901ce1ec21f88463b70f994baa1f411c90c0a2f8ae1",
+      "evidence_hash": "dea61c5b84589c7119025c49caf6ad3f062f83a98eb77879965bc1266592c2c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "cli 系 3 層それぞれの型カタログ（`cli-types.json` / `cli-composition-types.json` / `cli-driver-types.json`）が起草されており、各層の既存 public 型が allowlist 内のロール（`cli`: `Dto` / `ErrorType` / `FreeFunction`、`cli_composition`: `CompositionRoot` / `ErrorType`、`cli_driver`: `PrimaryAdapter` / `Dto` / `FreeFunction`）で宣言されている。"
+      }
+    },
+    {
+      "claim_hash": "ad09080063517a43827e9e5f5fd98ff054dbaca7e9a96c94224d3d675b9e8e11",
+      "evidence_hash": "dea61c5b84589c7119025c49caf6ad3f062f83a98eb77879965bc1266592c2c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各層の既存 public 型が allowlist 内のロール（`cli`: `Dto` / `ErrorType` / `FreeFunction`、`cli_composition`: `CompositionRoot` / `ErrorType`、`cli_driver`: `PrimaryAdapter` / `Dto` / `FreeFunction`）で宣言されている。`cargo make ci` が pass する。"
+      }
+    },
+    {
+      "claim_hash": "a69c19e1ed49e15d60cb0fe75e749f7225e01ff9c6be316d89c1efd50ceba969",
+      "evidence_hash": "dea61c5b84589c7119025c49caf6ad3f062f83a98eb77879965bc1266592c2c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「cli 系 3 層それぞれの型カタログ（`cli-types.json` / `cli-composition-types.json` / `cli-driver-types.json`）が起草されており、各層の既存 public 型が allowlist 内のロール（`cli`: `Dto` / `ErrorType` / `FreeFunction`、`cli_composition`: `CompositionRoot` / `ErrorType`、`cli_driver`: `PrimaryAdapter` / `Dto` / `FreeFunction`）で宣言されている。」"
+      }
+    },
+    {
+      "claim_hash": "7d55e01389f078e12f2907b859f94dcc1f1f8acd121951feace86e61d550499a",
+      "evidence_hash": "dea61c5b84589c7119025c49caf6ad3f062f83a98eb77879965bc1266592c2c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各層の既存 public 型が allowlist 内のロール（`cli`: `Dto` / `ErrorType` / `FreeFunction`、`cli_composition`: `CompositionRoot` / `ErrorType`、`cli_driver`: `PrimaryAdapter` / `Dto` / `FreeFunction`）で宣言されている。"
+      }
+    },
+    {
+      "claim_hash": "230cc3e8b7d92a583c8fedae9f5e25be9ee83e8da6d0edd27263b0fa9ca6001e",
+      "evidence_hash": "dea61c5b84589c7119025c49caf6ad3f062f83a98eb77879965bc1266592c2c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各層の既存 public 型が allowlist 内のロール（`cli`: `Dto` / `ErrorType` / `FreeFunction`、`cli_composition`: `CompositionRoot` / `ErrorType`、`cli_driver`: `PrimaryAdapter` / `Dto` / `FreeFunction`）で宣言されている。"
+      }
+    },
+    {
+      "claim_hash": "278e1eda5b5bfb861ce716d2c9ac0690f1aa752952be256770c7fde97f9d7ea4",
+      "evidence_hash": "dea61c5b84589c7119025c49caf6ad3f062f83a98eb77879965bc1266592c2c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各層の既存 public 型が allowlist 内のロール（`cli`: `Dto` / `ErrorType` / `FreeFunction`、`cli_composition`: `CompositionRoot` / `ErrorType`、`cli_driver`: `PrimaryAdapter` / `Dto` / `FreeFunction`）で宣言されている。"
+      }
+    },
+    {
+      "claim_hash": "58fe998f0c9b2f1582eaabca8f91d190f0c3d53fcca9ada85043c5df8527651e",
+      "evidence_hash": "dea61c5b84589c7119025c49caf6ad3f062f83a98eb77879965bc1266592c2c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "cli 系 3 層それぞれの型カタログ（`cli-types.json` / `cli-composition-types.json` / `cli-driver-types.json`）が起草されており、各層の既存 public 型が allowlist 内のロール（`cli`: `Dto` / `ErrorType` / `FreeFunction`、`cli_composition`: `CompositionRoot` / `ErrorType`、`cli_driver`: `PrimaryAdapter` / `Dto` / `FreeFunction`）で宣言されている。"
+      }
+    },
+    {
+      "claim_hash": "77ad04dee6993e68ad6366d235bd4ef28af23a82eda6c6ee0fb2027c0a041766",
+      "evidence_hash": "dea61c5b84589c7119025c49caf6ad3f062f83a98eb77879965bc1266592c2c1",
+      "verdict": {
+        "kind": "fail",
+        "reason": "New design constraint: the entry requires deleting cli::commands::plan::codex_local::configure_child_process_group as a pre-track test shim, but AC-06 only requires the CLI layer catalogues to be drafted, existing public types to be declared under allowlisted roles, and cargo make ci to pass; it does not state or imply removal of this child process group function."
+      }
+    },
+    {
+      "claim_hash": "0eaeafc5fe75b2b7315c043ccb59444df563e6ab8dc8608bb96fb63787004c93",
+      "evidence_hash": "dea61c5b84589c7119025c49caf6ad3f062f83a98eb77879965bc1266592c2c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各層の既存 public 型が allowlist 内のロール（`cli`: `Dto` / `ErrorType` / `FreeFunction`、`cli_composition`: `CompositionRoot` / `ErrorType`、`cli_driver`: `PrimaryAdapter` / `Dto` / `FreeFunction`）で宣言されている。"
+      }
+    },
+    {
+      "claim_hash": "0cb72756caf80ff9b627d47d8bdeedfe1e7c7bf9f3335fa703ec79c34a395c22",
+      "evidence_hash": "dea61c5b84589c7119025c49caf6ad3f062f83a98eb77879965bc1266592c2c1",
+      "verdict": {
+        "kind": "fail",
+        "reason": "New design constraint: the claim says this function is removed because subprocess orchestration lives in `infrastructure::codex_planner`, but AC-06 only requires CLI layer type catalogues, allowlisted roles for existing public types, and `cargo make ci` passing; it does not state or imply this ownership/deletion requirement."
+      }
+    },
+    {
+      "claim_hash": "e6d0889d91af7554ef6e166ba10e7201ad34e97d13bf78d78edc46a00b1f3c3c",
+      "evidence_hash": "dea61c5b84589c7119025c49caf6ad3f062f83a98eb77879965bc1266592c2c1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各層の既存 public 型が allowlist 内のロール（`cli`: `Dto` / `ErrorType` / `FreeFunction`、`cli_composition`: `CompositionRoot` / `ErrorType`、`cli_driver`: `PrimaryAdapter` / `Dto` / `FreeFunction`）で宣言されている。"
+      }
+    },
+    {
+      "claim_hash": "0af7ac55d9135868d163d0178041ce65c30669e0fb91b3581b06aed40926aaf0",
+      "evidence_hash": "19f7edab12f18f12c7cce5e413bec6b7fe9b3d0d37b17476a99a5bb9fc249f6b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli`（bin crate）の `schema_export`（rustdoc JSON 生成）が `[[bin]]` target に対して正常に動作し、`bin/sotp signal calc-impl-catalog` が cli 層のカタログと rustdoc 出力を照合して signal を返せる。"
+      }
+    },
+    {
+      "claim_hash": "a788da4768500626b2738220e257a831b86972da61a6726e8d750bd64f87aef6",
+      "evidence_hash": "19f7edab12f18f12c7cce5e413bec6b7fe9b3d0d37b17476a99a5bb9fc249f6b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp signal calc-impl-catalog` が cli 層のカタログと rustdoc 出力を照合して signal を返せる。"
+      }
+    },
+    {
+      "claim_hash": "9fca19233fdc617860faeae3a84a35c2d02832cfbb1b2774ad722a93fec3f8cd",
+      "evidence_hash": "19f7edab12f18f12c7cce5e413bec6b7fe9b3d0d37b17476a99a5bb9fc249f6b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli`（bin crate）の `schema_export`（rustdoc JSON 生成）が `[[bin]]` target に対して正常に動作し、`bin/sotp signal calc-impl-catalog` が cli 層のカタログと rustdoc 出力を照合して signal を返せる。"
+      }
+    },
+    {
+      "claim_hash": "b36a55bc32d6e6047ef82274e11a28ce6da7eeac9892fc1044aa8927bee174d6",
+      "evidence_hash": "19f7edab12f18f12c7cce5e413bec6b7fe9b3d0d37b17476a99a5bb9fc249f6b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp signal calc-impl-catalog` が cli 層のカタログと rustdoc 出力を照合して signal を返せる。"
+      }
+    },
+    {
+      "claim_hash": "5e169923bfa910640e943f5e155979000e1542a7caba1ddf946ee54ae95d4232",
+      "evidence_hash": "19f7edab12f18f12c7cce5e413bec6b7fe9b3d0d37b17476a99a5bb9fc249f6b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli`（bin crate）の `schema_export`（rustdoc JSON 生成）が `[[bin]]` target に対して正常に動作し、`bin/sotp signal calc-impl-catalog` が cli 層のカタログと rustdoc 出力を照合して signal を返せる。"
+      }
+    },
+    {
+      "claim_hash": "d257e3b13bc506167a92299bbaebe644256ab66c405c410de1a63310153117e9",
+      "evidence_hash": "19f7edab12f18f12c7cce5e413bec6b7fe9b3d0d37b17476a99a5bb9fc249f6b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli`（bin crate）の `schema_export`（rustdoc JSON 生成）が `[[bin]]` target に対して正常に動作し、`bin/sotp signal calc-impl-catalog` が cli 層のカタログと rustdoc 出力を照合して signal を返せる。"
+      }
+    },
+    {
+      "claim_hash": "7261faa07c25c6ddee101918e418340525041b5390f2692539963c7d515c5a5b",
+      "evidence_hash": "19f7edab12f18f12c7cce5e413bec6b7fe9b3d0d37b17476a99a5bb9fc249f6b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli`（bin crate）の `schema_export`（rustdoc JSON 生成）が `[[bin]]` target に対して正常に動作し、`bin/sotp signal calc-impl-catalog` が cli 層のカタログと rustdoc 出力を照合して signal を返せる。"
+      }
+    },
+    {
+      "claim_hash": "0af7ac55d9135868d163d0178041ce65c30669e0fb91b3581b06aed40926aaf0",
+      "evidence_hash": "19f7edab12f18f12c7cce5e413bec6b7fe9b3d0d37b17476a99a5bb9fc249f6b",
+      "verdict": {
+        "kind": "fail",
+        "reason": "The reference is unrelated: AC-09 concerns rustdoc JSON generation for the cli bin target and calc-impl-catalog comparison signals, while deleting a commands::plan PlanRunResult DTO is not motivated by that behavior. This is a new design constraint absent from the evidence."
+      }
+    },
+    {
+      "claim_hash": "4a07e8a508e40c6af233a2bdd143d49b78dc71c5e86a8df4811487aba9287501",
+      "evidence_hash": "19f7edab12f18f12c7cce5e413bec6b7fe9b3d0d37b17476a99a5bb9fc249f6b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli`（bin crate）の `schema_export`（rustdoc JSON 生成）が `[[bin]]` target に対して正常に動作し、`bin/sotp signal calc-impl-catalog` が cli 層のカタログと rustdoc 出力を照合して signal を返せる。"
+      }
+    },
+    {
+      "claim_hash": "b3e8ebc96d1f253512b7e44199a8d733cdc6dbf5ca59eda3b854bcf967ce4260",
+      "evidence_hash": "19f7edab12f18f12c7cce5e413bec6b7fe9b3d0d37b17476a99a5bb9fc249f6b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp signal calc-impl-catalog` が cli 層のカタログと rustdoc 出力を照合して signal を返せる"
+      }
+    },
+    {
+      "claim_hash": "437d06fc7936145d74bb868c9050242b387c926e04bcfc455e6d102e1de7d69e",
+      "evidence_hash": "19f7edab12f18f12c7cce5e413bec6b7fe9b3d0d37b17476a99a5bb9fc249f6b",
+      "verdict": {
+        "kind": "fail",
+        "reason": "New behavioral commitment / wrong reference: the entry is about removing a pre-track test shim for spawning the Codex process, while AC-09 only requires cli rustdoc JSON generation and calc-impl-catalog comparison/signaling. The evidence does not motivate deletion of this process-spawning function."
+      }
+    },
+    {
+      "claim_hash": "018fd0e1f45d6b32b00cbaef4795facbc1dd4fff3fe243dd76520f81f352bca0",
+      "evidence_hash": "19f7edab12f18f12c7cce5e413bec6b7fe9b3d0d37b17476a99a5bb9fc249f6b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp signal calc-impl-catalog` が cli 層のカタログと rustdoc 出力を照合して signal を返せる。"
+      }
+    },
+    {
+      "claim_hash": "b2cecc52c3fe6262206e2d1e80918e918fb348a45a16bdcadee647d77a26a553",
+      "evidence_hash": "19f7edab12f18f12c7cce5e413bec6b7fe9b3d0d37b17476a99a5bb9fc249f6b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp signal calc-impl-catalog` が cli 層のカタログと rustdoc 出力を照合して signal を返せる。"
+      }
+    },
+    {
+      "claim_hash": "45203367d5f0b0fcfc0e9792db2b65d2d96fbdb4181e324d490b65fe28d26093",
+      "evidence_hash": "a6cc42479d205a4120bcfb8ffb5eb5f8bf46f0e76080045b78679691549efec9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli` の TDDD カタログを `{Dto, ErrorType, FreeFunction}` の allowlist 内に収めなければならない"
+      }
+    },
+    {
+      "claim_hash": "45203367d5f0b0fcfc0e9792db2b65d2d96fbdb4181e324d490b65fe28d26093",
+      "evidence_hash": "d811c5c796fcc9372e7cbb1d93558fc75519e1c924a43e5e48a04a0337de0e5d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli/src/commands/{plan,review}/codex_local.rs` の本番パスは clap 引数→入力変換と composition root への dispatch のみを含み"
+      }
+    },
+    {
+      "claim_hash": "45203367d5f0b0fcfc0e9792db2b65d2d96fbdb4181e324d490b65fe28d26093",
+      "evidence_hash": "a6cc42479d205a4120bcfb8ffb5eb5f8bf46f0e76080045b78679691549efec9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "cli カタログのサブプロセス関連型（Command / Stdio / Child 等）が消え、allowlist 内に収まる。"
+      }
+    },
+    {
+      "claim_hash": "45203367d5f0b0fcfc0e9792db2b65d2d96fbdb4181e324d490b65fe28d26093",
+      "evidence_hash": "d811c5c796fcc9372e7cbb1d93558fc75519e1c924a43e5e48a04a0337de0e5d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "(1) `apps/cli/src/commands/{plan,review}/codex_local.rs` の本番パスは clap 引数→入力変換と composition root への dispatch のみを含み、`Command::new` / `Stdio::piped` / tee / ログファイル書き込み / `spawn` を本番コードに持たない。(4) `apps/cli-driver/src/plan.rs` が `PlanDriver`（PrimaryAdapter 役）を定義し、`Arc<dyn PlannerPort>` を保持して `handle(PlanInput) -> CommandOutcome` を公開する。"
+      }
+    },
+    {
+      "claim_hash": "7f256c43b887dc6d543049769ce0b7c03d2c9103e0db8e12c720398857b3b35e",
+      "evidence_hash": "a6cc42479d205a4120bcfb8ffb5eb5f8bf46f0e76080045b78679691549efec9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "planner のサブプロセス管理・stderr tee・セッションログ書き込みを `apps/cli` から移設し、ヘキサゴナル・ペアとして配置する。… このヘキサゴナル・ペアがあることで `cli` カタログのサブプロセス関連型（`Command` / `Stdio` / `Child` 等）が消え、allowlist 内に収まる。"
+      }
+    },
+    {
+      "claim_hash": "7f256c43b887dc6d543049769ce0b7c03d2c9103e0db8e12c720398857b3b35e",
+      "evidence_hash": "d811c5c796fcc9372e7cbb1d93558fc75519e1c924a43e5e48a04a0337de0e5d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "(1) `apps/cli/src/commands/{plan,review}/codex_local.rs` の本番パスは clap 引数→入力変換と composition root への dispatch のみを含み、`Command::new` / `Stdio::piped` / tee / ログファイル書き込み / `spawn` を本番コードに持たない。 (3) `libs/infrastructure/src/codex_planner.rs` が `PlannerPort` を実装する `CodexPlannerAdapter` を定義し、サブプロセス起動・stderr tee・ログファイル書き込みロジックを内包する。"
+      }
+    },
+    {
+      "claim_hash": "e4a958dd9035704c4fe2d75bc320c2d4f590f2c9b95ac3d2e04b40940489de92",
+      "evidence_hash": "a6cc42479d205a4120bcfb8ffb5eb5f8bf46f0e76080045b78679691549efec9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "このヘキサゴナル・ペアがあることで `cli` カタログのサブプロセス関連型が消え、allowlist 内に収まる"
+      }
+    },
+    {
+      "claim_hash": "e4a958dd9035704c4fe2d75bc320c2d4f590f2c9b95ac3d2e04b40940489de92",
+      "evidence_hash": "d811c5c796fcc9372e7cbb1d93558fc75519e1c924a43e5e48a04a0337de0e5d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "(1) `apps/cli/src/commands/{plan,review}/codex_local.rs` の本番パスは clap 引数→入力変換と composition root への dispatch のみを含み、`Command::new` / `Stdio::piped` / tee / ログファイル書き込み / `spawn` を本番コードに持たない。"
+      }
+    },
+    {
+      "claim_hash": "2728a665468ecec4cf0b3f401c216399a17cd68d4455c7360aeffb4b69d2f82d",
+      "evidence_hash": "a6cc42479d205a4120bcfb8ffb5eb5f8bf46f0e76080045b78679691549efec9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "このヘキサゴナル・ペアがあることで `cli` カタログのサブプロセス関連型（`Command` / `Stdio` / `Child` 等）が消え、allowlist 内に収まる。"
+      }
+    },
+    {
+      "claim_hash": "2728a665468ecec4cf0b3f401c216399a17cd68d4455c7360aeffb4b69d2f82d",
+      "evidence_hash": "d811c5c796fcc9372e7cbb1d93558fc75519e1c924a43e5e48a04a0337de0e5d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli/src/commands/{plan,review}/codex_local.rs` の本番パスは clap 引数→入力変換と composition root への dispatch のみを含み、`Command::new` / `Stdio::piped` / tee / ログファイル書き込み / `spawn` を本番コードに持たない。"
+      }
+    },
+    {
+      "claim_hash": "4dbd0d38f5391bd8db3a6b430c5887aeda912d46684850e3ada637ff7305a14f",
+      "evidence_hash": "a6cc42479d205a4120bcfb8ffb5eb5f8bf46f0e76080045b78679691549efec9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "planner のサブプロセス管理・stderr tee・セッションログ書き込みを `apps/cli` から移設し、ヘキサゴナル・ペアとして配置する。... このヘキサゴナル・ペアがあることで `cli` カタログのサブプロセス関連型（`Command` / `Stdio` / `Child` 等）が消え、allowlist 内に収まる。"
+      }
+    },
+    {
+      "claim_hash": "4dbd0d38f5391bd8db3a6b430c5887aeda912d46684850e3ada637ff7305a14f",
+      "evidence_hash": "d811c5c796fcc9372e7cbb1d93558fc75519e1c924a43e5e48a04a0337de0e5d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli/src/commands/{plan,review}/codex_local.rs` の本番パスは clap 引数→入力変換と composition root への dispatch のみを含み、`Command::new` / `Stdio::piped` / tee / ログファイル書き込み / `spawn` を本番コードに持たない。(3) `libs/infrastructure/src/codex_planner.rs` が `PlannerPort` を実装する `CodexPlannerAdapter` を定義し、サブプロセス起動・stderr tee・ログファイル書き込みロジックを内包する。"
+      }
+    },
+    {
+      "claim_hash": "3a8eadaac7351e57fa07454048df5587bf4b3578a7ec275a36e9ab47bbbe33c0",
+      "evidence_hash": "a6cc42479d205a4120bcfb8ffb5eb5f8bf46f0e76080045b78679691549efec9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "planner のサブプロセス管理・stderr tee・セッションログ書き込みを `apps/cli` から移設し"
+      }
+    },
+    {
+      "claim_hash": "3a8eadaac7351e57fa07454048df5587bf4b3578a7ec275a36e9ab47bbbe33c0",
+      "evidence_hash": "d811c5c796fcc9372e7cbb1d93558fc75519e1c924a43e5e48a04a0337de0e5d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "(1) `apps/cli/src/commands/{plan,review}/codex_local.rs` の本番パスは clap 引数→入力変換と composition root への dispatch のみを含み、`Command::new` / `Stdio::piped` / tee / ログファイル書き込み / `spawn` を本番コードに持たない。(3) `libs/infrastructure/src/codex_planner.rs` が `PlannerPort` を実装する `CodexPlannerAdapter` を定義し、サブプロセス起動・stderr tee・ログファイル書き込みロジックを内包する。"
+      }
+    },
+    {
+      "claim_hash": "fcd3dcf497b0db39f94b97cb847d47451109a3a3ecd275df773d1008f1919172",
+      "evidence_hash": "a6cc42479d205a4120bcfb8ffb5eb5f8bf46f0e76080045b78679691549efec9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "planner のサブプロセス管理・stderr tee・セッションログ書き込みを `apps/cli` から移設し、ヘキサゴナル・ペアとして配置する。... このヘキサゴナル・ペアがあることで `cli` カタログのサブプロセス関連型（`Command` / `Stdio` / `Child` 等）が消え、allowlist 内に収まる。"
+      }
+    },
+    {
+      "claim_hash": "fcd3dcf497b0db39f94b97cb847d47451109a3a3ecd275df773d1008f1919172",
+      "evidence_hash": "d811c5c796fcc9372e7cbb1d93558fc75519e1c924a43e5e48a04a0337de0e5d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli/src/commands/{plan,review}/codex_local.rs` の本番パスは clap 引数→入力変換と composition root への dispatch のみを含み、`Command::new` / `Stdio::piped` / tee / ログファイル書き込み / `spawn` を本番コードに持たない。(3) `libs/infrastructure/src/codex_planner.rs` が `PlannerPort` を実装する `CodexPlannerAdapter` を定義し、サブプロセス起動・stderr tee・ログファイル書き込みロジックを内包する"
+      }
+    },
+    {
+      "claim_hash": "2334aa1de60f1815c750d85f41d9cc164fdcd4852e8495fb6951778b7b153292",
+      "evidence_hash": "a6cc42479d205a4120bcfb8ffb5eb5f8bf46f0e76080045b78679691549efec9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "planner のサブプロセス管理・stderr tee・セッションログ書き込みを `apps/cli` から移設し、ヘキサゴナル・ペアとして配置する。"
+      }
+    },
+    {
+      "claim_hash": "2334aa1de60f1815c750d85f41d9cc164fdcd4852e8495fb6951778b7b153292",
+      "evidence_hash": "d811c5c796fcc9372e7cbb1d93558fc75519e1c924a43e5e48a04a0337de0e5d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "(1) `apps/cli/src/commands/{plan,review}/codex_local.rs` の本番パスは clap 引数→入力変換と composition root への dispatch のみを含み、`Command::new` / `Stdio::piped` / tee / ログファイル書き込み / `spawn` を本番コードに持たない。 (3) `libs/infrastructure/src/codex_planner.rs` が `PlannerPort` を実装する `CodexPlannerAdapter` を定義し、サブプロセス起動・stderr tee・ログファイル書き込みロジックを内包する。"
+      }
+    },
+    {
+      "claim_hash": "ba57d2a9b96d8f87bd84e0f967fad159f8e12f6782ac153f4b1e943a41eea671",
+      "evidence_hash": "a6cc42479d205a4120bcfb8ffb5eb5f8bf46f0e76080045b78679691549efec9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli` カタログのサブプロセス関連型（`Command` / `Stdio` / `Child` 等）が消え、allowlist 内に収まる"
+      }
+    },
+    {
+      "claim_hash": "ba57d2a9b96d8f87bd84e0f967fad159f8e12f6782ac153f4b1e943a41eea671",
+      "evidence_hash": "d811c5c796fcc9372e7cbb1d93558fc75519e1c924a43e5e48a04a0337de0e5d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli/src/commands/{plan,review}/codex_local.rs` の本番パスは clap 引数→入力変換と composition root への dispatch のみを含み、`Command::new` / `Stdio::piped` / tee / ログファイル書き込み / `spawn` を本番コードに持たない。"
+      }
+    },
+    {
+      "claim_hash": "20018f40d8c591fc9231daedeac7a9d1222e2dd2518de83b0f5c17af48bcbc1d",
+      "evidence_hash": "a6cc42479d205a4120bcfb8ffb5eb5f8bf46f0e76080045b78679691549efec9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "planner のサブプロセス管理・stderr tee・セッションログ書き込みを `apps/cli` から移設し"
+      }
+    },
+    {
+      "claim_hash": "20018f40d8c591fc9231daedeac7a9d1222e2dd2518de83b0f5c17af48bcbc1d",
+      "evidence_hash": "d811c5c796fcc9372e7cbb1d93558fc75519e1c924a43e5e48a04a0337de0e5d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "(1) `apps/cli/src/commands/{plan,review}/codex_local.rs` の本番パスは clap 引数→入力変換と composition root への dispatch のみを含み、`Command::new` / `Stdio::piped` / tee / ログファイル書き込み / `spawn` を本番コードに持たない。"
+      }
+    },
+    {
+      "claim_hash": "37b2e20028c69726182a47d0f6748f78aeb3b8b26d193c1267fee48bbbbff1b8",
+      "evidence_hash": "a6cc42479d205a4120bcfb8ffb5eb5f8bf46f0e76080045b78679691549efec9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "thin-bin 制約（ADR 1328 D5）の下では `cli` の TDDD カタログを `{Dto, ErrorType, FreeFunction}` の allowlist 内に収めなければならない（AC-06）。これを充足するための前提条件として、planner のサブプロセス管理・stderr tee・セッションログ書き込みを `apps/cli` から移設し、ヘキサゴナル・ペアとして配置する。"
+      }
+    },
+    {
+      "claim_hash": "83d7696f7935238c76f99404b5e9c4e4aaca126be51dfdb424ef676b06574191",
+      "evidence_hash": "a6cc42479d205a4120bcfb8ffb5eb5f8bf46f0e76080045b78679691549efec9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli` はその `PlanDriver` を受け取って dispatch するだけでよい。"
+      }
+    },
+    {
+      "claim_hash": "83d7696f7935238c76f99404b5e9c4e4aaca126be51dfdb424ef676b06574191",
+      "evidence_hash": "d811c5c796fcc9372e7cbb1d93558fc75519e1c924a43e5e48a04a0337de0e5d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli/src/commands/{plan,review}/codex_local.rs` の本番パスは clap 引数→入力変換と composition root への dispatch のみを含み、`Command::new` / `Stdio::piped` / tee / ログファイル書き込み / `spawn` を本番コードに持たない。"
+      }
+    },
+    {
+      "claim_hash": "37b2e20028c69726182a47d0f6748f78aeb3b8b26d193c1267fee48bbbbff1b8",
+      "evidence_hash": "d811c5c796fcc9372e7cbb1d93558fc75519e1c924a43e5e48a04a0337de0e5d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli/src/commands/{plan,review}/codex_local.rs` の本番パスは clap 引数→入力変換と composition root への dispatch のみを含み"
+      }
+    },
+    {
+      "claim_hash": "f1e9cdd7291f6d23e0b64c8be26f27178d931948f9f88df1ebc8242d42ed7f35",
+      "evidence_hash": "a6cc42479d205a4120bcfb8ffb5eb5f8bf46f0e76080045b78679691549efec9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli-driver` の `PlanDriver`（PrimaryAdapter）は `Arc<dyn PlannerPort>` を依存注入で保持し `handle(PlanInput) -> CommandOutcome` を公開する。`apps/cli-composition` の `PlanCompositionRoot`（CompositionRoot）が `CodexPlannerAdapter` を構築して `PlanDriver` に注入し、`apps/cli` はその `PlanDriver` を受け取って dispatch するだけでよい。"
+      }
+    },
+    {
+      "claim_hash": "f1e9cdd7291f6d23e0b64c8be26f27178d931948f9f88df1ebc8242d42ed7f35",
+      "evidence_hash": "d811c5c796fcc9372e7cbb1d93558fc75519e1c924a43e5e48a04a0337de0e5d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli/src/commands/{plan,review}/codex_local.rs` の本番パスは clap 引数→入力変換と composition root への dispatch のみを含み"
+      }
+    },
+    {
+      "claim_hash": "adbf1cc474dc3beb96a40fe99f8e3bc30bd47bbc1622f537e00c41b44818869a",
+      "evidence_hash": "a6cc42479d205a4120bcfb8ffb5eb5f8bf46f0e76080045b78679691549efec9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli-driver` の `PlanDriver`（PrimaryAdapter）は `Arc<dyn PlannerPort>` を依存注入で保持し `handle(PlanInput) -> CommandOutcome` を公開する。`apps/cli-composition` の `PlanCompositionRoot`（CompositionRoot）が `CodexPlannerAdapter` を構築して `PlanDriver` に注入し、`apps/cli` はその `PlanDriver` を受け取って dispatch するだけでよい。"
+      }
+    },
+    {
+      "claim_hash": "adbf1cc474dc3beb96a40fe99f8e3bc30bd47bbc1622f537e00c41b44818869a",
+      "evidence_hash": "d811c5c796fcc9372e7cbb1d93558fc75519e1c924a43e5e48a04a0337de0e5d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli/src/commands/{plan,review}/codex_local.rs` の本番パスは clap 引数→入力変換と composition root への dispatch のみを含み... `apps/cli-driver/src/plan.rs` が `PlanDriver`（PrimaryAdapter 役）を定義し、`Arc<dyn PlannerPort>` を保持して `handle(PlanInput) -> CommandOutcome` を公開する。"
+      }
+    },
+    {
+      "claim_hash": "df06552fb29ac6decef918e3f4d1a3ce24be3ac2c3bf62d9a5a2f7ac70002d4e",
+      "evidence_hash": "a6cc42479d205a4120bcfb8ffb5eb5f8bf46f0e76080045b78679691549efec9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "thin-bin 制約（ADR 1328 D5）の下では `cli` の TDDD カタログを `{Dto, ErrorType, FreeFunction}` の allowlist 内に収めなければならない"
+      }
+    },
+    {
+      "claim_hash": "df06552fb29ac6decef918e3f4d1a3ce24be3ac2c3bf62d9a5a2f7ac70002d4e",
+      "evidence_hash": "d811c5c796fcc9372e7cbb1d93558fc75519e1c924a43e5e48a04a0337de0e5d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "thin-bin ヘキサゴナル・ペア（IN-08）の実装が次の観察可能な証跡を備えている。(1) `apps/cli/src/commands/{plan,review}/codex_local.rs` の本番パスは clap 引数→入力変換と composition root への dispatch のみを含み"
+      }
+    },
+    {
+      "claim_hash": "0f21248d5f859fd6fd18b0b132f2bcdee01db1f918cc07c2d33437371a86a58c",
+      "evidence_hash": "a6cc42479d205a4120bcfb8ffb5eb5f8bf46f0e76080045b78679691549efec9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli` の TDDD カタログを `{Dto, ErrorType, FreeFunction}` の allowlist 内に収めなければならない（AC-06）。"
+      }
+    },
+    {
+      "claim_hash": "0f21248d5f859fd6fd18b0b132f2bcdee01db1f918cc07c2d33437371a86a58c",
+      "evidence_hash": "d811c5c796fcc9372e7cbb1d93558fc75519e1c924a43e5e48a04a0337de0e5d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "(1) `apps/cli/src/commands/{plan,review}/codex_local.rs` の本番パスは clap 引数→入力変換と composition root への dispatch のみを含み、`Command::new` / `Stdio::piped` / tee / ログファイル書き込み / `spawn` を本番コードに持たない。"
+      }
+    },
+    {
+      "claim_hash": "ca6d981bc398de7d5c86ea84c80c89592815e0b9c9c320f50ea3a94298483109",
+      "evidence_hash": "a6cc42479d205a4120bcfb8ffb5eb5f8bf46f0e76080045b78679691549efec9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli` はその `PlanDriver` を受け取って dispatch するだけでよい。"
+      }
+    },
+    {
+      "claim_hash": "ca6d981bc398de7d5c86ea84c80c89592815e0b9c9c320f50ea3a94298483109",
+      "evidence_hash": "d811c5c796fcc9372e7cbb1d93558fc75519e1c924a43e5e48a04a0337de0e5d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "(1) `apps/cli/src/commands/{plan,review}/codex_local.rs` の本番パスは clap 引数→入力変換と composition root への dispatch のみを含み"
+      }
+    },
+    {
+      "claim_hash": "45203367d5f0b0fcfc0e9792db2b65d2d96fbdb4181e324d490b65fe28d26093",
+      "evidence_hash": "d0850d8e69e74f5440be5ab67b3210afe249efa2b6dc3cf5f46b8e7519b0fc53",
+      "verdict": {
+        "kind": "pass",
+        "citation": "thin-bin 制約（ADR 1328 D5）の下では `cli` の TDDD カタログを `{Dto, ErrorType, FreeFunction}` の allowlist 内に収めなければならない（AC-06）。... このヘキサゴナル・ペアがあることで `cli` カタログのサブプロセス関連型（`Command` / `Stdio` / `Child` 等）が消え、allowlist 内に収まる。"
+      }
+    },
+    {
+      "claim_hash": "45203367d5f0b0fcfc0e9792db2b65d2d96fbdb4181e324d490b65fe28d26093",
+      "evidence_hash": "b5e73bb566f52126f92d6723a9a04228fd8955b94ef4e2500f0c009fa9cb8bde",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「clap 引数→入力変換と composition root への dispatch のみを含み」および「`apps/cli-driver/src/plan.rs` が `PlanDriver`（PrimaryAdapter 役）を定義し、... `handle(PlanInput) -> CommandOutcome` を公開する。」"
+      }
+    },
+    {
+      "claim_hash": "45203367d5f0b0fcfc0e9792db2b65d2d96fbdb4181e324d490b65fe28d26093",
+      "evidence_hash": "d0850d8e69e74f5440be5ab67b3210afe249efa2b6dc3cf5f46b8e7519b0fc53",
+      "verdict": {
+        "kind": "pass",
+        "citation": "apps/cli-driver の `PlanDriver`（PrimaryAdapter）は `Arc<dyn PlannerService>` を依存注入で保持し `handle(PlanInput) -> CommandOutcome` を公開する。`apps/cli` はその `PlanDriver` を受け取って dispatch するだけでよい。"
+      }
+    },
+    {
+      "claim_hash": "45203367d5f0b0fcfc0e9792db2b65d2d96fbdb4181e324d490b65fe28d26093",
+      "evidence_hash": "b5e73bb566f52126f92d6723a9a04228fd8955b94ef4e2500f0c009fa9cb8bde",
+      "verdict": {
+        "kind": "pass",
+        "citation": "(1) `apps/cli/src/commands/{plan,review}/codex_local.rs` の本番パスは clap 引数→入力変換と composition root への dispatch のみを含み、`Command::new` / `Stdio::piped` / tee / ログファイル書き込み / `spawn` を本番コードに持たない。(4) `apps/cli-driver/src/plan.rs` が `PlanDriver`（PrimaryAdapter 役）を定義し、`Arc<dyn PlannerService>` を保持して `handle(PlanInput) -> CommandOutcome` を公開する。"
+      }
+    },
+    {
+      "claim_hash": "7f256c43b887dc6d543049769ce0b7c03d2c9103e0db8e12c720398857b3b35e",
+      "evidence_hash": "d0850d8e69e74f5440be5ab67b3210afe249efa2b6dc3cf5f46b8e7519b0fc53",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/infrastructure` が `CodexPlannerAdapter`（SecondaryAdapter）として `PlannerPort` を実装し、サブプロセス起動・stderr tee・ログファイル書き込みの全 I/O を担う。`apps/cli` はその `PlanDriver` を受け取って dispatch するだけでよい。このヘキサゴナル・ペアがあることで `cli` カタログのサブプロセス関連型（`Command` / `Stdio` / `Child` 等）が消え、allowlist 内に収まる。"
+      }
+    },
+    {
+      "claim_hash": "7f256c43b887dc6d543049769ce0b7c03d2c9103e0db8e12c720398857b3b35e",
+      "evidence_hash": "b5e73bb566f52126f92d6723a9a04228fd8955b94ef4e2500f0c009fa9cb8bde",
+      "verdict": {
+        "kind": "pass",
+        "citation": "(1) `apps/cli/src/commands/{plan,review}/codex_local.rs` の本番パスは clap 引数→入力変換と composition root への dispatch のみを含み、`Command::new` / `Stdio::piped` / tee / ログファイル書き込み / `spawn` を本番コードに持たない。(3) `libs/infrastructure/src/codex_planner.rs` が `PlannerPort` を実装する `CodexPlannerAdapter` を定義し、サブプロセス起動・stderr tee・ログファイル書き込みロジックを内包する。"
+      }
+    },
+    {
+      "claim_hash": "e4a958dd9035704c4fe2d75bc320c2d4f590f2c9b95ac3d2e04b40940489de92",
+      "evidence_hash": "d0850d8e69e74f5440be5ab67b3210afe249efa2b6dc3cf5f46b8e7519b0fc53",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`PlannerInteractor` が prompt 解決・briefing ファイル存在確認などのアプリケーションレベル処理を担ったうえで `PlannerPort` へ委譲する。"
+      }
+    },
+    {
+      "claim_hash": "e4a958dd9035704c4fe2d75bc320c2d4f590f2c9b95ac3d2e04b40940489de92",
+      "evidence_hash": "b5e73bb566f52126f92d6723a9a04228fd8955b94ef4e2500f0c009fa9cb8bde",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「apps/cli/src/commands/{plan,review}/codex_local.rs の本番パスは clap 引数→入力変換と composition root への dispatch のみを含み、`Command::new` / `Stdio::piped` / tee / ログファイル書き込み / `spawn` を本番コードに持たない。 ... prompt 解決・briefing ファイル存在確認などのアプリケーションレベル処理は `PlannerInteractor` が担う。」"
+      }
+    },
+    {
+      "claim_hash": "2728a665468ecec4cf0b3f401c216399a17cd68d4455c7360aeffb4b69d2f82d",
+      "evidence_hash": "d0850d8e69e74f5440be5ab67b3210afe249efa2b6dc3cf5f46b8e7519b0fc53",
+      "verdict": {
+        "kind": "pass",
+        "citation": "このヘキサゴナル・ペアがあることで `cli` カタログのサブプロセス関連型（`Command` / `Stdio` / `Child` 等）が消え、allowlist 内に収まる"
+      }
+    },
+    {
+      "claim_hash": "2728a665468ecec4cf0b3f401c216399a17cd68d4455c7360aeffb4b69d2f82d",
+      "evidence_hash": "b5e73bb566f52126f92d6723a9a04228fd8955b94ef4e2500f0c009fa9cb8bde",
+      "verdict": {
+        "kind": "pass",
+        "citation": "apps/cli/src/commands/{plan,review}/codex_local.rs の本番パスは clap 引数→入力変換と composition root への dispatch のみを含み"
+      }
+    },
+    {
+      "claim_hash": "4dbd0d38f5391bd8db3a6b430c5887aeda912d46684850e3ada637ff7305a14f",
+      "evidence_hash": "d0850d8e69e74f5440be5ab67b3210afe249efa2b6dc3cf5f46b8e7519b0fc53",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli` から移設し、... `cli` カタログのサブプロセス関連型（`Command` / `Stdio` / `Child` 等）が消え、allowlist 内に収まる"
+      }
+    },
+    {
+      "claim_hash": "4dbd0d38f5391bd8db3a6b430c5887aeda912d46684850e3ada637ff7305a14f",
+      "evidence_hash": "b5e73bb566f52126f92d6723a9a04228fd8955b94ef4e2500f0c009fa9cb8bde",
+      "verdict": {
+        "kind": "pass",
+        "citation": "(1) `apps/cli/src/commands/{plan,review}/codex_local.rs` の本番パスは clap 引数→入力変換と composition root への dispatch のみを含み、`Command::new` / `Stdio::piped` / tee / ログファイル書き込み / `spawn` を本番コードに持たない。"
+      }
+    },
+    {
+      "claim_hash": "f1e9cdd7291f6d23e0b64c8be26f27178d931948f9f88df1ebc8242d42ed7f35",
+      "evidence_hash": "d0850d8e69e74f5440be5ab67b3210afe249efa2b6dc3cf5f46b8e7519b0fc53",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli` の TDDD カタログを `{Dto, ErrorType, FreeFunction}` の allowlist 内に収めなければならない（AC-06）。... `apps/cli-driver` の `PlanDriver`（PrimaryAdapter）は `Arc<dyn PlannerService>` を依存注入で保持し `handle(PlanInput) -> CommandOutcome` を公開する。"
+      }
+    },
+    {
+      "claim_hash": "f1e9cdd7291f6d23e0b64c8be26f27178d931948f9f88df1ebc8242d42ed7f35",
+      "evidence_hash": "b5e73bb566f52126f92d6723a9a04228fd8955b94ef4e2500f0c009fa9cb8bde",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli/src/commands/{plan,review}/codex_local.rs` の本番パスは clap 引数→入力変換と composition root への dispatch のみを含み"
+      }
+    },
+    {
+      "claim_hash": "3a8eadaac7351e57fa07454048df5587bf4b3578a7ec275a36e9ab47bbbe33c0",
+      "evidence_hash": "d0850d8e69e74f5440be5ab67b3210afe249efa2b6dc3cf5f46b8e7519b0fc53",
+      "verdict": {
+        "kind": "pass",
+        "citation": "planner のサブプロセス管理・stderr tee・セッションログ書き込みを `apps/cli` から移設し、ヘキサゴナル・ペアとして配置する。"
+      }
+    },
+    {
+      "claim_hash": "3a8eadaac7351e57fa07454048df5587bf4b3578a7ec275a36e9ab47bbbe33c0",
+      "evidence_hash": "b5e73bb566f52126f92d6723a9a04228fd8955b94ef4e2500f0c009fa9cb8bde",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli/src/commands/{plan,review}/codex_local.rs` の本番パスは clap 引数→入力変換と composition root への dispatch のみを含み、`Command::new` / `Stdio::piped` / tee / ログファイル書き込み / `spawn` を本番コードに持たない。(3) `libs/infrastructure/src/codex_planner.rs` が `PlannerPort` を実装する `CodexPlannerAdapter` を定義し、サブプロセス起動・stderr tee・ログファイル書き込みロジックを内包する。"
+      }
+    },
+    {
+      "claim_hash": "fcd3dcf497b0db39f94b97cb847d47451109a3a3ecd275df773d1008f1919172",
+      "evidence_hash": "d0850d8e69e74f5440be5ab67b3210afe249efa2b6dc3cf5f46b8e7519b0fc53",
+      "verdict": {
+        "kind": "pass",
+        "citation": "planner のサブプロセス管理・stderr tee・セッションログ書き込みを `apps/cli` から移設し、ヘキサゴナル・ペアとして配置する。... このヘキサゴナル・ペアがあることで `cli` カタログのサブプロセス関連型（`Command` / `Stdio` / `Child` 等）が消え、allowlist 内に収まる。"
+      }
+    },
+    {
+      "claim_hash": "fcd3dcf497b0db39f94b97cb847d47451109a3a3ecd275df773d1008f1919172",
+      "evidence_hash": "b5e73bb566f52126f92d6723a9a04228fd8955b94ef4e2500f0c009fa9cb8bde",
+      "verdict": {
+        "kind": "pass",
+        "citation": "(1) `apps/cli/src/commands/{plan,review}/codex_local.rs` の本番パスは clap 引数→入力変換と composition root への dispatch のみを含み、`Command::new` / `Stdio::piped` / tee / ログファイル書き込み / `spawn` を本番コードに持たない。"
+      }
+    },
+    {
+      "claim_hash": "2334aa1de60f1815c750d85f41d9cc164fdcd4852e8495fb6951778b7b153292",
+      "evidence_hash": "d0850d8e69e74f5440be5ab67b3210afe249efa2b6dc3cf5f46b8e7519b0fc53",
+      "verdict": {
+        "kind": "pass",
+        "citation": "planner のサブプロセス管理・stderr tee・セッションログ書き込みを `apps/cli` から移設し"
+      }
+    },
+    {
+      "claim_hash": "2334aa1de60f1815c750d85f41d9cc164fdcd4852e8495fb6951778b7b153292",
+      "evidence_hash": "b5e73bb566f52126f92d6723a9a04228fd8955b94ef4e2500f0c009fa9cb8bde",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli/src/commands/{plan,review}/codex_local.rs` の本番パスは clap 引数→入力変換と composition root への dispatch のみを含み、`Command::new` / `Stdio::piped` / tee / ログファイル書き込み / `spawn` を本番コードに持たない。 ... `libs/infrastructure/src/codex_planner.rs` が `PlannerPort` を実装する `CodexPlannerAdapter` を定義し、サブプロセス起動・stderr tee・ログファイル書き込みロジックを内包する。"
+      }
+    },
+    {
+      "claim_hash": "adbf1cc474dc3beb96a40fe99f8e3bc30bd47bbc1622f537e00c41b44818869a",
+      "evidence_hash": "d0850d8e69e74f5440be5ab67b3210afe249efa2b6dc3cf5f46b8e7519b0fc53",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli-driver` の `PlanDriver`（PrimaryAdapter）は `Arc<dyn PlannerService>` を依存注入で保持し `handle(PlanInput) -> CommandOutcome` を公開する。`apps/cli` はその `PlanDriver` を受け取って dispatch するだけでよい。"
+      }
+    },
+    {
+      "claim_hash": "adbf1cc474dc3beb96a40fe99f8e3bc30bd47bbc1622f537e00c41b44818869a",
+      "evidence_hash": "b5e73bb566f52126f92d6723a9a04228fd8955b94ef4e2500f0c009fa9cb8bde",
+      "verdict": {
+        "kind": "pass",
+        "citation": "(1) `apps/cli/src/commands/{plan,review}/codex_local.rs` の本番パスは clap 引数→入力変換と composition root への dispatch のみを含み"
+      }
+    },
+    {
+      "claim_hash": "ba57d2a9b96d8f87bd84e0f967fad159f8e12f6782ac153f4b1e943a41eea671",
+      "evidence_hash": "d0850d8e69e74f5440be5ab67b3210afe249efa2b6dc3cf5f46b8e7519b0fc53",
+      "verdict": {
+        "kind": "pass",
+        "citation": "planner のサブプロセス管理・stderr tee・セッションログ書き込みを `apps/cli` から移設し、ヘキサゴナル・ペアとして配置する。... このヘキサゴナル・ペアがあることで `cli` カタログのサブプロセス関連型（`Command` / `Stdio` / `Child` 等）が消え、allowlist 内に収まる。"
+      }
+    },
+    {
+      "claim_hash": "ba57d2a9b96d8f87bd84e0f967fad159f8e12f6782ac153f4b1e943a41eea671",
+      "evidence_hash": "b5e73bb566f52126f92d6723a9a04228fd8955b94ef4e2500f0c009fa9cb8bde",
+      "verdict": {
+        "kind": "pass",
+        "citation": "(1) `apps/cli/src/commands/{plan,review}/codex_local.rs` の本番パスは clap 引数→入力変換と composition root への dispatch のみを含み、`Command::new` / `Stdio::piped` / tee / ログファイル書き込み / `spawn` を本番コードに持たない。"
+      }
+    },
+    {
+      "claim_hash": "20018f40d8c591fc9231daedeac7a9d1222e2dd2518de83b0f5c17af48bcbc1d",
+      "evidence_hash": "d0850d8e69e74f5440be5ab67b3210afe249efa2b6dc3cf5f46b8e7519b0fc53",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`planner のサブプロセス管理・stderr tee・セッションログ書き込みを `apps/cli` から移設し` ... `cli` カタログのサブプロセス関連型（`Command` / `Stdio` / `Child` 等）が消え`"
+      }
+    },
+    {
+      "claim_hash": "20018f40d8c591fc9231daedeac7a9d1222e2dd2518de83b0f5c17af48bcbc1d",
+      "evidence_hash": "b5e73bb566f52126f92d6723a9a04228fd8955b94ef4e2500f0c009fa9cb8bde",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli/src/commands/{plan,review}/codex_local.rs` の本番パスは clap 引数→入力変換と composition root への dispatch のみを含み、`Command::new` / `Stdio::piped` / tee / ログファイル書き込み / `spawn` を本番コードに持たない。"
+      }
+    },
+    {
+      "claim_hash": "df06552fb29ac6decef918e3f4d1a3ce24be3ac2c3bf62d9a5a2f7ac70002d4e",
+      "evidence_hash": "d0850d8e69e74f5440be5ab67b3210afe249efa2b6dc3cf5f46b8e7519b0fc53",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli-driver` の `PlanDriver`（PrimaryAdapter）は `Arc<dyn PlannerService>` を依存注入で保持し `handle(PlanInput) -> CommandOutcome` を公開する。`apps/cli-composition` の `PlanCompositionRoot`（CompositionRoot）が `CodexPlannerAdapter → PlannerInteractor → PlanDriver` の wire chain を構築し、`apps/cli` はその `PlanDriver` を受け取って dispatch するだけでよい。"
+      }
+    },
+    {
+      "claim_hash": "df06552fb29ac6decef918e3f4d1a3ce24be3ac2c3bf62d9a5a2f7ac70002d4e",
+      "evidence_hash": "b5e73bb566f52126f92d6723a9a04228fd8955b94ef4e2500f0c009fa9cb8bde",
+      "verdict": {
+        "kind": "pass",
+        "citation": "(1) `apps/cli/src/commands/{plan,review}/codex_local.rs` の本番パスは clap 引数→入力変換と composition root への dispatch のみを含み、`Command::new` / `Stdio::piped` / tee / ログファイル書き込み / `spawn` を本番コードに持たない。"
+      }
+    },
+    {
+      "claim_hash": "0f21248d5f859fd6fd18b0b132f2bcdee01db1f918cc07c2d33437371a86a58c",
+      "evidence_hash": "d0850d8e69e74f5440be5ab67b3210afe249efa2b6dc3cf5f46b8e7519b0fc53",
+      "verdict": {
+        "kind": "pass",
+        "citation": "thin-bin 制約（ADR 1328 D5）の下では `cli` の TDDD カタログを `{Dto, ErrorType, FreeFunction}` の allowlist 内に収めなければならない（AC-06）"
+      }
+    },
+    {
+      "claim_hash": "0f21248d5f859fd6fd18b0b132f2bcdee01db1f918cc07c2d33437371a86a58c",
+      "evidence_hash": "b5e73bb566f52126f92d6723a9a04228fd8955b94ef4e2500f0c009fa9cb8bde",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli/src/commands/{plan,review}/codex_local.rs` の本番パスは clap 引数→入力変換と composition root への dispatch のみを含み"
+      }
+    },
+    {
+      "claim_hash": "ca6d981bc398de7d5c86ea84c80c89592815e0b9c9c320f50ea3a94298483109",
+      "evidence_hash": "b5e73bb566f52126f92d6723a9a04228fd8955b94ef4e2500f0c009fa9cb8bde",
+      "verdict": {
+        "kind": "pass",
+        "citation": "(1) `apps/cli/src/commands/{plan,review}/codex_local.rs` の本番パスは clap 引数→入力変換と composition root への dispatch のみを含み、`Command::new` / `Stdio::piped` / tee / ログファイル書き込み / `spawn` を本番コードに持たない。"
+      }
+    },
+    {
+      "claim_hash": "ca6d981bc398de7d5c86ea84c80c89592815e0b9c9c320f50ea3a94298483109",
+      "evidence_hash": "d0850d8e69e74f5440be5ab67b3210afe249efa2b6dc3cf5f46b8e7519b0fc53",
+      "verdict": {
+        "kind": "pass",
+        "citation": "thin-bin 制約（ADR 1328 D5）の下では `cli` の TDDD カタログを `{Dto, ErrorType, FreeFunction}` の allowlist 内に収めなければならない"
+      }
+    }
+  ]
+}

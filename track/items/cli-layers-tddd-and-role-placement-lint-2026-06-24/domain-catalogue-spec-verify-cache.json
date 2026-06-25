@@ -97,6 +97,22 @@
         "kind": "pass",
         "citation": "新ロール追加（`CompositionRoot` / `PrimaryAdapter`）に伴う `DataRole` の breaking migration を実施する。`Copy` が外れ、strum 文字列変換・codec・signal evaluator・renderer・全 `role ==` 比較を更新する。"
       }
+    },
+    {
+      "claim_hash": "324bd66d1e1c26b527570f468014bc055782f489d181c6b8e9aa7b47a8c2a080",
+      "evidence_hash": "daa34be89e64222bfa18e20cfa24b4b746e315927f2268c14f3231e54e51c45c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole` に `PrimaryAdapter` variant（新設）を追加する。`PrimaryAdapter` は注入された use case を保持し handle で呼んで整形する driving adapter（controller）の住所であり、DI しない。独自の機械検査ルールとして `KindLayerConstraint { permitted_layers: [\"cli_driver\"] }` と `NoRoleInMethodSignature { forbidden_roles: [\"Entity\", \"AggregateRoot\", \"ValueObject\", \"Repository\", \"SecondaryPort\", \"UseCase\", \"Interactor\", \"Command\", \"Query\"] }` を持つ。"
+      }
+    },
+    {
+      "claim_hash": "ba018083fc572fe141008206a3566c1177da1dcfe41aa75c5c31059058b8db4a",
+      "evidence_hash": "daa34be89e64222bfa18e20cfa24b4b746e315927f2268c14f3231e54e51c45c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DataRole` に `PrimaryAdapter` variant（新設）を追加する。`PrimaryAdapter` は注入された use case を保持し handle で呼んで整形する driving adapter（controller）の住所であり、DI しない。独自の機械検査ルールとして `KindLayerConstraint { permitted_layers: [\"cli_driver\"] }` と `NoRoleInMethodSignature { forbidden_roles: [\"Entity\", \"AggregateRoot\", \"ValueObject\", \"Repository\", \"SecondaryPort\", \"UseCase\", \"Interactor\", \"Command\", \"Query\"] }` を持つ。"
+      }
     }
   ]
 }

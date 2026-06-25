@@ -313,7 +313,7 @@ fn function_role_display_tag(role: FunctionRole) -> &'static str {
 fn v3_action_tag(action: domain::tddd::catalogue_v2::ItemAction) -> &'static str {
     use domain::tddd::catalogue_v2::ItemAction;
     match action {
-        ItemAction::Add => "\u{2014}", // — (default; omitted)
+        ItemAction::Add => "add",
         ItemAction::Modify => "modify",
         ItemAction::Reference => "reference",
         ItemAction::Delete => "delete",

@@ -19,6 +19,7 @@ pub mod file;
 pub mod git;
 pub mod guard;
 pub mod hook;
+pub mod plan;
 pub mod pr;
 pub mod ref_verify;
 pub mod render;

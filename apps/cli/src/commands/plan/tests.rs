@@ -1,236 +1,79 @@
 #![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 
+use std::path::PathBuf;
+use std::process::ExitCode;
+
+use cli_driver::{CommandOutcome, plan::PlanInput};
+
 use super::{
-    CODEX_BIN_ENV, CodexInvocation, PlanCodexLocalArgs,
-    codex_local::{build_codex_invocation, build_prompt, run_codex_local_invocation},
+    PlanCodexLocalArgs,
+    codex_local::{plan_input_from_args, run_execute_codex_local},
 };
-use std::ffi::OsString;
-use std::fs;
-use std::path::{Path, PathBuf};
-use std::sync::{Mutex, OnceLock};
-use std::time::Duration;
-
-fn env_lock() -> &'static Mutex<()> {
-    static LOCK: OnceLock<Mutex<()>> = OnceLock::new();
-    LOCK.get_or_init(|| Mutex::new(()))
-}
-
-struct EnvVarGuard {
-    key: &'static str,
-    original: Option<OsString>,
-}
-
-impl EnvVarGuard {
-    fn set(key: &'static str, value: &std::ffi::OsStr) -> Self {
-        let original = std::env::var_os(key);
-        // SAFETY: tests serialize access via env_lock(), so mutating process env here is safe.
-        unsafe { std::env::set_var(key, value) };
-        Self { key, original }
-    }
-}
-
-impl Drop for EnvVarGuard {
-    fn drop(&mut self) {
-        match &self.original {
-            Some(value) => {
-                // SAFETY: tests serialize access via env_lock(), so mutating process env here is safe.
-                unsafe { std::env::set_var(self.key, value) };
-            }
-            None => {
-                // SAFETY: tests serialize access via env_lock(), so mutating process env here is safe.
-                unsafe { std::env::remove_var(self.key) };
-            }
-        }
-    }
-}
 
 fn fake_args(prompt: Option<String>, briefing_file: Option<PathBuf>) -> PlanCodexLocalArgs {
-    PlanCodexLocalArgs { model: "gpt-5.4".to_owned(), timeout_seconds: 600, briefing_file, prompt }
+    PlanCodexLocalArgs { model: "gpt-5.4".to_owned(), timeout_seconds: 42, briefing_file, prompt }
 }
 
-// ---------------------------------------------------------------------------
-// build_prompt tests
-// ---------------------------------------------------------------------------
+#[test]
+fn test_codex_local_inline_prompt_dispatches_plan_input() {
+    let args = fake_args(Some("Plan this change.".to_owned()), None);
+
+    let exit = run_execute_codex_local(&args, |input| {
+        match input {
+            PlanInput::RunCodexLocal { model, timeout_seconds, prompt } => {
+                assert_eq!(model, "gpt-5.4");
+                assert_eq!(timeout_seconds, 42);
+                assert_eq!(prompt, "Plan this change.");
+            }
+        }
+        CommandOutcome { stdout: None, stderr: None, exit_code: 7 }
+    });
+
+    assert_eq!(exit, ExitCode::from(7));
+}
 
 #[test]
-fn build_prompt_with_briefing_file_returns_read_instruction() {
+fn test_codex_local_briefing_file_dispatches_read_instruction() {
     let dir = tempfile::tempdir().unwrap();
     let briefing = dir.path().join("briefing.md");
-    fs::write(&briefing, "# Task\n").unwrap();
+    std::fs::write(&briefing, "# Task\n").unwrap();
     let args = fake_args(None, Some(briefing.clone()));
 
-    let prompt = build_prompt(&args).unwrap();
+    let exit = run_execute_codex_local(&args, |input| {
+        match input {
+            PlanInput::RunCodexLocal { model, timeout_seconds, prompt } => {
+                assert_eq!(model, "gpt-5.4");
+                assert_eq!(timeout_seconds, 42);
+                assert_eq!(
+                    prompt,
+                    format!("Read {} and perform the task described there.", briefing.display())
+                );
+            }
+        }
+        CommandOutcome { stdout: None, stderr: None, exit_code: 0 }
+    });
 
-    assert_eq!(
-        prompt,
-        format!("Read {} and perform the task described there.", briefing.display())
-    );
+    assert_eq!(exit, ExitCode::SUCCESS);
 }
 
 #[test]
-fn build_prompt_with_inline_prompt_returns_prompt_string() {
-    let args = fake_args(Some("Analyze this design.".to_owned()), None);
-
-    let prompt = build_prompt(&args).unwrap();
-
-    assert_eq!(prompt, "Analyze this design.");
-}
-
-#[test]
-fn build_prompt_with_missing_briefing_file_returns_error() {
+fn test_codex_local_missing_briefing_file_fails_before_dispatch() {
     let args = fake_args(None, Some(PathBuf::from("/nonexistent/briefing.md")));
 
-    let result = build_prompt(&args);
+    let exit = run_execute_codex_local(&args, |_| {
+        panic!("driver must not be called when briefing file validation fails");
+    });
 
-    assert!(result.is_err());
-    assert!(result.unwrap_err().contains("briefing file not found"));
-}
-
-// ---------------------------------------------------------------------------
-// build_codex_invocation tests
-// ---------------------------------------------------------------------------
-
-#[test]
-fn build_codex_invocation_always_uses_read_only_sandbox() {
-    let invocation = build_codex_invocation("gpt-5.3-codex-spark", "Design this module.");
-    let rendered: Vec<String> =
-        invocation.args.iter().map(|arg| arg.to_string_lossy().to_string()).collect();
-
-    assert_eq!(rendered.first().map(String::as_str), Some("exec"));
-    assert!(rendered.windows(2).any(|pair| pair == ["--sandbox", "read-only"]));
-    assert!(rendered.windows(2).any(|pair| pair == ["--model", "gpt-5.3-codex-spark"]));
-    // Planner must NEVER use --full-auto (it implies --sandbox workspace-write)
-    assert!(!rendered.iter().any(|arg| arg == "--full-auto"));
-    // No --output-schema or --output-last-message (planner is simpler than reviewer)
-    assert!(!rendered.iter().any(|arg| arg == "--output-schema"));
-    assert!(!rendered.iter().any(|arg| arg == "--output-last-message"));
+    assert_eq!(exit, ExitCode::FAILURE);
 }
 
 #[test]
-fn build_codex_invocation_never_includes_full_auto_even_for_full_model() {
-    // --full-auto implies --sandbox workspace-write in Codex CLI,
-    // which would override our read-only constraint for planners.
-    let invocation = build_codex_invocation("gpt-5.4", "Design this module.");
-    let rendered: Vec<String> =
-        invocation.args.iter().map(|arg| arg.to_string_lossy().to_string()).collect();
+fn test_plan_input_from_args_missing_prompt_returns_typed_error() {
+    let args = fake_args(None, None);
 
-    assert!(!rendered.iter().any(|arg| arg == "--full-auto"));
-    assert!(rendered.windows(2).any(|pair| pair == ["--sandbox", "read-only"]));
-}
-
-#[test]
-fn build_codex_invocation_includes_prompt_as_last_arg() {
-    let prompt = "Please analyze this trait design.";
-    let invocation = build_codex_invocation("gpt-5.4", prompt);
-    let rendered: Vec<String> =
-        invocation.args.iter().map(|arg| arg.to_string_lossy().to_string()).collect();
-
-    assert_eq!(rendered.last().map(String::as_str), Some(prompt));
-}
-
-#[test]
-fn build_codex_invocation_uses_codex_as_default_bin() {
-    let _lock = env_lock().lock().unwrap();
-    let _guard = EnvVarGuard::set(CODEX_BIN_ENV, std::ffi::OsStr::new(""));
-
-    let invocation = build_codex_invocation("gpt-5.4", "prompt");
-
-    assert_eq!(invocation.bin, OsString::from("codex"));
-}
-
-#[test]
-fn build_codex_invocation_uses_env_override_for_bin() {
-    let _lock = env_lock().lock().unwrap();
-    let _guard = EnvVarGuard::set(CODEX_BIN_ENV, std::ffi::OsStr::new("/custom/codex"));
-
-    let invocation = build_codex_invocation("gpt-5.4", "prompt");
-
-    assert_eq!(invocation.bin, OsString::from("/custom/codex"));
-}
-
-// ---------------------------------------------------------------------------
-// Integration tests: subprocess lifecycle
-// ---------------------------------------------------------------------------
-
-#[cfg(unix)]
-fn write_fake_codex_script(root: &Path) -> PathBuf {
-    let script = root.join("fake-codex.sh");
-    fs::write(
-        &script,
-        r#"#!/bin/sh
-set -eu
-sleep_seconds="${SOTP_FAKE_CODEX_SLEEP_SECONDS:-0}"
-if [ "$sleep_seconds" != "0" ]; then
-  sleep "$sleep_seconds"
-fi
-exit "${SOTP_FAKE_CODEX_EXIT_CODE:-0}"
-"#,
-    )
-    .unwrap();
-    let mut perms = fs::metadata(&script).unwrap().permissions();
-    use std::os::unix::fs::PermissionsExt;
-    perms.set_mode(0o755);
-    fs::set_permissions(&script, perms).unwrap();
-    script
-}
-
-#[cfg(unix)]
-#[test]
-fn run_codex_local_invocation_happy_path_returns_exit_code_zero() {
-    let _lock = env_lock().lock().unwrap();
-    let dir = tempfile::tempdir().unwrap();
-    let script = write_fake_codex_script(dir.path());
-    let _bin = EnvVarGuard::set(CODEX_BIN_ENV, script.as_os_str());
-    let _exit = EnvVarGuard::set("SOTP_FAKE_CODEX_EXIT_CODE", std::ffi::OsStr::new("0"));
-
-    let invocation = build_codex_invocation("gpt-5.4", "Plan this feature.");
-    let result = run_codex_local_invocation(&invocation, Duration::from_secs(10)).unwrap();
-
-    assert_eq!(result.exit_code, 0);
-}
-
-#[cfg(unix)]
-#[test]
-fn run_codex_local_invocation_propagates_nonzero_exit_code() {
-    let _lock = env_lock().lock().unwrap();
-    let dir = tempfile::tempdir().unwrap();
-    let script = write_fake_codex_script(dir.path());
-    let _bin = EnvVarGuard::set(CODEX_BIN_ENV, script.as_os_str());
-    let _exit = EnvVarGuard::set("SOTP_FAKE_CODEX_EXIT_CODE", std::ffi::OsStr::new("42"));
-
-    let invocation = build_codex_invocation("gpt-5.4", "Plan this feature.");
-    let result = run_codex_local_invocation(&invocation, Duration::from_secs(10)).unwrap();
-
-    assert_eq!(result.exit_code, 42);
-}
-
-#[cfg(unix)]
-#[test]
-fn run_codex_local_invocation_returns_exit_code_1_on_timeout() {
-    let _lock = env_lock().lock().unwrap();
-    let dir = tempfile::tempdir().unwrap();
-    let script = write_fake_codex_script(dir.path());
-    let _bin = EnvVarGuard::set(CODEX_BIN_ENV, script.as_os_str());
-    let _sleep = EnvVarGuard::set("SOTP_FAKE_CODEX_SLEEP_SECONDS", std::ffi::OsStr::new("30"));
-
-    let invocation = build_codex_invocation("gpt-5.4", "Plan this feature.");
-    // Timeout of 0 seconds triggers immediate timeout
-    let result = run_codex_local_invocation(&invocation, Duration::from_secs(0)).unwrap();
-
-    assert_eq!(result.exit_code, 1, "timeout should return exit code 1");
-}
-
-#[test]
-fn run_codex_local_invocation_spawn_failure_returns_error() {
-    let _lock = env_lock().lock().unwrap();
-    let _bin = EnvVarGuard::set(CODEX_BIN_ENV, std::ffi::OsStr::new("/nonexistent/codex-binary"));
-
-    let invocation = CodexInvocation {
-        bin: OsString::from("/nonexistent/codex-binary"),
-        args: vec![OsString::from("exec"), OsString::from("prompt")],
+    let Err(err) = plan_input_from_args(&args) else {
+        panic!("expected missing prompt args to fail");
     };
-    let result = run_codex_local_invocation(&invocation, Duration::from_secs(10));
 
-    assert!(result.is_err());
-    assert!(result.unwrap_err().contains("failed to spawn"));
+    assert!(err.to_string().contains("either --briefing-file or --prompt is required"));
 }

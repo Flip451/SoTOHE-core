@@ -10,26 +10,64 @@
     {
       "id": "T002",
       "description": "architecture-rules.json TDDD flip — set tddd.enabled: true for cli, cli_composition, and cli_driver layers. Add catalogue_file, catalogue_spec_signal, and schema_export blocks for each layer: cli uses crate name 'cli' with [[bin]] target (first [[bin]] TDDD instance in the workspace; verify rustdoc --document-private-items or equivalent bin-target flag is not required — bin targets are supported by rustdoc JSON nightly; note in the schema_export.targets value). Confirm sotp verify layers passes after the flip (layer definitions vs Cargo.toml workspace members). Full cargo make ci is deferred to T006 after the cli-layer catalogues and rustdoc baselines exist. Depends on T001.",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T003",
-      "description": "Lint config — add KindLayerConstraint and NoRoleInMethodSignature rules for CompositionRoot and PrimaryAdapter to .harness/catalogue-lint/presets/ddd-strict.json. Rules to add: (1) CompositionRoot -> KindLayerConstraint { permitted_layers: [\"cli_composition\"] }; (2) PrimaryAdapter -> KindLayerConstraint { permitted_layers: [\"cli_driver\"] }; (3) PrimaryAdapter -> NoRoleInMethodSignature { forbidden_roles: [\"Entity\", \"AggregateRoot\", \"ValueObject\", \"DomainService\", \"Specification\", \"Factory\", \"DomainEvent\", \"EventPolicy\", \"Repository\", \"SecondaryPort\", \"SpecificationPort\", \"UseCase\", \"Interactor\", \"Command\", \"Query\", \"ApplicationService\"] }. Also update existing Dto and FreeFunction KindLayerConstraint rules to extend their permitted_layers with the cli-layer entries: Dto permits [\"usecase\", \"infrastructure\", \"cli\", \"cli_driver\"] (domain and cli_composition excluded); FreeFunction adds cli and cli_driver. ErrorType needs a new role-global rule if not already present: permitted_layers [\"domain\", \"usecase\", \"infrastructure\", \"cli\", \"cli_composition\"] (cli_driver excluded). Verify .harness/catalogue-lint/config.json (if it exists) is consistent. sotp track lint must not error on the newly drafted cli-layer catalogues after T005 is applied. Depends on T001, including FunctionRole / FreeFunction support in RoleKind and lint evaluation.",
-      "status": "in_progress"
+      "description": "Lint config — add KindLayerConstraint and NoRoleInMethodSignature rules for CompositionRoot and PrimaryAdapter to .harness/catalogue-lint/presets/ddd-strict.json. Rules added: (1) CompositionRoot -> KindLayerConstraint { permitted_layers: [\"cli_composition\"] }; (2) PrimaryAdapter -> KindLayerConstraint { permitted_layers: [\"cli_driver\"] }; (3) PrimaryAdapter -> NoRoleInMethodSignature { forbidden_roles: [\"Entity\", \"AggregateRoot\", \"ValueObject\", \"DomainService\", \"Specification\", \"Factory\", \"DomainEvent\", \"EventPolicy\", \"Repository\", \"SecondaryPort\", \"SpecificationPort\", \"UseCase\", \"Interactor\", \"Command\", \"Query\", \"ApplicationService\"] }. Note: the initial implementation's forbidden_roles list is broader than the updated ADR 1420 D3 / IN-03 / AC-04 exact list. The follow-up normalization is addressed in T007. Also updated Dto and FreeFunction KindLayerConstraint rules and added ErrorType rule. Depends on T001.",
+      "status": "done",
+      "commit_hash": "6f1ab16536e0073e688369981753b0d98e8e7954"
     },
     {
       "id": "T004",
       "description": "R1 matrix update — extend knowledge/conventions/type-designer-kind-selection.md R1 table to add cli, cli_composition, and cli_driver columns and CompositionRoot / PrimaryAdapter rows. Column entries for new rows: CompositionRoot: cli=forbidden, cli_composition=ONLY, cli_driver=forbidden (and forbidden in domain/usecase/infrastructure). PrimaryAdapter: cli=forbidden, cli_composition=forbidden, cli_driver=ONLY (and forbidden in domain/usecase/infrastructure). Existing rows: Dto — add cli=OK, cli_composition=forbidden, cli_driver=OK. ErrorType — add cli=OK, cli_composition=OK, cli_driver=forbidden. FreeFunction — add cli=OK, cli_composition=forbidden, cli_driver=OK. SecondaryAdapter — add cli=forbidden, cli_composition=forbidden, cli_driver=forbidden. All other roles not in the allowlist for cli-system layers are forbidden in all three new columns. Update the v5 roles note in the preamble to reflect 17 DataRole variants post this track. Depends on T001 (CompositionRoot/PrimaryAdapter must be defined before the matrix is authoritative).",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "6f1ab16536e0073e688369981753b0d98e8e7954"
     },
     {
       "id": "T005",
-      "description": "Draft type catalogues for cli, cli_composition, and cli_driver layers. Create track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/cli-types.json, cli-composition-types.json, and cli-driver-types.json (schema_version: 5). cli catalogue: CliError as role ErrorType (enum, existing public type in apps/cli/src/error.rs); all public clap command / args / filter enums and structs under apps/cli/src/commands (for example TrackCommand, ReviewCommand, DryCommand, SignalCommand, VerifyCommand, PrCommand, GitCommand, TelemetryCommand, FileCommand, PlanCommand, and their public *Args / *Filter / *Name types) as role Dto; pub dispatch free functions (execute_*, run_cli* in main.rs if pub — note fn main() is private, not catalogued; track_command_label / hook_command_hook_name / verify_command_gate_name are private helpers, not catalogued). cli_composition catalogue: CompositionError as role ErrorType (enum, apps/cli-composition/src/error.rs); per-context composition root structs (DemoCompositionRoot, ArchCompositionRoot, etc.) as role CompositionRoot (each is a wiring struct). Do not declare Dto or FreeFunction entries in cli_composition; if cli_composition::CommandOutcome, tee_stderr_to_file, or build_codex_read_only_invocation are public at implementation time, make them private helpers, remove/move them to cli_driver, or move behavior behind CompositionRoot build methods before catalogue linting so the catalogue stays within the allowlist. cli_driver catalogue: CommandOutcome (apps/cli-driver/src/render.rs) as role Dto (struct — it is a plain data carrier, not a primary-adapter driver itself); per-family driver structs (DemoDriver, TelemetryDriver, etc.) as role PrimaryAdapter (each holds an injected use case, exposes handle()); public render_* helpers in apps/cli-driver/src/render.rs as role FreeFunction (stateless output formatting functions). Input types (DemoInput, TelemetryInput, etc.) as role Dto. Use action: add for types newly declared in this track; use action: reference for types that already exist in the baseline and are not changed. Depends on T002 and T003 (architecture-rules.json must have tddd.enabled: true before catalogues are authored; lint rules must be in place for sotp track lint to validate).",
-      "status": "todo"
+      "description": "Type catalogue authoring for cli, cli_composition, and cli_driver layers (completed by Phase 2 type-designer). All three layer catalogues (cli-types.json, cli_composition-types.json, cli_driver-types.json) have been drafted at schema_version 5. cli catalogue: CliError (ErrorType), all public clap command/args/filter types as Dto, pub free functions as FreeFunction. cli_composition catalogue: CompositionError (ErrorType), all per-context *CompositionRoot structs (CompositionRoot), action:delete tombstones for CommandOutcome/tee_stderr_to_file/build_codex_read_only_invocation removed from this layer. cli_driver catalogue: CommandOutcome (Dto), *Driver structs (PrimaryAdapter), *Input types (Dto), format_pair_status (FreeFunction). New additions from IN-08/IN-09 type-designer pass: PlanInput (add, Dto) and PlanDriver (add, PrimaryAdapter) in cli_driver; PlanCompositionRoot (add, CompositionRoot) in cli_composition; ArchDriver/ConventionsDriver/FileDriver/VerifyDriver (modify, from Arc<*Port> to Arc<*Service> dependency); ArchCompositionRoot/ConventionsCompositionRoot/FileCompositionRoot/VerifyCompositionRoot (modify, updated wire chain). Depends on T002 and T003.",
+      "status": "done",
+      "commit_hash": null
     },
     {
       "id": "T006",
-      "description": "Baseline capture and CI gate. Capture rustdoc JSON baselines for cli, cli_composition, and cli_driver layers: run bin/sotp track baseline-capture (or the equivalent cargo make workflow) for each of the three layers now that tddd.enabled is true in architecture-rules.json. Handle the [[bin]] target edge case for cli: verify that the sotp signal calc-impl-catalog command can resolve the cli bin crate's rustdoc output and produce a signal. Fix any baseline-capture issues specific to [[bin]] targets. Run cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) and fix all remaining issues. sotp track lint must pass for all six active catalogues (domain, usecase, infrastructure, cli, cli_composition, cli_driver); the infrastructure catalogue is expected to remain empty for this track and must lint cleanly. Run sotp verify plan-artifact-refs as the final gate. Depends on T005.",
+      "description": "Baseline capture and CI gate. Capture rustdoc JSON baselines for cli, cli_composition, and cli_driver layers: run bin/sotp track baseline-capture (or the equivalent cargo make workflow) for each of the three layers now that tddd.enabled is true in architecture-rules.json. Handle the [[bin]] target edge case for cli: verify that the sotp signal calc-impl-catalog command can resolve the cli bin crate's rustdoc output and produce a signal. Fix any baseline-capture issues specific to [[bin]] targets. Run cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) and fix all remaining issues. sotp track lint must pass for all six active catalogues (domain, usecase, infrastructure, cli, cli_composition, cli_driver); the infrastructure catalogue includes the thin-bin refactor's CodexPlannerAdapter and must lint cleanly. Run sotp verify plan-artifact-refs as the final gate. Depends on T005 and T007-T013.",
+      "status": "in_progress"
+    },
+    {
+      "id": "T007",
+      "description": "Lint config fix — normalize PrimaryAdapter NoRoleInMethodSignature.forbidden_roles in .harness/catalogue-lint/presets/ddd-strict.json and .harness/catalogue-lint/config.json to the exact ADR 1420 D3 / IN-03 / AC-04 list: [\"Entity\", \"AggregateRoot\", \"ValueObject\", \"Repository\", \"SecondaryPort\", \"UseCase\", \"Interactor\", \"Command\", \"Query\"]. Remove the legacy extra entries \"DomainService\", \"Specification\", \"Factory\", \"DomainEvent\", \"EventPolicy\", \"SpecificationPort\", and \"ApplicationService\" from that rule. Per updated ADR 1420 D3, ApplicationService is NOT forbidden in PrimaryAdapter method signatures: cli_driver PrimaryAdapter must depend on ApplicationService (the application-level contract) rather than SecondaryPort per DIP. The KindLayerConstraint on ApplicationService (permitted only in usecase) already prevents ApplicationService from being declared in cli_driver; NoRoleInMethodSignature must not block the legitimate signature dependency. After this fix, sotp track lint must pass for ArchDriver/ConventionsDriver/FileDriver/PlanDriver/VerifyDriver (all take Arc<dyn *Service> in new()), and AC-04 is satisfied. Expected diff size: one forbidden_roles list update in each of the two config files. Depends on T003 (which introduced the broader rule list).",
+      "status": "todo"
+    },
+    {
+      "id": "T008",
+      "description": "ApplicationService / Interactor pair for Arch — implement in libs/usecase/src/arch.rs: ArchService trait (ApplicationService role) with render_tree/render_tree_full/render_members/render_direct_checks methods, and ArchInteractor struct (Interactor role) holding Arc<dyn ArchPort> and implementing ArchService by delegating to the port. Update apps/cli-driver/src/arch.rs: change ArchDriver's field from Arc<dyn ArchPort> to Arc<dyn ArchService> and update new() accordingly. Update apps/cli-composition/src/arch.rs: update ArchCompositionRoot.arch_driver() wire chain to FsArchAdapter -> ArchInteractor -> ArchDriver. All three files must compile and cargo make ci must pass after this task. Expected diff: ~80-150 lines total across usecase/cli_driver/cli_composition. Depends on T007 (lint config must accept Arc<dyn ArchService> in ArchDriver::new before sotp track lint passes).",
+      "status": "todo"
+    },
+    {
+      "id": "T009",
+      "description": "ApplicationService / Interactor pair for Conventions — implement in libs/usecase/src/conventions.rs: ConventionsService trait (ApplicationService role) with add_convention/update_index/verify_index methods, and ConventionsInteractor struct (Interactor role) holding Arc<dyn ConventionsPort> and implementing ConventionsService by delegating. Update apps/cli-driver/src/conventions.rs: change ConventionsDriver's field from Arc<dyn ConventionsPort> to Arc<dyn ConventionsService> and update new(). Update apps/cli-composition/src/conventions.rs: update ConventionsCompositionRoot.conventions_driver() wire chain to FsConventionsAdapter -> ConventionsInteractor -> ConventionsDriver. All three files must compile and cargo make ci must pass after this task. Expected diff: ~80-150 lines total. Depends on T007.",
+      "status": "todo"
+    },
+    {
+      "id": "T010",
+      "description": "ApplicationService / Interactor pair for File — implement in libs/usecase/src/file.rs: FileService trait (ApplicationService role) with write_atomic method, and FileInteractor struct (Interactor role) holding Arc<dyn FileWritePort> and implementing FileService by delegating. Update apps/cli-driver/src/file.rs: change FileDriver's field from Arc<dyn FileWritePort> to Arc<dyn FileService> and update new(). Update apps/cli-composition/src/file.rs: update FileCompositionRoot.file_driver() wire chain to FsFileWriteAdapter -> FileInteractor -> FileDriver. All three files must compile and cargo make ci must pass after this task. Expected diff: ~80-130 lines total. Depends on T007.",
+      "status": "todo"
+    },
+    {
+      "id": "T011",
+      "description": "ApplicationService / Interactor pair for Verify — implement in libs/usecase/src/verify.rs: VerifyService trait (ApplicationService role) with all verify_* methods (verify_tech_stack, verify_latest_track, verify_arch_docs, verify_layers, verify_hooks_path, verify_spec_attribution, verify_spec_frontmatter, verify_canonical_modules, verify_module_size, verify_domain_purity, verify_domain_strings, verify_usecase_purity, verify_doc_links, verify_view_freshness, verify_spec_signals, verify_plan_artifact_refs, verify_catalogue_spec_refs), and VerifyInteractor struct (Interactor role) holding Arc<dyn VerifyPort> and implementing VerifyService by delegating each method. Update apps/cli-driver/src/verify.rs: change VerifyDriver's field from Arc<dyn VerifyPort> to Arc<dyn VerifyService> and update new(). Update apps/cli-composition/src/verify.rs: update VerifyCompositionRoot.verify_driver() wire chain to FsVerifyAdapter -> VerifyInteractor -> VerifyDriver. All three files must compile and cargo make ci must pass after this task. Expected diff: ~150-250 lines total (VerifyService has many methods). Depends on T007.",
+      "status": "todo"
+    },
+    {
+      "id": "T012",
+      "description": "ApplicationService / Interactor pair for Planner (usecase layer) — implement in libs/usecase/src/planner.rs: PlannerPort trait (SecondaryPort role) with run(model, prompt, timeout_seconds) method returning Result<PlanRunOutput, PlannerPortError>; PlanRunOutput struct (Dto); PlannerPortError enum (ErrorType) with MissingPromptSource/PlannerUnavailable/PlannerTimeout/PlannerFailed variants; PlannerService trait (ApplicationService role) with run_codex_local(model, briefing_file, prompt, timeout_seconds) method; PlannerInteractor struct (Interactor role) holding Arc<dyn PlannerPort> and implementing PlannerService — absorbs prompt-resolution logic (briefing-file existence check and prompt construction currently in apps/cli/src/commands/plan/codex_local.rs plan_input_from_args) so that the resolution happens inside PlannerInteractor.run_codex_local before delegating to PlannerPort.run. Also implement CodexPlannerAdapter in libs/infrastructure/src/codex_planner.rs implementing PlannerPort: contains the subprocess spawn, stderr tee, and log-file write logic currently in apps/cli-composition/src/plan.rs or apps/cli/src/commands/plan/codex_local.rs. cargo make ci must pass after this task. Expected diff: ~200-350 lines across usecase/infrastructure. Depends on T001 (PlannerPort SecondaryPort and ApplicationService roles must be in DataRole/RoleKind).",
+      "status": "todo"
+    },
+    {
+      "id": "T013",
+      "description": "ApplicationService / Interactor pair for Planner (driver and composition layers) — after T007 and T012, update apps/cli-driver/src/plan.rs: introduce PlanDriver struct (PrimaryAdapter role) holding Arc<dyn PlannerService> with handle(PlanInput) -> CommandOutcome; PlanInput enum (Dto) with RunCodexLocal variant carrying model/timeout_seconds/briefing_file/prompt fields. Update apps/cli/src/commands/plan/codex_local.rs: strip application-level logic (prompt resolution, briefing-file existence check) so only clap args -> PlanInput conversion and dispatch to PlanCompositionRoot remain. Create apps/cli-composition/src/plan.rs: PlanCompositionRoot (CompositionRoot role) with new(runtime_dir) and plan_driver() wiring CodexPlannerAdapter -> PlannerInteractor -> PlanDriver. Remove or encapsulate any subprocess / I/O logic remaining in apps/cli-composition/src/ that was part of the pre-refactor plan flow. cargo make ci must pass after this task. Expected diff: ~150-280 lines across cli_driver/cli/cli_composition. Depends on T007 and T012.",
       "status": "todo"
     }
   ],
@@ -63,16 +101,15 @@
       },
       {
         "id": "S3",
-        "title": "Lint config expansion — KindLayerConstraint rules for new roles and cli layers",
+        "title": "Lint config — initial expansion and forbidden-role correction",
         "description": [
-          "T003 updates .harness/catalogue-lint/presets/ddd-strict.json to add the role-placement enforcement rules mandated by ADR 1420 D2/D3.",
-          "New rules: CompositionRoot → KindLayerConstraint (cli_composition only); PrimaryAdapter → KindLayerConstraint (cli_driver only); PrimaryAdapter → NoRoleInMethodSignature (forbid domain/usecase-layer roles in method signatures).",
-          "Extended rules: the role-global Dto constraint preserves usecase and infrastructure while adding cli and cli_driver; FreeFunction gains cli and cli_driver in its permitted layers. A new role-global ErrorType KindLayerConstraint rule permits domain, usecase, infrastructure, cli, and cli_composition while excluding cli_driver.",
-          "After T003, sotp track lint run against the cli-layer catalogues (drafted in T005) must produce zero violations for compliant entries and must report violations for intentionally misconfigured entries (AC-07 / AC-08 enforcement confirmation).",
-          "Depends on T001 (CompositionRoot, PrimaryAdapter, and FreeFunction must be defined in RoleKind and lint evaluation before rules referencing them are meaningful)."
+          "T003 introduced the KindLayerConstraint and NoRoleInMethodSignature rules for CompositionRoot and PrimaryAdapter, and extended Dto/FreeFunction/ErrorType rules for the three new cli layers. It was committed against the pre-revision ADR D3, whose PrimaryAdapter forbidden_roles list was broader than the updated ADR 1420 D3 / IN-03 / AC-04 exact list.",
+          "T007 corrects this by normalizing NoRoleInMethodSignature.forbidden_roles in both .harness/catalogue-lint/presets/ddd-strict.json and .harness/catalogue-lint/config.json to [\"Entity\", \"AggregateRoot\", \"ValueObject\", \"Repository\", \"SecondaryPort\", \"UseCase\", \"Interactor\", \"Command\", \"Query\"]. Per ADR 1420 D3 (revised post-Phase 1), PrimaryAdapter is expected to depend on ApplicationService (the application-level DIP contract); forbidding it via NoRoleInMethodSignature would cause the five Arc<dyn *Service> constructors in T008-T013 to fail lint. After T007, AC-04 is satisfied.",
+          "Depends on T003 (T007 is a targeted follow-up to the lint config T003 introduced)."
         ],
         "task_ids": [
-          "T003"
+          "T003",
+          "T007"
         ]
       },
       {
@@ -92,12 +129,10 @@
         "id": "S5",
         "title": "Type catalogue authoring for cli, cli_composition, and cli_driver",
         "description": [
-          "T005 drafts three layer-level type catalogues (cli-types.json, cli-composition-types.json, cli-driver-types.json) at schema_version 5.",
-          "cli catalogue: CliError (role: ErrorType), all public clap command / args / filter enums and structs under apps/cli/src/commands as Dto, and any public free functions in apps/cli. fn main() is private and not catalogued. The dispatch helpers (track_command_label, etc.) are private and not catalogued.",
-          "cli_composition catalogue: CompositionError (role: ErrorType), all per-context *CompositionRoot structs (role: CompositionRoot — these are the wiring structs that build and inject drivers). No Dto or FreeFunction entries are declared for cli_composition; if cli_composition::CommandOutcome, tee_stderr_to_file, or build_codex_read_only_invocation are public at implementation time, make them private helpers, remove/move them to cli_driver, or move behavior behind CompositionRoot build methods before catalogue linting.",
-          "cli_driver catalogue: CommandOutcome (role: Dto — a plain data carrier struct), per-family *Driver structs (role: PrimaryAdapter), public render_* helpers (role: FreeFunction), *Input enums (role: Dto).",
-          "Types that exist in the baseline and are not modified by this track use action: reference. Types newly declared in this track use action: add.",
-          "Depends on T002 (architecture-rules.json must have tddd.enabled: true) and T003 (lint rules must be in place for the sotp track lint validation in T006)."
+          "T005 authored all three layer-level type catalogues (cli-types.json, cli_composition-types.json, cli_driver-types.json) at schema_version 5.",
+          "The Phase 2 type-designer pass extended the catalogues with the ApplicationService/Interactor types for all five driver pairs: ArchService, ConventionsService, FileService, PlannerService, VerifyService (ApplicationService role) and corresponding *Interactor structs in usecase; modified ArchDriver, ConventionsDriver, FileDriver, VerifyDriver (modify action) and added PlanDriver, PlanInput in cli_driver; modified ArchCompositionRoot, ConventionsCompositionRoot, FileCompositionRoot, VerifyCompositionRoot and added PlanCompositionRoot in cli_composition. Also added PlannerPort (SecondaryPort), PlanRunOutput (Dto), PlannerPortError (ErrorType) in usecase.",
+          "The catalogue files are considered complete for Phase 3. Source files implementing these types are authored in T008-T013.",
+          "Depends on T002 and T003."
         ],
         "task_ids": [
           "T005"
@@ -105,13 +140,30 @@
       },
       {
         "id": "S6",
+        "title": "ApplicationService / Interactor implementation — five driver-port pairs",
+        "description": [
+          "T008-T013 implement the source code for all five ApplicationService / Interactor pairs declared in the type catalogues. T008-T011 handle the four simpler pairs (Arch, Conventions, File, Verify) where the Interactor is a pure delegation wrapper. T012-T013 handle the Planner pair in two sub-tasks: T012 implements PlannerPort/PlannerService/PlannerInteractor/CodexPlannerAdapter in the usecase and infrastructure layers; T013 wires PlanDriver and PlanCompositionRoot in the delivery layers and strips plan_input_from_args application logic from apps/cli.",
+          "The split follows the thin-bin constraint (ADR 1328 D5 / IN-08): apps/cli must not contain subprocess management or application-level prompt resolution after T013. Each task is scoped to keep the diff under 500 lines.",
+          "Tasks that expose Arc<dyn *Service> through PrimaryAdapter new() signatures depend on T007 (lint config must allow those signatures before sotp track lint can pass): T008-T011 and T013. T012 is the Planner usecase/infrastructure task and depends on T001 because PlannerPort / PlannerService role registration must exist before those usecase catalogue roles can be implemented. T013 also depends on T012 because PlannerService/PlannerInteractor must exist before PlanDriver can reference them."
+        ],
+        "task_ids": [
+          "T008",
+          "T009",
+          "T010",
+          "T011",
+          "T012",
+          "T013"
+        ]
+      },
+      {
+        "id": "S7",
         "title": "Baseline capture for new TDDD layers and final CI gate",
         "description": [
           "T006 captures the rustdoc JSON baselines for cli, cli_composition, and cli_driver (via bin/sotp track baseline-capture or the cargo make equivalent). The [[bin]] target edge case for the cli layer is the primary implementation risk: verify that cargo +nightly rustdoc --output-format json on a [[bin]] target produces usable rustdoc JSON and that bin/sotp signal calc-impl-catalog can consume it (AC-09).",
           "After successful baseline captures, runs cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) and fixes all remaining issues.",
-          "sotp track lint is run against all six active catalogues (domain, usecase, infrastructure, cli, cli_composition, cli_driver); the infrastructure catalogue is expected to remain empty for this track and must lint cleanly, and the full lint run must produce zero violations (AC-07). sotp track lint with a deliberately misconfigured entry (CompositionRoot in cli_driver, PrimaryAdapter in cli_composition) must produce violations (AC-08 enforcement confirmation).",
+          "sotp track lint is run against all six active catalogues (domain, usecase, infrastructure, cli, cli_composition, cli_driver). sotp track lint with a deliberately misconfigured entry (CompositionRoot in cli_driver, PrimaryAdapter in cli_composition) must produce violations (AC-08 enforcement confirmation).",
           "bin/sotp verify plan-artifact-refs is run as the final Phase 3 gate. AC-10 (cargo make ci all-green) is the final acceptance criterion for this section.",
-          "Depends on T005 (catalogues must be authored before baselines can be captured and lint can be run)."
+          "Depends on T005 and all tasks in S6 (T007-T013)."
         ],
         "task_ids": [
           "T006"

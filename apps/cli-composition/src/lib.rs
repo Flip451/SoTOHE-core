@@ -20,6 +20,7 @@ mod file;
 mod git;
 mod guard;
 mod hook;
+mod plan;
 mod pr;
 mod ref_verify;
 pub mod review_v2;
@@ -41,6 +42,60 @@ pub(crate) mod semantic_dup_driver_adapter;
 /// only place in the codebase where `tracing_subscriber` is initialised
 /// (IN-01 / CN-04 / AC-01).
 pub mod telemetry_wiring;
+
+// ---------------------------------------------------------------------------
+// Public re-exports for all DTOs (callers use `cli_composition::ReviewRunCodexInput` etc.)
+// ---------------------------------------------------------------------------
+
+pub use domain::ExportSchemaInput;
+pub use dry::{DryCheckApprovedInput, DryResultsInput, DryWriteInput, RunDryFixLocalInput};
+pub use error::CompositionError;
+pub use ref_verify::{RefVerifyCheckApprovedInput, RefVerifyRunInput};
+pub use review_v2::{
+    ReviewResultsInput, ReviewRunClaudeInput, ReviewRunCodexInput, ReviewRunLocalInput,
+    RunReviewFixLocalInput,
+};
+pub use semantic_dup::{
+    DupCheckInput, DupIndexBuildInput, DupIndexMeasureQualityInput, FindSimilarInput,
+};
+pub use signal::SignalGateName;
+pub use telemetry::TelemetryReportInput;
+pub use track::fixpoint_resolve::FixpointResolveInput;
+
+// ---------------------------------------------------------------------------
+// Per-context composition root re-exports (AC-04 / D2)
+// ---------------------------------------------------------------------------
+
+pub use arch::ArchCompositionRoot;
+pub use conventions::ConventionsCompositionRoot;
+pub use demo::DemoCompositionRoot;
+pub use domain::DomainCompositionRoot;
+pub use dry::DryCompositionRoot;
+pub use dry_fix_runner::DryFixRunnerCompositionRoot;
+pub use file::FileCompositionRoot;
+pub use git::GitCompositionRoot;
+pub use guard::GuardCompositionRoot;
+pub use hook::HookCompositionRoot;
+pub use plan::PlanCompositionRoot;
+pub use pr::PrCompositionRoot;
+pub use ref_verify::RefVerifyCompositionRoot;
+pub use review_v2::ReviewCompositionRoot;
+pub use semantic_dup::SemanticDupCompositionRoot;
+pub use signal::SignalCompositionRoot;
+pub use telemetry::TelemetryCompositionRoot;
+pub use track::composition_root::TrackCompositionRoot;
+pub use verify::VerifyCompositionRoot;
+
+// ---------------------------------------------------------------------------
+// Public API types
+// ---------------------------------------------------------------------------
+
+/// Unified return type for all command methods.
+///
+/// Re-exported from `cli_driver` as the canonical single definition.
+/// `bin` reads `stdout` / `stderr` and emits them, then exits with `exit_code`.
+/// All fields are primitives so `bin` never needs to import domain types (CN-02).
+pub use cli_driver::CommandOutcome;
 
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::panic)]
@@ -96,124 +151,5 @@ pub(crate) mod test_support {
         run_git(path, &["init", "-q"]);
         run_git(path, &["checkout", "-B", branch]);
         run_git(path, &["commit", "--allow-empty", "-m", "init", "--no-gpg-sign"]);
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Public re-exports for all DTOs (callers use `cli_composition::ReviewRunCodexInput` etc.)
-// ---------------------------------------------------------------------------
-
-pub use domain::ExportSchemaInput;
-pub use dry::{DryCheckApprovedInput, DryResultsInput, DryWriteInput, RunDryFixLocalInput};
-pub use error::CompositionError;
-pub use ref_verify::{RefVerifyCheckApprovedInput, RefVerifyRunInput};
-pub use review_v2::{
-    ReviewResultsInput, ReviewRunClaudeInput, ReviewRunCodexInput, ReviewRunLocalInput,
-    RunReviewFixLocalInput,
-};
-pub use semantic_dup::{
-    DupCheckInput, DupIndexBuildInput, DupIndexMeasureQualityInput, FindSimilarInput,
-};
-pub use signal::SignalGateName;
-pub use telemetry::TelemetryReportInput;
-pub use track::fixpoint_resolve::FixpointResolveInput;
-
-// ---------------------------------------------------------------------------
-// Per-context composition root re-exports (AC-04 / D2)
-// ---------------------------------------------------------------------------
-
-pub use arch::ArchCompositionRoot;
-pub use conventions::ConventionsCompositionRoot;
-pub use demo::DemoCompositionRoot;
-pub use domain::DomainCompositionRoot;
-pub use dry::DryCompositionRoot;
-pub use dry_fix_runner::DryFixRunnerCompositionRoot;
-pub use file::FileCompositionRoot;
-pub use git::GitCompositionRoot;
-pub use guard::GuardCompositionRoot;
-pub use hook::HookCompositionRoot;
-pub use pr::PrCompositionRoot;
-pub use ref_verify::RefVerifyCompositionRoot;
-pub use review_v2::ReviewCompositionRoot;
-pub use semantic_dup::SemanticDupCompositionRoot;
-pub use signal::SignalCompositionRoot;
-pub use telemetry::TelemetryCompositionRoot;
-pub use track::composition_root::TrackCompositionRoot;
-pub use verify::VerifyCompositionRoot;
-
-/// Tee the child process's stderr to a log file while also forwarding each
-/// line to the current process's stderr.
-///
-/// Implemented natively with stdlib types so that `apps/cli` can call this
-/// helper without importing `infrastructure` directly.  The signature uses
-/// only `std` types; no infrastructure types cross the boundary.
-pub fn tee_stderr_to_file(pipe: std::process::ChildStderr, mut log_file: std::fs::File) {
-    use std::io::{BufRead as _, BufReader, Write as _};
-
-    let reader = BufReader::new(pipe);
-    for line in reader.lines() {
-        match line {
-            Ok(line) => {
-                let _ = writeln!(log_file, "{line}");
-                eprintln!("{line}");
-            }
-            Err(_) => break,
-        }
-    }
-    let _ = log_file.flush();
-}
-
-/// Build the argument vector for a `codex exec --sandbox read-only` invocation.
-///
-/// Re-exports [`infrastructure::codex_common::build_codex_read_only_invocation`]
-/// so that `apps/cli` test helpers can reuse it without importing
-/// `infrastructure` directly (which the architecture disallows for `cli`).
-///
-/// # Arguments
-/// - `model`: Codex model name.
-/// - `reasoning_effort`: `model_reasoning_effort` value (e.g. `"high"`).
-/// - `prompt`: Full prompt string.
-/// - `output_last_message`: Path where Codex writes the last message JSON.
-/// - `output_schema`: Path to the JSON schema file for structured output.
-pub fn build_codex_read_only_invocation(
-    model: &str,
-    reasoning_effort: &str,
-    prompt: &str,
-    output_last_message: &std::path::Path,
-    output_schema: &std::path::Path,
-) -> Vec<std::ffi::OsString> {
-    infrastructure::codex_common::build_codex_read_only_invocation(
-        model,
-        reasoning_effort,
-        prompt,
-        output_last_message,
-        output_schema,
-    )
-}
-
-// ---------------------------------------------------------------------------
-// Public API types
-// ---------------------------------------------------------------------------
-
-/// Unified return type for all command methods.
-///
-/// `bin` reads `stdout` / `stderr` and emits them, then exits with `exit_code`.
-/// All fields are primitives so `bin` never needs to import domain types (CN-02).
-#[derive(Debug, Clone)]
-pub struct CommandOutcome {
-    pub stdout: Option<String>,
-    pub stderr: Option<String>,
-    pub exit_code: u8,
-}
-
-impl CommandOutcome {
-    /// Convenience constructor: success with optional stdout text.
-    pub fn success(stdout: Option<String>) -> Self {
-        Self { stdout, stderr: None, exit_code: 0 }
-    }
-
-    /// Convenience constructor: failure with optional stderr text.
-    pub fn failure(stderr: Option<String>) -> Self {
-        Self { stdout: None, stderr, exit_code: 1 }
     }
 }

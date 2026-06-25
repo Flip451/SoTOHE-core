@@ -1,7 +1,5 @@
 //! CLI subcommands for local reviewer workflow wrappers.
 
-#[cfg(test)]
-use std::ffi::OsString;
 use std::path::PathBuf;
 use std::process::ExitCode;
 
@@ -9,8 +7,6 @@ use clap::{ArgGroup, Args, Subcommand};
 use cli_driver::review::ReviewInput;
 #[cfg(test)]
 use usecase::review_v2::{ReviewApprovalDecision, ReviewApprovalOutput};
-#[cfg(test)]
-use usecase::review_workflow::ReviewVerdict;
 
 mod classify;
 mod claude_local;
@@ -31,11 +27,6 @@ use local::{LocalArgs, execute_local};
 use results::execute_results;
 
 const DEFAULT_TIMEOUT_SECONDS: u64 = 1800;
-
-#[cfg(test)]
-pub(super) const REVIEW_RUNTIME_DIR: &str = "tmp/reviewer-runtime";
-#[cfg(test)]
-pub(super) const CODEX_BIN_ENV: &str = "SOTP_CODEX_BIN";
 
 #[derive(Debug, Subcommand)]
 pub enum ReviewCommand {
@@ -347,31 +338,6 @@ pub struct ResultsArgs {
     /// Suppress the commit hint line.
     #[arg(long)]
     pub(super) no_hint: bool,
-}
-
-// These types are only needed by the test shim in codex_local.rs.
-#[cfg(test)]
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub(super) struct ReviewRunResult {
-    pub(super) verdict: ReviewVerdict,
-    pub(super) final_message: Option<String>,
-    pub(super) output_last_message: PathBuf,
-    pub(super) output_last_message_auto_managed: bool,
-    pub(super) verdict_detail: Option<String>,
-}
-
-#[cfg(test)]
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub(super) struct CodexInvocation {
-    pub(super) bin: OsString,
-    pub(super) args: Vec<OsString>,
-}
-
-#[cfg(test)]
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub(super) struct OutputLastMessagePath {
-    pub(super) path: PathBuf,
-    pub(super) auto_managed: bool,
 }
 
 pub fn execute(cmd: ReviewCommand) -> ExitCode {
