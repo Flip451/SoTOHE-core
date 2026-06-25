@@ -4,5 +4,5 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| ReviewScopeConfig | domain_service | modify | — | 🟡 | 🔵 |
+| ReviewScopeConfig | domain_service | modify | — | 🔵 | 🔵 |
 

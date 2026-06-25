@@ -78,7 +78,7 @@ impl ReviewScopeConfig {
         operational: Vec<String>,
         other_track: Vec<String>,
         default_diff_ceiling: Option<u32>,
-    ) -> Result<Self, ScopeConfigError> {
+    ) -> Result<ReviewScopeConfig, ScopeConfigError> {
         // Build named scopes
         let mut scopes = HashMap::new();
         for (name, patterns, briefing_file, diff_ceiling) in entries {
