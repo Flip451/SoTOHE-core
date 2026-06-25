@@ -2,7 +2,7 @@
 
 use std::path::PathBuf;
 
-use crate::{CommandOutcome, cmd_outcome::render_outcome, error::CompositionError};
+use crate::{CommandOutcome, error::CompositionError};
 
 // ---------------------------------------------------------------------------
 // Per-context composition root
@@ -69,64 +69,15 @@ pub fn execute_catalogue_spec_refs(
 
 impl VerifyCompositionRoot {
     /// Build a wired [`cli_driver::verify::VerifyDriver`] for the verify family.
+    ///
+    /// Wire chain: `FsVerifyAdapter` → `VerifyInteractor` → `VerifyDriver`.
     pub fn verify_driver(&self) -> cli_driver::verify::VerifyDriver {
         use infrastructure::FsVerifyAdapter;
         use std::sync::Arc;
+        use usecase::verify::{VerifyInteractor, VerifyPort};
 
-        let port = Arc::new(FsVerifyAdapter::new());
-        cli_driver::verify::VerifyDriver::new(port)
-    }
-
-    /// Check local Git config uses `.githooks` as `core.hooksPath`.
-    ///
-    /// # Errors
-    /// Returns `Err` when the underlying composition logic fails.
-    pub fn verify_hooks_path(
-        &self,
-        project_root: PathBuf,
-    ) -> Result<CommandOutcome, CompositionError> {
-        let outcome = infrastructure::verify::hooks_path::verify(&project_root);
-        Ok(render_outcome("verify hooks path", &outcome))
-    }
-}
-
-#[cfg(test)]
-#[allow(clippy::unwrap_used)]
-mod tests {
-    use infrastructure::verify::test_support::run_git;
-
-    use super::*;
-
-    #[test]
-    fn test_verify_hooks_path_with_githooks_configured_returns_success() {
-        let dir = tempfile::tempdir().unwrap();
-        run_git(dir.path(), &["init"]);
-        run_git(dir.path(), &["config", "--local", "core.hooksPath", ".githooks"]);
-
-        let outcome =
-            VerifyCompositionRoot::new().verify_hooks_path(dir.path().to_path_buf()).unwrap();
-
-        assert_eq!(outcome.exit_code, 0);
-        let stdout = outcome.stdout.unwrap();
-        assert!(stdout.contains("--- verify hooks path ---"));
-        assert!(stdout.contains("[OK] All checks passed."));
-        assert!(stdout.contains("--- verify hooks path PASSED ---"));
-        assert!(outcome.stderr.is_none());
-    }
-
-    #[test]
-    fn test_verify_hooks_path_with_unset_config_returns_failure() {
-        let dir = tempfile::tempdir().unwrap();
-        run_git(dir.path(), &["init"]);
-
-        let outcome =
-            VerifyCompositionRoot::new().verify_hooks_path(dir.path().to_path_buf()).unwrap();
-
-        assert_eq!(outcome.exit_code, 1);
-        let stdout = outcome.stdout.unwrap();
-        assert!(stdout.contains("--- verify hooks path ---"));
-        assert!(stdout.contains("core.hooksPath is not set to .githooks"));
-        assert!(stdout.contains("--- verify hooks path FAILED ---"));
-        assert!(outcome.stderr.is_none());
+        let adapter = Arc::new(FsVerifyAdapter::new());
+        let interactor = Arc::new(VerifyInteractor::new(adapter as Arc<dyn VerifyPort>));
+        cli_driver::verify::VerifyDriver::new(interactor)
     }
 }

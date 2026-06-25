@@ -62,5 +62,5 @@
 | SignalDriver | primary_adapter | reference | — | 🔵 | 🔵 |
 | TelemetryDriver | primary_adapter | reference | — | 🔵 | 🔵 |
 | TrackDriver | primary_adapter | reference | — | 🔵 | 🔵 |
-| VerifyDriver | primary_adapter | modify | — | 🟡 | 🔵 |
+| VerifyDriver | primary_adapter | modify | — | 🔵 | 🔵 |
 

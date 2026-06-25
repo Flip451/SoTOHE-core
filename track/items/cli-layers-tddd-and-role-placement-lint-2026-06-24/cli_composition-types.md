@@ -41,5 +41,5 @@
 | SignalCompositionRoot | composition_root | reference | — | 🔵 | 🔵 |
 | TelemetryCompositionRoot | composition_root | reference | — | 🔵 | 🔵 |
 | TrackCompositionRoot | composition_root | reference | — | 🔵 | 🔵 |
-| VerifyCompositionRoot | composition_root | modify | — | 🟡 | 🔵 |
+| VerifyCompositionRoot | composition_root | modify | — | 🔵 | 🔵 |
 

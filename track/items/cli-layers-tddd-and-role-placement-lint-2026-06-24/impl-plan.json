@@ -57,7 +57,8 @@
     {
       "id": "T010",
       "description": "ApplicationService / Interactor pair for File — implement in libs/usecase/src/file.rs: FileService trait (ApplicationService role) with write_atomic method, and FileInteractor struct (Interactor role) holding Arc<dyn FileWritePort> and implementing FileService by delegating. Update apps/cli-driver/src/file.rs: change FileDriver's field from Arc<dyn FileWritePort> to Arc<dyn FileService> and update new(). Update apps/cli-composition/src/file.rs: update FileCompositionRoot.file_driver() wire chain to FsFileWriteAdapter -> FileInteractor -> FileDriver. All three files must compile and cargo make ci must pass after this task. Expected diff: ~80-130 lines total. Depends on T007.",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "4eb0a4aeec05c5fd6f185dcf16f033684168aa54"
     },
     {
       "id": "T011",
