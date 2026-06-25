@@ -8,8 +8,8 @@ use std::sync::Arc;
 
 /// Composition root for the `conventions` command family.
 ///
-/// This family has no injectable adapter dependencies; the infrastructure
-/// functions are called directly inside each method.
+/// Wires the `ConventionsPort` adapter into `ConventionsInteractor`, then injects
+/// `ConventionsInteractor` into `ConventionsDriver`.
 pub struct ConventionsCompositionRoot;
 
 impl ConventionsCompositionRoot {
@@ -27,10 +27,14 @@ impl Default for ConventionsCompositionRoot {
 
 impl ConventionsCompositionRoot {
     /// Build a wired [`cli_driver::conventions::ConventionsDriver`] for the conventions family.
+    ///
+    /// Wire chain: `FsConventionsAdapter` → `ConventionsInteractor` → `ConventionsDriver`.
     pub fn conventions_driver(&self) -> cli_driver::conventions::ConventionsDriver {
         use infrastructure::conventions::FsConventionsAdapter;
+        use usecase::conventions::{ConventionsInteractor, ConventionsPort};
 
-        let port = Arc::new(FsConventionsAdapter::new());
-        cli_driver::conventions::ConventionsDriver::new(port)
+        let adapter = Arc::new(FsConventionsAdapter::new());
+        let interactor = Arc::new(ConventionsInteractor::new(adapter as Arc<dyn ConventionsPort>));
+        cli_driver::conventions::ConventionsDriver::new(interactor)
     }
 }
