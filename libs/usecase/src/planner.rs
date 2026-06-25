@@ -31,7 +31,7 @@ pub enum PlannerPortError {
     MissingPromptSource,
 
     /// The planner could not be started or contacted.
-    #[error("planner unavailable")]
+    #[error("planner unavailable: {reason}")]
     PlannerUnavailable { reason: String },
 
     /// The planner request exceeded the allowed time.
