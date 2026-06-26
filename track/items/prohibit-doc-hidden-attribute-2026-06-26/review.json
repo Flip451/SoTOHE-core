@@ -1,17 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "cli": {
-      "rounds": [
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:663c23c399fd0a9cbbc07b9a41b0475eebe46b5d398dc67a49d07c780075806b",
-          "at": "2026-06-26T11:30:30Z"
-        }
-      ]
-    },
     "infrastructure": {
       "rounds": [
         {
@@ -215,17 +204,35 @@
           "findings": [],
           "hash": "rvw1:sha256:a007cee41a952f8cdf442fbe81e1d3669c0c3c1a7e3e8e2d86f4171c18ceb83b",
           "at": "2026-06-26T18:45:16Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a839517a82eeb87ffb3fb615cee3e198bbf712ce7ef6bb9e41b7dde51b875684",
+          "at": "2026-06-26T19:06:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new body walk only visits `Stmt::Item` entries that are direct children of the function/method/default-method block. Rust items can also be declared inside nested blocks or control-flow bodies, e.g. `fn f() { if cond { #[doc(hidden)] struct X; } }`; those appear under expression blocks and are skipped here, so the new doc-hidden gate still has a production bypass. The scanner needs to recurse through statement expressions/blocks, or use `syn::visit`, while preserving the existing `#[cfg(test)]` pruning.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/syn_scan.rs",
+              "line": 485,
+              "category": "scanner false negative"
+            }
+          ],
+          "hash": "rvw1:sha256:a839517a82eeb87ffb3fb615cee3e198bbf712ce7ef6bb9e41b7dde51b875684",
+          "at": "2026-06-26T19:10:20Z"
+        },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:763459a6efbc7fa614fd826d2f13b08bfef5a2e176ffde796c11caf80b3a68a8",
-          "at": "2026-06-26T11:34:02Z"
+          "hash": "rvw1:sha256:f420ba6c3def9f198ad64ddeb565d0e689eab664e309ce11a29f3b7890b25841",
+          "at": "2026-06-26T19:16:09Z"
         }
       ]
     },
@@ -237,24 +244,6 @@
           "findings": [],
           "hash": "rvw1:sha256:8cf39553ddfa2cc58beac6bc96e2a7b81a15485fd600d4f4a021613cfe3e9af2",
           "at": "2026-06-26T11:32:52Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0d984876b867a5ecabd80e498d9bdbcb94f6af4f23faaab41a8fc65cc6539cf8",
-          "at": "2026-06-26T11:30:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0d984876b867a5ecabd80e498d9bdbcb94f6af4f23faaab41a8fc65cc6539cf8",
-          "at": "2026-06-26T12:01:21Z"
         }
       ]
     },
@@ -433,6 +422,46 @@
           "findings": [],
           "hash": "rvw1:sha256:b8d06746999c77799440c924b12c678ba5d09d384bad91192351d009af78332a",
           "at": "2026-06-26T12:12:07Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0d984876b867a5ecabd80e498d9bdbcb94f6af4f23faaab41a8fc65cc6539cf8",
+          "at": "2026-06-26T11:30:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0d984876b867a5ecabd80e498d9bdbcb94f6af4f23faaab41a8fc65cc6539cf8",
+          "at": "2026-06-26T12:01:21Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:763459a6efbc7fa614fd826d2f13b08bfef5a2e176ffde796c11caf80b3a68a8",
+          "at": "2026-06-26T11:34:02Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:663c23c399fd0a9cbbc07b9a41b0475eebe46b5d398dc67a49d07c780075806b",
+          "at": "2026-06-26T11:30:30Z"
         }
       ]
     }

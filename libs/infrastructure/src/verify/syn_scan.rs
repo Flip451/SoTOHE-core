@@ -476,6 +476,11 @@ where
                     self.visit_foreign_item(foreign_item);
                 }
             }
+            syn::Item::Fn(item_fn) => {
+                // Walk function bodies for local item declarations, including
+                // items nested in expression blocks and control-flow bodies.
+                self.visit_block_for_local_items(&item_fn.block);
+            }
             _ => {}
         }
     }
@@ -486,6 +491,9 @@ where
             return;
         }
         self.emit("impl_item", attrs);
+        if let syn::ImplItem::Fn(method) = item {
+            self.visit_block_for_local_items(&method.block);
+        }
     }
 
     fn visit_trait_item(&mut self, item: &syn::TraitItem) {
@@ -494,6 +502,11 @@ where
             return;
         }
         self.emit("trait_item", attrs);
+        if let syn::TraitItem::Fn(method) = item {
+            if let Some(body) = &method.default {
+                self.visit_block_for_local_items(body);
+            }
+        }
     }
 
     fn visit_field(&mut self, field: &syn::Field) {
@@ -520,6 +533,24 @@ where
             return;
         }
         self.emit("foreign_item", attrs);
+    }
+
+    fn visit_block_for_local_items(&mut self, block: &syn::Block) {
+        let mut visitor = LocalItemVisitor { node_visitor: self };
+        syn::visit::visit_block(&mut visitor, block);
+    }
+}
+
+struct LocalItemVisitor<'node, 'a, F> {
+    node_visitor: &'node mut NodeVisitor<'a, F>,
+}
+
+impl<'ast, 'node, 'a, F> syn::visit::Visit<'ast> for LocalItemVisitor<'node, 'a, F>
+where
+    F: FnMut(SynScanContext) -> Vec<VerifyFinding>,
+{
+    fn visit_item(&mut self, item: &'ast syn::Item) {
+        self.node_visitor.visit_item(item);
     }
 }
 

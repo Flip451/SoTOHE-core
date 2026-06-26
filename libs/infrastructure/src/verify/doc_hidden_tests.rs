@@ -833,3 +833,149 @@ fn test_ignores_doc_hidden_when_parent_module_file_has_inner_cfg_test() {
         outcome.findings()
     );
 }
+
+// ── LB01-LB05: local items in function / method bodies ──────────────────────
+
+/// LB01: `fn f() { #[doc(hidden)] struct Local; }` — `#[doc(hidden)]` on a
+/// local struct declaration inside a function body must be flagged.
+#[test]
+fn test_detects_doc_hidden_on_local_struct_in_fn_body() {
+    let tmp = TempDir::new().unwrap();
+    setup(tmp.path(), concat!("fn f() {\n", "    #[doc(hidden)]\n", "    struct Local;\n", "}\n"));
+    let outcome = verify(tmp.path());
+    assert!(
+        outcome.has_errors(),
+        "expected error for #[doc(hidden)] on local struct in fn body (LB01): {:?}",
+        outcome.findings()
+    );
+}
+
+/// LB02: `fn f() { #[doc(hidden)] fn inner() {} }` — `#[doc(hidden)]` on a
+/// local function declaration inside a function body must be flagged.
+#[test]
+fn test_detects_doc_hidden_on_local_fn_in_fn_body() {
+    let tmp = TempDir::new().unwrap();
+    setup(tmp.path(), concat!("fn f() {\n", "    #[doc(hidden)]\n", "    fn inner() {}\n", "}\n"));
+    let outcome = verify(tmp.path());
+    assert!(
+        outcome.has_errors(),
+        "expected error for #[doc(hidden)] on local fn in fn body (LB02): {:?}",
+        outcome.findings()
+    );
+}
+
+/// LB03: `#[cfg(test)] fn t() { #[doc(hidden)] struct X; }` — when the
+/// enclosing function is `#[cfg(test)]`, local items inside its body must
+/// not be flagged (the outer test-gate excludes the entire body).
+#[test]
+fn test_ignores_doc_hidden_in_local_item_inside_cfg_test_fn() {
+    let tmp = TempDir::new().unwrap();
+    setup(
+        tmp.path(),
+        concat!("#[cfg(test)]\n", "fn t() {\n", "    #[doc(hidden)]\n", "    struct X;\n", "}\n"),
+    );
+    let outcome = verify(tmp.path());
+    assert!(
+        outcome.is_ok(),
+        "#[doc(hidden)] local item inside #[cfg(test)] fn must not be flagged (LB03): {:?}",
+        outcome.findings()
+    );
+}
+
+/// LB04: `fn f() { #[cfg(test)] #[doc(hidden)] struct X; }` — when the local
+/// item itself carries `#[cfg(test)]`, it must not be flagged even though the
+/// enclosing function is production code.
+#[test]
+fn test_ignores_doc_hidden_on_local_item_with_cfg_test_attr_in_fn_body() {
+    let tmp = TempDir::new().unwrap();
+    setup(
+        tmp.path(),
+        concat!(
+            "fn f() {\n",
+            "    #[cfg(test)]\n",
+            "    #[doc(hidden)]\n",
+            "    struct X;\n",
+            "}\n"
+        ),
+    );
+    let outcome = verify(tmp.path());
+    assert!(
+        outcome.is_ok(),
+        "#[doc(hidden)] local item with its own #[cfg(test)] must not be flagged (LB04): {:?}",
+        outcome.findings()
+    );
+}
+
+/// LB05: `impl S { fn m(&self) { #[doc(hidden)] enum E {} } }` — `#[doc(hidden)]`
+/// on a local item inside an impl method body must be flagged.
+#[test]
+fn test_detects_doc_hidden_on_local_enum_in_impl_method_body() {
+    let tmp = TempDir::new().unwrap();
+    setup(
+        tmp.path(),
+        concat!(
+            "struct S;\n",
+            "impl S {\n",
+            "    fn m(&self) {\n",
+            "        #[doc(hidden)]\n",
+            "        enum E {}\n",
+            "    }\n",
+            "}\n"
+        ),
+    );
+    let outcome = verify(tmp.path());
+    assert!(
+        outcome.has_errors(),
+        "expected error for #[doc(hidden)] on local enum in impl method body (LB05): {:?}",
+        outcome.findings()
+    );
+}
+
+/// LB06: `fn f() { if cond { #[doc(hidden)] struct X; } }` — local items
+/// nested under expression/control-flow blocks must be flagged.
+#[test]
+fn test_detects_doc_hidden_on_local_struct_in_nested_if_block() {
+    let tmp = TempDir::new().unwrap();
+    setup(
+        tmp.path(),
+        concat!(
+            "fn f() {\n",
+            "    if true {\n",
+            "        #[doc(hidden)]\n",
+            "        struct X;\n",
+            "    }\n",
+            "}\n"
+        ),
+    );
+    let outcome = verify(tmp.path());
+    assert!(
+        outcome.has_errors(),
+        "expected error for #[doc(hidden)] on local struct in nested if block (LB06): {:?}",
+        outcome.findings()
+    );
+}
+
+/// LB07: local items nested in expression/control-flow blocks keep their own
+/// `#[cfg(test)]` pruning.
+#[test]
+fn test_ignores_doc_hidden_on_cfg_test_local_item_inside_nested_if_block() {
+    let tmp = TempDir::new().unwrap();
+    setup(
+        tmp.path(),
+        concat!(
+            "fn f() {\n",
+            "    if true {\n",
+            "        #[cfg(test)]\n",
+            "        #[doc(hidden)]\n",
+            "        struct X;\n",
+            "    }\n",
+            "}\n"
+        ),
+    );
+    let outcome = verify(tmp.path());
+    assert!(
+        outcome.is_ok(),
+        "#[doc(hidden)] cfg(test) local item inside nested if block must not be flagged (LB07): {:?}",
+        outcome.findings()
+    );
+}
