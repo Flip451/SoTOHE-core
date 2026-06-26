@@ -7,31 +7,23 @@
       "evidence_hash": "68a8ccee2a17ff3c9d1840b2d4c59b7b67bbed93f4f262279973abf637481708",
       "verdict": {
         "kind": "pass",
-        "citation": "option として `--track-id` (optional; 省略時はブランチから自動解決)、`--items-dir` (default: `track/items`)、`--chain {1|2|all}`、`--layer <name>|all`、`--filter {pass|fail|pending|all}` を持つ"
-      }
-    },
-    {
-      "claim_hash": "a56e7971d3466bf3fc34682ed8f76c72898e0cad0dc55141d942c3d5eeab4643",
-      "evidence_hash": "68a8ccee2a17ff3c9d1840b2d4c59b7b67bbed93f4f262279973abf637481708",
-      "verdict": {
-        "kind": "pass",
         "citation": "`sotp ref-verify results` CLI サブコマンドの実装。option として `--track-id` (optional; 省略時はブランチから自動解決)、`--items-dir` (default: `track/items`)、`--chain {1|2|all}`、`--layer <name>|all`、`--filter {pass|fail|pending|all}` を持つ"
-      }
-    },
-    {
-      "claim_hash": "9eeb29bb3f27a91e67f6f0667d5e998e1e145264ba6a76e31684c84d2efcac33",
-      "evidence_hash": "68a8ccee2a17ff3c9d1840b2d4c59b7b67bbed93f4f262279973abf637481708",
-      "verdict": {
-        "kind": "pass",
-        "citation": "`sotp ref-verify results` CLI サブコマンドの実装。option として `--track-id` (optional; 省略時はブランチから自動解決)、`--items-dir` (default: `track/items`)、`--chain {1|2|all}`、`--layer <name>|all`、`--filter {pass|fail|pending|all}` を持つ"
-      }
-    },
-    {
-      "claim_hash": "8d7f4b813f9425cac6ee517dc492e78a466efad50abbf2308601fe37e083599b",
-      "evidence_hash": "68a8ccee2a17ff3c9d1840b2d4c59b7b67bbed93f4f262279973abf637481708",
-      "verdict": {
-        "kind": "pass",
-        "citation": "`sotp ref-verify results` CLI サブコマンドの実装。option として `--track-id` (optional; 省略時はブランチから自動解決)、`--items-dir` (default: `track/items`)、`--chain {1|2|all}`、`--layer <name>|all`、`--filter {pass|fail|pending|all}` を持つ"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/ref-verify-results-command-2026-06-26/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "RefVerifyChainSelect"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "`sotp ref-verify results` CLI サブコマンドの実装。option として `--track-id` (optional; 省略時はブランチから自動解決)、`--items-dir` (default: `track/items`)、`--chain {1|2|all}`、`--layer <name>|all`、`--filter {pass|fail|pending|all}` を持つ"
+        }
       }
     },
     {
@@ -40,6 +32,22 @@
       "verdict": {
         "kind": "pass",
         "citation": "`sotp ref-verify results` CLI サブコマンドの実装。option として `--track-id` (optional; 省略時はブランチから自動解決)、`--items-dir` (default: `track/items`)、`--chain {1|2|all}`、`--layer <name>|all`、`--filter {pass|fail|pending|all}` を持つ"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/ref-verify-results-command-2026-06-26/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "RefVerifyDriver"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "`sotp ref-verify results` CLI サブコマンドの実装。option として `--track-id` (optional; 省略時はブランチから自動解決)、`--items-dir` (default: `track/items`)、`--chain {1|2|all}`、`--layer <name>|all`、`--filter {pass|fail|pending|all}` を持つ"
+        }
       }
     },
     {
@@ -48,6 +56,46 @@
       "verdict": {
         "kind": "pass",
         "citation": "`sotp ref-verify results` コマンドが実行可能であり、先頭ブロック (Chain×Layer 集計) + レコードブロック (fail/pending pair) + Summary 行を含む text を stdout に出力する。exit code は 0"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/ref-verify-results-command-2026-06-26/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "RefVerifyDriver"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`sotp ref-verify results` コマンドが実行可能であり、先頭ブロック (Chain×Layer 集計) + レコードブロック (fail/pending pair) + Summary 行を含む text を stdout に出力する。exit code は 0"
+        }
+      }
+    },
+    {
+      "claim_hash": "a56e7971d3466bf3fc34682ed8f76c72898e0cad0dc55141d942c3d5eeab4643",
+      "evidence_hash": "68a8ccee2a17ff3c9d1840b2d4c59b7b67bbed93f4f262279973abf637481708",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp ref-verify results` CLI サブコマンドの実装。option として `--track-id` (optional; 省略時はブランチから自動解決)、`--items-dir` (default: `track/items`)、`--chain {1|2|all}`、`--layer <name>|all`、`--filter {pass|fail|pending|all}` を持つ"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/ref-verify-results-command-2026-06-26/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "RefVerifyInput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "`sotp ref-verify results` CLI サブコマンドの実装。option として `--track-id` (optional; 省略時はブランチから自動解決)、`--items-dir` (default: `track/items`)、`--chain {1|2|all}`、`--layer <name>|all`、`--filter {pass|fail|pending|all}` を持つ"
+        }
       }
     },
     {
@@ -55,7 +103,23 @@
       "evidence_hash": "68a8ccee2a17ff3c9d1840b2d4c59b7b67bbed93f4f262279973abf637481708",
       "verdict": {
         "kind": "pass",
-        "citation": "`sotp ref-verify results` CLI サブコマンドの実装。option として `--track-id` (optional; 省略時はブランチから自動解決)、`--items-dir` (default: `track/items`)、`--chain {1|2|all}`、`--layer <name>|all`、`--filter {pass|fail|pending|all}` を持つ"
+        "citation": "option として `--track-id` (optional; 省略時はブランチから自動解決)、`--items-dir` (default: `track/items`)、`--chain {1|2|all}`、`--layer <name>|all`、`--filter {pass|fail|pending|all}` を持つ"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/ref-verify-results-command-2026-06-26/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "RefVerifyResultsInput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "`sotp ref-verify results` CLI サブコマンドの実装。option として `--track-id` (optional; 省略時はブランチから自動解決)、`--items-dir` (default: `track/items`)、`--chain {1|2|all}`、`--layer <name>|all`、`--filter {pass|fail|pending|all}` を持つ"
+        }
       }
     },
     {
@@ -64,6 +128,22 @@
       "verdict": {
         "kind": "pass",
         "citation": "`sotp ref-verify results` CLI サブコマンドの実装。option として `--track-id` (optional; 省略時はブランチから自動解決)、`--items-dir` (default: `track/items`)、`--chain {1|2|all}`、`--layer <name>|all`、`--filter {pass|fail|pending|all}` を持つ"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/ref-verify-results-command-2026-06-26/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "RefVerifyVerdictSelect"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "`sotp ref-verify results` CLI サブコマンドの実装。option として `--track-id` (optional; 省略時はブランチから自動解決)、`--items-dir` (default: `track/items`)、`--chain {1|2|all}`、`--layer <name>|all`、`--filter {pass|fail|pending|all}` を持つ"
+        }
       }
     },
     {
@@ -72,6 +152,94 @@
       "verdict": {
         "kind": "pass",
         "citation": "`--filter` 省略時は fail/pending pair がレコードブロックに表示される。`--filter fail` を指定すると fail pair のみ、`--filter pending` は pending pair のみ、`--filter pass` は pass pair のみ、`--filter all` はすべての pair を表示する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/ref-verify-results-command-2026-06-26/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "RefVerifyVerdictSelect"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "`--filter` 省略時は fail/pending pair がレコードブロックに表示される。`--filter fail` を指定すると fail pair のみ、`--filter pending` は pending pair のみ、`--filter pass` は pass pair のみ、`--filter all` はすべての pair を表示する。先頭ブロック (集計) と Summary 行は `--filter` に関わらず、`--chain` / `--layer` 適用後の lane 全件集計を表示する"
+        }
+      }
+    },
+    {
+      "claim_hash": "e5c2501a53d42ee5e026bf3d2b2bdb89bfa8e64e16af734b7c371d01b4d48b5b",
+      "evidence_hash": "68a8ccee2a17ff3c9d1840b2d4c59b7b67bbed93f4f262279973abf637481708",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp ref-verify results` CLI サブコマンドの実装。option として `--track-id` (optional; 省略時はブランチから自動解決)、`--items-dir` (default: `track/items`)、`--chain {1|2|all}`、`--layer <name>|all`、`--filter {pass|fail|pending|all}` を持つ"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/ref-verify-results-command-2026-06-26/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "RefVerifyChainSelect"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "`sotp ref-verify results` CLI サブコマンドの実装。option として `--track-id` (optional; 省略時はブランチから自動解決)、`--items-dir` (default: `track/items`)、`--chain {1|2|all}`、`--layer <name>|all`、`--filter {pass|fail|pending|all}` を持つ"
+        }
+      }
+    },
+    {
+      "claim_hash": "b9b36b31a02a627ce8c761dbb9ef763dad0644babef822732c3132e6c5cd05f6",
+      "evidence_hash": "68a8ccee2a17ff3c9d1840b2d4c59b7b67bbed93f4f262279973abf637481708",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp ref-verify results` CLI サブコマンドの実装。option として `--track-id` (optional; 省略時はブランチから自動解決)、`--items-dir` (default: `track/items`)、`--chain {1|2|all}`、`--layer <name>|all`、`--filter {pass|fail|pending|all}` を持つ"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/ref-verify-results-command-2026-06-26/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "RefVerifyVerdictSelect"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "`sotp ref-verify results` CLI サブコマンドの実装。option として `--track-id` (optional; 省略時はブランチから自動解決)、`--items-dir` (default: `track/items`)、`--chain {1|2|all}`、`--layer <name>|all`、`--filter {pass|fail|pending|all}` を持つ"
+        }
+      }
+    },
+    {
+      "claim_hash": "b9b36b31a02a627ce8c761dbb9ef763dad0644babef822732c3132e6c5cd05f6",
+      "evidence_hash": "b017b9cccce84f690c94ba171d5d98c71f8c8bc1313dba45294a0893ff3933b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`--filter` 省略時は fail/pending pair がレコードブロックに表示される。`--filter fail` を指定すると fail pair のみ、`--filter pending` は pending pair のみ、`--filter pass` は pass pair のみ、`--filter all` はすべての pair を表示する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/ref-verify-results-command-2026-06-26/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "RefVerifyVerdictSelect"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "`--filter` 省略時は fail/pending pair がレコードブロックに表示される。`--filter fail` を指定すると fail pair のみ、`--filter pending` は pending pair のみ、`--filter pass` は pass pair のみ、`--filter all` はすべての pair を表示する。先頭ブロック (集計) と Summary 行は `--filter` に関わらず、`--chain` / `--layer` 適用後の lane 全件集計を表示する"
+        }
       }
     }
   ]

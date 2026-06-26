@@ -103,17 +103,8 @@ impl RefVerifyApplicationService for VerifySemanticRefsInteractor {
         };
 
         for scope in &scopes {
-            match self.cache.load_entries(cmd, scope) {
-                Ok(entries) => {
-                    scope_cache.insert(scope.clone(), entries);
-                }
-                Err(RefVerifyError::CacheSchemaOutdated { .. }) => {
-                    // Old-schema cache (missing origin fields): treat as invalidated empty cache.
-                    // The run will re-verify all pairs for this scope and write new-schema entries.
-                    scope_cache.insert(scope.clone(), Vec::new());
-                }
-                Err(e) => return Err(e),
-            }
+            let entries = self.cache.load_entries(cmd, scope)?;
+            scope_cache.insert(scope.clone(), entries);
         }
 
         // Partition production pairs into cache hits and cache misses.

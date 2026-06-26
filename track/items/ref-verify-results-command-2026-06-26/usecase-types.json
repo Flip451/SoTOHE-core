@@ -177,7 +177,7 @@
       "informal_grounds": []
     },
     "RefVerifyError": {
-      "action": "modify",
+      "action": "reference",
       "role": { "ErrorType": {} },
       "kind": {
         "kind": "enum",
@@ -187,16 +187,13 @@
           { "name": "VerifierPort",             "payload": { "kind": "struct", "fields": [{ "name": "message",    "ty": "String" }] } },
           { "name": "CachePersistence",         "payload": { "kind": "struct", "fields": [{ "name": "message",    "ty": "String" }] } },
           { "name": "SemanticFailuresConfirmed","payload": { "kind": "struct", "fields": [{ "name": "pair_count", "ty": "usize"  }] } },
-          { "name": "HumanEscalationRequired",  "payload": { "kind": "struct", "fields": [{ "name": "pair_count", "ty": "usize"  }] } },
-          { "name": "CacheSchemaOutdated",      "payload": { "kind": "struct", "fields": [{ "name": "message",    "ty": "String" }] } }
+          { "name": "HumanEscalationRequired",  "payload": { "kind": "struct", "fields": [{ "name": "pair_count", "ty": "usize"  }] } }
         ]
       },
       "methods": [],
       "module_path": "ref_verify",
-      "docs": "Error type for the ref-verify command family. Extended to add CacheSchemaOutdated, which signals that the verify-cache file uses a pre-D3 schema (missing claim_origin / evidence_origin fields). The run path re-verifies all pairs from scratch on this error; results and check-approved return this error with a non-zero exit code.",
-      "spec_refs": [
-        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "AC-12" }
-      ],
+      "docs": "Lower-level usecase error type for the ref-verify command family. Referenced in this track because existing usecase ports and interactors still use RefVerifyError, while the driver-facing aggregate service methods return RefVerifyDriverError. The enum structure is unchanged from the baseline (6 variants).",
+      "spec_refs": [],
       "informal_grounds": []
     }
   },

@@ -164,19 +164,6 @@ impl RefVerifyCacheAdapter {
     }
 }
 
-fn is_missing_origin_error(
-    e: &crate::tddd::semantic_verify_codec::SemanticVerifyCodecError,
-) -> bool {
-    use crate::tddd::semantic_verify_codec::SemanticVerifyCodecError;
-    match e {
-        SemanticVerifyCodecError::Json { message } => {
-            message.contains("missing field `claim_origin`")
-                || message.contains("missing field `evidence_origin`")
-        }
-        _ => false,
-    }
-}
-
 impl RefVerifyCachePort for RefVerifyCacheAdapter {
     fn load_entries(
         &self,
@@ -201,37 +188,22 @@ impl RefVerifyCachePort for RefVerifyCacheAdapter {
         match scope {
             RefVerifyCacheScope::SpecAdr => {
                 let doc = SpecAdrVerifyCacheDocumentCodec::decode(&text).map_err(|e| {
-                    if is_missing_origin_error(&e) {
-                        RefVerifyError::CacheSchemaOutdated {
-                            message: format!("spec-adr-verify-cache at '{}': {e}", path.display()),
-                        }
-                    } else {
-                        RefVerifyError::CachePersistence {
-                            message: format!(
-                                "cannot decode spec-adr-verify-cache at '{}': {e}",
-                                path.display()
-                            ),
-                        }
+                    RefVerifyError::CachePersistence {
+                        message: format!(
+                            "cannot decode spec-adr-verify-cache at '{}': {e}",
+                            path.display()
+                        ),
                     }
                 })?;
                 Ok(doc.entries)
             }
             RefVerifyCacheScope::CatalogueSpec { layer } => {
                 let doc = CatalogueSpecVerifyCacheDocumentCodec::decode(&text).map_err(|e| {
-                    if is_missing_origin_error(&e) {
-                        RefVerifyError::CacheSchemaOutdated {
-                            message: format!(
-                                "catalogue-spec-verify-cache at '{}': {e}",
-                                path.display()
-                            ),
-                        }
-                    } else {
-                        RefVerifyError::CachePersistence {
-                            message: format!(
-                                "cannot decode catalogue-spec-verify-cache at '{}': {e}",
-                                path.display()
-                            ),
-                        }
+                    RefVerifyError::CachePersistence {
+                        message: format!(
+                            "cannot decode catalogue-spec-verify-cache at '{}': {e}",
+                            path.display()
+                        ),
                     }
                 })?;
                 if &doc.layer != layer {

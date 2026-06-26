@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "a4c7f1ee4d3b59158b3ee9a7f93e2fff18a563b02a623d08a6f845939ba48ba4",
+  "catalogue_declaration_hash": "9ba8a6dc285264f8ce85dac62fea1efdd92c428f62d974229b2ae805860742d5",
   "signals": [
     {
       "type_name": "AdrDecisionRefDto",

@@ -6,7 +6,22 @@
       "evidence_hash": "e02af715be0e0da57326b394abf054e00990ccb1f3449d87ef00ec44bd916105",
       "verdict": {
         "kind": "pass",
-        "citation": "`bin/sotp ref-verify results` サブコマンドを新設し、ref-verify lane の結果確認を verify-cache JSON 直読みから CLI に一本化する。"
+        "citation": "`bin/sotp ref-verify results` サブコマンドを新設し、ref-verify lane の結果確認を verify-cache JSON 直読みから CLI に一本化する。\n\n- sotp 配下の他の verdict-bearing サブコマンド (`bin/sotp review results` / `bin/sotp dry results`) と同等の CLI 取り出し面を提供する。\n- caller (skill / agent briefing / user) は cache ファイルのスキーマを意識せず CLI 出力のみを読めばよい。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "`bin/sotp ref-verify results` サブコマンドを新設し、ref-verify レーンの結果確認を verify-cache JSON 直読みから CLI に一本化する。caller (skill / agent briefing / user) が cache スキーマを意識せず CLI 出力のみで判定結果を取得できるようにし、`bin/sotp review results` / `bin/sotp dry results` と同等の読み取り面を sotp 配下の verdict-bearing サブコマンド全体に揃える"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "decision_id": "D1"
+        }
       }
     },
     {
@@ -14,7 +29,22 @@
       "evidence_hash": "e02af715be0e0da57326b394abf054e00990ccb1f3449d87ef00ec44bd916105",
       "verdict": {
         "kind": "pass",
-        "citation": "棚卸し的に揃えるのではなく「誤読しにくさ」と「ref-verify が担う SoT Chain semantic verification の意味」を保ちながら整合させる。"
+        "citation": "`sotp ref-verify results` の出力面と option を `bin/sotp review results` / `bin/sotp dry results` と、棚卸し的に揃えるのではなく「誤読しにくさ」と「ref-verify が担う SoT Chain semantic verification の意味」を保ちながら整合させる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-02",
+          "text_label": "`sotp ref-verify results` の出力面と option を `bin/sotp review results` / `bin/sotp dry results` と「誤読しにくさ」および「ref-verify が担う SoT Chain semantic verification の意味」を保ちながら方針整合させる。option の 1:1 棚卸しはせず、ref-verify に適用できるものだけを選択的に採用する"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "decision_id": "D2"
+        }
       }
     },
     {
@@ -22,7 +52,22 @@
       "evidence_hash": "e02af715be0e0da57326b394abf054e00990ccb1f3449d87ef00ec44bd916105",
       "verdict": {
         "kind": "pass",
-        "citation": "verify-cache の `SemanticVerifyEntry` に `claim_origin` / `evidence_origin` フィールドを追加し、cached pair の source を hash と verdict だけでなく具体位置 ... として保存する。これにより `sotp ref-verify results` は pass/fail の cached pair について cache entry だけで pair の origin を artifact 種別レベル + 具体位置レベルで出せる。 ... pending (cache miss / 未確定 pair) は verify-cache entry を持たないため origin meta を cache には保存しない。`results` は `ref-verify run` と同じ pair source 解決を read-only で呼び、current artifact から pending pair と origin meta を再導出する。"
+        "citation": "`claim_origin` / `evidence_origin` フィールドを追加し、cached pair の source を具体位置として保存する。`sotp ref-verify results` は pass/fail の cached pair について cache entry だけで pair の origin を出せる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-03",
+          "text_label": "verify-cache の `SemanticVerifyEntry` に `claim_origin` / `evidence_origin` フィールドを追加し、判定済みの pair の source を artifact 種別 + 具体位置レベルで cache に保存する。`sotp ref-verify results` は pass/fail の cached pair について cache 読みだけで origin を表示でき、pending pair については current artifact から read-only で再導出して表示する"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "decision_id": "D3"
+        }
       }
     },
     {
@@ -30,7 +75,22 @@
       "evidence_hash": "e02af715be0e0da57326b394abf054e00990ccb1f3449d87ef00ec44bd916105",
       "verdict": {
         "kind": "pass",
-        "citation": "`bin/sotp ref-verify results` サブコマンドを新設し、ref-verify lane の結果確認を verify-cache JSON 直読みから CLI に一本化する。\n\n- sotp 配下の他の verdict-bearing サブコマンド (`bin/sotp review results` / `bin/sotp dry results`) と同等の CLI 取り出し面を提供する。"
+        "citation": "`bin/sotp ref-verify results` サブコマンドを新設し、ref-verify lane の結果確認の verify-cache JSON 直読みから CLI に一本化する。- sotp 配下の他の verdict-bearing サブコマンド (`bin/sotp review results` / `bin/sotp dry results`) と同等の CLI 取り出し面を提供する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "`sotp ref-verify results` CLI サブコマンドの実装。option として `--track-id` (optional; 省略時はブランチから自動解決)、`--items-dir` (default: `track/items`)、`--chain {1|2|all}`、`--layer <name>|all`、`--filter {pass|fail|pending|all}` を持つ"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "decision_id": "D1"
+        }
       }
     },
     {
@@ -38,7 +98,22 @@
       "evidence_hash": "e02af715be0e0da57326b394abf054e00990ccb1f3449d87ef00ec44bd916105",
       "verdict": {
         "kind": "pass",
-        "citation": "- option:\n  - `--track-id` (optional; 省略時は現在のブランチ `track/<id>` から **必ず自動解決する**。手動指定も可) / `--items-dir` (default: `track/items`)\n  - `--chain {1|2|all}` (`bin/sotp review results` の `--scope`/`--all` と同趣旨)\n  - `--layer <name>|all` (Chain② に対する filter; 有効な layer 名は `architecture-rules.json` から動的解決する)\n  - `--filter {pass|fail|pending|all}` (`bin/sotp dry results` の `--filter` と同趣旨)"
+        "citation": "option: - `--track-id` (optional; 省略時は現在のブランチ `track/<id>` から **必ず自動解決する**。手動指定も可) / `--items-dir` (default: `track/items`) - `--chain {1|2|all}` - `--layer <name>|all` - `--filter {pass|fail|pending|all}`"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "`sotp ref-verify results` CLI サブコマンドの実装。option として `--track-id` (optional; 省略時はブランチから自動解決)、`--items-dir` (default: `track/items`)、`--chain {1|2|all}`、`--layer <name>|all`、`--filter {pass|fail|pending|all}` を持つ"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "decision_id": "D2"
+        }
       }
     },
     {
@@ -46,23 +121,68 @@
       "evidence_hash": "e02af715be0e0da57326b394abf054e00990ccb1f3449d87ef00ec44bd916105",
       "verdict": {
         "kind": "pass",
-        "citation": "1. 先頭ブロック: Chain×Layer 集計 (Chain① spec↔ADR / Chain② 各 layer × catalogue↔spec、layer 集合は `architecture-rules.json` から動的解決する) を 1 行/lane で `pass=N fail=N pending=N` 形式で表示する。"
+        "citation": "「Chain① spec↔ADR / Chain② 各 layer × catalogue↔spec、layer 集合は `architecture-rules.json` から動的解決する) を 1 行/lane で `pass=N fail=N pending=N` 形式で表示する。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "出力先頭ブロック (Chain×Layer 集計): Chain① (spec↔ADR) と Chain② (各 layer × catalogue↔spec) を 1 行/lane で `pass=N fail=N pending=N` 形式で表示する。Chain② の layer 集合は `architecture-rules.json` から動的に解決する"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "decision_id": "D2"
+        }
       }
     },
     {
-      "claim_hash": "40d597c7af7f3f15a8ac2abf59cdb3a7a810ae433e435a7775312e22dd74addf",
+      "claim_hash": "9125d7f8ef9dc4625848e472e4bdc8e23b38da678d25df5485023ecc2a2c7b36",
       "evidence_hash": "e02af715be0e0da57326b394abf054e00990ccb1f3449d87ef00ec44bd916105",
       "verdict": {
         "kind": "pass",
-        "citation": "\"fail/pending pair を `bin/sotp dry results` 調で列挙する\" / \"各 pair に source を併記する\""
+        "citation": "「レコードブロック: fail/pending pair を `bin/sotp dry results` 調で列挙する」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "出力レコードブロック (filter 対象 pair の列挙): `--filter` に従って pass/fail/pending pair を列挙する。`--filter` 省略時は default 出力として fail/pending pair を列挙する。各 pair を `claim_hash / evidence_hash / verdict / reason / chain+layer` の形で表示し、claim/evidence の source (artifact 種別 + 具体位置: spec.json の section+id / ADR の file+anchor / catalogue の file+section_key+entry_key) を併記する"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "decision_id": "D2"
+        }
       }
     },
     {
-      "claim_hash": "40d597c7af7f3f15a8ac2abf59cdb3a7a810ae433e435a7775312e22dd74addf",
+      "claim_hash": "9125d7f8ef9dc4625848e472e4bdc8e23b38da678d25df5485023ecc2a2c7b36",
       "evidence_hash": "e02af715be0e0da57326b394abf054e00990ccb1f3449d87ef00ec44bd916105",
       "verdict": {
         "kind": "pass",
-        "citation": "cache entry だけで pair の origin を artifact 種別レベル + 具体位置レベルで出せる"
+        "citation": "「具体位置 (path + anchor + label / section + id / catalogue entry key) として保存する」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "出力レコードブロック (filter 対象 pair の列挙): `--filter` に従って pass/fail/pending pair を列挙する。`--filter` 省略時は default 出力として fail/pending pair を列挙する。各 pair を `claim_hash / evidence_hash / verdict / reason / chain+layer` の形で表示し、claim/evidence の source (artifact 種別 + 具体位置: spec.json の section+id / ADR の file+anchor / catalogue の file+section_key+entry_key) を併記する"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "decision_id": "D3"
+        }
       }
     },
     {
@@ -70,7 +190,22 @@
       "evidence_hash": "e02af715be0e0da57326b394abf054e00990ccb1f3449d87ef00ec44bd916105",
       "verdict": {
         "kind": "pass",
-        "citation": "cached pair の source を hash と verdict だけでなく具体位置 (path + anchor + label / section + id / catalogue entry key) として保存する。これにより `sotp ref-verify results` は pass/fail の cached pair について cache entry だけで pair の origin を artifact 種別レベル + 具体位置レベルで出せる。"
+        "citation": "verify-cache の `SemanticVerifyEntry` に `claim_origin` / `evidence_origin` フィールドを追加し、cached pair の source を hash と verdict だけでなく具体位置 (path + anchor + label / section + id + catalogue entry key) として保存する。これにより `sotp ref-verify results` は pass/fail の cached pair について cache entry だけで pair の origin を artifact 種別レベル + 具体位置レベルで出せる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "fail pair の source 表示: verify-cache entry に persist された `claim_origin` / `evidence_origin` から artifact 種別と具体位置を表示する。artifact の再 parse は不要"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "decision_id": "D3"
+        }
       }
     },
     {
@@ -78,7 +213,22 @@
       "evidence_hash": "e02af715be0e0da57326b394abf054e00990ccb1f3449d87ef00ec44bd916105",
       "verdict": {
         "kind": "pass",
-        "citation": "`ref-verify run` と同じ pair source 解決を read-only で呼び、current artifact から pending pair と origin meta を再導出する。"
+        "citation": "`results` は `ref-verify run` と同じ pair source 解決を read-only で呼び、current artifact から pending pair と origin meta を再導出する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "pending pair (cache miss / 未確定 pair) の source 表示: `ref-verify run` と同じ pair source 解決を read-only で呼び、current artifact から pending pair と origin meta を再導出して表示する。LLM 呼び出しおよび verifier subprocess は起動しない"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "decision_id": "D3"
+        }
       }
     },
     {
@@ -87,6 +237,21 @@
       "verdict": {
         "kind": "pass",
         "citation": "3. 末尾: `Summary: N pass, N fail, N pending, N total` を表示する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "出力末尾の Summary 行: `Summary: N pass, N fail, N pending, N total` を表示する"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "decision_id": "D2"
+        }
       }
     },
     {
@@ -94,15 +259,45 @@
       "evidence_hash": "e02af715be0e0da57326b394abf054e00990ccb1f3449d87ef00ec44bd916105",
       "verdict": {
         "kind": "pass",
-        "citation": "verify-cache の `SemanticVerifyEntry` に `claim_origin` / `evidence_origin` フィールドを追加し、cached pair の source を hash と verdict だけでなく具体位置 (path + anchor + label / section + id / catalogue entry key) として保存する。"
+        "citation": "verify-cache の `SemanticVerifyEntry` に `claim_origin` / `evidence_origin` フィールドを追加し、... - Chain① pair: `claim_origin` は spec.json の `(section, requirement id, text label)`、`evidence_origin` は ADR の `(file path, anchor=decision id)`。 - Chain② pair: `claim_origin` は catalogue の `(file path, section key=types|traits|functions, entry key)`、`evidence_origin` は spec.json の `(section, requirement id, text label)`。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "`SemanticVerifyEntry` schema の拡張: `claim_origin` / `evidence_origin` フィールドを追加する。Chain① pair: `claim_origin` は spec.json の `(section, requirement_id, text_label)`、`evidence_origin` は ADR の `(file_path, anchor=decision_id)`。Chain② pair: `claim_origin` は catalogue の `(file_path, section_key=types|traits|functions, entry_key)`、`evidence_origin` は spec.json の `(section, requirement_id, text_label)`"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "decision_id": "D3"
+        }
       }
     },
     {
-      "claim_hash": "7714e67ff500c11075eee257800491d9c999680e4a2d880dbd01b29168da3e80",
+      "claim_hash": "7b123b0ee53aca400bd90bc960bdf3905b937e409b154c73bd82011bf452eb08",
       "evidence_hash": "e02af715be0e0da57326b394abf054e00990ccb1f3449d87ef00ec44bd916105",
       "verdict": {
         "kind": "pass",
-        "citation": "旧 cache (origin meta 無し) は parse error として reject する。`#[serde(deny_unknown_fields)]` は維持する。"
+        "citation": "後方互換は持たない。verify-cache は track-local の実行ログであり、`bin/sotp ref-verify run` の再実行で再生成される ... ため、旧 cache (origin meta 無し) は parse error として reject する。`#[serde(deny_unknown_fields)]` は維持する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "verify-cache schema の旧バージョン (origin meta フィールドなし) を parse error として reject する。read-only の cache consumer (`results` / `check-approved`) は非 0 エラーとして返し、`bin/sotp ref-verify run` は旧 entry を有効 cache として再利用せず、新 schema の cache を再生成する。`#[serde(deny_unknown_fields)]` は維持する"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "decision_id": "D3"
+        }
       }
     },
     {
@@ -111,6 +306,21 @@
       "verdict": {
         "kind": "pass",
         "citation": "`bin/sotp ref-verify results` サブコマンドを新設し、ref-verify lane の結果確認を verify-cache JSON 直読みから CLI に一本化する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-09",
+          "text_label": "`/track:ref-verify` skill の Step 2 更新: `spec-adr-verify-cache.json` / `<layer>-catalogue-spec-verify-cache.json` を手で Read して failing pair を特定する手順を `sotp ref-verify results` 経由の手順に置き換える"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "decision_id": "D1"
+        }
       }
     },
     {
@@ -118,7 +328,22 @@
       "evidence_hash": "e02af715be0e0da57326b394abf054e00990ccb1f3449d87ef00ec44bd916105",
       "verdict": {
         "kind": "pass",
-        "citation": "- `--format json` は導入しない (review/dry も非提供、YAGNI)."
+        "citation": "- `--format json` は導入しない (review/dry も非提供、YAGNI)"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-01",
+          "text_label": "`--format json` 出力: review/dry results のいずれも JSON 出力を提供していないため、本コマンドも採用しない (YAGNI)。需要が顕在化したとき別 ADR で追加できる"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "decision_id": "D2"
+        }
       }
     },
     {
@@ -127,6 +352,21 @@
       "verdict": {
         "kind": "pass",
         "citation": "`bin/sotp review results` の `--limit` / `--round-type` は ref-verify に round 概念がないため採用しない。option 1:1 で棚卸ししない方針を採る。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-02",
+          "text_label": "`--limit` / `--round-type` option の採用: ref-verify に round 概念がないため `bin/sotp review results` の `--limit` / `--round-type` は適用しない"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "decision_id": "D2"
+        }
       }
     },
     {
@@ -135,6 +375,21 @@
       "verdict": {
         "kind": "pass",
         "citation": "writer (spec-designer / type-designer / adr-editor) への振り分けは caller (skill / agent briefing) の責務とし、本コマンドは source 表示までに留める。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-03",
+          "text_label": "writer (spec-designer / type-designer / adr-editor) への振り分けロジック: `results` は source 表示までに留める。failing pair をどの writer に差し戻すかは caller (skill / agent briefing) の責務"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "decision_id": "D2"
+        }
       }
     },
     {
@@ -142,7 +397,22 @@
       "evidence_hash": "e02af715be0e0da57326b394abf054e00990ccb1f3449d87ef00ec44bd916105",
       "verdict": {
         "kind": "pass",
-        "citation": "`ref-verify lane の結果確認を verify-cache JSON 直読みから CLI に一本化する`"
+        "citation": "`bin/sotp ref-verify results` サブコマンドを新設し、ref-verify lane の結果確認を verify-cache JSON 直読みから CLI に一本化する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-04",
+          "text_label": "verify-cache 直読みを skill 本文で標準化する方針 (Rejected Alternative A): 旧来の `/track:ref-verify` skill Step 2 の「直接 Read」を継続し、caller ごとの読み方を skill で統一する案。cache schema 変更時に各所が壊れる構造のため却下"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "decision_id": "D1"
+        }
       }
     },
     {
@@ -150,7 +420,22 @@
       "evidence_hash": "e02af715be0e0da57326b394abf054e00990ccb1f3449d87ef00ec44bd916105",
       "verdict": {
         "kind": "pass",
-        "citation": "`bin/sotp ref-verify results` サブコマンドを新設し、ref-verify lane の結果確認を verify-cache JSON 直読みから CLI に一本化する。- sotp 配下の他の verdict-bearing サブコマンド (`bin/sotp review results` / `bin/sotp dry results`) と同等の CLI 取り出し面を提供する。"
+        "citation": "`bin/sotp ref-verify results` サブコマンドを新設し、ref-verify lane の結果確認を verify-cache JSON 直読みから CLI に一本化する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-05",
+          "text_label": "`bin/sotp ref-verify run` の標準出力に per-pair 詳細を統合する方針 (Rejected Alternative B): run は verifier 呼び出しを伴う重い操作であり、read-only の `results` を別コマンドとして分ける設計が review/dry と整合する"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "decision_id": "D1"
+        }
       }
     },
     {
@@ -158,7 +443,22 @@
       "evidence_hash": "e02af715be0e0da57326b394abf054e00990ccb1f3449d87ef00ec44bd916105",
       "verdict": {
         "kind": "pass",
-        "citation": "default 出力 (human-readable text):"
+        "citation": "「default 出力 (human-readable text)」および「`--format json` は導入しない」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "`sotp ref-verify results` は text 単一フォーマットのみを提供する。`--format json` は実装しない"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "decision_id": "D2"
+        }
       }
     },
     {
@@ -166,7 +466,22 @@
       "evidence_hash": "e02af715be0e0da57326b394abf054e00990ccb1f3449d87ef00ec44bd916105",
       "verdict": {
         "kind": "pass",
-        "citation": "- exit code: 常に 0 (informational)。verdict gate は `check-approved` の責務 (review/dry results と同じポリシー)"
+        "citation": "- exit code: 常に 0 (informational)。verdict gate は `check-approved` の責務 (review/dry results と同じポリシー)。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "`sotp ref-verify results` の exit code は常に 0 (informational)。verdict gate は `bin/sotp ref-verify check-approved` の責務であり、`results` はゲートに使わない。review/dry results と同じポリシー"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "decision_id": "D2"
+        }
       }
     },
     {
@@ -174,7 +489,22 @@
       "evidence_hash": "e02af715be0e0da57326b394abf054e00990ccb1f3449d87ef00ec44bd916105",
       "verdict": {
         "kind": "pass",
-        "citation": "- `--track-id` (optional; 省略時は現在のブランチ `track/<id>` から **必ず自動解決する**。手動指定も可) / `--items-dir` (default: `track/items`)"
+        "citation": "`--track-id` (optional; 省略時は現在のブランチ `track/<id>` から **必ず自動解決する**。手動指定も可)"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "`--track-id` を省略したとき、現在のブランチ名 `track/<id>` から必ず自動解決する。ブランチから解決できない場合はエラーとし、手動指定を要求する。手動指定も常にサポートする"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "decision_id": "D2"
+        }
       }
     },
     {
@@ -182,15 +512,45 @@
       "evidence_hash": "e02af715be0e0da57326b394abf054e00990ccb1f3449d87ef00ec44bd916105",
       "verdict": {
         "kind": "pass",
-        "citation": "`--layer <name>|all` (Chain② に対する filter; 有効な layer 名は `architecture-rules.json` から動的解決する)\n1. 先頭ブロック: Chain×Layer 集計 (Chain① spec↔ADR / Chain② 各 layer × catalogue↔spec、layer 集合は `architecture-rules.json` から動的解決する) を 1 行/lane で `pass=N fail=N pending=N` 形式で表示する。"
+        "citation": "Chain×Layer 集計 (Chain① spec↔ADR / Chain② 各 layer × catalogue↔spec、layer 集合は `architecture-rules.json` から動的解決する)"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "`--layer` option の有効な layer 名は `architecture-rules.json` から動的に解決する。ハードコードしない。Chain① (`--chain 1`) に `--layer` を指定した場合は no-op とする (Chain① は layer 粒度を持たない)"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "decision_id": "D2"
+        }
       }
     },
     {
-      "claim_hash": "41e5aac52738cabb305f4001a26d5530107cf7a7120907ff86a3ee58a40e8eb6",
+      "claim_hash": "cd3547046c6e7fe82991d2d401ea879ef2eabd9af77fa6bbef070c1bf720ad40",
       "evidence_hash": "e02af715be0e0da57326b394abf054e00990ccb1f3449d87ef00ec44bd916105",
       "verdict": {
         "kind": "pass",
         "citation": "後方互換は持たない。verify-cache は track-local の実行ログであり、`bin/sotp ref-verify run` の再実行で再生成される (track 横断永続資産ではない) ため、旧 cache (origin meta 無し) は parse error として reject する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-05",
+          "text_label": "旧 verify-cache (origin meta フィールドなし) は後方互換を持たず parse error として reject する。verify-cache は track-local 実行ログであり `bin/sotp ref-verify run` の再実行で新 schema に再生成できる。旧 entry を silently forward-compatible に読む migration は不要"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "decision_id": "D3"
+        }
       }
     },
     {
@@ -198,7 +558,22 @@
       "evidence_hash": "e02af715be0e0da57326b394abf054e00990ccb1f3449d87ef00ec44bd916105",
       "verdict": {
         "kind": "pass",
-        "citation": "writer (spec-designer / type-designer / adr-editor) への振り分けは caller (skill / agent briefing) の責務とし、本コマンドは source 表示までに留める。"
+        "citation": "writer への振り分けは caller の責務とし、本コマンドは source 表示までに留める"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-06",
+          "text_label": "failing pair / pending pair の writer への振り分けは caller の責務とする。`results` コマンドは source 情報 (artifact 種別 + 具体位置) を提示するにとどまり、writer の指定・エラーメッセージの生成・fix ループの管理は行わない"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "decision_id": "D2"
+        }
       }
     },
     {
@@ -206,7 +581,22 @@
       "evidence_hash": "e02af715be0e0da57326b394abf054e00990ccb1f3449d87ef00ec44bd916105",
       "verdict": {
         "kind": "pass",
-        "citation": "`bin/sotp ref-verify results` サブコマンドを新設し、ref-verify lane の結果確認の verify-cache JSON 直読みから CLI に一本化する。\n- caller (skill / agent briefing / user) は cache ファイルのスキーマを意識せず CLI 出力のみを読めばよい。"
+        "citation": "`bin/sotp ref-verify results` サブコマンドを新設し、ref-verify lane の結果確認を verify-cache JSON 直読みから CLI に一本化する。\n\n- sotp 配下の他の verdict-bearing サブコマンド (`bin/sotp review results` / `bin/sotp dry results`) と同等の CLI 取り出し面を提供する。\n- caller (skill / agent briefing / user) は cache ファイルのスキーマを意識せず CLI 出力のみを読めばよい。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`sotp ref-verify results` コマンドが実行可能であり、先頭ブロック (Chain×Layer 集計) + レコードブロック (fail/pending pair) + Summary 行を含む text を stdout に出力する。exit code は 0"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "decision_id": "D1"
+        }
       }
     },
     {
@@ -214,7 +604,22 @@
       "evidence_hash": "e02af715be0e0da57326b394abf054e00990ccb1f3449d87ef00ec44bd916105",
       "verdict": {
         "kind": "pass",
-        "citation": "`default 出力 (human-readable text)`...`先頭ブロック: Chain×Layer 集計`...`レコードブロック: fail/pending pair`...`Summary: N pass, N fail, N pending, N total`...`exit code: 常に 0`"
+        "citation": "`sotp ref-verify results` の出力面 ... 1. 先頭ブロック: Chain×Layer 集計 ... 2. レコードブロック: fail/pending pair ... 3. 末尾: `Summary: N pass, N fail, N pending, N total` ... exit code: 常に 0 (informational)。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`sotp ref-verify results` コマンドが実行可能であり、先頭ブロック (Chain×Layer 集計) + レコードブロック (fail/pending pair) + Summary 行を含む text を stdout に出力する。exit code は 0"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "decision_id": "D2"
+        }
       }
     },
     {
@@ -222,7 +627,22 @@
       "evidence_hash": "e02af715be0e0da57326b394abf054e00990ccb1f3449d87ef00ec44bd916105",
       "verdict": {
         "kind": "pass",
-        "citation": "`1. 先頭ブロック: Chain×Layer 集計 (Chain① spec↔ADR / Chain② 各 layer × catalogue↔spec、layer 集合は `architecture-rules.json` から動的解決する) を 1 行/lane で `pass=N fail=N pending=N` 形式で表示する。`"
+        "citation": "先頭ブロック: Chain×Layer 集計 (Chain① spec↔ADR / Chain② 各 layer × catalogue↔spec、layer 集合は `architecture-rules.json` から動的解決する) を 1 行/lane で `pass=N fail=N pending=N` 形式で表示する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "先頭ブロックが Chain① (spec↔ADR) と Chain② (各 layer × catalogue↔spec) を 1 行/lane で表示し、各行が `pass=N fail=N pending=N` 形式を持つ。Chain② の layer 名が `architecture-rules.json` から解決されたものと一致する"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "decision_id": "D2"
+        }
       }
     },
     {
@@ -230,7 +650,22 @@
       "evidence_hash": "e02af715be0e0da57326b394abf054e00990ccb1f3449d87ef00ec44bd916105",
       "verdict": {
         "kind": "pass",
-        "citation": "「レコードブロック: fail/pending pair を `bin/sotp dry results` 調で列挙する (claim_hash / evidence_hash / verdict / reason / chain+layer)。各 pair に **claim/evidence の source** (artifact 種別 + 具体位置: spec.json の section+id / ADR の file+anchor / catalogue+layer の section+entry) を併記する。fail は verify-cache entry に persist された origin meta から source を表示し」"
+        "citation": "レコードブロック: fail/pending pair を `bin/sotp dry results` 調で列挙する (claim_hash / evidence_hash / verdict / reason / chain+layer)。各 pair に **claim/evidence の source** (artifact 種別 + 具体位置: spec.json の section+id / ADR の file+anchor / catalogue+layer の section+entry) を併記する。fail は verify-cache entry に persist された origin meta から source を表示し、pending (cache miss / 未確定 pair) は現在の pair source artifact から再導出した origin meta で source を表示する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "レコードブロックの fail pair が `claim_hash / evidence_hash / verdict / reason / chain+layer` + claim/evidence source (artifact 種別 + 具体位置) を表示する。source は cache entry の `claim_origin` / `evidence_origin` から取得し、artifact の再 parse を要しない"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "decision_id": "D2"
+        }
       }
     },
     {
@@ -238,7 +673,22 @@
       "evidence_hash": "e02af715be0e0da57326b394abf054e00990ccb1f3449d87ef00ec44bd916105",
       "verdict": {
         "kind": "pass",
-        "citation": "cache entry だけで pair の origin を artifact 種別レベル + 具体位置レベルで出せる"
+        "citation": "verify-cache の `SemanticVerifyEntry` に `claim_origin` / `evidence_origin` フィールドを追加し、cached pair の source を hash と verdict だけでなく具体位置 (path + anchor + label / section + id / catalogue entry key) として保存する。これにより `sotp ref-verify results` は pass/fail の cached pair について cache entry だけで pair の origin を artifact 種別レベル + 具体位置レベルで出せる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "レコードブロックの fail pair が `claim_hash / evidence_hash / verdict / reason / chain+layer` + claim/evidence source (artifact 種別 + 具体位置) を表示する。source は cache entry の `claim_origin` / `evidence_origin` から取得し、artifact の再 parse を要しない"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "decision_id": "D3"
+        }
       }
     },
     {
@@ -246,7 +696,22 @@
       "evidence_hash": "e02af715be0e0da57326b394abf054e00990ccb1f3449d87ef00ec44bd916105",
       "verdict": {
         "kind": "pass",
-        "citation": "fail/pending pair を ... (claim_hash / evidence_hash / verdict / reason / chain+layer)。pending (cache miss / 未確定 pair) は現在の pair source artifact から再導出した origin meta で source を表示する。"
+        "citation": "「レコードブロック: fail/pending pair を `bin/sotp dry results` 調で列挙する」「pending (cache miss / 未確定 pair) は現在の pair source artifact から再導出した origin meta で source を表示する」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "レコードブロックの pending pair (cache miss) が `claim_hash / evidence_hash / verdict=pending / chain+layer` + claim/evidence source を表示する。source は current artifact から read-only で再導出し、LLM / verifier の呼び出しは発生しない"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "decision_id": "D2"
+        }
       }
     },
     {
@@ -254,7 +719,22 @@
       "evidence_hash": "e02af715be0e0da57326b394abf054e00990ccb1f3449d87ef00ec44bd916105",
       "verdict": {
         "kind": "pass",
-        "citation": "「pending (cache miss / 未確定 pair) は verify-cache entry を持たないため origin meta を cache には保存しない。`results` は `ref-verify run` と同じ pair source 解決を read-only で呼び、current artifact から pending pair と origin meta を再導出する。」"
+        "citation": "pending (cache miss / 未確定 pair) は verify-cache entry を持たないため origin meta を cache には保存しない。`results` は `ref-verify run` と同じ pair source 解決を read-only で呼び、current artifact から pending pair と origin meta を再導出する."
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "レコードブロックの pending pair (cache miss) が `claim_hash / evidence_hash / verdict=pending / chain+layer` + claim/evidence source を表示する。source は current artifact から read-only で再導出し、LLM / verifier の呼び出しは発生しない"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "decision_id": "D3"
+        }
       }
     },
     {
@@ -262,7 +742,22 @@
       "evidence_hash": "e02af715be0e0da57326b394abf054e00990ccb1f3449d87ef00ec44bd916105",
       "verdict": {
         "kind": "pass",
-        "citation": "- 末尾: `Summary: N pass, N fail, N pending, N total` を表示する。"
+        "citation": "3. 末尾: `Summary: N pass, N fail, N pending, N total` を表示する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "末尾の Summary 行が `Summary: N pass, N fail, N pending, N total` 形式で正確な集計を出力する"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "decision_id": "D2"
+        }
       }
     },
     {
@@ -271,6 +766,21 @@
       "verdict": {
         "kind": "pass",
         "citation": "`--track-id` (optional; 省略時は現在のブランチ `track/<id>` から **必ず自動解決する**。手動指定も可)"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "`--track-id` を省略したとき、現在のブランチ名 `track/<id>` から track id が自動解決され、正しい track のデータが表示される"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "decision_id": "D2"
+        }
       }
     },
     {
@@ -278,7 +788,22 @@
       "evidence_hash": "e02af715be0e0da57326b394abf054e00990ccb1f3449d87ef00ec44bd916105",
       "verdict": {
         "kind": "pass",
-        "citation": "- `--chain {1|2|all}` (`bin/sotp review results` の `--scope`/`--all` と同趣旨)\n- default 出力 (human-readable text):\n  1. 先頭ブロック: Chain×Layer 集計 (Chain① spec↔ADR / Chain② 各 layer × catalogue↔spec、layer 集合は `architecture-rules.json` から動的解決する) を 1 行/lane で `pass=N fail=N pending=N` 形式で表示する。"
+        "citation": "`--chain {1|2|all}` / `Chain① spec↔ADR / Chain② 各 layer × catalogue↔spec`"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "`--chain 1` を指定すると Chain① のみが表示され (先頭ブロックに Chain① の 1 lane のみ)、`--chain 2` では Chain② のみ (layer 数分の lane)、`--chain all` (既定) では両 Chain が表示される"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "decision_id": "D2"
+        }
       }
     },
     {
@@ -286,15 +811,45 @@
       "evidence_hash": "e02af715be0e0da57326b394abf054e00990ccb1f3449d87ef00ec44bd916105",
       "verdict": {
         "kind": "pass",
-        "citation": "- `--layer <name>|all` (Chain② に対する filter; 有効な layer 名は `architecture-rules.json` から動的解決する)\n- default 出力 (human-readable text):\n  1. 先頭ブロック: Chain×Layer 集計 (Chain① spec↔ADR / Chain② 各 layer × catalogue↔spec、layer 集合は `architecture-rules.json` から動的解決する) を 1 行/lane で `pass=N fail=N pending=N` 形式で表示する。\n  2. レコードブロック: fail/pending pair を ... `chain+layer`"
+        "citation": "- `--chain {1|2|all}` (`bin/sotp review results` の `--scope`/`--all` と同趣旨)\n- `--layer <name>|all` (Chain② に対する filter; 有効な layer 名は `architecture-rules.json` から動的解決する)"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "`--layer <name>` を指定すると Chain② の指定 layer 分のみが先頭ブロックとレコードブロックに表示される。`--layer all` (既定) は全 layer を表示する。`--layer` を `--chain 1` と同時指定した場合は Chain① に layer 概念がないため no-op として扱われる"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "decision_id": "D2"
+        }
       }
     },
     {
-      "claim_hash": "8dd7c283bc90dfe91d689a169ab6c0b0ec6b1801c22bdfcd58fa5e4368216e4e",
+      "claim_hash": "b017b9cccce84f690c94ba171d5d98c71f8c8bc1313dba45294a0893ff3933b4",
       "evidence_hash": "e02af715be0e0da57326b394abf054e00990ccb1f3449d87ef00ec44bd916105",
       "verdict": {
         "kind": "pass",
-        "citation": "- `--filter {pass|fail|pending|all}` (`bin/sotp dry results` の `--filter` と同趣旨)\n- 1. 先頭ブロック: Chain×Layer 集計 ... を 1 行/lane で `pass=N fail=N pending=N` 形式で表示する。\n- 2. レコードブロック: fail/pending pair を `bin/sotp dry results` 調で列挙する ...\n- 3. 末尾: `Summary: N pass, N fail, N pending, N total` を表示する。"
+        "citation": "レコードブロック: fail/pending pair を bin/sotp dry results 調で列挙する ... - `--filter {pass|fail|pending|all}` (`bin/sotp dry results` の `--filter` と同趣旨)"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "`--filter` 省略時は fail/pending pair がレコードブロックに表示される。`--filter fail` を指定すると fail pair のみ、`--filter pending` は pending pair のみ、`--filter pass` は pass pair のみ、`--filter all` はすべての pair を表示する。先頭ブロック (集計) と Summary 行は `--filter` に関わらず、`--chain` / `--layer` 適用後の lane 全件集計を表示する"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "decision_id": "D2"
+        }
       }
     },
     {
@@ -302,7 +857,22 @@
       "evidence_hash": "e02af715be0e0da57326b394abf054e00990ccb1f3449d87ef00ec44bd916105",
       "verdict": {
         "kind": "pass",
-        "citation": "exit code: 常に 0 (informational)。verdict gate は check-approved の責務 (review/dry results と同じポリシー)"
+        "citation": "exit code: 常に0 (informational)。verdict gate は `check-approved` の責務 (review/dry results と同じポリシー) 。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-10",
+          "text_label": "`sotp ref-verify results` の exit code が pass/fail/pending pair の存在によらず常に 0 となる。0 以外の exit code を返すのはコマンド実行自体のエラー (引数不正・IO エラー等) のみ"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "decision_id": "D2"
+        }
       }
     },
     {
@@ -310,15 +880,45 @@
       "evidence_hash": "e02af715be0e0da57326b394abf054e00990ccb1f3449d87ef00ec44bd916105",
       "verdict": {
         "kind": "pass",
-        "citation": "verify-cache の `SemanticVerifyEntry` に `claim_origin` / `evidence_origin` フィールドを追加し、cached pair の source を hash と verdict だけでなく具体位置として保存する。"
+        "citation": "`SemanticVerifyEntry` に `claim_origin` / `evidence_origin` フィールドを追加し、cached pair の source を hash と verdict だけでなく具体位置として保存する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-11",
+          "text_label": "`SemanticVerifyEntry` に `claim_origin` / `evidence_origin` フィールドが追加されており、`bin/sotp ref-verify run` が新規に判定した pair についてこれらのフィールドを正しく populate した状態で cache に保存する。Chain① / Chain② それぞれのフィールド内容が D3 の仕様と一致する"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "decision_id": "D3"
+        }
       }
     },
     {
-      "claim_hash": "1ea486574e3ea9cdb6c5d233228b5c31e0041ba0c9e3a2b6922f8918a591ed72",
+      "claim_hash": "50d3f0692055b25b024a5002d5d04d25ba55f17218c96301ad021881193320b0",
       "evidence_hash": "e02af715be0e0da57326b394abf054e00990ccb1f3449d87ef00ec44bd916105",
       "verdict": {
         "kind": "pass",
-        "citation": "後方互換は持たない。verify-cache は track-local の実行ログであり、`bin/sotp ref-verify run` の再実行で再生成される (track 横断永続資産ではない) ため、旧 cache (origin meta 無し) は parse error として reject する。`#[serde(deny_unknown_fields)]` は維持する。"
+        "citation": "後方互換は持たない。verify-cache は track-local の実行ログであり、`bin/sotp ref-verify run` の再実行で再生成される (track 横断永続資産ではない) ため、旧 cache (origin meta 無し) は parse error として reject する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-12",
+          "text_label": "旧 verify-cache (origin meta フィールドなし) を read-only consumer が読み込もうとすると parse error が発生し、`bin/sotp ref-verify results` / `bin/sotp ref-verify check-approved` がエラーメッセージと非 0 exit code を返す。`bin/sotp ref-verify run` は旧 entry を有効 cache として再利用せず、新 schema の cache を再生成する。旧 cache の silently forward-compat な読み込みは行わない"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "decision_id": "D3"
+        }
       }
     },
     {
@@ -327,62 +927,21 @@
       "verdict": {
         "kind": "pass",
         "citation": "`bin/sotp ref-verify results` サブコマンドを新設し、ref-verify lane の結果確認を verify-cache JSON 直読みから CLI に一本化する。"
-      }
-    },
-    {
-      "claim_hash": "85d37b6ce0d9c65920e825f709196acb4a114ca2cca42a178432f6648e8fd95e",
-      "evidence_hash": "e02af715be0e0da57326b394abf054e00990ccb1f3449d87ef00ec44bd916105",
-      "verdict": {
-        "kind": "fail",
-        "reason": "New behavioral commitment / wrong reference: the claim requires the full `cargo make ci` gate (`fmt-check + clippy + nextest + deny + check-layers + verify-*`) to pass, but the ADR only decides to add and use `bin/sotp ref-verify results` for ref-verify result inspection and does not mention CI pass requirements or those checks."
-      }
-    },
-    {
-      "claim_hash": "9125d7f8ef9dc4625848e472e4bdc8e23b38da678d25df5485023ecc2a2c7b36",
-      "evidence_hash": "e02af715be0e0da57326b394abf054e00990ccb1f3449d87ef00ec44bd916105",
-      "verdict": {
-        "kind": "pass",
-        "citation": "「レコードブロック: fail/pending pair を `bin/sotp dry results` 調で列挙する (claim_hash / evidence_hash / verdict / reason / chain+layer)」「option: ... `--filter {pass|fail|pending|all}`」"
-      }
-    },
-    {
-      "claim_hash": "9125d7f8ef9dc4625848e472e4bdc8e23b38da678d25df5485023ecc2a2c7b36",
-      "evidence_hash": "e02af715be0e0da57326b394abf054e00990ccb1f3449d87ef00ec44bd916105",
-      "verdict": {
-        "kind": "pass",
-        "citation": "「pair の origin を artifact 種別レベル + 具体位置レベルで出せる」"
-      }
-    },
-    {
-      "claim_hash": "7b123b0ee53aca400bd90bc960bdf3905b937e409b154c73bd82011bf452eb08",
-      "evidence_hash": "e02af715be0e0da57326b394abf054e00990ccb1f3449d87ef00ec44bd916105",
-      "verdict": {
-        "kind": "pass",
-        "citation": "「後方互換は持たない。verify-cache は track-local の実行ログであり、`bin/sotp ref-verify run` の再実行で再生成される (track 横断永続資産ではない) ため、旧 cache (origin meta 無し) は parse error として reject する。`#[serde(deny_unknown_fields)]` は維持する。」"
-      }
-    },
-    {
-      "claim_hash": "cd3547046c6e7fe82991d2d401ea879ef2eabd9af77fa6bbef070c1bf720ad40",
-      "evidence_hash": "e02af715be0e0da57326b394abf054e00990ccb1f3449d87ef00ec44bd916105",
-      "verdict": {
-        "kind": "pass",
-        "citation": "後方互換は持たない。verify-cache は track-local の実行ログであり、`bin/sotp ref-verify run` の再実行で再生成される (track 横断永続資産ではない) ため、旧 cache (origin meta 無し) は parse error として reject する。`#[serde(deny_unknown_fields)]` は維持する。"
-      }
-    },
-    {
-      "claim_hash": "b017b9cccce84f690c94ba171d5d98c71f8c8bc1313dba45294a0893ff3933b4",
-      "evidence_hash": "e02af715be0e0da57326b394abf054e00990ccb1f3449d87ef00ec44bd916105",
-      "verdict": {
-        "kind": "pass",
-        "citation": "「レコードブロック: fail/pending pair を ... 列挙する」および「--filter {pass|fail|pending|all}」"
-      }
-    },
-    {
-      "claim_hash": "50d3f0692055b25b024a5002d5d04d25ba55f17218c96301ad021881193320b0",
-      "evidence_hash": "e02af715be0e0da57326b394abf054e00990ccb1f3449d87ef00ec44bd916105",
-      "verdict": {
-        "kind": "pass",
-        "citation": "「後方互換は持たない。verify-cache は track-local の実行ログであり、`bin/sotp ref-verify run` の再実行で再生成される (track 横断永続資産ではない) ため、旧 cache (origin meta 無し) は parse error として reject する。`#[serde(deny_unknown_fields)]` は維持する。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-13",
+          "text_label": "`/track:ref-verify` skill の Step 2 が `sotp ref-verify results` の出力を使う手順に更新されており、`spec-adr-verify-cache.json` / `<layer>-catalogue-spec-verify-cache.json` を直接 Read する旧手順が削除されている"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "decision_id": "D1"
+        }
       }
     }
   ]

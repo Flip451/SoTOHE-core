@@ -411,7 +411,7 @@ impl usecase::ref_verify::RefVerifyAggregateService for FsRefVerifyAggregateAdap
         let current_pairs: Vec<usecase::ref_verify::RefVerifyPair> =
             all_pairs.into_iter().filter(|p| !p.known_bad).collect();
 
-        Ok(compute_results(chain1_entries, chain2_caches, current_pairs, chain, layer, verdict))
+        compute_results(chain1_entries, chain2_caches, current_pairs, chain, layer, verdict)
     }
 }
 

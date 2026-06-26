@@ -5,7 +5,7 @@
   "types": {
     "RefVerifyChainSelect": {
       "action": "add",
-      "role": { "ValueObject": {} },
+      "role": { "Dto": {} },
       "kind": {
         "kind": "enum",
         "variants": [
@@ -16,7 +16,7 @@
       },
       "methods": [],
       "module_path": "ref_verify",
-      "docs": "Chain-filter selection for the `ref-verify results` command. Defined in the cli_driver layer so the cli layer can construct RefVerifyResultsInput without depending on the usecase crate directly. RefVerifyDriver::handle converts this to usecase::ref_verify::RefVerifyChainFilter before calling the service.",
+      "docs": "Chain-filter selection for the `ref-verify results` command. Defined in the cli_driver layer so the cli layer can construct RefVerifyResultsInput without depending on the usecase crate directly. RefVerifyDriver::handle converts this to usecase::ref_verify::RefVerifyChainFilter before calling the service. Role Dto (not ValueObject) per R1: ValueObject is forbidden in cli_driver; Dto is the appropriate role for input-parameter enums at this layer.",
       "spec_refs": [
         { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "IN-01" }
       ],
@@ -24,7 +24,7 @@
     },
     "RefVerifyVerdictSelect": {
       "action": "add",
-      "role": { "ValueObject": {} },
+      "role": { "Dto": {} },
       "kind": {
         "kind": "enum",
         "variants": [
@@ -37,7 +37,7 @@
       },
       "methods": [],
       "module_path": "ref_verify",
-      "docs": "Verdict-filter selection for the `ref-verify results` command. `FailPending` represents omitted CLI `--filter` and preserves the ADR default record block; explicit CLI values map to Pass/Fail/Pending/All. Defined in the cli_driver layer so the cli layer can construct RefVerifyResultsInput without depending on the usecase crate directly. RefVerifyDriver::handle converts this to usecase::ref_verify::RefVerifyVerdictFilter before calling the service.",
+      "docs": "Verdict-filter selection for the `ref-verify results` command. `FailPending` represents omitted CLI `--filter` and preserves the ADR default record block; explicit CLI values map to Pass/Fail/Pending/All. Defined in the cli_driver layer so the cli layer can construct RefVerifyResultsInput without depending on the usecase crate directly. RefVerifyDriver::handle converts this to usecase::ref_verify::RefVerifyVerdictFilter before calling the service. Role Dto (not ValueObject) per R1: ValueObject is forbidden in cli_driver; Dto is the appropriate role for input-parameter enums at this layer.",
       "spec_refs": [
         { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "IN-01" },
         { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "AC-09" }

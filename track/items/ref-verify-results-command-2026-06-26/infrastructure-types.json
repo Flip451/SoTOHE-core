@@ -250,6 +250,9 @@
     { "trait_ref": "serde::Serialize",              "for_type": "VerifyOriginRefDto" },
     { "trait_ref": "serde::Deserialize<'de>",       "for_type": "VerifyOriginRefDto" },
 
+    { "trait_ref": "serde::Serialize",              "for_type": "SemanticVerdictDto" },
+    { "trait_ref": "serde::Deserialize<'de>",       "for_type": "SemanticVerdictDto" },
+
     { "trait_ref": "serde::Serialize",              "for_type": "SemanticVerifyEntryDto" },
     { "trait_ref": "serde::Deserialize<'de>",       "for_type": "SemanticVerifyEntryDto" },
 

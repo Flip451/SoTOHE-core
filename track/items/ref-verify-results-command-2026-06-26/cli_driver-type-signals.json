@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-26T09:15:33Z",
-  "declaration_hash": "138488bbc629ab3806e9433d09abc7e91a0e77c67d2fc3d073508cef17a74f51",
+  "generated_at": "2026-06-26T12:22:56Z",
+  "declaration_hash": "541ab1dced22a3d597247e97bfbbeabc830ab0aeddcd7f4aca846b3bf7efaf53",
   "signals": [
     {
       "type_name": "RefVerifyChainSelect",

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-26T09:15:29Z",
-  "declaration_hash": "4d6285eb6472214509466be51f1cb8e1bbc436cac2147e718fe267648c35de1d",
+  "generated_at": "2026-06-26T12:22:51Z",
+  "declaration_hash": "939f292be4eada7774bfd44d6349d73999206d1d398835c650850f0e1092cfa1",
   "signals": [
     {
       "type_name": "RefVerifyAggregateService",
@@ -20,12 +20,6 @@
         "core::cmp::PartialEq",
         "core::fmt::Debug"
       ]
-    },
-    {
-      "type_name": "RefVerifyError",
-      "kind_tag": "error_type",
-      "signal": "blue",
-      "found_type": true
     },
     {
       "type_name": "RefVerifyLaneSummary",
@@ -85,6 +79,12 @@
         "core::cmp::PartialEq",
         "core::fmt::Debug"
       ]
+    },
+    {
+      "type_name": "RefVerifyError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true
     }
   ]
 }

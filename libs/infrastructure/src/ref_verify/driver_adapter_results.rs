@@ -88,6 +88,12 @@ fn extract_verdict_and_origins(
 /// Separated from the I/O-bound adapter method so it can be unit-tested without
 /// filesystem access. All parameters are pre-loaded; no I/O or LLM calls are
 /// made inside this function.
+///
+/// # Errors
+///
+/// Returns [`usecase::ref_verify::RefVerifyDriverError::Wiring`] when the
+/// chain filter includes Chain2 and a `Specific` layer filter names a layer
+/// that is not present in the resolved TDDD bindings (`chain2_caches`).
 #[allow(clippy::too_many_lines)]
 pub(crate) fn compute_results(
     chain1_cache: Vec<domain::tddd::semantic_verify::SemanticVerifyEntry>,
@@ -99,14 +105,35 @@ pub(crate) fn compute_results(
     chain: usecase::ref_verify::RefVerifyChainFilter,
     layer: usecase::ref_verify::RefVerifyLayerFilter,
     verdict: usecase::ref_verify::RefVerifyVerdictFilter,
-) -> usecase::ref_verify::RefVerifyResultsOutput {
+) -> Result<usecase::ref_verify::RefVerifyResultsOutput, usecase::ref_verify::RefVerifyDriverError>
+{
     use domain::ContentHash;
     use domain::tddd::semantic_verify::{SemanticVerdict, SemanticVerifyEntry, VerifyOriginRef};
     use std::collections::HashMap;
     use usecase::ref_verify::{
-        RefVerifyCacheScope, RefVerifyChainFilter, RefVerifyLaneSummary, RefVerifyLayerFilter,
-        RefVerifyPairRecord, RefVerifyResultsOutput, RefVerifyVerdictFilter,
+        RefVerifyCacheScope, RefVerifyChainFilter, RefVerifyDriverError, RefVerifyLaneSummary,
+        RefVerifyLayerFilter, RefVerifyPairRecord, RefVerifyResultsOutput, RefVerifyVerdictFilter,
     };
+
+    // Validate layer filter when Chain2 results are requested.
+    let include_chain2 = matches!(chain, RefVerifyChainFilter::Chain2 | RefVerifyChainFilter::All);
+    if include_chain2 {
+        if let RefVerifyLayerFilter::Specific(layer_id) = &layer {
+            let valid: Vec<&str> = chain2_caches.iter().map(|(id, _)| id.as_ref()).collect();
+            if !valid.contains(&layer_id.as_ref()) {
+                let valid_list = if valid.is_empty() {
+                    "(none — no TDDD layers configured)".to_owned()
+                } else {
+                    valid.join(", ")
+                };
+                return Err(RefVerifyDriverError::Wiring(format!(
+                    "unknown layer '{}' for --layer filter; \
+                     valid TDDD layers: {valid_list}",
+                    layer_id.as_ref(),
+                )));
+            }
+        }
+    }
 
     type HashKey = (ContentHash, ContentHash);
 
@@ -284,7 +311,13 @@ pub(crate) fn compute_results(
         }
     }
 
-    RefVerifyResultsOutput { lane_summaries, pair_records, total_pass, total_fail, total_pending }
+    Ok(RefVerifyResultsOutput {
+        lane_summaries,
+        pair_records,
+        total_pass,
+        total_fail,
+        total_pending,
+    })
 }
 
 #[cfg(test)]
@@ -400,6 +433,19 @@ mod tests {
         assert!(err.to_string().contains("cannot load TDDD layer bindings for results"));
     }
 
+    fn domain_chain2_caches()
+    -> Vec<(LayerId, Vec<domain::tddd::semantic_verify::SemanticVerifyEntry>)> {
+        vec![(LayerId::try_new("domain".to_owned()).unwrap(), vec![])]
+    }
+
+    fn domain_usecase_chain2_caches()
+    -> Vec<(LayerId, Vec<domain::tddd::semantic_verify::SemanticVerifyEntry>)> {
+        vec![
+            (LayerId::try_new("domain".to_owned()).unwrap(), vec![]),
+            (LayerId::try_new("usecase".to_owned()).unwrap(), vec![]),
+        ]
+    }
+
     #[test]
     fn compute_results_empty_pairs_returns_empty_output() {
         let out = compute_results(
@@ -409,7 +455,8 @@ mod tests {
             RefVerifyChainFilter::All,
             RefVerifyLayerFilter::All,
             RefVerifyVerdictFilter::All,
-        );
+        )
+        .unwrap();
         assert!(out.lane_summaries.is_empty());
         assert!(out.pair_records.is_empty());
         assert_eq!(out.total_pass, 0);
@@ -426,7 +473,8 @@ mod tests {
             RefVerifyChainFilter::All,
             RefVerifyLayerFilter::All,
             RefVerifyVerdictFilter::All,
-        );
+        )
+        .unwrap();
         assert_eq!(out.lane_summaries.len(), 1);
         assert_eq!(out.lane_summaries[0].pending_count, 1);
         assert_eq!(out.lane_summaries[0].pass_count, 0);
@@ -445,7 +493,8 @@ mod tests {
             RefVerifyChainFilter::All,
             RefVerifyLayerFilter::All,
             RefVerifyVerdictFilter::All,
-        );
+        )
+        .unwrap();
         assert_eq!(out.total_pass, 1);
         assert_eq!(out.total_fail, 0);
         assert_eq!(out.total_pending, 0);
@@ -459,12 +508,13 @@ mod tests {
         let layer_id = LayerId::try_new("domain".to_owned()).unwrap();
         let out = compute_results(
             vec![],
-            vec![],
+            domain_usecase_chain2_caches(),
             vec![chain2_pair(0x01, 0x02, "domain"), chain2_pair(0x03, 0x04, "usecase")],
             RefVerifyChainFilter::Chain2,
             RefVerifyLayerFilter::Specific(layer_id),
             RefVerifyVerdictFilter::All,
-        );
+        )
+        .unwrap();
         assert_eq!(out.lane_summaries.len(), 1, "only domain lane should be included");
         assert_eq!(out.lane_summaries[0].label, "Chain2:domain");
         assert_eq!(out.total_pending, 1);
@@ -481,7 +531,8 @@ mod tests {
             RefVerifyChainFilter::Chain1,
             RefVerifyLayerFilter::All,
             RefVerifyVerdictFilter::All,
-        );
+        )
+        .unwrap();
         assert_eq!(out.lane_summaries.len(), 1);
         assert_eq!(out.lane_summaries[0].label, "Chain1 (spec\u{2194}ADR)");
         assert_eq!(out.total_pending, 1);
@@ -492,12 +543,13 @@ mod tests {
     fn compute_results_chain2_filter_excludes_chain1() {
         let out = compute_results(
             vec![],
-            vec![],
+            domain_chain2_caches(),
             vec![chain1_pair(0x01, 0x02), chain2_pair(0x03, 0x04, "domain")],
             RefVerifyChainFilter::Chain2,
             RefVerifyLayerFilter::All,
             RefVerifyVerdictFilter::All,
-        );
+        )
+        .unwrap();
         assert_eq!(out.lane_summaries.len(), 1);
         assert!(out.lane_summaries[0].label.starts_with("Chain2:"));
         assert_eq!(out.total_pending, 1);
@@ -513,7 +565,8 @@ mod tests {
             RefVerifyChainFilter::All,
             RefVerifyLayerFilter::All,
             RefVerifyVerdictFilter::FailPending,
-        );
+        )
+        .unwrap();
         // Lane summary covers all verdicts.
         assert_eq!(out.lane_summaries[0].pass_count, 1);
         assert_eq!(out.lane_summaries[0].pending_count, 1);
@@ -533,7 +586,8 @@ mod tests {
             RefVerifyChainFilter::All,
             RefVerifyLayerFilter::All,
             RefVerifyVerdictFilter::Pass,
-        );
+        )
+        .unwrap();
         // Lane summary still shows all counts.
         assert_eq!(out.lane_summaries[0].pass_count, 1);
         assert_eq!(out.lane_summaries[0].pending_count, 1);
@@ -551,7 +605,8 @@ mod tests {
             RefVerifyChainFilter::All,
             RefVerifyLayerFilter::All,
             RefVerifyVerdictFilter::Fail,
-        );
+        )
+        .unwrap();
         assert_eq!(out.total_fail, 1);
         assert_eq!(out.total_pending, 1);
         assert_eq!(out.pair_records.len(), 1);
@@ -568,7 +623,8 @@ mod tests {
             RefVerifyChainFilter::All,
             RefVerifyLayerFilter::All,
             RefVerifyVerdictFilter::Pending,
-        );
+        )
+        .unwrap();
         assert_eq!(out.pair_records.len(), 1);
         assert!(matches!(out.pair_records[0].verdict, SemanticVerdict::Pending));
     }
@@ -582,7 +638,8 @@ mod tests {
             RefVerifyChainFilter::All,
             RefVerifyLayerFilter::All,
             RefVerifyVerdictFilter::All,
-        );
+        )
+        .unwrap();
         assert_eq!(out.pair_records.len(), 3);
         assert_eq!(out.total_pass, 1);
         assert_eq!(out.total_fail, 1);
@@ -599,9 +656,88 @@ mod tests {
             RefVerifyChainFilter::All,
             RefVerifyLayerFilter::All,
             RefVerifyVerdictFilter::Pass,
-        );
+        )
+        .unwrap();
         assert_eq!(out.lane_summaries[0].pending_count, 2);
         assert_eq!(out.total_pending, 2);
         assert!(out.pair_records.is_empty(), "no pass pairs → records empty");
+    }
+
+    // ── layer filter validation ───────────────────────────────────────────────
+
+    #[test]
+    fn compute_results_specific_unknown_layer_with_chain2_returns_wiring_error() {
+        // Typo "domian" is not in chain2_caches → Wiring error with Chain2 filter.
+        let bad_layer = LayerId::try_new("domian".to_owned()).unwrap();
+        let err = compute_results(
+            vec![],
+            domain_chain2_caches(),
+            vec![chain2_pair(0x01, 0x02, "domain")],
+            RefVerifyChainFilter::Chain2,
+            RefVerifyLayerFilter::Specific(bad_layer),
+            RefVerifyVerdictFilter::All,
+        )
+        .unwrap_err();
+        assert!(
+            matches!(err, usecase::ref_verify::RefVerifyDriverError::Wiring(ref msg)
+                if msg.contains("domian") && msg.contains("domain")),
+            "expected Wiring error naming the bad layer and valid set, got: {err:?}"
+        );
+    }
+
+    #[test]
+    fn compute_results_specific_unknown_layer_with_all_chain_returns_wiring_error() {
+        // Typo "domian" is not in chain2_caches → Wiring error with All filter.
+        let bad_layer = LayerId::try_new("domian".to_owned()).unwrap();
+        let err = compute_results(
+            vec![pass_cache_entry(0x01, 0x02)],
+            domain_chain2_caches(),
+            vec![chain1_pair(0x01, 0x02), chain2_pair(0x03, 0x04, "domain")],
+            RefVerifyChainFilter::All,
+            RefVerifyLayerFilter::Specific(bad_layer),
+            RefVerifyVerdictFilter::All,
+        )
+        .unwrap_err();
+        assert!(
+            matches!(err, usecase::ref_verify::RefVerifyDriverError::Wiring(ref msg)
+                if msg.contains("domian")),
+            "expected Wiring error for unknown layer under All chain filter, got: {err:?}"
+        );
+    }
+
+    #[test]
+    fn compute_results_specific_valid_layer_with_chain2_succeeds() {
+        // A valid layer name in chain2_caches passes validation.
+        let valid_layer = LayerId::try_new("domain".to_owned()).unwrap();
+        let out = compute_results(
+            vec![],
+            domain_chain2_caches(),
+            vec![chain2_pair(0x01, 0x02, "domain")],
+            RefVerifyChainFilter::Chain2,
+            RefVerifyLayerFilter::Specific(valid_layer),
+            RefVerifyVerdictFilter::All,
+        )
+        .unwrap();
+        assert_eq!(out.total_pending, 1);
+    }
+
+    #[test]
+    fn compute_results_specific_layer_with_chain1_filter_is_noop() {
+        // Chain1 filter: --layer is ignored (no chain2 involved).
+        // Even a nonexistent layer name must not produce an error.
+        let unknown_layer = LayerId::try_new("domian".to_owned()).unwrap();
+        let out = compute_results(
+            vec![pass_cache_entry(0x01, 0x02)],
+            domain_chain2_caches(),
+            vec![chain1_pair(0x01, 0x02)],
+            RefVerifyChainFilter::Chain1,
+            RefVerifyLayerFilter::Specific(unknown_layer),
+            RefVerifyVerdictFilter::All,
+        )
+        .unwrap();
+        // Chain1 lane is included; the bad layer filter has no effect on Chain1.
+        assert_eq!(out.total_pass, 1);
+        assert_eq!(out.lane_summaries.len(), 1);
+        assert_eq!(out.lane_summaries[0].label, "Chain1 (spec\u{2194}ADR)");
     }
 }

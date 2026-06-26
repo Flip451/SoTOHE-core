@@ -284,12 +284,6 @@ pub enum RefVerifyError {
         /// Number of unresolved pairs (Pending or known-bad degradation).
         pair_count: usize,
     },
-    /// The cache file exists but uses an older schema (missing origin fields).
-    /// The run path treats this as an invalidated empty cache and re-verifies.
-    CacheSchemaOutdated {
-        /// Human-readable description of the schema mismatch.
-        message: String,
-    },
 }
 
 impl fmt::Display for RefVerifyError {
@@ -320,9 +314,6 @@ impl fmt::Display for RefVerifyError {
                     "human review required for {pair_count} unresolved pair(s) \
                      or known-bad detection failure"
                 )
-            }
-            RefVerifyError::CacheSchemaOutdated { message } => {
-                write!(f, "verify-cache schema outdated (re-verifying): {message}")
             }
         }
     }

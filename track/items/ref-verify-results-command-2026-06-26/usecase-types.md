@@ -18,7 +18,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| RefVerifyError | error_type | modify | InvalidConfig, TrackNotActive, VerifierPort, CachePersistence, SemanticFailuresConfirmed, HumanEscalationRequired, CacheSchemaOutdated | 🔵 | 🔵 |
+| RefVerifyError | error_type | reference | InvalidConfig, TrackNotActive, VerifierPort, CachePersistence, SemanticFailuresConfirmed, HumanEscalationRequired | 🔵 | 🔵 |
 
 ## Application Services
 
