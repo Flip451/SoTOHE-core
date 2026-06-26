@@ -504,6 +504,36 @@ mod tests {
         )
     }
 
+    /// Chain-2 shaped pass entry: CatalogueEntry claim + SpecElement evidence.
+    /// Use this for catalogue-spec cache fixtures; `pass_entry` is Chain-1.
+    fn chain2_pass_entry(claim: u8, evidence: u8) -> SemanticVerifyEntry {
+        use domain::plan_ref::SpecElementId;
+        use domain::tddd::semantic_verify::{
+            CatalogueEntryKey, CatalogueEntryRef, CatalogueSectionKey, SpecElementRef,
+            SpecSectionKind, VerifyOriginRef,
+        };
+        let claim_origin = VerifyOriginRef::CatalogueEntry(CatalogueEntryRef::new(
+            "track/items/test/domain-types.json".to_owned(),
+            CatalogueSectionKey::Types,
+            CatalogueEntryKey::try_new(format!("Entry{claim:02x}")).unwrap(),
+        ));
+        let evidence_origin = VerifyOriginRef::SpecElement(SpecElementRef::new(
+            SpecSectionKind::Goal,
+            SpecElementId::try_new(format!("GO-{evidence:02}")).unwrap(),
+            format!("evidence-{evidence:02}"),
+        ));
+        SemanticVerifyEntry::new(
+            hash(claim),
+            hash(evidence),
+            SemanticVerdict::Pass {
+                citation: EvidenceCitation::try_new("the catalogue entry matches".to_owned())
+                    .unwrap(),
+            },
+            claim_origin,
+            evidence_origin,
+        )
+    }
+
     fn track_cmd(track_id: &str) -> RefVerifyCommand {
         RefVerifyCommand {
             track_id: domain::TrackId::try_new(track_id).unwrap(),
@@ -1161,7 +1191,7 @@ This section must not make D2 a valid ADR ref.
         assert_cache_adapter_roundtrip(
             "my-track-3",
             RefVerifyCacheScope::CatalogueSpec { layer },
-            vec![pass_entry(0x0a, 0x0b)],
+            vec![chain2_pass_entry(0x0a, 0x0b)],
         );
     }
 
@@ -1177,7 +1207,7 @@ This section must not make D2 a valid ADR ref.
 
         let spec_adr_entries = vec![pass_entry(0x01, 0x02)];
         let layer = LayerId::try_new("usecase".to_owned()).unwrap();
-        let cat_entries = vec![pass_entry(0x0a, 0x0b)];
+        let cat_entries = vec![chain2_pass_entry(0x0a, 0x0b)];
 
         adapter
             .save_entries(&cmd, &RefVerifyCacheScope::SpecAdr, spec_adr_entries.clone())
@@ -1234,7 +1264,10 @@ This section must not make D2 a valid ADR ref.
         std::fs::create_dir_all(&items_dir).unwrap();
         let stored_layer = LayerId::try_new("domain".to_owned()).unwrap();
         let requested_layer = LayerId::try_new("usecase".to_owned()).unwrap();
-        let doc = CatalogueSpecVerifyCacheDocument::new(stored_layer, vec![pass_entry(0x01, 0x02)]);
+        let doc = CatalogueSpecVerifyCacheDocument::new(
+            stored_layer,
+            vec![chain2_pass_entry(0x01, 0x02)],
+        );
         let json = CatalogueSpecVerifyCacheDocumentCodec::encode(&doc).unwrap();
         std::fs::write(items_dir.join("usecase-catalogue-spec-verify-cache.json"), json).unwrap();
 
