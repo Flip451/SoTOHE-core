@@ -1,14 +1,15 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-26T06:40:21Z",
-  "declaration_hash": "a88f840b76473839c565e0b25e01ffae9fc12b2e59768b66042df1caedcb9f8b",
+  "generated_at": "2026-06-26T09:07:31Z",
+  "declaration_hash": "932cf18eef6d2ec776b58d70d64bceccc8a35976d23da92d577832f46808faa6",
   "signals": [
     {
       "type_name": "RefVerifyChainArg",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "clap_builder::derive::ValueEnum",
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -18,7 +19,7 @@
     {
       "type_name": "RefVerifyCommand",
       "kind_tag": "enum",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::fmt::Debug"
@@ -27,18 +28,21 @@
     {
       "type_name": "RefVerifyResultsArgs",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "clap_builder::derive::Args",
+        "clap_builder::derive::FromArgMatches",
         "core::fmt::Debug"
       ]
     },
     {
       "type_name": "RefVerifyVerdictFilterArg",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "clap_builder::derive::ValueEnum",
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -47,6 +51,12 @@
     },
     {
       "type_name": "cli::commands::ref_verify::execute",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::ref_verify::execute_results",
       "kind_tag": "free_function",
       "signal": "blue",
       "found_type": true

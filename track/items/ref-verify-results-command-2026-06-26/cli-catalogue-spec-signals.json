@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "a88f840b76473839c565e0b25e01ffae9fc12b2e59768b66042df1caedcb9f8b",
+  "catalogue_declaration_hash": "932cf18eef6d2ec776b58d70d64bceccc8a35976d23da92d577832f46808faa6",
   "signals": [
     {
       "type_name": "CheckApprovedArgs",
@@ -36,6 +36,11 @@
       "type_name": "cli::commands::ref_verify::execute",
       "signal": "blue",
       "entry_hash": "792875d5dedd144ee10e35536e88808271592973cc5e5b0bf1f32fce302746de"
+    },
+    {
+      "type_name": "cli::commands::ref_verify::execute_results",
+      "signal": "blue",
+      "entry_hash": "604deab9e82912c4a14b5943a5e20df8ea1789c7cbcb859434366ef4df472514"
     }
   ]
 }

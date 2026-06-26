@@ -14,6 +14,7 @@ use usecase::ref_verify::{
     RefVerifyRunOutcome, RefVerifyRunService,
 };
 
+use super::driver_adapter_results::{compute_results, load_results_tddd_bindings};
 use super::{
     AgentRefVerifierAdapter, RefVerifyCacheAdapter, RefVerifyPairSourceAdapter,
     RefVerifyScopeResolver, make_ref_verifier_process_runner,
@@ -341,6 +342,77 @@ impl usecase::ref_verify::RefVerifyAggregateService for FsRefVerifyAggregateAdap
     ) -> Result<RefVerifyCheckApprovedOutcome, RefVerifyDriverError> {
         FsRefVerifyCheckApprovedAdapter::new().check_approved(track_id, items_dir)
     }
+
+    fn results(
+        &self,
+        track_id_str: &str,
+        items_dir: &Path,
+        chain: usecase::ref_verify::RefVerifyChainFilter,
+        layer: usecase::ref_verify::RefVerifyLayerFilter,
+        verdict: usecase::ref_verify::RefVerifyVerdictFilter,
+    ) -> Result<usecase::ref_verify::RefVerifyResultsOutput, RefVerifyDriverError> {
+        use domain::tddd::LayerId;
+        use domain::tddd::semantic_verify::SemanticVerifyEntry;
+        use usecase::ref_verify::{
+            RefVerifyCachePort, RefVerifyCacheScope, RefVerifyConfig, RefVerifyPairSourcePort,
+        };
+
+        // (a) Resolve project root and validate track ID.
+        let project_root = resolve_project_root(items_dir)
+            .map_err(|e| RefVerifyDriverError::Wiring(e.to_string()))?;
+        let canonical_root = project_root.canonicalize().map_err(|e| {
+            RefVerifyDriverError::Wiring(format!("cannot canonicalize project root: {e}"))
+        })?;
+        let track_id = validate_track_id(track_id_str)
+            .map_err(|e| RefVerifyDriverError::Wiring(e.to_string()))?;
+
+        // (b) Resolve scope using RefVerifyScopeResolver (existence-based, same as run/check_approved).
+        let resolver = RefVerifyScopeResolver::new(canonical_root.clone());
+        let scope = resolver.resolve(track_id.as_ref()).map_err(|e| {
+            RefVerifyDriverError::Wiring(format!("ref-verify scope resolution failed: {e}"))
+        })?;
+
+        let current_branch = current_git_branch(&canonical_root)
+            .map_err(|e| RefVerifyDriverError::Unavailable(e.to_string()))?;
+
+        let cmd = usecase::ref_verify::RefVerifyCommand { track_id, scope, current_branch };
+
+        // (c) Load all cache files (old-schema cache → SemanticVerifyCodecError::Json propagated
+        // as RefVerifyDriverError::Usecase via the existing RefVerifyCachePort error mapping).
+        let cache_adapter = RefVerifyCacheAdapter::new(canonical_root.clone());
+
+        let chain1_entries = cache_adapter
+            .load_entries(&cmd, &RefVerifyCacheScope::SpecAdr)
+            .map_err(|e| RefVerifyDriverError::Usecase(e.to_string()))?;
+
+        let bindings = load_results_tddd_bindings(&canonical_root)?;
+        let mut chain2_caches: Vec<(LayerId, Vec<SemanticVerifyEntry>)> = Vec::new();
+        for binding in &bindings {
+            let layer_str = binding.layer_id();
+            let layer_id = LayerId::try_new(layer_str.to_owned()).map_err(|e| {
+                RefVerifyDriverError::Wiring(format!("invalid layer id '{layer_str}': {e}"))
+            })?;
+            let cache_scope = RefVerifyCacheScope::CatalogueSpec { layer: layer_id.clone() };
+            let entries = cache_adapter
+                .load_entries(&cmd, &cache_scope)
+                .map_err(|e| RefVerifyDriverError::Usecase(e.to_string()))?;
+            chain2_caches.push((layer_id, entries));
+        }
+
+        // (d) Enumerate current pairs read-only (CN-06: no LLM subprocess in the results path).
+        // Use the default config and filter out known-bad probes afterward; RefVerifyPercent
+        // rejects 0 so zero-injection is not representable via RefVerifyConfig::try_new.
+        let pair_source = RefVerifyPairSourceAdapter::new(canonical_root.clone());
+        let config = RefVerifyConfig::default();
+        let all_pairs = pair_source
+            .load_pairs(&cmd, &config)
+            .map_err(|e| RefVerifyDriverError::Usecase(format!("pair source enumeration: {e}")))?;
+        // Exclude known-bad calibration probes; classify only real production pairs.
+        let current_pairs: Vec<usecase::ref_verify::RefVerifyPair> =
+            all_pairs.into_iter().filter(|p| !p.known_bad).collect();
+
+        Ok(compute_results(chain1_entries, chain2_caches, current_pairs, chain, layer, verdict))
+    }
 }
 
 // ── FsRefVerifyCheckApprovedAdapter ──────────────────────────────────────────
@@ -423,7 +495,7 @@ impl RefVerifyCheckApprovedDriverService for FsRefVerifyCheckApprovedAdapter {
 }
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used)]
+#[allow(clippy::unwrap_used, clippy::indexing_slicing)]
 mod tests {
     use super::*;
 

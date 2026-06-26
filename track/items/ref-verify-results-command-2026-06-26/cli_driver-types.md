@@ -4,16 +4,16 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| RefVerifyChainSelect | enum | add | Chain1, Chain2, All | 🟡 | 🔵 |
-| RefVerifyInput | enum | modify | Run, CheckApproved, Results | 🟡 | 🔵 |
-| RefVerifyVerdictSelect | enum | add | FailPending, Pass, Fail, Pending, All | 🟡 | 🔵 |
+| RefVerifyChainSelect | enum | add | Chain1, Chain2, All | 🔵 | 🔵 |
+| RefVerifyInput | enum | modify | Run, CheckApproved, Results | 🔵 | 🔵 |
+| RefVerifyVerdictSelect | enum | add | FailPending, Pass, Fail, Pending, All | 🔵 | 🔵 |
 
 ## DTOs
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | RefVerifyCheckApprovedInput | dto | reference | — | 🔵 | 🔵 |
-| RefVerifyResultsInput | dto | add | — | 🟡 | 🔵 |
+| RefVerifyResultsInput | dto | add | — | 🔵 | 🔵 |
 | RefVerifyRunInput | dto | reference | — | 🔵 | 🔵 |
 
 ## Primary Adapters

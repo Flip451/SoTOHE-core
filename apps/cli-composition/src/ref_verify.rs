@@ -33,6 +33,19 @@ pub struct RefVerifyRunInput {
     pub items_dir: PathBuf,
 }
 
+/// Input for the `ref_verify results` command at the cli_composition boundary.
+///
+/// Carries usecase-level filter types directly; the composition root converts
+/// them to the cli_driver-level String representation before delegation.
+#[derive(Debug, Clone)]
+pub struct RefVerifyResultsInput {
+    pub track_id: String,
+    pub items_dir: PathBuf,
+    pub chain: usecase::ref_verify::RefVerifyChainFilter,
+    pub layer: usecase::ref_verify::RefVerifyLayerFilter,
+    pub verdict: usecase::ref_verify::RefVerifyVerdictFilter,
+}
+
 #[derive(Debug, Clone)]
 pub struct RefVerifyCheckApprovedInput {
     pub track_id: String,
@@ -323,6 +336,70 @@ impl RefVerifyCompositionRoot {
                 exit_code: 1,
             })
         }
+    }
+
+    /// Wire and dispatch the `ref_verify results` command.
+    ///
+    /// Converts usecase-level filter types to cli_driver-level representations and
+    /// delegates to [`cli_driver::ref_verify::RefVerifyDriver`].
+    pub fn ref_verify_results(
+        &self,
+        input: RefVerifyResultsInput,
+    ) -> Result<CommandOutcome, CompositionError> {
+        use cli_driver::ref_verify::{RefVerifyInput, RefVerifyResultsInput as DriverInput};
+
+        let layer_str = layer_filter_to_string(input.layer);
+        let driver_input = DriverInput {
+            track_id: input.track_id,
+            items_dir: input.items_dir,
+            chain: convert_chain_filter(input.chain),
+            layer: layer_str,
+            verdict: convert_verdict_filter(input.verdict),
+        };
+        Ok(self.ref_verify_driver().handle(RefVerifyInput::Results(driver_input)))
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Filter conversion helpers (cli_composition boundary)
+// ---------------------------------------------------------------------------
+
+fn convert_chain_filter(
+    chain: usecase::ref_verify::RefVerifyChainFilter,
+) -> cli_driver::ref_verify::RefVerifyChainSelect {
+    use cli_driver::ref_verify::RefVerifyChainSelect;
+    use usecase::ref_verify::RefVerifyChainFilter;
+    match chain {
+        RefVerifyChainFilter::Chain1 => RefVerifyChainSelect::Chain1,
+        RefVerifyChainFilter::Chain2 => RefVerifyChainSelect::Chain2,
+        RefVerifyChainFilter::All => RefVerifyChainSelect::All,
+    }
+}
+
+/// Convert a [`usecase::ref_verify::RefVerifyLayerFilter`] to the cli_driver-level
+/// String representation used by [`cli_driver::ref_verify::RefVerifyResultsInput`].
+///
+/// - `All` maps to `"all"`.
+/// - `Specific(id)` maps to the layer id string.
+fn layer_filter_to_string(layer: usecase::ref_verify::RefVerifyLayerFilter) -> String {
+    use usecase::ref_verify::RefVerifyLayerFilter;
+    match layer {
+        RefVerifyLayerFilter::All => "all".to_owned(),
+        RefVerifyLayerFilter::Specific(id) => id.as_ref().to_owned(),
+    }
+}
+
+fn convert_verdict_filter(
+    verdict: usecase::ref_verify::RefVerifyVerdictFilter,
+) -> cli_driver::ref_verify::RefVerifyVerdictSelect {
+    use cli_driver::ref_verify::RefVerifyVerdictSelect;
+    use usecase::ref_verify::RefVerifyVerdictFilter;
+    match verdict {
+        RefVerifyVerdictFilter::FailPending => RefVerifyVerdictSelect::FailPending,
+        RefVerifyVerdictFilter::Pass => RefVerifyVerdictSelect::Pass,
+        RefVerifyVerdictFilter::Fail => RefVerifyVerdictSelect::Fail,
+        RefVerifyVerdictFilter::Pending => RefVerifyVerdictSelect::Pending,
+        RefVerifyVerdictFilter::All => RefVerifyVerdictSelect::All,
     }
 }
 
@@ -1194,6 +1271,50 @@ exit 64
                 .join(track_id)
                 .join("spec-adr-verify-cache.json")
                 .exists()
+        );
+    }
+
+    /// Integration test for `ref_verify_results` with no cache (AC-01 / AC-06 / CN-03).
+    ///
+    /// Chain-1 fixture present, no verify-cache written. All pairs are pending.
+    /// `ref_verify_results` must exit 0 (CN-02) and include a `Summary:` line
+    /// with 0 pass and 0 fail (all pending).
+    #[cfg(unix)]
+    #[test]
+    fn test_ref_verify_results_no_cache_returns_all_pending() {
+        use super::RefVerifyResultsInput;
+        use usecase::ref_verify::{
+            RefVerifyChainFilter, RefVerifyLayerFilter, RefVerifyVerdictFilter,
+        };
+
+        let (_tmp, items_dir) = temp_project_with_items_dir();
+        let project_root = project_root_from_items_dir(&items_dir).to_path_buf();
+        let track_id = "test-ref-verify-results-no-cache";
+        write_chain1_fixture(&items_dir, track_id);
+
+        let outcome = with_fake_track_branch(&project_root, track_id, || {
+            RefVerifyCompositionRoot::new()
+                .ref_verify_results(RefVerifyResultsInput {
+                    track_id: track_id.to_owned(),
+                    items_dir: items_dir.clone(),
+                    chain: RefVerifyChainFilter::All,
+                    layer: RefVerifyLayerFilter::All,
+                    verdict: RefVerifyVerdictFilter::FailPending,
+                })
+                .unwrap()
+        });
+
+        assert_eq!(outcome.exit_code, 0, "ref_verify_results must always exit 0: {outcome:?}");
+        let stdout = outcome.stdout.as_deref().unwrap_or("");
+        assert!(stdout.contains("Summary:"), "stdout must contain 'Summary:' line: {stdout:?}");
+        // With no cache all pairs are pending — pass and fail counts must both be 0.
+        assert!(
+            stdout.contains("0 pass"),
+            "stdout must contain '0 pass' when no cache: {stdout:?}"
+        );
+        assert!(
+            stdout.contains("0 fail"),
+            "stdout must contain '0 fail' when no cache: {stdout:?}"
         );
     }
 }

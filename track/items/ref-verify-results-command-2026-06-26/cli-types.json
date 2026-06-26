@@ -155,21 +155,39 @@
         { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "IN-01" }
       ],
       "informal_grounds": []
+    },
+    "cli::commands::ref_verify::execute_results": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [{ "name": "args", "ty": "&RefVerifyResultsArgs" }],
+      "returns": "std::process::ExitCode",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Private dispatch helper for `sotp ref-verify results`. Constructs RefVerifyResultsInput from RefVerifyResultsArgs and dispatches to the driver via RefVerifyCompositionRoot. Exit code mirrors driver_outcome_to_exit; always 0 for results content per D2/CN-02.",
+      "spec_refs": [
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "IN-01" }
+      ],
+      "informal_grounds": []
     }
   },
   "inherent_impls": [],
   "trait_impls": [
-    { "trait_ref": "core::fmt::Debug",     "for_type": "RefVerifyChainArg" },
-    { "trait_ref": "core::clone::Clone",   "for_type": "RefVerifyChainArg" },
-    { "trait_ref": "core::cmp::PartialEq", "for_type": "RefVerifyChainArg" },
-    { "trait_ref": "core::cmp::Eq",        "for_type": "RefVerifyChainArg" },
+    { "trait_ref": "core::fmt::Debug",                  "for_type": "RefVerifyChainArg" },
+    { "trait_ref": "core::clone::Clone",                "for_type": "RefVerifyChainArg" },
+    { "trait_ref": "core::cmp::PartialEq",              "for_type": "RefVerifyChainArg" },
+    { "trait_ref": "core::cmp::Eq",                     "for_type": "RefVerifyChainArg" },
+    { "trait_ref": "clap_builder::derive::ValueEnum",   "for_type": "RefVerifyChainArg" },
 
-    { "trait_ref": "core::fmt::Debug",     "for_type": "RefVerifyVerdictFilterArg" },
-    { "trait_ref": "core::clone::Clone",   "for_type": "RefVerifyVerdictFilterArg" },
-    { "trait_ref": "core::cmp::PartialEq", "for_type": "RefVerifyVerdictFilterArg" },
-    { "trait_ref": "core::cmp::Eq",        "for_type": "RefVerifyVerdictFilterArg" },
+    { "trait_ref": "core::fmt::Debug",                  "for_type": "RefVerifyVerdictFilterArg" },
+    { "trait_ref": "core::clone::Clone",                "for_type": "RefVerifyVerdictFilterArg" },
+    { "trait_ref": "core::cmp::PartialEq",              "for_type": "RefVerifyVerdictFilterArg" },
+    { "trait_ref": "core::cmp::Eq",                     "for_type": "RefVerifyVerdictFilterArg" },
+    { "trait_ref": "clap_builder::derive::ValueEnum",   "for_type": "RefVerifyVerdictFilterArg" },
 
-    { "trait_ref": "core::fmt::Debug",   "for_type": "RefVerifyResultsArgs" },
+    { "trait_ref": "core::fmt::Debug",                      "for_type": "RefVerifyResultsArgs" },
+    { "trait_ref": "clap_builder::derive::Args",            "for_type": "RefVerifyResultsArgs" },
+    { "trait_ref": "clap_builder::derive::FromArgMatches",  "for_type": "RefVerifyResultsArgs" },
 
     { "action": "modify",    "trait_ref": "core::fmt::Debug",                         "for_type": "RefVerifyCommand" },
     { "action": "reference", "trait_ref": "clap_builder::derive::FromArgMatches",        "for_type": "RefVerifyCommand" },

@@ -321,6 +321,7 @@ subgraph cli["cli"]
     T15_cli_cli_RunArgs__self[RunArgs]
   end
   F42_cli_cli_cli__commands__ref_verify__execute[[execute]]
+  F50_cli_cli_cli__commands__ref_verify__execute_results[[execute_results]]
   end
 end
 T27_domain_domain_SpecElementId_try_new --> T27_domain_domain_SpecElementId__self
@@ -385,6 +386,7 @@ T24_cli_cli_RefVerifyCommand_Results --o T28_cli_cli_RefVerifyResultsArgs__self
 T28_cli_cli_RefVerifyResultsArgs__self --o|chain| T25_cli_cli_RefVerifyChainArg__self
 T28_cli_cli_RefVerifyResultsArgs__self --o|filter| T33_cli_cli_RefVerifyVerdictFilterArg__self
 F42_cli_cli_cli__commands__ref_verify__execute --o T24_cli_cli_RefVerifyCommand__self
+F50_cli_cli_cli__commands__ref_verify__execute_results --o T28_cli_cli_RefVerifyResultsArgs__self
 class T27_domain_domain_SpecElementId_try_new method_node
 class T27_domain_domain_SpecElementId__self value_object
 class T28_domain_domain_AdrDecisionRef_new method_node
@@ -510,4 +512,6 @@ class T33_cli_cli_RefVerifyVerdictFilterArg__self dto
 class T15_cli_cli_RunArgs__self dto
 class F42_cli_cli_cli__commands__ref_verify__execute free_function
 class F42_cli_cli_cli__commands__ref_verify__execute function_node
+class F50_cli_cli_cli__commands__ref_verify__execute_results free_function
+class F50_cli_cli_cli__commands__ref_verify__execute_results function_node
 ```

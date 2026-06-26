@@ -21,9 +21,7 @@ use std::fmt;
 
 use domain::TrackId;
 use domain::tddd::LayerId;
-use domain::tddd::semantic_verify::{
-    ModelTier, SemanticVerdict, SemanticVerifyEntry, VerifyOriginRef,
-};
+use domain::tddd::semantic_verify::{ModelTier, SemanticVerifyEntry};
 
 // ── RefVerifyScope ────────────────────────────────────────────────────────────
 
@@ -449,4 +447,14 @@ pub use driver_service::{
     RefVerifyCheckApprovedOutcome, RefVerifyDriverError, RefVerifyLaneSummary,
     RefVerifyLayerFilter, RefVerifyPairRecord, RefVerifyResultsOutput, RefVerifyRunOutcome,
     RefVerifyRunService, RefVerifyVerdictFilter,
+};
+
+// Re-exported for cli_driver layer accessibility (T005).
+// `RefVerifyPairRecord` exposes these domain types in its public fields; making
+// them accessible here follows the existing `pub use domain::tddd::LayerId`
+// pattern and does not change any behavioral contract.
+pub use domain::SpecElementId;
+pub use domain::tddd::semantic_verify::{
+    AdrDecisionRef, CatalogueEntryKey, CatalogueEntryRef, CatalogueSectionKey, SemanticVerdict,
+    SpecElementRef, SpecSectionKind, VerifyOriginRef,
 };
