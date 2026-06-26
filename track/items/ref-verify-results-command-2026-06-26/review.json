@@ -1,151 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Chain-2 evidence origins are built from `find_spec_element_text`, which returns the rendered snippet (`[section id] text`) rather than the raw spec element text. That violates the `SpecElementRef` contract that `text_label` is verbatim text, so the cache will persist a different origin payload than Chain-1 and the codec/domain model expect.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/pair_source_chain2.rs",
-              "line": 194,
-              "category": "adapter correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:4e20fe67f2d1ed0d0ef8603110a43a1309e65cdd3dc859385b42a8e32e0c908c",
-          "at": "2026-06-26T05:54:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:96da4a2b0621c63a4936bc1817543966a7701335dfd6a42fea38c7f34d36ed23",
-          "at": "2026-06-26T06:09:50Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:96da4a2b0621c63a4936bc1817543966a7701335dfd6a42fea38c7f34d36ed23",
-          "at": "2026-06-26T06:14:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7493efff237b03f5436243b97c7ef0d8e77e9fa9ca417bb5caed5f582b1a7389",
-          "at": "2026-06-26T07:53:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7493efff237b03f5436243b97c7ef0d8e77e9fa9ca417bb5caed5f582b1a7389",
-          "at": "2026-06-26T07:58:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8cff3089885c4a8ab336ef156e6f78f19eb51ebbdb0c9209c3c583b16fd87a62",
-          "at": "2026-06-26T08:55:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`load_results_tddd_bindings` falls back to `Ok(Vec::new())` when `architecture-rules.json` is malformed or absent. This helper feeds the results adapter's Chain-2 cache loading, so a broken rules file can be treated as “no Chain-2 layers” instead of failing closed. The lower-level `load_tddd_layers` contract treats this file as required because catalogue bindings cannot be trusted without it; per the infrastructure severity policy, config loaders must not silently default on parse/missing-file errors when the convention is fail-closed.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/ref_verify/driver_adapter_results.rs",
-              "line": 21,
-              "category": "non-fail-closed config"
-            }
-          ],
-          "hash": "rvw1:sha256:8cff3089885c4a8ab336ef156e6f78f19eb51ebbdb0c9209c3c583b16fd87a62",
-          "at": "2026-06-26T08:59:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9642498d7ae829561ad29ce8166333387bd19018c35241252d74f6734b592a48",
-          "at": "2026-06-26T09:06:00Z"
-        }
-      ]
-    },
-    "cli_driver": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c0699d1af1ddf7a1267fc9edf59cab97b28ca06132625d51a2abcc1103cb60fc",
-          "at": "2026-06-26T07:55:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c0699d1af1ddf7a1267fc9edf59cab97b28ca06132625d51a2abcc1103cb60fc",
-          "at": "2026-06-26T07:57:30Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Both `chain` and `filter` are custom `ValueEnum`s, but these fields are missing `#[arg(value_enum)]`. As written, clap will not wire the enum parser here, so valid inputs like `--chain 1` and `--filter pass` will not be accepted by `ref-verify results`.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/ref_verify.rs",
-              "line": 150,
-              "category": "cli parsing"
-            }
-          ],
-          "hash": "rvw1:sha256:6f1f2a5f6af6e5fec280c20f29885ef1176ffc7752d625ff6d836673a634a3f4",
-          "at": "2026-06-26T08:00:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0f3cb10ac67f6ab84e3dfa1ff98c2ac21e4697b79e51f0caffc3a11577f45ffc",
-          "at": "2026-06-26T08:05:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0f3cb10ac67f6ab84e3dfa1ff98c2ac21e4697b79e51f0caffc3a11577f45ffc",
-          "at": "2026-06-26T08:07:51Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f7114518cfa2b99cb943299aaba4be42d9a51d89ca3fd8ee4773086596ba4897",
-          "at": "2026-06-26T05:51:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f7114518cfa2b99cb943299aaba4be42d9a51d89ca3fd8ee4773086596ba4897",
-          "at": "2026-06-26T05:53:47Z"
-        }
-      ]
-    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -469,6 +324,103 @@
           "findings": [],
           "hash": "rvw1:sha256:30dabab980463f6ae4aff3e2fe0196d8fd3c8ba484a550d65b7c837cd6b29c04",
           "at": "2026-06-26T08:13:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:32a5cfefd9748d3654de6e8d6fa43fd530d56864526e90d8a475b8c82fe45e62",
+          "at": "2026-06-26T09:11:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:32a5cfefd9748d3654de6e8d6fa43fd530d56864526e90d8a475b8c82fe45e62",
+          "at": "2026-06-26T09:14:35Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e4378b99ef188edf534cc44dcf7370191de70db814863d31a94ea5e3e5034f38",
+          "at": "2026-06-26T05:50:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e4378b99ef188edf534cc44dcf7370191de70db814863d31a94ea5e3e5034f38",
+          "at": "2026-06-26T05:53:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:94da838097d36ee152e41bcbee1a102243b422f8a160707868e38fc88ec62337",
+          "at": "2026-06-26T07:52:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:94da838097d36ee152e41bcbee1a102243b422f8a160707868e38fc88ec62337",
+          "at": "2026-06-26T07:55:43Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Both `chain` and `filter` are custom `ValueEnum`s, but these fields are missing `#[arg(value_enum)]`. As written, clap will not wire the enum parser here, so valid inputs like `--chain 1` and `--filter pass` will not be accepted by `ref-verify results`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/ref_verify.rs",
+              "line": 150,
+              "category": "cli parsing"
+            }
+          ],
+          "hash": "rvw1:sha256:6f1f2a5f6af6e5fec280c20f29885ef1176ffc7752d625ff6d836673a634a3f4",
+          "at": "2026-06-26T08:00:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0f3cb10ac67f6ab84e3dfa1ff98c2ac21e4697b79e51f0caffc3a11577f45ffc",
+          "at": "2026-06-26T08:05:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0f3cb10ac67f6ab84e3dfa1ff98c2ac21e4697b79e51f0caffc3a11577f45ffc",
+          "at": "2026-06-26T08:07:51Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f7114518cfa2b99cb943299aaba4be42d9a51d89ca3fd8ee4773086596ba4897",
+          "at": "2026-06-26T05:51:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f7114518cfa2b99cb943299aaba4be42d9a51d89ca3fd8ee4773086596ba4897",
+          "at": "2026-06-26T05:53:47Z"
         }
       ]
     },
@@ -541,6 +493,82 @@
         }
       ]
     },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Chain-2 evidence origins are built from `find_spec_element_text`, which returns the rendered snippet (`[section id] text`) rather than the raw spec element text. That violates the `SpecElementRef` contract that `text_label` is verbatim text, so the cache will persist a different origin payload than Chain-1 and the codec/domain model expect.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/pair_source_chain2.rs",
+              "line": 194,
+              "category": "adapter correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4e20fe67f2d1ed0d0ef8603110a43a1309e65cdd3dc859385b42a8e32e0c908c",
+          "at": "2026-06-26T05:54:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:96da4a2b0621c63a4936bc1817543966a7701335dfd6a42fea38c7f34d36ed23",
+          "at": "2026-06-26T06:09:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:96da4a2b0621c63a4936bc1817543966a7701335dfd6a42fea38c7f34d36ed23",
+          "at": "2026-06-26T06:14:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7493efff237b03f5436243b97c7ef0d8e77e9fa9ca417bb5caed5f582b1a7389",
+          "at": "2026-06-26T07:53:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7493efff237b03f5436243b97c7ef0d8e77e9fa9ca417bb5caed5f582b1a7389",
+          "at": "2026-06-26T07:58:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8cff3089885c4a8ab336ef156e6f78f19eb51ebbdb0c9209c3c583b16fd87a62",
+          "at": "2026-06-26T08:55:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`load_results_tddd_bindings` falls back to `Ok(Vec::new())` when `architecture-rules.json` is malformed or absent. This helper feeds the results adapter's Chain-2 cache loading, so a broken rules file can be treated as “no Chain-2 layers” instead of failing closed. The lower-level `load_tddd_layers` contract treats this file as required because catalogue bindings cannot be trusted without it; per the infrastructure severity policy, config loaders must not silently default on parse/missing-file errors when the convention is fail-closed.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/ref_verify/driver_adapter_results.rs",
+              "line": 21,
+              "category": "non-fail-closed config"
+            }
+          ],
+          "hash": "rvw1:sha256:8cff3089885c4a8ab336ef156e6f78f19eb51ebbdb0c9209c3c583b16fd87a62",
+          "at": "2026-06-26T08:59:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9642498d7ae829561ad29ce8166333387bd19018c35241252d74f6734b592a48",
+          "at": "2026-06-26T09:06:00Z"
+        }
+      ]
+    },
     "usecase": {
       "rounds": [
         {
@@ -573,35 +601,21 @@
         }
       ]
     },
-    "cli_composition": {
+    "cli_driver": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:e4378b99ef188edf534cc44dcf7370191de70db814863d31a94ea5e3e5034f38",
-          "at": "2026-06-26T05:50:17Z"
+          "hash": "rvw1:sha256:c0699d1af1ddf7a1267fc9edf59cab97b28ca06132625d51a2abcc1103cb60fc",
+          "at": "2026-06-26T07:55:07Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:e4378b99ef188edf534cc44dcf7370191de70db814863d31a94ea5e3e5034f38",
-          "at": "2026-06-26T05:53:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:94da838097d36ee152e41bcbee1a102243b422f8a160707868e38fc88ec62337",
-          "at": "2026-06-26T07:52:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:94da838097d36ee152e41bcbee1a102243b422f8a160707868e38fc88ec62337",
-          "at": "2026-06-26T07:55:43Z"
+          "hash": "rvw1:sha256:c0699d1af1ddf7a1267fc9edf59cab97b28ca06132625d51a2abcc1103cb60fc",
+          "at": "2026-06-26T07:57:30Z"
         }
       ]
     }
