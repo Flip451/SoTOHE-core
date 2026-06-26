@@ -1,8 +1,18 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-26T13:45:34Z",
-  "declaration_hash": "1d29df878102cabd243611252f4be4c5846f77b3c8a1b6ba6f979cf963513a43",
+  "generated_at": "2026-06-26T14:47:51Z",
+  "declaration_hash": "8f1f7fc683428cd9430431a9b039912ef7e90962d7a309f6e68d346ca0786732",
   "signals": [
+    {
+      "type_name": "RefVerifyChainFilter",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
+    },
     {
       "type_name": "RefVerifyCompositionRoot",
       "kind_tag": "composition_root",
@@ -12,6 +22,16 @@
     {
       "type_name": "RefVerifyResultsInput",
       "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "RefVerifyVerdictFilter",
+      "kind_tag": "enum",
       "signal": "blue",
       "found_type": true,
       "found_items": [

@@ -1,7 +1,12 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "1d29df878102cabd243611252f4be4c5846f77b3c8a1b6ba6f979cf963513a43",
+  "catalogue_declaration_hash": "8f1f7fc683428cd9430431a9b039912ef7e90962d7a309f6e68d346ca0786732",
   "signals": [
+    {
+      "type_name": "RefVerifyChainFilter",
+      "signal": "blue",
+      "entry_hash": "9ed8bc7f451422d26e5662a83ef0391d40ba548af2829cbafe4f411c7177f7b6"
+    },
     {
       "type_name": "RefVerifyCheckApprovedInput",
       "signal": "blue",
@@ -15,12 +20,17 @@
     {
       "type_name": "RefVerifyResultsInput",
       "signal": "blue",
-      "entry_hash": "4fecf4fa0d0ba9ba915d50f8a138ac32ee7f67fe3c46e2ad0db0702f5f1a1a43"
+      "entry_hash": "dbf2a4015b910e54d11eb78a925a6729df27dbc69d826141ef83ffae661f5939"
     },
     {
       "type_name": "RefVerifyRunInput",
       "signal": "blue",
       "entry_hash": "73c26c1411bec0533c965ec318676d1f40514d68190e2ede3167c8cf617ab677"
+    },
+    {
+      "type_name": "RefVerifyVerdictFilter",
+      "signal": "blue",
+      "entry_hash": "04357c3c2af17825c6bed2040c1842886038654746f6fb5daabc37ea57ee7cb6"
     }
   ]
 }

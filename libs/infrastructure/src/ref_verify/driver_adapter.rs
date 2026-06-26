@@ -414,13 +414,44 @@ impl usecase::ref_verify::RefVerifyAggregateService for FsRefVerifyAggregateAdap
             let target_ids = resolve_results_chain2_target_layers(&bindings, &layer)?;
 
             for layer_id in &target_ids {
+                // Pre-Phase-2 graceful skip: if the layer's catalogue file does not yet
+                // exist on disk, contribute zero pairs and zero cache entries for this
+                // layer.  A present-but-corrupt catalogue continues to propagate errors
+                // through the pair source / cache codec (IN-07).
+                let catalogue_file = bindings
+                    .iter()
+                    .find(|b| b.layer_id() == layer_id.as_ref())
+                    .map(|b| b.catalogue_file().to_owned())
+                    .unwrap_or_else(|| format!("{}-types.json", layer_id.as_ref()));
+                let catalogue_path = canonical_root
+                    .join("track")
+                    .join("items")
+                    .join(cmd.track_id.as_ref())
+                    .join(&catalogue_file);
+                let catalogue_exists = crate::track::symlink_guard::reject_symlinks_below(
+                    &catalogue_path,
+                    &canonical_root,
+                )
+                .map_err(|e| {
+                    RefVerifyDriverError::Wiring(format!(
+                        "cannot inspect catalogue '{}': {e}",
+                        catalogue_path.display()
+                    ))
+                })?;
+                if !catalogue_exists {
+                    // Absent catalogue → pre-Phase-2; record the valid layer with
+                    // zero cache entries, but skip pair enumeration for it.
+                    chain2_caches.push((layer_id.clone(), Vec::new()));
+                    continue;
+                }
+
                 let cache_scope = RefVerifyCacheScope::CatalogueSpec { layer: layer_id.clone() };
                 let entries = cache_adapter
                     .load_entries(&cmd, &cache_scope)
                     .map_err(|e| RefVerifyDriverError::Usecase(e.to_string()))?;
                 chain2_caches.push((layer_id.clone(), entries));
+                chain2_layer_ids.push(layer_id.clone());
             }
-            chain2_layer_ids = target_ids;
         }
 
         // (d) Enumerate current pairs narrowed by chain and layer filter.

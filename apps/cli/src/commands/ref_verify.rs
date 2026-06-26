@@ -18,10 +18,7 @@ use std::process::ExitCode;
 
 use clap::{Args, Subcommand, ValueEnum};
 use cli_composition::RefVerifyCompositionRoot;
-use cli_driver::ref_verify::{
-    RefVerifyChainSelect, RefVerifyCheckApprovedInput, RefVerifyInput, RefVerifyResultsInput,
-    RefVerifyRunInput, RefVerifyVerdictSelect,
-};
+use cli_driver::ref_verify::{RefVerifyCheckApprovedInput, RefVerifyInput, RefVerifyRunInput};
 
 use crate::commands::driver_outcome_to_exit;
 
@@ -205,6 +202,8 @@ fn execute_check_approved(args: &CheckApprovedArgs) -> ExitCode {
 }
 
 fn execute_results(args: &RefVerifyResultsArgs) -> ExitCode {
+    use cli_composition::{RefVerifyChainFilter, RefVerifyResultsInput, RefVerifyVerdictFilter};
+
     let track_id =
         match crate::commands::track::resolve_track_id(args.track_id.clone(), &args.items_dir) {
             Ok(id) => id,
@@ -214,26 +213,31 @@ fn execute_results(args: &RefVerifyResultsArgs) -> ExitCode {
             }
         };
     let chain = match &args.chain {
-        RefVerifyChainArg::Chain1 => RefVerifyChainSelect::Chain1,
-        RefVerifyChainArg::Chain2 => RefVerifyChainSelect::Chain2,
-        RefVerifyChainArg::All => RefVerifyChainSelect::All,
+        RefVerifyChainArg::Chain1 => RefVerifyChainFilter::Chain1,
+        RefVerifyChainArg::Chain2 => RefVerifyChainFilter::Chain2,
+        RefVerifyChainArg::All => RefVerifyChainFilter::All,
     };
     let verdict = match &args.filter {
-        None => RefVerifyVerdictSelect::FailPending,
-        Some(RefVerifyVerdictFilterArg::Pass) => RefVerifyVerdictSelect::Pass,
-        Some(RefVerifyVerdictFilterArg::Fail) => RefVerifyVerdictSelect::Fail,
-        Some(RefVerifyVerdictFilterArg::Pending) => RefVerifyVerdictSelect::Pending,
-        Some(RefVerifyVerdictFilterArg::All) => RefVerifyVerdictSelect::All,
+        None => RefVerifyVerdictFilter::FailPending,
+        Some(RefVerifyVerdictFilterArg::Pass) => RefVerifyVerdictFilter::Pass,
+        Some(RefVerifyVerdictFilterArg::Fail) => RefVerifyVerdictFilter::Fail,
+        Some(RefVerifyVerdictFilterArg::Pending) => RefVerifyVerdictFilter::Pending,
+        Some(RefVerifyVerdictFilterArg::All) => RefVerifyVerdictFilter::All,
     };
-    driver_outcome_to_exit(RefVerifyCompositionRoot::new().ref_verify_driver().handle(
-        RefVerifyInput::Results(RefVerifyResultsInput {
-            track_id,
-            items_dir: args.items_dir.clone(),
-            chain,
-            layer: args.layer.clone(),
-            verdict,
-        }),
-    ))
+    let input = RefVerifyResultsInput {
+        track_id,
+        items_dir: args.items_dir.clone(),
+        chain,
+        layer: args.layer.clone(),
+        verdict,
+    };
+    match RefVerifyCompositionRoot::new().ref_verify_results(input) {
+        Ok(outcome) => driver_outcome_to_exit(outcome),
+        Err(e) => {
+            eprintln!("{e}");
+            ExitCode::FAILURE
+        }
+    }
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────────────

@@ -931,4 +931,48 @@ mod tests {
         assert_eq!(out.lane_summaries[0].label, "Chain1 (spec\u{2194}ADR)");
         assert_eq!(out.pair_records.len(), 1);
     }
+
+    /// Verifies that `compute_results` returns success with zero output when
+    /// pre-Phase-2 state causes the adapter to produce empty caches and pairs
+    /// for Chain2 (absent-catalogue layers were skipped by the F1 fix).
+    #[test]
+    fn compute_results_chain2_all_with_pre_phase2_state_returns_zero_pair_result() {
+        let layer_id = LayerId::try_new("domain".to_owned()).unwrap();
+        let out = compute_results(
+            vec![],                   // no chain1 cache
+            vec![(layer_id, vec![])], // absent catalogue contributes zero cache entries
+            vec![],                   // no pairs enumerated for absent catalogues
+            RefVerifyChainFilter::Chain2,
+            RefVerifyLayerFilter::All,
+            RefVerifyVerdictFilter::All,
+        )
+        .unwrap();
+        assert!(out.lane_summaries.is_empty());
+        assert!(out.pair_records.is_empty());
+        assert_eq!(out.total_pass, 0);
+        assert_eq!(out.total_fail, 0);
+        assert_eq!(out.total_pending, 0);
+    }
+
+    /// Verifies that a specific valid layer with an absent catalogue is still
+    /// accepted as a zero-pair pre-Phase-2 result, not misclassified as an
+    /// unknown-layer typo by cache-based validation.
+    #[test]
+    fn compute_results_chain2_specific_with_pre_phase2_state_returns_zero_pair_result() {
+        let layer_id = LayerId::try_new("domain".to_owned()).unwrap();
+        let out = compute_results(
+            vec![],
+            vec![(layer_id.clone(), vec![])],
+            vec![],
+            RefVerifyChainFilter::Chain2,
+            RefVerifyLayerFilter::Specific(layer_id),
+            RefVerifyVerdictFilter::All,
+        )
+        .unwrap();
+        assert!(out.lane_summaries.is_empty());
+        assert!(out.pair_records.is_empty());
+        assert_eq!(out.total_pass, 0);
+        assert_eq!(out.total_fail, 0);
+        assert_eq!(out.total_pending, 0);
+    }
 }

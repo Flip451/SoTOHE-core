@@ -33,17 +33,41 @@ pub struct RefVerifyRunInput {
     pub items_dir: PathBuf,
 }
 
+/// Chain filter at the `cli_composition` boundary.
+///
+/// Mirrors `cli_driver::ref_verify::RefVerifyChainSelect`; callers of
+/// `ref_verify_results` must not depend on `usecase::ref_verify` types.
+#[derive(Debug, Clone)]
+pub enum RefVerifyChainFilter {
+    Chain1,
+    Chain2,
+    All,
+}
+
+/// Verdict filter at the `cli_composition` boundary.
+///
+/// Mirrors `cli_driver::ref_verify::RefVerifyVerdictSelect`; callers of
+/// `ref_verify_results` must not depend on `usecase::ref_verify` types.
+#[derive(Debug, Clone)]
+pub enum RefVerifyVerdictFilter {
+    FailPending,
+    Pass,
+    Fail,
+    Pending,
+    All,
+}
+
 /// Input for the `ref_verify results` command at the cli_composition boundary.
 ///
-/// Carries usecase-level filter types directly; the composition root converts
-/// them to the cli_driver-level String representation before delegation.
+/// Uses composition-owned filter types (not usecase-layer types) so callers
+/// do not need to depend on `usecase::ref_verify`.
 #[derive(Debug, Clone)]
 pub struct RefVerifyResultsInput {
     pub track_id: String,
     pub items_dir: PathBuf,
-    pub chain: usecase::ref_verify::RefVerifyChainFilter,
-    pub layer: usecase::ref_verify::RefVerifyLayerFilter,
-    pub verdict: usecase::ref_verify::RefVerifyVerdictFilter,
+    pub chain: RefVerifyChainFilter,
+    pub layer: String,
+    pub verdict: RefVerifyVerdictFilter,
 }
 
 #[derive(Debug, Clone)]
@@ -340,66 +364,37 @@ impl RefVerifyCompositionRoot {
 
     /// Wire and dispatch the `ref_verify results` command.
     ///
-    /// Converts usecase-level filter types to cli_driver-level representations and
+    /// Converts composition-owned filter types to cli_driver-level representations and
     /// delegates to [`cli_driver::ref_verify::RefVerifyDriver`].
     pub fn ref_verify_results(
         &self,
         input: RefVerifyResultsInput,
     ) -> Result<CommandOutcome, CompositionError> {
-        use cli_driver::ref_verify::{RefVerifyInput, RefVerifyResultsInput as DriverInput};
+        use cli_driver::ref_verify::{
+            RefVerifyChainSelect, RefVerifyInput, RefVerifyResultsInput as DriverInput,
+            RefVerifyVerdictSelect,
+        };
 
-        let layer_str = layer_filter_to_string(input.layer);
+        let chain = match input.chain {
+            RefVerifyChainFilter::Chain1 => RefVerifyChainSelect::Chain1,
+            RefVerifyChainFilter::Chain2 => RefVerifyChainSelect::Chain2,
+            RefVerifyChainFilter::All => RefVerifyChainSelect::All,
+        };
+        let verdict = match input.verdict {
+            RefVerifyVerdictFilter::FailPending => RefVerifyVerdictSelect::FailPending,
+            RefVerifyVerdictFilter::Pass => RefVerifyVerdictSelect::Pass,
+            RefVerifyVerdictFilter::Fail => RefVerifyVerdictSelect::Fail,
+            RefVerifyVerdictFilter::Pending => RefVerifyVerdictSelect::Pending,
+            RefVerifyVerdictFilter::All => RefVerifyVerdictSelect::All,
+        };
         let driver_input = DriverInput {
             track_id: input.track_id,
             items_dir: input.items_dir,
-            chain: convert_chain_filter(input.chain),
-            layer: layer_str,
-            verdict: convert_verdict_filter(input.verdict),
+            chain,
+            layer: input.layer,
+            verdict,
         };
         Ok(self.ref_verify_driver().handle(RefVerifyInput::Results(driver_input)))
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Filter conversion helpers (cli_composition boundary)
-// ---------------------------------------------------------------------------
-
-fn convert_chain_filter(
-    chain: usecase::ref_verify::RefVerifyChainFilter,
-) -> cli_driver::ref_verify::RefVerifyChainSelect {
-    use cli_driver::ref_verify::RefVerifyChainSelect;
-    use usecase::ref_verify::RefVerifyChainFilter;
-    match chain {
-        RefVerifyChainFilter::Chain1 => RefVerifyChainSelect::Chain1,
-        RefVerifyChainFilter::Chain2 => RefVerifyChainSelect::Chain2,
-        RefVerifyChainFilter::All => RefVerifyChainSelect::All,
-    }
-}
-
-/// Convert a [`usecase::ref_verify::RefVerifyLayerFilter`] to the cli_driver-level
-/// String representation used by [`cli_driver::ref_verify::RefVerifyResultsInput`].
-///
-/// - `All` maps to `"all"`.
-/// - `Specific(id)` maps to the layer id string.
-fn layer_filter_to_string(layer: usecase::ref_verify::RefVerifyLayerFilter) -> String {
-    use usecase::ref_verify::RefVerifyLayerFilter;
-    match layer {
-        RefVerifyLayerFilter::All => "all".to_owned(),
-        RefVerifyLayerFilter::Specific(id) => id.as_ref().to_owned(),
-    }
-}
-
-fn convert_verdict_filter(
-    verdict: usecase::ref_verify::RefVerifyVerdictFilter,
-) -> cli_driver::ref_verify::RefVerifyVerdictSelect {
-    use cli_driver::ref_verify::RefVerifyVerdictSelect;
-    use usecase::ref_verify::RefVerifyVerdictFilter;
-    match verdict {
-        RefVerifyVerdictFilter::FailPending => RefVerifyVerdictSelect::FailPending,
-        RefVerifyVerdictFilter::Pass => RefVerifyVerdictSelect::Pass,
-        RefVerifyVerdictFilter::Fail => RefVerifyVerdictSelect::Fail,
-        RefVerifyVerdictFilter::Pending => RefVerifyVerdictSelect::Pending,
-        RefVerifyVerdictFilter::All => RefVerifyVerdictSelect::All,
     }
 }
 
@@ -1282,10 +1277,7 @@ exit 64
     #[cfg(unix)]
     #[test]
     fn test_ref_verify_results_no_cache_returns_all_pending() {
-        use super::RefVerifyResultsInput;
-        use usecase::ref_verify::{
-            RefVerifyChainFilter, RefVerifyLayerFilter, RefVerifyVerdictFilter,
-        };
+        use super::{RefVerifyChainFilter, RefVerifyResultsInput, RefVerifyVerdictFilter};
 
         let (_tmp, items_dir) = temp_project_with_items_dir();
         let project_root = project_root_from_items_dir(&items_dir).to_path_buf();
@@ -1298,7 +1290,7 @@ exit 64
                     track_id: track_id.to_owned(),
                     items_dir: items_dir.clone(),
                     chain: RefVerifyChainFilter::All,
-                    layer: RefVerifyLayerFilter::All,
+                    layer: "all".to_owned(),
                     verdict: RefVerifyVerdictFilter::FailPending,
                 })
                 .unwrap()

@@ -50,7 +50,10 @@ pub mod telemetry_wiring;
 pub use domain::ExportSchemaInput;
 pub use dry::{DryCheckApprovedInput, DryResultsInput, DryWriteInput, RunDryFixLocalInput};
 pub use error::CompositionError;
-pub use ref_verify::{RefVerifyCheckApprovedInput, RefVerifyResultsInput, RefVerifyRunInput};
+pub use ref_verify::{
+    RefVerifyChainFilter, RefVerifyCheckApprovedInput, RefVerifyResultsInput, RefVerifyRunInput,
+    RefVerifyVerdictFilter,
+};
 pub use review_v2::{
     ReviewResultsInput, ReviewRunClaudeInput, ReviewRunCodexInput, ReviewRunLocalInput,
     RunReviewFixLocalInput,

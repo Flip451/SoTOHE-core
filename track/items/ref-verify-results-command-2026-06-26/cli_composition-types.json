@@ -13,21 +13,61 @@
           "fields": [
             { "name": "track_id",  "ty": "String" },
             { "name": "items_dir", "ty": "std::path::PathBuf" },
-            { "name": "chain",     "ty": "usecase::ref_verify::RefVerifyChainFilter" },
-            { "name": "layer",     "ty": "usecase::ref_verify::RefVerifyLayerFilter" },
-            { "name": "verdict",   "ty": "usecase::ref_verify::RefVerifyVerdictFilter" }
+            { "name": "chain",     "ty": "RefVerifyChainFilter" },
+            { "name": "layer",     "ty": "String" },
+            { "name": "verdict",   "ty": "RefVerifyVerdictFilter" }
           ],
           "has_stripped_fields": false
         }
       },
       "methods": [],
       "module_path": "ref_verify",
-      "docs": "Input DTO for the cli_composition-level ref_verify_results() integration path. Uses typed usecase-layer filter enums (cli_composition depends on usecase). Parallel to RefVerifyRunInput and RefVerifyCheckApprovedInput defined in this module.",
+      "docs": "Input DTO for the cli_composition-level ref_verify_results() integration path. Uses the cli_composition-owned mirror enums (RefVerifyChainFilter, RefVerifyVerdictFilter) so callers do not depend on usecase crate. layer is a plain String ('all' or a layer id) because valid layer names are dynamic. Parallel to RefVerifyRunInput and RefVerifyCheckApprovedInput defined in this module.",
       "spec_refs": [
         { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "IN-01" },
         { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "AC-07" },
         { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "AC-08" },
         { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "AC-09" }
+      ],
+      "informal_grounds": []
+    },
+    "RefVerifyChainFilter": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Chain1", "payload": { "kind": "unit" } },
+          { "name": "Chain2", "payload": { "kind": "unit" } },
+          { "name": "All",    "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "ref_verify",
+      "docs": "Chain filter at the cli_composition boundary. Mirrors cli_driver::ref_verify::RefVerifyChainSelect so callers of ref_verify_results do not depend on usecase::ref_verify. Re-exported from the crate root.",
+      "spec_refs": [
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "IN-01" }
+      ],
+      "informal_grounds": []
+    },
+    "RefVerifyVerdictFilter": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "FailPending", "payload": { "kind": "unit" } },
+          { "name": "Pass",        "payload": { "kind": "unit" } },
+          { "name": "Fail",        "payload": { "kind": "unit" } },
+          { "name": "Pending",     "payload": { "kind": "unit" } },
+          { "name": "All",         "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "ref_verify",
+      "docs": "Verdict filter at the cli_composition boundary. Mirrors cli_driver::ref_verify::RefVerifyVerdictSelect so callers of ref_verify_results do not depend on usecase::ref_verify. Re-exported from the crate root.",
+      "spec_refs": [
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "IN-01" }
       ],
       "informal_grounds": []
     },
@@ -161,6 +201,12 @@
     }
   ],
   "trait_impls": [
+    { "trait_ref": "core::fmt::Debug",   "for_type": "RefVerifyChainFilter" },
+    { "trait_ref": "core::clone::Clone", "for_type": "RefVerifyChainFilter" },
+
+    { "trait_ref": "core::fmt::Debug",   "for_type": "RefVerifyVerdictFilter" },
+    { "trait_ref": "core::clone::Clone", "for_type": "RefVerifyVerdictFilter" },
+
     { "trait_ref": "core::fmt::Debug",   "for_type": "RefVerifyResultsInput" },
     { "trait_ref": "core::clone::Clone", "for_type": "RefVerifyResultsInput" },
 
