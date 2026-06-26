@@ -11,19 +11,24 @@ use super::syn_helpers::{extract_path_attr, has_cfg_test_attr};
 
 /// Memoisation cache for [`classify_file_module_references`].
 ///
-/// Keyed on `(file_path, module_path)` — identical inputs always produce the
-/// same output, so results are safe to cache for the entire workspace scan.
-/// Sharing one cache across all calls in `scan_workspace_rust_sources` prevents
-/// the cumulative `proc-macro2` byte-offset from overflowing `u32::MAX`.
-pub(crate) type ClassifyCache = HashMap<(PathBuf, Vec<String>), (bool, bool)>;
+/// Keyed on `(file_path, module_path, target_file)` — identical inputs always
+/// produce the same output, so results are safe to cache for the entire workspace
+/// scan.  `target_file` is included because two targets with the same
+/// `module_path` (e.g. `src/foo.rs` and `src/foo/mod.rs`, both `["foo"]`) must
+/// produce independent results.  Sharing one cache across all calls in
+/// `scan_workspace_rust_sources` prevents the cumulative `proc-macro2`
+/// byte-offset from overflowing `u32::MAX`.
+pub(crate) type ClassifyCache = HashMap<(PathBuf, Vec<String>, PathBuf), (bool, bool)>;
 
 /// Memoisation cache for [`classify_sibling_probe`].
 ///
 /// Separate from [`ClassifyCache`] because sibling probes use `#[path]`-only
 /// matching, producing different results than full ident + path-attr matching.
-/// Sharing one instance across the workspace scan prevents redundant re-parses
-/// (and keeps cumulative `proc-macro2` byte-offsets within `u32::MAX`).
-pub(crate) type SiblingClassifyCache = HashMap<(PathBuf, Vec<String>), (bool, bool)>;
+/// Keyed on `(file_path, module_path, target_file)` for the same reason as
+/// [`ClassifyCache`].  Sharing one instance across the workspace scan prevents
+/// redundant re-parses (and keeps cumulative `proc-macro2` byte-offsets within
+/// `u32::MAX`).
+pub(crate) type SiblingClassifyCache = HashMap<(PathBuf, Vec<String>, PathBuf), (bool, bool)>;
 
 /// Returns `(cfg_test_referenced, production_referenced)`: whether a
 /// `#[cfg(test)]` or non-`cfg(test)` `mod` declaration in `path` resolves to
@@ -37,17 +42,23 @@ pub(crate) fn classify_file_module_references(
     path: &Path,
     module_path: &[String],
     cache: &mut ClassifyCache,
+    target_file: &Path,
 ) -> (bool, bool) {
-    let key = (path.to_path_buf(), module_path.to_vec());
+    let key = (path.to_path_buf(), module_path.to_vec(), target_file.to_path_buf());
     if let Some(&cached) = cache.get(&key) {
         return cached;
     }
-    let result = classify_uncached(root, path, module_path);
+    let result = classify_uncached(root, path, module_path, target_file);
     cache.insert(key, result);
     result
 }
 
-fn classify_uncached(root: &Path, path: &Path, module_path: &[String]) -> (bool, bool) {
+fn classify_uncached(
+    root: &Path,
+    path: &Path,
+    module_path: &[String],
+    target_file: &Path,
+) -> (bool, bool) {
     let Ok(true) = reject_symlinks_below(path, root) else {
         return (false, false);
     };
@@ -69,9 +80,20 @@ fn classify_uncached(root: &Path, path: &Path, module_path: &[String]) -> (bool,
     };
 
     let inherited_cfg_test = has_cfg_test_attr(&file.attrs);
-    let cfg_test = items_declare_cfg_test_module_path(&file.items, module_path, inherited_cfg_test);
-    let production =
-        items_declare_production_module_path(&file.items, module_path, inherited_cfg_test);
+    let cfg_test = items_declare_cfg_test_module_path(
+        &file.items,
+        module_path,
+        inherited_cfg_test,
+        path,
+        target_file,
+    );
+    let production = items_declare_production_module_path(
+        &file.items,
+        module_path,
+        inherited_cfg_test,
+        path,
+        target_file,
+    );
     (cfg_test, production)
 }
 
@@ -79,6 +101,8 @@ fn items_declare_cfg_test_module_path(
     items: &[syn::Item],
     module_path: &[String],
     inherited_cfg_test: bool,
+    containing_file: &Path,
+    target_file: &Path,
 ) -> bool {
     let Some((head, tail)) = module_path.split_first() else {
         return false;
@@ -90,11 +114,14 @@ fn items_declare_cfg_test_module_path(
         };
         let cfg_test = inherited_cfg_test || has_cfg_test_attr(&module.attrs);
 
-        // `#[path = "..."]` overrides the ident.
+        // `#[path = "..."]` overrides the ident: compare by resolved file path, not
+        // by module-path components.  Module-path comparison is ambiguous because
+        // `src/foo.rs` and `src/foo/mod.rs` both produce the component sequence
+        // `["foo"]`, whereas the `#[path]` value literally names one of the two.
         if let Some(path_value) = extract_path_attr(&module.attrs) {
             return module.content.is_none()
                 && cfg_test
-                && path_attr_matches_module_path(&path_value, module_path);
+                && path_attr_resolves_to_target(&path_value, containing_file, target_file);
         }
 
         if module.ident != head.as_str() {
@@ -107,7 +134,13 @@ fn items_declare_cfg_test_module_path(
             return true;
         }
         if let Some((_, nested_items)) = &module.content {
-            return items_declare_cfg_test_module_path(nested_items, tail, cfg_test);
+            return items_declare_cfg_test_module_path(
+                nested_items,
+                tail,
+                cfg_test,
+                containing_file,
+                target_file,
+            );
         }
         false
     })
@@ -119,6 +152,8 @@ fn items_declare_production_module_path(
     items: &[syn::Item],
     module_path: &[String],
     inherited_cfg_test: bool,
+    containing_file: &Path,
+    target_file: &Path,
 ) -> bool {
     let Some((head, tail)) = module_path.split_first() else {
         return false;
@@ -133,7 +168,7 @@ fn items_declare_production_module_path(
         if let Some(path_value) = extract_path_attr(&module.attrs) {
             return module.content.is_none()
                 && !cfg_test
-                && path_attr_matches_module_path(&path_value, module_path);
+                && path_attr_resolves_to_target(&path_value, containing_file, target_file);
         }
 
         if module.ident != head.as_str() {
@@ -146,55 +181,60 @@ fn items_declare_production_module_path(
             return false;
         }
         if let Some((_, nested_items)) = &module.content {
-            return items_declare_production_module_path(nested_items, tail, cfg_test);
+            return items_declare_production_module_path(
+                nested_items,
+                tail,
+                cfg_test,
+                containing_file,
+                target_file,
+            );
         }
         false
     })
 }
 
-/// Returns `true` when `path_value` (a `#[path = "..."]` string), treated as a
-/// relative path, matches the entire `module_path` component sequence.  The last
-/// component is compared by file stem; `mod.rs` pops the stem and matches one level up.
+/// Returns `true` when the `#[path = "path_value"]` attribute in `containing_file`
+/// resolves to `target_file` via lexical path normalization.
 ///
-/// Leading `./` (`Component::CurDir`) is skipped so that `"./helpers.rs"` and
-/// `"helpers.rs"` resolve identically.  Any other non-`Normal` component
-/// (`RootDir`, `ParentDir`, `Prefix`) causes an immediate `false` return.
-fn path_attr_matches_module_path(path_value: &str, module_path: &[String]) -> bool {
+/// `path_value` is joined to `containing_file`'s parent directory and then
+/// lexically normalized (CurDir components stripped).  `ParentDir` (`..`) and
+/// absolute paths are rejected immediately with `false`.  The result is compared
+/// to `target_file` after the same normalization.
+///
+/// File-path comparison is used instead of module-path component comparison
+/// because both `src/foo.rs` and `src/foo/mod.rs` yield the same module-path
+/// component sequence `["foo"]`, making module-path comparison ambiguous when a
+/// `#[path]` attribute explicitly targets one of the two files.
+fn path_attr_resolves_to_target(
+    path_value: &str,
+    containing_file: &Path,
+    target_file: &Path,
+) -> bool {
     use std::path::Component;
 
-    let path = Path::new(path_value);
-    let mut components = Vec::new();
-    for component in path.components() {
+    // Reject absolute or parent-traversing path values.
+    for component in Path::new(path_value).components() {
         match component {
-            Component::CurDir => {} // skip leading ./
-            Component::Normal(name) => {
-                components.push(name.to_string_lossy().into_owned());
-            }
+            Component::Normal(_) | Component::CurDir => {}
             _ => return false, // RootDir / ParentDir / Prefix → reject
         }
     }
 
-    if components.is_empty() {
+    let Some(containing_dir) = containing_file.parent() else {
         return false;
-    }
+    };
 
-    if let Some(last_component) = components.last_mut() {
-        let stem = Path::new(last_component.as_str())
-            .file_stem()
-            .map(|s| s.to_string_lossy().into_owned())
-            .unwrap_or_else(|| last_component.clone());
-        if stem == "mod" {
-            components.pop();
-        } else {
-            *last_component = stem;
-        }
-    }
+    let resolved = lexical_normalize(&containing_dir.join(path_value));
+    lexical_normalize(target_file) == resolved
+}
 
-    components.len() == module_path.len()
-        && components
-            .iter()
-            .zip(module_path.iter())
-            .all(|(component, expected)| component == expected)
+/// Lexically normalise `path` by stripping `CurDir` (`.`) components.
+///
+/// Unlike `std::fs::canonicalize` this does not access the filesystem, making
+/// it safe to call on hypothetical paths constructed by joining a `#[path]`
+/// attribute value to a file's parent directory.
+fn lexical_normalize(path: &Path) -> PathBuf {
+    path.components().filter(|c| *c != std::path::Component::CurDir).collect()
 }
 
 /// Returns `(cfg_test_referenced, production_referenced)` for a same-directory
@@ -213,17 +253,18 @@ pub(crate) fn classify_sibling_probe(
     path: &Path,
     module_path: &[String],
     cache: &mut SiblingClassifyCache,
+    target_file: &Path,
 ) -> (bool, bool) {
-    let key = (path.to_path_buf(), module_path.to_vec());
+    let key = (path.to_path_buf(), module_path.to_vec(), target_file.to_path_buf());
     if let Some(&cached) = cache.get(&key) {
         return cached;
     }
-    let result = classify_sibling_uncached(root, path, module_path);
+    let result = classify_sibling_uncached(root, path, target_file);
     cache.insert(key, result);
     result
 }
 
-fn classify_sibling_uncached(root: &Path, path: &Path, module_path: &[String]) -> (bool, bool) {
+fn classify_sibling_uncached(root: &Path, path: &Path, target_file: &Path) -> (bool, bool) {
     let Ok(true) = reject_symlinks_below(path, root) else {
         return (false, false);
     };
@@ -243,19 +284,17 @@ fn classify_sibling_uncached(root: &Path, path: &Path, module_path: &[String]) -
     };
     let inherited_cfg_test = has_cfg_test_attr(&file.attrs);
     (
-        items_declare_cfg_test_path_attr_only(&file.items, module_path, inherited_cfg_test),
-        items_declare_production_path_attr_only(&file.items, module_path, inherited_cfg_test),
+        items_declare_cfg_test_path_attr_only(&file.items, inherited_cfg_test, path, target_file),
+        items_declare_production_path_attr_only(&file.items, inherited_cfg_test, path, target_file),
     )
 }
 
 fn items_declare_cfg_test_path_attr_only(
     items: &[syn::Item],
-    module_path: &[String],
     inherited_cfg_test: bool,
+    containing_file: &Path,
+    target_file: &Path,
 ) -> bool {
-    if module_path.is_empty() {
-        return false;
-    }
     items.iter().any(|item| {
         let syn::Item::Mod(module) = item else {
             return false;
@@ -264,7 +303,7 @@ fn items_declare_cfg_test_path_attr_only(
         if let Some(path_value) = extract_path_attr(&module.attrs) {
             return module.content.is_none()
                 && cfg_test
-                && path_attr_matches_module_path(&path_value, module_path);
+                && path_attr_resolves_to_target(&path_value, containing_file, target_file);
         }
         false
     })
@@ -272,12 +311,10 @@ fn items_declare_cfg_test_path_attr_only(
 
 fn items_declare_production_path_attr_only(
     items: &[syn::Item],
-    module_path: &[String],
     inherited_cfg_test: bool,
+    containing_file: &Path,
+    target_file: &Path,
 ) -> bool {
-    if module_path.is_empty() {
-        return false;
-    }
     items.iter().any(|item| {
         let syn::Item::Mod(module) = item else {
             return false;
@@ -286,7 +323,7 @@ fn items_declare_production_path_attr_only(
         if let Some(path_value) = extract_path_attr(&module.attrs) {
             return module.content.is_none()
                 && !cfg_test
-                && path_attr_matches_module_path(&path_value, module_path);
+                && path_attr_resolves_to_target(&path_value, containing_file, target_file);
         }
         false
     })

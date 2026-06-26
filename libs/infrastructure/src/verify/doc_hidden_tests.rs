@@ -1288,6 +1288,70 @@ fn test_detects_doc_hidden_on_local_item_in_static_initializer_block() {
     );
 }
 
+// ── PR35-PR36: #[path] file disambiguation (foo.rs vs foo/mod.rs) ────────────
+
+/// PR35: a `cfg(test)` `#[path]` attribute that points to `foo/mod.rs` must NOT
+/// cause `foo.rs` to be treated as test-only.  Both files share the module-path
+/// component sequence `["foo"]`, so the old module-path comparison was ambiguous
+/// and incorrectly excluded `foo.rs`.  The fix resolves the `#[path]` value to an
+/// absolute file path and compares it against the actual target file.
+#[test]
+fn test_flags_doc_hidden_in_foo_rs_when_cfg_test_path_attr_points_to_foo_mod_rs() {
+    let tmp = TempDir::new().unwrap();
+    write_arch_rules(tmp.path());
+    // lib.rs points its cfg(test) module at foo/mod.rs via #[path].
+    write_src(
+        tmp.path(),
+        "lib.rs",
+        concat!(
+            "pub fn clean() {}\n",
+            "#[cfg(test)]\n",
+            "#[path = \"foo/mod.rs\"]\n",
+            "mod foo;\n",
+        ),
+    );
+    // foo.rs is a production file distinct from foo/mod.rs; #[doc(hidden)] must be flagged.
+    write_src(tmp.path(), "foo.rs", "#[doc(hidden)]\npub fn bad() {}\n");
+    // foo/mod.rs is the literal target of the #[path] attribute.
+    write_src(tmp.path(), "foo/mod.rs", "pub fn ok() {}\n");
+
+    let outcome = verify(tmp.path());
+    assert!(
+        outcome.has_errors(),
+        "#[doc(hidden)] in foo.rs must be flagged; #[path = \"foo/mod.rs\"] resolves to \
+         foo/mod.rs, not foo.rs (PR35): {:?}",
+        outcome.findings()
+    );
+}
+
+/// PR36: regression — `#[cfg(test)] #[path = "foo/mod.rs"] mod foo;` must still
+/// exclude `foo/mod.rs` itself (the literal target of the attribute).
+#[test]
+fn test_ignores_doc_hidden_in_foo_mod_rs_when_cfg_test_path_attr_points_to_foo_mod_rs() {
+    let tmp = TempDir::new().unwrap();
+    write_arch_rules(tmp.path());
+    write_src(
+        tmp.path(),
+        "lib.rs",
+        concat!(
+            "pub fn clean() {}\n",
+            "#[cfg(test)]\n",
+            "#[path = \"foo/mod.rs\"]\n",
+            "mod foo;\n",
+        ),
+    );
+    // foo/mod.rs is the direct target of the cfg(test) #[path] attribute; must be excluded.
+    write_src(tmp.path(), "foo/mod.rs", "#[doc(hidden)]\npub fn hidden_helper() {}\n");
+
+    let outcome = verify(tmp.path());
+    assert!(
+        outcome.is_ok(),
+        "#[doc(hidden)] in foo/mod.rs must not be flagged when #[path = \"foo/mod.rs\"] is \
+         cfg(test) (PR36 regression): {:?}",
+        outcome.findings()
+    );
+}
+
 /// PR31: regression — a same-directory sibling that uses `#[cfg(test)] #[path =
 /// "shared_helpers.rs"] mod tests;` must still cause `shared_helpers.rs` to be
 /// classified as test-only and excluded from scanning.  The sibling probe must

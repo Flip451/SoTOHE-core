@@ -1,181 +1,32 @@
 {
   "schema_version": 2,
   "scopes": {
-    "plan-artifacts": {
+    "harness-policy": {
       "rounds": [
         {
-          "type": "fast",
+          "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:78a275cea866a7176f303ab67dc9a41537222b03ad41669582ccff4ade985220",
-          "at": "2026-06-26T08:19:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D2 lists direct inner attributes like `#![doc(hidden)]` as required detections, but then says the judgment target is any `syn item`. A crate/file-level inner attribute lives on `syn::File::attrs`, not on an item, so an implementation that follows the item-only wording can miss the exact inner-attribute form the ADR says is in scope. The plan should explicitly include file-level attrs as scan targets, or narrow the inner-attribute claim.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-06-26-0810-prohibit-doc-hidden-attribute.md",
-              "line": 52,
-              "category": "contradiction"
-            },
-            {
-              "message": "The same sentence says doc comment string literals do not appear as attributes in syn, but Rust doc comments are represented as `#[doc = \"...\"]` attributes. The intended behavior can still exclude them, but the ADR should describe that as ignoring `doc` name-value attributes and only matching `doc(hidden)` list forms, not as relying on doc comments being absent from the AST.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-06-26-0810-prohibit-doc-hidden-attribute.md",
-              "line": 52,
-              "category": "factual error"
-            }
-          ],
-          "hash": "rvw1:sha256:78a275cea866a7176f303ab67dc9a41537222b03ad41669582ccff4ade985220",
-          "at": "2026-06-26T08:22:36Z"
+          "hash": "rvw1:sha256:0d984876b867a5ecabd80e498d9bdbcb94f6af4f23faaab41a8fc65cc6539cf8",
+          "at": "2026-06-26T11:30:32Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7fd9bca0fba2ca88fdef8245c2386f014eada43fd5631e21032a81f0b421295e",
-          "at": "2026-06-26T08:43:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ae44f76029faa895f85b9169e6040e9b506e3c97a584c07fc0beb820eb04fb9b",
-          "at": "2026-06-26T09:45:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T001 is mapped to IN-04/AC-07, which require a reusable syn scanning helper with callback-swappable detection logic, but the implementation plan and infrastructure catalogue only define `doc_hidden::verify` and place file discovery, `syn::parse_file`, cfg-test filtering, and attribute detection inside that detector. That leaves no task/type contract for the common helper the spec requires, so the plan can satisfy the doc-hidden gate while missing the reusable scanning architecture.",
-              "severity": "P1",
-              "file": "track/items/prohibit-doc-hidden-attribute-2026-06-26/impl-plan.json",
-              "line": 6,
-              "category": "contradiction"
-            },
-            {
-              "message": "The infrastructure catalogue declares no trait implementation changes, but T002 explicitly requires adding `verify_doc_hidden` to `FsVerifyAdapter`'s `VerifyPort` implementation. This makes the type catalogue/contract map inconsistent with the hexagonal wiring plan and can leave the new `VerifyPort` method without a documented infrastructure adapter implementation.",
-              "severity": "P1",
-              "file": "track/items/prohibit-doc-hidden-attribute-2026-06-26/infrastructure-types.json",
-              "line": 31,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:ae44f76029faa895f85b9169e6040e9b506e3c97a584c07fc0beb820eb04fb9b",
-          "at": "2026-06-26T09:51:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T001 narrows the scanner callback to crate-level attributes plus attributes on `Item` / impl-associated items, but the spec requires failing whenever any non-test source contains a `#[doc(hidden)]`-equivalent attribute. Attributes on other Rust AST nodes such as struct fields, enum variants, and trait associated items are still non-test source attributes and can affect rustdoc output, yet this traversal plan and its tests would not exercise them. As written, the gate can pass with prohibited `#[doc(hidden)]` declarations still present, so AC-02/AC-04 are not actually satisfied.",
-              "severity": "P1",
-              "file": "track/items/prohibit-doc-hidden-attribute-2026-06-26/impl-plan.json",
-              "line": 6,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:3f57bb8f88259c9e7c7e4518bf81cc843eb327fe0a8b2a607ce7e103fc5b4d90",
-          "at": "2026-06-26T10:03:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "IN-01 explicitly includes adding the verify gate-name label, but T002 only plans the enum variant, dispatch arm, items_dir arm, and Makefile tasks. In this CLI, verify commands are also matched by a telemetry gate-name function, so following this plan as written leaves the new DocHidden variant without its required gate label and the wiring is incomplete. Add the gate-name label/update to T002 and the rendered plan/type artifacts so IN-01 is actually covered.",
-              "severity": "P1",
-              "file": "track/items/prohibit-doc-hidden-attribute-2026-06-26/impl-plan.json",
-              "line": 11,
-              "category": "infeasibility"
-            }
-          ],
-          "hash": "rvw1:sha256:f0c64409d9788ebe7322900e564008bad0e08fc115230c0f20294ed30e300d88",
-          "at": "2026-06-26T10:09:26Z"
-        },
+          "hash": "rvw1:sha256:0d984876b867a5ecabd80e498d9bdbcb94f6af4f23faaab41a8fc65cc6539cf8",
+          "at": "2026-06-26T12:01:21Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4e2ec70aa2668e1dcc4ab97b1817cf47e784d338e50b5cc3aefeefbd91f064c2",
-          "at": "2026-06-26T10:16:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The type view now marks the CLI `VerifyCommand` row, including the `DocHidden` variant planned under T002, as 🔵, while the same plan still leaves T002 unchecked/todo in `plan.md` line 29 and `impl-plan.json` lines 10-12. These artifacts now assert both that the CLI wiring is complete and that the wiring task has not started, so the plan state is incoherent.",
-              "severity": "P1",
-              "file": "track/items/prohibit-doc-hidden-attribute-2026-06-26/cli-types.md",
-              "line": 7,
-              "category": "contradiction"
-            },
-            {
-              "message": "The `VerifyInput` row is now 🔵 for the `DocHidden` CLI-driver wiring that belongs to T002, but T002 remains todo in the rendered and JSON plan. This creates the same lifecycle contradiction for the cli-driver layer: the catalogue view says the T002 surface is complete while the task tracking says it is still unstarted.",
-              "severity": "P1",
-              "file": "track/items/prohibit-doc-hidden-attribute-2026-06-26/cli_driver-types.md",
-              "line": 7,
-              "category": "contradiction"
-            },
-            {
-              "message": "The usecase type view now marks `VerifyPort`/`VerifyService` with `verify_doc_hidden` as 🔵 even though T002, which owns adding that usecase wiring, remains todo in `plan.md` and `impl-plan.json`. The type catalogue signals should not advance this wiring independently of the task state, otherwise the plan artifacts give conflicting implementation status.",
-              "severity": "P1",
-              "file": "track/items/prohibit-doc-hidden-attribute-2026-06-26/usecase-types.md",
-              "line": 7,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:42d303eaf813039bfe71e972e642c27793ed25cee5d6bb5feeb1e0cf0e162992",
-          "at": "2026-06-26T11:34:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T002 is now marked `in_progress`, but the transition described for this plan-artifacts round is only T001 moving from `todo` to `in_progress`, and T002's own description still declares T001 as its prerequisite. This leaves the plan claiming a dependent wiring task is active before the detection-core task is completed; keep T002 as `todo` until T001 is transitioned.",
-              "severity": "P1",
-              "file": "track/items/prohibit-doc-hidden-attribute-2026-06-26/impl-plan.json",
-              "line": 12,
-              "category": "contradiction"
-            },
-            {
-              "message": "This rendered type view was changed from a pending signal to blue during a round whose stated artifact transition is limited to `impl-plan.json` and the generated `plan.md`; the same unexpected signal flip appears in `cli_driver-types.md`, `infrastructure-types.md`, and `usecase-types.md`. That makes the artifact set inconsistent with the declared lifecycle-only transition and should be restored/regenerated so type rendered views remain unchanged in this round.",
-              "severity": "P1",
-              "file": "track/items/prohibit-doc-hidden-attribute-2026-06-26/cli-types.md",
-              "line": 7,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:c99896e341620c3e8d99cdc0747077adb07969728e607f7a5d1856147db565a0",
-          "at": "2026-06-26T11:39:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:42d303eaf813039bfe71e972e642c27793ed25cee5d6bb5feeb1e0cf0e162992",
-          "at": "2026-06-26T11:45:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b8d06746999c77799440c924b12c678ba5d09d384bad91192351d009af78332a",
-          "at": "2026-06-26T12:09:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b8d06746999c77799440c924b12c678ba5d09d384bad91192351d009af78332a",
-          "at": "2026-06-26T12:12:07Z"
+          "hash": "rvw1:sha256:663c23c399fd0a9cbbc07b9a41b0475eebe46b5d398dc67a49d07c780075806b",
+          "at": "2026-06-26T11:30:30Z"
         }
       ]
     },
@@ -481,35 +332,198 @@
           "findings": [],
           "hash": "rvw1:sha256:eb6ed972d6b1b801883f6ef57a41b6c78d03ac976f3948a61a129f59c94a24b1",
           "at": "2026-06-26T22:52:04Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
+        },
         {
-          "type": "final",
+          "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0d984876b867a5ecabd80e498d9bdbcb94f6af4f23faaab41a8fc65cc6539cf8",
-          "at": "2026-06-26T11:30:32Z"
+          "hash": "rvw1:sha256:9e773a6b215ea72364d3aae762c700e2af205a91d61a10761b4ce88d816cf4b4",
+          "at": "2026-06-26T23:23:24Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0d984876b867a5ecabd80e498d9bdbcb94f6af4f23faaab41a8fc65cc6539cf8",
-          "at": "2026-06-26T12:01:21Z"
+          "hash": "rvw1:sha256:9e773a6b215ea72364d3aae762c700e2af205a91d61a10761b4ce88d816cf4b4",
+          "at": "2026-06-26T23:26:42Z"
         }
       ]
     },
-    "usecase": {
+    "plan-artifacts": {
       "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:78a275cea866a7176f303ab67dc9a41537222b03ad41669582ccff4ade985220",
+          "at": "2026-06-26T08:19:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2 lists direct inner attributes like `#![doc(hidden)]` as required detections, but then says the judgment target is any `syn item`. A crate/file-level inner attribute lives on `syn::File::attrs`, not on an item, so an implementation that follows the item-only wording can miss the exact inner-attribute form the ADR says is in scope. The plan should explicitly include file-level attrs as scan targets, or narrow the inner-attribute claim.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-26-0810-prohibit-doc-hidden-attribute.md",
+              "line": 52,
+              "category": "contradiction"
+            },
+            {
+              "message": "The same sentence says doc comment string literals do not appear as attributes in syn, but Rust doc comments are represented as `#[doc = \"...\"]` attributes. The intended behavior can still exclude them, but the ADR should describe that as ignoring `doc` name-value attributes and only matching `doc(hidden)` list forms, not as relying on doc comments being absent from the AST.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-26-0810-prohibit-doc-hidden-attribute.md",
+              "line": 52,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:78a275cea866a7176f303ab67dc9a41537222b03ad41669582ccff4ade985220",
+          "at": "2026-06-26T08:22:36Z"
+        },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:763459a6efbc7fa614fd826d2f13b08bfef5a2e176ffde796c11caf80b3a68a8",
-          "at": "2026-06-26T11:34:02Z"
+          "hash": "rvw1:sha256:7fd9bca0fba2ca88fdef8245c2386f014eada43fd5631e21032a81f0b421295e",
+          "at": "2026-06-26T08:43:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ae44f76029faa895f85b9169e6040e9b506e3c97a584c07fc0beb820eb04fb9b",
+          "at": "2026-06-26T09:45:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 is mapped to IN-04/AC-07, which require a reusable syn scanning helper with callback-swappable detection logic, but the implementation plan and infrastructure catalogue only define `doc_hidden::verify` and place file discovery, `syn::parse_file`, cfg-test filtering, and attribute detection inside that detector. That leaves no task/type contract for the common helper the spec requires, so the plan can satisfy the doc-hidden gate while missing the reusable scanning architecture.",
+              "severity": "P1",
+              "file": "track/items/prohibit-doc-hidden-attribute-2026-06-26/impl-plan.json",
+              "line": 6,
+              "category": "contradiction"
+            },
+            {
+              "message": "The infrastructure catalogue declares no trait implementation changes, but T002 explicitly requires adding `verify_doc_hidden` to `FsVerifyAdapter`'s `VerifyPort` implementation. This makes the type catalogue/contract map inconsistent with the hexagonal wiring plan and can leave the new `VerifyPort` method without a documented infrastructure adapter implementation.",
+              "severity": "P1",
+              "file": "track/items/prohibit-doc-hidden-attribute-2026-06-26/infrastructure-types.json",
+              "line": 31,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ae44f76029faa895f85b9169e6040e9b506e3c97a584c07fc0beb820eb04fb9b",
+          "at": "2026-06-26T09:51:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 narrows the scanner callback to crate-level attributes plus attributes on `Item` / impl-associated items, but the spec requires failing whenever any non-test source contains a `#[doc(hidden)]`-equivalent attribute. Attributes on other Rust AST nodes such as struct fields, enum variants, and trait associated items are still non-test source attributes and can affect rustdoc output, yet this traversal plan and its tests would not exercise them. As written, the gate can pass with prohibited `#[doc(hidden)]` declarations still present, so AC-02/AC-04 are not actually satisfied.",
+              "severity": "P1",
+              "file": "track/items/prohibit-doc-hidden-attribute-2026-06-26/impl-plan.json",
+              "line": 6,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:3f57bb8f88259c9e7c7e4518bf81cc843eb327fe0a8b2a607ce7e103fc5b4d90",
+          "at": "2026-06-26T10:03:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-01 explicitly includes adding the verify gate-name label, but T002 only plans the enum variant, dispatch arm, items_dir arm, and Makefile tasks. In this CLI, verify commands are also matched by a telemetry gate-name function, so following this plan as written leaves the new DocHidden variant without its required gate label and the wiring is incomplete. Add the gate-name label/update to T002 and the rendered plan/type artifacts so IN-01 is actually covered.",
+              "severity": "P1",
+              "file": "track/items/prohibit-doc-hidden-attribute-2026-06-26/impl-plan.json",
+              "line": 11,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:f0c64409d9788ebe7322900e564008bad0e08fc115230c0f20294ed30e300d88",
+          "at": "2026-06-26T10:09:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4e2ec70aa2668e1dcc4ab97b1817cf47e784d338e50b5cc3aefeefbd91f064c2",
+          "at": "2026-06-26T10:16:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The type view now marks the CLI `VerifyCommand` row, including the `DocHidden` variant planned under T002, as 🔵, while the same plan still leaves T002 unchecked/todo in `plan.md` line 29 and `impl-plan.json` lines 10-12. These artifacts now assert both that the CLI wiring is complete and that the wiring task has not started, so the plan state is incoherent.",
+              "severity": "P1",
+              "file": "track/items/prohibit-doc-hidden-attribute-2026-06-26/cli-types.md",
+              "line": 7,
+              "category": "contradiction"
+            },
+            {
+              "message": "The `VerifyInput` row is now 🔵 for the `DocHidden` CLI-driver wiring that belongs to T002, but T002 remains todo in the rendered and JSON plan. This creates the same lifecycle contradiction for the cli-driver layer: the catalogue view says the T002 surface is complete while the task tracking says it is still unstarted.",
+              "severity": "P1",
+              "file": "track/items/prohibit-doc-hidden-attribute-2026-06-26/cli_driver-types.md",
+              "line": 7,
+              "category": "contradiction"
+            },
+            {
+              "message": "The usecase type view now marks `VerifyPort`/`VerifyService` with `verify_doc_hidden` as 🔵 even though T002, which owns adding that usecase wiring, remains todo in `plan.md` and `impl-plan.json`. The type catalogue signals should not advance this wiring independently of the task state, otherwise the plan artifacts give conflicting implementation status.",
+              "severity": "P1",
+              "file": "track/items/prohibit-doc-hidden-attribute-2026-06-26/usecase-types.md",
+              "line": 7,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:42d303eaf813039bfe71e972e642c27793ed25cee5d6bb5feeb1e0cf0e162992",
+          "at": "2026-06-26T11:34:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 is now marked `in_progress`, but the transition described for this plan-artifacts round is only T001 moving from `todo` to `in_progress`, and T002's own description still declares T001 as its prerequisite. This leaves the plan claiming a dependent wiring task is active before the detection-core task is completed; keep T002 as `todo` until T001 is transitioned.",
+              "severity": "P1",
+              "file": "track/items/prohibit-doc-hidden-attribute-2026-06-26/impl-plan.json",
+              "line": 12,
+              "category": "contradiction"
+            },
+            {
+              "message": "This rendered type view was changed from a pending signal to blue during a round whose stated artifact transition is limited to `impl-plan.json` and the generated `plan.md`; the same unexpected signal flip appears in `cli_driver-types.md`, `infrastructure-types.md`, and `usecase-types.md`. That makes the artifact set inconsistent with the declared lifecycle-only transition and should be restored/regenerated so type rendered views remain unchanged in this round.",
+              "severity": "P1",
+              "file": "track/items/prohibit-doc-hidden-attribute-2026-06-26/cli-types.md",
+              "line": 7,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c99896e341620c3e8d99cdc0747077adb07969728e607f7a5d1856147db565a0",
+          "at": "2026-06-26T11:39:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:42d303eaf813039bfe71e972e642c27793ed25cee5d6bb5feeb1e0cf0e162992",
+          "at": "2026-06-26T11:45:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b8d06746999c77799440c924b12c678ba5d09d384bad91192351d009af78332a",
+          "at": "2026-06-26T12:09:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b8d06746999c77799440c924b12c678ba5d09d384bad91192351d009af78332a",
+          "at": "2026-06-26T12:12:07Z"
         }
       ]
     },
@@ -524,14 +538,14 @@
         }
       ]
     },
-    "cli": {
+    "usecase": {
       "rounds": [
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:663c23c399fd0a9cbbc07b9a41b0475eebe46b5d398dc67a49d07c780075806b",
-          "at": "2026-06-26T11:30:30Z"
+          "hash": "rvw1:sha256:763459a6efbc7fa614fd826d2f13b08bfef5a2e176ffde796c11caf80b3a68a8",
+          "at": "2026-06-26T11:34:02Z"
         }
       ]
     }

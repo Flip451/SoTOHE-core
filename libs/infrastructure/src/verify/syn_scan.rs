@@ -356,9 +356,9 @@ fn is_file_backed_test_module_inner(
         // A bare `mod foo;` in `src/a.rs` resolves to `src/a/foo.rs`, not to sibling
         // `src/foo.rs`, so ident-based matching is skipped for sibling probes.
         let (ct, prod) = if is_sibling {
-            classify_sibling_probe(root, &candidate, &module_path, sibling_cache)
+            classify_sibling_probe(root, &candidate, &module_path, sibling_cache, path)
         } else {
-            classify_file_module_references(root, &candidate, &module_path, cache)
+            classify_file_module_references(root, &candidate, &module_path, cache, path)
         };
         if parent_is_test {
             cfg_test_ref |= ct | prod;
