@@ -1352,6 +1352,73 @@ fn test_ignores_doc_hidden_in_foo_mod_rs_when_cfg_test_path_attr_points_to_foo_m
     );
 }
 
+// ── PR37-PR38: #[path] inside inline mods — basedir accumulation ─────────────
+
+/// PR37: `lib.rs` has `#[cfg(test)] mod tests { #[path = "helpers.rs"] mod helpers; }` +
+/// `src/tests/helpers.rs` has a `#[doc(hidden)]` item.
+/// rustc resolves `helpers.rs` relative to the inline mod name (`src/tests/`),
+/// not the containing file's directory (`src/`).  The file must be excluded.
+#[test]
+fn test_ignores_doc_hidden_in_path_attr_mod_inside_inline_cfg_test_mod() {
+    let tmp = TempDir::new().unwrap();
+    write_arch_rules(tmp.path());
+    write_src(
+        tmp.path(),
+        "lib.rs",
+        concat!(
+            "pub fn clean() {}\n",
+            "#[cfg(test)]\n",
+            "mod tests {\n",
+            "    #[path = \"helpers.rs\"]\n",
+            "    mod helpers;\n",
+            "}\n",
+        ),
+    );
+    write_src(tmp.path(), "tests/helpers.rs", "#[doc(hidden)]\npub fn hidden_helper() {}\n");
+
+    let outcome = verify(tmp.path());
+    assert!(
+        outcome.is_ok(),
+        "#[path = \"helpers.rs\"] inside inline #[cfg(test)] mod tests must resolve to \
+         tests/helpers.rs and be excluded (PR37): {:?}",
+        outcome.findings()
+    );
+}
+
+/// PR38: multi-level inline mods — `lib.rs` has
+/// `mod a { mod b { #[cfg(test)] #[path = "h.rs"] mod helpers; } }` +
+/// `src/a/b/h.rs` has `#[doc(hidden)]`.
+/// rustc accumulates inline mod names for `#[path]` resolution: `h.rs` resolves
+/// to `src/a/b/h.rs`.  The file must be excluded.
+#[test]
+fn test_ignores_doc_hidden_in_path_attr_mod_inside_multi_level_inline_mods() {
+    let tmp = TempDir::new().unwrap();
+    write_arch_rules(tmp.path());
+    write_src(
+        tmp.path(),
+        "lib.rs",
+        concat!(
+            "pub fn clean() {}\n",
+            "mod a {\n",
+            "    mod b {\n",
+            "        #[cfg(test)]\n",
+            "        #[path = \"h.rs\"]\n",
+            "        mod helpers;\n",
+            "    }\n",
+            "}\n",
+        ),
+    );
+    write_src(tmp.path(), "a/b/h.rs", "#[doc(hidden)]\npub fn hidden() {}\n");
+
+    let outcome = verify(tmp.path());
+    assert!(
+        outcome.is_ok(),
+        "#[path = \"h.rs\"] inside multi-level inline `mod a {{ mod b {{ … }} }}` must \
+         resolve to a/b/h.rs and be excluded (PR38): {:?}",
+        outcome.findings()
+    );
+}
+
 /// PR31: regression — a same-directory sibling that uses `#[cfg(test)] #[path =
 /// "shared_helpers.rs"] mod tests;` must still cause `shared_helpers.rs` to be
 /// classified as test-only and excluded from scanning.  The sibling probe must

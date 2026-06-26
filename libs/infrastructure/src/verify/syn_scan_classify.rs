@@ -134,11 +134,22 @@ fn items_declare_cfg_test_module_path(
             return true;
         }
         if let Some((_, nested_items)) = &module.content {
+            // Inline mods shift the base directory used by rustc to resolve
+            // `#[path]` attributes declared inside them.  For example,
+            // `mod tests { #[path = "helpers.rs"] mod helpers; }` in
+            // `src/lib.rs` resolves `helpers.rs` to `src/tests/helpers.rs`,
+            // not `src/helpers.rs`.  We represent this by updating the
+            // virtual containing-file path so that its `parent()` equals the
+            // inline module's resolution directory.
+            let inline_basefile = containing_file
+                .parent()
+                .map(|d| d.join(module.ident.to_string()).join("_.rs"))
+                .unwrap_or_else(|| PathBuf::from(module.ident.to_string()).join("_.rs"));
             return items_declare_cfg_test_module_path(
                 nested_items,
                 tail,
                 cfg_test,
-                containing_file,
+                &inline_basefile,
                 target_file,
             );
         }
@@ -181,11 +192,17 @@ fn items_declare_production_module_path(
             return false;
         }
         if let Some((_, nested_items)) = &module.content {
+            // Mirror the basedir-update logic from `items_declare_cfg_test_module_path`:
+            // inline mods shift the `#[path]` resolution directory.
+            let inline_basefile = containing_file
+                .parent()
+                .map(|d| d.join(module.ident.to_string()).join("_.rs"))
+                .unwrap_or_else(|| PathBuf::from(module.ident.to_string()).join("_.rs"));
             return items_declare_production_module_path(
                 nested_items,
                 tail,
                 cfg_test,
-                containing_file,
+                &inline_basefile,
                 target_file,
             );
         }
