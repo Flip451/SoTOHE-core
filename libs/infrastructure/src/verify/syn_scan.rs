@@ -271,14 +271,16 @@ fn attr_start_line(attr: Option<&syn::Attribute>) -> usize {
     attr.map(|a| a.pound_token.spans[0].start().line).unwrap_or(0)
 }
 
+/// Returns `true` only when `path` is referenced exclusively by `#[cfg(test)]`
+/// module declarations (no production `mod` declaration also points to it).
 fn is_file_backed_test_module(root: &Path, path: &Path) -> bool {
+    let (mut cfg_test_ref, mut prod_ref) = (false, false);
     for (candidate, module_path) in file_backed_module_source_probes(root, path) {
-        if file_declares_cfg_test_module_path(root, &candidate, &module_path) {
-            return true;
-        }
+        let (ct, prod) = classify_file_module_references(root, &candidate, &module_path);
+        cfg_test_ref |= ct;
+        prod_ref |= prod;
     }
-
-    false
+    cfg_test_ref && !prod_ref
 }
 
 fn file_backed_module_source_probes(root: &Path, path: &Path) -> Vec<(PathBuf, Vec<String>)> {
@@ -348,28 +350,36 @@ fn normal_component_strings(path: &Path) -> Option<Vec<String>> {
     Some(names)
 }
 
-fn file_declares_cfg_test_module_path(root: &Path, path: &Path, module_path: &[String]) -> bool {
+/// Reads `path` once and returns `(cfg_test_referenced, production_referenced)`:
+/// whether a `#[cfg(test)]` or non-`cfg(test)` `mod` in `path` resolves to `module_path`.
+fn classify_file_module_references(
+    root: &Path,
+    path: &Path,
+    module_path: &[String],
+) -> (bool, bool) {
     let Ok(true) = reject_symlinks_below(path, root) else {
-        return false;
+        return (false, false);
     };
     let Ok(meta) = path.symlink_metadata() else {
-        return false;
+        return (false, false);
     };
     if !meta.is_file() {
-        return false;
+        return (false, false);
     }
 
     let content = match std::fs::read_to_string(path) {
         Ok(content) => content,
-        Err(_) => return false,
+        Err(_) => return (false, false),
     };
 
     let file = match syn::parse_file(&content) {
         Ok(file) => file,
-        Err(_) => return false,
+        Err(_) => return (false, false),
     };
 
-    items_declare_cfg_test_module_path(&file.items, module_path, false)
+    let cfg_test = items_declare_cfg_test_module_path(&file.items, module_path, false);
+    let production = items_declare_production_module_path(&file.items, module_path, false);
+    (cfg_test, production)
 }
 
 fn items_declare_cfg_test_module_path(
@@ -387,24 +397,13 @@ fn items_declare_cfg_test_module_path(
         };
         let cfg_test = inherited_cfg_test || has_cfg_test_attr(&module.attrs);
 
-        // If this is a file-backed module (`mod foo;` with no inline content)
-        // and it carries a `#[path = "..."]` attribute, compare by the resolved
-        // path components rather than by module ident.  This handles patterns like:
-        //
-        //   #[cfg(test)]
-        //   #[path = "helpers.rs"]
-        //   mod test_helpers;
-        //
-        // where the module ident (`test_helpers`) differs from the file stem
-        // (`helpers`).  The path attribute may contain directory components, e.g.
-        // `"subdir/helpers.rs"` maps to module_path `["subdir", "helpers"]`.
+        // `#[path = "..."]` overrides the ident.
         if let Some(path_value) = extract_path_attr(&module.attrs) {
             return module.content.is_none()
                 && cfg_test
                 && path_attr_matches_module_path(&path_value, module_path);
         }
 
-        // Standard ident-based matching (no `#[path]` attribute present).
         if module.ident != head.as_str() {
             return false;
         }
@@ -421,10 +420,46 @@ fn items_declare_cfg_test_module_path(
     })
 }
 
-/// Extracts the string value of a `#[path = "..."]` attribute, if present.
-///
-/// Returns `Some(value)` for the first well-formed `#[path = "literal"]`
-/// attribute found in `attrs`, otherwise `None`.
+/// Returns `true` when a non-`cfg(test)` file-backed `mod` declaration in
+/// `items` resolves to `module_path` (mirror of `items_declare_cfg_test_module_path`).
+fn items_declare_production_module_path(
+    items: &[syn::Item],
+    module_path: &[String],
+    inherited_cfg_test: bool,
+) -> bool {
+    let Some((head, tail)) = module_path.split_first() else {
+        return false;
+    };
+
+    items.iter().any(|item| {
+        let syn::Item::Mod(module) = item else {
+            return false;
+        };
+        let cfg_test = inherited_cfg_test || has_cfg_test_attr(&module.attrs);
+
+        if let Some(path_value) = extract_path_attr(&module.attrs) {
+            return module.content.is_none()
+                && !cfg_test
+                && path_attr_matches_module_path(&path_value, module_path);
+        }
+
+        if module.ident != head.as_str() {
+            return false;
+        }
+        if tail.is_empty() {
+            return module.content.is_none() && !cfg_test;
+        }
+        if cfg_test && module.content.is_none() {
+            return false;
+        }
+        if let Some((_, nested_items)) = &module.content {
+            return items_declare_production_module_path(nested_items, tail, cfg_test);
+        }
+        false
+    })
+}
+
+/// Returns the string value of the first `#[path = "..."]` attribute in `attrs`, if any.
 fn extract_path_attr(attrs: &[syn::Attribute]) -> Option<String> {
     for attr in attrs {
         if !attr.path().is_ident("path") {
@@ -439,18 +474,9 @@ fn extract_path_attr(attrs: &[syn::Attribute]) -> Option<String> {
     None
 }
 
-/// Returns `true` when the `#[path = "value"]` attribute string, interpreted
-/// as a relative path, matches the entire `module_path` component sequence.
-///
-/// Each path component of `value` is compared to the corresponding element of
-/// `module_path`.  The **last** component is compared by file stem (extension
-/// stripped); all preceding components are compared verbatim.
-///
-/// # Examples
-///
-/// - `"helpers.rs"` matches `["helpers"]`
-/// - `"subdir/helpers.rs"` matches `["subdir", "helpers"]`
-/// - `"helpers.rs"` does **not** match `["test_helpers"]`
+/// Returns `true` when `path_value` (a `#[path = "..."]` string), treated as a
+/// relative path, matches the entire `module_path` component sequence.  The last
+/// component is compared by file stem; `mod.rs` pops the stem and matches one level up.
 fn path_attr_matches_module_path(path_value: &str, module_path: &[String]) -> bool {
     let path = Path::new(path_value);
     let mut components = Vec::new();
