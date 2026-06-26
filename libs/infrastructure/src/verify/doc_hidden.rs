@@ -20,6 +20,10 @@ use super::syn_helpers::{has_cfg_test_attr, scan_rs_files};
 const PROHIBITION_REASON: &str = "pub + #[doc(hidden)] is forbidden: rustdoc excludes this item from its paths output, \
      causing TDDD chain\u{2462} to fire DanglingId and block the track-active-gate commit gate";
 
+/// Additional suffix appended when the violation is via `#[cfg_attr(<pred>, doc(hidden))]`.
+const CFG_ATTR_PROHIBITION_SUFFIX: &str = "; cfg_attr(<pred>, doc(hidden)) forms are also forbidden because \
+     they expand to #[doc(hidden)] in production builds";
+
 // ---------------------------------------------------------------------------
 // Public entry point
 // ---------------------------------------------------------------------------
@@ -272,11 +276,18 @@ fn check_item(item: &syn::Item, file_path: &Path, findings: &mut Vec<VerifyFindi
         }
         // `use` items rarely carry `#[doc(hidden)]`, but include them for completeness.
         syn::Item::Use(i) => {
-            if !is_test_scoped(&i.attrs) && is_pub_vis(&i.vis) && has_doc_hidden(&i.attrs) {
-                findings.push(VerifyFinding::error(format!(
-                    "{}: `use` item — {PROHIBITION_REASON}",
-                    file_path.display(),
-                )));
+            if !is_test_scoped(&i.attrs) && is_pub_vis(&i.vis) {
+                if has_doc_hidden(&i.attrs) {
+                    findings.push(VerifyFinding::error(format!(
+                        "{}: `use` item — {PROHIBITION_REASON}",
+                        file_path.display(),
+                    )));
+                } else if has_cfg_attr_doc_hidden(&i.attrs) {
+                    findings.push(VerifyFinding::error(format!(
+                        "{}: `use` item — {PROHIBITION_REASON}{CFG_ATTR_PROHIBITION_SUFFIX}",
+                        file_path.display(),
+                    )));
+                }
             }
         }
         syn::Item::Union(i) => {
@@ -512,7 +523,7 @@ fn has_test_attr(attrs: &[syn::Attribute]) -> bool {
     attrs.iter().any(|attr| attr.path().is_ident("test"))
 }
 
-/// Returns `true` if `attrs` contains `#[doc(hidden)]`.
+/// Returns `true` if `attrs` contains a direct `#[doc(hidden)]` attribute.
 fn has_doc_hidden(attrs: &[syn::Attribute]) -> bool {
     attrs.iter().any(|attr| {
         if !attr.path().is_ident("doc") {
@@ -522,6 +533,51 @@ fn has_doc_hidden(attrs: &[syn::Attribute]) -> bool {
         // the path `hidden`. Mirrors the `has_cfg_test_attr` pattern.
         attr.parse_args::<syn::Path>().is_ok_and(|path| path.is_ident("hidden"))
     })
+}
+
+/// Returns `true` if `attrs` contains a `#[cfg_attr(<pred>, ..., doc(hidden), ...)]`
+/// form — including nested `cfg_attr` — regardless of the cfg predicate.
+///
+/// The ADR forbids `#[doc(hidden)]` outright; `cfg_attr` is not an escape hatch
+/// because the attribute expands to `#[doc(hidden)]` in production builds.
+fn has_cfg_attr_doc_hidden(attrs: &[syn::Attribute]) -> bool {
+    attrs.iter().any(|attr| attr.path().is_ident("cfg_attr") && cfg_attr_applies_doc_hidden(attr))
+}
+
+/// Returns `true` if the `#[cfg_attr(...)]` attribute's conditional argument
+/// list contains `doc(hidden)` (or a nested `cfg_attr` that transitively does).
+///
+/// `cfg_attr(pred, attr1, attr2, ...)` — the first token is the cfg predicate
+/// (skipped) and the rest are the conditional attributes we inspect.
+fn cfg_attr_applies_doc_hidden(attr: &syn::Attribute) -> bool {
+    let parser = syn::punctuated::Punctuated::<syn::Meta, syn::Token![,]>::parse_terminated;
+    let Ok(metas) = attr.parse_args_with(parser) else {
+        return false;
+    };
+    // Skip element [0] (the cfg predicate); check the conditional attrs.
+    metas.iter().skip(1).any(conditional_meta_is_doc_hidden)
+}
+
+/// Returns `true` if a single `Meta` (from the conditional portion of a
+/// `cfg_attr` argument list) is `doc(hidden)` or a nested `cfg_attr` that
+/// transitively applies `doc(hidden)`.
+fn conditional_meta_is_doc_hidden(meta: &syn::Meta) -> bool {
+    let syn::Meta::List(list) = meta else {
+        return false;
+    };
+    if list.path.is_ident("doc") {
+        return syn::parse2::<syn::Path>(list.tokens.clone()).is_ok_and(|p| p.is_ident("hidden"));
+    }
+    if list.path.is_ident("cfg_attr") {
+        // Nested cfg_attr — recurse into its conditional argument list.
+        use syn::parse::Parser;
+        let parser = syn::punctuated::Punctuated::<syn::Meta, syn::Token![,]>::parse_terminated;
+        return match parser.parse2(list.tokens.clone()) {
+            Ok(inner) => inner.iter().skip(1).any(conditional_meta_is_doc_hidden),
+            Err(_) => false,
+        };
+    }
+    false
 }
 
 /// Returns `true` if `vis` is bare `pub` (not `pub(crate)`, `pub(super)`,
@@ -548,9 +604,17 @@ fn report_if_public_doc_hidden(
     file_path: &Path,
     findings: &mut Vec<VerifyFinding>,
 ) {
-    if is_public && has_doc_hidden(attrs) {
+    if !is_public {
+        return;
+    }
+    if has_doc_hidden(attrs) {
         findings.push(VerifyFinding::error(format!(
             "{}: `{name}` — {PROHIBITION_REASON}",
+            file_path.display(),
+        )));
+    } else if has_cfg_attr_doc_hidden(attrs) {
+        findings.push(VerifyFinding::error(format!(
+            "{}: `{name}` — {PROHIBITION_REASON}{CFG_ATTR_PROHIBITION_SUFFIX}",
             file_path.display(),
         )));
     }
@@ -783,5 +847,104 @@ mod tests {
         let msg = outcome.findings()[0].to_string();
         assert!(msg.contains("../outside"), "layer path missing: {msg}");
         assert!(msg.contains("resolves outside trusted root"), "containment reason missing: {msg}");
+    }
+
+    // --- cfg_attr forms: AC-01 coverage for `#[cfg_attr(<pred>, doc(hidden))]` ---
+
+    // (f) cfg_attr(not(test), doc(hidden)) on a pub fn — flagged
+    #[test]
+    fn cfg_attr_not_test_doc_hidden_pub_fn_is_flagged() {
+        let tmp = TempDir::new().unwrap();
+        setup_arch_rules(tmp.path(), "layer");
+        write_src(
+            tmp.path(),
+            "layer/src/lib.rs",
+            "#[cfg_attr(not(test), doc(hidden))]\npub fn foo() {}\n",
+        );
+
+        let outcome = verify(tmp.path());
+
+        assert!(outcome.has_errors(), "expected error for cfg_attr(not(test), doc(hidden))");
+        let msg = outcome.findings()[0].to_string();
+        assert!(msg.contains("foo"), "item name missing: {msg}");
+        assert!(msg.contains("lib.rs"), "file path missing: {msg}");
+        assert!(msg.contains("pub + #[doc(hidden)] is forbidden"), "base reason missing: {msg}");
+        assert!(
+            msg.contains("cfg_attr(<pred>, doc(hidden)) forms are also forbidden"),
+            "cfg_attr suffix missing: {msg}"
+        );
+    }
+
+    // (g) cfg_attr(feature = "x", doc(hidden)) on a pub fn — flagged
+    #[test]
+    fn cfg_attr_feature_doc_hidden_pub_fn_is_flagged() {
+        let tmp = TempDir::new().unwrap();
+        setup_arch_rules(tmp.path(), "layer");
+        write_src(
+            tmp.path(),
+            "layer/src/lib.rs",
+            "#[cfg_attr(feature = \"x\", doc(hidden))]\npub fn bar() {}\n",
+        );
+
+        let outcome = verify(tmp.path());
+
+        assert!(outcome.has_errors(), "expected error for cfg_attr(feature = \"x\", doc(hidden))");
+        let msg = outcome.findings()[0].to_string();
+        assert!(msg.contains("bar"), "item name missing: {msg}");
+        assert!(msg.contains("pub + #[doc(hidden)] is forbidden"), "base reason missing: {msg}");
+        assert!(
+            msg.contains("cfg_attr(<pred>, doc(hidden)) forms are also forbidden"),
+            "cfg_attr suffix missing: {msg}"
+        );
+    }
+
+    // (h) Nested cfg_attr: cfg_attr(not(test), cfg_attr(any(), doc(hidden))) — flagged
+    #[test]
+    fn nested_cfg_attr_doc_hidden_pub_fn_is_flagged() {
+        let tmp = TempDir::new().unwrap();
+        setup_arch_rules(tmp.path(), "layer");
+        write_src(
+            tmp.path(),
+            "layer/src/lib.rs",
+            "#[cfg_attr(not(test), cfg_attr(any(), doc(hidden)))]\npub fn baz() {}\n",
+        );
+
+        let outcome = verify(tmp.path());
+
+        assert!(outcome.has_errors(), "expected error for nested cfg_attr doc(hidden)");
+        let msg = outcome.findings()[0].to_string();
+        assert!(msg.contains("baz"), "item name missing: {msg}");
+        assert!(msg.contains("pub + #[doc(hidden)] is forbidden"), "base reason missing: {msg}");
+        assert!(
+            msg.contains("cfg_attr(<pred>, doc(hidden)) forms are also forbidden"),
+            "cfg_attr suffix missing: {msg}"
+        );
+    }
+
+    // (i) cfg_attr(test, doc(hidden)) — flagged regardless of predicate; the rule
+    // forbids writing doc(hidden) on any pub item irrespective of the cfg condition.
+    #[test]
+    fn cfg_attr_test_doc_hidden_pub_fn_is_still_flagged() {
+        let tmp = TempDir::new().unwrap();
+        setup_arch_rules(tmp.path(), "layer");
+        write_src(
+            tmp.path(),
+            "layer/src/lib.rs",
+            "#[cfg_attr(test, doc(hidden))]\npub fn quux() {}\n",
+        );
+
+        let outcome = verify(tmp.path());
+
+        assert!(
+            outcome.has_errors(),
+            "expected error: cfg_attr(test, doc(hidden)) on pub item is forbidden regardless of predicate"
+        );
+        let msg = outcome.findings()[0].to_string();
+        assert!(msg.contains("quux"), "item name missing: {msg}");
+        assert!(msg.contains("pub + #[doc(hidden)] is forbidden"), "base reason missing: {msg}");
+        assert!(
+            msg.contains("cfg_attr(<pred>, doc(hidden)) forms are also forbidden"),
+            "cfg_attr suffix missing: {msg}"
+        );
     }
 }
