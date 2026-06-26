@@ -185,6 +185,14 @@
         "kind": "pass",
         "citation": "`sotp ref-verify results` CLI サブコマンドの実装。option として `--track-id` (optional; 省略時はブランチから自動解決)、`--items-dir` (default: `track/items`)、`--chain {1|2|all}`、`--layer <name>|all`、`--filter {pass|fail|pending|all}` を持つ"
       }
+    },
+    {
+      "claim_hash": "e602e9454949b4527c3cee7dacc87730c8d5c2dec05377a97ddceb92f207142d",
+      "evidence_hash": "50d3f0692055b25b024a5002d5d04d25ba55f17218c96301ad021881193320b0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "旧 verify-cache (origin meta フィールドなし) を read-only consumer が読み込もうとすると parse error が発生し、`bin/sotp ref-verify results` / `bin/sotp ref-verify check-approved` がエラーメッセージと非 0 exit code を返す。`bin/sotp ref-verify run` は旧 entry を有効 cache として再利用せず、新 schema の cache を再生成する。旧 cache の silently forward-compat な読み込みは行わない"
+      }
     }
   ]
 }

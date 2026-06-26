@@ -163,6 +163,19 @@ impl RefVerifyCacheAdapter {
     }
 }
 
+fn is_missing_origin_error(
+    e: &crate::tddd::semantic_verify_codec::SemanticVerifyCodecError,
+) -> bool {
+    use crate::tddd::semantic_verify_codec::SemanticVerifyCodecError;
+    match e {
+        SemanticVerifyCodecError::Json { message } => {
+            message.contains("missing field `claim_origin`")
+                || message.contains("missing field `evidence_origin`")
+        }
+        _ => false,
+    }
+}
+
 impl RefVerifyCachePort for RefVerifyCacheAdapter {
     fn load_entries(
         &self,
@@ -187,22 +200,37 @@ impl RefVerifyCachePort for RefVerifyCacheAdapter {
         match scope {
             RefVerifyCacheScope::SpecAdr => {
                 let doc = SpecAdrVerifyCacheDocumentCodec::decode(&text).map_err(|e| {
-                    RefVerifyError::CachePersistence {
-                        message: format!(
-                            "cannot decode spec-adr-verify-cache at '{}': {e}",
-                            path.display()
-                        ),
+                    if is_missing_origin_error(&e) {
+                        RefVerifyError::CacheSchemaOutdated {
+                            message: format!("spec-adr-verify-cache at '{}': {e}", path.display()),
+                        }
+                    } else {
+                        RefVerifyError::CachePersistence {
+                            message: format!(
+                                "cannot decode spec-adr-verify-cache at '{}': {e}",
+                                path.display()
+                            ),
+                        }
                     }
                 })?;
                 Ok(doc.entries)
             }
             RefVerifyCacheScope::CatalogueSpec { layer } => {
                 let doc = CatalogueSpecVerifyCacheDocumentCodec::decode(&text).map_err(|e| {
-                    RefVerifyError::CachePersistence {
-                        message: format!(
-                            "cannot decode catalogue-spec-verify-cache at '{}': {e}",
-                            path.display()
-                        ),
+                    if is_missing_origin_error(&e) {
+                        RefVerifyError::CacheSchemaOutdated {
+                            message: format!(
+                                "catalogue-spec-verify-cache at '{}': {e}",
+                                path.display()
+                            ),
+                        }
+                    } else {
+                        RefVerifyError::CachePersistence {
+                            message: format!(
+                                "cannot decode catalogue-spec-verify-cache at '{}': {e}",
+                                path.display()
+                            ),
+                        }
                     }
                 })?;
                 if &doc.layer != layer {
@@ -466,10 +494,37 @@ mod tests {
         ContentHash::from_bytes([byte; 32])
     }
 
-    fn pass_entry(claim: u8, evidence: u8) -> SemanticVerifyEntry {
+    fn make_test_entry(
+        claim: u8,
+        evidence: u8,
+        verdict: domain::tddd::semantic_verify::SemanticVerdict,
+    ) -> SemanticVerifyEntry {
+        use domain::plan_ref::SpecElementId;
+        use domain::tddd::semantic_verify::{
+            AdrDecisionRef, SpecElementRef, SpecSectionKind, VerifyOriginRef,
+        };
+        let claim_origin = VerifyOriginRef::SpecElement(SpecElementRef::new(
+            SpecSectionKind::Goal,
+            SpecElementId::try_new(format!("GO-{claim:02}")).unwrap(),
+            format!("claim-{claim:02}"),
+        ));
+        let evidence_origin = VerifyOriginRef::AdrDecision(AdrDecisionRef::new(
+            "test-adr.md".to_owned(),
+            format!("D{evidence:02x}"),
+        ));
         SemanticVerifyEntry::new(
             hash(claim),
             hash(evidence),
+            verdict,
+            claim_origin,
+            evidence_origin,
+        )
+    }
+
+    fn pass_entry(claim: u8, evidence: u8) -> SemanticVerifyEntry {
+        make_test_entry(
+            claim,
+            evidence,
             SemanticVerdict::Pass {
                 citation: EvidenceCitation::try_new("the spec states X".to_owned()).unwrap(),
             },

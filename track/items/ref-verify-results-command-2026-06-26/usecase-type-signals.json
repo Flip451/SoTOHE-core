@@ -1,20 +1,20 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-26T04:36:13Z",
-  "declaration_hash": "ee549738b86dc40269c271dcd0a7be6f9078026efd444245e20bc72ab8948da9",
+  "generated_at": "2026-06-26T06:40:13Z",
+  "declaration_hash": "4d6285eb6472214509466be51f1cb8e1bbc436cac2147e718fe267648c35de1d",
   "signals": [
     {
       "type_name": "RefVerifyAggregateService",
       "kind_tag": "application_service",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
       "type_name": "RefVerifyChainFilter",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -22,11 +22,17 @@
       ]
     },
     {
+      "type_name": "RefVerifyError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
       "type_name": "RefVerifyLaneSummary",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::fmt::Debug"
       ]
@@ -34,9 +40,9 @@
     {
       "type_name": "RefVerifyLayerFilter",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -46,15 +52,15 @@
     {
       "type_name": "RefVerifyPair",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
       "type_name": "RefVerifyPairRecord",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::fmt::Debug"
       ]
@@ -62,18 +68,18 @@
     {
       "type_name": "RefVerifyResultsOutput",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::fmt::Debug"
       ]
     },
     {
       "type_name": "RefVerifyVerdictFilter",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",

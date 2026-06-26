@@ -9,6 +9,10 @@ pub(super) use super::pair_source_json::{extract_json_object_parsed, render_prom
 
 use crate::adr_decision::parse_adr_frontmatter;
 use crate::verify::plan_artifact_refs::{build_element_map, canonical_json_sha256};
+use domain::plan_ref::SpecElementId;
+use domain::tddd::semantic_verify::{
+    AdrDecisionRef, SpecElementRef, SpecSectionKind, VerifyOriginRef,
+};
 use domain::{AdrDecisionCommon, AdrDecisionEntry, ContentHash};
 use std::path::{Component, Path, PathBuf};
 use usecase::ref_verify::{RefVerifyCacheScope, RefVerifyError, RefVerifyPair};
@@ -43,6 +47,17 @@ pub(super) fn hash_git_blob_text(text: &str) -> ContentHash {
 
 // Path resolution / guarded reads live in `super::guarded_io`.
 use super::guarded_io::{lexically_normalize, read_guarded_text, resolve_and_guard_path};
+
+fn map_section_str_to_kind(section: &str) -> SpecSectionKind {
+    match section {
+        "goal" => SpecSectionKind::Goal,
+        "in_scope" => SpecSectionKind::InScope,
+        "out_of_scope" => SpecSectionKind::OutOfScope,
+        "constraint" => SpecSectionKind::Constraint,
+        // pair_source uses "acceptance_criterion" (singular) as the label
+        _ => SpecSectionKind::AcceptanceCriteria,
+    }
+}
 
 // ---------------------------------------------------------------------------
 // Chain-1: spec → ADR
@@ -158,6 +173,15 @@ pub(super) fn enumerate_chain1_pairs(
             })?;
         let claim_hash = hash_text(canonical_element_json)?;
 
+        let element_id = SpecElementId::try_new(id.to_owned()).map_err(|e| {
+            RefVerifyError::VerifierPort { message: format!("invalid spec element id '{id}': {e}") }
+        })?;
+        let claim_origin = VerifyOriginRef::SpecElement(SpecElementRef::new(
+            map_section_str_to_kind(section),
+            element_id,
+            req.text().to_owned(),
+        ));
+
         for adr_ref in req.adr_refs() {
             // Validate the reference is repo-relative before the guarded read.
             let adr_path = resolve_and_guard_path(
@@ -171,6 +195,10 @@ pub(super) fn enumerate_chain1_pairs(
 
             // ADR D3/D4: the Chain-1 evidence key is the ADR file's Git blob-object identity.
             let evidence_hash = hash_git_blob_text(&adr_raw);
+            let evidence_origin = VerifyOriginRef::AdrDecision(AdrDecisionRef::new(
+                adr_ref.file.to_string_lossy().into_owned(),
+                adr_ref.anchor.as_ref().to_owned(),
+            ));
             pairs.push(RefVerifyPair {
                 claim: claim_text.clone(),
                 evidence: evidence_text,
@@ -178,6 +206,8 @@ pub(super) fn enumerate_chain1_pairs(
                 evidence_hash,
                 cache_scope: RefVerifyCacheScope::SpecAdr,
                 known_bad: false,
+                claim_origin: claim_origin.clone(),
+                evidence_origin,
             });
         }
     }
@@ -391,5 +421,25 @@ pub(super) fn make_known_bad_probe(
     );
     let claim_hash = hash_text(&claim)?;
     let evidence_hash = hash_text(&evidence)?;
-    Ok(RefVerifyPair { claim, evidence, claim_hash, evidence_hash, cache_scope, known_bad: true })
+    let claim_origin = VerifyOriginRef::SpecElement(SpecElementRef::new(
+        SpecSectionKind::Goal,
+        SpecElementId::try_new(format!("PROBE-{index}")).map_err(|e| {
+            RefVerifyError::VerifierPort { message: format!("invalid probe id: {e}") }
+        })?,
+        format!("known-bad-probe-{index}"),
+    ));
+    let evidence_origin = VerifyOriginRef::AdrDecision(AdrDecisionRef::new(
+        "known-bad-probe".to_owned(),
+        format!("PROBE-{index}"),
+    ));
+    Ok(RefVerifyPair {
+        claim,
+        evidence,
+        claim_hash,
+        evidence_hash,
+        cache_scope,
+        known_bad: true,
+        claim_origin,
+        evidence_origin,
+    })
 }

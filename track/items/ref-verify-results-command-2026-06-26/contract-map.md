@@ -97,6 +97,17 @@ subgraph usecase["usecase"]
     T36_usecase_usecase_RefVerifyChainFilter_Chain2[Chain2]
     T36_usecase_usecase_RefVerifyChainFilter_All[All]
   end
+  subgraph T30_usecase_usecase_RefVerifyError["ref_verify::RefVerifyError"]
+    direction TB
+    T30_usecase_usecase_RefVerifyError__self[RefVerifyError]
+    T30_usecase_usecase_RefVerifyError_InvalidConfig[InvalidConfig]
+    T30_usecase_usecase_RefVerifyError_TrackNotActive[TrackNotActive]
+    T30_usecase_usecase_RefVerifyError_VerifierPort[VerifierPort]
+    T30_usecase_usecase_RefVerifyError_CachePersistence[CachePersistence]
+    T30_usecase_usecase_RefVerifyError_SemanticFailuresConfirmed[SemanticFailuresConfirmed]
+    T30_usecase_usecase_RefVerifyError_HumanEscalationRequired[HumanEscalationRequired]
+    T30_usecase_usecase_RefVerifyError_CacheSchemaOutdated[CacheSchemaOutdated]
+  end
   subgraph T36_usecase_usecase_RefVerifyLaneSummary["ref_verify::driver_service::RefVerifyLaneSummary"]
     direction TB
     T36_usecase_usecase_RefVerifyLaneSummary__self[RefVerifyLaneSummary]
@@ -405,6 +416,14 @@ class T36_usecase_usecase_RefVerifyChainFilter_Chain1 variant_node
 class T36_usecase_usecase_RefVerifyChainFilter_Chain2 variant_node
 class T36_usecase_usecase_RefVerifyChainFilter_All variant_node
 class T36_usecase_usecase_RefVerifyChainFilter__self value_object
+class T30_usecase_usecase_RefVerifyError_InvalidConfig variant_node
+class T30_usecase_usecase_RefVerifyError_TrackNotActive variant_node
+class T30_usecase_usecase_RefVerifyError_VerifierPort variant_node
+class T30_usecase_usecase_RefVerifyError_CachePersistence variant_node
+class T30_usecase_usecase_RefVerifyError_SemanticFailuresConfirmed variant_node
+class T30_usecase_usecase_RefVerifyError_HumanEscalationRequired variant_node
+class T30_usecase_usecase_RefVerifyError_CacheSchemaOutdated variant_node
+class T30_usecase_usecase_RefVerifyError__self error_type
 class T36_usecase_usecase_RefVerifyLaneSummary__self dto
 class T36_usecase_usecase_RefVerifyLayerFilter_Specific variant_node
 class T36_usecase_usecase_RefVerifyLayerFilter_All variant_node

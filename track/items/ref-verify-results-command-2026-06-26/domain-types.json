@@ -226,7 +226,7 @@
           "name": "try_new",
           "receiver": null,
           "params": [{ "name": "raw", "ty": "String" }],
-          "returns": "Result<CatalogueEntryKey, ValidationError>",
+          "returns": "Result<Self, ValidationError>",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,

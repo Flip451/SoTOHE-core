@@ -515,10 +515,25 @@ mod tests {
         let entries = verdicts
             .into_iter()
             .map(|verdict| {
+                use domain::plan_ref::SpecElementId;
+                use domain::tddd::semantic_verify::{
+                    AdrDecisionRef, SpecElementRef, SpecSectionKind, VerifyOriginRef,
+                };
+                let claim_origin = VerifyOriginRef::SpecElement(SpecElementRef::new(
+                    SpecSectionKind::Goal,
+                    SpecElementId::try_new("GO-01".to_owned()).unwrap(),
+                    "test claim".to_owned(),
+                ));
+                let evidence_origin = VerifyOriginRef::AdrDecision(AdrDecisionRef::new(
+                    "knowledge/adr/decision.md".to_owned(),
+                    "D1".to_owned(),
+                ));
                 SemanticVerifyEntry::new(
                     pair.claim_hash.clone(),
                     pair.evidence_hash.clone(),
                     verdict,
+                    claim_origin,
+                    evidence_origin,
                 )
             })
             .collect();

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "3014dea854ddb04b685c059a5f5575071e6324bcfdbfb0dfe6369c7dd67ea989",
+  "catalogue_declaration_hash": "3aa44cd3b3f1f05e27550e02de766a0cc9f94fc5955a441f1e1ad396d03c0625",
   "signals": [
     {
       "type_name": "AdrDecisionRef",

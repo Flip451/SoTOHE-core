@@ -103,8 +103,17 @@ impl RefVerifyApplicationService for VerifySemanticRefsInteractor {
         };
 
         for scope in &scopes {
-            let entries = self.cache.load_entries(cmd, scope)?;
-            scope_cache.insert(scope.clone(), entries);
+            match self.cache.load_entries(cmd, scope) {
+                Ok(entries) => {
+                    scope_cache.insert(scope.clone(), entries);
+                }
+                Err(RefVerifyError::CacheSchemaOutdated { .. }) => {
+                    // Old-schema cache (missing origin fields): treat as invalidated empty cache.
+                    // The run will re-verify all pairs for this scope and write new-schema entries.
+                    scope_cache.insert(scope.clone(), Vec::new());
+                }
+                Err(e) => return Err(e),
+            }
         }
 
         // Partition production pairs into cache hits and cache misses.
@@ -307,6 +316,8 @@ impl RefVerifyApplicationService for VerifySemanticRefsInteractor {
                         pair.claim_hash.clone(),
                         pair.evidence_hash.clone(),
                         verdict.clone(),
+                        pair.claim_origin.clone(),
+                        pair.evidence_origin.clone(),
                     );
                     new_entries_by_scope.entry(pair.cache_scope.clone()).or_default().push(entry);
                 }
@@ -448,9 +459,11 @@ mod tests {
     use std::sync::{Arc, Mutex};
 
     use domain::ContentHash;
+    use domain::plan_ref::SpecElementId;
     use domain::tddd::LayerId;
     use domain::tddd::semantic_verify::{
-        EvidenceCitation, ModelTier, SemanticVerdict, SemanticVerifyEntry,
+        AdrDecisionRef, EvidenceCitation, ModelTier, SemanticVerdict, SemanticVerifyEntry,
+        SpecElementRef, SpecSectionKind, VerifyOriginRef,
     };
 
     use super::super::{
@@ -485,6 +498,15 @@ mod tests {
             evidence_hash: hash(evidence_byte),
             cache_scope: RefVerifyCacheScope::SpecAdr,
             known_bad: false,
+            claim_origin: VerifyOriginRef::SpecElement(SpecElementRef::new(
+                SpecSectionKind::Goal,
+                SpecElementId::try_new(format!("GO-{claim_byte:03}")).unwrap(),
+                format!("claim-{claim_byte}"),
+            )),
+            evidence_origin: VerifyOriginRef::AdrDecision(AdrDecisionRef::new(
+                "adr.md".to_owned(),
+                format!("D{evidence_byte}"),
+            )),
         }
     }
 
@@ -496,7 +518,39 @@ mod tests {
             evidence_hash: hash(0xfe),
             cache_scope: RefVerifyCacheScope::SpecAdr,
             known_bad: true,
+            claim_origin: VerifyOriginRef::SpecElement(SpecElementRef::new(
+                SpecSectionKind::Goal,
+                SpecElementId::try_new("PROBE-0".to_owned()).unwrap(),
+                "known-bad-probe-0".to_owned(),
+            )),
+            evidence_origin: VerifyOriginRef::AdrDecision(AdrDecisionRef::new(
+                "known-bad-probe".to_owned(),
+                "PROBE-0".to_owned(),
+            )),
         }
+    }
+
+    fn make_cached_entry(
+        claim_byte: u8,
+        evidence_byte: u8,
+        verdict: SemanticVerdict,
+    ) -> SemanticVerifyEntry {
+        let claim_origin = VerifyOriginRef::SpecElement(SpecElementRef::new(
+            SpecSectionKind::Goal,
+            SpecElementId::try_new(format!("GO-{claim_byte:03}")).unwrap(),
+            format!("claim-{claim_byte}"),
+        ));
+        let evidence_origin = VerifyOriginRef::AdrDecision(AdrDecisionRef::new(
+            "adr.md".to_owned(),
+            format!("D{evidence_byte}"),
+        ));
+        SemanticVerifyEntry::new(
+            hash(claim_byte),
+            hash(evidence_byte),
+            verdict,
+            claim_origin,
+            evidence_origin,
+        )
     }
 
     fn track_cmd() -> RefVerifyCommand {
@@ -752,11 +806,7 @@ mod tests {
     fn cache_hit_pairs_are_skipped_by_verifier() {
         let pair = production_pair(0x01, 0x02);
         // Pre-populate cache with an entry matching pair's hashes.
-        let cached_entry = SemanticVerifyEntry::new(
-            pair.claim_hash.clone(),
-            pair.evidence_hash.clone(),
-            pass_verdict(),
-        );
+        let cached_entry = make_cached_entry(0x01, 0x02, pass_verdict());
         let pairs = vec![pair];
         let source: Arc<dyn RefVerifyPairSourcePort> = Arc::new(StubPairSource { pairs });
         let cache: Arc<StubCache> = Arc::new(StubCache::with_entries(vec![cached_entry]));
@@ -791,11 +841,7 @@ mod tests {
         // D12: when production pairs exist and every one of them is a cache hit,
         // calibration probes have nothing to calibrate — they must not be evaluated.
         let pair = production_pair(0x01, 0x02);
-        let cached_entry = SemanticVerifyEntry::new(
-            pair.claim_hash.clone(),
-            pair.evidence_hash.clone(),
-            pass_verdict(),
-        );
+        let cached_entry = make_cached_entry(0x01, 0x02, pass_verdict());
         let probe = known_bad_pair();
         let source: Arc<dyn RefVerifyPairSourcePort> =
             Arc::new(StubPairSource { pairs: vec![pair, probe] });
@@ -829,11 +875,7 @@ mod tests {
         spy: &Arc<SpyVerifier>,
     ) -> RefVerifyError {
         let pair = production_pair(claim_byte, evidence_byte);
-        let cached_entry = SemanticVerifyEntry::new(
-            pair.claim_hash.clone(),
-            pair.evidence_hash.clone(),
-            cached_verdict,
-        );
+        let cached_entry = make_cached_entry(claim_byte, evidence_byte, cached_verdict);
         let source: Arc<dyn RefVerifyPairSourcePort> =
             Arc::new(StubPairSource { pairs: vec![pair] });
         let cache: Arc<StubCache> = Arc::new(StubCache::with_entries(vec![cached_entry]));
@@ -879,11 +921,7 @@ mod tests {
         // Even if the cache contains an entry with the same hashes as a known-bad probe,
         // the probe must still be sent to the verifier (cache bypass for known_bad=true).
         let probe = known_bad_pair();
-        let cached_entry = SemanticVerifyEntry::new(
-            probe.claim_hash.clone(),
-            probe.evidence_hash.clone(),
-            pass_verdict(),
-        );
+        let cached_entry = make_cached_entry(0xff, 0xfe, pass_verdict());
         let source: Arc<dyn RefVerifyPairSourcePort> =
             Arc::new(StubPairSource { pairs: vec![probe] });
         let cache: Arc<StubCache> = Arc::new(StubCache::with_entries(vec![cached_entry]));

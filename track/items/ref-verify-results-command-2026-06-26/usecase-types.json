@@ -175,6 +175,29 @@
         { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "IN-06" }
       ],
       "informal_grounds": []
+    },
+    "RefVerifyError": {
+      "action": "modify",
+      "role": { "ErrorType": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "InvalidConfig",            "payload": { "kind": "struct", "fields": [{ "name": "message",    "ty": "String" }] } },
+          { "name": "TrackNotActive",           "payload": { "kind": "struct", "fields": [{ "name": "branch",     "ty": "String" }] } },
+          { "name": "VerifierPort",             "payload": { "kind": "struct", "fields": [{ "name": "message",    "ty": "String" }] } },
+          { "name": "CachePersistence",         "payload": { "kind": "struct", "fields": [{ "name": "message",    "ty": "String" }] } },
+          { "name": "SemanticFailuresConfirmed","payload": { "kind": "struct", "fields": [{ "name": "pair_count", "ty": "usize"  }] } },
+          { "name": "HumanEscalationRequired",  "payload": { "kind": "struct", "fields": [{ "name": "pair_count", "ty": "usize"  }] } },
+          { "name": "CacheSchemaOutdated",      "payload": { "kind": "struct", "fields": [{ "name": "message",    "ty": "String" }] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "ref_verify",
+      "docs": "Error type for the ref-verify command family. Extended to add CacheSchemaOutdated, which signals that the verify-cache file uses a pre-D3 schema (missing claim_origin / evidence_origin fields). The run path re-verifies all pairs from scratch on this error; results and check-approved return this error with a non-zero exit code.",
+      "spec_refs": [
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "AC-12" }
+      ],
+      "informal_grounds": []
     }
   },
   "traits": {
@@ -266,6 +289,10 @@
     { "trait_ref": "core::fmt::Debug",   "for_type": "RefVerifyPairRecord" },
     { "trait_ref": "core::clone::Clone", "for_type": "RefVerifyPairRecord" },
 
-    { "trait_ref": "core::fmt::Debug",   "for_type": "RefVerifyResultsOutput" }
+    { "trait_ref": "core::fmt::Debug",   "for_type": "RefVerifyResultsOutput" },
+
+    { "action": "reference", "trait_ref": "core::fmt::Debug",   "for_type": "RefVerifyError" },
+    { "action": "reference", "trait_ref": "core::fmt::Display", "for_type": "RefVerifyError" },
+    { "action": "reference", "trait_ref": "core::error::Error", "for_type": "RefVerifyError" }
   ]
 }

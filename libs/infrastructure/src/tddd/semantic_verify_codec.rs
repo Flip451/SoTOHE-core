@@ -19,7 +19,12 @@
 //!
 //! No filesystem I/O lives here. Callers handle `std::fs` and symlink guards.
 
+use domain::plan_ref::SpecElementId;
 use domain::tddd::layer_id::LayerId;
+use domain::tddd::semantic_verify::{
+    AdrDecisionRef, CatalogueEntryKey, CatalogueEntryRef, CatalogueSectionKey, SpecElementRef,
+    SpecSectionKind, VerifyOriginRef,
+};
 use domain::{
     CatalogueSpecVerifyCacheDocument, ContentHash, EvidenceCitation, SemanticVerdict,
     SemanticVerifyEntry, SpecAdrVerifyCacheDocument, ValidationError,
@@ -94,6 +99,63 @@ const SEMANTIC_VERIFY_CACHE_SCHEMA_VERSION: u32 = 1;
 // DTOs — private to this module
 // ---------------------------------------------------------------------------
 
+/// Wire format for [`SpecSectionKind`].
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case", deny_unknown_fields)]
+enum SpecSectionKindDto {
+    Goal,
+    InScope,
+    OutOfScope,
+    Constraint,
+    AcceptanceCriteria,
+}
+
+/// Wire format for [`CatalogueSectionKey`].
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case", deny_unknown_fields)]
+enum CatalogueSectionKeyDto {
+    Types,
+    Traits,
+    Functions,
+}
+
+/// Wire format for [`SpecElementRef`].
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct SpecElementRefDto {
+    section: SpecSectionKindDto,
+    element_id: String,
+    text_label: String,
+}
+
+/// Wire format for [`AdrDecisionRef`].
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct AdrDecisionRefDto {
+    file_path: String,
+    decision_id: String,
+}
+
+/// Wire format for [`CatalogueEntryRef`].
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct CatalogueEntryRefDto {
+    file_path: String,
+    section_key: CatalogueSectionKeyDto,
+    entry_key: String,
+}
+
+/// Wire format for [`VerifyOriginRef`].
+///
+/// Uses adjacently-tagged encoding: `{ "kind": "spec_element", "data": { ... } }`.
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(tag = "kind", content = "data", rename_all = "snake_case", deny_unknown_fields)]
+enum VerifyOriginRefDto {
+    SpecElement(SpecElementRefDto),
+    AdrDecision(AdrDecisionRefDto),
+    CatalogueEntry(CatalogueEntryRefDto),
+}
+
 /// Wire format for [`SemanticVerdict`].
 ///
 /// Uses internally-tagged `#[serde(tag = "kind")]` so JSON looks like:
@@ -129,7 +191,7 @@ enum SemanticVerdictDto {
 /// Wire format for a single [`SemanticVerifyEntry`].
 ///
 /// All fields are required; missing `claim_hash` / `evidence_hash` /
-/// `verdict` are decode errors.
+/// `verdict` / `claim_origin` / `evidence_origin` are decode errors.
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 struct SemanticVerifyEntryDto {
@@ -139,6 +201,10 @@ struct SemanticVerifyEntryDto {
     evidence_hash: String,
     /// Frozen verdict for this (claim, evidence) pair.
     verdict: SemanticVerdictDto,
+    /// Origin reference for the claim.
+    claim_origin: VerifyOriginRefDto,
+    /// Origin reference for the evidence.
+    evidence_origin: VerifyOriginRefDto,
 }
 
 /// Wire format for `spec-adr-verify-cache.json` (schema_version 1).
@@ -213,11 +279,102 @@ fn verdict_from_dto(dto: SemanticVerdictDto) -> Result<SemanticVerdict, Semantic
     }
 }
 
+fn section_kind_to_dto(kind: &SpecSectionKind) -> SpecSectionKindDto {
+    match kind {
+        SpecSectionKind::Goal => SpecSectionKindDto::Goal,
+        SpecSectionKind::InScope => SpecSectionKindDto::InScope,
+        SpecSectionKind::OutOfScope => SpecSectionKindDto::OutOfScope,
+        SpecSectionKind::Constraint => SpecSectionKindDto::Constraint,
+        SpecSectionKind::AcceptanceCriteria => SpecSectionKindDto::AcceptanceCriteria,
+    }
+}
+
+fn section_kind_from_dto(dto: SpecSectionKindDto) -> SpecSectionKind {
+    match dto {
+        SpecSectionKindDto::Goal => SpecSectionKind::Goal,
+        SpecSectionKindDto::InScope => SpecSectionKind::InScope,
+        SpecSectionKindDto::OutOfScope => SpecSectionKind::OutOfScope,
+        SpecSectionKindDto::Constraint => SpecSectionKind::Constraint,
+        SpecSectionKindDto::AcceptanceCriteria => SpecSectionKind::AcceptanceCriteria,
+    }
+}
+
+fn catalogue_section_key_to_dto(key: &CatalogueSectionKey) -> CatalogueSectionKeyDto {
+    match key {
+        CatalogueSectionKey::Types => CatalogueSectionKeyDto::Types,
+        CatalogueSectionKey::Traits => CatalogueSectionKeyDto::Traits,
+        CatalogueSectionKey::Functions => CatalogueSectionKeyDto::Functions,
+    }
+}
+
+fn catalogue_section_key_from_dto(dto: CatalogueSectionKeyDto) -> CatalogueSectionKey {
+    match dto {
+        CatalogueSectionKeyDto::Types => CatalogueSectionKey::Types,
+        CatalogueSectionKeyDto::Traits => CatalogueSectionKey::Traits,
+        CatalogueSectionKeyDto::Functions => CatalogueSectionKey::Functions,
+    }
+}
+
+fn origin_to_dto(origin: &VerifyOriginRef) -> VerifyOriginRefDto {
+    match origin {
+        VerifyOriginRef::SpecElement(r) => VerifyOriginRefDto::SpecElement(SpecElementRefDto {
+            section: section_kind_to_dto(&r.section),
+            element_id: r.element_id.as_ref().to_owned(),
+            text_label: r.text_label.clone(),
+        }),
+        VerifyOriginRef::AdrDecision(r) => VerifyOriginRefDto::AdrDecision(AdrDecisionRefDto {
+            file_path: r.file_path.clone(),
+            decision_id: r.decision_id.clone(),
+        }),
+        VerifyOriginRef::CatalogueEntry(r) => {
+            VerifyOriginRefDto::CatalogueEntry(CatalogueEntryRefDto {
+                file_path: r.file_path.clone(),
+                section_key: catalogue_section_key_to_dto(&r.section_key),
+                entry_key: r.entry_key.as_str().to_owned(),
+            })
+        }
+    }
+}
+
+fn origin_from_dto(dto: VerifyOriginRefDto) -> Result<VerifyOriginRef, SemanticVerifyCodecError> {
+    match dto {
+        VerifyOriginRefDto::SpecElement(r) => {
+            let element_id = SpecElementId::try_new(r.element_id).map_err(|e| {
+                SemanticVerifyCodecError::Validation {
+                    message: format!("invalid spec element id in origin: {e}"),
+                }
+            })?;
+            Ok(VerifyOriginRef::SpecElement(SpecElementRef::new(
+                section_kind_from_dto(r.section),
+                element_id,
+                r.text_label,
+            )))
+        }
+        VerifyOriginRefDto::AdrDecision(r) => {
+            Ok(VerifyOriginRef::AdrDecision(AdrDecisionRef::new(r.file_path, r.decision_id)))
+        }
+        VerifyOriginRefDto::CatalogueEntry(r) => {
+            let entry_key = CatalogueEntryKey::try_new(r.entry_key).map_err(|e| {
+                SemanticVerifyCodecError::Validation {
+                    message: format!("invalid catalogue entry key in origin: {e}"),
+                }
+            })?;
+            Ok(VerifyOriginRef::CatalogueEntry(CatalogueEntryRef::new(
+                r.file_path,
+                catalogue_section_key_from_dto(r.section_key),
+                entry_key,
+            )))
+        }
+    }
+}
+
 fn entry_to_dto(entry: &SemanticVerifyEntry) -> SemanticVerifyEntryDto {
     SemanticVerifyEntryDto {
         claim_hash: entry.claim_hash.to_hex(),
         evidence_hash: entry.evidence_hash.to_hex(),
         verdict: verdict_to_dto(&entry.verdict),
+        claim_origin: origin_to_dto(&entry.claim_origin),
+        evidence_origin: origin_to_dto(&entry.evidence_origin),
     }
 }
 
@@ -227,7 +384,9 @@ fn entry_from_dto(
     let claim_hash = ContentHash::try_from_hex(&dto.claim_hash)?;
     let evidence_hash = ContentHash::try_from_hex(&dto.evidence_hash)?;
     let verdict = verdict_from_dto(dto.verdict)?;
-    Ok(SemanticVerifyEntry::new(claim_hash, evidence_hash, verdict))
+    let claim_origin = origin_from_dto(dto.claim_origin)?;
+    let evidence_origin = origin_from_dto(dto.evidence_origin)?;
+    Ok(SemanticVerifyEntry::new(claim_hash, evidence_hash, verdict, claim_origin, evidence_origin))
 }
 
 // ---------------------------------------------------------------------------
@@ -356,11 +515,29 @@ mod tests {
         EvidenceCitation::try_new("The spec states X.".to_string()).unwrap()
     }
 
+    fn make_spec_element_origin() -> VerifyOriginRef {
+        use domain::plan_ref::SpecElementId;
+        VerifyOriginRef::SpecElement(SpecElementRef::new(
+            SpecSectionKind::Goal,
+            SpecElementId::try_new("GO-01".to_owned()).unwrap(),
+            "test spec element".to_owned(),
+        ))
+    }
+
+    fn make_adr_decision_origin() -> VerifyOriginRef {
+        VerifyOriginRef::AdrDecision(AdrDecisionRef::new(
+            "knowledge/adr/test.md".to_owned(),
+            "D1".to_owned(),
+        ))
+    }
+
     fn make_pass_entry(claim: u8, evidence: u8) -> SemanticVerifyEntry {
         SemanticVerifyEntry::new(
             make_hash(claim),
             make_hash(evidence),
             SemanticVerdict::Pass { citation: make_citation() },
+            make_spec_element_origin(),
+            make_adr_decision_origin(),
         )
     }
 
@@ -369,11 +546,19 @@ mod tests {
             make_hash(claim),
             make_hash(evidence),
             SemanticVerdict::Fail { reason: "mismatch".to_string() },
+            make_spec_element_origin(),
+            make_adr_decision_origin(),
         )
     }
 
     fn make_pending_entry(claim: u8, evidence: u8) -> SemanticVerifyEntry {
-        SemanticVerifyEntry::new(make_hash(claim), make_hash(evidence), SemanticVerdict::Pending)
+        SemanticVerifyEntry::new(
+            make_hash(claim),
+            make_hash(evidence),
+            SemanticVerdict::Pending,
+            make_spec_element_origin(),
+            make_adr_decision_origin(),
+        )
     }
 
     fn sample_spec_adr_doc() -> SpecAdrVerifyCacheDocument {
@@ -483,7 +668,9 @@ mod tests {
                 {{
                   "claim_hash": "{}",
                   "evidence_hash": "{}",
-                  "verdict": {{ "kind": "pending" }}
+                  "verdict": {{ "kind": "pending" }},
+                  "claim_origin": {{"kind": "spec_element", "data": {{"section": "goal", "element_id": "GO-01", "text_label": "t"}}}},
+                  "evidence_origin": {{"kind": "adr_decision", "data": {{"file_path": "a.md", "decision_id": "D1"}}}}
                 }}
               ]
             }}"#,
@@ -506,7 +693,9 @@ mod tests {
                 {{
                   "claim_hash": "{}",
                   "evidence_hash": "{}",
-                  "verdict": {{ "kind": "maybe" }}
+                  "verdict": {{ "kind": "maybe" }},
+                  "claim_origin": {{"kind": "spec_element", "data": {{"section": "goal", "element_id": "GO-01", "text_label": "t"}}}},
+                  "evidence_origin": {{"kind": "adr_decision", "data": {{"file_path": "a.md", "decision_id": "D1"}}}}
                 }}
               ]
             }}"#,
@@ -528,7 +717,9 @@ mod tests {
                 {{
                   "claim_hash": "{}",
                   "evidence_hash": "{}",
-                  "verdict": {{ "kind": "pass" }}
+                  "verdict": {{ "kind": "pass" }},
+                  "claim_origin": {{"kind": "spec_element", "data": {{"section": "goal", "element_id": "GO-01", "text_label": "t"}}}},
+                  "evidence_origin": {{"kind": "adr_decision", "data": {{"file_path": "a.md", "decision_id": "D1"}}}}
                 }}
               ]
             }}"#,
@@ -553,7 +744,9 @@ mod tests {
                 {{
                   "claim_hash": "{}",
                   "evidence_hash": "{}",
-                  "verdict": {{ "kind": "pass", "citation": "" }}
+                  "verdict": {{ "kind": "pass", "citation": "" }},
+                  "claim_origin": {{"kind": "spec_element", "data": {{"section": "goal", "element_id": "GO-01", "text_label": "t"}}}},
+                  "evidence_origin": {{"kind": "adr_decision", "data": {{"file_path": "a.md", "decision_id": "D1"}}}}
                 }}
               ]
             }}"#,
@@ -608,6 +801,8 @@ mod tests {
                   "claim_hash": "{}",
                   "evidence_hash": "{}",
                   "verdict": {{ "kind": "pending" }},
+                  "claim_origin": {{"kind": "spec_element", "data": {{"section": "goal", "element_id": "GO-01", "text_label": "t"}}}},
+                  "evidence_origin": {{"kind": "adr_decision", "data": {{"file_path": "a.md", "decision_id": "D1"}}}},
                   "extra": "not allowed"
                 }}
               ]
@@ -637,7 +832,9 @@ mod tests {
                 {{
                   "claim_hash": "not-hex",
                   "evidence_hash": "{}",
-                  "verdict": {{ "kind": "pending" }}
+                  "verdict": {{ "kind": "pending" }},
+                  "claim_origin": {{"kind": "spec_element", "data": {{"section": "goal", "element_id": "GO-01", "text_label": "t"}}}},
+                  "evidence_origin": {{"kind": "adr_decision", "data": {{"file_path": "a.md", "decision_id": "D1"}}}}
                 }}
               ]
             }}"#,
@@ -656,7 +853,9 @@ mod tests {
                 {{
                   "claim_hash": "{}",
                   "evidence_hash": "UPPERCASE",
-                  "verdict": {{ "kind": "pending" }}
+                  "verdict": {{ "kind": "pending" }},
+                  "claim_origin": {{"kind": "spec_element", "data": {{"section": "goal", "element_id": "GO-01", "text_label": "t"}}}},
+                  "evidence_origin": {{"kind": "adr_decision", "data": {{"file_path": "a.md", "decision_id": "D1"}}}}
                 }}
               ]
             }}"#,
@@ -696,5 +895,124 @@ mod tests {
         let json = r#"{"schema_version": 1, "entries": []}"#;
         let err = CatalogueSpecVerifyCacheDocumentCodec::decode(json).unwrap_err();
         assert!(matches!(err, SemanticVerifyCodecError::Json { .. }));
+    }
+
+    // ── VerifyOriginRef round-trip tests ─────────────────────────────────────
+
+    #[test]
+    fn origin_spec_element_roundtrip_through_codec() {
+        use domain::plan_ref::SpecElementId;
+        let origin = VerifyOriginRef::SpecElement(SpecElementRef::new(
+            SpecSectionKind::InScope,
+            SpecElementId::try_new("IN-07".to_owned()).unwrap(),
+            "some spec text".to_owned(),
+        ));
+        let adr_origin = make_adr_decision_origin();
+        let entry = SemanticVerifyEntry::new(
+            make_hash(0x10),
+            make_hash(0x11),
+            SemanticVerdict::Pending,
+            origin.clone(),
+            adr_origin,
+        );
+        let doc = SpecAdrVerifyCacheDocument::new(vec![entry]);
+        let json = SpecAdrVerifyCacheDocumentCodec::encode(&doc).unwrap();
+        let decoded = SpecAdrVerifyCacheDocumentCodec::decode(&json).unwrap();
+        assert_eq!(decoded.entries[0].claim_origin, origin);
+    }
+
+    #[test]
+    fn origin_adr_decision_roundtrip_through_codec() {
+        let origin = VerifyOriginRef::AdrDecision(AdrDecisionRef::new(
+            "knowledge/adr/some-decision.md".to_owned(),
+            "D3".to_owned(),
+        ));
+        let spec_origin = make_spec_element_origin();
+        let entry = SemanticVerifyEntry::new(
+            make_hash(0x12),
+            make_hash(0x13),
+            SemanticVerdict::Pending,
+            spec_origin,
+            origin.clone(),
+        );
+        let doc = SpecAdrVerifyCacheDocument::new(vec![entry]);
+        let json = SpecAdrVerifyCacheDocumentCodec::encode(&doc).unwrap();
+        let decoded = SpecAdrVerifyCacheDocumentCodec::decode(&json).unwrap();
+        assert_eq!(decoded.entries[0].evidence_origin, origin);
+    }
+
+    #[test]
+    fn origin_catalogue_entry_roundtrip_through_codec() {
+        let entry_key = CatalogueEntryKey::try_new("MyRepository".to_owned()).unwrap();
+        let origin = VerifyOriginRef::CatalogueEntry(CatalogueEntryRef::new(
+            "track/items/foo/domain-types.json".to_owned(),
+            CatalogueSectionKey::Traits,
+            entry_key,
+        ));
+        let spec_origin = make_spec_element_origin();
+        let entry = SemanticVerifyEntry::new(
+            make_hash(0x14),
+            make_hash(0x15),
+            SemanticVerdict::Pending,
+            origin.clone(),
+            spec_origin,
+        );
+        let layer = domain::tddd::layer_id::LayerId::try_new("domain".to_owned()).unwrap();
+        let doc = CatalogueSpecVerifyCacheDocument::new(layer, vec![entry]);
+        let json = CatalogueSpecVerifyCacheDocumentCodec::encode(&doc).unwrap();
+        let decoded = CatalogueSpecVerifyCacheDocumentCodec::decode(&json).unwrap();
+        assert_eq!(decoded.entries[0].claim_origin, origin);
+    }
+
+    // ── Fail-closed: missing origin fields ────────────────────────────────────
+
+    #[test]
+    fn decode_rejects_entry_missing_claim_origin() {
+        let json = format!(
+            r#"{{
+              "schema_version": 1,
+              "entries": [
+                {{
+                  "claim_hash": "{}",
+                  "evidence_hash": "{}",
+                  "verdict": {{ "kind": "pending" }}
+                }}
+              ]
+            }}"#,
+            hex_pattern(0x01),
+            hex_pattern(0x02)
+        );
+        let err = SpecAdrVerifyCacheDocumentCodec::decode(&json).unwrap_err();
+        assert!(
+            matches!(err, SemanticVerifyCodecError::Json { .. }),
+            "entry without claim_origin must be a JSON decode error, got: {err}"
+        );
+    }
+
+    #[test]
+    fn decode_rejects_entry_missing_evidence_origin() {
+        let json = format!(
+            r#"{{
+              "schema_version": 1,
+              "entries": [
+                {{
+                  "claim_hash": "{}",
+                  "evidence_hash": "{}",
+                  "verdict": {{ "kind": "pending" }},
+                  "claim_origin": {{
+                    "kind": "adr_decision",
+                    "data": {{ "file_path": "adr.md", "decision_id": "D1" }}
+                  }}
+                }}
+              ]
+            }}"#,
+            hex_pattern(0x01),
+            hex_pattern(0x02)
+        );
+        let err = SpecAdrVerifyCacheDocumentCodec::decode(&json).unwrap_err();
+        assert!(
+            matches!(err, SemanticVerifyCodecError::Json { .. }),
+            "entry without evidence_origin must be a JSON decode error, got: {err}"
+        );
     }
 }

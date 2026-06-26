@@ -1,11 +1,16 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "ee549738b86dc40269c271dcd0a7be6f9078026efd444245e20bc72ab8948da9",
+  "catalogue_declaration_hash": "4d6285eb6472214509466be51f1cb8e1bbc436cac2147e718fe267648c35de1d",
   "signals": [
     {
       "type_name": "RefVerifyChainFilter",
       "signal": "blue",
       "entry_hash": "7893699b6e00fb913915acfc7e4c9756b1b89aace6ea4f0dcf741a9101577113"
+    },
+    {
+      "type_name": "RefVerifyError",
+      "signal": "blue",
+      "entry_hash": "e602e9454949b4527c3cee7dacc87730c8d5c2dec05377a97ddceb92f207142d"
     },
     {
       "type_name": "RefVerifyLaneSummary",
