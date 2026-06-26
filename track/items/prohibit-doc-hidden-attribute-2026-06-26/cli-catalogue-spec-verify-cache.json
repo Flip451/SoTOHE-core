@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "layer": "cli",
+  "entries": [
+    {
+      "claim_hash": "df7e87bd0e909b559aad08550fdb698d5350becbae62cb5cc4678ad4f0b7f8db",
+      "evidence_hash": "4465ea04d2ff21432ebeb512e6cf7fbd34458eceed75af764a7c498f49e6bbfb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "新 `sotp verify doc-hidden` サブコマンドの追加と、`Makefile.toml` の `ci-local` dependencies への組み込み。`VerifyCommand` enum バリアント / dispatch / gate-name ラベル / `verify/mod.rs` への公開 / `verify-doc-hidden-local` Makefile タスク配線を含む。"
+      }
+    },
+    {
+      "claim_hash": "df7e87bd0e909b559aad08550fdb698d5350becbae62cb5cc4678ad4f0b7f8db",
+      "evidence_hash": "338c4834833a013c299e6bfc298dd9e90698aeca77121a2543d669bcd0fb8b14",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp verify doc-hidden` が `VerifyCommand` enum のバリアントとして登録されており、`#[doc(hidden)]` のないクリーンなソースに対して `[OK] All checks passed.` を出力して exit 0 を返す。"
+      }
+    },
+    {
+      "claim_hash": "df7e87bd0e909b559aad08550fdb698d5350becbae62cb5cc4678ad4f0b7f8db",
+      "evidence_hash": "1a693a97da3e79bf642eadc1e3dce8b869e6975b0b9757bec85ea2e0c08767e9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`verify-doc-hidden-local` タスクが `Makefile.toml` の `ci-local` dependencies 配列に含まれ、`cargo make ci` 実行時にゲートが自動的に走る。"
+      }
+    },
+    {
+      "claim_hash": "d91acab9b7502ed80f578ffc6226e337a564148f4b9fd5e0e473a24d96eaf7b3",
+      "evidence_hash": "4465ea04d2ff21432ebeb512e6cf7fbd34458eceed75af764a7c498f49e6bbfb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`VerifyCommand` enum バリアント / dispatch / gate-name ラベル / `verify/mod.rs` への公開 / `verify-doc-hidden-local` Makefile タスク配線を含む。"
+      }
+    }
+  ]
+}

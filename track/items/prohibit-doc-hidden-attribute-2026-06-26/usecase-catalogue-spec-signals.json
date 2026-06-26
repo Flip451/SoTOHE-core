@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "73d3a63dec8353d549203c3855f5014910937dd4f9320ecf4094cd45e9b9e642",
+  "signals": [
+    {
+      "type_name": "VerifyInteractor",
+      "signal": "blue",
+      "entry_hash": "ab490a6673f4d3441cdc51d8762c514dda56f77dea0dad245828c4cc74298229"
+    },
+    {
+      "type_name": "VerifyPort",
+      "signal": "blue",
+      "entry_hash": "17f84cf2364d0418e7841b1a7608ce0d533f078babb93f9071d2d91489b00f0b"
+    },
+    {
+      "type_name": "VerifyService",
+      "signal": "blue",
+      "entry_hash": "bc13f0987f25d8926af1dd5be8644b4b758ca5d6ae229a282e3585f1dc855b46"
+    }
+  ]
+}

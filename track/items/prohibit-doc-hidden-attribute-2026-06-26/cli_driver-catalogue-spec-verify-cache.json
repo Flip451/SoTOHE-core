@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "layer": "cli_driver",
+  "entries": [
+    {
+      "claim_hash": "026a6e9124dcb16acaead7db50a83887c69b52edfb9e117c7ba3059019d8e521",
+      "evidence_hash": "4465ea04d2ff21432ebeb512e6cf7fbd34458eceed75af764a7c498f49e6bbfb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "新 `sotp verify doc-hidden` サブコマンドの追加と、`Makefile.toml` の `ci-local` dependencies への組み込み。`VerifyCommand` enum バリアント / dispatch / gate-name ラベル / `verify/mod.rs` への公開 / `verify-doc-hidden-local` Makefile タスク配線を含む。"
+      }
+    },
+    {
+      "claim_hash": "026a6e9124dcb16acaead7db50a83887c69b52edfb9e117c7ba3059019d8e521",
+      "evidence_hash": "338c4834833a013c299e6bfc298dd9e90698aeca77121a2543d669bcd0fb8b14",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp verify doc-hidden` が `VerifyCommand` enum のバリアントとして登録されており、`#[doc(hidden)]` のないクリーンなソースに対して `[OK] All checks passed.` を出力して exit 0 を返す。"
+      }
+    }
+  ]
+}

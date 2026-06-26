@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "7d693b1aa6077b5944c7ab9b9794510d555513b478a8979bf22359346af7672c",
+  "signals": [
+    {
+      "type_name": "VerifyDriver",
+      "signal": "blue",
+      "entry_hash": "74d431a8a0dfac5caf3a8bdf4b0af7bbf14fc1ae9221a8c2de543e6c01e29e8a"
+    },
+    {
+      "type_name": "VerifyInput",
+      "signal": "blue",
+      "entry_hash": "026a6e9124dcb16acaead7db50a83887c69b52edfb9e117c7ba3059019d8e521"
+    }
+  ]
+}

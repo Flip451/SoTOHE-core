@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "61686a93d3aedf1d2bc4b66a9e4a144024b657980b1290cfb097e4071adb9302",
+  "signals": [
+    {
+      "type_name": "FsVerifyAdapter",
+      "signal": "blue",
+      "entry_hash": "521ed192b68d79a3fe27c5863d2363d4b353f0aebd4849525221d7ff3b79165e"
+    },
+    {
+      "type_name": "SynScanContext",
+      "signal": "blue",
+      "entry_hash": "c35740e8d4902c2eaef1aec0a0decc19a1762d8071994cc0d419158c077a5c4b"
+    },
+    {
+      "type_name": "infrastructure::verify::doc_hidden::verify",
+      "signal": "blue",
+      "entry_hash": "bb8a7ac3b1b970bcecd3776b587316511572b5820e0040e4040e6f016831556e"
+    },
+    {
+      "type_name": "infrastructure::verify::syn_scan::scan_workspace_rust_sources",
+      "signal": "blue",
+      "entry_hash": "ad091e3fd64b2ebf6000d26b2abb9d450b1e6f5b2354dbb078c03c26f1351f5e"
+    }
+  ]
+}

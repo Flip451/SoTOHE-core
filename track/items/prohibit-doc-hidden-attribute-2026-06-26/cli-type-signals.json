@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-06-26T10:16:51Z",
+  "declaration_hash": "ab61dd4d31ef6b128fbb2b389efe2e5bd006382e7c7814658bb64d4edb87a8ed",
+  "signals": [
+    {
+      "type_name": "VerifyCommand",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::verify_command_gate_name",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "VerifyArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

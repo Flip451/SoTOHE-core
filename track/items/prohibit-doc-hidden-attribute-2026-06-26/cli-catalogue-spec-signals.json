@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "ab61dd4d31ef6b128fbb2b389efe2e5bd006382e7c7814658bb64d4edb87a8ed",
+  "signals": [
+    {
+      "type_name": "VerifyArgs",
+      "signal": "blue",
+      "entry_hash": "5dd6a9902cbac517ba05f87b56e147fb5dfac3eb97e1a636705631c9102cd71e"
+    },
+    {
+      "type_name": "VerifyCommand",
+      "signal": "blue",
+      "entry_hash": "df7e87bd0e909b559aad08550fdb698d5350becbae62cb5cc4678ad4f0b7f8db"
+    },
+    {
+      "type_name": "cli::verify_command_gate_name",
+      "signal": "blue",
+      "entry_hash": "d91acab9b7502ed80f578ffc6226e337a564148f4b9fd5e0e473a24d96eaf7b3"
+    }
+  ]
+}

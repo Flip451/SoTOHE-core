@@ -38,6 +38,72 @@
           "findings": [],
           "hash": "rvw1:sha256:7fd9bca0fba2ca88fdef8245c2386f014eada43fd5631e21032a81f0b421295e",
           "at": "2026-06-26T08:43:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ae44f76029faa895f85b9169e6040e9b506e3c97a584c07fc0beb820eb04fb9b",
+          "at": "2026-06-26T09:45:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 is mapped to IN-04/AC-07, which require a reusable syn scanning helper with callback-swappable detection logic, but the implementation plan and infrastructure catalogue only define `doc_hidden::verify` and place file discovery, `syn::parse_file`, cfg-test filtering, and attribute detection inside that detector. That leaves no task/type contract for the common helper the spec requires, so the plan can satisfy the doc-hidden gate while missing the reusable scanning architecture.",
+              "severity": "P1",
+              "file": "track/items/prohibit-doc-hidden-attribute-2026-06-26/impl-plan.json",
+              "line": 6,
+              "category": "contradiction"
+            },
+            {
+              "message": "The infrastructure catalogue declares no trait implementation changes, but T002 explicitly requires adding `verify_doc_hidden` to `FsVerifyAdapter`'s `VerifyPort` implementation. This makes the type catalogue/contract map inconsistent with the hexagonal wiring plan and can leave the new `VerifyPort` method without a documented infrastructure adapter implementation.",
+              "severity": "P1",
+              "file": "track/items/prohibit-doc-hidden-attribute-2026-06-26/infrastructure-types.json",
+              "line": 31,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ae44f76029faa895f85b9169e6040e9b506e3c97a584c07fc0beb820eb04fb9b",
+          "at": "2026-06-26T09:51:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 narrows the scanner callback to crate-level attributes plus attributes on `Item` / impl-associated items, but the spec requires failing whenever any non-test source contains a `#[doc(hidden)]`-equivalent attribute. Attributes on other Rust AST nodes such as struct fields, enum variants, and trait associated items are still non-test source attributes and can affect rustdoc output, yet this traversal plan and its tests would not exercise them. As written, the gate can pass with prohibited `#[doc(hidden)]` declarations still present, so AC-02/AC-04 are not actually satisfied.",
+              "severity": "P1",
+              "file": "track/items/prohibit-doc-hidden-attribute-2026-06-26/impl-plan.json",
+              "line": 6,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:3f57bb8f88259c9e7c7e4518bf81cc843eb327fe0a8b2a607ce7e103fc5b4d90",
+          "at": "2026-06-26T10:03:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-01 explicitly includes adding the verify gate-name label, but T002 only plans the enum variant, dispatch arm, items_dir arm, and Makefile tasks. In this CLI, verify commands are also matched by a telemetry gate-name function, so following this plan as written leaves the new DocHidden variant without its required gate label and the wiring is incomplete. Add the gate-name label/update to T002 and the rendered plan/type artifacts so IN-01 is actually covered.",
+              "severity": "P1",
+              "file": "track/items/prohibit-doc-hidden-attribute-2026-06-26/impl-plan.json",
+              "line": 11,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:f0c64409d9788ebe7322900e564008bad0e08fc115230c0f20294ed30e300d88",
+          "at": "2026-06-26T10:09:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4e2ec70aa2668e1dcc4ab97b1817cf47e784d338e50b5cc3aefeefbd91f064c2",
+          "at": "2026-06-26T10:16:10Z"
         }
       ]
     }

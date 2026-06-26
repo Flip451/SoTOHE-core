@@ -1,0 +1,99 @@
+{
+  "schema_version": 5,
+  "crate_name": "cli",
+  "layer": "cli",
+  "types": {
+    "VerifyCommand": {
+      "action": "modify",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "TechStack",        "payload": { "kind": "tuple", "fields": ["VerifyArgs"] } },
+          { "name": "LatestTrack",      "payload": { "kind": "tuple", "fields": ["VerifyArgs"] } },
+          { "name": "ArchDocs",         "payload": { "kind": "tuple", "fields": ["VerifyArgs"] } },
+          { "name": "Layers",           "payload": { "kind": "tuple", "fields": ["VerifyArgs"] } },
+          { "name": "HooksPath",        "payload": { "kind": "tuple", "fields": ["VerifyArgs"] } },
+          { "name": "SpecAttribution",  "payload": { "kind": "tuple", "fields": ["SpecVerifyArgs"] } },
+          { "name": "SpecFrontmatter",  "payload": { "kind": "tuple", "fields": ["SpecVerifyArgs"] } },
+          { "name": "CanonicalModules", "payload": { "kind": "tuple", "fields": ["VerifyArgs"] } },
+          { "name": "ModuleSize",       "payload": { "kind": "tuple", "fields": ["VerifyArgs"] } },
+          { "name": "DomainPurity",     "payload": { "kind": "tuple", "fields": ["VerifyArgs"] } },
+          { "name": "DomainStrings",    "payload": { "kind": "tuple", "fields": ["VerifyArgs"] } },
+          { "name": "UsecasePurity",    "payload": { "kind": "tuple", "fields": ["VerifyArgs"] } },
+          { "name": "DocLinks",         "payload": { "kind": "tuple", "fields": ["VerifyArgs"] } },
+          { "name": "ViewFreshness",    "payload": { "kind": "tuple", "fields": ["VerifyArgs"] } },
+          { "name": "SpecSignals",      "payload": { "kind": "tuple", "fields": ["SpecVerifyArgs"] } },
+          { "name": "PlanArtifactRefs", "payload": { "kind": "tuple", "fields": ["PlanArtifactRefsArgs"] } },
+          { "name": "CatalogueSpecRefs","payload": { "kind": "tuple", "fields": ["CatalogueSpecRefsArgs"] } },
+          { "name": "DocHidden",        "payload": { "kind": "tuple", "fields": ["VerifyArgs"] } }
+        ]
+      },
+      "methods": [
+        {
+          "name": "items_dir",
+          "receiver": "&self",
+          "params": [],
+          "returns": "std::path::PathBuf",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "commands::verify",
+      "docs": "CLI subcommand enum for the verify command family. Extended in this track with the DocHidden(VerifyArgs) variant for the sotp verify doc-hidden subcommand (ADR 2026-06-26-0810 D2). items_dir() method gains a new DocHidden match arm but its signature is unchanged.",
+      "spec_refs": [
+        { "file": "track/items/prohibit-doc-hidden-attribute-2026-06-26/spec.json", "anchor": "IN-01" },
+        { "file": "track/items/prohibit-doc-hidden-attribute-2026-06-26/spec.json", "anchor": "AC-01" },
+        { "file": "track/items/prohibit-doc-hidden-attribute-2026-06-26/spec.json", "anchor": "AC-05" }
+      ],
+      "informal_grounds": []
+    },
+    "VerifyArgs": {
+      "action": "reference",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "commands::verify",
+      "docs": "Carried as reference: baseline-identical, no structural change in this track. Common arguments for project-root-based verify subcommands (private project_root: PathBuf field).",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {
+    "cli::verify_command_gate_name": {
+      "action": "modify",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "cmd", "ty": "&commands::verify::VerifyCommand" }
+      ],
+      "returns": "&'static str",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Telemetry gate-name helper for verify subcommands. Extended in this track with `VerifyCommand::DocHidden(_) => \"verify-doc-hidden\"` so `sotp verify doc-hidden` emits the required gate_name label.",
+      "spec_refs": [
+        { "file": "track/items/prohibit-doc-hidden-attribute-2026-06-26/spec.json", "anchor": "IN-01" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "inherent_impls": [],
+  "trait_impls": [
+    {
+      "action": "reference",
+      "trait_ref": "clap_builder::derive::FromArgMatches",
+      "for_type": "VerifyCommand"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "clap_builder::derive::Subcommand",
+      "for_type": "VerifyCommand"
+    }
+  ]
+}

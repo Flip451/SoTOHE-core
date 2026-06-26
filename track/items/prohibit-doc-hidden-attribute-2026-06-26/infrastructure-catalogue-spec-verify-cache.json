@@ -1,0 +1,174 @@
+{
+  "schema_version": 1,
+  "layer": "infrastructure",
+  "entries": [
+    {
+      "claim_hash": "791238fe34b8d3cf68d8600f0c5e8593dd42bd115f9e961b29030eda1a140b44",
+      "evidence_hash": "8c7e5fd26ae57e27ba58e538deae07f8cd8230b6989763b562a51c5c26b1e86d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "以下の全形式の `#[doc(hidden)]` 相当属性の syn AST 検出: 直接の outer `#[doc(hidden)]`、直接の inner `#![doc(hidden)]`、複合 doc 引数（順序不問）`#[doc(hidden, alias = \"x\")]` / `#[doc(alias = \"x\", hidden)]`、`cfg_attr` 包み outer `#[cfg_attr(pred, doc(hidden))]` / `#[cfg_attr(pred, doc(hidden, ...))]`、`cfg_attr` 包み inner `#![cfg_attr(pred, doc(hidden))]`。`#[doc = \"...\"]` name-value 形式は対象外とする。"
+      }
+    },
+    {
+      "claim_hash": "791238fe34b8d3cf68d8600f0c5e8593dd42bd115f9e961b29030eda1a140b44",
+      "evidence_hash": "91a1b9ca81f3c4b00de6ed2ed6d7501e4319acb63b3596aaeb1be4005fc61b62",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`#[cfg(test)]` または `#[test]` で gated された item のスキャン除外。既存 `syn_helpers.rs` の `has_cfg_test_attr` を流用し、テストコードは検出対象としない。"
+      }
+    },
+    {
+      "claim_hash": "791238fe34b8d3cf68d8600f0c5e8593dd42bd115f9e961b29030eda1a140b44",
+      "evidence_hash": "8e9316e0d5d294450a87233842f7700824a0a7cc787c8375e7039066f9e68d74",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/infrastructure/src/verify/` 配下に共通 syn 走査ヘルパ（`.rs` ファイル再帰発見 → `syn::parse_file` → `#[cfg(test)]` / `#[test]` 除外 → コールバック visitor による判定）を新設する。既存 `syn_helpers.rs` の `has_cfg_test_attr` を再利用し、判定ロジックはコールバックで受ける設計とする。"
+      }
+    },
+    {
+      "claim_hash": "791238fe34b8d3cf68d8600f0c5e8593dd42bd115f9e961b29030eda1a140b44",
+      "evidence_hash": "c7153e959bd047fd76ca31b62cfe0c1925ae03a0925bcd33ca63f0ab4994288c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ゲートの有効化スコープを `architecture-rules.json` の `layers[]` から実行時に取得する。per-layer フラグや特定 crate パスのハードコードは持たず、`layers[]` に新 crate が追加されれば自動的に対象に含まれる。"
+      }
+    },
+    {
+      "claim_hash": "791238fe34b8d3cf68d8600f0c5e8593dd42bd115f9e961b29030eda1a140b44",
+      "evidence_hash": "2de1183a0b9f4e99a82c3868afa95b52e140441a98c67fb01b3947b6ad0d95b7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`layers[]` のいずれかの crate の非テストソースに `#[doc(hidden)]` 相当の属性が存在する場合、ゲートが exit non-zero を返し、`#[doc(hidden)]` 属性の存在をファイルパス・行情報とともに示す finding を出力する。"
+      }
+    },
+    {
+      "claim_hash": "791238fe34b8d3cf68d8600f0c5e8593dd42bd115f9e961b29030eda1a140b44",
+      "evidence_hash": "1a2f3a5ab1624db3a47970a7b68f3bbc17eb5936a6b3444c10f0a57a58b2afc2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "具体的には、ファイル再帰発見・`syn::parse_file`・cfg(test) 除外を共通基盤とし、判定ロジックのみをコールバックで差し替えられること。"
+      }
+    },
+    {
+      "claim_hash": "521ed192b68d79a3fe27c5863d2363d4b353f0aebd4849525221d7ff3b79165e",
+      "evidence_hash": "4465ea04d2ff21432ebeb512e6cf7fbd34458eceed75af764a7c498f49e6bbfb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "新 `sotp verify doc-hidden` サブコマンドの追加と、`Makefile.toml` の `ci-local` dependencies への組み込み。`VerifyCommand` enum バリアント / dispatch / gate-name ラベル / `verify/mod.rs` への公開 / `verify-doc-hidden-local` Makefile タスク配線を含む。"
+      }
+    },
+    {
+      "claim_hash": "521ed192b68d79a3fe27c5863d2363d4b353f0aebd4849525221d7ff3b79165e",
+      "evidence_hash": "338c4834833a013c299e6bfc298dd9e90698aeca77121a2543d669bcd0fb8b14",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp verify doc-hidden` が `VerifyCommand` enum のバリアントとして登録されており、`#[doc(hidden)]` のないクリーンなソースに対して `[OK] All checks passed.` を出力して exit 0 を返す。"
+      }
+    },
+    {
+      "claim_hash": "c35740e8d4902c2eaef1aec0a0decc19a1762d8071994cc0d419158c077a5c4b",
+      "evidence_hash": "8e9316e0d5d294450a87233842f7700824a0a7cc787c8375e7039066f9e68d74",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/infrastructure/src/verify/` 配下に共通 syn 走査ヘルパ（`.rs` ファイル再帰発見 → `syn::parse_file` → `#[cfg(test)]` / `#[test]` 除外 → コールバック visitor による判定）を新設する。既存 `syn_helpers.rs` の `has_cfg_test_attr` を再利用し、判定ロジックはコールバックで受ける設計とする。後続の syn ベース lint（例: `Result<_, String>` 禁止）でも再利用できる粒度とする。"
+      }
+    },
+    {
+      "claim_hash": "c35740e8d4902c2eaef1aec0a0decc19a1762d8071994cc0d419158c077a5c4b",
+      "evidence_hash": "1a2f3a5ab1624db3a47970a7b68f3bbc17eb5936a6b3444c10f0a57a58b2afc2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "後続の syn ベース lint（例: `Result<_, String>` 禁止）から再利用できる設計になっている。具体的には、ファイル再帰発見・`syn::parse_file`・cfg(test) 除外を共通基盤とし、判定ロジックのみをコールバックで差し替えられること。"
+      }
+    },
+    {
+      "claim_hash": "bb8a7ac3b1b970bcecd3776b587316511572b5820e0040e4040e6f016831556e",
+      "evidence_hash": "8c7e5fd26ae57e27ba58e538deae07f8cd8230b6989763b562a51c5c26b1e86d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "以下の全形式の `#[doc(hidden)]` 相当属性の syn AST 検出: 直接の outer `#[doc(hidden)]`、直接の inner `#![doc(hidden)]`、複合 doc 引数（順序不問）`#[doc(hidden, alias = \"x\")]` / `#[doc(alias = \"x\", hidden)]`、`cfg_attr` 包み outer `#[cfg_attr(pred, doc(hidden))]` / `#[cfg_attr(pred, doc(hidden, ...))]`、`cfg_attr` 包み inner `#![cfg_attr(pred, doc(hidden))]`。"
+      }
+    },
+    {
+      "claim_hash": "bb8a7ac3b1b970bcecd3776b587316511572b5820e0040e4040e6f016831556e",
+      "evidence_hash": "91a1b9ca81f3c4b00de6ed2ed6d7501e4319acb63b3596aaeb1be4005fc61b62",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`#[cfg(test)]` または `#[test]` で gated された item のスキャン除外。既存 `syn_helpers.rs` の `has_cfg_test_attr` を流用し、テストコードは検出対象としない。"
+      }
+    },
+    {
+      "claim_hash": "bb8a7ac3b1b970bcecd3776b587316511572b5820e0040e4040e6f016831556e",
+      "evidence_hash": "8e9316e0d5d294450a87233842f7700824a0a7cc787c8375e7039066f9e68d74",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/infrastructure/src/verify/` 配下に共通 syn 走査ヘルパ（`.rs` ファイル再帰発見 → `syn::parse_file` → `#[cfg(test)]` / `#[test]` 除外 → コールバック visitor による判定）を新設する。既存 `syn_helpers.rs` の `has_cfg_test_attr` を再利用し、判定ロジックはコールバックで受ける設計とする。"
+      }
+    },
+    {
+      "claim_hash": "bb8a7ac3b1b970bcecd3776b587316511572b5820e0040e4040e6f016831556e",
+      "evidence_hash": "2de1183a0b9f4e99a82c3868afa95b52e140441a98c67fb01b3947b6ad0d95b7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`layers[]` のいずれかの crate の非テストソースに `#[doc(hidden)]` 相当の属性が存在する場合、ゲートが exit non-zero を返し、`#[doc(hidden)]` 属性の存在をファイルパス・行情報とともに示す finding を出力する。"
+      }
+    },
+    {
+      "claim_hash": "bb8a7ac3b1b970bcecd3776b587316511572b5820e0040e4040e6f016831556e",
+      "evidence_hash": "1a2f3a5ab1624db3a47970a7b68f3bbc17eb5936a6b3444c10f0a57a58b2afc2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "具体的には、ファイル再帰発見・`syn::parse_file`・cfg(test) 除外を共通基盤とし、判定ロジックのみをコールバックで差し替えられること。"
+      }
+    },
+    {
+      "claim_hash": "ad091e3fd64b2ebf6000d26b2abb9d450b1e6f5b2354dbb078c03c26f1351f5e",
+      "evidence_hash": "91a1b9ca81f3c4b00de6ed2ed6d7501e4319acb63b3596aaeb1be4005fc61b62",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`#[cfg(test)]` または `#[test]` で gated された item のスキャン除外。既存 `syn_helpers.rs` の `has_cfg_test_attr` を流用し、テストコードは検出対象としない。"
+      }
+    },
+    {
+      "claim_hash": "ad091e3fd64b2ebf6000d26b2abb9d450b1e6f5b2354dbb078c03c26f1351f5e",
+      "evidence_hash": "8e9316e0d5d294450a87233842f7700824a0a7cc787c8375e7039066f9e68d74",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/infrastructure/src/verify/` 配下に共通 syn 走査ヘルパ（`.rs` ファイル再帰発見 → `syn::parse_file` → `#[cfg(test)]` / `#[test]` 除外 → コールバック visitor による判定）を新設する。既存 `syn_helpers.rs` の `has_cfg_test_attr` を再利用し、判定ロジックはコールバックで受ける設計とする。後続の syn ベース lint（例: `Result<_, String>` 禁止）でも再利用できる粒度とする。"
+      }
+    },
+    {
+      "claim_hash": "ad091e3fd64b2ebf6000d26b2abb9d450b1e6f5b2354dbb078c03c26f1351f5e",
+      "evidence_hash": "c7153e959bd047fd76ca31b62cfe0c1925ae03a0925bcd33ca63f0ab4994288c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ゲートの有効化スコープを `architecture-rules.json` の `layers[]` から実行時に取得する。per-layer フラグや特定 crate パスのハードコードは持たず、`layers[]` に新 crate が追加されれば自動的に対象に含まれる。"
+      }
+    },
+    {
+      "claim_hash": "ad091e3fd64b2ebf6000d26b2abb9d450b1e6f5b2354dbb078c03c26f1351f5e",
+      "evidence_hash": "7a73219927a448186337a6ce09b8533554b59dbef683cfe977380b1e243c3495",
+      "verdict": {
+        "kind": "pass",
+        "citation": "検出ロジックは syn AST 走査で実装する。行ベースの raw text regex は使わない。syn パースにより comment / 文字列リテラル / トークン境界を正確に扱い、複数行属性や `cfg_attr` 絡みの偽陽性・偽陰性を構造的に排除する。"
+      }
+    },
+    {
+      "claim_hash": "ad091e3fd64b2ebf6000d26b2abb9d450b1e6f5b2354dbb078c03c26f1351f5e",
+      "evidence_hash": "1a2f3a5ab1624db3a47970a7b68f3bbc17eb5936a6b3444c10f0a57a58b2afc2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ファイル再帰発見・`syn::parse_file`・cfg(test) 除外を共通基盤とし、判定ロジックのみをコールバックで差し替えられること。"
+      }
+    },
+    {
+      "claim_hash": "bb8a7ac3b1b970bcecd3776b587316511572b5820e0040e4040e6f016831556e",
+      "evidence_hash": "c7153e959bd047fd76ca31b62cfe0c1925ae03a0925bcd33ca63f0ab4994288c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ゲートの有効化スコープを `architecture-rules.json` の `layers[]` から実行時に取得する。"
+      }
+    }
+  ]
+}
