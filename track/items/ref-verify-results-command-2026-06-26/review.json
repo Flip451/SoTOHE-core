@@ -1,6 +1,189 @@
 {
   "schema_version": 2,
   "scopes": {
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 0b still says the per-scope ceiling is a \"hard upper bound at split time\". That preserves the old hard-cap semantics and conflicts with the new advisory behavior in Rule 3, where over-ceiling singleton batches are explicitly allowed to proceed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/full-cycle.md",
+              "line": 87,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:5093e40888ea5c5fa5bf7c16aa5ca9f038e0bb9725d55ee3d0343e012688c872",
+          "at": "2026-06-26T05:51:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:20deb4cc45e56320b3f1f40682d880a61cf173a5bfb134cbd31a95474358bdfb",
+          "at": "2026-06-26T05:53:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 1b now defines ceiling overflow as advisory and says to log and continue, but the DFP `completed` branch still gates Review on the batch fitting the ceiling. An over-ceiling singleton that Rule 3 explicitly permits will pass Step 1b, then be blocked here before Review, so the command still behaves like a hard cap.",
+              "severity": "P1",
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 169,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "The Review/DFP fixpoint still requires `actual diff stays within ceiling` as a precondition for Commit. That contradicts the new advisory overflow behavior in Step 1b and makes any legitimate over-ceiling atomic batch impossible to finish after review fixes, reintroducing the hard-cap semantics the change is meant to remove.",
+              "severity": "P1",
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 190,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:20deb4cc45e56320b3f1f40682d880a61cf173a5bfb134cbd31a95474358bdfb",
+          "at": "2026-06-26T06:12:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:01124d701f57f1c269540ad0cddcac31504429cb2f3bf38cdbf042f33e98a6c0",
+          "at": "2026-06-26T06:15:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a53dd1eb1bae5c3bc794c857c166239e140be50b3c5b49c7d45f82d63fcc0ab",
+          "at": "2026-06-26T07:52:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a53dd1eb1bae5c3bc794c857c166239e140be50b3c5b49c7d45f82d63fcc0ab",
+          "at": "2026-06-26T07:55:16Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:02613a3a89fea445d75ae9c64e5c67afe7812003b24a7915e02978d23916742d",
+          "at": "2026-06-26T05:52:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:02613a3a89fea445d75ae9c64e5c67afe7812003b24a7915e02978d23916742d",
+          "at": "2026-06-26T05:56:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9eebd493ef8295cc4250f8227ec63d9fb465e34f06d6c7e3c49e60d9076d3084",
+          "at": "2026-06-26T07:48:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9eebd493ef8295cc4250f8227ec63d9fb465e34f06d6c7e3c49e60d9076d3084",
+          "at": "2026-06-26T07:51:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0faf6dcffce55fcf9c8d2dbe2d883115eefc05f037c7fd671e3294d5c0186dc8",
+          "at": "2026-06-26T12:14:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0faf6dcffce55fcf9c8d2dbe2d883115eefc05f037c7fd671e3294d5c0186dc8",
+          "at": "2026-06-26T12:17:18Z"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c0699d1af1ddf7a1267fc9edf59cab97b28ca06132625d51a2abcc1103cb60fc",
+          "at": "2026-06-26T07:55:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c0699d1af1ddf7a1267fc9edf59cab97b28ca06132625d51a2abcc1103cb60fc",
+          "at": "2026-06-26T07:57:30Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e4378b99ef188edf534cc44dcf7370191de70db814863d31a94ea5e3e5034f38",
+          "at": "2026-06-26T05:50:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e4378b99ef188edf534cc44dcf7370191de70db814863d31a94ea5e3e5034f38",
+          "at": "2026-06-26T05:53:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:94da838097d36ee152e41bcbee1a102243b422f8a160707868e38fc88ec62337",
+          "at": "2026-06-26T07:52:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:94da838097d36ee152e41bcbee1a102243b422f8a160707868e38fc88ec62337",
+          "at": "2026-06-26T07:55:43Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f7114518cfa2b99cb943299aaba4be42d9a51d89ca3fd8ee4773086596ba4897",
+          "at": "2026-06-26T05:51:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f7114518cfa2b99cb943299aaba4be42d9a51d89ca3fd8ee4773086596ba4897",
+          "at": "2026-06-26T05:53:47Z"
+        }
+      ]
+    },
     "infrastructure": {
       "rounds": [
         {
@@ -117,93 +300,57 @@
           "findings": [],
           "hash": "rvw1:sha256:e188af4840bd249f526a0e02c1cde98a0d6a27242a83029b34425c20818c621b",
           "at": "2026-06-26T12:52:44Z"
-        }
-      ]
-    },
-    "cli_driver": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c0699d1af1ddf7a1267fc9edf59cab97b28ca06132625d51a2abcc1103cb60fc",
-          "at": "2026-06-26T07:55:07Z"
         },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c0699d1af1ddf7a1267fc9edf59cab97b28ca06132625d51a2abcc1103cb60fc",
-          "at": "2026-06-26T07:57:30Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "Step 0b still says the per-scope ceiling is a \"hard upper bound at split time\". That preserves the old hard-cap semantics and conflicts with the new advisory behavior in Rule 3, where over-ceiling singleton batches are explicitly allowed to proceed.",
+              "message": "Calling `load_results_tddd_bindings` here makes `results --chain All` require `architecture-rules.json` even in the documented pre-TDDD / pre-architecture-rules state where Chain2 should contribute zero pairs. The existing scope resolver and Chain2 pair source treat a missing rules file as \"no TDDD layers declared\"; this branch now returns an error instead of Chain1-only results.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/full-cycle.md",
-              "line": 87,
-              "category": "convention contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:5093e40888ea5c5fa5bf7c16aa5ca9f038e0bb9725d55ee3d0343e012688c872",
-          "at": "2026-06-26T05:51:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:20deb4cc45e56320b3f1f40682d880a61cf173a5bfb134cbd31a95474358bdfb",
-          "at": "2026-06-26T05:53:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 1b now defines ceiling overflow as advisory and says to log and continue, but the DFP `completed` branch still gates Review on the batch fitting the ceiling. An over-ceiling singleton that Rule 3 explicitly permits will pass Step 1b, then be blocked here before Review, so the command still behaves like a hard cap.",
-              "severity": "P1",
-              "file": ".claude/commands/track/full-cycle.md",
-              "line": 169,
-              "category": "command wiring breakage"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/driver_adapter.rs",
+              "line": 411,
+              "category": "non-fail-closed config"
             },
             {
-              "message": "The Review/DFP fixpoint still requires `actual diff stays within ceiling` as a precondition for Commit. That contradicts the new advisory overflow behavior in Step 1b and makes any legitimate over-ceiling atomic batch impossible to finish after review fixes, reintroducing the hard-cap semantics the change is meant to remove.",
+              "message": "The `All` branch uses `filter_map(...).ok()` when building `target_ids`, so any `architecture-rules.json` layer id that is accepted by `parse_tddd_layers` but rejected by `LayerId::try_new` is silently skipped instead of failing closed. The previous `enumerate_chain2_all_layers` path surfaced this as a `Wiring` error, so `results --chain All` can now under-report an entire layer without any signal.",
               "severity": "P1",
-              "file": ".claude/commands/track/full-cycle.md",
-              "line": 190,
-              "category": "command wiring breakage"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/driver_adapter.rs",
+              "line": 430,
+              "category": "non-fail-closed config"
             }
           ],
-          "hash": "rvw1:sha256:20deb4cc45e56320b3f1f40682d880a61cf173a5bfb134cbd31a95474358bdfb",
-          "at": "2026-06-26T06:12:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:01124d701f57f1c269540ad0cddcac31504429cb2f3bf38cdbf042f33e98a6c0",
-          "at": "2026-06-26T06:15:45Z"
+          "hash": "rvw1:sha256:c49c0f89788b087045905a03c23d59e5afa37ba2e2e7556d476cae2c2e30db34",
+          "at": "2026-06-26T13:28:49Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:6a53dd1eb1bae5c3bc794c857c166239e140be50b3c5b49c7d45f82d63fcc0ab",
-          "at": "2026-06-26T07:52:24Z"
+          "hash": "rvw1:sha256:d985a3feaeca121d8a8ff80906d3b264dd69f25ec88c250658cb0130bc8b1fc2",
+          "at": "2026-06-26T13:37:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`load_results_tddd_bindings` now converts a missing `architecture-rules.json` into `Ok(Vec::new())`, so a Chain2 results request with `--layer all` can silently report zero Chain2 lanes instead of failing closed when the layer binding config is absent. This overrides the underlying `load_tddd_layers` contract, which treats the missing rules file as a hard configuration error because catalogue bindings cannot be determined without it. Please propagate the `NotFound` as `RefVerifyDriverError::Wiring` for Chain2 paths instead of defaulting to an empty binding set.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/ref_verify/driver_adapter_results.rs",
+              "line": 22,
+              "category": "non-fail-closed config"
+            }
+          ],
+          "hash": "rvw1:sha256:d985a3feaeca121d8a8ff80906d3b264dd69f25ec88c250658cb0130bc8b1fc2",
+          "at": "2026-06-26T13:40:36Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:6a53dd1eb1bae5c3bc794c857c166239e140be50b3c5b49c7d45f82d63fcc0ab",
-          "at": "2026-06-26T07:55:16Z"
+          "hash": "rvw1:sha256:736526b32ea6f553556a3fa6702db4b8238b1805a4603d038b7628b666a55279",
+          "at": "2026-06-26T13:44:22Z"
         }
       ]
     },
@@ -576,38 +723,6 @@
         }
       ]
     },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e4378b99ef188edf534cc44dcf7370191de70db814863d31a94ea5e3e5034f38",
-          "at": "2026-06-26T05:50:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e4378b99ef188edf534cc44dcf7370191de70db814863d31a94ea5e3e5034f38",
-          "at": "2026-06-26T05:53:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:94da838097d36ee152e41bcbee1a102243b422f8a160707868e38fc88ec62337",
-          "at": "2026-06-26T07:52:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:94da838097d36ee152e41bcbee1a102243b422f8a160707868e38fc88ec62337",
-          "at": "2026-06-26T07:55:43Z"
-        }
-      ]
-    },
     "cli": {
       "rounds": [
         {
@@ -638,70 +753,6 @@
           "findings": [],
           "hash": "rvw1:sha256:0f3cb10ac67f6ab84e3dfa1ff98c2ac21e4697b79e51f0caffc3a11577f45ffc",
           "at": "2026-06-26T08:07:51Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f7114518cfa2b99cb943299aaba4be42d9a51d89ca3fd8ee4773086596ba4897",
-          "at": "2026-06-26T05:51:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f7114518cfa2b99cb943299aaba4be42d9a51d89ca3fd8ee4773086596ba4897",
-          "at": "2026-06-26T05:53:47Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:02613a3a89fea445d75ae9c64e5c67afe7812003b24a7915e02978d23916742d",
-          "at": "2026-06-26T05:52:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:02613a3a89fea445d75ae9c64e5c67afe7812003b24a7915e02978d23916742d",
-          "at": "2026-06-26T05:56:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9eebd493ef8295cc4250f8227ec63d9fb465e34f06d6c7e3c49e60d9076d3084",
-          "at": "2026-06-26T07:48:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9eebd493ef8295cc4250f8227ec63d9fb465e34f06d6c7e3c49e60d9076d3084",
-          "at": "2026-06-26T07:51:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0faf6dcffce55fcf9c8d2dbe2d883115eefc05f037c7fd671e3294d5c0186dc8",
-          "at": "2026-06-26T12:14:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0faf6dcffce55fcf9c8d2dbe2d883115eefc05f037c7fd671e3294d5c0186dc8",
-          "at": "2026-06-26T12:17:18Z"
         }
       ]
     }

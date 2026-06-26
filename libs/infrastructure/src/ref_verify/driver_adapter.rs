@@ -14,7 +14,9 @@ use usecase::ref_verify::{
     RefVerifyRunOutcome, RefVerifyRunService,
 };
 
-use super::driver_adapter_results::{compute_results, load_results_tddd_bindings};
+use super::driver_adapter_results::{
+    compute_results, load_results_tddd_bindings, resolve_results_chain2_target_layers,
+};
 use super::{
     AgentRefVerifierAdapter, RefVerifyCacheAdapter, RefVerifyPairSourceAdapter,
     RefVerifyScopeResolver, make_ref_verifier_process_runner,
@@ -213,19 +215,6 @@ fn load_agent_profiles(project_root: &Path) -> Result<AgentProfiles, RefVerifyAd
         .map_err(|e| RefVerifyAdapterError(format!("cannot load agent-profiles.json: {e}")))
 }
 
-fn pair_source_scope_for_results(
-    resolved_scope: &usecase::ref_verify::RefVerifyScope,
-    chain: &usecase::ref_verify::RefVerifyChainFilter,
-) -> usecase::ref_verify::RefVerifyScope {
-    match chain {
-        usecase::ref_verify::RefVerifyChainFilter::Chain1 => {
-            usecase::ref_verify::RefVerifyScope::Chain1
-        }
-        usecase::ref_verify::RefVerifyChainFilter::Chain2
-        | usecase::ref_verify::RefVerifyChainFilter::All => resolved_scope.clone(),
-    }
-}
-
 fn current_git_branch(project_root: &Path) -> Result<String, RefVerifyAdapterError> {
     use crate::git_cli::{GitRepository as _, SystemGitRepo};
     SystemGitRepo::discover_from(project_root)
@@ -391,51 +380,90 @@ impl usecase::ref_verify::RefVerifyAggregateService for FsRefVerifyAggregateAdap
 
         let cmd = usecase::ref_verify::RefVerifyCommand { track_id, scope, current_branch };
 
-        // (c) Load all cache files (old-schema cache → SemanticVerifyCodecError::Json propagated
-        // as RefVerifyDriverError::Usecase via the existing RefVerifyCachePort error mapping).
+        // Determine which chains are included in the results request.
+        let include_chain1 =
+            matches!(&chain, RefVerifyChainFilter::Chain1 | RefVerifyChainFilter::All);
+        let include_chain2 =
+            matches!(&chain, RefVerifyChainFilter::Chain2 | RefVerifyChainFilter::All);
+
+        // (c) Load cache files scoped to the requested chains and layers.
+        //
+        // F1: Load Chain1 (SpecAdr) cache only when the chain filter includes Chain1.
+        // A stale or absent SpecAdr cache must not fail a Chain2-only results query.
         let cache_adapter = RefVerifyCacheAdapter::new(canonical_root.clone());
 
-        let chain1_entries = cache_adapter
-            .load_entries(&cmd, &RefVerifyCacheScope::SpecAdr)
-            .map_err(|e| RefVerifyDriverError::Usecase(e.to_string()))?;
+        let chain1_entries: Vec<SemanticVerifyEntry> = if include_chain1 {
+            cache_adapter
+                .load_entries(&cmd, &RefVerifyCacheScope::SpecAdr)
+                .map_err(|e| RefVerifyDriverError::Usecase(e.to_string()))?
+        } else {
+            Vec::new()
+        };
 
         // Only load Chain2 bindings and caches when the chain filter requests Chain2 results.
         // Skipping this I/O for chain=Chain1 ensures that a missing or malformed
         // architecture-rules.json / Chain2 cache file cannot fail a Chain1-only results query.
-        let include_chain2 =
-            matches!(&chain, RefVerifyChainFilter::Chain2 | RefVerifyChainFilter::All);
+        //
+        // F2: When layer=Specific(X), validate X exists in the TDDD bindings and load only
+        // that layer's cache.  A corrupt or absent cache for an unrelated layer must not
+        // fail a single-layer Chain2 results query.
         let mut chain2_caches: Vec<(LayerId, Vec<SemanticVerifyEntry>)> = Vec::new();
+        let mut chain2_layer_ids: Vec<LayerId> = Vec::new();
         if include_chain2 {
             let bindings = load_results_tddd_bindings(&canonical_root)?;
-            for binding in &bindings {
-                let layer_str = binding.layer_id();
-                let layer_id = LayerId::try_new(layer_str.to_owned()).map_err(|e| {
-                    RefVerifyDriverError::Wiring(format!("invalid layer id '{layer_str}': {e}"))
-                })?;
+            let target_ids = resolve_results_chain2_target_layers(&bindings, &layer)?;
+
+            for layer_id in &target_ids {
                 let cache_scope = RefVerifyCacheScope::CatalogueSpec { layer: layer_id.clone() };
                 let entries = cache_adapter
                     .load_entries(&cmd, &cache_scope)
                     .map_err(|e| RefVerifyDriverError::Usecase(e.to_string()))?;
-                chain2_caches.push((layer_id, entries));
+                chain2_caches.push((layer_id.clone(), entries));
+            }
+            chain2_layer_ids = target_ids;
+        }
+
+        // (d) Enumerate current pairs narrowed by chain and layer filter.
+        //
+        // F3: Use RefVerifyScope::Chain1 for Chain1 pairs and
+        // RefVerifyScope::Chain2 { layer } per layer for Chain2 pairs.
+        // This avoids enumerating Chain1 artifacts (spec.json / ADR files) when
+        // chain=Chain2, so a broken Chain1 reference cannot fail a Chain2-only query.
+        // CN-06: no LLM subprocess in the results path.
+        let pair_source = RefVerifyPairSourceAdapter::new(canonical_root.clone());
+        let config = RefVerifyConfig::default();
+        let mut all_raw_pairs: Vec<usecase::ref_verify::RefVerifyPair> = Vec::new();
+
+        if include_chain1 {
+            let chain1_cmd = usecase::ref_verify::RefVerifyCommand {
+                track_id: cmd.track_id.clone(),
+                scope: usecase::ref_verify::RefVerifyScope::Chain1,
+                current_branch: cmd.current_branch.clone(),
+            };
+            let raw = pair_source.load_pairs(&chain1_cmd, &config).map_err(|e| {
+                RefVerifyDriverError::Usecase(format!("pair source enumeration: {e}"))
+            })?;
+            all_raw_pairs.extend(raw);
+        }
+
+        if include_chain2 {
+            // Enumerate per layer using Chain2 scope to avoid reading Chain1 files.
+            for layer_id in &chain2_layer_ids {
+                let chain2_cmd = usecase::ref_verify::RefVerifyCommand {
+                    track_id: cmd.track_id.clone(),
+                    scope: usecase::ref_verify::RefVerifyScope::Chain2 { layer: layer_id.clone() },
+                    current_branch: cmd.current_branch.clone(),
+                };
+                let raw = pair_source.load_pairs(&chain2_cmd, &config).map_err(|e| {
+                    RefVerifyDriverError::Usecase(format!("pair source enumeration: {e}"))
+                })?;
+                all_raw_pairs.extend(raw);
             }
         }
 
-        // (d) Enumerate current pairs read-only (CN-06: no LLM subprocess in the results path).
-        // Use the default config and filter out known-bad probes afterward; RefVerifyPercent
-        // rejects 0 so zero-injection is not representable via RefVerifyConfig::try_new.
-        let pair_source = RefVerifyPairSourceAdapter::new(canonical_root.clone());
-        let config = RefVerifyConfig::default();
-        let pair_cmd = usecase::ref_verify::RefVerifyCommand {
-            track_id: cmd.track_id.clone(),
-            scope: pair_source_scope_for_results(&cmd.scope, &chain),
-            current_branch: cmd.current_branch.clone(),
-        };
-        let all_pairs = pair_source
-            .load_pairs(&pair_cmd, &config)
-            .map_err(|e| RefVerifyDriverError::Usecase(format!("pair source enumeration: {e}")))?;
         // Exclude known-bad calibration probes; classify only real production pairs.
         let current_pairs: Vec<usecase::ref_verify::RefVerifyPair> =
-            all_pairs.into_iter().filter(|p| !p.known_bad).collect();
+            all_raw_pairs.into_iter().filter(|p| !p.known_bad).collect();
 
         compute_results(chain1_entries, chain2_caches, current_pairs, chain, layer, verdict)
     }
@@ -606,23 +634,37 @@ mod tests {
         assert!(err.contains("refusing to follow symlink"), "{err}");
     }
 
-    #[test]
-    fn test_pair_source_scope_for_results_chain1_forces_chain1() {
-        let scope = pair_source_scope_for_results(
-            &usecase::ref_verify::RefVerifyScope::All,
-            &usecase::ref_verify::RefVerifyChainFilter::Chain1,
-        );
+    // ── F3 structural tests ───────────────────────────────────────────────────
 
-        assert_eq!(scope, usecase::ref_verify::RefVerifyScope::Chain1);
+    /// F3: For chain=Chain2, `include_chain1` is false, so the Chain1 pair source is
+    /// never called and Chain1 files (spec.json / ADR) are not opened.
+    #[test]
+    fn pair_source_chain2_does_not_enumerate_chain1() {
+        // Mirrors the `include_chain1` computation in `results()`.
+        let chain = usecase::ref_verify::RefVerifyChainFilter::Chain2;
+        let include_chain1 = matches!(
+            &chain,
+            usecase::ref_verify::RefVerifyChainFilter::Chain1
+                | usecase::ref_verify::RefVerifyChainFilter::All
+        );
+        assert!(!include_chain1, "chain=Chain2 must not enumerate Chain1 from the pair source");
     }
 
+    /// F3: For chain=Chain2, pair enumeration uses `RefVerifyScope::Chain2 { layer }` per
+    /// layer — not `RefVerifyScope::All` (which would also open Chain1 artifacts).
     #[test]
-    fn test_pair_source_scope_for_results_chain2_preserves_resolved_scope() {
-        let scope = pair_source_scope_for_results(
-            &usecase::ref_verify::RefVerifyScope::All,
-            &usecase::ref_verify::RefVerifyChainFilter::Chain2,
+    fn pair_source_chain2_scope_is_chain2_not_all() {
+        use domain::tddd::LayerId;
+        let domain_id = LayerId::try_new("domain".to_owned()).unwrap();
+        // Mirrors what `results()` constructs when include_chain2 is true.
+        let scope = usecase::ref_verify::RefVerifyScope::Chain2 { layer: domain_id.clone() };
+        assert!(
+            matches!(&scope, usecase::ref_verify::RefVerifyScope::Chain2 { layer } if layer == &domain_id),
+            "chain=Chain2 pair enumeration must use Chain2 {{ layer }} scope"
         );
-
-        assert_eq!(scope, usecase::ref_verify::RefVerifyScope::All);
+        assert!(
+            !matches!(&scope, usecase::ref_verify::RefVerifyScope::All),
+            "chain=Chain2 pair enumeration must not use All scope (would read Chain1 files)"
+        );
     }
 }

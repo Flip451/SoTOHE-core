@@ -8,14 +8,56 @@ use usecase::ref_verify::RefVerifyDriverError;
 
 /// Load TDDD layer bindings for the `results` command.
 ///
-/// Propagates `architecture-rules.json` load errors as [`RefVerifyDriverError::Wiring`].
+/// Propagates missing or invalid `architecture-rules.json` as
+/// [`RefVerifyDriverError::Wiring`] so Chain2 results fail closed when layer
+/// bindings cannot be determined.
 pub(crate) fn load_results_tddd_bindings(
     project_root: &Path,
 ) -> Result<Vec<crate::verify::tddd_layers::TdddLayerBinding>, RefVerifyDriverError> {
     let rules_path = project_root.join("architecture-rules.json");
-    crate::verify::tddd_layers::load_tddd_layers(&rules_path, project_root).map_err(|e| {
-        RefVerifyDriverError::Wiring(format!("cannot load TDDD layer bindings for results: {e}"))
-    })
+    match crate::verify::tddd_layers::load_tddd_layers(&rules_path, project_root) {
+        Ok(bindings) => Ok(bindings),
+        Err(e) => Err(RefVerifyDriverError::Wiring(format!(
+            "cannot load TDDD layer bindings for results: {e}"
+        ))),
+    }
+}
+
+pub(crate) fn resolve_results_chain2_target_layers(
+    bindings: &[crate::verify::tddd_layers::TdddLayerBinding],
+    layer: &usecase::ref_verify::RefVerifyLayerFilter,
+) -> Result<Vec<domain::tddd::LayerId>, RefVerifyDriverError> {
+    use domain::tddd::LayerId;
+    use usecase::ref_verify::RefVerifyLayerFilter;
+
+    match layer {
+        RefVerifyLayerFilter::Specific(layer_id) => {
+            if !bindings.iter().any(|b| b.layer_id() == layer_id.as_ref()) {
+                let valid: Vec<&str> = bindings.iter().map(|b| b.layer_id()).collect();
+                let valid_list = if valid.is_empty() {
+                    "(none - no TDDD layers configured)".to_owned()
+                } else {
+                    valid.join(", ")
+                };
+                return Err(RefVerifyDriverError::Wiring(format!(
+                    "unknown layer '{}' for --layer filter; valid TDDD layers: {valid_list}",
+                    layer_id.as_ref()
+                )));
+            }
+            Ok(vec![layer_id.clone()])
+        }
+        RefVerifyLayerFilter::All => bindings
+            .iter()
+            .map(|binding| {
+                LayerId::try_new(binding.layer_id().to_owned()).map_err(|e| {
+                    RefVerifyDriverError::Wiring(format!(
+                        "invalid TDDD layer '{}' for results: {e}",
+                        binding.layer_id()
+                    ))
+                })
+            })
+            .collect(),
+    }
 }
 
 /// Classify one pair against a cache lookup map and derive its origin references.
@@ -433,6 +475,36 @@ mod tests {
         assert!(err.to_string().contains("cannot load TDDD layer bindings for results"));
     }
 
+    #[test]
+    fn resolve_results_chain2_target_layers_all_invalid_layer_returns_wiring_error() {
+        let dir = tempfile::tempdir().unwrap();
+        std::fs::write(
+            dir.path().join("architecture-rules.json"),
+            r#"{
+              "layers": [
+                {
+                  "crate": "1domain",
+                  "tddd": {
+                    "enabled": true,
+                    "catalogue_file": "1domain-types.json"
+                  }
+                }
+              ]
+            }"#,
+        )
+        .unwrap();
+        let bindings = load_results_tddd_bindings(dir.path()).unwrap();
+
+        let err = resolve_results_chain2_target_layers(&bindings, &RefVerifyLayerFilter::All)
+            .unwrap_err();
+
+        assert!(
+            matches!(err, RefVerifyDriverError::Wiring(ref msg)
+                if msg.contains("invalid TDDD layer '1domain'")),
+            "expected invalid layer Wiring error, got: {err:?}"
+        );
+    }
+
     fn domain_chain2_caches()
     -> Vec<(LayerId, Vec<domain::tddd::semantic_verify::SemanticVerifyEntry>)> {
         vec![(LayerId::try_new("domain".to_owned()).unwrap(), vec![])]
@@ -766,6 +838,77 @@ mod tests {
         assert_eq!(out.total_pending, 0);
         assert_eq!(out.pair_records.len(), 1);
         assert!(matches!(out.pair_records[0].verdict, SemanticVerdict::Pass { .. }));
+    }
+
+    // ── F1 / F2 / F3 unit tests ───────────────────────────────────────────────
+
+    /// F1: chain=Chain2 with an absent Chain1 cache succeeds.
+    /// Simulates the F1 fix: `load_entries(SpecAdr)` is skipped when chain=Chain2.
+    /// An empty `chain1_cache` (as the adapter passes) must not degrade Chain2 output.
+    #[test]
+    fn compute_results_chain2_absent_chain1_cache_succeeds() {
+        let layer_id = LayerId::try_new("domain".to_owned()).unwrap();
+        let out = compute_results(
+            vec![], // chain1 cache absent — not loaded for chain=Chain2 (F1 fix)
+            vec![(layer_id.clone(), vec![pass_cache_entry(0x01, 0x02)])],
+            vec![chain2_pair(0x01, 0x02, "domain")],
+            RefVerifyChainFilter::Chain2,
+            RefVerifyLayerFilter::All,
+            RefVerifyVerdictFilter::All,
+        )
+        .unwrap();
+        assert_eq!(out.total_pass, 1);
+        assert_eq!(out.lane_summaries.len(), 1, "only Chain2 lane expected");
+        assert!(out.lane_summaries[0].label.starts_with("Chain2:"));
+        assert!(
+            !out.lane_summaries.iter().any(|s| s.label.contains("Chain1")),
+            "no Chain1 lane should appear"
+        );
+    }
+
+    /// F2: chain=Chain2 + layer=Specific(domain) + only domain cache loaded succeeds.
+    /// Simulates the F2 fix: when layer=Specific(domain), only domain's cache is loaded;
+    /// a corrupt or absent usecase cache must not fail a domain-only results query.
+    #[test]
+    fn compute_results_chain2_specific_layer_absent_other_layer_cache_succeeds() {
+        let domain_id = LayerId::try_new("domain".to_owned()).unwrap();
+        // chain2_caches has only domain (simulating F2 fix: usecase cache not loaded).
+        let out = compute_results(
+            vec![],
+            vec![(domain_id.clone(), vec![pass_cache_entry(0x01, 0x02)])],
+            vec![chain2_pair(0x01, 0x02, "domain")],
+            RefVerifyChainFilter::Chain2,
+            RefVerifyLayerFilter::Specific(domain_id),
+            RefVerifyVerdictFilter::All,
+        )
+        .unwrap();
+        assert_eq!(out.total_pass, 1);
+        assert_eq!(out.lane_summaries.len(), 1, "only domain lane expected");
+        assert_eq!(out.lane_summaries[0].label, "Chain2:domain");
+    }
+
+    /// F3: chain=Chain2 + only Chain2 pairs from narrowed pair source → correct results.
+    /// Simulates the F3 fix: pair source uses `Chain2 { layer }` scope, so `current_pairs`
+    /// contains no Chain1 pairs even when Chain1 artifacts exist on disk.
+    #[test]
+    fn compute_results_chain2_with_chain2_only_pairs_excludes_chain1_output() {
+        let layer_id = LayerId::try_new("domain".to_owned()).unwrap();
+        // current_pairs contains only Chain2 pairs (F3: pair source used Chain2 scope).
+        let out = compute_results(
+            vec![], // chain1 cache empty (F1: not loaded)
+            vec![(layer_id.clone(), vec![pass_cache_entry(0x01, 0x02)])],
+            vec![chain2_pair(0x01, 0x02, "domain")], // only Chain2 pairs (F3 invariant)
+            RefVerifyChainFilter::Chain2,
+            RefVerifyLayerFilter::All,
+            RefVerifyVerdictFilter::All,
+        )
+        .unwrap();
+        assert_eq!(out.total_pass, 1);
+        assert_eq!(out.total_fail, 0);
+        assert_eq!(out.total_pending, 0);
+        assert_eq!(out.lane_summaries.len(), 1);
+        assert!(out.lane_summaries[0].label.starts_with("Chain2:"));
+        assert_eq!(out.pair_records.len(), 1);
     }
 
     #[test]
