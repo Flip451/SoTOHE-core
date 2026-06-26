@@ -1086,4 +1086,89 @@ mod tests {
         );
         assert!(outcome.findings().is_empty());
     }
+
+    // --- inline-mod #[path] and implicit-path resolution (2-pass, inline module stacking) ---
+
+    // (p) lib.rs has `#[cfg(test)] mod tests { #[path = "shared_helpers.rs"] mod helpers; }`
+    // (inline tests block). tests/shared_helpers.rs contains a pub + #[doc(hidden)] helper.
+    // The helper must NOT be flagged — inline mod + #[path] resolved via stacked basedir.
+    #[test]
+    fn cfg_test_inline_mod_with_path_attr_not_flagged() {
+        let tmp = TempDir::new().unwrap();
+        setup_arch_rules(tmp.path(), "layer");
+        write_src(
+            tmp.path(),
+            "layer/src/lib.rs",
+            "#[cfg(test)]\nmod tests {\n    #[path = \"shared_helpers.rs\"]\n    mod helpers;\n}\n",
+        );
+        write_src(
+            tmp.path(),
+            "layer/src/tests/shared_helpers.rs",
+            "#[doc(hidden)]\npub fn helper() {}\n",
+        );
+
+        let outcome = verify(tmp.path());
+
+        assert!(
+            outcome.is_ok(),
+            "expected ok — tests/shared_helpers.rs is cfg-test via inline mod + #[path], \
+             helper should not be flagged: {:?}",
+            outcome.findings()
+        );
+        assert!(outcome.findings().is_empty());
+    }
+
+    // (q) lib.rs has `#[cfg(test)] mod tests { mod helpers; }` (inline mod, no #[path]).
+    // tests/helpers.rs contains a pub + #[doc(hidden)] helper.
+    // The helper must NOT be flagged — inline mod child file-backed resolution (regression).
+    #[test]
+    fn cfg_test_inline_mod_implicit_child_not_flagged() {
+        let tmp = TempDir::new().unwrap();
+        setup_arch_rules(tmp.path(), "layer");
+        write_src(
+            tmp.path(),
+            "layer/src/lib.rs",
+            "#[cfg(test)]\nmod tests {\n    mod helpers;\n}\n",
+        );
+        write_src(tmp.path(), "layer/src/tests/helpers.rs", "#[doc(hidden)]\npub fn helper() {}\n");
+
+        let outcome = verify(tmp.path());
+
+        assert!(
+            outcome.is_ok(),
+            "expected ok — tests/helpers.rs is cfg-test via inline mod (no #[path]), \
+             helper should not be flagged: {:?}",
+            outcome.findings()
+        );
+        assert!(outcome.findings().is_empty());
+    }
+
+    // (r) lib.rs has `#[cfg(test)] mod tests { mod nested { #[path = "deep.rs"] mod deep; } }`
+    // (2-level inline nesting). tests/nested/deep.rs contains a pub + #[doc(hidden)] helper.
+    // The helper must NOT be flagged — two stacked inline basedirs + #[path].
+    #[test]
+    fn cfg_test_two_level_inline_mod_with_path_attr_not_flagged() {
+        let tmp = TempDir::new().unwrap();
+        setup_arch_rules(tmp.path(), "layer");
+        write_src(
+            tmp.path(),
+            "layer/src/lib.rs",
+            "#[cfg(test)]\nmod tests {\n    mod nested {\n        #[path = \"deep.rs\"]\n        mod deep;\n    }\n}\n",
+        );
+        write_src(
+            tmp.path(),
+            "layer/src/tests/nested/deep.rs",
+            "#[doc(hidden)]\npub fn helper() {}\n",
+        );
+
+        let outcome = verify(tmp.path());
+
+        assert!(
+            outcome.is_ok(),
+            "expected ok — tests/nested/deep.rs is cfg-test via 2-level inline mod + #[path], \
+             helper should not be flagged: {:?}",
+            outcome.findings()
+        );
+        assert!(outcome.findings().is_empty());
+    }
 }

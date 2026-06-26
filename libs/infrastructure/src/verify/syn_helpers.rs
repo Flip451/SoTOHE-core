@@ -182,11 +182,13 @@ fn collect_module_child_files_inner(
             }
             Some((_, inner_items)) => {
                 let inner_basedir = basedir.join(mod_item.ident.to_string());
-                // file_dir is unchanged for inline modules — they live in the same file.
+                // For inline modules, Rust resolves #[path] relative to the inline
+                // module's basedir (the accumulated stack), not the containing file's
+                // directory. Pass inner_basedir as the new path-resolution base.
                 collect_module_child_files_inner(
                     inner_items,
                     &inner_basedir,
-                    file_dir,
+                    &inner_basedir,
                     scan_root,
                     child_files,
                 );
@@ -228,11 +230,13 @@ fn collect_module_refs_for_context(
             }
             Some((_, inner_items)) => {
                 let inner_basedir = basedir.join(mod_item.ident.to_string());
-                // file_dir is unchanged for inline modules — they live in the same file.
+                // For inline modules, Rust resolves #[path] relative to the inline
+                // module's basedir (the accumulated stack), not the containing file's
+                // directory. Pass inner_basedir as the new path-resolution base.
                 collect_module_refs_for_context(
                     inner_items,
                     &inner_basedir,
-                    file_dir,
+                    &inner_basedir,
                     scan_root,
                     child_context,
                     worklist,
