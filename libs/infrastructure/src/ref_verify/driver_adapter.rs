@@ -355,13 +355,6 @@ impl usecase::ref_verify::RefVerifyAggregateService for FsRefVerifyAggregateAdap
         layer: usecase::ref_verify::RefVerifyLayerFilter,
         verdict: usecase::ref_verify::RefVerifyVerdictFilter,
     ) -> Result<usecase::ref_verify::RefVerifyResultsOutput, RefVerifyDriverError> {
-        use domain::tddd::LayerId;
-        use domain::tddd::semantic_verify::SemanticVerifyEntry;
-        use usecase::ref_verify::{
-            RefVerifyCachePort, RefVerifyCacheScope, RefVerifyChainFilter, RefVerifyConfig,
-            RefVerifyPairSourcePort,
-        };
-
         // (a) Resolve project root and validate track ID.
         let project_root = resolve_project_root(items_dir)
             .map_err(|e| RefVerifyDriverError::Wiring(e.to_string()))?;
@@ -371,135 +364,168 @@ impl usecase::ref_verify::RefVerifyAggregateService for FsRefVerifyAggregateAdap
         let track_id = validate_track_id(track_id_str)
             .map_err(|e| RefVerifyDriverError::Wiring(e.to_string()))?;
 
-        // Determine which chains are included in the results request.
-        // This is computed before scope resolution so the resolver call can be
-        // gated on whether Chain2 output is actually requested.
-        let include_chain1 =
-            matches!(&chain, RefVerifyChainFilter::Chain1 | RefVerifyChainFilter::All);
-        let include_chain2 =
-            matches!(&chain, RefVerifyChainFilter::Chain2 | RefVerifyChainFilter::All);
+        // Branch resolution: fall back to "<detached>" sentinel when HEAD is detached.
+        // The results path is read-only and does not enforce the active-track guard,
+        // so any branch value — including the detached sentinel — is accepted by
+        // downstream cache / pair-source callers (RefVerifyCacheAdapter::load_entries
+        // and RefVerifyPairSourceAdapter::load_pairs do not inspect current_branch).
+        let current_branch =
+            current_git_branch(&canonical_root).unwrap_or_else(|_| "<detached>".to_owned());
 
-        // (b-pre) Validate the track directory exists regardless of chain filter.
-        // A typo in track_id must produce a typed error, not a silent zero-pair result.
-        check_track_dir_exists(&canonical_root, track_id.as_ref())?;
+        results_core(&canonical_root, track_id, chain, layer, verdict, current_branch)
+    }
+}
 
-        // (b) Resolve scope.
-        // For Chain1-only: skip RefVerifyScopeResolver — it enforces Chain2 catalogue
-        // consistency (IN-05: partial set is rejected) which is irrelevant for a
-        // Chain1-only request and would block users from inspecting spec↔ADR failures
-        // while Phase-2 artefacts are still incomplete.  Instead, check the Chain1
-        // paths and the IN-06 ordering rule without enforcing partial-catalogue consistency.
-        // For Chain2 or All: run the full resolver to validate catalogue consistency.
-        let scope = if !include_chain2 {
-            resolve_chain1_only_scope(&canonical_root, track_id.as_ref())?
-        } else {
-            let resolver = RefVerifyScopeResolver::new(canonical_root.clone());
-            resolver.resolve(track_id.as_ref()).map_err(|e| {
-                RefVerifyDriverError::Wiring(format!("ref-verify scope resolution failed: {e}"))
-            })?
-        };
+// ── results_core ─────────────────────────────────────────────────────────────
 
-        let current_branch = current_git_branch(&canonical_root)
-            .map_err(|e| RefVerifyDriverError::Unavailable(e.to_string()))?;
+/// Inner implementation for the read-only results query path.
+///
+/// Accepts a pre-resolved `current_branch` string so that the caller
+/// (`FsRefVerifyAggregateAdapter::results`) can supply a detached-HEAD sentinel
+/// when git branch detection fails, without propagating an `Unavailable` error
+/// for an inherently read-only operation.
+///
+/// Downstream callers (`RefVerifyCacheAdapter::load_entries`,
+/// `RefVerifyPairSourceAdapter::load_pairs`) do not inspect `current_branch`,
+/// so any sentinel value is safe here.
+fn results_core(
+    canonical_root: &Path,
+    track_id: domain::TrackId,
+    chain: usecase::ref_verify::RefVerifyChainFilter,
+    layer: usecase::ref_verify::RefVerifyLayerFilter,
+    verdict: usecase::ref_verify::RefVerifyVerdictFilter,
+    current_branch: String,
+) -> Result<usecase::ref_verify::RefVerifyResultsOutput, RefVerifyDriverError> {
+    use domain::tddd::LayerId;
+    use domain::tddd::semantic_verify::SemanticVerifyEntry;
+    use usecase::ref_verify::{
+        RefVerifyCachePort, RefVerifyCacheScope, RefVerifyChainFilter, RefVerifyConfig,
+        RefVerifyPairSourcePort,
+    };
 
-        let cmd = usecase::ref_verify::RefVerifyCommand { track_id, scope, current_branch };
+    // Determine which chains are included in the results request.
+    // This is computed before scope resolution so the resolver call can be
+    // gated on whether Chain2 output is actually requested.
+    let include_chain1 = matches!(&chain, RefVerifyChainFilter::Chain1 | RefVerifyChainFilter::All);
+    let include_chain2 = matches!(&chain, RefVerifyChainFilter::Chain2 | RefVerifyChainFilter::All);
 
-        // (c) Load cache files scoped to the requested chains and layers.
-        //
-        // F1: Load Chain1 (SpecAdr) cache only when the chain filter includes Chain1.
-        // A stale or absent SpecAdr cache must not fail a Chain2-only results query.
-        let cache_adapter = RefVerifyCacheAdapter::new(canonical_root.clone());
+    // (b-pre) Validate the track directory exists regardless of chain filter.
+    // A typo in track_id must produce a typed error, not a silent zero-pair result.
+    check_track_dir_exists(canonical_root, track_id.as_ref())?;
 
-        let chain1_entries: Vec<SemanticVerifyEntry> = if include_chain1 {
-            cache_adapter
-                .load_entries(&cmd, &RefVerifyCacheScope::SpecAdr)
-                .map_err(|e| RefVerifyDriverError::Usecase(e.to_string()))?
-        } else {
-            Vec::new()
-        };
+    // (b) Resolve scope.
+    // For Chain1-only: skip RefVerifyScopeResolver — it enforces Chain2 catalogue
+    // consistency (IN-05: partial set is rejected) which is irrelevant for a
+    // Chain1-only request and would block users from inspecting spec↔ADR failures
+    // while Phase-2 artefacts are still incomplete.  Instead, check the Chain1
+    // paths and the IN-06 ordering rule without enforcing partial-catalogue consistency.
+    // For Chain2 or All: run the full resolver to validate catalogue consistency.
+    let scope = if !include_chain2 {
+        resolve_chain1_only_scope(canonical_root, track_id.as_ref())?
+    } else {
+        let resolver = RefVerifyScopeResolver::new(canonical_root.to_path_buf());
+        resolver.resolve(track_id.as_ref()).map_err(|e| {
+            RefVerifyDriverError::Wiring(format!("ref-verify scope resolution failed: {e}"))
+        })?
+    };
 
-        // Only load Chain2 caches when the chain filter requests Chain2 results.
-        // Skipping this I/O for chain=Chain1 ensures that Chain2 cache/catalogue
-        // files cannot fail a Chain1-only results query.
-        //
-        // F2: When layer=Specific(X), validate X exists in the TDDD bindings and load only
-        // that layer's cache.  A corrupt or absent cache for an unrelated layer must not
-        // fail a single-layer Chain2 results query.
-        let mut chain2_caches: Vec<(LayerId, Vec<SemanticVerifyEntry>)> = Vec::new();
-        let mut chain2_layer_ids: Vec<LayerId> = Vec::new();
-        if include_chain2 {
-            let bindings = load_results_tddd_bindings(&canonical_root)?;
-            let (present_layer_ids, absent_layer_ids) =
-                inspect_chain2_catalogue_set(&canonical_root, cmd.track_id.as_ref(), &bindings)?;
-            // Fail-closed for partial catalogue sets before layer narrowing.
-            // Only all-absent (pre-Phase-2) is accepted without error; partial absence
-            // means some declared layers were never inspected, which would produce a
-            // misleadingly complete-looking Chain2 summary.
-            check_partial_catalogue_set(&present_layer_ids, &absent_layer_ids)?;
+    let cmd = usecase::ref_verify::RefVerifyCommand { track_id, scope, current_branch };
 
-            let target_ids = resolve_results_chain2_target_layers(&bindings, &layer)?;
+    // (c) Load cache files scoped to the requested chains and layers.
+    //
+    // F1: Load Chain1 (SpecAdr) cache only when the chain filter includes Chain1.
+    // A stale or absent SpecAdr cache must not fail a Chain2-only results query.
+    let cache_adapter = RefVerifyCacheAdapter::new(canonical_root.to_path_buf());
 
-            for layer_id in &target_ids {
-                if absent_layer_ids.iter().any(|absent| absent == layer_id) {
-                    // Record in chain2_caches so that compute_results layer validation can
-                    // distinguish pre-Phase-2 zero-pair from an unknown layer typo.
-                    chain2_caches.push((layer_id.clone(), Vec::new()));
-                    continue;
-                }
+    let chain1_entries: Vec<SemanticVerifyEntry> = if include_chain1 {
+        cache_adapter
+            .load_entries(&cmd, &RefVerifyCacheScope::SpecAdr)
+            .map_err(|e| RefVerifyDriverError::Usecase(e.to_string()))?
+    } else {
+        Vec::new()
+    };
 
-                let cache_scope = RefVerifyCacheScope::CatalogueSpec { layer: layer_id.clone() };
-                let entries = cache_adapter
-                    .load_entries(&cmd, &cache_scope)
-                    .map_err(|e| RefVerifyDriverError::Usecase(e.to_string()))?;
-                chain2_caches.push((layer_id.clone(), entries));
-                chain2_layer_ids.push(layer_id.clone());
+    // Only load Chain2 caches when the chain filter requests Chain2 results.
+    // Skipping this I/O for chain=Chain1 ensures that Chain2 cache/catalogue
+    // files cannot fail a Chain1-only results query.
+    //
+    // F2: When layer=Specific(X), validate X exists in the TDDD bindings and load only
+    // that layer's cache.  A corrupt or absent cache for an unrelated layer must not
+    // fail a single-layer Chain2 results query.
+    let mut chain2_caches: Vec<(LayerId, Vec<SemanticVerifyEntry>)> = Vec::new();
+    let mut chain2_layer_ids: Vec<LayerId> = Vec::new();
+    if include_chain2 {
+        let bindings = load_results_tddd_bindings(canonical_root)?;
+        let (present_layer_ids, absent_layer_ids) =
+            inspect_chain2_catalogue_set(canonical_root, cmd.track_id.as_ref(), &bindings)?;
+        // Fail-closed for partial catalogue sets before layer narrowing.
+        // Only all-absent (pre-Phase-2) is accepted without error; partial absence
+        // means some declared layers were never inspected, which would produce a
+        // misleadingly complete-looking Chain2 summary.
+        check_partial_catalogue_set(&present_layer_ids, &absent_layer_ids)?;
+
+        let target_ids = resolve_results_chain2_target_layers(&bindings, &layer)?;
+
+        for layer_id in &target_ids {
+            if absent_layer_ids.iter().any(|absent| absent == layer_id) {
+                // Record in chain2_caches so that compute_results layer validation can
+                // distinguish pre-Phase-2 zero-pair from an unknown layer typo.
+                chain2_caches.push((layer_id.clone(), Vec::new()));
+                continue;
             }
+
+            let cache_scope = RefVerifyCacheScope::CatalogueSpec { layer: layer_id.clone() };
+            let entries = cache_adapter
+                .load_entries(&cmd, &cache_scope)
+                .map_err(|e| RefVerifyDriverError::Usecase(e.to_string()))?;
+            chain2_caches.push((layer_id.clone(), entries));
+            chain2_layer_ids.push(layer_id.clone());
         }
+    }
 
-        // (d) Enumerate current pairs narrowed by chain and layer filter.
-        //
-        // F3: Use RefVerifyScope::Chain1 for Chain1 pairs and
-        // RefVerifyScope::Chain2 { layer } per layer for Chain2 pairs.
-        // This avoids enumerating Chain1 artifacts (spec.json / ADR files) when
-        // chain=Chain2, so a broken Chain1 reference cannot fail a Chain2-only query.
-        // CN-06: no LLM subprocess in the results path.
-        let pair_source = RefVerifyPairSourceAdapter::new(canonical_root.clone());
-        let config = RefVerifyConfig::default();
-        let mut all_raw_pairs: Vec<usecase::ref_verify::RefVerifyPair> = Vec::new();
+    // (d) Enumerate current pairs narrowed by chain and layer filter.
+    //
+    // F3: Use RefVerifyScope::Chain1 for Chain1 pairs and
+    // RefVerifyScope::Chain2 { layer } per layer for Chain2 pairs.
+    // This avoids enumerating Chain1 artifacts (spec.json / ADR files) when
+    // chain=Chain2, so a broken Chain1 reference cannot fail a Chain2-only query.
+    // CN-06: no LLM subprocess in the results path.
+    let pair_source = RefVerifyPairSourceAdapter::new(canonical_root.to_path_buf());
+    let config = RefVerifyConfig::default();
+    let mut all_raw_pairs: Vec<usecase::ref_verify::RefVerifyPair> = Vec::new();
 
-        if include_chain1 {
-            let chain1_cmd = usecase::ref_verify::RefVerifyCommand {
+    if include_chain1 {
+        let chain1_cmd = usecase::ref_verify::RefVerifyCommand {
+            track_id: cmd.track_id.clone(),
+            scope: usecase::ref_verify::RefVerifyScope::Chain1,
+            current_branch: cmd.current_branch.clone(),
+        };
+        let raw = pair_source
+            .load_pairs(&chain1_cmd, &config)
+            .map_err(|e| RefVerifyDriverError::Usecase(format!("pair source enumeration: {e}")))?;
+        all_raw_pairs.extend(raw);
+    }
+
+    if include_chain2 {
+        // Enumerate per layer using Chain2 scope to avoid reading Chain1 files.
+        for layer_id in &chain2_layer_ids {
+            let chain2_cmd = usecase::ref_verify::RefVerifyCommand {
                 track_id: cmd.track_id.clone(),
-                scope: usecase::ref_verify::RefVerifyScope::Chain1,
+                scope: usecase::ref_verify::RefVerifyScope::Chain2 { layer: layer_id.clone() },
                 current_branch: cmd.current_branch.clone(),
             };
-            let raw = pair_source.load_pairs(&chain1_cmd, &config).map_err(|e| {
+            let raw = pair_source.load_pairs(&chain2_cmd, &config).map_err(|e| {
                 RefVerifyDriverError::Usecase(format!("pair source enumeration: {e}"))
             })?;
             all_raw_pairs.extend(raw);
         }
-
-        if include_chain2 {
-            // Enumerate per layer using Chain2 scope to avoid reading Chain1 files.
-            for layer_id in &chain2_layer_ids {
-                let chain2_cmd = usecase::ref_verify::RefVerifyCommand {
-                    track_id: cmd.track_id.clone(),
-                    scope: usecase::ref_verify::RefVerifyScope::Chain2 { layer: layer_id.clone() },
-                    current_branch: cmd.current_branch.clone(),
-                };
-                let raw = pair_source.load_pairs(&chain2_cmd, &config).map_err(|e| {
-                    RefVerifyDriverError::Usecase(format!("pair source enumeration: {e}"))
-                })?;
-                all_raw_pairs.extend(raw);
-            }
-        }
-
-        // Exclude known-bad calibration probes; classify only real production pairs.
-        let current_pairs: Vec<usecase::ref_verify::RefVerifyPair> =
-            all_raw_pairs.into_iter().filter(|p| !p.known_bad).collect();
-
-        compute_results(chain1_entries, chain2_caches, current_pairs, chain, layer, verdict)
     }
+
+    // Exclude known-bad calibration probes; classify only real production pairs.
+    let current_pairs: Vec<usecase::ref_verify::RefVerifyPair> =
+        all_raw_pairs.into_iter().filter(|p| !p.known_bad).collect();
+
+    compute_results(chain1_entries, chain2_caches, current_pairs, chain, layer, verdict)
 }
 
 // ── FsRefVerifyCheckApprovedAdapter ──────────────────────────────────────────
@@ -665,6 +691,48 @@ mod tests {
         let err = load_agent_profiles(tmp.path()).unwrap_err();
         assert!(err.contains("agent-profiles.json path rejected before read"), "{err}");
         assert!(err.contains("refusing to follow symlink"), "{err}");
+    }
+
+    // ── detached HEAD tests ───────────────────────────────────────────────────
+
+    /// Verifies that `results` succeeds with a detached-HEAD sentinel branch value.
+    ///
+    /// When `sotp ref-verify results --track-id <id>` is run from a CI checkout
+    /// where HEAD is detached, `current_git_branch()` returns `Err`.  The fixed
+    /// `results` path falls back to the `"<detached>"` sentinel and delegates to
+    /// `results_core`, which must not surface an `Unavailable` error.
+    ///
+    /// Invariant: passing `"<detached>"` as `current_branch` to `results_core`
+    /// with a valid track directory and a valid Chain1 cache succeeds — the
+    /// results path does not enforce the active-track guard.
+    #[test]
+    fn compute_results_with_explicit_track_id_and_detached_head_succeeds() {
+        let tmp = tempfile::tempdir().unwrap();
+        let canonical_root = tmp.path().canonicalize().unwrap();
+        let track_id = domain::TrackId::try_new("dry-gate-opt-in".to_owned()).unwrap();
+        let track_dir = canonical_root.join("track").join("items").join(track_id.as_ref());
+        std::fs::create_dir_all(&track_dir).unwrap();
+
+        // Write a structurally valid (empty) Chain1 cache file to satisfy the
+        // "valid Chain1 cache" requirement without needing real spec/ADR content.
+        let cache_json = r#"{"schema_version":1,"entries":[]}"#;
+        std::fs::write(track_dir.join("spec-adr-verify-cache.json"), cache_json).unwrap();
+
+        // Simulate detached HEAD: pass the sentinel directly to results_core,
+        // mirroring what the production code does when current_git_branch() fails.
+        let result = results_core(
+            &canonical_root,
+            track_id,
+            usecase::ref_verify::RefVerifyChainFilter::Chain1,
+            usecase::ref_verify::RefVerifyLayerFilter::All,
+            usecase::ref_verify::RefVerifyVerdictFilter::All,
+            "<detached>".to_owned(),
+        );
+
+        assert!(
+            result.is_ok(),
+            "detached HEAD sentinel must not cause Unavailable error: {result:?}"
+        );
     }
 
     // ── F3 structural tests ───────────────────────────────────────────────────
