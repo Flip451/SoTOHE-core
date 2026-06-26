@@ -112,6 +112,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [typestate は struct 形状と直交配置する — 全 struct 形状を typestate 状態にする](2026-05-26-1002-typestate-struct-kind-orthogonal.md) | Proposed | 2026-05-26 |
 | [SoT Chain に意味論レビューゲートを追加する](2026-05-27-1601-sot-chain-semantic-review-gate.md) | Proposed | 2026-05-27 |
 | [`--lenient` と `--force` の実行経路を削除する](2026-06-01-1206-remove-lenient-and-force-flag-paths.md) | — | 2026-06-01 |
+| [`sotp ref-verify results` で verify-cache 直読みを置き換える](2026-06-26-0842-ref-verify-results-command.md) | — | 2026-06-26 |
 | [signal CLI 名前空間統一と gate strictness の宣言的管理](2026-06-16-1030-signal-gate-strictness-config.md) | Proposed | 2026-06-16 |
 | [TDDD GAT trait サポート: パーサ QualifiedPath + 比較フォーマッター正規化 + カタログ関連アイテムスキーマ](2026-06-18-0822-typeref-parser-qualified-path-support.md) | Proposed | 2026-06-18 |
 | [cli 系 3 層への TDDD 適用と既存 linter によるロール配置制約の設定](2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md) | Proposed | 2026-06-21 |

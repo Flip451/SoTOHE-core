@@ -1,0 +1,38 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b7d983f19d56f610cbfc530967683e5887b8babbc1efa5670895d21c23dc10df",
+          "at": "2026-06-26T00:18:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2 requires the results command to list fail/pending pairs with claim/evidence source locations, but D3 makes those source locations available only by adding origin metadata to verify-cache entries and later says results can work from the cache alone. That does not cover pending/cache-miss pairs, which have no cache entry to carry origin metadata, so an implementation following this plan either cannot show pending pair sources or must re-load the current pair source/artifacts despite the stated cache-only design. The plan needs to explicitly choose one model: persist pending entries with origins, or have `results` derive pending pairs from the source artifacts.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+              "line": 58,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b7d983f19d56f610cbfc530967683e5887b8babbc1efa5670895d21c23dc10df",
+          "at": "2026-06-26T00:22:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bc9812dd221e02da43e593ebb70f297908c8f51bafc89a408ccdd9ed286a70b8",
+          "at": "2026-06-26T00:26:55Z"
+        }
+      ]
+    }
+  }
+}
