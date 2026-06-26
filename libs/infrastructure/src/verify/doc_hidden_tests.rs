@@ -604,3 +604,101 @@ fn test_ignores_doc_hidden_when_only_cfg_test_path_attr_references_file() {
         outcome.findings()
     );
 }
+
+// ── PR10-PR12: sibling file-backed cfg(test) module exclusion ────────────────
+
+/// PR10: `foo.rs` in the same directory declares
+/// `#[cfg(test)] #[path = "foo_tests.rs"] mod tests;`.
+/// `foo_tests.rs` contains a `#[doc(hidden)]` fixture — the file is not a
+/// canonical module entry point (`mod.rs` / `lib.rs` / `main.rs`), yet the
+/// sibling reference must cause it to be excluded from scanning.
+#[test]
+fn test_ignores_doc_hidden_in_sibling_file_backed_cfg_test_mod() {
+    let tmp = TempDir::new().unwrap();
+    write_arch_rules(tmp.path());
+    // lib.rs is clean and does not reference foo or foo_tests.
+    write_src(tmp.path(), "lib.rs", "pub fn clean() {}\n");
+    // foo.rs declares foo_tests.rs as its test module via a sibling #[path].
+    write_src(
+        tmp.path(),
+        "foo.rs",
+        concat!(
+            "pub fn foo_fn() {}\n",
+            "#[cfg(test)]\n",
+            "#[path = \"foo_tests.rs\"]\n",
+            "mod tests;\n",
+        ),
+    );
+    // foo_tests.rs has a #[doc(hidden)] fixture: must not be flagged.
+    write_src(tmp.path(), "foo_tests.rs", "#[doc(hidden)]\npub fn x() {}\n");
+
+    let outcome = verify(tmp.path());
+    assert!(
+        outcome.is_ok(),
+        "doc(hidden) in sibling #[cfg(test)] #[path] test module must not be flagged: {:?}",
+        outcome.findings()
+    );
+}
+
+/// PR11: both `foo.rs` and `bar.rs` declare
+/// `#[cfg(test)] #[path = "shared_tests.rs"] mod tests;`.
+/// All references to `shared_tests.rs` are `cfg(test)`, so any `#[doc(hidden)]`
+/// fixture inside it must still be excluded.
+#[test]
+fn test_ignores_doc_hidden_in_shared_test_file_referenced_by_multiple_cfg_test_siblings() {
+    let tmp = TempDir::new().unwrap();
+    write_arch_rules(tmp.path());
+    write_src(tmp.path(), "lib.rs", "pub fn clean() {}\n");
+    write_src(
+        tmp.path(),
+        "foo.rs",
+        concat!(
+            "pub fn foo_fn() {}\n",
+            "#[cfg(test)]\n",
+            "#[path = \"shared_tests.rs\"]\n",
+            "mod tests;\n",
+        ),
+    );
+    write_src(
+        tmp.path(),
+        "bar.rs",
+        concat!(
+            "pub fn bar_fn() {}\n",
+            "#[cfg(test)]\n",
+            "#[path = \"shared_tests.rs\"]\n",
+            "mod tests;\n",
+        ),
+    );
+    // shared_tests.rs has a #[doc(hidden)] fixture: must not be flagged.
+    write_src(tmp.path(), "shared_tests.rs", "#[doc(hidden)]\npub fn hidden() {}\n");
+
+    let outcome = verify(tmp.path());
+    assert!(
+        outcome.is_ok(),
+        "doc(hidden) in shared test file referenced only by cfg(test) siblings must not be \
+         flagged: {:?}",
+        outcome.findings()
+    );
+}
+
+/// PR12: regression — a file that is NOT referenced as a `cfg(test)` module by
+/// any sibling must still be flagged.  The sibling probe must not accidentally
+/// exclude production files simply because sibling files exist.
+#[test]
+fn test_flags_doc_hidden_in_file_not_referenced_as_cfg_test_by_any_sibling() {
+    let tmp = TempDir::new().unwrap();
+    write_arch_rules(tmp.path());
+    write_src(tmp.path(), "lib.rs", "pub fn clean() {}\n");
+    // sibling.rs exists but does NOT reference production.rs as a test module.
+    write_src(tmp.path(), "sibling.rs", "pub fn sibling_fn() {}\n");
+    // production.rs has #[doc(hidden)] and no cfg(test) reference: must be flagged.
+    write_src(tmp.path(), "production.rs", "#[doc(hidden)]\npub fn bad() {}\n");
+
+    let outcome = verify(tmp.path());
+    assert!(
+        outcome.has_errors(),
+        "doc(hidden) in file not referenced as cfg(test) by any sibling must still be flagged: \
+         {:?}",
+        outcome.findings()
+    );
+}

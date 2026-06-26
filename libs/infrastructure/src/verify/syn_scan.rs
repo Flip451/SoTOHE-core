@@ -15,7 +15,7 @@ use domain::verify::{VerifyFinding, VerifyOutcome};
 use crate::track::symlink_guard::reject_symlinks_below;
 
 use super::path_safety::lexical_normalize;
-use super::syn_helpers::has_cfg_test_attr;
+use super::syn_helpers::{extract_path_attr, has_cfg_test_attr, sibling_rs_files};
 use super::trusted_root::absolutize;
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -289,6 +289,19 @@ fn file_backed_module_source_probes(root: &Path, path: &Path) -> Vec<(PathBuf, V
         return probes;
     };
 
+    // Probe sibling .rs files in the same directory as `path`.
+    //
+    // The standard probe list only covers canonical module entry points
+    // (`mod.rs`, `lib.rs`, `main.rs`, `<parent>.rs`).  A sibling file such as
+    // `foo.rs` can declare `#[cfg(test)] #[path = "foo_tests.rs"] mod tests;`
+    // without being a canonical entry point.  Including all same-directory `.rs`
+    // siblings as additional probes catches this pattern.
+    if let Some(module_path) = module_path_for_file_from_base(&base_dir, path) {
+        for sibling in sibling_rs_files(root, path) {
+            probes.push((sibling, module_path.clone()));
+        }
+    }
+
     loop {
         for source in parent_module_file_candidates(root, &base_dir) {
             if source.as_path() == path {
@@ -457,21 +470,6 @@ fn items_declare_production_module_path(
         }
         false
     })
-}
-
-/// Returns the string value of the first `#[path = "..."]` attribute in `attrs`, if any.
-fn extract_path_attr(attrs: &[syn::Attribute]) -> Option<String> {
-    for attr in attrs {
-        if !attr.path().is_ident("path") {
-            continue;
-        }
-        if let syn::Meta::NameValue(nv) = &attr.meta {
-            if let syn::Expr::Lit(syn::ExprLit { lit: syn::Lit::Str(s), .. }) = &nv.value {
-                return Some(s.value());
-            }
-        }
-    }
-    None
 }
 
 /// Returns `true` when `path_value` (a `#[path = "..."]` string), treated as a
