@@ -947,4 +947,66 @@ mod tests {
             "cfg_attr suffix missing: {msg}"
         );
     }
+
+    // --- cfg-test file-backed module exclusion (2-pass approach) ---
+
+    // (j) lib.rs declares `#[cfg(test)] mod tests;` (file-backed); tests.rs contains
+    // a pub + #[doc(hidden)] helper. The helper must NOT be flagged because tests.rs
+    // is reachable only through the cfg-test module declaration.
+    #[test]
+    fn cfg_test_file_backed_mod_sibling_rs_not_flagged() {
+        let tmp = TempDir::new().unwrap();
+        setup_arch_rules(tmp.path(), "layer");
+        write_src(tmp.path(), "layer/src/lib.rs", "#[cfg(test)] mod tests;\n");
+        write_src(tmp.path(), "layer/src/tests.rs", "#[doc(hidden)]\npub fn helper() {}\n");
+
+        let outcome = verify(tmp.path());
+
+        assert!(
+            outcome.is_ok(),
+            "expected ok — tests.rs is cfg-test, helper should not be flagged: {:?}",
+            outcome.findings()
+        );
+        assert!(outcome.findings().is_empty());
+    }
+
+    // (k) lib.rs declares `#[cfg(test)] mod tests;` (file-backed); tests/mod.rs
+    // contains a pub + #[doc(hidden)] helper. The helper must NOT be flagged.
+    #[test]
+    fn cfg_test_file_backed_mod_dir_mod_rs_not_flagged() {
+        let tmp = TempDir::new().unwrap();
+        setup_arch_rules(tmp.path(), "layer");
+        write_src(tmp.path(), "layer/src/lib.rs", "#[cfg(test)] mod tests;\n");
+        write_src(tmp.path(), "layer/src/tests/mod.rs", "#[doc(hidden)]\npub fn helper() {}\n");
+
+        let outcome = verify(tmp.path());
+
+        assert!(
+            outcome.is_ok(),
+            "expected ok — tests/mod.rs is cfg-test, helper should not be flagged: {:?}",
+            outcome.findings()
+        );
+        assert!(outcome.findings().is_empty());
+    }
+
+    // (l) Nested case: lib.rs declares `mod foo;` (production); foo.rs declares
+    // `#[cfg(test)] mod inner;`; foo/inner.rs contains a pub + #[doc(hidden)] helper.
+    // The helper must NOT be flagged because inner.rs is transitively cfg-test.
+    #[test]
+    fn cfg_test_nested_file_backed_mod_not_flagged() {
+        let tmp = TempDir::new().unwrap();
+        setup_arch_rules(tmp.path(), "layer");
+        write_src(tmp.path(), "layer/src/lib.rs", "mod foo;\n");
+        write_src(tmp.path(), "layer/src/foo.rs", "#[cfg(test)] mod inner;\n");
+        write_src(tmp.path(), "layer/src/foo/inner.rs", "#[doc(hidden)]\npub fn helper() {}\n");
+
+        let outcome = verify(tmp.path());
+
+        assert!(
+            outcome.is_ok(),
+            "expected ok — foo/inner.rs is transitively cfg-test, helper should not be flagged: {:?}",
+            outcome.findings()
+        );
+        assert!(outcome.findings().is_empty());
+    }
 }

@@ -37,6 +37,42 @@
         }
       ]
     },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:adf87f6c9e1b068c56ad0861098ea350924a8e3b7b1e6579dca6b3cf3754367b",
+          "at": "2026-06-26T02:02:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:adf87f6c9e1b068c56ad0861098ea350924a8e3b7b1e6579dca6b3cf3754367b",
+          "at": "2026-06-26T02:05:22Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1b60ff3c8a1d331ccb6c346dcc8076d858dd390632efac92315a793737cd5ee7",
+          "at": "2026-06-26T02:04:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1b60ff3c8a1d331ccb6c346dcc8076d858dd390632efac92315a793737cd5ee7",
+          "at": "2026-06-26T02:06:55Z"
+        }
+      ]
+    },
     "infrastructure": {
       "rounds": [
         {
@@ -118,6 +154,80 @@
           "findings": [],
           "hash": "rvw1:sha256:a7c59e26daa159dfee50dde858926468192507bbbd441134e645b23b4240d88c",
           "at": "2026-06-26T03:06:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a8f86221c95da4d6d9857d9f8358d40f780b7203fe4992f4d7f2d1af15cf3b4d",
+          "at": "2026-06-26T03:34:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Pass 1 can follow a symlink before the symlink-rejecting Pass 2 runs. `collect_file_backed_mods_inner` accepts module candidates with `candidate.exists()` and puts them on `worklist`; the transitive-closure loop then calls `read_to_string(&file)` on those paths without first checking `symlink_metadata().file_type().is_symlink()`. A `#[cfg(test)] mod tests;` target that is a symlink will therefore be read during collection, violating the existing symlink-rejection boundary contract for `scan_rs_files`. Reject symlink candidates before enqueue/read, matching the existing symlink tests/pattern.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/syn_helpers.rs",
+              "line": 194,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:a8f86221c95da4d6d9857d9f8358d40f780b7203fe4992f4d7f2d1af15cf3b4d",
+          "at": "2026-06-26T03:38:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Pass 1 builds one global cfg-test set by scanning every `.rs` file under the root, then Pass 2 skips any path in that set. This can hide production files when the same source path is used by more than one crate root: for example `src/lib.rs` can declare `mod api;` while `src/main.rs` declares `#[cfg(test)] mod api;`; the seed scan of `main.rs` adds `src/api.rs`, and the production scan then skips `api.rs` entirely, missing forbidden `pub + #[doc(hidden)]` items. The cfg-test exclusion needs to be tied to the production module context or otherwise avoid letting unrelated root files mark shared production modules test-only.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/syn_helpers.rs",
+              "line": 199,
+              "category": "production-scan false negative"
+            }
+          ],
+          "hash": "rvw1:sha256:f222f18c1523c8dac4b716ab6284d84641c08980a5a8f7da89b40de8c1f8b532",
+          "at": "2026-06-26T03:44:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`has_path_attr` matches `attr.meta` by value while iterating over `&syn::Attribute`. In syn 2, `Meta` is not `Copy`, so this attempts to move out of a shared reference and the infrastructure crate will not compile. Borrow the meta instead, e.g. `matches!(&attr.meta, syn::Meta::NameValue(_))`, before this review path can pass.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/verify/syn_helpers.rs",
+              "line": 52,
+              "category": "build"
+            }
+          ],
+          "hash": "rvw1:sha256:93a91e9499bb88995127f3330df8f4b5ac90083c39f7b28f26a6ec144a9960f8",
+          "at": "2026-06-26T03:58:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`collect_cfg_test_files` removes every file that appears as a module child from the initial production roots. That lets a test-only module declaration in one crate root hide another crate root from the production scan: for example, if `src/main.rs` contains `#[cfg(test)] mod lib;` and `src/lib.rs` contains a production `pub #[doc(hidden)]` item, `lib.rs` is filtered out here, later visited only with `TestOnly` context, added to `cfg_test_files`, and then skipped by Pass 2. This weakens the doc-hidden gate for production files; crate-root files such as scan-root `lib.rs`/`main.rs` need to remain production roots even if another file can also name them as a module.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/syn_helpers.rs",
+              "line": 218,
+              "category": "verification false negative"
+            }
+          ],
+          "hash": "rvw1:sha256:65b08cc250eb113e6d32b6b0e728e91a50cd2c350f3e866432fb509f425992d8",
+          "at": "2026-06-26T04:03:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e6c4d3b6c06761feedce9b647de4da26216ec139671fe814195cb53dbe64ac92",
+          "at": "2026-06-26T04:09:13Z"
         }
       ]
     },
@@ -215,42 +325,6 @@
           "findings": [],
           "hash": "rvw1:sha256:8aa3fef4cdd04f23365a90f99dcb8fa3d251afbfcf007cd004c646a68f1d8b04",
           "at": "2026-06-26T02:43:58Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:adf87f6c9e1b068c56ad0861098ea350924a8e3b7b1e6579dca6b3cf3754367b",
-          "at": "2026-06-26T02:02:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:adf87f6c9e1b068c56ad0861098ea350924a8e3b7b1e6579dca6b3cf3754367b",
-          "at": "2026-06-26T02:05:22Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1b60ff3c8a1d331ccb6c346dcc8076d858dd390632efac92315a793737cd5ee7",
-          "at": "2026-06-26T02:04:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1b60ff3c8a1d331ccb6c346dcc8076d858dd390632efac92315a793737cd5ee7",
-          "at": "2026-06-26T02:06:55Z"
         }
       ]
     }
