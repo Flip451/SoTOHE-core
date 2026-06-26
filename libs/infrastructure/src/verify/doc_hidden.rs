@@ -646,6 +646,48 @@ mod tests {
         );
     }
 
+    // ── PR4-PR6: union field-level attribute scanning ────────────────────────
+
+    /// PR4: field-level `#[doc(hidden)]` on a union field must be flagged.
+    #[test]
+    fn test_detects_doc_hidden_on_union_field() {
+        let tmp = TempDir::new().unwrap();
+        setup(tmp.path(), "pub union U { pub x: u32, #[doc(hidden)] pub y: u32 }\n");
+        let outcome = verify(tmp.path());
+        assert!(
+            outcome.has_errors(),
+            "expected error for #[doc(hidden)] on union field: {:?}",
+            outcome.findings()
+        );
+    }
+
+    /// PR5: `#[doc(hidden)]` on the union item itself must be flagged (regression).
+    #[test]
+    fn test_detects_doc_hidden_on_union_item() {
+        let tmp = TempDir::new().unwrap();
+        setup(tmp.path(), "#[doc(hidden)]\npub union U { pub x: u32 }\n");
+        let outcome = verify(tmp.path());
+        assert!(
+            outcome.has_errors(),
+            "expected error for #[doc(hidden)] on union item: {:?}",
+            outcome.findings()
+        );
+    }
+
+    /// PR6: `#[cfg(test)]` union must be excluded — field-level `#[doc(hidden)]`
+    /// inside it must not be flagged.
+    #[test]
+    fn test_ignores_doc_hidden_on_union_field_inside_cfg_test() {
+        let tmp = TempDir::new().unwrap();
+        setup(tmp.path(), "#[cfg(test)]\nunion U { #[doc(hidden)] x: u32 }\n");
+        let outcome = verify(tmp.path());
+        assert!(
+            outcome.is_ok(),
+            "#[doc(hidden)] inside #[cfg(test)] union must not be flagged: {:?}",
+            outcome.findings()
+        );
+    }
+
     // ── AC-07: scanner callback replaceability ────────────────────────────────
 
     #[test]

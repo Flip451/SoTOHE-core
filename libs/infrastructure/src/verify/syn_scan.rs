@@ -555,6 +555,11 @@ where
                     self.visit_field(field);
                 }
             }
+            syn::Item::Union(u) => {
+                for field in &u.fields.named {
+                    self.visit_field(field);
+                }
+            }
             syn::Item::Enum(e) => {
                 for variant in &e.variants {
                     self.visit_variant(variant);
