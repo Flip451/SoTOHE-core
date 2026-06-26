@@ -366,6 +366,210 @@ pub(crate) fn compute_results(
     })
 }
 
+// ── Chain1-only scope resolution and pre-flight validation helpers ────────────
+//
+// Extracted from `driver_adapter.rs` to stay under the 700-line module-size cap.
+// These helpers are called from `FsRefVerifyAggregateAdapter::results` in that
+// module but live here because they share the same "results-path validation"
+// concern as the functions above.
+
+/// Returns `Err(Wiring(...))` when both `present` and `absent` are non-empty
+/// (partial catalogue set — fail-closed semantics).
+///
+/// # Semantics
+/// - All-absent (`present` empty): pre-Phase-2 valid → `Ok(())`.
+/// - Partial (`present` non-empty AND `absent` non-empty): missing layers → `Err(Wiring)`.
+/// - All-present (`absent` empty): normal operation → `Ok(())`.
+pub(crate) fn check_partial_catalogue_set(
+    present: &[domain::tddd::LayerId],
+    absent: &[domain::tddd::LayerId],
+) -> Result<(), RefVerifyDriverError> {
+    if !present.is_empty() && !absent.is_empty() {
+        let missing_list = absent.iter().map(|id| id.as_ref()).collect::<Vec<_>>().join(", ");
+        Err(RefVerifyDriverError::Wiring(format!(
+            "partial Chain2 catalogue set: catalogue absent for layer(s) [{missing_list}]; \
+             run the ref-verify pipeline to generate missing catalogues or check Phase-2 status",
+        )))
+    } else {
+        Ok(())
+    }
+}
+
+pub(crate) fn inspect_chain2_catalogue_set(
+    project_root: &Path,
+    track_id: &str,
+    bindings: &[crate::verify::tddd_layers::TdddLayerBinding],
+) -> Result<(Vec<domain::tddd::LayerId>, Vec<domain::tddd::LayerId>), RefVerifyDriverError> {
+    let mut present = Vec::new();
+    let mut absent = Vec::new();
+
+    for binding in bindings {
+        let layer_id =
+            domain::tddd::LayerId::try_new(binding.layer_id().to_owned()).map_err(|e| {
+                RefVerifyDriverError::Wiring(format!(
+                    "invalid TDDD layer '{}' for results: {e}",
+                    binding.layer_id()
+                ))
+            })?;
+        let catalogue_path =
+            project_root.join("track").join("items").join(track_id).join(binding.catalogue_file());
+        let catalogue_exists =
+            crate::track::symlink_guard::reject_symlinks_below(&catalogue_path, project_root)
+                .map_err(|e| {
+                    RefVerifyDriverError::Wiring(format!(
+                        "cannot inspect catalogue '{}': {e}",
+                        catalogue_path.display()
+                    ))
+                })?;
+        if catalogue_exists {
+            present.push(layer_id);
+        } else {
+            absent.push(layer_id);
+        }
+    }
+
+    Ok((present, absent))
+}
+
+/// Validate that the track directory `<project_root>/track/items/<track_id>/`
+/// exists before any catalogue or cache classification runs.
+///
+/// A typo in `track_id` would otherwise cause every declared catalogue to be
+/// classified as absent, which the "all-absent = pre-Phase-2 valid" branch
+/// silently accepts as a zero-pair result.  This function fails closed with a
+/// typed [`RefVerifyDriverError::Wiring`] error in that case.
+///
+/// The validation is chain-filter-agnostic: even a Chain1-only results request
+/// must not silently succeed with empty output when the track directory does not
+/// exist.
+pub(crate) fn check_track_dir_exists(
+    canonical_root: &Path,
+    track_id: &str,
+) -> Result<(), RefVerifyDriverError> {
+    let track_dir = canonical_root.join("track").join("items").join(track_id);
+    match crate::track::symlink_guard::reject_symlinks_below(&track_dir, canonical_root) {
+        Ok(true) => {
+            let metadata = track_dir.symlink_metadata().map_err(|e| {
+                RefVerifyDriverError::Wiring(format!(
+                    "cannot stat track directory '{}': {e}",
+                    track_dir.display()
+                ))
+            })?;
+            if metadata.is_dir() {
+                Ok(())
+            } else {
+                Err(RefVerifyDriverError::Wiring(format!(
+                    "track path '{}' exists but is not a directory — track_id '{}' is invalid",
+                    track_dir.display(),
+                    track_id,
+                )))
+            }
+        }
+        Ok(false) => Err(RefVerifyDriverError::Wiring(format!(
+            "track directory not found: '{}' — track_id '{}' does not exist under track/items",
+            track_dir.display(),
+            track_id,
+        ))),
+        Err(e) => Err(RefVerifyDriverError::Wiring(format!(
+            "cannot inspect track directory '{}': {e}",
+            track_dir.display()
+        ))),
+    }
+}
+
+/// Load TDDD bindings for Chain1-only consistency checks.
+///
+/// Missing `architecture-rules.json` is the pre-TDDD/zero-layer state and
+/// contributes no declared Chain2 catalogues. Malformed rules and other I/O
+/// errors still fail closed because declared catalogue state cannot be trusted.
+fn load_chain1_scope_tddd_bindings(
+    project_root: &Path,
+) -> Result<Vec<crate::verify::tddd_layers::TdddLayerBinding>, RefVerifyDriverError> {
+    use crate::verify::tddd_layers::LoadTdddLayersError;
+
+    let rules_path = project_root.join("architecture-rules.json");
+    match crate::verify::tddd_layers::load_tddd_layers(&rules_path, project_root) {
+        Ok(bindings) => Ok(bindings),
+        Err(LoadTdddLayersError::Io { source, .. })
+            if source.kind() == std::io::ErrorKind::NotFound =>
+        {
+            Ok(Vec::new())
+        }
+        Err(e) => Err(RefVerifyDriverError::Wiring(format!(
+            "cannot load TDDD layer bindings for Chain1 scope: {e}"
+        ))),
+    }
+}
+
+fn inspect_present_chain2_catalogues_for_chain1_scope(
+    project_root: &Path,
+    track_id: &str,
+    bindings: &[crate::verify::tddd_layers::TdddLayerBinding],
+) -> Result<Vec<String>, RefVerifyDriverError> {
+    let track_dir = project_root.join("track").join("items").join(track_id);
+    let mut present = Vec::new();
+
+    for binding in bindings {
+        let catalogue_path = track_dir.join(binding.catalogue_file());
+        let exists =
+            crate::track::symlink_guard::reject_symlinks_below(&catalogue_path, project_root)
+                .map_err(|e| {
+                    RefVerifyDriverError::Wiring(format!(
+                        "cannot inspect catalogue path '{}': {e}",
+                        catalogue_path.display()
+                    ))
+                })?;
+        if exists {
+            present.push(binding.catalogue_file().to_owned());
+        }
+    }
+
+    Ok(present)
+}
+
+/// Resolve the scope for a Chain1-only results query without invoking
+/// [`RefVerifyScopeResolver`].
+///
+/// [`RefVerifyScopeResolver::resolve`] enforces Chain2 catalogue consistency
+/// (IN-05: partial catalogue set is rejected).  For a Chain1-only request that
+/// consistency check is irrelevant and would incorrectly block users from
+/// inspecting Chain1 (spec vs ADR) failures while Phase-2 artefacts are still
+/// incomplete.
+///
+/// This function performs the only path check that Chain1 pair enumeration
+/// needs before the pair source runs: it verifies that the `spec.json` path can
+/// be inspected without crossing a symlink.  A missing `spec.json` remains a
+/// legal Phase-0 zero-pair state only when no declared Chain2 catalogue exists.
+pub(crate) fn resolve_chain1_only_scope(
+    canonical_root: &Path,
+    track_id: &str,
+) -> Result<usecase::ref_verify::RefVerifyScope, RefVerifyDriverError> {
+    use usecase::ref_verify::RefVerifyScope;
+
+    let spec_path = canonical_root.join("track").join("items").join(track_id).join("spec.json");
+    let spec_exists =
+        crate::track::symlink_guard::reject_symlinks_below(&spec_path, canonical_root).map_err(
+            |e| {
+                RefVerifyDriverError::Wiring(format!(
+                    "cannot inspect spec.json at '{}': {e}",
+                    spec_path.display()
+                ))
+            },
+        )?;
+    let bindings = load_chain1_scope_tddd_bindings(canonical_root)?;
+    let present_catalogues =
+        inspect_present_chain2_catalogues_for_chain1_scope(canonical_root, track_id, &bindings)?;
+    if !spec_exists && !present_catalogues.is_empty() {
+        return Err(RefVerifyDriverError::Wiring(format!(
+            "ref-verify results --chain 1: spec.json not found while TDDD catalogue(s) exist for \
+             track '{}': {}",
+            track_id,
+            present_catalogues.join(", ")
+        )));
+    }
+    Ok(RefVerifyScope::Chain1)
+}
+
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::indexing_slicing)]
 mod tests {
@@ -1123,5 +1327,272 @@ mod tests {
         assert_eq!(out.total_pass, 0);
         assert_eq!(out.total_fail, 0);
         assert_eq!(out.total_pending, 0);
+    }
+
+    // ── Helpers shared by scope-resolution and pre-flight tests ──────────────
+
+    fn write_tddd_rules(project_root: &std::path::Path) {
+        std::fs::write(
+            project_root.join("architecture-rules.json"),
+            r#"{
+              "layers": [
+                {
+                  "crate": "domain",
+                  "tddd": {
+                    "enabled": true,
+                    "catalogue_file": "domain-types.json"
+                  }
+                },
+                {
+                  "crate": "usecase",
+                  "tddd": {
+                    "enabled": true,
+                    "catalogue_file": "usecase-types.json"
+                  }
+                }
+              ]
+            }"#,
+        )
+        .unwrap();
+    }
+
+    // ── F2: partial-set catalogue detection ───────────────────────────────────
+
+    /// 2 layers declared, one catalogue absent / one present → Wiring error.
+    #[test]
+    fn check_partial_catalogue_set_partial_returns_wiring_error() {
+        let domain_id = LayerId::try_new("domain".to_owned()).unwrap();
+        let usecase_id = LayerId::try_new("usecase".to_owned()).unwrap();
+        // Simulate: domain present, usecase absent.
+        let present = [domain_id];
+        let absent = [usecase_id];
+        let err = check_partial_catalogue_set(&present, &absent).unwrap_err();
+        assert!(
+            matches!(err, RefVerifyDriverError::Wiring(ref msg) if msg.contains("usecase")),
+            "expected Wiring error naming the absent layer, got: {err:?}"
+        );
+    }
+
+    /// All target catalogues absent → pre-Phase-2 valid (success, no error).
+    #[test]
+    fn check_partial_catalogue_set_all_absent_succeeds() {
+        let domain_id = LayerId::try_new("domain".to_owned()).unwrap();
+        let usecase_id = LayerId::try_new("usecase".to_owned()).unwrap();
+        let present: [LayerId; 0] = [];
+        let absent = [domain_id, usecase_id];
+        check_partial_catalogue_set(&present, &absent).unwrap();
+    }
+
+    /// Single declared target catalogue present → success.
+    #[test]
+    fn check_partial_catalogue_set_all_present_succeeds() {
+        let domain_id = LayerId::try_new("domain".to_owned()).unwrap();
+        let present = [domain_id];
+        let absent: [LayerId; 0] = [];
+        check_partial_catalogue_set(&present, &absent).unwrap();
+    }
+
+    /// Specific-layer query must still fail closed when the full declared
+    /// Chain2 catalogue set is partial.
+    #[test]
+    fn inspect_chain2_catalogue_set_partial_returns_wiring_error() {
+        let dir = tempfile::tempdir().unwrap();
+        let track_id = "test-track";
+        let track_dir = dir.path().join("track").join("items").join(track_id);
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(track_dir.join("usecase-types.json"), "{}").unwrap();
+        let bindings = crate::verify::tddd_layers::parse_tddd_layers(
+            r#"{
+              "layers": [
+                {
+                  "crate": "domain",
+                  "tddd": {
+                    "enabled": true,
+                    "catalogue_file": "domain-types.json"
+                  }
+                },
+                {
+                  "crate": "usecase",
+                  "tddd": {
+                    "enabled": true,
+                    "catalogue_file": "usecase-types.json"
+                  }
+                }
+              ]
+            }"#,
+        )
+        .unwrap();
+
+        let (present, absent) =
+            inspect_chain2_catalogue_set(dir.path(), track_id, &bindings).unwrap();
+        let present_layers: Vec<&str> = present.iter().map(|id| id.as_ref()).collect();
+        let absent_layers: Vec<&str> = absent.iter().map(|id| id.as_ref()).collect();
+        assert_eq!(present_layers, vec!["usecase"]);
+        assert_eq!(absent_layers, vec!["domain"]);
+
+        let err = check_partial_catalogue_set(&present, &absent).unwrap_err();
+        assert!(
+            matches!(err, RefVerifyDriverError::Wiring(ref msg) if msg.contains("domain")),
+            "expected Wiring error naming the absent target layer, got: {err:?}"
+        );
+    }
+
+    // ── F1: Chain1-only scope resolution bypasses Chain2 consistency ─────────
+
+    /// F1: `chain=Chain1` against a partial Phase-2 catalogue set must succeed.
+    ///
+    /// `resolve_chain1_only_scope` must return `Chain1` when spec.json is present,
+    /// regardless of whether Chain2 catalogues are partially (or fully) absent.
+    #[test]
+    fn resolve_chain1_only_scope_partial_chain2_catalogue_succeeds() {
+        let dir = tempfile::tempdir().unwrap();
+        let track_id = "T001";
+        let track_dir = dir.path().join("track").join("items").join(track_id);
+        write_tddd_rules(dir.path());
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(track_dir.join("spec.json"), "{}").unwrap();
+        // Partial Chain2: only one catalogue present — full resolver would reject this.
+        std::fs::write(track_dir.join("domain-types.json"), "{}").unwrap();
+        // usecase-types.json intentionally absent.
+
+        let scope = resolve_chain1_only_scope(dir.path(), track_id).unwrap();
+        assert!(
+            matches!(scope, usecase::ref_verify::RefVerifyScope::Chain1),
+            "Chain1-only path must return Chain1 scope despite partial Chain2 set; got: {scope:?}"
+        );
+    }
+
+    /// F1: absent spec.json is Phase-0 zero-pair state, so Chain1 scope still resolves.
+    #[test]
+    fn resolve_chain1_only_scope_absent_spec_resolves_chain1() {
+        let dir = tempfile::tempdir().unwrap();
+        let track_id = "T001";
+        let track_dir = dir.path().join("track").join("items").join(track_id);
+        write_tddd_rules(dir.path());
+        std::fs::create_dir_all(&track_dir).unwrap();
+        // No spec.json.
+
+        let scope = resolve_chain1_only_scope(dir.path(), track_id).unwrap();
+        assert!(
+            matches!(scope, usecase::ref_verify::RefVerifyScope::Chain1),
+            "Chain1-only path must preserve Phase-0 zero-pair state when spec.json is absent; got: {scope:?}"
+        );
+    }
+
+    /// F1: absent spec.json is invalid when any declared Chain2 catalogue exists.
+    #[test]
+    fn resolve_chain1_only_scope_absent_spec_with_catalogue_returns_wiring_error() {
+        let dir = tempfile::tempdir().unwrap();
+        let track_id = "T001";
+        let track_dir = dir.path().join("track").join("items").join(track_id);
+        write_tddd_rules(dir.path());
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(track_dir.join("domain-types.json"), "{}").unwrap();
+        // No spec.json.
+
+        let err = resolve_chain1_only_scope(dir.path(), track_id).unwrap_err();
+        assert!(
+            matches!(&err, RefVerifyDriverError::Wiring(msg)
+                if msg.contains("spec.json not found while TDDD catalogue")),
+            "expected Wiring error for IN-06 violation, got: {err:?}"
+        );
+    }
+
+    /// F1: missing architecture-rules.json is pre-TDDD zero-layer state.
+    #[test]
+    fn resolve_chain1_only_scope_missing_rules_resolves_chain1() {
+        let dir = tempfile::tempdir().unwrap();
+        let track_id = "T001";
+        let track_dir = dir.path().join("track").join("items").join(track_id);
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(track_dir.join("spec.json"), "{}").unwrap();
+        // No architecture-rules.json.
+
+        let scope = resolve_chain1_only_scope(dir.path(), track_id).unwrap();
+        assert!(
+            matches!(scope, usecase::ref_verify::RefVerifyScope::Chain1),
+            "Chain1-only path must preserve pre-TDDD zero-layer state when rules are absent; got: {scope:?}"
+        );
+    }
+
+    /// F1: Chain1-only scope resolution still fails closed on malformed TDDD config.
+    #[test]
+    fn resolve_chain1_only_scope_malformed_rules_returns_wiring_error() {
+        let dir = tempfile::tempdir().unwrap();
+        let track_id = "T001";
+        let track_dir = dir.path().join("track").join("items").join(track_id);
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(track_dir.join("spec.json"), "{}").unwrap();
+        std::fs::write(dir.path().join("architecture-rules.json"), "not json").unwrap();
+
+        let err = resolve_chain1_only_scope(dir.path(), track_id).unwrap_err();
+        assert!(
+            matches!(&err, RefVerifyDriverError::Wiring(msg)
+                if msg.contains("cannot load TDDD layer bindings for Chain1 scope")
+                    && msg.contains("not valid JSON")),
+            "expected Wiring error for malformed TDDD config, got: {err:?}"
+        );
+    }
+
+    // ── F2: track directory pre-check ─────────────────────────────────────────
+
+    /// F2: An invalid track_id (no track directory) must return a typed Wiring
+    /// error, not a silent zero-pair result.
+    #[test]
+    fn check_track_dir_exists_missing_directory_returns_wiring_error() {
+        let dir = tempfile::tempdir().unwrap();
+        // No track/items/nonexistent-track/ directory created.
+        let err = check_track_dir_exists(dir.path(), "nonexistent-track").unwrap_err();
+        assert!(
+            matches!(&err, RefVerifyDriverError::Wiring(msg) if msg.contains("track directory not found")),
+            "expected Wiring error for missing track directory, got: {err:?}"
+        );
+    }
+
+    /// F2 counterpart: a valid track directory returns Ok(()).
+    #[test]
+    fn check_track_dir_exists_valid_directory_returns_ok() {
+        let dir = tempfile::tempdir().unwrap();
+        let track_id = "T001";
+        let track_dir = dir.path().join("track").join("items").join(track_id);
+        std::fs::create_dir_all(&track_dir).unwrap();
+
+        check_track_dir_exists(dir.path(), track_id).unwrap();
+    }
+
+    /// F2: a regular file at the track slot is not a valid track directory.
+    #[test]
+    fn check_track_dir_exists_regular_file_returns_wiring_error() {
+        let dir = tempfile::tempdir().unwrap();
+        let track_id = "T001";
+        let items_dir = dir.path().join("track").join("items");
+        std::fs::create_dir_all(&items_dir).unwrap();
+        std::fs::write(items_dir.join(track_id), "{}").unwrap();
+
+        let err = check_track_dir_exists(dir.path(), track_id).unwrap_err();
+        assert!(
+            matches!(&err, RefVerifyDriverError::Wiring(msg) if msg.contains("not a directory")),
+            "expected Wiring error for non-directory track path, got: {err:?}"
+        );
+    }
+
+    /// F2: a symlink at the track slot must be rejected before results classification.
+    #[cfg(unix)]
+    #[test]
+    fn check_track_dir_exists_symlink_returns_wiring_error() {
+        let dir = tempfile::tempdir().unwrap();
+        let outside = tempfile::tempdir().unwrap();
+        let track_id = "T001";
+        let items_dir = dir.path().join("track").join("items");
+        std::fs::create_dir_all(&items_dir).unwrap();
+        std::os::unix::fs::symlink(outside.path(), items_dir.join(track_id)).unwrap();
+
+        let err = check_track_dir_exists(dir.path(), track_id).unwrap_err();
+        assert!(
+            matches!(&err, RefVerifyDriverError::Wiring(msg)
+                if msg.contains("cannot inspect track directory")
+                    && msg.contains("refusing to follow symlink")),
+            "expected Wiring error for symlinked track path, got: {err:?}"
+        );
     }
 }
