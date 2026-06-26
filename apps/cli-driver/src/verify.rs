@@ -107,6 +107,12 @@ pub enum VerifyInput {
         /// Skip stale entries.
         skip_stale: bool,
     },
+    /// Check all `architecture-rules.json` `layers[]` crates for `#[doc(hidden)]`
+    /// attribute declarations (syn AST scan, visibility-agnostic, all forms).
+    DocHidden {
+        /// Project root directory.
+        project_root: PathBuf,
+    },
 }
 
 // ---------------------------------------------------------------------------
@@ -184,6 +190,9 @@ impl VerifyDriver {
                     workspace_root,
                     skip_stale,
                 ))
+            }
+            VerifyInput::DocHidden { project_root } => {
+                map_result(self.service.verify_doc_hidden(project_root))
             }
         }
     }

@@ -12,7 +12,8 @@
     },
     "infrastructure": {
       "patterns": ["libs/infrastructure/**"],
-      "briefing_file": ".harness/custom/review-prompts/infrastructure.md"
+      "briefing_file": ".harness/custom/review-prompts/infrastructure.md",
+      "diff_ceiling_lines": 1000
     },
     "cli": {
       "patterns": ["apps/cli/**"],

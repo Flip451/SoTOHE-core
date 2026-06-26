@@ -1,6 +1,90 @@
 {
   "schema_version": 2,
   "scopes": {
+    "usecase": {
+      "rounds": [
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:763459a6efbc7fa614fd826d2f13b08bfef5a2e176ffde796c11caf80b3a68a8",
+          "at": "2026-06-26T11:34:02Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:663c23c399fd0a9cbbc07b9a41b0475eebe46b5d398dc67a49d07c780075806b",
+          "at": "2026-06-26T11:30:30Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`layer.path` from `architecture-rules.json` is joined directly into `root.join(...).join(\"src\")` with no containment check, so a malformed or malicious layer entry can escape the trusted root (for example `../..` or an absolute path) and make the verifier scan arbitrary files outside the workspace.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/verify/syn_scan.rs",
+              "line": 77,
+              "category": "trusted-root violation"
+            },
+            {
+              "message": "The directory walk reads and recurses through entries with plain `read_dir`, `path.is_dir()`, and `read_to_string()` but never rejects symlinks at the boundary, so a symlink under `src/` can redirect the scan outside the workspace. This breaks the real-file semantics used elsewhere for trusted-root loaders.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/verify/syn_scan.rs",
+              "line": 98,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:a83d0b82cdada70c245adb5a0abff76897cbee4d59956fc0fc4caa95bd59a707",
+          "at": "2026-06-26T11:32:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ad7fdd873270974747ad0d1167cb5f14b7ddfbf32567f12532eecfeca62fc1a5",
+          "at": "2026-06-26T11:39:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "File-backed modules are never resolved here. A crate with `#[cfg(test)] mod tests;` and a separate `tests.rs` under `src/` will still have that file scanned, so `#[doc(hidden)]` inside a test-only module can be reported as a violation. This breaks the stated `cfg(test) mod foo;` exclusion and needs module-file resolution or an equivalent skip map.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/verify/syn_scan.rs",
+              "line": 320,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:ad7fdd873270974747ad0d1167cb5f14b7ddfbf32567f12532eecfeca62fc1a5",
+          "at": "2026-06-26T11:41:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:673466641fec9f1a3efdecd1cce353d9a878a0d1df3d0fb5c94ddd5e8b2d8691",
+          "at": "2026-06-26T12:00:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:673466641fec9f1a3efdecd1cce353d9a878a0d1df3d0fb5c94ddd5e8b2d8691",
+          "at": "2026-06-26T12:05:34Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -104,6 +188,93 @@
           "findings": [],
           "hash": "rvw1:sha256:4e2ec70aa2668e1dcc4ab97b1817cf47e784d338e50b5cc3aefeefbd91f064c2",
           "at": "2026-06-26T10:16:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The type view now marks the CLI `VerifyCommand` row, including the `DocHidden` variant planned under T002, as 🔵, while the same plan still leaves T002 unchecked/todo in `plan.md` line 29 and `impl-plan.json` lines 10-12. These artifacts now assert both that the CLI wiring is complete and that the wiring task has not started, so the plan state is incoherent.",
+              "severity": "P1",
+              "file": "track/items/prohibit-doc-hidden-attribute-2026-06-26/cli-types.md",
+              "line": 7,
+              "category": "contradiction"
+            },
+            {
+              "message": "The `VerifyInput` row is now 🔵 for the `DocHidden` CLI-driver wiring that belongs to T002, but T002 remains todo in the rendered and JSON plan. This creates the same lifecycle contradiction for the cli-driver layer: the catalogue view says the T002 surface is complete while the task tracking says it is still unstarted.",
+              "severity": "P1",
+              "file": "track/items/prohibit-doc-hidden-attribute-2026-06-26/cli_driver-types.md",
+              "line": 7,
+              "category": "contradiction"
+            },
+            {
+              "message": "The usecase type view now marks `VerifyPort`/`VerifyService` with `verify_doc_hidden` as 🔵 even though T002, which owns adding that usecase wiring, remains todo in `plan.md` and `impl-plan.json`. The type catalogue signals should not advance this wiring independently of the task state, otherwise the plan artifacts give conflicting implementation status.",
+              "severity": "P1",
+              "file": "track/items/prohibit-doc-hidden-attribute-2026-06-26/usecase-types.md",
+              "line": 7,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:42d303eaf813039bfe71e972e642c27793ed25cee5d6bb5feeb1e0cf0e162992",
+          "at": "2026-06-26T11:34:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 is now marked `in_progress`, but the transition described for this plan-artifacts round is only T001 moving from `todo` to `in_progress`, and T002's own description still declares T001 as its prerequisite. This leaves the plan claiming a dependent wiring task is active before the detection-core task is completed; keep T002 as `todo` until T001 is transitioned.",
+              "severity": "P1",
+              "file": "track/items/prohibit-doc-hidden-attribute-2026-06-26/impl-plan.json",
+              "line": 12,
+              "category": "contradiction"
+            },
+            {
+              "message": "This rendered type view was changed from a pending signal to blue during a round whose stated artifact transition is limited to `impl-plan.json` and the generated `plan.md`; the same unexpected signal flip appears in `cli_driver-types.md`, `infrastructure-types.md`, and `usecase-types.md`. That makes the artifact set inconsistent with the declared lifecycle-only transition and should be restored/regenerated so type rendered views remain unchanged in this round.",
+              "severity": "P1",
+              "file": "track/items/prohibit-doc-hidden-attribute-2026-06-26/cli-types.md",
+              "line": 7,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c99896e341620c3e8d99cdc0747077adb07969728e607f7a5d1856147db565a0",
+          "at": "2026-06-26T11:39:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:42d303eaf813039bfe71e972e642c27793ed25cee5d6bb5feeb1e0cf0e162992",
+          "at": "2026-06-26T11:45:23Z"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8cf39553ddfa2cc58beac6bc96e2a7b81a15485fd600d4f4a021613cfe3e9af2",
+          "at": "2026-06-26T11:32:52Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0d984876b867a5ecabd80e498d9bdbcb94f6af4f23faaab41a8fc65cc6539cf8",
+          "at": "2026-06-26T11:30:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0d984876b867a5ecabd80e498d9bdbcb94f6af4f23faaab41a8fc65cc6539cf8",
+          "at": "2026-06-26T12:01:21Z"
         }
       ]
     }

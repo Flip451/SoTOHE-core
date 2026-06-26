@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-26T10:16:48Z",
+  "generated_at": "2026-06-26T12:06:12Z",
   "declaration_hash": "7d693b1aa6077b5944c7ab9b9794510d555513b478a8979bf22359346af7672c",
   "signals": [
     {
       "type_name": "VerifyInput",
       "kind_tag": "enum",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {

@@ -111,6 +111,10 @@ pub trait VerifyPort: Send + Sync {
         workspace_root: &Path,
         skip_stale: bool,
     ) -> Result<VerifyOutcome, VerifyPortError>;
+
+    /// Check all `architecture-rules.json` `layers[]` crates for `#[doc(hidden)]`
+    /// attribute declarations (syn AST scan, visibility-agnostic, all forms).
+    fn verify_doc_hidden(&self, project_root: &Path) -> Result<VerifyOutcome, VerifyPortError>;
 }
 
 /// Application-level contract for all verify subcommands.
@@ -193,6 +197,10 @@ pub trait VerifyService: Send + Sync {
         workspace_root: PathBuf,
         skip_stale: bool,
     ) -> Result<VerifyOutcome, VerifyPortError>;
+
+    /// Check all `architecture-rules.json` `layers[]` crates for `#[doc(hidden)]`
+    /// attribute declarations (syn AST scan, visibility-agnostic, all forms).
+    fn verify_doc_hidden(&self, project_root: PathBuf) -> Result<VerifyOutcome, VerifyPortError>;
 }
 
 /// Interactor that implements `VerifyService` by delegating to the injected `VerifyPort`.
@@ -309,5 +317,9 @@ impl VerifyService for VerifyInteractor {
             workspace_root.as_path(),
             skip_stale,
         )
+    }
+
+    fn verify_doc_hidden(&self, project_root: PathBuf) -> Result<VerifyOutcome, VerifyPortError> {
+        self.port.verify_doc_hidden(project_root.as_path())
     }
 }
