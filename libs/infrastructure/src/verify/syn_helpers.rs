@@ -56,3 +56,26 @@ pub(crate) fn sibling_rs_files(root: &Path, path: &Path) -> Vec<PathBuf> {
     siblings.sort();
     siblings
 }
+
+/// Returns all `.rs` files (non-recursive) in `dir` that are within `root`.
+///
+/// Used by `file_backed_module_source_probes` in [`super::syn_scan`] to probe
+/// ancestor directories for any `.rs` file that may contain a
+/// `#[cfg(test)] #[path = "subdir/..."] mod tests;` declaration referencing a
+/// target file located in a subdirectory of `dir`.
+pub(crate) fn rs_files_in_dir(root: &Path, dir: &Path) -> Vec<PathBuf> {
+    if dir.strip_prefix(root).is_err() {
+        return Vec::new();
+    }
+    let Ok(entries) = std::fs::read_dir(dir) else {
+        return Vec::new();
+    };
+    let mut files: Vec<PathBuf> = entries
+        .flatten()
+        .map(|e| e.path())
+        .filter(|p| p.extension().is_some_and(|ext| ext == "rs"))
+        .filter(|p| p.strip_prefix(root).is_ok())
+        .collect();
+    files.sort();
+    files
+}

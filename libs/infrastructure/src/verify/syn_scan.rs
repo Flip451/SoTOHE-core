@@ -16,7 +16,7 @@ use domain::verify::{VerifyFinding, VerifyOutcome};
 use crate::track::symlink_guard::reject_symlinks_below;
 
 use super::path_safety::lexical_normalize;
-use super::syn_helpers::{has_cfg_test_attr, sibling_rs_files};
+use super::syn_helpers::{has_cfg_test_attr, rs_files_in_dir, sibling_rs_files};
 use super::syn_scan_classify::{ClassifyCache, classify_file_module_references};
 use super::trusted_root::absolutize;
 
@@ -350,6 +350,19 @@ fn file_backed_module_source_probes(root: &Path, path: &Path) -> Vec<(PathBuf, V
             break;
         };
         base_dir = parent.to_path_buf();
+
+        // Ancestor sibling probe: add all .rs files in `base_dir` (now the
+        // ancestor directory).  Any file there may use
+        // `#[cfg(test)] #[path = "subdir/helpers.rs"] mod tests;`
+        // to reference `path` via a subdirectory path attribute, a pattern
+        // that the canonical-candidates list above does not cover.
+        if let Some(module_path) = module_path_for_file_from_base(&base_dir, path) {
+            for ancestor_file in rs_files_in_dir(root, &base_dir) {
+                if ancestor_file.as_path() != path {
+                    probes.push((ancestor_file, module_path.clone()));
+                }
+            }
+        }
     }
 
     probes

@@ -1062,3 +1062,94 @@ fn test_ignores_doc_hidden_in_cfg_test_mod_with_bare_path_attr_regression() {
         outcome.findings()
     );
 }
+
+// ── PR24-PR26: non-root module with subdirectory #[path] reference ───────────
+
+/// PR24: `foo.rs` (not lib.rs) in `src/` declares
+/// `#[cfg(test)] #[path = "fixtures/helpers.rs"] mod tests;`.
+/// `src/fixtures/helpers.rs` contains `#[doc(hidden)]`.
+/// The probe must walk ancestor directories of `src/fixtures/helpers.rs` and
+/// find the sibling `foo.rs` — the file must be excluded from scanning.
+#[test]
+fn test_ignores_doc_hidden_in_cfg_test_mod_declared_in_non_root_sibling_with_subdir_path() {
+    let tmp = TempDir::new().unwrap();
+    write_arch_rules(tmp.path());
+    write_src(tmp.path(), "lib.rs", "pub fn clean() {}\n");
+    write_src(
+        tmp.path(),
+        "foo.rs",
+        concat!(
+            "pub fn foo_fn() {}\n",
+            "#[cfg(test)]\n",
+            "#[path = \"fixtures/helpers.rs\"]\n",
+            "mod tests;\n",
+        ),
+    );
+    write_src(tmp.path(), "fixtures/helpers.rs", "#[doc(hidden)]\npub fn hidden_helper() {}\n");
+
+    let outcome = verify(tmp.path());
+    assert!(
+        outcome.is_ok(),
+        "doc(hidden) in cfg(test) file declared via subdirectory #[path] from a non-root \
+         sibling must not be flagged (PR24): {:?}",
+        outcome.findings()
+    );
+}
+
+/// PR25: multi-level subdirectory — `foo.rs` in `src/` declares
+/// `#[cfg(test)] #[path = "fixtures/inner/helpers.rs"] mod tests;`.
+/// `src/fixtures/inner/helpers.rs` contains `#[doc(hidden)]`.
+/// The ancestor probe must recurse past two subdirectory levels and still find
+/// `foo.rs` as the cfg(test) parent — the file must be excluded.
+#[test]
+fn test_ignores_doc_hidden_in_cfg_test_mod_declared_in_non_root_sibling_with_multi_level_subdir_path()
+ {
+    let tmp = TempDir::new().unwrap();
+    write_arch_rules(tmp.path());
+    write_src(tmp.path(), "lib.rs", "pub fn clean() {}\n");
+    write_src(
+        tmp.path(),
+        "foo.rs",
+        concat!(
+            "pub fn foo_fn() {}\n",
+            "#[cfg(test)]\n",
+            "#[path = \"fixtures/inner/helpers.rs\"]\n",
+            "mod tests;\n",
+        ),
+    );
+    write_src(
+        tmp.path(),
+        "fixtures/inner/helpers.rs",
+        "#[doc(hidden)]\npub fn hidden_helper() {}\n",
+    );
+
+    let outcome = verify(tmp.path());
+    assert!(
+        outcome.is_ok(),
+        "doc(hidden) in cfg(test) file declared via multi-level subdirectory #[path] from a \
+         non-root sibling must not be flagged (PR25): {:?}",
+        outcome.findings()
+    );
+}
+
+/// PR26: regression — the ancestor sibling probe must not cause false negatives.
+/// `foo.rs` exists in `src/` but does NOT declare any cfg(test) reference to
+/// `src/fixtures/helpers.rs`.  The file still has `#[doc(hidden)]` and must be
+/// flagged, because no cfg(test) module declaration covers it.
+#[test]
+fn test_flags_doc_hidden_when_ancestor_sibling_does_not_reference_file_as_cfg_test() {
+    let tmp = TempDir::new().unwrap();
+    write_arch_rules(tmp.path());
+    write_src(tmp.path(), "lib.rs", "pub fn clean() {}\n");
+    // foo.rs exists in src/ but does not reference fixtures/helpers.rs.
+    write_src(tmp.path(), "foo.rs", "pub fn foo_fn() {}\n");
+    write_src(tmp.path(), "fixtures/helpers.rs", "#[doc(hidden)]\npub fn hidden_helper() {}\n");
+
+    let outcome = verify(tmp.path());
+    assert!(
+        outcome.has_errors(),
+        "doc(hidden) in file with no cfg(test) ancestor reference must still be flagged \
+         (PR26 regression): {:?}",
+        outcome.findings()
+    );
+}
