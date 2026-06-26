@@ -274,6 +274,25 @@ fn attr_start_line(attr: Option<&syn::Attribute>) -> usize {
     attr.map(|a| a.pound_token.spans[0].start().line).unwrap_or(0)
 }
 
+/// Returns `true` when `path` is a crate root entry point (`src/lib.rs` or
+/// `src/main.rs`).
+///
+/// Crate roots have no parent `mod` declaration in any production file, so the
+/// dual-ref scan would produce `cfg_test_ref=true, prod_ref=false` if a sibling
+/// file contains `#[cfg(test)] #[path = "lib.rs"] mod …;`.  By short-circuiting
+/// on crate roots we prevent such sibling declarations from misclassifying the
+/// root as test-only and allowing `#[doc(hidden)]` to bypass the gate.
+fn is_crate_root_entry_point(path: &Path) -> bool {
+    let Some(file_name) = path.file_name() else {
+        return false;
+    };
+    let name = file_name.to_string_lossy();
+    if name != "lib.rs" && name != "main.rs" {
+        return false;
+    }
+    path.parent().is_some_and(|p| p.file_name().is_some_and(|n| n == "src"))
+}
+
 /// Returns `true` when `path` is exclusively referenced by `#[cfg(test)] mod`
 /// declarations, propagating test context transitively from ancestor files.
 fn is_file_backed_test_module(root: &Path, path: &Path, cache: &mut ClassifyCache) -> bool {
@@ -289,6 +308,14 @@ fn is_file_backed_test_module_inner(
     memo: &mut HashMap<PathBuf, bool>,
     cache: &mut ClassifyCache,
 ) -> bool {
+    // Crate roots (`src/lib.rs`, `src/main.rs`) are always production code.
+    // They have no parent `mod` declaration, so a sibling file that declares
+    // `#[cfg(test)] #[path = "lib.rs"] mod …;` would otherwise produce
+    // cfg_test_ref=true, prod_ref=false — misclassifying the root as test-only.
+    if is_crate_root_entry_point(path) {
+        return false;
+    }
+
     if let Some(result) = memo.get(path) {
         return *result;
     }

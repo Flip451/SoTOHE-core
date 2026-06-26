@@ -1153,3 +1153,80 @@ fn test_flags_doc_hidden_when_ancestor_sibling_does_not_reference_file_as_cfg_te
         outcome.findings()
     );
 }
+
+/// PR27: `src/lib.rs` has `#[doc(hidden)]` AND a sibling `bypass.rs` declares
+/// `#[cfg(test)] #[path = "lib.rs"] mod fake_root;`.
+/// Before the fix the crate root was misclassified as test-only (cfg_test_ref=true,
+/// prod_ref=false) and the finding was silently dropped.  After the fix the root is
+/// always treated as production and the violation must be flagged.
+#[test]
+fn test_flags_doc_hidden_in_lib_rs_when_sibling_has_cfg_test_path_ref_to_lib() {
+    let tmp = TempDir::new().unwrap();
+    write_arch_rules(tmp.path());
+    write_src(tmp.path(), "lib.rs", "#[doc(hidden)]\npub fn x() {}\n");
+    write_src(
+        tmp.path(),
+        "bypass.rs",
+        concat!("#[cfg(test)]\n", "#[path = \"lib.rs\"]\n", "mod fake_root;\n",),
+    );
+
+    let outcome = verify(tmp.path());
+    assert!(
+        outcome.has_errors(),
+        "doc(hidden) in lib.rs must be flagged even when a sibling declares \
+         #[cfg(test)] #[path = \"lib.rs\"] mod … (PR27): {:?}",
+        outcome.findings()
+    );
+}
+
+/// PR28: `src/main.rs` has `#[doc(hidden)]` AND a sibling declares
+/// `#[cfg(test)] #[path = "main.rs"] mod fake_main;`.
+/// The crate root must not be misclassified as test-only; the violation must be flagged.
+#[test]
+fn test_flags_doc_hidden_in_main_rs_when_sibling_has_cfg_test_path_ref_to_main() {
+    let tmp = TempDir::new().unwrap();
+    write_arch_rules(tmp.path());
+    write_src(tmp.path(), "main.rs", "#[doc(hidden)]\npub fn x() {}\n");
+    write_src(
+        tmp.path(),
+        "sibling.rs",
+        concat!("#[cfg(test)]\n", "#[path = \"main.rs\"]\n", "mod fake_main;\n",),
+    );
+
+    let outcome = verify(tmp.path());
+    assert!(
+        outcome.has_errors(),
+        "doc(hidden) in main.rs must be flagged even when a sibling declares \
+         #[cfg(test)] #[path = \"main.rs\"] mod … (PR28): {:?}",
+        outcome.findings()
+    );
+}
+
+/// PR29: regression — a non-root file referenced only via `#[cfg(test)] mod` in
+/// `lib.rs` must still be classified as test-only and NOT flagged.
+/// The crate-root fix must not affect the existing test-helper exclusion logic.
+#[test]
+fn test_non_root_file_cfg_test_only_ref_from_lib_rs_remains_test_only() {
+    let tmp = TempDir::new().unwrap();
+    write_arch_rules(tmp.path());
+    // lib.rs (crate root) only references helpers.rs via cfg(test) — no prod ref.
+    write_src(
+        tmp.path(),
+        "lib.rs",
+        concat!(
+            "pub fn clean() {}\n",
+            "#[cfg(test)]\n",
+            "#[path = \"helpers.rs\"]\n",
+            "mod test_helpers;\n",
+        ),
+    );
+    write_src(tmp.path(), "helpers.rs", "#[doc(hidden)]\npub fn hidden_helper() {}\n");
+
+    let outcome = verify(tmp.path());
+    assert!(
+        outcome.is_ok(),
+        "doc(hidden) in a non-root file referenced only via cfg(test) mod must not be \
+         flagged (PR29 regression): {:?}",
+        outcome.findings()
+    );
+}
