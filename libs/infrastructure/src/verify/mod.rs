@@ -36,6 +36,7 @@ pub mod spec_states;
 pub(crate) mod spec_states_legacy_markdown;
 pub(crate) mod syn_helpers;
 pub(crate) mod syn_scan;
+pub(crate) mod syn_scan_classify;
 pub mod tddd_layers;
 pub mod tech_stack;
 pub mod trusted_root;

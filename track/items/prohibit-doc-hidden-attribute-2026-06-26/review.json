@@ -1,24 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0d984876b867a5ecabd80e498d9bdbcb94f6af4f23faaab41a8fc65cc6539cf8",
-          "at": "2026-06-26T11:30:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0d984876b867a5ecabd80e498d9bdbcb94f6af4f23faaab41a8fc65cc6539cf8",
-          "at": "2026-06-26T12:01:21Z"
-        }
-      ]
-    },
     "cli": {
       "rounds": [
         {
@@ -175,6 +157,64 @@
           "findings": [],
           "hash": "rvw1:sha256:60ced0cb9fb5886056d8ee5895605f3a4ad313f765751ce3bb50cd5e738d561b",
           "at": "2026-06-26T14:24:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`candidate.parent() != path.parent()` prevents recursion into same-directory module files, so transitive test-only inheritance still fails for common chains like `lib.rs -> a.rs -> b.rs` (or any same-directory `mod` chain). In that case `b.rs` is still treated as production-reachable and `#[doc(hidden)]` there will be flagged even though it is only reachable through `#[cfg(test)]`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/syn_scan.rs",
+              "line": 285,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:8dfd6b9af9b16442f2970b9144eb9c6ee310652dcee721c62cfdeecf73158258",
+          "at": "2026-06-26T16:59:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c961303cbb9b58eb98c722a95d06bdbc39a729b146d046bde5e18c3fc42e0815",
+          "at": "2026-06-26T17:08:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The transitive test-module check only treats a parent file as test-only when that parent was itself reached through a file-backed `#[cfg(test)] mod` chain. It does not consider a module file's own inner `#![cfg(test)]` attribute, even though `scan_single_file` skips such files directly. As a result, `lib.rs` with `mod tests;`, `tests.rs` with `#![cfg(test)]\nmod helpers;`, and `tests/helpers.rs` with `#[doc(hidden)]` will classify `helpers.rs` as production-referenced and report a false violation, despite the whole parent module being test-only. This breaks the required `#[cfg(test)]` pruning for file-backed descendants.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/syn_scan.rs",
+              "line": 289,
+              "category": "cfg-test exclusion"
+            }
+          ],
+          "hash": "rvw1:sha256:c961303cbb9b58eb98c722a95d06bdbc39a729b146d046bde5e18c3fc42e0815",
+          "at": "2026-06-26T17:13:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9319253547b81b57dcb1e4e1f8a39c0ee1bc53ec55c71b96839ac84b96e732a3",
+          "at": "2026-06-26T17:18:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a007cee41a952f8cdf442fbe81e1d3669c0c3c1a7e3e8e2d86f4171c18ceb83b",
+          "at": "2026-06-26T18:41:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a007cee41a952f8cdf442fbe81e1d3669c0c3c1a7e3e8e2d86f4171c18ceb83b",
+          "at": "2026-06-26T18:45:16Z"
         }
       ]
     },
@@ -197,6 +237,24 @@
           "findings": [],
           "hash": "rvw1:sha256:8cf39553ddfa2cc58beac6bc96e2a7b81a15485fd600d4f4a021613cfe3e9af2",
           "at": "2026-06-26T11:32:52Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0d984876b867a5ecabd80e498d9bdbcb94f6af4f23faaab41a8fc65cc6539cf8",
+          "at": "2026-06-26T11:30:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0d984876b867a5ecabd80e498d9bdbcb94f6af4f23faaab41a8fc65cc6539cf8",
+          "at": "2026-06-26T12:01:21Z"
         }
       ]
     },

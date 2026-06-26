@@ -702,3 +702,134 @@ fn test_flags_doc_hidden_in_file_not_referenced_as_cfg_test_by_any_sibling() {
         outcome.findings()
     );
 }
+
+// ── PR13-PR17: transitive cfg(test) context propagation ──────────────────────
+
+/// PR13: `lib.rs` has `#[cfg(test)] mod tests;`, `tests.rs` has a plain
+/// `mod helpers;`, and `tests/helpers.rs` has `#[doc(hidden)]`.
+/// Because `tests.rs` is itself only reachable under `#[cfg(test)]`, the plain
+/// `mod helpers;` inside it is transitively test-only, so `tests/helpers.rs`
+/// must not be flagged.
+#[test]
+fn test_ignores_doc_hidden_in_nested_file_backed_test_module() {
+    let tmp = TempDir::new().unwrap();
+    write_arch_rules(tmp.path());
+    write_src(
+        tmp.path(),
+        "lib.rs",
+        concat!("pub fn clean() {}\n", "#[cfg(test)]\n", "mod tests;\n"),
+    );
+    write_src(tmp.path(), "tests.rs", "mod helpers;\n");
+    write_src(tmp.path(), "tests/helpers.rs", "#[doc(hidden)]\npub fn x() {}\n");
+
+    let outcome = verify(tmp.path());
+    assert!(
+        outcome.is_ok(),
+        "doc(hidden) in transitively test-only file must not be flagged (PR13): {:?}",
+        outcome.findings()
+    );
+}
+
+/// PR14: regression — when `lib.rs` has a production `mod tests;` (no
+/// `#[cfg(test)]`), `tests.rs` is production, so `tests/helpers.rs` must
+/// still be flagged even though `tests.rs` declares `mod helpers;` plainly.
+#[test]
+fn test_flags_doc_hidden_when_parent_is_production_module() {
+    let tmp = TempDir::new().unwrap();
+    write_arch_rules(tmp.path());
+    write_src(
+        tmp.path(),
+        "lib.rs",
+        // Plain mod tests; — no #[cfg(test)].
+        concat!("pub fn clean() {}\n", "mod tests;\n"),
+    );
+    write_src(tmp.path(), "tests.rs", "mod helpers;\n");
+    write_src(tmp.path(), "tests/helpers.rs", "#[doc(hidden)]\npub fn x() {}\n");
+
+    let outcome = verify(tmp.path());
+    assert!(
+        outcome.has_errors(),
+        "doc(hidden) reachable via production mod chain must be flagged (PR14): {:?}",
+        outcome.findings()
+    );
+}
+
+/// PR15: multi-level transitive inheritance — `lib.rs` has
+/// `#[cfg(test)] mod a;`, `a.rs` has plain `mod b;`, `a/b.rs` has plain
+/// `mod c;`, and `a/b/c.rs` has `#[doc(hidden)]`.
+/// All three descendant files are transitively test-only and must not be flagged.
+#[test]
+fn test_ignores_doc_hidden_in_deeply_nested_transitive_cfg_test_module() {
+    let tmp = TempDir::new().unwrap();
+    write_arch_rules(tmp.path());
+    write_src(tmp.path(), "lib.rs", concat!("pub fn clean() {}\n", "#[cfg(test)]\n", "mod a;\n"));
+    write_src(tmp.path(), "a.rs", "mod b;\n");
+    write_src(tmp.path(), "a/b.rs", "mod c;\n");
+    write_src(tmp.path(), "a/b/c.rs", "#[doc(hidden)]\npub fn hidden() {}\n");
+
+    let outcome = verify(tmp.path());
+    assert!(
+        outcome.is_ok(),
+        "doc(hidden) in deeply nested transitively test-only file must not be flagged (PR15): \
+         {:?}",
+        outcome.findings()
+    );
+}
+
+/// PR16: same-directory transitive inheritance — `lib.rs` has
+/// `#[cfg(test)] mod a;`, `a.rs` has plain `mod b;`, and `b.rs` has
+/// `#[doc(hidden)]`.  The plain same-directory child is still test-only
+/// because its parent file is test-only.
+#[test]
+fn test_ignores_doc_hidden_in_same_directory_transitive_cfg_test_module() {
+    let tmp = TempDir::new().unwrap();
+    write_arch_rules(tmp.path());
+    write_src(tmp.path(), "lib.rs", concat!("pub fn clean() {}\n", "#[cfg(test)]\n", "mod a;\n"));
+    write_src(tmp.path(), "a.rs", "mod b;\n");
+    write_src(tmp.path(), "b.rs", "#[doc(hidden)]\npub fn hidden() {}\n");
+
+    let outcome = verify(tmp.path());
+    assert!(
+        outcome.is_ok(),
+        "doc(hidden) in same-directory transitively test-only file must not be flagged (PR16): \
+         {:?}",
+        outcome.findings()
+    );
+}
+
+/// PR17: same-directory production regression — without `#[cfg(test)]` on the
+/// root module, `a.rs` and `b.rs` are production files and the violation must
+/// still be reported.
+#[test]
+fn test_flags_doc_hidden_in_same_directory_production_module_chain() {
+    let tmp = TempDir::new().unwrap();
+    write_arch_rules(tmp.path());
+    write_src(tmp.path(), "lib.rs", concat!("pub fn clean() {}\n", "mod a;\n"));
+    write_src(tmp.path(), "a.rs", "mod b;\n");
+    write_src(tmp.path(), "b.rs", "#[doc(hidden)]\npub fn hidden() {}\n");
+
+    let outcome = verify(tmp.path());
+    assert!(
+        outcome.has_errors(),
+        "doc(hidden) in same-directory production module chain must be flagged (PR17): {:?}",
+        outcome.findings()
+    );
+}
+
+/// PR18: a production `mod tests;` can still point at a module file whose own
+/// file-level `#![cfg(test)]` makes every child module declaration test-only.
+#[test]
+fn test_ignores_doc_hidden_when_parent_module_file_has_inner_cfg_test() {
+    let tmp = TempDir::new().unwrap();
+    write_arch_rules(tmp.path());
+    write_src(tmp.path(), "lib.rs", concat!("pub fn clean() {}\n", "mod tests;\n"));
+    write_src(tmp.path(), "tests.rs", "#![cfg(test)]\nmod helpers;\n");
+    write_src(tmp.path(), "tests/helpers.rs", "#[doc(hidden)]\npub fn hidden() {}\n");
+
+    let outcome = verify(tmp.path());
+    assert!(
+        outcome.is_ok(),
+        "doc(hidden) under a file-level cfg(test) parent module must not be flagged (PR18): {:?}",
+        outcome.findings()
+    );
+}

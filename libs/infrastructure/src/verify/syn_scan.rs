@@ -8,6 +8,7 @@
 //! Later syn-based lint gates (e.g. `Result<_, String>` ban) can reuse this
 //! scanner by supplying a different detection callback.
 
+use std::collections::{HashMap, HashSet};
 use std::path::{Path, PathBuf};
 
 use domain::verify::{VerifyFinding, VerifyOutcome};
@@ -15,12 +16,9 @@ use domain::verify::{VerifyFinding, VerifyOutcome};
 use crate::track::symlink_guard::reject_symlinks_below;
 
 use super::path_safety::lexical_normalize;
-use super::syn_helpers::{extract_path_attr, has_cfg_test_attr, sibling_rs_files};
+use super::syn_helpers::{has_cfg_test_attr, sibling_rs_files};
+use super::syn_scan_classify::{ClassifyCache, classify_file_module_references};
 use super::trusted_root::absolutize;
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Public context type
-// ─────────────────────────────────────────────────────────────────────────────
 
 /// Context passed from the scanner to a detection callback for each
 /// attribute-bearing AST node.
@@ -77,6 +75,7 @@ pub(crate) fn scan_workspace_rust_sources(
 
     let trusted_root = lexical_normalize(&absolutize(root));
     let mut findings = Vec::new();
+    let mut classify_cache = ClassifyCache::new();
 
     for layer in rules.layers() {
         let src_dir = match resolve_layer_src_dir(&trusted_root, &layer.crate_name, &layer.path) {
@@ -86,15 +85,17 @@ pub(crate) fn scan_workspace_rust_sources(
                 continue;
             }
         };
-        scan_rs_files_in_dir(&trusted_root, &src_dir, &mut findings, &mut inspect);
+        scan_rs_files_in_dir(
+            &trusted_root,
+            &src_dir,
+            &mut findings,
+            &mut inspect,
+            &mut classify_cache,
+        );
     }
 
     VerifyOutcome::from_findings(findings)
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Internal file discovery helpers
-// ─────────────────────────────────────────────────────────────────────────────
 
 fn resolve_layer_src_dir(
     trusted_root: &Path,
@@ -154,6 +155,7 @@ fn scan_rs_files_in_dir(
     dir: &Path,
     findings: &mut Vec<VerifyFinding>,
     inspect: &mut impl FnMut(SynScanContext) -> Vec<VerifyFinding>,
+    classify_cache: &mut ClassifyCache,
 ) {
     let Some(meta) = guarded_metadata(root, dir, findings) else {
         return;
@@ -196,9 +198,9 @@ fn scan_rs_files_in_dir(
             continue;
         };
         if meta.is_dir() {
-            scan_rs_files_in_dir(root, &path, findings, inspect);
+            scan_rs_files_in_dir(root, &path, findings, inspect, classify_cache);
         } else if meta.is_file() && path.extension().is_some_and(|ext| ext == "rs") {
-            scan_single_file(root, &path, findings, inspect);
+            scan_single_file(root, &path, findings, inspect, classify_cache);
         }
     }
 }
@@ -208,6 +210,7 @@ fn scan_single_file(
     path: &Path,
     findings: &mut Vec<VerifyFinding>,
     inspect: &mut impl FnMut(SynScanContext) -> Vec<VerifyFinding>,
+    classify_cache: &mut ClassifyCache,
 ) {
     let Some(meta) = guarded_metadata(root, path, findings) else {
         return;
@@ -242,7 +245,7 @@ fn scan_single_file(
     if has_cfg_test_attr(&file.attrs) {
         return;
     }
-    if is_file_backed_test_module(root, path) {
+    if is_file_backed_test_module(root, path, classify_cache) {
         return;
     }
 
@@ -271,16 +274,50 @@ fn attr_start_line(attr: Option<&syn::Attribute>) -> usize {
     attr.map(|a| a.pound_token.spans[0].start().line).unwrap_or(0)
 }
 
-/// Returns `true` only when `path` is referenced exclusively by `#[cfg(test)]`
-/// module declarations (no production `mod` declaration also points to it).
-fn is_file_backed_test_module(root: &Path, path: &Path) -> bool {
+/// Returns `true` when `path` is exclusively referenced by `#[cfg(test)] mod`
+/// declarations, propagating test context transitively from ancestor files.
+fn is_file_backed_test_module(root: &Path, path: &Path, cache: &mut ClassifyCache) -> bool {
+    is_file_backed_test_module_inner(root, path, &mut HashSet::new(), &mut HashMap::new(), cache)
+}
+
+/// Inner recursive helper for [`is_file_backed_test_module`] with DFS cycle guard.
+/// Removes the `path` entry from `visiting` on return to allow re-visits from other paths.
+fn is_file_backed_test_module_inner(
+    root: &Path,
+    path: &Path,
+    visiting: &mut HashSet<PathBuf>,
+    memo: &mut HashMap<PathBuf, bool>,
+    cache: &mut ClassifyCache,
+) -> bool {
+    if let Some(result) = memo.get(path) {
+        return *result;
+    }
+    if !visiting.insert(path.to_path_buf()) {
+        return false;
+    }
     let (mut cfg_test_ref, mut prod_ref) = (false, false);
     for (candidate, module_path) in file_backed_module_source_probes(root, path) {
-        let (ct, prod) = classify_file_module_references(root, &candidate, &module_path);
-        cfg_test_ref |= ct;
-        prod_ref |= prod;
+        let parent_is_test = is_existing_source_file(root, &candidate)
+            && is_file_backed_test_module_inner(root, &candidate, visiting, memo, cache);
+        let (ct, prod) = classify_file_module_references(root, &candidate, &module_path, cache);
+        if parent_is_test {
+            cfg_test_ref |= ct | prod;
+        } else {
+            cfg_test_ref |= ct;
+            prod_ref |= prod;
+        }
     }
-    cfg_test_ref && !prod_ref
+    let result = cfg_test_ref && !prod_ref;
+    visiting.remove(&path.to_path_buf());
+    memo.insert(path.to_path_buf(), result);
+    result
+}
+
+fn is_existing_source_file(root: &Path, path: &Path) -> bool {
+    let Ok(true) = reject_symlinks_below(path, root) else {
+        return false;
+    };
+    path.symlink_metadata().is_ok_and(|meta| meta.is_file())
 }
 
 fn file_backed_module_source_probes(root: &Path, path: &Path) -> Vec<(PathBuf, Vec<String>)> {
@@ -289,13 +326,7 @@ fn file_backed_module_source_probes(root: &Path, path: &Path) -> Vec<(PathBuf, V
         return probes;
     };
 
-    // Probe sibling .rs files in the same directory as `path`.
-    //
-    // The standard probe list only covers canonical module entry points
-    // (`mod.rs`, `lib.rs`, `main.rs`, `<parent>.rs`).  A sibling file such as
-    // `foo.rs` can declare `#[cfg(test)] #[path = "foo_tests.rs"] mod tests;`
-    // without being a canonical entry point.  Including all same-directory `.rs`
-    // siblings as additional probes catches this pattern.
+    // Also probe same-directory .rs siblings — they may use #[path] to reference `path`.
     if let Some(module_path) = module_path_for_file_from_base(&base_dir, path) {
         for sibling in sibling_rs_files(root, path) {
             probes.push((sibling, module_path.clone()));
@@ -362,155 +393,6 @@ fn normal_component_strings(path: &Path) -> Option<Vec<String>> {
     }
     Some(names)
 }
-
-/// Reads `path` once and returns `(cfg_test_referenced, production_referenced)`:
-/// whether a `#[cfg(test)]` or non-`cfg(test)` `mod` in `path` resolves to `module_path`.
-fn classify_file_module_references(
-    root: &Path,
-    path: &Path,
-    module_path: &[String],
-) -> (bool, bool) {
-    let Ok(true) = reject_symlinks_below(path, root) else {
-        return (false, false);
-    };
-    let Ok(meta) = path.symlink_metadata() else {
-        return (false, false);
-    };
-    if !meta.is_file() {
-        return (false, false);
-    }
-
-    let content = match std::fs::read_to_string(path) {
-        Ok(content) => content,
-        Err(_) => return (false, false),
-    };
-
-    let file = match syn::parse_file(&content) {
-        Ok(file) => file,
-        Err(_) => return (false, false),
-    };
-
-    let cfg_test = items_declare_cfg_test_module_path(&file.items, module_path, false);
-    let production = items_declare_production_module_path(&file.items, module_path, false);
-    (cfg_test, production)
-}
-
-fn items_declare_cfg_test_module_path(
-    items: &[syn::Item],
-    module_path: &[String],
-    inherited_cfg_test: bool,
-) -> bool {
-    let Some((head, tail)) = module_path.split_first() else {
-        return false;
-    };
-
-    items.iter().any(|item| {
-        let syn::Item::Mod(module) = item else {
-            return false;
-        };
-        let cfg_test = inherited_cfg_test || has_cfg_test_attr(&module.attrs);
-
-        // `#[path = "..."]` overrides the ident.
-        if let Some(path_value) = extract_path_attr(&module.attrs) {
-            return module.content.is_none()
-                && cfg_test
-                && path_attr_matches_module_path(&path_value, module_path);
-        }
-
-        if module.ident != head.as_str() {
-            return false;
-        }
-        if tail.is_empty() {
-            return module.content.is_none() && cfg_test;
-        }
-        if cfg_test && module.content.is_none() {
-            return true;
-        }
-        if let Some((_, nested_items)) = &module.content {
-            return items_declare_cfg_test_module_path(nested_items, tail, cfg_test);
-        }
-        false
-    })
-}
-
-/// Returns `true` when a non-`cfg(test)` file-backed `mod` declaration in
-/// `items` resolves to `module_path` (mirror of `items_declare_cfg_test_module_path`).
-fn items_declare_production_module_path(
-    items: &[syn::Item],
-    module_path: &[String],
-    inherited_cfg_test: bool,
-) -> bool {
-    let Some((head, tail)) = module_path.split_first() else {
-        return false;
-    };
-
-    items.iter().any(|item| {
-        let syn::Item::Mod(module) = item else {
-            return false;
-        };
-        let cfg_test = inherited_cfg_test || has_cfg_test_attr(&module.attrs);
-
-        if let Some(path_value) = extract_path_attr(&module.attrs) {
-            return module.content.is_none()
-                && !cfg_test
-                && path_attr_matches_module_path(&path_value, module_path);
-        }
-
-        if module.ident != head.as_str() {
-            return false;
-        }
-        if tail.is_empty() {
-            return module.content.is_none() && !cfg_test;
-        }
-        if cfg_test && module.content.is_none() {
-            return false;
-        }
-        if let Some((_, nested_items)) = &module.content {
-            return items_declare_production_module_path(nested_items, tail, cfg_test);
-        }
-        false
-    })
-}
-
-/// Returns `true` when `path_value` (a `#[path = "..."]` string), treated as a
-/// relative path, matches the entire `module_path` component sequence.  The last
-/// component is compared by file stem; `mod.rs` pops the stem and matches one level up.
-fn path_attr_matches_module_path(path_value: &str, module_path: &[String]) -> bool {
-    let path = Path::new(path_value);
-    let mut components = Vec::new();
-    for component in path.components() {
-        let std::path::Component::Normal(name) = component else {
-            return false;
-        };
-        components.push(name.to_string_lossy().into_owned());
-    }
-
-    if components.is_empty() {
-        return false;
-    }
-
-    if let Some(last_component) = components.last_mut() {
-        let stem = Path::new(last_component.as_str())
-            .file_stem()
-            .map(|s| s.to_string_lossy().into_owned())
-            .unwrap_or_else(|| last_component.clone());
-        if stem == "mod" {
-            components.pop();
-        } else {
-            *last_component = stem;
-        }
-    }
-
-    components.len() == module_path.len()
-        && components
-            .iter()
-            .zip(module_path.iter())
-            .all(|(component, expected)| component == expected)
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Recursive AST visitor
-// ─────────────────────────────────────────────────────────────────────────────
 
 struct NodeVisitor<'a, F> {
     rel_path: &'a Path,
@@ -640,10 +522,6 @@ where
         self.emit("foreign_item", attrs);
     }
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Attribute extraction helpers
-// ─────────────────────────────────────────────────────────────────────────────
 
 fn item_attrs(item: &syn::Item) -> &[syn::Attribute] {
     match item {
