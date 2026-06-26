@@ -8,15 +8,25 @@ use usecase::ref_verify::RefVerifyDriverError;
 
 /// Load TDDD layer bindings for the `results` command.
 ///
-/// Propagates missing or invalid `architecture-rules.json` as
-/// [`RefVerifyDriverError::Wiring`] so Chain2 results fail closed when layer
-/// bindings cannot be determined.
+/// Returns an empty binding set when `architecture-rules.json` is not present
+/// (pre-TDDD repository or zero-layer state), matching the behaviour of
+/// [`super::RefVerifyScopeResolver`].  Any other I/O error (corrupt file,
+/// permission denied) or parse error propagates as
+/// [`RefVerifyDriverError::Wiring`] so those cases remain fail-closed.
 pub(crate) fn load_results_tddd_bindings(
     project_root: &Path,
 ) -> Result<Vec<crate::verify::tddd_layers::TdddLayerBinding>, RefVerifyDriverError> {
+    use crate::verify::tddd_layers::LoadTdddLayersError;
     let rules_path = project_root.join("architecture-rules.json");
     match crate::verify::tddd_layers::load_tddd_layers(&rules_path, project_root) {
         Ok(bindings) => Ok(bindings),
+        // Absent rules file → pre-TDDD repository; treat as zero bindings,
+        // consistent with RefVerifyScopeResolver::load_bindings_or_empty.
+        Err(LoadTdddLayersError::Io { source, .. })
+            if source.kind() == std::io::ErrorKind::NotFound =>
+        {
+            Ok(Vec::new())
+        }
         Err(e) => Err(RefVerifyDriverError::Wiring(format!(
             "cannot load TDDD layer bindings for results: {e}"
         ))),
@@ -455,13 +465,15 @@ mod tests {
     }
 
     #[test]
-    fn load_results_tddd_bindings_missing_rules_returns_error() {
+    fn load_results_tddd_bindings_missing_rules_returns_empty() {
+        // Absent architecture-rules.json → pre-TDDD repository state.
+        // The helper must return Ok(vec![]) rather than an error so that
+        // `sotp ref-verify results --chain all` can still show Chain1 output.
         let dir = tempfile::tempdir().unwrap();
 
-        let err = load_results_tddd_bindings(dir.path()).unwrap_err();
+        let bindings = load_results_tddd_bindings(dir.path()).unwrap();
 
-        assert!(matches!(err, RefVerifyDriverError::Wiring(_)));
-        assert!(err.to_string().contains("cannot load TDDD layer bindings for results"));
+        assert!(bindings.is_empty(), "absent rules file should yield zero bindings");
     }
 
     #[test]
@@ -970,6 +982,76 @@ mod tests {
         )
         .unwrap();
         assert!(out.lane_summaries.is_empty());
+        assert!(out.pair_records.is_empty());
+        assert_eq!(out.total_pass, 0);
+        assert_eq!(out.total_fail, 0);
+        assert_eq!(out.total_pending, 0);
+    }
+
+    // ── pre-TDDD / absent architecture-rules.json regression tests ──────────────
+
+    /// Verifies that `compute_results` with `chain=All` succeeds when
+    /// `architecture-rules.json` is absent (pre-TDDD repository).
+    ///
+    /// In this state `load_results_tddd_bindings` returns `Ok(vec![])` (the
+    /// NotFound fix), so `chain2_caches` is empty and no Chain2 pairs are
+    /// enumerated.  The command must show a Chain1 lane (from spec ↔ ADR pairs)
+    /// and produce no Chain2 lanes.
+    #[test]
+    fn compute_results_chain_all_with_absent_architecture_rules_succeeds_with_empty_chain2() {
+        // Simulate: load_results_tddd_bindings returned Ok(vec![]) because
+        // architecture-rules.json was not found.
+        // There is one Chain1 pair from spec.json ↔ an ADR decision.
+        let out = compute_results(
+            vec![],                        // no Chain1 cache (not yet verified)
+            vec![],                        // chain2_caches: empty (absent rules)
+            vec![chain1_pair(0x01, 0x02)], // one Chain1 pair
+            RefVerifyChainFilter::All,
+            RefVerifyLayerFilter::All,
+            RefVerifyVerdictFilter::FailPending,
+        )
+        .unwrap();
+
+        // Chain1 lane is present.
+        assert_eq!(out.lane_summaries.len(), 1, "only Chain1 lane expected");
+        assert_eq!(out.lane_summaries[0].label, "Chain1 (spec\u{2194}ADR)");
+
+        // No Chain2 lanes.
+        assert!(
+            !out.lane_summaries.iter().any(|s| s.label.starts_with("Chain2:")),
+            "no Chain2 lane should appear when architecture-rules.json is absent"
+        );
+
+        // The single pair is pending (cache is empty).
+        assert_eq!(out.total_pending, 1);
+        assert_eq!(out.total_pass, 0);
+        assert_eq!(out.total_fail, 0);
+
+        // FailPending verdict filter includes pending pairs.
+        assert_eq!(out.pair_records.len(), 1);
+        assert!(matches!(out.pair_records[0].verdict, SemanticVerdict::Pending));
+    }
+
+    /// Verifies that `compute_results` with `chain=Chain2` also succeeds when
+    /// `architecture-rules.json` is absent (pre-TDDD repository).
+    ///
+    /// In this state `chain2_caches` is empty and no pairs are enumerated, so
+    /// the result is an empty output — not an error.
+    #[test]
+    fn compute_results_chain2_with_absent_architecture_rules_succeeds_with_empty_chain2() {
+        // Simulate: load_results_tddd_bindings returned Ok(vec![]) and
+        // chain2_layer_ids / chain2_caches are both empty.
+        let out = compute_results(
+            vec![], // chain1 cache not loaded (chain=Chain2 short-circuit)
+            vec![], // chain2_caches: empty (absent architecture-rules.json)
+            vec![], // no pairs enumerated (no TDDD layers)
+            RefVerifyChainFilter::Chain2,
+            RefVerifyLayerFilter::All,
+            RefVerifyVerdictFilter::FailPending,
+        )
+        .unwrap();
+
+        assert!(out.lane_summaries.is_empty(), "no lanes when architecture-rules.json is absent");
         assert!(out.pair_records.is_empty());
         assert_eq!(out.total_pass, 0);
         assert_eq!(out.total_fail, 0);
