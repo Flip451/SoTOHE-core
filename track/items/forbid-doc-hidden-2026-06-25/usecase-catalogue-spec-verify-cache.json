@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "layer": "usecase",
+  "entries": [
+    {
+      "claim_hash": "a336110e5e292446a9902045275493397aaf1009f07363c29f06b11e2e7291d5",
+      "evidence_hash": "2b9609b599da312eec0be9e3b7387281b0b922d48319663b1eb712df156f20f1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp verify doc-hidden` コマンドを `sotp verify` サブコマンド群に追加する。既存の `VerifyCommand` dispatch 機構に組み込み、`items_dir` / gate-name ラベル等の既存配線パターンに倣って実装する。"
+      }
+    },
+    {
+      "claim_hash": "c05b9b9a37f080b79159e547674e85244663d27329da2ed633ec209cbbdadb72",
+      "evidence_hash": "2b9609b599da312eec0be9e3b7387281b0b922d48319663b1eb712df156f20f1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp verify doc-hidden` コマンドを `sotp verify` サブコマンド群に追加する。既存の `VerifyCommand` dispatch 機構に組み込み、`items_dir` / gate-name ラベル等の既存配線パターンに倣って実装する。"
+      }
+    }
+  ]
+}

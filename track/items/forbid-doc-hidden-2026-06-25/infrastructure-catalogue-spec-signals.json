@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "59ff84c18db66cafe65f3182aee1882a888be9259a890588b5ffe6df4f11f245",
+  "signals": [
+    {
+      "type_name": "infrastructure::verify::doc_hidden::verify",
+      "signal": "blue",
+      "entry_hash": "c583db68cb1deab9df0b33d056b0047b49e1e2c40705eedf9d442e65a3660ece"
+    }
+  ]
+}

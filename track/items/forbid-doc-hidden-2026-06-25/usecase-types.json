@@ -1,0 +1,517 @@
+{
+  "schema_version": 5,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {
+    "VerifyInteractor": {
+      "action": "reference",
+      "role": {
+        "Interactor": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "verify",
+      "docs": "Interactor that implements VerifyService by delegating to the injected VerifyPort.",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "traits": {
+    "VerifyPort": {
+      "action": "modify",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "module_path": "verify",
+      "docs": "Secondary port for all verify subcommands. Infrastructure implements this port by delegating to the infrastructure::verify::* submodules. Extended with verify_doc_hidden for the new #[doc(hidden)] gate (ADR 2026-06-25-1344 §D2).",
+      "methods": [
+        {
+          "name": "verify_tech_stack",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "&std::path::Path" }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "verify_latest_track",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "&std::path::Path" }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "verify_arch_docs",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "&std::path::Path" }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "verify_layers",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "&std::path::Path" }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "verify_hooks_path",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "&std::path::Path" }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "verify_spec_attribution",
+          "receiver": "&self",
+          "params": [
+            { "name": "spec_path", "ty": "&std::path::Path" }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "verify_spec_frontmatter",
+          "receiver": "&self",
+          "params": [
+            { "name": "spec_path", "ty": "&std::path::Path" }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "verify_canonical_modules",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "&std::path::Path" }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "verify_module_size",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "&std::path::Path" }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "verify_domain_purity",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "&std::path::Path" }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "verify_domain_strings",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "&std::path::Path" }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "verify_usecase_purity",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "&std::path::Path" }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "verify_doc_links",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "&std::path::Path" }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "verify_view_freshness",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "&std::path::Path" }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "verify_spec_signals",
+          "receiver": "&self",
+          "params": [
+            { "name": "spec_path", "ty": "&std::path::Path" }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "verify_plan_artifact_refs",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_dir", "ty": "Option<&std::path::Path>" }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "verify_catalogue_spec_refs",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id", "ty": "Option<&str>" },
+            { "name": "items_dir", "ty": "&std::path::Path" },
+            { "name": "workspace_root", "ty": "&std::path::Path" },
+            { "name": "skip_stale", "ty": "bool" }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "verify_doc_hidden",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "&std::path::Path" }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/forbid-doc-hidden-2026-06-25/spec.json",
+          "anchor": "IN-03"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "VerifyService": {
+      "action": "modify",
+      "role": {
+        "ApplicationService": {}
+      },
+      "module_path": "verify",
+      "docs": "Application-level contract for all verify subcommands. PrimaryAdapter (VerifyDriver) depends on this interface rather than directly on VerifyPort (DIP). Extended with verify_doc_hidden for the new #[doc(hidden)] gate (ADR 2026-06-25-1344 §D2).",
+      "methods": [
+        {
+          "name": "verify_tech_stack",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "verify_latest_track",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "verify_arch_docs",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "verify_layers",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "verify_hooks_path",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "verify_spec_attribution",
+          "receiver": "&self",
+          "params": [
+            { "name": "spec_path", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "verify_spec_frontmatter",
+          "receiver": "&self",
+          "params": [
+            { "name": "spec_path", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "verify_canonical_modules",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "verify_module_size",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "verify_domain_purity",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "verify_domain_strings",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "verify_usecase_purity",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "verify_doc_links",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "verify_view_freshness",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "verify_spec_signals",
+          "receiver": "&self",
+          "params": [
+            { "name": "spec_path", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "verify_plan_artifact_refs",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_dir", "ty": "Option<std::path::PathBuf>" }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "verify_catalogue_spec_refs",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id", "ty": "Option<String>" },
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "workspace_root", "ty": "std::path::PathBuf" },
+            { "name": "skip_stale", "ty": "bool" }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "verify_doc_hidden",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Result<VerifyOutcome, VerifyPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ],
+      "spec_refs": [
+        {
+          "file": "track/items/forbid-doc-hidden-2026-06-25/spec.json",
+          "anchor": "IN-03"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "functions": {},
+  "inherent_impls": [],
+  "trait_impls": [
+    {
+      "action": "reference",
+      "trait_ref": "VerifyService",
+      "for_type": "VerifyInteractor"
+    }
+  ]
+}

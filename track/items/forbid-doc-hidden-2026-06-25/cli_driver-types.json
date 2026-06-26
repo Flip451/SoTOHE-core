@@ -1,0 +1,197 @@
+{
+  "schema_version": 5,
+  "crate_name": "cli_driver",
+  "layer": "cli_driver",
+  "types": {
+    "VerifyInput": {
+      "action": "modify",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "verify",
+      "docs": "Typed input for the verify command family.",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "TechStack",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "project_root", "ty": "std::path::PathBuf" }
+              ]
+            }
+          },
+          {
+            "name": "LatestTrack",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "project_root", "ty": "std::path::PathBuf" }
+              ]
+            }
+          },
+          {
+            "name": "ArchDocs",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "project_root", "ty": "std::path::PathBuf" }
+              ]
+            }
+          },
+          {
+            "name": "Layers",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "project_root", "ty": "std::path::PathBuf" }
+              ]
+            }
+          },
+          {
+            "name": "HooksPath",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "project_root", "ty": "std::path::PathBuf" }
+              ]
+            }
+          },
+          {
+            "name": "SpecAttribution",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "spec_path", "ty": "std::path::PathBuf" }
+              ]
+            }
+          },
+          {
+            "name": "SpecFrontmatter",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "spec_path", "ty": "std::path::PathBuf" }
+              ]
+            }
+          },
+          {
+            "name": "CanonicalModules",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "project_root", "ty": "std::path::PathBuf" }
+              ]
+            }
+          },
+          {
+            "name": "ModuleSize",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "project_root", "ty": "std::path::PathBuf" }
+              ]
+            }
+          },
+          {
+            "name": "DomainPurity",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "project_root", "ty": "std::path::PathBuf" }
+              ]
+            }
+          },
+          {
+            "name": "DomainStrings",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "project_root", "ty": "std::path::PathBuf" }
+              ]
+            }
+          },
+          {
+            "name": "UsecasePurity",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "project_root", "ty": "std::path::PathBuf" }
+              ]
+            }
+          },
+          {
+            "name": "DocLinks",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "project_root", "ty": "std::path::PathBuf" }
+              ]
+            }
+          },
+          {
+            "name": "ViewFreshness",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "project_root", "ty": "std::path::PathBuf" }
+              ]
+            }
+          },
+          {
+            "name": "SpecSignals",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "spec_path", "ty": "std::path::PathBuf" }
+              ]
+            }
+          },
+          {
+            "name": "PlanArtifactRefs",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "track_dir", "ty": "Option<std::path::PathBuf>" }
+              ]
+            }
+          },
+          {
+            "name": "CatalogueSpecRefs",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "track_id", "ty": "Option<String>" },
+                { "name": "items_dir", "ty": "std::path::PathBuf" },
+                { "name": "workspace_root", "ty": "std::path::PathBuf" },
+                { "name": "skip_stale", "ty": "bool" }
+              ]
+            }
+          },
+          {
+            "name": "DocHidden",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "project_root", "ty": "std::path::PathBuf" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/forbid-doc-hidden-2026-06-25/spec.json",
+          "anchor": "IN-03"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [],
+  "trait_impls": []
+}

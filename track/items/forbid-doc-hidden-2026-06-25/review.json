@@ -16,6 +16,57 @@
           "findings": [],
           "hash": "rvw1:sha256:2746127487d7025c86e16ff7142d63002e9e581b37f77e2ebeba9a747db2d9a0",
           "at": "2026-06-25T23:47:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan.md` overstates the scope of the doc_hidden unit tests: AC-05/AC-06 and several CN items are repo-wide or process constraints, so they cannot be established by tests in the `doc_hidden` module alone. As written, the plan promises verification the proposed test location cannot provide.",
+              "severity": "P1",
+              "file": "track/items/forbid-doc-hidden-2026-06-25/plan.md",
+              "line": 19,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:eacf5b0a7eb66d70265c21238e6bf501c3cfc67e94be472fd27b9e35da962773",
+          "at": "2026-06-26T01:07:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 says there are \"no changes to ... any existing verify module,\" but the same task explicitly edits `libs/infrastructure/src/verify/syn_helpers.rs`. That file is already under the `verify` module tree, so the scope note contradicts the work the task requires.",
+              "severity": "P1",
+              "file": "track/items/forbid-doc-hidden-2026-06-25/impl-plan.json",
+              "line": 6,
+              "category": "contradiction"
+            },
+            {
+              "message": "T001 claims AC-04 coverage for excluding both `#[cfg(test)]` blocks and `#[test]` functions, but the only explicit unit test it lists is the `#[cfg(test)]` module case. There is no separate `#[test]`-only case, so the plan overstates the coverage it documents for AC-04.",
+              "severity": "P1",
+              "file": "track/items/forbid-doc-hidden-2026-06-25/impl-plan.json",
+              "line": 6,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:a7299c3c27e712eb4fb9d675b2bf4bc60534bea79e3da1be66cd36c1633e7742",
+          "at": "2026-06-26T01:13:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da4fcf241bc5838fd708d2c4d68c5787672e578b7f7a998e08e98d758fc2babb",
+          "at": "2026-06-26T01:18:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da4fcf241bc5838fd708d2c4d68c5787672e578b7f7a998e08e98d758fc2babb",
+          "at": "2026-06-26T01:24:54Z"
         }
       ]
     }

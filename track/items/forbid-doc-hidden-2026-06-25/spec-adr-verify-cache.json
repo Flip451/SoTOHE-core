@@ -1,0 +1,229 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "3fd72ba00c262cce2f5716932c5294e697463917e6054435c9b8b5c568bb7061",
+      "evidence_hash": "69980635d22b42da1aa5af7d161d1a4fb3a15af304160b255fd5782230fac171",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`.rs` 再帰発見 → `syn::parse_file` → `#[cfg(test)]` / `#[test]` 除外」の走査骨格を共通モジュールに集約する。既存 `verify/syn_helpers.rs` の `has_cfg_test_attr` を流用し、判定ロジック（visitor）はコールバックで受ける。本ヘルパは `#[doc(hidden)]` ゲートの基盤であると同時に、後続の syn ベース lint でも再利用する。"
+      }
+    },
+    {
+      "claim_hash": "663a90dfa3abb5135a66dd4987e7c8e2ad3c727154738a624774c34488925ef5",
+      "evidence_hash": "69980635d22b42da1aa5af7d161d1a4fb3a15af304160b255fd5782230fac171",
+      "verdict": {
+        "kind": "pass",
+        "citation": "新サブコマンド（例 `sotp verify doc-hidden`）を追加する。`pub` item に `#[doc(hidden)]` が付くものを error とする。検出ロジックは type-signals から独立させ、禁止理由（rustdoc paths 除外 → DanglingId → track-active-gate ブロック）はエラーメッセージと規約 doc で説明する。有効化スコープは `architecture-rules.json` の `layers[]` に列挙された全 crate を一律対象とし … 新 crate が `layers[]` に追加されれば自動的に対象になる。"
+      }
+    },
+    {
+      "claim_hash": "1762d7aeeb48b11bab8d7757fe0ba9d0304863178c74b295b6cc0e9f9c3acb51",
+      "evidence_hash": "69980635d22b42da1aa5af7d161d1a4fb3a15af304160b255fd5782230fac171",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`usecase_purity`（I/O 純粋性）/ `canonical_modules`（再実装禁止）/ type-signals（型シグネチャ追跡）には手を入れない。新機能を既存の責務に相乗りさせない。"
+      }
+    },
+    {
+      "claim_hash": "794fa5f3ae93d74b2dcf19f35345a201e384f3780da7f197d28a392421494285",
+      "evidence_hash": "69980635d22b42da1aa5af7d161d1a4fb3a15af304160b255fd5782230fac171",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`.rs` 再帰発見 → `syn::parse_file` → `#[cfg(test)]` / `#[test]` 除外」の走査骨格を共通モジュールに集約する。既存 `verify/syn_helpers.rs` の `has_cfg_test_attr` を流用し、判定ロジック（visitor）はコールバックで受ける。本ヘルパは `#[doc(hidden)]` ゲートの基盤であると同時に、後続の syn ベース lint でも再利用する。"
+      }
+    },
+    {
+      "claim_hash": "20bdb474e1de683af4f58327a14115d5967b02a9020ee6a63932d94ad3781fa6",
+      "evidence_hash": "69980635d22b42da1aa5af7d161d1a4fb3a15af304160b255fd5782230fac171",
+      "verdict": {
+        "kind": "pass",
+        "citation": "新サブコマンド（例 `sotp verify doc-hidden`）を追加する。`pub` item に `#[doc(hidden)]` が付くものを error とする。検出ロジックは type-signals から独立させ"
+      }
+    },
+    {
+      "claim_hash": "2b9609b599da312eec0be9e3b7387281b0b922d48319663b1eb712df156f20f1",
+      "evidence_hash": "69980635d22b42da1aa5af7d161d1a4fb3a15af304160b255fd5782230fac171",
+      "verdict": {
+        "kind": "pass",
+        "citation": "新サブコマンド（例 `sotp verify doc-hidden`）を追加する。`pub` item に `#[doc(hidden)]` が付くものを error とする。"
+      }
+    },
+    {
+      "claim_hash": "0bf2481fc127e3f32f2666d2f9415151f1d6b475205f46fc987769dd3be02eb2",
+      "evidence_hash": "69980635d22b42da1aa5af7d161d1a4fb3a15af304160b255fd5782230fac171",
+      "verdict": {
+        "kind": "pass",
+        "citation": "新サブコマンド（例 `sotp verify doc-hidden`）を追加する。`pub` item に `#[doc(hidden)]` が付くものを error とする。"
+      }
+    },
+    {
+      "claim_hash": "a2d29cb178d832e580079d54358a467e3ce54b68408f828da3ad0e6453cff0f2",
+      "evidence_hash": "69980635d22b42da1aa5af7d161d1a4fb3a15af304160b255fd5782230fac171",
+      "verdict": {
+        "kind": "pass",
+        "citation": "有効化スコープは `architecture-rules.json` の `layers[]` に列挙された全 crate を一律対象とし（テストコードは syn の `#[cfg(test)]` / `#[test]` 除外により対象外）、per-layer フラグや層のハードコード選択は持たない。新 crate が `layers[]` に追加されれば自動的に対象になる。"
+      }
+    },
+    {
+      "claim_hash": "2a93a39aac456f289efb2b9a68e897c6cc31694dd1fb3f268da45e9638430137",
+      "evidence_hash": "69980635d22b42da1aa5af7d161d1a4fb3a15af304160b255fd5782230fac171",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`.rs` 再帰発見 → `syn::parse_file` → `#[cfg(test)]` / `#[test]` 除外」の走査骨格を共通モジュールに集約する。既存 `verify/syn_helpers.rs` の `has_cfg_test_attr` を流用し、判定ロジック（visitor）はコールバックで受ける。"
+      }
+    },
+    {
+      "claim_hash": "2a93a39aac456f289efb2b9a68e897c6cc31694dd1fb3f268da45e9638430137",
+      "evidence_hash": "69980635d22b42da1aa5af7d161d1a4fb3a15af304160b255fd5782230fac171",
+      "verdict": {
+        "kind": "pass",
+        "citation": "テストコードは syn の `#[cfg(test)]` / `#[test]` 除外により対象外"
+      }
+    },
+    {
+      "claim_hash": "944e5299eff75524922cf350695646ac178d991fe42706057969deece0d3c31c",
+      "evidence_hash": "69980635d22b42da1aa5af7d161d1a4fb3a15af304160b255fd5782230fac171",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「有効化スコープは architecture-rules.json の `layers[]` に列挙された全 crate を一律対象とし… per-layer フラグや層のハードコード選択は持たない。」 / 「`pub` item に `#[doc(hidden)]` が付くものを error とする。」"
+      }
+    },
+    {
+      "claim_hash": "c3ac8d3c9567c42bb7fd9e2d2d0cef61a44d31d724f14105dfee417d44d46607",
+      "evidence_hash": "69980635d22b42da1aa5af7d161d1a4fb3a15af304160b255fd5782230fac171",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存ゲートを共通走査基盤へ乗せ替えるのは将来の任意改善とし、本決定のスコープ外とする。"
+      }
+    },
+    {
+      "claim_hash": "a38c4dace685ca985633e0f1888bbaed5c2bf975c18d08855310f1e90875cb67",
+      "evidence_hash": "69980635d22b42da1aa5af7d161d1a4fb3a15af304160b255fd5782230fac171",
+      "verdict": {
+        "kind": "pass",
+        "citation": "candidate_selection: from:[clippy-disallowed-types,canonical-regex,type-signals-integration,dylint] chose:syn-independent-gate\n\n### D2: #[doc(hidden)] 禁止を独立サブコマンドとして実装する\n\n新サブコマンド（例 `sotp verify doc-hidden`）を追加する。`pub` item に `#[doc(hidden)]` が付くものを error とする。検出ロジックは type-signals から独立させる"
+      }
+    },
+    {
+      "claim_hash": "1985be7310b24ca74a19245cbb793d71b80af93c4754a52d0f7690fbf7230ee6",
+      "evidence_hash": "69980635d22b42da1aa5af7d161d1a4fb3a15af304160b255fd5782230fac171",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`pub` item に `#[doc(hidden)]` が付くものを error とする。」"
+      }
+    },
+    {
+      "claim_hash": "9ef4293d0d41d242dd873b7b66dd96b93c5a4b5f46529cd3f3b0596cce27e556",
+      "evidence_hash": "69980635d22b42da1aa5af7d161d1a4fb3a15af304160b255fd5782230fac171",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`usecase_purity`（I/O 純粋性）/ `canonical_modules`（再実装禁止）/ type-signals（型シグネチャ追跡）には手を入れない。新機能を既存の責務に相乗りさせない。"
+      }
+    },
+    {
+      "claim_hash": "356a650abc004ec145a2922a51178534a84ea6ad80fe9c717b0ed83060fa2265",
+      "evidence_hash": "69980635d22b42da1aa5af7d161d1a4fb3a15af304160b255fd5782230fac171",
+      "verdict": {
+        "kind": "pass",
+        "citation": "有効化スコープは `architecture-rules.json` の `layers[]` に列挙された全 crate を一律対象とし（テストコードは syn の `#[cfg(test)]` / `#[test]` 除外により対象外）、per-layer フラグや層のハードコード選択は持たない。新 crate が `layers[]` に追加されれば自動的に対象になる。"
+      }
+    },
+    {
+      "claim_hash": "7a92dd78ba48b10d29808239cfe1a1b8975da521d9cf893f7877e8f1752b8907",
+      "evidence_hash": "69980635d22b42da1aa5af7d161d1a4fb3a15af304160b255fd5782230fac171",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`.rs` 再帰発見 → `syn::parse_file` → `#[cfg(test)]` / `#[test]` 除外」の走査骨格を共通モジュールに集約する。既存 `verify/syn_helpers.rs` の `has_cfg_test_attr` を流用し、判定ロジック（visitor）はコールバックで受ける。"
+      }
+    },
+    {
+      "claim_hash": "7a92dd78ba48b10d29808239cfe1a1b8975da521d9cf893f7877e8f1752b8907",
+      "evidence_hash": "69980635d22b42da1aa5af7d161d1a4fb3a15af304160b255fd5782230fac171",
+      "verdict": {
+        "kind": "pass",
+        "citation": "有効化スコープは `architecture-rules.json` の `layers[]` に列挙された全 crate を一律対象とし（テストコードは syn の `#[cfg(test)]` / `#[test]` 除外により対象外）、per-layer フラグや層のハードコード選択は持たない。"
+      }
+    },
+    {
+      "claim_hash": "e1e018edfeb43fbfd852fc2074fdb7bad8e40d8ce6180f9dc77baf4169ebbc4c",
+      "evidence_hash": "69980635d22b42da1aa5af7d161d1a4fb3a15af304160b255fd5782230fac171",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`pub` item に `#[doc(hidden)]` が付くものを error とする。… 禁止理由（rustdoc paths 除外 → DanglingId → track-active-gate ブロック）はエラーメッセージと規約 doc で説明する。」"
+      }
+    },
+    {
+      "claim_hash": "df48d51318bc5c111569ba8ecfd96e0aad2916742e330d229872ad4abffab9c5",
+      "evidence_hash": "69980635d22b42da1aa5af7d161d1a4fb3a15af304160b255fd5782230fac171",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「新サブコマンド（例 `sotp verify doc-hidden`）を追加する。`pub` item に `#[doc(hidden)]` が付くものを error とする。」"
+      }
+    },
+    {
+      "claim_hash": "1098534521e7ccca3b098108c0abc3ab178eaf7ec6e8d77a06a34607248d470d",
+      "evidence_hash": "69980635d22b42da1aa5af7d161d1a4fb3a15af304160b255fd5782230fac171",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「新サブコマンド（例 `sotp verify doc-hidden`）を追加する。`pub` item に `#[doc(hidden)]` が付くものを error とする。… 有効化スコープは `architecture-rules.json` の `layers[]` に列挙された全 crate を一律対象とし…」"
+      }
+    },
+    {
+      "claim_hash": "67bb45dc4124f72258a82ff8641b5b1cf5da97cb9cdb8bb40d5f8f019ff894a9",
+      "evidence_hash": "69980635d22b42da1aa5af7d161d1a4fb3a15af304160b255fd5782230fac171",
+      "verdict": {
+        "kind": "pass",
+        "citation": "新 crate が `layers[]` に追加されれば自動的に対象になる。"
+      }
+    },
+    {
+      "claim_hash": "b998587eace147629157f247ad04df6a3b069498fb9e5a0bca3411da705842e0",
+      "evidence_hash": "69980635d22b42da1aa5af7d161d1a4fb3a15af304160b255fd5782230fac171",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`.rs` 再帰発見 → `syn::parse_file` → `#[cfg(test)]` / `#[test]` 除外」の走査骨格を共通モジュールに集約する。既存 `verify/syn_helpers.rs` の `has_cfg_test_attr` を流用し、判定ロジック（visitor）はコールバックで受ける。本ヘルパは `#[doc(hidden)]` ゲートの基盤である"
+      }
+    },
+    {
+      "claim_hash": "b998587eace147629157f247ad04df6a3b069498fb9e5a0bca3411da705842e0",
+      "evidence_hash": "69980635d22b42da1aa5af7d161d1a4fb3a15af304160b255fd5782230fac171",
+      "verdict": {
+        "kind": "pass",
+        "citation": "新サブコマンド（例 `sotp verify doc-hidden`）を追加する。`pub` item に `#[doc(hidden)]` が付くものを error とする。検出ロジックは type-signals から独立させ、禁止理由（rustdoc paths 除外 → DanglingId → track-active-gate ブロック）はエラーメッセージと規約 doc で説明する。有効化スコープは `architecture-rules.json` の `layers[]` に列挙された全 crate を一律対象とし（テストコードは syn の `#[cfg(test)]` / `#[test]` 除外により対象外）、per-layer フラグや層のハードコード選択は持たない。"
+      }
+    },
+    {
+      "claim_hash": "3bfaa0bbddeb573ee16cedd811922ab3c30b56f84a8dfc081059af402127f8e6",
+      "evidence_hash": "69980635d22b42da1aa5af7d161d1a4fb3a15af304160b255fd5782230fac171",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`usecase_purity`（I/O 純粋性）/ `canonical_modules`（再実装禁止）/ type-signals（型シグネチャ追跡）には手を入れない。新機能を既存の責務に相乗りさせない。既存ゲートを共通走査基盤へ乗せ替えるのは将来の任意改善とし、本決定のスコープ外とする。"
+      }
+    },
+    {
+      "claim_hash": "8fd4ea6116ac7e7c6fcc8e00e946e4efb08bcd29a1485da0cd40ffd82706a2a2",
+      "evidence_hash": "69980635d22b42da1aa5af7d161d1a4fb3a15af304160b255fd5782230fac171",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本ヘルパは `#[doc(hidden)]` ゲートの基盤であると同時に、後続の syn ベース lint でも再利用する。"
+      }
+    },
+    {
+      "claim_hash": "2f7d9ac4f857cf81aa764aa9ced77fb3d666856965683b557f82164263745372",
+      "evidence_hash": "69980635d22b42da1aa5af7d161d1a4fb3a15af304160b255fd5782230fac171",
+      "verdict": {
+        "kind": "pass",
+        "citation": "candidate_selection: from:[clippy-disallowed-types,canonical-regex,type-signals-integration,dylint] chose:syn-independent-gate"
+      }
+    },
+    {
+      "claim_hash": "a0397bfd0a98bd8277d5726f4b8e2fdd38d0c08934e47ab36f793adac7fd0571",
+      "evidence_hash": "69980635d22b42da1aa5af7d161d1a4fb3a15af304160b255fd5782230fac171",
+      "verdict": {
+        "kind": "pass",
+        "citation": "新サブコマンド（例 `sotp verify doc-hidden`）を追加する。`pub` item に `#[doc(hidden)]` が付くものを error とする。"
+      }
+    }
+  ]
+}

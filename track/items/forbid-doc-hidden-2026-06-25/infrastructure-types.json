@@ -1,0 +1,37 @@
+{
+  "schema_version": 5,
+  "crate_name": "infrastructure",
+  "layer": "infrastructure",
+  "types": {},
+  "traits": {},
+  "functions": {
+    "infrastructure::verify::doc_hidden::verify": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        {
+          "name": "root",
+          "ty": "&std::path::Path"
+        }
+      ],
+      "returns": "domain::verify::VerifyOutcome",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Scan all TDDD-enabled layers listed in architecture-rules.json for pub + #[doc(hidden)] violations in production code. Returns findings for each violation found. Test-scoped items (inside #[cfg(test)] blocks or #[test] functions) are excluded at the syn AST level.",
+      "spec_refs": [
+        {
+          "file": "track/items/forbid-doc-hidden-2026-06-25/spec.json",
+          "anchor": "IN-02"
+        },
+        {
+          "file": "track/items/forbid-doc-hidden-2026-06-25/spec.json",
+          "anchor": "GO-02"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "inherent_impls": [],
+  "trait_impls": []
+}

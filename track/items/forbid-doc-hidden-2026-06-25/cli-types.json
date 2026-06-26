@@ -1,0 +1,115 @@
+{
+  "schema_version": 5,
+  "crate_name": "cli",
+  "layer": "cli",
+  "types": {
+    "VerifyCommand": {
+      "action": "modify",
+      "role": {
+        "Dto": {}
+      },
+      "module_path": "commands::verify",
+      "docs": "Verify subcommands for CI validation. Extended with DocHidden variant for the new #[doc(hidden)] gate.",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "TechStack",
+            "payload": { "kind": "unit" }
+          },
+          {
+            "name": "LatestTrack",
+            "payload": { "kind": "unit" }
+          },
+          {
+            "name": "ArchDocs",
+            "payload": { "kind": "unit" }
+          },
+          {
+            "name": "Layers",
+            "payload": { "kind": "unit" }
+          },
+          {
+            "name": "HooksPath",
+            "payload": { "kind": "unit" }
+          },
+          {
+            "name": "SpecAttribution",
+            "payload": { "kind": "unit" }
+          },
+          {
+            "name": "SpecFrontmatter",
+            "payload": { "kind": "unit" }
+          },
+          {
+            "name": "CanonicalModules",
+            "payload": { "kind": "unit" }
+          },
+          {
+            "name": "ModuleSize",
+            "payload": { "kind": "unit" }
+          },
+          {
+            "name": "DomainPurity",
+            "payload": { "kind": "unit" }
+          },
+          {
+            "name": "DomainStrings",
+            "payload": { "kind": "unit" }
+          },
+          {
+            "name": "UsecasePurity",
+            "payload": { "kind": "unit" }
+          },
+          {
+            "name": "DocLinks",
+            "payload": { "kind": "unit" }
+          },
+          {
+            "name": "ViewFreshness",
+            "payload": { "kind": "unit" }
+          },
+          {
+            "name": "SpecSignals",
+            "payload": { "kind": "unit" }
+          },
+          {
+            "name": "PlanArtifactRefs",
+            "payload": { "kind": "unit" }
+          },
+          {
+            "name": "CatalogueSpecRefs",
+            "payload": { "kind": "unit" }
+          },
+          {
+            "name": "DocHidden",
+            "payload": { "kind": "unit" }
+          }
+        ]
+      },
+      "methods": [],
+      "spec_refs": [
+        {
+          "file": "track/items/forbid-doc-hidden-2026-06-25/spec.json",
+          "anchor": "IN-03"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [],
+  "trait_impls": [
+    {
+      "action": "reference",
+      "trait_ref": "clap_builder::derive::FromArgMatches",
+      "for_type": "VerifyCommand"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "clap_builder::derive::Subcommand",
+      "for_type": "VerifyCommand"
+    }
+  ]
+}

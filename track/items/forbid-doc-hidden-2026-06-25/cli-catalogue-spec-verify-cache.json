@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "layer": "cli",
+  "entries": [
+    {
+      "claim_hash": "50a987303ceeb1463d521c878166527340b8c0f089e6893fb5fdd891851f42f7",
+      "evidence_hash": "2b9609b599da312eec0be9e3b7387281b0b922d48319663b1eb712df156f20f1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp verify doc-hidden` コマンドを `sotp verify` サブコマンド群に追加する。既存の `VerifyCommand` dispatch 機構に組み込み、`items_dir` / gate-name ラベル等の既存配線パターンに倣って実装する。"
+      }
+    }
+  ]
+}

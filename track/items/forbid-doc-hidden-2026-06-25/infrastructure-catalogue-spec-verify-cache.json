@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "layer": "infrastructure",
+  "entries": [
+    {
+      "claim_hash": "c583db68cb1deab9df0b33d056b0047b49e1e2c40705eedf9d442e65a3660ece",
+      "evidence_hash": "20bdb474e1de683af4f58327a14115d5967b02a9020ee6a63932d94ad3781fa6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`pub + #[doc(hidden)]` の検出ロジックを実装する。検出ロジックは IN-01 の走査フレームワークにコールバックとして渡す形とし、ファイル発見・テスト除外の重複実装を避ける。"
+      }
+    },
+    {
+      "claim_hash": "c583db68cb1deab9df0b33d056b0047b49e1e2c40705eedf9d442e65a3660ece",
+      "evidence_hash": "663a90dfa3abb5135a66dd4987e7c8e2ad3c727154738a624774c34488925ef5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`architecture-rules.json` の `layers[]` に列挙された全クレートのプロダクションコードを走査し、`pub` アイテムに `#[doc(hidden)]` が付いている場合をエラーとして報告する。"
+      }
+    }
+  ]
+}
