@@ -17,7 +17,9 @@ use crate::track::symlink_guard::reject_symlinks_below;
 
 use super::path_safety::lexical_normalize;
 use super::syn_helpers::{has_cfg_test_attr, rs_files_in_dir, sibling_rs_files};
-use super::syn_scan_classify::{ClassifyCache, classify_file_module_references};
+use super::syn_scan_classify::{
+    ClassifyCache, SiblingClassifyCache, classify_file_module_references, classify_sibling_probe,
+};
 use super::trusted_root::absolutize;
 
 /// Context passed from the scanner to a detection callback for each
@@ -76,6 +78,7 @@ pub(crate) fn scan_workspace_rust_sources(
     let trusted_root = lexical_normalize(&absolutize(root));
     let mut findings = Vec::new();
     let mut classify_cache = ClassifyCache::new();
+    let mut sibling_cache = SiblingClassifyCache::new();
 
     for layer in rules.layers() {
         let src_dir = match resolve_layer_src_dir(&trusted_root, &layer.crate_name, &layer.path) {
@@ -91,6 +94,7 @@ pub(crate) fn scan_workspace_rust_sources(
             &mut findings,
             &mut inspect,
             &mut classify_cache,
+            &mut sibling_cache,
         );
     }
 
@@ -156,6 +160,7 @@ fn scan_rs_files_in_dir(
     findings: &mut Vec<VerifyFinding>,
     inspect: &mut impl FnMut(SynScanContext) -> Vec<VerifyFinding>,
     classify_cache: &mut ClassifyCache,
+    sibling_cache: &mut SiblingClassifyCache,
 ) {
     let Some(meta) = guarded_metadata(root, dir, findings) else {
         return;
@@ -198,9 +203,9 @@ fn scan_rs_files_in_dir(
             continue;
         };
         if meta.is_dir() {
-            scan_rs_files_in_dir(root, &path, findings, inspect, classify_cache);
+            scan_rs_files_in_dir(root, &path, findings, inspect, classify_cache, sibling_cache);
         } else if meta.is_file() && path.extension().is_some_and(|ext| ext == "rs") {
-            scan_single_file(root, &path, findings, inspect, classify_cache);
+            scan_single_file(root, &path, findings, inspect, classify_cache, sibling_cache);
         }
     }
 }
@@ -211,6 +216,7 @@ fn scan_single_file(
     findings: &mut Vec<VerifyFinding>,
     inspect: &mut impl FnMut(SynScanContext) -> Vec<VerifyFinding>,
     classify_cache: &mut ClassifyCache,
+    sibling_cache: &mut SiblingClassifyCache,
 ) {
     let Some(meta) = guarded_metadata(root, path, findings) else {
         return;
@@ -245,7 +251,7 @@ fn scan_single_file(
     if has_cfg_test_attr(&file.attrs) {
         return;
     }
-    if is_file_backed_test_module(root, path, classify_cache) {
+    if is_file_backed_test_module(root, path, classify_cache, sibling_cache) {
         return;
     }
 
@@ -295,8 +301,20 @@ fn is_crate_root_entry_point(path: &Path) -> bool {
 
 /// Returns `true` when `path` is exclusively referenced by `#[cfg(test)] mod`
 /// declarations, propagating test context transitively from ancestor files.
-fn is_file_backed_test_module(root: &Path, path: &Path, cache: &mut ClassifyCache) -> bool {
-    is_file_backed_test_module_inner(root, path, &mut HashSet::new(), &mut HashMap::new(), cache)
+fn is_file_backed_test_module(
+    root: &Path,
+    path: &Path,
+    cache: &mut ClassifyCache,
+    sibling_cache: &mut SiblingClassifyCache,
+) -> bool {
+    is_file_backed_test_module_inner(
+        root,
+        path,
+        &mut HashSet::new(),
+        &mut HashMap::new(),
+        cache,
+        sibling_cache,
+    )
 }
 
 /// Inner recursive helper for [`is_file_backed_test_module`] with DFS cycle guard.
@@ -307,6 +325,7 @@ fn is_file_backed_test_module_inner(
     visiting: &mut HashSet<PathBuf>,
     memo: &mut HashMap<PathBuf, bool>,
     cache: &mut ClassifyCache,
+    sibling_cache: &mut SiblingClassifyCache,
 ) -> bool {
     // Crate roots (`src/lib.rs`, `src/main.rs`) are always production code.
     // They have no parent `mod` declaration, so a sibling file that declares
@@ -323,10 +342,24 @@ fn is_file_backed_test_module_inner(
         return false;
     }
     let (mut cfg_test_ref, mut prod_ref) = (false, false);
-    for (candidate, module_path) in file_backed_module_source_probes(root, path) {
+    for (candidate, module_path, is_sibling) in file_backed_module_source_probes(root, path) {
         let parent_is_test = is_existing_source_file(root, &candidate)
-            && is_file_backed_test_module_inner(root, &candidate, visiting, memo, cache);
-        let (ct, prod) = classify_file_module_references(root, &candidate, &module_path, cache);
+            && is_file_backed_test_module_inner(
+                root,
+                &candidate,
+                visiting,
+                memo,
+                cache,
+                sibling_cache,
+            );
+        // Sibling probes (same-directory files) must only match via `#[path]` attributes.
+        // A bare `mod foo;` in `src/a.rs` resolves to `src/a/foo.rs`, not to sibling
+        // `src/foo.rs`, so ident-based matching is skipped for sibling probes.
+        let (ct, prod) = if is_sibling {
+            classify_sibling_probe(root, &candidate, &module_path, sibling_cache)
+        } else {
+            classify_file_module_references(root, &candidate, &module_path, cache)
+        };
         if parent_is_test {
             cfg_test_ref |= ct | prod;
         } else {
@@ -347,16 +380,21 @@ fn is_existing_source_file(root: &Path, path: &Path) -> bool {
     path.symlink_metadata().is_ok_and(|meta| meta.is_file())
 }
 
-fn file_backed_module_source_probes(root: &Path, path: &Path) -> Vec<(PathBuf, Vec<String>)> {
+// Each probe is `(candidate_file, module_path, is_sibling_probe)`.
+// `is_sibling_probe = true` means the candidate is a same-directory sibling of
+// `path`.  Sibling probes must only be classified via `#[path]` attributes because
+// a bare `mod foo;` in a sibling file resolves to a subdirectory, not to `path`.
+fn file_backed_module_source_probes(root: &Path, path: &Path) -> Vec<(PathBuf, Vec<String>, bool)> {
     let mut probes = Vec::new();
     let Some(mut base_dir) = path.parent().map(Path::to_path_buf) else {
         return probes;
     };
 
-    // Also probe same-directory .rs siblings — they may use #[path] to reference `path`.
+    // Probe same-directory .rs siblings — they may use `#[path]` to reference `path`.
+    // Marked as sibling probes so that ident-based `mod` matching is skipped.
     if let Some(module_path) = module_path_for_file_from_base(&base_dir, path) {
         for sibling in sibling_rs_files(root, path) {
-            probes.push((sibling, module_path.clone()));
+            probes.push((sibling, module_path.clone(), true));
         }
     }
 
@@ -366,7 +404,7 @@ fn file_backed_module_source_probes(root: &Path, path: &Path) -> Vec<(PathBuf, V
                 continue;
             }
             if let Some(module_path) = module_path_for_file_from_base(&base_dir, path) {
-                probes.push((source, module_path));
+                probes.push((source, module_path, false));
             }
         }
 
@@ -386,7 +424,7 @@ fn file_backed_module_source_probes(root: &Path, path: &Path) -> Vec<(PathBuf, V
         if let Some(module_path) = module_path_for_file_from_base(&base_dir, path) {
             for ancestor_file in rs_files_in_dir(root, &base_dir) {
                 if ancestor_file.as_path() != path {
-                    probes.push((ancestor_file, module_path.clone()));
+                    probes.push((ancestor_file, module_path.clone(), false));
                 }
             }
         }
@@ -521,6 +559,14 @@ where
                 // items nested in expression blocks and control-flow bodies.
                 self.visit_block_for_local_items(&item_fn.block);
             }
+            syn::Item::Const(item_const) => {
+                // Walk const initializer expressions for block items with attributes.
+                self.visit_expr_for_local_items(&item_const.expr);
+            }
+            syn::Item::Static(item_static) => {
+                // Walk static initializer expressions for block items with attributes.
+                self.visit_expr_for_local_items(&item_static.expr);
+            }
             _ => {}
         }
     }
@@ -578,6 +624,11 @@ where
     fn visit_block_for_local_items(&mut self, block: &syn::Block) {
         let mut visitor = LocalItemVisitor { node_visitor: self };
         syn::visit::visit_block(&mut visitor, block);
+    }
+
+    fn visit_expr_for_local_items(&mut self, expr: &syn::Expr) {
+        let mut visitor = LocalItemVisitor { node_visitor: self };
+        syn::visit::visit_expr(&mut visitor, expr);
     }
 }
 

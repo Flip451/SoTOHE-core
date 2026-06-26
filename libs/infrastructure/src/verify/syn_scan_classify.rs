@@ -17,6 +17,14 @@ use super::syn_helpers::{extract_path_attr, has_cfg_test_attr};
 /// the cumulative `proc-macro2` byte-offset from overflowing `u32::MAX`.
 pub(crate) type ClassifyCache = HashMap<(PathBuf, Vec<String>), (bool, bool)>;
 
+/// Memoisation cache for [`classify_sibling_probe`].
+///
+/// Separate from [`ClassifyCache`] because sibling probes use `#[path]`-only
+/// matching, producing different results than full ident + path-attr matching.
+/// Sharing one instance across the workspace scan prevents redundant re-parses
+/// (and keeps cumulative `proc-macro2` byte-offsets within `u32::MAX`).
+pub(crate) type SiblingClassifyCache = HashMap<(PathBuf, Vec<String>), (bool, bool)>;
+
 /// Returns `(cfg_test_referenced, production_referenced)`: whether a
 /// `#[cfg(test)]` or non-`cfg(test)` `mod` declaration in `path` resolves to
 /// `module_path`.
@@ -187,4 +195,99 @@ fn path_attr_matches_module_path(path_value: &str, module_path: &[String]) -> bo
             .iter()
             .zip(module_path.iter())
             .all(|(component, expected)| component == expected)
+}
+
+/// Returns `(cfg_test_referenced, production_referenced)` for a same-directory
+/// sibling probe.
+///
+/// Unlike [`classify_file_module_references`], only `#[path = "..."]`-based `mod`
+/// declarations are considered.  A bare `mod foo;` in `src/a.rs` resolves to
+/// `src/a/foo.rs` (not to sibling `src/foo.rs`), so ident-based matching is
+/// intentionally skipped for sibling probes.
+///
+/// Results are memoised in `cache` to bound the cumulative `proc-macro2`
+/// byte-offset within `u32::MAX` across a workspace-wide scan (the same sibling
+/// file may be probed by many targets in the same directory).
+pub(crate) fn classify_sibling_probe(
+    root: &Path,
+    path: &Path,
+    module_path: &[String],
+    cache: &mut SiblingClassifyCache,
+) -> (bool, bool) {
+    let key = (path.to_path_buf(), module_path.to_vec());
+    if let Some(&cached) = cache.get(&key) {
+        return cached;
+    }
+    let result = classify_sibling_uncached(root, path, module_path);
+    cache.insert(key, result);
+    result
+}
+
+fn classify_sibling_uncached(root: &Path, path: &Path, module_path: &[String]) -> (bool, bool) {
+    let Ok(true) = reject_symlinks_below(path, root) else {
+        return (false, false);
+    };
+    let Ok(meta) = path.symlink_metadata() else {
+        return (false, false);
+    };
+    if !meta.is_file() {
+        return (false, false);
+    }
+    let content = match std::fs::read_to_string(path) {
+        Ok(content) => content,
+        Err(_) => return (false, false),
+    };
+    let file = match syn::parse_file(&content) {
+        Ok(file) => file,
+        Err(_) => return (false, false),
+    };
+    let inherited_cfg_test = has_cfg_test_attr(&file.attrs);
+    (
+        items_declare_cfg_test_path_attr_only(&file.items, module_path, inherited_cfg_test),
+        items_declare_production_path_attr_only(&file.items, module_path, inherited_cfg_test),
+    )
+}
+
+fn items_declare_cfg_test_path_attr_only(
+    items: &[syn::Item],
+    module_path: &[String],
+    inherited_cfg_test: bool,
+) -> bool {
+    if module_path.is_empty() {
+        return false;
+    }
+    items.iter().any(|item| {
+        let syn::Item::Mod(module) = item else {
+            return false;
+        };
+        let cfg_test = inherited_cfg_test || has_cfg_test_attr(&module.attrs);
+        if let Some(path_value) = extract_path_attr(&module.attrs) {
+            return module.content.is_none()
+                && cfg_test
+                && path_attr_matches_module_path(&path_value, module_path);
+        }
+        false
+    })
+}
+
+fn items_declare_production_path_attr_only(
+    items: &[syn::Item],
+    module_path: &[String],
+    inherited_cfg_test: bool,
+) -> bool {
+    if module_path.is_empty() {
+        return false;
+    }
+    items.iter().any(|item| {
+        let syn::Item::Mod(module) = item else {
+            return false;
+        };
+        let cfg_test = inherited_cfg_test || has_cfg_test_attr(&module.attrs);
+        if let Some(path_value) = extract_path_attr(&module.attrs) {
+            return module.content.is_none()
+                && !cfg_test
+                && path_attr_matches_module_path(&path_value, module_path);
+        }
+        false
+    })
 }

@@ -776,10 +776,10 @@ fn test_ignores_doc_hidden_in_deeply_nested_transitive_cfg_test_module() {
     );
 }
 
-/// PR16: same-directory transitive inheritance — `lib.rs` has
-/// `#[cfg(test)] mod a;`, `a.rs` has plain `mod b;`, and `b.rs` has
-/// `#[doc(hidden)]`.  The plain same-directory child is still test-only
-/// because its parent file is test-only.
+/// PR16: same-directory sibling correctness — `lib.rs` has `#[cfg(test)] mod a;`,
+/// `a.rs` has plain `mod b;` (no `#[path]`), and `b.rs` has `#[doc(hidden)]`.
+/// In Rust, `mod b;` in `src/a.rs` resolves to `src/a/b.rs` (subdirectory), NOT
+/// to sibling `src/b.rs`.  `src/b.rs` is an orphan file and must be flagged.
 #[test]
 fn test_ignores_doc_hidden_in_same_directory_transitive_cfg_test_module() {
     let tmp = TempDir::new().unwrap();
@@ -789,10 +789,12 @@ fn test_ignores_doc_hidden_in_same_directory_transitive_cfg_test_module() {
     write_src(tmp.path(), "b.rs", "#[doc(hidden)]\npub fn hidden() {}\n");
 
     let outcome = verify(tmp.path());
+    // `mod b;` in a.rs resolves to src/a/b.rs, not to sibling src/b.rs.
+    // b.rs is an orphan and must be flagged (PR16 — corrected after sibling-probe fix).
     assert!(
-        outcome.is_ok(),
-        "doc(hidden) in same-directory transitively test-only file must not be flagged (PR16): \
-         {:?}",
+        outcome.has_errors(),
+        "doc(hidden) in sibling b.rs (orphaned — a.rs's mod b; resolves to a/b.rs) must be \
+         flagged (PR16): {:?}",
         outcome.findings()
     );
 }
@@ -1227,6 +1229,93 @@ fn test_non_root_file_cfg_test_only_ref_from_lib_rs_remains_test_only() {
         outcome.is_ok(),
         "doc(hidden) in a non-root file referenced only via cfg(test) mod must not be \
          flagged (PR29 regression): {:?}",
+        outcome.findings()
+    );
+}
+
+/// PR30: a same-directory sibling file that declares `#[cfg(test)] mod b;` (no
+/// `#[path]`) must NOT exclude `src/b.rs` from scanning.  In Rust, `mod b;` in
+/// `src/a.rs` resolves to `src/a/b.rs`, not to sibling `src/b.rs`.  Without the
+/// fix the sibling probe incorrectly propagates the `cfg(test)` gate to `b.rs` and
+/// silently drops the `#[doc(hidden)]` finding.
+#[test]
+fn test_flags_doc_hidden_in_b_rs_when_sibling_has_cfg_test_mod_b_without_path() {
+    let tmp = TempDir::new().unwrap();
+    write_arch_rules(tmp.path());
+    write_src(tmp.path(), "lib.rs", "pub mod a;\n");
+    // a.rs has a cfg(test)-gated bare `mod b;` (no #[path]).
+    // In Rust this resolves to src/a/b.rs, not to sibling src/b.rs.
+    write_src(tmp.path(), "a.rs", "pub fn a_fn() {}\n#[cfg(test)]\nmod b;\n");
+    // b.rs has a violation.
+    write_src(tmp.path(), "b.rs", "#[doc(hidden)]\npub fn x() {}\n");
+
+    let outcome = verify(tmp.path());
+    assert!(
+        outcome.has_errors(),
+        "#[doc(hidden)] in b.rs must be flagged; sibling `mod b;` (no #[path]) in a.rs must \
+         not exclude b.rs (PR30): {:?}",
+        outcome.findings()
+    );
+}
+
+/// PR32: `const X: usize = { #[doc(hidden)] struct Hidden; 1 };` — `#[doc(hidden)]`
+/// on a local struct inside a const initializer block must be flagged.
+#[test]
+fn test_detects_doc_hidden_on_local_item_in_const_initializer_block() {
+    let tmp = TempDir::new().unwrap();
+    setup(tmp.path(), "const X: usize = { #[doc(hidden)] struct Hidden; 1 };\n");
+    let outcome = verify(tmp.path());
+    assert!(
+        outcome.has_errors(),
+        "expected error for #[doc(hidden)] on local struct in const initializer block (PR32): \
+         {:?}",
+        outcome.findings()
+    );
+}
+
+/// PR33: `static Y: usize = { #[doc(hidden)] fn h() {} 0 };` — `#[doc(hidden)]`
+/// on a local function inside a static initializer block must be flagged.
+#[test]
+fn test_detects_doc_hidden_on_local_item_in_static_initializer_block() {
+    let tmp = TempDir::new().unwrap();
+    setup(tmp.path(), "static Y: usize = { #[doc(hidden)] fn h() {} 0 };\n");
+    let outcome = verify(tmp.path());
+    assert!(
+        outcome.has_errors(),
+        "expected error for #[doc(hidden)] on local fn in static initializer block (PR33): \
+         {:?}",
+        outcome.findings()
+    );
+}
+
+/// PR31: regression — a same-directory sibling that uses `#[cfg(test)] #[path =
+/// "shared_helpers.rs"] mod tests;` must still cause `shared_helpers.rs` to be
+/// classified as test-only and excluded from scanning.  The sibling probe must
+/// continue to work for `#[path]`-based declarations after the PR30 fix.
+#[test]
+fn test_sibling_cfg_test_path_attr_still_excludes_target() {
+    let tmp = TempDir::new().unwrap();
+    write_arch_rules(tmp.path());
+    write_src(tmp.path(), "lib.rs", "pub mod a;\n");
+    // a.rs references shared_helpers.rs via #[path] under cfg(test).
+    write_src(
+        tmp.path(),
+        "a.rs",
+        concat!(
+            "pub fn a_fn() {}\n",
+            "#[cfg(test)]\n",
+            "#[path = \"shared_helpers.rs\"]\n",
+            "mod tests;\n",
+        ),
+    );
+    // shared_helpers.rs is a sibling of a.rs and referenced only via cfg(test) #[path].
+    write_src(tmp.path(), "shared_helpers.rs", "#[doc(hidden)]\npub fn hidden_helper() {}\n");
+
+    let outcome = verify(tmp.path());
+    assert!(
+        outcome.is_ok(),
+        "shared_helpers.rs referenced only via #[cfg(test)] #[path] must remain excluded \
+         after the PR30 sibling-probe fix (PR31 regression): {:?}",
         outcome.findings()
     );
 }
