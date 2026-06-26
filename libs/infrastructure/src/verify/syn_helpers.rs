@@ -90,6 +90,13 @@ fn is_real_file(path: &Path) -> bool {
     }
 }
 
+fn is_safe_module_file(path: &Path, scan_root: &Path) -> bool {
+    path.starts_with(scan_root)
+        && crate::track::symlink_guard::reject_symlinks_below(path, scan_root)
+            .is_ok_and(|exists| exists)
+        && is_real_file(path)
+}
+
 fn parse_real_rs_file(path: &Path) -> Option<syn::File> {
     if !is_real_file(path) {
         return None;
@@ -167,14 +174,15 @@ fn collect_module_child_files_inner(
                 if let Some(path_val) = extract_path_attr_value(&mod_item.attrs) {
                     // Resolve #[path = "..."] relative to the containing file's directory.
                     // Lexically normalize to collapse any `..` components before the
-                    // scan-root containment check to prevent path-traversal bypasses.
+                    // scan-root containment and symlink-ancestor checks to prevent
+                    // path-traversal bypasses.
                     let resolved = lexical_normalize(&file_dir.join(&path_val));
-                    if resolved.starts_with(scan_root) && is_real_file(&resolved) {
+                    if is_safe_module_file(&resolved, scan_root) {
                         child_files.insert(resolved);
                     }
                 } else {
                     for candidate in module_candidate_paths(basedir, mod_item) {
-                        if is_real_file(&candidate) {
+                        if is_safe_module_file(&candidate, scan_root) {
                             child_files.insert(candidate);
                         }
                     }
@@ -215,14 +223,15 @@ fn collect_module_refs_for_context(
                 if let Some(path_val) = extract_path_attr_value(&mod_item.attrs) {
                     // Resolve #[path = "..."] relative to the containing file's directory.
                     // Lexically normalize to collapse any `..` components before the
-                    // scan-root containment check to prevent path-traversal bypasses.
+                    // scan-root containment and symlink-ancestor checks to prevent
+                    // path-traversal bypasses.
                     let resolved = lexical_normalize(&file_dir.join(&path_val));
-                    if resolved.starts_with(scan_root) && is_real_file(&resolved) {
+                    if is_safe_module_file(&resolved, scan_root) {
                         worklist.push((resolved, child_context));
                     }
                 } else {
                     for candidate in module_candidate_paths(basedir, mod_item) {
-                        if is_real_file(&candidate) {
+                        if is_safe_module_file(&candidate, scan_root) {
                             worklist.push((candidate, child_context));
                         }
                     }
@@ -246,7 +255,7 @@ fn collect_module_refs_for_context(
     }
 }
 
-fn is_scan_crate_root(root: &Path, file: &Path) -> bool {
+pub(crate) fn is_scan_crate_root(root: &Path, file: &Path) -> bool {
     let Some(file_name) = file.file_name().and_then(|name| name.to_str()) else {
         return false;
     };
@@ -307,6 +316,113 @@ fn collect_cfg_test_files(root: &Path) -> HashSet<PathBuf> {
 
     cfg_test_files.retain(|file| !production_files.contains(file));
     cfg_test_files
+}
+
+/// Collect the set of `.rs` file paths that are reachable through `pub mod`
+/// declarations (bare `pub` only) starting from the crate roots (`lib.rs` /
+/// `main.rs`) in `root`.
+///
+/// Only bare `pub` visibility propagates rustdoc reachability; `pub(crate)`,
+/// `pub(super)`, and private module declarations are not followed. The crate
+/// roots themselves are always included in the returned set.
+///
+/// The returned set is transitively closed: a pub-reachable file is itself
+/// scanned for further `pub mod` declarations so that their children are added.
+/// `#[path = "..."]` attributes are resolved relative to the containing file's
+/// directory and guarded by scan-root containment and symlink-ancestor checks.
+pub(crate) fn collect_pub_reachable_files(root: &Path) -> HashSet<PathBuf> {
+    let mut rs_files = Vec::new();
+    collect_rs_files_from_dir(root, &mut rs_files);
+
+    // Seed: crate roots are always pub-reachable.
+    let mut worklist: Vec<PathBuf> =
+        rs_files.iter().filter(|f| is_scan_crate_root(root, f)).cloned().collect();
+    let mut pub_reachable: HashSet<PathBuf> = worklist.iter().cloned().collect();
+    let mut visited: HashSet<PathBuf> = HashSet::new();
+
+    while let Some(file) = worklist.pop() {
+        if !visited.insert(file.clone()) {
+            continue;
+        }
+        let Some(ast) = parse_real_rs_file(&file) else {
+            continue;
+        };
+        let Some(basedir) = module_basedir(&file) else {
+            continue;
+        };
+        let Some(file_dir) = file.parent() else {
+            continue;
+        };
+        collect_pub_reachable_refs(
+            &ast.items,
+            &basedir,
+            file_dir,
+            root,
+            &mut pub_reachable,
+            &mut worklist,
+        );
+    }
+
+    pub_reachable
+}
+
+/// Recursive helper for [`collect_pub_reachable_files`]: walks `items` and
+/// adds file paths reachable through `pub mod` declarations to `pub_reachable`
+/// and `worklist`.
+fn collect_pub_reachable_refs(
+    items: &[syn::Item],
+    basedir: &Path,
+    file_dir: &Path,
+    scan_root: &Path,
+    pub_reachable: &mut HashSet<PathBuf>,
+    worklist: &mut Vec<PathBuf>,
+) {
+    for item in items {
+        let syn::Item::Mod(mod_item) = item else {
+            continue;
+        };
+        // cfg-test mods are test-scoped and never pub-reachable for doc purposes.
+        if has_cfg_test_attr(&mod_item.attrs) {
+            continue;
+        }
+        // Only bare `pub` propagates rustdoc reachability.
+        if !matches!(mod_item.vis, syn::Visibility::Public(_)) {
+            continue;
+        }
+        match &mod_item.content {
+            None => {
+                // File-backed pub mod: resolve the child file path.
+                if let Some(path_val) = extract_path_attr_value(&mod_item.attrs) {
+                    let resolved = lexical_normalize(&file_dir.join(&path_val));
+                    if is_safe_module_file(&resolved, scan_root)
+                        && pub_reachable.insert(resolved.clone())
+                    {
+                        worklist.push(resolved);
+                    }
+                } else {
+                    for candidate in module_candidate_paths(basedir, mod_item) {
+                        if is_safe_module_file(&candidate, scan_root)
+                            && pub_reachable.insert(candidate.clone())
+                        {
+                            worklist.push(candidate);
+                        }
+                    }
+                }
+            }
+            Some((_, inner_items)) => {
+                // Inline pub mod: recurse into its items using the stacked basedir.
+                let inner_basedir = basedir.join(mod_item.ident.to_string());
+                collect_pub_reachable_refs(
+                    inner_items,
+                    &inner_basedir,
+                    &inner_basedir,
+                    scan_root,
+                    pub_reachable,
+                    worklist,
+                );
+            }
+        }
+    }
 }
 
 /// Recursively scan all `.rs` files under `root`, calling `on_file` for each
@@ -517,6 +633,29 @@ mod tests {
         assert!(
             messages.iter().any(|msg| msg.contains("visited lib.rs")),
             "cfg-test mod in main.rs must not hide scan-root lib.rs: {messages:?}"
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_collect_pub_reachable_files_path_mod_rejects_symlink_parent() {
+        let tmp = tempfile::tempdir().unwrap();
+        let outside = tempfile::tempdir().unwrap();
+        let outside_file = outside.path().join("outside.rs");
+        let link_dir = tmp.path().join("link-dir");
+        std::fs::write(
+            tmp.path().join("lib.rs"),
+            "#[path = \"link-dir/outside.rs\"] pub mod outside;\n",
+        )
+        .unwrap();
+        std::fs::write(&outside_file, "pub fn exposed() {}\n").unwrap();
+        std::os::unix::fs::symlink(outside.path(), &link_dir).unwrap();
+
+        let pub_reachable = collect_pub_reachable_files(tmp.path());
+
+        assert!(
+            !pub_reachable.contains(&lexical_normalize(&link_dir.join("outside.rs"))),
+            "#[path] resolution must not follow a symlinked parent outside scan root"
         );
     }
 }

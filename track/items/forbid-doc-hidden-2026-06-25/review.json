@@ -1,157 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2e163880ca21835277945a00a9edfc80159e659ec428874093fc22bf01dc6ff5",
-          "at": "2026-06-26T02:02:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2e163880ca21835277945a00a9edfc80159e659ec428874093fc22bf01dc6ff5",
-          "at": "2026-06-26T02:05:39Z"
-        }
-      ]
-    },
-    "plan-artifacts": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2746127487d7025c86e16ff7142d63002e9e581b37f77e2ebeba9a747db2d9a0",
-          "at": "2026-06-25T23:42:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2746127487d7025c86e16ff7142d63002e9e581b37f77e2ebeba9a747db2d9a0",
-          "at": "2026-06-25T23:47:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`plan.md` overstates the scope of the doc_hidden unit tests: AC-05/AC-06 and several CN items are repo-wide or process constraints, so they cannot be established by tests in the `doc_hidden` module alone. As written, the plan promises verification the proposed test location cannot provide.",
-              "severity": "P1",
-              "file": "track/items/forbid-doc-hidden-2026-06-25/plan.md",
-              "line": 19,
-              "category": "infeasibility"
-            }
-          ],
-          "hash": "rvw1:sha256:eacf5b0a7eb66d70265c21238e6bf501c3cfc67e94be472fd27b9e35da962773",
-          "at": "2026-06-26T01:07:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T001 says there are \"no changes to ... any existing verify module,\" but the same task explicitly edits `libs/infrastructure/src/verify/syn_helpers.rs`. That file is already under the `verify` module tree, so the scope note contradicts the work the task requires.",
-              "severity": "P1",
-              "file": "track/items/forbid-doc-hidden-2026-06-25/impl-plan.json",
-              "line": 6,
-              "category": "contradiction"
-            },
-            {
-              "message": "T001 claims AC-04 coverage for excluding both `#[cfg(test)]` blocks and `#[test]` functions, but the only explicit unit test it lists is the `#[cfg(test)]` module case. There is no separate `#[test]`-only case, so the plan overstates the coverage it documents for AC-04.",
-              "severity": "P1",
-              "file": "track/items/forbid-doc-hidden-2026-06-25/impl-plan.json",
-              "line": 6,
-              "category": "factual error"
-            }
-          ],
-          "hash": "rvw1:sha256:a7299c3c27e712eb4fb9d675b2bf4bc60534bea79e3da1be66cd36c1633e7742",
-          "at": "2026-06-26T01:13:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:da4fcf241bc5838fd708d2c4d68c5787672e578b7f7a998e08e98d758fc2babb",
-          "at": "2026-06-26T01:18:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:da4fcf241bc5838fd708d2c4d68c5787672e578b7f7a998e08e98d758fc2babb",
-          "at": "2026-06-26T01:24:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8538add7861c48b371d3c4ad07d7048f36a1bb8ecbad3678734e0911351dbd3a",
-          "at": "2026-06-26T02:04:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8538add7861c48b371d3c4ad07d7048f36a1bb8ecbad3678734e0911351dbd3a",
-          "at": "2026-06-26T02:07:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8aa3fef4cdd04f23365a90f99dcb8fa3d251afbfcf007cd004c646a68f1d8b04",
-          "at": "2026-06-26T02:41:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8aa3fef4cdd04f23365a90f99dcb8fa3d251afbfcf007cd004c646a68f1d8b04",
-          "at": "2026-06-26T02:43:58Z"
-        }
-      ]
-    },
-    "cli_driver": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9958578ee337e6677f74e8f25361db97bcf372b1fd62cf335f11fcf2027381aa",
-          "at": "2026-06-26T02:02:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9958578ee337e6677f74e8f25361db97bcf372b1fd62cf335f11fcf2027381aa",
-          "at": "2026-06-26T02:05:21Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:adf87f6c9e1b068c56ad0861098ea350924a8e3b7b1e6579dca6b3cf3754367b",
-          "at": "2026-06-26T02:02:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:adf87f6c9e1b068c56ad0861098ea350924a8e3b7b1e6579dca6b3cf3754367b",
-          "at": "2026-06-26T02:05:22Z"
-        }
-      ]
-    },
     "cli": {
       "rounds": [
         {
@@ -367,6 +216,200 @@
           "findings": [],
           "hash": "rvw1:sha256:069a6ed219276e71aa5ca93d1b8a5a6f6280ca2347b04c0cf100a297da3a34ff",
           "at": "2026-06-26T05:37:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`#[path]`-based `pub mod` resolution only applies `lexical_normalize(...).starts_with(scan_root)` and `is_real_file()`. That still allows a `#[path]` to pass through a symlinked intermediate directory under `scan_root` and reach a file outside the trusted root, because no ancestor symlink check like `reject_symlinks_below()` is performed here. This is a P1 trusted-root / symlink boundary gap.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/syn_helpers.rs",
+              "line": 387,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:38cc025351b52437ea582899d529430cba5a5a6ca8979a4ef9a91e644603d379",
+          "at": "2026-06-26T06:10:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:84254cd6323ddf6f3692b4731c02c5a006f2a6d46f9013a72016e9f39438144b",
+          "at": "2026-06-26T06:19:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:84254cd6323ddf6f3692b4731c02c5a006f2a6d46f9013a72016e9f39438144b",
+          "at": "2026-06-26T06:22:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ba70dc10afaed927f9460e3d42fe0f2bb4054c10879f74e7981414b19d4ddb7b",
+          "at": "2026-06-26T06:53:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ba70dc10afaed927f9460e3d42fe0f2bb4054c10879f74e7981414b19d4ddb7b",
+          "at": "2026-06-26T06:56:49Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2e163880ca21835277945a00a9edfc80159e659ec428874093fc22bf01dc6ff5",
+          "at": "2026-06-26T02:02:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2e163880ca21835277945a00a9edfc80159e659ec428874093fc22bf01dc6ff5",
+          "at": "2026-06-26T02:05:39Z"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9958578ee337e6677f74e8f25361db97bcf372b1fd62cf335f11fcf2027381aa",
+          "at": "2026-06-26T02:02:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9958578ee337e6677f74e8f25361db97bcf372b1fd62cf335f11fcf2027381aa",
+          "at": "2026-06-26T02:05:21Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:adf87f6c9e1b068c56ad0861098ea350924a8e3b7b1e6579dca6b3cf3754367b",
+          "at": "2026-06-26T02:02:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:adf87f6c9e1b068c56ad0861098ea350924a8e3b7b1e6579dca6b3cf3754367b",
+          "at": "2026-06-26T02:05:22Z"
+        }
+      ]
+    },
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2746127487d7025c86e16ff7142d63002e9e581b37f77e2ebeba9a747db2d9a0",
+          "at": "2026-06-25T23:42:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2746127487d7025c86e16ff7142d63002e9e581b37f77e2ebeba9a747db2d9a0",
+          "at": "2026-06-25T23:47:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan.md` overstates the scope of the doc_hidden unit tests: AC-05/AC-06 and several CN items are repo-wide or process constraints, so they cannot be established by tests in the `doc_hidden` module alone. As written, the plan promises verification the proposed test location cannot provide.",
+              "severity": "P1",
+              "file": "track/items/forbid-doc-hidden-2026-06-25/plan.md",
+              "line": 19,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:eacf5b0a7eb66d70265c21238e6bf501c3cfc67e94be472fd27b9e35da962773",
+          "at": "2026-06-26T01:07:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 says there are \"no changes to ... any existing verify module,\" but the same task explicitly edits `libs/infrastructure/src/verify/syn_helpers.rs`. That file is already under the `verify` module tree, so the scope note contradicts the work the task requires.",
+              "severity": "P1",
+              "file": "track/items/forbid-doc-hidden-2026-06-25/impl-plan.json",
+              "line": 6,
+              "category": "contradiction"
+            },
+            {
+              "message": "T001 claims AC-04 coverage for excluding both `#[cfg(test)]` blocks and `#[test]` functions, but the only explicit unit test it lists is the `#[cfg(test)]` module case. There is no separate `#[test]`-only case, so the plan overstates the coverage it documents for AC-04.",
+              "severity": "P1",
+              "file": "track/items/forbid-doc-hidden-2026-06-25/impl-plan.json",
+              "line": 6,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:a7299c3c27e712eb4fb9d675b2bf4bc60534bea79e3da1be66cd36c1633e7742",
+          "at": "2026-06-26T01:13:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da4fcf241bc5838fd708d2c4d68c5787672e578b7f7a998e08e98d758fc2babb",
+          "at": "2026-06-26T01:18:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da4fcf241bc5838fd708d2c4d68c5787672e578b7f7a998e08e98d758fc2babb",
+          "at": "2026-06-26T01:24:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8538add7861c48b371d3c4ad07d7048f36a1bb8ecbad3678734e0911351dbd3a",
+          "at": "2026-06-26T02:04:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8538add7861c48b371d3c4ad07d7048f36a1bb8ecbad3678734e0911351dbd3a",
+          "at": "2026-06-26T02:07:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8aa3fef4cdd04f23365a90f99dcb8fa3d251afbfcf007cd004c646a68f1d8b04",
+          "at": "2026-06-26T02:41:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8aa3fef4cdd04f23365a90f99dcb8fa3d251afbfcf007cd004c646a68f1d8b04",
+          "at": "2026-06-26T02:43:58Z"
         }
       ]
     }
