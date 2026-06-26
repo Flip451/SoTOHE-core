@@ -740,4 +740,52 @@ mod tests {
         assert_eq!(out.lane_summaries.len(), 1);
         assert_eq!(out.lane_summaries[0].label, "Chain1 (spec\u{2194}ADR)");
     }
+
+    // ── chain=Chain1 short-circuit (P1 finding: Chain2 load skipped for Chain1-only) ─────
+
+    #[test]
+    fn compute_results_chain1_only_skips_chain2_bindings() {
+        // Structural stand-in for "Chain2 binding load failure":
+        // chain2_caches is deliberately empty, simulating the short-circuit in
+        // driver_adapter.rs where load_results_tddd_bindings + Chain2 cache loading are
+        // skipped entirely when chain=Chain1.  Chain1 data is healthy.
+        // Assert: succeeds and returns only the Chain1 lane with correct verdicts.
+        let out = compute_results(
+            vec![pass_cache_entry(0x01, 0x02)],
+            vec![], // empty: simulates skipped Chain2 loading
+            vec![chain1_pair(0x01, 0x02)],
+            RefVerifyChainFilter::Chain1,
+            RefVerifyLayerFilter::All,
+            RefVerifyVerdictFilter::All,
+        )
+        .unwrap();
+        assert_eq!(out.lane_summaries.len(), 1, "only Chain1 lane should be present");
+        assert_eq!(out.lane_summaries[0].label, "Chain1 (spec\u{2194}ADR)");
+        assert_eq!(out.total_pass, 1);
+        assert_eq!(out.total_fail, 0);
+        assert_eq!(out.total_pending, 0);
+        assert_eq!(out.pair_records.len(), 1);
+        assert!(matches!(out.pair_records[0].verdict, SemanticVerdict::Pass { .. }));
+    }
+
+    #[test]
+    fn compute_results_chain1_only_layer_specified_is_noop() {
+        // chain=Chain1 + Specific(unknown layer) + empty chain2_caches (simulating the
+        // short-circuit where Chain2 loading was skipped): no validation error is raised
+        // (layer validation is Chain2-only), and Chain1 output is unaffected.
+        let unknown_layer = LayerId::try_new("nonexistent-layer".to_owned()).unwrap();
+        let out = compute_results(
+            vec![pass_cache_entry(0x01, 0x02)],
+            vec![], // empty: simulates skipped Chain2 loading
+            vec![chain1_pair(0x01, 0x02)],
+            RefVerifyChainFilter::Chain1,
+            RefVerifyLayerFilter::Specific(unknown_layer),
+            RefVerifyVerdictFilter::All,
+        )
+        .unwrap();
+        assert_eq!(out.total_pass, 1);
+        assert_eq!(out.lane_summaries.len(), 1);
+        assert_eq!(out.lane_summaries[0].label, "Chain1 (spec\u{2194}ADR)");
+        assert_eq!(out.pair_records.len(), 1);
+    }
 }

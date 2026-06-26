@@ -213,6 +213,19 @@ fn load_agent_profiles(project_root: &Path) -> Result<AgentProfiles, RefVerifyAd
         .map_err(|e| RefVerifyAdapterError(format!("cannot load agent-profiles.json: {e}")))
 }
 
+fn pair_source_scope_for_results(
+    resolved_scope: &usecase::ref_verify::RefVerifyScope,
+    chain: &usecase::ref_verify::RefVerifyChainFilter,
+) -> usecase::ref_verify::RefVerifyScope {
+    match chain {
+        usecase::ref_verify::RefVerifyChainFilter::Chain1 => {
+            usecase::ref_verify::RefVerifyScope::Chain1
+        }
+        usecase::ref_verify::RefVerifyChainFilter::Chain2
+        | usecase::ref_verify::RefVerifyChainFilter::All => resolved_scope.clone(),
+    }
+}
+
 fn current_git_branch(project_root: &Path) -> Result<String, RefVerifyAdapterError> {
     use crate::git_cli::{GitRepository as _, SystemGitRepo};
     SystemGitRepo::discover_from(project_root)
@@ -354,7 +367,8 @@ impl usecase::ref_verify::RefVerifyAggregateService for FsRefVerifyAggregateAdap
         use domain::tddd::LayerId;
         use domain::tddd::semantic_verify::SemanticVerifyEntry;
         use usecase::ref_verify::{
-            RefVerifyCachePort, RefVerifyCacheScope, RefVerifyConfig, RefVerifyPairSourcePort,
+            RefVerifyCachePort, RefVerifyCacheScope, RefVerifyChainFilter, RefVerifyConfig,
+            RefVerifyPairSourcePort,
         };
 
         // (a) Resolve project root and validate track ID.
@@ -385,18 +399,25 @@ impl usecase::ref_verify::RefVerifyAggregateService for FsRefVerifyAggregateAdap
             .load_entries(&cmd, &RefVerifyCacheScope::SpecAdr)
             .map_err(|e| RefVerifyDriverError::Usecase(e.to_string()))?;
 
-        let bindings = load_results_tddd_bindings(&canonical_root)?;
+        // Only load Chain2 bindings and caches when the chain filter requests Chain2 results.
+        // Skipping this I/O for chain=Chain1 ensures that a missing or malformed
+        // architecture-rules.json / Chain2 cache file cannot fail a Chain1-only results query.
+        let include_chain2 =
+            matches!(&chain, RefVerifyChainFilter::Chain2 | RefVerifyChainFilter::All);
         let mut chain2_caches: Vec<(LayerId, Vec<SemanticVerifyEntry>)> = Vec::new();
-        for binding in &bindings {
-            let layer_str = binding.layer_id();
-            let layer_id = LayerId::try_new(layer_str.to_owned()).map_err(|e| {
-                RefVerifyDriverError::Wiring(format!("invalid layer id '{layer_str}': {e}"))
-            })?;
-            let cache_scope = RefVerifyCacheScope::CatalogueSpec { layer: layer_id.clone() };
-            let entries = cache_adapter
-                .load_entries(&cmd, &cache_scope)
-                .map_err(|e| RefVerifyDriverError::Usecase(e.to_string()))?;
-            chain2_caches.push((layer_id, entries));
+        if include_chain2 {
+            let bindings = load_results_tddd_bindings(&canonical_root)?;
+            for binding in &bindings {
+                let layer_str = binding.layer_id();
+                let layer_id = LayerId::try_new(layer_str.to_owned()).map_err(|e| {
+                    RefVerifyDriverError::Wiring(format!("invalid layer id '{layer_str}': {e}"))
+                })?;
+                let cache_scope = RefVerifyCacheScope::CatalogueSpec { layer: layer_id.clone() };
+                let entries = cache_adapter
+                    .load_entries(&cmd, &cache_scope)
+                    .map_err(|e| RefVerifyDriverError::Usecase(e.to_string()))?;
+                chain2_caches.push((layer_id, entries));
+            }
         }
 
         // (d) Enumerate current pairs read-only (CN-06: no LLM subprocess in the results path).
@@ -404,8 +425,13 @@ impl usecase::ref_verify::RefVerifyAggregateService for FsRefVerifyAggregateAdap
         // rejects 0 so zero-injection is not representable via RefVerifyConfig::try_new.
         let pair_source = RefVerifyPairSourceAdapter::new(canonical_root.clone());
         let config = RefVerifyConfig::default();
+        let pair_cmd = usecase::ref_verify::RefVerifyCommand {
+            track_id: cmd.track_id.clone(),
+            scope: pair_source_scope_for_results(&cmd.scope, &chain),
+            current_branch: cmd.current_branch.clone(),
+        };
         let all_pairs = pair_source
-            .load_pairs(&cmd, &config)
+            .load_pairs(&pair_cmd, &config)
             .map_err(|e| RefVerifyDriverError::Usecase(format!("pair source enumeration: {e}")))?;
         // Exclude known-bad calibration probes; classify only real production pairs.
         let current_pairs: Vec<usecase::ref_verify::RefVerifyPair> =
@@ -578,5 +604,25 @@ mod tests {
         let err = load_agent_profiles(tmp.path()).unwrap_err();
         assert!(err.contains("agent-profiles.json path rejected before read"), "{err}");
         assert!(err.contains("refusing to follow symlink"), "{err}");
+    }
+
+    #[test]
+    fn test_pair_source_scope_for_results_chain1_forces_chain1() {
+        let scope = pair_source_scope_for_results(
+            &usecase::ref_verify::RefVerifyScope::All,
+            &usecase::ref_verify::RefVerifyChainFilter::Chain1,
+        );
+
+        assert_eq!(scope, usecase::ref_verify::RefVerifyScope::Chain1);
+    }
+
+    #[test]
+    fn test_pair_source_scope_for_results_chain2_preserves_resolved_scope() {
+        let scope = pair_source_scope_for_results(
+            &usecase::ref_verify::RefVerifyScope::All,
+            &usecase::ref_verify::RefVerifyChainFilter::Chain2,
+        );
+
+        assert_eq!(scope, usecase::ref_verify::RefVerifyScope::All);
     }
 }
