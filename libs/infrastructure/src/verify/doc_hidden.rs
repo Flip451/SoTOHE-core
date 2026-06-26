@@ -50,7 +50,7 @@ fn detect_doc_hidden(ctx: SynScanContext) -> Vec<VerifyFinding> {
 
     for attr in &ctx.attrs {
         // Prefer the attribute's own source line; fall back to the node's line.
-        let attr_line = attr.pound_token.spans[0].start().line;
+        let attr_line = attr.pound_token.spans.first().map(|s| s.start().line).unwrap_or(0);
         let line = if attr_line > 0 { attr_line } else { ctx.line };
 
         if is_doc_hidden_attr(attr) {
