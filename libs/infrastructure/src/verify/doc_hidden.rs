@@ -31,6 +31,11 @@ const CFG_ATTR_PROHIBITION_SUFFIX: &str = "; cfg_attr(<pred>, doc(hidden)) forms
 /// on the `mod` declaration.
 const INNER_ATTR_PROHIBITION_SUFFIX: &str = "; inner #![doc(hidden)] on a public module file is equivalent to \
      #[doc(hidden)] on the `mod` declaration and is also excluded from rustdoc paths";
+/// Additional suffix appended when the violation is caused by `#[doc(hidden)]` on
+/// an enclosing `impl` block, which propagates hidden status to every pub item in
+/// the block.
+const IMPL_BLOCK_PROHIBITION_SUFFIX: &str =
+    "; enclosing impl block has #[doc(hidden)], propagating hidden status to pub items";
 
 /// Scan all layers listed in `architecture-rules.json` for `pub + #[doc(hidden)]`
 /// violations in production code. Returns findings for each violation.
@@ -259,7 +264,13 @@ fn check_item(item: &syn::Item, file_path: &Path, findings: &mut Vec<VerifyFindi
         }
         syn::Item::Impl(i) => {
             if !is_test_scoped(&i.attrs) {
-                check_impl_items(&i.items, file_path, findings);
+                // Only inherent impls propagate block-level #[doc(hidden)] to pub items.
+                // Trait impls are excluded: trait items carry Inherited (non-pub) visibility,
+                // and hiding a trait impl is conceptually the trait's concern (test aj).
+                let impl_hidden = i.trait_.is_none() && has_doc_hidden(&i.attrs);
+                let impl_cfg_hidden =
+                    i.trait_.is_none() && !impl_hidden && has_cfg_attr_doc_hidden(&i.attrs);
+                check_impl_items(&i.items, impl_hidden, impl_cfg_hidden, file_path, findings);
             }
         }
         syn::Item::Mod(i) => {
@@ -428,43 +439,32 @@ fn check_public_trait_items(
     }
 }
 
-fn check_impl_items(items: &[syn::ImplItem], file_path: &Path, findings: &mut Vec<VerifyFinding>) {
+fn check_impl_items(
+    items: &[syn::ImplItem],
+    impl_hidden: bool,
+    impl_cfg_hidden: bool,
+    file_path: &Path,
+    findings: &mut Vec<VerifyFinding>,
+) {
     for item in items {
-        match item {
-            syn::ImplItem::Const(i) => {
-                if !is_test_scoped(&i.attrs) {
-                    report_if_pub_doc_hidden(
-                        &i.vis,
-                        &i.attrs,
-                        &i.ident.to_string(),
-                        file_path,
-                        findings,
-                    );
-                }
-            }
-            syn::ImplItem::Fn(i) => {
-                if !is_test_scoped(&i.attrs) {
-                    report_if_pub_doc_hidden(
-                        &i.vis,
-                        &i.attrs,
-                        &i.sig.ident.to_string(),
-                        file_path,
-                        findings,
-                    );
-                }
-            }
-            syn::ImplItem::Type(i) => {
-                if !is_test_scoped(&i.attrs) {
-                    report_if_pub_doc_hidden(
-                        &i.vis,
-                        &i.attrs,
-                        &i.ident.to_string(),
-                        file_path,
-                        findings,
-                    );
-                }
-            }
-            _ => {}
+        let (vis, attrs, name): (&syn::Visibility, &[syn::Attribute], String) = match item {
+            syn::ImplItem::Const(i) => (&i.vis, i.attrs.as_slice(), i.ident.to_string()),
+            syn::ImplItem::Fn(i) => (&i.vis, i.attrs.as_slice(), i.sig.ident.to_string()),
+            syn::ImplItem::Type(i) => (&i.vis, i.attrs.as_slice(), i.ident.to_string()),
+            _ => continue,
+        };
+        if is_test_scoped(attrs) {
+            continue;
+        }
+        report_if_pub_doc_hidden(vis, attrs, &name, file_path, findings);
+        // Propagate enclosing impl block's #[doc(hidden)] to bare-pub items (OS-04 maintained:
+        // only pub, not pub(crate)/pub(super)/private).
+        if (impl_hidden || impl_cfg_hidden) && is_pub_vis(vis) {
+            let extra = if impl_cfg_hidden { CFG_ATTR_PROHIBITION_SUFFIX } else { "" };
+            findings.push(VerifyFinding::error(format!(
+                "{}: `{name}` — {PROHIBITION_REASON}{extra}{IMPL_BLOCK_PROHIBITION_SUFFIX}",
+                file_path.display(),
+            )));
         }
     }
 }
@@ -475,41 +475,14 @@ fn check_foreign_items(
     findings: &mut Vec<VerifyFinding>,
 ) {
     for item in items {
-        match item {
-            syn::ForeignItem::Fn(i) => {
-                if !is_test_scoped(&i.attrs) {
-                    report_if_pub_doc_hidden(
-                        &i.vis,
-                        &i.attrs,
-                        &i.sig.ident.to_string(),
-                        file_path,
-                        findings,
-                    );
-                }
-            }
-            syn::ForeignItem::Static(i) => {
-                if !is_test_scoped(&i.attrs) {
-                    report_if_pub_doc_hidden(
-                        &i.vis,
-                        &i.attrs,
-                        &i.ident.to_string(),
-                        file_path,
-                        findings,
-                    );
-                }
-            }
-            syn::ForeignItem::Type(i) => {
-                if !is_test_scoped(&i.attrs) {
-                    report_if_pub_doc_hidden(
-                        &i.vis,
-                        &i.attrs,
-                        &i.ident.to_string(),
-                        file_path,
-                        findings,
-                    );
-                }
-            }
-            _ => {}
+        let (vis, attrs, name): (&syn::Visibility, &[syn::Attribute], String) = match item {
+            syn::ForeignItem::Fn(i) => (&i.vis, i.attrs.as_slice(), i.sig.ident.to_string()),
+            syn::ForeignItem::Static(i) => (&i.vis, i.attrs.as_slice(), i.ident.to_string()),
+            syn::ForeignItem::Type(i) => (&i.vis, i.attrs.as_slice(), i.ident.to_string()),
+            _ => continue,
+        };
+        if !is_test_scoped(attrs) {
+            report_if_pub_doc_hidden(vis, attrs, &name, file_path, findings);
         }
     }
 }

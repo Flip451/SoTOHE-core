@@ -754,3 +754,137 @@ fn inner_doc_hidden_cfg_test_pub_mod_not_flagged() {
     );
     assert!(outcome.findings().is_empty());
 }
+
+// --- impl block level #[doc(hidden)] propagation ---
+
+// (ae) #[doc(hidden)] impl Visible { pub fn hidden(&self) {} } → flagged
+#[test]
+fn doc_hidden_impl_block_propagates_to_pub_fn() {
+    let tmp = TempDir::new().unwrap();
+    setup_arch_rules(tmp.path(), "layer");
+    write_src(
+        tmp.path(),
+        "layer/src/lib.rs",
+        "pub struct Visible;\n#[doc(hidden)]\nimpl Visible {\n    pub fn hidden(&self) {}\n}\n",
+    );
+
+    let outcome = verify(tmp.path());
+
+    assert!(
+        outcome.has_errors(),
+        "expected flagged: impl block #[doc(hidden)] propagates to pub fn"
+    );
+    let msg = outcome.findings().iter().map(|f| f.to_string()).collect::<Vec<_>>().join("\n");
+    assert!(msg.contains("hidden"), "method name missing: {msg}");
+    assert!(msg.contains("enclosing impl block"), "impl block context missing: {msg}");
+    assert!(msg.contains("pub + #[doc(hidden)] is forbidden"), "reason missing: {msg}");
+}
+
+// (af) #[doc(hidden, alias = "x")] impl Visible { pub fn foo() {} } → flagged (compound form)
+#[test]
+fn doc_hidden_impl_block_compound_form_propagates_to_pub_fn() {
+    let tmp = TempDir::new().unwrap();
+    setup_arch_rules(tmp.path(), "layer");
+    write_src(
+        tmp.path(),
+        "layer/src/lib.rs",
+        "pub struct Visible;\n#[doc(hidden, alias = \"x\")]\nimpl Visible {\n    pub fn foo() {}\n}\n",
+    );
+
+    let outcome = verify(tmp.path());
+
+    assert!(outcome.has_errors(), "expected flagged: compound #[doc(hidden, alias)] on impl block");
+    let msg = outcome.findings().iter().map(|f| f.to_string()).collect::<Vec<_>>().join("\n");
+    assert!(msg.contains("foo"), "method name missing: {msg}");
+    assert!(msg.contains("enclosing impl block"), "impl block context missing: {msg}");
+    assert!(msg.contains("pub + #[doc(hidden)] is forbidden"), "reason missing: {msg}");
+}
+
+// (ag) #[cfg_attr(not(test), doc(hidden))] impl Visible { pub fn bar() {} } → flagged (cfg_attr)
+#[test]
+fn cfg_attr_doc_hidden_impl_block_propagates_to_pub_fn() {
+    let tmp = TempDir::new().unwrap();
+    setup_arch_rules(tmp.path(), "layer");
+    write_src(
+        tmp.path(),
+        "layer/src/lib.rs",
+        "pub struct Visible;\n#[cfg_attr(not(test), doc(hidden))]\nimpl Visible {\n    pub fn bar() {}\n}\n",
+    );
+
+    let outcome = verify(tmp.path());
+
+    assert!(outcome.has_errors(), "expected flagged: cfg_attr doc(hidden) on impl block");
+    let msg = outcome.findings().iter().map(|f| f.to_string()).collect::<Vec<_>>().join("\n");
+    assert!(msg.contains("bar"), "method name missing: {msg}");
+    assert!(msg.contains("enclosing impl block"), "impl block context missing: {msg}");
+    assert!(msg.contains("pub + #[doc(hidden)] is forbidden"), "base reason missing: {msg}");
+    assert!(
+        msg.contains("cfg_attr(<pred>, doc(hidden)) forms are also forbidden"),
+        "cfg_attr suffix missing: {msg}"
+    );
+}
+
+// (ah) impl Visible { pub fn baz() {} } → not flagged (no doc(hidden) on impl block, control)
+#[test]
+fn impl_block_without_doc_hidden_pub_fn_not_flagged() {
+    let tmp = TempDir::new().unwrap();
+    setup_arch_rules(tmp.path(), "layer");
+    write_src(
+        tmp.path(),
+        "layer/src/lib.rs",
+        "pub struct Visible;\nimpl Visible {\n    pub fn baz() {}\n}\n",
+    );
+
+    let outcome = verify(tmp.path());
+
+    assert!(
+        outcome.is_ok(),
+        "expected ok — no #[doc(hidden)] on impl block: {:?}",
+        outcome.findings()
+    );
+    assert!(outcome.findings().is_empty());
+}
+
+// (ai) #[doc(hidden)] impl Visible { pub(crate) fn qux() {} } → not flagged (non-pub, OS-04)
+#[test]
+fn doc_hidden_impl_block_non_pub_item_not_flagged() {
+    let tmp = TempDir::new().unwrap();
+    setup_arch_rules(tmp.path(), "layer");
+    write_src(
+        tmp.path(),
+        "layer/src/lib.rs",
+        "pub struct Visible;\n#[doc(hidden)]\nimpl Visible {\n    pub(crate) fn qux() {}\n}\n",
+    );
+
+    let outcome = verify(tmp.path());
+
+    assert!(
+        outcome.is_ok(),
+        "expected ok — pub(crate) in hidden impl is not flagged (OS-04): {:?}",
+        outcome.findings()
+    );
+    assert!(outcome.findings().is_empty());
+}
+
+// (aj) #[doc(hidden)] impl Trait for Visible { fn method() {} } → not flagged (trait impl)
+// Trait methods carry Inherited (non-pub) visibility; the impl side is not flagged.
+#[test]
+fn doc_hidden_trait_impl_block_not_flagged() {
+    let tmp = TempDir::new().unwrap();
+    setup_arch_rules(tmp.path(), "layer");
+    write_src(
+        tmp.path(),
+        "layer/src/lib.rs",
+        "pub trait Trait {\n    fn method(&self);\n}\npub struct Visible;\n\
+         #[doc(hidden)]\nimpl Trait for Visible {\n    fn method(&self) {}\n}\n",
+    );
+
+    let outcome = verify(tmp.path());
+
+    assert!(
+        outcome.is_ok(),
+        "expected ok — trait impl with #[doc(hidden)] on block not flagged: {:?}",
+        outcome.findings()
+    );
+    assert!(outcome.findings().is_empty());
+}
