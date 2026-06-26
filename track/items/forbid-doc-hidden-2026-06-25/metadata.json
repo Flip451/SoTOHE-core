@@ -1,0 +1,8 @@
+{
+  "branch": "track/forbid-doc-hidden-2026-06-25",
+  "created_at": "2026-06-25T23:36:16Z",
+  "id": "forbid-doc-hidden-2026-06-25",
+  "schema_version": 5,
+  "title": "`#[doc(hidden)]` の禁止を独立 syn 走査ゲートで機械化する",
+  "updated_at": "2026-06-25T23:36:16Z"
+}
