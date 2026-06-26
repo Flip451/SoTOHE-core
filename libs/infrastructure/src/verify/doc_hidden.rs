@@ -523,15 +523,22 @@ fn has_test_attr(attrs: &[syn::Attribute]) -> bool {
     attrs.iter().any(|attr| attr.path().is_ident("test"))
 }
 
-/// Returns `true` if `attrs` contains a direct `#[doc(hidden)]` attribute.
+/// Returns `true` if `attrs` contains a direct `#[doc(hidden)]` attribute,
+/// including combined forms like `#[doc(hidden, alias = "x")]`.
 fn has_doc_hidden(attrs: &[syn::Attribute]) -> bool {
     attrs.iter().any(|attr| {
         if !attr.path().is_ident("doc") {
             return false;
         }
-        // `#[doc(hidden)]` has the form doc(hidden) where the inner token is
-        // the path `hidden`. Mirrors the `has_cfg_test_attr` pattern.
-        attr.parse_args::<syn::Path>().is_ok_and(|path| path.is_ident("hidden"))
+        // Parse the inner tokens of `doc(...)` as comma-separated `Meta` items.
+        // This handles single-item `#[doc(hidden)]` as well as combined forms
+        // like `#[doc(hidden, alias = "x")]` or `#[doc(alias = "x", hidden)]`.
+        // `#[doc = "..."]` (NameValue form) will fail to parse here and
+        // return false — which is correct since it is not `doc(hidden)`.
+        let parser = syn::punctuated::Punctuated::<syn::Meta, syn::Token![,]>::parse_terminated;
+        attr.parse_args_with(parser).is_ok_and(|metas| {
+            metas.iter().any(|m| matches!(m, syn::Meta::Path(p) if p.is_ident("hidden")))
+        })
     })
 }
 
@@ -566,7 +573,13 @@ fn conditional_meta_is_doc_hidden(meta: &syn::Meta) -> bool {
         return false;
     };
     if list.path.is_ident("doc") {
-        return syn::parse2::<syn::Path>(list.tokens.clone()).is_ok_and(|p| p.is_ident("hidden"));
+        // Parse inner tokens as comma-separated Metas and check for `hidden`.
+        // Handles `doc(hidden)` as well as combined forms like `doc(hidden, alias = "x")`.
+        use syn::parse::Parser;
+        let parser = syn::punctuated::Punctuated::<syn::Meta, syn::Token![,]>::parse_terminated;
+        return parser.parse2(list.tokens.clone()).is_ok_and(|metas| {
+            metas.iter().any(|m| matches!(m, syn::Meta::Path(p) if p.is_ident("hidden")))
+        });
     }
     if list.path.is_ident("cfg_attr") {
         // Nested cfg_attr — recurse into its conditional argument list.
@@ -1170,5 +1183,106 @@ mod tests {
             outcome.findings()
         );
         assert!(outcome.findings().is_empty());
+    }
+
+    // --- Combined doc meta forms: #[doc(hidden, alias = "x")] etc. ---
+
+    // (s) #[doc(hidden, alias = "x")] on a pub fn — flagged (combined meta, hidden first)
+    #[test]
+    fn doc_hidden_with_alias_combined_is_flagged() {
+        let tmp = TempDir::new().unwrap();
+        setup_arch_rules(tmp.path(), "layer");
+        write_src(
+            tmp.path(),
+            "layer/src/lib.rs",
+            "#[doc(hidden, alias = \"x\")]\npub fn foo() {}\n",
+        );
+
+        let outcome = verify(tmp.path());
+
+        assert!(outcome.has_errors(), "expected error for #[doc(hidden, alias = \"x\")]");
+        let msg = outcome.findings()[0].to_string();
+        assert!(msg.contains("foo"), "item name missing: {msg}");
+        assert!(msg.contains("lib.rs"), "file path missing: {msg}");
+        assert!(msg.contains("pub + #[doc(hidden)] is forbidden"), "reason missing: {msg}");
+    }
+
+    // (t) #[doc(alias = "x", hidden)] on a pub fn — flagged (order reversed)
+    #[test]
+    fn doc_alias_then_hidden_combined_is_flagged() {
+        let tmp = TempDir::new().unwrap();
+        setup_arch_rules(tmp.path(), "layer");
+        write_src(
+            tmp.path(),
+            "layer/src/lib.rs",
+            "#[doc(alias = \"x\", hidden)]\npub fn bar() {}\n",
+        );
+
+        let outcome = verify(tmp.path());
+
+        assert!(outcome.has_errors(), "expected error for #[doc(alias = \"x\", hidden)]");
+        let msg = outcome.findings()[0].to_string();
+        assert!(msg.contains("bar"), "item name missing: {msg}");
+        assert!(msg.contains("pub + #[doc(hidden)] is forbidden"), "reason missing: {msg}");
+    }
+
+    // (u) #[doc(alias = "x")] on a pub fn — NOT flagged (no hidden, control case)
+    #[test]
+    fn doc_alias_only_not_flagged() {
+        let tmp = TempDir::new().unwrap();
+        setup_arch_rules(tmp.path(), "layer");
+        write_src(tmp.path(), "layer/src/lib.rs", "#[doc(alias = \"x\")]\npub fn baz() {}\n");
+
+        let outcome = verify(tmp.path());
+
+        assert!(outcome.is_ok(), "expected ok for #[doc(alias = \"x\")]: {:?}", outcome.findings());
+        assert!(outcome.findings().is_empty());
+    }
+
+    // (v) #[doc = "/// doc comment"] on a pub fn — NOT flagged (NameValue form, control case)
+    #[test]
+    fn doc_name_value_form_not_flagged() {
+        let tmp = TempDir::new().unwrap();
+        setup_arch_rules(tmp.path(), "layer");
+        write_src(
+            tmp.path(),
+            "layer/src/lib.rs",
+            "#[doc = \"/// doc comment\"]\npub fn qux() {}\n",
+        );
+
+        let outcome = verify(tmp.path());
+
+        assert!(
+            outcome.is_ok(),
+            "expected ok for #[doc = \"...\"] NameValue form: {:?}",
+            outcome.findings()
+        );
+        assert!(outcome.findings().is_empty());
+    }
+
+    // (w) cfg_attr with combined doc(hidden, alias = "x") — flagged
+    #[test]
+    fn cfg_attr_doc_hidden_alias_combined_is_flagged() {
+        let tmp = TempDir::new().unwrap();
+        setup_arch_rules(tmp.path(), "layer");
+        write_src(
+            tmp.path(),
+            "layer/src/lib.rs",
+            "#[cfg_attr(not(test), doc(hidden, alias = \"x\"))]\npub fn quux() {}\n",
+        );
+
+        let outcome = verify(tmp.path());
+
+        assert!(
+            outcome.has_errors(),
+            "expected error for cfg_attr(not(test), doc(hidden, alias = \"x\"))"
+        );
+        let msg = outcome.findings()[0].to_string();
+        assert!(msg.contains("quux"), "item name missing: {msg}");
+        assert!(msg.contains("pub + #[doc(hidden)] is forbidden"), "base reason missing: {msg}");
+        assert!(
+            msg.contains("cfg_attr(<pred>, doc(hidden)) forms are also forbidden"),
+            "cfg_attr suffix missing: {msg}"
+        );
     }
 }
