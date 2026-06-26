@@ -1009,4 +1009,81 @@ mod tests {
         );
         assert!(outcome.findings().is_empty());
     }
+
+    // --- #[path = "..."] attribute resolution (file-backed cfg-test modules) ---
+
+    // (m) lib.rs declares `#[cfg(test)] #[path = "shared_helpers.rs"] mod tests;`
+    // (split-test pattern). shared_helpers.rs contains a pub + #[doc(hidden)] helper.
+    // The helper must NOT be flagged because shared_helpers.rs is cfg-test via #[path].
+    #[test]
+    fn cfg_test_file_backed_mod_with_path_attr_sibling_not_flagged() {
+        let tmp = TempDir::new().unwrap();
+        setup_arch_rules(tmp.path(), "layer");
+        write_src(
+            tmp.path(),
+            "layer/src/lib.rs",
+            "#[cfg(test)]\n#[path = \"shared_helpers.rs\"]\nmod tests;\n",
+        );
+        write_src(
+            tmp.path(),
+            "layer/src/shared_helpers.rs",
+            "#[doc(hidden)]\npub fn helper() {}\n",
+        );
+
+        let outcome = verify(tmp.path());
+
+        assert!(
+            outcome.is_ok(),
+            "expected ok — shared_helpers.rs is cfg-test via #[path], helper should not be flagged: {:?}",
+            outcome.findings()
+        );
+        assert!(outcome.findings().is_empty());
+    }
+
+    // (n) lib.rs declares `#[cfg(test)] #[path = "subdir/helpers.rs"] mod tests;`
+    // subdir/helpers.rs contains a pub + #[doc(hidden)] helper.
+    // The helper must NOT be flagged — #[path] is resolved relative to lib.rs's directory.
+    #[test]
+    fn cfg_test_file_backed_mod_with_path_attr_subdir_not_flagged() {
+        let tmp = TempDir::new().unwrap();
+        setup_arch_rules(tmp.path(), "layer");
+        write_src(
+            tmp.path(),
+            "layer/src/lib.rs",
+            "#[cfg(test)]\n#[path = \"subdir/helpers.rs\"]\nmod tests;\n",
+        );
+        write_src(
+            tmp.path(),
+            "layer/src/subdir/helpers.rs",
+            "#[doc(hidden)]\npub fn helper() {}\n",
+        );
+
+        let outcome = verify(tmp.path());
+
+        assert!(
+            outcome.is_ok(),
+            "expected ok — subdir/helpers.rs is cfg-test via #[path], helper should not be flagged: {:?}",
+            outcome.findings()
+        );
+        assert!(outcome.findings().is_empty());
+    }
+
+    // (o) Regression: #[cfg(test)] mod tests; without #[path] continues to work
+    // as before — tests.rs is correctly identified as cfg-test.
+    #[test]
+    fn cfg_test_file_backed_mod_without_path_attr_regression() {
+        let tmp = TempDir::new().unwrap();
+        setup_arch_rules(tmp.path(), "layer");
+        write_src(tmp.path(), "layer/src/lib.rs", "#[cfg(test)] mod tests;\n");
+        write_src(tmp.path(), "layer/src/tests.rs", "#[doc(hidden)]\npub fn helper() {}\n");
+
+        let outcome = verify(tmp.path());
+
+        assert!(
+            outcome.is_ok(),
+            "expected ok — tests.rs (no #[path]) is cfg-test, helper should not be flagged: {:?}",
+            outcome.findings()
+        );
+        assert!(outcome.findings().is_empty());
+    }
 }

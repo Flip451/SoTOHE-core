@@ -5,6 +5,8 @@ use std::path::{Path, PathBuf};
 
 use domain::verify::{VerifyFinding, VerifyOutcome};
 
+use super::path_safety::lexical_normalize;
+
 /// Returns `true` if `attrs` contains an exact `#[cfg(test)]` attribute.
 ///
 /// Only exact `cfg(test)` marks code as test-only. Broader expressions such as
@@ -40,16 +42,25 @@ fn module_basedir(file: &Path) -> Option<PathBuf> {
     }
 }
 
-/// Returns `true` if `attrs` contains a `#[path = "..."]` attribute.
+/// Extract the literal string value of a `#[path = "..."]` attribute, if present.
 ///
-/// File-backed `mod` declarations with `#[path]` use a caller-specified path
-/// instead of the standard name-based resolution. This static analysis does not
-/// resolve `#[path]`-specified paths, so such modules are excluded from cfg-test
-/// file collection.
-fn has_path_attr(attrs: &[syn::Attribute]) -> bool {
-    attrs
-        .iter()
-        .any(|attr| attr.path().is_ident("path") && matches!(&attr.meta, syn::Meta::NameValue(_)))
+/// Returns `Some(path_value)` when the attribute list contains exactly a
+/// `#[path = "<literal>"]` `NameValue` form.  Returns `None` when no such
+/// attribute exists.  `#[cfg_attr(..., path = "...")]` forms are not resolved
+/// here; only the direct `#[path]` form is handled.
+fn extract_path_attr_value(attrs: &[syn::Attribute]) -> Option<String> {
+    attrs.iter().find_map(|attr| {
+        if !attr.path().is_ident("path") {
+            return None;
+        }
+        let syn::Meta::NameValue(nv) = &attr.meta else {
+            return None;
+        };
+        let syn::Expr::Lit(syn::ExprLit { lit: syn::Lit::Str(s), .. }) = &nv.value else {
+            return None;
+        };
+        Some(s.value())
+    })
 }
 
 #[derive(Clone, Copy, Eq, Hash, PartialEq)]
@@ -117,7 +128,7 @@ fn collect_rs_files_from_dir(dir: &Path, rs_files: &mut Vec<PathBuf>) {
     }
 }
 
-fn collect_module_child_files(rs_files: &[PathBuf]) -> HashSet<PathBuf> {
+fn collect_module_child_files(rs_files: &[PathBuf], scan_root: &Path) -> HashSet<PathBuf> {
     let mut child_files = HashSet::new();
     for file in rs_files {
         let Some(ast) = parse_real_rs_file(file) else {
@@ -126,7 +137,16 @@ fn collect_module_child_files(rs_files: &[PathBuf]) -> HashSet<PathBuf> {
         let Some(basedir) = module_basedir(file) else {
             continue;
         };
-        collect_module_child_files_inner(&ast.items, &basedir, &mut child_files);
+        let Some(file_dir) = file.parent() else {
+            continue;
+        };
+        collect_module_child_files_inner(
+            &ast.items,
+            &basedir,
+            file_dir,
+            scan_root,
+            &mut child_files,
+        );
     }
     child_files
 }
@@ -134,6 +154,8 @@ fn collect_module_child_files(rs_files: &[PathBuf]) -> HashSet<PathBuf> {
 fn collect_module_child_files_inner(
     items: &[syn::Item],
     basedir: &Path,
+    file_dir: &Path,
+    scan_root: &Path,
     child_files: &mut HashSet<PathBuf>,
 ) {
     for item in items {
@@ -142,18 +164,32 @@ fn collect_module_child_files_inner(
         };
         match &mod_item.content {
             None => {
-                if has_path_attr(&mod_item.attrs) {
-                    continue;
-                }
-                for candidate in module_candidate_paths(basedir, mod_item) {
-                    if is_real_file(&candidate) {
-                        child_files.insert(candidate);
+                if let Some(path_val) = extract_path_attr_value(&mod_item.attrs) {
+                    // Resolve #[path = "..."] relative to the containing file's directory.
+                    // Lexically normalize to collapse any `..` components before the
+                    // scan-root containment check to prevent path-traversal bypasses.
+                    let resolved = lexical_normalize(&file_dir.join(&path_val));
+                    if resolved.starts_with(scan_root) && is_real_file(&resolved) {
+                        child_files.insert(resolved);
+                    }
+                } else {
+                    for candidate in module_candidate_paths(basedir, mod_item) {
+                        if is_real_file(&candidate) {
+                            child_files.insert(candidate);
+                        }
                     }
                 }
             }
             Some((_, inner_items)) => {
                 let inner_basedir = basedir.join(mod_item.ident.to_string());
-                collect_module_child_files_inner(inner_items, &inner_basedir, child_files);
+                // file_dir is unchanged for inline modules — they live in the same file.
+                collect_module_child_files_inner(
+                    inner_items,
+                    &inner_basedir,
+                    file_dir,
+                    scan_root,
+                    child_files,
+                );
             }
         }
     }
@@ -162,6 +198,8 @@ fn collect_module_child_files_inner(
 fn collect_module_refs_for_context(
     items: &[syn::Item],
     basedir: &Path,
+    file_dir: &Path,
+    scan_root: &Path,
     context: ModuleScanContext,
     worklist: &mut Vec<(PathBuf, ModuleScanContext)>,
 ) {
@@ -172,20 +210,30 @@ fn collect_module_refs_for_context(
         let child_context = context.with_attrs(&mod_item.attrs);
         match &mod_item.content {
             None => {
-                if has_path_attr(&mod_item.attrs) {
-                    continue;
-                }
-                for candidate in module_candidate_paths(basedir, mod_item) {
-                    if is_real_file(&candidate) {
-                        worklist.push((candidate, child_context));
+                if let Some(path_val) = extract_path_attr_value(&mod_item.attrs) {
+                    // Resolve #[path = "..."] relative to the containing file's directory.
+                    // Lexically normalize to collapse any `..` components before the
+                    // scan-root containment check to prevent path-traversal bypasses.
+                    let resolved = lexical_normalize(&file_dir.join(&path_val));
+                    if resolved.starts_with(scan_root) && is_real_file(&resolved) {
+                        worklist.push((resolved, child_context));
+                    }
+                } else {
+                    for candidate in module_candidate_paths(basedir, mod_item) {
+                        if is_real_file(&candidate) {
+                            worklist.push((candidate, child_context));
+                        }
                     }
                 }
             }
             Some((_, inner_items)) => {
                 let inner_basedir = basedir.join(mod_item.ident.to_string());
+                // file_dir is unchanged for inline modules — they live in the same file.
                 collect_module_refs_for_context(
                     inner_items,
                     &inner_basedir,
+                    file_dir,
+                    scan_root,
                     child_context,
                     worklist,
                 );
@@ -209,18 +257,15 @@ fn is_scan_crate_root(root: &Path, file: &Path) -> bool {
 /// scanned for further file-backed sub-module declarations so that their children
 /// are also included.
 ///
-/// **Limitation**: `#[path = "..."]` attributes override the standard name-based
-/// module resolution with a caller-specified path. This function does not resolve
-/// `#[path]` attributes and therefore does not collect files referenced through
-/// them. In this codebase `#[path]` is used in `verify/latest_track.rs` and
-/// `verify/plan_artifact_refs/mod.rs`; files referenced there are still scanned
-/// by Pass 2 (the production code walk). Those specific files do not contain
-/// `pub + #[doc(hidden)]` items, so the limitation has no practical effect on
-/// the gate outcome.
+/// `#[path = "..."]` attributes on file-backed `mod` declarations are resolved
+/// relative to the containing file's directory, normalized lexically to prevent
+/// `..`-traversal bypasses, and guarded by a scan-root containment check before
+/// being added to the worklist.  Only exact `#[path]` forms are handled;
+/// `#[cfg_attr(..., path = "...")]` is not resolved and those modules are skipped.
 fn collect_cfg_test_files(root: &Path) -> HashSet<PathBuf> {
     let mut rs_files = Vec::new();
     collect_rs_files_from_dir(root, &mut rs_files);
-    let module_child_files = collect_module_child_files(&rs_files);
+    let module_child_files = collect_module_child_files(&rs_files, root);
 
     let mut worklist: Vec<(PathBuf, ModuleScanContext)> = rs_files
         .into_iter()
@@ -244,8 +289,15 @@ fn collect_cfg_test_files(root: &Path) -> HashSet<PathBuf> {
         } else {
             production_files.insert(file.clone());
         }
-        if let Some(basedir) = module_basedir(&file) {
-            collect_module_refs_for_context(&ast.items, &basedir, file_context, &mut worklist);
+        if let (Some(basedir), Some(file_dir)) = (module_basedir(&file), file.parent()) {
+            collect_module_refs_for_context(
+                &ast.items,
+                &basedir,
+                file_dir,
+                root,
+                file_context,
+                &mut worklist,
+            );
         }
     }
 
