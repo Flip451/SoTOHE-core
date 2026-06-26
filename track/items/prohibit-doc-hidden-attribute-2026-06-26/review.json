@@ -1,90 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "usecase": {
-      "rounds": [
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:763459a6efbc7fa614fd826d2f13b08bfef5a2e176ffde796c11caf80b3a68a8",
-          "at": "2026-06-26T11:34:02Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:663c23c399fd0a9cbbc07b9a41b0475eebe46b5d398dc67a49d07c780075806b",
-          "at": "2026-06-26T11:30:30Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`layer.path` from `architecture-rules.json` is joined directly into `root.join(...).join(\"src\")` with no containment check, so a malformed or malicious layer entry can escape the trusted root (for example `../..` or an absolute path) and make the verifier scan arbitrary files outside the workspace.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/verify/syn_scan.rs",
-              "line": 77,
-              "category": "trusted-root violation"
-            },
-            {
-              "message": "The directory walk reads and recurses through entries with plain `read_dir`, `path.is_dir()`, and `read_to_string()` but never rejects symlinks at the boundary, so a symlink under `src/` can redirect the scan outside the workspace. This breaks the real-file semantics used elsewhere for trusted-root loaders.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/verify/syn_scan.rs",
-              "line": 98,
-              "category": "symlink not rejected at boundary"
-            }
-          ],
-          "hash": "rvw1:sha256:a83d0b82cdada70c245adb5a0abff76897cbee4d59956fc0fc4caa95bd59a707",
-          "at": "2026-06-26T11:32:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ad7fdd873270974747ad0d1167cb5f14b7ddfbf32567f12532eecfeca62fc1a5",
-          "at": "2026-06-26T11:39:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "File-backed modules are never resolved here. A crate with `#[cfg(test)] mod tests;` and a separate `tests.rs` under `src/` will still have that file scanned, so `#[doc(hidden)]` inside a test-only module can be reported as a violation. This breaks the stated `cfg(test) mod foo;` exclusion and needs module-file resolution or an equivalent skip map.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/verify/syn_scan.rs",
-              "line": 320,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:ad7fdd873270974747ad0d1167cb5f14b7ddfbf32567f12532eecfeca62fc1a5",
-          "at": "2026-06-26T11:41:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:673466641fec9f1a3efdecd1cce353d9a878a0d1df3d0fb5c94ddd5e8b2d8691",
-          "at": "2026-06-26T12:00:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:673466641fec9f1a3efdecd1cce353d9a878a0d1df3d0fb5c94ddd5e8b2d8691",
-          "at": "2026-06-26T12:05:34Z"
-        }
-      ]
-    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -246,6 +162,20 @@
           "findings": [],
           "hash": "rvw1:sha256:42d303eaf813039bfe71e972e642c27793ed25cee5d6bb5feeb1e0cf0e162992",
           "at": "2026-06-26T11:45:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b8d06746999c77799440c924b12c678ba5d09d384bad91192351d009af78332a",
+          "at": "2026-06-26T12:09:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b8d06746999c77799440c924b12c678ba5d09d384bad91192351d009af78332a",
+          "at": "2026-06-26T12:12:07Z"
         }
       ]
     },
@@ -275,6 +205,90 @@
           "findings": [],
           "hash": "rvw1:sha256:0d984876b867a5ecabd80e498d9bdbcb94f6af4f23faaab41a8fc65cc6539cf8",
           "at": "2026-06-26T12:01:21Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`layer.path` from `architecture-rules.json` is joined directly into `root.join(...).join(\"src\")` with no containment check, so a malformed or malicious layer entry can escape the trusted root (for example `../..` or an absolute path) and make the verifier scan arbitrary files outside the workspace.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/verify/syn_scan.rs",
+              "line": 77,
+              "category": "trusted-root violation"
+            },
+            {
+              "message": "The directory walk reads and recurses through entries with plain `read_dir`, `path.is_dir()`, and `read_to_string()` but never rejects symlinks at the boundary, so a symlink under `src/` can redirect the scan outside the workspace. This breaks the real-file semantics used elsewhere for trusted-root loaders.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/verify/syn_scan.rs",
+              "line": 98,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:a83d0b82cdada70c245adb5a0abff76897cbee4d59956fc0fc4caa95bd59a707",
+          "at": "2026-06-26T11:32:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ad7fdd873270974747ad0d1167cb5f14b7ddfbf32567f12532eecfeca62fc1a5",
+          "at": "2026-06-26T11:39:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "File-backed modules are never resolved here. A crate with `#[cfg(test)] mod tests;` and a separate `tests.rs` under `src/` will still have that file scanned, so `#[doc(hidden)]` inside a test-only module can be reported as a violation. This breaks the stated `cfg(test) mod foo;` exclusion and needs module-file resolution or an equivalent skip map.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/verify/syn_scan.rs",
+              "line": 320,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:ad7fdd873270974747ad0d1167cb5f14b7ddfbf32567f12532eecfeca62fc1a5",
+          "at": "2026-06-26T11:41:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:673466641fec9f1a3efdecd1cce353d9a878a0d1df3d0fb5c94ddd5e8b2d8691",
+          "at": "2026-06-26T12:00:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:673466641fec9f1a3efdecd1cce353d9a878a0d1df3d0fb5c94ddd5e8b2d8691",
+          "at": "2026-06-26T12:05:34Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:763459a6efbc7fa614fd826d2f13b08bfef5a2e176ffde796c11caf80b3a68a8",
+          "at": "2026-06-26T11:34:02Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:663c23c399fd0a9cbbc07b9a41b0475eebe46b5d398dc67a49d07c780075806b",
+          "at": "2026-06-26T11:30:30Z"
         }
       ]
     }
