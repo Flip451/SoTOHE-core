@@ -75,21 +75,18 @@ pub(crate) fn resolve_results_chain2_target_layers(
 /// - `Pass`: origins from cache entry; empty reason.
 /// - `Fail`: origins from cache entry; reason from cached `Fail { reason }`.
 /// - `Pending` (cache miss or `Pending` verdict in cache): origins from the
-///   current pair-source `origin_lookup`, falling back to cached origins for
-///   `Pending`-in-cache entries when the key is absent from the lookup.
+///   `current_claim_origin` / `current_evidence_origin` parameters — always
+///   the calling pair's own origins, so pairs in different layers that share
+///   identical `(claim_hash, evidence_hash)` values each carry the correct
+///   per-layer origin reference.
 fn extract_verdict_and_origins(
     key: &(domain::ContentHash, domain::ContentHash),
     cache_map: &std::collections::HashMap<
         (domain::ContentHash, domain::ContentHash),
         &domain::tddd::semantic_verify::SemanticVerifyEntry,
     >,
-    origin_lookup: &std::collections::HashMap<
-        (domain::ContentHash, domain::ContentHash),
-        (
-            domain::tddd::semantic_verify::VerifyOriginRef,
-            domain::tddd::semantic_verify::VerifyOriginRef,
-        ),
-    >,
+    current_claim_origin: &domain::tddd::semantic_verify::VerifyOriginRef,
+    current_evidence_origin: &domain::tddd::semantic_verify::VerifyOriginRef,
 ) -> (
     domain::tddd::semantic_verify::SemanticVerdict,
     String,
@@ -112,26 +109,21 @@ fn extract_verdict_and_origins(
                 entry.claim_origin.clone(),
                 entry.evidence_origin.clone(),
             ),
-            // Pending in cache → unresolved; prefer origins from pair source.
-            SemanticVerdict::Pending => {
-                let (co, eo) = origin_lookup
-                    .get(key)
-                    .cloned()
-                    .unwrap_or_else(|| (entry.claim_origin.clone(), entry.evidence_origin.clone()));
-                (SemanticVerdict::Pending, "pair not yet verified".to_owned(), co, eo)
-            }
+            // Pending in cache → unresolved; use current pair's origin (per-layer correct).
+            SemanticVerdict::Pending => (
+                SemanticVerdict::Pending,
+                "pair not yet verified".to_owned(),
+                current_claim_origin.clone(),
+                current_evidence_origin.clone(),
+            ),
         },
-        // Cache miss → pending; derive origins from current pair source.
-        // The lookup should always succeed because `origin_lookup` is built from
-        // the same `current_pairs` that supply the keys.
-        None => {
-            use domain::tddd::semantic_verify::{AdrDecisionRef, VerifyOriginRef};
-            let placeholder =
-                || VerifyOriginRef::AdrDecision(AdrDecisionRef::new(String::new(), String::new()));
-            let (co, eo) =
-                origin_lookup.get(key).cloned().unwrap_or_else(|| (placeholder(), placeholder()));
-            (SemanticVerdict::Pending, "pair not yet verified".to_owned(), co, eo)
-        }
+        // Cache miss → pending; use current pair's origin (per-layer correct).
+        None => (
+            SemanticVerdict::Pending,
+            "pair not yet verified".to_owned(),
+            current_claim_origin.clone(),
+            current_evidence_origin.clone(),
+        ),
     }
 }
 
@@ -160,7 +152,7 @@ pub(crate) fn compute_results(
 ) -> Result<usecase::ref_verify::RefVerifyResultsOutput, usecase::ref_verify::RefVerifyDriverError>
 {
     use domain::ContentHash;
-    use domain::tddd::semantic_verify::{SemanticVerdict, SemanticVerifyEntry, VerifyOriginRef};
+    use domain::tddd::semantic_verify::{SemanticVerdict, SemanticVerifyEntry};
     use std::collections::HashMap;
     use usecase::ref_verify::{
         RefVerifyCacheScope, RefVerifyChainFilter, RefVerifyDriverError, RefVerifyLaneSummary,
@@ -213,14 +205,6 @@ pub(crate) fn compute_results(
         })
         .collect();
 
-    // Build origin lookup from current pair source for pending-pair origin derivation.
-    let mut origin_lookup: HashMap<HashKey, (VerifyOriginRef, VerifyOriginRef)> = HashMap::new();
-    for pair in &current_pairs {
-        origin_lookup
-            .entry((pair.claim_hash.clone(), pair.evidence_hash.clone()))
-            .or_insert_with(|| (pair.claim_origin.clone(), pair.evidence_origin.clone()));
-    }
-
     // (e/h) Classify pairs and accumulate per-lane data.
     let mut chain1_lane: Option<LaneAccum> = None;
     // Ordered list of layer strings for deterministic output (insertion order).
@@ -233,7 +217,12 @@ pub(crate) fn compute_results(
 
         match &pair.cache_scope {
             RefVerifyCacheScope::SpecAdr => {
-                let (v, r, co, eo) = extract_verdict_and_origins(&key, &chain1_map, &origin_lookup);
+                let (v, r, co, eo) = extract_verdict_and_origins(
+                    &key,
+                    &chain1_map,
+                    &pair.claim_origin,
+                    &pair.evidence_origin,
+                );
                 let lane = chain1_lane.get_or_insert_with(|| LaneAccum {
                     label: "Chain1 (spec\u{2194}ADR)".to_owned(),
                     pass_count: 0,
@@ -260,7 +249,12 @@ pub(crate) fn compute_results(
             RefVerifyCacheScope::CatalogueSpec { layer: layer_id } => {
                 let layer_str = layer_id.as_ref().to_owned();
                 let layer_cache = chain2_maps.get(&layer_str).unwrap_or(&empty_map);
-                let (v, r, co, eo) = extract_verdict_and_origins(&key, layer_cache, &origin_lookup);
+                let (v, r, co, eo) = extract_verdict_and_origins(
+                    &key,
+                    layer_cache,
+                    &pair.claim_origin,
+                    &pair.evidence_origin,
+                );
                 if !chain2_lane_map.contains_key(&layer_str) {
                     chain2_lane_order.push(layer_str.clone());
                     chain2_lane_map.insert(
@@ -1030,6 +1024,79 @@ mod tests {
         // FailPending verdict filter includes pending pairs.
         assert_eq!(out.pair_records.len(), 1);
         assert!(matches!(out.pair_records[0].verdict, SemanticVerdict::Pending));
+    }
+
+    // ── F1 regression: per-layer origin preserved for same-hash pairs ────────────
+
+    /// Regression test for F1: when two Chain2 layers have pairs with identical
+    /// `(claim_hash, evidence_hash)` (e.g. the same spec element referenced from
+    /// both layers) but different `claim_origin` values (each pointing to their own
+    /// catalogue file), both pending records must carry their own layer-correct
+    /// origin — not the first layer's origin.
+    ///
+    /// Before the fix, `origin_lookup` was keyed only by hash, so the second
+    /// layer's pending record silently received the first layer's `claim_origin`.
+    #[test]
+    fn compute_results_pending_origin_preserved_per_layer_with_same_hash() {
+        let domain_id = LayerId::try_new("domain".to_owned()).unwrap();
+        let usecase_id = LayerId::try_new("usecase".to_owned()).unwrap();
+
+        // Both pairs share the same hashes — simulating catalogue JSON that produces
+        // the same content hash in two layers for the same spec element.
+        let shared_claim_hash = test_hash(0x01);
+        let shared_evidence_hash = test_hash(0x02);
+
+        let domain_pair = RefVerifyPair {
+            claim: "claim-domain".to_owned(),
+            evidence: "evidence-shared".to_owned(),
+            claim_hash: shared_claim_hash.clone(),
+            evidence_hash: shared_evidence_hash.clone(),
+            cache_scope: RefVerifyCacheScope::CatalogueSpec { layer: domain_id.clone() },
+            known_bad: false,
+            claim_origin: catalogue_origin(0x01, "domain"),
+            evidence_origin: spec_origin(0x02),
+        };
+        let usecase_pair = RefVerifyPair {
+            claim: "claim-usecase".to_owned(),
+            evidence: "evidence-shared".to_owned(),
+            claim_hash: shared_claim_hash,
+            evidence_hash: shared_evidence_hash,
+            cache_scope: RefVerifyCacheScope::CatalogueSpec { layer: usecase_id.clone() },
+            known_bad: false,
+            claim_origin: catalogue_origin(0x01, "usecase"),
+            evidence_origin: spec_origin(0x02),
+        };
+
+        // No cache entries for either layer → both pairs are cache-miss → Pending.
+        let out = compute_results(
+            vec![],
+            vec![(domain_id, vec![]), (usecase_id, vec![])],
+            vec![domain_pair, usecase_pair],
+            RefVerifyChainFilter::Chain2,
+            RefVerifyLayerFilter::All,
+            RefVerifyVerdictFilter::All,
+        )
+        .unwrap();
+
+        assert_eq!(out.pair_records.len(), 2, "both pairs should be present");
+        assert_eq!(out.total_pending, 2, "both pairs should be Pending (cache miss)");
+
+        let domain_record =
+            out.pair_records.iter().find(|r| r.chain_layer == "Chain2:domain").unwrap();
+        let usecase_record =
+            out.pair_records.iter().find(|r| r.chain_layer == "Chain2:usecase").unwrap();
+
+        // Each pending record must carry its own layer's catalogue origin.
+        assert_eq!(
+            domain_record.claim_origin,
+            catalogue_origin(0x01, "domain"),
+            "domain pending record must carry domain catalogue origin"
+        );
+        assert_eq!(
+            usecase_record.claim_origin,
+            catalogue_origin(0x01, "usecase"),
+            "usecase pending record must carry usecase catalogue origin (not domain's)"
+        );
     }
 
     /// Verifies that `compute_results` with `chain=Chain2` also succeeds when

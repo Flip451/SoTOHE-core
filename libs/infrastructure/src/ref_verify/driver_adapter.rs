@@ -226,6 +226,64 @@ fn current_git_branch(project_root: &Path) -> Result<String, RefVerifyAdapterErr
         })
 }
 
+/// Returns `Err(Wiring(...))` when both `present` and `absent` are non-empty
+/// (partial catalogue set — fail-closed semantics).
+///
+/// # Semantics
+/// - All-absent (`present` empty): pre-Phase-2 valid → `Ok(())`.
+/// - Partial (`present` non-empty AND `absent` non-empty): missing layers → `Err(Wiring)`.
+/// - All-present (`absent` empty): normal operation → `Ok(())`.
+fn check_partial_catalogue_set(
+    present: &[domain::tddd::LayerId],
+    absent: &[domain::tddd::LayerId],
+) -> Result<(), RefVerifyDriverError> {
+    if !present.is_empty() && !absent.is_empty() {
+        let missing_list = absent.iter().map(|id| id.as_ref()).collect::<Vec<_>>().join(", ");
+        Err(RefVerifyDriverError::Wiring(format!(
+            "partial Chain2 catalogue set: catalogue absent for layer(s) [{missing_list}]; \
+             run the ref-verify pipeline to generate missing catalogues or check Phase-2 status",
+        )))
+    } else {
+        Ok(())
+    }
+}
+
+fn inspect_chain2_catalogue_set(
+    project_root: &Path,
+    track_id: &str,
+    bindings: &[crate::verify::tddd_layers::TdddLayerBinding],
+) -> Result<(Vec<domain::tddd::LayerId>, Vec<domain::tddd::LayerId>), RefVerifyDriverError> {
+    let mut present = Vec::new();
+    let mut absent = Vec::new();
+
+    for binding in bindings {
+        let layer_id =
+            domain::tddd::LayerId::try_new(binding.layer_id().to_owned()).map_err(|e| {
+                RefVerifyDriverError::Wiring(format!(
+                    "invalid TDDD layer '{}' for results: {e}",
+                    binding.layer_id()
+                ))
+            })?;
+        let catalogue_path =
+            project_root.join("track").join("items").join(track_id).join(binding.catalogue_file());
+        let catalogue_exists =
+            crate::track::symlink_guard::reject_symlinks_below(&catalogue_path, project_root)
+                .map_err(|e| {
+                    RefVerifyDriverError::Wiring(format!(
+                        "cannot inspect catalogue '{}': {e}",
+                        catalogue_path.display()
+                    ))
+                })?;
+        if catalogue_exists {
+            present.push(layer_id);
+        } else {
+            absent.push(layer_id);
+        }
+    }
+
+    Ok((present, absent))
+}
+
 // ── FsRefVerifyRunAdapter ─────────────────────────────────────────────────────
 
 /// Filesystem-backed adapter implementing [`RefVerifyRunService`].
@@ -411,36 +469,20 @@ impl usecase::ref_verify::RefVerifyAggregateService for FsRefVerifyAggregateAdap
         let mut chain2_layer_ids: Vec<LayerId> = Vec::new();
         if include_chain2 {
             let bindings = load_results_tddd_bindings(&canonical_root)?;
+            let (present_layer_ids, absent_layer_ids) =
+                inspect_chain2_catalogue_set(&canonical_root, cmd.track_id.as_ref(), &bindings)?;
+            // Fail-closed for partial catalogue sets before layer narrowing.
+            // Only all-absent (pre-Phase-2) is accepted without error; partial absence
+            // means some declared layers were never inspected, which would produce a
+            // misleadingly complete-looking Chain2 summary.
+            check_partial_catalogue_set(&present_layer_ids, &absent_layer_ids)?;
+
             let target_ids = resolve_results_chain2_target_layers(&bindings, &layer)?;
 
             for layer_id in &target_ids {
-                // Pre-Phase-2 graceful skip: if the layer's catalogue file does not yet
-                // exist on disk, contribute zero pairs and zero cache entries for this
-                // layer.  A present-but-corrupt catalogue continues to propagate errors
-                // through the pair source / cache codec (IN-07).
-                let catalogue_file = bindings
-                    .iter()
-                    .find(|b| b.layer_id() == layer_id.as_ref())
-                    .map(|b| b.catalogue_file().to_owned())
-                    .unwrap_or_else(|| format!("{}-types.json", layer_id.as_ref()));
-                let catalogue_path = canonical_root
-                    .join("track")
-                    .join("items")
-                    .join(cmd.track_id.as_ref())
-                    .join(&catalogue_file);
-                let catalogue_exists = crate::track::symlink_guard::reject_symlinks_below(
-                    &catalogue_path,
-                    &canonical_root,
-                )
-                .map_err(|e| {
-                    RefVerifyDriverError::Wiring(format!(
-                        "cannot inspect catalogue '{}': {e}",
-                        catalogue_path.display()
-                    ))
-                })?;
-                if !catalogue_exists {
-                    // Absent catalogue → pre-Phase-2; record the valid layer with
-                    // zero cache entries, but skip pair enumeration for it.
+                if absent_layer_ids.iter().any(|absent| absent == layer_id) {
+                    // Record in chain2_caches so that compute_results layer validation can
+                    // distinguish pre-Phase-2 zero-pair from an unknown layer typo.
                     chain2_caches.push((layer_id.clone(), Vec::new()));
                     continue;
                 }
@@ -679,6 +721,90 @@ mod tests {
                 | usecase::ref_verify::RefVerifyChainFilter::All
         );
         assert!(!include_chain1, "chain=Chain2 must not enumerate Chain1 from the pair source");
+    }
+
+    // ── F2: partial-set catalogue detection ───────────────────────────────────
+
+    /// 2 layers declared, one catalogue absent / one present → Wiring error.
+    #[test]
+    fn compute_results_chain2_all_partial_catalogue_returns_wiring_error() {
+        use domain::tddd::LayerId;
+        let domain_id = LayerId::try_new("domain".to_owned()).unwrap();
+        let usecase_id = LayerId::try_new("usecase".to_owned()).unwrap();
+        // Simulate: domain present, usecase absent.
+        let present = [domain_id];
+        let absent = [usecase_id];
+        let err = check_partial_catalogue_set(&present, &absent).unwrap_err();
+        assert!(
+            matches!(err, RefVerifyDriverError::Wiring(ref msg) if msg.contains("usecase")),
+            "expected Wiring error naming the absent layer, got: {err:?}"
+        );
+    }
+
+    /// All target catalogues absent → pre-Phase-2 valid (success, no error).
+    #[test]
+    fn compute_results_chain2_all_all_absent_succeeds_zero_pair() {
+        use domain::tddd::LayerId;
+        let domain_id = LayerId::try_new("domain".to_owned()).unwrap();
+        let usecase_id = LayerId::try_new("usecase".to_owned()).unwrap();
+        let present: [LayerId; 0] = [];
+        let absent = [domain_id, usecase_id];
+        check_partial_catalogue_set(&present, &absent).unwrap();
+    }
+
+    /// Single declared target catalogue present → success.
+    #[test]
+    fn compute_results_chain2_specific_present_layer_succeeds() {
+        use domain::tddd::LayerId;
+        let domain_id = LayerId::try_new("domain".to_owned()).unwrap();
+        let present = [domain_id];
+        let absent: [LayerId; 0] = [];
+        check_partial_catalogue_set(&present, &absent).unwrap();
+    }
+
+    /// Specific-layer query must still fail closed when the full declared
+    /// Chain2 catalogue set is partial.
+    #[test]
+    fn compute_results_chain2_specific_absent_layer_with_other_present_returns_wiring_error() {
+        let dir = tempfile::tempdir().unwrap();
+        let track_id = "test-track";
+        let track_dir = dir.path().join("track").join("items").join(track_id);
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(track_dir.join("usecase-types.json"), "{}").unwrap();
+        let bindings = crate::verify::tddd_layers::parse_tddd_layers(
+            r#"{
+              "layers": [
+                {
+                  "crate": "domain",
+                  "tddd": {
+                    "enabled": true,
+                    "catalogue_file": "domain-types.json"
+                  }
+                },
+                {
+                  "crate": "usecase",
+                  "tddd": {
+                    "enabled": true,
+                    "catalogue_file": "usecase-types.json"
+                  }
+                }
+              ]
+            }"#,
+        )
+        .unwrap();
+
+        let (present, absent) =
+            inspect_chain2_catalogue_set(dir.path(), track_id, &bindings).unwrap();
+        let present_layers: Vec<&str> = present.iter().map(|id| id.as_ref()).collect();
+        let absent_layers: Vec<&str> = absent.iter().map(|id| id.as_ref()).collect();
+        assert_eq!(present_layers, vec!["usecase"]);
+        assert_eq!(absent_layers, vec!["domain"]);
+
+        let err = check_partial_catalogue_set(&present, &absent).unwrap_err();
+        assert!(
+            matches!(err, RefVerifyDriverError::Wiring(ref msg) if msg.contains("domain")),
+            "expected Wiring error naming the absent target layer, got: {err:?}"
+        );
     }
 
     /// F3: For chain=Chain2, pair enumeration uses `RefVerifyScope::Chain2 { layer }` per
