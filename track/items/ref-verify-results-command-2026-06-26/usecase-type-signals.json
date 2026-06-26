@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-06-26T04:36:13Z",
+  "declaration_hash": "ee549738b86dc40269c271dcd0a7be6f9078026efd444245e20bc72ab8948da9",
+  "signals": [
+    {
+      "type_name": "RefVerifyAggregateService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "RefVerifyChainFilter",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "RefVerifyLaneSummary",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "RefVerifyLayerFilter",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "RefVerifyPair",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "RefVerifyPairRecord",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "RefVerifyResultsOutput",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "RefVerifyVerdictFilter",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    }
+  ]
+}

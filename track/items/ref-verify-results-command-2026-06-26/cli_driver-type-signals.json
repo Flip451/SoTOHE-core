@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-06-26T04:36:17Z",
+  "declaration_hash": "138488bbc629ab3806e9433d09abc7e91a0e77c67d2fc3d073508cef17a74f51",
+  "signals": [
+    {
+      "type_name": "RefVerifyChainSelect",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "RefVerifyDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "RefVerifyInput",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "RefVerifyResultsInput",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "RefVerifyVerdictSelect",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "RefVerifyCheckApprovedInput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "RefVerifyRunInput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

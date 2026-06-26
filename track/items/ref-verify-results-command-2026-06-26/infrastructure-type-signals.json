@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-06-26T04:36:17Z",
+  "declaration_hash": "a4c7f1ee4d3b59158b3ee9a7f93e2fff18a563b02a623d08a6f845939ba48ba4",
+  "signals": [
+    {
+      "type_name": "AdrDecisionRefDto",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "serde::Deserialize<'de>",
+        "serde::Serialize"
+      ]
+    },
+    {
+      "type_name": "CatalogueEntryRefDto",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "serde::Deserialize<'de>",
+        "serde::Serialize"
+      ]
+    },
+    {
+      "type_name": "CatalogueSectionKeyDto",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "serde::Deserialize<'de>",
+        "serde::Serialize"
+      ]
+    },
+    {
+      "type_name": "FsRefVerifyAggregateAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "RefVerifyAggregateService"
+      ]
+    },
+    {
+      "type_name": "SemanticVerdictDto",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "SemanticVerifyEntryDto",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "serde::Deserialize<'de>",
+        "serde::Serialize"
+      ]
+    },
+    {
+      "type_name": "SpecElementRefDto",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "serde::Deserialize<'de>",
+        "serde::Serialize"
+      ]
+    },
+    {
+      "type_name": "SpecSectionKindDto",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "serde::Deserialize<'de>",
+        "serde::Serialize"
+      ]
+    },
+    {
+      "type_name": "VerifyOriginRefDto",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "serde::Deserialize<'de>",
+        "serde::Serialize"
+      ]
+    }
+  ]
+}

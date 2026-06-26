@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "138488bbc629ab3806e9433d09abc7e91a0e77c67d2fc3d073508cef17a74f51",
+  "signals": [
+    {
+      "type_name": "RefVerifyChainSelect",
+      "signal": "blue",
+      "entry_hash": "5b264df9f48894985c13cd4c93b6cabbff0b9611cd437238bcc629f24c76c1ce"
+    },
+    {
+      "type_name": "RefVerifyCheckApprovedInput",
+      "signal": "blue",
+      "entry_hash": "7b28a3d1257e6fc18b6596c5c4645b8b242d2eda077a6c6d7a4a5f80b3bf4259"
+    },
+    {
+      "type_name": "RefVerifyDriver",
+      "signal": "blue",
+      "entry_hash": "66ee3d5a24c2a74b0596d1e6e029e4cdf8490a9415b3d8ce85e9f9fb4f4236d7"
+    },
+    {
+      "type_name": "RefVerifyInput",
+      "signal": "blue",
+      "entry_hash": "a56e7971d3466bf3fc34682ed8f76c72898e0cad0dc55141d942c3d5eeab4643"
+    },
+    {
+      "type_name": "RefVerifyResultsInput",
+      "signal": "blue",
+      "entry_hash": "53997d4d05ae1f67cb6f67ff0204b2485c95b525e11f170dbe79dd5bca2adaa1"
+    },
+    {
+      "type_name": "RefVerifyRunInput",
+      "signal": "blue",
+      "entry_hash": "48eb11b293ecb0ee381001bec0613e5ba881402ebd2b475b3f7add2ed35de3d9"
+    },
+    {
+      "type_name": "RefVerifyVerdictSelect",
+      "signal": "blue",
+      "entry_hash": "7b495382d4e0647fdd9c14c5117db4b394e3a9d1002294884ac624a7227f10d2"
+    }
+  ]
+}

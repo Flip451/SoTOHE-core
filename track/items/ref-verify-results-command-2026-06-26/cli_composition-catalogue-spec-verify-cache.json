@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "layer": "cli_composition",
+  "entries": [
+    {
+      "claim_hash": "a0641acc1824560a1d333acad150d4890daa75d6f7c73de265ceb0498e9177e4",
+      "evidence_hash": "68a8ccee2a17ff3c9d1840b2d4c59b7b67bbed93f4f262279973abf637481708",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp ref-verify results` CLI サブコマンドの実装。option として `--track-id` (optional; 省略時はブランチから自動解決)、`--items-dir` (default: `track/items`)、`--chain {1|2|all}`、`--layer <name>|all`、`--filter {pass|fail|pending|all}` を持つ"
+      }
+    },
+    {
+      "claim_hash": "05b7446cc25f83f42cfeb047d3ba79585edc1f69927e4a22b0d1934d927a90cc",
+      "evidence_hash": "68a8ccee2a17ff3c9d1840b2d4c59b7b67bbed93f4f262279973abf637481708",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp ref-verify results` CLI サブコマンドの実装。option として `--track-id` (optional; 省略時はブランチから自動解決)、`--items-dir` (default: `track/items`)、`--chain {1|2|all}`、`--layer <name>|all`、`--filter {pass|fail|pending|all}` を持つ"
+      }
+    },
+    {
+      "claim_hash": "0a7f948af60164159f88b58b3e9aaf260c08798aa1d819ac80a0601a4476320b",
+      "evidence_hash": "68a8ccee2a17ff3c9d1840b2d4c59b7b67bbed93f4f262279973abf637481708",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp ref-verify results` CLI サブコマンドの実装。option として `--track-id` (optional; 省略時はブランチから自動解決)、`--items-dir` (default: `track/items`)、`--chain {1|2|all}`、`--layer <name>|all`、`--filter {pass|fail|pending|all}` を持つ"
+      }
+    },
+    {
+      "claim_hash": "0a7f948af60164159f88b58b3e9aaf260c08798aa1d819ac80a0601a4476320b",
+      "evidence_hash": "1ef58db70c36bdbc91b1dc6e94f267abb48f579051e424571d15bbded0fa8109",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`--chain 1` を指定すると Chain① のみが表示され (先頭ブロックに Chain① の 1 lane のみ)、`--chain 2` では Chain② のみ (layer 数分の lane)、`--chain all` (既定) では両 Chain が表示される"
+      }
+    },
+    {
+      "claim_hash": "0a7f948af60164159f88b58b3e9aaf260c08798aa1d819ac80a0601a4476320b",
+      "evidence_hash": "37341145f02b7f09297351fbdd1ed6f107e05a2cc0e0b59f728a9e9d00a1e614",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`--layer all` (既定) は全 layer を表示する。"
+      }
+    },
+    {
+      "claim_hash": "0a7f948af60164159f88b58b3e9aaf260c08798aa1d819ac80a0601a4476320b",
+      "evidence_hash": "b017b9cccce84f690c94ba171d5d98c71f8c8bc1313dba45294a0893ff3933b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`--filter` 省略時は fail/pending pair がレコードブロックに表示される。`--filter fail` を指定すると fail pair のみ、`--filter pending` は pending pair のみ、`--filter pass` は pass pair のみ、`--filter all` はすべての pair を表示する。先頭ブロック (集計) と Summary 行は `--filter` に関わらず、`--chain` / `--layer` 適用後の lane 全件集計を表示する"
+      }
+    },
+    {
+      "claim_hash": "4fecf4fa0d0ba9ba915d50f8a138ac32ee7f67fe3c46e2ad0db0702f5f1a1a43",
+      "evidence_hash": "68a8ccee2a17ff3c9d1840b2d4c59b7b67bbed93f4f262279973abf637481708",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp ref-verify results` CLI サブコマンドの実装。option として `--track-id` (optional; 省略時はブランチから自動解決)、`--items-dir` (default: `track/items`)、`--chain {1|2|all}`、`--layer <name>|all`、`--filter {pass|fail|pending|all}` を持つ"
+      }
+    },
+    {
+      "claim_hash": "4fecf4fa0d0ba9ba915d50f8a138ac32ee7f67fe3c46e2ad0db0702f5f1a1a43",
+      "evidence_hash": "1ef58db70c36bdbc91b1dc6e94f267abb48f579051e424571d15bbded0fa8109",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`--chain 1` を指定すると Chain① のみが表示され (先頭ブロックに Chain① の 1 lane のみ)、`--chain 2` では Chain② のみ (layer 数分の lane)、`--chain all` (既定) では両 Chain が表示される"
+      }
+    },
+    {
+      "claim_hash": "4fecf4fa0d0ba9ba915d50f8a138ac32ee7f67fe3c46e2ad0db0702f5f1a1a43",
+      "evidence_hash": "37341145f02b7f09297351fbdd1ed6f107e05a2cc0e0b59f728a9e9d00a1e614",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`--layer <name>` を指定すると Chain② の指定 layer 分のみが先頭ブロックとレコードブロックに表示される。`--layer all` (既定) は全 layer を表示する。`--layer` を `--chain 1` と同時指定した場合は Chain① に layer 概念がないため no-op として扱われる"
+      }
+    },
+    {
+      "claim_hash": "4fecf4fa0d0ba9ba915d50f8a138ac32ee7f67fe3c46e2ad0db0702f5f1a1a43",
+      "evidence_hash": "b017b9cccce84f690c94ba171d5d98c71f8c8bc1313dba45294a0893ff3933b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`--filter` 省略時は fail/pending pair がレコードブロックに表示される。`--filter all` はすべての pair を表示する。`--chain` / `--layer` 適用後の lane 全件集計を表示する"
+      }
+    }
+  ]
+}

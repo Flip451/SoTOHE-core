@@ -1,0 +1,190 @@
+{
+  "schema_version": 1,
+  "layer": "usecase",
+  "entries": [
+    {
+      "claim_hash": "7893699b6e00fb913915acfc7e4c9756b1b89aace6ea4f0dcf741a9101577113",
+      "evidence_hash": "68a8ccee2a17ff3c9d1840b2d4c59b7b67bbed93f4f262279973abf637481708",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp ref-verify results` CLI サブコマンドの実装。option として `--track-id` (optional; 省略時はブランチから自動解決)、`--items-dir` (default: `track/items`)、`--chain {1|2|all}`、`--layer <name>|all`、`--filter {pass|fail|pending|all}` を持つ"
+      }
+    },
+    {
+      "claim_hash": "85bf2d223fed917af4786e658e1a3bd2103540dc680c07d8f6ace395be9a1df6",
+      "evidence_hash": "73e5fc8cdf7961e1320aa0a0dcc16914c63b067b663b68473656733159f47d77",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Chain① (spec↔ADR) と Chain② (各 layer × catalogue↔spec) を 1 行/lane で `pass=N fail=N pending=N` 形式で表示する。"
+      }
+    },
+    {
+      "claim_hash": "482e3bdf7b36da8a4ef301b47e03fcc2226f643e516f11f6fa27d6d668445bfe",
+      "evidence_hash": "68a8ccee2a17ff3c9d1840b2d4c59b7b67bbed93f4f262279973abf637481708",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp ref-verify results` CLI サブコマンドの実装。option として `--track-id` (optional; 省略時はブランチから自動解決)、`--items-dir` (default: `track/items`)、`--chain {1|2|all}`、`--layer <name>|all`、`--filter {pass|fail|pending|all}` を持つ"
+      }
+    },
+    {
+      "claim_hash": "ddc72890557f8375e2a28f00394ec996aae22a5f21fb441ac847bf32ae887886",
+      "evidence_hash": "40d597c7af7f3f15a8ac2abf59cdb3a7a810ae433e435a7775312e22dd74addf",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各 pair を `claim_hash / evidence_hash / verdict / reason / chain+layer` の形で列挙する。各 pair に claim/evidence の source (artifact 種別 + 具体位置: spec.json の section+id / ADR の file+anchor / catalogue の file+section_key+entry_key) を併記する"
+      }
+    },
+    {
+      "claim_hash": "ddc72890557f8375e2a28f00394ec996aae22a5f21fb441ac847bf32ae887886",
+      "evidence_hash": "747e66fc5802f30b3bea4ccc5d95fc9d9a6a4ee179b5df8c75a70d33dacb5e6e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "fail pair の source 表示: verify-cache entry に persist された `claim_origin` / `evidence_origin` から artifact 種別と具体位置を表示する。artifact の再 parse は不要"
+      }
+    },
+    {
+      "claim_hash": "ddc72890557f8375e2a28f00394ec996aae22a5f21fb441ac847bf32ae887886",
+      "evidence_hash": "ad4144536e775ab2f1f44b4632bb66199b8085c2dad6dbafc45fd19b364c1816",
+      "verdict": {
+        "kind": "pass",
+        "citation": "pending pair (cache miss / 未確定 pair) の source 表示: `ref-verify run` と同じ pair source 解決を read-only で呼び、current artifact から pending pair と origin meta を再導出して表示する。LLM 呼び出しおよび verifier subprocess は起動しない"
+      }
+    },
+    {
+      "claim_hash": "efb5d4eeb5c897a9e4222fc695eebf732a06fa79be9ab41cc676862e5a455f52",
+      "evidence_hash": "73e5fc8cdf7961e1320aa0a0dcc16914c63b067b663b68473656733159f47d77",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Chain① (spec↔ADR) と Chain② (各 layer × catalogue↔spec) を 1 行/lane で `pass=N fail=N pending=N` 形式で表示する。Chain② の layer 集合は `architecture-rules.json` から動的に解決する"
+      }
+    },
+    {
+      "claim_hash": "efb5d4eeb5c897a9e4222fc695eebf732a06fa79be9ab41cc676862e5a455f52",
+      "evidence_hash": "40d597c7af7f3f15a8ac2abf59cdb3a7a810ae433e435a7775312e22dd74addf",
+      "verdict": {
+        "kind": "pass",
+        "citation": "出力レコードブロック (fail/pending pair の列挙): 各 pair を `claim_hash / evidence_hash / verdict / reason / chain+layer` の形で列挙する。各 pair に claim/evidence の source (artifact 種別 + 具体位置: spec.json の section+id / ADR の file+anchor / catalogue の file+section_key+entry_key) を併記する"
+      }
+    },
+    {
+      "claim_hash": "efb5d4eeb5c897a9e4222fc695eebf732a06fa79be9ab41cc676862e5a455f52",
+      "evidence_hash": "504dcb964c8dcbaae73ccef13f513921676374a6cdc4ffa26903171f284a1ed7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "出力末尾の Summary 行: `Summary: N pass, N fail, N pending, N total` を表示する"
+      }
+    },
+    {
+      "claim_hash": "6354f43a0f4fbfd565a361d0ebd7b218e2be008b802939bacc99b9798fcfaf7e",
+      "evidence_hash": "68a8ccee2a17ff3c9d1840b2d4c59b7b67bbed93f4f262279973abf637481708",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp ref-verify results` CLI サブコマンドの実装。option として `--track-id` (optional; 省略時はブランチから自動解決)、`--items-dir` (default: `track/items`)、`--chain {1|2|all}`、`--layer <name>|all`、`--filter {pass|fail|pending|all}` を持つ"
+      }
+    },
+    {
+      "claim_hash": "2ca30b6defc08e58caf412efdd4ee119e752c1b5acc7ff81b41a9daf990ff341",
+      "evidence_hash": "68a8ccee2a17ff3c9d1840b2d4c59b7b67bbed93f4f262279973abf637481708",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp ref-verify results` CLI サブコマンドの実装。option として `--track-id` (optional; 省略時はブランチから自動解決)、`--items-dir` (default: `track/items`)、`--chain {1|2|all}`、`--layer <name>|all`、`--filter {pass|fail|pending|all}` を持つ"
+      }
+    },
+    {
+      "claim_hash": "1f2c11feef071455721f3599f33a2ceaa9159dbd8d4fa488e3eb1630c410227f",
+      "evidence_hash": "ad4144536e775ab2f1f44b4632bb66199b8085c2dad6dbafc45fd19b364c1816",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ref-verify run` と同じ pair source 解決を read-only で呼び、current artifact から pending pair と origin meta を再導出して表示する。LLM 呼び出しおよび verifier subprocess は起動しない"
+      }
+    },
+    {
+      "claim_hash": "1f2c11feef071455721f3599f33a2ceaa9159dbd8d4fa488e3eb1630c410227f",
+      "evidence_hash": "927c12702ddbffc701f471f76228c9e73e11dd56687b83f0228b8ba3de70e3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`SemanticVerifyEntry` schema の拡張: `claim_origin` / `evidence_origin` フィールドを追加する。Chain② pair: `claim_origin` は catalogue の `(file_path, section_key=types|traits|functions, entry_key)`、`evidence_origin` は spec.json の `(section, requirement_id, text_label)`"
+      }
+    },
+    {
+      "claim_hash": "1f2c11feef071455721f3599f33a2ceaa9159dbd8d4fa488e3eb1630c410227f",
+      "evidence_hash": "9995ce9397b2867dec0e22e1ffbcadba40ea08b2e6bee07795c5f9ac18fbd7cf",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`SemanticVerifyEntry` に `claim_origin` / `evidence_origin` フィールドが追加されており、`bin/sotp ref-verify run` が新規に判定した pair についてこれらのフィールドを正しく populate した状態で cache に保存する。Chain① / Chain② それぞれのフィールド内容が D3 の仕様と一致する"
+      }
+    },
+    {
+      "claim_hash": "3130a177e4753a124c1bfda862f636219c854efeb7447bbcf2583725eaebdcc3",
+      "evidence_hash": "9125d7f8ef9dc4625848e472e4bdc8e23b38da678d25df5485023ecc2a2c7b36",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各 pair を `claim_hash / evidence_hash / verdict / reason / chain+layer` の形で表示し、claim/evidence の source (artifact 種別 + 具体位置: spec.json の section+id / ADR の file+anchor / catalogue の file+section_key+entry_key) を併記する"
+      }
+    },
+    {
+      "claim_hash": "3130a177e4753a124c1bfda862f636219c854efeb7447bbcf2583725eaebdcc3",
+      "evidence_hash": "747e66fc5802f30b3bea4ccc5d95fc9d9a6a4ee179b5df8c75a70d33dacb5e6e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "verify-cache entry に persist された `claim_origin` / `evidence_origin` から artifact 種別と具体位置を表示する。artifact の再 parse は不要"
+      }
+    },
+    {
+      "claim_hash": "3130a177e4753a124c1bfda862f636219c854efeb7447bbcf2583725eaebdcc3",
+      "evidence_hash": "ad4144536e775ab2f1f44b4632bb66199b8085c2dad6dbafc45fd19b364c1816",
+      "verdict": {
+        "kind": "pass",
+        "citation": "pending pair (cache miss / 未確定 pair) の source 表示: `ref-verify run` と同じ pair source 解決を read-only で呼び、current artifact から pending pair と origin meta を再導出して表示する。LLM 呼び出しおよび verifier subprocess は起動しない"
+      }
+    },
+    {
+      "claim_hash": "ede2fd4a5577a295c9485ab1519f4527f75e79cc064e2da947aaa87a9be6ddf2",
+      "evidence_hash": "73e5fc8cdf7961e1320aa0a0dcc16914c63b067b663b68473656733159f47d77",
+      "verdict": {
+        "kind": "pass",
+        "citation": "出力先頭ブロック (Chain×Layer 集計): Chain① (spec↔ADR) と Chain② (各 layer × catalogue↔spec) を 1 行/lane で `pass=N fail=N pending=N` 形式で表示する。Chain② の layer 集合は `architecture-rules.json` から動的に解決する"
+      }
+    },
+    {
+      "claim_hash": "ede2fd4a5577a295c9485ab1519f4527f75e79cc064e2da947aaa87a9be6ddf2",
+      "evidence_hash": "9125d7f8ef9dc4625848e472e4bdc8e23b38da678d25df5485023ecc2a2c7b36",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`--filter` に従って pass/fail/pending pair を列挙する。`--filter` 省略時は default 出力として fail/pending pair を列挙する。各 pair を `claim_hash / evidence_hash / verdict / reason / chain+layer` の形で表示し、claim/evidence の source (artifact 種別 + 具体位置: spec.json の section+id / ADR の file+anchor / catalogue の file+section_key+entry_key) を併記する"
+      }
+    },
+    {
+      "claim_hash": "ede2fd4a5577a295c9485ab1519f4527f75e79cc064e2da947aaa87a9be6ddf2",
+      "evidence_hash": "504dcb964c8dcbaae73ccef13f513921676374a6cdc4ffa26903171f284a1ed7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "出力末尾の Summary 行: `Summary: N pass, N fail, N pending, N total` を表示する"
+      }
+    },
+    {
+      "claim_hash": "4c42d6752be0bae4a775d0dbfb9d57033211cccacd4ac84a66ff919bd9eefd50",
+      "evidence_hash": "68a8ccee2a17ff3c9d1840b2d4c59b7b67bbed93f4f262279973abf637481708",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp ref-verify results` CLI サブコマンドの実装。option として `--track-id` (optional; 省略時はブランチから自動解決)、`--items-dir` (default: `track/items`)、`--chain {1|2|all}`、`--layer <name>|all`、`--filter {pass|fail|pending|all}` を持つ"
+      }
+    },
+    {
+      "claim_hash": "4c42d6752be0bae4a775d0dbfb9d57033211cccacd4ac84a66ff919bd9eefd50",
+      "evidence_hash": "b017b9cccce84f690c94ba171d5d98c71f8c8bc1313dba45294a0893ff3933b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`--filter` 省略時は fail/pending pair がレコードブロックに表示される。`--filter fail` を指定すると fail pair のみ、`--filter pending` は pending pair のみ、`--filter pass` は pass pair のみ、`--filter all` はすべての pair を表示する。先頭ブロック (集計) と Summary 行は `--filter` に関わらず、`--chain` / `--layer` 適用後の lane 全件集計を表示する"
+      }
+    },
+    {
+      "claim_hash": "5db2d0914edb6454bce16ce2cbed5585bad433144f5c4bb72efad6c04cccc060",
+      "evidence_hash": "68a8ccee2a17ff3c9d1840b2d4c59b7b67bbed93f4f262279973abf637481708",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp ref-verify results` CLI サブコマンドの実装。option として `--track-id` (optional; 省略時はブランチから自動解決)、`--items-dir` (default: `track/items`)、`--chain {1|2|all}`、`--layer <name>|all`、`--filter {pass|fail|pending|all}` を持つ"
+      }
+    }
+  ]
+}

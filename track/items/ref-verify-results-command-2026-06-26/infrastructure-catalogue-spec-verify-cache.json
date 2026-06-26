@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "layer": "infrastructure",
+  "entries": [
+    {
+      "claim_hash": "62966b580554cb248ba5c5484dbaedd2b4da767ef07d8cec4c57e06e5ce19d41",
+      "evidence_hash": "927c12702ddbffc701f471f76228c9e73e11dd56687b83f0228b8ba3de70e3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Chain① pair: `claim_origin` は spec.json の `(section, requirement_id, text_label)`、`evidence_origin` は ADR の `(file_path, anchor=decision_id)`"
+      }
+    },
+    {
+      "claim_hash": "e8cca68d94ef00525c008d20c4b62aa2a99f0b6235b48afec9454912cfd5190b",
+      "evidence_hash": "927c12702ddbffc701f471f76228c9e73e11dd56687b83f0228b8ba3de70e3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Chain② pair: `claim_origin` は catalogue の `(file_path, section_key=types|traits|functions, entry_key)`, `evidence_origin` は spec.json の `(section, requirement_id, text_label)`"
+      }
+    },
+    {
+      "claim_hash": "431b57307b63cd62185a2318ae34758e02f2555b60c4086e088691e6ba6f7a12",
+      "evidence_hash": "927c12702ddbffc701f471f76228c9e73e11dd56687b83f0228b8ba3de70e3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Chain② pair: `claim_origin` は catalogue の `(file_path, section_key=types|traits|functions, entry_key)`、`evidence_origin` は spec.json の `(section, requirement_id, text_label)`"
+      }
+    },
+    {
+      "claim_hash": "ea60a7c864365f866673709d678028daab8066ebef89f98e4a6734b0fd4435eb",
+      "evidence_hash": "68a8ccee2a17ff3c9d1840b2d4c59b7b67bbed93f4f262279973abf637481708",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp ref-verify results` CLI サブコマンドの実装。option として `--track-id` (optional; 省略時はブランチから自動解決)、`--items-dir` (default: `track/items`)、`--chain {1|2|all}`、`--layer <name>|all`、`--filter {pass|fail|pending|all}` を持つ"
+      }
+    },
+    {
+      "claim_hash": "ea60a7c864365f866673709d678028daab8066ebef89f98e4a6734b0fd4435eb",
+      "evidence_hash": "ad4144536e775ab2f1f44b4632bb66199b8085c2dad6dbafc45fd19b364c1816",
+      "verdict": {
+        "kind": "pass",
+        "citation": "pending pair (cache miss / 未確定 pair) の source 表示: `ref-verify run` と同じ pair source 解決を read-only で呼び、current artifact から pending pair と origin meta を再導出して表示する。LLM 呼び出しおよび verifier subprocess は起動しない"
+      }
+    },
+    {
+      "claim_hash": "b9a3cbbfb6ded58c558e18049f644592184c77aab67708b3b2c61192fd32ef6f",
+      "evidence_hash": "927c12702ddbffc701f471f76228c9e73e11dd56687b83f0228b8ba3de70e3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Chain② pair: `claim_origin` は catalogue の `(file_path, section_key=types|traits|functions, entry_key)`、`evidence_origin` は spec.json の `(section, requirement_id, text_label)`"
+      }
+    },
+    {
+      "claim_hash": "252e7952b7b025e55aac290fc923494bb77f3dbff48a9d1f177e184e1299a418",
+      "evidence_hash": "927c12702ddbffc701f471f76228c9e73e11dd56687b83f0228b8ba3de70e3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Chain② pair: `claim_origin` は catalogue の `(file_path, section_key=types|traits|functions, entry_key)`, `evidence_origin` は spec.json の `(section, requirement_id, text_label)`"
+      }
+    },
+    {
+      "claim_hash": "d0a48242a31059b75818a047a782bb4438515159db76d48f8d55cfb7b53f13c2",
+      "evidence_hash": "927c12702ddbffc701f471f76228c9e73e11dd56687b83f0228b8ba3de70e3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Chain② pair: `claim_origin` は catalogue の `(file_path, section_key=types|traits|functions, entry_key)`、`evidence_origin` は spec.json の `(section, requirement_id, text_label)`"
+      }
+    },
+    {
+      "claim_hash": "908d839cc2b4944f30677e319106c620b28738de25b17dcde5507a706eefc06b",
+      "evidence_hash": "9125d7f8ef9dc4625848e472e4bdc8e23b38da678d25df5485023ecc2a2c7b36",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`--filter` に従って pass/fail/pending pair を列挙する。各 pair を `claim_hash / evidence_hash / verdict / reason / chain+layer` の形で表示し、claim/evidence の source (artifact 種別 + 具体位置: spec.json の section+id / ADR の file+anchor / catalogue の file+section_key+entry_key) を併記する"
+      }
+    },
+    {
+      "claim_hash": "908d839cc2b4944f30677e319106c620b28738de25b17dcde5507a706eefc06b",
+      "evidence_hash": "927c12702ddbffc701f471f76228c9e73e11dd56687b83f0228b8ba3de70e3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`SemanticVerifyEntry` schema の拡張: `claim_origin` / `evidence_origin` フィールドを追加する。"
+      }
+    },
+    {
+      "claim_hash": "dac3039248911d7d158840ccea6f443fd3cedc591c9a64e8ab9bf9e87bf7ee2f",
+      "evidence_hash": "927c12702ddbffc701f471f76228c9e73e11dd56687b83f0228b8ba3de70e3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`SemanticVerifyEntry` schema の拡張: `claim_origin` / `evidence_origin` フィールドを追加する。"
+      }
+    },
+    {
+      "claim_hash": "dac3039248911d7d158840ccea6f443fd3cedc591c9a64e8ab9bf9e87bf7ee2f",
+      "evidence_hash": "7b123b0ee53aca400bd90bc960bdf3905b937e409b154c73bd82011bf452eb08",
+      "verdict": {
+        "kind": "pass",
+        "citation": "verify-cache schema の旧バージョン (origin meta フィールドなし) を parse error として reject する。read-only の cache consumer (`results` / `check-approved`) は非 0 エラーとして返し、`bin/sotp ref-verify run` は旧 entry を有効 cache として再利用せず、新 schema の cache を再生成する。`#[serde(deny_unknown_fields)]` は維持する"
+      }
+    }
+  ]
+}

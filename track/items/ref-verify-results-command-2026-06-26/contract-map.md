@@ -1,0 +1,494 @@
+<!-- Generated contract-map-renderer — DO NOT EDIT DIRECTLY -->
+```mermaid
+flowchart LR
+classDef aggregate_root fill:#ede9fe,stroke:#4c1d95,stroke-width:2px
+classDef app_service fill:#ecfdf5,stroke:#059669,stroke-width:2px
+classDef command fill:#fff7ed,stroke:#c2410c,stroke-width:1px
+classDef domain_service fill:#fee2e2,stroke:#991b1b,stroke-width:1px
+classDef dto fill:#f8fafc,stroke:#64748b,stroke-width:1px
+classDef entity fill:#dbeafe,stroke:#1e40af,stroke-width:2px
+classDef error_type fill:#fef2f2,stroke:#b91c1c,stroke-width:1px,stroke-dasharray:4 2
+classDef factory fill:#e0f2fe,stroke:#0369a1,stroke-width:1px
+classDef free_function fill:#f5f3ff,stroke:#7c3aed,stroke-width:1px
+classDef function_node fill:#f5f3ff,stroke:#a78bfa,stroke-width:1px
+classDef interactor fill:#f0fdfa,stroke:#0d9488,stroke-width:1px
+classDef method_node fill:#f8fafc,stroke:#cbd5e1,stroke-width:1px
+classDef query fill:#f0f9ff,stroke:#0369a1,stroke-width:1px
+classDef secondary_adapter fill:#fafaf9,stroke:#57534e,stroke-width:1px
+classDef secondary_port fill:#fafaf9,stroke:#78716c,stroke-width:1px,stroke-dasharray:4 2
+classDef specification fill:#fdf4ff,stroke:#6b21a8,stroke-width:1px
+classDef specification_port fill:#fdf4ff,stroke:#9333ea,stroke-width:1px,stroke-dasharray:4 2
+classDef typestate_overlay stroke:#dc2626,stroke-width:3px
+classDef use_case fill:#ecfeff,stroke:#0e7490,stroke-width:1px
+classDef use_case_function fill:#eef2ff,stroke:#4338ca,stroke-width:1px
+classDef value_object fill:#d1fae5,stroke:#065f46,stroke-width:1px
+classDef variant_node fill:#fafaf9,stroke:#d6d3d1,stroke-width:1px
+subgraph domain["domain"]
+  direction TB
+  subgraph domain_domain_module_plan_ref["domain::plan_ref"]
+    direction TB
+  subgraph T27_domain_domain_SpecElementId["plan_ref::spec_ref::SpecElementId"]
+    direction TB
+    T27_domain_domain_SpecElementId__self[SpecElementId]
+    T27_domain_domain_SpecElementId_try_new([try_new])
+  end
+  end
+  subgraph domain_domain_module_tddd["domain::tddd"]
+    direction TB
+  subgraph T28_domain_domain_AdrDecisionRef["tddd::semantic_verify::AdrDecisionRef"]
+    direction TB
+    T28_domain_domain_AdrDecisionRef__self[AdrDecisionRef]
+    T28_domain_domain_AdrDecisionRef_new([new])
+  end
+  subgraph T31_domain_domain_CatalogueEntryKey["tddd::semantic_verify::CatalogueEntryKey"]
+    direction TB
+    T31_domain_domain_CatalogueEntryKey__self[CatalogueEntryKey]
+    T31_domain_domain_CatalogueEntryKey_try_new([try_new])
+    T31_domain_domain_CatalogueEntryKey_as_str([as_str])
+  end
+  subgraph T31_domain_domain_CatalogueEntryRef["tddd::semantic_verify::CatalogueEntryRef"]
+    direction TB
+    T31_domain_domain_CatalogueEntryRef__self[CatalogueEntryRef]
+    T31_domain_domain_CatalogueEntryRef_new([new])
+  end
+  subgraph T33_domain_domain_CatalogueSectionKey["tddd::semantic_verify::CatalogueSectionKey"]
+    direction TB
+    T33_domain_domain_CatalogueSectionKey__self[CatalogueSectionKey]
+    T33_domain_domain_CatalogueSectionKey_Types[Types]
+    T33_domain_domain_CatalogueSectionKey_Traits[Traits]
+    T33_domain_domain_CatalogueSectionKey_Functions[Functions]
+  end
+  subgraph T33_domain_domain_SemanticVerifyEntry["tddd::semantic_verify::SemanticVerifyEntry"]
+    direction TB
+    T33_domain_domain_SemanticVerifyEntry__self[SemanticVerifyEntry]
+    T33_domain_domain_SemanticVerifyEntry_new([new])
+  end
+  subgraph T28_domain_domain_SpecElementRef["tddd::semantic_verify::SpecElementRef"]
+    direction TB
+    T28_domain_domain_SpecElementRef__self[SpecElementRef]
+    T28_domain_domain_SpecElementRef_new([new])
+  end
+  subgraph T29_domain_domain_SpecSectionKind["tddd::semantic_verify::SpecSectionKind"]
+    direction TB
+    T29_domain_domain_SpecSectionKind__self[SpecSectionKind]
+    T29_domain_domain_SpecSectionKind_Goal[Goal]
+    T29_domain_domain_SpecSectionKind_InScope[InScope]
+    T29_domain_domain_SpecSectionKind_OutOfScope[OutOfScope]
+    T29_domain_domain_SpecSectionKind_Constraint[Constraint]
+    T29_domain_domain_SpecSectionKind_AcceptanceCriteria[AcceptanceCriteria]
+  end
+  subgraph T29_domain_domain_VerifyOriginRef["tddd::semantic_verify::VerifyOriginRef"]
+    direction TB
+    T29_domain_domain_VerifyOriginRef__self[VerifyOriginRef]
+    T29_domain_domain_VerifyOriginRef_SpecElement[SpecElement]
+    T29_domain_domain_VerifyOriginRef_AdrDecision[AdrDecision]
+    T29_domain_domain_VerifyOriginRef_CatalogueEntry[CatalogueEntry]
+  end
+  end
+end
+subgraph usecase["usecase"]
+  direction TB
+  subgraph usecase_usecase_module_ref_verify["usecase::ref_verify"]
+    direction TB
+  subgraph T36_usecase_usecase_RefVerifyChainFilter["ref_verify::driver_service::RefVerifyChainFilter"]
+    direction TB
+    T36_usecase_usecase_RefVerifyChainFilter__self[RefVerifyChainFilter]
+    T36_usecase_usecase_RefVerifyChainFilter_Chain1[Chain1]
+    T36_usecase_usecase_RefVerifyChainFilter_Chain2[Chain2]
+    T36_usecase_usecase_RefVerifyChainFilter_All[All]
+  end
+  subgraph T36_usecase_usecase_RefVerifyLaneSummary["ref_verify::driver_service::RefVerifyLaneSummary"]
+    direction TB
+    T36_usecase_usecase_RefVerifyLaneSummary__self[RefVerifyLaneSummary]
+  end
+  subgraph T36_usecase_usecase_RefVerifyLayerFilter["ref_verify::driver_service::RefVerifyLayerFilter"]
+    direction TB
+    T36_usecase_usecase_RefVerifyLayerFilter__self[RefVerifyLayerFilter]
+    T36_usecase_usecase_RefVerifyLayerFilter_Specific[Specific]
+    T36_usecase_usecase_RefVerifyLayerFilter_All[All]
+  end
+  subgraph T29_usecase_usecase_RefVerifyPair["ref_verify::RefVerifyPair"]
+    direction TB
+    T29_usecase_usecase_RefVerifyPair__self[RefVerifyPair]
+  end
+  subgraph T35_usecase_usecase_RefVerifyPairRecord["ref_verify::driver_service::RefVerifyPairRecord"]
+    direction TB
+    T35_usecase_usecase_RefVerifyPairRecord__self[RefVerifyPairRecord]
+  end
+  subgraph T38_usecase_usecase_RefVerifyResultsOutput["ref_verify::driver_service::RefVerifyResultsOutput"]
+    direction TB
+    T38_usecase_usecase_RefVerifyResultsOutput__self[RefVerifyResultsOutput]
+  end
+  subgraph T38_usecase_usecase_RefVerifyVerdictFilter["ref_verify::driver_service::RefVerifyVerdictFilter"]
+    direction TB
+    T38_usecase_usecase_RefVerifyVerdictFilter__self[RefVerifyVerdictFilter]
+    T38_usecase_usecase_RefVerifyVerdictFilter_FailPending[FailPending]
+    T38_usecase_usecase_RefVerifyVerdictFilter_Pass[Pass]
+    T38_usecase_usecase_RefVerifyVerdictFilter_Fail[Fail]
+    T38_usecase_usecase_RefVerifyVerdictFilter_Pending[Pending]
+    T38_usecase_usecase_RefVerifyVerdictFilter_All[All]
+  end
+  subgraph R41_usecase_usecase_RefVerifyAggregateService["ref_verify::driver_service::RefVerifyAggregateService"]
+    direction TB
+    R41_usecase_usecase_RefVerifyAggregateService__self[RefVerifyAggregateService]
+    R41_usecase_usecase_RefVerifyAggregateService_run([run])
+    R41_usecase_usecase_RefVerifyAggregateService_check_approved([check_approved])
+    R41_usecase_usecase_RefVerifyAggregateService_results([results])
+  end
+  end
+end
+subgraph infrastructure["infrastructure"]
+  direction TB
+  subgraph infrastructure_infrastructure_module_ref_verify["infrastructure::ref_verify"]
+    direction TB
+  subgraph T57_infrastructure_infrastructure_FsRefVerifyAggregateAdapter["ref_verify::driver_adapter::FsRefVerifyAggregateAdapter"]
+    direction TB
+    T57_infrastructure_infrastructure_FsRefVerifyAggregateAdapter__self[FsRefVerifyAggregateAdapter]
+    T57_infrastructure_infrastructure_FsRefVerifyAggregateAdapter_new([new])
+  end
+  end
+  subgraph infrastructure_infrastructure_module_tddd["infrastructure::tddd"]
+    direction TB
+  subgraph T47_infrastructure_infrastructure_AdrDecisionRefDto["tddd::semantic_verify_codec::AdrDecisionRefDto"]
+    direction TB
+    T47_infrastructure_infrastructure_AdrDecisionRefDto__self[AdrDecisionRefDto]
+  end
+  subgraph T50_infrastructure_infrastructure_CatalogueEntryRefDto["tddd::semantic_verify_codec::CatalogueEntryRefDto"]
+    direction TB
+    T50_infrastructure_infrastructure_CatalogueEntryRefDto__self[CatalogueEntryRefDto]
+  end
+  subgraph T52_infrastructure_infrastructure_CatalogueSectionKeyDto["tddd::semantic_verify_codec::CatalogueSectionKeyDto"]
+    direction TB
+    T52_infrastructure_infrastructure_CatalogueSectionKeyDto__self[CatalogueSectionKeyDto]
+    T52_infrastructure_infrastructure_CatalogueSectionKeyDto_Types[Types]
+    T52_infrastructure_infrastructure_CatalogueSectionKeyDto_Traits[Traits]
+    T52_infrastructure_infrastructure_CatalogueSectionKeyDto_Functions[Functions]
+  end
+  subgraph T48_infrastructure_infrastructure_SemanticVerdictDto["tddd::semantic_verify_codec::SemanticVerdictDto"]
+    direction TB
+    T48_infrastructure_infrastructure_SemanticVerdictDto__self[SemanticVerdictDto]
+    T48_infrastructure_infrastructure_SemanticVerdictDto_Pass[Pass]
+    T48_infrastructure_infrastructure_SemanticVerdictDto_Fail[Fail]
+    T48_infrastructure_infrastructure_SemanticVerdictDto_Pending[Pending]
+  end
+  subgraph T52_infrastructure_infrastructure_SemanticVerifyEntryDto["tddd::semantic_verify_codec::SemanticVerifyEntryDto"]
+    direction TB
+    T52_infrastructure_infrastructure_SemanticVerifyEntryDto__self[SemanticVerifyEntryDto]
+  end
+  subgraph T47_infrastructure_infrastructure_SpecElementRefDto["tddd::semantic_verify_codec::SpecElementRefDto"]
+    direction TB
+    T47_infrastructure_infrastructure_SpecElementRefDto__self[SpecElementRefDto]
+  end
+  subgraph T48_infrastructure_infrastructure_SpecSectionKindDto["tddd::semantic_verify_codec::SpecSectionKindDto"]
+    direction TB
+    T48_infrastructure_infrastructure_SpecSectionKindDto__self[SpecSectionKindDto]
+    T48_infrastructure_infrastructure_SpecSectionKindDto_Goal[Goal]
+    T48_infrastructure_infrastructure_SpecSectionKindDto_InScope[InScope]
+    T48_infrastructure_infrastructure_SpecSectionKindDto_OutOfScope[OutOfScope]
+    T48_infrastructure_infrastructure_SpecSectionKindDto_Constraint[Constraint]
+    T48_infrastructure_infrastructure_SpecSectionKindDto_AcceptanceCriteria[AcceptanceCriteria]
+  end
+  subgraph T48_infrastructure_infrastructure_VerifyOriginRefDto["tddd::semantic_verify_codec::VerifyOriginRefDto"]
+    direction TB
+    T48_infrastructure_infrastructure_VerifyOriginRefDto__self[VerifyOriginRefDto]
+    T48_infrastructure_infrastructure_VerifyOriginRefDto_SpecElement[SpecElement]
+    T48_infrastructure_infrastructure_VerifyOriginRefDto_AdrDecision[AdrDecision]
+    T48_infrastructure_infrastructure_VerifyOriginRefDto_CatalogueEntry[CatalogueEntry]
+  end
+  end
+end
+subgraph cli_driver["cli_driver"]
+  direction TB
+  subgraph cli_driver_cli_driver_module_ref_verify["cli_driver::ref_verify"]
+    direction TB
+  subgraph T42_cli_driver_cli_driver_RefVerifyChainSelect["ref_verify::RefVerifyChainSelect"]
+    direction TB
+    T42_cli_driver_cli_driver_RefVerifyChainSelect__self[RefVerifyChainSelect]
+    T42_cli_driver_cli_driver_RefVerifyChainSelect_Chain1[Chain1]
+    T42_cli_driver_cli_driver_RefVerifyChainSelect_Chain2[Chain2]
+    T42_cli_driver_cli_driver_RefVerifyChainSelect_All[All]
+  end
+  subgraph T49_cli_driver_cli_driver_RefVerifyCheckApprovedInput["ref_verify::RefVerifyCheckApprovedInput"]
+    direction TB
+    T49_cli_driver_cli_driver_RefVerifyCheckApprovedInput__self[RefVerifyCheckApprovedInput]
+  end
+  subgraph T37_cli_driver_cli_driver_RefVerifyDriver["ref_verify::RefVerifyDriver"]
+    direction TB
+    T37_cli_driver_cli_driver_RefVerifyDriver__self[RefVerifyDriver]
+    T37_cli_driver_cli_driver_RefVerifyDriver_new([new])
+    T37_cli_driver_cli_driver_RefVerifyDriver_handle([handle])
+  end
+  subgraph T36_cli_driver_cli_driver_RefVerifyInput["ref_verify::RefVerifyInput"]
+    direction TB
+    T36_cli_driver_cli_driver_RefVerifyInput__self[RefVerifyInput]
+    T36_cli_driver_cli_driver_RefVerifyInput_Run[Run]
+    T36_cli_driver_cli_driver_RefVerifyInput_CheckApproved[CheckApproved]
+    T36_cli_driver_cli_driver_RefVerifyInput_Results[Results]
+  end
+  subgraph T43_cli_driver_cli_driver_RefVerifyResultsInput["ref_verify::RefVerifyResultsInput"]
+    direction TB
+    T43_cli_driver_cli_driver_RefVerifyResultsInput__self[RefVerifyResultsInput]
+  end
+  subgraph T39_cli_driver_cli_driver_RefVerifyRunInput["ref_verify::RefVerifyRunInput"]
+    direction TB
+    T39_cli_driver_cli_driver_RefVerifyRunInput__self[RefVerifyRunInput]
+  end
+  subgraph T44_cli_driver_cli_driver_RefVerifyVerdictSelect["ref_verify::RefVerifyVerdictSelect"]
+    direction TB
+    T44_cli_driver_cli_driver_RefVerifyVerdictSelect__self[RefVerifyVerdictSelect]
+    T44_cli_driver_cli_driver_RefVerifyVerdictSelect_FailPending[FailPending]
+    T44_cli_driver_cli_driver_RefVerifyVerdictSelect_Pass[Pass]
+    T44_cli_driver_cli_driver_RefVerifyVerdictSelect_Fail[Fail]
+    T44_cli_driver_cli_driver_RefVerifyVerdictSelect_Pending[Pending]
+    T44_cli_driver_cli_driver_RefVerifyVerdictSelect_All[All]
+  end
+  end
+end
+subgraph cli_composition["cli_composition"]
+  direction TB
+  subgraph cli_composition_cli_composition_module_ref_verify["cli_composition::ref_verify"]
+    direction TB
+  subgraph T59_cli_composition_cli_composition_RefVerifyCheckApprovedInput["ref_verify::RefVerifyCheckApprovedInput"]
+    direction TB
+    T59_cli_composition_cli_composition_RefVerifyCheckApprovedInput__self[RefVerifyCheckApprovedInput]
+  end
+  subgraph T56_cli_composition_cli_composition_RefVerifyCompositionRoot["ref_verify::RefVerifyCompositionRoot"]
+    direction TB
+    T56_cli_composition_cli_composition_RefVerifyCompositionRoot__self[RefVerifyCompositionRoot]
+    T56_cli_composition_cli_composition_RefVerifyCompositionRoot_new([new])
+    T56_cli_composition_cli_composition_RefVerifyCompositionRoot_ref_verify_driver([ref_verify_driver])
+    T56_cli_composition_cli_composition_RefVerifyCompositionRoot_ref_verify_run([ref_verify_run])
+    T56_cli_composition_cli_composition_RefVerifyCompositionRoot_ref_verify_check_approved([ref_verify_check_approved])
+    T56_cli_composition_cli_composition_RefVerifyCompositionRoot_ref_verify_results([ref_verify_results])
+  end
+  subgraph T53_cli_composition_cli_composition_RefVerifyResultsInput["ref_verify::RefVerifyResultsInput"]
+    direction TB
+    T53_cli_composition_cli_composition_RefVerifyResultsInput__self[RefVerifyResultsInput]
+  end
+  subgraph T49_cli_composition_cli_composition_RefVerifyRunInput["ref_verify::RefVerifyRunInput"]
+    direction TB
+    T49_cli_composition_cli_composition_RefVerifyRunInput__self[RefVerifyRunInput]
+  end
+  end
+end
+subgraph cli["cli"]
+  direction TB
+  subgraph cli_cli_module_commands["cli::commands"]
+    direction TB
+  subgraph T25_cli_cli_CheckApprovedArgs["commands::ref_verify::CheckApprovedArgs"]
+    direction TB
+    T25_cli_cli_CheckApprovedArgs__self[CheckApprovedArgs]
+  end
+  subgraph T25_cli_cli_RefVerifyChainArg["commands::ref_verify::RefVerifyChainArg"]
+    direction TB
+    T25_cli_cli_RefVerifyChainArg__self[RefVerifyChainArg]
+    T25_cli_cli_RefVerifyChainArg_Chain1[Chain1]
+    T25_cli_cli_RefVerifyChainArg_Chain2[Chain2]
+    T25_cli_cli_RefVerifyChainArg_All[All]
+  end
+  subgraph T24_cli_cli_RefVerifyCommand["commands::ref_verify::RefVerifyCommand"]
+    direction TB
+    T24_cli_cli_RefVerifyCommand__self[RefVerifyCommand]
+    T24_cli_cli_RefVerifyCommand_Run[Run]
+    T24_cli_cli_RefVerifyCommand_CheckApproved[CheckApproved]
+    T24_cli_cli_RefVerifyCommand_Results[Results]
+  end
+  subgraph T28_cli_cli_RefVerifyResultsArgs["commands::ref_verify::RefVerifyResultsArgs"]
+    direction TB
+    T28_cli_cli_RefVerifyResultsArgs__self[RefVerifyResultsArgs]
+  end
+  subgraph T33_cli_cli_RefVerifyVerdictFilterArg["commands::ref_verify::RefVerifyVerdictFilterArg"]
+    direction TB
+    T33_cli_cli_RefVerifyVerdictFilterArg__self[RefVerifyVerdictFilterArg]
+    T33_cli_cli_RefVerifyVerdictFilterArg_Pass[Pass]
+    T33_cli_cli_RefVerifyVerdictFilterArg_Fail[Fail]
+    T33_cli_cli_RefVerifyVerdictFilterArg_Pending[Pending]
+    T33_cli_cli_RefVerifyVerdictFilterArg_All[All]
+  end
+  subgraph T15_cli_cli_RunArgs["commands::ref_verify::RunArgs"]
+    direction TB
+    T15_cli_cli_RunArgs__self[RunArgs]
+  end
+  F42_cli_cli_cli__commands__ref_verify__execute[[execute]]
+  end
+end
+T27_domain_domain_SpecElementId_try_new --> T27_domain_domain_SpecElementId__self
+T28_domain_domain_AdrDecisionRef_new --> T28_domain_domain_AdrDecisionRef__self
+T31_domain_domain_CatalogueEntryKey_try_new --> T31_domain_domain_CatalogueEntryKey__self
+T31_domain_domain_CatalogueEntryRef_new --o T33_domain_domain_CatalogueSectionKey__self
+T31_domain_domain_CatalogueEntryRef_new --o T31_domain_domain_CatalogueEntryKey__self
+T31_domain_domain_CatalogueEntryRef_new --> T31_domain_domain_CatalogueEntryRef__self
+T31_domain_domain_CatalogueEntryRef__self --o|section_key| T33_domain_domain_CatalogueSectionKey__self
+T31_domain_domain_CatalogueEntryRef__self --o|entry_key| T31_domain_domain_CatalogueEntryKey__self
+T33_domain_domain_SemanticVerifyEntry_new --o T29_domain_domain_VerifyOriginRef__self
+T33_domain_domain_SemanticVerifyEntry_new --o T29_domain_domain_VerifyOriginRef__self
+T33_domain_domain_SemanticVerifyEntry_new --> T33_domain_domain_SemanticVerifyEntry__self
+T33_domain_domain_SemanticVerifyEntry__self --o|claim_origin| T29_domain_domain_VerifyOriginRef__self
+T33_domain_domain_SemanticVerifyEntry__self --o|evidence_origin| T29_domain_domain_VerifyOriginRef__self
+T28_domain_domain_SpecElementRef_new --o T29_domain_domain_SpecSectionKind__self
+T28_domain_domain_SpecElementRef_new --o T27_domain_domain_SpecElementId__self
+T28_domain_domain_SpecElementRef_new --> T28_domain_domain_SpecElementRef__self
+T28_domain_domain_SpecElementRef__self --o|section| T29_domain_domain_SpecSectionKind__self
+T28_domain_domain_SpecElementRef__self --o|element_id| T27_domain_domain_SpecElementId__self
+T29_domain_domain_VerifyOriginRef_SpecElement --o T28_domain_domain_SpecElementRef__self
+T29_domain_domain_VerifyOriginRef_AdrDecision --o T28_domain_domain_AdrDecisionRef__self
+T29_domain_domain_VerifyOriginRef_CatalogueEntry --o T31_domain_domain_CatalogueEntryRef__self
+T29_usecase_usecase_RefVerifyPair__self --o|claim_origin| T29_domain_domain_VerifyOriginRef__self
+T29_usecase_usecase_RefVerifyPair__self --o|evidence_origin| T29_domain_domain_VerifyOriginRef__self
+T35_usecase_usecase_RefVerifyPairRecord__self --o|claim_origin| T29_domain_domain_VerifyOriginRef__self
+T35_usecase_usecase_RefVerifyPairRecord__self --o|evidence_origin| T29_domain_domain_VerifyOriginRef__self
+T38_usecase_usecase_RefVerifyResultsOutput__self --o|lane_summaries| T36_usecase_usecase_RefVerifyLaneSummary__self
+T38_usecase_usecase_RefVerifyResultsOutput__self --o|pair_records| T35_usecase_usecase_RefVerifyPairRecord__self
+R41_usecase_usecase_RefVerifyAggregateService_results --o T36_usecase_usecase_RefVerifyChainFilter__self
+R41_usecase_usecase_RefVerifyAggregateService_results --o T36_usecase_usecase_RefVerifyLayerFilter__self
+R41_usecase_usecase_RefVerifyAggregateService_results --o T38_usecase_usecase_RefVerifyVerdictFilter__self
+R41_usecase_usecase_RefVerifyAggregateService_results --> T38_usecase_usecase_RefVerifyResultsOutput__self
+T57_infrastructure_infrastructure_FsRefVerifyAggregateAdapter_new --> T57_infrastructure_infrastructure_FsRefVerifyAggregateAdapter__self
+T50_infrastructure_infrastructure_CatalogueEntryRefDto__self --o|section_key| T52_infrastructure_infrastructure_CatalogueSectionKeyDto__self
+T52_infrastructure_infrastructure_SemanticVerifyEntryDto__self --o|verdict| T48_infrastructure_infrastructure_SemanticVerdictDto__self
+T52_infrastructure_infrastructure_SemanticVerifyEntryDto__self --o|claim_origin| T48_infrastructure_infrastructure_VerifyOriginRefDto__self
+T52_infrastructure_infrastructure_SemanticVerifyEntryDto__self --o|evidence_origin| T48_infrastructure_infrastructure_VerifyOriginRefDto__self
+T47_infrastructure_infrastructure_SpecElementRefDto__self --o|section| T48_infrastructure_infrastructure_SpecSectionKindDto__self
+T48_infrastructure_infrastructure_VerifyOriginRefDto_SpecElement --o T47_infrastructure_infrastructure_SpecElementRefDto__self
+T48_infrastructure_infrastructure_VerifyOriginRefDto_AdrDecision --o T47_infrastructure_infrastructure_AdrDecisionRefDto__self
+T48_infrastructure_infrastructure_VerifyOriginRefDto_CatalogueEntry --o T50_infrastructure_infrastructure_CatalogueEntryRefDto__self
+T57_infrastructure_infrastructure_FsRefVerifyAggregateAdapter__self -.impl.-> R41_usecase_usecase_RefVerifyAggregateService__self
+T37_cli_driver_cli_driver_RefVerifyDriver_new --> T37_cli_driver_cli_driver_RefVerifyDriver__self
+T37_cli_driver_cli_driver_RefVerifyDriver_handle --o T36_cli_driver_cli_driver_RefVerifyInput__self
+T36_cli_driver_cli_driver_RefVerifyInput_Run --o T39_cli_driver_cli_driver_RefVerifyRunInput__self
+T36_cli_driver_cli_driver_RefVerifyInput_CheckApproved --o T49_cli_driver_cli_driver_RefVerifyCheckApprovedInput__self
+T36_cli_driver_cli_driver_RefVerifyInput_Results --o T43_cli_driver_cli_driver_RefVerifyResultsInput__self
+T43_cli_driver_cli_driver_RefVerifyResultsInput__self --o|chain| T42_cli_driver_cli_driver_RefVerifyChainSelect__self
+T43_cli_driver_cli_driver_RefVerifyResultsInput__self --o|verdict| T44_cli_driver_cli_driver_RefVerifyVerdictSelect__self
+T56_cli_composition_cli_composition_RefVerifyCompositionRoot_new --> T56_cli_composition_cli_composition_RefVerifyCompositionRoot__self
+T56_cli_composition_cli_composition_RefVerifyCompositionRoot_ref_verify_driver --> T37_cli_driver_cli_driver_RefVerifyDriver__self
+T56_cli_composition_cli_composition_RefVerifyCompositionRoot_ref_verify_run --o T49_cli_composition_cli_composition_RefVerifyRunInput__self
+T56_cli_composition_cli_composition_RefVerifyCompositionRoot_ref_verify_check_approved --o T59_cli_composition_cli_composition_RefVerifyCheckApprovedInput__self
+T56_cli_composition_cli_composition_RefVerifyCompositionRoot_ref_verify_results --o T53_cli_composition_cli_composition_RefVerifyResultsInput__self
+T53_cli_composition_cli_composition_RefVerifyResultsInput__self --o|chain| T36_usecase_usecase_RefVerifyChainFilter__self
+T53_cli_composition_cli_composition_RefVerifyResultsInput__self --o|layer| T36_usecase_usecase_RefVerifyLayerFilter__self
+T53_cli_composition_cli_composition_RefVerifyResultsInput__self --o|verdict| T38_usecase_usecase_RefVerifyVerdictFilter__self
+T24_cli_cli_RefVerifyCommand_Run --o T15_cli_cli_RunArgs__self
+T24_cli_cli_RefVerifyCommand_CheckApproved --o T25_cli_cli_CheckApprovedArgs__self
+T24_cli_cli_RefVerifyCommand_Results --o T28_cli_cli_RefVerifyResultsArgs__self
+T28_cli_cli_RefVerifyResultsArgs__self --o|chain| T25_cli_cli_RefVerifyChainArg__self
+T28_cli_cli_RefVerifyResultsArgs__self --o|filter| T33_cli_cli_RefVerifyVerdictFilterArg__self
+F42_cli_cli_cli__commands__ref_verify__execute --o T24_cli_cli_RefVerifyCommand__self
+class T27_domain_domain_SpecElementId_try_new method_node
+class T27_domain_domain_SpecElementId__self value_object
+class T28_domain_domain_AdrDecisionRef_new method_node
+class T28_domain_domain_AdrDecisionRef__self value_object
+class T31_domain_domain_CatalogueEntryKey_try_new method_node
+class T31_domain_domain_CatalogueEntryKey_as_str method_node
+class T31_domain_domain_CatalogueEntryKey__self value_object
+class T31_domain_domain_CatalogueEntryRef_new method_node
+class T31_domain_domain_CatalogueEntryRef__self value_object
+class T33_domain_domain_CatalogueSectionKey_Types variant_node
+class T33_domain_domain_CatalogueSectionKey_Traits variant_node
+class T33_domain_domain_CatalogueSectionKey_Functions variant_node
+class T33_domain_domain_CatalogueSectionKey__self value_object
+class T33_domain_domain_SemanticVerifyEntry_new method_node
+class T33_domain_domain_SemanticVerifyEntry__self value_object
+class T28_domain_domain_SpecElementRef_new method_node
+class T28_domain_domain_SpecElementRef__self value_object
+class T29_domain_domain_SpecSectionKind_Goal variant_node
+class T29_domain_domain_SpecSectionKind_InScope variant_node
+class T29_domain_domain_SpecSectionKind_OutOfScope variant_node
+class T29_domain_domain_SpecSectionKind_Constraint variant_node
+class T29_domain_domain_SpecSectionKind_AcceptanceCriteria variant_node
+class T29_domain_domain_SpecSectionKind__self value_object
+class T29_domain_domain_VerifyOriginRef_SpecElement variant_node
+class T29_domain_domain_VerifyOriginRef_AdrDecision variant_node
+class T29_domain_domain_VerifyOriginRef_CatalogueEntry variant_node
+class T29_domain_domain_VerifyOriginRef__self value_object
+class T36_usecase_usecase_RefVerifyChainFilter_Chain1 variant_node
+class T36_usecase_usecase_RefVerifyChainFilter_Chain2 variant_node
+class T36_usecase_usecase_RefVerifyChainFilter_All variant_node
+class T36_usecase_usecase_RefVerifyChainFilter__self value_object
+class T36_usecase_usecase_RefVerifyLaneSummary__self dto
+class T36_usecase_usecase_RefVerifyLayerFilter_Specific variant_node
+class T36_usecase_usecase_RefVerifyLayerFilter_All variant_node
+class T36_usecase_usecase_RefVerifyLayerFilter__self value_object
+class T29_usecase_usecase_RefVerifyPair__self value_object
+class T35_usecase_usecase_RefVerifyPairRecord__self dto
+class T38_usecase_usecase_RefVerifyResultsOutput__self dto
+class T38_usecase_usecase_RefVerifyVerdictFilter_FailPending variant_node
+class T38_usecase_usecase_RefVerifyVerdictFilter_Pass variant_node
+class T38_usecase_usecase_RefVerifyVerdictFilter_Fail variant_node
+class T38_usecase_usecase_RefVerifyVerdictFilter_Pending variant_node
+class T38_usecase_usecase_RefVerifyVerdictFilter_All variant_node
+class T38_usecase_usecase_RefVerifyVerdictFilter__self value_object
+class R41_usecase_usecase_RefVerifyAggregateService_run method_node
+class R41_usecase_usecase_RefVerifyAggregateService_check_approved method_node
+class R41_usecase_usecase_RefVerifyAggregateService_results method_node
+class R41_usecase_usecase_RefVerifyAggregateService__self app_service
+class T57_infrastructure_infrastructure_FsRefVerifyAggregateAdapter_new method_node
+class T57_infrastructure_infrastructure_FsRefVerifyAggregateAdapter__self secondary_adapter
+class T47_infrastructure_infrastructure_AdrDecisionRefDto__self dto
+class T50_infrastructure_infrastructure_CatalogueEntryRefDto__self dto
+class T52_infrastructure_infrastructure_CatalogueSectionKeyDto_Types variant_node
+class T52_infrastructure_infrastructure_CatalogueSectionKeyDto_Traits variant_node
+class T52_infrastructure_infrastructure_CatalogueSectionKeyDto_Functions variant_node
+class T52_infrastructure_infrastructure_CatalogueSectionKeyDto__self dto
+class T48_infrastructure_infrastructure_SemanticVerdictDto_Pass variant_node
+class T48_infrastructure_infrastructure_SemanticVerdictDto_Fail variant_node
+class T48_infrastructure_infrastructure_SemanticVerdictDto_Pending variant_node
+class T48_infrastructure_infrastructure_SemanticVerdictDto__self dto
+class T52_infrastructure_infrastructure_SemanticVerifyEntryDto__self dto
+class T47_infrastructure_infrastructure_SpecElementRefDto__self dto
+class T48_infrastructure_infrastructure_SpecSectionKindDto_Goal variant_node
+class T48_infrastructure_infrastructure_SpecSectionKindDto_InScope variant_node
+class T48_infrastructure_infrastructure_SpecSectionKindDto_OutOfScope variant_node
+class T48_infrastructure_infrastructure_SpecSectionKindDto_Constraint variant_node
+class T48_infrastructure_infrastructure_SpecSectionKindDto_AcceptanceCriteria variant_node
+class T48_infrastructure_infrastructure_SpecSectionKindDto__self dto
+class T48_infrastructure_infrastructure_VerifyOriginRefDto_SpecElement variant_node
+class T48_infrastructure_infrastructure_VerifyOriginRefDto_AdrDecision variant_node
+class T48_infrastructure_infrastructure_VerifyOriginRefDto_CatalogueEntry variant_node
+class T48_infrastructure_infrastructure_VerifyOriginRefDto__self dto
+class T42_cli_driver_cli_driver_RefVerifyChainSelect_Chain1 variant_node
+class T42_cli_driver_cli_driver_RefVerifyChainSelect_Chain2 variant_node
+class T42_cli_driver_cli_driver_RefVerifyChainSelect_All variant_node
+class T42_cli_driver_cli_driver_RefVerifyChainSelect__self value_object
+class T49_cli_driver_cli_driver_RefVerifyCheckApprovedInput__self dto
+class T37_cli_driver_cli_driver_RefVerifyDriver_new method_node
+class T37_cli_driver_cli_driver_RefVerifyDriver_handle method_node
+class T36_cli_driver_cli_driver_RefVerifyInput_Run variant_node
+class T36_cli_driver_cli_driver_RefVerifyInput_CheckApproved variant_node
+class T36_cli_driver_cli_driver_RefVerifyInput_Results variant_node
+class T36_cli_driver_cli_driver_RefVerifyInput__self dto
+class T43_cli_driver_cli_driver_RefVerifyResultsInput__self dto
+class T39_cli_driver_cli_driver_RefVerifyRunInput__self dto
+class T44_cli_driver_cli_driver_RefVerifyVerdictSelect_FailPending variant_node
+class T44_cli_driver_cli_driver_RefVerifyVerdictSelect_Pass variant_node
+class T44_cli_driver_cli_driver_RefVerifyVerdictSelect_Fail variant_node
+class T44_cli_driver_cli_driver_RefVerifyVerdictSelect_Pending variant_node
+class T44_cli_driver_cli_driver_RefVerifyVerdictSelect_All variant_node
+class T44_cli_driver_cli_driver_RefVerifyVerdictSelect__self value_object
+class T59_cli_composition_cli_composition_RefVerifyCheckApprovedInput__self dto
+class T56_cli_composition_cli_composition_RefVerifyCompositionRoot_new method_node
+class T56_cli_composition_cli_composition_RefVerifyCompositionRoot_ref_verify_driver method_node
+class T56_cli_composition_cli_composition_RefVerifyCompositionRoot_ref_verify_run method_node
+class T56_cli_composition_cli_composition_RefVerifyCompositionRoot_ref_verify_check_approved method_node
+class T56_cli_composition_cli_composition_RefVerifyCompositionRoot_ref_verify_results method_node
+class T53_cli_composition_cli_composition_RefVerifyResultsInput__self dto
+class T49_cli_composition_cli_composition_RefVerifyRunInput__self dto
+class T25_cli_cli_CheckApprovedArgs__self dto
+class T25_cli_cli_RefVerifyChainArg_Chain1 variant_node
+class T25_cli_cli_RefVerifyChainArg_Chain2 variant_node
+class T25_cli_cli_RefVerifyChainArg_All variant_node
+class T25_cli_cli_RefVerifyChainArg__self dto
+class T24_cli_cli_RefVerifyCommand_Run variant_node
+class T24_cli_cli_RefVerifyCommand_CheckApproved variant_node
+class T24_cli_cli_RefVerifyCommand_Results variant_node
+class T24_cli_cli_RefVerifyCommand__self dto
+class T28_cli_cli_RefVerifyResultsArgs__self dto
+class T33_cli_cli_RefVerifyVerdictFilterArg_Pass variant_node
+class T33_cli_cli_RefVerifyVerdictFilterArg_Fail variant_node
+class T33_cli_cli_RefVerifyVerdictFilterArg_Pending variant_node
+class T33_cli_cli_RefVerifyVerdictFilterArg_All variant_node
+class T33_cli_cli_RefVerifyVerdictFilterArg__self dto
+class T15_cli_cli_RunArgs__self dto
+class F42_cli_cli_cli__commands__ref_verify__execute free_function
+class F42_cli_cli_cli__commands__ref_verify__execute function_node
+```

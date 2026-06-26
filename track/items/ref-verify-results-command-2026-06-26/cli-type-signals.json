@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-06-26T04:36:20Z",
+  "declaration_hash": "a88f840b76473839c565e0b25e01ffae9fc12b2e59768b66042df1caedcb9f8b",
+  "signals": [
+    {
+      "type_name": "RefVerifyChainArg",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "RefVerifyCommand",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "RefVerifyResultsArgs",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "RefVerifyVerdictFilterArg",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "cli::commands::ref_verify::execute",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CheckApprovedArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "RunArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

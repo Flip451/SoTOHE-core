@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "ee549738b86dc40269c271dcd0a7be6f9078026efd444245e20bc72ab8948da9",
+  "signals": [
+    {
+      "type_name": "RefVerifyChainFilter",
+      "signal": "blue",
+      "entry_hash": "7893699b6e00fb913915acfc7e4c9756b1b89aace6ea4f0dcf741a9101577113"
+    },
+    {
+      "type_name": "RefVerifyLaneSummary",
+      "signal": "blue",
+      "entry_hash": "85bf2d223fed917af4786e658e1a3bd2103540dc680c07d8f6ace395be9a1df6"
+    },
+    {
+      "type_name": "RefVerifyLayerFilter",
+      "signal": "blue",
+      "entry_hash": "482e3bdf7b36da8a4ef301b47e03fcc2226f643e516f11f6fa27d6d668445bfe"
+    },
+    {
+      "type_name": "RefVerifyPair",
+      "signal": "blue",
+      "entry_hash": "1f2c11feef071455721f3599f33a2ceaa9159dbd8d4fa488e3eb1630c410227f"
+    },
+    {
+      "type_name": "RefVerifyPairRecord",
+      "signal": "blue",
+      "entry_hash": "3130a177e4753a124c1bfda862f636219c854efeb7447bbcf2583725eaebdcc3"
+    },
+    {
+      "type_name": "RefVerifyResultsOutput",
+      "signal": "blue",
+      "entry_hash": "ede2fd4a5577a295c9485ab1519f4527f75e79cc064e2da947aaa87a9be6ddf2"
+    },
+    {
+      "type_name": "RefVerifyVerdictFilter",
+      "signal": "blue",
+      "entry_hash": "4c42d6752be0bae4a775d0dbfb9d57033211cccacd4ac84a66ff919bd9eefd50"
+    },
+    {
+      "type_name": "RefVerifyAggregateService",
+      "signal": "blue",
+      "entry_hash": "5db2d0914edb6454bce16ce2cbed5585bad433144f5c4bb72efad6c04cccc060"
+    }
+  ]
+}

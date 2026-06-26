@@ -1,0 +1,271 @@
+{
+  "schema_version": 5,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {
+    "RefVerifyPair": {
+      "action": "modify",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "claim",           "ty": "String" },
+            { "name": "evidence",        "ty": "String" },
+            { "name": "claim_hash",      "ty": "domain::plan_ref::ContentHash" },
+            { "name": "evidence_hash",   "ty": "domain::plan_ref::ContentHash" },
+            { "name": "cache_scope",     "ty": "RefVerifyCacheScope" },
+            { "name": "known_bad",       "ty": "bool" },
+            { "name": "claim_origin",    "ty": "domain::tddd::semantic_verify::VerifyOriginRef" },
+            { "name": "evidence_origin", "ty": "domain::tddd::semantic_verify::VerifyOriginRef" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "ref_verify",
+      "docs": "Usecase-owned representation of one semantic reference pair. Extended by D3 to carry `claim_origin` and `evidence_origin` so newly verified pairs can persist origin metadata to SemanticVerifyEntry and results can re-derive pending-pair origins from the current pair source without invoking the verifier.",
+      "spec_refs": [
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "IN-05" },
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "IN-07" },
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "AC-11" }
+      ],
+      "informal_grounds": []
+    },
+    "RefVerifyChainFilter": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Chain1", "payload": { "kind": "unit" } },
+          { "name": "Chain2", "payload": { "kind": "unit" } },
+          { "name": "All",    "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "ref_verify::driver_service",
+      "docs": "Selects which SoT Chain to include in the `ref-verify results` output (maps to `--chain {1|2|all}`). Unlike RefVerifyScope, this filter separates chain selection from layer selection: Chain2 without an embedded layer means 'all Chain-2 lanes'. The valid states are enforced by the closed variant set.",
+      "spec_refs": [
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "IN-01" }
+      ],
+      "informal_grounds": []
+    },
+    "RefVerifyLayerFilter": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Specific",
+            "payload": { "kind": "tuple", "fields": ["domain::tddd::LayerId"] }
+          },
+          { "name": "All", "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "ref_verify::driver_service",
+      "docs": "Selects which architecture layer to include in Chain-2 results (maps to `--layer <name>|all`). `Specific(LayerId)` narrows Chain-2 output to a single layer; `All` includes all layers. This filter has no effect when RefVerifyChainFilter is Chain1.",
+      "spec_refs": [
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "IN-01" }
+      ],
+      "informal_grounds": []
+    },
+    "RefVerifyVerdictFilter": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "FailPending", "payload": { "kind": "unit" } },
+          { "name": "Pass",        "payload": { "kind": "unit" } },
+          { "name": "Fail",        "payload": { "kind": "unit" } },
+          { "name": "Pending",     "payload": { "kind": "unit" } },
+          { "name": "All",         "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "ref_verify::driver_service",
+      "docs": "Controls which verdict classes appear in the record block of `ref-verify results` output. `FailPending` is the ADR-defined default when CLI `--filter` is omitted; explicit CLI values map to Pass/Fail/Pending/All for `--filter {pass|fail|pending|all}`. The lane-summary header block is always shown for all verdicts regardless of this filter.",
+      "spec_refs": [
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "IN-01" },
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "AC-09" }
+      ],
+      "informal_grounds": []
+    },
+    "RefVerifyLaneSummary": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "label",         "ty": "String" },
+            { "name": "pass_count",    "ty": "usize" },
+            { "name": "fail_count",    "ty": "usize" },
+            { "name": "pending_count", "ty": "usize" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "ref_verify::driver_service",
+      "docs": "Output DTO carrying the pass/fail/pending counts for a single Chain×Layer lane. `label` is a human-readable display string (e.g. `Chain1 (spec↔ADR)`, `Chain2:domain`); free text with no constraint. Transferred from the infrastructure adapter to the cli_driver for header-block formatting. No serde derives.",
+      "spec_refs": [
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "IN-02" }
+      ],
+      "informal_grounds": []
+    },
+    "RefVerifyPairRecord": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "chain_scope",    "ty": "RefVerifyCacheScope" },
+            { "name": "chain_layer",    "ty": "String" },
+            { "name": "claim_hash",     "ty": "domain::plan_ref::ContentHash" },
+            { "name": "evidence_hash",  "ty": "domain::plan_ref::ContentHash" },
+            { "name": "verdict",        "ty": "domain::tddd::semantic_verify::SemanticVerdict" },
+            { "name": "reason",         "ty": "String" },
+            { "name": "claim_origin",   "ty": "domain::tddd::semantic_verify::VerifyOriginRef" },
+            { "name": "evidence_origin","ty": "domain::tddd::semantic_verify::VerifyOriginRef" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "ref_verify::driver_service",
+      "docs": "Output DTO for a single (claim, evidence) pair in the results record block. `chain_layer` is the display label for the record's Chain×Layer lane (e.g. `Chain1` or `Chain2:domain`). `reason` is the display reason: fail records use the cached SemanticVerdict::Fail reason, pending records use the unresolved-pair reason, and pass records may use an empty reason. For pass/fail pairs, origin fields come from the verify-cache entry. For pending pairs, origin fields are re-derived from the current pair source without invoking the LLM verifier. Transferred from the infrastructure adapter to the cli_driver for record-block formatting.",
+      "spec_refs": [
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "IN-03" },
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "IN-05" }
+      ],
+      "informal_grounds": []
+    },
+    "RefVerifyResultsOutput": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "lane_summaries", "ty": "Vec<RefVerifyLaneSummary>" },
+            { "name": "pair_records",   "ty": "Vec<RefVerifyPairRecord>" },
+            { "name": "total_pass",     "ty": "usize" },
+            { "name": "total_fail",     "ty": "usize" },
+            { "name": "total_pending",  "ty": "usize" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "ref_verify::driver_service",
+      "docs": "Aggregate output DTO for the `ref-verify results` service call. `lane_summaries` carries chain×layer summary rows (filtered by chain and layer options) for the header block. `pair_records` carries individual pair records (fully filtered by chain, layer, and verdict) for the record block. `total_pass/fail/pending` summarize the same chain/layer-filtered lane set as `lane_summaries`; they are unaffected only by the verdict filter.",
+      "spec_refs": [
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "IN-02" },
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "IN-03" },
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "IN-06" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {
+    "RefVerifyAggregateService": {
+      "action": "modify",
+      "role": { "ApplicationService": {} },
+      "methods": [
+        {
+          "name": "run",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id",  "ty": "&str" },
+            { "name": "items_dir", "ty": "&std::path::Path" }
+          ],
+          "returns": "Result<RefVerifyRunOutcome, RefVerifyDriverError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Execute the semantic reference verification pipeline."
+        },
+        {
+          "name": "check_approved",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id",  "ty": "&str" },
+            { "name": "items_dir", "ty": "&std::path::Path" }
+          ],
+          "returns": "Result<RefVerifyCheckApprovedOutcome, RefVerifyDriverError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Execute the check-approved gate."
+        },
+        {
+          "name": "results",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id",  "ty": "&str" },
+            { "name": "items_dir", "ty": "&std::path::Path" },
+            { "name": "chain",     "ty": "RefVerifyChainFilter" },
+            { "name": "layer",     "ty": "RefVerifyLayerFilter" },
+            { "name": "verdict",   "ty": "RefVerifyVerdictFilter" }
+          ],
+          "returns": "Result<RefVerifyResultsOutput, RefVerifyDriverError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": true,
+          "where_predicates": [],
+          "docs": "Read the verify-cache and re-derive pending pairs, then return structured results data filtered by the given chain, layer, and verdict filters. T003 supplies a compile-safe default body returning RefVerifyDriverError::Unavailable(\"ref-verify results not implemented\".to_owned()) so existing implementors continue to compile until T004 overrides it. No LLM verifier subprocess is started."
+        }
+      ],
+      "supertrait_bounds": ["core::marker::Send", "core::marker::Sync"],
+      "module_path": "ref_verify::driver_service",
+      "docs": "Aggregate primary port for the `ref_verify` command family. Extended by D1/D2/D3 to add the `results` method. The results method has a temporary default Unavailable implementation in T003 so the trait extension is compile-safe before FsRefVerifyAggregateAdapter overrides it in T004. RefVerifyDriver holds one Arc<dyn RefVerifyAggregateService> and dispatches each RefVerifyInput variant to the corresponding method.",
+      "spec_refs": [
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "IN-01" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "functions": {},
+  "inherent_impls": [],
+  "trait_impls": [
+    { "action": "reference", "trait_ref": "core::fmt::Debug",     "for_type": "RefVerifyPair" },
+    { "action": "reference", "trait_ref": "core::clone::Clone",   "for_type": "RefVerifyPair" },
+    { "action": "reference", "trait_ref": "core::cmp::PartialEq", "for_type": "RefVerifyPair" },
+    { "action": "reference", "trait_ref": "core::cmp::Eq",        "for_type": "RefVerifyPair" },
+
+    { "trait_ref": "core::fmt::Debug",     "for_type": "RefVerifyChainFilter" },
+    { "trait_ref": "core::clone::Clone",   "for_type": "RefVerifyChainFilter" },
+    { "trait_ref": "core::cmp::PartialEq", "for_type": "RefVerifyChainFilter" },
+    { "trait_ref": "core::cmp::Eq",        "for_type": "RefVerifyChainFilter" },
+
+    { "trait_ref": "core::fmt::Debug",     "for_type": "RefVerifyLayerFilter" },
+    { "trait_ref": "core::clone::Clone",   "for_type": "RefVerifyLayerFilter" },
+    { "trait_ref": "core::cmp::PartialEq", "for_type": "RefVerifyLayerFilter" },
+    { "trait_ref": "core::cmp::Eq",        "for_type": "RefVerifyLayerFilter" },
+
+    { "trait_ref": "core::fmt::Debug",     "for_type": "RefVerifyVerdictFilter" },
+    { "trait_ref": "core::clone::Clone",   "for_type": "RefVerifyVerdictFilter" },
+    { "trait_ref": "core::cmp::PartialEq", "for_type": "RefVerifyVerdictFilter" },
+    { "trait_ref": "core::cmp::Eq",        "for_type": "RefVerifyVerdictFilter" },
+
+    { "trait_ref": "core::fmt::Debug",   "for_type": "RefVerifyLaneSummary" },
+    { "trait_ref": "core::clone::Clone", "for_type": "RefVerifyLaneSummary" },
+
+    { "trait_ref": "core::fmt::Debug",   "for_type": "RefVerifyPairRecord" },
+    { "trait_ref": "core::clone::Clone", "for_type": "RefVerifyPairRecord" },
+
+    { "trait_ref": "core::fmt::Debug",   "for_type": "RefVerifyResultsOutput" }
+  ]
+}
