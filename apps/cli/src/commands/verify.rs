@@ -59,6 +59,9 @@ pub enum VerifyCommand {
     ///
     /// ADR `2026-04-23-0344-catalogue-spec-signal-activation.md` §D1.5 / §D3.2.
     CatalogueSpecRefs(CatalogueSpecRefsArgs),
+
+    /// Check all architecture-rules.json layers[] crates for pub + #[doc(hidden)] violations.
+    DocHidden(VerifyArgs),
 }
 
 /// Arguments for `catalogue-spec-refs` verify subcommand.
@@ -121,7 +124,8 @@ impl VerifyCommand {
             | VerifyCommand::DomainStrings(a)
             | VerifyCommand::UsecasePurity(a)
             | VerifyCommand::DocLinks(a)
-            | VerifyCommand::ViewFreshness(a) => a.project_root.join("track").join("items"),
+            | VerifyCommand::ViewFreshness(a)
+            | VerifyCommand::DocHidden(a) => a.project_root.join("track").join("items"),
 
             // Workspace-root–based commands: the explicit --items-dir field is the
             // primary artifact root.  Only rewrite to `<workspace_root>/track/items`
@@ -232,6 +236,9 @@ fn dispatch_to_outcome(driver: &VerifyDriver, cmd: VerifyCommand) -> cli_driver:
             workspace_root: args.workspace_root,
             skip_stale: args.skip_stale,
         }),
+        VerifyCommand::DocHidden(args) => {
+            driver.handle(VerifyInput::DocHidden { project_root: args.project_root })
+        }
     }
 }
 

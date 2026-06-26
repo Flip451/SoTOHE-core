@@ -15,6 +15,7 @@ pub mod architecture_rules;
 pub mod canonical_modules;
 pub mod catalogue_spec_refs;
 pub mod catalogue_spec_signals;
+pub mod doc_hidden;
 pub mod doc_links;
 pub mod doc_patterns;
 pub mod domain_purity;

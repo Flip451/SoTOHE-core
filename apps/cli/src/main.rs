@@ -432,6 +432,7 @@ fn verify_command_gate_name(cmd: &commands::verify::VerifyCommand) -> &'static s
         VerifyCommand::SpecSignals(_) => "verify-spec-signals",
         VerifyCommand::PlanArtifactRefs(_) => "verify-plan-artifact-refs",
         VerifyCommand::CatalogueSpecRefs(_) => "verify-catalogue-spec-refs",
+        VerifyCommand::DocHidden(_) => "verify-doc-hidden",
     }
 }
 

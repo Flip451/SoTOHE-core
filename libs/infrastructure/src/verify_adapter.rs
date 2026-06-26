@@ -407,6 +407,14 @@ impl VerifyPort for FsVerifyAdapter {
         ))
     }
 
+    fn verify_doc_hidden(&self, project_root: &Path) -> Result<VerifyOutcome, VerifyPortError> {
+        if let Some(outcome) = reject_symlinked_trusted_root("verify doc-hidden", project_root) {
+            return Ok(outcome);
+        }
+
+        Ok(render_outcome("verify doc-hidden", &crate::verify::doc_hidden::verify(project_root)))
+    }
+
     fn verify_doc_links(&self, project_root: &Path) -> Result<VerifyOutcome, VerifyPortError> {
         if let Some(outcome) = reject_symlinked_trusted_root("verify doc links", project_root) {
             return Ok(outcome);

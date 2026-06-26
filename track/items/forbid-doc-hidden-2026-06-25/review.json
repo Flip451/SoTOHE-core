@@ -67,6 +67,162 @@
           "findings": [],
           "hash": "rvw1:sha256:da4fcf241bc5838fd708d2c4d68c5787672e578b7f7a998e08e98d758fc2babb",
           "at": "2026-06-26T01:24:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8538add7861c48b371d3c4ad07d7048f36a1bb8ecbad3678734e0911351dbd3a",
+          "at": "2026-06-26T02:04:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8538add7861c48b371d3c4ad07d7048f36a1bb8ecbad3678734e0911351dbd3a",
+          "at": "2026-06-26T02:07:28Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1b60ff3c8a1d331ccb6c346dcc8076d858dd390632efac92315a793737cd5ee7",
+          "at": "2026-06-26T02:04:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1b60ff3c8a1d331ccb6c346dcc8076d858dd390632efac92315a793737cd5ee7",
+          "at": "2026-06-26T02:06:55Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2e163880ca21835277945a00a9edfc80159e659ec428874093fc22bf01dc6ff5",
+          "at": "2026-06-26T02:02:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2e163880ca21835277945a00a9edfc80159e659ec428874093fc22bf01dc6ff5",
+          "at": "2026-06-26T02:05:39Z"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9958578ee337e6677f74e8f25361db97bcf372b1fd62cf335f11fcf2027381aa",
+          "at": "2026-06-26T02:02:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9958578ee337e6677f74e8f25361db97bcf372b1fd62cf335f11fcf2027381aa",
+          "at": "2026-06-26T02:05:21Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:adf87f6c9e1b068c56ad0861098ea350924a8e3b7b1e6579dca6b3cf3754367b",
+          "at": "2026-06-26T02:02:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:adf87f6c9e1b068c56ad0861098ea350924a8e3b7b1e6579dca6b3cf3754367b",
+          "at": "2026-06-26T02:05:22Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`layer.path` from `architecture-rules.json` is joined to `root` and then scanned without any containment check. A malformed or malicious layer path like `../..` or an absolute path can make `verify doc-hidden` read files outside the trusted workspace.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/verify/doc_hidden.rs",
+              "line": 50,
+              "category": "trusted-root violation"
+            },
+            {
+              "message": "`scan_rs_files` follows `read_dir` entries by calling `path.is_dir()` and `read_to_string()` without rejecting symlinks first. A symlinked `src/` subtree or file can redirect the scan outside the repo or create recursive traversal through symlink loops.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/verify/syn_helpers.rs",
+              "line": 56,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:bdc5f37324f79cb0eef92f46ffc1185d4b14f2111e90caa16f8f489872393caa",
+          "at": "2026-06-26T02:05:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: [`doc_hidden.rs`](file:///home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/verify/doc_hidden.rs#L122) only checks top-level `syn::Item` variants and recurses into inline `mod` blocks. It does not descend into `impl`/`trait` bodies, struct fields, enum variants, or foreign items, so `#[doc(hidden)]` on public associated items or public fields/variants will be missed and the new gate can pass code that still produces the downstream `DanglingId` failure.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/verify/doc_hidden.rs",
+              "line": 122,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:667b9bcb39253521d7a76219b805bbe609617d1a01e27ea6f70644bc016e665e",
+          "at": "2026-06-26T02:18:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aa3d2f7427d4db7856263374094b520fc74c35e052453a4a92ee6a481b5f2c0a",
+          "at": "2026-06-26T02:27:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "A test-scoped inline module aborts scanning for the rest of the file. In the `syn::Item::Mod` arm, `return` exits `check_item`, so when `check_items` is iterating a file, any production items after `#[cfg(test)] mod tests` are never checked. That lets a later `#[doc(hidden)] pub ...` bypass this gate and still trigger the rustdoc/DanglingId failure the verifier is meant to prevent. Skip only that module instead of returning from the item scan.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/doc_hidden.rs",
+              "line": 258,
+              "category": "verifier-correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:aa3d2f7427d4db7856263374094b520fc74c35e052453a4a92ee6a481b5f2c0a",
+          "at": "2026-06-26T02:32:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0fce051f67ae5f7a10041608c1b1ab9b68d14b72615d70f22f0d94b2ee370b88",
+          "at": "2026-06-26T02:37:10Z"
         }
       ]
     }
