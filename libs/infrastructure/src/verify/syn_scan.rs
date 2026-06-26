@@ -382,23 +382,106 @@ fn items_declare_cfg_test_module_path(
     };
 
     items.iter().any(|item| {
-        if let syn::Item::Mod(module) = item {
-            if module.ident != head.as_str() {
-                return false;
-            }
-            let cfg_test = inherited_cfg_test || has_cfg_test_attr(&module.attrs);
-            if tail.is_empty() {
-                return module.content.is_none() && cfg_test;
-            }
-            if cfg_test && module.content.is_none() {
-                return true;
-            }
-            if let Some((_, nested_items)) = &module.content {
-                return items_declare_cfg_test_module_path(nested_items, tail, cfg_test);
-            }
+        let syn::Item::Mod(module) = item else {
+            return false;
+        };
+        let cfg_test = inherited_cfg_test || has_cfg_test_attr(&module.attrs);
+
+        // If this is a file-backed module (`mod foo;` with no inline content)
+        // and it carries a `#[path = "..."]` attribute, compare by the resolved
+        // path components rather than by module ident.  This handles patterns like:
+        //
+        //   #[cfg(test)]
+        //   #[path = "helpers.rs"]
+        //   mod test_helpers;
+        //
+        // where the module ident (`test_helpers`) differs from the file stem
+        // (`helpers`).  The path attribute may contain directory components, e.g.
+        // `"subdir/helpers.rs"` maps to module_path `["subdir", "helpers"]`.
+        if let Some(path_value) = extract_path_attr(&module.attrs) {
+            return module.content.is_none()
+                && cfg_test
+                && path_attr_matches_module_path(&path_value, module_path);
+        }
+
+        // Standard ident-based matching (no `#[path]` attribute present).
+        if module.ident != head.as_str() {
+            return false;
+        }
+        if tail.is_empty() {
+            return module.content.is_none() && cfg_test;
+        }
+        if cfg_test && module.content.is_none() {
+            return true;
+        }
+        if let Some((_, nested_items)) = &module.content {
+            return items_declare_cfg_test_module_path(nested_items, tail, cfg_test);
         }
         false
     })
+}
+
+/// Extracts the string value of a `#[path = "..."]` attribute, if present.
+///
+/// Returns `Some(value)` for the first well-formed `#[path = "literal"]`
+/// attribute found in `attrs`, otherwise `None`.
+fn extract_path_attr(attrs: &[syn::Attribute]) -> Option<String> {
+    for attr in attrs {
+        if !attr.path().is_ident("path") {
+            continue;
+        }
+        if let syn::Meta::NameValue(nv) = &attr.meta {
+            if let syn::Expr::Lit(syn::ExprLit { lit: syn::Lit::Str(s), .. }) = &nv.value {
+                return Some(s.value());
+            }
+        }
+    }
+    None
+}
+
+/// Returns `true` when the `#[path = "value"]` attribute string, interpreted
+/// as a relative path, matches the entire `module_path` component sequence.
+///
+/// Each path component of `value` is compared to the corresponding element of
+/// `module_path`.  The **last** component is compared by file stem (extension
+/// stripped); all preceding components are compared verbatim.
+///
+/// # Examples
+///
+/// - `"helpers.rs"` matches `["helpers"]`
+/// - `"subdir/helpers.rs"` matches `["subdir", "helpers"]`
+/// - `"helpers.rs"` does **not** match `["test_helpers"]`
+fn path_attr_matches_module_path(path_value: &str, module_path: &[String]) -> bool {
+    let path = Path::new(path_value);
+    let mut components = Vec::new();
+    for component in path.components() {
+        let std::path::Component::Normal(name) = component else {
+            return false;
+        };
+        components.push(name.to_string_lossy().into_owned());
+    }
+
+    if components.is_empty() {
+        return false;
+    }
+
+    if let Some(last_component) = components.last_mut() {
+        let stem = Path::new(last_component.as_str())
+            .file_stem()
+            .map(|s| s.to_string_lossy().into_owned())
+            .unwrap_or_else(|| last_component.clone());
+        if stem == "mod" {
+            components.pop();
+        } else {
+            *last_component = stem;
+        }
+    }
+
+    components.len() == module_path.len()
+        && components
+            .iter()
+            .zip(module_path.iter())
+            .all(|(component, expected)| component == expected)
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

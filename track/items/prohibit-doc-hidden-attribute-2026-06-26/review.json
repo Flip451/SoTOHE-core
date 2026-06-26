@@ -1,6 +1,141 @@
 {
   "schema_version": 2,
   "scopes": {
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`layer.path` from `architecture-rules.json` is joined directly into `root.join(...).join(\"src\")` with no containment check, so a malformed or malicious layer entry can escape the trusted root (for example `../..` or an absolute path) and make the verifier scan arbitrary files outside the workspace.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/verify/syn_scan.rs",
+              "line": 77,
+              "category": "trusted-root violation"
+            },
+            {
+              "message": "The directory walk reads and recurses through entries with plain `read_dir`, `path.is_dir()`, and `read_to_string()` but never rejects symlinks at the boundary, so a symlink under `src/` can redirect the scan outside the workspace. This breaks the real-file semantics used elsewhere for trusted-root loaders.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/verify/syn_scan.rs",
+              "line": 98,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:a83d0b82cdada70c245adb5a0abff76897cbee4d59956fc0fc4caa95bd59a707",
+          "at": "2026-06-26T11:32:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ad7fdd873270974747ad0d1167cb5f14b7ddfbf32567f12532eecfeca62fc1a5",
+          "at": "2026-06-26T11:39:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "File-backed modules are never resolved here. A crate with `#[cfg(test)] mod tests;` and a separate `tests.rs` under `src/` will still have that file scanned, so `#[doc(hidden)]` inside a test-only module can be reported as a violation. This breaks the stated `cfg(test) mod foo;` exclusion and needs module-file resolution or an equivalent skip map.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/verify/syn_scan.rs",
+              "line": 320,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:ad7fdd873270974747ad0d1167cb5f14b7ddfbf32567f12532eecfeca62fc1a5",
+          "at": "2026-06-26T11:41:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:673466641fec9f1a3efdecd1cce353d9a878a0d1df3d0fb5c94ddd5e8b2d8691",
+          "at": "2026-06-26T12:00:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:673466641fec9f1a3efdecd1cce353d9a878a0d1df3d0fb5c94ddd5e8b2d8691",
+          "at": "2026-06-26T12:05:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`path_attr_matches_module_path()` cannot recognize the common `#[path = \".../mod.rs\"] mod foo;` layout: it requires the path component count to exactly equal the logical module path and compares the last component by file stem, so `mod.rs` never matches a one-segment module name. As a result, `is_file_backed_test_module()` will fail open on test-only modules stored as `mod.rs`, and `verify()` will scan and flag valid code in those files.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/syn_scan.rs",
+              "line": 454,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:41875d3b51deb1d4a242c2f77024d0ed162db4192128712dfecc634e555c43d4",
+          "at": "2026-06-26T12:30:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `#[path]` branch fails open: when a `#[path]` attribute is present but does not match the probed file, execution falls back to ident-based matching instead of rejecting the candidate. That means a declaration like `#[cfg(test)] #[path = \"other.rs\"] mod shared_helpers;` can still make `shared_helpers.rs` look test-only and skip real findings. `path_attr_matches_module_path` also drops `.`/`..` components, so traversal-style values can alias the wrong in-root file.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/syn_scan.rs",
+              "line": 401,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:69cab994e86167e912ba32bc5bcff5d30e95f984503798b612f574b916895801",
+          "at": "2026-06-26T12:39:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a6198f85005b110fe042d53f1b23d2ad95ba31a35c6e2af47f784677a99d41a3",
+          "at": "2026-06-26T12:45:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a6198f85005b110fe042d53f1b23d2ad95ba31a35c6e2af47f784677a99d41a3",
+          "at": "2026-06-26T12:48:50Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0d984876b867a5ecabd80e498d9bdbcb94f6af4f23faaab41a8fc65cc6539cf8",
+          "at": "2026-06-26T11:30:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0d984876b867a5ecabd80e498d9bdbcb94f6af4f23faaab41a8fc65cc6539cf8",
+          "at": "2026-06-26T12:01:21Z"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8cf39553ddfa2cc58beac6bc96e2a7b81a15485fd600d4f4a021613cfe3e9af2",
+          "at": "2026-06-26T11:32:52Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -176,97 +311,6 @@
           "findings": [],
           "hash": "rvw1:sha256:b8d06746999c77799440c924b12c678ba5d09d384bad91192351d009af78332a",
           "at": "2026-06-26T12:12:07Z"
-        }
-      ]
-    },
-    "cli_driver": {
-      "rounds": [
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8cf39553ddfa2cc58beac6bc96e2a7b81a15485fd600d4f4a021613cfe3e9af2",
-          "at": "2026-06-26T11:32:52Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0d984876b867a5ecabd80e498d9bdbcb94f6af4f23faaab41a8fc65cc6539cf8",
-          "at": "2026-06-26T11:30:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0d984876b867a5ecabd80e498d9bdbcb94f6af4f23faaab41a8fc65cc6539cf8",
-          "at": "2026-06-26T12:01:21Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`layer.path` from `architecture-rules.json` is joined directly into `root.join(...).join(\"src\")` with no containment check, so a malformed or malicious layer entry can escape the trusted root (for example `../..` or an absolute path) and make the verifier scan arbitrary files outside the workspace.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/verify/syn_scan.rs",
-              "line": 77,
-              "category": "trusted-root violation"
-            },
-            {
-              "message": "The directory walk reads and recurses through entries with plain `read_dir`, `path.is_dir()`, and `read_to_string()` but never rejects symlinks at the boundary, so a symlink under `src/` can redirect the scan outside the workspace. This breaks the real-file semantics used elsewhere for trusted-root loaders.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/verify/syn_scan.rs",
-              "line": 98,
-              "category": "symlink not rejected at boundary"
-            }
-          ],
-          "hash": "rvw1:sha256:a83d0b82cdada70c245adb5a0abff76897cbee4d59956fc0fc4caa95bd59a707",
-          "at": "2026-06-26T11:32:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ad7fdd873270974747ad0d1167cb5f14b7ddfbf32567f12532eecfeca62fc1a5",
-          "at": "2026-06-26T11:39:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "File-backed modules are never resolved here. A crate with `#[cfg(test)] mod tests;` and a separate `tests.rs` under `src/` will still have that file scanned, so `#[doc(hidden)]` inside a test-only module can be reported as a violation. This breaks the stated `cfg(test) mod foo;` exclusion and needs module-file resolution or an equivalent skip map.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/verify/syn_scan.rs",
-              "line": 320,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:ad7fdd873270974747ad0d1167cb5f14b7ddfbf32567f12532eecfeca62fc1a5",
-          "at": "2026-06-26T11:41:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:673466641fec9f1a3efdecd1cce353d9a878a0d1df3d0fb5c94ddd5e8b2d8691",
-          "at": "2026-06-26T12:00:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:673466641fec9f1a3efdecd1cce353d9a878a0d1df3d0fb5c94ddd5e8b2d8691",
-          "at": "2026-06-26T12:05:34Z"
         }
       ]
     },

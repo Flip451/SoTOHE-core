@@ -494,6 +494,158 @@ mod tests {
         assert!(outcome.has_errors(), "violation in layer-b must be detected");
     }
 
+    // ── IN-03/AC-03: #[path] cfg(test) mod exclusion ────────────────────────
+
+    /// PR1: `#[cfg(test)] #[path = "shared_helpers.rs"] mod test_helpers;` —
+    /// the module ident (`test_helpers`) differs from the file stem
+    /// (`shared_helpers`); the file must still be excluded from scanning.
+    #[test]
+    fn test_ignores_doc_hidden_in_cfg_test_mod_with_path_attr_same_dir() {
+        let tmp = TempDir::new().unwrap();
+        write_arch_rules(tmp.path());
+        write_src(
+            tmp.path(),
+            "lib.rs",
+            concat!(
+                "pub fn clean() {}\n",
+                "#[cfg(test)]\n",
+                "#[path = \"shared_helpers.rs\"]\n",
+                "mod test_helpers;\n",
+            ),
+        );
+        write_src(tmp.path(), "shared_helpers.rs", "#[doc(hidden)]\npub fn hidden_helper() {}\n");
+
+        let outcome = verify(tmp.path());
+        assert!(
+            outcome.is_ok(),
+            "#[path = \"shared_helpers.rs\"] cfg(test) mod must exclude the pointed file: {:?}",
+            outcome.findings()
+        );
+    }
+
+    /// PR2: `#[cfg(test)] #[path = "subdir/helpers.rs"] mod test_helpers;` —
+    /// multi-component path attribute; file in a subdirectory must be excluded.
+    #[test]
+    fn test_ignores_doc_hidden_in_cfg_test_mod_with_path_attr_subdir() {
+        let tmp = TempDir::new().unwrap();
+        write_arch_rules(tmp.path());
+        write_src(
+            tmp.path(),
+            "lib.rs",
+            concat!(
+                "pub fn clean() {}\n",
+                "#[cfg(test)]\n",
+                "#[path = \"subdir/helpers.rs\"]\n",
+                "mod test_helpers;\n",
+            ),
+        );
+        write_src(tmp.path(), "subdir/helpers.rs", "#[doc(hidden)]\npub fn hidden_helper() {}\n");
+
+        let outcome = verify(tmp.path());
+        assert!(
+            outcome.is_ok(),
+            "#[path = \"subdir/helpers.rs\"] cfg(test) mod must exclude the pointed file: {:?}",
+            outcome.findings()
+        );
+    }
+
+    /// PR2b: `#[cfg(test)] #[path = "fixtures/mod.rs"] mod fixtures;` —
+    /// `mod.rs` is the canonical file for the `fixtures` module and must
+    /// match the containing directory component, not the literal `mod` stem.
+    #[test]
+    fn test_ignores_doc_hidden_in_cfg_test_mod_with_path_attr_mod_rs() {
+        let tmp = TempDir::new().unwrap();
+        write_arch_rules(tmp.path());
+        write_src(
+            tmp.path(),
+            "lib.rs",
+            concat!(
+                "pub fn clean() {}\n",
+                "#[cfg(test)]\n",
+                "#[path = \"fixtures/mod.rs\"]\n",
+                "mod fixtures;\n",
+            ),
+        );
+        write_src(tmp.path(), "fixtures/mod.rs", "#[doc(hidden)]\npub fn hidden_helper() {}\n");
+
+        let outcome = verify(tmp.path());
+        assert!(
+            outcome.is_ok(),
+            "#[path = \"fixtures/mod.rs\"] cfg(test) mod must exclude the pointed file: {:?}",
+            outcome.findings()
+        );
+    }
+
+    #[test]
+    fn test_path_attr_mismatch_does_not_exclude_ident_named_file() {
+        let tmp = TempDir::new().unwrap();
+        write_arch_rules(tmp.path());
+        write_src(
+            tmp.path(),
+            "lib.rs",
+            concat!(
+                "pub fn clean() {}\n",
+                "#[cfg(test)]\n",
+                "#[path = \"other.rs\"]\n",
+                "mod shared_helpers;\n",
+            ),
+        );
+        write_src(tmp.path(), "other.rs", "pub fn clean_helper() {}\n");
+        write_src(tmp.path(), "shared_helpers.rs", "#[doc(hidden)]\npub fn hidden_helper() {}\n");
+
+        let outcome = verify(tmp.path());
+        assert!(
+            outcome.has_errors(),
+            "mismatched #[path] must not fall back to ident-based exclusion: {:?}",
+            outcome.findings()
+        );
+    }
+
+    #[test]
+    fn test_path_attr_parent_dir_component_does_not_alias_scanned_file() {
+        let tmp = TempDir::new().unwrap();
+        write_arch_rules(tmp.path());
+        write_src(
+            tmp.path(),
+            "lib.rs",
+            concat!(
+                "pub fn clean() {}\n",
+                "#[cfg(test)]\n",
+                "#[path = \"../fixtures/shared_helpers.rs\"]\n",
+                "mod shared_helpers;\n",
+            ),
+        );
+        write_src(tmp.path(), "fixtures/shared_helpers.rs", "#[doc(hidden)]\npub fn hidden() {}\n");
+
+        let outcome = verify(tmp.path());
+        assert!(
+            outcome.has_errors(),
+            "path attrs with parent components must not alias in-src scanned files: {:?}",
+            outcome.findings()
+        );
+    }
+
+    /// PR3: `#[cfg(test)] mod tests;` (no `#[path]`) — regression guard: the
+    /// existing ident-based resolution must continue to work unchanged.
+    #[test]
+    fn test_file_backed_cfg_test_mod_without_path_attr_regression() {
+        let tmp = TempDir::new().unwrap();
+        write_arch_rules(tmp.path());
+        write_src(
+            tmp.path(),
+            "lib.rs",
+            concat!("pub fn clean() {}\n", "#[cfg(test)]\n", "mod tests;\n"),
+        );
+        write_src(tmp.path(), "tests.rs", "#[doc(hidden)]\npub fn hidden_in_test() {}\n");
+
+        let outcome = verify(tmp.path());
+        assert!(
+            outcome.is_ok(),
+            "#[cfg(test)] mod without #[path] must still exclude the target file: {:?}",
+            outcome.findings()
+        );
+    }
+
     // ── AC-07: scanner callback replaceability ────────────────────────────────
 
     #[test]
