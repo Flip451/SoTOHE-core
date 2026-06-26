@@ -1,0 +1,45 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:78a275cea866a7176f303ab67dc9a41537222b03ad41669582ccff4ade985220",
+          "at": "2026-06-26T08:19:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2 lists direct inner attributes like `#![doc(hidden)]` as required detections, but then says the judgment target is any `syn item`. A crate/file-level inner attribute lives on `syn::File::attrs`, not on an item, so an implementation that follows the item-only wording can miss the exact inner-attribute form the ADR says is in scope. The plan should explicitly include file-level attrs as scan targets, or narrow the inner-attribute claim.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-26-0810-prohibit-doc-hidden-attribute.md",
+              "line": 52,
+              "category": "contradiction"
+            },
+            {
+              "message": "The same sentence says doc comment string literals do not appear as attributes in syn, but Rust doc comments are represented as `#[doc = \"...\"]` attributes. The intended behavior can still exclude them, but the ADR should describe that as ignoring `doc` name-value attributes and only matching `doc(hidden)` list forms, not as relying on doc comments being absent from the AST.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-26-0810-prohibit-doc-hidden-attribute.md",
+              "line": 52,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:78a275cea866a7176f303ab67dc9a41537222b03ad41669582ccff4ade985220",
+          "at": "2026-06-26T08:22:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7fd9bca0fba2ca88fdef8245c2386f014eada43fd5631e21032a81f0b421295e",
+          "at": "2026-06-26T08:43:31Z"
+        }
+      ]
+    }
+  }
+}

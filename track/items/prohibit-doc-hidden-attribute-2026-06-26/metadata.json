@@ -1,0 +1,8 @@
+{
+  "branch": "track/prohibit-doc-hidden-attribute-2026-06-26",
+  "created_at": "2026-06-26T08:10:22Z",
+  "id": "prohibit-doc-hidden-attribute-2026-06-26",
+  "schema_version": 5,
+  "title": "`#[doc(hidden)]` 属性の宣言を syn AST 走査で一律禁止する",
+  "updated_at": "2026-06-26T08:10:22Z"
+}
