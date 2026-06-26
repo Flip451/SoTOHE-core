@@ -147,14 +147,23 @@ fn items_declare_production_module_path(
 /// Returns `true` when `path_value` (a `#[path = "..."]` string), treated as a
 /// relative path, matches the entire `module_path` component sequence.  The last
 /// component is compared by file stem; `mod.rs` pops the stem and matches one level up.
+///
+/// Leading `./` (`Component::CurDir`) is skipped so that `"./helpers.rs"` and
+/// `"helpers.rs"` resolve identically.  Any other non-`Normal` component
+/// (`RootDir`, `ParentDir`, `Prefix`) causes an immediate `false` return.
 fn path_attr_matches_module_path(path_value: &str, module_path: &[String]) -> bool {
+    use std::path::Component;
+
     let path = Path::new(path_value);
     let mut components = Vec::new();
     for component in path.components() {
-        let std::path::Component::Normal(name) = component else {
-            return false;
-        };
-        components.push(name.to_string_lossy().into_owned());
+        match component {
+            Component::CurDir => {} // skip leading ./
+            Component::Normal(name) => {
+                components.push(name.to_string_lossy().into_owned());
+            }
+            _ => return false, // RootDir / ParentDir / Prefix → reject
+        }
     }
 
     if components.is_empty() {

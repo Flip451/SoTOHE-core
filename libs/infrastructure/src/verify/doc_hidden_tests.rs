@@ -979,3 +979,86 @@ fn test_ignores_doc_hidden_on_cfg_test_local_item_inside_nested_if_block() {
         outcome.findings()
     );
 }
+
+// ── PR21-PR23: leading ./ in #[path] attributes ──────────────────────────────
+
+/// PR21: `#[cfg(test)] #[path = "./helpers.rs"] mod test_helpers;` — a leading
+/// `./` in the path attribute must not prevent the target file from being
+/// classified as test-only.
+#[test]
+fn test_ignores_doc_hidden_in_cfg_test_mod_with_cur_dir_prefix_path_attr() {
+    let tmp = TempDir::new().unwrap();
+    write_arch_rules(tmp.path());
+    write_src(
+        tmp.path(),
+        "lib.rs",
+        concat!(
+            "pub fn clean() {}\n",
+            "#[cfg(test)]\n",
+            "#[path = \"./helpers.rs\"]\n",
+            "mod test_helpers;\n",
+        ),
+    );
+    write_src(tmp.path(), "helpers.rs", "#[doc(hidden)]\npub fn hidden_helper() {}\n");
+
+    let outcome = verify(tmp.path());
+    assert!(
+        outcome.is_ok(),
+        "#[path = \"./helpers.rs\"] cfg(test) mod must exclude the pointed file (PR21): {:?}",
+        outcome.findings()
+    );
+}
+
+/// PR22: `#[cfg(test)] #[path = "./subdir/helpers.rs"] mod test_helpers;` — a
+/// leading `./` combined with a subdirectory path must also be handled correctly.
+#[test]
+fn test_ignores_doc_hidden_in_cfg_test_mod_with_cur_dir_prefix_subdir_path_attr() {
+    let tmp = TempDir::new().unwrap();
+    write_arch_rules(tmp.path());
+    write_src(
+        tmp.path(),
+        "lib.rs",
+        concat!(
+            "pub fn clean() {}\n",
+            "#[cfg(test)]\n",
+            "#[path = \"./subdir/helpers.rs\"]\n",
+            "mod test_helpers;\n",
+        ),
+    );
+    write_src(tmp.path(), "subdir/helpers.rs", "#[doc(hidden)]\npub fn hidden_helper() {}\n");
+
+    let outcome = verify(tmp.path());
+    assert!(
+        outcome.is_ok(),
+        "#[path = \"./subdir/helpers.rs\"] cfg(test) mod must exclude the pointed file (PR22): \
+         {:?}",
+        outcome.findings()
+    );
+}
+
+/// PR23: regression — `#[cfg(test)] #[path = "helpers.rs"] mod test_helpers;`
+/// (no leading `./`) must continue to work exactly as before the PR21/PR22 fix.
+#[test]
+fn test_ignores_doc_hidden_in_cfg_test_mod_with_bare_path_attr_regression() {
+    let tmp = TempDir::new().unwrap();
+    write_arch_rules(tmp.path());
+    write_src(
+        tmp.path(),
+        "lib.rs",
+        concat!(
+            "pub fn clean() {}\n",
+            "#[cfg(test)]\n",
+            "#[path = \"helpers.rs\"]\n",
+            "mod test_helpers;\n",
+        ),
+    );
+    write_src(tmp.path(), "helpers.rs", "#[doc(hidden)]\npub fn hidden_helper() {}\n");
+
+    let outcome = verify(tmp.path());
+    assert!(
+        outcome.is_ok(),
+        "#[path = \"helpers.rs\"] (no ./) cfg(test) mod must still exclude the file (PR23 \
+         regression): {:?}",
+        outcome.findings()
+    );
+}
