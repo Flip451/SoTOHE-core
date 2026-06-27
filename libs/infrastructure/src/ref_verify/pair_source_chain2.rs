@@ -8,7 +8,12 @@ use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
 use domain::ContentHash;
+use domain::plan_ref::SpecElementId;
 use domain::tddd::LayerId;
+use domain::tddd::semantic_verify::{
+    CatalogueEntryKey, CatalogueEntryRef, CatalogueSectionKey, SpecElementRef, SpecSectionKind,
+    VerifyOriginRef,
+};
 use usecase::ref_verify::{RefVerifyCacheScope, RefVerifyError, RefVerifyPair};
 
 use crate::verify::plan_artifact_refs::{build_element_map, canonical_json};
@@ -18,6 +23,53 @@ use crate::track::symlink_guard::reject_symlinks_below;
 
 use super::guarded_io::{read_guarded_text, resolve_and_guard_path};
 use super::pair_source::hash_text;
+
+fn map_section_str_to_catalogue_key(section: &str) -> CatalogueSectionKey {
+    match section {
+        "traits" => CatalogueSectionKey::Traits,
+        "functions" => CatalogueSectionKey::Functions,
+        _ => CatalogueSectionKey::Types,
+    }
+}
+
+fn find_spec_element_section_kind(
+    spec_doc: &domain::SpecDocument,
+    element_id: &str,
+) -> Option<SpecSectionKind> {
+    find_spec_element(spec_doc, element_id).map(|(kind, _, _)| kind)
+}
+
+fn find_spec_element<'a>(
+    spec_doc: &'a domain::SpecDocument,
+    element_id: &str,
+) -> Option<(SpecSectionKind, &'static str, &'a domain::SpecRequirement)> {
+    for req in spec_doc.goal() {
+        if req.id().as_ref() == element_id {
+            return Some((SpecSectionKind::Goal, "goal", req));
+        }
+    }
+    for req in spec_doc.scope().in_scope() {
+        if req.id().as_ref() == element_id {
+            return Some((SpecSectionKind::InScope, "in_scope", req));
+        }
+    }
+    for req in spec_doc.scope().out_of_scope() {
+        if req.id().as_ref() == element_id {
+            return Some((SpecSectionKind::OutOfScope, "out_of_scope", req));
+        }
+    }
+    for req in spec_doc.constraints() {
+        if req.id().as_ref() == element_id {
+            return Some((SpecSectionKind::Constraint, "constraint", req));
+        }
+    }
+    for req in spec_doc.acceptance_criteria() {
+        if req.id().as_ref() == element_id {
+            return Some((SpecSectionKind::AcceptanceCriteria, "acceptance_criterion", req));
+        }
+    }
+    None
+}
 
 /// Enumerate Chain-2 pairs for a single layer.
 pub(super) fn enumerate_chain2_pairs_for_layer(
@@ -99,6 +151,26 @@ fn enumerate_chain2_pairs_for_catalogue(
             entry.section_key, entry_key, canonical_entry_json
         );
 
+        // Compute catalogue_rel_path for the claim origin (project-relative path).
+        let catalogue_rel_path = if catalogue_path.starts_with(project_root) {
+            catalogue_path
+                .strip_prefix(project_root)
+                .map(|p| p.to_string_lossy().into_owned())
+                .unwrap_or_else(|_| catalogue_path.to_string_lossy().into_owned())
+        } else {
+            catalogue_path.to_string_lossy().into_owned()
+        };
+
+        let catalogue_entry_key = CatalogueEntryKey::try_new(entry_key.as_str().to_owned())
+            .map_err(|e| RefVerifyError::VerifierPort {
+                message: format!("invalid catalogue entry key '{entry_key}': {e}"),
+            })?;
+        let claim_origin = VerifyOriginRef::CatalogueEntry(CatalogueEntryRef::new(
+            catalogue_rel_path,
+            map_section_str_to_catalogue_key(section),
+            catalogue_entry_key,
+        ));
+
         for spec_ref in entry.spec_refs {
             let anchor = spec_ref.anchor.as_ref();
             let (evidence_text, evidence_hash) = load_chain2_spec_evidence(
@@ -109,6 +181,38 @@ fn enumerate_chain2_pairs_for_catalogue(
                 entry_key,
             )?;
 
+            // Compute evidence_origin from spec cache (already loaded by load_chain2_spec_evidence).
+            let context = format!("Chain-2 spec_ref '{}'", spec_ref.file.display());
+            let spec_path = resolve_and_guard_path(project_root, &spec_ref.file, &context)?;
+            let spec_section_kind = spec_cache
+                .get(&spec_path)
+                .and_then(|ev| find_spec_element_section_kind(&ev.spec_doc, anchor))
+                .ok_or_else(|| RefVerifyError::VerifierPort {
+                    message: format!(
+                        "spec element '{anchor}' section not found in '{}' (origin computation)",
+                        spec_ref.file.display()
+                    ),
+                })?;
+            let spec_element_id = SpecElementId::try_new(anchor.to_owned()).map_err(|e| {
+                RefVerifyError::VerifierPort {
+                    message: format!("invalid spec element id '{anchor}' (origin): {e}"),
+                }
+            })?;
+            let spec_element_text = spec_cache
+                .get(&spec_path)
+                .and_then(|ev| find_spec_element_text_label(&ev.spec_doc, anchor))
+                .ok_or_else(|| RefVerifyError::VerifierPort {
+                    message: format!(
+                        "spec element '{anchor}' text not found in '{}' (origin computation)",
+                        spec_ref.file.display()
+                    ),
+                })?;
+            let evidence_origin = VerifyOriginRef::SpecElement(SpecElementRef::new(
+                spec_section_kind,
+                spec_element_id,
+                spec_element_text,
+            ));
+
             pairs.push(RefVerifyPair {
                 claim: claim_text.clone(),
                 evidence: evidence_text,
@@ -116,6 +220,8 @@ fn enumerate_chain2_pairs_for_catalogue(
                 evidence_hash,
                 cache_scope: cache_scope.clone(),
                 known_bad: false,
+                claim_origin: claim_origin.clone(),
+                evidence_origin,
             });
         }
     }
@@ -199,22 +305,22 @@ pub(super) fn find_spec_element_text(
     spec_doc: &domain::SpecDocument,
     element_id: &str,
 ) -> Option<String> {
-    let all_reqs: Vec<(&str, &domain::SpecRequirement)> = spec_doc
-        .goal()
-        .iter()
-        .map(|r| ("goal", r))
-        .chain(spec_doc.scope().in_scope().iter().map(|r| ("in_scope", r)))
-        .chain(spec_doc.scope().out_of_scope().iter().map(|r| ("out_of_scope", r)))
-        .chain(spec_doc.constraints().iter().map(|r| ("constraint", r)))
-        .chain(spec_doc.acceptance_criteria().iter().map(|r| ("acceptance_criterion", r)))
-        .collect();
+    find_spec_element_rendered_text(spec_doc, element_id)
+}
 
-    for (section, req) in all_reqs {
-        if req.id().as_ref() == element_id {
-            return Some(format!("[{section} {}] {}", req.id().as_ref(), req.text()));
-        }
-    }
-    None
+fn find_spec_element_rendered_text(
+    spec_doc: &domain::SpecDocument,
+    element_id: &str,
+) -> Option<String> {
+    find_spec_element(spec_doc, element_id)
+        .map(|(_, section, req)| format!("[{section} {}] {}", req.id().as_ref(), req.text()))
+}
+
+fn find_spec_element_text_label(
+    spec_doc: &domain::SpecDocument,
+    element_id: &str,
+) -> Option<String> {
+    find_spec_element(spec_doc, element_id).map(|(_, _, req)| req.text().to_owned())
 }
 
 fn load_tddd_layer_bindings(project_root: &Path) -> Result<Vec<TdddLayerBinding>, RefVerifyError> {

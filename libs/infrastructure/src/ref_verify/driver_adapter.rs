@@ -14,6 +14,11 @@ use usecase::ref_verify::{
     RefVerifyRunOutcome, RefVerifyRunService,
 };
 
+use super::driver_adapter_results::{
+    check_partial_catalogue_set, check_track_dir_exists, compute_results,
+    inspect_chain2_catalogue_set, inspect_chain2_catalogue_set_for_targets,
+    load_results_tddd_bindings, resolve_chain1_only_scope, resolve_results_chain2_target_layers,
+};
 use super::{
     AgentRefVerifierAdapter, RefVerifyCacheAdapter, RefVerifyPairSourceAdapter,
     RefVerifyScopeResolver, make_ref_verifier_process_runner,
@@ -341,6 +346,230 @@ impl usecase::ref_verify::RefVerifyAggregateService for FsRefVerifyAggregateAdap
     ) -> Result<RefVerifyCheckApprovedOutcome, RefVerifyDriverError> {
         FsRefVerifyCheckApprovedAdapter::new().check_approved(track_id, items_dir)
     }
+
+    fn results(
+        &self,
+        track_id_str: &str,
+        items_dir: &Path,
+        chain: usecase::ref_verify::RefVerifyChainFilter,
+        layer: usecase::ref_verify::RefVerifyLayerFilter,
+        verdict: usecase::ref_verify::RefVerifyVerdictFilter,
+    ) -> Result<usecase::ref_verify::RefVerifyResultsOutput, RefVerifyDriverError> {
+        // (a) Resolve project root and validate track ID.
+        let project_root = resolve_project_root(items_dir)
+            .map_err(|e| RefVerifyDriverError::Wiring(e.to_string()))?;
+        let canonical_root = project_root.canonicalize().map_err(|e| {
+            RefVerifyDriverError::Wiring(format!("cannot canonicalize project root: {e}"))
+        })?;
+        let track_id = validate_track_id(track_id_str)
+            .map_err(|e| RefVerifyDriverError::Wiring(e.to_string()))?;
+
+        // Branch resolution: fall back to "<detached>" sentinel when HEAD is detached.
+        // The results path is read-only and does not enforce the active-track guard,
+        // so any branch value — including the detached sentinel — is accepted by
+        // downstream cache / pair-source callers (RefVerifyCacheAdapter::load_entries
+        // and RefVerifyPairSourceAdapter::load_pairs do not inspect current_branch).
+        let current_branch =
+            current_git_branch(&canonical_root).unwrap_or_else(|_| "<detached>".to_owned());
+
+        results_core(&canonical_root, track_id, chain, layer, verdict, current_branch)
+    }
+}
+
+// ── results_core ─────────────────────────────────────────────────────────────
+
+/// Inner implementation for the read-only results query path.
+///
+/// Accepts a pre-resolved `current_branch` string so that the caller
+/// (`FsRefVerifyAggregateAdapter::results`) can supply a detached-HEAD sentinel
+/// when git branch detection fails, without propagating an `Unavailable` error
+/// for an inherently read-only operation.
+///
+/// Downstream callers (`RefVerifyCacheAdapter::load_entries`,
+/// `RefVerifyPairSourceAdapter::load_pairs`) do not inspect `current_branch`,
+/// so any sentinel value is safe here.
+fn results_core(
+    canonical_root: &Path,
+    track_id: domain::TrackId,
+    chain: usecase::ref_verify::RefVerifyChainFilter,
+    layer: usecase::ref_verify::RefVerifyLayerFilter,
+    verdict: usecase::ref_verify::RefVerifyVerdictFilter,
+    current_branch: String,
+) -> Result<usecase::ref_verify::RefVerifyResultsOutput, RefVerifyDriverError> {
+    use domain::tddd::LayerId;
+    use domain::tddd::semantic_verify::SemanticVerifyEntry;
+    use usecase::ref_verify::{
+        RefVerifyCachePort, RefVerifyCacheScope, RefVerifyChainFilter, RefVerifyConfig,
+        RefVerifyLayerFilter, RefVerifyPairSourcePort,
+    };
+
+    // Determine which chains are included in the results request.
+    // This is computed before scope resolution so the resolver call can be
+    // gated on whether Chain2 output is actually requested.
+    let include_chain1 = matches!(&chain, RefVerifyChainFilter::Chain1 | RefVerifyChainFilter::All);
+    let include_chain2 = matches!(&chain, RefVerifyChainFilter::Chain2 | RefVerifyChainFilter::All);
+
+    // (b-pre) Validate the track directory exists regardless of chain filter.
+    // A typo in track_id must produce a typed error, not a silent zero-pair result.
+    check_track_dir_exists(canonical_root, track_id.as_ref())?;
+
+    // (b) Resolve scope.
+    // For Chain1-only: skip RefVerifyScopeResolver — it enforces Chain2 catalogue
+    // consistency (IN-05: partial set is rejected) which is irrelevant for a
+    // Chain1-only request and would block users from inspecting spec↔ADR failures
+    // while Phase-2 artefacts are still incomplete.  Instead, check the Chain1
+    // paths and the IN-06 ordering rule without enforcing partial-catalogue consistency.
+    // For Chain2 or All + Specific(X): also skip RefVerifyScopeResolver — it enforces
+    // full-set catalogue consistency which must not block a single-layer results query.
+    // Run the same IN-06 ordering preflight as Chain1-only, then narrow only
+    // the partial-catalogue check below to {X}.  cmd.scope is not consumed by
+    // RefVerifyCacheAdapter or RefVerifyPairSourceAdapter in the results path
+    // (those use cmd.track_id + explicit scope args).
+    // For Chain2 or All + layer=All: run the full resolver to validate catalogue
+    // consistency of the complete declared set.
+    let scope = if !include_chain2 {
+        resolve_chain1_only_scope(canonical_root, track_id.as_ref())?
+    } else if matches!(layer, RefVerifyLayerFilter::Specific(_)) {
+        // Single-layer query: skip the full-set consistency check performed by the
+        // resolver.  scope = All is a safe placeholder; cmd.scope is unused by the
+        // cache and pair-source adapters in the results path.
+        resolve_chain1_only_scope(canonical_root, track_id.as_ref())?;
+        usecase::ref_verify::RefVerifyScope::All
+    } else {
+        let resolver = RefVerifyScopeResolver::new(canonical_root.to_path_buf());
+        resolver.resolve(track_id.as_ref()).map_err(|e| {
+            RefVerifyDriverError::Wiring(format!("ref-verify scope resolution failed: {e}"))
+        })?
+    };
+
+    let cmd = usecase::ref_verify::RefVerifyCommand { track_id, scope, current_branch };
+
+    // (c) Load cache files scoped to the requested chains and layers.
+    //
+    // F1: Load Chain1 (SpecAdr) cache only when the chain filter includes Chain1.
+    // A stale or absent SpecAdr cache must not fail a Chain2-only results query.
+    let cache_adapter = RefVerifyCacheAdapter::new(canonical_root.to_path_buf());
+
+    let chain1_entries: Vec<SemanticVerifyEntry> = if include_chain1 {
+        cache_adapter
+            .load_entries(&cmd, &RefVerifyCacheScope::SpecAdr)
+            .map_err(|e| RefVerifyDriverError::Usecase(e.to_string()))?
+    } else {
+        Vec::new()
+    };
+
+    // Only load Chain2 caches when the chain filter requests Chain2 results.
+    // Skipping this I/O for chain=Chain1 ensures that Chain2 cache/catalogue
+    // files cannot fail a Chain1-only results query.
+    //
+    // F2: When layer=Specific(X), validate X exists in the TDDD bindings and load only
+    // that layer's cache.  A corrupt or absent cache for an unrelated layer must not
+    // fail a single-layer Chain2 results query.
+    let mut chain2_caches: Vec<(LayerId, Vec<SemanticVerifyEntry>)> = Vec::new();
+    let mut chain2_layer_ids: Vec<LayerId> = Vec::new();
+    if include_chain2 {
+        let bindings = load_results_tddd_bindings(canonical_root)?;
+
+        // Resolve the target layer IDs first so that Specific(X) queries can validate
+        // that X is a known layer before the catalogue presence check is narrowed to {X}.
+        // resolve_results_chain2_target_layers also produces the Wiring error for
+        // unknown layer names (e.g. typos).
+        let target_ids = resolve_results_chain2_target_layers(&bindings, &layer)?;
+
+        // Fail-closed for partial catalogue sets, narrowed to the target scope:
+        // - layer=All: check all declared layers (preserves original behaviour; partial
+        //   absence means some declared layers were never inspected, which would produce
+        //   a misleadingly complete-looking Chain2 summary).
+        // - layer=Specific(X): check only {X} — partial presence of unrelated declared
+        //   layers must not block a single-layer results query.
+        let (present_layer_ids, absent_layer_ids) =
+            if matches!(layer, RefVerifyLayerFilter::Specific(_)) {
+                inspect_chain2_catalogue_set_for_targets(
+                    canonical_root,
+                    cmd.track_id.as_ref(),
+                    &bindings,
+                    &target_ids,
+                )?
+            } else {
+                inspect_chain2_catalogue_set(canonical_root, cmd.track_id.as_ref(), &bindings)?
+            };
+        check_partial_catalogue_set(&present_layer_ids, &absent_layer_ids)?;
+
+        // Specific(X) + X absent: fail closed.  The user explicitly requested
+        // layer X; an absent catalogue means Phase-2 for X has not been run yet,
+        // which is an actionable error — not the pre-Phase-2 graceful zero-pair
+        // path that applies to `layer=All` when no catalogues exist at all.
+        if matches!(layer, RefVerifyLayerFilter::Specific(_)) && present_layer_ids.is_empty() {
+            let layer_name = absent_layer_ids
+                .first()
+                .map(|id| id.as_ref().to_owned())
+                .unwrap_or_else(|| "unknown".to_owned());
+            return Err(RefVerifyDriverError::Wiring(format!(
+                "requested layer '{layer_name}' catalogue is absent; \
+                 run the Phase-2 pipeline for this layer before querying results",
+            )));
+        }
+
+        for layer_id in &target_ids {
+            if absent_layer_ids.iter().any(|absent| absent == layer_id) {
+                // Record in chain2_caches so that compute_results layer validation can
+                // distinguish pre-Phase-2 zero-pair from an unknown layer typo.
+                chain2_caches.push((layer_id.clone(), Vec::new()));
+                continue;
+            }
+
+            let cache_scope = RefVerifyCacheScope::CatalogueSpec { layer: layer_id.clone() };
+            let entries = cache_adapter
+                .load_entries(&cmd, &cache_scope)
+                .map_err(|e| RefVerifyDriverError::Usecase(e.to_string()))?;
+            chain2_caches.push((layer_id.clone(), entries));
+            chain2_layer_ids.push(layer_id.clone());
+        }
+    }
+
+    // (d) Enumerate current pairs narrowed by chain and layer filter.
+    //
+    // F3: Use RefVerifyScope::Chain1 for Chain1 pairs and
+    // RefVerifyScope::Chain2 { layer } per layer for Chain2 pairs.
+    // This avoids enumerating Chain1 artifacts (spec.json / ADR files) when
+    // chain=Chain2, so a broken Chain1 reference cannot fail a Chain2-only query.
+    // CN-06: no LLM subprocess in the results path.
+    let pair_source = RefVerifyPairSourceAdapter::new(canonical_root.to_path_buf());
+    let config = RefVerifyConfig::default();
+    let mut all_raw_pairs: Vec<usecase::ref_verify::RefVerifyPair> = Vec::new();
+
+    if include_chain1 {
+        let chain1_cmd = usecase::ref_verify::RefVerifyCommand {
+            track_id: cmd.track_id.clone(),
+            scope: usecase::ref_verify::RefVerifyScope::Chain1,
+            current_branch: cmd.current_branch.clone(),
+        };
+        let raw = pair_source
+            .load_pairs(&chain1_cmd, &config)
+            .map_err(|e| RefVerifyDriverError::Usecase(format!("pair source enumeration: {e}")))?;
+        all_raw_pairs.extend(raw);
+    }
+
+    if include_chain2 {
+        // Enumerate per layer using Chain2 scope to avoid reading Chain1 files.
+        for layer_id in &chain2_layer_ids {
+            let chain2_cmd = usecase::ref_verify::RefVerifyCommand {
+                track_id: cmd.track_id.clone(),
+                scope: usecase::ref_verify::RefVerifyScope::Chain2 { layer: layer_id.clone() },
+                current_branch: cmd.current_branch.clone(),
+            };
+            let raw = pair_source.load_pairs(&chain2_cmd, &config).map_err(|e| {
+                RefVerifyDriverError::Usecase(format!("pair source enumeration: {e}"))
+            })?;
+            all_raw_pairs.extend(raw);
+        }
+    }
+
+    // Exclude known-bad calibration probes; classify only real production pairs.
+    let current_pairs: Vec<usecase::ref_verify::RefVerifyPair> =
+        all_raw_pairs.into_iter().filter(|p| !p.known_bad).collect();
+
+    compute_results(chain1_entries, chain2_caches, current_pairs, chain, layer, verdict)
 }
 
 // ── FsRefVerifyCheckApprovedAdapter ──────────────────────────────────────────
@@ -423,7 +652,7 @@ impl RefVerifyCheckApprovedDriverService for FsRefVerifyCheckApprovedAdapter {
 }
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used)]
+#[allow(clippy::unwrap_used, clippy::indexing_slicing)]
 mod tests {
     use super::*;
 
@@ -506,5 +735,476 @@ mod tests {
         let err = load_agent_profiles(tmp.path()).unwrap_err();
         assert!(err.contains("agent-profiles.json path rejected before read"), "{err}");
         assert!(err.contains("refusing to follow symlink"), "{err}");
+    }
+
+    // ── detached HEAD tests ───────────────────────────────────────────────────
+
+    /// Verifies that `results` succeeds with a detached-HEAD sentinel branch value.
+    ///
+    /// When `sotp ref-verify results --track-id <id>` is run from a CI checkout
+    /// where HEAD is detached, `current_git_branch()` returns `Err`.  The fixed
+    /// `results` path falls back to the `"<detached>"` sentinel and delegates to
+    /// `results_core`, which must not surface an `Unavailable` error.
+    ///
+    /// Invariant: passing `"<detached>"` as `current_branch` to `results_core`
+    /// with a valid track directory and a valid Chain1 cache succeeds — the
+    /// results path does not enforce the active-track guard.
+    #[test]
+    fn compute_results_with_explicit_track_id_and_detached_head_succeeds() {
+        let tmp = tempfile::tempdir().unwrap();
+        let canonical_root = tmp.path().canonicalize().unwrap();
+        let track_id = domain::TrackId::try_new("dry-gate-opt-in".to_owned()).unwrap();
+        let track_dir = canonical_root.join("track").join("items").join(track_id.as_ref());
+        std::fs::create_dir_all(&track_dir).unwrap();
+
+        // Write a structurally valid (empty) Chain1 cache file to satisfy the
+        // "valid Chain1 cache" requirement without needing real spec/ADR content.
+        let cache_json = r#"{"schema_version":1,"entries":[]}"#;
+        std::fs::write(track_dir.join("spec-adr-verify-cache.json"), cache_json).unwrap();
+
+        // Simulate detached HEAD: pass the sentinel directly to results_core,
+        // mirroring what the production code does when current_git_branch() fails.
+        let result = results_core(
+            &canonical_root,
+            track_id,
+            usecase::ref_verify::RefVerifyChainFilter::Chain1,
+            usecase::ref_verify::RefVerifyLayerFilter::All,
+            usecase::ref_verify::RefVerifyVerdictFilter::All,
+            "<detached>".to_owned(),
+        );
+
+        assert!(
+            result.is_ok(),
+            "detached HEAD sentinel must not cause Unavailable error: {result:?}"
+        );
+    }
+
+    // ── F3 structural tests ───────────────────────────────────────────────────
+
+    /// F3: For chain=Chain2, `include_chain1` is false, so the Chain1 pair source is
+    /// never called and Chain1 files (spec.json / ADR) are not opened.
+    #[test]
+    fn pair_source_chain2_does_not_enumerate_chain1() {
+        // Mirrors the `include_chain1` computation in `results()`.
+        let chain = usecase::ref_verify::RefVerifyChainFilter::Chain2;
+        let include_chain1 = matches!(
+            &chain,
+            usecase::ref_verify::RefVerifyChainFilter::Chain1
+                | usecase::ref_verify::RefVerifyChainFilter::All
+        );
+        assert!(!include_chain1, "chain=Chain2 must not enumerate Chain1 from the pair source");
+    }
+
+    /// F3: For chain=Chain2, pair enumeration uses `RefVerifyScope::Chain2 { layer }` per
+    /// layer — not `RefVerifyScope::All` (which would also open Chain1 artifacts).
+    #[test]
+    fn pair_source_chain2_scope_is_chain2_not_all() {
+        use domain::tddd::LayerId;
+        let domain_id = LayerId::try_new("domain".to_owned()).unwrap();
+        // Mirrors what `results()` constructs when include_chain2 is true.
+        let scope = usecase::ref_verify::RefVerifyScope::Chain2 { layer: domain_id.clone() };
+        assert!(
+            matches!(&scope, usecase::ref_verify::RefVerifyScope::Chain2 { layer } if layer == &domain_id),
+            "chain=Chain2 pair enumeration must use Chain2 {{ layer }} scope"
+        );
+        assert!(
+            !matches!(&scope, usecase::ref_verify::RefVerifyScope::All),
+            "chain=Chain2 pair enumeration must not use All scope (would read Chain1 files)"
+        );
+    }
+
+    fn write_two_layer_tddd_rules(project_root: &std::path::Path) {
+        std::fs::write(
+            project_root.join("architecture-rules.json"),
+            r#"{
+              "layers": [
+                {
+                  "crate": "domain",
+                  "tddd": { "enabled": true, "catalogue_file": "domain-types.json" }
+                },
+                {
+                  "crate": "usecase",
+                  "tddd": { "enabled": true, "catalogue_file": "usecase-types.json" }
+                }
+              ]
+            }"#,
+        )
+        .unwrap();
+    }
+
+    fn write_minimal_results_spec(track_dir: &std::path::Path) {
+        std::fs::write(
+            track_dir.join("spec.json"),
+            r#"{"schema_version":2,"version":"1","title":"T","scope":{"in_scope":[],"out_of_scope":[]}}"#,
+        )
+        .unwrap();
+    }
+
+    fn write_minimal_domain_catalogue(track_dir: &std::path::Path) {
+        std::fs::write(
+            track_dir.join("domain-types.json"),
+            r#"{"schema_version":5,"crate_name":"domain","layer":"domain","types":{},"traits":{},"functions":{}}"#,
+        )
+        .unwrap();
+    }
+
+    // ── P1 round-23 regression: Specific layer with partial catalogue set ────────
+
+    /// `--chain 2 --layer Specific(domain)` with 2 declared layers where only
+    /// `domain-types.json` is present (usecase absent) must succeed.
+    ///
+    /// Before the fix, `check_partial_catalogue_set` was applied to the full
+    /// declared set before layer narrowing, causing a `Wiring` error even though
+    /// the requested layer's catalogue was present.
+    ///
+    /// Invariant: when `--layer Specific(X)` is requested, the partial-catalogue
+    /// guard is narrowed to {X} only; the absent state of unrelated layers does
+    /// not affect the result.  The output contains exactly one lane: `Chain2:domain`.
+    #[test]
+    fn compute_results_chain2_specific_layer_present_other_layer_absent_succeeds() {
+        let tmp = tempfile::tempdir().unwrap();
+        let canonical_root = tmp.path().canonicalize().unwrap();
+        let track_id = domain::TrackId::try_new("test-track".to_owned()).unwrap();
+        let track_dir = canonical_root.join("track").join("items").join(track_id.as_ref());
+        std::fs::create_dir_all(&track_dir).unwrap();
+
+        // Two declared TDDD layers; only domain catalogue is present.
+        write_two_layer_tddd_rules(&canonical_root);
+        write_minimal_results_spec(&track_dir);
+        // Minimal valid catalogue: schema_version 5, empty type/trait/function maps.
+        // The pair source reads this file for Chain2 pair enumeration; content {} would
+        // fail decoding with a "missing field `schema_version`" error.
+        write_minimal_domain_catalogue(&track_dir);
+        // usecase-types.json intentionally absent (partial set at declaration level).
+
+        let domain_layer = domain::tddd::LayerId::try_new("domain".to_owned()).unwrap();
+        let result = results_core(
+            &canonical_root,
+            track_id,
+            usecase::ref_verify::RefVerifyChainFilter::Chain2,
+            usecase::ref_verify::RefVerifyLayerFilter::Specific(domain_layer),
+            usecase::ref_verify::RefVerifyVerdictFilter::All,
+            "<detached>".to_owned(),
+        );
+
+        assert!(
+            result.is_ok(),
+            "--chain 2 --layer domain with usecase absent must succeed: {result:?}"
+        );
+        let out = result.unwrap();
+        assert_eq!(out.lane_summaries.len(), 1, "only domain lane expected");
+        assert_eq!(out.lane_summaries[0].label, "Chain2:domain");
+        assert!(
+            !out.lane_summaries.iter().any(|s| s.label == "Chain2:usecase"),
+            "usecase lane must not appear"
+        );
+    }
+
+    /// `--chain all --layer Specific(domain)` with 2 declared layers where only
+    /// `domain-types.json` is present must succeed, producing a Chain1 lane and
+    /// a Chain2:domain lane.
+    ///
+    /// The partial-catalogue guard must be applied only to {domain} for Chain2
+    /// even when chain=All; the usecase lane's absence must not block the query.
+    ///
+    /// Invariant: output has exactly two lanes — `Chain1 (spec↔ADR)` and
+    /// `Chain2:domain`; no `Chain2:usecase` lane appears.
+    #[test]
+    fn compute_results_chain_all_specific_layer_present_other_layer_absent_succeeds() {
+        let tmp = tempfile::tempdir().unwrap();
+        let canonical_root = tmp.path().canonicalize().unwrap();
+        let track_id = domain::TrackId::try_new("test-track".to_owned()).unwrap();
+        let track_dir = canonical_root.join("track").join("items").join(track_id.as_ref());
+        std::fs::create_dir_all(&track_dir).unwrap();
+
+        // Two declared TDDD layers; only domain catalogue present.
+        write_two_layer_tddd_rules(&canonical_root);
+        write_minimal_results_spec(&track_dir);
+        // Minimal valid catalogue: schema_version 5, empty maps.
+        write_minimal_domain_catalogue(&track_dir);
+        // usecase-types.json intentionally absent.
+        // Chain1 and Chain2 cache files are intentionally absent: the cache adapter
+        // returns Ok([]) for absent files, so cache loading is a no-op.
+
+        let domain_layer = domain::tddd::LayerId::try_new("domain".to_owned()).unwrap();
+        let result = results_core(
+            &canonical_root,
+            track_id,
+            usecase::ref_verify::RefVerifyChainFilter::All,
+            usecase::ref_verify::RefVerifyLayerFilter::Specific(domain_layer),
+            usecase::ref_verify::RefVerifyVerdictFilter::All,
+            "<detached>".to_owned(),
+        );
+
+        assert!(
+            result.is_ok(),
+            "--chain all --layer domain with usecase absent must succeed: {result:?}"
+        );
+        let out = result.unwrap();
+        assert!(
+            out.lane_summaries.iter().any(|s| s.label == "Chain1 (spec\u{2194}ADR)"),
+            "Chain1 lane must appear; summaries: {:?}",
+            out.lane_summaries.iter().map(|s| &s.label).collect::<Vec<_>>()
+        );
+        assert!(
+            out.lane_summaries.iter().any(|s| s.label == "Chain2:domain"),
+            "Chain2:domain lane must appear; summaries: {:?}",
+            out.lane_summaries.iter().map(|s| &s.label).collect::<Vec<_>>()
+        );
+        assert!(
+            !out.lane_summaries.iter().any(|s| s.label == "Chain2:usecase"),
+            "Chain2:usecase must NOT appear"
+        );
+    }
+
+    /// `--chain 2 --layer Specific(domain)` must fail closed when the target
+    /// Chain2 catalogue exists before `spec.json`.
+    #[test]
+    fn compute_results_chain2_specific_layer_present_without_spec_returns_wiring_error() {
+        let tmp = tempfile::tempdir().unwrap();
+        let canonical_root = tmp.path().canonicalize().unwrap();
+        let track_id = domain::TrackId::try_new("test-track".to_owned()).unwrap();
+        let track_dir = canonical_root.join("track").join("items").join(track_id.as_ref());
+        std::fs::create_dir_all(&track_dir).unwrap();
+        write_two_layer_tddd_rules(&canonical_root);
+        write_minimal_domain_catalogue(&track_dir);
+
+        let domain_layer = domain::tddd::LayerId::try_new("domain".to_owned()).unwrap();
+        let err = results_core(
+            &canonical_root,
+            track_id,
+            usecase::ref_verify::RefVerifyChainFilter::Chain2,
+            usecase::ref_verify::RefVerifyLayerFilter::Specific(domain_layer),
+            usecase::ref_verify::RefVerifyVerdictFilter::All,
+            "<detached>".to_owned(),
+        )
+        .unwrap_err();
+
+        assert!(
+            matches!(err, RefVerifyDriverError::Wiring(ref msg)
+                if msg.contains("spec.json not found") && msg.contains("domain")),
+            "expected Wiring error for Chain2 ordering violation, got: {err:?}"
+        );
+    }
+
+    /// `--chain all --layer Specific(domain)` uses the same targeted Chain2
+    /// ordering guard even though Chain1 output is also requested.
+    #[test]
+    fn compute_results_chain_all_specific_layer_present_without_spec_returns_wiring_error() {
+        let tmp = tempfile::tempdir().unwrap();
+        let canonical_root = tmp.path().canonicalize().unwrap();
+        let track_id = domain::TrackId::try_new("test-track".to_owned()).unwrap();
+        let track_dir = canonical_root.join("track").join("items").join(track_id.as_ref());
+        std::fs::create_dir_all(&track_dir).unwrap();
+        write_two_layer_tddd_rules(&canonical_root);
+        write_minimal_domain_catalogue(&track_dir);
+
+        let domain_layer = domain::tddd::LayerId::try_new("domain".to_owned()).unwrap();
+        let err = results_core(
+            &canonical_root,
+            track_id,
+            usecase::ref_verify::RefVerifyChainFilter::All,
+            usecase::ref_verify::RefVerifyLayerFilter::Specific(domain_layer),
+            usecase::ref_verify::RefVerifyVerdictFilter::All,
+            "<detached>".to_owned(),
+        )
+        .unwrap_err();
+
+        assert!(
+            matches!(err, RefVerifyDriverError::Wiring(ref msg)
+                if msg.contains("spec.json not found") && msg.contains("domain")),
+            "expected Wiring error for Chain2 ordering violation, got: {err:?}"
+        );
+    }
+
+    /// `--chain all --layer Specific(domain)` must still reject a missing
+    /// `spec.json` when an unselected Chain2 catalogue exists.
+    #[test]
+    fn compute_results_chain_all_specific_absent_target_other_catalogue_without_spec_returns_wiring_error()
+     {
+        let tmp = tempfile::tempdir().unwrap();
+        let canonical_root = tmp.path().canonicalize().unwrap();
+        let track_id = domain::TrackId::try_new("test-track".to_owned()).unwrap();
+        let track_dir = canonical_root.join("track").join("items").join(track_id.as_ref());
+        std::fs::create_dir_all(&track_dir).unwrap();
+        write_two_layer_tddd_rules(&canonical_root);
+        std::fs::write(track_dir.join("usecase-types.json"), "{}").unwrap();
+
+        let domain_layer = domain::tddd::LayerId::try_new("domain".to_owned()).unwrap();
+        let err = results_core(
+            &canonical_root,
+            track_id,
+            usecase::ref_verify::RefVerifyChainFilter::All,
+            usecase::ref_verify::RefVerifyLayerFilter::Specific(domain_layer),
+            usecase::ref_verify::RefVerifyVerdictFilter::All,
+            "<detached>".to_owned(),
+        )
+        .unwrap_err();
+
+        assert!(
+            matches!(err, RefVerifyDriverError::Wiring(ref msg)
+                if msg.contains("spec.json not found") && msg.contains("usecase-types.json")),
+            "expected Wiring error for unselected Chain2 ordering violation, got: {err:?}"
+        );
+    }
+
+    /// `--chain 2 --layer Specific(domain)` must also reject a missing
+    /// `spec.json` when an unselected Chain2 catalogue exists.
+    #[test]
+    fn compute_results_chain2_specific_absent_target_other_catalogue_without_spec_returns_wiring_error()
+     {
+        let tmp = tempfile::tempdir().unwrap();
+        let canonical_root = tmp.path().canonicalize().unwrap();
+        let track_id = domain::TrackId::try_new("test-track".to_owned()).unwrap();
+        let track_dir = canonical_root.join("track").join("items").join(track_id.as_ref());
+        std::fs::create_dir_all(&track_dir).unwrap();
+        write_two_layer_tddd_rules(&canonical_root);
+        std::fs::write(track_dir.join("usecase-types.json"), "{}").unwrap();
+
+        let domain_layer = domain::tddd::LayerId::try_new("domain".to_owned()).unwrap();
+        let err = results_core(
+            &canonical_root,
+            track_id,
+            usecase::ref_verify::RefVerifyChainFilter::Chain2,
+            usecase::ref_verify::RefVerifyLayerFilter::Specific(domain_layer),
+            usecase::ref_verify::RefVerifyVerdictFilter::All,
+            "<detached>".to_owned(),
+        )
+        .unwrap_err();
+
+        assert!(
+            matches!(err, RefVerifyDriverError::Wiring(ref msg)
+                if msg.contains("spec.json not found") && msg.contains("usecase-types.json")),
+            "expected Wiring error for unselected Chain2 ordering violation, got: {err:?}"
+        );
+    }
+
+    // ── P1 round-27 regression: Specific(X) absent must fail closed ─────────
+
+    /// `--chain 2 --layer Specific(domain)` where domain catalogue is absent
+    /// must fail closed with a `Wiring` error.
+    ///
+    /// Scenario: domain is a declared TDDD layer, but `domain-types.json` has
+    /// not been generated yet.  The user explicitly requested domain results;
+    /// an absent catalogue is an actionable error, not a pre-Phase-2 graceful
+    /// empty-result.  The pre-Phase-2 graceful path applies only to
+    /// `--layer All` when no catalogues exist at all.
+    ///
+    /// Invariant: `Specific(X)` + X absent → `Wiring` error containing the
+    /// layer name and "absent".
+    #[test]
+    fn compute_results_chain2_specific_layer_absent_returns_wiring_error() {
+        let tmp = tempfile::tempdir().unwrap();
+        let canonical_root = tmp.path().canonicalize().unwrap();
+        let track_id = domain::TrackId::try_new("test-track".to_owned()).unwrap();
+        let track_dir = canonical_root.join("track").join("items").join(track_id.as_ref());
+        std::fs::create_dir_all(&track_dir).unwrap();
+
+        // Two declared TDDD layers; neither catalogue is present yet.
+        write_two_layer_tddd_rules(&canonical_root);
+        // spec.json and domain-types.json intentionally absent (pre-Phase-2 for domain).
+
+        let domain_layer = domain::tddd::LayerId::try_new("domain".to_owned()).unwrap();
+        let err = results_core(
+            &canonical_root,
+            track_id,
+            usecase::ref_verify::RefVerifyChainFilter::Chain2,
+            usecase::ref_verify::RefVerifyLayerFilter::Specific(domain_layer),
+            usecase::ref_verify::RefVerifyVerdictFilter::All,
+            "<detached>".to_owned(),
+        )
+        .unwrap_err();
+
+        assert!(
+            matches!(err, RefVerifyDriverError::Wiring(ref msg)
+                if msg.contains("domain") && msg.contains("absent")),
+            "expected Wiring error for absent target layer, got: {err:?}"
+        );
+    }
+
+    /// `--chain 2 --layer Specific(domain)` with domain catalogue present and
+    /// usecase catalogue absent succeeds (Round-23 narrowing path unchanged).
+    ///
+    /// Variant of the Round-23 regression test confirming that the targeted
+    /// partial-catalogue check covers only {X} when `--layer Specific(X)` is
+    /// used.  An absent unrelated layer (usecase) must not block the query.
+    ///
+    /// Invariant: X present + unrelated Y absent → Ok; exactly one
+    /// `Chain2:domain` lane in the output.
+    #[test]
+    fn compute_results_chain2_specific_layer_present_other_absent_succeeds() {
+        let tmp = tempfile::tempdir().unwrap();
+        let canonical_root = tmp.path().canonicalize().unwrap();
+        let track_id = domain::TrackId::try_new("test-track".to_owned()).unwrap();
+        let track_dir = canonical_root.join("track").join("items").join(track_id.as_ref());
+        std::fs::create_dir_all(&track_dir).unwrap();
+
+        write_two_layer_tddd_rules(&canonical_root);
+        write_minimal_results_spec(&track_dir);
+        write_minimal_domain_catalogue(&track_dir);
+        // usecase-types.json intentionally absent.
+
+        let domain_layer = domain::tddd::LayerId::try_new("domain".to_owned()).unwrap();
+        let result = results_core(
+            &canonical_root,
+            track_id,
+            usecase::ref_verify::RefVerifyChainFilter::Chain2,
+            usecase::ref_verify::RefVerifyLayerFilter::Specific(domain_layer),
+            usecase::ref_verify::RefVerifyVerdictFilter::All,
+            "<detached>".to_owned(),
+        );
+
+        assert!(
+            result.is_ok(),
+            "--chain 2 --layer domain with usecase absent must succeed: {result:?}"
+        );
+        let out = result.unwrap();
+        assert_eq!(out.lane_summaries.len(), 1, "only domain lane expected");
+        assert_eq!(out.lane_summaries[0].label, "Chain2:domain");
+    }
+
+    /// `--chain 2 --layer All` with all declared catalogues absent succeeds with
+    /// zero pairs (pre-Phase-2 state).
+    ///
+    /// When no catalogue has been generated yet, `--layer All` is the
+    /// pre-Phase-2 valid state: the user did not explicitly target any layer,
+    /// so the absence of all catalogues is handled gracefully.  This path must
+    /// not be broken by the fail-closed check added for `Specific(X)`.
+    ///
+    /// Invariant: `All` + all catalogues absent → Ok; every lane has zero
+    /// pass/fail/pending counts.
+    #[test]
+    fn compute_results_chain2_all_all_absent_succeeds_zero_pair() {
+        let tmp = tempfile::tempdir().unwrap();
+        let canonical_root = tmp.path().canonicalize().unwrap();
+        let track_id = domain::TrackId::try_new("test-track".to_owned()).unwrap();
+        let track_dir = canonical_root.join("track").join("items").join(track_id.as_ref());
+        std::fs::create_dir_all(&track_dir).unwrap();
+
+        // Two declared TDDD layers; neither catalogue present (pre-Phase-2).
+        write_two_layer_tddd_rules(&canonical_root);
+        // spec.json and both catalogues intentionally absent.
+
+        let result = results_core(
+            &canonical_root,
+            track_id,
+            usecase::ref_verify::RefVerifyChainFilter::Chain2,
+            usecase::ref_verify::RefVerifyLayerFilter::All,
+            usecase::ref_verify::RefVerifyVerdictFilter::All,
+            "<detached>".to_owned(),
+        );
+
+        assert!(
+            result.is_ok(),
+            "--chain 2 --layer all with all catalogues absent must succeed (pre-Phase-2): {result:?}"
+        );
+        let out = result.unwrap();
+        assert!(
+            out.lane_summaries
+                .iter()
+                .all(|s| s.pass_count == 0 && s.fail_count == 0 && s.pending_count == 0),
+            "all lanes must have zero counts in pre-Phase-2 state: {:?}",
+            out.lane_summaries
+        );
     }
 }

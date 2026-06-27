@@ -1,0 +1,55 @@
+{
+  "schema_version": 5,
+  "crate_name": "infrastructure",
+  "layer": "infrastructure",
+  "types": {
+    "FsRefVerifyAggregateAdapter": {
+      "action": "modify",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "unit" }
+      },
+      "methods": [],
+      "module_path": "ref_verify::driver_adapter",
+      "docs": "Unit-struct adapter implementing RefVerifyAggregateService. Extended by D1/D2/D3 to add the `results` method: reads verify-cache files and re-derives pending pairs read-only from the pair source. No LLM subprocess is started in the results path.",
+      "spec_refs": [
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "IN-01" },
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "IN-05" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [
+    {
+      "type_name": "FsRefVerifyAggregateAdapter",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    {
+      "action": "modify",
+      "trait_ref": "usecase::ref_verify::RefVerifyAggregateService",
+      "for_type": "FsRefVerifyAggregateAdapter"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::default::Default",
+      "for_type": "FsRefVerifyAggregateAdapter"
+    }
+  ]
+}

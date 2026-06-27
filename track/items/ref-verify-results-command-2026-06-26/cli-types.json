@@ -1,0 +1,196 @@
+{
+  "schema_version": 5,
+  "crate_name": "cli",
+  "layer": "cli",
+  "types": {
+    "RefVerifyChainArg": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Chain1", "payload": { "kind": "unit" } },
+          { "name": "Chain2", "payload": { "kind": "unit" } },
+          { "name": "All",    "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "commands::ref_verify",
+      "docs": "Clap ValueEnum for the `--chain {1|2|all}` option. `Chain1` maps to the clap value `1`, `Chain2` maps to `2`, `All` maps to `all` via `#[value(name = ...)]` attributes. Converted to cli_driver::ref_verify::RefVerifyChainSelect when constructing RefVerifyResultsInput.",
+      "spec_refs": [
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "IN-01" }
+      ],
+      "informal_grounds": []
+    },
+    "RefVerifyVerdictFilterArg": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Pass",    "payload": { "kind": "unit" } },
+          { "name": "Fail",    "payload": { "kind": "unit" } },
+          { "name": "Pending", "payload": { "kind": "unit" } },
+          { "name": "All",     "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "commands::ref_verify",
+      "docs": "Clap ValueEnum for the explicit `--filter {pass|fail|pending|all}` option. Variants use automatic kebab-case: pass/fail/pending/all. The option itself is optional on RefVerifyResultsArgs; absence maps to cli_driver::ref_verify::RefVerifyVerdictSelect::FailPending to preserve the ADR default record block.",
+      "spec_refs": [
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "IN-01" },
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "AC-09" }
+      ],
+      "informal_grounds": []
+    },
+    "RefVerifyResultsArgs": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "track_id",  "ty": "Option<String>" },
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "chain",     "ty": "RefVerifyChainArg" },
+            { "name": "layer",     "ty": "String" },
+            { "name": "filter",    "ty": "Option<RefVerifyVerdictFilterArg>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "commands::ref_verify",
+      "docs": "Arguments for `sotp ref-verify results`. Named with the `RefVerify` prefix to avoid collision with the existing commands::review::ResultsArgs type. `track_id` is optional (auto-resolved from branch when omitted). `layer` is a plain String (default 'all') because valid layer names are resolved dynamically from architecture-rules.json at runtime. `chain` uses a typed clap ValueEnum arg with default All; `filter` is optional, has no clap default, and maps None to cli_driver::ref_verify::RefVerifyVerdictSelect::FailPending so default output lists fail/pending pairs while explicit `--filter all` still lists all verdicts.",
+      "spec_refs": [
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "IN-01" },
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "IN-02" },
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "IN-06" },
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "AC-09" }
+      ],
+      "informal_grounds": []
+    },
+    "RefVerifyCommand": {
+      "action": "modify",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Run",
+            "payload": { "kind": "tuple", "fields": ["RunArgs"] }
+          },
+          {
+            "name": "CheckApproved",
+            "payload": { "kind": "tuple", "fields": ["CheckApprovedArgs"] }
+          },
+          {
+            "name": "Results",
+            "payload": { "kind": "tuple", "fields": ["RefVerifyResultsArgs"] }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "commands::ref_verify",
+      "docs": "Subcommands for `sotp ref-verify`. Extended with the `Results(RefVerifyResultsArgs)` variant for D1 (one-stop CLI for ref-verify results). Derives clap::Subcommand and Debug.",
+      "spec_refs": [
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "IN-01" }
+      ],
+      "informal_grounds": []
+    },
+    "RunArgs": {
+      "action": "reference",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "track_id",  "ty": "Option<String>" },
+            { "name": "items_dir", "ty": "std::path::PathBuf" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "commands::ref_verify",
+      "docs": "Arguments for `sotp ref-verify run`.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "CheckApprovedArgs": {
+      "action": "reference",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "track_id",  "ty": "Option<String>" },
+            { "name": "items_dir", "ty": "std::path::PathBuf" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "commands::ref_verify",
+      "docs": "Arguments for `sotp ref-verify check-approved`.",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {
+    "cli::commands::ref_verify::execute": {
+      "action": "modify",
+      "role": "FreeFunction",
+      "params": [{ "name": "cmd", "ty": "RefVerifyCommand" }],
+      "returns": "std::process::ExitCode",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Execute `sotp ref-verify <subcommand>`. Extended with a Results arm that constructs RefVerifyResultsInput from RefVerifyResultsArgs and dispatches to the driver. Exit code is always 0 regardless of result content (D2 / IN-06 for the results subcommand).",
+      "spec_refs": [
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "IN-01" }
+      ],
+      "informal_grounds": []
+    },
+    "cli::commands::ref_verify::execute_results": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [{ "name": "args", "ty": "&RefVerifyResultsArgs" }],
+      "returns": "std::process::ExitCode",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Private dispatch helper for `sotp ref-verify results`. Constructs RefVerifyResultsInput from RefVerifyResultsArgs and dispatches to the driver via RefVerifyCompositionRoot. Exit code mirrors driver_outcome_to_exit; always 0 for results content per D2/CN-02.",
+      "spec_refs": [
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "IN-01" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "inherent_impls": [],
+  "trait_impls": [
+    { "trait_ref": "core::fmt::Debug",                  "for_type": "RefVerifyChainArg" },
+    { "trait_ref": "core::clone::Clone",                "for_type": "RefVerifyChainArg" },
+    { "trait_ref": "core::cmp::PartialEq",              "for_type": "RefVerifyChainArg" },
+    { "trait_ref": "core::cmp::Eq",                     "for_type": "RefVerifyChainArg" },
+    { "trait_ref": "clap_builder::derive::ValueEnum",   "for_type": "RefVerifyChainArg" },
+
+    { "trait_ref": "core::fmt::Debug",                  "for_type": "RefVerifyVerdictFilterArg" },
+    { "trait_ref": "core::clone::Clone",                "for_type": "RefVerifyVerdictFilterArg" },
+    { "trait_ref": "core::cmp::PartialEq",              "for_type": "RefVerifyVerdictFilterArg" },
+    { "trait_ref": "core::cmp::Eq",                     "for_type": "RefVerifyVerdictFilterArg" },
+    { "trait_ref": "clap_builder::derive::ValueEnum",   "for_type": "RefVerifyVerdictFilterArg" },
+
+    { "trait_ref": "core::fmt::Debug",                      "for_type": "RefVerifyResultsArgs" },
+    { "trait_ref": "clap_builder::derive::Args",            "for_type": "RefVerifyResultsArgs" },
+    { "trait_ref": "clap_builder::derive::FromArgMatches",  "for_type": "RefVerifyResultsArgs" },
+
+    { "action": "modify",    "trait_ref": "core::fmt::Debug",                         "for_type": "RefVerifyCommand" },
+    { "action": "reference", "trait_ref": "clap_builder::derive::FromArgMatches",        "for_type": "RefVerifyCommand" },
+    { "action": "reference", "trait_ref": "clap_builder::derive::Subcommand",            "for_type": "RefVerifyCommand" }
+  ]
+}

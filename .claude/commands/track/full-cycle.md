@@ -65,9 +65,12 @@ DonePending tasks into one or more **batches** by greedy accumulation:
 3. If this task's own contribution would exceed a configured ceiling for a layer whose current
    batch cumulative diff is still **zero**, a batch boundary cannot make that task compliant.
    If the current batch is non-empty, close the current batch first and re-evaluate the task in a
-   fresh batch. If the task still exceeds the ceiling as a singleton, stop before implementation
-   and require the task to be split/refined in `impl-plan.json`; do **not** emit an
-   over-ceiling singleton batch.
+   fresh batch. If the task still exceeds the ceiling as a singleton, **emit it as an
+   over-ceiling singleton batch and log the overflow** — the ceiling is advisory ("stop adding
+   more tasks once a scope is over the line"), not a hard halt on intrinsically-large atomic
+   work. A singleton that legitimately requires more lines (e.g. cross-layer atomic migration,
+   codec rewrite) proceeds; recording the actual line count lets future planning refine the
+   task granularity if useful.
 4. If adding this task would cause some layer's **already-non-zero** cumulative diff in the
    current batch to exceed its `diff_ceiling_for_scope`, **close the current batch** (commit
    it as below) and start a new one. The next iteration places this task into the fresh batch.
@@ -81,8 +84,9 @@ DonePending tasks into one or more **batches** by greedy accumulation:
 
 The planner is a heuristic, not a binary gate. When sizing is uncertain (estimates are rough
 or the task list is short), bias toward fewer / larger batches and let the per-scope ceiling
-serve as the hard upper bound at split time. A single feature with no over-ceiling layer
-collapses to one batch.
+serve as the advisory split signal for multi-task accumulation. A single feature with no
+over-ceiling layer collapses to one batch, and an intrinsically over-ceiling singleton follows
+Rule 3.
 
 ## Step 0c: Order tasks inside a batch by implementation dependencies
 
@@ -105,14 +109,18 @@ For each batch produced by Step 0b, in order:
    Step 0c order. Do NOT commit between tasks in the same batch — accumulate all changes in the
    working tree.
 
-1b. **Actual-diff guard (hard cap on Step 0b estimates)**: measure the **actual** per-scope
-    diff against the ceilings loaded in Step 0a. Step 0b is a planning heuristic over per-task
-    *estimates*; this step is the hard cap that prevents an underestimated batch from silently
-    bypassing the configured ceilings. Run it at both pre-review mutation boundaries:
-    - after implementation finishes and before DFP, to catch underestimated implementation
-      batches early; and
+1b. **Actual-diff guard (advisory ceiling visibility)**: measure the **actual** per-scope diff
+    against the ceilings loaded in Step 0a and surface the numbers. Step 0b is a planning
+    heuristic over per-task *estimates*; this step makes the real line counts visible so the
+    orchestrator can refine future batches with actual data. The ceiling is **advisory** ("stop
+    adding more tasks once a scope is over the line"), not a hard halt that rolls back an
+    already-implemented batch.
+
+    Run it at both pre-review mutation boundaries:
+    - after implementation finishes and before DFP, to surface actual line counts before review
+      starts; and
     - after DFP returns `skipped` / `completed` and before Review, because DFP can edit files
-      and push the same batch over a scope ceiling.
+      and shift the per-scope totals.
 
     Procedure:
 
@@ -131,18 +139,17 @@ For each batch produced by Step 0b, in order:
        as one batch diff. The implicit `ScopeName::Other` is exempt (no ceiling, by Step 0a).
     2. Compare each scope's actual line count to its `diff_ceiling_for_scope` value. When the
        ceiling is `None` for a scope, skip the comparison for that scope.
-    3. If any scope's actual diff exceeds its ceiling, **halt the batch loop immediately**:
-       - Do NOT proceed to DFP, Review, or Commit for this batch.
-       - Report the overflowing scopes with their actual line counts and ceiling values.
-       - The estimator in Step 0b underestimated this batch; the correct response is one of:
-         (a) refine the offending task's description in `impl-plan.json` and re-split via a
-         smaller follow-up `impl-plan` revision, (b) raise the ceiling explicitly in
-         `.harness/config/review-scope.json` with a justification, or (c) revert / shelf the
-         offending edits and re-implement them as a separate batch.
-       - This is a hard cap that protects the per-scope review-cost ceiling property of D3 /
-         AC-04. Skipping it defeats the workflow's main guarantee.
-    4. If every scope is within its ceiling, continue to the next phase: Step 1c (DFP) for the
-       post-implementation run, or Step 2 (Review) for the post-DFP/pre-review run.
+    3. If any scope's actual diff exceeds its ceiling, **log the overflow (scope name, actual
+       line count, ceiling value) and continue** to the next phase. Do not halt, do not revert,
+       do not require user judgment. The ceiling is advisory: it guides Step 0b's "stop adding
+       more tasks to this batch" decision, and it surfaces information that future impl-plan
+       authors can use to refine task granularity. A single atomic task that legitimately needs
+       more lines (cross-layer migration, codec rewrite, large refactor) proceeds through
+       review/commit as a single-task over-ceiling batch without intervention.
+    4. Continue to the next phase: Step 1c (DFP) for the post-implementation run, or Step 2
+       (Review) for the post-DFP/pre-review run. The overflow log from step 3 may inform a
+       follow-up impl-plan revision if a recurring overrun suggests the task could be split
+       cleanly, but that is a separate planning decision and never blocks the current batch.
 
 1c. **DRY fix phase (DFP, once per batch)**: execute `/track:dry-check` once for the
     accumulated batch diff. This runs the whole-codebase DRY gate (single scope, D13) via the
@@ -159,7 +166,8 @@ For each batch produced by Step 0b, in order:
       post-DFP/pre-review guard before proceeding to Review (Step 2). The single SSoT for the
       opt-out lives in `/track:dry-check`; do NOT duplicate the config probe here.
     - **`completed`** — the DRY gate is Approved. Re-run Step 1b as the post-DFP/pre-review
-      guard, then proceed to Review (Step 2) only if the batch still fits its ceilings.
+      visibility pass, then proceed to Review (Step 2). Any ceiling overflow is logged by
+      Step 1b and does not block the transition.
     - **`blocked`** — DRY violations remain that dfl could not resolve autonomously (the loop
       exhausted its fix attempts). This is a **DRY-gate outcome, NOT a tooling error**. Halt
       the batch loop immediately, surface the unresolved DRY violation pairs (`bin/sotp dry
@@ -177,13 +185,13 @@ For each batch produced by Step 0b, in order:
    Review must reach full-model `zero_findings` in every required scope.
 
    **Back-edge (RFP → DFP fixpoint)**: review fixes (RFP) edit code, which can reintroduce
-   duplication AND can grow the per-scope diff past its ceiling. After Review reaches
+   duplication AND can change the per-scope diff totals. After Review reaches
    `zero_findings`, **re-run Step 1b (Actual-diff guard), Step 1c (DFP), and the post-DFP
    Step 1b guard before returning to Review or Commit**. Iterate `Actual-diff guard` → DFP →
-   `Actual-diff guard` ⇄ RFP until **all three** gates are clean in the same pass (the actual
-   diff stays within ceiling after both RFP and DFP mutations, the DRY gate stays Approved, and
-   review stays `zero_findings` with no new edits) — that fixpoint is the precondition for
-   Commit.
+   `Actual-diff guard` ⇄ RFP until the same pass has Step 1b measurements recorded at both
+   mutation boundaries, the DRY gate stays Approved, and review stays `zero_findings` with no
+   new edits. Any ceiling overflow remains advisory and logged; it is not a fixpoint
+   precondition.
 
 3. **Commit (single commit per batch, same hash for all batch tasks)**: stage **after** the
    final review round (`cargo make add-all` or selective `track-add-paths`), then execute

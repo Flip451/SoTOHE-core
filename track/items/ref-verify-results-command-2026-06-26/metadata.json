@@ -1,0 +1,8 @@
+{
+  "schema_version": 5,
+  "id": "ref-verify-results-command-2026-06-26",
+  "title": "`sotp ref-verify results` で verify-cache 直読みを置き換える",
+  "branch": "track/ref-verify-results-command-2026-06-26",
+  "created_at": "2026-06-25T23:46:47Z",
+  "updated_at": "2026-06-25T23:46:47Z"
+}

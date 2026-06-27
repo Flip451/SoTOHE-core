@@ -21,7 +21,7 @@ use std::fmt;
 
 use domain::TrackId;
 use domain::tddd::LayerId;
-use domain::tddd::semantic_verify::{ModelTier, SemanticVerdict, SemanticVerifyEntry};
+use domain::tddd::semantic_verify::{ModelTier, SemanticVerifyEntry};
 
 // ── RefVerifyScope ────────────────────────────────────────────────────────────
 
@@ -111,6 +111,10 @@ pub struct RefVerifyPair {
     /// When `true`, this pair is a known-bad monitor probe. It is evaluated
     /// every run (bypassing cache) but its verdict is not persisted.
     pub known_bad: bool,
+    /// Origin reference identifying which artifact and location the claim came from.
+    pub claim_origin: VerifyOriginRef,
+    /// Origin reference identifying which artifact and location the evidence came from.
+    pub evidence_origin: VerifyOriginRef,
 }
 
 // ── RefVerifyPercent ──────────────────────────────────────────────────────────
@@ -430,6 +434,18 @@ pub use check_approved::{
 
 pub mod driver_service;
 pub use driver_service::{
-    RefVerifyAggregateService, RefVerifyCheckApprovedDriverService, RefVerifyCheckApprovedOutcome,
-    RefVerifyDriverError, RefVerifyRunOutcome, RefVerifyRunService,
+    RefVerifyAggregateService, RefVerifyChainFilter, RefVerifyCheckApprovedDriverService,
+    RefVerifyCheckApprovedOutcome, RefVerifyDriverError, RefVerifyLaneSummary,
+    RefVerifyLayerFilter, RefVerifyPairRecord, RefVerifyResultsOutput, RefVerifyRunOutcome,
+    RefVerifyRunService, RefVerifyVerdictFilter,
+};
+
+// Re-exported for cli_driver layer accessibility (T005).
+// `RefVerifyPairRecord` exposes these domain types in its public fields; making
+// them accessible here follows the existing `pub use domain::tddd::LayerId`
+// pattern and does not change any behavioral contract.
+pub use domain::SpecElementId;
+pub use domain::tddd::semantic_verify::{
+    AdrDecisionRef, CatalogueEntryKey, CatalogueEntryRef, CatalogueSectionKey, SemanticVerdict,
+    SpecElementRef, SpecSectionKind, VerifyOriginRef,
 };

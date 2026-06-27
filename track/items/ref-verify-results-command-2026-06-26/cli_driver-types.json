@@ -1,0 +1,211 @@
+{
+  "schema_version": 5,
+  "crate_name": "cli_driver",
+  "layer": "cli_driver",
+  "types": {
+    "RefVerifyChainSelect": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Chain1", "payload": { "kind": "unit" } },
+          { "name": "Chain2", "payload": { "kind": "unit" } },
+          { "name": "All",    "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "ref_verify",
+      "docs": "Chain-filter selection for the `ref-verify results` command. Defined in the cli_driver layer so the cli layer can construct RefVerifyResultsInput without depending on the usecase crate directly. RefVerifyDriver::handle converts this to usecase::ref_verify::RefVerifyChainFilter before calling the service. Role Dto (not ValueObject) per R1: ValueObject is forbidden in cli_driver; Dto is the appropriate role for input-parameter enums at this layer.",
+      "spec_refs": [
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "IN-01" }
+      ],
+      "informal_grounds": []
+    },
+    "RefVerifyVerdictSelect": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "FailPending", "payload": { "kind": "unit" } },
+          { "name": "Pass",        "payload": { "kind": "unit" } },
+          { "name": "Fail",        "payload": { "kind": "unit" } },
+          { "name": "Pending",     "payload": { "kind": "unit" } },
+          { "name": "All",         "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "ref_verify",
+      "docs": "Verdict-filter selection for the `ref-verify results` command. `FailPending` represents omitted CLI `--filter` and preserves the ADR default record block; explicit CLI values map to Pass/Fail/Pending/All. Defined in the cli_driver layer so the cli layer can construct RefVerifyResultsInput without depending on the usecase crate directly. RefVerifyDriver::handle converts this to usecase::ref_verify::RefVerifyVerdictFilter before calling the service. Role Dto (not ValueObject) per R1: ValueObject is forbidden in cli_driver; Dto is the appropriate role for input-parameter enums at this layer.",
+      "spec_refs": [
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "IN-01" },
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "AC-09" }
+      ],
+      "informal_grounds": []
+    },
+    "RefVerifyResultsInput": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "track_id",  "ty": "String" },
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "chain",     "ty": "RefVerifyChainSelect" },
+            { "name": "layer",     "ty": "String" },
+            { "name": "verdict",   "ty": "RefVerifyVerdictSelect" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "ref_verify",
+      "docs": "Input DTO for `sotp ref-verify results`. `track_id` is already resolved from the branch when omitted on the CLI. `chain` and `verdict` are typed cli_driver-level selects (no usecase import required at the cli layer). `layer` is a plain String ('all' or a layer name) because valid layer names are dynamic (from architecture-rules.json) and cannot be captured in a closed enum at this layer; the driver ignores this raw layer string when chain=Chain1 because Chain1 has no layer dimension.",
+      "spec_refs": [
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "IN-01" }
+      ],
+      "informal_grounds": []
+    },
+    "RefVerifyInput": {
+      "action": "modify",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Run",
+            "payload": { "kind": "tuple", "fields": ["RefVerifyRunInput"] }
+          },
+          {
+            "name": "CheckApproved",
+            "payload": { "kind": "tuple", "fields": ["RefVerifyCheckApprovedInput"] }
+          },
+          {
+            "name": "Results",
+            "payload": { "kind": "tuple", "fields": ["RefVerifyResultsInput"] }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "ref_verify",
+      "docs": "Typed input for the `ref_verify` command family. Extended with a `Results` variant to carry the structured input for `sotp ref-verify results`.",
+      "spec_refs": [
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "IN-01" }
+      ],
+      "informal_grounds": []
+    },
+    "RefVerifyDriver": {
+      "action": "modify",
+      "role": { "PrimaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "ref_verify",
+      "docs": "Primary adapter driver for the `ref_verify` command family. Holds a single injected RefVerifyAggregateService; exposes handle(input) -> CommandOutcome. The match body gains a Results arm in this track; the method signature is unchanged.",
+      "spec_refs": [
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "IN-01" },
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "AC-01" }
+      ],
+      "informal_grounds": []
+    },
+    "RefVerifyRunInput": {
+      "action": "reference",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "track_id",  "ty": "String" },
+            { "name": "items_dir", "ty": "std::path::PathBuf" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "ref_verify",
+      "docs": "Input DTO for `sotp ref-verify run`.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "RefVerifyCheckApprovedInput": {
+      "action": "reference",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "track_id",  "ty": "String" },
+            { "name": "items_dir", "ty": "std::path::PathBuf" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "ref_verify",
+      "docs": "Input DTO for `sotp ref-verify check-approved`.",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [
+    {
+      "type_name": "RefVerifyDriver",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            {
+              "name": "service",
+              "ty": "std::sync::Arc<dyn usecase::ref_verify::RefVerifyAggregateService>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Create a new RefVerifyDriver with a single injected aggregate service."
+        },
+        {
+          "name": "handle",
+          "receiver": "&self",
+          "params": [{ "name": "input", "ty": "RefVerifyInput" }],
+          "returns": "CommandOutcome",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Handle a ref_verify command by dispatching to the corresponding service method."
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    { "trait_ref": "core::fmt::Debug",     "for_type": "RefVerifyChainSelect" },
+    { "trait_ref": "core::clone::Clone",   "for_type": "RefVerifyChainSelect" },
+    { "trait_ref": "core::cmp::PartialEq", "for_type": "RefVerifyChainSelect" },
+    { "trait_ref": "core::cmp::Eq",        "for_type": "RefVerifyChainSelect" },
+
+    { "trait_ref": "core::fmt::Debug",     "for_type": "RefVerifyVerdictSelect" },
+    { "trait_ref": "core::clone::Clone",   "for_type": "RefVerifyVerdictSelect" },
+    { "trait_ref": "core::cmp::PartialEq", "for_type": "RefVerifyVerdictSelect" },
+    { "trait_ref": "core::cmp::Eq",        "for_type": "RefVerifyVerdictSelect" },
+
+    { "trait_ref": "core::fmt::Debug",   "for_type": "RefVerifyResultsInput" },
+    { "trait_ref": "core::clone::Clone", "for_type": "RefVerifyResultsInput" }
+  ]
+}

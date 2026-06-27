@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-06-27T07:17:24Z",
+  "declaration_hash": "8f1f7fc683428cd9430431a9b039912ef7e90962d7a309f6e68d346ca0786732",
+  "signals": [
+    {
+      "type_name": "RefVerifyChainFilter",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "RefVerifyCompositionRoot",
+      "kind_tag": "composition_root",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "RefVerifyResultsInput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "RefVerifyVerdictFilter",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "RefVerifyCheckApprovedInput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "RefVerifyRunInput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

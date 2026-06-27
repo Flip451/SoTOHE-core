@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "7cbf9b10b97fddb20a4cbe8bbd23559f8363fdef3341045800a6b14f07c923d0",
+  "signals": [
+    {
+      "type_name": "FsRefVerifyAggregateAdapter",
+      "signal": "blue",
+      "entry_hash": "ea60a7c864365f866673709d678028daab8066ebef89f98e4a6734b0fd4435eb"
+    }
+  ]
+}

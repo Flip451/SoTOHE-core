@@ -46,8 +46,10 @@ impl RefVerifyApplicationService for VerifySemanticRefsInteractor {
     /// 1. Load all pairs (production + known-bad probes) via `pair_source`.
     /// 2. Separate `known_bad` probes from production pairs.
     /// 3. For each `cache_scope` group of production pairs, load existing
-    ///    cache entries and skip pairs whose `(claim_hash, evidence_hash)` is
-    ///    unchanged (AC-07).
+    ///    cache entries and skip pairs whose full key
+    ///    `(claim_hash, evidence_hash, claim_origin, evidence_origin)` matches a
+    ///    frozen entry (AC-07). Same-hash-different-origin pairs are treated as
+    ///    cache misses and sent to fresh verification.
     ///    3b. D12: when production pairs exist and **all** of them are cache
     ///    hits, skip known-bad probe evaluation entirely (no fresh production
     ///    work → nothing to calibrate) and gate on the frozen verdicts alone.
@@ -108,7 +110,9 @@ impl RefVerifyApplicationService for VerifySemanticRefsInteractor {
         }
 
         // Partition production pairs into cache hits and cache misses.
-        // A cache hit means (claim_hash, evidence_hash) is frozen in the cache for ANY verdict.
+        // A cache hit means (claim_hash, evidence_hash, claim_origin, evidence_origin) all match a
+        // frozen entry in the scope's cache. Same-hash-different-origin pairs are cache misses and
+        // proceed to fresh verification (R24 origin-keyed lookup).
         // Cache-hit pairs are NOT sent to the verifier; their frozen verdict is preserved as-is.
         let (cache_hits, cache_misses): (Vec<_>, Vec<_>) =
             production_pairs.iter().partition(|pair| {
@@ -116,7 +120,10 @@ impl RefVerifyApplicationService for VerifySemanticRefsInteractor {
                     .get(&pair.cache_scope)
                     .map(|entries| {
                         entries.iter().any(|e| {
-                            e.claim_hash == pair.claim_hash && e.evidence_hash == pair.evidence_hash
+                            e.claim_hash == pair.claim_hash
+                                && e.evidence_hash == pair.evidence_hash
+                                && e.claim_origin == pair.claim_origin
+                                && e.evidence_origin == pair.evidence_origin
                         })
                     })
                     .unwrap_or(false)
@@ -124,6 +131,8 @@ impl RefVerifyApplicationService for VerifySemanticRefsInteractor {
 
         // Collect frozen verdicts for cache-hit pairs so they participate in
         // confirmed_fails / confirmed_pending categorisation below.
+        // Uses the full key (claim_hash, evidence_hash, claim_origin, evidence_origin) so that
+        // duplicate entries sharing hashes but differing in origin each map to their own verdict.
         let cache_hit_verdicts: Vec<(&RefVerifyPair, SemanticVerdict)> = cache_hits
             .iter()
             .filter_map(|pair| {
@@ -131,7 +140,10 @@ impl RefVerifyApplicationService for VerifySemanticRefsInteractor {
                     entries
                         .iter()
                         .find(|e| {
-                            e.claim_hash == pair.claim_hash && e.evidence_hash == pair.evidence_hash
+                            e.claim_hash == pair.claim_hash
+                                && e.evidence_hash == pair.evidence_hash
+                                && e.claim_origin == pair.claim_origin
+                                && e.evidence_origin == pair.evidence_origin
                         })
                         .map(|e| (*pair, e.verdict.clone()))
                 })
@@ -150,23 +162,39 @@ impl RefVerifyApplicationService for VerifySemanticRefsInteractor {
         // (cache_miss_owned is empty), there is no fresh production work to calibrate
         // against. Skip known-bad probe evaluation entirely — running probes only
         // to validate a verifier that is never invoked for real work would burn
-        // model budget without any signal benefit. Persist Ok(()) immediately
-        // since cache-hit verdicts have already been categorised below by the
-        // caller-side accumulators (and confirmed_fails / confirmed_pending are
-        // zero by construction when this branch fires because cache_hit_verdicts
-        // contains only Pass-derived entries — Pending is never cached, and Fail
-        // would have surfaced on the previous run).
+        // model budget without any signal benefit.
+        //
+        // Rebuild all cache entries with current pair origins and always re-save so
+        // that renamed/moved source artifacts are reflected (origin refresh).
         if !production_pairs.is_empty() && cache_miss_owned.is_empty() {
-            // Still walk cache-hit verdicts to surface previously cached failures.
+            let mut new_entries_by_scope: HashMap<RefVerifyCacheScope, Vec<SemanticVerifyEntry>> =
+                HashMap::new();
             let mut hit_fails: usize = 0;
             let mut hit_pending: usize = 0;
-            for (_, verdict) in &cache_hit_verdicts {
+
+            for (pair, verdict) in &cache_hit_verdicts {
                 match verdict {
                     SemanticVerdict::Fail { .. } => hit_fails += 1,
                     SemanticVerdict::Pending => hit_pending += 1,
                     SemanticVerdict::Pass { .. } => {}
                 }
+                // Rebuild cached entry with current pair origins to prevent stale-origin results.
+                let entry = SemanticVerifyEntry::new(
+                    pair.claim_hash.clone(),
+                    pair.evidence_hash.clone(),
+                    verdict.clone(),
+                    pair.claim_origin.clone(),
+                    pair.evidence_origin.clone(),
+                );
+                new_entries_by_scope.entry(pair.cache_scope.clone()).or_default().push(entry);
             }
+
+            // Always save so that origin changes are written even when content hashes
+            // are unchanged (e.g. a catalogue entry is renamed but its JSON is identical).
+            for (scope, entries) in new_entries_by_scope {
+                self.cache.save_entries(cmd, &scope, entries)?;
+            }
+
             if hit_fails > 0 {
                 return Err(RefVerifyError::SemanticFailuresConfirmed { pair_count: hit_fails });
             }
@@ -263,56 +291,70 @@ impl RefVerifyApplicationService for VerifySemanticRefsInteractor {
             return Err(RefVerifyError::HumanEscalationRequired { pair_count: count });
         }
 
-        // Step 8: build updated cache contents grouped by cache_scope.
+        // Step 8: build updated cache entries from ALL production pairs (cache-hits and fresh).
         // Only reached when calibration is healthy; degraded-verifier verdicts are never cached.
-        // For each scope, start from the existing cache entries, replace the entries that
-        // correspond to re-evaluated pairs with fresh verdicts, and add new ones.
+        // Origins are always taken from the current pair source to prevent stale-origin results
+        // when an entry is renamed or moved without changing its content hashes. Pairs that are
+        // no longer present in the current source are naturally evicted from the cache.
         let mut new_entries_by_scope: HashMap<RefVerifyCacheScope, Vec<SemanticVerifyEntry>> =
             HashMap::new();
 
-        // Retain existing cache entries whose hashes were NOT freshly evaluated in this scope.
-        // The fresh_hashes check MUST be scope-local: caches are stored in separate artifacts
-        // per scope, so a (claim_hash, evidence_hash) collision across scopes must not
-        // cause one scope's entry to be silently deleted by a re-evaluation in another scope.
-        for scope in &scopes {
-            // Build the set of freshly-evaluated hash pairs for THIS scope only.
-            let fresh_hashes_in_scope: Vec<_> = fresh_final_production_verdicts
+        for pair in &production_pairs {
+            // Resolve verdict: prefer fresh evaluation (cache miss) over frozen cache hit.
+            // Uses the full key so same-hash-different-origin pairs each receive their own verdict.
+            let fresh_verdict = fresh_final_production_verdicts
                 .iter()
-                .filter(|(pair, _)| &pair.cache_scope == scope)
-                .map(|(pair, _)| (&pair.claim_hash, &pair.evidence_hash))
-                .collect();
+                .find(|(p, _)| {
+                    p.cache_scope == pair.cache_scope
+                        && p.claim_hash == pair.claim_hash
+                        && p.evidence_hash == pair.evidence_hash
+                        && p.claim_origin == pair.claim_origin
+                        && p.evidence_origin == pair.evidence_origin
+                })
+                .map(|(_, v)| v);
 
-            if let Some(existing) = scope_cache.get(scope) {
-                let retained: Vec<SemanticVerifyEntry> = existing
-                    .iter()
-                    .filter(|e| {
-                        !fresh_hashes_in_scope
-                            .iter()
-                            .any(|(ch, eh)| *ch == &e.claim_hash && *eh == &e.evidence_hash)
-                    })
-                    .cloned()
-                    .collect();
-
-                if !retained.is_empty() {
-                    new_entries_by_scope.entry(scope.clone()).or_default().extend(retained);
+            if let Some(verdict) = fresh_verdict {
+                match verdict {
+                    SemanticVerdict::Pass { .. } | SemanticVerdict::Fail { .. } => {
+                        let entry = SemanticVerifyEntry::new(
+                            pair.claim_hash.clone(),
+                            pair.evidence_hash.clone(),
+                            verdict.clone(),
+                            pair.claim_origin.clone(),
+                            pair.evidence_origin.clone(),
+                        );
+                        new_entries_by_scope
+                            .entry(pair.cache_scope.clone())
+                            .or_default()
+                            .push(entry);
+                    }
+                    SemanticVerdict::Pending => {
+                        // Fresh Pending verdicts are not persisted (CN-06 fail-closed).
+                    }
                 }
+                continue;
             }
-        }
 
-        // Add freshly-evaluated Pass and Fail verdicts (Pending is not cached).
-        for (pair, verdict) in &fresh_final_production_verdicts {
-            match verdict {
-                SemanticVerdict::Pass { .. } | SemanticVerdict::Fail { .. } => {
-                    let entry = SemanticVerifyEntry::new(
-                        pair.claim_hash.clone(),
-                        pair.evidence_hash.clone(),
-                        verdict.clone(),
-                    );
-                    new_entries_by_scope.entry(pair.cache_scope.clone()).or_default().push(entry);
-                }
-                SemanticVerdict::Pending => {
-                    // Pending verdicts are not persisted (CN-06 fail-closed).
-                }
+            let cached_verdict = cache_hit_verdicts
+                .iter()
+                .find(|(p, _)| {
+                    p.cache_scope == pair.cache_scope
+                        && p.claim_hash == pair.claim_hash
+                        && p.evidence_hash == pair.evidence_hash
+                        && p.claim_origin == pair.claim_origin
+                        && p.evidence_origin == pair.evidence_origin
+                })
+                .map(|(_, v)| v);
+
+            if let Some(verdict) = cached_verdict {
+                let entry = SemanticVerifyEntry::new(
+                    pair.claim_hash.clone(),
+                    pair.evidence_hash.clone(),
+                    verdict.clone(),
+                    pair.claim_origin.clone(),
+                    pair.evidence_origin.clone(),
+                );
+                new_entries_by_scope.entry(pair.cache_scope.clone()).or_default().push(entry);
             }
         }
 
@@ -448,9 +490,11 @@ mod tests {
     use std::sync::{Arc, Mutex};
 
     use domain::ContentHash;
+    use domain::plan_ref::SpecElementId;
     use domain::tddd::LayerId;
     use domain::tddd::semantic_verify::{
-        EvidenceCitation, ModelTier, SemanticVerdict, SemanticVerifyEntry,
+        AdrDecisionRef, EvidenceCitation, ModelTier, SemanticVerdict, SemanticVerifyEntry,
+        SpecElementRef, SpecSectionKind, VerifyOriginRef,
     };
 
     use super::super::{
@@ -485,6 +529,15 @@ mod tests {
             evidence_hash: hash(evidence_byte),
             cache_scope: RefVerifyCacheScope::SpecAdr,
             known_bad: false,
+            claim_origin: VerifyOriginRef::SpecElement(SpecElementRef::new(
+                SpecSectionKind::Goal,
+                SpecElementId::try_new(format!("GO-{claim_byte:03}")).unwrap(),
+                format!("claim-{claim_byte}"),
+            )),
+            evidence_origin: VerifyOriginRef::AdrDecision(AdrDecisionRef::new(
+                "adr.md".to_owned(),
+                format!("D{evidence_byte}"),
+            )),
         }
     }
 
@@ -496,7 +549,39 @@ mod tests {
             evidence_hash: hash(0xfe),
             cache_scope: RefVerifyCacheScope::SpecAdr,
             known_bad: true,
+            claim_origin: VerifyOriginRef::SpecElement(SpecElementRef::new(
+                SpecSectionKind::Goal,
+                SpecElementId::try_new("PROBE-0".to_owned()).unwrap(),
+                "known-bad-probe-0".to_owned(),
+            )),
+            evidence_origin: VerifyOriginRef::AdrDecision(AdrDecisionRef::new(
+                "known-bad-probe".to_owned(),
+                "PROBE-0".to_owned(),
+            )),
         }
+    }
+
+    fn make_cached_entry(
+        claim_byte: u8,
+        evidence_byte: u8,
+        verdict: SemanticVerdict,
+    ) -> SemanticVerifyEntry {
+        let claim_origin = VerifyOriginRef::SpecElement(SpecElementRef::new(
+            SpecSectionKind::Goal,
+            SpecElementId::try_new(format!("GO-{claim_byte:03}")).unwrap(),
+            format!("claim-{claim_byte}"),
+        ));
+        let evidence_origin = VerifyOriginRef::AdrDecision(AdrDecisionRef::new(
+            "adr.md".to_owned(),
+            format!("D{evidence_byte}"),
+        ));
+        SemanticVerifyEntry::new(
+            hash(claim_byte),
+            hash(evidence_byte),
+            verdict,
+            claim_origin,
+            evidence_origin,
+        )
     }
 
     fn track_cmd() -> RefVerifyCommand {
@@ -577,6 +662,26 @@ mod tests {
             _tier: ModelTier,
         ) -> Result<SemanticVerdict, RefVerifyError> {
             Ok(self.verdict.clone())
+        }
+    }
+
+    /// A verifier that returns a scope-specific Pass citation.
+    struct ScopeCitationVerifier;
+    impl RefVerifierPort for ScopeCitationVerifier {
+        fn verify_pair(
+            &self,
+            _claim: String,
+            _evidence: String,
+            cache_scope: &RefVerifyCacheScope,
+            _tier: ModelTier,
+        ) -> Result<SemanticVerdict, RefVerifyError> {
+            let citation = match cache_scope {
+                RefVerifyCacheScope::SpecAdr => "spec-adr-pass",
+                RefVerifyCacheScope::CatalogueSpec { .. } => "catalogue-spec-pass",
+            };
+            Ok(SemanticVerdict::Pass {
+                citation: EvidenceCitation::try_new(citation.to_owned()).unwrap(),
+            })
         }
     }
 
@@ -752,11 +857,7 @@ mod tests {
     fn cache_hit_pairs_are_skipped_by_verifier() {
         let pair = production_pair(0x01, 0x02);
         // Pre-populate cache with an entry matching pair's hashes.
-        let cached_entry = SemanticVerifyEntry::new(
-            pair.claim_hash.clone(),
-            pair.evidence_hash.clone(),
-            pass_verdict(),
-        );
+        let cached_entry = make_cached_entry(0x01, 0x02, pass_verdict());
         let pairs = vec![pair];
         let source: Arc<dyn RefVerifyPairSourcePort> = Arc::new(StubPairSource { pairs });
         let cache: Arc<StubCache> = Arc::new(StubCache::with_entries(vec![cached_entry]));
@@ -791,11 +892,7 @@ mod tests {
         // D12: when production pairs exist and every one of them is a cache hit,
         // calibration probes have nothing to calibrate — they must not be evaluated.
         let pair = production_pair(0x01, 0x02);
-        let cached_entry = SemanticVerifyEntry::new(
-            pair.claim_hash.clone(),
-            pair.evidence_hash.clone(),
-            pass_verdict(),
-        );
+        let cached_entry = make_cached_entry(0x01, 0x02, pass_verdict());
         let probe = known_bad_pair();
         let source: Arc<dyn RefVerifyPairSourcePort> =
             Arc::new(StubPairSource { pairs: vec![pair, probe] });
@@ -829,11 +926,7 @@ mod tests {
         spy: &Arc<SpyVerifier>,
     ) -> RefVerifyError {
         let pair = production_pair(claim_byte, evidence_byte);
-        let cached_entry = SemanticVerifyEntry::new(
-            pair.claim_hash.clone(),
-            pair.evidence_hash.clone(),
-            cached_verdict,
-        );
+        let cached_entry = make_cached_entry(claim_byte, evidence_byte, cached_verdict);
         let source: Arc<dyn RefVerifyPairSourcePort> =
             Arc::new(StubPairSource { pairs: vec![pair] });
         let cache: Arc<StubCache> = Arc::new(StubCache::with_entries(vec![cached_entry]));
@@ -879,11 +972,7 @@ mod tests {
         // Even if the cache contains an entry with the same hashes as a known-bad probe,
         // the probe must still be sent to the verifier (cache bypass for known_bad=true).
         let probe = known_bad_pair();
-        let cached_entry = SemanticVerifyEntry::new(
-            probe.claim_hash.clone(),
-            probe.evidence_hash.clone(),
-            pass_verdict(),
-        );
+        let cached_entry = make_cached_entry(0xff, 0xfe, pass_verdict());
         let source: Arc<dyn RefVerifyPairSourcePort> =
             Arc::new(StubPairSource { pairs: vec![probe] });
         let cache: Arc<StubCache> = Arc::new(StubCache::with_entries(vec![cached_entry]));
@@ -1167,6 +1256,132 @@ mod tests {
     }
 
     #[test]
+    fn test_interactor_scope_hash_collision_uses_scope_local_verdict() {
+        // Same hashes can appear in different cache artifacts. Rebuilding cache entries
+        // must resolve the verdict inside the pair's own cache_scope, not by hashes alone.
+        let layer = LayerId::try_new("domain").unwrap();
+        let mut spec_pair = production_pair(0x66, 0x67);
+        spec_pair.cache_scope = RefVerifyCacheScope::SpecAdr;
+        let mut catalogue_pair = production_pair(0x66, 0x67);
+        let catalogue_scope = RefVerifyCacheScope::CatalogueSpec { layer };
+        catalogue_pair.cache_scope = catalogue_scope.clone();
+
+        let source: Arc<dyn RefVerifyPairSourcePort> =
+            Arc::new(StubPairSource { pairs: vec![spec_pair, catalogue_pair.clone()] });
+        let cache: Arc<StubCache> = Arc::new(StubCache::empty());
+        let verifier: Arc<dyn RefVerifierPort> = Arc::new(ScopeCitationVerifier);
+
+        let interactor = VerifySemanticRefsInteractor::new(
+            source,
+            Arc::clone(&cache) as Arc<dyn RefVerifyCachePort>,
+            verifier,
+            RefVerifyConfig::default(),
+        );
+
+        let result = interactor.execute(&track_cmd());
+        assert!(result.is_ok(), "expected Ok(()), got: {result:?}");
+
+        let saved = cache.saved_calls();
+        let catalogue_entry = saved
+            .iter()
+            .find(|(scope, _)| scope == &catalogue_scope)
+            .and_then(|(_, entries)| {
+                entries.iter().find(|entry| {
+                    entry.claim_hash == catalogue_pair.claim_hash
+                        && entry.evidence_hash == catalogue_pair.evidence_hash
+                })
+            })
+            .expect("catalogue scope entry must be saved");
+
+        let SemanticVerdict::Pass { citation } = &catalogue_entry.verdict else {
+            panic!("catalogue entry must be a Pass verdict");
+        };
+        assert_eq!(
+            citation.as_str(),
+            "catalogue-spec-pass",
+            "catalogue scope must keep its own verdict when hashes collide across scopes"
+        );
+    }
+
+    #[test]
+    fn test_interactor_d12_resave_retains_cached_pending_entry() {
+        let pair = production_pair(0x68, 0x69);
+        let cached_entry = make_cached_entry(0x68, 0x69, SemanticVerdict::Pending);
+        let source: Arc<dyn RefVerifyPairSourcePort> =
+            Arc::new(StubPairSource { pairs: vec![pair.clone()] });
+        let cache: Arc<StubCache> = Arc::new(StubCache::with_entries(vec![cached_entry]));
+        let verifier: Arc<dyn RefVerifierPort> =
+            Arc::new(FixedVerifier { verdict: pass_verdict() });
+
+        let interactor = VerifySemanticRefsInteractor::new(
+            source,
+            Arc::clone(&cache) as Arc<dyn RefVerifyCachePort>,
+            verifier,
+            RefVerifyConfig::default(),
+        );
+
+        let result = interactor.execute(&track_cmd());
+        assert!(
+            matches!(result, Err(RefVerifyError::HumanEscalationRequired { pair_count: 1 })),
+            "expected cached Pending to surface as HumanEscalationRequired, got: {result:?}"
+        );
+
+        let saved = cache.saved_calls();
+        let pending_entry = saved
+            .iter()
+            .flat_map(|(_, entries)| entries)
+            .find(|entry| {
+                entry.claim_hash == pair.claim_hash && entry.evidence_hash == pair.evidence_hash
+            })
+            .expect("cached Pending entry must be retained when D12 re-saves the cache");
+
+        assert!(
+            matches!(pending_entry.verdict, SemanticVerdict::Pending),
+            "cached Pending verdict must remain in the saved cache entry"
+        );
+    }
+
+    #[test]
+    fn test_interactor_mixed_resave_retains_cached_pending_entry() {
+        let miss_pair = production_pair(0x6a, 0x6b);
+        let pending_pair = production_pair(0x6c, 0x6d);
+        let cached_entry = make_cached_entry(0x6c, 0x6d, SemanticVerdict::Pending);
+        let source: Arc<dyn RefVerifyPairSourcePort> =
+            Arc::new(StubPairSource { pairs: vec![miss_pair, pending_pair.clone()] });
+        let cache: Arc<StubCache> = Arc::new(StubCache::with_entries(vec![cached_entry]));
+        let verifier: Arc<dyn RefVerifierPort> =
+            Arc::new(FixedVerifier { verdict: pass_verdict() });
+
+        let interactor = VerifySemanticRefsInteractor::new(
+            source,
+            Arc::clone(&cache) as Arc<dyn RefVerifyCachePort>,
+            verifier,
+            RefVerifyConfig::default(),
+        );
+
+        let result = interactor.execute(&track_cmd());
+        assert!(
+            matches!(result, Err(RefVerifyError::HumanEscalationRequired { pair_count: 1 })),
+            "expected cached Pending to surface as HumanEscalationRequired, got: {result:?}"
+        );
+
+        let saved = cache.saved_calls();
+        let pending_entry = saved
+            .iter()
+            .flat_map(|(_, entries)| entries)
+            .find(|entry| {
+                entry.claim_hash == pending_pair.claim_hash
+                    && entry.evidence_hash == pending_pair.evidence_hash
+            })
+            .expect("cached Pending entry must be retained when mixed run re-saves the cache");
+
+        assert!(
+            matches!(pending_entry.verdict, SemanticVerdict::Pending),
+            "cached Pending verdict must remain in the saved cache entry"
+        );
+    }
+
+    #[test]
     fn adapter_verdict_stored_with_correct_claim_and_evidence_hashes() {
         // Verify that the SemanticVerifyEntry saved to cache uses the pair's
         // claim_hash and evidence_hash (not some fabricated value).
@@ -1195,6 +1410,292 @@ mod tests {
         assert!(
             found.is_some(),
             "saved entry must carry the pair's original claim_hash and evidence_hash"
+        );
+    }
+
+    // ── origin-refresh tests ─────────────────────────────────────────────────
+
+    #[test]
+    fn interactor_refreshes_cache_hit_origin_on_save() {
+        // Mixed run: pair_a is a cache miss (freshly evaluated), pair_b is a cache hit
+        // whose cached entry has a stale evidence_origin ("old-adr.md" vs "adr.md").
+        // After execute, the saved entry for pair_b must carry the current origin.
+        let pair_a = production_pair(0x10, 0x11);
+        let pair_b = production_pair(0x12, 0x13);
+
+        // Stale cached entry for pair_b: same hashes, but evidence file_path is stale.
+        let stale_cached_entry = SemanticVerifyEntry::new(
+            hash(0x12),
+            hash(0x13),
+            pass_verdict(),
+            VerifyOriginRef::SpecElement(SpecElementRef::new(
+                SpecSectionKind::Goal,
+                SpecElementId::try_new(format!("GO-{:03}", 0x12u8)).unwrap(),
+                format!("claim-{}", 0x12u8),
+            )),
+            // Stale file path — the current pair_b has "adr.md" (from production_pair).
+            VerifyOriginRef::AdrDecision(AdrDecisionRef::new(
+                "old-adr.md".to_owned(),
+                format!("D{}", 0x13u8),
+            )),
+        );
+
+        let source = Arc::new(StubPairSource { pairs: vec![pair_a, pair_b.clone()] });
+        let cache = Arc::new(StubCache::with_entries(vec![stale_cached_entry]));
+        // No known-bad probes → detection = 100% (healthy). FixedVerifier returns Pass.
+        let verifier: Arc<dyn RefVerifierPort> =
+            Arc::new(FixedVerifier { verdict: pass_verdict() });
+        let cfg = RefVerifyConfig::default();
+
+        let interactor = VerifySemanticRefsInteractor::new(
+            source,
+            Arc::clone(&cache) as Arc<dyn RefVerifyCachePort>,
+            verifier,
+            cfg,
+        );
+
+        let result = interactor.execute(&track_cmd());
+        assert!(result.is_ok(), "expected Ok(()), got: {result:?}");
+
+        let saved = cache.saved_calls();
+        let pair_b_entry = saved
+            .iter()
+            .flat_map(|(_, entries)| entries)
+            .find(|e| e.claim_hash == pair_b.claim_hash && e.evidence_hash == pair_b.evidence_hash);
+
+        assert!(pair_b_entry.is_some(), "cache-hit pair_b must appear in saved cache");
+        let entry = pair_b_entry.unwrap();
+
+        // The saved entry must carry the current pair evidence_origin, not the stale one.
+        let expected_evidence_origin = VerifyOriginRef::AdrDecision(AdrDecisionRef::new(
+            "adr.md".to_owned(),
+            format!("D{}", 0x13u8),
+        ));
+        assert_eq!(
+            entry.evidence_origin, expected_evidence_origin,
+            "cache-hit entry must carry current pair evidence_origin after origin refresh; \
+             stale 'old-adr.md' must not be retained"
+        );
+    }
+
+    #[test]
+    fn interactor_resaves_all_hit_run_when_origin_changed() {
+        // D12 path: single production pair that is a cache hit, but the cached entry
+        // has a stale evidence_origin. Execute must re-save with the current origin.
+        let pair = production_pair(0x20, 0x21);
+
+        let stale_cached_entry = SemanticVerifyEntry::new(
+            hash(0x20),
+            hash(0x21),
+            pass_verdict(),
+            VerifyOriginRef::SpecElement(SpecElementRef::new(
+                SpecSectionKind::Goal,
+                SpecElementId::try_new(format!("GO-{:03}", 0x20u8)).unwrap(),
+                format!("claim-{}", 0x20u8),
+            )),
+            // Stale file path in the cached entry.
+            VerifyOriginRef::AdrDecision(AdrDecisionRef::new(
+                "old-adr.md".to_owned(),
+                format!("D{}", 0x21u8),
+            )),
+        );
+
+        let source = Arc::new(StubPairSource { pairs: vec![pair.clone()] });
+        let cache = Arc::new(StubCache::with_entries(vec![stale_cached_entry]));
+        // No verifier calls expected on the D12 skip path.
+        let verifier: Arc<dyn RefVerifierPort> =
+            Arc::new(FixedVerifier { verdict: pass_verdict() });
+        let cfg = RefVerifyConfig::default();
+
+        let interactor = VerifySemanticRefsInteractor::new(
+            source,
+            Arc::clone(&cache) as Arc<dyn RefVerifyCachePort>,
+            verifier,
+            cfg,
+        );
+
+        let result = interactor.execute(&track_cmd());
+        assert!(result.is_ok(), "expected Ok(()), got: {result:?}");
+
+        // The cache must be re-saved even though all production pairs were cache hits.
+        let saved = cache.saved_calls();
+        assert!(
+            !saved.is_empty(),
+            "all-hit run must still re-save the cache so that origin changes are persisted"
+        );
+
+        let pair_entry = saved
+            .iter()
+            .flat_map(|(_, entries)| entries)
+            .find(|e| e.claim_hash == pair.claim_hash && e.evidence_hash == pair.evidence_hash);
+
+        assert!(pair_entry.is_some(), "re-saved cache must contain an entry for the pair");
+        let entry = pair_entry.unwrap();
+
+        // The saved entry must carry the current pair evidence_origin.
+        let expected_evidence_origin = VerifyOriginRef::AdrDecision(AdrDecisionRef::new(
+            "adr.md".to_owned(),
+            format!("D{}", 0x21u8),
+        ));
+        assert_eq!(
+            entry.evidence_origin, expected_evidence_origin,
+            "all-hit D12 run must re-save with current evidence_origin; \
+             stale 'old-adr.md' must not be retained"
+        );
+    }
+
+    // ── origin-keyed cache-hit tests (R24) ───────────────────────────────────
+
+    /// Build a `RefVerifyPair` with the given hashes but a custom `evidence_origin`
+    /// (different `adr_file`), keeping the same `claim_origin` pattern as `production_pair`.
+    fn production_pair_with_evidence_origin(
+        claim_byte: u8,
+        evidence_byte: u8,
+        adr_file: &str,
+        decision_id: &str,
+    ) -> RefVerifyPair {
+        RefVerifyPair {
+            claim: format!("claim-{claim_byte}"),
+            evidence: format!("evidence-{evidence_byte}"),
+            claim_hash: hash(claim_byte),
+            evidence_hash: hash(evidence_byte),
+            cache_scope: RefVerifyCacheScope::SpecAdr,
+            known_bad: false,
+            claim_origin: VerifyOriginRef::SpecElement(SpecElementRef::new(
+                SpecSectionKind::Goal,
+                SpecElementId::try_new(format!("GO-{claim_byte:03}")).unwrap(),
+                format!("claim-{claim_byte}"),
+            )),
+            evidence_origin: VerifyOriginRef::AdrDecision(AdrDecisionRef::new(
+                adr_file.to_owned(),
+                decision_id.to_owned(),
+            )),
+        }
+    }
+
+    #[test]
+    fn interactor_distinguishes_cache_hits_by_origin() {
+        // Two production pairs with IDENTICAL hashes but DIFFERENT origins:
+        //   pair_a → evidence comes from "adr-a.md"  (origin_A) → cached verdict: Pass
+        //   pair_b → evidence comes from "adr-b.md"  (origin_B) → cached verdict: Fail
+        // After execute, pair_a must remain Pass and pair_b must remain Fail.
+        // Cross-contamination (pair_b silently receiving pair_a's Pass) is the bug this guards.
+        let pair_a = production_pair_with_evidence_origin(0xa0, 0xa1, "adr-a.md", "DA");
+        let pair_b = production_pair_with_evidence_origin(0xa0, 0xa1, "adr-b.md", "DB");
+
+        // Cached entries: same hashes, different origins, different verdicts.
+        let entry_a = SemanticVerifyEntry::new(
+            hash(0xa0),
+            hash(0xa1),
+            pass_verdict(),
+            pair_a.claim_origin.clone(),
+            pair_a.evidence_origin.clone(),
+        );
+        let entry_b = SemanticVerifyEntry::new(
+            hash(0xa0),
+            hash(0xa1),
+            fail_verdict(),
+            pair_b.claim_origin.clone(),
+            pair_b.evidence_origin.clone(),
+        );
+
+        let source = Arc::new(StubPairSource { pairs: vec![pair_a.clone(), pair_b.clone()] });
+        let cache = Arc::new(StubCache::with_entries(vec![entry_a, entry_b]));
+        // Verifier must not be called — both pairs are cache hits.
+        let spy: Arc<SpyVerifier> = Arc::new(SpyVerifier::new(pass_verdict(), fail_verdict()));
+
+        let interactor = VerifySemanticRefsInteractor::new(
+            source,
+            Arc::clone(&cache) as Arc<dyn RefVerifyCachePort>,
+            Arc::clone(&spy) as Arc<dyn RefVerifierPort>,
+            RefVerifyConfig::default(),
+        );
+
+        let result = interactor.execute(&track_cmd());
+
+        // pair_b carries a cached Fail → SemanticFailuresConfirmed.
+        assert!(
+            matches!(result, Err(RefVerifyError::SemanticFailuresConfirmed { pair_count: 1 })),
+            "expected SemanticFailuresConfirmed(1) because pair_b has a cached Fail; got: {result:?}"
+        );
+
+        // Verifier must not have been called for either production pair.
+        let calls = spy.calls();
+        let production_calls: Vec<_> =
+            calls.iter().filter(|(claim, _)| !claim.starts_with("known-bad")).collect();
+        assert!(
+            production_calls.is_empty(),
+            "verifier must not be called for cache-hit pairs (origin-keyed); got: {calls:?}"
+        );
+
+        // The saved cache must contain pair_a → Pass and pair_b → Fail (no cross-contamination).
+        let saved = cache.saved_calls();
+        let find_saved = |pair: &RefVerifyPair| {
+            saved
+                .iter()
+                .flat_map(|(_, entries)| entries)
+                .find(|e| {
+                    e.claim_hash == pair.claim_hash
+                        && e.evidence_hash == pair.evidence_hash
+                        && e.claim_origin == pair.claim_origin
+                        && e.evidence_origin == pair.evidence_origin
+                })
+                .map(|e| e.verdict.clone())
+        };
+        let verdict_a = find_saved(&pair_a);
+        let verdict_b = find_saved(&pair_b);
+        assert!(
+            matches!(verdict_a, Some(SemanticVerdict::Pass { .. })),
+            "pair_a must be saved as Pass; got: {verdict_a:?}"
+        );
+        assert!(
+            matches!(verdict_b, Some(SemanticVerdict::Fail { .. })),
+            "pair_b must be saved as Fail (not contaminated by pair_a's Pass); got: {verdict_b:?}"
+        );
+    }
+
+    #[test]
+    fn interactor_same_hash_distinct_origin_pair_with_missing_cache_falls_to_fresh_verify() {
+        // Cache contains ONE entry for origin_A.
+        // A second production pair (pair_b) has the SAME hashes as pair_a but a DIFFERENT
+        // evidence_origin (origin_B). pair_b must be treated as a cache miss and go to fresh
+        // verification — it must not silently inherit pair_a's cached verdict.
+        let pair_a = production_pair_with_evidence_origin(0xb0, 0xb1, "adr-a.md", "DA");
+        let pair_b = production_pair_with_evidence_origin(0xb0, 0xb1, "adr-b.md", "DB");
+
+        // Cache has only pair_a's entry.
+        let entry_a = SemanticVerifyEntry::new(
+            hash(0xb0),
+            hash(0xb1),
+            pass_verdict(),
+            pair_a.claim_origin.clone(),
+            pair_a.evidence_origin.clone(),
+        );
+
+        let source = Arc::new(StubPairSource { pairs: vec![pair_a.clone(), pair_b.clone()] });
+        let cache = Arc::new(StubCache::with_entries(vec![entry_a]));
+        // Verifier returns Pass for any pair it evaluates.
+        let spy: Arc<SpyVerifier> = Arc::new(SpyVerifier::new(pass_verdict(), fail_verdict()));
+
+        let interactor = VerifySemanticRefsInteractor::new(
+            source,
+            Arc::clone(&cache) as Arc<dyn RefVerifyCachePort>,
+            Arc::clone(&spy) as Arc<dyn RefVerifierPort>,
+            RefVerifyConfig::default(),
+        );
+
+        let result = interactor.execute(&track_cmd());
+        // Both pairs resolve to Pass → Ok(()).
+        assert!(result.is_ok(), "expected Ok(()), got: {result:?}");
+
+        // The verifier must have been called for pair_b (the cache-miss pair).
+        let calls = spy.calls();
+        let pair_b_calls: Vec<_> =
+            calls.iter().filter(|(claim, _)| claim == &format!("claim-{}", 0xb0u8)).collect();
+        assert!(
+            !pair_b_calls.is_empty(),
+            "pair_b (same hash, different origin than cached entry) must go to fresh verification; \
+             verifier calls: {calls:?}"
         );
     }
 

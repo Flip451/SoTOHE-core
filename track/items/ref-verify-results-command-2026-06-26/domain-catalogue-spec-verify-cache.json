@@ -1,0 +1,222 @@
+{
+  "schema_version": 1,
+  "layer": "domain",
+  "entries": [
+    {
+      "claim_hash": "84ed07aa8687e64c6aaec34739b4d673c6c3a6b62c03abcc734c74cdafae9cfc",
+      "evidence_hash": "927c12702ddbffc701f471f76228c9e73e11dd56687b83f0228b8ba3de70e3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Chain① pair: `claim_origin` は spec.json の `(section, requirement_id, text_label)`、`evidence_origin` は ADR の `(file_path, anchor=decision_id)`。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/ref-verify-results-command-2026-06-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "AdrDecisionRef"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "`SemanticVerifyEntry` schema の拡張: `claim_origin` / `evidence_origin` フィールドを追加する。Chain① pair: `claim_origin` は spec.json の `(section, requirement_id, text_label)`、`evidence_origin` は ADR の `(file_path, anchor=decision_id)`。Chain② pair: `claim_origin` は catalogue の `(file_path, section_key=types|traits|functions, entry_key)`、`evidence_origin` は spec.json の `(section, requirement_id, text_label)`"
+        }
+      }
+    },
+    {
+      "claim_hash": "3ec4e79518d8778081fbacb2405a0215c32e026a0553c447907a2e334d43fbd4",
+      "evidence_hash": "927c12702ddbffc701f471f76228c9e73e11dd56687b83f0228b8ba3de70e3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Chain② pair: claim_origin は catalogue の `(file_path, section_key=types|traits|functions, entry_key)`、evidence_origin は spec.json の `(section, requirement_id, text_label)`"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/ref-verify-results-command-2026-06-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogueEntryKey"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "`SemanticVerifyEntry` schema の拡張: `claim_origin` / `evidence_origin` フィールドを追加する。Chain① pair: `claim_origin` は spec.json の `(section, requirement_id, text_label)`、`evidence_origin` は ADR の `(file_path, anchor=decision_id)`。Chain② pair: `claim_origin` は catalogue の `(file_path, section_key=types|traits|functions, entry_key)`、`evidence_origin` は spec.json の `(section, requirement_id, text_label)`"
+        }
+      }
+    },
+    {
+      "claim_hash": "431e58ebbf8da2d4cbff34f5752c593f85e534484f4c3d1a9214feb78c2f21b9",
+      "evidence_hash": "927c12702ddbffc701f471f76228c9e73e11dd56687b83f0228b8ba3de70e3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`Chain② pair: `claim_origin` は catalogue の `(file_path, section_key=types|traits|functions, entry_key)`、`evidence_origin` は spec.json の `(section, requirement_id, text_label)`"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/ref-verify-results-command-2026-06-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogueEntryRef"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "`SemanticVerifyEntry` schema の拡張: `claim_origin` / `evidence_origin` フィールドを追加する。Chain① pair: `claim_origin` は spec.json の `(section, requirement_id, text_label)`、`evidence_origin` は ADR の `(file_path, anchor=decision_id)`。Chain② pair: `claim_origin` は catalogue の `(file_path, section_key=types|traits|functions, entry_key)`、`evidence_origin` は spec.json の `(section, requirement_id, text_label)`"
+        }
+      }
+    },
+    {
+      "claim_hash": "54256a564c605214ba2acb34fb399ad4778af7f907e6be76cfe7c1bed41552a6",
+      "evidence_hash": "927c12702ddbffc701f471f76228c9e73e11dd56687b83f0228b8ba3de70e3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Chain② pair: `claim_origin` は catalogue の `(file_path, section_key=types|traits|functions, entry_key)`、`evidence_origin` は spec.json の `(section, requirement_id, text_label)`"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/ref-verify-results-command-2026-06-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogueSectionKey"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "`SemanticVerifyEntry` schema の拡張: `claim_origin` / `evidence_origin` フィールドを追加する。Chain① pair: `claim_origin` は spec.json の `(section, requirement_id, text_label)`、`evidence_origin` は ADR の `(file_path, anchor=decision_id)`。Chain② pair: `claim_origin` は catalogue の `(file_path, section_key=types|traits|functions, entry_key)`、`evidence_origin` は spec.json の `(section, requirement_id, text_label)`"
+        }
+      }
+    },
+    {
+      "claim_hash": "37b2cd74cccd20b6efffaa9dbaf4ddeb84ac7a29b7dec85516fb5abd825408b7",
+      "evidence_hash": "927c12702ddbffc701f471f76228c9e73e11dd56687b83f0228b8ba3de70e3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`SemanticVerifyEntry` schema の拡張: `claim_origin` / `evidence_origin` フィールドを追加する。Chain① pair: `claim_origin` は spec.json の `(section, requirement_id, text_label)`、`evidence_origin` は ADR の `(file_path, anchor=decision_id)`。Chain② pair: `claim_origin` は catalogue の `(file_path, section_key=types|traits|functions, entry_key)`、`evidence_origin` は spec.json の `(section, requirement_id, text_label)`"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/ref-verify-results-command-2026-06-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "SemanticVerifyEntry"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "`SemanticVerifyEntry` schema の拡張: `claim_origin` / `evidence_origin` フィールドを追加する。Chain① pair: `claim_origin` は spec.json の `(section, requirement_id, text_label)`、`evidence_origin` は ADR の `(file_path, anchor=decision_id)`。Chain② pair: `claim_origin` は catalogue の `(file_path, section_key=types|traits|functions, entry_key)`、`evidence_origin` は spec.json の `(section, requirement_id, text_label)`"
+        }
+      }
+    },
+    {
+      "claim_hash": "37b2cd74cccd20b6efffaa9dbaf4ddeb84ac7a29b7dec85516fb5abd825408b7",
+      "evidence_hash": "7b123b0ee53aca400bd90bc960bdf3905b937e409b154c73bd82011bf452eb08",
+      "verdict": {
+        "kind": "pass",
+        "citation": "verify-cache schema の旧バージョン (origin meta フィールドなし) を parse error として reject する。read-only の cache consumer (`results` / `check-approved`) は非 0 エラーとして返し、`bin/sotp ref-verify run` は旧 entry を有効 cache として再利用せず、新 schema の cache を再生成する。`#[serde(deny_unknown_fields)]` は維持する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/ref-verify-results-command-2026-06-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "SemanticVerifyEntry"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "verify-cache schema の旧バージョン (origin meta フィールドなし) を parse error として reject する。read-only の cache consumer (`results` / `check-approved`) は非 0 エラーとして返し、`bin/sotp ref-verify run` は旧 entry を有効 cache として再利用せず、新 schema の cache を再生成する。`#[serde(deny_unknown_fields)]` は維持する"
+        }
+      }
+    },
+    {
+      "claim_hash": "12c5094d89d497fc69e88bc1f9dbc47c04c895f883fc6c08df01698aad65a1d0",
+      "evidence_hash": "927c12702ddbffc701f471f76228c9e73e11dd56687b83f0228b8ba3de70e3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Chain② pair: `claim_origin` は catalogue の `(file_path, section_key=types|traits|functions, entry_key)`、`evidence_origin` は spec.json の `(section, requirement_id, text_label)`"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/ref-verify-results-command-2026-06-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "SpecElementRef"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "`SemanticVerifyEntry` schema の拡張: `claim_origin` / `evidence_origin` フィールドを追加する。Chain① pair: `claim_origin` は spec.json の `(section, requirement_id, text_label)`、`evidence_origin` は ADR の `(file_path, anchor=decision_id)`。Chain② pair: `claim_origin` は catalogue の `(file_path, section_key=types|traits|functions, entry_key)`、`evidence_origin` は spec.json の `(section, requirement_id, text_label)`"
+        }
+      }
+    },
+    {
+      "claim_hash": "5f64d2a36ba183edfb3005a34af0e3266fef53781ad26cc763645d04c70d0865",
+      "evidence_hash": "927c12702ddbffc701f471f76228c9e73e11dd56687b83f0228b8ba3de70e3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Chain② pair: `claim_origin` は catalogue の `(file_path, section_key=types|traits|functions, entry_key)`, `evidence_origin` は spec.json の `(section, requirement_id, text_label)`"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/ref-verify-results-command-2026-06-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "SpecSectionKind"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "`SemanticVerifyEntry` schema の拡張: `claim_origin` / `evidence_origin` フィールドを追加する。Chain① pair: `claim_origin` は spec.json の `(section, requirement_id, text_label)`、`evidence_origin` は ADR の `(file_path, anchor=decision_id)`。Chain② pair: `claim_origin` は catalogue の `(file_path, section_key=types|traits|functions, entry_key)`、`evidence_origin` は spec.json の `(section, requirement_id, text_label)`"
+        }
+      }
+    },
+    {
+      "claim_hash": "f360a67d7661291272eb813688cc1bcc9b74f5d66f512502bdcc5c75b7557776",
+      "evidence_hash": "927c12702ddbffc701f471f76228c9e73e11dd56687b83f0228b8ba3de70e3cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Chain② pair: `claim_origin` は catalogue の `(file_path, section_key=types|traits|functions, entry_key)`、`evidence_origin` は spec.json の `(section, requirement_id, text_label)`"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/ref-verify-results-command-2026-06-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "VerifyOriginRef"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "`SemanticVerifyEntry` schema の拡張: `claim_origin` / `evidence_origin` フィールドを追加する。Chain① pair: `claim_origin` は spec.json の `(section, requirement_id, text_label)`、`evidence_origin` は ADR の `(file_path, anchor=decision_id)`。Chain② pair: `claim_origin` は catalogue の `(file_path, section_key=types|traits|functions, entry_key)`、`evidence_origin` は spec.json の `(section, requirement_id, text_label)`"
+        }
+      }
+    }
+  ]
+}

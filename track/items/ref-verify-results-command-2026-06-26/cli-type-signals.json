@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-06-27T07:17:22Z",
+  "declaration_hash": "932cf18eef6d2ec776b58d70d64bceccc8a35976d23da92d577832f46808faa6",
+  "signals": [
+    {
+      "type_name": "RefVerifyChainArg",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "clap_builder::derive::ValueEnum",
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "RefVerifyCommand",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "RefVerifyResultsArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "clap_builder::derive::Args",
+        "clap_builder::derive::FromArgMatches",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "RefVerifyVerdictFilterArg",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "clap_builder::derive::ValueEnum",
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "cli::commands::ref_verify::execute",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::ref_verify::execute_results",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CheckApprovedArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "RunArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

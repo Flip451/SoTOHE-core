@@ -1,0 +1,382 @@
+{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "SpecSectionKind": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Goal",               "payload": { "kind": "unit" } },
+          { "name": "InScope",            "payload": { "kind": "unit" } },
+          { "name": "OutOfScope",         "payload": { "kind": "unit" } },
+          { "name": "Constraint",         "payload": { "kind": "unit" } },
+          { "name": "AcceptanceCriteria", "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::semantic_verify",
+      "docs": "Identifies which top-level section of spec.json a SpecElementRef points to. Used as the `section` discriminant in SpecElementRef so origin-tracking can locate the exact spec element without reparsing the file. Distinct from the existing domain::spec::SpecSection struct (a free-form additional section with title/content).",
+      "spec_refs": [
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "IN-07" }
+      ],
+      "informal_grounds": []
+    },
+    "CatalogueSectionKey": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Types",     "payload": { "kind": "unit" } },
+          { "name": "Traits",    "payload": { "kind": "unit" } },
+          { "name": "Functions", "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::semantic_verify",
+      "docs": "Identifies which BTreeMap section of a `<layer>-types.json` catalogue file a CatalogueEntryRef points to. The three variants mirror the top-level `types`, `traits`, and `functions` keys of the v5 catalogue schema.",
+      "spec_refs": [
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "IN-07" }
+      ],
+      "informal_grounds": []
+    },
+    "SpecElementId": {
+      "action": "reference",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "tuple", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "plan_ref::spec_ref",
+      "docs": "Validated newtype for a spec.json element identifier (e.g. `IN-01`, `AC-03`). Pattern: two or more ASCII uppercase letters, a hyphen, one or more digits. Defined in plan_ref::spec_ref; referenced here because SpecElementRef carries it as the `element_id` field.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "CatalogueEntryKey": {
+      "action": "add",
+      "role": {
+        "ValueObject": {
+          "invariants": [
+            { "name": "non_empty", "predicate": { "SelfMethod": "as_str" } }
+          ]
+        }
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "tuple", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "tddd::semantic_verify",
+      "docs": "Validated non-empty key for an entry in a catalogue section BTreeMap (a type name, trait name, or function path). Used as the `entry_key` field of CatalogueEntryRef.",
+      "spec_refs": [
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "IN-07" }
+      ],
+      "informal_grounds": []
+    },
+    "SpecElementRef": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "section",    "ty": "SpecSectionKind" },
+            { "name": "element_id", "ty": "SpecElementId" },
+            { "name": "text_label", "ty": "String" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "tddd::semantic_verify",
+      "docs": "Origin reference to a single element in spec.json. `section` identifies the top-level spec section (SpecSectionKind); `element_id` is the element's validated id value (e.g. `IN-01`); `text_label` is the verbatim text value (free text, no constraint). Chain-1 claim origins and Chain-2 evidence origins are encoded as this type.",
+      "spec_refs": [
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "IN-07" }
+      ],
+      "informal_grounds": []
+    },
+    "AdrDecisionRef": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "file_path",   "ty": "String" },
+            { "name": "decision_id", "ty": "String" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "tddd::semantic_verify",
+      "docs": "Origin reference to a specific decision in an ADR file. `file_path` is the project-relative path to the ADR file; stored as an opaque string since path validity is checked at file-access time. `decision_id` is the ADR decision anchor (e.g. `D1`); stored as an opaque string since format validation occurs at ADR parse time. Chain-1 evidence origins are encoded as this type.",
+      "spec_refs": [
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "IN-07" }
+      ],
+      "informal_grounds": []
+    },
+    "CatalogueEntryRef": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "file_path",   "ty": "String" },
+            { "name": "section_key", "ty": "CatalogueSectionKey" },
+            { "name": "entry_key",   "ty": "CatalogueEntryKey" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "tddd::semantic_verify",
+      "docs": "Origin reference to a specific entry in a `<layer>-types.json` catalogue file. `file_path` is the project-relative path to the catalogue file; stored as an opaque string. `section_key` identifies which BTreeMap section (Types/Traits/Functions). `entry_key` is the key in that BTreeMap. Chain-2 claim origins are encoded as this type.",
+      "spec_refs": [
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "IN-07" }
+      ],
+      "informal_grounds": []
+    },
+    "VerifyOriginRef": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "SpecElement",
+            "payload": { "kind": "tuple", "fields": ["SpecElementRef"] }
+          },
+          {
+            "name": "AdrDecision",
+            "payload": { "kind": "tuple", "fields": ["AdrDecisionRef"] }
+          },
+          {
+            "name": "CatalogueEntry",
+            "payload": { "kind": "tuple", "fields": ["CatalogueEntryRef"] }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::semantic_verify",
+      "docs": "Tagged origin reference identifying the artifact and location of a claim or evidence in a SemanticVerifyEntry. Chain-1: claim=SpecElement, evidence=AdrDecision. Chain-2: claim=CatalogueEntry, evidence=SpecElement.",
+      "spec_refs": [
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "IN-07" }
+      ],
+      "informal_grounds": []
+    },
+    "SemanticVerifyEntry": {
+      "action": "modify",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "claim_hash",      "ty": "ContentHash" },
+            { "name": "evidence_hash",   "ty": "ContentHash" },
+            { "name": "verdict",         "ty": "SemanticVerdict" },
+            { "name": "claim_origin",    "ty": "VerifyOriginRef" },
+            { "name": "evidence_origin", "ty": "VerifyOriginRef" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "tddd::semantic_verify",
+      "docs": "Single frozen verdict record in a semantic verify cache artifact. Extended by D3 to carry `claim_origin` and `evidence_origin` fields that identify the source artifact and location of each side of the pair. Old cache entries that lack these fields are rejected as parse errors (no backward compat, IN-08).",
+      "spec_refs": [
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "IN-07" },
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "IN-08" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [
+    {
+      "type_name": "SpecElementId",
+      "methods": [
+        {
+          "name": "try_new",
+          "receiver": null,
+          "params": [{ "name": "value", "ty": "String" }],
+          "returns": "Result<SpecElementId, ValidationError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Validate and wrap `value` as a SpecElementId. Returns ValidationError::InvalidSpecElementId when the value does not match the required pattern."
+        }
+      ]
+    },
+    {
+      "type_name": "CatalogueEntryKey",
+      "methods": [
+        {
+          "name": "try_new",
+          "receiver": null,
+          "params": [{ "name": "raw", "ty": "String" }],
+          "returns": "Result<Self, ValidationError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Validate and wrap `raw` as a CatalogueEntryKey. Returns ValidationError when the trimmed value is empty."
+        },
+        {
+          "name": "as_str",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Return the inner key string as a `&str`."
+        }
+      ]
+    },
+    {
+      "type_name": "SpecElementRef",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "section",    "ty": "SpecSectionKind" },
+            { "name": "element_id", "ty": "SpecElementId" },
+            { "name": "text_label", "ty": "String" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        }
+      ]
+    },
+    {
+      "type_name": "AdrDecisionRef",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "file_path",   "ty": "String" },
+            { "name": "decision_id", "ty": "String" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        }
+      ]
+    },
+    {
+      "type_name": "CatalogueEntryRef",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "file_path",   "ty": "String" },
+            { "name": "section_key", "ty": "CatalogueSectionKey" },
+            { "name": "entry_key",   "ty": "CatalogueEntryKey" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        }
+      ]
+    },
+    {
+      "type_name": "SemanticVerifyEntry",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "claim_hash",      "ty": "ContentHash" },
+            { "name": "evidence_hash",   "ty": "ContentHash" },
+            { "name": "verdict",         "ty": "SemanticVerdict" },
+            { "name": "claim_origin",    "ty": "VerifyOriginRef" },
+            { "name": "evidence_origin", "ty": "VerifyOriginRef" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Construct a new SemanticVerifyEntry with the given pair hashes, verdict, and origin references."
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    { "trait_ref": "core::fmt::Debug",     "for_type": "SpecSectionKind" },
+    { "trait_ref": "core::clone::Clone",   "for_type": "SpecSectionKind" },
+    { "trait_ref": "core::cmp::PartialEq", "for_type": "SpecSectionKind" },
+    { "trait_ref": "core::cmp::Eq",        "for_type": "SpecSectionKind" },
+
+    { "trait_ref": "core::fmt::Debug",     "for_type": "CatalogueSectionKey" },
+    { "trait_ref": "core::clone::Clone",   "for_type": "CatalogueSectionKey" },
+    { "trait_ref": "core::cmp::PartialEq", "for_type": "CatalogueSectionKey" },
+    { "trait_ref": "core::cmp::Eq",        "for_type": "CatalogueSectionKey" },
+
+    { "action": "reference", "trait_ref": "core::fmt::Debug",         "for_type": "SpecElementId" },
+    { "action": "reference", "trait_ref": "core::clone::Clone",       "for_type": "SpecElementId" },
+    { "action": "reference", "trait_ref": "core::cmp::PartialEq",     "for_type": "SpecElementId" },
+    { "action": "reference", "trait_ref": "core::cmp::Eq",            "for_type": "SpecElementId" },
+    { "action": "reference", "trait_ref": "core::hash::Hash",         "for_type": "SpecElementId" },
+    { "action": "reference", "trait_ref": "core::cmp::PartialOrd",    "for_type": "SpecElementId" },
+    { "action": "reference", "trait_ref": "core::cmp::Ord",           "for_type": "SpecElementId" },
+    { "action": "reference", "trait_ref": "core::convert::AsRef<str>","for_type": "SpecElementId" },
+    { "action": "reference", "trait_ref": "core::fmt::Display",       "for_type": "SpecElementId" },
+
+    { "trait_ref": "core::fmt::Debug",     "for_type": "CatalogueEntryKey" },
+    { "trait_ref": "core::clone::Clone",   "for_type": "CatalogueEntryKey" },
+    { "trait_ref": "core::cmp::PartialEq", "for_type": "CatalogueEntryKey" },
+    { "trait_ref": "core::cmp::Eq",        "for_type": "CatalogueEntryKey" },
+
+    { "trait_ref": "core::fmt::Debug",     "for_type": "SpecElementRef" },
+    { "trait_ref": "core::clone::Clone",   "for_type": "SpecElementRef" },
+    { "trait_ref": "core::cmp::PartialEq", "for_type": "SpecElementRef" },
+    { "trait_ref": "core::cmp::Eq",        "for_type": "SpecElementRef" },
+
+    { "trait_ref": "core::fmt::Debug",     "for_type": "AdrDecisionRef" },
+    { "trait_ref": "core::clone::Clone",   "for_type": "AdrDecisionRef" },
+    { "trait_ref": "core::cmp::PartialEq", "for_type": "AdrDecisionRef" },
+    { "trait_ref": "core::cmp::Eq",        "for_type": "AdrDecisionRef" },
+
+    { "trait_ref": "core::fmt::Debug",     "for_type": "CatalogueEntryRef" },
+    { "trait_ref": "core::clone::Clone",   "for_type": "CatalogueEntryRef" },
+    { "trait_ref": "core::cmp::PartialEq", "for_type": "CatalogueEntryRef" },
+    { "trait_ref": "core::cmp::Eq",        "for_type": "CatalogueEntryRef" },
+
+    { "trait_ref": "core::fmt::Debug",     "for_type": "VerifyOriginRef" },
+    { "trait_ref": "core::clone::Clone",   "for_type": "VerifyOriginRef" },
+    { "trait_ref": "core::cmp::PartialEq", "for_type": "VerifyOriginRef" },
+    { "trait_ref": "core::cmp::Eq",        "for_type": "VerifyOriginRef" },
+
+    { "action": "reference", "trait_ref": "core::fmt::Debug",     "for_type": "SemanticVerifyEntry" },
+    { "action": "reference", "trait_ref": "core::clone::Clone",   "for_type": "SemanticVerifyEntry" },
+    { "action": "reference", "trait_ref": "core::cmp::PartialEq", "for_type": "SemanticVerifyEntry" },
+    { "action": "reference", "trait_ref": "core::cmp::Eq",        "for_type": "SemanticVerifyEntry" }
+  ]
+}

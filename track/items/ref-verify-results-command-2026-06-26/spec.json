@@ -1,0 +1,426 @@
+{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "`sotp ref-verify results` で verify-cache 直読みを置き換える",
+  "goal": [
+    {
+      "id": "GO-01",
+      "text": "`bin/sotp ref-verify results` サブコマンドを新設し、ref-verify レーンの結果確認を verify-cache JSON 直読みから CLI に一本化する。caller (skill / agent briefing / user) が cache スキーマを意識せず CLI 出力のみで判定結果を取得できるようにし、`bin/sotp review results` / `bin/sotp dry results` と同等の読み取り面を sotp 配下の verdict-bearing サブコマンド全体に揃える",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "GO-02",
+      "text": "`sotp ref-verify results` の出力面と option を `bin/sotp review results` / `bin/sotp dry results` と「誤読しにくさ」および「ref-verify が担う SoT Chain semantic verification の意味」を保ちながら方針整合させる。option の 1:1 棚卸しはせず、ref-verify に適用できるものだけを選択的に採用する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "GO-03",
+      "text": "verify-cache の `SemanticVerifyEntry` に `claim_origin` / `evidence_origin` フィールドを追加し、判定済みの pair の source を artifact 種別 + 具体位置レベルで cache に保存する。`sotp ref-verify results` は pass/fail の cached pair について cache 読みだけで origin を表示でき、pending pair については current artifact から read-only で再導出して表示する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "anchor": "D3"
+        }
+      ]
+    }
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "id": "IN-01",
+        "text": "`sotp ref-verify results` CLI サブコマンドの実装。option として `--track-id` (optional; 省略時はブランチから自動解決)、`--items-dir` (default: `track/items`)、`--chain {1|2|all}`、`--layer <name>|all`、`--filter {pass|fail|pending|all}` を持つ",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+            "anchor": "D1"
+          },
+          {
+            "file": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-02",
+        "text": "出力先頭ブロック (Chain×Layer 集計): Chain① (spec↔ADR) と Chain② (各 layer × catalogue↔spec) を 1 行/lane で `pass=N fail=N pending=N` 形式で表示する。Chain② の layer 集合は `architecture-rules.json` から動的に解決する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-03",
+        "text": "出力レコードブロック (filter 対象 pair の列挙): `--filter` に従って pass/fail/pending pair を列挙する。`--filter` 省略時は default 出力として fail/pending pair を列挙する。各 pair を `claim_hash / evidence_hash / verdict / reason / chain+layer` の形で表示し、claim/evidence の source (artifact 種別 + 具体位置: spec.json の section+id / ADR の file+anchor / catalogue の file+section_key+entry_key) を併記する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+            "anchor": "D2"
+          },
+          {
+            "file": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "IN-04",
+        "text": "fail pair の source 表示: verify-cache entry に persist された `claim_origin` / `evidence_origin` から artifact 種別と具体位置を表示する。artifact の再 parse は不要",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "IN-05",
+        "text": "pending pair (cache miss / 未確定 pair) の source 表示: `ref-verify run` と同じ pair source 解決を read-only で呼び、current artifact から pending pair と origin meta を再導出して表示する。LLM 呼び出しおよび verifier subprocess は起動しない",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "IN-06",
+        "text": "出力末尾の Summary 行: `Summary: N pass, N fail, N pending, N total` を表示する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-07",
+        "text": "`SemanticVerifyEntry` schema の拡張: `claim_origin` / `evidence_origin` フィールドを追加する。Chain① pair: `claim_origin` は spec.json の `(section, requirement_id, text_label)`、`evidence_origin` は ADR の `(file_path, anchor=decision_id)`。Chain② pair: `claim_origin` は catalogue の `(file_path, section_key=types|traits|functions, entry_key)`、`evidence_origin` は spec.json の `(section, requirement_id, text_label)`",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "IN-08",
+        "text": "verify-cache schema の旧バージョン (origin meta フィールドなし) を parse error として reject する。read-only の cache consumer (`results` / `check-approved`) は非 0 エラーとして返し、`bin/sotp ref-verify run` は旧 entry を有効 cache として再利用せず、新 schema の cache を再生成する。`#[serde(deny_unknown_fields)]` は維持する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "IN-09",
+        "text": "`/track:ref-verify` skill の Step 2 更新: `spec-adr-verify-cache.json` / `<layer>-catalogue-spec-verify-cache.json` を手で Read して failing pair を特定する手順を `sotp ref-verify results` 経由の手順に置き換える",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+            "anchor": "D1"
+          }
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "id": "OS-01",
+        "text": "`--format json` 出力: review/dry results のいずれも JSON 出力を提供していないため、本コマンドも採用しない (YAGNI)。需要が顕在化したとき別 ADR で追加できる",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "OS-02",
+        "text": "`--limit` / `--round-type` option の採用: ref-verify に round 概念がないため `bin/sotp review results` の `--limit` / `--round-type` は適用しない",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "OS-03",
+        "text": "writer (spec-designer / type-designer / adr-editor) への振り分けロジック: `results` は source 表示までに留める。failing pair をどの writer に差し戻すかは caller (skill / agent briefing) の責務",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "OS-04",
+        "text": "verify-cache 直読みを skill 本文で標準化する方針 (Rejected Alternative A): 旧来の `/track:ref-verify` skill Step 2 の「直接 Read」を継続し、caller ごとの読み方を skill で統一する案。cache schema 変更時に各所が壊れる構造のため却下",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OS-05",
+        "text": "`bin/sotp ref-verify run` の標準出力に per-pair 詳細を統合する方針 (Rejected Alternative B): run は verifier 呼び出しを伴う重い操作であり、read-only の `results` を別コマンドとして分ける設計が review/dry と整合する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+            "anchor": "D1"
+          }
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "id": "CN-01",
+      "text": "`sotp ref-verify results` は text 単一フォーマットのみを提供する。`--format json` は実装しない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "CN-02",
+      "text": "`sotp ref-verify results` の exit code は常に 0 (informational)。verdict gate は `bin/sotp ref-verify check-approved` の責務であり、`results` はゲートに使わない。review/dry results と同じポリシー",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "CN-03",
+      "text": "`--track-id` を省略したとき、現在のブランチ名 `track/<id>` から必ず自動解決する。ブランチから解決できない場合はエラーとし、手動指定を要求する。手動指定も常にサポートする",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "CN-04",
+      "text": "`--layer` option の有効な layer 名は `architecture-rules.json` から動的に解決する。ハードコードしない。Chain① (`--chain 1`) に `--layer` を指定した場合は no-op とする (Chain① は layer 粒度を持たない)",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "CN-05",
+      "text": "旧 verify-cache (origin meta フィールドなし) は後方互換を持たず parse error として reject する。verify-cache は track-local 実行ログであり `bin/sotp ref-verify run` の再実行で新 schema に再生成できる。旧 entry を silently forward-compatible に読む migration は不要",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "anchor": "D3"
+        }
+      ],
+      "convention_refs": [
+        {
+          "file": "knowledge/conventions/no-backward-compat.md",
+          "anchor": "Rules"
+        }
+      ]
+    },
+    {
+      "id": "CN-06",
+      "text": "failing pair / pending pair の writer への振り分けは caller の責務とする。`results` コマンドは source 情報 (artifact 種別 + 具体位置) を提示するにとどまり、writer の指定・エラーメッセージの生成・fix ループの管理は行わない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "anchor": "D2"
+        }
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-01",
+      "text": "`sotp ref-verify results` コマンドが実行可能であり、先頭ブロック (Chain×Layer 集計) + レコードブロック (fail/pending pair) + Summary 行を含む text を stdout に出力する。exit code は 0",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-02",
+      "text": "先頭ブロックが Chain① (spec↔ADR) と Chain② (各 layer × catalogue↔spec) を 1 行/lane で表示し、各行が `pass=N fail=N pending=N` 形式を持つ。Chain② の layer 名が `architecture-rules.json` から解決されたものと一致する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-03",
+      "text": "レコードブロックの fail pair が `claim_hash / evidence_hash / verdict / reason / chain+layer` + claim/evidence source (artifact 種別 + 具体位置) を表示する。source は cache entry の `claim_origin` / `evidence_origin` から取得し、artifact の再 parse を要しない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "AC-04",
+      "text": "レコードブロックの pending pair (cache miss) が `claim_hash / evidence_hash / verdict=pending / chain+layer` + claim/evidence source を表示する。source は current artifact から read-only で再導出し、LLM / verifier の呼び出しは発生しない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "AC-05",
+      "text": "末尾の Summary 行が `Summary: N pass, N fail, N pending, N total` 形式で正確な集計を出力する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-06",
+      "text": "`--track-id` を省略したとき、現在のブランチ名 `track/<id>` から track id が自動解決され、正しい track のデータが表示される",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-07",
+      "text": "`--chain 1` を指定すると Chain① のみが表示され (先頭ブロックに Chain① の 1 lane のみ)、`--chain 2` では Chain② のみ (layer 数分の lane)、`--chain all` (既定) では両 Chain が表示される",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-08",
+      "text": "`--layer <name>` を指定すると Chain② の指定 layer 分のみが先頭ブロックとレコードブロックに表示される。`--layer all` (既定) は全 layer を表示する。`--layer` を `--chain 1` と同時指定した場合は Chain① に layer 概念がないため no-op として扱われる",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-09",
+      "text": "`--filter` 省略時は fail/pending pair がレコードブロックに表示される。`--filter fail` を指定すると fail pair のみ、`--filter pending` は pending pair のみ、`--filter pass` は pass pair のみ、`--filter all` はすべての pair を表示する。先頭ブロック (集計) と Summary 行は `--filter` に関わらず、`--chain` / `--layer` 適用後の lane 全件集計を表示する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-10",
+      "text": "`sotp ref-verify results` の exit code が pass/fail/pending pair の存在によらず常に 0 となる。0 以外の exit code を返すのはコマンド実行自体のエラー (引数不正・IO エラー等) のみ",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-11",
+      "text": "`SemanticVerifyEntry` に `claim_origin` / `evidence_origin` フィールドが追加されており、`bin/sotp ref-verify run` が新規に判定した pair についてこれらのフィールドを正しく populate した状態で cache に保存する。Chain① / Chain② それぞれのフィールド内容が D3 の仕様と一致する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "AC-12",
+      "text": "旧 verify-cache (origin meta フィールドなし) を read-only consumer が読み込もうとすると parse error が発生し、`bin/sotp ref-verify results` / `bin/sotp ref-verify check-approved` がエラーメッセージと非 0 exit code を返す。`bin/sotp ref-verify run` は旧 entry を有効 cache として再利用せず、新 schema の cache を再生成する。旧 cache の silently forward-compat な読み込みは行わない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "AC-13",
+      "text": "`/track:ref-verify` skill の Step 2 が `sotp ref-verify results` の出力を使う手順に更新されており、`spec-adr-verify-cache.json` / `<layer>-catalogue-spec-verify-cache.json` を直接 Read する旧手順が削除されている",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+          "anchor": "D1"
+        }
+      ]
+    }
+  ],
+  "related_conventions": [
+    {
+      "file": "knowledge/conventions/hexagonal-architecture.md",
+      "anchor": "Layer Dependencies"
+    },
+    {
+      "file": "knowledge/conventions/no-backward-compat.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/coding-principles.md",
+      "anchor": "No Panics in Library Code"
+    },
+    {
+      "file": "knowledge/conventions/prefer-type-safe-abstractions.md",
+      "anchor": "Make Illegal States Unrepresentable"
+    }
+  ],
+  "signals": {
+    "blue": 36,
+    "yellow": 0,
+    "red": 0
+  }
+}

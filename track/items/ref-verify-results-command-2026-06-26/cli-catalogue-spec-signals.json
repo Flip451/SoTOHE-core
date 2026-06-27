@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "932cf18eef6d2ec776b58d70d64bceccc8a35976d23da92d577832f46808faa6",
+  "signals": [
+    {
+      "type_name": "CheckApprovedArgs",
+      "signal": "blue",
+      "entry_hash": "8d9b9d4429bb56b6c625d5afdc470c06c6c38a144bdc71083a2a3ce579711aaa"
+    },
+    {
+      "type_name": "RefVerifyChainArg",
+      "signal": "blue",
+      "entry_hash": "8835b722801a02eb4188abc15b21779e58caf2601abba64a3a9bc08bf09ef2d0"
+    },
+    {
+      "type_name": "RefVerifyCommand",
+      "signal": "blue",
+      "entry_hash": "4d90a1e90ea983654af564bbcb6ebcdbe228233a49f1a385d5a7ab43d9f22203"
+    },
+    {
+      "type_name": "RefVerifyResultsArgs",
+      "signal": "blue",
+      "entry_hash": "a69912f5de48a39584676dfb7cb7f731885fcf3cd3a7ecd93d71927453249e49"
+    },
+    {
+      "type_name": "RefVerifyVerdictFilterArg",
+      "signal": "blue",
+      "entry_hash": "1c73e34263104990680ed82d29a04dd8bda40582a4606dd7dab3e5e390a10ca7"
+    },
+    {
+      "type_name": "RunArgs",
+      "signal": "blue",
+      "entry_hash": "d3f12ebfc9bf3faba9973914cf722032310e594f9f4c4f20cdb08c4786d4530c"
+    },
+    {
+      "type_name": "cli::commands::ref_verify::execute",
+      "signal": "blue",
+      "entry_hash": "792875d5dedd144ee10e35536e88808271592973cc5e5b0bf1f32fce302746de"
+    },
+    {
+      "type_name": "cli::commands::ref_verify::execute_results",
+      "signal": "blue",
+      "entry_hash": "604deab9e82912c4a14b5943a5e20df8ea1789c7cbcb859434366ef4df472514"
+    }
+  ]
+}

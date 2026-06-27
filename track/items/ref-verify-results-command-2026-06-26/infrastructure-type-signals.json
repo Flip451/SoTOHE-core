@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-06-27T07:17:18Z",
+  "declaration_hash": "7cbf9b10b97fddb20a4cbe8bbd23559f8363fdef3341045800a6b14f07c923d0",
+  "signals": [
+    {
+      "type_name": "FsRefVerifyAggregateAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "RefVerifyAggregateService"
+      ]
+    }
+  ]
+}

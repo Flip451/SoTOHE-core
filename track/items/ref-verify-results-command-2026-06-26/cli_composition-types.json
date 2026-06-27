@@ -1,0 +1,221 @@
+{
+  "schema_version": 5,
+  "crate_name": "cli_composition",
+  "layer": "cli_composition",
+  "types": {
+    "RefVerifyResultsInput": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "track_id",  "ty": "String" },
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "chain",     "ty": "RefVerifyChainFilter" },
+            { "name": "layer",     "ty": "String" },
+            { "name": "verdict",   "ty": "RefVerifyVerdictFilter" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "ref_verify",
+      "docs": "Input DTO for the cli_composition-level ref_verify_results() integration path. Uses the cli_composition-owned mirror enums (RefVerifyChainFilter, RefVerifyVerdictFilter) so callers do not depend on usecase crate. layer is a plain String ('all' or a layer id) because valid layer names are dynamic. Parallel to RefVerifyRunInput and RefVerifyCheckApprovedInput defined in this module.",
+      "spec_refs": [
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "IN-01" },
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "AC-07" },
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "AC-08" },
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "AC-09" }
+      ],
+      "informal_grounds": []
+    },
+    "RefVerifyChainFilter": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Chain1", "payload": { "kind": "unit" } },
+          { "name": "Chain2", "payload": { "kind": "unit" } },
+          { "name": "All",    "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "ref_verify",
+      "docs": "Chain filter at the cli_composition boundary. Mirrors cli_driver::ref_verify::RefVerifyChainSelect so callers of ref_verify_results do not depend on usecase::ref_verify. Re-exported from the crate root.",
+      "spec_refs": [
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "IN-01" }
+      ],
+      "informal_grounds": []
+    },
+    "RefVerifyVerdictFilter": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "FailPending", "payload": { "kind": "unit" } },
+          { "name": "Pass",        "payload": { "kind": "unit" } },
+          { "name": "Fail",        "payload": { "kind": "unit" } },
+          { "name": "Pending",     "payload": { "kind": "unit" } },
+          { "name": "All",         "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "ref_verify",
+      "docs": "Verdict filter at the cli_composition boundary. Mirrors cli_driver::ref_verify::RefVerifyVerdictSelect so callers of ref_verify_results do not depend on usecase::ref_verify. Re-exported from the crate root.",
+      "spec_refs": [
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "IN-01" }
+      ],
+      "informal_grounds": []
+    },
+    "RefVerifyCompositionRoot": {
+      "action": "modify",
+      "role": { "CompositionRoot": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "unit" }
+      },
+      "methods": [],
+      "module_path": "ref_verify",
+      "docs": "Composition root for the ref_verify command family. Unit struct. Extended by D1/D2 with a ref_verify_results() method and the accompanying RefVerifyResultsInput type.",
+      "spec_refs": [
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "IN-01" },
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "AC-07" },
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "AC-08" },
+        { "file": "track/items/ref-verify-results-command-2026-06-26/spec.json", "anchor": "AC-09" }
+      ],
+      "informal_grounds": []
+    },
+    "RefVerifyRunInput": {
+      "action": "reference",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "track_id",  "ty": "String" },
+            { "name": "items_dir", "ty": "std::path::PathBuf" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "ref_verify",
+      "docs": "Input DTO for ref_verify_run(). Defined in cli_composition::ref_verify and re-exported from the crate root.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "RefVerifyCheckApprovedInput": {
+      "action": "reference",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "track_id",  "ty": "String" },
+            { "name": "items_dir", "ty": "std::path::PathBuf" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "ref_verify",
+      "docs": "Input DTO for ref_verify_check_approved(). Defined in cli_composition::ref_verify and re-exported from the crate root.",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [
+    {
+      "type_name": "RefVerifyCompositionRoot",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Create a new RefVerifyCompositionRoot."
+        },
+        {
+          "name": "ref_verify_driver",
+          "receiver": "&self",
+          "params": [],
+          "returns": "cli_driver::ref_verify::RefVerifyDriver",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Build a wired RefVerifyDriver backed by FsRefVerifyAggregateAdapter. The primary execution path for the CLI (run, check_approved, results subcommands all go through the driver)."
+        },
+        {
+          "name": "ref_verify_run",
+          "receiver": "&self",
+          "params": [
+            { "name": "input", "ty": "RefVerifyRunInput" }
+          ],
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Full-stack integration path for ref-verify run (used in integration tests)."
+        },
+        {
+          "name": "ref_verify_check_approved",
+          "receiver": "&self",
+          "params": [
+            { "name": "input", "ty": "RefVerifyCheckApprovedInput" }
+          ],
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Full-stack integration path for ref-verify check-approved (used in integration tests)."
+        },
+        {
+          "name": "ref_verify_results",
+          "receiver": "&self",
+          "params": [
+            { "name": "input", "ty": "RefVerifyResultsInput" }
+          ],
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Full-stack integration path for ref-verify results. Reads the verify-cache and re-derives pending pairs read-only; no LLM subprocess is started. Added by D1/D2."
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    { "trait_ref": "core::fmt::Debug",   "for_type": "RefVerifyChainFilter" },
+    { "trait_ref": "core::clone::Clone", "for_type": "RefVerifyChainFilter" },
+
+    { "trait_ref": "core::fmt::Debug",   "for_type": "RefVerifyVerdictFilter" },
+    { "trait_ref": "core::clone::Clone", "for_type": "RefVerifyVerdictFilter" },
+
+    { "trait_ref": "core::fmt::Debug",   "for_type": "RefVerifyResultsInput" },
+    { "trait_ref": "core::clone::Clone", "for_type": "RefVerifyResultsInput" },
+
+    { "action": "reference", "trait_ref": "core::fmt::Debug",   "for_type": "RefVerifyRunInput" },
+    { "action": "reference", "trait_ref": "core::clone::Clone", "for_type": "RefVerifyRunInput" },
+
+    { "action": "reference", "trait_ref": "core::fmt::Debug",   "for_type": "RefVerifyCheckApprovedInput" },
+    { "action": "reference", "trait_ref": "core::clone::Clone", "for_type": "RefVerifyCheckApprovedInput" },
+
+    { "action": "reference", "trait_ref": "core::default::Default", "for_type": "RefVerifyCompositionRoot" }
+  ]
+}
