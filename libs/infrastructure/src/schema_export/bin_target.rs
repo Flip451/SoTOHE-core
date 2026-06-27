@@ -17,15 +17,8 @@ pub(super) fn run_rustdoc(
     workspace_root: &Path,
     crate_name: &str,
 ) -> Result<PathBuf, SchemaExportError> {
-    let args = |target: &[&str]| -> Vec<String> {
-        let mut v = vec!["+nightly".into(), "rustdoc".into(), "-p".into(), crate_name.into()];
-        v.extend(target.iter().map(|s| (*s).into()));
-        v.extend(["--", "-Z", "unstable-options", "--output-format", "json"].map(Into::into));
-        v
-    };
-
     let lib_out = Command::new("cargo")
-        .args(args(&["--lib"]))
+        .args(build_rustdoc_args(crate_name, &["--lib"]))
         .current_dir(workspace_root)
         .output()
         .map_err(|e| SchemaExportError::RustdocFailed(e.to_string()))?;
@@ -58,7 +51,7 @@ pub(super) fn run_rustdoc(
     // [[bin]]-only crate: resolve the binary target name and retry with --bin.
     let bin_name = resolve_bin_target_name(workspace_root, crate_name)?;
     let bin_out = Command::new("cargo")
-        .args(args(&["--bin", &bin_name]))
+        .args(build_rustdoc_args(crate_name, &["--bin", &bin_name]))
         .current_dir(workspace_root)
         .output()
         .map_err(|e| SchemaExportError::RustdocFailed(e.to_string()))?;
@@ -82,6 +75,16 @@ pub(super) fn run_rustdoc(
             path.display()
         )))
     }
+}
+
+fn build_rustdoc_args(crate_name: &str, target: &[&str]) -> Vec<String> {
+    let mut v = vec!["+nightly".into(), "rustdoc".into(), "-p".into(), crate_name.into()];
+    v.extend(target.iter().map(|s| (*s).into()));
+    v.extend(
+        ["--", "-Z", "unstable-options", "--output-format", "json", "--document-hidden-items"]
+            .map(Into::into),
+    );
+    v
 }
 
 fn rustdoc_artifact_name(target_name: &str) -> String {
@@ -193,6 +196,17 @@ mod tests {
     use serde_json::json;
 
     use super::*;
+
+    #[test]
+    fn test_build_rustdoc_args_includes_document_hidden_items_flag() {
+        let args = build_rustdoc_args("my_crate", &["--lib"]);
+
+        assert!(
+            args.iter().any(|a| a == "--document-hidden-items"),
+            "build_rustdoc_args must include --document-hidden-items so that rustdoc emits \
+             #[doc(hidden)] items into the paths table; got args = {args:?}"
+        );
+    }
 
     #[test]
     fn test_select_bin_target_name_single_bin_returns_bin_name() {
