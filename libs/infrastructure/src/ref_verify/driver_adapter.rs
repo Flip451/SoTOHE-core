@@ -495,6 +495,21 @@ fn results_core(
             };
         check_partial_catalogue_set(&present_layer_ids, &absent_layer_ids)?;
 
+        // Specific(X) + X absent: fail closed.  The user explicitly requested
+        // layer X; an absent catalogue means Phase-2 for X has not been run yet,
+        // which is an actionable error — not the pre-Phase-2 graceful zero-pair
+        // path that applies to `layer=All` when no catalogues exist at all.
+        if matches!(layer, RefVerifyLayerFilter::Specific(_)) && present_layer_ids.is_empty() {
+            let layer_name = absent_layer_ids
+                .first()
+                .map(|id| id.as_ref().to_owned())
+                .unwrap_or_else(|| "unknown".to_owned());
+            return Err(RefVerifyDriverError::Wiring(format!(
+                "requested layer '{layer_name}' catalogue is absent; \
+                 run the Phase-2 pipeline for this layer before querying results",
+            )));
+        }
+
         for layer_id in &target_ids {
             if absent_layer_ids.iter().any(|absent| absent == layer_id) {
                 // Record in chain2_caches so that compute_results layer validation can
@@ -1061,6 +1076,135 @@ mod tests {
             matches!(err, RefVerifyDriverError::Wiring(ref msg)
                 if msg.contains("spec.json not found") && msg.contains("usecase-types.json")),
             "expected Wiring error for unselected Chain2 ordering violation, got: {err:?}"
+        );
+    }
+
+    // ── P1 round-27 regression: Specific(X) absent must fail closed ─────────
+
+    /// `--chain 2 --layer Specific(domain)` where domain catalogue is absent
+    /// must fail closed with a `Wiring` error.
+    ///
+    /// Scenario: domain is a declared TDDD layer, but `domain-types.json` has
+    /// not been generated yet.  The user explicitly requested domain results;
+    /// an absent catalogue is an actionable error, not a pre-Phase-2 graceful
+    /// empty-result.  The pre-Phase-2 graceful path applies only to
+    /// `--layer All` when no catalogues exist at all.
+    ///
+    /// Invariant: `Specific(X)` + X absent → `Wiring` error containing the
+    /// layer name and "absent".
+    #[test]
+    fn compute_results_chain2_specific_layer_absent_returns_wiring_error() {
+        let tmp = tempfile::tempdir().unwrap();
+        let canonical_root = tmp.path().canonicalize().unwrap();
+        let track_id = domain::TrackId::try_new("test-track".to_owned()).unwrap();
+        let track_dir = canonical_root.join("track").join("items").join(track_id.as_ref());
+        std::fs::create_dir_all(&track_dir).unwrap();
+
+        // Two declared TDDD layers; neither catalogue is present yet.
+        write_two_layer_tddd_rules(&canonical_root);
+        // spec.json and domain-types.json intentionally absent (pre-Phase-2 for domain).
+
+        let domain_layer = domain::tddd::LayerId::try_new("domain".to_owned()).unwrap();
+        let err = results_core(
+            &canonical_root,
+            track_id,
+            usecase::ref_verify::RefVerifyChainFilter::Chain2,
+            usecase::ref_verify::RefVerifyLayerFilter::Specific(domain_layer),
+            usecase::ref_verify::RefVerifyVerdictFilter::All,
+            "<detached>".to_owned(),
+        )
+        .unwrap_err();
+
+        assert!(
+            matches!(err, RefVerifyDriverError::Wiring(ref msg)
+                if msg.contains("domain") && msg.contains("absent")),
+            "expected Wiring error for absent target layer, got: {err:?}"
+        );
+    }
+
+    /// `--chain 2 --layer Specific(domain)` with domain catalogue present and
+    /// usecase catalogue absent succeeds (Round-23 narrowing path unchanged).
+    ///
+    /// Variant of the Round-23 regression test confirming that the targeted
+    /// partial-catalogue check covers only {X} when `--layer Specific(X)` is
+    /// used.  An absent unrelated layer (usecase) must not block the query.
+    ///
+    /// Invariant: X present + unrelated Y absent → Ok; exactly one
+    /// `Chain2:domain` lane in the output.
+    #[test]
+    fn compute_results_chain2_specific_layer_present_other_absent_succeeds() {
+        let tmp = tempfile::tempdir().unwrap();
+        let canonical_root = tmp.path().canonicalize().unwrap();
+        let track_id = domain::TrackId::try_new("test-track".to_owned()).unwrap();
+        let track_dir = canonical_root.join("track").join("items").join(track_id.as_ref());
+        std::fs::create_dir_all(&track_dir).unwrap();
+
+        write_two_layer_tddd_rules(&canonical_root);
+        write_minimal_results_spec(&track_dir);
+        write_minimal_domain_catalogue(&track_dir);
+        // usecase-types.json intentionally absent.
+
+        let domain_layer = domain::tddd::LayerId::try_new("domain".to_owned()).unwrap();
+        let result = results_core(
+            &canonical_root,
+            track_id,
+            usecase::ref_verify::RefVerifyChainFilter::Chain2,
+            usecase::ref_verify::RefVerifyLayerFilter::Specific(domain_layer),
+            usecase::ref_verify::RefVerifyVerdictFilter::All,
+            "<detached>".to_owned(),
+        );
+
+        assert!(
+            result.is_ok(),
+            "--chain 2 --layer domain with usecase absent must succeed: {result:?}"
+        );
+        let out = result.unwrap();
+        assert_eq!(out.lane_summaries.len(), 1, "only domain lane expected");
+        assert_eq!(out.lane_summaries[0].label, "Chain2:domain");
+    }
+
+    /// `--chain 2 --layer All` with all declared catalogues absent succeeds with
+    /// zero pairs (pre-Phase-2 state).
+    ///
+    /// When no catalogue has been generated yet, `--layer All` is the
+    /// pre-Phase-2 valid state: the user did not explicitly target any layer,
+    /// so the absence of all catalogues is handled gracefully.  This path must
+    /// not be broken by the fail-closed check added for `Specific(X)`.
+    ///
+    /// Invariant: `All` + all catalogues absent → Ok; every lane has zero
+    /// pass/fail/pending counts.
+    #[test]
+    fn compute_results_chain2_all_all_absent_succeeds_zero_pair() {
+        let tmp = tempfile::tempdir().unwrap();
+        let canonical_root = tmp.path().canonicalize().unwrap();
+        let track_id = domain::TrackId::try_new("test-track".to_owned()).unwrap();
+        let track_dir = canonical_root.join("track").join("items").join(track_id.as_ref());
+        std::fs::create_dir_all(&track_dir).unwrap();
+
+        // Two declared TDDD layers; neither catalogue present (pre-Phase-2).
+        write_two_layer_tddd_rules(&canonical_root);
+        // spec.json and both catalogues intentionally absent.
+
+        let result = results_core(
+            &canonical_root,
+            track_id,
+            usecase::ref_verify::RefVerifyChainFilter::Chain2,
+            usecase::ref_verify::RefVerifyLayerFilter::All,
+            usecase::ref_verify::RefVerifyVerdictFilter::All,
+            "<detached>".to_owned(),
+        );
+
+        assert!(
+            result.is_ok(),
+            "--chain 2 --layer all with all catalogues absent must succeed (pre-Phase-2): {result:?}"
+        );
+        let out = result.unwrap();
+        assert!(
+            out.lane_summaries
+                .iter()
+                .all(|s| s.pass_count == 0 && s.fail_count == 0 && s.pending_count == 0),
+            "all lanes must have zero counts in pre-Phase-2 state: {:?}",
+            out.lane_summaries
         );
     }
 }
