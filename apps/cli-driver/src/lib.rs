@@ -26,6 +26,7 @@ pub mod render;
 pub mod review;
 pub mod semantic_dup;
 pub mod signal;
+pub mod task_contract;
 pub mod telemetry;
 pub mod track;
 pub mod verify;

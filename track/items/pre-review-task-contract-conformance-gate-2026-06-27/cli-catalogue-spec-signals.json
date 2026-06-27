@@ -1,7 +1,12 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "732fb6f04090c3baada406c78671357980368eb01629eaee15d5a2e9a2984f6b",
+  "catalogue_declaration_hash": "0b02db13031c573dfcef3c4d5929a14f114bb0d48c63e13c9b030693cc01bb14",
   "signals": [
+    {
+      "type_name": "CliCommand",
+      "signal": "blue",
+      "entry_hash": "d9775ee5c31fca78a68b0786cced93044d9cfe2f5ccf9e64f4175a46ca7df705"
+    },
     {
       "type_name": "TaskContractCheckArgs",
       "signal": "blue",

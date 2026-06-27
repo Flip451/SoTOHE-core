@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-27T13:04:21Z",
-  "declaration_hash": "43b8c28f635ab93f53f350406d3e8ba842085ebac06d45027ce01d69a12fea9f",
+  "generated_at": "2026-06-27T15:12:11Z",
+  "declaration_hash": "e0acfb3421ecc2e5fa1bd638a9fc543b136a354d56914296d46a1e7c54db008e",
   "signals": [
     {
       "type_name": "ContractedEntryRef",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -18,9 +18,9 @@
     {
       "type_name": "PreReviewGateOutcome",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -30,9 +30,9 @@
     {
       "type_name": "PreReviewGateViolation",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -42,9 +42,9 @@
     {
       "type_name": "TaskContractDocument",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",

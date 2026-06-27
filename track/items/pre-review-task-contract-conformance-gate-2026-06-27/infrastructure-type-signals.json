@@ -1,33 +1,47 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-27T13:04:28Z",
-  "declaration_hash": "d2c2e7934e812a07593d70e440e5a158ac0a723c1c00b05d8b1f58dbba795205",
+  "generated_at": "2026-06-27T15:12:17Z",
+  "declaration_hash": "4f6474ed2d159938f7849eb1a5737cbd77ad75238af465b74d051ed3701de94e",
   "signals": [
+    {
+      "type_name": "ContractedEntryRefDto",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::fmt::Debug",
+        "serde_core::de::Deserialize<'de>",
+        "serde_core::ser::Serialize"
+      ]
+    },
     {
       "type_name": "FsImplCatalogSignalReader",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
-        "ImplCatalogSignalReaderPort"
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "ImplCatalogSignalReaderPort",
+        "core::fmt::Debug"
       ]
     },
     {
       "type_name": "FsTaskContractReader",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
-        "TaskContractReaderPort"
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "TaskContractReaderPort",
+        "core::fmt::Debug"
       ]
     },
     {
       "type_name": "TaskContractCodecError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::convert::From<Error>",
+        "core::convert::From<ValidationError>",
         "core::error::Error",
         "core::fmt::Debug",
         "core::fmt::Display"
@@ -36,25 +50,25 @@
     {
       "type_name": "TaskContractDocumentDto",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::fmt::Debug",
-        "serde::Deserialize",
-        "serde::Serialize"
+        "serde_core::de::Deserialize<'de>",
+        "serde_core::ser::Serialize"
       ]
     },
     {
       "type_name": "infrastructure::task_contract_codec::decode",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "infrastructure::task_contract_codec::encode",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     }
   ]
 }

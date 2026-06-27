@@ -111,6 +111,11 @@ enum CliCommand {
         #[command(subcommand)]
         cmd: commands::signal::SignalCommand,
     },
+    /// Pre-review conformance gate: verify contracted catalogue entries have blue signals.
+    TaskContract {
+        #[command(subcommand)]
+        cmd: commands::task_contract::TaskContractCommand,
+    },
     /// Run the example track state machine demo.
     Demo,
 }
@@ -152,6 +157,7 @@ fn run_cli_with(
         Some(CliCommand::Dry { cmd }) => dry_execute(cmd),
         Some(CliCommand::RefVerify { cmd }) => ref_verify_execute(cmd),
         Some(CliCommand::Signal { cmd }) => commands::signal::execute(cmd),
+        Some(CliCommand::TaskContract { cmd }) => commands::task_contract::execute(cmd),
         Some(CliCommand::Demo) | None => {
             let outcome = DemoCompositionRoot::new().demo_driver().handle(DemoInput::Run);
             if let Some(msg) = outcome.stdout {

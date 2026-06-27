@@ -10,13 +10,40 @@
         "kind": "struct",
         "shape": {
           "kind": "plain",
-          "fields": [],
-          "has_stripped_fields": true
+          "fields": [
+            { "name": "schema_version", "ty": "u32" },
+            { "name": "track_id",       "ty": "String" },
+            { "name": "entries",        "ty": "std::collections::BTreeMap<String, Vec<ContractedEntryRefDto>>" }
+          ],
+          "has_stripped_fields": false
         }
       },
       "methods": [],
       "module_path": "task_contract_codec",
-      "docs": "JSON-serializable mirror of domain::task_contract::TaskContractDocument. Used exclusively as an intermediate serde representation inside task_contract_codec::decode and task_contract_codec::encode. The internal fields (schema_version, track_id, entries) are implementation detail of the codec and are not listed here (has_stripped_fields: true). Must derive Serialize + Deserialize; Debug for error diagnostics.",
+      "docs": "JSON-serializable mirror of domain::task_contract::TaskContractDocument. Used exclusively as an intermediate serde representation inside task_contract_codec::decode and task_contract_codec::encode. Must derive Serialize + Deserialize; Debug for error diagnostics. All fields are pub. schema_version: u32 — opaque version tag (R9: truly opaque technical value). track_id and the BTreeMap String key: serde-boundary Strings converted to TrackId and TaskId domain types in the decode function (R9 justification: domain types are serde-free; conversion happens immediately on decode).",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-01" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-01" }
+      ],
+      "informal_grounds": []
+    },
+    "ContractedEntryRefDto": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "layer", "ty": "String" },
+            { "name": "entry_key", "ty": "String" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "task_contract_codec",
+      "docs": "Serde DTO for a single (layer, entry_key) pair. Used exclusively as an intermediate serde representation inside task_contract_codec::decode and task_contract_codec::encode. Both fields are String (wire format): layer is validated against LayerId and entry_key against CatalogueEntryKey in the decode function (R9 justification: these DTO fields exist solely at the serde boundary; the domain types LayerId and CatalogueEntryKey are serde-free, and conversion happens immediately on decode before any domain logic is invoked).",
       "spec_refs": [
         { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-01" },
         { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-01" }
@@ -57,7 +84,7 @@
       },
       "methods": [],
       "module_path": "task_contract_codec",
-      "docs": "Error type for task-contract.json codec operations. Json: serde_json parse or serialization failure. UnsupportedSchemaVersion: the schema_version field in the file does not match the supported version. Validation: domain-level validation failed when constructing TaskContractDocument from the DTO (message is an opaque String from the domain ValidationError). Used by decode/encode free functions.",
+      "docs": "Error type for task-contract.json codec operations. Json: serde_json parse or serialization failure (#[from] serde_json::Error). UnsupportedSchemaVersion: the schema_version field in the file does not match the supported version. Validation: domain-level validation failed when constructing TaskContractDocument from the DTO (message is an opaque String from the domain ValidationError — converted via a manual From<ValidationError> impl). Used by decode/encode free functions.",
       "spec_refs": [
         { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-01" },
         { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-01" }
@@ -182,13 +209,19 @@
   ],
   "trait_impls": [
     { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "TaskContractDocumentDto" },
-    { "action": "add", "trait_ref": "serde::Serialize", "for_type": "TaskContractDocumentDto" },
-    { "action": "add", "trait_ref": "serde::Deserialize", "for_type": "TaskContractDocumentDto" },
+    { "action": "add", "trait_ref": "serde_core::ser::Serialize", "for_type": "TaskContractDocumentDto" },
+    { "action": "add", "trait_ref": "serde_core::de::Deserialize<'de>", "for_type": "TaskContractDocumentDto" },
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "ContractedEntryRefDto" },
+    { "action": "add", "trait_ref": "serde_core::ser::Serialize", "for_type": "ContractedEntryRefDto" },
+    { "action": "add", "trait_ref": "serde_core::de::Deserialize<'de>", "for_type": "ContractedEntryRefDto" },
     { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "TaskContractCodecError" },
     { "action": "add", "trait_ref": "core::fmt::Display", "for_type": "TaskContractCodecError" },
     { "action": "add", "trait_ref": "core::error::Error", "for_type": "TaskContractCodecError" },
     { "action": "add", "trait_ref": "core::convert::From<serde_json::Error>", "for_type": "TaskContractCodecError" },
+    { "action": "add", "trait_ref": "core::convert::From<domain::ValidationError>", "for_type": "TaskContractCodecError" },
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "FsTaskContractReader" },
     { "action": "add", "trait_ref": "usecase::pre_review_gate::TaskContractReaderPort", "for_type": "FsTaskContractReader" },
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "FsImplCatalogSignalReader" },
     { "action": "add", "trait_ref": "usecase::pre_review_gate::ImplCatalogSignalReaderPort", "for_type": "FsImplCatalogSignalReader" }
   ]
 }

@@ -16,7 +16,7 @@
       },
       "methods": [],
       "module_path": "task_contract",
-      "docs": "Domain model for task-contract.json. Maps each TaskId in the active track to the catalogue entries (layer + entry_key pairs) that the task is responsible for implementing. Validated at construction: track_id must be non-empty (enforced by TrackId), entries map must be non-empty.",
+      "docs": "Domain model for task-contract.json. Maps each TaskId in the active track to the catalogue entries (layer + entry_key pairs) that the task is responsible for implementing. Validated at construction: track_id must be non-empty (enforced by TrackId), entries map must be non-empty, and every task must carry at least one contracted entry.",
       "spec_refs": [
         { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-01" },
         { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-01" }
@@ -30,16 +30,13 @@
         "kind": "struct",
         "shape": {
           "kind": "plain",
-          "fields": [
-            { "name": "layer", "ty": "LayerId" },
-            { "name": "entry_key", "ty": "CatalogueEntryKey" }
-          ],
-          "has_stripped_fields": false
+          "fields": [],
+          "has_stripped_fields": true
         }
       },
       "methods": [],
       "module_path": "task_contract",
-      "docs": "A (layer, entry_key) pair identifying one catalogue entry contracted to a task. Distinct from domain::tddd::semantic_verify::CatalogueEntryRef (which holds file_path + section_key + entry_key for spec-adr verification). This type carries only the layer identity and catalogue entry key needed for the pre-review gate check.",
+      "docs": "A (layer, entry_key) pair identifying one catalogue entry contracted to a task. Distinct from domain::tddd::semantic_verify::CatalogueEntryRef (which holds file_path + section_key + entry_key for spec-adr verification). This type carries only the layer identity and catalogue entry key needed for the pre-review gate check. Fields (layer: LayerId, entry_key: CatalogueEntryKey) are pub(crate) and thus stripped in rustdoc; accessed via the layer() and entry_key() getter methods.",
       "spec_refs": [
         { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-01" },
         { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "CN-01" },
@@ -127,7 +124,7 @@
       },
       "methods": [],
       "module_path": "task_contract",
-      "docs": "Outcome of the pre-review gate check. Passed carries a human-readable conformance summary to be appended to the reviewer briefing (IN-06, GO-04). Blocked carries all violations found. conformance_summary is an opaque prose string with no cross-domain identity (R9: content of the summary is not a domain concept).",
+      "docs": "Outcome of the pre-review gate check. Passed carries a human-readable conformance summary to be appended to the reviewer briefing (IN-06, GO-04). Blocked carries all violations found. conformance_summary is an opaque prose string with no cross-domain identity (R9: content of the summary is not a domain concept). The Blocked variant is #[non_exhaustive]. Use PreReviewGateOutcome::blocked() to construct a Blocked outcome so the non-empty invariant is checked.",
       "spec_refs": [
         { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-04" },
         { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-06" },
@@ -155,7 +152,7 @@
           "generics": [],
           "has_default_impl": false,
           "where_predicates": [],
-          "docs": "Construct a TaskContractDocument. Returns ValidationError when entries is empty."
+          "docs": "Construct a TaskContractDocument. Returns ValidationError when entries is empty or any task has an empty contracted-entry list."
         },
         {
           "name": "schema_version",
@@ -208,6 +205,46 @@
           "has_default_impl": false,
           "where_predicates": [],
           "docs": "Construct a ContractedEntryRef from a layer id and catalogue entry key."
+        },
+        {
+          "name": "layer",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&LayerId",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns a reference to the layer id."
+        },
+        {
+          "name": "entry_key",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&CatalogueEntryKey",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns a reference to the catalogue entry key."
+        }
+      ]
+    },
+    {
+      "type_name": "PreReviewGateOutcome",
+      "methods": [
+        {
+          "name": "blocked",
+          "receiver": null,
+          "params": [
+            { "name": "violations", "ty": "Vec<PreReviewGateViolation>" }
+          ],
+          "returns": "Result<Self, ValidationError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Constructs a Blocked outcome with at least one violation. Returns ValidationError when violations is empty."
         }
       ]
     }

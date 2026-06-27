@@ -3,6 +3,54 @@
   "layer": "infrastructure",
   "entries": [
     {
+      "claim_hash": "a05cd3124599fe30440a2c1eeff994d25d6b4cc14a6c2297f5fa3bbb9949f74e",
+      "evidence_hash": "443217435b97a1d007284f3c64a7c38ea0650489d73e3f8ae6b4cf2de635f685",
+      "verdict": {
+        "kind": "pass",
+        "citation": "新 Phase 3 artifact `task-contract.json` のスキーマ定義と codec 実装。artifact はタスクリスト（各タスクが履行責務を持つ型カタログ entry 識別子のリスト）と schema_version を含む。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "ContractedEntryRefDto"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "新 Phase 3 artifact `task-contract.json` のスキーマ定義と codec 実装。artifact はタスクリスト（各タスクが履行責務を持つ型カタログ entry 識別子のリスト）と schema_version を含む。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a05cd3124599fe30440a2c1eeff994d25d6b4cc14a6c2297f5fa3bbb9949f74e",
+      "evidence_hash": "91c5c462efaf4aebaa314c9cb8d5e54695bcad6d171f65361cca1962cb224c0d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "artifact には schema_version・track id・タスクリスト（各タスクが履行責務を持つ型カタログ entry 識別子のリスト）が含まれる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "ContractedEntryRefDto"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`task-contract.json` のスキーマが定義されており、impl-planner が Phase 3 output として本 artifact を author する。artifact には schema_version・track id・タスクリスト（各タスクが履行責務を持つ型カタログ entry 識別子のリスト）が含まれる。"
+        }
+      }
+    },
+    {
       "claim_hash": "afcec3a11f3f236053b4e56b8ab46831827ad230a10d8cbc39252657ad01c2a1",
       "evidence_hash": "4776c2bc5cd2dad2214630005d3ccd1cb935b6ddae6278553aa61a8bea32b22b",
       "verdict": {
@@ -99,7 +147,7 @@
       }
     },
     {
-      "claim_hash": "849dc8132a71ac9ca189359e907aff0d2d30cc77cdae1e61284b69e17f0d5a3c",
+      "claim_hash": "2d953036a47b8c5ec753bcd4973f3dab9d9a201ea19ba86bc6910526bc4b1ffe",
       "evidence_hash": "443217435b97a1d007284f3c64a7c38ea0650489d73e3f8ae6b4cf2de635f685",
       "verdict": {
         "kind": "pass",
@@ -123,7 +171,7 @@
       }
     },
     {
-      "claim_hash": "849dc8132a71ac9ca189359e907aff0d2d30cc77cdae1e61284b69e17f0d5a3c",
+      "claim_hash": "2d953036a47b8c5ec753bcd4973f3dab9d9a201ea19ba86bc6910526bc4b1ffe",
       "evidence_hash": "91c5c462efaf4aebaa314c9cb8d5e54695bcad6d171f65361cca1962cb224c0d",
       "verdict": {
         "kind": "pass",
@@ -147,7 +195,7 @@
       }
     },
     {
-      "claim_hash": "3da7f29fd6aec9869ea658091e3f7a614e2078c68438c56df84e3c851b131bcf",
+      "claim_hash": "4f47f7c2fb1a37806751002f4e896a2ed03b621a2a2574dab291f0f503ef4978",
       "evidence_hash": "443217435b97a1d007284f3c64a7c38ea0650489d73e3f8ae6b4cf2de635f685",
       "verdict": {
         "kind": "pass",
@@ -171,11 +219,11 @@
       }
     },
     {
-      "claim_hash": "3da7f29fd6aec9869ea658091e3f7a614e2078c68438c56df84e3c851b131bcf",
+      "claim_hash": "4f47f7c2fb1a37806751002f4e896a2ed03b621a2a2574dab291f0f503ef4978",
       "evidence_hash": "91c5c462efaf4aebaa314c9cb8d5e54695bcad6d171f65361cca1962cb224c0d",
       "verdict": {
         "kind": "pass",
-        "citation": "`task-contract.json` のスキーマが定義されており、impl-planner が Phase 3 output として本 artifact を author する。artifact には schema_version・track id・タスクリスト（各タスクが履行責務を持つ型カタログ entry 識別子のリスト）が含まれる。"
+        "citation": "artifact には schema_version・track id・タスクリスト（各タスクが履行責務を持つ型カタログ entry 識別子のリスト）が含まれる。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",

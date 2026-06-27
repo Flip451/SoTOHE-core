@@ -31,12 +31,15 @@ subgraph domain["domain"]
     direction TB
     T32_domain_domain_ContractedEntryRef__self[ContractedEntryRef]
     T32_domain_domain_ContractedEntryRef_new([new])
+    T32_domain_domain_ContractedEntryRef_layer([layer])
+    T32_domain_domain_ContractedEntryRef_entry_key([entry_key])
   end
   subgraph T34_domain_domain_PreReviewGateOutcome["task_contract::PreReviewGateOutcome"]
     direction TB
     T34_domain_domain_PreReviewGateOutcome__self[PreReviewGateOutcome]
     T34_domain_domain_PreReviewGateOutcome_Passed[Passed]
     T34_domain_domain_PreReviewGateOutcome_Blocked[Blocked]
+    T34_domain_domain_PreReviewGateOutcome_blocked([blocked])
   end
   subgraph T36_domain_domain_PreReviewGateViolation["task_contract::PreReviewGateViolation"]
     direction TB
@@ -105,6 +108,10 @@ subgraph infrastructure["infrastructure"]
   end
   subgraph infrastructure_infrastructure_module_task_contract_codec["infrastructure::task_contract_codec"]
     direction TB
+  subgraph T51_infrastructure_infrastructure_ContractedEntryRefDto["task_contract_codec::ContractedEntryRefDto"]
+    direction TB
+    T51_infrastructure_infrastructure_ContractedEntryRefDto__self[ContractedEntryRefDto]
+  end
   subgraph T52_infrastructure_infrastructure_TaskContractCodecError["task_contract_codec::TaskContractCodecError"]
     direction TB
     T52_infrastructure_infrastructure_TaskContractCodecError__self[TaskContractCodecError]
@@ -160,6 +167,31 @@ subgraph cli_composition["cli_composition"]
 end
 subgraph cli["cli"]
   direction TB
+  subgraph T18_cli_cli_CliCommand["CliCommand"]
+    direction TB
+    T18_cli_cli_CliCommand__self[CliCommand]
+    T18_cli_cli_CliCommand_Arch[Arch]
+    T18_cli_cli_CliCommand_Conventions[Conventions]
+    T18_cli_cli_CliCommand_Domain[Domain]
+    T18_cli_cli_CliCommand_Guard[Guard]
+    T18_cli_cli_CliCommand_Hook[Hook]
+    T18_cli_cli_CliCommand_Track[Track]
+    T18_cli_cli_CliCommand_Git[Git]
+    T18_cli_cli_CliCommand_Pr[Pr]
+    T18_cli_cli_CliCommand_Plan[Plan]
+    T18_cli_cli_CliCommand_Review[Review]
+    T18_cli_cli_CliCommand_File[File]
+    T18_cli_cli_CliCommand_Verify[Verify]
+    T18_cli_cli_CliCommand_FindSimilar[FindSimilar]
+    T18_cli_cli_CliCommand_DupIndex[DupIndex]
+    T18_cli_cli_CliCommand_DupCheck[DupCheck]
+    T18_cli_cli_CliCommand_Telemetry[Telemetry]
+    T18_cli_cli_CliCommand_Dry[Dry]
+    T18_cli_cli_CliCommand_RefVerify[RefVerify]
+    T18_cli_cli_CliCommand_Signal[Signal]
+    T18_cli_cli_CliCommand_TaskContract[TaskContract]
+    T18_cli_cli_CliCommand_Demo[Demo]
+  end
   subgraph cli_cli_module_commands["cli::commands"]
     direction TB
   subgraph T29_cli_cli_TaskContractCheckArgs["commands::task_contract::TaskContractCheckArgs"]
@@ -177,6 +209,8 @@ subgraph cli["cli"]
 end
 T32_domain_domain_ContractedEntryRef_new --> T32_domain_domain_ContractedEntryRef__self
 T34_domain_domain_PreReviewGateOutcome_Blocked --o|violations| T36_domain_domain_PreReviewGateViolation__self
+T34_domain_domain_PreReviewGateOutcome_blocked --o T36_domain_domain_PreReviewGateViolation__self
+T34_domain_domain_PreReviewGateOutcome_blocked --> T34_domain_domain_PreReviewGateOutcome__self
 T36_domain_domain_PreReviewGateViolation_OrphanEntry --o|entry| T32_domain_domain_ContractedEntryRef__self
 T36_domain_domain_PreReviewGateViolation_InvalidEntryRef --o|entry| T32_domain_domain_ContractedEntryRef__self
 T36_domain_domain_PreReviewGateViolation_NonBlueSignal --o|entry| T32_domain_domain_ContractedEntryRef__self
@@ -192,6 +226,7 @@ R38_usecase_usecase_TaskContractReaderPort_read --> T34_usecase_usecase_PreRevie
 R38_usecase_usecase_TaskContractReaderPort_read --> T34_domain_domain_TaskContractDocument__self
 T39_usecase_usecase_PreReviewGateInteractor__self -.impl.-> R36_usecase_usecase_PreReviewGateService__self
 T55_infrastructure_infrastructure_FsImplCatalogSignalReader_new --> T55_infrastructure_infrastructure_FsImplCatalogSignalReader__self
+T53_infrastructure_infrastructure_TaskContractDocumentDto__self --o|entries| T51_infrastructure_infrastructure_ContractedEntryRefDto__self
 F73_infrastructure_infrastructure_infrastructure__task_contract_codec__decode --> T52_infrastructure_infrastructure_TaskContractCodecError__self
 F73_infrastructure_infrastructure_infrastructure__task_contract_codec__decode --> T34_domain_domain_TaskContractDocument__self
 F73_infrastructure_infrastructure_infrastructure__task_contract_codec__encode --o T34_domain_domain_TaskContractDocument__self
@@ -203,13 +238,17 @@ T40_cli_driver_cli_driver_TaskContractDriver_new --> T40_cli_driver_cli_driver_T
 T40_cli_driver_cli_driver_TaskContractDriver_handle --o T39_cli_driver_cli_driver_TaskContractInput__self
 T59_cli_composition_cli_composition_TaskContractCompositionRoot_new --> T59_cli_composition_cli_composition_TaskContractCompositionRoot__self
 T59_cli_composition_cli_composition_TaskContractCompositionRoot_task_contract_driver --> T40_cli_driver_cli_driver_TaskContractDriver__self
+T18_cli_cli_CliCommand_TaskContract --o|cmd| T27_cli_cli_TaskContractCommand__self
 T27_cli_cli_TaskContractCommand_Check --o T29_cli_cli_TaskContractCheckArgs__self
 F45_cli_cli_cli__commands__task_contract__execute --o T27_cli_cli_TaskContractCommand__self
 F65_cli_cli_cli__commands__task_contract__execute_task_contract_check --o T29_cli_cli_TaskContractCheckArgs__self
 class T32_domain_domain_ContractedEntryRef_new method_node
+class T32_domain_domain_ContractedEntryRef_layer method_node
+class T32_domain_domain_ContractedEntryRef_entry_key method_node
 class T32_domain_domain_ContractedEntryRef__self value_object
 class T34_domain_domain_PreReviewGateOutcome_Passed variant_node
 class T34_domain_domain_PreReviewGateOutcome_Blocked variant_node
+class T34_domain_domain_PreReviewGateOutcome_blocked method_node
 class T34_domain_domain_PreReviewGateOutcome__self value_object
 class T36_domain_domain_PreReviewGateViolation_MissingTaskContract variant_node
 class T36_domain_domain_PreReviewGateViolation_OrphanEntry variant_node
@@ -236,6 +275,7 @@ class R38_usecase_usecase_TaskContractReaderPort_read method_node
 class R38_usecase_usecase_TaskContractReaderPort__self secondary_port
 class T55_infrastructure_infrastructure_FsImplCatalogSignalReader_new method_node
 class T55_infrastructure_infrastructure_FsImplCatalogSignalReader__self secondary_adapter
+class T51_infrastructure_infrastructure_ContractedEntryRefDto__self dto
 class T52_infrastructure_infrastructure_TaskContractCodecError_Json variant_node
 class T52_infrastructure_infrastructure_TaskContractCodecError_UnsupportedSchemaVersion variant_node
 class T52_infrastructure_infrastructure_TaskContractCodecError_Validation variant_node
@@ -254,6 +294,28 @@ class T39_cli_driver_cli_driver_TaskContractInput__self dto
 class T59_cli_composition_cli_composition_TaskContractCompositionRoot_new method_node
 class T59_cli_composition_cli_composition_TaskContractCompositionRoot_task_contract_driver method_node
 class T59_cli_composition_cli_composition_TaskContractCompositionRoot_task_contract_check method_node
+class T18_cli_cli_CliCommand_Arch variant_node
+class T18_cli_cli_CliCommand_Conventions variant_node
+class T18_cli_cli_CliCommand_Domain variant_node
+class T18_cli_cli_CliCommand_Guard variant_node
+class T18_cli_cli_CliCommand_Hook variant_node
+class T18_cli_cli_CliCommand_Track variant_node
+class T18_cli_cli_CliCommand_Git variant_node
+class T18_cli_cli_CliCommand_Pr variant_node
+class T18_cli_cli_CliCommand_Plan variant_node
+class T18_cli_cli_CliCommand_Review variant_node
+class T18_cli_cli_CliCommand_File variant_node
+class T18_cli_cli_CliCommand_Verify variant_node
+class T18_cli_cli_CliCommand_FindSimilar variant_node
+class T18_cli_cli_CliCommand_DupIndex variant_node
+class T18_cli_cli_CliCommand_DupCheck variant_node
+class T18_cli_cli_CliCommand_Telemetry variant_node
+class T18_cli_cli_CliCommand_Dry variant_node
+class T18_cli_cli_CliCommand_RefVerify variant_node
+class T18_cli_cli_CliCommand_Signal variant_node
+class T18_cli_cli_CliCommand_TaskContract variant_node
+class T18_cli_cli_CliCommand_Demo variant_node
+class T18_cli_cli_CliCommand__self dto
 class T29_cli_cli_TaskContractCheckArgs__self dto
 class T27_cli_cli_TaskContractCommand_Check variant_node
 class T27_cli_cli_TaskContractCommand__self dto

@@ -1,14 +1,22 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-27T13:04:32Z",
-  "declaration_hash": "732fb6f04090c3baada406c78671357980368eb01629eaee15d5a2e9a2984f6b",
+  "generated_at": "2026-06-27T15:12:21Z",
+  "declaration_hash": "0b02db13031c573dfcef3c4d5929a14f114bb0d48c63e13c9b030693cc01bb14",
   "signals": [
+    {
+      "type_name": "CliCommand",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
     {
       "type_name": "TaskContractCheckArgs",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "clap_builder::derive::Args",
+        "clap_builder::derive::FromArgMatches",
         "core::clone::Clone",
         "core::fmt::Debug"
       ]
@@ -16,9 +24,11 @@
     {
       "type_name": "TaskContractCommand",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "clap_builder::derive::FromArgMatches",
+        "clap_builder::derive::Subcommand",
         "core::clone::Clone",
         "core::fmt::Debug"
       ]
@@ -26,14 +36,14 @@
     {
       "type_name": "cli::commands::task_contract::execute",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "cli::commands::task_contract::execute_task_contract_check",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     }
   ]
 }

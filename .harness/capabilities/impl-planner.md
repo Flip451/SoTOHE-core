@@ -7,7 +7,7 @@
 
 ## Mission
 
-Author two Phase 3 artifacts:
+Author three Phase 3 artifacts:
 
 - `track/items/<id>/impl-plan.json` — the implementation plan:
   - `schema_version`
@@ -15,16 +15,21 @@ Author two Phase 3 artifacts:
   - `plan.sections[]` of `{id, title, description[], task_ids[]}` — the grouping view used by `plan.md`
 - `track/items/<id>/task-coverage.json` — the coverage map:
   - Per-section (`in_scope` / `out_of_scope` / `constraints` / `acceptance_criteria`) mapping from `SpecElementId` to `Vec<TaskId>`, enforcing that every enforced spec element is linked to at least one task
+- `track/items/<id>/task-contract.json` — the task-to-catalogue-entry attribution map (IN-02):
+  - `schema_version`
+  - `track_id` — the active track identifier
+  - `entries` — map from `TaskId` to list of `{layer, entry_key}` pairs, declaring which catalogue entries each task is responsible for implementing; used by the CN-01 pre-review gate to verify attribution completeness and impl_catalog blue signals before review
+  - Rollout note: the track introducing `task-contract.json` defines the schema/gate first; subsequent impl-planner runs generate this third artifact alongside the existing two outputs
 
 The plan describes **how the feature is broken into implementation steps**, not the types themselves. Trait signatures, enum variants, and `TypeDefinitionKind` decisions belong to the type-designer's catalogue; architectural decisions belong to the ADR.
 
-This capability **owns `impl-plan.json` and `task-coverage.json` for this track**: it writes both artifacts directly and evaluates the task-coverage binary gate via `bin/sotp verify plan-artifact-refs`. The orchestrator receives the gate verdict (OK / ERROR) and decides whether Phase 3 passes.
+This capability **owns `impl-plan.json`, `task-coverage.json`, and `task-contract.json` for this track**: it writes all three artifacts directly, evaluates the task-coverage binary gate via `bin/sotp verify plan-artifact-refs`, and relies on the CN-01 pre-review gate for `task-contract.json` attribution-completeness / impl_catalog-blue verification. The orchestrator receives the gate verdicts (OK / ERROR) and decides whether Phase 3 passes.
 
 ## Boundary with other capabilities
 
 | aspect | impl-planner (this capability) | spec-designer | type-designer | adr-editor |
 |---|---|---|---|---|
-| output | `impl-plan.json` + `task-coverage.json` | `spec.json` + `spec.md` | `<layer>-types.json` + rendered views | `knowledge/adr/*.md` |
+| output | `impl-plan.json` + `task-coverage.json` + `task-contract.json` | `spec.json` + `spec.md` | `<layer>-types.json` + rendered views | `knowledge/adr/*.md` |
 | phase | Phase 3 | Phase 1 | Phase 2 | back-and-forth |
 | input | spec.json + type catalogue + ADR | ADR + convention | spec.json + ADR + convention | downstream signal 🔴 + current ADR |
 | typical trigger | `/track:impl-plan` | `/track:spec-design` | `/track:type-design` | `/track:plan` back-and-forth |
@@ -49,10 +54,11 @@ If the briefing asks for:
 
 ### Internal pipeline (all executed by the specialist)
 
-1. Draft the `impl-plan.json` content (`tasks[]` + `plan.sections[]`) and the `task-coverage.json` content (per-section `SpecElementId` → `Vec<TaskId>` map).
+1. Draft the `impl-plan.json` content (`tasks[]` + `plan.sections[]`), the `task-coverage.json` content (per-section `SpecElementId` → `Vec<TaskId>` map), and the `task-contract.json` content (`TaskId` → `Vec<{layer, entry_key}>` attribution map).
 2. Write `track/items/<id>/impl-plan.json` directly with the drafted content.
 3. Write `track/items/<id>/task-coverage.json` directly with the drafted content.
-4. Evaluate the task-coverage binary gate:
+4. Write `track/items/<id>/task-contract.json` directly with the drafted content.
+5. Evaluate the task-coverage binary gate:
    ```
    bin/sotp verify plan-artifact-refs
    ```
@@ -78,7 +84,7 @@ Apply `knowledge/conventions/prefer-type-safe-abstractions.md` (Newtype / Enum-f
 
 ## Scope Ownership
 
-- **Writes permitted**: `track/items/<id>/impl-plan.json` (direct), `track/items/<id>/task-coverage.json` (direct).
+- **Writes permitted**: `track/items/<id>/impl-plan.json` (direct), `track/items/<id>/task-coverage.json` (direct), `track/items/<id>/task-contract.json` (direct).
 - **Writes forbidden**: any other track's artifacts, other capabilities' SSoT files (`spec.json`, `<layer>-types.json`, `metadata.json`), `plan.md`, any file under `knowledge/adr/` or `knowledge/conventions/`, any source code.
 - **Bash usage**: restricted to `bin/sotp` CLI invocations required by the internal pipeline (`bin/sotp verify plan-artifact-refs`). No `git`, `cat`, `grep`, `head`, `tail`, `sed`, or `awk`.
 - Do not spawn further agents (keep planning deterministic and serial).

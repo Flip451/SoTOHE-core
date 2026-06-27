@@ -3,7 +3,7 @@
   "layer": "domain",
   "entries": [
     {
-      "claim_hash": "0f947e72f780886980c6780c2a2dc31b8b01d9784f4cc328db2f7da96ea6bbda",
+      "claim_hash": "a2461e70441859dd842c822b6c66594ccd5874ab84a9285f3560f53b870e0839",
       "evidence_hash": "443217435b97a1d007284f3c64a7c38ea0650489d73e3f8ae6b4cf2de635f685",
       "verdict": {
         "kind": "pass",
@@ -27,7 +27,7 @@
       }
     },
     {
-      "claim_hash": "0f947e72f780886980c6780c2a2dc31b8b01d9784f4cc328db2f7da96ea6bbda",
+      "claim_hash": "a2461e70441859dd842c822b6c66594ccd5874ab84a9285f3560f53b870e0839",
       "evidence_hash": "804aac23c761cf53a1f9eebd865037751bbaf86dde5b06d0a87bb2c2e26f62de",
       "verdict": {
         "kind": "pass",
@@ -51,7 +51,7 @@
       }
     },
     {
-      "claim_hash": "0f947e72f780886980c6780c2a2dc31b8b01d9784f4cc328db2f7da96ea6bbda",
+      "claim_hash": "a2461e70441859dd842c822b6c66594ccd5874ab84a9285f3560f53b870e0839",
       "evidence_hash": "6ec9c57a4b7634291d1d5d7a82c8fd5b48931ebb6ddb7696e0062eb571d206a5",
       "verdict": {
         "kind": "pass",
@@ -75,11 +75,11 @@
       }
     },
     {
-      "claim_hash": "ebe1595ceabff0792d690fad1b72ab88472f8a0ba95571c57844e9674bccdb0d",
+      "claim_hash": "377afe0169c8fdae9d68524f5a488511d09728d5b90011479b6e5fbeec9e88de",
       "evidence_hash": "4776c2bc5cd2dad2214630005d3ccd1cb935b6ddae6278553aa61a8bea32b22b",
       "verdict": {
         "kind": "pass",
-        "citation": "全 entry が 🔵 かを確認する。ゲートは sotp CLI サブコマンドとして実装し、fail-closed ... ブロック"
+        "citation": "task-contract.json の attribution completeness を検証した後、attribution された全カタログ entry の impl_catalog 信号を既存信号テーブルと entry キーで JOIN し、全 entry が 🔵 かを確認する。ゲートは sotp CLI サブコマンドとして実装し、fail-closed（artifact 不在・attribution 不完全・非 🔵 entry のいずれでもブロック）とする。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -99,7 +99,7 @@
       }
     },
     {
-      "claim_hash": "ebe1595ceabff0792d690fad1b72ab88472f8a0ba95571c57844e9674bccdb0d",
+      "claim_hash": "377afe0169c8fdae9d68524f5a488511d09728d5b90011479b6e5fbeec9e88de",
       "evidence_hash": "e979640a1a9ea9ec64aaafd1fe9f35c0010ff0935f3b206d85c10d62c32a3e03",
       "verdict": {
         "kind": "pass",
@@ -123,7 +123,7 @@
       }
     },
     {
-      "claim_hash": "ebe1595ceabff0792d690fad1b72ab88472f8a0ba95571c57844e9674bccdb0d",
+      "claim_hash": "377afe0169c8fdae9d68524f5a488511d09728d5b90011479b6e5fbeec9e88de",
       "evidence_hash": "e4db291e7a77ac5d313288622aa58f5bb39db198b394bf25c925e94c77399681",
       "verdict": {
         "kind": "pass",
@@ -147,11 +147,11 @@
       }
     },
     {
-      "claim_hash": "ebe1595ceabff0792d690fad1b72ab88472f8a0ba95571c57844e9674bccdb0d",
+      "claim_hash": "377afe0169c8fdae9d68524f5a488511d09728d5b90011479b6e5fbeec9e88de",
       "evidence_hash": "1a36170a35af585aabdbb69a2d4a079dbd049a65cc1ef478db351b44b8f23d45",
       "verdict": {
         "kind": "pass",
-        "citation": "ゲート通過時に verified-conformance サマリを reviewer briefing へ追記し、ゲートの保証範囲（「宣言した API surface が型契約と shape 一致、body は未検証」）を正確に伝える。過大表現による reviewer の over-trust とすり抜け悪化を防ぐために文言を規律する。"
+        "citation": "ゲート通過時に verified-conformance サマリを reviewer briefing へ追記し、ゲートの保証範囲（「宣言した API surface が型契約と shape 一致、body は未検証」）を正確に伝える。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -267,7 +267,7 @@
       }
     },
     {
-      "claim_hash": "10e1f6ae7cec8431c2feae1f9689897aae34690fb589d1e93af1e2c48ed910d9",
+      "claim_hash": "509df0ce979d3aed33c25767611fac8a85f52d800326d5e6ec09fbd43b85d691",
       "evidence_hash": "443217435b97a1d007284f3c64a7c38ea0650489d73e3f8ae6b4cf2de635f685",
       "verdict": {
         "kind": "pass",
@@ -291,11 +291,11 @@
       }
     },
     {
-      "claim_hash": "10e1f6ae7cec8431c2feae1f9689897aae34690fb589d1e93af1e2c48ed910d9",
+      "claim_hash": "509df0ce979d3aed33c25767611fac8a85f52d800326d5e6ec09fbd43b85d691",
       "evidence_hash": "91c5c462efaf4aebaa314c9cb8d5e54695bcad6d171f65361cca1962cb224c0d",
       "verdict": {
         "kind": "pass",
-        "citation": "artifact には schema_version・track id・タスクリスト（各タスクが履行責務を持つ型カタログ entry 識別子のリスト）が含まれる。"
+        "citation": "`task-contract.json` のスキーマが定義されており、impl-planner が Phase 3 output として本 artifact を author する。artifact には schema_version・track id・タスクリスト（各タスクが履行責務を持つ型カタログ entry 識別子のリスト）が含まれる。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",

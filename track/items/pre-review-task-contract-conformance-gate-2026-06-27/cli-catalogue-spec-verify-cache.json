@@ -3,6 +3,30 @@
   "layer": "cli",
   "entries": [
     {
+      "claim_hash": "d9775ee5c31fca78a68b0786cced93044d9cfe2f5ccf9e64f4175a46ca7df705",
+      "evidence_hash": "4776c2bc5cd2dad2214630005d3ccd1cb935b6ddae6278553aa61a8bea32b22b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ゲートは sotp CLI サブコマンドとして実装し、fail-closed（artifact 不在・attribution 不完全・非 🔵 entry のいずれでもブロック）とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CliCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "pre-review blocking binary check ゲートの実装: task-contract.json の attribution completeness を検証した後、attribution された全カタログ entry の impl_catalog 信号を既存信号テーブルと entry キーで JOIN し、全 entry が 🔵 かを確認する。ゲートは sotp CLI サブコマンドとして実装し、fail-closed（artifact 不在・attribution 不完全・非 🔵 entry のいずれでもブロック）とする。"
+        }
+      }
+    },
+    {
       "claim_hash": "eadf7f031e4ff62bd7bd38c7c01e401eff7af2baa887020a41b07913f1e71359",
       "evidence_hash": "4776c2bc5cd2dad2214630005d3ccd1cb935b6ddae6278553aa61a8bea32b22b",
       "verdict": {

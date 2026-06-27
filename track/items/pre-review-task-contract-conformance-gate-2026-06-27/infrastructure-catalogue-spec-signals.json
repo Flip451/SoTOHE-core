@@ -1,7 +1,12 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "d2c2e7934e812a07593d70e440e5a158ac0a723c1c00b05d8b1f58dbba795205",
+  "catalogue_declaration_hash": "4f6474ed2d159938f7849eb1a5737cbd77ad75238af465b74d051ed3701de94e",
   "signals": [
+    {
+      "type_name": "ContractedEntryRefDto",
+      "signal": "blue",
+      "entry_hash": "a05cd3124599fe30440a2c1eeff994d25d6b4cc14a6c2297f5fa3bbb9949f74e"
+    },
     {
       "type_name": "FsImplCatalogSignalReader",
       "signal": "blue",
@@ -15,12 +20,12 @@
     {
       "type_name": "TaskContractCodecError",
       "signal": "blue",
-      "entry_hash": "849dc8132a71ac9ca189359e907aff0d2d30cc77cdae1e61284b69e17f0d5a3c"
+      "entry_hash": "2d953036a47b8c5ec753bcd4973f3dab9d9a201ea19ba86bc6910526bc4b1ffe"
     },
     {
       "type_name": "TaskContractDocumentDto",
       "signal": "blue",
-      "entry_hash": "3da7f29fd6aec9869ea658091e3f7a614e2078c68438c56df84e3c851b131bcf"
+      "entry_hash": "4f47f7c2fb1a37806751002f4e896a2ed03b621a2a2574dab291f0f503ef4978"
     },
     {
       "type_name": "infrastructure::task_contract_codec::decode",

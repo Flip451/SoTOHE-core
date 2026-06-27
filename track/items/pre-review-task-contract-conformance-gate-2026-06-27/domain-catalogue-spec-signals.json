@@ -1,16 +1,16 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "43b8c28f635ab93f53f350406d3e8ba842085ebac06d45027ce01d69a12fea9f",
+  "catalogue_declaration_hash": "e0acfb3421ecc2e5fa1bd638a9fc543b136a354d56914296d46a1e7c54db008e",
   "signals": [
     {
       "type_name": "ContractedEntryRef",
       "signal": "blue",
-      "entry_hash": "0f947e72f780886980c6780c2a2dc31b8b01d9784f4cc328db2f7da96ea6bbda"
+      "entry_hash": "a2461e70441859dd842c822b6c66594ccd5874ab84a9285f3560f53b870e0839"
     },
     {
       "type_name": "PreReviewGateOutcome",
       "signal": "blue",
-      "entry_hash": "ebe1595ceabff0792d690fad1b72ab88472f8a0ba95571c57844e9674bccdb0d"
+      "entry_hash": "377afe0169c8fdae9d68524f5a488511d09728d5b90011479b6e5fbeec9e88de"
     },
     {
       "type_name": "PreReviewGateViolation",
@@ -20,7 +20,7 @@
     {
       "type_name": "TaskContractDocument",
       "signal": "blue",
-      "entry_hash": "10e1f6ae7cec8431c2feae1f9689897aae34690fb589d1e93af1e2c48ed910d9"
+      "entry_hash": "509df0ce979d3aed33c25767611fac8a85f52d800326d5e6ec09fbd43b85d691"
     }
   ]
 }

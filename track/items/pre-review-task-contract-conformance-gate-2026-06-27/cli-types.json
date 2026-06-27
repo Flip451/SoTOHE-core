@@ -3,6 +3,43 @@
   "crate_name": "cli",
   "layer": "cli",
   "types": {
+    "CliCommand": {
+      "action": "modify",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Arch",        "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "ArchCommand" }] } },
+          { "name": "Conventions", "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "ConventionsCommand" }] } },
+          { "name": "Domain",      "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "DomainCommand" }] } },
+          { "name": "Guard",       "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "GuardCommand" }] } },
+          { "name": "Hook",        "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "HookCommand" }] } },
+          { "name": "Track",       "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "TrackCommand" }] } },
+          { "name": "Git",         "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "GitCommand" }] } },
+          { "name": "Pr",          "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "PrCommand" }] } },
+          { "name": "Plan",        "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "PlanCommand" }] } },
+          { "name": "Review",      "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "ReviewCommand" }] } },
+          { "name": "File",        "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "FileCommand" }] } },
+          { "name": "Verify",      "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "VerifyCommand" }] } },
+          { "name": "FindSimilar", "payload": { "kind": "tuple",  "fields": ["FindSimilarArgs"] } },
+          { "name": "DupIndex",    "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "DupIndexCommand" }] } },
+          { "name": "DupCheck",    "payload": { "kind": "tuple",  "fields": ["DupCheckArgs"] } },
+          { "name": "Telemetry",   "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "TelemetryCommand" }] } },
+          { "name": "Dry",         "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "DryCommand" }] } },
+          { "name": "RefVerify",   "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "RefVerifyCommand" }] } },
+          { "name": "Signal",      "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "SignalCommand" }] } },
+          { "name": "TaskContract","payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "TaskContractCommand" }] } },
+          { "name": "Demo",        "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "",
+      "docs": "Top-level sotp CLI command dispatcher. Routes sotp subcommands to their respective handlers. TaskContract variant added by this track (T005) to expose the pre-review conformance gate check (sotp task-contract check).",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-04" }
+      ],
+      "informal_grounds": []
+    },
     "TaskContractCommand": {
       "action": "add",
       "role": { "Dto": {} },
@@ -90,9 +127,15 @@
   },
   "inherent_impls": [],
   "trait_impls": [
-    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "TaskContractCommand" },
-    { "action": "add", "trait_ref": "core::clone::Clone", "for_type": "TaskContractCommand" },
-    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "TaskContractCheckArgs" },
-    { "action": "add", "trait_ref": "core::clone::Clone", "for_type": "TaskContractCheckArgs" }
+    { "action": "reference", "trait_ref": "clap_builder::derive::FromArgMatches", "for_type": "CliCommand" },
+    { "action": "reference", "trait_ref": "clap_builder::derive::Subcommand",      "for_type": "CliCommand" },
+    { "action": "add", "trait_ref": "core::fmt::Debug",                             "for_type": "TaskContractCommand" },
+    { "action": "add", "trait_ref": "core::clone::Clone",                           "for_type": "TaskContractCommand" },
+    { "action": "add", "trait_ref": "clap_builder::derive::FromArgMatches",         "for_type": "TaskContractCommand" },
+    { "action": "add", "trait_ref": "clap_builder::derive::Subcommand",             "for_type": "TaskContractCommand" },
+    { "action": "add", "trait_ref": "core::fmt::Debug",                             "for_type": "TaskContractCheckArgs" },
+    { "action": "add", "trait_ref": "core::clone::Clone",                           "for_type": "TaskContractCheckArgs" },
+    { "action": "add", "trait_ref": "clap_builder::derive::Args",                   "for_type": "TaskContractCheckArgs" },
+    { "action": "add", "trait_ref": "clap_builder::derive::FromArgMatches",         "for_type": "TaskContractCheckArgs" }
   ]
 }

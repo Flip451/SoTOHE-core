@@ -4,11 +4,11 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| TaskContractInput | enum | add | Check | 🟡 | 🔵 |
+| TaskContractInput | enum | add | Check | 🔵 | 🔵 |
 
 ## Primary Adapters
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| TaskContractDriver | primary_adapter | add | — | 🟡 | 🔵 |
+| TaskContractDriver | primary_adapter | add | — | 🔵 | 🔵 |
 

@@ -4,18 +4,19 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| TaskContractCommand | enum | add | Check | 🟡 | 🔵 |
+| CliCommand | enum | modify | Arch, Conventions, Domain, Guard, Hook, Track, Git, Pr, Plan, Review, File, Verify, FindSimilar, DupIndex, DupCheck, Telemetry, Dry, RefVerify, Signal, TaskContract, Demo | 🔵 | 🔵 |
+| TaskContractCommand | enum | add | Check | 🔵 | 🔵 |
 
 ## DTOs
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| TaskContractCheckArgs | dto | add | — | 🟡 | 🔵 |
+| TaskContractCheckArgs | dto | add | — | 🔵 | 🔵 |
 
 ## Free Functions
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| cli::commands::task_contract::execute | free_function | add | fn(cmd: TaskContractCommand) -> std::process::ExitCode | 🟡 | 🔵 |
-| cli::commands::task_contract::execute_task_contract_check | free_function | add | fn(args: TaskContractCheckArgs) -> std::process::ExitCode | 🟡 | 🔵 |
+| cli::commands::task_contract::execute | free_function | add | fn(cmd: TaskContractCommand) -> std::process::ExitCode | 🔵 | 🔵 |
+| cli::commands::task_contract::execute_task_contract_check | free_function | add | fn(args: TaskContractCheckArgs) -> std::process::ExitCode | 🔵 | 🔵 |
 
