@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "track_id": "pre-review-task-contract-conformance-gate-2026-06-27",
+  "entries": {
+    "T001": [
+      { "layer": "domain", "entry_key": "TaskContractDocument" },
+      { "layer": "domain", "entry_key": "ContractedEntryRef" },
+      { "layer": "domain", "entry_key": "PreReviewGateViolation" },
+      { "layer": "domain", "entry_key": "PreReviewGateOutcome" }
+    ],
+    "T002": [
+      { "layer": "usecase", "entry_key": "PreReviewGateService" },
+      { "layer": "usecase", "entry_key": "PreReviewGateInteractor" },
+      { "layer": "usecase", "entry_key": "PreReviewGateCommand" },
+      { "layer": "usecase", "entry_key": "PreReviewGateError" },
+      { "layer": "usecase", "entry_key": "TaskContractReaderPort" },
+      { "layer": "usecase", "entry_key": "ImplCatalogSignalReaderPort" }
+    ],
+    "T003": [
+      { "layer": "infrastructure", "entry_key": "TaskContractDocumentDto" },
+      { "layer": "infrastructure", "entry_key": "ContractedEntryRefDto" },
+      { "layer": "infrastructure", "entry_key": "TaskContractCodecError" },
+      { "layer": "infrastructure", "entry_key": "FsTaskContractReader" },
+      { "layer": "infrastructure", "entry_key": "FsImplCatalogSignalReader" },
+      { "layer": "infrastructure", "entry_key": "infrastructure::task_contract_codec::decode" },
+      { "layer": "infrastructure", "entry_key": "infrastructure::task_contract_codec::encode" }
+    ],
+    "T004": [
+      { "layer": "cli_driver", "entry_key": "TaskContractInput" },
+      { "layer": "cli_driver", "entry_key": "TaskContractDriver" }
+    ],
+    "T005": [
+      { "layer": "cli", "entry_key": "CliCommand" },
+      { "layer": "cli", "entry_key": "TaskContractCommand" },
+      { "layer": "cli", "entry_key": "TaskContractCheckArgs" },
+      { "layer": "cli", "entry_key": "cli::commands::task_contract::execute" },
+      { "layer": "cli", "entry_key": "cli::commands::task_contract::execute_task_contract_check" }
+    ],
+    "T006": [
+      { "layer": "cli_composition", "entry_key": "TaskContractCompositionRoot" }
+    ]
+  }
+}

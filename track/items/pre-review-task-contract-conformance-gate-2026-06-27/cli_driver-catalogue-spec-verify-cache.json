@@ -51,11 +51,11 @@
       }
     },
     {
-      "claim_hash": "f96e0881a5ac1a8513acd98d95ad6a4ae76be2b9b7b758080219b8f330f140d8",
+      "claim_hash": "ef19974b9998f64c6fb0e7385713bc963c71298c8951ffbf0f00fa56a698d3fa",
       "evidence_hash": "4776c2bc5cd2dad2214630005d3ccd1cb935b6ddae6278553aa61a8bea32b22b",
       "verdict": {
         "kind": "pass",
-        "citation": "pre-review blocking binary check ゲートの実装: task-contract.json の attribution completeness を検証した後、attribution された全カタログ entry の impl_catalog 信号を既存信号テーブルと entry キーで JOIN し、全 entry が 🔵 かを確認する。ゲートは sotp CLI サブコマンドとして実装し、fail-closed（artifact 不在・attribution 不完全・非 🔵 entry のいずれでもブロック）とする。"
+        "citation": "pre-review blocking binary check ゲートの実装: task-contract.json の attribution completeness を検証した後、... ゲートは sotp CLI サブコマンドとして実装し、fail-closed（artifact 不在・attribution 不完全・非 🔵 entry のいずれでもブロック）とする。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -75,7 +75,7 @@
       }
     },
     {
-      "claim_hash": "f96e0881a5ac1a8513acd98d95ad6a4ae76be2b9b7b758080219b8f330f140d8",
+      "claim_hash": "ef19974b9998f64c6fb0e7385713bc963c71298c8951ffbf0f00fa56a698d3fa",
       "evidence_hash": "d57e40abf0c5bfe042a3ad635e207d2efdff37274ac637d06c6c39d3c0da3822",
       "verdict": {
         "kind": "pass",

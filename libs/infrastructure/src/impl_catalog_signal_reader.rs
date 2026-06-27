@@ -44,6 +44,30 @@ impl FsImplCatalogSignalReader {
 }
 
 impl ImplCatalogSignalReaderPort for FsImplCatalogSignalReader {
+    fn read_optional_signals(
+        &self,
+        track_id: &TrackId,
+        layer: &LayerId,
+    ) -> Result<Option<TypeSignalsDocument>, PreReviewGateError> {
+        let filename = format!("{}-type-signals.json", layer.as_ref());
+        let items_dir =
+            crate::resolve_items_dir_under_current_repo(&self.items_dir).map_err(|e| {
+                PreReviewGateError::SignalReadFailed {
+                    layer: layer.clone(),
+                    message: format!("items_dir rejected before reading type-signals: {e}"),
+                }
+            })?;
+        let path = items_dir.join(track_id.as_ref()).join(&filename);
+        match reject_symlinks_below(&path, &items_dir) {
+            Ok(true) => self.read_signals(track_id, layer).map(Some),
+            Ok(false) => Ok(None),
+            Err(e) => Err(PreReviewGateError::SignalReadFailed {
+                layer: layer.clone(),
+                message: format!("symlink check failed for {}: {e}", path.display()),
+            }),
+        }
+    }
+
     fn read_signals(
         &self,
         track_id: &TrackId,
@@ -184,6 +208,14 @@ mod tests {
     }
 
     #[test]
+    fn test_read_optional_signals_returns_none_for_missing_file() {
+        let dir = temp_items_dir();
+        let reader = FsImplCatalogSignalReader::new(dir.path().to_path_buf());
+        let doc = reader.read_optional_signals(&track_id("my-track"), &layer("domain")).unwrap();
+        assert!(doc.is_none());
+    }
+
+    #[test]
     fn read_signals_returns_signal_read_failed_for_malformed_json() {
         let dir = temp_items_dir();
         let track_dir = dir.path().join("my-track");
@@ -243,6 +275,23 @@ mod tests {
 
         let reader = FsImplCatalogSignalReader::new(dir.path().to_path_buf());
         let err = reader.read_signals(&track_id("my-track"), &layer("domain")).unwrap_err();
+        assert!(
+            matches!(err, PreReviewGateError::SignalReadFailed { .. }),
+            "expected SignalReadFailed, got: {err}"
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_read_optional_signals_returns_signal_read_failed_for_symlinked_track_dir() {
+        let dir = temp_items_dir();
+        let real_track_dir = dir.path().join("real-track");
+        fs::create_dir_all(&real_track_dir).unwrap();
+        std::os::unix::fs::symlink(&real_track_dir, dir.path().join("my-track")).unwrap();
+
+        let reader = FsImplCatalogSignalReader::new(dir.path().to_path_buf());
+        let err =
+            reader.read_optional_signals(&track_id("my-track"), &layer("domain")).unwrap_err();
         assert!(
             matches!(err, PreReviewGateError::SignalReadFailed { .. }),
             "expected SignalReadFailed, got: {err}"

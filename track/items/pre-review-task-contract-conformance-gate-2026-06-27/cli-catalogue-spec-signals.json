@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "0b02db13031c573dfcef3c4d5929a14f114bb0d48c63e13c9b030693cc01bb14",
+  "catalogue_declaration_hash": "ebee13547abdeb5f0a51bc5639c5a1738781cfa881b77d81661b06b3a2c768e6",
   "signals": [
     {
       "type_name": "CliCommand",
@@ -10,12 +10,12 @@
     {
       "type_name": "TaskContractCheckArgs",
       "signal": "blue",
-      "entry_hash": "eadf7f031e4ff62bd7bd38c7c01e401eff7af2baa887020a41b07913f1e71359"
+      "entry_hash": "36db979a8580ee57962c51c54179cc1b1ca66abd2f127a56e7bb744a5c035951"
     },
     {
       "type_name": "TaskContractCommand",
       "signal": "blue",
-      "entry_hash": "53a36e9148324d087dba9b12725ee36a5941a646abc017ed1fc0690a42af2cbe"
+      "entry_hash": "54af26236facb767bbafa55ddf4a40ec7e77bf60431c63664e54c3d9dea606bb"
     },
     {
       "type_name": "cli::commands::task_contract::execute",
@@ -25,7 +25,7 @@
     {
       "type_name": "cli::commands::task_contract::execute_task_contract_check",
       "signal": "blue",
-      "entry_hash": "a6e825b96be7404df74f50bac2fba5e841eefe07864a512736c36a72c9c3671f"
+      "entry_hash": "a2ac502a6595122e652dd012e4069af483104cd24aef3a404cfb6487fbf21485"
     }
   ]
 }

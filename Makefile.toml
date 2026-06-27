@@ -637,9 +637,19 @@ command = "bin/sotp"
 args = ["git", "switch-and-pull", "main"]
 
 [tasks.track-local-review-fix-codex]
-description = "[wrapper] Resolve CODEX_BIN for toolchain-manager shims, then launch the Codex review-fix-lead fixer via bin/sotp review fix-local"
+description = "[wrapper] Run task-contract pre-review gate (all TDDD layers), then launch Codex review-fix-lead via bin/sotp review fix-local"
 script_runner = "@shell"
-script = ['case "${1:-}" in --) shift ;; esac; CODEX_BIN="${CODEX_BIN:-$(asdf which codex 2>/dev/null || command -v codex)}" bin/sotp review fix-local "$@"']
+script = ['''
+case "${1:-}" in --) shift ;; esac
+_TRACK_ID=""
+_PREV=""
+for _A in "$@"; do
+  [ "$_PREV" = "--track-id" ] && _TRACK_ID="$_A"
+  _PREV="$_A"
+done
+bin/sotp task-contract check --track-id "$_TRACK_ID" --items-dir track/items \
+  && CODEX_BIN="${CODEX_BIN:-$(asdf which codex 2>/dev/null || command -v codex)}" bin/sotp review fix-local "$@"
+''']
 
 [tasks.track-local-dry-fix]
 description = "[wrapper] Resolve CODEX_BIN for toolchain-manager shims, then launch the Codex dry-fix-lead fixer via bin/sotp dry fix-local"

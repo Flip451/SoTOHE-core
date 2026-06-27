@@ -10,7 +10,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| ImplCatalogSignalReaderPort | secondary_port | add | fn read_signals(&self, track_id: &domain::TrackId, layer: &domain::tddd::LayerId) -> Result<domain::TypeSignalsDocument, PreReviewGateError> | 🔵 | 🔵 |
+| ImplCatalogSignalReaderPort | secondary_port | add | fn read_signals(&self, track_id: &domain::TrackId, layer: &domain::tddd::LayerId) -> Result<domain::TypeSignalsDocument, PreReviewGateError>, fn read_optional_signals(&self, track_id: &domain::TrackId, layer: &domain::tddd::LayerId) -> Result<Option<domain::TypeSignalsDocument>, PreReviewGateError> | 🔵 | 🔵 |
 | TaskContractReaderPort | secondary_port | add | fn read(&self, track_id: &domain::TrackId) -> Result<domain::task_contract::TaskContractDocument, PreReviewGateError> | 🔵 | 🔵 |
 
 ## Application Services

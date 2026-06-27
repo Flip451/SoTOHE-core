@@ -12,14 +12,14 @@
           "kind": "plain",
           "fields": [
             { "name": "track_id", "ty": "domain::TrackId" },
-            { "name": "group", "ty": "domain::tddd::LayerId" }
+            { "name": "layer", "ty": "Option<domain::tddd::LayerId>" }
           ],
           "has_stripped_fields": false
         }
       },
       "methods": [],
       "module_path": "pre_review_gate",
-      "docs": "CQRS command for the pre-review gate check use case. track_id identifies the active track whose task-contract.json is evaluated. group is the TDDD layer review group being submitted for review. Both fields are domain value objects: TrackId enforces non-empty identity; LayerId constrains the gate to layer scopes that have <layer>-type-signals.json documents. The gate check verifies catalogue entries for the requested layer by reading the TypeSignalsDocument for cmd.group, filtering task-contract.json entries where entry.layer == cmd.group, and requiring those scope-relevant entries to be attribution-complete with blue impl_catalog signals. Non-layer review scopes are skipped by the Makefile wrapper before this command is invoked.",
+      "docs": "CQRS command for the pre-review gate check use case. track_id identifies the active track whose task-contract.json is evaluated. layer is the optional TDDD layer scope: Some(layer_id) checks only the given layer (per-layer mode); None visits the 6 canonical TDDD layer ids and combines outcomes for layers with readable signal documents (all-layers mode). Missing signal documents in all-layers mode are classified as no entries to verify; read/decode failures still fail closed. Both fields are domain value objects: TrackId enforces non-empty identity; LayerId constrains explicit per-layer checks to layer scopes that have <layer>-type-signals.json documents.",
       "spec_refs": [
         { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-03" },
         { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-02" }
@@ -158,7 +158,21 @@
           "generics": [],
           "has_default_impl": false,
           "where_predicates": [],
-          "docs": "Read the per-layer impl-catalog type-signals document for the given track and layer. Returns SignalReadFailed on I/O or decode errors."
+          "docs": "Read the per-layer impl-catalog type-signals document for the given track and layer. Returns SignalReadFailed on absent-file, I/O, or decode errors."
+        },
+        {
+          "name": "read_optional_signals",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id", "ty": "&domain::TrackId" },
+            { "name": "layer", "ty": "&domain::tddd::LayerId" }
+          ],
+          "returns": "Result<Option<domain::TypeSignalsDocument>, PreReviewGateError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": true,
+          "where_predicates": [],
+          "docs": "Read the per-layer impl-catalog type-signals document when absence is an expected state. Returns Ok(None) only when the adapter can positively classify the document as absent (e.g. NotFound). Other read/decode failures must return SignalReadFailed. Used only by the all-layer iterate path of PreReviewGateInteractor::check (cmd.layer = None) to treat absent signal documents as no entries to verify while still failing closed on unreadable or malformed documents."
         }
       ],
       "supertrait_bounds": ["Send", "Sync"],

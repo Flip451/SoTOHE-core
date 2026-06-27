@@ -1,24 +1,29 @@
 //! Pre-review contract conformance gate use case.
 //!
 //! Implements the three-phase gate that verifies all contracted catalogue entries
-//! for a given TDDD layer review group have blue `impl_catalog` signals before
-//! allowing review to proceed (ADR `knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md`).
+//! for a given TDDD layer have blue `impl_catalog` signals before allowing review
+//! to proceed (ADR `knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md`).
 //!
-//! ## Gate logic (three phases)
+//! ## Gate logic (three phases, per layer)
 //!
 //! 1. **Scope discovery + orphan detection**: reads the `TypeSignalsDocument` for
-//!    `cmd.group`, derives the set of scope-relevant catalogue entry keys from
-//!    that document, then checks that every scope-relevant signal entry is covered
-//!    by at least one task attribution in `task-contract.json`. Uncovered entries
-//!    produce [`PreReviewGateViolation::OrphanEntry`].
+//!    the layer derived from `cmd.layer`, derives the set of scope-relevant catalogue
+//!    entry keys from that document, then checks that every scope-relevant signal
+//!    entry is covered by at least one task attribution in `task-contract.json`.
+//!    Uncovered entries produce [`PreReviewGateViolation::OrphanEntry`].
 //!
 //! 2. **Referential integrity**: verifies that every contracted entry for
-//!    `cmd.group` exists in the `TypeSignalsDocument`. Non-existent entries
+//!    the layer exists in the `TypeSignalsDocument`. Non-existent entries
 //!    produce [`PreReviewGateViolation::InvalidEntryRef`].
 //!
 //! 3. **Signal check**: verifies that every contracted entry that exists in the
 //!    `TypeSignalsDocument` has an `impl_catalog` signal of `Blue`. Non-blue
 //!    entries produce [`PreReviewGateViolation::NonBlueSignal`].
+//!
+//! When `cmd.layer` is `None`, all 6 canonical TDDD layers are iterated and the
+//! outcomes are combined into a single result. Layers reported missing by the
+//! signal reader are skipped silently — that is "no entries to verify", not an
+//! error — while other signal read or validation failures still propagate.
 
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
@@ -38,23 +43,20 @@ use thiserror::Error;
 /// CQRS command for the pre-review gate check use case.
 ///
 /// `track_id` identifies the active track whose `task-contract.json` is
-/// evaluated. `group` is the TDDD layer review group being submitted for
-/// review. Both fields are domain value objects: `TrackId` enforces non-empty
+/// evaluated. `layer` is the optional TDDD layer scope:
+/// - `Some(layer_id)` → check only the given layer (per-layer mode).
+/// - `None` → iterate all 6 canonical TDDD layers and combine their outcomes
+///   (all-layers mode).
+///
+/// Both fields are domain value objects: `TrackId` enforces non-empty
 /// identity; `LayerId` constrains the gate to layer scopes that have
 /// `<layer>-type-signals.json` documents.
-///
-/// The gate check verifies catalogue entries for the requested layer by reading
-/// the `TypeSignalsDocument` for `cmd.group`, filtering `task-contract.json`
-/// entries where `entry.layer == cmd.group`, and requiring those scope-relevant
-/// entries to be attribution-complete with blue impl_catalog signals.
-/// Non-layer review scopes are skipped by the Makefile wrapper before this
-/// command is invoked.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PreReviewGateCommand {
     /// The active track whose task-contract.json is evaluated.
     pub track_id: domain::TrackId,
-    /// The TDDD layer review group being submitted for review.
-    pub group: domain::tddd::LayerId,
+    /// The TDDD layer to check, or `None` to iterate all 6 canonical layers.
+    pub layer: Option<domain::tddd::LayerId>,
 }
 
 // ---------------------------------------------------------------------------
@@ -129,6 +131,20 @@ pub trait ImplCatalogSignalReaderPort: Send + Sync {
         track_id: &domain::TrackId,
         layer: &domain::tddd::LayerId,
     ) -> Result<TypeSignalsDocument, PreReviewGateError>;
+
+    /// Read the per-layer signal document when absence is an expected state.
+    ///
+    /// Returns `Ok(None)` only when the adapter can positively classify the
+    /// document as absent. Other read/decode failures must return
+    /// [`PreReviewGateError::SignalReadFailed`]. The default implementation is
+    /// fail-closed for adapters that only implement [`Self::read_signals`].
+    fn read_optional_signals(
+        &self,
+        track_id: &domain::TrackId,
+        layer: &domain::tddd::LayerId,
+    ) -> Result<Option<TypeSignalsDocument>, PreReviewGateError> {
+        self.read_signals(track_id, layer).map(Some)
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -178,6 +194,17 @@ impl PreReviewGateInteractor {
     }
 }
 
+/// Conformance summary for per-layer (single-layer) gate passes.
+const SINGLE_LAYER_SUMMARY: &str = "宣言した API surface が型契約と shape 一致（body は未検証 — stub / liveness は reviewer が確認）";
+
+/// Conformance summary for all-layer gate passes.
+const ALL_LAYERS_SUMMARY: &str = "全 6 TDDD レイヤー（domain / usecase / infrastructure / cli_driver / cli / cli_composition）\
+の API surface が型契約と shape 一致（body は未検証 — stub / liveness は reviewer が確認）";
+
+/// Canonical TDDD layer identifiers iterated in all-layers mode.
+const CANONICAL_LAYERS: &[&str] =
+    &["domain", "usecase", "infrastructure", "cli_driver", "cli", "cli_composition"];
+
 fn blocked_outcome(
     violations: Vec<PreReviewGateViolation>,
 ) -> Result<PreReviewGateOutcome, PreReviewGateError> {
@@ -188,22 +215,18 @@ fn blocked_outcome(
     })
 }
 
-impl PreReviewGateService for PreReviewGateInteractor {
-    fn check(&self, cmd: PreReviewGateCommand) -> Result<PreReviewGateOutcome, PreReviewGateError> {
-        // ── Step 0: read task-contract.json ──────────────────────────────────
-        //
-        // TaskContractNotFound short-circuits to MissingTaskContract violation.
-        let contract_doc = match self.task_contract_reader.read(&cmd.track_id) {
-            Ok(doc) => doc,
-            Err(PreReviewGateError::TaskContractNotFound) => {
-                return blocked_outcome(vec![PreReviewGateViolation::MissingTaskContract]);
-            }
-            Err(e) => return Err(e),
-        };
-
-        // ── Step 1: read type-signals for cmd.group ───────────────────────────
-        let signal_doc = self.signal_reader.read_signals(&cmd.track_id, &cmd.group)?;
-
+impl PreReviewGateInteractor {
+    /// Evaluate one already-loaded signal document against the task contract.
+    ///
+    /// Returns the list of violations found for this layer (empty = passed).
+    /// The caller is responsible for combining per-layer results into a final
+    /// [`PreReviewGateOutcome`].
+    fn check_signal_document(
+        &self,
+        layer: &domain::tddd::LayerId,
+        contract_doc: &domain::task_contract::TaskContractDocument,
+        signal_doc: &TypeSignalsDocument,
+    ) -> Result<Vec<PreReviewGateViolation>, PreReviewGateError> {
         // ── Build lookup structures ───────────────────────────────────────────
         //
         // scope_signals: type_name -> ConfidenceSignal for entries in the signal doc.
@@ -215,23 +238,23 @@ impl PreReviewGateService for PreReviewGateInteractor {
                 signal.type_name().to_owned(),
             )
             .map_err(|_| PreReviewGateError::SignalReadFailed {
-                layer: cmd.group.clone(),
+                layer: layer.clone(),
                 message: format!(
                     "invalid entry key '{}' in {}-type-signals.json",
                     signal.type_name(),
-                    cmd.group.as_ref()
+                    layer.as_ref()
                 ),
             })?;
             let key = entry_key.as_str().to_owned();
             scope_entries
                 .entry(key.clone())
-                .or_insert_with(|| ContractedEntryRef::new(cmd.group.clone(), entry_key));
+                .or_insert_with(|| ContractedEntryRef::new(layer.clone(), entry_key));
             scope_signals.insert(key, signal.signal());
         }
 
-        // attributed_keys: set of entry_key strings contracted to cmd.group
+        // attributed_keys: set of entry_key strings contracted to layer
         let attributed_entries: Vec<&ContractedEntryRef> =
-            contract_doc.entries().values().flatten().filter(|e| e.layer() == &cmd.group).collect();
+            contract_doc.entries().values().flatten().filter(|e| e.layer() == layer).collect();
 
         let attributed_keys: HashSet<&str> =
             attributed_entries.iter().map(|e| e.entry_key().as_str()).collect();
@@ -249,7 +272,7 @@ impl PreReviewGateService for PreReviewGateInteractor {
 
         // ── Phase 2: Referential integrity ────────────────────────────────────
         //
-        // Every contracted entry for cmd.group must exist in the signal document.
+        // Every contracted entry for layer must exist in the signal document.
         for entry in &attributed_entries {
             let key = entry.entry_key().as_str();
             if !scope_signals.contains_key(key) {
@@ -258,7 +281,7 @@ impl PreReviewGateService for PreReviewGateInteractor {
                     reason: format!(
                         "entry_key '{}' not found in {}-type-signals.json",
                         key,
-                        cmd.group.as_ref()
+                        layer.as_ref()
                     ),
                 });
             }
@@ -279,13 +302,83 @@ impl PreReviewGateService for PreReviewGateInteractor {
             }
         }
 
-        // ── Result ────────────────────────────────────────────────────────────
-        if violations.is_empty() {
-            Ok(PreReviewGateOutcome::Passed {
-                conformance_summary: "宣言した API surface が型契約と shape 一致（body は未検証 — stub / liveness は reviewer が確認）".to_owned(),
-            })
-        } else {
-            blocked_outcome(violations)
+        Ok(violations)
+    }
+
+    /// Run the three-phase gate for a single TDDD layer.
+    ///
+    /// Returns the list of violations found for this layer (empty = passed).
+    /// The caller is responsible for combining per-layer results into a final
+    /// [`PreReviewGateOutcome`].
+    fn check_layer(
+        &self,
+        track_id: &domain::TrackId,
+        layer: &domain::tddd::LayerId,
+        contract_doc: &domain::task_contract::TaskContractDocument,
+    ) -> Result<Vec<PreReviewGateViolation>, PreReviewGateError> {
+        // ── Step 1: read type-signals for layer ───────────────────────────────
+        let signal_doc = self.signal_reader.read_signals(track_id, layer)?;
+        self.check_signal_document(layer, contract_doc, &signal_doc)
+    }
+}
+
+impl PreReviewGateService for PreReviewGateInteractor {
+    fn check(&self, cmd: PreReviewGateCommand) -> Result<PreReviewGateOutcome, PreReviewGateError> {
+        // ── Step 0: read task-contract.json ──────────────────────────────────
+        //
+        // TaskContractNotFound short-circuits to MissingTaskContract violation.
+        let contract_doc = match self.task_contract_reader.read(&cmd.track_id) {
+            Ok(doc) => doc,
+            Err(PreReviewGateError::TaskContractNotFound) => {
+                return blocked_outcome(vec![PreReviewGateViolation::MissingTaskContract]);
+            }
+            Err(e) => return Err(e),
+        };
+
+        match cmd.layer {
+            Some(layer) => {
+                // ── Per-layer mode ────────────────────────────────────────────
+                let violations = self.check_layer(&cmd.track_id, &layer, &contract_doc)?;
+                if violations.is_empty() {
+                    Ok(PreReviewGateOutcome::Passed {
+                        conformance_summary: SINGLE_LAYER_SUMMARY.to_owned(),
+                    })
+                } else {
+                    blocked_outcome(violations)
+                }
+            }
+            None => {
+                // ── All-layers mode ───────────────────────────────────────────
+                //
+                // Iterate all 6 canonical TDDD layers and combine violations.
+                // Layers reported missing by the signal reader are skipped
+                // silently — that is "no entries to verify", not an error.
+                // Other signal read or validation failures still fail closed.
+                let mut all_violations: Vec<PreReviewGateViolation> = Vec::new();
+                for &layer_str in CANONICAL_LAYERS {
+                    let Ok(layer) = domain::tddd::LayerId::try_new(layer_str.to_owned()) else {
+                        // Unreachable: CANONICAL_LAYERS contains only valid identifiers.
+                        continue;
+                    };
+                    match self.signal_reader.read_optional_signals(&cmd.track_id, &layer)? {
+                        Some(signal_doc) => {
+                            let violations =
+                                self.check_signal_document(&layer, &contract_doc, &signal_doc)?;
+                            all_violations.extend(violations);
+                        }
+                        None => {
+                            // No signal document for this layer — skip silently.
+                        }
+                    }
+                }
+                if all_violations.is_empty() {
+                    Ok(PreReviewGateOutcome::Passed {
+                        conformance_summary: ALL_LAYERS_SUMMARY.to_owned(),
+                    })
+                } else {
+                    blocked_outcome(all_violations)
+                }
+            }
         }
     }
 }
@@ -407,6 +500,51 @@ mod tests {
         }
     }
 
+    /// Layer-aware signal reader: returns the document registered for the requested
+    /// layer, or typed absence if no document is registered for that layer.
+    struct LayerAwareSignalReader(std::collections::HashMap<String, TypeSignalsDocument>);
+
+    impl ImplCatalogSignalReaderPort for LayerAwareSignalReader {
+        fn read_signals(
+            &self,
+            _track_id: &TrackId,
+            layer: &LayerId,
+        ) -> Result<TypeSignalsDocument, PreReviewGateError> {
+            match self.0.get(layer.as_ref()) {
+                Some(doc) => Ok(doc.clone()),
+                None => Err(PreReviewGateError::SignalReadFailed {
+                    layer: layer.clone(),
+                    message: format!("no signal document for layer '{}'", layer.as_ref()),
+                }),
+            }
+        }
+
+        fn read_optional_signals(
+            &self,
+            _track_id: &TrackId,
+            layer: &LayerId,
+        ) -> Result<Option<TypeSignalsDocument>, PreReviewGateError> {
+            Ok(self.0.get(layer.as_ref()).cloned())
+        }
+    }
+
+    struct FailingSignalReader {
+        message: &'static str,
+    }
+
+    impl ImplCatalogSignalReaderPort for FailingSignalReader {
+        fn read_signals(
+            &self,
+            _track_id: &TrackId,
+            layer: &LayerId,
+        ) -> Result<TypeSignalsDocument, PreReviewGateError> {
+            Err(PreReviewGateError::SignalReadFailed {
+                layer: layer.clone(),
+                message: self.message.to_owned(),
+            })
+        }
+    }
+
     fn interactor(
         contract: Result<TaskContractDocument, PreReviewGateError>,
         signals: Result<TypeSignalsDocument, PreReviewGateError>,
@@ -418,7 +556,7 @@ mod tests {
     }
 
     fn cmd(track: &str, group: &str) -> PreReviewGateCommand {
-        PreReviewGateCommand { track_id: track_id(track), group: layer(group) }
+        PreReviewGateCommand { track_id: track_id(track), layer: Some(layer(group)) }
     }
 
     // ── AC-07 (a): TaskContractNotFound → Blocked/MissingTaskContract ─────────
@@ -614,6 +752,149 @@ mod tests {
                 );
             }
             other => panic!("expected Passed, got {other:?}"),
+        }
+    }
+
+    // ── All-layers mode: None layer → iterate all 6 TDDD layers ─────────────
+
+    #[test]
+    fn all_layer_iterate_passes_when_two_layers_are_blue_and_complete() {
+        // Domain has Foo (blue, attributed T001); usecase has Bar (blue, attributed T001).
+        // The other 4 canonical layers are reported as missing → skipped silently.
+        let mut signal_docs = std::collections::HashMap::new();
+        signal_docs.insert("domain".to_owned(), make_signals(vec![blue_signal("Foo")]));
+        signal_docs.insert("usecase".to_owned(), make_signals(vec![blue_signal("Bar")]));
+
+        let svc = PreReviewGateInteractor::new(
+            Arc::new(ConstContractReader(Ok(make_contract(
+                "my-track",
+                vec![(
+                    task_id("T001"),
+                    vec![
+                        ContractedEntryRef::new(layer("domain"), entry_key("Foo")),
+                        ContractedEntryRef::new(layer("usecase"), entry_key("Bar")),
+                    ],
+                )],
+            )))),
+            Arc::new(LayerAwareSignalReader(signal_docs)),
+        );
+
+        let outcome = svc
+            .check(PreReviewGateCommand { track_id: track_id("my-track"), layer: None })
+            .unwrap();
+
+        match outcome {
+            PreReviewGateOutcome::Passed { conformance_summary } => {
+                assert!(
+                    conformance_summary.contains("全 6"),
+                    "all-layer summary must mention all 6 layers, got: {conformance_summary}"
+                );
+                assert!(
+                    conformance_summary.contains("shape 一致"),
+                    "all-layer summary must contain D5 phrasing 'shape 一致', got: {conformance_summary}"
+                );
+                assert!(
+                    conformance_summary.contains("未検証"),
+                    "all-layer summary must contain D5 phrasing '未検証', got: {conformance_summary}"
+                );
+            }
+            other => panic!("expected Passed, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_all_layer_iterate_malformed_signal_document_returns_signal_read_failed() {
+        let invalid_signal =
+            TypeSignal::new("   ", "struct", ConfidenceSignal::Blue, true, vec![], vec![], vec![]);
+        let mut signal_docs = std::collections::HashMap::new();
+        signal_docs.insert("domain".to_owned(), make_signals(vec![invalid_signal]));
+
+        let svc = PreReviewGateInteractor::new(
+            Arc::new(ConstContractReader(Ok(make_contract(
+                "my-track",
+                vec![(
+                    task_id("T001"),
+                    vec![ContractedEntryRef::new(layer("domain"), entry_key("Foo"))],
+                )],
+            )))),
+            Arc::new(LayerAwareSignalReader(signal_docs)),
+        );
+
+        let err = svc
+            .check(PreReviewGateCommand { track_id: track_id("my-track"), layer: None })
+            .unwrap_err();
+
+        match err {
+            PreReviewGateError::SignalReadFailed { layer, message } => {
+                assert_eq!(layer.as_ref(), "domain");
+                assert!(
+                    message.contains("invalid entry key"),
+                    "expected malformed signal document to propagate, got: {message}"
+                );
+            }
+            other => panic!("expected SignalReadFailed, got {other}"),
+        }
+    }
+
+    #[test]
+    fn test_all_layer_iterate_non_missing_signal_read_failed_returns_error() {
+        let svc = PreReviewGateInteractor::new(
+            Arc::new(ConstContractReader(Ok(make_contract(
+                "my-track",
+                vec![(
+                    task_id("T001"),
+                    vec![ContractedEntryRef::new(layer("domain"), entry_key("Foo"))],
+                )],
+            )))),
+            Arc::new(FailingSignalReader {
+                message: "codec error reading domain-type-signals.json",
+            }),
+        );
+
+        let err = svc
+            .check(PreReviewGateCommand { track_id: track_id("my-track"), layer: None })
+            .unwrap_err();
+
+        match err {
+            PreReviewGateError::SignalReadFailed { layer, message } => {
+                assert_eq!(layer.as_ref(), "domain");
+                assert!(
+                    message.contains("codec error"),
+                    "expected non-missing signal read failure to propagate, got: {message}"
+                );
+            }
+            other => panic!("expected SignalReadFailed, got {other}"),
+        }
+    }
+
+    #[test]
+    fn test_all_layer_iterate_missing_like_signal_read_failed_returns_error() {
+        let svc = PreReviewGateInteractor::new(
+            Arc::new(ConstContractReader(Ok(make_contract(
+                "my-track",
+                vec![(
+                    task_id("T001"),
+                    vec![ContractedEntryRef::new(layer("domain"), entry_key("Foo"))],
+                )],
+            )))),
+            Arc::new(FailingSignalReader {
+                message: "signal file not found: codec emitted misleading diagnostic",
+            }),
+        );
+
+        let err = svc
+            .check(PreReviewGateCommand { track_id: track_id("my-track"), layer: None })
+            .unwrap_err();
+
+        match err {
+            PreReviewGateError::SignalReadFailed { layer, message } => {
+                assert_eq!(layer.as_ref(), "domain");
+                assert!(
+                    message.contains("signal file not found"),
+                    "expected original diagnostic to propagate, got: {message}"
+                );
+            }
+            other => panic!("expected SignalReadFailed, got {other}"),
         }
     }
 }

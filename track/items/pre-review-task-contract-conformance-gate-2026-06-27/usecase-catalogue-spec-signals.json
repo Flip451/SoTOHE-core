@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "f0675f875a68a541fd20811affb2ec767820369e25e6965dda3ee3e757073a6c",
+  "catalogue_declaration_hash": "a5b54ff085b972f471868ab5d28487936b91839ca56b838e29539cbf6c82773d",
   "signals": [
     {
       "type_name": "PreReviewGateCommand",
       "signal": "blue",
-      "entry_hash": "e1f6b8b49fdcc3778c8225a7020d0aa25ac9b0ac16978c51472743eae5f4d15e"
+      "entry_hash": "e20294086579500054d433cd692c289d6207adeeab053e53cb6691298e8983ed"
     },
     {
       "type_name": "PreReviewGateError",
@@ -20,7 +20,7 @@
     {
       "type_name": "ImplCatalogSignalReaderPort",
       "signal": "blue",
-      "entry_hash": "7dde66a79d77c83ec82e118b6c335ff4736d948407ea966fed6f3b8740faf6a4"
+      "entry_hash": "e08bb0a2dc9c06704e5e43ce711047d491780cf8d7b4b63efc088c03bcb47175"
     },
     {
       "type_name": "PreReviewGateService",

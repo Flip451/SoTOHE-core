@@ -57,7 +57,7 @@
       },
       "methods": [],
       "module_path": "commands::task_contract",
-      "docs": "Subcommands for `sotp task-contract`. Check: run the pre-review conformance gate check for the given TDDD layer group and track, verifying the contracted catalogue entries in that layer scope have blue impl_catalog signals.",
+      "docs": "Subcommands for `sotp task-contract`. Check: run the pre-review conformance gate check for the given optional TDDD layer and track. When --layer is omitted, all 6 canonical TDDD layers are checked in sequence and their violations combined.",
       "spec_refs": [
         { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-04" },
         { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-03" }
@@ -72,7 +72,7 @@
         "shape": {
           "kind": "plain",
           "fields": [
-            { "name": "group", "ty": "String" },
+            { "name": "layer", "ty": "Option<String>" },
             { "name": "track_id", "ty": "String" },
             { "name": "items_dir", "ty": "std::path::PathBuf" }
           ],
@@ -81,7 +81,7 @@
       },
       "methods": [],
       "module_path": "commands::task_contract",
-      "docs": "Arguments for `sotp task-contract check`. group: TDDD layer review group (domain, usecase, infrastructure, cli_driver, cli, or cli_composition) identifying the layer signal document to check; passed as an opaque CLI string validated as LayerId in the primary adapter. Non-layer review scopes are skipped by the track-local-review-fix-codex wrapper and should not invoke this gate. track_id: active track identifier (also opaque at this boundary). items_dir: path to the track items directory; defaults to 'track/items' (same default convention as all other track-reading commands in this workspace).",
+      "docs": "Arguments for `sotp task-contract check`. layer: optional TDDD layer (domain, usecase, infrastructure, cli_driver, cli, or cli_composition) identifying the layer signal document to check; passed as an opaque CLI string validated as LayerId in the primary adapter; when omitted (None), all 6 canonical TDDD layers are iterated internally and their results combined. track_id: active track identifier (also opaque at this boundary). items_dir: path to the track items directory; defaults to 'track/items' (same default convention as all other track-reading commands in this workspace).",
       "spec_refs": [
         { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-04" },
         { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-03" }
@@ -117,7 +117,7 @@
       "is_async": false,
       "generics": [],
       "where_predicates": [],
-      "docs": "Execute `sotp task-contract check`. Constructs a TaskContractCompositionRoot, calls task_contract_check(group, track_id, items_dir), and converts the CommandOutcome to a process ExitCode (0 on Passed, non-zero on Blocked or error).",
+      "docs": "Execute `sotp task-contract check`. Constructs a TaskContractCompositionRoot, calls task_contract_check(layer, track_id, items_dir), and converts the CommandOutcome to a process ExitCode (0 on Passed, non-zero on Blocked or error).",
       "spec_refs": [
         { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-04" },
         { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-03" }

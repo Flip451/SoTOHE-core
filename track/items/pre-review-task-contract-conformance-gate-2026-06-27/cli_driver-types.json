@@ -14,7 +14,7 @@
             "payload": {
               "kind": "struct",
               "fields": [
-                { "name": "group", "ty": "String" },
+                { "name": "layer", "ty": "Option<String>" },
                 { "name": "track_id", "ty": "String" }
               ]
             }
@@ -23,7 +23,7 @@
       },
       "methods": [],
       "module_path": "task_contract",
-      "docs": "Typed input for the task-contract command family. Check: run the pre-review conformance gate for the given TDDD layer review group and track. group and track_id are opaque CLI strings validated by the primary adapter before it constructs PreReviewGateCommand (group -> LayerId, track_id -> TrackId). The filesystem root is not part of this primary-adapter input; cli_composition builds the injected service with the requested items_dir before constructing the driver.",
+      "docs": "Typed input for the task-contract command family. Check: run the pre-review conformance gate for the given optional TDDD layer and track. layer is an optional opaque CLI string validated into Option<LayerId> by the primary adapter; when None, the gate iterates all 6 canonical TDDD layers internally. track_id is validated into TrackId. The filesystem root is not part of this primary-adapter input; cli_composition builds the injected service with the requested items_dir before constructing the driver.",
       "spec_refs": [
         { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-04" },
         { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-03" }

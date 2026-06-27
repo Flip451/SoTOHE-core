@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-27T15:12:21Z",
-  "declaration_hash": "0b02db13031c573dfcef3c4d5929a14f114bb0d48c63e13c9b030693cc01bb14",
+  "generated_at": "2026-06-27T16:59:54Z",
+  "declaration_hash": "ebee13547abdeb5f0a51bc5639c5a1738781cfa881b77d81661b06b3a2c768e6",
   "signals": [
     {
       "type_name": "CliCommand",

@@ -39,7 +39,7 @@
           "name": "task_contract_check",
           "receiver": "&self",
           "params": [
-            { "name": "group", "ty": "String" },
+            { "name": "layer", "ty": "Option<String>" },
             { "name": "track_id", "ty": "String" },
             { "name": "items_dir", "ty": "std::path::PathBuf" }
           ],
@@ -48,7 +48,7 @@
           "generics": [],
           "has_default_impl": false,
           "where_predicates": [],
-          "docs": "Wire and invoke the pre-review conformance gate check. Constructs a TaskContractDriver via task_contract_driver(items_dir), then dispatches TaskContractInput::Check { group, track_id }. The driver parses CLI strings, calls the use case, and renders Passed/Blocked outcomes as CommandOutcome."
+          "docs": "Wire and invoke the pre-review conformance gate check. Constructs a TaskContractDriver via task_contract_driver(items_dir), then dispatches TaskContractInput::Check { layer, track_id }. The driver parses CLI strings, calls the use case, and renders Passed/Blocked outcomes as CommandOutcome. When layer is None, the gate iterates all 6 canonical TDDD layers internally and returns a single combined verdict."
         }
       ],
       "module_path": "task_contract",

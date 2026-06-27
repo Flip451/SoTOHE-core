@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-27T15:12:12Z",
-  "declaration_hash": "f0675f875a68a541fd20811affb2ec767820369e25e6965dda3ee3e757073a6c",
+  "generated_at": "2026-06-27T16:59:46Z",
+  "declaration_hash": "a5b54ff085b972f471868ab5d28487936b91839ca56b838e29539cbf6c82773d",
   "signals": [
     {
       "type_name": "ImplCatalogSignalReaderPort",

@@ -4,9 +4,9 @@
 //! [`usecase::pre_review_gate::PreReviewGateService`] and exposes
 //! `handle(input) -> CommandOutcome`.
 //!
-//! Input strings (`group`, `track_id`) are validated into domain value objects
-//! (`LayerId`, `TrackId`) inside `handle`, so that parsing errors are surfaced as
-//! `CommandOutcome::failure` rather than panics.
+//! Input strings (`layer`, `track_id`) are validated into domain value objects
+//! (`Option<LayerId>`, `TrackId`) inside `handle`, so that parsing errors are
+//! surfaced as `CommandOutcome::failure` rather than panics.
 
 use std::sync::Arc;
 
@@ -25,10 +25,11 @@ use crate::render::CommandOutcome;
 
 /// Typed input for the task-contract command family.
 ///
-/// `Check`: run the pre-review conformance gate for the given TDDD layer
-/// review group and track. `group` and `track_id` are opaque CLI strings
-/// validated by this primary adapter before it constructs
-/// [`PreReviewGateCommand`] (`group -> LayerId`, `track_id -> TrackId`).
+/// `Check`: run the pre-review conformance gate for the given optional TDDD
+/// layer and track. `layer` is an optional opaque CLI string validated into
+/// `Option<LayerId>` by this primary adapter; when `None`, the gate iterates
+/// all 6 canonical TDDD layers internally. `track_id` is validated into
+/// `TrackId`.
 ///
 /// The filesystem root is not part of this primary-adapter input;
 /// `cli_composition` builds the injected service with the requested `items_dir`
@@ -37,8 +38,9 @@ use crate::render::CommandOutcome;
 pub enum TaskContractInput {
     /// Run the pre-review conformance gate check.
     Check {
-        /// TDDD layer review group (e.g. `"domain"`, `"usecase"`).
-        group: String,
+        /// Optional TDDD layer (e.g. `Some("domain")`, `Some("usecase")`).
+        /// `None` iterates all 6 canonical TDDD layers.
+        layer: Option<String>,
         /// Active track identifier.
         track_id: String,
     },
@@ -52,8 +54,8 @@ pub enum TaskContractInput {
 ///
 /// Holds a private `Arc<dyn PreReviewGateService>` and dispatches
 /// [`TaskContractInput`] variants to the appropriate use-case operation.
-/// Converts CLI strings to domain value objects (`TrackId`, `LayerId`) and
-/// renders the [`PreReviewGateOutcome`] as a [`CommandOutcome`] (exit 0 on
+/// Converts CLI strings to domain value objects (`TrackId`, `Option<LayerId>`)
+/// and renders the [`PreReviewGateOutcome`] as a [`CommandOutcome`] (exit 0 on
 /// `Passed`, exit 1 with violation list on `Blocked`).
 pub struct TaskContractDriver {
     service: Arc<dyn PreReviewGateService>,
@@ -77,22 +79,27 @@ impl TaskContractDriver {
     /// operation and render the result as a [`CommandOutcome`].
     pub fn handle(&self, input: TaskContractInput) -> CommandOutcome {
         match input {
-            TaskContractInput::Check { group, track_id } => self.handle_check(group, track_id),
+            TaskContractInput::Check { layer, track_id } => self.handle_check(layer, track_id),
         }
     }
 
-    fn handle_check(&self, group: String, track_id: String) -> CommandOutcome {
-        // Parse CLI strings into domain value objects.
-        let layer = match LayerId::try_new(group.clone()) {
-            Ok(l) => l,
-            Err(ValidationError::InvalidLayerId(v)) => {
-                return CommandOutcome::failure(Some(format!(
-                    "invalid group '{v}': must be a non-empty ASCII identifier"
-                )));
-            }
-            Err(e) => {
-                return CommandOutcome::failure(Some(format!("invalid group '{group}': {e}")));
-            }
+    fn handle_check(&self, layer: Option<String>, track_id: String) -> CommandOutcome {
+        // Parse optional layer CLI string into Option<LayerId>.
+        let layer_opt = match layer {
+            Some(layer_str) => match LayerId::try_new(layer_str.clone()) {
+                Ok(l) => Some(l),
+                Err(ValidationError::InvalidLayerId(v)) => {
+                    return CommandOutcome::failure(Some(format!(
+                        "invalid layer '{v}': must be a non-empty ASCII identifier"
+                    )));
+                }
+                Err(e) => {
+                    return CommandOutcome::failure(Some(format!(
+                        "invalid layer '{layer_str}': {e}"
+                    )));
+                }
+            },
+            None => None,
         };
 
         let tid = match TrackId::try_new(track_id.clone()) {
@@ -104,7 +111,7 @@ impl TaskContractDriver {
             }
         };
 
-        let cmd = PreReviewGateCommand { track_id: tid, group: layer };
+        let cmd = PreReviewGateCommand { track_id: tid, layer: layer_opt };
 
         match self.service.check(cmd) {
             Ok(PreReviewGateOutcome::Passed { conformance_summary }) => {

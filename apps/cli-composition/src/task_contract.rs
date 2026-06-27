@@ -3,6 +3,7 @@
 //! [`TaskContractCompositionRoot`] wires `FsTaskContractReader`,
 //! `FsImplCatalogSignalReader`, `PreReviewGateInteractor`, and
 //! `TaskContractDriver` for the `sotp task-contract check` subcommand.
+//! When `layer` is `None`, the gate iterates all 6 canonical TDDD layers.
 
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -45,9 +46,12 @@ impl TaskContractCompositionRoot {
     ///
     /// Constructs a [`TaskContractDriver`] via
     /// [`task_contract_driver(items_dir)`](Self::task_contract_driver), then
-    /// dispatches [`TaskContractInput::Check { group, track_id }`]. The driver
+    /// dispatches [`TaskContractInput::Check { layer, track_id }`]. The driver
     /// parses CLI strings, calls the use case, and renders `Passed`/`Blocked`
     /// outcomes as [`cli_driver::CommandOutcome`].
+    ///
+    /// When `layer` is `None`, the gate iterates all 6 canonical TDDD layers
+    /// internally and returns a single combined verdict.
     ///
     /// # Errors
     ///
@@ -56,12 +60,12 @@ impl TaskContractCompositionRoot {
     /// errors such as config loading).
     pub fn task_contract_check(
         &self,
-        group: String,
+        layer: Option<String>,
         track_id: String,
         items_dir: PathBuf,
     ) -> Result<cli_driver::CommandOutcome, CompositionError> {
         let driver = self.task_contract_driver(items_dir);
-        Ok(driver.handle(TaskContractInput::Check { group, track_id }))
+        Ok(driver.handle(TaskContractInput::Check { layer, track_id }))
     }
 }
 

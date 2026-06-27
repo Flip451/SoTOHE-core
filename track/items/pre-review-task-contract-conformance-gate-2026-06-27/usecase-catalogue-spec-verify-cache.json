@@ -3,7 +3,7 @@
   "layer": "usecase",
   "entries": [
     {
-      "claim_hash": "e1f6b8b49fdcc3778c8225a7020d0aa25ac9b0ac16978c51472743eae5f4d15e",
+      "claim_hash": "e20294086579500054d433cd692c289d6207adeeab053e53cb6691298e8983ed",
       "evidence_hash": "a1d0161f82fb1e359219bf20fe13ea166879459cc9479416e655b084f689460c",
       "verdict": {
         "kind": "pass",
@@ -27,7 +27,7 @@
       }
     },
     {
-      "claim_hash": "e1f6b8b49fdcc3778c8225a7020d0aa25ac9b0ac16978c51472743eae5f4d15e",
+      "claim_hash": "e20294086579500054d433cd692c289d6207adeeab053e53cb6691298e8983ed",
       "evidence_hash": "0328c46d2ea160bdb4a50550c0994bb547d768770ee5f2477759e71e1eccceb6",
       "verdict": {
         "kind": "pass",
@@ -147,11 +147,11 @@
       }
     },
     {
-      "claim_hash": "7dde66a79d77c83ec82e118b6c335ff4736d948407ea966fed6f3b8740faf6a4",
+      "claim_hash": "e08bb0a2dc9c06704e5e43ce711047d491780cf8d7b4b63efc088c03bcb47175",
       "evidence_hash": "4776c2bc5cd2dad2214630005d3ccd1cb935b6ddae6278553aa61a8bea32b22b",
       "verdict": {
         "kind": "pass",
-        "citation": "「attribution された全カタログ entry の impl_catalog 信号を既存信号テーブルと entry キーで JOIN し、全 entry が 🔵 かを確認する。」"
+        "citation": "task-contract.json の attribution completeness を検証した後、attribution された全カタログ entry の impl_catalog 信号を既存信号テーブルと entry キーで JOIN し、全 entry が 🔵 かを確認する。ゲートは sotp CLI サブコマンドとして実装し、fail-closed（artifact 不在・attribution 不完全・非 🔵 entry のいずれでもブロック）とする。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -171,7 +171,7 @@
       }
     },
     {
-      "claim_hash": "7dde66a79d77c83ec82e118b6c335ff4736d948407ea966fed6f3b8740faf6a4",
+      "claim_hash": "e08bb0a2dc9c06704e5e43ce711047d491780cf8d7b4b63efc088c03bcb47175",
       "evidence_hash": "214168b37d83d6faf1f99c96412c9c16d4efc3cc77482c75f4975b6977d09363",
       "verdict": {
         "kind": "pass",
