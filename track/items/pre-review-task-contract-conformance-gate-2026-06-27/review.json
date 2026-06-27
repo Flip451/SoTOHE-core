@@ -1,0 +1,68 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:993b3b943951377f71a6a98d72766d4d1e3de48e2dc4a049e34d182a2318e792",
+          "at": "2026-06-27T09:17:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ADR limits the new `task-contract.json` validation to referential integrity, but the pre-review gate only checks entries that a task declares. That leaves an unattributed catalogue entry invisible to the new gate, so a Red/Yellow `impl_catalog` signal can still be deferred to merge-gate, contradicting the stated shift-left guarantee for contract violations. The plan needs a completeness invariant for relevant catalogue entries, not just RI of declared entries.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+              "line": 70,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:993b3b943951377f71a6a98d72766d4d1e3de48e2dc4a049e34d182a2318e792",
+          "at": "2026-06-27T09:21:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ADR includes shape-only stubs in the stated shift-left problem, saying unimplemented code with only the shape in place should be caught earlier, but D3/D5 later define the new gate as impl_catalog blue only and explicitly state correct-signature stubs pass because body/liveness is reviewer-owned. That makes the plan internally inconsistent about the gate's guarantee and can lead implementation to expect body-aware blocking that the decision forbids. Remove stubs from the shift-left target/benefit, or change the decision to include a body-aware check.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+              "line": 34,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f0e6c2a01b384db611087719bd2258c47fd0d682a12712fef47615a79f3fbc15",
+          "at": "2026-06-27T09:27:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ADR frontmatter records every decision D1-D5 as `status: accepted`, but the README index adds this ADR as `Proposed`. That makes the plan artifacts contradict each other about whether this baseline ADR is accepted; update the index status to match the ADR's accepted decisions.",
+              "severity": "P1",
+              "file": "knowledge/adr/README.md",
+              "line": 139,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:8a82e0a85fe5770bbe02a957eeff270f091dbb875500049d79013fc0cfa45f84",
+          "at": "2026-06-27T09:29:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ebdb9f3f8c06ae8e39a95335cf75f057f0935940245de18e9c98f4b5700baa27",
+          "at": "2026-06-27T09:31:41Z"
+        }
+      ]
+    }
+  }
+}
