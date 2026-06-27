@@ -141,10 +141,26 @@ fn items_declare_cfg_test_module_path(
             // not `src/helpers.rs`.  We represent this by updating the
             // virtual containing-file path so that its `parent()` equals the
             // inline module's resolution directory.
-            let inline_basefile = containing_file
-                .parent()
-                .map(|d| d.join(module.ident.to_string()).join("_.rs"))
-                .unwrap_or_else(|| PathBuf::from(module.ident.to_string()).join("_.rs"));
+            //
+            // The starting basedir depends on the containing file type:
+            // - module root files (`lib.rs`, `main.rs`, `mod.rs`): parent dir
+            // - other files (`foo.rs`): parent dir / file_stem (the module dir)
+            //   e.g. `src/foo.rs` → module dir `src/foo/`
+            let module_dir = if is_module_root_file(containing_file) {
+                containing_file.parent().map(Path::to_path_buf)
+            } else {
+                containing_file
+                    .parent()
+                    .and_then(|d| containing_file.file_stem().map(|s| d.join(s)))
+            };
+            // Use `mod.rs` as the virtual file name so that `is_module_root_file`
+            // returns `true` for it in subsequent recursive calls.  This ensures
+            // each additional inline mod level correctly uses `parent()` as its
+            // basedir rather than `parent() + stem` (which would be wrong for
+            // synthetic `mod.rs` paths).
+            let inline_basefile = module_dir
+                .map(|d| d.join(module.ident.to_string()).join("mod.rs"))
+                .unwrap_or_else(|| PathBuf::from(module.ident.to_string()).join("mod.rs"));
             return items_declare_cfg_test_module_path(
                 nested_items,
                 tail,
@@ -194,10 +210,19 @@ fn items_declare_production_module_path(
         if let Some((_, nested_items)) = &module.content {
             // Mirror the basedir-update logic from `items_declare_cfg_test_module_path`:
             // inline mods shift the `#[path]` resolution directory.
-            let inline_basefile = containing_file
-                .parent()
-                .map(|d| d.join(module.ident.to_string()).join("_.rs"))
-                .unwrap_or_else(|| PathBuf::from(module.ident.to_string()).join("_.rs"));
+            // Starting basedir: parent dir for module root files, parent/stem for others.
+            let module_dir = if is_module_root_file(containing_file) {
+                containing_file.parent().map(Path::to_path_buf)
+            } else {
+                containing_file
+                    .parent()
+                    .and_then(|d| containing_file.file_stem().map(|s| d.join(s)))
+            };
+            // Use `mod.rs` as the virtual file name — see the matching comment in
+            // `items_declare_cfg_test_module_path` for the rationale.
+            let inline_basefile = module_dir
+                .map(|d| d.join(module.ident.to_string()).join("mod.rs"))
+                .unwrap_or_else(|| PathBuf::from(module.ident.to_string()).join("mod.rs"));
             return items_declare_production_module_path(
                 nested_items,
                 tail,
@@ -324,6 +349,19 @@ fn items_declare_cfg_test_path_attr_only(
         }
         false
     })
+}
+
+/// Returns `true` when `path` is a module root file (`lib.rs`, `main.rs`, or `mod.rs`).
+///
+/// Rustc resolves `#[path]` attributes inside inline `mod` declarations relative to
+/// the *module directory* of the containing file.  For module root files the module
+/// directory equals the file's parent directory; for a regular file such as `foo.rs`
+/// the module directory is `<parent>/foo/`.
+fn is_module_root_file(path: &Path) -> bool {
+    matches!(
+        path.file_name().map(|n| n.to_string_lossy()).as_deref(),
+        Some("lib.rs") | Some("main.rs") | Some("mod.rs")
+    )
 }
 
 fn items_declare_production_path_attr_only(

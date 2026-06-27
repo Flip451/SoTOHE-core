@@ -1519,3 +1519,70 @@ fn test_sibling_cfg_test_path_attr_still_excludes_target() {
         outcome.findings()
     );
 }
+
+// ── PR42-PR43: inline-mod basedir for non-root containing files ──────────────
+
+/// PR42: `foo.rs` (a non-root module file, not `lib.rs`/`main.rs`/`mod.rs`) contains
+/// `#[cfg(test)] mod tests { #[path = "helpers.rs"] mod helpers; }`.
+/// rustc resolves `helpers.rs` relative to the module dir of `foo.rs`, which is
+/// `src/foo/`, so the target is `src/foo/tests/helpers.rs` (not `src/tests/helpers.rs`).
+/// The file must be classified as test-only and excluded from scanning.
+#[test]
+fn test_ignores_doc_hidden_in_path_attr_mod_inside_inline_cfg_test_mod_in_non_root_file() {
+    let tmp = TempDir::new().unwrap();
+    write_arch_rules(tmp.path());
+    write_src(tmp.path(), "lib.rs", "pub mod foo;\n");
+    write_src(
+        tmp.path(),
+        "foo.rs",
+        concat!(
+            "pub fn foo_fn() {}\n",
+            "#[cfg(test)]\n",
+            "mod tests {\n",
+            "    #[path = \"helpers.rs\"]\n",
+            "    mod helpers;\n",
+            "}\n",
+        ),
+    );
+    write_src(tmp.path(), "foo/tests/helpers.rs", "#[doc(hidden)]\npub fn hidden_helper() {}\n");
+
+    let outcome = verify(tmp.path());
+    assert!(
+        outcome.is_ok(),
+        "#[path = \"helpers.rs\"] inside inline #[cfg(test)] mod tests in foo.rs must resolve \
+         to foo/tests/helpers.rs and be excluded (PR42): {:?}",
+        outcome.findings()
+    );
+}
+
+/// PR43: regression — after the PR42 basedir fix, the existing `lib.rs` inline
+/// `#[path]` pattern (covered by PR37) must remain correct.
+/// `lib.rs` is a module root file so its basedir is its parent (`src/`), meaning
+/// `#[path = "helpers.rs"]` inside `mod tests { … }` still resolves to
+/// `src/tests/helpers.rs`, not `src/lib/tests/helpers.rs`.
+#[test]
+fn test_regression_lib_rs_inline_path_attr_basedir_unchanged_after_pr42_fix() {
+    let tmp = TempDir::new().unwrap();
+    write_arch_rules(tmp.path());
+    write_src(
+        tmp.path(),
+        "lib.rs",
+        concat!(
+            "pub fn clean() {}\n",
+            "#[cfg(test)]\n",
+            "mod tests {\n",
+            "    #[path = \"helpers.rs\"]\n",
+            "    mod helpers;\n",
+            "}\n",
+        ),
+    );
+    write_src(tmp.path(), "tests/helpers.rs", "#[doc(hidden)]\npub fn hidden_helper() {}\n");
+
+    let outcome = verify(tmp.path());
+    assert!(
+        outcome.is_ok(),
+        "#[path = \"helpers.rs\"] inside inline #[cfg(test)] mod tests in lib.rs must still \
+         resolve to tests/helpers.rs (PR43 regression after PR42 fix): {:?}",
+        outcome.findings()
+    );
+}
