@@ -250,116 +250,10 @@ impl RefVerifyCompositionRoot {
         &self,
         input: RefVerifyCheckApprovedInput,
     ) -> Result<CommandOutcome, CompositionError> {
-        use infrastructure::ref_verify::{
-            RefVerifyCacheAdapter, RefVerifyPairSourceAdapter, RefVerifyScopeResolver,
-        };
-        use usecase::ref_verify::{
-            RefVerifyCachePort as _, RefVerifyCacheScope, RefVerifyPairSourcePort as _,
-        };
+        use cli_driver::ref_verify::{RefVerifyCheckApprovedInput as DriverInput, RefVerifyInput};
 
-        let RefVerifyCommandContext { canonical_root, track_id } =
-            resolve_ref_verify_context(&input.items_dir, &input.track_id)?;
-
-        // check-approved is the commit gate's read-only verification surface;
-        // the scope derives from artifact existence like every other run.
-        let resolver = RefVerifyScopeResolver::new(canonical_root.clone());
-        let scope = resolver.resolve(track_id.as_ref()).map_err(|e| {
-            CompositionError::WiringFailed(format!("ref-verify scope resolution failed: {e}"))
-        })?;
-
-        let current_branch = current_git_branch(&canonical_root)?;
-        let expected_branch = format!("track/{}", track_id.as_ref());
-        if current_branch != expected_branch {
-            return Err(CompositionError::WiringFailed(format!(
-                "ref-verify check-approved failed: track is not active: current branch '{current_branch}', expected '{expected_branch}'"
-            )));
-        }
-
-        let cmd = usecase::ref_verify::RefVerifyCommand {
-            track_id: track_id.clone(),
-            scope,
-            current_branch: current_branch.clone(),
-        };
-        let config = usecase::ref_verify::RefVerifyConfig::default();
-
-        let pair_source = RefVerifyPairSourceAdapter::new(canonical_root.clone());
-        let pairs = pair_source.load_pairs(&cmd, &config).map_err(|e| {
-            CompositionError::Infrastructure(format!(
-                "ref-verify check-approved: failed to load pairs: {e}"
-            ))
-        })?;
-        let production_pairs: Vec<_> = pairs.into_iter().filter(|p| !p.known_bad).collect();
-
-        if production_pairs.is_empty() {
-            return Ok(CommandOutcome::success(Some(
-                "[OK] No production reference pairs found — check-approved gate passes.".to_owned(),
-            )));
-        }
-
-        let cache_adapter = RefVerifyCacheAdapter::new(canonical_root.clone());
-
-        let mut missing_or_non_pass: Vec<String> = Vec::new();
-
-        let mut scope_keys: std::collections::HashMap<
-            RefVerifyCacheScope,
-            Vec<(domain::ContentHash, domain::ContentHash)>,
-        > = std::collections::HashMap::new();
-        for pair in &production_pairs {
-            scope_keys
-                .entry(pair.cache_scope.clone())
-                .or_default()
-                .push((pair.claim_hash.clone(), pair.evidence_hash.clone()));
-        }
-
-        for (cache_scope, pair_keys) in &scope_keys {
-            let entries = cache_adapter.load_entries(&cmd, cache_scope).map_err(|e| {
-                CompositionError::Infrastructure(format!(
-                    "ref-verify check-approved: failed to read verify-cache for {cache_scope:?}: {e}"
-                ))
-            })?;
-
-            use domain::tddd::semantic_verify::SemanticVerdict;
-            for (claim_hash, evidence_hash) in pair_keys {
-                let matching_entries = entries
-                    .iter()
-                    .filter(|entry| {
-                        entry.claim_hash == *claim_hash && entry.evidence_hash == *evidence_hash
-                    })
-                    .collect::<Vec<_>>();
-                if matching_entries.is_empty() {
-                    missing_or_non_pass.push(format!(
-                        "pair ({}, {}) has no Pass cache entry",
-                        claim_hash.to_hex(),
-                        evidence_hash.to_hex()
-                    ));
-                } else if matching_entries
-                    .iter()
-                    .any(|entry| !matches!(entry.verdict, SemanticVerdict::Pass { .. }))
-                {
-                    missing_or_non_pass.push(format!(
-                        "pair ({}, {}) has non-Pass cache entry",
-                        claim_hash.to_hex(),
-                        evidence_hash.to_hex()
-                    ));
-                }
-            }
-        }
-
-        if missing_or_non_pass.is_empty() {
-            Ok(CommandOutcome::success(Some(
-                "[OK] All production reference pairs have verified Pass cache entries.".to_owned(),
-            )))
-        } else {
-            Ok(CommandOutcome {
-                stdout: None,
-                stderr: Some(format!(
-                    "[BLOCKED] ref-verify check-approved failed: {} pair(s) without Pass cache:\n{}",
-                    missing_or_non_pass.len(),
-                    missing_or_non_pass.join("\n")
-                )),
-                exit_code: 1,
-            })
-        }
+        let driver_input = DriverInput { track_id: input.track_id, items_dir: input.items_dir };
+        Ok(self.ref_verify_driver().handle(RefVerifyInput::CheckApproved(driver_input)))
     }
 
     /// Wire and dispatch the `ref_verify results` command.
@@ -584,28 +478,17 @@ mod tests {
         let pairs =
             pair_source.load_pairs(&cmd, &usecase::ref_verify::RefVerifyConfig::default()).unwrap();
         let pair = pairs.into_iter().find(|pair| !pair.known_bad).unwrap();
+        // Use the actual pair origins so that the four-field cache lookup
+        // (claim_hash, evidence_hash, claim_origin, evidence_origin) succeeds.
         let entries = verdicts
             .into_iter()
             .map(|verdict| {
-                use domain::plan_ref::SpecElementId;
-                use domain::tddd::semantic_verify::{
-                    AdrDecisionRef, SpecElementRef, SpecSectionKind, VerifyOriginRef,
-                };
-                let claim_origin = VerifyOriginRef::SpecElement(SpecElementRef::new(
-                    SpecSectionKind::Goal,
-                    SpecElementId::try_new("GO-01".to_owned()).unwrap(),
-                    "test claim".to_owned(),
-                ));
-                let evidence_origin = VerifyOriginRef::AdrDecision(AdrDecisionRef::new(
-                    "knowledge/adr/decision.md".to_owned(),
-                    "D1".to_owned(),
-                ));
                 SemanticVerifyEntry::new(
                     pair.claim_hash.clone(),
                     pair.evidence_hash.clone(),
                     verdict,
-                    claim_origin,
-                    evidence_origin,
+                    pair.claim_origin.clone(),
+                    pair.evidence_origin.clone(),
                 )
             })
             .collect();
@@ -834,11 +717,14 @@ exit 64
 
     #[test]
     fn test_ref_verify_check_approved_invalid_track_id_returns_error() {
-        let (_tmp, items_dir) = temp_project_with_items_dir();
-        let result = RefVerifyCompositionRoot::new().ref_verify_check_approved(
-            RefVerifyCheckApprovedInput { track_id: "../outside".to_owned(), items_dir },
-        );
-        let msg = result.unwrap_err().to_string();
+        let outcome = RefVerifyCompositionRoot::new()
+            .ref_verify_check_approved(RefVerifyCheckApprovedInput {
+                track_id: "../outside".to_owned(),
+                items_dir: repo_root_for_tests().join("track").join("items"),
+            })
+            .unwrap();
+        let msg = outcome.stderr.as_deref().unwrap_or_default();
+        assert_eq!(outcome.exit_code, 1, "invalid track id must fail, got: {outcome:?}");
         assert!(
             msg.contains("invalid --track-id") || msg.contains("invalid track"),
             "invalid track id must be rejected, got: {msg}"
@@ -854,9 +740,11 @@ exit 64
                 items_dir: dir.path().to_path_buf(),
             },
         );
-        let msg = result.unwrap_err().to_string();
+        let outcome = result.unwrap();
+        let msg = outcome.stderr.as_deref().unwrap_or_default();
+        assert_eq!(outcome.exit_code, 1, "outside items_dir must fail, got: {outcome:?}");
         assert!(
-            msg.contains("items_dir") || msg.contains("project root"),
+            msg.contains("items-dir") || msg.contains("project root"),
             "items_dir outside repo must be rejected, got: {msg}"
         );
     }
@@ -1003,17 +891,18 @@ exit 64
         )
         .unwrap();
 
-        let err = with_fake_track_branch(&project_root, track_id, || {
+        let outcome = with_fake_track_branch(&project_root, track_id, || {
             RefVerifyCompositionRoot::new().ref_verify_check_approved(RefVerifyCheckApprovedInput {
                 track_id: track_id.to_owned(),
                 items_dir,
             })
         })
-        .unwrap_err()
-        .to_string();
+        .unwrap();
+        let err = outcome.stderr.as_deref().unwrap_or_default();
 
+        assert_eq!(outcome.exit_code, 1, "cache corruption must fail, got: {outcome:?}");
         assert!(
-            err.contains("failed to read verify-cache"),
+            err.contains("verify-cache"),
             "cache corruption must be surfaced as an infrastructure error, got: {err}"
         );
     }
@@ -1026,15 +915,16 @@ exit 64
         let track_id = "test-ref-verify-approved-branch-guard";
         write_chain1_fixture(&items_dir, track_id);
 
-        let err = with_fake_git_branch(&project_root, "not-the-track", || {
+        let outcome = with_fake_git_branch(&project_root, "not-the-track", || {
             RefVerifyCompositionRoot::new().ref_verify_check_approved(RefVerifyCheckApprovedInput {
                 track_id: track_id.to_owned(),
                 items_dir,
             })
         })
-        .unwrap_err()
-        .to_string();
+        .unwrap();
+        let err = outcome.stderr.as_deref().unwrap_or_default();
 
+        assert_eq!(outcome.exit_code, 1, "wrong branch must fail, got: {outcome:?}");
         assert!(err.contains("track is not active"), "expected active-track error, got: {err}");
     }
 
@@ -1266,6 +1156,145 @@ exit 64
                 .join(track_id)
                 .join("spec-adr-verify-cache.json")
                 .exists()
+        );
+    }
+
+    /// Creates a spec.json where GO-01 references TWO identical ADR files.
+    ///
+    /// Because both ADR files have identical content, the pair source produces two
+    /// Chain-1 pairs that share the same `(claim_hash, evidence_hash)` but have
+    /// different `evidence_origin` (different ADR file paths).  This fixture is the
+    /// minimal setup for testing origin-discriminating cache lookups at the
+    /// composition boundary.
+    fn write_chain1_fixture_two_identical_adrs(items_dir: &Path, track_id: &str) {
+        let project_root = project_root_from_items_dir(items_dir);
+        let track_items_dir = items_dir.join(track_id);
+        let adr_dir = project_root.join("knowledge").join("adr");
+        std::fs::create_dir_all(&track_items_dir).unwrap();
+        std::fs::create_dir_all(&adr_dir).unwrap();
+        write_architecture_rules_no_tddd(project_root);
+
+        // Identical content in both files → same git-blob hash → same evidence_hash.
+        let adr_content = "---\nadr_id: alpha\ndecisions:\n  - id: D1\n    \
+                           status: proposed\n    candidate_selection: \"choose the guarded path\"\n\
+                           ---\n# ADR\n\n### D1: Guarded path decision\n\
+                           The guarded path must stay inside the trusted repository root.\n";
+        std::fs::write(adr_dir.join("adr-alpha.md"), adr_content).unwrap();
+        std::fs::write(adr_dir.join("adr-beta.md"), adr_content).unwrap();
+
+        std::fs::write(
+            track_items_dir.join("spec.json"),
+            serde_json::json!({
+                "schema_version": 2,
+                "version": "0.1",
+                "title": "Test",
+                "goal": [{
+                    "id": "GO-01",
+                    "text": "The guarded path must stay inside the trusted repository root.",
+                    "adr_refs": [
+                        { "file": "knowledge/adr/adr-alpha.md", "anchor": "D1" },
+                        { "file": "knowledge/adr/adr-beta.md", "anchor": "D1" }
+                    ]
+                }],
+                "scope": { "in_scope": [], "out_of_scope": [] },
+                "constraints": [],
+                "acceptance_criteria": []
+            })
+            .to_string(),
+        )
+        .unwrap();
+    }
+
+    /// Verifies that `ref_verify_check_approved` uses the four-field cache key
+    /// `(claim_hash, evidence_hash, claim_origin, evidence_origin)` and does NOT
+    /// approve a production pair solely because another pair with the same content
+    /// hashes already has a Pass cache entry.
+    ///
+    /// Setup: one spec goal (GO-01) references two ADR files (adr-alpha.md and
+    /// adr-beta.md) that have identical content.  Because content is identical,
+    /// both Chain-1 pairs share the same `(claim_hash, evidence_hash)`.  They
+    /// differ only in `evidence_origin` (different file paths).
+    ///
+    /// A Pass cache entry is written for pair P (adr-alpha.md origin only).
+    /// `ref_verify_check_approved` must report pair Q (adr-beta.md) as missing a
+    /// Pass cache entry, because the four-field key for Q does not match the cached
+    /// entry for P even though the hashes are equal.
+    #[cfg(unix)]
+    #[test]
+    fn test_ref_verify_check_approved_distinguishes_pass_by_origin() {
+        use domain::tddd::semantic_verify::{
+            EvidenceCitation, SemanticVerdict, SemanticVerifyEntry,
+        };
+        use infrastructure::ref_verify::{RefVerifyCacheAdapter, RefVerifyPairSourceAdapter};
+        use usecase::ref_verify::{
+            RefVerifyCachePort as _, RefVerifyCacheScope, RefVerifyPairSourcePort as _,
+        };
+
+        let (_tmp, items_dir) = temp_project_with_items_dir();
+        let project_root = project_root_from_items_dir(&items_dir).to_path_buf();
+        let track_id = "test-ref-verify-check-approved-origin-distinguish";
+        write_chain1_fixture_two_identical_adrs(&items_dir, track_id);
+
+        // Load the two production pairs; they share (claim_hash, evidence_hash)
+        // but differ in evidence_origin (adr-alpha.md vs adr-beta.md).
+        let cmd = ref_verify_chain1_cmd(track_id).unwrap();
+        let pair_source = RefVerifyPairSourceAdapter::new(project_root.clone());
+        let all_pairs =
+            pair_source.load_pairs(&cmd, &usecase::ref_verify::RefVerifyConfig::default()).unwrap();
+        let mut production_pairs: Vec<_> = all_pairs.into_iter().filter(|p| !p.known_bad).collect();
+        assert_eq!(production_pairs.len(), 2, "fixture must produce exactly two production pairs");
+
+        // Sort by evidence_origin debug string for deterministic ordering (alpha < beta).
+        production_pairs.sort_by_key(|p| format!("{:?}", p.evidence_origin));
+        let pair_alpha = &production_pairs[0]; // adr-alpha.md
+        let pair_beta = &production_pairs[1]; // adr-beta.md
+
+        // Both pairs must share the same content hashes (same spec element, identical ADR files).
+        assert_eq!(
+            pair_alpha.claim_hash, pair_beta.claim_hash,
+            "fixture invariant: both pairs must share claim_hash"
+        );
+        assert_eq!(
+            pair_alpha.evidence_hash, pair_beta.evidence_hash,
+            "fixture invariant: both pairs must share evidence_hash (identical ADR content)"
+        );
+
+        // Write a Pass cache entry for pair P (adr-alpha.md origin) only.
+        let pass_entry = SemanticVerifyEntry::new(
+            pair_alpha.claim_hash.clone(),
+            pair_alpha.evidence_hash.clone(),
+            SemanticVerdict::Pass {
+                citation: EvidenceCitation::try_new("guarded path".to_owned()).unwrap(),
+            },
+            pair_alpha.claim_origin.clone(),
+            pair_alpha.evidence_origin.clone(),
+        );
+        RefVerifyCacheAdapter::new(project_root.clone())
+            .save_entries(&cmd, &RefVerifyCacheScope::SpecAdr, vec![pass_entry])
+            .unwrap();
+
+        // check_approved must detect that pair Q (adr-beta.md) is not covered.
+        let outcome = with_fake_track_branch(&project_root, track_id, || {
+            RefVerifyCompositionRoot::new().ref_verify_check_approved(RefVerifyCheckApprovedInput {
+                track_id: track_id.to_owned(),
+                items_dir: items_dir.clone(),
+            })
+        })
+        .unwrap();
+
+        assert_eq!(
+            outcome.exit_code, 1,
+            "pair Q (adr-beta.md) shares hashes with pair P but has a different evidence_origin — \
+             must not be approved by P's cache entry: {outcome:?}"
+        );
+        assert!(
+            outcome.stderr.as_deref().is_some_and(|s| s.contains("no Pass cache entry")),
+            "expected 'no Pass cache entry' for origin-mismatched pair Q: {outcome:?}"
+        );
+        // Exactly one pair is missing (pair Q); pair P is covered.
+        assert!(
+            outcome.stderr.as_deref().is_some_and(|s| s.contains("1 pair(s)")),
+            "expected exactly 1 missing pair (pair Q only — pair P has a matching Pass entry): {outcome:?}"
         );
     }
 
