@@ -1,51 +1,11 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "9ba8a6dc285264f8ce85dac62fea1efdd92c428f62d974229b2ae805860742d5",
+  "catalogue_declaration_hash": "7cbf9b10b97fddb20a4cbe8bbd23559f8363fdef3341045800a6b14f07c923d0",
   "signals": [
-    {
-      "type_name": "AdrDecisionRefDto",
-      "signal": "blue",
-      "entry_hash": "62966b580554cb248ba5c5484dbaedd2b4da767ef07d8cec4c57e06e5ce19d41"
-    },
-    {
-      "type_name": "CatalogueEntryRefDto",
-      "signal": "blue",
-      "entry_hash": "e8cca68d94ef00525c008d20c4b62aa2a99f0b6235b48afec9454912cfd5190b"
-    },
-    {
-      "type_name": "CatalogueSectionKeyDto",
-      "signal": "blue",
-      "entry_hash": "431b57307b63cd62185a2318ae34758e02f2555b60c4086e088691e6ba6f7a12"
-    },
     {
       "type_name": "FsRefVerifyAggregateAdapter",
       "signal": "blue",
       "entry_hash": "ea60a7c864365f866673709d678028daab8066ebef89f98e4a6734b0fd4435eb"
-    },
-    {
-      "type_name": "SemanticVerdictDto",
-      "signal": "blue",
-      "entry_hash": "908d839cc2b4944f30677e319106c620b28738de25b17dcde5507a706eefc06b"
-    },
-    {
-      "type_name": "SemanticVerifyEntryDto",
-      "signal": "blue",
-      "entry_hash": "dac3039248911d7d158840ccea6f443fd3cedc591c9a64e8ab9bf9e87bf7ee2f"
-    },
-    {
-      "type_name": "SpecElementRefDto",
-      "signal": "blue",
-      "entry_hash": "b9a3cbbfb6ded58c558e18049f644592184c77aab67708b3b2c61192fd32ef6f"
-    },
-    {
-      "type_name": "SpecSectionKindDto",
-      "signal": "blue",
-      "entry_hash": "d0a48242a31059b75818a047a782bb4438515159db76d48f8d55cfb7b53f13c2"
-    },
-    {
-      "type_name": "VerifyOriginRefDto",
-      "signal": "blue",
-      "entry_hash": "252e7952b7b025e55aac290fc923494bb77f3dbff48a9d1f177e184e1299a418"
     }
   ]
 }
