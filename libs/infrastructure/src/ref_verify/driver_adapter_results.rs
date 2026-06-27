@@ -159,8 +159,11 @@ pub(crate) fn compute_results(
         RefVerifyLayerFilter, RefVerifyPairRecord, RefVerifyResultsOutput, RefVerifyVerdictFilter,
     };
 
-    // Validate layer filter when Chain2 results are requested.
+    // Determine which chains are included before validation and pre-initialization.
+    let include_chain1 = matches!(chain, RefVerifyChainFilter::Chain1 | RefVerifyChainFilter::All);
     let include_chain2 = matches!(chain, RefVerifyChainFilter::Chain2 | RefVerifyChainFilter::All);
+
+    // Validate layer filter when Chain2 results are requested.
     if include_chain2 {
         if let RefVerifyLayerFilter::Specific(layer_id) = &layer {
             let valid: Vec<&str> = chain2_caches.iter().map(|(id, _)| id.as_ref()).collect();
@@ -205,13 +208,58 @@ pub(crate) fn compute_results(
         })
         .collect();
 
-    // (e/h) Classify pairs and accumulate per-lane data.
-    let mut chain1_lane: Option<LaneAccum> = None;
-    // Ordered list of layer strings for deterministic output (insertion order).
+    // Layer filter closure — defined here so it can be used during pre-initialization.
+    let layer_matches = |lane_layer: &str| match &layer {
+        RefVerifyLayerFilter::All => true,
+        RefVerifyLayerFilter::Specific(id) => id.as_ref() == lane_layer,
+    };
+
+    // Pre-initialize lanes from the resolved chain/layer set so that every resolved
+    // lane appears in the summary even when it has zero pairs (AC-02 / AC-07 / T004).
+    //
+    // Chain1 lane: present whenever include_chain1 is true.
+    let mut chain1_lane: Option<LaneAccum> = if include_chain1 {
+        Some(LaneAccum {
+            label: "Chain1 (spec\u{2194}ADR)".to_owned(),
+            pass_count: 0,
+            fail_count: 0,
+            pending_count: 0,
+            records: Vec::new(),
+        })
+    } else {
+        None
+    };
+
+    // Chain2 lanes: one per layer in chain2_caches that passes the layer filter.
+    // Insertion order is preserved for deterministic output.
     let mut chain2_lane_order: Vec<String> = Vec::new();
     let mut chain2_lane_map: HashMap<String, LaneAccum> = HashMap::new();
+    if include_chain2 {
+        for (layer_id, _) in &chain2_caches {
+            let layer_str = layer_id.as_ref().to_owned();
+            if !layer_matches(&layer_str) {
+                continue;
+            }
+            if !chain2_lane_map.contains_key(&layer_str) {
+                chain2_lane_order.push(layer_str.clone());
+                chain2_lane_map.insert(
+                    layer_str.clone(),
+                    LaneAccum {
+                        label: format!("Chain2:{layer_str}"),
+                        pass_count: 0,
+                        fail_count: 0,
+                        pending_count: 0,
+                        records: Vec::new(),
+                    },
+                );
+            }
+        }
+    }
+
     let empty_map: HashMap<HashKey, &SemanticVerifyEntry> = HashMap::new();
 
+    // Classify pairs and increment the pre-initialized lane counts.
+    // Pairs whose lane is absent (excluded by chain or layer filter) are skipped.
     for pair in &current_pairs {
         let key = (pair.claim_hash.clone(), pair.evidence_hash.clone());
 
@@ -223,28 +271,23 @@ pub(crate) fn compute_results(
                     &pair.claim_origin,
                     &pair.evidence_origin,
                 );
-                let lane = chain1_lane.get_or_insert_with(|| LaneAccum {
-                    label: "Chain1 (spec\u{2194}ADR)".to_owned(),
-                    pass_count: 0,
-                    fail_count: 0,
-                    pending_count: 0,
-                    records: Vec::new(),
-                });
-                match &v {
-                    SemanticVerdict::Pass { .. } => lane.pass_count += 1,
-                    SemanticVerdict::Fail { .. } => lane.fail_count += 1,
-                    SemanticVerdict::Pending => lane.pending_count += 1,
+                if let Some(lane) = chain1_lane.as_mut() {
+                    match &v {
+                        SemanticVerdict::Pass { .. } => lane.pass_count += 1,
+                        SemanticVerdict::Fail { .. } => lane.fail_count += 1,
+                        SemanticVerdict::Pending => lane.pending_count += 1,
+                    }
+                    lane.records.push(RefVerifyPairRecord {
+                        chain_scope: RefVerifyCacheScope::SpecAdr,
+                        chain_layer: "Chain1".to_owned(),
+                        claim_hash: pair.claim_hash.clone(),
+                        evidence_hash: pair.evidence_hash.clone(),
+                        verdict: v,
+                        reason: r,
+                        claim_origin: co,
+                        evidence_origin: eo,
+                    });
                 }
-                lane.records.push(RefVerifyPairRecord {
-                    chain_scope: RefVerifyCacheScope::SpecAdr,
-                    chain_layer: "Chain1".to_owned(),
-                    claim_hash: pair.claim_hash.clone(),
-                    evidence_hash: pair.evidence_hash.clone(),
-                    verdict: v,
-                    reason: r,
-                    claim_origin: co,
-                    evidence_origin: eo,
-                });
             }
             RefVerifyCacheScope::CatalogueSpec { layer: layer_id } => {
                 let layer_str = layer_id.as_ref().to_owned();
@@ -255,19 +298,6 @@ pub(crate) fn compute_results(
                     &pair.claim_origin,
                     &pair.evidence_origin,
                 );
-                if !chain2_lane_map.contains_key(&layer_str) {
-                    chain2_lane_order.push(layer_str.clone());
-                    chain2_lane_map.insert(
-                        layer_str.clone(),
-                        LaneAccum {
-                            label: format!("Chain2:{layer_str}"),
-                            pass_count: 0,
-                            fail_count: 0,
-                            pending_count: 0,
-                            records: Vec::new(),
-                        },
-                    );
-                }
                 if let Some(lane) = chain2_lane_map.get_mut(&layer_str) {
                     match &v {
                         SemanticVerdict::Pass { .. } => lane.pass_count += 1,
@@ -289,14 +319,8 @@ pub(crate) fn compute_results(
         }
     }
 
-    // (f/g/h/i) Apply chain, layer, and verdict filters; assemble output.
-    let include_chain1 = matches!(chain, RefVerifyChainFilter::Chain1 | RefVerifyChainFilter::All);
-    let include_chain2 = matches!(chain, RefVerifyChainFilter::Chain2 | RefVerifyChainFilter::All);
-
-    let layer_matches = |lane_layer: &str| match &layer {
-        RefVerifyLayerFilter::All => true,
-        RefVerifyLayerFilter::Specific(id) => id.as_ref() == lane_layer,
-    };
+    // Assemble output from pre-initialized lanes; apply verdict filter to pair_records.
+    // include_chain1 / include_chain2 were computed at the top of the function.
 
     let verdict_matches = |v: &SemanticVerdict| match &verdict {
         RefVerifyVerdictFilter::FailPending => {
@@ -335,9 +359,8 @@ pub(crate) fn compute_results(
 
     if include_chain2 {
         for layer_str in &chain2_lane_order {
-            if !layer_matches(layer_str.as_str()) {
-                continue;
-            }
+            // chain2_lane_order was populated only for layers that passed the layer
+            // filter during pre-initialization; no additional filtering is needed here.
             if let Some(lane) = chain2_lane_map.remove(layer_str.as_str()) {
                 lane_summaries.push(RefVerifyLaneSummary {
                     label: lane.label,
@@ -729,7 +752,10 @@ mod tests {
     }
 
     #[test]
-    fn compute_results_empty_pairs_returns_empty_output() {
+    fn compute_results_empty_pairs_returns_chain1_zero_lane() {
+        // chain=All with no resolved Chain2 layers (chain2_caches empty):
+        // Chain1 lane is always pre-initialized when include_chain1=true, so it
+        // appears in lane_summaries with zero counts even when there are no pairs.
         let out = compute_results(
             vec![],
             vec![],
@@ -739,7 +765,11 @@ mod tests {
             RefVerifyVerdictFilter::All,
         )
         .unwrap();
-        assert!(out.lane_summaries.is_empty());
+        assert_eq!(out.lane_summaries.len(), 1, "Chain1 lane must appear even with zero pairs");
+        assert_eq!(out.lane_summaries[0].label, "Chain1 (spec\u{2194}ADR)");
+        assert_eq!(out.lane_summaries[0].pass_count, 0);
+        assert_eq!(out.lane_summaries[0].fail_count, 0);
+        assert_eq!(out.lane_summaries[0].pending_count, 0);
         assert!(out.pair_records.is_empty());
         assert_eq!(out.total_pass, 0);
         assert_eq!(out.total_fail, 0);
@@ -1146,7 +1176,11 @@ mod tests {
     /// pre-Phase-2 state causes the adapter to produce empty caches and pairs
     /// for Chain2 (absent-catalogue layers were skipped by the F1 fix).
     #[test]
-    fn compute_results_chain2_all_with_pre_phase2_state_returns_zero_pair_result() {
+    fn compute_results_chain2_all_with_pre_phase2_state_returns_zero_count_lane() {
+        // Pre-Phase-2: catalogue absent → zero cache entries → zero pairs.
+        // The domain layer is still in chain2_caches (the caller records it so that
+        // compute_results can distinguish pre-Phase-2 from an unknown-layer typo), and
+        // must appear in lane_summaries with zero counts (AC-02 / AC-07).
         let layer_id = LayerId::try_new("domain".to_owned()).unwrap();
         let out = compute_results(
             vec![],                   // no chain1 cache
@@ -1157,7 +1191,15 @@ mod tests {
             RefVerifyVerdictFilter::All,
         )
         .unwrap();
-        assert!(out.lane_summaries.is_empty());
+        assert_eq!(
+            out.lane_summaries.len(),
+            1,
+            "domain lane must appear even when catalogue is absent"
+        );
+        assert_eq!(out.lane_summaries[0].label, "Chain2:domain");
+        assert_eq!(out.lane_summaries[0].pass_count, 0);
+        assert_eq!(out.lane_summaries[0].fail_count, 0);
+        assert_eq!(out.lane_summaries[0].pending_count, 0);
         assert!(out.pair_records.is_empty());
         assert_eq!(out.total_pass, 0);
         assert_eq!(out.total_fail, 0);
@@ -1165,10 +1207,12 @@ mod tests {
     }
 
     /// Verifies that a specific valid layer with an absent catalogue is still
-    /// accepted as a zero-pair pre-Phase-2 result, not misclassified as an
-    /// unknown-layer typo by cache-based validation.
+    /// accepted as a pre-Phase-2 zero-pair state and produces a zero-count lane,
+    /// not misclassified as an unknown-layer typo.
     #[test]
-    fn compute_results_chain2_specific_with_pre_phase2_state_returns_zero_pair_result() {
+    fn compute_results_chain2_specific_with_pre_phase2_state_returns_zero_count_lane() {
+        // Pre-Phase-2 with layer=Specific: catalogue absent → zero pairs, but the
+        // single requested lane must still appear in lane_summaries with zero counts.
         let layer_id = LayerId::try_new("domain".to_owned()).unwrap();
         let out = compute_results(
             vec![],
@@ -1179,7 +1223,99 @@ mod tests {
             RefVerifyVerdictFilter::All,
         )
         .unwrap();
-        assert!(out.lane_summaries.is_empty());
+        assert_eq!(out.lane_summaries.len(), 1, "domain lane must appear even with zero pairs");
+        assert_eq!(out.lane_summaries[0].label, "Chain2:domain");
+        assert_eq!(out.lane_summaries[0].pass_count, 0);
+        assert_eq!(out.lane_summaries[0].fail_count, 0);
+        assert_eq!(out.lane_summaries[0].pending_count, 0);
+        assert!(out.pair_records.is_empty());
+        assert_eq!(out.total_pass, 0);
+        assert_eq!(out.total_fail, 0);
+        assert_eq!(out.total_pending, 0);
+    }
+
+    // ── zero-pair lane invariant (AC-02 / AC-07 / T004) ─────────────────────────
+
+    /// Chain2 layer whose catalogue is present but yields zero current_pairs must
+    /// still appear in lane_summaries with zero counts (catalogue has no spec_refs
+    /// this cycle, but the lane is declared and must be shown).
+    #[test]
+    fn compute_results_chain2_layer_with_zero_pairs_keeps_lane_in_summary() {
+        let layer_id = LayerId::try_new("domain".to_owned()).unwrap();
+        let out = compute_results(
+            vec![],
+            vec![(layer_id, vec![pass_cache_entry(0x01, 0x02)])], // catalogue present with cache
+            vec![],                                               // no current_pairs this cycle
+            RefVerifyChainFilter::Chain2,
+            RefVerifyLayerFilter::All,
+            RefVerifyVerdictFilter::All,
+        )
+        .unwrap();
+        assert_eq!(
+            out.lane_summaries.len(),
+            1,
+            "domain lane must appear even with zero current_pairs"
+        );
+        assert_eq!(out.lane_summaries[0].label, "Chain2:domain");
+        assert_eq!(out.lane_summaries[0].pass_count, 0);
+        assert_eq!(out.lane_summaries[0].fail_count, 0);
+        assert_eq!(out.lane_summaries[0].pending_count, 0);
+        assert!(out.pair_records.is_empty());
+        assert_eq!(out.total_pass, 0);
+        assert_eq!(out.total_fail, 0);
+        assert_eq!(out.total_pending, 0);
+    }
+
+    /// chain=All with no resolved Chain2 layers and no current_pairs: the Chain1
+    /// lane must appear with zero counts because include_chain1 is true.
+    #[test]
+    fn compute_results_chain_all_chain1_zero_pairs_keeps_lane_in_summary() {
+        let out = compute_results(
+            vec![pass_cache_entry(0x01, 0x02)], // chain1 cache has an entry
+            vec![],                             // no Chain2 layers
+            vec![],                             // zero current_pairs
+            RefVerifyChainFilter::All,
+            RefVerifyLayerFilter::All,
+            RefVerifyVerdictFilter::All,
+        )
+        .unwrap();
+        assert_eq!(
+            out.lane_summaries.len(),
+            1,
+            "Chain1 lane must appear even with zero current_pairs"
+        );
+        assert_eq!(out.lane_summaries[0].label, "Chain1 (spec\u{2194}ADR)");
+        assert_eq!(out.lane_summaries[0].pass_count, 0);
+        assert_eq!(out.lane_summaries[0].fail_count, 0);
+        assert_eq!(out.lane_summaries[0].pending_count, 0);
+        assert!(out.pair_records.is_empty());
+        assert_eq!(out.total_pass, 0);
+        assert_eq!(out.total_fail, 0);
+        assert_eq!(out.total_pending, 0);
+    }
+
+    /// --chain 2 --layer domain with zero domain-layer pairs: exactly one lane for
+    /// the selected layer must appear in lane_summaries with zero counts.
+    #[test]
+    fn compute_results_chain2_specific_zero_pairs_keeps_single_lane() {
+        let domain_id = LayerId::try_new("domain".to_owned()).unwrap();
+        let out = compute_results(
+            vec![],
+            vec![
+                (LayerId::try_new("domain".to_owned()).unwrap(), vec![]),
+                (LayerId::try_new("usecase".to_owned()).unwrap(), vec![]),
+            ],
+            vec![], // zero pairs for domain layer
+            RefVerifyChainFilter::Chain2,
+            RefVerifyLayerFilter::Specific(domain_id),
+            RefVerifyVerdictFilter::All,
+        )
+        .unwrap();
+        assert_eq!(out.lane_summaries.len(), 1, "exactly one lane for the specific layer");
+        assert_eq!(out.lane_summaries[0].label, "Chain2:domain");
+        assert_eq!(out.lane_summaries[0].pass_count, 0);
+        assert_eq!(out.lane_summaries[0].fail_count, 0);
+        assert_eq!(out.lane_summaries[0].pending_count, 0);
         assert!(out.pair_records.is_empty());
         assert_eq!(out.total_pass, 0);
         assert_eq!(out.total_fail, 0);
