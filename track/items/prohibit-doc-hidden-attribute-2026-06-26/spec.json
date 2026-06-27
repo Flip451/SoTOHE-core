@@ -141,7 +141,7 @@
     },
     {
       "id": "CN-02",
-      "text": "検出は可視性（`pub` / `pub(crate)` / 非 pub）を問わず全 item に適用する。テストコード、integration tests、examples、benches も除外しない。有効可視性の機械解析は行わず、属性の有無のみで判定する。",
+      "text": "検出は可視性（`pub` / `pub(crate)` / 非 pub）を問わず、syn が attribute を保持する Rust AST node（crate/file-level inner attribute、item、associated item、struct / union field、enum variant）に適用する。テストコード、integration tests、examples、benches も除外しない。有効可視性の機械解析は行わず、属性の有無のみで判定する。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-06-26-0810-prohibit-doc-hidden-attribute.md",
@@ -181,7 +181,7 @@
     },
     {
       "id": "CN-06",
-      "text": "実装全体は stable Rust toolchain のみで動作する。nightly や dylint の nightly `rustc_private` 依存は使わない。",
+      "text": "本サブコマンド (`sotp verify doc-hidden`) の検出ロジックは stable Rust toolchain のみで動作する syn AST 走査で実装する。nightly や dylint の nightly `rustc_private` 依存は本ゲートでは使わない（プロジェクト全体への制約は意図せず、本ゲートのスコープのみ）。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-06-26-0810-prohibit-doc-hidden-attribute.md",
@@ -203,7 +203,7 @@
     },
     {
       "id": "AC-02",
-      "text": "`layers[]` のいずれかの crate の任意の Rust ソース（テストコード、integration tests、examples、benches を含む）に `#[doc(hidden)]` 相当の属性が存在する場合、ゲートが exit non-zero を返し、`#[doc(hidden)]` 属性の存在をファイルパス・行情報とともに示す finding を出力する。",
+      "text": "`layers[]` のいずれかの crate の任意の Rust ソース（テストコード、integration tests、examples、benches を含む）の attribute-bearing 位置に `#[doc(hidden)]` 相当の属性が存在する場合、ゲートが exit non-zero を返し、`#[doc(hidden)]` 属性の存在をファイルパス・行情報とともに示す finding を出力する。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-06-26-0810-prohibit-doc-hidden-attribute.md",

@@ -46,10 +46,13 @@ pub(crate) struct SynScanContext {
 /// Reusable syn AST scanner for verify gates.
 ///
 /// Loads `architecture-rules.json` `layers[]` from `root`, discovers `.rs`
-/// source files under each layer's `{path}/src` directory, parses each file
-/// with [`syn::parse_file`], and invokes `inspect` for every attribute-bearing
-/// AST node (file-level inner attributes, items, impl/trait associated items,
-/// struct fields, enum variants, foreign items).
+/// source files under each layer's `{path}` directory (including `src/`,
+/// `tests/`, `examples/`, `benches/`, and any other subdirectories), parses
+/// each file with [`syn::parse_file`], and invokes `inspect` for every
+/// attribute-bearing AST node (file-level inner attributes, items, impl/trait
+/// associated items, struct fields, enum variants, foreign items).
+///
+/// `target/` and `.git/` directories are excluded at every nesting level.
 ///
 /// The `inspect` callback receives a [`SynScanContext`] and returns any
 /// [`VerifyFinding`] instances for violations it detects.  All findings are
@@ -74,20 +77,20 @@ pub(crate) fn scan_workspace_rust_sources(
     let mut findings = Vec::new();
 
     for layer in rules.layers() {
-        let src_dir = match resolve_layer_src_dir(&trusted_root, &layer.crate_name, &layer.path) {
+        let layer_dir = match resolve_layer_dir(&trusted_root, &layer.crate_name, &layer.path) {
             Ok(path) => path,
             Err(finding) => {
                 findings.push(finding);
                 continue;
             }
         };
-        scan_rs_files_in_dir(&trusted_root, &src_dir, &mut findings, &mut inspect);
+        scan_rs_files_in_dir(&trusted_root, &layer_dir, &mut findings, &mut inspect);
     }
 
     VerifyOutcome::from_findings(findings)
 }
 
-fn resolve_layer_src_dir(
+fn resolve_layer_dir(
     trusted_root: &Path,
     crate_name: &str,
     layer_path: &str,
@@ -108,7 +111,7 @@ fn resolve_layer_src_dir(
         )));
     }
 
-    Ok(normalized_layer_path.join("src"))
+    Ok(normalized_layer_path)
 }
 
 fn guarded_metadata(
@@ -183,6 +186,13 @@ fn scan_rs_files_in_dir(
     paths.sort();
 
     for path in paths {
+        // Skip build-artifact and VCS directories at every nesting level.
+        if let Some(name) = path.file_name() {
+            if name == "target" || name == ".git" {
+                continue;
+            }
+        }
+
         let Some(meta) = guarded_metadata(root, &path, findings) else {
             continue;
         };

@@ -305,6 +305,86 @@
         "kind": "pass",
         "citation": "ゲートの有効化スコープを `architecture-rules.json` の `layers[]` から実行時に取得する。per-layer フラグや特定 crate パスのハードコードは持たず、`layers[]` に新 crate が追加されれば自動的に対象に含まれる。走査対象は各 layer crate の **`src/` ディレクトリ**配下の `.rs` ファイルとする。"
       }
+    },
+    {
+      "claim_hash": "155a0e0f92e89c5c67144673c414227ab1081057e9fbb0c8a59836bb8e25b5c4",
+      "evidence_hash": "05ec32ac07f47dce822ae5425c7076ed4a5f479ba1049ef686ab97baee8d4863",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`layers[]` のいずれかの crate の `src/` ディレクトリ配下の Rust ソース（インラインテストモジュール含む）に `#[doc(hidden)]` 相当の属性が存在する場合、ゲートが exit non-zero を返し、`#[doc(hidden)]` 属性の存在をファイルパス・行情報とともに示す finding を出力する。"
+      }
+    },
+    {
+      "claim_hash": "856002c7f633bc28d7ff91b0863970273a889433a231ade4ece1e0b04c073827",
+      "evidence_hash": "90f3cbdc695b5abe03e609e1c0fd010f098fca7664e7c539e97943c500ee6ead",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/infrastructure/src/verify/` 配下に共通 syn 走査ヘルパ（各 layer crate の `src/` ディレクトリ配下の `.rs` ファイル再帰発見 → `syn::parse_file` → コールバック visitor による判定）を新設する。判定ロジックはコールバックで受ける設計とする。後続の syn ベース lint（例: `Result<_, String>` 禁止）でも再利用できる粒度とする。"
+      }
+    },
+    {
+      "claim_hash": "856002c7f633bc28d7ff91b0863970273a889433a231ade4ece1e0b04c073827",
+      "evidence_hash": "c53c8256e73a47e10b4dc3dc5de9a3cbcfc8f544a0f7f21c7a051a9b25a243ea",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各 layer crate の `src/` ディレクトリ配下のファイル再帰発見・`syn::parse_file` を共通基盤とし、判定ロジックのみをコールバックで差し替えられること。"
+      }
+    },
+    {
+      "claim_hash": "155a0e0f92e89c5c67144673c414227ab1081057e9fbb0c8a59836bb8e25b5c4",
+      "evidence_hash": "90f3cbdc695b5abe03e609e1c0fd010f098fca7664e7c539e97943c500ee6ead",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/infrastructure/src/verify/` 配下に共通 syn 走査ヘルパ（各 layer crate の `src/` ディレクトリ配下の `.rs` ファイル再帰発見 → `syn::parse_file` → コールバック visitor による判定）を新設する。判定ロジックはコールバックで受ける設計とする。"
+      }
+    },
+    {
+      "claim_hash": "155a0e0f92e89c5c67144673c414227ab1081057e9fbb0c8a59836bb8e25b5c4",
+      "evidence_hash": "9ea07c78ab722a620c380f4dbfcf7bab3b9a59ec20cc58b2a04077d6b38ed541",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ゲートの有効化スコープを `architecture-rules.json` の `layers[]` から実行時に取得する。per-layer フラグや特定 crate パスのハードコードは持たず、`layers[]` に新 crate が追加されれば自動的に対象に含まれる。走査対象は各 layer crate の **`src/` ディレクトリ**配下の `.rs` ファイルとし、`tests/` / `examples/` / `benches/` は別 crate target として rustdoc paths に出ないため対象外。"
+      }
+    },
+    {
+      "claim_hash": "155a0e0f92e89c5c67144673c414227ab1081057e9fbb0c8a59836bb8e25b5c4",
+      "evidence_hash": "c53c8256e73a47e10b4dc3dc5de9a3cbcfc8f544a0f7f21c7a051a9b25a243ea",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各 layer crate の `src/` ディレクトリ配下のファイル再帰発見・`syn::parse_file` を共通基盤とし、判定ロジックのみをコールバックで差し替えられること。"
+      }
+    },
+    {
+      "claim_hash": "7aa1060e127b7a24a33a6e3b3398b0761dccb44d984759e93282421beaf1f976",
+      "evidence_hash": "90f3cbdc695b5abe03e609e1c0fd010f098fca7664e7c539e97943c500ee6ead",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/infrastructure/src/verify/` 配下に共通 syn 走査ヘルパ（各 layer crate の `src/` ディレクトリ配下の `.rs` ファイル再帰発見 → `syn::parse_file` → コールバック visitor による判定）を新設する。判定ロジックはコールバックで受ける設計とする。後続の syn ベース lint（例: `Result<_, String>` 禁止）でも再利用できる粒度とする。"
+      }
+    },
+    {
+      "claim_hash": "7aa1060e127b7a24a33a6e3b3398b0761dccb44d984759e93282421beaf1f976",
+      "evidence_hash": "9ea07c78ab722a620c380f4dbfcf7bab3b9a59ec20cc58b2a04077d6b38ed541",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ゲートの有効化スコープを `architecture-rules.json` の `layers[]` から実行時に取得する。per-layer フラグや特定 crate パスのハードコードは持たず、`layers[]` に新 crate が追加されれば自動的に対象に含まれる。走査対象は各 layer crate の **`src/` ディレクトリ**配下の `.rs` ファイルとし、`tests/` / `examples/` / `benches/` は別 crate target として rustdoc paths に出ないため対象外。"
+      }
+    },
+    {
+      "claim_hash": "7aa1060e127b7a24a33a6e3b3398b0761dccb44d984759e93282421beaf1f976",
+      "evidence_hash": "c53c8256e73a47e10b4dc3dc5de9a3cbcfc8f544a0f7f21c7a051a9b25a243ea",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各 layer crate の `src/` ディレクトリ配下のファイル再帰発見・`syn::parse_file` を共通基盤とし、判定ロジックのみをコールバックで差し替えられること。"
+      }
+    },
+    {
+      "claim_hash": "155a0e0f92e89c5c67144673c414227ab1081057e9fbb0c8a59836bb8e25b5c4",
+      "evidence_hash": "5a73cdc5d42e193391a4f7a4ad7b018d679877d037d39cc55289602fb1fec991",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`layers[]` のいずれかの crate の任意の Rust ソース（テストコード、integration tests、examples、benches を含む）の attribute-bearing 位置に `#[doc(hidden)]` 相当の属性が存在する場合、ゲートが exit non-zero を返し、`#[doc(hidden)]` 属性の存在をファイルパス・行情報とともに示す finding を出力する。"
+      }
     }
   ]
 }

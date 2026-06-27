@@ -41,7 +41,7 @@ decisions:
 
 ### D2: `#[doc(hidden)]` 相当の属性宣言を可視性不問で一律禁止する
 
-新サブコマンド（例 `sotp verify doc-hidden`）を追加し、ソース上に出現する `#[doc(hidden)]` 相当の属性宣言を可視性に関わらず error とする。検出対象は次の形式すべて:
+新サブコマンド（例 `sotp verify doc-hidden`）を追加し、ソース上に出現する `#[doc(hidden)]` 相当の属性宣言を可視性に関わらず error とする。新サブコマンドは `Makefile.toml` の `ci-local` dependencies に組み込み、`cargo make ci` 実行時に commit gate として自動的に走らせる。検出対象は次の形式すべて:
 
 - 直接の outer attribute: `#[doc(hidden)]`
 - 直接の inner attribute: `#![doc(hidden)]`
@@ -49,11 +49,11 @@ decisions:
 - `cfg_attr` 包み込み: `#[cfg_attr(<pred>, doc(hidden))]` / `#[cfg_attr(<pred>, doc(hidden, ...))]`
 - 上記の inner attribute 版
 
-判定対象は `syn::File::attrs` に現れる crate/file-level inner attribute と、syn traversal で到達する各 item / impl associated item の attribute とし、`pub` / `pub(crate)` / 非 pub の区別を行わない。Rust の doc comment は syn AST 上 `#[doc = "..."]` の name-value attribute として現れるため、検出器は `doc(hidden)` を含む list attribute（および `cfg_attr` 内の同形）だけを match し、`#[doc = "..."]` は対象外とする。
+判定対象は `syn::File::attrs` に現れる crate/file-level inner attribute と、syn traversal で到達する attribute-bearing Rust AST node の attribute とする。対象 node には item、impl associated item、trait associated item、struct / union field、enum variant を含め、`pub` / `pub(crate)` / 非 pub の区別を行わない。Rust の doc comment は syn AST 上 `#[doc = "..."]` の name-value attribute として現れるため、検出器は `doc(hidden)` を含む list attribute（および `cfg_attr` 内の同形）だけを match し、`#[doc = "..."]` は対象外とする。
 
 有効化スコープは `architecture-rules.json` の `layers[]` に列挙された全 crate を一律対象とし、per-layer フラグや層のハードコード選択は持たない。新 crate が `layers[]` に追加されれば自動的に対象になる。走査対象は各 layer crate ディレクトリ配下の `.rs` ファイル全体とし、`src/` 内の production / test module だけでなく `tests/` / `examples/` / `benches/` も除外しない。テスト item は rustdoc paths に出ないため `#[doc(hidden)]` を付けても DanglingId は発火しないが、規約のシンプルさを優先して除外しない。
 
-非 pub item を含めて一律禁止することで、(a) effective visibility 解析（impl block propagation / pub-reachable 集合 / cross-file `pub use` 等）が一切不要となり、検出ロジックは「item の attribute だけを見る」 syn 単純走査で完結する。(b) 非 pub item の doc(hidden) は装飾として無意味なので失われる正当用途は無い。(c) 将来 pub 化したときに silent escape する経路を事前に閉じられる。
+非 pub item を含めて一律禁止することで、(a) effective visibility 解析（impl block propagation / pub-reachable 集合 / cross-file `pub use` 等）が一切不要となり、検出ロジックは「attribute-bearing node の attribute だけを見る」 syn 単純走査で完結する。(b) 非 pub item の doc(hidden) は装飾として無意味なので失われる正当用途は無い。(c) 将来 pub 化したときに silent escape する経路を事前に閉じられる。
 
 ### D3: 既存ゲート機構は不可侵とする
 
@@ -98,7 +98,7 @@ clippy には属性の有無で発火する汎用 lint 設定がなく、`disall
 
 ### Neutral
 
-- 既存コードベースに非 pub `#[doc(hidden)]` の実例がある場合、cleanup が必要（attribute を外すか、対象 item ごと削除）。実装着手時に grep で実例の有無を確認する。テストコード内に既存の `#[doc(hidden)]` があれば cleanup が必要（既存コードベース cleanup と統合）。
+- 既存コードベースに非 pub `#[doc(hidden)]` の実例がある場合、cleanup が必要（attribute を外すか、対象 item ごと削除）。実装着手時に grep で実例の有無を確認する。テストコード内に既存の `#[doc(hidden)]` があれば cleanup が必要（既存コードベース cleanup と統合）。本ラウンドでは追加 cleanup 対象は 0 件だった。
 - doc-hidden の独立検出と type-signals の DanglingId が二重検出になり得る。実装着手時にメッセージ衝突の有無を確認する。
 - 共通走査ヘルパの API は後続 lint（`Result<_, String>` 禁止等）の要件も見据える必要があるが、過剰一般化は避け、当面は doc-hidden の要件で確定する。
 

@@ -30,17 +30,6 @@
         }
       ]
     },
-    "cli_driver": {
-      "rounds": [
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8cf39553ddfa2cc58beac6bc96e2a7b81a15485fd600d4f4a021613cfe3e9af2",
-          "at": "2026-06-26T11:32:52Z"
-        }
-      ]
-    },
     "infrastructure": {
       "rounds": [
         {
@@ -442,6 +431,42 @@
           "findings": [],
           "hash": "rvw1:sha256:65fafa426f93027e80f49e396c8f1b29c4c0780d8d86ac4f69a5cc2bf79d9244",
           "at": "2026-06-27T01:55:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:80867365529e7f8e48d1562343659c03ba4a140efc8edc8780ed586fc1fc6624",
+          "at": "2026-06-27T03:24:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:80867365529e7f8e48d1562343659c03ba4a140efc8edc8780ed586fc1fc6624",
+          "at": "2026-06-27T03:28:58Z"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8cf39553ddfa2cc58beac6bc96e2a7b81a15485fd600d4f4a021613cfe3e9af2",
+          "at": "2026-06-26T11:32:52Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:763459a6efbc7fa614fd826d2f13b08bfef5a2e176ffde796c11caf80b3a68a8",
+          "at": "2026-06-26T11:34:02Z"
         }
       ]
     },
@@ -730,17 +755,86 @@
           "findings": [],
           "hash": "rvw1:sha256:f4bc930acbc8543c46e6805b340f873ffe80726ba8edd634a2b253f435b621a9",
           "at": "2026-06-27T02:38:02Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`GO-01` still says the gate scans all `.rs` sources under the layer crates, but the later scope/constraint items narrow the actual target set to `src/` only and explicitly exclude `tests/`, `examples/`, and `benches/`. That reads as two different scopes in the same spec. Reword the goal so it matches the narrower `src/`-only plan, or restore the broader source set consistently.",
+              "severity": "P1",
+              "file": "track/items/prohibit-doc-hidden-attribute-2026-06-26/spec.json",
+              "line": 8,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:573fbdb90d1323eb31c7dd82e4f8ad024f321bc67186f19a40e932557717e527",
+          "at": "2026-06-27T03:04:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2 now excludes `tests/` / `examples/` / `benches/`, but the same ADR still says in Consequences that test code is part of the detection set and in Neutral that existing test-code matches need cleanup. The spec copies the narrower `src/`-only scope, so the artifact set no longer matches the stated simplification to drop test exclusion and leaves the test handling ambiguous.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-26-0810-prohibit-doc-hidden-attribute.md",
+              "line": 54,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:25b5efa1ff434c78011e5b297f5e061709205cd77961a1a8878c079b1824b784",
+          "at": "2026-06-27T03:08:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9576c028799c0b990297d2b6d3f956d76652534b77b0f426fd587b722aa911c5",
+          "at": "2026-06-27T03:13:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9576c028799c0b990297d2b6d3f956d76652534b77b0f426fd587b722aa911c5",
+          "at": "2026-06-27T03:31:01Z"
+        },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:763459a6efbc7fa614fd826d2f13b08bfef5a2e176ffde796c11caf80b3a68a8",
-          "at": "2026-06-26T11:34:02Z"
+          "hash": "rvw1:sha256:9576c028799c0b990297d2b6d3f956d76652534b77b0f426fd587b722aa911c5",
+          "at": "2026-06-27T03:33:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:89c0af069c475da5da5a984b64d8a2fd9e6e1b901527f683cd460a4ffa6693ab",
+          "at": "2026-06-27T03:45:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2 says the gate errors on `#[doc(hidden)]` anywhere it appears in source, and AC-02 requires a finding for any Rust source containing such an attribute, but the actual target set is narrowed to `syn::File::attrs`, item attrs, and impl associated-item attrs. That leaves other valid doc-hidden attribute sites such as trait associated items, struct fields, and enum variants outside the stated traversal contract, so an implementation following this plan can pass the plan while missing source attributes the spec says must be blocked.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-26-0810-prohibit-doc-hidden-attribute.md",
+              "line": 52,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:89c0af069c475da5da5a984b64d8a2fd9e6e1b901527f683cd460a4ffa6693ab",
+          "at": "2026-06-27T03:49:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:610329a34ca8427fe8dc4c241c87463a7acbc5ad138f49ab115781f4a8802b1d",
+          "at": "2026-06-27T03:53:00Z"
         }
       ]
     }

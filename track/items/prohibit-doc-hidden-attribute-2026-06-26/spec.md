@@ -28,15 +28,15 @@ signals: { blue: 24, yellow: 0, red: 0 }
 
 ## Constraints
 - [CN-01] 検出ロジックは syn AST 走査で実装する。行ベースの raw text regex は使わない。syn パースにより comment / 文字列リテラル / トークン境界を正確に扱い、複数行属性や `cfg_attr` 絡みの偽陽性・偽陰性を構造的に排除する。 [adr: knowledge/adr/2026-06-26-0810-prohibit-doc-hidden-attribute.md#D1, knowledge/adr/2026-06-26-0810-prohibit-doc-hidden-attribute.md#D2] [tasks: T001]
-- [CN-02] 検出は可視性（`pub` / `pub(crate)` / 非 pub）を問わず全 item に適用する。テストコード、integration tests、examples、benches も除外しない。有効可視性の機械解析は行わず、属性の有無のみで判定する。 [adr: knowledge/adr/2026-06-26-0810-prohibit-doc-hidden-attribute.md#D2] [tasks: T001]
+- [CN-02] 検出は可視性（`pub` / `pub(crate)` / 非 pub）を問わず、syn が attribute を保持する Rust AST node（crate/file-level inner attribute、item、associated item、struct / union field、enum variant）に適用する。テストコード、integration tests、examples、benches も除外しない。有効可視性の機械解析は行わず、属性の有無のみで判定する。 [adr: knowledge/adr/2026-06-26-0810-prohibit-doc-hidden-attribute.md#D2] [tasks: T001]
 - [CN-03] ゲートのスコープは `architecture-rules.json` の `layers[]` を実行時に参照して決定する。特定 crate のパスや名前をコードにハードコードしない。`layers[]` に新 crate が追加されれば自動的にスコープに含まれる（per-layer フラグなし）。走査ディレクトリは各 layer crate ディレクトリとし、その配下の `.rs` ファイルを対象とする。 [adr: knowledge/adr/2026-06-26-0810-prohibit-doc-hidden-attribute.md#D2] [tasks: T001, T002]
 - [CN-04] 既存の verify ゲート（`usecase_purity` / `canonical_modules` / type-signals 等）のロジックおよびインターフェースに変更を加えない。共通走査ヘルパを新設するが、既存ゲートを共通基盤へ乗せ替えることは本トラックのスコープ外とする。 [adr: knowledge/adr/2026-06-26-0810-prohibit-doc-hidden-attribute.md#D3] [tasks: T001, T002, T003]
 - [CN-05] ゲートのエラー出力は `#[doc(hidden)]` 属性の存在をファイルパス・行情報とともに明示するメッセージを含む。DanglingId のように根本原因を隠すメッセージは許容しない。 [adr: knowledge/adr/2026-06-26-0810-prohibit-doc-hidden-attribute.md#D2] [tasks: T001]
-- [CN-06] 実装全体は stable Rust toolchain のみで動作する。nightly や dylint の nightly `rustc_private` 依存は使わない。 [adr: knowledge/adr/2026-06-26-0810-prohibit-doc-hidden-attribute.md#D2] [tasks: T001]
+- [CN-06] 本サブコマンド (`sotp verify doc-hidden`) の検出ロジックは stable Rust toolchain のみで動作する syn AST 走査で実装する。nightly や dylint の nightly `rustc_private` 依存は本ゲートでは使わない（プロジェクト全体への制約は意図せず、本ゲートのスコープのみ）。 [adr: knowledge/adr/2026-06-26-0810-prohibit-doc-hidden-attribute.md#D2] [tasks: T001]
 
 ## Acceptance Criteria
 - [ ] [AC-01] `sotp verify doc-hidden` が `VerifyCommand` enum のバリアントとして登録されており、`#[doc(hidden)]` のないクリーンなソースに対して `[OK] All checks passed.` を出力して exit 0 を返す。 [adr: knowledge/adr/2026-06-26-0810-prohibit-doc-hidden-attribute.md#D2] [tasks: T001, T002, T003]
-- [ ] [AC-02] `layers[]` のいずれかの crate の任意の Rust ソース（テストコード、integration tests、examples、benches を含む）に `#[doc(hidden)]` 相当の属性が存在する場合、ゲートが exit non-zero を返し、`#[doc(hidden)]` 属性の存在をファイルパス・行情報とともに示す finding を出力する。 [adr: knowledge/adr/2026-06-26-0810-prohibit-doc-hidden-attribute.md#D2] [tasks: T001]
+- [ ] [AC-02] `layers[]` のいずれかの crate の任意の Rust ソース（テストコード、integration tests、examples、benches を含む）の attribute-bearing 位置に `#[doc(hidden)]` 相当の属性が存在する場合、ゲートが exit non-zero を返し、`#[doc(hidden)]` 属性の存在をファイルパス・行情報とともに示す finding を出力する。 [adr: knowledge/adr/2026-06-26-0810-prohibit-doc-hidden-attribute.md#D2] [tasks: T001]
 - [ ] [AC-04] IN-02 で列挙した全属性形式（outer / inner / 複合 doc 引数（順序不問）/ cfg_attr 包み outer / cfg_attr 包み inner）が AC-02 の検出対象に含まれ、いずれの形式でも finding が出力される。 [adr: knowledge/adr/2026-06-26-0810-prohibit-doc-hidden-attribute.md#D2] [tasks: T001]
 - [ ] [AC-05] `verify-doc-hidden-local` タスクが `Makefile.toml` の `ci-local` dependencies 配列に含まれ、`cargo make ci` 実行時にゲートが自動的に走る。 [adr: knowledge/adr/2026-06-26-0810-prohibit-doc-hidden-attribute.md#D2] [tasks: T003]
 - [ ] [AC-06] ゲートの走査対象 crate リストが `architecture-rules.json` の `layers[]` を実行時に読み取って決定される。特定 crate パスがコードにハードコードされていない。`layers[]` に新 crate を追加するだけでゲートのスコープが自動的に広がる。 [adr: knowledge/adr/2026-06-26-0810-prohibit-doc-hidden-attribute.md#D2] [tasks: T001]

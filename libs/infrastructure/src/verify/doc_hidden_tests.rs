@@ -29,6 +29,24 @@ fn write_src(root: &Path, rel: &str, content: &str) {
     std::fs::write(&path, content).unwrap();
 }
 
+/// Write a Rust source file at `test-layer/tests/<rel>`.
+fn write_tests(root: &Path, rel: &str, content: &str) {
+    let path = root.join("test-layer/tests").join(rel);
+    if let Some(parent) = path.parent() {
+        std::fs::create_dir_all(parent).unwrap();
+    }
+    std::fs::write(&path, content).unwrap();
+}
+
+/// Write a Rust source file at `test-layer/examples/<rel>`.
+fn write_examples(root: &Path, rel: &str, content: &str) {
+    let path = root.join("test-layer/examples").join(rel);
+    if let Some(parent) = path.parent() {
+        std::fs::create_dir_all(parent).unwrap();
+    }
+    std::fs::write(&path, content).unwrap();
+}
+
 fn setup(root: &Path, content: &str) {
     write_arch_rules(root);
     write_src(root, "lib.rs", content);
@@ -471,6 +489,42 @@ fn test_flags_doc_hidden_on_test_fn_attribute() {
     assert!(
         outcome.has_errors(),
         "#[test] #[doc(hidden)] fn must be flagged (no test exclusion): {:?}",
+        outcome.findings()
+    );
+}
+
+// ── BR1/BR2: tests/ and examples/ directories are scanned ────────────────────
+
+/// BR1: `#[doc(hidden)]` in `tests/it.rs` must be flagged (scan broadened to
+/// whole layer directory, not just `src/`).
+#[test]
+fn test_flags_doc_hidden_in_tests_dir() {
+    let tmp = TempDir::new().unwrap();
+    write_arch_rules(tmp.path());
+    // src/ is clean; violation lives in tests/.
+    write_src(tmp.path(), "lib.rs", "pub fn ok() {}\n");
+    write_tests(tmp.path(), "it.rs", "#[doc(hidden)]\npub fn x() {}\n");
+    let outcome = verify(tmp.path());
+    assert!(
+        outcome.has_errors(),
+        "#[doc(hidden)] in tests/it.rs must be flagged: {:?}",
+        outcome.findings()
+    );
+}
+
+/// BR2: `#[doc(hidden)]` in `examples/ex.rs` must be flagged (scan broadened
+/// to whole layer directory, not just `src/`).
+#[test]
+fn test_flags_doc_hidden_in_examples_dir() {
+    let tmp = TempDir::new().unwrap();
+    write_arch_rules(tmp.path());
+    // src/ is clean; violation lives in examples/.
+    write_src(tmp.path(), "lib.rs", "pub fn ok() {}\n");
+    write_examples(tmp.path(), "ex.rs", "#[doc(hidden)]\npub fn x() {}\n");
+    let outcome = verify(tmp.path());
+    assert!(
+        outcome.has_errors(),
+        "#[doc(hidden)] in examples/ex.rs must be flagged: {:?}",
         outcome.findings()
     );
 }
