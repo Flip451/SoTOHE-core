@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "732fb6f04090c3baada406c78671357980368eb01629eaee15d5a2e9a2984f6b",
+  "signals": [
+    {
+      "type_name": "TaskContractCheckArgs",
+      "signal": "blue",
+      "entry_hash": "eadf7f031e4ff62bd7bd38c7c01e401eff7af2baa887020a41b07913f1e71359"
+    },
+    {
+      "type_name": "TaskContractCommand",
+      "signal": "blue",
+      "entry_hash": "53a36e9148324d087dba9b12725ee36a5941a646abc017ed1fc0690a42af2cbe"
+    },
+    {
+      "type_name": "cli::commands::task_contract::execute",
+      "signal": "blue",
+      "entry_hash": "7aca7177c77f0168c83adbf85be9f9eff67ee7d6c38715b16e2813e0cdb5855c"
+    },
+    {
+      "type_name": "cli::commands::task_contract::execute_task_contract_check",
+      "signal": "blue",
+      "entry_hash": "a6e825b96be7404df74f50bac2fba5e841eefe07864a512736c36a72c9c3671f"
+    }
+  ]
+}

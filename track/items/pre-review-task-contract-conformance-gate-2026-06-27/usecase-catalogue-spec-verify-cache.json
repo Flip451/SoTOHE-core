@@ -1,0 +1,294 @@
+{
+  "schema_version": 1,
+  "layer": "usecase",
+  "entries": [
+    {
+      "claim_hash": "e1f6b8b49fdcc3778c8225a7020d0aa25ac9b0ac16978c51472743eae5f4d15e",
+      "evidence_hash": "a1d0161f82fb1e359219bf20fe13ea166879459cc9479416e655b084f689460c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "attribution の complete relation invariant 検証: (a) review scope 内の関連カタログ entry が全て ≥1 タスクに attribution されていること、(b) orphan entry（review scope 内だがどのタスクにも attribution されていない関連 entry）が存在しないこと、(c) attribution された entry がカタログに実在し当該 scope 内であること（referential integrity）。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "attribution の complete relation invariant 検証: (a) review scope 内の関連カタログ entry が全て ≥1 タスクに attribution されていること、(b) orphan entry（review scope 内だがどのタスクにも attribution されていない関連 entry）が存在しないこと、(c) attribution された entry がカタログに実在し当該 scope 内であること（referential integrity）。"
+        }
+      }
+    },
+    {
+      "claim_hash": "e1f6b8b49fdcc3778c8225a7020d0aa25ac9b0ac16978c51472743eae5f4d15e",
+      "evidence_hash": "0328c46d2ea160bdb4a50550c0994bb547d768770ee5f2477759e71e1eccceb6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "attribution の complete relation invariant が機械的に検証可能である: (a) review scope 内の関連カタログ entry が全て ≥1 タスクに attribution されている、(b) orphan entry が存在しない、(c) attribution 対象 entry がカタログに実在し scope 内である。invariant 違反時にゲートが非ゼロ終了コードで返り、違反内容（orphan entry リスト・存在しない entry 識別子）を出力する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "attribution の complete relation invariant が機械的に検証可能である: (a) review scope 内の関連カタログ entry が全て ≥1 タスクに attribution されている、(b) orphan entry が存在しない、(c) attribution 対象 entry がカタログに実在し scope 内である。invariant 違反時にゲートが非ゼロ終了コードで返り、違反内容（orphan entry リスト・存在しない entry 識別子）を出力する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ec286d56dbe4bb5d995b6602b04aa931c70f63f97c786dddd2e2d9b8b6686fdb",
+      "evidence_hash": "a1d0161f82fb1e359219bf20fe13ea166879459cc9479416e655b084f689460c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "attribution の complete relation invariant 検証: (a) review scope 内の関連カタログ entry が全て ≥1 タスクに attribution されていること、(b) orphan entry（review scope 内だがどのタスクにも attribution されていない関連 entry）が存在しないこと、(c) attribution された entry がカタログに実在し当該 scope 内であること（referential integrity）."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "attribution の complete relation invariant 検証: (a) review scope 内の関連カタログ entry が全て ≥1 タスクに attribution されていること、(b) orphan entry（review scope 内だがどのタスクにも attribution されていない関連 entry）が存在しないこと、(c) attribution された entry がカタログに実在し当該 scope 内であること（referential integrity）。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ec286d56dbe4bb5d995b6602b04aa931c70f63f97c786dddd2e2d9b8b6686fdb",
+      "evidence_hash": "4776c2bc5cd2dad2214630005d3ccd1cb935b6ddae6278553aa61a8bea32b22b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "task-contract.json の attribution completeness を検証した後、attribution された全カタログ entry の impl_catalog 信号を既存信号テーブルと entry キーで JOIN し、全 entry が 🔵 かを確認する。ゲートは sotp CLI サブコマンドとして実装し、fail-closed（artifact 不在・attribution 不完全・非 🔵 entry のいずれでもブロック）とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "pre-review blocking binary check ゲートの実装: task-contract.json の attribution completeness を検証した後、attribution された全カタログ entry の impl_catalog 信号を既存信号テーブルと entry キーで JOIN し、全 entry が 🔵 かを確認する。ゲートは sotp CLI サブコマンドとして実装し、fail-closed（artifact 不在・attribution 不完全・非 🔵 entry のいずれでもブロック）とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5228b70c1dfa961751b4432ffb027448afdc7f4d7225a249e8d90f4e6023cf82",
+      "evidence_hash": "a1d0161f82fb1e359219bf20fe13ea166879459cc9479416e655b084f689460c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "attribution の complete relation invariant 検証: (a) review scope 内の関連カタログ entry が全て ≥1 タスクに attribution されていること、(b) orphan entry（review scope 内だがどのタスクにも attribution されていない関連 entry）が存在しないこと、(c) attribution された entry がカタログに実在し当該 scope 内であること（referential integrity）。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "attribution の complete relation invariant 検証: (a) review scope 内の関連カタログ entry が全て ≥1 タスクに attribution されていること、(b) orphan entry（review scope 内だがどのタスクにも attribution されていない関連 entry）が存在しないこと、(c) attribution された entry がカタログに実在し当該 scope 内であること（referential integrity）。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5228b70c1dfa961751b4432ffb027448afdc7f4d7225a249e8d90f4e6023cf82",
+      "evidence_hash": "0328c46d2ea160bdb4a50550c0994bb547d768770ee5f2477759e71e1eccceb6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "attribution の complete relation invariant が機械的に検証可能である: (a) review scope 内の関連カタログ entry が全て ≥1 タスクに attribution されている、(b) orphan entry が存在しない、(c) attribution 対象 entry がカタログに実在し scope 内である。invariant 違反時にゲートが非ゼロ終了コードで返り、違反内容（orphan entry リスト・存在しない entry 識別子）を出力する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "attribution の complete relation invariant が機械的に検証可能である: (a) review scope 内の関連カタログ entry が全て ≥1 タスクに attribution されている、(b) orphan entry が存在しない、(c) attribution 対象 entry がカタログに実在し scope 内である。invariant 違反時にゲートが非ゼロ終了コードで返り、違反内容（orphan entry リスト・存在しない entry 識別子）を出力する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "7dde66a79d77c83ec82e118b6c335ff4736d948407ea966fed6f3b8740faf6a4",
+      "evidence_hash": "4776c2bc5cd2dad2214630005d3ccd1cb935b6ddae6278553aa61a8bea32b22b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「attribution された全カタログ entry の impl_catalog 信号を既存信号テーブルと entry キーで JOIN し、全 entry が 🔵 かを確認する。」"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "ImplCatalogSignalReaderPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "pre-review blocking binary check ゲートの実装: task-contract.json の attribution completeness を検証した後、attribution された全カタログ entry の impl_catalog 信号を既存信号テーブルと entry キーで JOIN し、全 entry が 🔵 かを確認する。ゲートは sotp CLI サブコマンドとして実装し、fail-closed（artifact 不在・attribution 不完全・非 🔵 entry のいずれでもブロック）とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "7dde66a79d77c83ec82e118b6c335ff4736d948407ea966fed6f3b8740faf6a4",
+      "evidence_hash": "214168b37d83d6faf1f99c96412c9c16d4efc3cc77482c75f4975b6977d09363",
+      "verdict": {
+        "kind": "pass",
+        "citation": "pre-review ゲートは既存 impl_catalog 信号テーブルを entry キーで JOIN して動作し、新 chain・新信号エンジン・型カタログ拡張を必要としない。SignalEvaluatorV2 は変更せずに再利用する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "ImplCatalogSignalReaderPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-05",
+          "text_label": "pre-review ゲートは既存 impl_catalog 信号テーブルを entry キーで JOIN して動作し、新 chain・新信号エンジン・型カタログ拡張を必要としない。SignalEvaluatorV2 は変更せずに再利用する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "e9ab494bd7b9beb2e3ace363bc13833851f1c90fc9f75124250df714738507d2",
+      "evidence_hash": "a1d0161f82fb1e359219bf20fe13ea166879459cc9479416e655b084f689460c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "attribution の complete relation invariant 検証: (a) review scope 内の関連カタログ entry が全て ≥1 タスクに attribution されていること、(b) orphan entry（review scope 内だがどのタスクにも attribution されていない関連 entry）が存在しないこと、(c) attribution された entry がカタログに実在し当該 scope 内であること（referential integrity）。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "PreReviewGateService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "attribution の complete relation invariant 検証: (a) review scope 内の関連カタログ entry が全て ≥1 タスクに attribution されていること、(b) orphan entry（review scope 内だがどのタスクにも attribution されていない関連 entry）が存在しないこと、(c) attribution された entry がカタログに実在し当該 scope 内であること（referential integrity）。"
+        }
+      }
+    },
+    {
+      "claim_hash": "e9ab494bd7b9beb2e3ace363bc13833851f1c90fc9f75124250df714738507d2",
+      "evidence_hash": "0328c46d2ea160bdb4a50550c0994bb547d768770ee5f2477759e71e1eccceb6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "attribution の complete relation invariant が機械的に検証可能である: (a) review scope 内の関連カタログ entry が全て ≥1 タスクに attribution されている、(b) orphan entry が存在しない、(c) attribution 対象 entry がカタログに実在し scope 内である。invariant 違反時にゲートが非ゼロ終了コードで返り、違反内容（orphan entry リスト・存在しない entry 識別子）を出力する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "PreReviewGateService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "attribution の complete relation invariant が機械的に検証可能である: (a) review scope 内の関連カタログ entry が全て ≥1 タスクに attribution されている、(b) orphan entry が存在しない、(c) attribution 対象 entry がカタログに実在し scope 内である。invariant 違反時にゲートが非ゼロ終了コードで返り、違反内容（orphan entry リスト・存在しない entry 識別子）を出力する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "9f7f19a235071e7e4d9e45933ddfb0c1f08b940868cfa50eb5642f091969559e",
+      "evidence_hash": "443217435b97a1d007284f3c64a7c38ea0650489d73e3f8ae6b4cf2de635f685",
+      "verdict": {
+        "kind": "pass",
+        "citation": "新 Phase 3 artifact `task-contract.json` のスキーマ定義と codec 実装。artifact はタスクリスト（各タスクが履行責務を持つ型カタログ entry 識別子のリスト）と schema_version を含む。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TaskContractReaderPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "新 Phase 3 artifact `task-contract.json` のスキーマ定義と codec 実装。artifact はタスクリスト（各タスクが履行責務を持つ型カタログ entry 識別子のリスト）と schema_version を含む。"
+        }
+      }
+    },
+    {
+      "claim_hash": "9f7f19a235071e7e4d9e45933ddfb0c1f08b940868cfa50eb5642f091969559e",
+      "evidence_hash": "804aac23c761cf53a1f9eebd865037751bbaf86dde5b06d0a87bb2c2e26f62de",
+      "verdict": {
+        "kind": "pass",
+        "citation": "attribution は review scope 内の全関連カタログ entry に対する complete relation でなければならない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TaskContractReaderPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "attribution は review scope 内の全関連カタログ entry に対する complete relation でなければならない。orphan entry（scope 内で attribution されていない関連 entry）が存在する場合、その entry の impl_catalog 信号がゲート入力から漏れ shift-left の保証が崩れるため、ゲートは orphan 検出時に明示的にブロックする。"
+        }
+      }
+    }
+  ]
+}

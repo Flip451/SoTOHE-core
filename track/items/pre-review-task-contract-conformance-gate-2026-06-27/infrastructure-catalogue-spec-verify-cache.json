@@ -1,0 +1,294 @@
+{
+  "schema_version": 1,
+  "layer": "infrastructure",
+  "entries": [
+    {
+      "claim_hash": "afcec3a11f3f236053b4e56b8ab46831827ad230a10d8cbc39252657ad01c2a1",
+      "evidence_hash": "4776c2bc5cd2dad2214630005d3ccd1cb935b6ddae6278553aa61a8bea32b22b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "task-contract.json の attribution completeness を検証した後、attribution された全カタログ entry の impl_catalog 信号を既存信号テーブルと entry キーで JOIN し、全 entry が 🔵 かを確認する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsImplCatalogSignalReader"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "pre-review blocking binary check ゲートの実装: task-contract.json の attribution completeness を検証した後、attribution された全カタログ entry の impl_catalog 信号を既存信号テーブルと entry キーで JOIN し、全 entry が 🔵 かを確認する。ゲートは sotp CLI サブコマンドとして実装し、fail-closed（artifact 不在・attribution 不完全・非 🔵 entry のいずれでもブロック）とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "afcec3a11f3f236053b4e56b8ab46831827ad230a10d8cbc39252657ad01c2a1",
+      "evidence_hash": "214168b37d83d6faf1f99c96412c9c16d4efc3cc77482c75f4975b6977d09363",
+      "verdict": {
+        "kind": "pass",
+        "citation": "pre-review ゲートは既存 impl_catalog 信号テーブルを entry キーで JOIN して動作し、新 chain・新信号エンジン・型カタログ拡張を必要としない。SignalEvaluatorV2 は変更せずに再利用する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsImplCatalogSignalReader"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-05",
+          "text_label": "pre-review ゲートは既存 impl_catalog 信号テーブルを entry キーで JOIN して動作し、新 chain・新信号エンジン・型カタログ拡張を必要としない。SignalEvaluatorV2 は変更せずに再利用する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c647eda6b25f4f2efb2b0a1f0ef69d401410fde20c376f9d431dd19805a936b5",
+      "evidence_hash": "443217435b97a1d007284f3c64a7c38ea0650489d73e3f8ae6b4cf2de635f685",
+      "verdict": {
+        "kind": "pass",
+        "citation": "新 Phase 3 artifact `task-contract.json` のスキーマ定義と codec 実装。artifact はタスクリスト（各タスクが履行責務を持つ型カタログ entry 識別子のリスト）と schema_version を含む。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsTaskContractReader"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "新 Phase 3 artifact `task-contract.json` のスキーマ定義と codec 実装。artifact はタスクリスト（各タスクが履行責務を持つ型カタログ entry 識別子のリスト）と schema_version を含む。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c647eda6b25f4f2efb2b0a1f0ef69d401410fde20c376f9d431dd19805a936b5",
+      "evidence_hash": "804aac23c761cf53a1f9eebd865037751bbaf86dde5b06d0a87bb2c2e26f62de",
+      "verdict": {
+        "kind": "pass",
+        "citation": "attribution は review scope 内の全関連カタログ entry に対する complete relation でなければならない。orphan entry（scope 内で attribution されていない関連 entry）が存在する場合、その entry の impl_catalog 信号がゲート入力から漏れ shift-left の保証が崩れるため、ゲートは orphan 検出時に明示的にブロックする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsTaskContractReader"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "attribution は review scope 内の全関連カタログ entry に対する complete relation でなければならない。orphan entry（scope 内で attribution されていない関連 entry）が存在する場合、その entry の impl_catalog 信号がゲート入力から漏れ shift-left の保証が崩れるため、ゲートは orphan 検出時に明示的にブロックする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "849dc8132a71ac9ca189359e907aff0d2d30cc77cdae1e61284b69e17f0d5a3c",
+      "evidence_hash": "443217435b97a1d007284f3c64a7c38ea0650489d73e3f8ae6b4cf2de635f685",
+      "verdict": {
+        "kind": "pass",
+        "citation": "新 Phase 3 artifact `task-contract.json` のスキーマ定義と codec 実装。artifact はタスクリスト（各タスクが履行責務を持つ型カタログ entry 識別子のリスト）と schema_version を含む。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "TaskContractCodecError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "新 Phase 3 artifact `task-contract.json` のスキーマ定義と codec 実装。artifact はタスクリスト（各タスクが履行責務を持つ型カタログ entry 識別子のリスト）と schema_version を含む。"
+        }
+      }
+    },
+    {
+      "claim_hash": "849dc8132a71ac9ca189359e907aff0d2d30cc77cdae1e61284b69e17f0d5a3c",
+      "evidence_hash": "91c5c462efaf4aebaa314c9cb8d5e54695bcad6d171f65361cca1962cb224c0d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`task-contract.json` のスキーマが定義されており、impl-planner が Phase 3 output として本 artifact を author する。artifact には schema_version・track id・タスクリスト（各タスクが履行責務を持つ型カタログ entry 識別子のリスト）が含まれる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "TaskContractCodecError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`task-contract.json` のスキーマが定義されており、impl-planner が Phase 3 output として本 artifact を author する。artifact には schema_version・track id・タスクリスト（各タスクが履行責務を持つ型カタログ entry 識別子のリスト）が含まれる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "3da7f29fd6aec9869ea658091e3f7a614e2078c68438c56df84e3c851b131bcf",
+      "evidence_hash": "443217435b97a1d007284f3c64a7c38ea0650489d73e3f8ae6b4cf2de635f685",
+      "verdict": {
+        "kind": "pass",
+        "citation": "artifact はタスクリスト（各タスクが履行責務を持つ型カタログ entry 識別子のリスト）と schema_version を含む。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "TaskContractDocumentDto"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "新 Phase 3 artifact `task-contract.json` のスキーマ定義と codec 実装。artifact はタスクリスト（各タスクが履行責務を持つ型カタログ entry 識別子のリスト）と schema_version を含む。"
+        }
+      }
+    },
+    {
+      "claim_hash": "3da7f29fd6aec9869ea658091e3f7a614e2078c68438c56df84e3c851b131bcf",
+      "evidence_hash": "91c5c462efaf4aebaa314c9cb8d5e54695bcad6d171f65361cca1962cb224c0d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`task-contract.json` のスキーマが定義されており、impl-planner が Phase 3 output として本 artifact を author する。artifact には schema_version・track id・タスクリスト（各タスクが履行責務を持つ型カタログ entry 識別子のリスト）が含まれる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "TaskContractDocumentDto"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`task-contract.json` のスキーマが定義されており、impl-planner が Phase 3 output として本 artifact を author する。artifact には schema_version・track id・タスクリスト（各タスクが履行責務を持つ型カタログ entry 識別子のリスト）が含まれる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "45debdb16ff24b05829279d445f1750054b5dd12b5c58ca8ba60e34a01d18f3b",
+      "evidence_hash": "443217435b97a1d007284f3c64a7c38ea0650489d73e3f8ae6b4cf2de635f685",
+      "verdict": {
+        "kind": "pass",
+        "citation": "新 Phase 3 artifact `task-contract.json` のスキーマ定義と codec 実装。artifact はタスクリスト（各タスクが履行責務を持つ型カタログ entry 識別子のリスト）と schema_version を含む。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::task_contract_codec::decode"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "新 Phase 3 artifact `task-contract.json` のスキーマ定義と codec 実装。artifact はタスクリスト（各タスクが履行責務を持つ型カタログ entry 識別子のリスト）と schema_version を含む。"
+        }
+      }
+    },
+    {
+      "claim_hash": "45debdb16ff24b05829279d445f1750054b5dd12b5c58ca8ba60e34a01d18f3b",
+      "evidence_hash": "91c5c462efaf4aebaa314c9cb8d5e54695bcad6d171f65361cca1962cb224c0d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`task-contract.json` のスキーマが定義されており、impl-planner が Phase 3 output として本 artifact を author する。artifact には schema_version・track id・タスクリスト（各タスクが履行責務を持つ型カタログ entry 識別子のリスト）が含まれる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::task_contract_codec::decode"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`task-contract.json` のスキーマが定義されており、impl-planner が Phase 3 output として本 artifact を author する。artifact には schema_version・track id・タスクリスト（各タスクが履行責務を持つ型カタログ entry 識別子のリスト）が含まれる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "852dedfc2cac70bd4ee69b96d363b2e00786f8f553d1894c61a21a8a6aafd537",
+      "evidence_hash": "443217435b97a1d007284f3c64a7c38ea0650489d73e3f8ae6b4cf2de635f685",
+      "verdict": {
+        "kind": "pass",
+        "citation": "新 Phase 3 artifact `task-contract.json` のスキーマ定義と codec 実装。artifact はタスクリスト（各タスクが履行責務を持つ型カタログ entry 識別子のリスト）と schema_version を含む。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::task_contract_codec::encode"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "新 Phase 3 artifact `task-contract.json` のスキーマ定義と codec 実装。artifact はタスクリスト（各タスクが履行責務を持つ型カタログ entry 識別子のリスト）と schema_version を含む。"
+        }
+      }
+    },
+    {
+      "claim_hash": "852dedfc2cac70bd4ee69b96d363b2e00786f8f553d1894c61a21a8a6aafd537",
+      "evidence_hash": "91c5c462efaf4aebaa314c9cb8d5e54695bcad6d171f65361cca1962cb224c0d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`task-contract.json` のスキーマが定義されており、impl-planner が Phase 3 output として本 artifact を author する。artifact には schema_version・track id・タスクリスト（各タスクが履行責務を持つ型カタログ entry 識別子のリスト）が含まれる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::task_contract_codec::encode"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`task-contract.json` のスキーマが定義されており、impl-planner が Phase 3 output として本 artifact を author する。artifact には schema_version・track id・タスクリスト（各タスクが履行責務を持つ型カタログ entry 識別子のリスト）が含まれる。"
+        }
+      }
+    }
+  ]
+}

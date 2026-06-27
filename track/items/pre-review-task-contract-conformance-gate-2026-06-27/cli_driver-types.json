@@ -1,0 +1,94 @@
+{
+  "schema_version": 5,
+  "crate_name": "cli_driver",
+  "layer": "cli_driver",
+  "types": {
+    "TaskContractInput": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Check",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "group", "ty": "String" },
+                { "name": "track_id", "ty": "String" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "task_contract",
+      "docs": "Typed input for the task-contract command family. Check: run the pre-review conformance gate for the given TDDD layer review group and track. group and track_id are opaque CLI strings validated by the primary adapter before it constructs PreReviewGateCommand (group -> LayerId, track_id -> TrackId). The filesystem root is not part of this primary-adapter input; cli_composition builds the injected service with the requested items_dir before constructing the driver.",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-03" }
+      ],
+      "informal_grounds": []
+    },
+    "TaskContractDriver": {
+      "action": "add",
+      "role": { "PrimaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "task_contract",
+      "docs": "Primary adapter for the task-contract command family. Holds a private Arc<dyn PreReviewGateService> and dispatches TaskContractInput variants to the appropriate use-case operation. Converts CLI strings to domain value objects (TrackId, LayerId) and renders the PreReviewGateOutcome as a CommandOutcome (exit 0 on Passed, exit 1 with violation list on Blocked).",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-03" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [
+    {
+      "type_name": "TaskContractDriver",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "service", "ty": "std::sync::Arc<dyn usecase::pre_review_gate::PreReviewGateService>" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Construct a TaskContractDriver by injecting the primary application service port."
+        },
+        {
+          "name": "handle",
+          "receiver": "&self",
+          "params": [
+            { "name": "input", "ty": "TaskContractInput" }
+          ],
+          "returns": "CommandOutcome",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Dispatch a TaskContractInput variant to the appropriate use-case operation and render the result as a CommandOutcome."
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "TaskContractInput" },
+    { "action": "add", "trait_ref": "core::clone::Clone", "for_type": "TaskContractInput" },
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "TaskContractDriver" }
+  ]
+}

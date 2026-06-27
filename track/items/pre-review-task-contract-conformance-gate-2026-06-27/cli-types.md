@@ -1,0 +1,21 @@
+<!-- Generated from cli-types.json — DO NOT EDIT DIRECTLY -->
+
+## Enums
+
+| Name | Kind | Action | Details | Signal | Cat-Spec |
+|------|------|--------|---------|--------|----------|
+| TaskContractCommand | enum | add | Check | 🟡 | 🔵 |
+
+## DTOs
+
+| Name | Kind | Action | Details | Signal | Cat-Spec |
+|------|------|--------|---------|--------|----------|
+| TaskContractCheckArgs | dto | add | — | 🟡 | 🔵 |
+
+## Free Functions
+
+| Name | Kind | Action | Details | Signal | Cat-Spec |
+|------|------|--------|---------|--------|----------|
+| cli::commands::task_contract::execute | free_function | add | fn(cmd: TaskContractCommand) -> std::process::ExitCode | 🟡 | 🔵 |
+| cli::commands::task_contract::execute_task_contract_check | free_function | add | fn(args: TaskContractCheckArgs) -> std::process::ExitCode | 🟡 | 🔵 |
+

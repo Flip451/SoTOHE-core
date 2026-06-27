@@ -1,0 +1,206 @@
+{
+  "schema_version": 5,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {
+    "PreReviewGateCommand": {
+      "action": "add",
+      "role": { "Command": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "track_id", "ty": "domain::TrackId" },
+            { "name": "group", "ty": "domain::tddd::LayerId" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "pre_review_gate",
+      "docs": "CQRS command for the pre-review gate check use case. track_id identifies the active track whose task-contract.json is evaluated. group is the TDDD layer review group being submitted for review. Both fields are domain value objects: TrackId enforces non-empty identity; LayerId constrains the gate to layer scopes that have <layer>-type-signals.json documents. The gate check verifies catalogue entries for the requested layer by reading the TypeSignalsDocument for cmd.group, filtering task-contract.json entries where entry.layer == cmd.group, and requiring those scope-relevant entries to be attribution-complete with blue impl_catalog signals. Non-layer review scopes are skipped by the Makefile wrapper before this command is invoked.",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-03" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-02" }
+      ],
+      "informal_grounds": []
+    },
+    "PreReviewGateInteractor": {
+      "action": "add",
+      "role": { "Interactor": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "pre_review_gate",
+      "docs": "Interactor implementing PreReviewGateService. Holds two injected secondary ports: task_contract_reader reads the task-contract.json for the active track; signal_reader reads per-layer impl_catalog type-signal documents. The interactor joins task attribution from the contract document with blue/non-blue classification from the type-signals document to produce a PreReviewGateOutcome. All fields are private (Arc<dyn Port>).",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-03" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-02" }
+      ],
+      "informal_grounds": []
+    },
+    "PreReviewGateError": {
+      "action": "add",
+      "role": { "ErrorType": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "TaskContractNotFound",
+            "payload": { "kind": "unit" }
+          },
+          {
+            "name": "TaskContractReadFailed",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "message", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "SignalReadFailed",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "layer", "ty": "domain::tddd::LayerId" },
+                { "name": "message", "ty": "String" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "pre_review_gate",
+      "docs": "Error type returned by PreReviewGateService::check. TaskContractNotFound: the task-contract.json for the given track_id does not exist (gate short-circuits to MissingTaskContract violation). TaskContractReadFailed: I/O or decode error reading the contract; message is an opaque diagnostic string (R9: opaque infrastructure error message). SignalReadFailed: I/O or decode error reading per-layer type-signals document; layer is typed as domain::tddd::LayerId (R9: layer identifier is a constrained domain concept — the port takes &LayerId so the error always originates from a valid LayerId), message is an opaque diagnostic string. Gate violations (NonBlueSignal etc.) are NOT errors — they are data inside PreReviewGateOutcome::Blocked.",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-03" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-04" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {
+    "PreReviewGateService": {
+      "action": "add",
+      "role": { "ApplicationService": {} },
+      "methods": [
+        {
+          "name": "check",
+          "receiver": "&self",
+          "params": [
+            { "name": "cmd", "ty": "PreReviewGateCommand" }
+          ],
+          "returns": "Result<domain::task_contract::PreReviewGateOutcome, PreReviewGateError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Run the pre-review gate check for the active track. Returns Passed with a conformance summary, or Blocked with a list of violations."
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "pre_review_gate",
+      "docs": "Primary application service port for the pre-review gate use case. Called by cli_driver::task_contract::TaskContractDriver when handling TaskContractInput::Check.",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-03" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-02" }
+      ],
+      "informal_grounds": []
+    },
+    "TaskContractReaderPort": {
+      "action": "add",
+      "role": { "SecondaryPort": {} },
+      "methods": [
+        {
+          "name": "read",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id", "ty": "&domain::TrackId" }
+          ],
+          "returns": "Result<domain::task_contract::TaskContractDocument, PreReviewGateError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Read the task-contract.json for the given track. Returns TaskContractNotFound when the file does not exist; TaskContractReadFailed on I/O or decode errors."
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "pre_review_gate",
+      "docs": "Secondary port for reading a task-contract.json domain document. Implemented by infrastructure::task_contract_reader::FsTaskContractReader.",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-01" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "CN-01" }
+      ],
+      "informal_grounds": []
+    },
+    "ImplCatalogSignalReaderPort": {
+      "action": "add",
+      "role": { "SecondaryPort": {} },
+      "methods": [
+        {
+          "name": "read_signals",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id", "ty": "&domain::TrackId" },
+            { "name": "layer", "ty": "&domain::tddd::LayerId" }
+          ],
+          "returns": "Result<domain::TypeSignalsDocument, PreReviewGateError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Read the per-layer impl-catalog type-signals document for the given track and layer. Returns SignalReadFailed on I/O or decode errors."
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "pre_review_gate",
+      "docs": "Secondary port for reading a per-layer <layer>-type-signals.json document. Implemented by infrastructure::impl_catalog_signal_reader::FsImplCatalogSignalReader.",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "CN-05" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "functions": {},
+  "inherent_impls": [
+    {
+      "type_name": "PreReviewGateInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "task_contract_reader", "ty": "std::sync::Arc<dyn TaskContractReaderPort>" },
+            { "name": "signal_reader", "ty": "std::sync::Arc<dyn ImplCatalogSignalReaderPort>" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Construct a PreReviewGateInteractor by injecting the two secondary ports."
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "PreReviewGateCommand" },
+    { "action": "add", "trait_ref": "core::clone::Clone", "for_type": "PreReviewGateCommand" },
+    { "action": "add", "trait_ref": "core::cmp::PartialEq", "for_type": "PreReviewGateCommand" },
+    { "action": "add", "trait_ref": "core::cmp::Eq", "for_type": "PreReviewGateCommand" },
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "PreReviewGateError" },
+    { "action": "add", "trait_ref": "core::fmt::Display", "for_type": "PreReviewGateError" },
+    { "action": "add", "trait_ref": "core::error::Error", "for_type": "PreReviewGateError" },
+    { "action": "add", "trait_ref": "PreReviewGateService", "for_type": "PreReviewGateInteractor" }
+  ]
+}

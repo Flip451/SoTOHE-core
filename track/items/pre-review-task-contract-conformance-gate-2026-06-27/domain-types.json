@@ -1,0 +1,233 @@
+{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "TaskContractDocument": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "task_contract",
+      "docs": "Domain model for task-contract.json. Maps each TaskId in the active track to the catalogue entries (layer + entry_key pairs) that the task is responsible for implementing. Validated at construction: track_id must be non-empty (enforced by TrackId), entries map must be non-empty.",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-01" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-01" }
+      ],
+      "informal_grounds": []
+    },
+    "ContractedEntryRef": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "layer", "ty": "LayerId" },
+            { "name": "entry_key", "ty": "CatalogueEntryKey" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "task_contract",
+      "docs": "A (layer, entry_key) pair identifying one catalogue entry contracted to a task. Distinct from domain::tddd::semantic_verify::CatalogueEntryRef (which holds file_path + section_key + entry_key for spec-adr verification). This type carries only the layer identity and catalogue entry key needed for the pre-review gate check.",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-01" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "CN-01" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "CN-02" }
+      ],
+      "informal_grounds": []
+    },
+    "PreReviewGateViolation": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "MissingTaskContract",
+            "payload": { "kind": "unit" }
+          },
+          {
+            "name": "OrphanEntry",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "entry", "ty": "ContractedEntryRef" }
+              ]
+            }
+          },
+          {
+            "name": "InvalidEntryRef",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "entry", "ty": "ContractedEntryRef" },
+                { "name": "reason", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "NonBlueSignal",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "entry", "ty": "ContractedEntryRef" },
+                { "name": "signal", "ty": "ConfidenceSignal" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "task_contract",
+      "docs": "A single gate violation found during pre-review conformance checking. Modelled as a finding record (ValueObject), not an error type: it is data carried inside PreReviewGateOutcome::Blocked. InvalidEntryRef.reason is an opaque diagnostic string with no domain invariant (R9 exception: error message string).",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-03" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "CN-01" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "CN-03" }
+      ],
+      "informal_grounds": []
+    },
+    "PreReviewGateOutcome": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Passed",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "conformance_summary", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "Blocked",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "violations", "ty": "Vec<PreReviewGateViolation>" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "task_contract",
+      "docs": "Outcome of the pre-review gate check. Passed carries a human-readable conformance summary to be appended to the reviewer briefing (IN-06, GO-04). Blocked carries all violations found. conformance_summary is an opaque prose string with no cross-domain identity (R9: content of the summary is not a domain concept).",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-06" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "GO-03" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "GO-04" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [
+    {
+      "type_name": "TaskContractDocument",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "track_id", "ty": "TrackId" },
+            { "name": "entries", "ty": "std::collections::BTreeMap<TaskId, Vec<ContractedEntryRef>>" }
+          ],
+          "returns": "Result<Self, ValidationError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Construct a TaskContractDocument. Returns ValidationError when entries is empty."
+        },
+        {
+          "name": "schema_version",
+          "receiver": "&self",
+          "params": [],
+          "returns": "u32",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns the schema version constant for task-contract.json serialization."
+        },
+        {
+          "name": "track_id",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&TrackId",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns a reference to the track ID this contract belongs to."
+        },
+        {
+          "name": "entries",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&std::collections::BTreeMap<TaskId, Vec<ContractedEntryRef>>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns the task-to-entries mapping."
+        }
+      ]
+    },
+    {
+      "type_name": "ContractedEntryRef",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "layer", "ty": "LayerId" },
+            { "name": "entry_key", "ty": "CatalogueEntryKey" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Construct a ContractedEntryRef from a layer id and catalogue entry key."
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "TaskContractDocument" },
+    { "action": "add", "trait_ref": "core::clone::Clone", "for_type": "TaskContractDocument" },
+    { "action": "add", "trait_ref": "core::cmp::PartialEq", "for_type": "TaskContractDocument" },
+    { "action": "add", "trait_ref": "core::cmp::Eq", "for_type": "TaskContractDocument" },
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "ContractedEntryRef" },
+    { "action": "add", "trait_ref": "core::clone::Clone", "for_type": "ContractedEntryRef" },
+    { "action": "add", "trait_ref": "core::cmp::PartialEq", "for_type": "ContractedEntryRef" },
+    { "action": "add", "trait_ref": "core::cmp::Eq", "for_type": "ContractedEntryRef" },
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "PreReviewGateViolation" },
+    { "action": "add", "trait_ref": "core::clone::Clone", "for_type": "PreReviewGateViolation" },
+    { "action": "add", "trait_ref": "core::cmp::PartialEq", "for_type": "PreReviewGateViolation" },
+    { "action": "add", "trait_ref": "core::cmp::Eq", "for_type": "PreReviewGateViolation" },
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "PreReviewGateOutcome" },
+    { "action": "add", "trait_ref": "core::clone::Clone", "for_type": "PreReviewGateOutcome" },
+    { "action": "add", "trait_ref": "core::cmp::PartialEq", "for_type": "PreReviewGateOutcome" },
+    { "action": "add", "trait_ref": "core::cmp::Eq", "for_type": "PreReviewGateOutcome" }
+  ]
+}

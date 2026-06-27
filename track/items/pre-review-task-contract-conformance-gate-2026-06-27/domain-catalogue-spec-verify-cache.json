@@ -1,0 +1,318 @@
+{
+  "schema_version": 1,
+  "layer": "domain",
+  "entries": [
+    {
+      "claim_hash": "0f947e72f780886980c6780c2a2dc31b8b01d9784f4cc328db2f7da96ea6bbda",
+      "evidence_hash": "443217435b97a1d007284f3c64a7c38ea0650489d73e3f8ae6b4cf2de635f685",
+      "verdict": {
+        "kind": "pass",
+        "citation": "artifact はタスクリスト（各タスクが履行責務を持つ型カタログ entry 識別子のリスト）と schema_version を含む。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ContractedEntryRef"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "新 Phase 3 artifact `task-contract.json` のスキーマ定義と codec 実装。artifact はタスクリスト（各タスクが履行責務を持つ型カタログ entry 識別子のリスト）と schema_version を含む。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0f947e72f780886980c6780c2a2dc31b8b01d9784f4cc328db2f7da96ea6bbda",
+      "evidence_hash": "804aac23c761cf53a1f9eebd865037751bbaf86dde5b06d0a87bb2c2e26f62de",
+      "verdict": {
+        "kind": "pass",
+        "citation": "attribution は review scope 内の全関連カタログ entry に対する complete relation でなければならない。orphan entry（scope 内で attribution されていない関連 entry）が存在する場合、その entry の impl_catalog 信号がゲート入力から漏れ shift-left の保証が崩れるため、ゲートは orphan 検出時に明示的にブロックする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ContractedEntryRef"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "attribution は review scope 内の全関連カタログ entry に対する complete relation でなければならない。orphan entry（scope 内で attribution されていない関連 entry）が存在する場合、その entry の impl_catalog 信号がゲート入力から漏れ shift-left の保証が崩れるため、ゲートは orphan 検出時に明示的にブロックする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0f947e72f780886980c6780c2a2dc31b8b01d9784f4cc328db2f7da96ea6bbda",
+      "evidence_hash": "6ec9c57a4b7634291d1d5d7a82c8fd5b48931ebb6ddb7696e0062eb571d206a5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "task-contract.json が参照するカタログ entry 識別子は現行カタログに実在し当該 scope 内でなければならない（referential integrity）。存在しない entry や scope 外 entry への attribution はゲートエラーとし、stale な task-contract.json の検出手段とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ContractedEntryRef"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "task-contract.json が参照するカタログ entry 識別子は現行カタログに実在し当該 scope 内でなければならない（referential integrity）。存在しない entry や scope 外 entry への attribution はゲートエラーとし、stale な task-contract.json の検出手段とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ebe1595ceabff0792d690fad1b72ab88472f8a0ba95571c57844e9674bccdb0d",
+      "evidence_hash": "4776c2bc5cd2dad2214630005d3ccd1cb935b6ddae6278553aa61a8bea32b22b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "全 entry が 🔵 かを確認する。ゲートは sotp CLI サブコマンドとして実装し、fail-closed ... ブロック"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/domain-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateOutcome"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "pre-review blocking binary check ゲートの実装: task-contract.json の attribution completeness を検証した後、attribution された全カタログ entry の impl_catalog 信号を既存信号テーブルと entry キーで JOIN し、全 entry が 🔵 かを確認する。ゲートは sotp CLI サブコマンドとして実装し、fail-closed（artifact 不在・attribution 不完全・非 🔵 entry のいずれでもブロック）とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ebe1595ceabff0792d690fad1b72ab88472f8a0ba95571c57844e9674bccdb0d",
+      "evidence_hash": "e979640a1a9ea9ec64aaafd1fe9f35c0010ff0935f3b206d85c10d62c32a3e03",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ゲート通過時の verified-conformance サマリ生成と reviewer briefing への追記。文言は「宣言した API surface が型契約と shape 一致（body は未検証 — stub / liveness は reviewer が確認）」とし、D5 の文言規律に従う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/domain-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateOutcome"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "ゲート通過時の verified-conformance サマリ生成と reviewer briefing への追記。文言は「宣言した API surface が型契約と shape 一致（body は未検証 — stub / liveness は reviewer が確認）」とし、D5 の文言規律に従う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ebe1595ceabff0792d690fad1b72ab88472f8a0ba95571c57844e9674bccdb0d",
+      "evidence_hash": "e4db291e7a77ac5d313288622aa58f5bb39db198b394bf25c925e94c77399681",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ゲートの合否基準は impl_catalog 信号 🔵 のみとし、body の liveness（`todo!()` でないか等）はゲートの管轄外として reviewer の責務に留置する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/domain-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateOutcome"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-03",
+          "text_label": "ゲートの合否基準は impl_catalog 信号 🔵 のみとし、body の liveness（`todo!()` でないか等）はゲートの管轄外として reviewer の責務に留置する。「構造的整合 = 機械的信号 / 意味論的整合 = LLM レビュー」という既存の責任分界点を維持する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ebe1595ceabff0792d690fad1b72ab88472f8a0ba95571c57844e9674bccdb0d",
+      "evidence_hash": "1a36170a35af585aabdbb69a2d4a079dbd049a65cc1ef478db351b44b8f23d45",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ゲート通過時に verified-conformance サマリを reviewer briefing へ追記し、ゲートの保証範囲（「宣言した API surface が型契約と shape 一致、body は未検証」）を正確に伝える。過大表現による reviewer の over-trust とすり抜け悪化を防ぐために文言を規律する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/domain-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateOutcome"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-04",
+          "text_label": "ゲート通過時に verified-conformance サマリを reviewer briefing へ追記し、ゲートの保証範囲（「宣言した API surface が型契約と shape 一致、body は未検証」）を正確に伝える。過大表現による reviewer の over-trust とすり抜け悪化を防ぐために文言を規律する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "963ba265339924932aefa90918591826d6843515aee4909f7c9d82a6dd3a0149",
+      "evidence_hash": "a1d0161f82fb1e359219bf20fe13ea166879459cc9479416e655b084f689460c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "attribution の complete relation invariant 検証: (a) review scope 内の関連カタログ entry が全て ≥1 タスクに attribution されていること、(b) orphan entry（review scope 内だがどのタスクにも attribution されていない関連 entry）が存在しないこと、(c) attribution された entry がカタログに実在し当該 scope 内であること（referential integrity）。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/domain-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateViolation"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "attribution の complete relation invariant 検証: (a) review scope 内の関連カタログ entry が全て ≥1 タスクに attribution されていること、(b) orphan entry（review scope 内だがどのタスクにも attribution されていない関連 entry）が存在しないこと、(c) attribution された entry がカタログに実在し当該 scope 内であること（referential integrity）。"
+        }
+      }
+    },
+    {
+      "claim_hash": "963ba265339924932aefa90918591826d6843515aee4909f7c9d82a6dd3a0149",
+      "evidence_hash": "4776c2bc5cd2dad2214630005d3ccd1cb935b6ddae6278553aa61a8bea32b22b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "task-contract.json の attribution completeness を検証した後、attribution された全カタログ entry の impl_catalog 信号を既存信号テーブルと entry キーで JOIN し、全 entry が 🔵 かを確認する。… fail-closed（artifact 不在・attribution 不完全・非 🔵 entry のいずれでもブロック）"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/domain-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateViolation"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "pre-review blocking binary check ゲートの実装: task-contract.json の attribution completeness を検証した後、attribution された全カタログ entry の impl_catalog 信号を既存信号テーブルと entry キーで JOIN し、全 entry が 🔵 かを確認する。ゲートは sotp CLI サブコマンドとして実装し、fail-closed（artifact 不在・attribution 不完全・非 🔵 entry のいずれでもブロック）とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "963ba265339924932aefa90918591826d6843515aee4909f7c9d82a6dd3a0149",
+      "evidence_hash": "804aac23c761cf53a1f9eebd865037751bbaf86dde5b06d0a87bb2c2e26f62de",
+      "verdict": {
+        "kind": "pass",
+        "citation": "attribution は review scope 内の全関連カタログ entry に対する complete relation でなければならない。orphan entry（scope 内で attribution されていない関連 entry）が存在する場合、その entry の impl_catalog 信号がゲート入力から漏れ shift-left の保証が崩れるため、ゲートは orphan 検出時に明示的にブロックする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/domain-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateViolation"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "attribution は review scope 内の全関連カタログ entry に対する complete relation でなければならない。orphan entry（scope 内で attribution されていない関連 entry）が存在する場合、その entry の impl_catalog 信号がゲート入力から漏れ shift-left の保証が崩れるため、ゲートは orphan 検出時に明示的にブロックする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "963ba265339924932aefa90918591826d6843515aee4909f7c9d82a6dd3a0149",
+      "evidence_hash": "01e5762c93f9fbc3b7c776f78648710574c28ec197263de3e14d7253a270c691",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ゲートの合否基準は impl_catalog 信号 🔵 のみ。🟡（Yellow）は 🔴（Red）と同様に blocking とする。body の確認・test 結果・stub 走査は判定に含めない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/domain-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateViolation"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "ゲートの合否基準は impl_catalog 信号 🔵 のみ。🟡（Yellow）は 🔴（Red）と同様に blocking とする。body の確認・test 結果・stub 走査は判定に含めない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "10e1f6ae7cec8431c2feae1f9689897aae34690fb589d1e93af1e2c48ed910d9",
+      "evidence_hash": "443217435b97a1d007284f3c64a7c38ea0650489d73e3f8ae6b4cf2de635f685",
+      "verdict": {
+        "kind": "pass",
+        "citation": "artifact はタスクリスト（各タスクが履行責務を持つ型カタログ entry 識別子のリスト）と schema_version を含む。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TaskContractDocument"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "新 Phase 3 artifact `task-contract.json` のスキーマ定義と codec 実装。artifact はタスクリスト（各タスクが履行責務を持つ型カタログ entry 識別子のリスト）と schema_version を含む。"
+        }
+      }
+    },
+    {
+      "claim_hash": "10e1f6ae7cec8431c2feae1f9689897aae34690fb589d1e93af1e2c48ed910d9",
+      "evidence_hash": "91c5c462efaf4aebaa314c9cb8d5e54695bcad6d171f65361cca1962cb224c0d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "artifact には schema_version・track id・タスクリスト（各タスクが履行責務を持つ型カタログ entry 識別子のリスト）が含まれる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TaskContractDocument"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`task-contract.json` のスキーマが定義されており、impl-planner が Phase 3 output として本 artifact を author する。artifact には schema_version・track id・タスクリスト（各タスクが履行責務を持つ型カタログ entry 識別子のリスト）が含まれる。"
+        }
+      }
+    }
+  ]
+}

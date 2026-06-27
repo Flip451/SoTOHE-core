@@ -1,0 +1,342 @@
+{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "タスク単位の契約履行 pre-review ゲート",
+  "goal": [
+    {
+      "id": "GO-01",
+      "text": "型カタログと実装の構造的一致（impl_catalog 信号）を確認する最初の hard gate を、現行の merge-gate（strict）から reviewer 入場前（per-task）へ shift-left する。契約違反（宣言シンボル欠落・shape ずれ）を authoring 直後・per-task で表面化させ、merge 直前まで遅延する手戻りコストを除去する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "GO-02",
+      "text": "新 Phase 3 artifact `task-contract.json` を導入し、タスク → 型カタログ entry の attribution を complete relation として保持する。impl-planner（Phase 3 writer）が本 artifact を author し、どのタスクがどの entry の履行責務を持つかを明記する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "GO-03",
+      "text": "ゲートの合否基準は impl_catalog 信号 🔵 のみとし、body の liveness（`todo!()` でないか等）はゲートの管轄外として reviewer の責務に留置する。「構造的整合 = 機械的信号 / 意味論的整合 = LLM レビュー」という既存の責任分界点を維持する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "GO-04",
+      "text": "ゲート通過時に verified-conformance サマリを reviewer briefing へ追記し、ゲートの保証範囲（「宣言した API surface が型契約と shape 一致、body は未検証」）を正確に伝える。過大表現による reviewer の over-trust とすり抜け悪化を防ぐために文言を規律する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "anchor": "D5"
+        }
+      ]
+    }
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "id": "IN-01",
+        "text": "新 Phase 3 artifact `task-contract.json` のスキーマ定義と codec 実装。artifact はタスクリスト（各タスクが履行責務を持つ型カタログ entry 識別子のリスト）と schema_version を含む。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-02",
+        "text": "impl-planner の Phase 3 output 責務拡張: impl-plan.json・task-coverage.json に加えて `task-contract.json` を author する。type-designer（Phase 2）の責務は変更しない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-03",
+        "text": "attribution の complete relation invariant 検証: (a) review scope 内の関連カタログ entry が全て ≥1 タスクに attribution されていること、(b) orphan entry（review scope 内だがどのタスクにも attribution されていない関連 entry）が存在しないこと、(c) attribution された entry がカタログに実在し当該 scope 内であること（referential integrity）。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-04",
+        "text": "pre-review blocking binary check ゲートの実装: task-contract.json の attribution completeness を検証した後、attribution された全カタログ entry の impl_catalog 信号を既存信号テーブルと entry キーで JOIN し、全 entry が 🔵 かを確認する。ゲートは sotp CLI サブコマンドとして実装し、fail-closed（artifact 不在・attribution 不完全・非 🔵 entry のいずれでもブロック）とする。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+            "anchor": "D2"
+          },
+          {
+            "file": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+            "anchor": "D4"
+          }
+        ]
+      },
+      {
+        "id": "IN-05",
+        "text": "review-fix ワークフロー（`sotp review fix-local` / fixpoint_resolve または同等の呼び出し経路）への pre-review ゲートの配線。ゲートは `sotp review fix-local` が reviewer invocation を起動する前に実行され、ゲートがブロックした場合は reviewer invocation が実行されない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-06",
+        "text": "ゲート通過時の verified-conformance サマリ生成と reviewer briefing への追記。文言は「宣言した API surface が型契約と shape 一致（body は未検証 — stub / liveness は reviewer が確認）」とし、D5 の文言規律に従う。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+            "anchor": "D2"
+          },
+          {
+            "file": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+            "anchor": "D5"
+          }
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "id": "OS-01",
+        "text": "body の liveness / stub 検査（test-pass・stub-scan・syn による body walking）。ゲートの直接入力は既存 impl_catalog / type-signals document であり、上流の impl_catalog 信号は rustdoc JSON（body を含まない）から生成されるため、🔵 判定は宣言シンボルの存在と shape 一致のみを保証する。stub が通過することは意図的なスコープ限定である。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "OS-02",
+        "text": "新 SoT Chain（task_conformance 等）の追加。ゲートは binary check として実装し、既存 impl_catalog 信号を再利用する。chain matrix・strictness 設定・views の表面積は増やさない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+            "anchor": "D4"
+          }
+        ]
+      },
+      {
+        "id": "OS-03",
+        "text": "型カタログ（`<layer>-types.json`）へのタスク情報の追加。Phase 2 成果物に Phase 3 概念（task）への後方依存を持たせることは SoT Chain 逆流であり禁止。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OS-04",
+        "text": "`task-coverage.json`（spec coverage artifact）への attribution 情報の追加。参照 SSoT・供給先ゲート・invariant がいずれも異なる別責務 artifact とし、同居させない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OS-05",
+        "text": "pre-review ゲートの advisory モード・緩和モード（per-task / per-track のブロック回避オプション）。ゲートは blocking かつ fail-closed で実装する。interim 的運用の緩和は本 track 対象外。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "OS-06",
+        "text": "SignalEvaluatorV2（既存の型カタログ ↔ 実装比較エンジン）の変更。ゲートは本エンジンの評価結果（per-entry impl_catalog 信号）を読み取るだけであり、エンジン自体は変更しない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+            "anchor": "D4"
+          }
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "id": "CN-01",
+      "text": "attribution は review scope 内の全関連カタログ entry に対する complete relation でなければならない。orphan entry（scope 内で attribution されていない関連 entry）が存在する場合、その entry の impl_catalog 信号がゲート入力から漏れ shift-left の保証が崩れるため、ゲートは orphan 検出時に明示的にブロックする。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-02",
+      "text": "task-contract.json が参照するカタログ entry 識別子は現行カタログに実在し当該 scope 内でなければならない（referential integrity）。存在しない entry や scope 外 entry への attribution はゲートエラーとし、stale な task-contract.json の検出手段とする。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-03",
+      "text": "ゲートの合否基準は impl_catalog 信号 🔵 のみ。🟡（Yellow）は 🔴（Red）と同様に blocking とする。body の確認・test 結果・stub 走査は判定に含めない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "CN-04",
+      "text": "reviewer briefing の verified-conformance 行は「宣言した API surface が型契約と shape 一致（body は未検証 — stub / liveness は reviewer が確認）」と正確に記述する。「契約 satisfied」「実装済み」「liveness 確認済み」等の過大な表現は使用しない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "anchor": "D5"
+        }
+      ]
+    },
+    {
+      "id": "CN-05",
+      "text": "pre-review ゲートは既存 impl_catalog 信号テーブルを entry キーで JOIN して動作し、新 chain・新信号エンジン・型カタログ拡張を必要としない。SignalEvaluatorV2 は変更せずに再利用する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "CN-06",
+      "text": "task-contract.json の author は impl-planner（Phase 3）に限定する。type-designer（Phase 2）は本 artifact を書かない。Phase 2 成果物が Phase 3 概念（task）を参照することは SoT Chain の順序違反であり禁止。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "anchor": "D1"
+        }
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-01",
+      "text": "`task-contract.json` のスキーマが定義されており、impl-planner が Phase 3 output として本 artifact を author する。artifact には schema_version・track id・タスクリスト（各タスクが履行責務を持つ型カタログ entry 識別子のリスト）が含まれる。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-02",
+      "text": "attribution の complete relation invariant が機械的に検証可能である: (a) review scope 内の関連カタログ entry が全て ≥1 タスクに attribution されている、(b) orphan entry が存在しない、(c) attribution 対象 entry がカタログに実在し scope 内である。invariant 違反時にゲートが非ゼロ終了コードで返り、違反内容（orphan entry リスト・存在しない entry 識別子）を出力する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-03",
+      "text": "pre-review ゲートのコマンド（`sotp` CLI サブコマンドまたは Makefile.toml タスク）が追加されており、review-fix ワークフロー内で `sotp review fix-local` が reviewer invocation を起動する前に実行される。task-contract.json が不在の場合、ゲートはファイル不在を明示するエラーメッセージで失敗する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-04",
+      "text": "attribution された全カタログ entry の impl_catalog 信号が 🔵 のとき、ゲートがパスして verified-conformance サマリを生成する。attribution された entry に impl_catalog 信号 🟡 または 🔴 のものが含まれる場合、ゲートがブロックし、非 🔵 entry の一覧と信号状態を出力する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "AC-05",
+      "text": "reviewer briefing へ追記される verified-conformance サマリが「宣言した API surface が型契約と shape 一致（body は未検証 — stub / liveness は reviewer が確認）」の文言規律に従っており、「契約 satisfied」「実装済み」等の過大表現を含まない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "anchor": "D5"
+        }
+      ]
+    },
+    {
+      "id": "AC-06",
+      "text": "ゲートがブロックした場合、`sotp review fix-local` 経由の reviewer invocation が実行されない。ゲートは fail-closed であり、ゲートエラーが上位ワークフローに伝播して review invocation を中断する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-07",
+      "text": "`cargo make ci`（fmt-check + clippy + nextest + deny + check-layers + verify-*）が pass する。ゲートロジックのユニットテストとして次のケースを網羅する: (a) task-contract.json 不在でブロック、(b) orphan entry 存在でブロック、(c) attribution referential integrity 違反でブロック、(d) 非 🔵 entry 存在でブロック、(e) 全 attributed entry 🔵 かつ attribution 完全でパス・verified-conformance サマリ生成。既存テストへのリグレッションがない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "anchor": "D2"
+        }
+      ]
+    }
+  ],
+  "related_conventions": [
+    {
+      "file": "knowledge/conventions/coding-principles.md",
+      "anchor": "No Panics in Library Code"
+    },
+    {
+      "file": "knowledge/conventions/hexagonal-architecture.md",
+      "anchor": "Layer Dependencies"
+    },
+    {
+      "file": "knowledge/conventions/prefer-type-safe-abstractions.md",
+      "anchor": "Rule"
+    },
+    {
+      "file": "knowledge/conventions/workflow-ceremony-minimization.md",
+      "anchor": "Rules"
+    }
+  ],
+  "signals": {
+    "blue": 29,
+    "yellow": 0,
+    "red": 0
+  }
+}

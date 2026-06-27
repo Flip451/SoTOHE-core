@@ -61,6 +61,139 @@
           "findings": [],
           "hash": "rvw1:sha256:ebdb9f3f8c06ae8e39a95335cf75f057f0935940245de18e9c98f4b5700baa27",
           "at": "2026-06-27T09:31:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002's orphan-detection step is backwards: it only walks `ContractedEntryRef`s already present in `task-contract.json`, so it cannot detect scope entries that were never attributed. `IN-03`/`AC-02` require comparing the contract against the full in-scope catalogue entry set, so as written this step cannot satisfy the orphan-entry case (and T007(b) is impossible to implement literally).",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/plan.md",
+              "line": 14,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:ecb7995bb577e3433f73c2fc71c19225940712f558b4484d3cc6e36b8f347904",
+          "at": "2026-06-27T12:02:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d19753fed9a3ed85da4a6efe5d906692fe7443c7f1db6889675a7e7e8f8f0331",
+          "at": "2026-06-27T12:10:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-05 is marked covered by T002/T007, but those tasks only create and test the conformance summary text; the implementation plan routes successful checks to stdout and never adds a task that appends the verified-conformance line to the reviewer briefing required by IN-06/AC-05. As written, the plan can complete with no briefing update, so reviewers would not receive the promised scope-of-guarantee notice.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/task-coverage.json",
+              "line": 32,
+              "category": "contradiction"
+            },
+            {
+              "message": "This catalogue says the gate verifies all catalogue entries contracted to the track, while the spec and OQ-1 resolution define the gate as review-scope-specific via `cmd.group` and `<group>-type-signals.json`. If implemented from this contract, one scope review could be blocked by unrelated layers, defeating the per-scope pre-review gate design.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+              "line": 22,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:d19753fed9a3ed85da4a6efe5d906692fe7443c7f1db6889675a7e7e8f8f0331",
+          "at": "2026-06-27T12:16:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The plan makes `--group` do double duty as both the review scope and a TDDD layer: OQ-1 says the gate reads the TypeSignalsDocument for `cmd.group`, filters `ContractedEntryRef.layer == cmd.group`, and T008 then prepends that same gate to every `track-local-review-fix-codex` invocation. But the type catalogue models `group` as `ReviewGroupName` while the signal reader needs a `LayerId`, and review groups include non-layer scopes such as `plan-artifacts`. With the current universal wiring, those review runs will fail closed before the reviewer can start. The plan needs an explicit review-scope-to-layer mapping or a defined bypass for non-layer scopes before T008 is executable.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/plan.md",
+              "line": 10,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:d7e67a5b995da1a878afd62d7ba51a8c30032aa5983b6f7f47bdc561e65077c4",
+          "at": "2026-06-27T12:23:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`task_contract_check` is specified to build the filesystem adapters from the CLI `items_dir` and call the use case directly, while the same plan/catalogue makes `TaskContractDriver` the primary adapter responsible for parsing `TaskContractInput` and rendering `PreReviewGateOutcome` to `CommandOutcome`. That leaves two conflicting execution paths: using `task_contract_driver()` ignores the `--items-dir` value because it wires a default path, while using `task_contract_check()` bypasses the primary adapter and duplicates driver responsibilities in the composition root. The plan needs one coherent path, e.g. construct the driver with adapters built from the requested `items_dir` and dispatch `TaskContractInput::Check`, or remove `items_dir` from the driver input and keep rendering outside it.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/cli_composition-types.json",
+              "line": 49,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9ada25e935103ef5df7696e2c1df3d2e9e2e09652000df2f42e5a46a0ddb3e33",
+          "at": "2026-06-27T12:30:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The spec and implementation plan disagree on the workflow command being gated: IN-05/AC-03/AC-06 require the gate before/blocking `sotp review local`, while T008 wires only `bin/sotp review fix-local` via `track-local-review-fix-codex`. Because T008 is marked as satisfying those criteria, the artifacts can claim AC-06 coverage while implementing a different review invocation path. Align the spec criteria with `review fix-local` or change T008 to gate the command named by the spec.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json",
+              "line": 95,
+              "category": "contradiction"
+            },
+            {
+              "message": "The dependency narrative lets T005 run before the composition root it calls exists. T005 explicitly constructs `TaskContractCompositionRoot` and calls `task_contract_check`, but the section says T005 depends only on T004 while T006 is the task that adds `TaskContractCompositionRoot`. A task runner following this plan can schedule/assign T005 before T006 and produce an unbuildable CLI task; add a T005 dependency on T006 or reorder the composition task before the CLI execute task.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/impl-plan.json",
+              "line": 84,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:f6607d5a7ae69adb8dbaac9dedc7b9d899e1383ecccdf6636957352e883781cc",
+          "at": "2026-06-27T12:39:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ImplCatalogSignalReaderPort` is traced to `spec.json#IN-02`, but IN-02 is the impl-planner responsibility to author `task-contract.json`. This port reads existing per-layer impl_catalog signal documents, so the traceability should point to the gate/signal-join requirement such as IN-04/CN-05. The same mismatch appears on `FsImplCatalogSignalReader`, making the catalogue claim the signal-reader work satisfies the wrong spec element.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+              "line": 168,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:a6a8a14f269d383097eaae835ca78bdfd65bbbfdb644221a72b47d71321ef83e",
+          "at": "2026-06-27T12:48:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "OS-01 says the gate input is rustdoc JSON, but IN-04/CN-05 and the Phase 2/3 artifacts define the gate as reading existing impl_catalog/type-signals documents and explicitly not changing SignalEvaluatorV2. That gives implementers two incompatible input contracts; following OS-01 would push the design toward re-reading rustdoc instead of using the signal table, violating the intended signal-reuse boundary.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json",
+              "line": 121,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ef200d3ca77930923ee94ff4f2e50573b4c4cc785d62b9a6144fc4666992575e",
+          "at": "2026-06-27T12:54:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:26f6d712ab6968f84c03b5ddf64b90dd462a95aba14e96d7e76a1e74c502562a",
+          "at": "2026-06-27T13:01:43Z"
         }
       ]
     }

@@ -1,0 +1,69 @@
+{
+  "schema_version": 5,
+  "crate_name": "cli_composition",
+  "layer": "cli_composition",
+  "types": {
+    "TaskContractCompositionRoot": {
+      "action": "add",
+      "role": { "CompositionRoot": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "unit" }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Create a new TaskContractCompositionRoot."
+        },
+        {
+          "name": "task_contract_driver",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "cli_driver::task_contract::TaskContractDriver",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Construct a fully-wired TaskContractDriver for the requested items_dir. Wires FsTaskContractReader and FsImplCatalogSignalReader from that items_dir into a PreReviewGateInteractor and wraps it as Arc<dyn PreReviewGateService>."
+        },
+        {
+          "name": "task_contract_check",
+          "receiver": "&self",
+          "params": [
+            { "name": "group", "ty": "String" },
+            { "name": "track_id", "ty": "String" },
+            { "name": "items_dir", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Wire and invoke the pre-review conformance gate check. Constructs a TaskContractDriver via task_contract_driver(items_dir), then dispatches TaskContractInput::Check { group, track_id }. The driver parses CLI strings, calls the use case, and renders Passed/Blocked outcomes as CommandOutcome."
+        }
+      ],
+      "module_path": "task_contract",
+      "docs": "Composition root for the task-contract command family. Wires FsTaskContractReader, FsImplCatalogSignalReader, PreReviewGateInteractor, and TaskContractDriver for the sotp task-contract check subcommand.",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-03" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [],
+  "trait_impls": [
+    { "action": "add", "trait_ref": "core::default::Default", "for_type": "TaskContractCompositionRoot" }
+  ]
+}

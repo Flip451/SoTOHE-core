@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-06-27T13:04:29Z",
+  "declaration_hash": "13895dca22112a24f963ea9e97182f234c1c5f7302850c07504582c72f79575d",
+  "signals": [
+    {
+      "type_name": "TaskContractDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "TaskContractInput",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
+    }
+  ]
+}

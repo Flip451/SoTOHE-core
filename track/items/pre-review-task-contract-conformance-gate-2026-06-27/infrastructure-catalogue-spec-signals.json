@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "d2c2e7934e812a07593d70e440e5a158ac0a723c1c00b05d8b1f58dbba795205",
+  "signals": [
+    {
+      "type_name": "FsImplCatalogSignalReader",
+      "signal": "blue",
+      "entry_hash": "afcec3a11f3f236053b4e56b8ab46831827ad230a10d8cbc39252657ad01c2a1"
+    },
+    {
+      "type_name": "FsTaskContractReader",
+      "signal": "blue",
+      "entry_hash": "c647eda6b25f4f2efb2b0a1f0ef69d401410fde20c376f9d431dd19805a936b5"
+    },
+    {
+      "type_name": "TaskContractCodecError",
+      "signal": "blue",
+      "entry_hash": "849dc8132a71ac9ca189359e907aff0d2d30cc77cdae1e61284b69e17f0d5a3c"
+    },
+    {
+      "type_name": "TaskContractDocumentDto",
+      "signal": "blue",
+      "entry_hash": "3da7f29fd6aec9869ea658091e3f7a614e2078c68438c56df84e3c851b131bcf"
+    },
+    {
+      "type_name": "infrastructure::task_contract_codec::decode",
+      "signal": "blue",
+      "entry_hash": "45debdb16ff24b05829279d445f1750054b5dd12b5c58ca8ba60e34a01d18f3b"
+    },
+    {
+      "type_name": "infrastructure::task_contract_codec::encode",
+      "signal": "blue",
+      "entry_hash": "852dedfc2cac70bd4ee69b96d363b2e00786f8f553d1894c61a21a8a6aafd537"
+    }
+  ]
+}

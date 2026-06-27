@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "43b8c28f635ab93f53f350406d3e8ba842085ebac06d45027ce01d69a12fea9f",
+  "signals": [
+    {
+      "type_name": "ContractedEntryRef",
+      "signal": "blue",
+      "entry_hash": "0f947e72f780886980c6780c2a2dc31b8b01d9784f4cc328db2f7da96ea6bbda"
+    },
+    {
+      "type_name": "PreReviewGateOutcome",
+      "signal": "blue",
+      "entry_hash": "ebe1595ceabff0792d690fad1b72ab88472f8a0ba95571c57844e9674bccdb0d"
+    },
+    {
+      "type_name": "PreReviewGateViolation",
+      "signal": "blue",
+      "entry_hash": "963ba265339924932aefa90918591826d6843515aee4909f7c9d82a6dd3a0149"
+    },
+    {
+      "type_name": "TaskContractDocument",
+      "signal": "blue",
+      "entry_hash": "10e1f6ae7cec8431c2feae1f9689897aae34690fb589d1e93af1e2c48ed910d9"
+    }
+  ]
+}

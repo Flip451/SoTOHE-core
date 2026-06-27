@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-06-27T13:04:35Z",
+  "declaration_hash": "915340e5ca0ec6a1a9f39eb5f21910c9f6fcad2e6a734174622c7ec5b5aecc36",
+  "signals": [
+    {
+      "type_name": "TaskContractCompositionRoot",
+      "kind_tag": "composition_root",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::default::Default"
+      ]
+    }
+  ]
+}

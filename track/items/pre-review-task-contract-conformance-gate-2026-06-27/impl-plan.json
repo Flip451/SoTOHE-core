@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "Domain: add libs/domain/src/task_contract.rs with TaskContractDocument, ContractedEntryRef, PreReviewGateViolation, and PreReviewGateOutcome as specified in domain-types.json. Implement inherent impls (TaskContractDocument::new / schema_version / track_id / entries; ContractedEntryRef::new) and derive Debug + Clone + PartialEq + Eq for all four types. Wire the new module into libs/domain/src/lib.rs as `pub mod task_contract`. Also update .harness/capabilities/impl-planner.md to extend Phase 3 output responsibility: add task-contract.json as a third written artifact alongside impl-plan.json and task-coverage.json (IN-02, AC-01).",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T002",
+      "description": "Usecase: add libs/usecase/src/pre_review_gate.rs with PreReviewGateCommand, PreReviewGateError, PreReviewGateInteractor, PreReviewGateService (primary application service trait), TaskContractReaderPort (secondary port), and ImplCatalogSignalReaderPort (secondary port) as specified in usecase-types.json. Implement PreReviewGateInteractor::new(task_contract_reader, signal_reader) and impl PreReviewGateService for PreReviewGateInteractor. PreReviewGateCommand carries track_id: TrackId and group: LayerId; the Makefile wrapper only invokes this gate for TDDD layer review groups. Gate logic executes three phases: (1) Scope discovery and attribution completeness: read the TypeSignalsDocument for cmd.group via ImplCatalogSignalReaderPort::read_signals, derive the full set of scope-relevant catalogue entry keys from that signal document, then flatten task-contract.json entries where entry.layer == cmd.group into the attributed set; any scope-relevant signal entry absent from the attributed set is an OrphanEntry violation; (2) Referential integrity: verify every attributed entry for cmd.group exists in that TypeSignalsDocument; non-existent entries produce InvalidEntryRef violations; (3) Signal check: all attributed scope-relevant entries must have impl_catalog signal Blue; Yellow or Red entries produce NonBlueSignal violations. On Passed, conformance_summary text follows D5 wording discipline ('宣言した API surface が型契約と shape 一致（body は未検証 — stub / liveness は reviewer が確認）'). Derive / trait impls per catalogue: Debug + Clone + PartialEq + Eq for Command; Debug + Display + Error for Error; PreReviewGateService for Interactor. Wire into libs/usecase/src/lib.rs.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T003",
+      "description": "Infrastructure: add three modules to libs/infrastructure/src/. (1) task_contract_codec: implement TaskContractDocumentDto (serde-serializable mirror of domain::task_contract::TaskContractDocument with schema_version / track_id / entries fields; derive Serialize + Deserialize + Debug) and TaskContractCodecError (Json(serde_json::Error) / UnsupportedSchemaVersion { found, expected } / Validation(String) variants; derive Debug + Display + Error + From<serde_json::Error>); add free functions `decode(&[u8]) -> Result<TaskContractDocument, TaskContractCodecError>` (validates schema_version before constructing the domain object) and `encode(&TaskContractDocument) -> Result<Vec<u8>, TaskContractCodecError>`. (2) task_contract_reader: implement FsTaskContractReader (items_dir: PathBuf injected via new(items_dir: PathBuf) -> Self) implementing usecase::pre_review_gate::TaskContractReaderPort; reads <items_dir>/<track_id>/task-contract.json via decode; maps missing file to PreReviewGateError::TaskContractNotFound, I/O and codec errors to TaskContractReadFailed. (3) impl_catalog_signal_reader: implement FsImplCatalogSignalReader (items_dir: PathBuf) implementing usecase::pre_review_gate::ImplCatalogSignalReaderPort; reads <items_dir>/<track_id>/<layer>-type-signals.json as domain::TypeSignalsDocument; maps errors to SignalReadFailed. Wire all three modules into libs/infrastructure/src/lib.rs.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T004",
+      "description": "CLI driver: add apps/cli-driver/src/task_contract.rs with TaskContractInput (enum with Check { group: String, track_id: String }) and TaskContractDriver (struct holding Arc<dyn usecase::pre_review_gate::PreReviewGateService>). Implement TaskContractDriver::new(service: Arc<dyn PreReviewGateService>) -> Self and TaskContractDriver::handle(input: TaskContractInput) -> CommandOutcome: for the Check variant, parse group and track_id into domain value objects (LayerId, TrackId) and call PreReviewGateService::check(cmd); on Passed emit conformance_summary to stdout and return CommandOutcome::Ok; on Blocked emit violation list to stderr and return CommandOutcome::Err(1); propagate PreReviewGateError variants as CommandOutcome::Err. items_dir is intentionally not part of TaskContractInput: the composition root injects filesystem adapters built from the requested items_dir before constructing the driver. Derive Debug + Clone for TaskContractInput; Debug for TaskContractDriver. Wire the module into apps/cli-driver/src/lib.rs.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T005",
+      "description": "CLI: add apps/cli/src/commands/task_contract.rs with TaskContractCommand (enum with Check(TaskContractCheckArgs) annotated with clap Subcommand derive), TaskContractCheckArgs (struct with group: String, track_id: String, items_dir: PathBuf defaulting to 'track/items', annotated with clap Args derive), and free functions `execute(cmd: TaskContractCommand) -> ExitCode` (dispatch to execute_* handler) and `execute_task_contract_check(args: TaskContractCheckArgs) -> ExitCode` (constructs TaskContractCompositionRoot, calls task_contract_check, converts CommandOutcome to ExitCode: 0 on Passed, 1 on Blocked or error). Derive Debug + Clone for TaskContractCommand and TaskContractCheckArgs. Register the `task-contract` top-level subcommand in the main CLI router (apps/cli/src/main.rs or the top-level clap Subcommand enum). Wire the module into apps/cli/src/commands/mod.rs.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T006",
+      "description": "CLI composition: add apps/cli-composition/src/task_contract.rs with TaskContractCompositionRoot (unit struct). Implement new() -> Self, task_contract_driver(&self, items_dir: PathBuf) -> cli_driver::task_contract::TaskContractDriver (constructs FsTaskContractReader and FsImplCatalogSignalReader from the requested items_dir, builds PreReviewGateInteractor, wraps as Arc<dyn PreReviewGateService>, returns TaskContractDriver::new(service)), and task_contract_check(&self, group: String, track_id: String, items_dir: PathBuf) -> Result<cli_driver::CommandOutcome, CompositionError> (builds a driver via task_contract_driver(items_dir), then dispatches TaskContractInput::Check { group, track_id }; the driver remains the single primary adapter responsible for parsing CLI strings, invoking the use case, and rendering Passed/Blocked outcomes). Impl Default. Wire the module into apps/cli-composition/src/lib.rs.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T007",
+      "description": "Unit tests: add #[cfg(test)] unit tests for PreReviewGateInteractor covering all AC-07 cases. Use in-module mock struct implementations of TaskContractReaderPort and ImplCatalogSignalReaderPort (or rstest fixtures). Required cases: (a) TaskContractReaderPort returns TaskContractNotFound error → outcome is Blocked with MissingTaskContract violation; (b) TypeSignalsDocument contains a scope-relevant entry whose layer matches group, but task-contract.json attributes no task to that entry → outcome is Blocked with OrphanEntry violation identifying the missing entry; (c) attributed entry's key does not exist in the TypeSignalsDocument returned by ImplCatalogSignalReaderPort (referential integrity violation) → outcome is Blocked with InvalidEntryRef violation; (d) attributed entry exists in TypeSignalsDocument but has impl_catalog signal Yellow or Red → outcome is Blocked with NonBlueSignal violation carrying the entry and signal; (e) all attributed scope-relevant entries have Blue signal and attribution is complete → outcome is Passed with conformance_summary that contains '型契約と shape 一致' (or the D5-compliant text authored in T002) and '未検証'. Confirm all five cases pass. No integration tests required in this task; AC-07 is satisfied by the unit test coverage here plus cargo make ci in the final batch commit.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T008",
+      "description": "Makefile.toml wiring: modify [tasks.track-local-review-fix-codex] to prepend the task-contract gate before `bin/sotp review fix-local` only for TDDD layer review groups. The revised script must: (1) extract --group, --track-id, and --briefing-file values by parsing the forwarded $@ arguments (these flags are already required by review fix-local so they will be present in every invocation); (2) compare $_GROUP against the explicit layer allowlist `domain usecase infrastructure cli_driver cli cli_composition`; if $_GROUP is not in that allowlist (for example plan-artifacts), skip task-contract check and continue to CODEX_BIN resolution plus `bin/sotp review fix-local \"$@\"` without appending a verified-conformance line, because no <group>-type-signals.json exists for non-layer review scopes; (3) for allowlisted layer groups, run `bin/sotp task-contract check --group \"$_GROUP\" --track-id \"$_TRACK_ID\" --items-dir track/items` as the first command after argument parsing, capturing the successful conformance_summary stdout while preserving non-zero exit behavior; (4) on layer-gate success, append a verified-conformance line containing that summary to \"$_BRIEFING_FILE\" before invoking review fix-local, so the reviewer receives the D5 scope-of-guarantee notice required by IN-06/AC-05; (5) propagate non-zero exit from task-contract check for allowlisted layer groups: if the gate fails, the script terminates before invoking CODEX_BIN resolution or review fix-local (fail-closed, AC-06). No sibling track-local-review-fix-claude task exists in Makefile.toml; only track-local-review-fix-codex requires modification. T008 is committed as a separate batch from T001-T007.",
+      "status": "todo",
+      "commit_hash": null
+    }
+  ],
+  "plan": {
+    "summary": [],
+    "sections": [
+      {
+        "id": "S1",
+        "title": "Foundation: domain model and usecase gate contracts",
+        "description": [
+          "T001 lays down the task_contract domain module with the four new types (TaskContractDocument, ContractedEntryRef, PreReviewGateViolation, PreReviewGateOutcome) and their inherent impls and derive trait impls. It also updates .harness/capabilities/impl-planner.md to declare task-contract.json as the third Phase 3 output artifact alongside impl-plan.json and task-coverage.json (IN-02).",
+          "T002 adds the pre_review_gate usecase module with the two secondary-port traits (TaskContractReaderPort, ImplCatalogSignalReaderPort), the primary service port (PreReviewGateService), the command and error types, and the PreReviewGateInteractor implementation. The interactor implements the three-phase gate logic: scope discovery, orphan detection, referential integrity check, and impl_catalog signal JOIN.",
+          "OQ-1 resolution (scope-relevant catalogue entries): task-contract checking is layer-scoped. For gate-applicable review groups, $_GROUP must be one of the six TDDD layer ids (domain, usecase, infrastructure, cli_driver, cli, cli_composition), and T008 enforces that exact allowlist before invoking the gate. Scope-relevant entries are the catalogue entries present in the TypeSignalsDocument read for cmd.group; task-contract.json ContractedEntryRef records are filtered where entry.layer equals cmd.group and compared against that full signal-derived set. Rationale: this uses the existing per-layer signal artifact as the authoritative scope catalogue, requires no filesystem probing or extra per-track declarations, and avoids treating non-layer review scopes such as plan-artifacts as signal layers. Non-layer review groups pass through to review fix-local without verified-conformance summary because the task-contract gate has no corresponding <group>-type-signals.json input.",
+          "T001 must precede T002; both tasks are implemented in the same Rust feature batch (no commit between them)."
+        ],
+        "task_ids": ["T001", "T002"]
+      },
+      {
+        "id": "S2",
+        "title": "Infrastructure: codec and filesystem adapters",
+        "description": [
+          "T003 adds task_contract_codec (TaskContractDocumentDto, TaskContractCodecError, decode, encode), task_contract_reader (FsTaskContractReader implementing TaskContractReaderPort), and impl_catalog_signal_reader (FsImplCatalogSignalReader implementing ImplCatalogSignalReaderPort) to libs/infrastructure.",
+          "FsImplCatalogSignalReader reads <items_dir>/<track_id>/<layer>-type-signals.json as domain::TypeSignalsDocument. No changes to SignalEvaluatorV2 or existing signal infrastructure (CN-05, OS-06); the adapter is a thin reader over the existing on-disk artifact produced by the TDDD signal calculation pipeline.",
+          "T003 depends on T001 (domain types) and T002 (port traits). It is part of the same Rust feature batch."
+        ],
+        "task_ids": ["T003"]
+      },
+      {
+        "id": "S3",
+        "title": "CLI stack: driver, subcommand, and composition root",
+        "description": [
+          "T004 adds TaskContractInput and TaskContractDriver in apps/cli-driver. The driver parses CLI strings into domain value objects and dispatches to PreReviewGateService::check, rendering PreReviewGateOutcome as CommandOutcome.",
+          "T006 adds TaskContractCompositionRoot in apps/cli-composition, which wires FsTaskContractReader + FsImplCatalogSignalReader + PreReviewGateInteractor + TaskContractDriver into one sotp task-contract check execution path. The composition root uses the CLI-provided items_dir to build the service, then dispatches TaskContractInput::Check through TaskContractDriver.",
+          "T005 adds clap-annotated TaskContractCommand and TaskContractCheckArgs in apps/cli, the two execute free functions, and registers `task-contract` as a top-level sotp subcommand. The items_dir flag defaults to 'track/items', matching the workspace convention for all track-reading commands.",
+          "T004 depends on T002 (service port); T006 depends on T003 and T004; T005 depends on T004 and T006 because execute_task_contract_check constructs TaskContractCompositionRoot and calls task_contract_check. All three tasks are implemented in the same Rust feature batch, with S3 implementation order T004 -> T006 -> T005."
+        ],
+        "task_ids": ["T004", "T006", "T005"]
+      },
+      {
+        "id": "S4",
+        "title": "Tests: gate logic unit test coverage (AC-07)",
+        "description": [
+          "T007 adds #[cfg(test)] unit tests inside libs/usecase/src/pre_review_gate.rs covering the five AC-07 scenarios with mock port implementations: (a) missing task-contract → Blocked/MissingTaskContract, (b) signal-document entry absent from task attribution → Blocked/OrphanEntry, (c) referential integrity violation → Blocked/InvalidEntryRef, (d) non-blue signal → Blocked/NonBlueSignal, (e) all blue + attribution complete → Passed with D5-compliant conformance_summary.",
+          "T007 depends on T002 (interactor under test) and T003 (concrete TypeSignalsDocument type used in mock responses). It is the final task in the Rust feature batch (T001-T007 committed together)."
+        ],
+        "task_ids": ["T007"]
+      },
+      {
+        "id": "S5",
+        "title": "Workflow wiring: Makefile.toml pre-review gate (separate commit)",
+        "description": [
+          "T008 modifies [tasks.track-local-review-fix-codex] in Makefile.toml to run `bin/sotp task-contract check --group \"$_GROUP\" --track-id \"$_TRACK_ID\" --items-dir track/items` before `bin/sotp review fix-local \"$@\"` only when $_GROUP is one of the six TDDD layer ids (domain, usecase, infrastructure, cli_driver, cli, cli_composition). The shell script extracts --group, --track-id, and --briefing-file from the forwarded $@ arguments; these flags are already required by review fix-local so they are present in every invocation. For non-layer review scopes such as plan-artifacts, the wrapper skips task-contract check and launches review fix-local without appending a verified-conformance line. On layer-gate success, the script appends a verified-conformance line containing the gate's conformance_summary to the briefing file before launching review fix-local, satisfying IN-06/AC-05 for gate-applicable scopes. Gate failure for an allowlisted layer group halts the script before review fix-local is reached, satisfying AC-06 fail-closed semantics.",
+          "No sibling track-local-review-fix-claude task exists; only track-local-review-fix-codex requires modification.",
+          "T008 is committed as a separate batch from the Rust feature batch (T001-T007)."
+        ],
+        "task_ids": ["T008"]
+      }
+    ]
+  }
+}

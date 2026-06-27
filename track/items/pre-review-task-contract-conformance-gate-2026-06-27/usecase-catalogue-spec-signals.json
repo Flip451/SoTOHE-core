@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "f0675f875a68a541fd20811affb2ec767820369e25e6965dda3ee3e757073a6c",
+  "signals": [
+    {
+      "type_name": "PreReviewGateCommand",
+      "signal": "blue",
+      "entry_hash": "e1f6b8b49fdcc3778c8225a7020d0aa25ac9b0ac16978c51472743eae5f4d15e"
+    },
+    {
+      "type_name": "PreReviewGateError",
+      "signal": "blue",
+      "entry_hash": "ec286d56dbe4bb5d995b6602b04aa931c70f63f97c786dddd2e2d9b8b6686fdb"
+    },
+    {
+      "type_name": "PreReviewGateInteractor",
+      "signal": "blue",
+      "entry_hash": "5228b70c1dfa961751b4432ffb027448afdc7f4d7225a249e8d90f4e6023cf82"
+    },
+    {
+      "type_name": "ImplCatalogSignalReaderPort",
+      "signal": "blue",
+      "entry_hash": "7dde66a79d77c83ec82e118b6c335ff4736d948407ea966fed6f3b8740faf6a4"
+    },
+    {
+      "type_name": "PreReviewGateService",
+      "signal": "blue",
+      "entry_hash": "e9ab494bd7b9beb2e3ace363bc13833851f1c90fc9f75124250df714738507d2"
+    },
+    {
+      "type_name": "TaskContractReaderPort",
+      "signal": "blue",
+      "entry_hash": "9f7f19a235071e7e4d9e45933ddfb0c1f08b940868cfa50eb5642f091969559e"
+    }
+  ]
+}
