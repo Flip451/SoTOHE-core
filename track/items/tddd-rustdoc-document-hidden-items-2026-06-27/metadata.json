@@ -1,0 +1,8 @@
+{
+  "branch": "track/tddd-rustdoc-document-hidden-items-2026-06-27",
+  "created_at": "2026-06-27T04:51:34Z",
+  "id": "tddd-rustdoc-document-hidden-items-2026-06-27",
+  "schema_version": 5,
+  "title": "TDDD chain ③ の cargo rustdoc 呼び出しに --document-hidden-items を追加する",
+  "updated_at": "2026-06-27T04:51:34Z"
+}
