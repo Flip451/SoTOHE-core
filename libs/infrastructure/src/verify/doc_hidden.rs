@@ -71,6 +71,40 @@ fn detect_doc_hidden(ctx: SynScanContext) -> Vec<VerifyFinding> {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Raw-identifier normalization helpers
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Returns `true` when `ident` represents the given bare `name`, accepting
+/// raw-identifier spelling.
+///
+/// `proc_macro2::Ident::eq(&str)` requires the compared string to start with
+/// `"r#"` in order to match a raw ident (e.g. `r#hidden == "hidden"` returns
+/// `false`).  This helper normalizes by stripping the `"r#"` prefix from the
+/// ident's string representation before comparing, so both `hidden` and
+/// `r#hidden` match `"hidden"`.
+fn ident_str_eq(ident: &proc_macro2::Ident, name: &str) -> bool {
+    ident.to_string().trim_start_matches("r#") == name
+}
+
+/// Returns `true` when `path` is a single-segment, argument-free path whose
+/// ident equals `name`, accepting raw-identifier spelling.
+///
+/// Mirrors `syn::Path::get_ident()` but uses [`ident_str_eq`] instead of the
+/// built-in `PartialEq<str>`, so `r#doc` matches `"doc"`.
+fn path_is_ident_norm(path: &syn::Path, name: &str) -> bool {
+    if path.leading_colon.is_some() || path.segments.len() != 1 {
+        return false;
+    }
+    let Some(seg) = path.segments.first() else {
+        return false;
+    };
+    if !matches!(seg.arguments, syn::PathArguments::None) {
+        return false;
+    }
+    ident_str_eq(&seg.ident, name)
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Attribute detection helpers
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -83,10 +117,12 @@ fn detect_doc_hidden(ctx: SynScanContext) -> Vec<VerifyFinding> {
 /// - `#![doc(hidden)]`
 /// - `#[doc(hidden, alias = "x")]`
 /// - `#[doc(alias = "x", hidden)]`
+/// - `#[doc(r#hidden)]` (raw-identifier form)
+/// - `#[r#doc(hidden)]` (raw-identifier path)
 ///
 /// Explicitly does NOT match `#[doc = "..."]` (name-value doc comments).
 fn is_doc_hidden_attr(attr: &syn::Attribute) -> bool {
-    if !attr.path().is_ident("doc") {
+    if !path_is_ident_norm(attr.path(), "doc") {
         return false;
     }
     // Only list-style meta `#[doc(...)]` can contain `hidden`.
@@ -100,8 +136,10 @@ fn is_doc_hidden_attr(attr: &syn::Attribute) -> bool {
 /// Returns `true` when `attr` is a `#[cfg_attr(pred, doc(hidden))]` or
 /// `#![cfg_attr(pred, doc(hidden))]` attribute (any predicate, order-agnostic
 /// combined forms inside the doc list).
+///
+/// Also accepts raw-identifier spellings: `r#cfg_attr` / `r#doc` / `r#hidden`.
 fn is_cfg_attr_with_doc_hidden(attr: &syn::Attribute) -> bool {
-    if !attr.path().is_ident("cfg_attr") {
+    if !path_is_ident_norm(attr.path(), "cfg_attr") {
         return false;
     }
     let syn::Meta::List(meta_list) = &attr.meta else {
@@ -115,19 +153,19 @@ fn is_cfg_attr_with_doc_hidden(attr: &syn::Attribute) -> bool {
 // ─────────────────────────────────────────────────────────────────────────────
 
 /// Returns `true` when the token stream of a `doc(...)` list contains a bare
-/// `hidden` identifier.
+/// `hidden` identifier (plain or raw-identifier spelling `r#hidden`).
 ///
 /// Works order-agnostically: `hidden, alias = "x"` and `alias = "x", hidden`
 /// both return `true`.
 ///
-/// Only `Ident("hidden")` tokens trigger detection, so `alias = "hidden"`
+/// Only `Ident` tokens trigger detection, so `alias = "hidden"`
 /// (where `"hidden"` is a `Literal`) is correctly excluded.
 fn doc_list_tokens_contain_hidden(tokens: &proc_macro2::TokenStream) -> bool {
     use proc_macro2::TokenTree;
     tokens
         .clone()
         .into_iter()
-        .any(|tt| matches!(tt, TokenTree::Ident(ref ident) if ident == "hidden"))
+        .any(|tt| matches!(tt, TokenTree::Ident(ref ident) if ident_str_eq(ident, "hidden")))
 }
 
 /// Returns `true` when the token stream of a `cfg_attr(...)` list contains a
@@ -159,12 +197,13 @@ fn cfg_attr_tokens_contain_doc_hidden(tokens: &proc_macro2::TokenStream) -> bool
     }
 
     // In the remaining tokens, look for the pattern `doc <Group(...)>` where
-    // the group's contents contain `hidden`.
+    // the group's contents contain `hidden`.  Accept raw-identifier spelling
+    // `r#doc` for the attribute name.
     let remaining: Vec<TokenTree> = iter.collect();
     let mut i = 0;
     while i < remaining.len() {
         if let Some(TokenTree::Ident(ident)) = remaining.get(i) {
-            if ident == "doc" {
+            if ident_str_eq(ident, "doc") {
                 if let Some(TokenTree::Group(g)) = remaining.get(i + 1) {
                     if g.delimiter() == proc_macro2::Delimiter::Parenthesis
                         && doc_list_tokens_contain_hidden(&g.stream())

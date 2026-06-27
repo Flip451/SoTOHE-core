@@ -528,3 +528,37 @@ fn test_flags_doc_hidden_in_examples_dir() {
         outcome.findings()
     );
 }
+
+// ── RI: raw-identifier spellings are detected ─────────────────────────────────
+
+/// RI1: `#[doc(r#hidden)]` — raw identifier in the doc arg list — must be flagged.
+#[test]
+fn test_detects_doc_raw_hidden_ident() {
+    let tmp = TempDir::new().unwrap();
+    setup(tmp.path(), "#[doc(r#hidden)]\npub fn x() {}\n");
+    let outcome = verify(tmp.path());
+    assert!(outcome.has_errors(), "#[doc(r#hidden)] must be flagged: {:?}", outcome.findings());
+}
+
+/// RI2: `#[r#doc(hidden)]` — raw identifier used as the attribute path — must be flagged.
+#[test]
+fn test_detects_raw_doc_path_attr() {
+    let tmp = TempDir::new().unwrap();
+    setup(tmp.path(), "#[r#doc(hidden)]\npub fn y() {}\n");
+    let outcome = verify(tmp.path());
+    assert!(outcome.has_errors(), "#[r#doc(hidden)] must be flagged: {:?}", outcome.findings());
+}
+
+/// RI3: `#[cfg_attr(test, doc(r#hidden))]` — raw identifier inside cfg_attr's
+/// doc arg list — must be flagged.
+#[test]
+fn test_detects_cfg_attr_doc_raw_hidden_ident() {
+    let tmp = TempDir::new().unwrap();
+    setup(tmp.path(), "#[cfg_attr(test, doc(r#hidden))]\npub fn z() {}\n");
+    let outcome = verify(tmp.path());
+    assert!(
+        outcome.has_errors(),
+        "#[cfg_attr(test, doc(r#hidden))] must be flagged: {:?}",
+        outcome.findings()
+    );
+}
