@@ -214,7 +214,7 @@
       "evidence_hash": "45e0c69ef38f3925113ad9b04f1ee246e3e2971aafaeff9588cab0dabb409e50",
       "verdict": {
         "kind": "pass",
-        "citation": "「新サブコマンド（例 `sotp verify doc-hidden`）を追加し、ソース上に出現する `#[doc(hidden)]` 相当の属性宣言を可視性に関わらず error とする。新サブコマンドは `Makefile.toml` の `ci-local` dependencies に組み込み、`cargo make ci` 実行時に commit gate として自動的に走らせる。」「判定対象は `syn::File::attrs` に現れる crate/file-level inner attribute と、syn traversal で到達する attribute-bearing Rust AST node の attribute とする。」「有効化スコープは `architecture-rules.json` の `layers[]` に列挙された全 crate を一律対象とし、per-layer フラグや層のハードコード選択は持たない。新 crate が `layers[]` に追加されれば自動的に対象になる。走査対象は各 layer crate ディレクトリ配下の `.rs` ファイル全体とし、`src/` 内の production / test module だけでなく `tests/` / `examples/` / `benches/` も除外しない。"
+        "citation": "新サブコマンド（例 `sotp verify doc-hidden`）を追加し"
       }
     },
     {
@@ -238,7 +238,7 @@
       "evidence_hash": "45e0c69ef38f3925113ad9b04f1ee246e3e2971aafaeff9588cab0dabb409e50",
       "verdict": {
         "kind": "pass",
-        "citation": "新サブコマンド（例 `sotp verify doc-hidden`）を追加し、`Makefile.toml` の `ci-local` dependencies に組み込み"
+        "citation": "新サブコマンド（例 `sotp verify doc-hidden`）を追加し、ソース上に出現する `#[doc(hidden)]` 相当の属性宣言を可視性に関わらず error とする。新サブコマンドは `Makefile.toml` の `ci-local` dependencies に組み込み、`cargo make ci` 実行時に commit gate として自動的に走らせる。"
       }
     },
     {
@@ -246,7 +246,7 @@
       "evidence_hash": "45e0c69ef38f3925113ad9b04f1ee246e3e2971aafaeff9588cab0dabb409e50",
       "verdict": {
         "kind": "pass",
-        "citation": "「#[doc(hidden)] 相当の属性宣言を可視性に関わらず一律禁止する」「検出対象は次の形式すべて」"
+        "citation": "検出対象は次の形式すべて: 直接の outer attribute: `#[doc(hidden)]`、直接の inner attribute: `#![doc(hidden)]`、複合 doc 引数（順序不問）: `#[doc(hidden, alias = \"x\")]` / `#[doc(alias = \"x\", hidden)]`、`cfg_attr` 包み込み: `#[cfg_attr(<pred>, doc(hidden))]` / `#[cfg_attr(<pred>, doc(hidden, ...))]`、上記の inner attribute 版。Rust の doc comment は syn AST 上 `#[doc = \"...\"]` の name-value attribute として現れるため、検出器は `doc(hidden)` を含む list attribute（および `cfg_attr` 内の同形）だけを match し、`#[doc = \"...\"]` は対象外とする。"
       }
     },
     {
@@ -262,7 +262,7 @@
       "evidence_hash": "45e0c69ef38f3925113ad9b04f1ee246e3e2971aafaeff9588cab0dabb409e50",
       "verdict": {
         "kind": "pass",
-        "citation": "有効化スコープは `architecture-rules.json` の `layers[]` に列挙された全 crate を一律対象とし、新 crate が `layers[]` に追加されれば自動的に対象になる。"
+        "citation": "有効化スコープは `architecture-rules.json` の `layers[]` に列挙された全 crate を一律対象とし、per-layer フラグや層のハードコード選択は持たない。新 crate が `layers[]` に追加されれば自動的に対象になる。走査対象は各 layer crate ディレクトリ配下の `.rs` ファイル全体とし、`tests/` / `examples/` / `benches/` も除外しない。"
       }
     },
     {
@@ -286,7 +286,7 @@
       "evidence_hash": "45e0c69ef38f3925113ad9b04f1ee246e3e2971aafaeff9588cab0dabb409e50",
       "verdict": {
         "kind": "pass",
-        "citation": "「可視性に関わらず error」「pub / pub(crate) / 非 pub の区別を行わない」"
+        "citation": "「`pub` / `pub(crate)` / 非 pub の区別を行わない。 (a) effective visibility 解析（impl block propagation / pub-reachable 集合 / cross-file `pub use` 等）が一切不要となり、検出ロジックは『attribute-bearing node の attribute だけを見る』 syn 単純走査で完結する。」"
       }
     },
     {
@@ -294,7 +294,7 @@
       "evidence_hash": "45e0c69ef38f3925113ad9b04f1ee246e3e2971aafaeff9588cab0dabb409e50",
       "verdict": {
         "kind": "pass",
-        "citation": "「新機能を既存の責務に相乗りさせない。既存ゲートを共通走査基盤へ乗せ替えるのは将来の任意改善とし、本決定のスコープ外とする。」"
+        "citation": "新機能を既存の責務に相乗りさせない。既存ゲートを共通走査基盤へ乗せ替えるのは将来の任意改善とし、本決定のスコープ外とする。"
       }
     },
     {
@@ -302,7 +302,7 @@
       "evidence_hash": "45e0c69ef38f3925113ad9b04f1ee246e3e2971aafaeff9588cab0dabb409e50",
       "verdict": {
         "kind": "pass",
-        "citation": "新サブコマンド（例 `sotp verify doc-hidden`）を追加し、ソース上に出現する `#[doc(hidden)]` 相当の属性宣言を可視性に関わらず error とする。判定対象は `syn::File::attrs` に現れる crate/file-level inner attribute と、syn traversal で到達する attribute-bearing Rust AST node の attribute とする。"
+        "citation": "「検出ロジックは「attribute-bearing node の attribute だけを見る」 syn 単純走査で完結」"
       }
     },
     {
@@ -310,7 +310,7 @@
       "evidence_hash": "45e0c69ef38f3925113ad9b04f1ee246e3e2971aafaeff9588cab0dabb409e50",
       "verdict": {
         "kind": "pass",
-        "citation": "「`.rs` 再帰発見 → `syn::parse_file`」の走査骨格を共通モジュールに集約する。判定ロジック（visitor）はコールバックで受ける。"
+        "citation": "「`.rs` 再帰発見 → `syn::parse_file`」の走査骨格を共通モジュールに集約する。判定ロジック（visitor）はコールバックで受ける。本ヘルパは本 ADR のゲートの基盤であると同時に、後続の syn ベース lint でも再利用する。"
       }
     },
     {
@@ -318,7 +318,7 @@
       "evidence_hash": "45e0c69ef38f3925113ad9b04f1ee246e3e2971aafaeff9588cab0dabb409e50",
       "verdict": {
         "kind": "pass",
-        "citation": "判定対象は `syn::File::attrs` に現れる crate/file-level inner attribute と、syn traversal で到達する attribute-bearing Rust AST node の attribute とする。対象 node には item、impl associated item、trait associated item、struct / union field、enum variant を含める... `cfg_attr` 包み込み: `#[cfg_attr(<pred>, doc(hidden))]` / `#[cfg_attr(<pred>, doc(hidden, ...))]`"
+        "citation": "「syn traversal で到達する attribute-bearing Rust AST node の attribute」 / 「cfg_attr 包み込み」"
       }
     },
     {
@@ -326,7 +326,7 @@
       "evidence_hash": "45e0c69ef38f3925113ad9b04f1ee246e3e2971aafaeff9588cab0dabb409e50",
       "verdict": {
         "kind": "pass",
-        "citation": "「対象 node には item、impl associated item、trait associated item、struct / union field、enum variant を含め、`pub` / `pub(crate)` / 非 `pub` の区別を行わない。」"
+        "citation": "判定対象は `syn::File::attrs` に現れる crate/file-level inner attribute と、syn traversal で到達する attribute-bearing Rust AST node の attribute とする。対象 node には item、impl associated item、trait associated item、struct / union field、enum variant を含め、`pub` / `pub(crate)` / 非 pub の区別を行わない。... 走査対象は各 layer crate ディレクトリ配下の `.rs` ファイル全体とし、`src/` 内の production / test module だけでなく `tests/` / `examples/` / `benches/` も除外しない。... 非 pub item を含めて一律禁止することで、(a) effective visibility 解析 ... が一切不要となり、検出ロジックは「attribute-bearing node の attribute だけを見る」 syn 単純走査で完結する。"
       }
     },
     {
@@ -334,7 +334,7 @@
       "evidence_hash": "45e0c69ef38f3925113ad9b04f1ee246e3e2971aafaeff9588cab0dabb409e50",
       "verdict": {
         "kind": "pass",
-        "citation": "architecture-rules.json の layers[] に列挙された全 crate を一律対象とし、per-layer フラグや層のハードコード選択は持たない。"
+        "citation": "有効化スコープは `architecture-rules.json` の `layers[]` に列挙された全 crate を一律対象とし、per-layer フラグや層のハードコード選択は持たない。新 crate が `layers[]` に追加されれば自動的に対象になる。走査対象は各 layer crate ディレクトリ配下の `.rs` ファイル全体とし、"
       }
     },
     {
@@ -342,7 +342,7 @@
       "evidence_hash": "45e0c69ef38f3925113ad9b04f1ee246e3e2971aafaeff9588cab0dabb409e50",
       "verdict": {
         "kind": "pass",
-        "citation": "`usecase_purity`（I/O 純粋性）/ `canonical_modules`（再実装禁止）/ type-signals（型シグネチャ追跡）には手を入れない。... 既存ゲートを共通走査基盤へ乗せ替えるのは将来の任意改善とし、本決定のスコープ外とする。"
+        "citation": "`usecase_purity`（I/O 純粋性）/ `canonical_modules`（再実装禁止）/ type-signals（型シグネチャ追跡）には手を入れない。新機能を既存の責務に相乗りさせない。既存ゲートを共通走査基盤へ乗せ替えるのは将来の任意改善とし、本決定のスコープ外とする。"
       }
     },
     {
@@ -350,7 +350,7 @@
       "evidence_hash": "45e0c69ef38f3925113ad9b04f1ee246e3e2971aafaeff9588cab0dabb409e50",
       "verdict": {
         "kind": "pass",
-        "citation": "新サブコマンド（例 `sotp verify doc-hidden`）を追加し、ソース上に出現する `#[doc(hidden)]` 相当の属性宣言を可視性に関わらず error とする。"
+        "citation": "ソース上に出現する `#[doc(hidden)]` 相当の属性宣言を可視性に関わらず error とする。"
       }
     },
     {
@@ -358,7 +358,7 @@
       "evidence_hash": "45e0c69ef38f3925113ad9b04f1ee246e3e2971aafaeff9588cab0dabb409e50",
       "verdict": {
         "kind": "pass",
-        "citation": "candidate_selection: from:[clippy-disallowed-types,canonical-regex,type-signals-integration,dylint,pub-only-detection] chose:syn-uniform-ban\n\n判定対象は `syn::File::attrs` に現れる crate/file-level inner attribute と、syn traversal で到達する attribute-bearing Rust AST node の attribute とする。"
+        "citation": "判定対象は `syn::File::attrs` に現れる crate/file-level inner attribute と、syn traversal で到達する attribute-bearing Rust AST node の attribute とする。… 非 pub item を含めて一律禁止することで、(a) effective visibility 解析（impl block propagation / pub-reachable 集合 / cross-file `pub use` 等）が一切不要となり、検出ロジックは「attribute-bearing node の attribute だけを見る」 syn 単純走査で完結する。"
       }
     },
     {
@@ -366,7 +366,7 @@
       "evidence_hash": "45e0c69ef38f3925113ad9b04f1ee246e3e2971aafaeff9588cab0dabb409e50",
       "verdict": {
         "kind": "pass",
-        "citation": "新サブコマンド（例 `sotp verify doc-hidden`）を追加し、ソース上に出現する `#[doc(hidden)]` 相当の属性宣言を可視性に関わらず error とする。"
+        "citation": "「新サブコマンド（例 `sotp verify doc-hidden`）を追加し、ソース上に出現する `#[doc(hidden)]` 相当の属性宣言を可視性に関わらず error とする。」"
       }
     },
     {
@@ -374,7 +374,7 @@
       "evidence_hash": "45e0c69ef38f3925113ad9b04f1ee246e3e2971aafaeff9588cab0dabb409e50",
       "verdict": {
         "kind": "pass",
-        "citation": "新サブコマンド（例 `sotp verify doc-hidden`）を追加し、ソース上に出現する `#[doc(hidden)]` 相当の属性宣言を可視性に関わらず error とする。新サブコマンドは `Makefile.toml` の `ci-local` dependencies に組み込み、`cargo make ci` 実行時に commit gate として自動的に走らせる。…有効化スコープは `architecture-rules.json` の `layers[]` に列挙された全 crate を一律対象とし、per-layer フラグや層のハードコード選択は持たない。新 crate が `layers[]` に追加されれば自動的に対象になる。走査対象は各 layer crate ディレクトリ配下の `.rs` ファイル全体とし、`src/` 内の production / test module だけでなく `tests/` / `examples/` / `benches/` も除外しない。"
+        "citation": "「ソース上に出現する `#[doc(hidden)]` 相当の属性宣言を可視性に関わらず一律禁止する」および「走査対象は各 layer crate ディレクトリ配下の `.rs` ファイル全体とし、`src/` 内の production / test module だけでなく `tests/` / `examples/` / `benches/` も除外しない。」"
       }
     },
     {
@@ -414,7 +414,7 @@
       "evidence_hash": "45e0c69ef38f3925113ad9b04f1ee246e3e2971aafaeff9588cab0dabb409e50",
       "verdict": {
         "kind": "pass",
-        "citation": "`既存ゲート機構は不可侵とする`\n\n`usecase_purity`（I/O 純粋性）/ `canonical_modules`（再実装禁止）/ type-signals（型シグネチャ追跡）には手を入れない。"
+        "citation": "`usecase_purity`（I/O 純粋性）/ `canonical_modules`（再実装禁止）/ type-signals（型シグネチャ追跡）には手を入れない。新機能を既存の責務に相乗りさせない。既存ゲートを共通走査基盤へ乗せ替えるのは将来の任意改善とし、本決定のスコープ外とする。"
       }
     }
   ]
