@@ -192,6 +192,29 @@ enum SemanticVerdictDto {
 ///
 /// All fields are required; missing `claim_hash` / `evidence_hash` /
 /// `verdict` / `claim_origin` / `evidence_origin` are decode errors.
+///
+/// # Intentional fail-closed behaviour for old caches (no backward compat)
+///
+/// `claim_origin` / `evidence_origin` are intentionally **required** (no
+/// `serde(default)`, no `Option<...>` fallback). Old `schema_version: 1` cache
+/// files written before these fields existed fail with a missing-field serde
+/// error on decode. This is by design per `knowledge/conventions/no-backward-compat.md`:
+/// new schemas / behaviours apply to active tracks only; non-active (completed
+/// / archived) track caches are write-protected and are not touched by new
+/// code in normal operation. The `schema_version` field is intentionally kept
+/// at `1` (no bump) because the rejection mechanism is the missing-field
+/// serde error itself (impl-plan §S002, spec CN-05).
+///
+/// Recovery for archived caches that are intentionally re-visited is manual:
+/// `rm track/items/<id>/*-verify-cache.json` then `bin/sotp ref-verify run`.
+///
+/// Any reviewer suggestion to (a) make these fields optional / fallback /
+/// backfill, (b) bump `schema_version` and add a migration path, (c) introduce
+/// a `CacheSchemaOutdated`-style variant with invalidated-empty re-generation,
+/// or (d) split `run` vs `check-approved` / `results` callers into a
+/// graceful-vs-fail-closed hybrid, contradicts the convention above and is
+/// rejected by the track's `Accepted Deviations` (see PR description). Do not
+/// re-introduce backward-compat handling here.
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 struct SemanticVerifyEntryDto {
