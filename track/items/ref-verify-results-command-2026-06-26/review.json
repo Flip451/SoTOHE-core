@@ -1,504 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 0b still says the per-scope ceiling is a \"hard upper bound at split time\". That preserves the old hard-cap semantics and conflicts with the new advisory behavior in Rule 3, where over-ceiling singleton batches are explicitly allowed to proceed.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/full-cycle.md",
-              "line": 87,
-              "category": "convention contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:5093e40888ea5c5fa5bf7c16aa5ca9f038e0bb9725d55ee3d0343e012688c872",
-          "at": "2026-06-26T05:51:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:20deb4cc45e56320b3f1f40682d880a61cf173a5bfb134cbd31a95474358bdfb",
-          "at": "2026-06-26T05:53:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 1b now defines ceiling overflow as advisory and says to log and continue, but the DFP `completed` branch still gates Review on the batch fitting the ceiling. An over-ceiling singleton that Rule 3 explicitly permits will pass Step 1b, then be blocked here before Review, so the command still behaves like a hard cap.",
-              "severity": "P1",
-              "file": ".claude/commands/track/full-cycle.md",
-              "line": 169,
-              "category": "command wiring breakage"
-            },
-            {
-              "message": "The Review/DFP fixpoint still requires `actual diff stays within ceiling` as a precondition for Commit. That contradicts the new advisory overflow behavior in Step 1b and makes any legitimate over-ceiling atomic batch impossible to finish after review fixes, reintroducing the hard-cap semantics the change is meant to remove.",
-              "severity": "P1",
-              "file": ".claude/commands/track/full-cycle.md",
-              "line": 190,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:20deb4cc45e56320b3f1f40682d880a61cf173a5bfb134cbd31a95474358bdfb",
-          "at": "2026-06-26T06:12:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:01124d701f57f1c269540ad0cddcac31504429cb2f3bf38cdbf042f33e98a6c0",
-          "at": "2026-06-26T06:15:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6a53dd1eb1bae5c3bc794c857c166239e140be50b3c5b49c7d45f82d63fcc0ab",
-          "at": "2026-06-26T07:52:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6a53dd1eb1bae5c3bc794c857c166239e140be50b3c5b49c7d45f82d63fcc0ab",
-          "at": "2026-06-26T07:55:16Z"
-        }
-      ]
-    },
-    "plan-artifacts": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b7d983f19d56f610cbfc530967683e5887b8babbc1efa5670895d21c23dc10df",
-          "at": "2026-06-26T00:18:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D2 requires the results command to list fail/pending pairs with claim/evidence source locations, but D3 makes those source locations available only by adding origin metadata to verify-cache entries and later says results can work from the cache alone. That does not cover pending/cache-miss pairs, which have no cache entry to carry origin metadata, so an implementation following this plan either cannot show pending pair sources or must re-load the current pair source/artifacts despite the stated cache-only design. The plan needs to explicitly choose one model: persist pending entries with origins, or have `results` derive pending pairs from the source artifacts.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
-              "line": 58,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:b7d983f19d56f610cbfc530967683e5887b8babbc1efa5670895d21c23dc10df",
-          "at": "2026-06-26T00:22:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bc9812dd221e02da43e593ebb70f297908c8f51bafc89a408ccdd9ed286a70b8",
-          "at": "2026-06-26T00:26:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`RefVerifyCommand` still documents the new variant as `Results(ResultsArgs)`, but this artifact defines the type as `RefVerifyResultsArgs` and the variant payload as `Results(RefVerifyResultsArgs)`. That broken reference will mislead anyone consuming the generated type docs.",
-              "severity": "P1",
-              "file": "track/items/ref-verify-results-command-2026-06-26/cli-types.json",
-              "line": 94,
-              "category": "broken reference"
-            },
-            {
-              "message": "T002 names the synthetic origin for `make_known_bad_probe` as `GoalSection`, but T001 only introduces `SpecSectionKind::Goal` and does not define any `GoalSection` symbol. As written, the task refers to a non-existent variant/type.",
-              "severity": "P1",
-              "file": "track/items/ref-verify-results-command-2026-06-26/plan.md",
-              "line": 32,
-              "category": "factual error"
-            },
-            {
-              "message": "The results-record contract requires a `reason` field in each pair row, but `RefVerifyPairRecord` only carries hashes, verdict, chain scope, and origins, and T005's renderer only prints those fields. Without a `reason` source in the data model, IN-03 / AC-03 cannot be satisfied as written.",
-              "severity": "P1",
-              "file": "track/items/ref-verify-results-command-2026-06-26/plan.md",
-              "line": 41,
-              "category": "infeasibility"
-            }
-          ],
-          "hash": "rvw1:sha256:03e752d9d7dc59967b71621dcc186de3ca2ec9da4229bdefe24902f0f2d068cc",
-          "at": "2026-06-26T02:35:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The default verdict filter is specified inconsistently. This file says `chain` and `filter` both default to `All`, but `impl-plan.json` T006 sets `--filter` to default to `fail` and its no-args test expects `filter=fail`. Implementers will get conflicting guidance on the command's baseline output.",
-              "severity": "P1",
-              "file": "track/items/ref-verify-results-command-2026-06-26/cli-types.json",
-              "line": 64,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:fdc94d8183e5ac3bcf35c354f11cf719ddeef59943193bbfcd92478bf42fc910",
-          "at": "2026-06-26T02:47:05Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`acceptance_criterion` is the wrong source key in the Chain-1 mapping. The rest of this track consistently uses `acceptance_criteria` / `AcceptanceCriteria`, so this task would leave the acceptance-criteria section unmapped.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/ref-verify-results-command-2026-06-26/plan.md",
-              "line": 32,
-              "category": "factual error"
-            },
-            {
-              "message": "T002 says the schema migration updates `SemanticVerifyEntryDto`, but the infrastructure catalog/contract-map in this artifact set never model that DTO at all. That leaves the phase-2 and phase-3 artifacts inconsistent about whether the cache DTO is part of the track.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/ref-verify-results-command-2026-06-26/plan.md",
-              "line": 28,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:89e65ec69ca2968d451f0df966c754e270ef62fe17eec4f0a3a37f988c732a84",
-          "at": "2026-06-26T02:58:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "IN-03 describes the record block as a fail/pending-only enumeration, but AC-09 and the implementation plan also require `pass` rows to be emitted when `--filter pass` or `--filter all` is used. The artifacts never settle on whether pass rows belong in the record block.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/ref-verify-results-command-2026-06-26/spec.json",
-              "line": 64,
-              "category": "contradiction"
-            },
-            {
-              "message": "AC-07/AC-08 are CLI-level behaviors, but the coverage matrix only assigns them to T003/T004/T005 and omits T006/T007, where the `Results` subcommand and the `--chain`/`--layer` parsing and dispatch wiring are actually introduced. As written, the matrix can mark those acceptance criteria covered before the CLI layer exists.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/ref-verify-results-command-2026-06-26/task-coverage.json",
-              "line": 36,
-              "category": "factual error"
-            }
-          ],
-          "hash": "rvw1:sha256:92a7ee2a33493238a63db11bb62ad36f84b99aeda4937cfdf51e4e29e9250370",
-          "at": "2026-06-26T03:11:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`find_spec_element_text(...).unwrap_or_default()` silently fabricates an empty `text_label` if the spec lookup fails, but `IN-07` requires the origin to carry the verbatim spec text. That would let Chain-2 evidence origins be recorded without the source text they are supposed to preserve, so this path needs to error instead of defaulting.",
-              "severity": "P1",
-              "file": "track/items/ref-verify-results-command-2026-06-26/impl-plan.json",
-              "line": 12,
-              "category": "factual error"
-            }
-          ],
-          "hash": "rvw1:sha256:ffa0d166bd3f29e074a3a31ea4e082081e46b721003999db1f04c375081ff55c",
-          "at": "2026-06-26T03:21:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`T005` still turns every non-`all` `--layer` value into `LayerId::try_new(...)` and fails on validation errors, but AC-08 says `--layer` is a no-op when `--chain 1` is selected. As written, `sotp ref-verify results --chain 1 --layer <invalid>` would reject instead of ignoring the layer flag.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/ref-verify-results-command-2026-06-26/impl-plan.json",
-              "line": 30,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:3ceaab09893e22beccfef55ec02cc5b15b1f3e29877add3df20a03bb4b86e26d",
-          "at": "2026-06-26T03:33:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b0db30b3e2907c4390e640f451abd9bea56ad6f84dfc687d0ccb8dcf5a377c90",
-          "at": "2026-06-26T03:38:50Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-07/AC-08 define `--chain` and `--layer` as limiting the displayed result set, but the implementation plan and output DTO require `total_pass/fail/pending` to be global totals across all chains and layers. With `--chain 1` or `--layer domain`, the Summary line would include counts for lanes the command otherwise excludes, contradicting the filter semantics and producing misleading results. The plan should define totals over the chain/layer-filtered lane set while remaining unaffected only by the verdict filter.",
-              "severity": "P1",
-              "file": "track/items/ref-verify-results-command-2026-06-26/usecase-types.json",
-              "line": 139,
-              "category": "contradiction"
-            },
-            {
-              "message": "`SemanticVerifyEntryDto` is marked with `action: \"add\"`, but the same entry says T002 modifies the existing DTO by adding required `claim_origin` and `evidence_origin` fields. This contradicts the schema-migration plan and can send implementers down the wrong path of adding a new DTO instead of modifying the cache-entry DTO in place.",
-              "severity": "P1",
-              "file": "track/items/ref-verify-results-command-2026-06-26/infrastructure-types.json",
-              "line": 172,
-              "category": "contradiction"
-            },
-            {
-              "message": "`RefVerifyDriver` is marked as `action: \"reference\"`, while the entry itself says the match body gains a `Results` arm in this track. T005 also requires adding `ref_verify_results` dispatch behavior, so the catalogue action should reflect a modification rather than a reference-only dependency.",
-              "severity": "P1",
-              "file": "track/items/ref-verify-results-command-2026-06-26/cli_driver-types.json",
-              "line": 99,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:b0db30b3e2907c4390e640f451abd9bea56ad6f84dfc687d0ccb8dcf5a377c90",
-          "at": "2026-06-26T03:44:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`RefVerifyResultsArgs` defines the `--filter` default as `Fail`, but the spec's default command acceptance criterion requires the record block to include fail/pending pairs. Since AC-09 says `--filter fail` shows only fail pairs, the planned default `sotp ref-verify results` output would omit pending records and fail AC-01/ADR D2's default-output intent.",
-              "severity": "P1",
-              "file": "track/items/ref-verify-results-command-2026-06-26/cli-types.json",
-              "line": 64,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:eb48f3d763332cb5b0b1260ac139c0bea499504456479579d9778bbf8580d80b",
-          "at": "2026-06-26T03:56:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T002 explicitly modifies the usecase `RefVerifyPair` shape by adding `claim_origin` and `evidence_origin`, but its catalogue refs omit any usecase catalogue entry and `usecase-types.json` contains no `RefVerifyPair` entry. That leaves the cross-layer schema migration's usecase contract uncatalogued while domain `SemanticVerifyEntry` and infrastructure `SemanticVerifyEntryDto` are catalogued, so the plan artifacts disagree about the full D3 contract surface.",
-              "severity": "P1",
-              "file": "track/items/ref-verify-results-command-2026-06-26/impl-plan.json",
-              "line": 12,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:a9344823404b4e18542aac4415f676dc3ebfbba91640e677b1d2bea7596be158",
-          "at": "2026-06-26T04:04:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T003 extends `RefVerifyAggregateService` with a new required `results` method while explicitly leaving the concrete `FsRefVerifyAggregateAdapter` implementation to T004. Since the catalogue still has that adapter implementing the trait, doing T003 as a standalone task leaves the Rust trait impl incomplete until T004, so the planned task boundary is not executable as an independently compilable step. Either make T003/T004 atomic like T002 or include a compile-safe trait implementation/default in T003.",
-              "severity": "P1",
-              "file": "track/items/ref-verify-results-command-2026-06-26/plan.md",
-              "line": 41,
-              "category": "infeasibility"
-            }
-          ],
-          "hash": "rvw1:sha256:7f1973c52669459322852e2a0eb24aa409b3e7c3c791bd16037edfdd75bb501c",
-          "at": "2026-06-26T04:12:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-12 requires `bin/sotp ref-verify run` to return a non-zero error when it reads an old cache, but CN-05/IN-08 in the same spec says old caches are regenerated by rerunning `ref-verify run`. A run that fails on the old cache cannot also regenerate it unless the plan adds a delete/overwrite path, so the old-cache handling contract is internally inconsistent.",
-              "severity": "P1",
-              "file": "track/items/ref-verify-results-command-2026-06-26/spec.json",
-              "line": 384,
-              "category": "contradiction"
-            },
-            {
-              "message": "T006 makes the no-args default `--filter all`, while AC-01 defines the record block as fail/pending pairs. With this default, ordinary `sotp ref-verify results` output includes pass records whenever they exist, so the planned CLI behavior no longer matches the stated default record-block contract. Clarify whether default output is fail+pending only or all pairs.",
-              "severity": "P1",
-              "file": "track/items/ref-verify-results-command-2026-06-26/impl-plan.json",
-              "line": 36,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:e9720ccbd88e17b72fd288d23b897101a7fb5f4dd54a7efc84757b857b86b4b6",
-          "at": "2026-06-26T04:19:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1637cff778c19d0d017aed849bfca6da74bb485a27b5387d29f2dcbe25ebbac3",
-          "at": "2026-06-26T04:34:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`impl-plan.json` moves T001-T003 from `todo` to `done`, but the batch brief explicitly says this round should not change `impl-plan.json` at all; only the rendered plan view should reflect the task transitions.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/ref-verify-results-command-2026-06-26/impl-plan.json",
-              "line": 7,
-              "category": "contradiction"
-            },
-            {
-              "message": "`CatalogueEntryKey` is still marked yellow even though T001 is marked complete and the other T001-added domain types in this file are blue, so the domain-type artifact is internally inconsistent about whether batch A finished the whole domain slice.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/ref-verify-results-command-2026-06-26/domain-types.md",
-              "line": 16,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:4235ed3682018907efa260e0fa9a1873cfca76d35626bac617c6b64c9fe48f46",
-          "at": "2026-06-26T05:50:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:91326e8fd68485151095744471ddfc5f9d20df9e6dcfb691add7f9d47f43dc15",
-          "at": "2026-06-26T06:33:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:91326e8fd68485151095744471ddfc5f9d20df9e6dcfb691add7f9d47f43dc15",
-          "at": "2026-06-26T06:37:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This rendered catalogue still marks the three new CLI artifacts introduced by T006 (`RefVerifyChainArg`, `RefVerifyVerdictFilterArg`, `RefVerifyResultsArgs`) as red, while the plan/impl-plan mark T006 as done. That makes the plan set internally inconsistent about whether the CLI results surface is complete.",
-              "severity": "P1",
-              "file": "track/items/ref-verify-results-command-2026-06-26/cli-types.md",
-              "line": 7,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:6c4f4fc88ca21f702361a4a2048d15a68ac5600e6706bc75584d2b007e3d5568",
-          "at": "2026-06-26T07:51:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:30dabab980463f6ae4aff3e2fe0196d8fd3c8ba484a550d65b7c837cd6b29c04",
-          "at": "2026-06-26T08:10:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:30dabab980463f6ae4aff3e2fe0196d8fd3c8ba484a550d65b7c837cd6b29c04",
-          "at": "2026-06-26T08:13:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:32a5cfefd9748d3654de6e8d6fa43fd530d56864526e90d8a475b8c82fe45e62",
-          "at": "2026-06-26T09:11:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:32a5cfefd9748d3654de6e8d6fa43fd530d56864526e90d8a475b8c82fe45e62",
-          "at": "2026-06-26T09:14:35Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:96e23155504919851adddf47979a7f9945f82eb71c94f717df64daa5c95b0af2",
-          "at": "2026-06-26T12:15:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The `RefVerifyError` docs say `results` and `check-approved` return `Result<_, RefVerifyError>`, but the same catalogue defines `RefVerifyAggregateService::check_approved` and `::results` as returning `Result<..., RefVerifyDriverError>`. This leaves the plan artifact internally contradictory about the usecase error contract and can send implementers/tests toward the wrong public API type.",
-              "severity": "P1",
-              "file": "track/items/ref-verify-results-command-2026-06-26/usecase-types.json",
-              "line": 195,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:96e23155504919851adddf47979a7f9945f82eb71c94f717df64daa5c95b0af2",
-          "at": "2026-06-26T12:18:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:23ce13cb0fda207deb0b4911f42313e5b16b02cb907b99b17e3cca4ce775cb5d",
-          "at": "2026-06-26T12:21:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a20c9c13f6f68dae3c77b81e0c45ec2e73e9709bc302ec0d8ea77c51508ef9c4",
-          "at": "2026-06-26T14:30:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a20c9c13f6f68dae3c77b81e0c45ec2e73e9709bc302ec0d8ea77c51508ef9c4",
-          "at": "2026-06-26T14:33:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ed039d63a4c99fdf3193c43f4b4b565a5a1b4df486a46cf0a81c91c5c4011534",
-          "at": "2026-06-26T14:44:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ed039d63a4c99fdf3193c43f4b4b565a5a1b4df486a46cf0a81c91c5c4011534",
-          "at": "2026-06-26T14:47:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4488eff928ed4a77bb0d1ab5b0b3ab537bdb94818aabf0cadec628e82f27e866",
-          "at": "2026-06-27T01:34:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4488eff928ed4a77bb0d1ab5b0b3ab537bdb94818aabf0cadec628e82f27e866",
-          "at": "2026-06-27T01:37:46Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f7114518cfa2b99cb943299aaba4be42d9a51d89ca3fd8ee4773086596ba4897",
-          "at": "2026-06-26T05:51:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f7114518cfa2b99cb943299aaba4be42d9a51d89ca3fd8ee4773086596ba4897",
-          "at": "2026-06-26T05:53:47Z"
-        }
-      ]
-    },
     "usecase": {
       "rounds": [
         {
@@ -635,50 +137,90 @@
         }
       ]
     },
-    "cli": {
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c0699d1af1ddf7a1267fc9edf59cab97b28ca06132625d51a2abcc1103cb60fc",
+          "at": "2026-06-26T07:55:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c0699d1af1ddf7a1267fc9edf59cab97b28ca06132625d51a2abcc1103cb60fc",
+          "at": "2026-06-26T07:57:30Z"
+        }
+      ]
+    },
+    "harness-policy": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "Both `chain` and `filter` are custom `ValueEnum`s, but these fields are missing `#[arg(value_enum)]`. As written, clap will not wire the enum parser here, so valid inputs like `--chain 1` and `--filter pass` will not be accepted by `ref-verify results`.",
+              "message": "Step 0b still says the per-scope ceiling is a \"hard upper bound at split time\". That preserves the old hard-cap semantics and conflicts with the new advisory behavior in Rule 3, where over-ceiling singleton batches are explicitly allowed to proceed.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/ref_verify.rs",
-              "line": 150,
-              "category": "cli parsing"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/full-cycle.md",
+              "line": 87,
+              "category": "convention contradiction"
             }
           ],
-          "hash": "rvw1:sha256:6f1f2a5f6af6e5fec280c20f29885ef1176ffc7752d625ff6d836673a634a3f4",
-          "at": "2026-06-26T08:00:27Z"
+          "hash": "rvw1:sha256:5093e40888ea5c5fa5bf7c16aa5ca9f038e0bb9725d55ee3d0343e012688c872",
+          "at": "2026-06-26T05:51:26Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0f3cb10ac67f6ab84e3dfa1ff98c2ac21e4697b79e51f0caffc3a11577f45ffc",
-          "at": "2026-06-26T08:05:12Z"
+          "hash": "rvw1:sha256:20deb4cc45e56320b3f1f40682d880a61cf173a5bfb134cbd31a95474358bdfb",
+          "at": "2026-06-26T05:53:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 1b now defines ceiling overflow as advisory and says to log and continue, but the DFP `completed` branch still gates Review on the batch fitting the ceiling. An over-ceiling singleton that Rule 3 explicitly permits will pass Step 1b, then be blocked here before Review, so the command still behaves like a hard cap.",
+              "severity": "P1",
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 169,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "The Review/DFP fixpoint still requires `actual diff stays within ceiling` as a precondition for Commit. That contradicts the new advisory overflow behavior in Step 1b and makes any legitimate over-ceiling atomic batch impossible to finish after review fixes, reintroducing the hard-cap semantics the change is meant to remove.",
+              "severity": "P1",
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 190,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:20deb4cc45e56320b3f1f40682d880a61cf173a5bfb134cbd31a95474358bdfb",
+          "at": "2026-06-26T06:12:32Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0f3cb10ac67f6ab84e3dfa1ff98c2ac21e4697b79e51f0caffc3a11577f45ffc",
-          "at": "2026-06-26T08:07:51Z"
+          "hash": "rvw1:sha256:01124d701f57f1c269540ad0cddcac31504429cb2f3bf38cdbf042f33e98a6c0",
+          "at": "2026-06-26T06:15:45Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:637c657210928deecc89cb4f91f2527bad4ffff663bf80ccb0d40069ce9232a7",
-          "at": "2026-06-26T14:19:03Z"
+          "hash": "rvw1:sha256:6a53dd1eb1bae5c3bc794c857c166239e140be50b3c5b49c7d45f82d63fcc0ab",
+          "at": "2026-06-26T07:52:24Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:637c657210928deecc89cb4f91f2527bad4ffff663bf80ccb0d40069ce9232a7",
-          "at": "2026-06-26T14:22:06Z"
+          "hash": "rvw1:sha256:6a53dd1eb1bae5c3bc794c857c166239e140be50b3c5b49c7d45f82d63fcc0ab",
+          "at": "2026-06-26T07:55:16Z"
         }
       ]
     },
@@ -1094,24 +636,541 @@
           "findings": [],
           "hash": "rvw1:sha256:12f19497a638598146135c6982c20f0f29a35b946c22d9dcd51428be909b6474",
           "at": "2026-06-27T04:11:56Z"
-        }
-      ]
-    },
-    "cli_driver": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:c0699d1af1ddf7a1267fc9edf59cab97b28ca06132625d51a2abcc1103cb60fc",
-          "at": "2026-06-26T07:55:07Z"
+          "hash": "rvw1:sha256:b5607710f61e84f4e8acd62977e6ee1c8fa8209b2ab2cc77ebc0128e614a5dda",
+          "at": "2026-06-27T04:43:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "For `--chain 2 --layer <X>` and `--chain all --layer <X>`, this branch skips `RefVerifyScopeResolver`, but the replacement checks only the targeted catalogue's presence. That drops the resolver's IN-06 fail-closed check for `spec.json` absent while a Chain2 catalogue exists. An empty target catalogue can now return a successful zero-pair result without ever reading `spec.json`, so an invalid Phase-2-without-Phase-1 artifact state is reported as clean. Reintroduce the spec/catalogue ordering check for the targeted catalogue before bypassing the full partial-set resolver path.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/ref_verify/driver_adapter.rs",
+              "line": 431,
+              "category": "non-fail-closed config"
+            }
+          ],
+          "hash": "rvw1:sha256:b5607710f61e84f4e8acd62977e6ee1c8fa8209b2ab2cc77ebc0128e614a5dda",
+          "at": "2026-06-27T04:47:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "For `--chain all --layer <X>`, this now skips the full scope resolver and narrows catalogue inspection to only `<X>`. If `<X>` is absent but another declared Chain2 catalogue is present while `spec.json` is missing, `present_layer_ids` is empty, `check_spec_exists_for_present_chain2_catalogues` is bypassed, and Chain1 enumeration returns a zero-pair result. That silently accepts the same SoT ordering violation that `resolve_chain1_only_scope` rejects for `--chain 1`, so `chain=All` can fail open whenever the offending catalogue is outside the selected Chain2 layer.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/ref_verify/driver_adapter.rs",
+              "line": 484,
+              "category": "non-fail-closed config"
+            }
+          ],
+          "hash": "rvw1:sha256:b9099145d297e055ed67e8659b9b3337022c61849f8ff768f378ade142c09718",
+          "at": "2026-06-27T04:57:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "When `--chain 2 --layer <X>` is used, this branch inspects only `target_ids` before calling `check_spec_exists_for_present_chain2_catalogues`. If the requested catalogue is absent but another declared Chain2 catalogue exists while `spec.json` is missing, `present_layer_ids` is empty, the ordering guard is skipped, and the results path can return a zero lane instead of failing closed. Keep the partial-catalogue check narrowed for `Specific(X)`, but the `spec.json` ordering guard needs to consider all present declared Chain2 catalogues.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/ref_verify/driver_adapter.rs",
+              "line": 488,
+              "category": "non-fail-closed config"
+            }
+          ],
+          "hash": "rvw1:sha256:41624f9873e412fdcbd0f419df70fe40104c2fd29c3cedf44580a713b2a78e33",
+          "at": "2026-06-27T05:03:08Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:c0699d1af1ddf7a1267fc9edf59cab97b28ca06132625d51a2abcc1103cb60fc",
-          "at": "2026-06-26T07:57:30Z"
+          "hash": "rvw1:sha256:d0f8613bcac636ed605c839236f41821550156b94257b51758ede44e1390baf9",
+          "at": "2026-06-27T05:12:44Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f7114518cfa2b99cb943299aaba4be42d9a51d89ca3fd8ee4773086596ba4897",
+          "at": "2026-06-26T05:51:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f7114518cfa2b99cb943299aaba4be42d9a51d89ca3fd8ee4773086596ba4897",
+          "at": "2026-06-26T05:53:47Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Both `chain` and `filter` are custom `ValueEnum`s, but these fields are missing `#[arg(value_enum)]`. As written, clap will not wire the enum parser here, so valid inputs like `--chain 1` and `--filter pass` will not be accepted by `ref-verify results`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/ref_verify.rs",
+              "line": 150,
+              "category": "cli parsing"
+            }
+          ],
+          "hash": "rvw1:sha256:6f1f2a5f6af6e5fec280c20f29885ef1176ffc7752d625ff6d836673a634a3f4",
+          "at": "2026-06-26T08:00:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0f3cb10ac67f6ab84e3dfa1ff98c2ac21e4697b79e51f0caffc3a11577f45ffc",
+          "at": "2026-06-26T08:05:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0f3cb10ac67f6ab84e3dfa1ff98c2ac21e4697b79e51f0caffc3a11577f45ffc",
+          "at": "2026-06-26T08:07:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:637c657210928deecc89cb4f91f2527bad4ffff663bf80ccb0d40069ce9232a7",
+          "at": "2026-06-26T14:19:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:637c657210928deecc89cb4f91f2527bad4ffff663bf80ccb0d40069ce9232a7",
+          "at": "2026-06-26T14:22:06Z"
+        }
+      ]
+    },
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b7d983f19d56f610cbfc530967683e5887b8babbc1efa5670895d21c23dc10df",
+          "at": "2026-06-26T00:18:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2 requires the results command to list fail/pending pairs with claim/evidence source locations, but D3 makes those source locations available only by adding origin metadata to verify-cache entries and later says results can work from the cache alone. That does not cover pending/cache-miss pairs, which have no cache entry to carry origin metadata, so an implementation following this plan either cannot show pending pair sources or must re-load the current pair source/artifacts despite the stated cache-only design. The plan needs to explicitly choose one model: persist pending entries with origins, or have `results` derive pending pairs from the source artifacts.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-26-0842-ref-verify-results-command.md",
+              "line": 58,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b7d983f19d56f610cbfc530967683e5887b8babbc1efa5670895d21c23dc10df",
+          "at": "2026-06-26T00:22:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bc9812dd221e02da43e593ebb70f297908c8f51bafc89a408ccdd9ed286a70b8",
+          "at": "2026-06-26T00:26:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`RefVerifyCommand` still documents the new variant as `Results(ResultsArgs)`, but this artifact defines the type as `RefVerifyResultsArgs` and the variant payload as `Results(RefVerifyResultsArgs)`. That broken reference will mislead anyone consuming the generated type docs.",
+              "severity": "P1",
+              "file": "track/items/ref-verify-results-command-2026-06-26/cli-types.json",
+              "line": 94,
+              "category": "broken reference"
+            },
+            {
+              "message": "T002 names the synthetic origin for `make_known_bad_probe` as `GoalSection`, but T001 only introduces `SpecSectionKind::Goal` and does not define any `GoalSection` symbol. As written, the task refers to a non-existent variant/type.",
+              "severity": "P1",
+              "file": "track/items/ref-verify-results-command-2026-06-26/plan.md",
+              "line": 32,
+              "category": "factual error"
+            },
+            {
+              "message": "The results-record contract requires a `reason` field in each pair row, but `RefVerifyPairRecord` only carries hashes, verdict, chain scope, and origins, and T005's renderer only prints those fields. Without a `reason` source in the data model, IN-03 / AC-03 cannot be satisfied as written.",
+              "severity": "P1",
+              "file": "track/items/ref-verify-results-command-2026-06-26/plan.md",
+              "line": 41,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:03e752d9d7dc59967b71621dcc186de3ca2ec9da4229bdefe24902f0f2d068cc",
+          "at": "2026-06-26T02:35:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The default verdict filter is specified inconsistently. This file says `chain` and `filter` both default to `All`, but `impl-plan.json` T006 sets `--filter` to default to `fail` and its no-args test expects `filter=fail`. Implementers will get conflicting guidance on the command's baseline output.",
+              "severity": "P1",
+              "file": "track/items/ref-verify-results-command-2026-06-26/cli-types.json",
+              "line": 64,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:fdc94d8183e5ac3bcf35c354f11cf719ddeef59943193bbfcd92478bf42fc910",
+          "at": "2026-06-26T02:47:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`acceptance_criterion` is the wrong source key in the Chain-1 mapping. The rest of this track consistently uses `acceptance_criteria` / `AcceptanceCriteria`, so this task would leave the acceptance-criteria section unmapped.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/ref-verify-results-command-2026-06-26/plan.md",
+              "line": 32,
+              "category": "factual error"
+            },
+            {
+              "message": "T002 says the schema migration updates `SemanticVerifyEntryDto`, but the infrastructure catalog/contract-map in this artifact set never model that DTO at all. That leaves the phase-2 and phase-3 artifacts inconsistent about whether the cache DTO is part of the track.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/ref-verify-results-command-2026-06-26/plan.md",
+              "line": 28,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:89e65ec69ca2968d451f0df966c754e270ef62fe17eec4f0a3a37f988c732a84",
+          "at": "2026-06-26T02:58:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-03 describes the record block as a fail/pending-only enumeration, but AC-09 and the implementation plan also require `pass` rows to be emitted when `--filter pass` or `--filter all` is used. The artifacts never settle on whether pass rows belong in the record block.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/ref-verify-results-command-2026-06-26/spec.json",
+              "line": 64,
+              "category": "contradiction"
+            },
+            {
+              "message": "AC-07/AC-08 are CLI-level behaviors, but the coverage matrix only assigns them to T003/T004/T005 and omits T006/T007, where the `Results` subcommand and the `--chain`/`--layer` parsing and dispatch wiring are actually introduced. As written, the matrix can mark those acceptance criteria covered before the CLI layer exists.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/ref-verify-results-command-2026-06-26/task-coverage.json",
+              "line": 36,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:92a7ee2a33493238a63db11bb62ad36f84b99aeda4937cfdf51e4e29e9250370",
+          "at": "2026-06-26T03:11:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`find_spec_element_text(...).unwrap_or_default()` silently fabricates an empty `text_label` if the spec lookup fails, but `IN-07` requires the origin to carry the verbatim spec text. That would let Chain-2 evidence origins be recorded without the source text they are supposed to preserve, so this path needs to error instead of defaulting.",
+              "severity": "P1",
+              "file": "track/items/ref-verify-results-command-2026-06-26/impl-plan.json",
+              "line": 12,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:ffa0d166bd3f29e074a3a31ea4e082081e46b721003999db1f04c375081ff55c",
+          "at": "2026-06-26T03:21:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T005` still turns every non-`all` `--layer` value into `LayerId::try_new(...)` and fails on validation errors, but AC-08 says `--layer` is a no-op when `--chain 1` is selected. As written, `sotp ref-verify results --chain 1 --layer <invalid>` would reject instead of ignoring the layer flag.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/ref-verify-results-command-2026-06-26/impl-plan.json",
+              "line": 30,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:3ceaab09893e22beccfef55ec02cc5b15b1f3e29877add3df20a03bb4b86e26d",
+          "at": "2026-06-26T03:33:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b0db30b3e2907c4390e640f451abd9bea56ad6f84dfc687d0ccb8dcf5a377c90",
+          "at": "2026-06-26T03:38:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-07/AC-08 define `--chain` and `--layer` as limiting the displayed result set, but the implementation plan and output DTO require `total_pass/fail/pending` to be global totals across all chains and layers. With `--chain 1` or `--layer domain`, the Summary line would include counts for lanes the command otherwise excludes, contradicting the filter semantics and producing misleading results. The plan should define totals over the chain/layer-filtered lane set while remaining unaffected only by the verdict filter.",
+              "severity": "P1",
+              "file": "track/items/ref-verify-results-command-2026-06-26/usecase-types.json",
+              "line": 139,
+              "category": "contradiction"
+            },
+            {
+              "message": "`SemanticVerifyEntryDto` is marked with `action: \"add\"`, but the same entry says T002 modifies the existing DTO by adding required `claim_origin` and `evidence_origin` fields. This contradicts the schema-migration plan and can send implementers down the wrong path of adding a new DTO instead of modifying the cache-entry DTO in place.",
+              "severity": "P1",
+              "file": "track/items/ref-verify-results-command-2026-06-26/infrastructure-types.json",
+              "line": 172,
+              "category": "contradiction"
+            },
+            {
+              "message": "`RefVerifyDriver` is marked as `action: \"reference\"`, while the entry itself says the match body gains a `Results` arm in this track. T005 also requires adding `ref_verify_results` dispatch behavior, so the catalogue action should reflect a modification rather than a reference-only dependency.",
+              "severity": "P1",
+              "file": "track/items/ref-verify-results-command-2026-06-26/cli_driver-types.json",
+              "line": 99,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b0db30b3e2907c4390e640f451abd9bea56ad6f84dfc687d0ccb8dcf5a377c90",
+          "at": "2026-06-26T03:44:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`RefVerifyResultsArgs` defines the `--filter` default as `Fail`, but the spec's default command acceptance criterion requires the record block to include fail/pending pairs. Since AC-09 says `--filter fail` shows only fail pairs, the planned default `sotp ref-verify results` output would omit pending records and fail AC-01/ADR D2's default-output intent.",
+              "severity": "P1",
+              "file": "track/items/ref-verify-results-command-2026-06-26/cli-types.json",
+              "line": 64,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:eb48f3d763332cb5b0b1260ac139c0bea499504456479579d9778bbf8580d80b",
+          "at": "2026-06-26T03:56:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 explicitly modifies the usecase `RefVerifyPair` shape by adding `claim_origin` and `evidence_origin`, but its catalogue refs omit any usecase catalogue entry and `usecase-types.json` contains no `RefVerifyPair` entry. That leaves the cross-layer schema migration's usecase contract uncatalogued while domain `SemanticVerifyEntry` and infrastructure `SemanticVerifyEntryDto` are catalogued, so the plan artifacts disagree about the full D3 contract surface.",
+              "severity": "P1",
+              "file": "track/items/ref-verify-results-command-2026-06-26/impl-plan.json",
+              "line": 12,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a9344823404b4e18542aac4415f676dc3ebfbba91640e677b1d2bea7596be158",
+          "at": "2026-06-26T04:04:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 extends `RefVerifyAggregateService` with a new required `results` method while explicitly leaving the concrete `FsRefVerifyAggregateAdapter` implementation to T004. Since the catalogue still has that adapter implementing the trait, doing T003 as a standalone task leaves the Rust trait impl incomplete until T004, so the planned task boundary is not executable as an independently compilable step. Either make T003/T004 atomic like T002 or include a compile-safe trait implementation/default in T003.",
+              "severity": "P1",
+              "file": "track/items/ref-verify-results-command-2026-06-26/plan.md",
+              "line": 41,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:7f1973c52669459322852e2a0eb24aa409b3e7c3c791bd16037edfdd75bb501c",
+          "at": "2026-06-26T04:12:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-12 requires `bin/sotp ref-verify run` to return a non-zero error when it reads an old cache, but CN-05/IN-08 in the same spec says old caches are regenerated by rerunning `ref-verify run`. A run that fails on the old cache cannot also regenerate it unless the plan adds a delete/overwrite path, so the old-cache handling contract is internally inconsistent.",
+              "severity": "P1",
+              "file": "track/items/ref-verify-results-command-2026-06-26/spec.json",
+              "line": 384,
+              "category": "contradiction"
+            },
+            {
+              "message": "T006 makes the no-args default `--filter all`, while AC-01 defines the record block as fail/pending pairs. With this default, ordinary `sotp ref-verify results` output includes pass records whenever they exist, so the planned CLI behavior no longer matches the stated default record-block contract. Clarify whether default output is fail+pending only or all pairs.",
+              "severity": "P1",
+              "file": "track/items/ref-verify-results-command-2026-06-26/impl-plan.json",
+              "line": 36,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e9720ccbd88e17b72fd288d23b897101a7fb5f4dd54a7efc84757b857b86b4b6",
+          "at": "2026-06-26T04:19:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1637cff778c19d0d017aed849bfca6da74bb485a27b5387d29f2dcbe25ebbac3",
+          "at": "2026-06-26T04:34:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`impl-plan.json` moves T001-T003 from `todo` to `done`, but the batch brief explicitly says this round should not change `impl-plan.json` at all; only the rendered plan view should reflect the task transitions.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/ref-verify-results-command-2026-06-26/impl-plan.json",
+              "line": 7,
+              "category": "contradiction"
+            },
+            {
+              "message": "`CatalogueEntryKey` is still marked yellow even though T001 is marked complete and the other T001-added domain types in this file are blue, so the domain-type artifact is internally inconsistent about whether batch A finished the whole domain slice.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/ref-verify-results-command-2026-06-26/domain-types.md",
+              "line": 16,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:4235ed3682018907efa260e0fa9a1873cfca76d35626bac617c6b64c9fe48f46",
+          "at": "2026-06-26T05:50:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:91326e8fd68485151095744471ddfc5f9d20df9e6dcfb691add7f9d47f43dc15",
+          "at": "2026-06-26T06:33:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:91326e8fd68485151095744471ddfc5f9d20df9e6dcfb691add7f9d47f43dc15",
+          "at": "2026-06-26T06:37:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This rendered catalogue still marks the three new CLI artifacts introduced by T006 (`RefVerifyChainArg`, `RefVerifyVerdictFilterArg`, `RefVerifyResultsArgs`) as red, while the plan/impl-plan mark T006 as done. That makes the plan set internally inconsistent about whether the CLI results surface is complete.",
+              "severity": "P1",
+              "file": "track/items/ref-verify-results-command-2026-06-26/cli-types.md",
+              "line": 7,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:6c4f4fc88ca21f702361a4a2048d15a68ac5600e6706bc75584d2b007e3d5568",
+          "at": "2026-06-26T07:51:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:30dabab980463f6ae4aff3e2fe0196d8fd3c8ba484a550d65b7c837cd6b29c04",
+          "at": "2026-06-26T08:10:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:30dabab980463f6ae4aff3e2fe0196d8fd3c8ba484a550d65b7c837cd6b29c04",
+          "at": "2026-06-26T08:13:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:32a5cfefd9748d3654de6e8d6fa43fd530d56864526e90d8a475b8c82fe45e62",
+          "at": "2026-06-26T09:11:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:32a5cfefd9748d3654de6e8d6fa43fd530d56864526e90d8a475b8c82fe45e62",
+          "at": "2026-06-26T09:14:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:96e23155504919851adddf47979a7f9945f82eb71c94f717df64daa5c95b0af2",
+          "at": "2026-06-26T12:15:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `RefVerifyError` docs say `results` and `check-approved` return `Result<_, RefVerifyError>`, but the same catalogue defines `RefVerifyAggregateService::check_approved` and `::results` as returning `Result<..., RefVerifyDriverError>`. This leaves the plan artifact internally contradictory about the usecase error contract and can send implementers/tests toward the wrong public API type.",
+              "severity": "P1",
+              "file": "track/items/ref-verify-results-command-2026-06-26/usecase-types.json",
+              "line": 195,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:96e23155504919851adddf47979a7f9945f82eb71c94f717df64daa5c95b0af2",
+          "at": "2026-06-26T12:18:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:23ce13cb0fda207deb0b4911f42313e5b16b02cb907b99b17e3cca4ce775cb5d",
+          "at": "2026-06-26T12:21:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a20c9c13f6f68dae3c77b81e0c45ec2e73e9709bc302ec0d8ea77c51508ef9c4",
+          "at": "2026-06-26T14:30:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a20c9c13f6f68dae3c77b81e0c45ec2e73e9709bc302ec0d8ea77c51508ef9c4",
+          "at": "2026-06-26T14:33:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ed039d63a4c99fdf3193c43f4b4b565a5a1b4df486a46cf0a81c91c5c4011534",
+          "at": "2026-06-26T14:44:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ed039d63a4c99fdf3193c43f4b4b565a5a1b4df486a46cf0a81c91c5c4011534",
+          "at": "2026-06-26T14:47:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4488eff928ed4a77bb0d1ab5b0b3ab537bdb94818aabf0cadec628e82f27e866",
+          "at": "2026-06-27T01:34:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4488eff928ed4a77bb0d1ab5b0b3ab537bdb94818aabf0cadec628e82f27e866",
+          "at": "2026-06-27T01:37:46Z"
         }
       ]
     }

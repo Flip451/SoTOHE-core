@@ -484,6 +484,54 @@ pub(crate) fn inspect_chain2_catalogue_set(
     Ok((present, absent))
 }
 
+/// Inspect the catalogue presence state for a **specific subset** of target layers.
+///
+/// Unlike [`inspect_chain2_catalogue_set`] which iterates all declared bindings,
+/// this function limits the check to `target_layers`.  It is used for
+/// `--layer Specific(X)` results queries so that partial presence of unrelated
+/// declared layers does not block inspection of the requested lane.
+///
+/// `target_layers` must be a validated subset of `bindings` (i.e. each entry
+/// must have a corresponding binding).  Callers are expected to derive
+/// `target_layers` from [`resolve_results_chain2_target_layers`] which already
+/// validates layer membership.
+pub(crate) fn inspect_chain2_catalogue_set_for_targets(
+    project_root: &Path,
+    track_id: &str,
+    bindings: &[crate::verify::tddd_layers::TdddLayerBinding],
+    target_layers: &[domain::tddd::LayerId],
+) -> Result<(Vec<domain::tddd::LayerId>, Vec<domain::tddd::LayerId>), RefVerifyDriverError> {
+    let mut present = Vec::new();
+    let mut absent = Vec::new();
+
+    for layer_id in target_layers {
+        let binding =
+            bindings.iter().find(|b| b.layer_id() == layer_id.as_ref()).ok_or_else(|| {
+                RefVerifyDriverError::Wiring(format!(
+                    "no TDDD binding found for target layer '{}' (internal error after validation)",
+                    layer_id.as_ref()
+                ))
+            })?;
+        let catalogue_path =
+            project_root.join("track").join("items").join(track_id).join(binding.catalogue_file());
+        let catalogue_exists =
+            crate::track::symlink_guard::reject_symlinks_below(&catalogue_path, project_root)
+                .map_err(|e| {
+                    RefVerifyDriverError::Wiring(format!(
+                        "cannot inspect catalogue '{}': {e}",
+                        catalogue_path.display()
+                    ))
+                })?;
+        if catalogue_exists {
+            present.push(layer_id.clone());
+        } else {
+            absent.push(layer_id.clone());
+        }
+    }
+
+    Ok((present, absent))
+}
+
 /// Validate that the track directory `<project_root>/track/items/<track_id>/`
 /// exists before any catalogue or cache classification runs.
 ///
@@ -1570,8 +1618,13 @@ mod tests {
         check_partial_catalogue_set(&present, &absent).unwrap();
     }
 
-    /// Specific-layer query must still fail closed when the full declared
-    /// Chain2 catalogue set is partial.
+    /// `inspect_chain2_catalogue_set` returns a Wiring error when the full
+    /// declared catalogue set is partial (one layer present, one absent).
+    ///
+    /// This test covers the helper function in isolation.  The system-level
+    /// behaviour for `--layer Specific(X)` results queries narrows the check to
+    /// {X} only (see `results_core` in `driver_adapter.rs`), so a partial
+    /// full-set no longer blocks a single-layer query.
     #[test]
     fn inspect_chain2_catalogue_set_partial_returns_wiring_error() {
         let dir = tempfile::tempdir().unwrap();
