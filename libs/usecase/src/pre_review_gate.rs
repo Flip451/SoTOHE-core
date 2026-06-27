@@ -367,7 +367,32 @@ impl PreReviewGateService for PreReviewGateInteractor {
                             all_violations.extend(violations);
                         }
                         None => {
-                            // No signal document for this layer — skip silently.
+                            // No signal document for this layer.
+                            //
+                            // If task-contract.json has entries attributing
+                            // catalogue keys to this layer, the gate cannot
+                            // verify them — emit InvalidEntryRef violations so
+                            // the unverified surface fails closed instead of
+                            // silently passing (PR #175 P1 finding).
+                            //
+                            // If no contract entries attribute anything to this
+                            // layer, the absence is genuinely "nothing to
+                            // verify" and skipping silently is correct.
+                            let contracted_for_layer: Vec<&ContractedEntryRef> = contract_doc
+                                .entries()
+                                .values()
+                                .flatten()
+                                .filter(|e| e.layer() == &layer)
+                                .collect();
+                            for entry in contracted_for_layer {
+                                all_violations.push(PreReviewGateViolation::InvalidEntryRef {
+                                    entry: entry.clone(),
+                                    reason: format!(
+                                        "signal document not found for layer '{}'; cannot verify entry",
+                                        layer.as_ref()
+                                    ),
+                                });
+                            }
                         }
                     }
                 }
@@ -895,6 +920,77 @@ mod tests {
                 );
             }
             other => panic!("expected SignalReadFailed, got {other}"),
+        }
+    }
+
+    // ── PR #175 P1: missing signal doc for a contracted layer must fail closed ─
+    //
+    // In all-layers mode, a layer with absent <layer>-type-signals.json must NOT
+    // be silently skipped if task-contract.json has entries attributing keys to
+    // that layer. Each such contracted entry must emit InvalidEntryRef so that
+    // the unverified surface fails closed (cannot pass with empty
+    // all_violations when a layer's signal doc is missing).
+
+    #[test]
+    fn all_layer_iterate_missing_signal_doc_for_contracted_layer_yields_invalid_entry_refs() {
+        // task-contract attributes 2 entries to "domain" and 1 to "usecase".
+        // signal_docs only registers "usecase" (so "domain" returns Ok(None) via read_optional_signals).
+        let mut signal_docs = std::collections::HashMap::new();
+        signal_docs.insert("usecase".to_owned(), make_signals(vec![blue_signal("UseFoo")]));
+        let svc = PreReviewGateInteractor::new(
+            Arc::new(ConstContractReader(Ok(make_contract(
+                "my-track",
+                vec![
+                    (
+                        task_id("T001"),
+                        vec![
+                            ContractedEntryRef::new(layer("domain"), entry_key("DomFoo")),
+                            ContractedEntryRef::new(layer("domain"), entry_key("DomBar")),
+                        ],
+                    ),
+                    (
+                        task_id("T002"),
+                        vec![ContractedEntryRef::new(layer("usecase"), entry_key("UseFoo"))],
+                    ),
+                ],
+            )))),
+            Arc::new(LayerAwareSignalReader(signal_docs)),
+        );
+
+        let outcome = svc
+            .check(PreReviewGateCommand { track_id: track_id("my-track"), layer: None })
+            .unwrap();
+
+        match outcome {
+            PreReviewGateOutcome::Blocked { violations, .. } => {
+                let invalid_for_domain: Vec<&str> = violations
+                    .iter()
+                    .filter_map(|v| {
+                        if let PreReviewGateViolation::InvalidEntryRef { entry, reason } = v {
+                            if entry.layer().as_ref() == "domain"
+                                && reason.contains("signal document not found")
+                            {
+                                Some(entry.entry_key().as_str())
+                            } else {
+                                None
+                            }
+                        } else {
+                            None
+                        }
+                    })
+                    .collect();
+                assert!(
+                    invalid_for_domain.contains(&"DomFoo"),
+                    "expected DomFoo in InvalidEntryRef for missing-signal layer, got: {invalid_for_domain:?}"
+                );
+                assert!(
+                    invalid_for_domain.contains(&"DomBar"),
+                    "expected DomBar in InvalidEntryRef for missing-signal layer, got: {invalid_for_domain:?}"
+                );
+            }
+            other => panic!(
+                "expected Blocked with InvalidEntryRef for unverified contracted layer, got {other:?}"
+            ),
         }
     }
 }

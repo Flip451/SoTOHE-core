@@ -57,17 +57,28 @@ This executes `sotp pr review-cycle` which:
 5. Collects the latest review round (sanitized `review.body` + inline comments) — without interpreting or grading them
 6. Surfaces those comments for you to judge, or reports a machine PASS when the bot signalled zero findings
 
-## Step 3: Handle results
+## Step 3: Handle results — MUST continue until explicit 👍
 
 After `cargo make track-pr-review` completes:
 
-- If the bot **signalled zero findings** (👍 reaction or a "no major issues" comment): this is a machine PASS. Proceed to `/track:commit`.
-- Otherwise the command surfaces the latest review round's comments verbatim (sanitized `review.body` + inline comments). Read them and decide which are actionable — the command does not grade them for you. Fix the actionable ones locally, then run `/track:pr-review` again to push, trigger a new round, and verify the fixes.
+- If the bot **signalled zero findings** (👍 reaction or a "no major issues" comment): this is a machine PASS. Report success to the user and recommend `/track:merge` once they are ready.
+- Otherwise the command surfaces the latest review round's comments verbatim (sanitized `review.body` + inline comments). **You MUST**:
+  1. Read each comment and assess actionability — the command does not grade them for you.
+  2. Fix every actionable finding locally (apply code edits, run local reviews to zero_findings, commit).
+  3. Re-run `/track:pr-review` to push the fix, trigger a new Codex Cloud review round, and verify the response.
+  4. Repeat steps 1–3 until the bot signals **explicit 👍 (zero-findings reaction or a "no major issues" comment)**.
 
-Report to the user:
+**Do NOT stop the loop on intermediate states**, including:
+
+- A round with "all findings are minor / non-blocking" wording (only an explicit 👍 / zero-findings comment counts as the terminal state).
+- A round where you intend to record `## Accepted Deviations` in the PR body. Recording an Accepted Deviation requires **explicit user approval** before the loop is allowed to terminate without 👍 — surface the proposed acceptance to the user and wait for their confirmation. Do NOT silently transition from "I judged this acceptable" to "stopping the loop"; the loop's terminal condition is 👍 by default, and the only documented exception is user-approved Accepted Deviations.
+- A round that returned the same review ID as the previous round (stale review — see Async handling below for retry guidance).
+
+Report to the user once the loop reaches its terminal state:
 1. PR URL
-2. **Machine PASS** (zero-findings signal): state that the bot signalled zero findings and the recommended next action is `/track:commit`.
-3. **Comments surfaced**: review state (APPROVED / CHANGES_REQUESTED / COMMENTED), the review body and each inline comment with its `path:line`, your assessment of which comments are actionable, and the recommended next action.
+2. **Terminal state**: explicit 👍 machine PASS, or user-approved Accepted Deviations (with the user's approval citation).
+3. **Per-round trace**: for each round, the review state (APPROVED / CHANGES_REQUESTED / COMMENTED), the surfaced comments (review body + inline comments with `path:line`), and the fix commit hashes that closed each actionable finding.
+4. The recommended next action (e.g., `/track:merge` once 👍 is reached and the user is ready).
 
 ## Async handling
 
@@ -118,6 +129,6 @@ parsed by automated reviewers.
 
 After execution, summarize:
 1. PR number and URL
-2. Outcome: machine PASS (zero-findings signal) or comments surfaced for judgment
-3. If comments were surfaced: the review body + inline comments with `path:line`, and your actionability assessment
-4. Recommended next command (`/track:pr-review` to retry after fixes, or `/track:commit <message>`)
+2. Terminal state: machine PASS (explicit zero-findings signal), or user-approved Accepted Deviations with the user's approval citation
+3. Per-round trace: review state (APPROVED / CHANGES_REQUESTED / COMMENTED), surfaced review body + inline comments with `path:line`, actionability assessment, and fix commit hashes for each actionable finding
+4. Recommended next command (`/track:merge` once 👍 is reached and the user is ready)

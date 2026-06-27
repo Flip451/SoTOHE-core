@@ -1,6 +1,119 @@
 {
   "schema_version": 2,
   "scopes": {
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ownership paragraph is stale: it still says this capability owns only `impl-plan.json` and `task-coverage.json`, but the same file now declares `task-contract.json` as a third Phase 3 artifact and allows writing it. That leaves the harness contract internally inconsistent about what `impl-planner` owns.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.harness/capabilities/impl-planner.md",
+              "line": 25,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:5c88d3e73fd515fed176ee8772485ed7fd45327646121cd4cd5e663dd7889ff3",
+          "at": "2026-06-27T13:46:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c0b457c465272b82b435c5f3966b08fd7ac30a457868f939c97e28709ed3614f",
+          "at": "2026-06-27T13:50:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c0b457c465272b82b435c5f3966b08fd7ac30a457868f939c97e28709ed3614f",
+          "at": "2026-06-27T13:54:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new gate parses `--group`, but the actual review-fix wrapper contract still uses `--scope` on the caller side and `bin/sotp review fix-local` itself expects `--scope`. That means the pre-review gate is unreachable for the documented invocation path, and any invocation that does pass `--group` will be forwarded unchanged to `review fix-local` and fail there. The task-contract check/briefing append therefore does not wire into the real fix workflow.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/Makefile.toml",
+              "line": 645,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:39d377d23f43855d211805b91d2b48cf61edc815f2be47191afd8c7ed27c1a2a",
+          "at": "2026-06-27T15:22:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c836db749917efcff22cb7ef95cc71d527d891eb4ae2af510928f6a237f6f2a",
+          "at": "2026-06-27T15:24:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d4aff7afa048fea304d3b0653c95ecbf55bb7957838277f3a9d60c603f77e87c",
+          "at": "2026-06-27T16:09:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d4aff7afa048fea304d3b0653c95ecbf55bb7957838277f3a9d60c603f77e87c",
+          "at": "2026-06-27T16:12:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3a836ba5b2f6095bcaa921ba37f1c3f609314f369e3fd2017ee4130015644b24",
+          "at": "2026-06-27T23:15:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 3 now makes surfaced PR-review comments non-terminal and requires fixing, committing, and re-running until an explicit zero-findings signal or user-approved Accepted Deviations. However, the stale Behavior summary still describes comments-surfaced as a reportable end state with only an actionability assessment and a next command. Agents following this summary can stop after the first non-pass round, which breaks the new MUST-continue loop contract. Update the Behavior section to report only terminal states and include the per-round trace/fix commits described above.",
+              "severity": "P1",
+              "file": ".claude/commands/track/pr-review.md",
+              "line": 132,
+              "category": "command_wiring_breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:3a836ba5b2f6095bcaa921ba37f1c3f609314f369e3fd2017ee4130015644b24",
+          "at": "2026-06-27T23:18:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 3 still tells the operator to proceed to `/track:commit` after a zero-findings PR review, while the same command's terminal-state report now points to `/track:merge` once 👍 is reached. That leaves two conflicting next-command wirings for the same terminal state; following the older `/track:commit` path after a clean PR review can send the workflow back to the guarded local commit command instead of the CI-gated PR merge flow described by this command and `/track:merge`. Update this terminal-state branch to match the new merge/report behavior.",
+              "severity": "P1",
+              "file": ".claude/commands/track/pr-review.md",
+              "line": 64,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:1c12ec2090613e13e787910cd381cc1a2ffbe831dd2e24a94f443d6e65fe30f9",
+          "at": "2026-06-27T23:21:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f97556ac6ebbffd35cbbb6984ab0821f5e4337fd395b7350fab240246b8a510d",
+          "at": "2026-06-27T23:24:16Z"
+        }
+      ]
+    },
     "usecase": {
       "rounds": [
         {
@@ -112,6 +225,20 @@
           "findings": [],
           "hash": "rvw1:sha256:5a24c9e3a48ad1676b97eb41ebef7eb3641fb4f6ea2c640862d6817e1e3e24d2",
           "at": "2026-06-27T16:41:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1b727304fe222a3508891c0db704f59e86e94bca9f2fa83516fb02479f9f7c8d",
+          "at": "2026-06-27T23:16:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1b727304fe222a3508891c0db704f59e86e94bca9f2fa83516fb02479f9f7c8d",
+          "at": "2026-06-27T23:18:45Z"
         }
       ]
     },
@@ -161,72 +288,81 @@
         }
       ]
     },
-    "harness-policy": {
+    "cli_composition": {
       "rounds": [
         {
           "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The ownership paragraph is stale: it still says this capability owns only `impl-plan.json` and `task-coverage.json`, but the same file now declares `task-contract.json` as a third Phase 3 artifact and allows writing it. That leaves the harness contract internally inconsistent about what `impl-planner` owns.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.harness/capabilities/impl-planner.md",
-              "line": 25,
-              "category": "convention contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:5c88d3e73fd515fed176ee8772485ed7fd45327646121cd4cd5e663dd7889ff3",
-          "at": "2026-06-27T13:46:31Z"
-        },
-        {
-          "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:c0b457c465272b82b435c5f3966b08fd7ac30a457868f939c97e28709ed3614f",
-          "at": "2026-06-27T13:50:43Z"
+          "hash": "rvw1:sha256:81d63ac4abbe47745215e9280d17c446e8638bd271d02046709485bf41e35040",
+          "at": "2026-06-27T13:46:05Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:c0b457c465272b82b435c5f3966b08fd7ac30a457868f939c97e28709ed3614f",
-          "at": "2026-06-27T13:54:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new gate parses `--group`, but the actual review-fix wrapper contract still uses `--scope` on the caller side and `bin/sotp review fix-local` itself expects `--scope`. That means the pre-review gate is unreachable for the documented invocation path, and any invocation that does pass `--group` will be forwarded unchanged to `review fix-local` and fail there. The task-contract check/briefing append therefore does not wire into the real fix workflow.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/Makefile.toml",
-              "line": 645,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:39d377d23f43855d211805b91d2b48cf61edc815f2be47191afd8c7ed27c1a2a",
-          "at": "2026-06-27T15:22:18Z"
+          "hash": "rvw1:sha256:81d63ac4abbe47745215e9280d17c446e8638bd271d02046709485bf41e35040",
+          "at": "2026-06-27T13:49:10Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:3c836db749917efcff22cb7ef95cc71d527d891eb4ae2af510928f6a237f6f2a",
-          "at": "2026-06-27T15:24:42Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d4aff7afa048fea304d3b0653c95ecbf55bb7957838277f3a9d60c603f77e87c",
-          "at": "2026-06-27T16:09:47Z"
+          "hash": "rvw1:sha256:a29d6da6a7c91675cbfe8900a118d1045794a97a91682ab2a54f9969944244d8",
+          "at": "2026-06-27T16:09:22Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d4aff7afa048fea304d3b0653c95ecbf55bb7957838277f3a9d60c603f77e87c",
-          "at": "2026-06-27T16:12:13Z"
+          "hash": "rvw1:sha256:a29d6da6a7c91675cbfe8900a118d1045794a97a91682ab2a54f9969944244d8",
+          "at": "2026-06-27T16:12:41Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:14d8205a81db5609a9e50d81a704134e95ea462fcb24f4c40a4fa62ae7fdbde4",
+          "at": "2026-06-27T13:45:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:14d8205a81db5609a9e50d81a704134e95ea462fcb24f4c40a4fa62ae7fdbde4",
+          "at": "2026-06-27T13:49:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3f94ef835677874e6d60897ad815f3f03eb567d33080dd15428c44a61d99e3be",
+          "at": "2026-06-27T16:09:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3f94ef835677874e6d60897ad815f3f03eb567d33080dd15428c44a61d99e3be",
+          "at": "2026-06-27T16:12:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e9d8db98c6703e49f7c67004e0e62004d030a63afa5f5184c2a26428a07bb1e6",
+          "at": "2026-06-27T16:45:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e9d8db98c6703e49f7c67004e0e62004d030a63afa5f5184c2a26428a07bb1e6",
+          "at": "2026-06-27T16:47:58Z"
         }
       ]
     },
@@ -791,84 +927,6 @@
           "findings": [],
           "hash": "rvw1:sha256:69a34af9b4645c4e2556d82d3c39cb8cb96fc6cee34d021d3216cb3c50b00f36",
           "at": "2026-06-27T17:09:04Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:14d8205a81db5609a9e50d81a704134e95ea462fcb24f4c40a4fa62ae7fdbde4",
-          "at": "2026-06-27T13:45:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:14d8205a81db5609a9e50d81a704134e95ea462fcb24f4c40a4fa62ae7fdbde4",
-          "at": "2026-06-27T13:49:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3f94ef835677874e6d60897ad815f3f03eb567d33080dd15428c44a61d99e3be",
-          "at": "2026-06-27T16:09:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3f94ef835677874e6d60897ad815f3f03eb567d33080dd15428c44a61d99e3be",
-          "at": "2026-06-27T16:12:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e9d8db98c6703e49f7c67004e0e62004d030a63afa5f5184c2a26428a07bb1e6",
-          "at": "2026-06-27T16:45:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e9d8db98c6703e49f7c67004e0e62004d030a63afa5f5184c2a26428a07bb1e6",
-          "at": "2026-06-27T16:47:58Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:81d63ac4abbe47745215e9280d17c446e8638bd271d02046709485bf41e35040",
-          "at": "2026-06-27T13:46:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:81d63ac4abbe47745215e9280d17c446e8638bd271d02046709485bf41e35040",
-          "at": "2026-06-27T13:49:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a29d6da6a7c91675cbfe8900a118d1045794a97a91682ab2a54f9969944244d8",
-          "at": "2026-06-27T16:09:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a29d6da6a7c91675cbfe8900a118d1045794a97a91682ab2a54f9969944244d8",
-          "at": "2026-06-27T16:12:41Z"
         }
       ]
     },
