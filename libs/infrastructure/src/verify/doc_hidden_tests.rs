@@ -1419,6 +1419,75 @@ fn test_ignores_doc_hidden_in_path_attr_mod_inside_multi_level_inline_mods() {
     );
 }
 
+// ── PR39-PR41: associated const initializers in impl/trait blocks ────────────
+
+/// PR39: `impl S { const X: usize = { #[doc(hidden)] struct H; 0 }; }` —
+/// `#[doc(hidden)]` on a local item inside an associated const initializer must
+/// be flagged (mirrors top-level `Item::Const` handling added in PR32).
+#[test]
+fn test_detects_doc_hidden_on_local_item_in_impl_associated_const_initializer() {
+    let tmp = TempDir::new().unwrap();
+    setup(tmp.path(), "struct S;\nimpl S { const X: usize = { #[doc(hidden)] struct H; 0 }; }\n");
+    let outcome = verify(tmp.path());
+    assert!(
+        outcome.has_errors(),
+        "expected error for #[doc(hidden)] on local struct in associated const initializer \
+         inside impl block (PR39): {:?}",
+        outcome.findings()
+    );
+}
+
+/// PR40: `pub trait T { const Y: usize = { #[doc(hidden)] fn h() {} 0 }; }` —
+/// `#[doc(hidden)]` on a local item inside a trait associated const default value
+/// must be flagged (mirrors top-level `Item::Const` handling added in PR32).
+#[test]
+fn test_detects_doc_hidden_on_local_item_in_trait_associated_const_default() {
+    let tmp = TempDir::new().unwrap();
+    setup(tmp.path(), "pub trait T { const Y: usize = { #[doc(hidden)] fn h() {} 0 }; }\n");
+    let outcome = verify(tmp.path());
+    assert!(
+        outcome.has_errors(),
+        "expected error for #[doc(hidden)] on local fn in trait associated const default \
+         value (PR40): {:?}",
+        outcome.findings()
+    );
+}
+
+/// PR41: regression — top-level const/static initializers and impl method bodies
+/// continue to be flagged after the PR39/PR40 refactor.
+#[test]
+fn test_regression_top_level_const_static_and_impl_fn_body_still_flagged() {
+    // Top-level const initializer (originally covered by PR32).
+    let tmp = TempDir::new().unwrap();
+    setup(tmp.path(), "const X: usize = { #[doc(hidden)] struct Hidden; 1 };\n");
+    let outcome = verify(tmp.path());
+    assert!(
+        outcome.has_errors(),
+        "regression (PR41): top-level const initializer must still be flagged: {:?}",
+        outcome.findings()
+    );
+
+    // Top-level static initializer (originally covered by PR33).
+    let tmp2 = TempDir::new().unwrap();
+    setup(tmp2.path(), "static Y: usize = { #[doc(hidden)] fn h() {} 0 };\n");
+    let outcome2 = verify(tmp2.path());
+    assert!(
+        outcome2.has_errors(),
+        "regression (PR41): top-level static initializer must still be flagged: {:?}",
+        outcome2.findings()
+    );
+
+    // impl method body (originally covered by earlier rounds).
+    let tmp3 = TempDir::new().unwrap();
+    setup(tmp3.path(), "struct S;\nimpl S { fn f() { #[doc(hidden)] struct Local; } }\n");
+    let outcome3 = verify(tmp3.path());
+    assert!(
+        outcome3.has_errors(),
+        "regression (PR41): impl method body must still be flagged: {:?}",
+        outcome3.findings()
+    );
+}
+
 /// PR31: regression — a same-directory sibling that uses `#[cfg(test)] #[path =
 /// "shared_helpers.rs"] mod tests;` must still cause `shared_helpers.rs` to be
 /// classified as test-only and excluded from scanning.  The sibling probe must

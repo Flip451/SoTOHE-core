@@ -79,3 +79,62 @@ pub(crate) fn rs_files_in_dir(root: &Path, dir: &Path) -> Vec<PathBuf> {
     files.sort();
     files
 }
+
+/// Returns the outer attributes attached to a [`syn::Item`], or an empty slice
+/// for item kinds that do not carry attributes.
+pub(crate) fn item_attrs(item: &syn::Item) -> &[syn::Attribute] {
+    match item {
+        syn::Item::Const(i) => &i.attrs,
+        syn::Item::Enum(i) => &i.attrs,
+        syn::Item::ExternCrate(i) => &i.attrs,
+        syn::Item::Fn(i) => &i.attrs,
+        syn::Item::ForeignMod(i) => &i.attrs,
+        syn::Item::Impl(i) => &i.attrs,
+        syn::Item::Macro(i) => &i.attrs,
+        syn::Item::Mod(i) => &i.attrs,
+        syn::Item::Static(i) => &i.attrs,
+        syn::Item::Struct(i) => &i.attrs,
+        syn::Item::Trait(i) => &i.attrs,
+        syn::Item::TraitAlias(i) => &i.attrs,
+        syn::Item::Type(i) => &i.attrs,
+        syn::Item::Union(i) => &i.attrs,
+        syn::Item::Use(i) => &i.attrs,
+        _ => &[],
+    }
+}
+
+/// Returns the outer attributes attached to a [`syn::ImplItem`], or an empty
+/// slice for associated item kinds that do not carry attributes.
+pub(crate) fn impl_item_attrs(item: &syn::ImplItem) -> &[syn::Attribute] {
+    match item {
+        syn::ImplItem::Const(i) => &i.attrs,
+        syn::ImplItem::Fn(i) => &i.attrs,
+        syn::ImplItem::Type(i) => &i.attrs,
+        syn::ImplItem::Macro(i) => &i.attrs,
+        _ => &[],
+    }
+}
+
+/// Returns the outer attributes attached to a [`syn::TraitItem`], or an empty
+/// slice for trait associated item kinds that do not carry attributes.
+pub(crate) fn trait_item_attrs(item: &syn::TraitItem) -> &[syn::Attribute] {
+    match item {
+        syn::TraitItem::Const(i) => &i.attrs,
+        syn::TraitItem::Fn(i) => &i.attrs,
+        syn::TraitItem::Type(i) => &i.attrs,
+        syn::TraitItem::Macro(i) => &i.attrs,
+        _ => &[],
+    }
+}
+
+/// Returns the outer attributes attached to a [`syn::ForeignItem`], or an
+/// empty slice for foreign item kinds that do not carry attributes.
+pub(crate) fn foreign_item_attrs(item: &syn::ForeignItem) -> &[syn::Attribute] {
+    match item {
+        syn::ForeignItem::Fn(i) => &i.attrs,
+        syn::ForeignItem::Static(i) => &i.attrs,
+        syn::ForeignItem::Type(i) => &i.attrs,
+        syn::ForeignItem::Macro(i) => &i.attrs,
+        _ => &[],
+    }
+}

@@ -16,7 +16,10 @@ use domain::verify::{VerifyFinding, VerifyOutcome};
 use crate::track::symlink_guard::reject_symlinks_below;
 
 use super::path_safety::lexical_normalize;
-use super::syn_helpers::{has_cfg_test_attr, rs_files_in_dir, sibling_rs_files};
+use super::syn_helpers::{
+    foreign_item_attrs, has_cfg_test_attr, impl_item_attrs, item_attrs, rs_files_in_dir,
+    sibling_rs_files, trait_item_attrs,
+};
 use super::syn_scan_classify::{
     ClassifyCache, SiblingClassifyCache, classify_file_module_references, classify_sibling_probe,
 };
@@ -577,8 +580,16 @@ where
             return;
         }
         self.emit("impl_item", attrs);
-        if let syn::ImplItem::Fn(method) = item {
-            self.visit_block_for_local_items(&method.block);
+        match item {
+            syn::ImplItem::Fn(method) => {
+                self.visit_block_for_local_items(&method.block);
+            }
+            syn::ImplItem::Const(item_const) => {
+                // Walk associated const initializer expressions for block items
+                // with attributes (mirrors top-level Item::Const handling).
+                self.visit_expr_for_local_items(&item_const.expr);
+            }
+            _ => {}
         }
     }
 
@@ -588,10 +599,20 @@ where
             return;
         }
         self.emit("trait_item", attrs);
-        if let syn::TraitItem::Fn(method) = item {
-            if let Some(body) = &method.default {
-                self.visit_block_for_local_items(body);
+        match item {
+            syn::TraitItem::Fn(method) => {
+                if let Some(body) = &method.default {
+                    self.visit_block_for_local_items(body);
+                }
             }
+            syn::TraitItem::Const(item_const) => {
+                // Walk trait associated const default value expressions for block
+                // items with attributes (mirrors top-level Item::Const handling).
+                if let Some((_, expr)) = &item_const.default {
+                    self.visit_expr_for_local_items(expr);
+                }
+            }
+            _ => {}
         }
     }
 
@@ -642,56 +663,5 @@ where
 {
     fn visit_item(&mut self, item: &'ast syn::Item) {
         self.node_visitor.visit_item(item);
-    }
-}
-
-fn item_attrs(item: &syn::Item) -> &[syn::Attribute] {
-    match item {
-        syn::Item::Const(i) => &i.attrs,
-        syn::Item::Enum(i) => &i.attrs,
-        syn::Item::ExternCrate(i) => &i.attrs,
-        syn::Item::Fn(i) => &i.attrs,
-        syn::Item::ForeignMod(i) => &i.attrs,
-        syn::Item::Impl(i) => &i.attrs,
-        syn::Item::Macro(i) => &i.attrs,
-        syn::Item::Mod(i) => &i.attrs,
-        syn::Item::Static(i) => &i.attrs,
-        syn::Item::Struct(i) => &i.attrs,
-        syn::Item::Trait(i) => &i.attrs,
-        syn::Item::TraitAlias(i) => &i.attrs,
-        syn::Item::Type(i) => &i.attrs,
-        syn::Item::Union(i) => &i.attrs,
-        syn::Item::Use(i) => &i.attrs,
-        _ => &[],
-    }
-}
-
-fn impl_item_attrs(item: &syn::ImplItem) -> &[syn::Attribute] {
-    match item {
-        syn::ImplItem::Const(i) => &i.attrs,
-        syn::ImplItem::Fn(i) => &i.attrs,
-        syn::ImplItem::Type(i) => &i.attrs,
-        syn::ImplItem::Macro(i) => &i.attrs,
-        _ => &[],
-    }
-}
-
-fn trait_item_attrs(item: &syn::TraitItem) -> &[syn::Attribute] {
-    match item {
-        syn::TraitItem::Const(i) => &i.attrs,
-        syn::TraitItem::Fn(i) => &i.attrs,
-        syn::TraitItem::Type(i) => &i.attrs,
-        syn::TraitItem::Macro(i) => &i.attrs,
-        _ => &[],
-    }
-}
-
-fn foreign_item_attrs(item: &syn::ForeignItem) -> &[syn::Attribute] {
-    match item {
-        syn::ForeignItem::Fn(i) => &i.attrs,
-        syn::ForeignItem::Static(i) => &i.attrs,
-        syn::ForeignItem::Type(i) => &i.attrs,
-        syn::ForeignItem::Macro(i) => &i.attrs,
-        _ => &[],
     }
 }
