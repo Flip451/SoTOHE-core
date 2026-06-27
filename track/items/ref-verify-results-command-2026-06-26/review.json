@@ -1,6 +1,561 @@
 {
   "schema_version": 2,
   "scopes": {
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Chain-2 evidence origins are built from `find_spec_element_text`, which returns the rendered snippet (`[section id] text`) rather than the raw spec element text. That violates the `SpecElementRef` contract that `text_label` is verbatim text, so the cache will persist a different origin payload than Chain-1 and the codec/domain model expect.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/pair_source_chain2.rs",
+              "line": 194,
+              "category": "adapter correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4e20fe67f2d1ed0d0ef8603110a43a1309e65cdd3dc859385b42a8e32e0c908c",
+          "at": "2026-06-26T05:54:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:96da4a2b0621c63a4936bc1817543966a7701335dfd6a42fea38c7f34d36ed23",
+          "at": "2026-06-26T06:09:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:96da4a2b0621c63a4936bc1817543966a7701335dfd6a42fea38c7f34d36ed23",
+          "at": "2026-06-26T06:14:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7493efff237b03f5436243b97c7ef0d8e77e9fa9ca417bb5caed5f582b1a7389",
+          "at": "2026-06-26T07:53:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7493efff237b03f5436243b97c7ef0d8e77e9fa9ca417bb5caed5f582b1a7389",
+          "at": "2026-06-26T07:58:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8cff3089885c4a8ab336ef156e6f78f19eb51ebbdb0c9209c3c583b16fd87a62",
+          "at": "2026-06-26T08:55:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`load_results_tddd_bindings` falls back to `Ok(Vec::new())` when `architecture-rules.json` is malformed or absent. This helper feeds the results adapter's Chain-2 cache loading, so a broken rules file can be treated as “no Chain-2 layers” instead of failing closed. The lower-level `load_tddd_layers` contract treats this file as required because catalogue bindings cannot be trusted without it; per the infrastructure severity policy, config loaders must not silently default on parse/missing-file errors when the convention is fail-closed.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/ref_verify/driver_adapter_results.rs",
+              "line": 21,
+              "category": "non-fail-closed config"
+            }
+          ],
+          "hash": "rvw1:sha256:8cff3089885c4a8ab336ef156e6f78f19eb51ebbdb0c9209c3c583b16fd87a62",
+          "at": "2026-06-26T08:59:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9642498d7ae829561ad29ce8166333387bd19018c35241252d74f6734b592a48",
+          "at": "2026-06-26T09:06:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8e867eaf43c788b130cb32ae0feeb55034d2ddb11a5bb948a8ba52cbc693da9c",
+          "at": "2026-06-26T12:16:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8e867eaf43c788b130cb32ae0feeb55034d2ddb11a5bb948a8ba52cbc693da9c",
+          "at": "2026-06-26T12:20:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:24ac79b820f0236b0b8c15375e7cf3143beca413b9546436a7abfb3480cd3c9c",
+          "at": "2026-06-26T12:42:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "For `--chain 1`, this still calls `RefVerifyPairSourceAdapter::load_pairs` with the resolver's unfiltered `scope`, which is `All` for normal tracks. That path enumerates Chain2 pairs and reads/parses `architecture-rules.json`, so a malformed rules file or broken Chain2 catalogue can still fail a Chain1-only results query before `compute_results` gets the data. The new cache-loading short-circuit needs the same Chain1-only treatment for pair enumeration, or it should call a Chain1-only source path here.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/ref_verify/driver_adapter.rs",
+              "line": 415,
+              "category": "adapter correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:24ac79b820f0236b0b8c15375e7cf3143beca413b9546436a7abfb3480cd3c9c",
+          "at": "2026-06-26T12:46:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e188af4840bd249f526a0e02c1cde98a0d6a27242a83029b34425c20818c621b",
+          "at": "2026-06-26T12:52:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Calling `load_results_tddd_bindings` here makes `results --chain All` require `architecture-rules.json` even in the documented pre-TDDD / pre-architecture-rules state where Chain2 should contribute zero pairs. The existing scope resolver and Chain2 pair source treat a missing rules file as \"no TDDD layers declared\"; this branch now returns an error instead of Chain1-only results.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/driver_adapter.rs",
+              "line": 411,
+              "category": "non-fail-closed config"
+            },
+            {
+              "message": "The `All` branch uses `filter_map(...).ok()` when building `target_ids`, so any `architecture-rules.json` layer id that is accepted by `parse_tddd_layers` but rejected by `LayerId::try_new` is silently skipped instead of failing closed. The previous `enumerate_chain2_all_layers` path surfaced this as a `Wiring` error, so `results --chain All` can now under-report an entire layer without any signal.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/driver_adapter.rs",
+              "line": 430,
+              "category": "non-fail-closed config"
+            }
+          ],
+          "hash": "rvw1:sha256:c49c0f89788b087045905a03c23d59e5afa37ba2e2e7556d476cae2c2e30db34",
+          "at": "2026-06-26T13:28:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d985a3feaeca121d8a8ff80906d3b264dd69f25ec88c250658cb0130bc8b1fc2",
+          "at": "2026-06-26T13:37:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`load_results_tddd_bindings` now converts a missing `architecture-rules.json` into `Ok(Vec::new())`, so a Chain2 results request with `--layer all` can silently report zero Chain2 lanes instead of failing closed when the layer binding config is absent. This overrides the underlying `load_tddd_layers` contract, which treats the missing rules file as a hard configuration error because catalogue bindings cannot be determined without it. Please propagate the `NotFound` as `RefVerifyDriverError::Wiring` for Chain2 paths instead of defaulting to an empty binding set.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/ref_verify/driver_adapter_results.rs",
+              "line": 22,
+              "category": "non-fail-closed config"
+            }
+          ],
+          "hash": "rvw1:sha256:d985a3feaeca121d8a8ff80906d3b264dd69f25ec88c250658cb0130bc8b1fc2",
+          "at": "2026-06-26T13:40:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:736526b32ea6f553556a3fa6702db4b8238b1805a4603d038b7628b666a55279",
+          "at": "2026-06-26T13:44:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2e214f632b5a8601da5520c1a16dfc7d9fd9588381a3de4d6f74fdfafdf096eb",
+          "at": "2026-06-26T14:18:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "When the request is for a specific Chain2 layer whose catalogue is absent in the pre-Phase-2 state, this new skip leaves `chain2_caches` and `chain2_layer_ids` empty, but `results()` still passes the original `RefVerifyLayerFilter::Specific(layer)` into `compute_results`. `compute_results` validates `Specific` against `chain2_caches` and returns `Wiring` when the layer is missing there, so `--chain 2 --layer <valid-layer>` still fails instead of producing the intended zero-pair result. The graceful skip needs to preserve the fact that the layer was a valid target, or bypass the duplicate cache-based validation for this absent-catalogue case.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/ref_verify/driver_adapter.rs",
+              "line": 441,
+              "category": "adapter correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:2e214f632b5a8601da5520c1a16dfc7d9fd9588381a3de4d6f74fdfafdf096eb",
+          "at": "2026-06-26T14:21:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:af248162dcbdbd333c04d4bb774271a0fbb2e227b65477eac20d491d4540f620",
+          "at": "2026-06-26T14:27:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eb5c0e350349ba3a09d545556794366a4fb53eaef71411d00b7b817fc2eefa87",
+          "at": "2026-06-26T15:04:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eb5c0e350349ba3a09d545556794366a4fb53eaef71411d00b7b817fc2eefa87",
+          "at": "2026-06-26T15:08:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:edea20856d615eab2c32fa9c5e82b25853edda5f0c939f22b3863a2cb47ae455",
+          "at": "2026-06-26T15:52:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The partial-catalogue fail-closed check only inspects `target_ids`, so `--chain 2 --layer domain` can still silently succeed in a partial Chain2 state. Example: `architecture-rules.json` declares `domain` and `usecase`, `usecase-types.json` exists, and `domain-types.json` is missing. With a specific `domain` filter, this loop records only `domain` as absent, `present` stays empty, `check_partial_catalogue_set` treats it as the all-absent pre-Phase-2 case, and results returns zero pairs instead of a Wiring error. The presence/absence scan needs to classify all declared Chain2 catalogues before applying the layer narrowing, matching the fail-closed partial-set policy.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/ref_verify/driver_adapter.rs",
+              "line": 436,
+              "category": "non-fail-closed config"
+            }
+          ],
+          "hash": "rvw1:sha256:edea20856d615eab2c32fa9c5e82b25853edda5f0c939f22b3863a2cb47ae455",
+          "at": "2026-06-26T16:33:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:22c8e188d7cadb823346aff6484cffbf4822e7e43a970ae24c1664f873bd9e82",
+          "at": "2026-06-26T16:43:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This makes `results --chain 1` fail on a valid Phase-0 track that has `track/items/<track_id>/` but no `spec.json`. `pair_source.rs` explicitly treats a missing `spec.json` as the legal zero-pair case, so this helper turns that state into `Wiring` instead of letting Chain1 return an empty summary.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/driver_adapter.rs",
+              "line": 345,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b60cf1a92a0f5e63cedfc5d9185aca830d10f47548a9cc3ab1b6b83c712e5f49",
+          "at": "2026-06-26T17:07:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`--chain 1` now bypasses `RefVerifyScopeResolver::resolve` entirely, so the IN-06 consistency check is no longer enforced on the Chain1-only path. A track with catalogues present but no `spec.json` will now fall through to empty Chain1 output instead of returning a typed `Wiring` error, which silently accepts an inconsistent on-disk state.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/driver_adapter.rs",
+              "line": 510,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:891bf2a11d8b56228b23502710b421f8e86e5e964d5e503067c4b554077e98d2",
+          "at": "2026-06-26T17:13:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`load_chain1_scope_tddd_bindings_or_empty()` converts both `LoadTdddLayersError::Parse` and `LoadTdddLayersError::Io(NotFound)` into `Ok(Vec::new())`, so a malformed or missing `architecture-rules.json` is treated as \"no TDDD bindings\". That makes `--chain 1` silently succeed instead of surfacing the config error, which defeats the fail-closed contract established by `load_tddd_layers` and can hide broken Phase-2 configuration behind an empty-result path.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/driver_adapter.rs",
+              "line": 323,
+              "category": "non-fail-closed config"
+            }
+          ],
+          "hash": "rvw1:sha256:8fd3c85c1810cfadf1571bca75290b10eeb63cb9d35d214a5df8fc6a5f8c638d",
+          "at": "2026-06-26T17:18:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_chain1_only_scope()` now hard-fails on `load_tddd_layers()` errors, including `architecture-rules.json` being absent. That makes `ref-verify results --chain 1` reject pre-TDDD / zero-layer repositories, even though the existing resolver and `load_results_tddd_bindings()` treat a missing rules file as \"no TDDD layers\". Chain1-only scope resolution should not introduce a stricter config dependency than the rest of the ref-verify path.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/driver_adapter.rs",
+              "line": 321,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:ec6b87fb3b8b95d61d73997e08447d529cde936ca7d48e203819bf1d5c9c6278",
+          "at": "2026-06-26T17:24:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`check_track_dir_exists()` only calls `try_exists()` on `track/items/<track_id>`. That accepts a symlink or even a regular file at the track slot, so the new precheck does not actually reject a non-real track directory. For `--chain 2`-only results this can still fall through to an empty success instead of the `Wiring` error the change is trying to enforce. The existing `enumerate_chain1_pairs()` guard shows the needed pattern: reject symlinks and confirm `is_dir()`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/driver_adapter.rs",
+              "line": 303,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:4fcc22b14f53f5eb16f26423489dd3724eb089d0d70edc30d6d4468b1da70563",
+          "at": "2026-06-26T17:33:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e4ccfcf85fd3280adf645044218ee6c469bec8cf9c7778075ffecc6edc601e67",
+          "at": "2026-06-26T17:43:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e4ccfcf85fd3280adf645044218ee6c469bec8cf9c7778075ffecc6edc601e67",
+          "at": "2026-06-26T17:48:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9cffe1a02ab0c2cbaef2127e33727d8a881b99ca140e0abfb233caab1a25ec59",
+          "at": "2026-06-26T18:14:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9cffe1a02ab0c2cbaef2127e33727d8a881b99ca140e0abfb233caab1a25ec59",
+          "at": "2026-06-26T18:18:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:78c98d1e1b63d0c10babadcf3d030bfa87c7eaf867415b775f4630896e7acd84",
+          "at": "2026-06-26T18:56:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:78c98d1e1b63d0c10babadcf3d030bfa87c7eaf867415b775f4630896e7acd84",
+          "at": "2026-06-26T19:00:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8fb386d00e97792979ce0d629328422f458697409614133d99625ab878c5ffe7",
+          "at": "2026-06-26T19:26:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8fb386d00e97792979ce0d629328422f458697409614133d99625ab878c5ffe7",
+          "at": "2026-06-26T19:30:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:314ca9cee70a7ee863618fc3d07add9f3b36e0b4020b32c64123b6ab1a326460",
+          "at": "2026-06-27T02:07:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:314ca9cee70a7ee863618fc3d07add9f3b36e0b4020b32c64123b6ab1a326460",
+          "at": "2026-06-27T02:10:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:738f3a533becccb077b7d339192f1c7fda1276d049f4682be002a93ff8b25ee6",
+          "at": "2026-06-27T02:37:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:738f3a533becccb077b7d339192f1c7fda1276d049f4682be002a93ff8b25ee6",
+          "at": "2026-06-27T02:41:19Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:02613a3a89fea445d75ae9c64e5c67afe7812003b24a7915e02978d23916742d",
+          "at": "2026-06-26T05:52:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:02613a3a89fea445d75ae9c64e5c67afe7812003b24a7915e02978d23916742d",
+          "at": "2026-06-26T05:56:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9eebd493ef8295cc4250f8227ec63d9fb465e34f06d6c7e3c49e60d9076d3084",
+          "at": "2026-06-26T07:48:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9eebd493ef8295cc4250f8227ec63d9fb465e34f06d6c7e3c49e60d9076d3084",
+          "at": "2026-06-26T07:51:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0faf6dcffce55fcf9c8d2dbe2d883115eefc05f037c7fd671e3294d5c0186dc8",
+          "at": "2026-06-26T12:14:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0faf6dcffce55fcf9c8d2dbe2d883115eefc05f037c7fd671e3294d5c0186dc8",
+          "at": "2026-06-26T12:17:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The cache rebuild here matches verdicts only on `(claim_hash, evidence_hash)`, so a pair in one `cache_scope` can accidentally reuse the verdict from another scope when the same hashes appear in both. That can persist the wrong verdict/origin combination because the lookup ignores the same scope partitioning used during cache load.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify/interactor.rs",
+              "line": 302,
+              "category": "business logic leak"
+            }
+          ],
+          "hash": "rvw1:sha256:eaf69cec6a2506c88f9cdf58049b200d7d8b9431186cc2935a8230fd51e26579",
+          "at": "2026-06-27T03:29:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Skipping `SemanticVerdict::Pending` while rebuilding a scope rewrites that cache file without any pending entries before returning `HumanEscalationRequired` (both the D12 fast path here and the later save loop at lines 321-345). Because `save_entries` replaces the whole artifact, any scope that mixes pending with pass/fail loses the unresolved pair from the cache, so the next run re-verifies it as a miss instead of preserving the prior unresolved state.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify/interactor.rs",
+              "line": 170,
+              "category": "cache semantics"
+            }
+          ],
+          "hash": "rvw1:sha256:1d5b4c062c95d339e11a5c7f4dc034677e8acf0f3bc77a270fbf62e5f757ac2a",
+          "at": "2026-06-27T03:38:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d6f5fe36413600cab919d09dffb700c48e59af1f0550c403df0ca979e8470dac",
+          "at": "2026-06-27T03:46:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d6f5fe36413600cab919d09dffb700c48e59af1f0550c403df0ca979e8470dac",
+          "at": "2026-06-27T03:48:29Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e4378b99ef188edf534cc44dcf7370191de70db814863d31a94ea5e3e5034f38",
+          "at": "2026-06-26T05:50:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e4378b99ef188edf534cc44dcf7370191de70db814863d31a94ea5e3e5034f38",
+          "at": "2026-06-26T05:53:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:94da838097d36ee152e41bcbee1a102243b422f8a160707868e38fc88ec62337",
+          "at": "2026-06-26T07:52:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:94da838097d36ee152e41bcbee1a102243b422f8a160707868e38fc88ec62337",
+          "at": "2026-06-26T07:55:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1504d19c7bd36ebb1bbfee56de9e85183ef42765deeff4857ca441fae06c20c3",
+          "at": "2026-06-26T14:18:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1504d19c7bd36ebb1bbfee56de9e85183ef42765deeff4857ca441fae06c20c3",
+          "at": "2026-06-26T14:21:18Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f7114518cfa2b99cb943299aaba4be42d9a51d89ca3fd8ee4773086596ba4897",
+          "at": "2026-06-26T05:51:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f7114518cfa2b99cb943299aaba4be42d9a51d89ca3fd8ee4773086596ba4897",
+          "at": "2026-06-26T05:53:47Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -412,6 +967,24 @@
         }
       ]
     },
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c0699d1af1ddf7a1267fc9edf59cab97b28ca06132625d51a2abcc1103cb60fc",
+          "at": "2026-06-26T07:55:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c0699d1af1ddf7a1267fc9edf59cab97b28ca06132625d51a2abcc1103cb60fc",
+          "at": "2026-06-26T07:57:30Z"
+        }
+      ]
+    },
     "cli": {
       "rounds": [
         {
@@ -456,407 +1029,6 @@
           "findings": [],
           "hash": "rvw1:sha256:637c657210928deecc89cb4f91f2527bad4ffff663bf80ccb0d40069ce9232a7",
           "at": "2026-06-26T14:22:06Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Chain-2 evidence origins are built from `find_spec_element_text`, which returns the rendered snippet (`[section id] text`) rather than the raw spec element text. That violates the `SpecElementRef` contract that `text_label` is verbatim text, so the cache will persist a different origin payload than Chain-1 and the codec/domain model expect.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/pair_source_chain2.rs",
-              "line": 194,
-              "category": "adapter correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:4e20fe67f2d1ed0d0ef8603110a43a1309e65cdd3dc859385b42a8e32e0c908c",
-          "at": "2026-06-26T05:54:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:96da4a2b0621c63a4936bc1817543966a7701335dfd6a42fea38c7f34d36ed23",
-          "at": "2026-06-26T06:09:50Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:96da4a2b0621c63a4936bc1817543966a7701335dfd6a42fea38c7f34d36ed23",
-          "at": "2026-06-26T06:14:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7493efff237b03f5436243b97c7ef0d8e77e9fa9ca417bb5caed5f582b1a7389",
-          "at": "2026-06-26T07:53:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7493efff237b03f5436243b97c7ef0d8e77e9fa9ca417bb5caed5f582b1a7389",
-          "at": "2026-06-26T07:58:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8cff3089885c4a8ab336ef156e6f78f19eb51ebbdb0c9209c3c583b16fd87a62",
-          "at": "2026-06-26T08:55:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`load_results_tddd_bindings` falls back to `Ok(Vec::new())` when `architecture-rules.json` is malformed or absent. This helper feeds the results adapter's Chain-2 cache loading, so a broken rules file can be treated as “no Chain-2 layers” instead of failing closed. The lower-level `load_tddd_layers` contract treats this file as required because catalogue bindings cannot be trusted without it; per the infrastructure severity policy, config loaders must not silently default on parse/missing-file errors when the convention is fail-closed.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/ref_verify/driver_adapter_results.rs",
-              "line": 21,
-              "category": "non-fail-closed config"
-            }
-          ],
-          "hash": "rvw1:sha256:8cff3089885c4a8ab336ef156e6f78f19eb51ebbdb0c9209c3c583b16fd87a62",
-          "at": "2026-06-26T08:59:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9642498d7ae829561ad29ce8166333387bd19018c35241252d74f6734b592a48",
-          "at": "2026-06-26T09:06:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8e867eaf43c788b130cb32ae0feeb55034d2ddb11a5bb948a8ba52cbc693da9c",
-          "at": "2026-06-26T12:16:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8e867eaf43c788b130cb32ae0feeb55034d2ddb11a5bb948a8ba52cbc693da9c",
-          "at": "2026-06-26T12:20:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:24ac79b820f0236b0b8c15375e7cf3143beca413b9546436a7abfb3480cd3c9c",
-          "at": "2026-06-26T12:42:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "For `--chain 1`, this still calls `RefVerifyPairSourceAdapter::load_pairs` with the resolver's unfiltered `scope`, which is `All` for normal tracks. That path enumerates Chain2 pairs and reads/parses `architecture-rules.json`, so a malformed rules file or broken Chain2 catalogue can still fail a Chain1-only results query before `compute_results` gets the data. The new cache-loading short-circuit needs the same Chain1-only treatment for pair enumeration, or it should call a Chain1-only source path here.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/ref_verify/driver_adapter.rs",
-              "line": 415,
-              "category": "adapter correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:24ac79b820f0236b0b8c15375e7cf3143beca413b9546436a7abfb3480cd3c9c",
-          "at": "2026-06-26T12:46:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e188af4840bd249f526a0e02c1cde98a0d6a27242a83029b34425c20818c621b",
-          "at": "2026-06-26T12:52:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Calling `load_results_tddd_bindings` here makes `results --chain All` require `architecture-rules.json` even in the documented pre-TDDD / pre-architecture-rules state where Chain2 should contribute zero pairs. The existing scope resolver and Chain2 pair source treat a missing rules file as \"no TDDD layers declared\"; this branch now returns an error instead of Chain1-only results.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/driver_adapter.rs",
-              "line": 411,
-              "category": "non-fail-closed config"
-            },
-            {
-              "message": "The `All` branch uses `filter_map(...).ok()` when building `target_ids`, so any `architecture-rules.json` layer id that is accepted by `parse_tddd_layers` but rejected by `LayerId::try_new` is silently skipped instead of failing closed. The previous `enumerate_chain2_all_layers` path surfaced this as a `Wiring` error, so `results --chain All` can now under-report an entire layer without any signal.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/driver_adapter.rs",
-              "line": 430,
-              "category": "non-fail-closed config"
-            }
-          ],
-          "hash": "rvw1:sha256:c49c0f89788b087045905a03c23d59e5afa37ba2e2e7556d476cae2c2e30db34",
-          "at": "2026-06-26T13:28:49Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d985a3feaeca121d8a8ff80906d3b264dd69f25ec88c250658cb0130bc8b1fc2",
-          "at": "2026-06-26T13:37:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`load_results_tddd_bindings` now converts a missing `architecture-rules.json` into `Ok(Vec::new())`, so a Chain2 results request with `--layer all` can silently report zero Chain2 lanes instead of failing closed when the layer binding config is absent. This overrides the underlying `load_tddd_layers` contract, which treats the missing rules file as a hard configuration error because catalogue bindings cannot be determined without it. Please propagate the `NotFound` as `RefVerifyDriverError::Wiring` for Chain2 paths instead of defaulting to an empty binding set.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/ref_verify/driver_adapter_results.rs",
-              "line": 22,
-              "category": "non-fail-closed config"
-            }
-          ],
-          "hash": "rvw1:sha256:d985a3feaeca121d8a8ff80906d3b264dd69f25ec88c250658cb0130bc8b1fc2",
-          "at": "2026-06-26T13:40:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:736526b32ea6f553556a3fa6702db4b8238b1805a4603d038b7628b666a55279",
-          "at": "2026-06-26T13:44:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2e214f632b5a8601da5520c1a16dfc7d9fd9588381a3de4d6f74fdfafdf096eb",
-          "at": "2026-06-26T14:18:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "When the request is for a specific Chain2 layer whose catalogue is absent in the pre-Phase-2 state, this new skip leaves `chain2_caches` and `chain2_layer_ids` empty, but `results()` still passes the original `RefVerifyLayerFilter::Specific(layer)` into `compute_results`. `compute_results` validates `Specific` against `chain2_caches` and returns `Wiring` when the layer is missing there, so `--chain 2 --layer <valid-layer>` still fails instead of producing the intended zero-pair result. The graceful skip needs to preserve the fact that the layer was a valid target, or bypass the duplicate cache-based validation for this absent-catalogue case.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/ref_verify/driver_adapter.rs",
-              "line": 441,
-              "category": "adapter correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:2e214f632b5a8601da5520c1a16dfc7d9fd9588381a3de4d6f74fdfafdf096eb",
-          "at": "2026-06-26T14:21:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:af248162dcbdbd333c04d4bb774271a0fbb2e227b65477eac20d491d4540f620",
-          "at": "2026-06-26T14:27:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:eb5c0e350349ba3a09d545556794366a4fb53eaef71411d00b7b817fc2eefa87",
-          "at": "2026-06-26T15:04:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:eb5c0e350349ba3a09d545556794366a4fb53eaef71411d00b7b817fc2eefa87",
-          "at": "2026-06-26T15:08:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:edea20856d615eab2c32fa9c5e82b25853edda5f0c939f22b3863a2cb47ae455",
-          "at": "2026-06-26T15:52:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The partial-catalogue fail-closed check only inspects `target_ids`, so `--chain 2 --layer domain` can still silently succeed in a partial Chain2 state. Example: `architecture-rules.json` declares `domain` and `usecase`, `usecase-types.json` exists, and `domain-types.json` is missing. With a specific `domain` filter, this loop records only `domain` as absent, `present` stays empty, `check_partial_catalogue_set` treats it as the all-absent pre-Phase-2 case, and results returns zero pairs instead of a Wiring error. The presence/absence scan needs to classify all declared Chain2 catalogues before applying the layer narrowing, matching the fail-closed partial-set policy.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/ref_verify/driver_adapter.rs",
-              "line": 436,
-              "category": "non-fail-closed config"
-            }
-          ],
-          "hash": "rvw1:sha256:edea20856d615eab2c32fa9c5e82b25853edda5f0c939f22b3863a2cb47ae455",
-          "at": "2026-06-26T16:33:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:22c8e188d7cadb823346aff6484cffbf4822e7e43a970ae24c1664f873bd9e82",
-          "at": "2026-06-26T16:43:57Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This makes `results --chain 1` fail on a valid Phase-0 track that has `track/items/<track_id>/` but no `spec.json`. `pair_source.rs` explicitly treats a missing `spec.json` as the legal zero-pair case, so this helper turns that state into `Wiring` instead of letting Chain1 return an empty summary.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/driver_adapter.rs",
-              "line": 345,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:b60cf1a92a0f5e63cedfc5d9185aca830d10f47548a9cc3ab1b6b83c712e5f49",
-          "at": "2026-06-26T17:07:57Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`--chain 1` now bypasses `RefVerifyScopeResolver::resolve` entirely, so the IN-06 consistency check is no longer enforced on the Chain1-only path. A track with catalogues present but no `spec.json` will now fall through to empty Chain1 output instead of returning a typed `Wiring` error, which silently accepts an inconsistent on-disk state.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/driver_adapter.rs",
-              "line": 510,
-              "category": "error handling"
-            }
-          ],
-          "hash": "rvw1:sha256:891bf2a11d8b56228b23502710b421f8e86e5e964d5e503067c4b554077e98d2",
-          "at": "2026-06-26T17:13:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`load_chain1_scope_tddd_bindings_or_empty()` converts both `LoadTdddLayersError::Parse` and `LoadTdddLayersError::Io(NotFound)` into `Ok(Vec::new())`, so a malformed or missing `architecture-rules.json` is treated as \"no TDDD bindings\". That makes `--chain 1` silently succeed instead of surfacing the config error, which defeats the fail-closed contract established by `load_tddd_layers` and can hide broken Phase-2 configuration behind an empty-result path.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/driver_adapter.rs",
-              "line": 323,
-              "category": "non-fail-closed config"
-            }
-          ],
-          "hash": "rvw1:sha256:8fd3c85c1810cfadf1571bca75290b10eeb63cb9d35d214a5df8fc6a5f8c638d",
-          "at": "2026-06-26T17:18:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`resolve_chain1_only_scope()` now hard-fails on `load_tddd_layers()` errors, including `architecture-rules.json` being absent. That makes `ref-verify results --chain 1` reject pre-TDDD / zero-layer repositories, even though the existing resolver and `load_results_tddd_bindings()` treat a missing rules file as \"no TDDD layers\". Chain1-only scope resolution should not introduce a stricter config dependency than the rest of the ref-verify path.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/driver_adapter.rs",
-              "line": 321,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:ec6b87fb3b8b95d61d73997e08447d529cde936ca7d48e203819bf1d5c9c6278",
-          "at": "2026-06-26T17:24:16Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`check_track_dir_exists()` only calls `try_exists()` on `track/items/<track_id>`. That accepts a symlink or even a regular file at the track slot, so the new precheck does not actually reject a non-real track directory. For `--chain 2`-only results this can still fall through to an empty success instead of the `Wiring` error the change is trying to enforce. The existing `enumerate_chain1_pairs()` guard shows the needed pattern: reject symlinks and confirm `is_dir()`.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/driver_adapter.rs",
-              "line": 303,
-              "category": "symlink not rejected at boundary"
-            }
-          ],
-          "hash": "rvw1:sha256:4fcc22b14f53f5eb16f26423489dd3724eb089d0d70edc30d6d4468b1da70563",
-          "at": "2026-06-26T17:33:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e4ccfcf85fd3280adf645044218ee6c469bec8cf9c7778075ffecc6edc601e67",
-          "at": "2026-06-26T17:43:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e4ccfcf85fd3280adf645044218ee6c469bec8cf9c7778075ffecc6edc601e67",
-          "at": "2026-06-26T17:48:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9cffe1a02ab0c2cbaef2127e33727d8a881b99ca140e0abfb233caab1a25ec59",
-          "at": "2026-06-26T18:14:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9cffe1a02ab0c2cbaef2127e33727d8a881b99ca140e0abfb233caab1a25ec59",
-          "at": "2026-06-26T18:18:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:78c98d1e1b63d0c10babadcf3d030bfa87c7eaf867415b775f4630896e7acd84",
-          "at": "2026-06-26T18:56:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:78c98d1e1b63d0c10babadcf3d030bfa87c7eaf867415b775f4630896e7acd84",
-          "at": "2026-06-26T19:00:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8fb386d00e97792979ce0d629328422f458697409614133d99625ab878c5ffe7",
-          "at": "2026-06-26T19:26:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8fb386d00e97792979ce0d629328422f458697409614133d99625ab878c5ffe7",
-          "at": "2026-06-26T19:30:49Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:314ca9cee70a7ee863618fc3d07add9f3b36e0b4020b32c64123b6ab1a326460",
-          "at": "2026-06-27T02:07:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:314ca9cee70a7ee863618fc3d07add9f3b36e0b4020b32c64123b6ab1a326460",
-          "at": "2026-06-27T02:10:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:738f3a533becccb077b7d339192f1c7fda1276d049f4682be002a93ff8b25ee6",
-          "at": "2026-06-27T02:37:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:738f3a533becccb077b7d339192f1c7fda1276d049f4682be002a93ff8b25ee6",
-          "at": "2026-06-27T02:41:19Z"
         }
       ]
     },
@@ -926,134 +1098,6 @@
           "findings": [],
           "hash": "rvw1:sha256:6a53dd1eb1bae5c3bc794c857c166239e140be50b3c5b49c7d45f82d63fcc0ab",
           "at": "2026-06-26T07:55:16Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:02613a3a89fea445d75ae9c64e5c67afe7812003b24a7915e02978d23916742d",
-          "at": "2026-06-26T05:52:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:02613a3a89fea445d75ae9c64e5c67afe7812003b24a7915e02978d23916742d",
-          "at": "2026-06-26T05:56:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9eebd493ef8295cc4250f8227ec63d9fb465e34f06d6c7e3c49e60d9076d3084",
-          "at": "2026-06-26T07:48:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9eebd493ef8295cc4250f8227ec63d9fb465e34f06d6c7e3c49e60d9076d3084",
-          "at": "2026-06-26T07:51:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0faf6dcffce55fcf9c8d2dbe2d883115eefc05f037c7fd671e3294d5c0186dc8",
-          "at": "2026-06-26T12:14:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0faf6dcffce55fcf9c8d2dbe2d883115eefc05f037c7fd671e3294d5c0186dc8",
-          "at": "2026-06-26T12:17:18Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e4378b99ef188edf534cc44dcf7370191de70db814863d31a94ea5e3e5034f38",
-          "at": "2026-06-26T05:50:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e4378b99ef188edf534cc44dcf7370191de70db814863d31a94ea5e3e5034f38",
-          "at": "2026-06-26T05:53:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:94da838097d36ee152e41bcbee1a102243b422f8a160707868e38fc88ec62337",
-          "at": "2026-06-26T07:52:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:94da838097d36ee152e41bcbee1a102243b422f8a160707868e38fc88ec62337",
-          "at": "2026-06-26T07:55:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1504d19c7bd36ebb1bbfee56de9e85183ef42765deeff4857ca441fae06c20c3",
-          "at": "2026-06-26T14:18:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1504d19c7bd36ebb1bbfee56de9e85183ef42765deeff4857ca441fae06c20c3",
-          "at": "2026-06-26T14:21:18Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f7114518cfa2b99cb943299aaba4be42d9a51d89ca3fd8ee4773086596ba4897",
-          "at": "2026-06-26T05:51:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f7114518cfa2b99cb943299aaba4be42d9a51d89ca3fd8ee4773086596ba4897",
-          "at": "2026-06-26T05:53:47Z"
-        }
-      ]
-    },
-    "cli_driver": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c0699d1af1ddf7a1267fc9edf59cab97b28ca06132625d51a2abcc1103cb60fc",
-          "at": "2026-06-26T07:55:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c0699d1af1ddf7a1267fc9edf59cab97b28ca06132625d51a2abcc1103cb60fc",
-          "at": "2026-06-26T07:57:30Z"
         }
       ]
     }
