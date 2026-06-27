@@ -51,22 +51,8 @@
         ]
       },
       {
-        "id": "IN-03",
-        "text": "`#[cfg(test)]` または `#[test]` で gated された item のスキャン除外。既存 `syn_helpers.rs` の `has_cfg_test_attr` を流用し、テストコードは検出対象としない。",
-        "adr_refs": [
-          {
-            "file": "knowledge/adr/2026-06-26-0810-prohibit-doc-hidden-attribute.md",
-            "anchor": "D2"
-          },
-          {
-            "file": "knowledge/adr/2026-06-26-0810-prohibit-doc-hidden-attribute.md",
-            "anchor": "D1"
-          }
-        ]
-      },
-      {
         "id": "IN-04",
-        "text": "`libs/infrastructure/src/verify/` 配下に共通 syn 走査ヘルパ（`.rs` ファイル再帰発見 → `syn::parse_file` → `#[cfg(test)]` / `#[test]` 除外 → コールバック visitor による判定）を新設する。既存 `syn_helpers.rs` の `has_cfg_test_attr` を再利用し、判定ロジックはコールバックで受ける設計とする。後続の syn ベース lint（例: `Result<_, String>` 禁止）でも再利用できる粒度とする。",
+        "text": "`libs/infrastructure/src/verify/` 配下に共通 syn 走査ヘルパ（各 layer crate ディレクトリ配下の `.rs` ファイル再帰発見 → `syn::parse_file` → コールバック visitor による判定）を新設する。判定ロジックはコールバックで受ける設計とする。後続の syn ベース lint（例: `Result<_, String>` 禁止）でも再利用できる粒度とする。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-06-26-0810-prohibit-doc-hidden-attribute.md",
@@ -76,7 +62,7 @@
       },
       {
         "id": "IN-05",
-        "text": "ゲートの有効化スコープを `architecture-rules.json` の `layers[]` から実行時に取得する。per-layer フラグや特定 crate パスのハードコードは持たず、`layers[]` に新 crate が追加されれば自動的に対象に含まれる。",
+        "text": "ゲートの有効化スコープを `architecture-rules.json` の `layers[]` から実行時に取得する。per-layer フラグや特定 crate パスのハードコードは持たず、`layers[]` に新 crate が追加されれば自動的に対象に含まれる。走査対象は各 layer crate ディレクトリ配下の `.rs` ファイル全体とし、`tests/` / `examples/` / `benches/` も除外しない。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-06-26-0810-prohibit-doc-hidden-attribute.md",
@@ -155,7 +141,7 @@
     },
     {
       "id": "CN-02",
-      "text": "検出は可視性（`pub` / `pub(crate)` / 非 pub）を問わず全 item に適用する。有効可視性の機械解析は行わず、属性の有無のみで判定する。",
+      "text": "検出は可視性（`pub` / `pub(crate)` / 非 pub）を問わず全 item に適用する。テストコード、integration tests、examples、benches も除外しない。有効可視性の機械解析は行わず、属性の有無のみで判定する。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-06-26-0810-prohibit-doc-hidden-attribute.md",
@@ -165,7 +151,7 @@
     },
     {
       "id": "CN-03",
-      "text": "ゲートのスコープは `architecture-rules.json` の `layers[]` を実行時に参照して決定する。特定 crate のパスや名前をコードにハードコードしない。`layers[]` に新 crate が追加されれば自動的にスコープに含まれる（per-layer フラグなし）。",
+      "text": "ゲートのスコープは `architecture-rules.json` の `layers[]` を実行時に参照して決定する。特定 crate のパスや名前をコードにハードコードしない。`layers[]` に新 crate が追加されれば自動的にスコープに含まれる（per-layer フラグなし）。走査ディレクトリは各 layer crate ディレクトリとし、その配下の `.rs` ファイルを対象とする。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-06-26-0810-prohibit-doc-hidden-attribute.md",
@@ -217,17 +203,7 @@
     },
     {
       "id": "AC-02",
-      "text": "`layers[]` のいずれかの crate の非テストソースに `#[doc(hidden)]` 相当の属性が存在する場合、ゲートが exit non-zero を返し、`#[doc(hidden)]` 属性の存在をファイルパス・行情報とともに示す finding を出力する。",
-      "adr_refs": [
-        {
-          "file": "knowledge/adr/2026-06-26-0810-prohibit-doc-hidden-attribute.md",
-          "anchor": "D2"
-        }
-      ]
-    },
-    {
-      "id": "AC-03",
-      "text": "`#[cfg(test)]` または `#[test]` で gated された item 内の `#[doc(hidden)]` はスキャン対象から除外され、finding を出力せずにゲートが pass する。",
+      "text": "`layers[]` のいずれかの crate の任意の Rust ソース（テストコード、integration tests、examples、benches を含む）に `#[doc(hidden)]` 相当の属性が存在する場合、ゲートが exit non-zero を返し、`#[doc(hidden)]` 属性の存在をファイルパス・行情報とともに示す finding を出力する。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-06-26-0810-prohibit-doc-hidden-attribute.md",
@@ -267,7 +243,7 @@
     },
     {
       "id": "AC-07",
-      "text": "IN-04 で導入した共通走査ヘルパが、後続の syn ベース lint（例: `Result<_, String>` 禁止）から再利用できる設計になっている。具体的には、ファイル再帰発見・`syn::parse_file`・cfg(test) 除外を共通基盤とし、判定ロジックのみをコールバックで差し替えられること。",
+      "text": "IN-04 で導入した共通走査ヘルパが、後続の syn ベース lint（例: `Result<_, String>` 禁止）から再利用できる設計になっている。具体的には、各 layer crate ディレクトリ配下のファイル再帰発見・`syn::parse_file` を共通基盤とし、判定ロジックのみをコールバックで差し替えられること。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-06-26-0810-prohibit-doc-hidden-attribute.md",
@@ -309,7 +285,7 @@
     }
   ],
   "signals": {
-    "blue": 26,
+    "blue": 24,
     "yellow": 0,
     "red": 0
   }

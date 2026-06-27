@@ -2,13 +2,12 @@
 //!
 //! Provides [`scan_workspace_rust_sources`] which discovers `.rs` files from
 //! `architecture-rules.json` `layers[]`, parses each file with
-//! [`syn::parse_file`], prunes `#[cfg(test)]` / `#[test]` items, and invokes a
-//! caller-supplied callback for every remaining attribute-bearing AST node.
+//! [`syn::parse_file`], and invokes a caller-supplied callback for every
+//! remaining attribute-bearing AST node.
 //!
 //! Later syn-based lint gates (e.g. `Result<_, String>` ban) can reuse this
 //! scanner by supplying a different detection callback.
 
-use std::collections::{HashMap, HashSet};
 use std::path::{Path, PathBuf};
 
 use domain::verify::{VerifyFinding, VerifyOutcome};
@@ -16,13 +15,7 @@ use domain::verify::{VerifyFinding, VerifyOutcome};
 use crate::track::symlink_guard::reject_symlinks_below;
 
 use super::path_safety::lexical_normalize;
-use super::syn_helpers::{
-    foreign_item_attrs, has_cfg_test_attr, impl_item_attrs, item_attrs, rs_files_in_dir,
-    sibling_rs_files, trait_item_attrs,
-};
-use super::syn_scan_classify::{
-    ClassifyCache, SiblingClassifyCache, classify_file_module_references, classify_sibling_probe,
-};
+use super::syn_helpers::{foreign_item_attrs, impl_item_attrs, item_attrs, trait_item_attrs};
 use super::trusted_root::absolutize;
 
 /// Context passed from the scanner to a detection callback for each
@@ -54,10 +47,9 @@ pub(crate) struct SynScanContext {
 ///
 /// Loads `architecture-rules.json` `layers[]` from `root`, discovers `.rs`
 /// source files under each layer's `{path}/src` directory, parses each file
-/// with [`syn::parse_file`], prunes `#[cfg(test)]` and `#[test]` items, and
-/// invokes `inspect` for every remaining attribute-bearing AST node (file-level
-/// inner attributes, items, impl/trait associated items, struct fields, enum
-/// variants, foreign items).
+/// with [`syn::parse_file`], and invokes `inspect` for every attribute-bearing
+/// AST node (file-level inner attributes, items, impl/trait associated items,
+/// struct fields, enum variants, foreign items).
 ///
 /// The `inspect` callback receives a [`SynScanContext`] and returns any
 /// [`VerifyFinding`] instances for violations it detects.  All findings are
@@ -80,8 +72,6 @@ pub(crate) fn scan_workspace_rust_sources(
 
     let trusted_root = lexical_normalize(&absolutize(root));
     let mut findings = Vec::new();
-    let mut classify_cache = ClassifyCache::new();
-    let mut sibling_cache = SiblingClassifyCache::new();
 
     for layer in rules.layers() {
         let src_dir = match resolve_layer_src_dir(&trusted_root, &layer.crate_name, &layer.path) {
@@ -91,14 +81,7 @@ pub(crate) fn scan_workspace_rust_sources(
                 continue;
             }
         };
-        scan_rs_files_in_dir(
-            &trusted_root,
-            &src_dir,
-            &mut findings,
-            &mut inspect,
-            &mut classify_cache,
-            &mut sibling_cache,
-        );
+        scan_rs_files_in_dir(&trusted_root, &src_dir, &mut findings, &mut inspect);
     }
 
     VerifyOutcome::from_findings(findings)
@@ -162,8 +145,6 @@ fn scan_rs_files_in_dir(
     dir: &Path,
     findings: &mut Vec<VerifyFinding>,
     inspect: &mut impl FnMut(SynScanContext) -> Vec<VerifyFinding>,
-    classify_cache: &mut ClassifyCache,
-    sibling_cache: &mut SiblingClassifyCache,
 ) {
     let Some(meta) = guarded_metadata(root, dir, findings) else {
         return;
@@ -206,9 +187,9 @@ fn scan_rs_files_in_dir(
             continue;
         };
         if meta.is_dir() {
-            scan_rs_files_in_dir(root, &path, findings, inspect, classify_cache, sibling_cache);
+            scan_rs_files_in_dir(root, &path, findings, inspect);
         } else if meta.is_file() && path.extension().is_some_and(|ext| ext == "rs") {
-            scan_single_file(root, &path, findings, inspect, classify_cache, sibling_cache);
+            scan_single_file(root, &path, findings, inspect);
         }
     }
 }
@@ -218,8 +199,6 @@ fn scan_single_file(
     path: &Path,
     findings: &mut Vec<VerifyFinding>,
     inspect: &mut impl FnMut(SynScanContext) -> Vec<VerifyFinding>,
-    classify_cache: &mut ClassifyCache,
-    sibling_cache: &mut SiblingClassifyCache,
 ) {
     let Some(meta) = guarded_metadata(root, path, findings) else {
         return;
@@ -250,14 +229,6 @@ fn scan_single_file(
 
     let rel_path = path.strip_prefix(root).unwrap_or(path).to_path_buf();
 
-    // Skip files whose crate-level attrs include `#![cfg(test)]`.
-    if has_cfg_test_attr(&file.attrs) {
-        return;
-    }
-    if is_file_backed_test_module(root, path, classify_cache, sibling_cache) {
-        return;
-    }
-
     // Emit findings for crate-level / file-level inner attributes.
     if !file.attrs.is_empty() {
         let line = attr_start_line(file.attrs.first());
@@ -281,198 +252,6 @@ fn scan_single_file(
 /// is unavailable.
 fn attr_start_line(attr: Option<&syn::Attribute>) -> usize {
     attr.map(|a| a.pound_token.spans[0].start().line).unwrap_or(0)
-}
-
-/// Returns `true` when `path` is a crate root entry point (`src/lib.rs` or
-/// `src/main.rs`).
-///
-/// Crate roots have no parent `mod` declaration in any production file, so the
-/// dual-ref scan would produce `cfg_test_ref=true, prod_ref=false` if a sibling
-/// file contains `#[cfg(test)] #[path = "lib.rs"] mod …;`.  By short-circuiting
-/// on crate roots we prevent such sibling declarations from misclassifying the
-/// root as test-only and allowing `#[doc(hidden)]` to bypass the gate.
-fn is_crate_root_entry_point(path: &Path) -> bool {
-    let Some(file_name) = path.file_name() else {
-        return false;
-    };
-    let name = file_name.to_string_lossy();
-    if name != "lib.rs" && name != "main.rs" {
-        return false;
-    }
-    path.parent().is_some_and(|p| p.file_name().is_some_and(|n| n == "src"))
-}
-
-/// Returns `true` when `path` is exclusively referenced by `#[cfg(test)] mod`
-/// declarations, propagating test context transitively from ancestor files.
-fn is_file_backed_test_module(
-    root: &Path,
-    path: &Path,
-    cache: &mut ClassifyCache,
-    sibling_cache: &mut SiblingClassifyCache,
-) -> bool {
-    is_file_backed_test_module_inner(
-        root,
-        path,
-        &mut HashSet::new(),
-        &mut HashMap::new(),
-        cache,
-        sibling_cache,
-    )
-}
-
-/// Inner recursive helper for [`is_file_backed_test_module`] with DFS cycle guard.
-/// Removes the `path` entry from `visiting` on return to allow re-visits from other paths.
-fn is_file_backed_test_module_inner(
-    root: &Path,
-    path: &Path,
-    visiting: &mut HashSet<PathBuf>,
-    memo: &mut HashMap<PathBuf, bool>,
-    cache: &mut ClassifyCache,
-    sibling_cache: &mut SiblingClassifyCache,
-) -> bool {
-    // Crate roots (`src/lib.rs`, `src/main.rs`) are always production code.
-    // They have no parent `mod` declaration, so a sibling file that declares
-    // `#[cfg(test)] #[path = "lib.rs"] mod …;` would otherwise produce
-    // cfg_test_ref=true, prod_ref=false — misclassifying the root as test-only.
-    if is_crate_root_entry_point(path) {
-        return false;
-    }
-
-    if let Some(result) = memo.get(path) {
-        return *result;
-    }
-    if !visiting.insert(path.to_path_buf()) {
-        return false;
-    }
-    let (mut cfg_test_ref, mut prod_ref) = (false, false);
-    for (candidate, module_path, is_sibling) in file_backed_module_source_probes(root, path) {
-        let parent_is_test = is_existing_source_file(root, &candidate)
-            && is_file_backed_test_module_inner(
-                root,
-                &candidate,
-                visiting,
-                memo,
-                cache,
-                sibling_cache,
-            );
-        // Sibling probes (same-directory files) must only match via `#[path]` attributes.
-        // A bare `mod foo;` in `src/a.rs` resolves to `src/a/foo.rs`, not to sibling
-        // `src/foo.rs`, so ident-based matching is skipped for sibling probes.
-        let (ct, prod) = if is_sibling {
-            classify_sibling_probe(root, &candidate, &module_path, sibling_cache, path)
-        } else {
-            classify_file_module_references(root, &candidate, &module_path, cache, path)
-        };
-        if parent_is_test {
-            cfg_test_ref |= ct | prod;
-        } else {
-            cfg_test_ref |= ct;
-            prod_ref |= prod;
-        }
-    }
-    let result = cfg_test_ref && !prod_ref;
-    visiting.remove(&path.to_path_buf());
-    memo.insert(path.to_path_buf(), result);
-    result
-}
-
-fn is_existing_source_file(root: &Path, path: &Path) -> bool {
-    let Ok(true) = reject_symlinks_below(path, root) else {
-        return false;
-    };
-    path.symlink_metadata().is_ok_and(|meta| meta.is_file())
-}
-
-// Each probe is `(candidate_file, module_path, is_sibling_probe)`.
-// `is_sibling_probe = true` means the candidate is a same-directory sibling of
-// `path`.  Sibling probes must only be classified via `#[path]` attributes because
-// a bare `mod foo;` in a sibling file resolves to a subdirectory, not to `path`.
-fn file_backed_module_source_probes(root: &Path, path: &Path) -> Vec<(PathBuf, Vec<String>, bool)> {
-    let mut probes = Vec::new();
-    let Some(mut base_dir) = path.parent().map(Path::to_path_buf) else {
-        return probes;
-    };
-
-    // Probe same-directory .rs siblings — they may use `#[path]` to reference `path`.
-    // Marked as sibling probes so that ident-based `mod` matching is skipped.
-    if let Some(module_path) = module_path_for_file_from_base(&base_dir, path) {
-        for sibling in sibling_rs_files(root, path) {
-            probes.push((sibling, module_path.clone(), true));
-        }
-    }
-
-    loop {
-        for source in parent_module_file_candidates(root, &base_dir) {
-            if source.as_path() == path {
-                continue;
-            }
-            if let Some(module_path) = module_path_for_file_from_base(&base_dir, path) {
-                probes.push((source, module_path, false));
-            }
-        }
-
-        if base_dir == root {
-            break;
-        }
-        let Some(parent) = base_dir.parent() else {
-            break;
-        };
-        base_dir = parent.to_path_buf();
-
-        // Ancestor sibling probe: add all .rs files in `base_dir` (now the
-        // ancestor directory).  Any file there may use
-        // `#[cfg(test)] #[path = "subdir/helpers.rs"] mod tests;`
-        // to reference `path` via a subdirectory path attribute, a pattern
-        // that the canonical-candidates list above does not cover.
-        if let Some(module_path) = module_path_for_file_from_base(&base_dir, path) {
-            for ancestor_file in rs_files_in_dir(root, &base_dir) {
-                if ancestor_file.as_path() != path {
-                    probes.push((ancestor_file, module_path.clone(), false));
-                }
-            }
-        }
-    }
-
-    probes
-}
-
-fn parent_module_file_candidates(root: &Path, parent_dir: &Path) -> Vec<PathBuf> {
-    let mut candidates =
-        vec![parent_dir.join("mod.rs"), parent_dir.join("lib.rs"), parent_dir.join("main.rs")];
-
-    if let Some(grandparent) = parent_dir.parent() {
-        if let Some(dir_name) = parent_dir.file_name() {
-            candidates.push(grandparent.join(format!("{}.rs", dir_name.to_string_lossy())));
-        }
-    }
-
-    candidates.into_iter().filter(|candidate| candidate.strip_prefix(root).is_ok()).collect()
-}
-
-fn module_path_for_file_from_base(base_dir: &Path, path: &Path) -> Option<Vec<String>> {
-    let file_name = path.file_name()?.to_string_lossy();
-    let module_path = if file_name == "mod.rs" {
-        let module_dir = path.parent()?;
-        normal_component_strings(module_dir.strip_prefix(base_dir).ok()?)?
-    } else {
-        let parent_dir = path.parent()?;
-        let mut components = normal_component_strings(parent_dir.strip_prefix(base_dir).ok()?)?;
-        components.push(path.file_stem()?.to_string_lossy().into_owned());
-        components
-    };
-
-    if module_path.is_empty() { None } else { Some(module_path) }
-}
-
-fn normal_component_strings(path: &Path) -> Option<Vec<String>> {
-    let mut names = Vec::new();
-    for component in path.components() {
-        let std::path::Component::Normal(name) = component else {
-            return None;
-        };
-        names.push(name.to_string_lossy().into_owned());
-    }
-    Some(names)
 }
 
 struct NodeVisitor<'a, F> {
@@ -500,21 +279,8 @@ where
         self.findings.extend((self.inspect)(ctx));
     }
 
-    /// Returns `true` when the attributes mark the item as test-only.
-    ///
-    /// Exact `#[cfg(test)]` and `#[test]` attributes cause an item to be
-    /// excluded from scanning (test code is not in scope for doc-hidden checks).
-    fn is_test_item(attrs: &[syn::Attribute]) -> bool {
-        has_cfg_test_attr(attrs) || attrs.iter().any(|a| a.path().is_ident("test"))
-    }
-
     fn visit_item(&mut self, item: &syn::Item) {
         let attrs = item_attrs(item);
-
-        // Skip test-gated items entirely — do not recurse into their children.
-        if Self::is_test_item(attrs) {
-            return;
-        }
 
         self.emit("item", attrs);
 
@@ -576,9 +342,6 @@ where
 
     fn visit_impl_item(&mut self, item: &syn::ImplItem) {
         let attrs = impl_item_attrs(item);
-        if Self::is_test_item(attrs) {
-            return;
-        }
         self.emit("impl_item", attrs);
         match item {
             syn::ImplItem::Fn(method) => {
@@ -595,9 +358,6 @@ where
 
     fn visit_trait_item(&mut self, item: &syn::TraitItem) {
         let attrs = trait_item_attrs(item);
-        if Self::is_test_item(attrs) {
-            return;
-        }
         self.emit("trait_item", attrs);
         match item {
             syn::TraitItem::Fn(method) => {
@@ -617,16 +377,10 @@ where
     }
 
     fn visit_field(&mut self, field: &syn::Field) {
-        if Self::is_test_item(&field.attrs) {
-            return;
-        }
         self.emit("field", &field.attrs);
     }
 
     fn visit_variant(&mut self, variant: &syn::Variant) {
-        if Self::is_test_item(&variant.attrs) {
-            return;
-        }
         self.emit("variant", &variant.attrs);
         // Also visit fields inside the variant (for struct-like variants).
         for field in &variant.fields {
@@ -636,9 +390,6 @@ where
 
     fn visit_foreign_item(&mut self, item: &syn::ForeignItem) {
         let attrs = foreign_item_attrs(item);
-        if Self::is_test_item(attrs) {
-            return;
-        }
         self.emit("foreign_item", attrs);
     }
 

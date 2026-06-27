@@ -232,6 +232,422 @@
         "kind": "pass",
         "citation": "新サブコマンド（例 `sotp verify doc-hidden`）を追加し、ソース上に出現する `#[doc(hidden)]` 相当の属性宣言を可視性に関わらず error とする。"
       }
+    },
+    {
+      "claim_hash": "f1804228962d7a3f54642fe2108b6f6ae35a748877f6e5a17124c2a076b100dc",
+      "evidence_hash": "9934fd5b4a48b186c3d2e767be816e977c9bcb1367a4b936579697ee42b3523b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「新サブコマンド（例 `sotp verify doc-hidden`）を追加し、ソース上に出現する `#[doc(hidden)]` 相当の属性宣言を可視性に関わらず error とする。… 判定対象は `syn::File::attrs` に現れる crate/file-level inner attribute と、syn traversal で到達する各 item / impl associated item の attribute とし… 有効化スコープは `architecture-rules.json` の `layers[]` に列挙された全 crate を一律対象とし、per-layer フラグや層のハードコード選択は持たない。新 crate が `layers[]` に追加されれば自動的に対象になる。」"
+      }
+    },
+    {
+      "claim_hash": "f1804228962d7a3f54642fe2108b6f6ae35a748877f6e5a17124c2a076b100dc",
+      "evidence_hash": "9934fd5b4a48b186c3d2e767be816e977c9bcb1367a4b936579697ee42b3523b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`.rs` 再帰発見 → `syn::parse_file`」の走査骨格を共通モジュールに集約する。判定ロジック（visitor）はコールバックで受ける。本ヘルパは本 ADR のゲートの基盤であると同時に、後続の syn ベース lint でも再利用する。"
+      }
+    },
+    {
+      "claim_hash": "989a636af4173655c9f86677dfdf599f262ec012b7eb52c0092af36965c18359",
+      "evidence_hash": "9934fd5b4a48b186c3d2e767be816e977c9bcb1367a4b936579697ee42b3523b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ソース上に出現する `#[doc(hidden)]` 相当の属性宣言を可視性に関わらず error とする。"
+      }
+    },
+    {
+      "claim_hash": "4465ea04d2ff21432ebeb512e6cf7fbd34458eceed75af764a7c498f49e6bbfb",
+      "evidence_hash": "9934fd5b4a48b186c3d2e767be816e977c9bcb1367a4b936579697ee42b3523b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "新サブコマンド（例 `sotp verify doc-hidden`）を追加し"
+      }
+    },
+    {
+      "claim_hash": "8c7e5fd26ae57e27ba58e538deae07f8cd8230b6989763b562a51c5c26b1e86d",
+      "evidence_hash": "9934fd5b4a48b186c3d2e767be816e977c9bcb1367a4b936579697ee42b3523b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "検出対象は次の形式すべて:\n- 直接の outer attribute: `#[doc(hidden)]`\n- 直接の inner attribute: `#![doc(hidden)]`\n- 複合 doc 引数（順序不問）: `#[doc(hidden, alias = \"x\")]` / `#[doc(alias = \"x\", hidden)]`\n- `cfg_attr` 包み込み: `#[cfg_attr(<pred>, doc(hidden))]` / `#[cfg_attr(<pred>, doc(hidden, ...))]`\n- 上記の inner attribute 版\n\nRust の doc comment は syn AST 上 `#[doc = \"...\"]` の name-value attribute として現れるため、検出器は `doc(hidden)` を含む list attribute（および `cfg_attr` 内の同形）だけを match し、`#[doc = \"...\"]` は対象外とする。"
+      }
+    },
+    {
+      "claim_hash": "2cfbbed631bac7fa851613d02b8ba6c02d0d04b25bb46e171bdae0292c5ba149",
+      "evidence_hash": "9934fd5b4a48b186c3d2e767be816e977c9bcb1367a4b936579697ee42b3523b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`.rs` 再帰発見 → `syn::parse_file`」の走査骨格を共通モジュールに集約する。判定ロジック（visitor）はコールバックで受ける。本ヘルパは本 ADR のゲートの基盤であると同時に、後続の syn ベース lint でも再利用する。"
+      }
+    },
+    {
+      "claim_hash": "153e8a1a02dfe8ecb6b6a7c35a94aab9f8fae6f436cbeecc12c09a4b1aa9692c",
+      "evidence_hash": "9934fd5b4a48b186c3d2e767be816e977c9bcb1367a4b936579697ee42b3523b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「有効化スコープは `architecture-rules.json` の `layers[]` に列挙された全 crate を一律対象とし、per-layer フラグや層のハードコード選択は持たない。新 crate が `layers[]` に追加されれば自動的に対象になる。走査ディレクトリは各 crate の `src/` のみとする。」"
+      }
+    },
+    {
+      "claim_hash": "d2cb38ba475c6f0745941159d67eed4488e7d4695dc5e4bad44b5a1518b2b5ff",
+      "evidence_hash": "9934fd5b4a48b186c3d2e767be816e977c9bcb1367a4b936579697ee42b3523b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`usecase_purity`（I/O 純粋性）/ `canonical_modules`（再実装禁止）/ type-signals（型シグネチャ追跡）には手を入れない。新機能を既存の責務に相乗りさせない。既存ゲートを共通走査基盤へ乗せ替えるのは将来の任意改善とし、本決定のスコープ外とする。"
+      }
+    },
+    {
+      "claim_hash": "7b0a3aff3297334834fb9f1d64aa21c92473d6ef33c578cd28e4d6e6e5fc79fe",
+      "evidence_hash": "9934fd5b4a48b186c3d2e767be816e977c9bcb1367a4b936579697ee42b3523b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "有効化スコープは `architecture-rules.json` の `layers[]` に列挙された全 crate を一律対象とし、per-layer フラグや層のハードコード選択は持たない。"
+      }
+    },
+    {
+      "claim_hash": "da70f840d0bc2d8315f39619d411e9e876e8ed66c3344851734afd455ea0916f",
+      "evidence_hash": "9934fd5b4a48b186c3d2e767be816e977c9bcb1367a4b936579697ee42b3523b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「pub / `pub(crate)` / 非 pub の区別を行わない。 ... effective visibility 解析 ... が一切不要となり」"
+      }
+    },
+    {
+      "claim_hash": "3f0609142820cd3523335d3a13a45d4557581197a03cf1560ace7c8a6f7cec09",
+      "evidence_hash": "9934fd5b4a48b186c3d2e767be816e977c9bcb1367a4b936579697ee42b3523b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "### D3: 既存ゲート機構は不可侵とする\n\n`usecase_purity`（I/O 純粋性）/ `canonical_modules`（再実装禁止）/ type-signals（型シグネチャ追跡）には手を入れない。新機能を既存の責務に相乗りさせない。既存ゲートを共通走査基盤へ乗せ替えるのは将来の任意改善とし、本決定のスコープ外とする。"
+      }
+    },
+    {
+      "claim_hash": "d36d1ea355248396652c12a6b049652e9480a7cf339045fcdb7e3c6ebb25af25",
+      "evidence_hash": "9934fd5b4a48b186c3d2e767be816e977c9bcb1367a4b936579697ee42b3523b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "candidate_selection: from:[clippy-disallowed-types,canonical-regex,type-signals-integration,dylint,pub-only-detection] chose:syn-uniform-ban\n\n...検出ロジックは「item の attribute だけを見る」 syn 単純走査で完結する。"
+      }
+    },
+    {
+      "claim_hash": "7a73219927a448186337a6ce09b8533554b59dbef683cfe977380b1e243c3495",
+      "evidence_hash": "9934fd5b4a48b186c3d2e767be816e977c9bcb1367a4b936579697ee42b3523b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「.rs」再帰発見 → `syn::parse_file` の走査骨格を共通モジュールに集約する。判定ロジック（visitor）はコールバックで受ける。本ヘルパは本 ADR のゲートの基盤であると同時に、後続の syn ベース lint でも再利用する。"
+      }
+    },
+    {
+      "claim_hash": "7a73219927a448186337a6ce09b8533554b59dbef683cfe977380b1e243c3495",
+      "evidence_hash": "9934fd5b4a48b186c3d2e767be816e977c9bcb1367a4b936579697ee42b3523b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "判定対象は `syn::File::attrs` に現れる crate/file-level inner attribute と、syn traversal で到達する各 item / impl associated item の attribute とし、pub / pub(crate) / 非 pub の区別を行わない。Rust の doc comment は syn AST 上 `#[doc = \"...\"]` の name-value attribute として現れるため、検出器は `doc(hidden)` を含む list attribute（および `cfg_attr` 内の同形）だけを match し、`#[doc = \"...\"]` は対象外とする。"
+      }
+    },
+    {
+      "claim_hash": "fe87f16d8a9543f69d761affdb56f7c1ece1ab80aeb4ff2fa066396871b3edd2",
+      "evidence_hash": "9934fd5b4a48b186c3d2e767be816e977c9bcb1367a4b936579697ee42b3523b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「判定対象は syn::File::attrs に現れる crate/file-level inner attribute と、syn traversal で到達する各 item / impl associated item の attribute とし、`pub` / `pub(crate)` / 非 pub の区別を行わない。」「検出ロジックは『item の attribute だけを見る』 syn 単純走査で完結する。」「走査ディレクトリは各 crate の **`src/` のみ**とする。」"
+      }
+    },
+    {
+      "claim_hash": "7fde5c0a9d4e5857a75094db066d83b998465c2645ba146117d7e2005d4714d5",
+      "evidence_hash": "9934fd5b4a48b186c3d2e767be816e977c9bcb1367a4b936579697ee42b3523b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "有効化スコープは `architecture-rules.json` の `layers[]` に列挙された全 crate を一律対象とし、per-layer フラグや層のハードコード選択は持たない。新 crate が `layers[]` に追加されれば自動的に対象になる。走査ディレクトリは各 crate の **`src/` のみ**とする。"
+      }
+    },
+    {
+      "claim_hash": "e88571a050a891051bb96f404f57e5efc4734ca3daf5431a1b86432fa6de11f1",
+      "evidence_hash": "9934fd5b4a48b186c3d2e767be816e977c9bcb1367a4b936579697ee42b3523b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`usecase_purity`（I/O 純粋性）/ `canonical_modules`（再実装禁止）/ type-signals（型シグネチャ追跡）には手を入れない。新機能を既存の責務に相乗りさせない。既存ゲートを共通走査基盤へ乗せ替えるのは将来の任意改善とし、本決定のスコープ外とする。"
+      }
+    },
+    {
+      "claim_hash": "338c4834833a013c299e6bfc298dd9e90698aeca77121a2543d669bcd0fb8b14",
+      "evidence_hash": "9934fd5b4a48b186c3d2e767be816e977c9bcb1367a4b936579697ee42b3523b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "新サブコマンド（例 `sotp verify doc-hidden`）を追加し、ソース上に出現する `#[doc(hidden)]` 相当の属性宣言を可視性に関わらず error とする。"
+      }
+    },
+    {
+      "claim_hash": "f011c16c43d21e157716e6a8f11c545fccb405493fa21b031a4dee809451b2cb",
+      "evidence_hash": "9934fd5b4a48b186c3d2e767be816e977c9bcb1367a4b936579697ee42b3523b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「走査ディレクトリは各 crate の `src/` のみとする。integration tests (`tests/`)、examples (`examples/`)、benches (`benches/`) は別 crate target」"
+      }
+    },
+    {
+      "claim_hash": "be238db925740bf03e4d1e627d334b1ab08340cea619bbae032c525d28913fd8",
+      "evidence_hash": "9934fd5b4a48b186c3d2e767be816e977c9bcb1367a4b936579697ee42b3523b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「ソース上に出現する `#[doc(hidden)]` 相当の属性宣言を可視性に関わらず一律禁止する」「検出対象は次の形式すべて:」"
+      }
+    },
+    {
+      "claim_hash": "a5faf852000575414213dbb277b2e37a3cf9d3ef4a00d5da98d6f8be2a55d263",
+      "evidence_hash": "9934fd5b4a48b186c3d2e767be816e977c9bcb1367a4b936579697ee42b3523b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "有効化スコープは `architecture-rules.json` の `layers[]` に列挙された全 crate を一律対象とし、per-layer フラグや層のハードコード選択は持たない。新 crate が `layers[]` に追加されれば自動的に対象になる。"
+      }
+    },
+    {
+      "claim_hash": "462fbc8bc7c434e3495ecc3cb22ac9a7275be592f4143d561bc0a8ee04100ad0",
+      "evidence_hash": "9934fd5b4a48b186c3d2e767be816e977c9bcb1367a4b936579697ee42b3523b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`.rs` 再帰発見 → `syn::parse_file`」の走査骨格を共通モジュールに集約する。判定ロジック（visitor）はコールバックで受ける。本ヘルパは本 ADR のゲートの基盤であると同時に、後続の syn ベース lint でも再利用する。"
+      }
+    },
+    {
+      "claim_hash": "6cab40b346b55b0b9f7174db1f0b20595dce65e2e36de86ce7cc58233f24c5fe",
+      "evidence_hash": "9934fd5b4a48b186c3d2e767be816e977c9bcb1367a4b936579697ee42b3523b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`usecase_purity`（I/O 純粋性）/ `canonical_modules`（再実装禁止）/ type-signals（型シグネチャ追跡）には手を入れない。新機能を既存の責務に相乗りさせない。既存ゲートを共通走査基盤へ乗せ替えるのは将来の任意改善とし、本決定のスコープ外とする。"
+      }
+    },
+    {
+      "claim_hash": "a802d967fa1456a1fc34fb18f542113c9670a63ed3e57440abd3ff1d887ed43a",
+      "evidence_hash": "9934fd5b4a48b186c3d2e767be816e977c9bcb1367a4b936579697ee42b3523b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "新サブコマンド（例 `sotp verify doc-hidden`）を追加し、ソース上に出現する `#[doc(hidden)]` 相当の属性宣言を可視性に関わらず error とする。"
+      }
+    },
+    {
+      "claim_hash": "0b2fc166116bc6e7a283cb2cad49f7b0343622742459e7c31979f2cd4a063ea1",
+      "evidence_hash": "9934fd5b4a48b186c3d2e767be816e977c9bcb1367a4b936579697ee42b3523b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "candidate_selection: from:[clippy-disallowed-types,canonical-regex,type-signals-integration,dylint,pub-only-detection] chose:syn-uniform-ban"
+      }
+    },
+    {
+      "claim_hash": "1a693a97da3e79bf642eadc1e3dce8b869e6975b0b9757bec85ea2e0c08767e9",
+      "evidence_hash": "9934fd5b4a48b186c3d2e767be816e977c9bcb1367a4b936579697ee42b3523b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "新サブコマンド（例 `sotp verify doc-hidden`）を追加し、ソース上に出現する `#[doc(hidden)]` 相当の属性宣言を可視性に関わらず error とする。"
+      }
+    },
+    {
+      "claim_hash": "f1804228962d7a3f54642fe2108b6f6ae35a748877f6e5a17124c2a076b100dc",
+      "evidence_hash": "9c9b429490e4a357d79e3c769550dd6dd4d884b752b8dca488e3a124963dcfe6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「新サブコマンド（例 `sotp verify doc-hidden`）を追加し、ソース上に出現する `#[doc(hidden)]` 相当の属性宣言を可視性に関わらず error とする。」「有効化スコープは `architecture-rules.json` の `layers[]` に列挙された全 crate を一律対象とし、per-layer フラグや層のハードコード選択は持たない。新 crate が `layers[]` に追加されれば自動的に対象になる。」"
+      }
+    },
+    {
+      "claim_hash": "f1804228962d7a3f54642fe2108b6f6ae35a748877f6e5a17124c2a076b100dc",
+      "evidence_hash": "9c9b429490e4a357d79e3c769550dd6dd4d884b752b8dca488e3a124963dcfe6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`.rs` 再帰発見 → `syn::parse_file`」の走査骨格を共通モジュールに集約する。判定ロジック（visitor）はコールバックで受ける。本ヘルパは本 ADR のゲートの基盤である"
+      }
+    },
+    {
+      "claim_hash": "989a636af4173655c9f86677dfdf599f262ec012b7eb52c0092af36965c18359",
+      "evidence_hash": "9c9b429490e4a357d79e3c769550dd6dd4d884b752b8dca488e3a124963dcfe6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "新サブコマンド（例 `sotp verify doc-hidden`）を追加し、ソース上に出現する `#[doc(hidden)]` 相当の属性宣言を可視性に関わらず error とする。"
+      }
+    },
+    {
+      "claim_hash": "4465ea04d2ff21432ebeb512e6cf7fbd34458eceed75af764a7c498f49e6bbfb",
+      "evidence_hash": "9c9b429490e4a357d79e3c769550dd6dd4d884b752b8dca488e3a124963dcfe6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "新サブコマンド（例 `sotp verify doc-hidden`）を追加し"
+      }
+    },
+    {
+      "claim_hash": "8c7e5fd26ae57e27ba58e538deae07f8cd8230b6989763b562a51c5c26b1e86d",
+      "evidence_hash": "9c9b429490e4a357d79e3c769550dd6dd4d884b752b8dca488e3a124963dcfe6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "検出対象は次の形式すべて: - 直接の outer attribute: `#[doc(hidden)]` - 直接の inner attribute: `#![doc(hidden)]` - 複合 doc 引数（順序不問）: `#[doc(hidden, alias = \"x\")]` / `#[doc(alias = \"x\", hidden)]` - `cfg_attr` 包み込み: `#[cfg_attr(<pred>, doc(hidden))]` / `#[cfg_attr(<pred>, doc(hidden, ...))]` - 上記の inner attribute 版 ... 検出器は `doc(hidden)` を含む list attribute（および `cfg_attr` 内の同形）だけを match し、`#[doc = \"...\"]` は対象外とする。"
+      }
+    },
+    {
+      "claim_hash": "2cfbbed631bac7fa851613d02b8ba6c02d0d04b25bb46e171bdae0292c5ba149",
+      "evidence_hash": "9c9b429490e4a357d79e3c769550dd6dd4d884b752b8dca488e3a124963dcfe6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`.rs` 再帰発見 → `syn::parse_file`」の走査骨格を共通モジュールに集約する。判定ロジック（visitor）はコールバックで受ける。本ヘルパは本 ADR のゲートの基盤であると同時に、後続の syn ベース lint でも再利用する。"
+      }
+    },
+    {
+      "claim_hash": "b27111535a5751fae43d0e0861440580a60df8ef41f9d59b294bc85dce7701a1",
+      "evidence_hash": "9c9b429490e4a357d79e3c769550dd6dd4d884b752b8dca488e3a124963dcfe6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "有効化スコープは `architecture-rules.json` の `layers[]` に列挙された全 crate を一律対象とし、per-layer フラグや層のハードコード選択は持たない。新 crate が `layers[]` に追加されれば自動的に対象になる。走査対象は各 layer crate ディレクトリ配下の `.rs` ファイル全体とし、`src/` 内の production / test module だけでなく `tests/` / `examples/` / `benches/` も除外しない。"
+      }
+    },
+    {
+      "claim_hash": "d2cb38ba475c6f0745941159d67eed4488e7d4695dc5e4bad44b5a1518b2b5ff",
+      "evidence_hash": "9c9b429490e4a357d79e3c769550dd6dd4d884b752b8dca488e3a124963dcfe6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「usecase_purity（I/O 純粋性）/ canonical_modules（再実装禁止）/ type-signals（型シグネチャ追跡）には手を入れない。」"
+      }
+    },
+    {
+      "claim_hash": "7b0a3aff3297334834fb9f1d64aa21c92473d6ef33c578cd28e4d6e6e5fc79fe",
+      "evidence_hash": "9c9b429490e4a357d79e3c769550dd6dd4d884b752b8dca488e3a124963dcfe6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "有効化スコープは `architecture-rules.json` の `layers[]` に列挙された全 crate を一律対象とし、per-layer フラグや層のハードコード選択は持たない。"
+      }
+    },
+    {
+      "claim_hash": "da70f840d0bc2d8315f39619d411e9e876e8ed66c3344851734afd455ea0916f",
+      "evidence_hash": "9c9b429490e4a357d79e3c769550dd6dd4d884b752b8dca488e3a124963dcfe6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "pub / pub(crate) / 非 pub の区別を行わない。非 pub item を含めて一律禁止することで、(a) effective visibility 解析（impl block propagation / pub-reachable 集合 / cross-file `pub use` 等）が一切不要"
+      }
+    },
+    {
+      "claim_hash": "3f0609142820cd3523335d3a13a45d4557581197a03cf1560ace7c8a6f7cec09",
+      "evidence_hash": "9c9b429490e4a357d79e3c769550dd6dd4d884b752b8dca488e3a124963dcfe6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "新機能を既存の責務に相乗りさせない。既存ゲートを共通走査基盤へ乗せ替えるのは将来の任意改善とし、本決定のスコープ外とする。"
+      }
+    },
+    {
+      "claim_hash": "d36d1ea355248396652c12a6b049652e9480a7cf339045fcdb7e3c6ebb25af25",
+      "evidence_hash": "9c9b429490e4a357d79e3c769550dd6dd4d884b752b8dca488e3a124963dcfe6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "判定対象は syn::File::attrs に現れる crate/file-level inner attribute と、syn traversal で到達する各 item / impl associated item の attribute"
+      }
+    },
+    {
+      "claim_hash": "7a73219927a448186337a6ce09b8533554b59dbef683cfe977380b1e243c3495",
+      "evidence_hash": "9c9b429490e4a357d79e3c769550dd6dd4d884b752b8dca488e3a124963dcfe6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`.rs` 再帰発見 → `syn::parse_file`」の走査骨格を共通モジュールに集約する。判定ロジック（visitor）はコールバックで受ける。"
+      }
+    },
+    {
+      "claim_hash": "7a73219927a448186337a6ce09b8533554b59dbef683cfe977380b1e243c3495",
+      "evidence_hash": "9c9b429490e4a357d79e3c769550dd6dd4d884b752b8dca488e3a124963dcfe6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "\"syn traversal で到達する各 item / impl associated item の attribute\" / \"cfg_attr 内の同形\""
+      }
+    },
+    {
+      "claim_hash": "ddb5bc0cf2546bdb265890ac622540742166220751ff312eabff8775d5eb9f6a",
+      "evidence_hash": "9c9b429490e4a357d79e3c769550dd6dd4d884b752b8dca488e3a124963dcfe6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「可視性に関わらず error とする」「pub / pub(crate) / 非 pub の区別を行わない」"
+      }
+    },
+    {
+      "claim_hash": "8fe58c4f4d50f753c443640b4d870d66442ce9f086daec7e50be26396892c79b",
+      "evidence_hash": "9c9b429490e4a357d79e3c769550dd6dd4d884b752b8dca488e3a124963dcfe6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "有効化スコープは `architecture-rules.json` の `layers[]` に列挙された全 crate を一律対象とし、per-layer フラグや層のハードコード選択は持たない。新 crate が `layers[]` に追加されれば自動的に対象になる。走査対象は各 layer crate ディレクトリ配下の `.rs` ファイル全体とし、`src/` 内の production / test module だけでなく `tests/` / `examples/` / `benches/` も除外しない。"
+      }
+    },
+    {
+      "claim_hash": "e88571a050a891051bb96f404f57e5efc4734ca3daf5431a1b86432fa6de11f1",
+      "evidence_hash": "9c9b429490e4a357d79e3c769550dd6dd4d884b752b8dca488e3a124963dcfe6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`usecase_purity`（I/O 純粋性）/ `canonical_modules`（再実装禁止）/ type-signals（型シグネチャ追跡）には手を入れない。... 既存ゲートを共通走査基盤へ乗せ替えるのは将来の任意改善とし、本決定のスコープ外とする。"
+      }
+    },
+    {
+      "claim_hash": "a802d967fa1456a1fc34fb18f542113c9670a63ed3e57440abd3ff1d887ed43a",
+      "evidence_hash": "9c9b429490e4a357d79e3c769550dd6dd4d884b752b8dca488e3a124963dcfe6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ソース上に出現する `#[doc(hidden)]` 相当の属性宣言を可視性に関わらず error とする。"
+      }
+    },
+    {
+      "claim_hash": "338c4834833a013c299e6bfc298dd9e90698aeca77121a2543d669bcd0fb8b14",
+      "evidence_hash": "9c9b429490e4a357d79e3c769550dd6dd4d884b752b8dca488e3a124963dcfe6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "新サブコマンド（例 `sotp verify doc-hidden`）を追加し、ソース上に出現する `#[doc(hidden)]` 相当の属性宣言を可視性に関わらず error とする。"
+      }
+    },
+    {
+      "claim_hash": "7a6ffddb78a2e7af3a35b64e64307042ca53933a7ba7517fe86da30d879147b7",
+      "evidence_hash": "9c9b429490e4a357d79e3c769550dd6dd4d884b752b8dca488e3a124963dcfe6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "新サブコマンド（例 `sotp verify doc-hidden`）を追加し、ソース上に出現する `#[doc(hidden)]` 相当の属性宣言を可視性に関わらず error とする。 有効化スコープは `architecture-rules.json` の `layers[]` に列挙された全 crate を一律対象とし、per-layer フラグや層のハードコード選択は持たない。新 crate が `layers[]` に追加されれば自動的に対象になる。走査対象は各 layer crate ディレクトリ配下の `.rs` ファイル全体とし、`src/` 内の production / test module だけでなく `tests/` / `examples/` / `benches/` も除外しない。"
+      }
+    },
+    {
+      "claim_hash": "be238db925740bf03e4d1e627d334b1ab08340cea619bbae032c525d28913fd8",
+      "evidence_hash": "9c9b429490e4a357d79e3c769550dd6dd4d884b752b8dca488e3a124963dcfe6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「検出対象は次の形式すべて: - 直接の outer attribute ... - 直接の inner attribute ... - 複合 doc 引数（順序不問） ... - `cfg_attr` 包み込み ...」"
+      }
+    },
+    {
+      "claim_hash": "a5faf852000575414213dbb277b2e37a3cf9d3ef4a00d5da98d6f8be2a55d263",
+      "evidence_hash": "9c9b429490e4a357d79e3c769550dd6dd4d884b752b8dca488e3a124963dcfe6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "有効化スコープは `architecture-rules.json` の `layers[]` に列挙された全 crate を一律対象とし、per-layer フラグや層のハードコード選択は持たない。新 crate が `layers[]` に追加されれば自動的に対象になる。"
+      }
+    },
+    {
+      "claim_hash": "462fbc8bc7c434e3495ecc3cb22ac9a7275be592f4143d561bc0a8ee04100ad0",
+      "evidence_hash": "9c9b429490e4a357d79e3c769550dd6dd4d884b752b8dca488e3a124963dcfe6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`.rs` 再帰発見 → `syn::parse_file`」の走査骨格を共通モジュールに集約する。判定ロジック（visitor）はコールバックで受ける。本ヘルパは本 ADR のゲートの基盤であると同時に、後続の syn ベース lint でも再利用する。"
+      }
+    },
+    {
+      "claim_hash": "6cab40b346b55b0b9f7174db1f0b20595dce65e2e36de86ce7cc58233f24c5fe",
+      "evidence_hash": "9c9b429490e4a357d79e3c769550dd6dd4d884b752b8dca488e3a124963dcfe6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「既存ゲート機構は不可侵とする」および「usecase_purity（I/O 純粋性）/ canonical_modules（再実装禁止）/ type-signals（型シグネチャ追跡）には手を入れない。」「既存ゲートを共通走査基盤へ乗せ替えるのは将来の任意改善とし、本決定のスコープ外とする。」"
+      }
+    },
+    {
+      "claim_hash": "0b2fc166116bc6e7a283cb2cad49f7b0343622742459e7c31979f2cd4a063ea1",
+      "evidence_hash": "9c9b429490e4a357d79e3c769550dd6dd4d884b752b8dca488e3a124963dcfe6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "candidate_selection: from:[clippy-disallowed-types,canonical-regex,type-signals-integration,dylint,pub-only-detection] chose:syn-uniform-ban"
+      }
+    },
+    {
+      "claim_hash": "1a693a97da3e79bf642eadc1e3dce8b869e6975b0b9757bec85ea2e0c08767e9",
+      "evidence_hash": "9c9b429490e4a357d79e3c769550dd6dd4d884b752b8dca488e3a124963dcfe6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "新サブコマンド（例 `sotp verify doc-hidden`）を追加し、ソース上に出現する `#[doc(hidden)]` 相当の属性宣言を可視性に関わらず error とする。"
+      }
     }
   ]
 }

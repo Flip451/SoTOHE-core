@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-27T00:55:07Z",
-  "declaration_hash": "61686a93d3aedf1d2bc4b66a9e4a144024b657980b1290cfb097e4071adb9302",
+  "generated_at": "2026-06-27T02:13:48Z",
+  "declaration_hash": "d07cdc4227626b9aede32ce33bff4eea9e8cd7190f085eef8457355b3b6a9f82",
   "signals": [
     {
       "type_name": "FsVerifyAdapter",

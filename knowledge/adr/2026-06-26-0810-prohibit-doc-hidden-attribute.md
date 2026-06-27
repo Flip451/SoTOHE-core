@@ -37,7 +37,7 @@ decisions:
 
 ### D1: syn ベースの共通走査ヘルパを新設する
 
-「`.rs` 再帰発見 → `syn::parse_file` → `#[cfg(test)]` / `#[test]` 除外」の走査骨格を共通モジュールに集約する。既存 `verify/syn_helpers.rs` の `has_cfg_test_attr` を流用し、判定ロジック（visitor）はコールバックで受ける。本ヘルパは本 ADR のゲートの基盤であると同時に、後続の syn ベース lint でも再利用する。
+「`.rs` 再帰発見 → `syn::parse_file`」の走査骨格を共通モジュールに集約する。判定ロジック（visitor）はコールバックで受ける。本ヘルパは本 ADR のゲートの基盤であると同時に、後続の syn ベース lint でも再利用する。
 
 ### D2: `#[doc(hidden)]` 相当の属性宣言を可視性不問で一律禁止する
 
@@ -51,7 +51,7 @@ decisions:
 
 判定対象は `syn::File::attrs` に現れる crate/file-level inner attribute と、syn traversal で到達する各 item / impl associated item の attribute とし、`pub` / `pub(crate)` / 非 pub の区別を行わない。Rust の doc comment は syn AST 上 `#[doc = "..."]` の name-value attribute として現れるため、検出器は `doc(hidden)` を含む list attribute（および `cfg_attr` 内の同形）だけを match し、`#[doc = "..."]` は対象外とする。
 
-有効化スコープは `architecture-rules.json` の `layers[]` に列挙された全 crate を一律対象とし、per-layer フラグや層のハードコード選択は持たない。新 crate が `layers[]` に追加されれば自動的に対象になる。テストコードは `#[cfg(test)]` / `#[test]` の syn AST 除外で対象外（テスト item は rustdoc paths に出ないため doc(hidden) を付ける意味も無く、対象にしても実害は無いが、規約の明確化のため除外を維持する）。
+有効化スコープは `architecture-rules.json` の `layers[]` に列挙された全 crate を一律対象とし、per-layer フラグや層のハードコード選択は持たない。新 crate が `layers[]` に追加されれば自動的に対象になる。走査対象は各 layer crate ディレクトリ配下の `.rs` ファイル全体とし、`src/` 内の production / test module だけでなく `tests/` / `examples/` / `benches/` も除外しない。テスト item は rustdoc paths に出ないため `#[doc(hidden)]` を付けても DanglingId は発火しないが、規約のシンプルさを優先して除外しない。
 
 非 pub item を含めて一律禁止することで、(a) effective visibility 解析（impl block propagation / pub-reachable 集合 / cross-file `pub use` 等）が一切不要となり、検出ロジックは「item の attribute だけを見る」 syn 単純走査で完結する。(b) 非 pub item の doc(hidden) は装飾として無意味なので失われる正当用途は無い。(c) 将来 pub 化したときに silent escape する経路を事前に閉じられる。
 
@@ -86,7 +86,7 @@ clippy には属性の有無で発火する汎用 lint 設定がなく、`disall
 ### Positive
 
 - `#[doc(hidden)]` が commit gate（`ci-local`）で機械検出される。
-- syn AST 走査により comment / 文字列 / test コードを誤検知しない。
+- syn AST 走査により comment / 文字列を誤検知しない。テストコードも `#[doc(hidden)]` 相当属性があれば検出対象になる。
 - doc-hidden の不明瞭な DanglingId 副作用検出が、明示エラーに置き換わる。
 - 検出ロジックが可視性解析を伴わない単純な item-attribute 走査に閉じ、属性形式や module 構造の組合せから来る edge case 連鎖を構造的に回避できる。
 - 共通走査ヘルパを導入し、後続の syn ベース lint の追加コストを下げる。stable toolchain を維持。
@@ -98,7 +98,7 @@ clippy には属性の有無で発火する汎用 lint 設定がなく、`disall
 
 ### Neutral
 
-- 既存コードベースに非 pub `#[doc(hidden)]` の実例がある場合、cleanup が必要（attribute を外すか、対象 item ごと削除）。実装着手時に grep で実例の有無を確認する。
+- 既存コードベースに非 pub `#[doc(hidden)]` の実例がある場合、cleanup が必要（attribute を外すか、対象 item ごと削除）。実装着手時に grep で実例の有無を確認する。テストコード内に既存の `#[doc(hidden)]` があれば cleanup が必要（既存コードベース cleanup と統合）。
 - doc-hidden の独立検出と type-signals の DanglingId が二重検出になり得る。実装着手時にメッセージ衝突の有無を確認する。
 - 共通走査ヘルパの API は後続 lint（`Result<_, String>` 禁止等）の要件も見据える必要があるが、過剰一般化は避け、当面は doc-hidden の要件で確定する。
 

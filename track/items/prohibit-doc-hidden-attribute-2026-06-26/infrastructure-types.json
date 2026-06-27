@@ -21,7 +21,7 @@
       },
       "methods": [],
       "module_path": "verify::syn_scan",
-      "docs": "Context passed from the reusable syn scanner to a caller-supplied detection callback. Carries the root-relative source path, source line, AST node kind label, and syn attributes for the current attribute-bearing node (crate, item, associated item, field, enum variant, foreign item, and similar non-test source nodes) so later syn-based verify gates can reuse the same traversal and supply different detection logic.",
+      "docs": "Context passed from the reusable syn scanner to a caller-supplied detection callback. Carries the root-relative source path, source line, AST node kind label, and syn attributes for the current attribute-bearing node (crate, item, associated item, field, enum variant, foreign item, and similar source nodes) so later syn-based verify gates can reuse the same traversal and supply different detection logic.",
       "spec_refs": [
         { "file": "track/items/prohibit-doc-hidden-attribute-2026-06-26/spec.json", "anchor": "IN-04" },
         { "file": "track/items/prohibit-doc-hidden-attribute-2026-06-26/spec.json", "anchor": "AC-07" }
@@ -58,9 +58,8 @@
       "is_async": false,
       "generics": [],
       "where_predicates": [],
-      "docs": "Reusable syn AST scanner for verify gates. Loads architecture-rules.json layers[], finds .rs files under each layer src dir, parses each file with syn::parse_file, skips cfg(test)/#[test] items through syn_helpers::has_cfg_test_attr, and invokes a caller-supplied callback for every remaining attribute-bearing AST node including crate attrs, items, associated items, fields, enum variants, and foreign items so detection logic is swappable for later syn-based lints.",
+      "docs": "Reusable syn AST scanner for verify gates. Loads architecture-rules.json layers[], finds .rs files under each layer crate directory, parses each file with syn::parse_file, and invokes a caller-supplied callback for every attribute-bearing AST node including crate attrs, items, associated items, fields, enum variants, and foreign items so detection logic is swappable for later syn-based lints.",
       "spec_refs": [
-        { "file": "track/items/prohibit-doc-hidden-attribute-2026-06-26/spec.json", "anchor": "IN-03" },
         { "file": "track/items/prohibit-doc-hidden-attribute-2026-06-26/spec.json", "anchor": "IN-04" },
         { "file": "track/items/prohibit-doc-hidden-attribute-2026-06-26/spec.json", "anchor": "IN-05" },
         { "file": "track/items/prohibit-doc-hidden-attribute-2026-06-26/spec.json", "anchor": "CN-01" },
@@ -78,10 +77,9 @@
       "is_async": false,
       "generics": [],
       "where_predicates": [],
-      "docs": "Verify gate entry point for #[doc(hidden)] attribute usage. Delegates workspace file discovery, syn::parse_file, and cfg(test)/#[test] pruning to verify::syn_scan::scan_workspace_rust_sources, then supplies a doc-hidden-specific callback that detects all required direct doc-list and cfg_attr-wrapped forms. All detected occurrences are reported as error-severity findings with file path and line number.",
+      "docs": "Verify gate entry point for #[doc(hidden)] attribute usage. Delegates workspace file discovery and syn::parse_file to verify::syn_scan::scan_workspace_rust_sources, then supplies a doc-hidden-specific callback that detects all required direct doc-list and cfg_attr-wrapped forms. All detected occurrences are reported as error-severity findings with file path and line number.",
       "spec_refs": [
         { "file": "track/items/prohibit-doc-hidden-attribute-2026-06-26/spec.json", "anchor": "IN-02" },
-        { "file": "track/items/prohibit-doc-hidden-attribute-2026-06-26/spec.json", "anchor": "IN-03" },
         { "file": "track/items/prohibit-doc-hidden-attribute-2026-06-26/spec.json", "anchor": "IN-04" },
         { "file": "track/items/prohibit-doc-hidden-attribute-2026-06-26/spec.json", "anchor": "IN-05" },
         { "file": "track/items/prohibit-doc-hidden-attribute-2026-06-26/spec.json", "anchor": "AC-02" },

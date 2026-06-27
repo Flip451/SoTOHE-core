@@ -1,14 +1,32 @@
 {
   "schema_version": 2,
   "scopes": {
-    "cli_driver": {
+    "cli": {
       "rounds": [
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8cf39553ddfa2cc58beac6bc96e2a7b81a15485fd600d4f4a021613cfe3e9af2",
-          "at": "2026-06-26T11:32:52Z"
+          "hash": "rvw1:sha256:663c23c399fd0a9cbbc07b9a41b0475eebe46b5d398dc67a49d07c780075806b",
+          "at": "2026-06-26T11:30:30Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0d984876b867a5ecabd80e498d9bdbcb94f6af4f23faaab41a8fc65cc6539cf8",
+          "at": "2026-06-26T11:30:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0d984876b867a5ecabd80e498d9bdbcb94f6af4f23faaab41a8fc65cc6539cf8",
+          "at": "2026-06-26T12:01:21Z"
         }
       ]
     },
@@ -377,6 +395,42 @@
           "findings": [],
           "hash": "rvw1:sha256:11d505265242060bba1d9b8e1075b987a30f456421d7b3d9ddec14b884707534",
           "at": "2026-06-27T00:54:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Routing ancestor-directory probes through `classify_sibling_probe` drops the recursive `mod` walk that `classify_file_module_references` provides. That means legitimate test-only references from an ancestor sibling into a nested target path, e.g. `src/foo.rs` -> `src/foo/fixtures/helpers.rs` via `mod fixtures { mod helpers; }`, will no longer exclude the target file and `#[doc(hidden)]` violations in those files will be reported incorrectly.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/verify/syn_scan.rs",
+              "line": 437,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:e856063946c4357ca8b7f223aa52aefc26949d7feaf117330e8e27eee896c4b5",
+          "at": "2026-06-27T01:14:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:466b2890dc3b4c4433838f0cad159e9f9f1fa21edde3d4b977cb9ee97b5c020f",
+          "at": "2026-06-27T01:26:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:65fafa426f93027e80f49e396c8f1b29c4c0780d8d86ac4f69a5cc2bf79d9244",
+          "at": "2026-06-27T01:50:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:65fafa426f93027e80f49e396c8f1b29c4c0780d8d86ac4f69a5cc2bf79d9244",
+          "at": "2026-06-27T01:55:17Z"
         }
       ]
     },
@@ -555,24 +609,98 @@
           "findings": [],
           "hash": "rvw1:sha256:b8d06746999c77799440c924b12c678ba5d09d384bad91192351d009af78332a",
           "at": "2026-06-26T12:12:07Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
+        },
         {
-          "type": "final",
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AC-02` still limits the blocking condition to non-test source, but the revised ADR/spec intent says test code is included and should be handled uniformly. The same non-test-only framing also remains in the scanner contract in `infrastructure-types.json`, so the branch is internally inconsistent about whether a doc(hidden) inside test code is supposed to fail the gate.",
+              "severity": "P1",
+              "file": "track/items/prohibit-doc-hidden-attribute-2026-06-26/spec.json",
+              "line": 205,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:aaa39a78684ce475731246025ce5198aee8da26889b5e88bc3fe7d91bd5c2eda",
+          "at": "2026-06-27T01:47:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-02 now says the gate fails only when `#[doc(hidden)]` appears in sources that contain test code, but ADR D2 and CN-02 still require the rule to apply to all files/items regardless of test status or visibility. As written, the acceptance criteria no longer explicitly cover ordinary production sources, so the plan is narrower than its stated design intent.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/prohibit-doc-hidden-attribute-2026-06-26/spec.json",
+              "line": 205,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:4791f63d03608757f9276f0e178f96e72d7073fe0d8fe8550d2c5cbc36881c7d",
+          "at": "2026-06-27T01:51:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-02 broadens coverage to any Rust source including tests, but `scan_workspace_rust_sources` is still defined to discover only `.rs` files under each layer's `src` dir. That leaves integration tests or other non-`src` Rust files outside the gate, so the widened scope is not actually implementable without expanding discovery or narrowing AC-02.",
+              "severity": "P1",
+              "file": "track/items/prohibit-doc-hidden-attribute-2026-06-26/infrastructure-types.json",
+              "line": 61,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:7badafd76df7588af927622666cea38874817f3b282e6a9cb3d44fc5a85eaa0b",
+          "at": "2026-06-27T01:55:10Z"
+        },
+        {
+          "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0d984876b867a5ecabd80e498d9bdbcb94f6af4f23faaab41a8fc65cc6539cf8",
-          "at": "2026-06-26T11:30:32Z"
+          "hash": "rvw1:sha256:0823f6cb7394c16a40c8f269d6db2ddc95a4e1a228f94a6abec9c665f3b6fabe",
+          "at": "2026-06-27T02:07:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0823f6cb7394c16a40c8f269d6db2ddc95a4e1a228f94a6abec9c665f3b6fabe",
+          "at": "2026-06-27T02:08:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR D2 now says test modules, integration tests, examples, and benches are intentionally included and `#[doc(hidden)]` in test code should be reported, but the Positive consequences still claim syn traversal avoids false-detecting `test コード`. That preserves the old exclusion rationale and conflicts with the new uniform-ban design, leaving readers with two different requirements for test code handling.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-26-0810-prohibit-doc-hidden-attribute.md",
+              "line": 89,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0823f6cb7394c16a40c8f269d6db2ddc95a4e1a228f94a6abec9c665f3b6fabe",
+          "at": "2026-06-27T02:11:01Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0d984876b867a5ecabd80e498d9bdbcb94f6af4f23faaab41a8fc65cc6539cf8",
-          "at": "2026-06-26T12:01:21Z"
+          "hash": "rvw1:sha256:2f570617badd13ab86078011c310f194b367efd660c7f078b4e5b706a35a8f0d",
+          "at": "2026-06-27T02:13:12Z"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8cf39553ddfa2cc58beac6bc96e2a7b81a15485fd600d4f4a021613cfe3e9af2",
+          "at": "2026-06-26T11:32:52Z"
         }
       ]
     },
@@ -584,17 +712,6 @@
           "findings": [],
           "hash": "rvw1:sha256:763459a6efbc7fa614fd826d2f13b08bfef5a2e176ffde796c11caf80b3a68a8",
           "at": "2026-06-26T11:34:02Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:663c23c399fd0a9cbbc07b9a41b0475eebe46b5d398dc67a49d07c780075806b",
-          "at": "2026-06-26T11:30:30Z"
         }
       ]
     }

@@ -169,6 +169,118 @@
         "kind": "pass",
         "citation": "ゲートの有効化スコープを `architecture-rules.json` の `layers[]` から実行時に取得する。"
       }
+    },
+    {
+      "claim_hash": "856002c7f633bc28d7ff91b0863970273a889433a231ade4ece1e0b04c073827",
+      "evidence_hash": "2cfbbed631bac7fa851613d02b8ba6c02d0d04b25bb46e171bdae0292c5ba149",
+      "verdict": {
+        "kind": "pass",
+        "citation": "判定ロジックはコールバックで受ける設計とする。後続の syn ベース lint（例: `Result<_, String>` 禁止）でも再利用できる粒度とする。"
+      }
+    },
+    {
+      "claim_hash": "856002c7f633bc28d7ff91b0863970273a889433a231ade4ece1e0b04c073827",
+      "evidence_hash": "462fbc8bc7c434e3495ecc3cb22ac9a7275be592f4143d561bc0a8ee04100ad0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "具体的には、各 layer crate ディレクトリ配下のファイル再帰発見・`syn::parse_file` を共通基盤とし、判定ロジックのみをコールバックで差し替えられること。"
+      }
+    },
+    {
+      "claim_hash": "155a0e0f92e89c5c67144673c414227ab1081057e9fbb0c8a59836bb8e25b5c4",
+      "evidence_hash": "8c7e5fd26ae57e27ba58e538deae07f8cd8230b6989763b562a51c5c26b1e86d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "以下の全形式の `#[doc(hidden)]` 相当属性の syn AST 検出: 直接の outer `#[doc(hidden)]`、直接の inner `#![doc(hidden)]`、複合 doc 引数（順序不問）`#[doc(hidden, alias = \"x\")]` / `#[doc(alias = \"x\", hidden)]`、`cfg_attr` 包み outer `#[cfg_attr(pred, doc(hidden))]` / `#[cfg_attr(pred, doc(hidden, ...))]`、`cfg_attr` 包み inner `#![cfg_attr(pred, doc(hidden))]`。`#[doc = \"...\"]` name-value 形式は対象外とする。"
+      }
+    },
+    {
+      "claim_hash": "155a0e0f92e89c5c67144673c414227ab1081057e9fbb0c8a59836bb8e25b5c4",
+      "evidence_hash": "2cfbbed631bac7fa851613d02b8ba6c02d0d04b25bb46e171bdae0292c5ba149",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/infrastructure/src/verify/` 配下に共通 syn 走査ヘルパ（各 layer crate ディレクトリ配下の `.rs` ファイル再帰発見 → `syn::parse_file` → コールバック visitor による判定）を新設する。判定ロジックはコールバックで受ける設計とする。"
+      }
+    },
+    {
+      "claim_hash": "155a0e0f92e89c5c67144673c414227ab1081057e9fbb0c8a59836bb8e25b5c4",
+      "evidence_hash": "153e8a1a02dfe8ecb6b6a7c35a94aab9f8fae6f436cbeecc12c09a4b1aa9692c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ゲートの有効化スコープを `architecture-rules.json` の `layers[]` から実行時に取得する。per-layer フラグや特定 crate パスのハードコードは持たず、`layers[]` に新 crate が追加されれば自動的に対象に含まれる。走査対象は各 crate の `src/` ディレクトリ配下のみとする。"
+      }
+    },
+    {
+      "claim_hash": "155a0e0f92e89c5c67144673c414227ab1081057e9fbb0c8a59836bb8e25b5c4",
+      "evidence_hash": "f011c16c43d21e157716e6a8f11c545fccb405493fa21b031a4dee809451b2cb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`layers[]` のいずれかの crate の `src/` 配下の Rust ソースに `#[doc(hidden)]` 相当の属性が存在する場合、ゲートが exit non-zero を返し、`#[doc(hidden)]` 属性の存在をファイルパス・行情報とともに示す finding を出力する。integration tests (`tests/`)、examples (`examples/`)、benches (`benches/`) は別 crate target であり rustdoc paths に現れないため走査対象外とする。"
+      }
+    },
+    {
+      "claim_hash": "155a0e0f92e89c5c67144673c414227ab1081057e9fbb0c8a59836bb8e25b5c4",
+      "evidence_hash": "462fbc8bc7c434e3495ecc3cb22ac9a7275be592f4143d561bc0a8ee04100ad0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "具体的には、各 layer crate ディレクトリ配下のファイル再帰発見・`syn::parse_file` を共通基盤とし、判定ロジックのみをコールバックで差し替えられること。"
+      }
+    },
+    {
+      "claim_hash": "7aa1060e127b7a24a33a6e3b3398b0761dccb44d984759e93282421beaf1f976",
+      "evidence_hash": "2cfbbed631bac7fa851613d02b8ba6c02d0d04b25bb46e171bdae0292c5ba149",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/infrastructure/src/verify/` 配下に共通 syn 走査ヘルパ（各 layer crate ディレクトリ配下の `.rs` ファイル再帰発見 → `syn::parse_file` → コールバック visitor による判定）を新設する。判定ロジックはコールバックで受ける設計とする。後続の syn ベース lint（例: `Result<_, String>` 禁止）でも再利用できる粒度とする。"
+      }
+    },
+    {
+      "claim_hash": "7aa1060e127b7a24a33a6e3b3398b0761dccb44d984759e93282421beaf1f976",
+      "evidence_hash": "153e8a1a02dfe8ecb6b6a7c35a94aab9f8fae6f436cbeecc12c09a4b1aa9692c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ゲートの有効化スコープを `architecture-rules.json` の `layers[]` から実行時に取得する。per-layer フラグや特定 crate パスのハードコードは持たず、`layers[]` に新 crate が追加されれば自動的に対象に含まれる。走査対象は各 crate の `src/` ディレクトリ配下のみとする。"
+      }
+    },
+    {
+      "claim_hash": "7aa1060e127b7a24a33a6e3b3398b0761dccb44d984759e93282421beaf1f976",
+      "evidence_hash": "7a73219927a448186337a6ce09b8533554b59dbef683cfe977380b1e243c3495",
+      "verdict": {
+        "kind": "pass",
+        "citation": "検出ロジックは syn AST 走査で実装する。行ベースの raw text regex は使わない。syn パースにより comment / 文字列リテラル / トークン境界を正確に扱い、複数行属性や `cfg_attr` 絡みの偽陽性・偽陰性を構造的に排除する。"
+      }
+    },
+    {
+      "claim_hash": "7aa1060e127b7a24a33a6e3b3398b0761dccb44d984759e93282421beaf1f976",
+      "evidence_hash": "462fbc8bc7c434e3495ecc3cb22ac9a7275be592f4143d561bc0a8ee04100ad0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "IN-04 で導入した共通走査ヘルパが、後続の syn ベース lint（例: `Result<_, String>` 禁止）から再利用できる設計になっている。具体的には、各 layer crate ディレクトリ配下のファイル再帰発見・`syn::parse_file` を共通基盤とし、判定ロジックのみをコールバックで差し替えられること。"
+      }
+    },
+    {
+      "claim_hash": "155a0e0f92e89c5c67144673c414227ab1081057e9fbb0c8a59836bb8e25b5c4",
+      "evidence_hash": "b27111535a5751fae43d0e0861440580a60df8ef41f9d59b294bc85dce7701a1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ゲートの有効化スコープを `architecture-rules.json` の `layers[]` から実行時に取得する。per-layer フラグや特定 crate パスのハードコードは持たず、`layers[]` に新 crate が追加されれば自動的に対象に含まれる。走査対象は各 layer crate ディレクトリ配下の `.rs` ファイル全体とし、`tests/` / `examples/` / `benches/` も除外しない。"
+      }
+    },
+    {
+      "claim_hash": "155a0e0f92e89c5c67144673c414227ab1081057e9fbb0c8a59836bb8e25b5c4",
+      "evidence_hash": "7a6ffddb78a2e7af3a35b64e64307042ca53933a7ba7517fe86da30d879147b7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`layers[]` のいずれかの crate の任意の Rust ソース（テストコード、integration tests、examples、benches を含む）に `#[doc(hidden)]` 相当の属性が存在する場合、ゲートが exit non-zero を返し、`#[doc(hidden)]` 属性の存在をファイルパス・行情報とともに示す finding を出力する。"
+      }
+    },
+    {
+      "claim_hash": "7aa1060e127b7a24a33a6e3b3398b0761dccb44d984759e93282421beaf1f976",
+      "evidence_hash": "b27111535a5751fae43d0e0861440580a60df8ef41f9d59b294bc85dce7701a1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ゲートの有効化スコープを `architecture-rules.json` の `layers[]` から実行時に取得する。per-layer フラグや特定 crate パスのハードコードは持たず、`layers[]` に新 crate が追加されれば自動的に対象に含まれる。走査対象は各 layer crate ディレクトリ配下の `.rs` ファイル全体とし、`tests/` / `examples/` / `benches/` も除外しない。"
+      }
     }
   ]
 }

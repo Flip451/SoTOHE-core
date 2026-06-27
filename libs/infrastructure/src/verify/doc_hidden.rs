@@ -25,7 +25,6 @@ use super::syn_scan::{SynScanContext, scan_workspace_rust_sources};
 /// 5. `cfg_attr`-wrapped inner: `#![cfg_attr(pred, doc(hidden))]`
 ///
 /// `#[doc = "..."]` name-value doc comments are **never** flagged.
-/// Test-scoped items (`#[cfg(test)]` / `#[test]`) are excluded (IN-03).
 ///
 /// # Errors
 ///
