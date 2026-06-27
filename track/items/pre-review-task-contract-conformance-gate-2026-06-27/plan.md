@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # タスク単位の契約履行 pre-review ゲート
 
-## Tasks (7/8 resolved)
+## Tasks (8/8 resolved)
 
 ### S1 — Foundation: domain model and usecase gate contracts
 
@@ -45,4 +45,4 @@
 > No sibling track-local-review-fix-claude task exists; only track-local-review-fix-codex requires modification.
 > T008 is committed as a separate batch from the Rust feature batch (T001-T007).
 
-- [~] **T008**: Makefile.toml wiring: modify [tasks.track-local-review-fix-codex] to prepend the task-contract gate before `bin/sotp review fix-local`. The revised thin-chain script must: (1) strip a leading `--` separator when present and extract --track-id from the forwarded $@ arguments; (2) run `bin/sotp task-contract check --track-id "$_TRACK_ID" --items-dir track/items` without --layer so PreReviewGateCommand.layer is None and all-layers mode visits the 6 canonical TDDD layer ids, combines outcomes for readable signal documents, and treats absent signal documents as no entries to verify; (3) resolve CODEX_BIN and invoke `bin/sotp review fix-local "$@"` only after the gate exits 0; (4) propagate non-zero exit from task-contract check so review fix-local is not reached when the all-layers gate blocks on violations or signal read/decode errors. No sibling track-local-review-fix-claude task exists in Makefile.toml; only track-local-review-fix-codex requires modification. T008 is committed as a separate batch from T001-T007.
+- [x] **T008**: Makefile.toml wiring: modify [tasks.track-local-review-fix-codex] to prepend the task-contract gate before `bin/sotp review fix-local`. The revised thin-chain script must: (1) strip a leading `--` separator when present and extract --track-id from the forwarded $@ arguments; (2) run `bin/sotp task-contract check --track-id "$_TRACK_ID" --items-dir track/items` without --layer so PreReviewGateCommand.layer is None and all-layers mode visits the 6 canonical TDDD layer ids, combines outcomes for readable signal documents, and treats absent signal documents as no entries to verify; (3) resolve CODEX_BIN and invoke `bin/sotp review fix-local "$@"` only after the gate exits 0; (4) propagate non-zero exit from task-contract check so review fix-local is not reached when the all-layers gate blocks on violations or signal read/decode errors. No sibling track-local-review-fix-claude task exists in Makefile.toml; only track-local-review-fix-codex requires modification. T008 is committed as a separate batch from T001-T007. (`15bd28856fa981ee3d67b156336faa1c80908040`)

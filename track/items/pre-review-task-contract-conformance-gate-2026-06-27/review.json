@@ -1,38 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:81d63ac4abbe47745215e9280d17c446e8638bd271d02046709485bf41e35040",
-          "at": "2026-06-27T13:46:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:81d63ac4abbe47745215e9280d17c446e8638bd271d02046709485bf41e35040",
-          "at": "2026-06-27T13:49:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a29d6da6a7c91675cbfe8900a118d1045794a97a91682ab2a54f9969944244d8",
-          "at": "2026-06-27T16:09:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a29d6da6a7c91675cbfe8900a118d1045794a97a91682ab2a54f9969944244d8",
-          "at": "2026-06-27T16:12:41Z"
-        }
-      ]
-    },
     "usecase": {
       "rounds": [
         {
@@ -193,141 +161,72 @@
         }
       ]
     },
-    "cli": {
+    "harness-policy": {
       "rounds": [
         {
           "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:14d8205a81db5609a9e50d81a704134e95ea462fcb24f4c40a4fa62ae7fdbde4",
-          "at": "2026-06-27T13:45:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:14d8205a81db5609a9e50d81a704134e95ea462fcb24f4c40a4fa62ae7fdbde4",
-          "at": "2026-06-27T13:49:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3f94ef835677874e6d60897ad815f3f03eb567d33080dd15428c44a61d99e3be",
-          "at": "2026-06-27T16:09:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3f94ef835677874e6d60897ad815f3f03eb567d33080dd15428c44a61d99e3be",
-          "at": "2026-06-27T16:12:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e9d8db98c6703e49f7c67004e0e62004d030a63afa5f5184c2a26428a07bb1e6",
-          "at": "2026-06-27T16:45:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e9d8db98c6703e49f7c67004e0e62004d030a63afa5f5184c2a26428a07bb1e6",
-          "at": "2026-06-27T16:47:58Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cc0d115b6bb167040272c41f983e7e930caa32425e32f2cfee94ffee30f9eb6a",
-          "at": "2026-06-27T13:47:24Z"
-        },
-        {
-          "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`TaskContractDocument::new` documents that a contract with no attributed entries is invalid, but it only rejects an empty map. A value like `{ T001: vec![] }` is accepted even though it contains zero `ContractedEntryRef`s, so the domain type can represent the fail-closed-empty contract the constructor claims to reject. Tighten the constructor to reject no actual attributions, and likely empty per-task lists as well.",
+              "message": "The ownership paragraph is stale: it still says this capability owns only `impl-plan.json` and `task-coverage.json`, but the same file now declares `task-contract.json` as a third Phase 3 artifact and allows writing it. That leaves the harness contract internally inconsistent about what `impl-planner` owns.",
               "severity": "P1",
-              "file": "libs/domain/src/task_contract.rs",
-              "line": 83,
-              "category": "broken invariant in newtype constructor"
-            },
-            {
-              "message": "`Blocked` is documented as carrying one or more gate violations, but the public variant stores a raw `Vec<PreReviewGateViolation>`, so callers can construct `PreReviewGateOutcome::Blocked { violations: vec![] }`. That makes an illegal gate state representable; follow the project’s non-empty findings pattern with a validated non-empty wrapper or constructor.",
-              "severity": "P1",
-              "file": "libs/domain/src/task_contract.rs",
-              "line": 169,
-              "category": "primitive obsession"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.harness/capabilities/impl-planner.md",
+              "line": 25,
+              "category": "convention contradiction"
             }
           ],
-          "hash": "rvw1:sha256:cc0d115b6bb167040272c41f983e7e930caa32425e32f2cfee94ffee30f9eb6a",
-          "at": "2026-06-27T13:53:16Z"
+          "hash": "rvw1:sha256:5c88d3e73fd515fed176ee8772485ed7fd45327646121cd4cd5e663dd7889ff3",
+          "at": "2026-06-27T13:46:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c0b457c465272b82b435c5f3966b08fd7ac30a457868f939c97e28709ed3614f",
+          "at": "2026-06-27T13:50:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c0b457c465272b82b435c5f3966b08fd7ac30a457868f939c97e28709ed3614f",
+          "at": "2026-06-27T13:54:18Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "P1: `PreReviewGateOutcome::blocked()` validates that `violations` is non-empty, but the `Blocked { violations: Vec<_> }` variant is public and can still be constructed directly with `vec![]`. That means the returned type does not encode the invariant the constructor just checked, so the non-empty gate result can be bypassed at the API boundary.",
+              "message": "The new gate parses `--group`, but the actual review-fix wrapper contract still uses `--scope` on the caller side and `bin/sotp review fix-local` itself expects `--scope`. That means the pre-review gate is unreachable for the documented invocation path, and any invocation that does pass `--group` will be forwarded unchanged to `review fix-local` and fail there. The task-contract check/briefing append therefore does not wire into the real fix workflow.",
               "severity": "P1",
-              "file": "libs/domain/src/task_contract.rs",
-              "line": 173,
-              "category": "typestate / parse-don't-validate gap"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/Makefile.toml",
+              "line": 645,
+              "category": "command wiring breakage"
             }
           ],
-          "hash": "rvw1:sha256:fd1304d844f5bdf07e8c097d917931c8bcfe6dfa46481965d066bcfb89040f97",
-          "at": "2026-06-27T14:29:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`PreReviewGateOutcome::Blocked` no longer matches the tracked domain contract: the variant lost `#[non_exhaustive]` and its payload type changed from `Vec<PreReviewGateViolation>` to the new `PreReviewGateViolations` wrapper. That diverges from `track/items/pre-review-task-contract-conformance-gate-2026-06-27/domain-types.json` and breaks consumers generated against the declared shape.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/domain/src/task_contract.rs",
-              "line": 217,
-              "category": "catalogue-contract"
-            }
-          ],
-          "hash": "rvw1:sha256:9fc1eb27af24e4ea5a2d676c4f0d065fe04b6e8934e2ca420f14fbf4ad9271cc",
-          "at": "2026-06-27T14:37:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`PreReviewGateOutcome::Blocked` no longer matches the declared domain contract: `domain-types.json` says the payload is `Vec<PreReviewGateViolation>` (and marks the variant non-exhaustive), but this implementation exposes the new public `PreReviewGateViolations` wrapper instead. That breaks shape parity for generated consumers and makes the domain API diverge from the catalog the rest of the track is built against.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/domain/src/task_contract.rs",
-              "line": 217,
-              "category": "typestate / parse-don't-validate gap"
-            }
-          ],
-          "hash": "rvw1:sha256:9fc1eb27af24e4ea5a2d676c4f0d065fe04b6e8934e2ca420f14fbf4ad9271cc",
-          "at": "2026-06-27T14:54:38Z"
+          "hash": "rvw1:sha256:39d377d23f43855d211805b91d2b48cf61edc815f2be47191afd8c7ed27c1a2a",
+          "at": "2026-06-27T15:22:18Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:fd1304d844f5bdf07e8c097d917931c8bcfe6dfa46481965d066bcfb89040f97",
-          "at": "2026-06-27T15:02:32Z"
+          "hash": "rvw1:sha256:3c836db749917efcff22cb7ef95cc71d527d891eb4ae2af510928f6a237f6f2a",
+          "at": "2026-06-27T15:24:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d4aff7afa048fea304d3b0653c95ecbf55bb7957838277f3a9d60c603f77e87c",
+          "at": "2026-06-27T16:09:47Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:fd1304d844f5bdf07e8c097d917931c8bcfe6dfa46481965d066bcfb89040f97",
-          "at": "2026-06-27T15:07:01Z"
+          "hash": "rvw1:sha256:d4aff7afa048fea304d3b0653c95ecbf55bb7957838277f3a9d60c603f77e87c",
+          "at": "2026-06-27T16:12:13Z"
         }
       ]
     },
@@ -878,75 +777,190 @@
           "findings": [],
           "hash": "rvw1:sha256:56229dfbcb2f85a373c55c1563ead60960358d1bd49335521b528b94cdb6ee3d",
           "at": "2026-06-27T16:59:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69a34af9b4645c4e2556d82d3c39cb8cb96fc6cee34d021d3216cb3c50b00f36",
+          "at": "2026-06-27T17:06:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69a34af9b4645c4e2556d82d3c39cb8cb96fc6cee34d021d3216cb3c50b00f36",
+          "at": "2026-06-27T17:09:04Z"
         }
       ]
     },
-    "harness-policy": {
+    "cli": {
       "rounds": [
         {
           "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The ownership paragraph is stale: it still says this capability owns only `impl-plan.json` and `task-coverage.json`, but the same file now declares `task-contract.json` as a third Phase 3 artifact and allows writing it. That leaves the harness contract internally inconsistent about what `impl-planner` owns.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.harness/capabilities/impl-planner.md",
-              "line": 25,
-              "category": "convention contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:5c88d3e73fd515fed176ee8772485ed7fd45327646121cd4cd5e663dd7889ff3",
-          "at": "2026-06-27T13:46:31Z"
-        },
-        {
-          "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:c0b457c465272b82b435c5f3966b08fd7ac30a457868f939c97e28709ed3614f",
-          "at": "2026-06-27T13:50:43Z"
+          "hash": "rvw1:sha256:14d8205a81db5609a9e50d81a704134e95ea462fcb24f4c40a4fa62ae7fdbde4",
+          "at": "2026-06-27T13:45:25Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:c0b457c465272b82b435c5f3966b08fd7ac30a457868f939c97e28709ed3614f",
-          "at": "2026-06-27T13:54:18Z"
+          "hash": "rvw1:sha256:14d8205a81db5609a9e50d81a704134e95ea462fcb24f4c40a4fa62ae7fdbde4",
+          "at": "2026-06-27T13:49:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3f94ef835677874e6d60897ad815f3f03eb567d33080dd15428c44a61d99e3be",
+          "at": "2026-06-27T16:09:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3f94ef835677874e6d60897ad815f3f03eb567d33080dd15428c44a61d99e3be",
+          "at": "2026-06-27T16:12:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e9d8db98c6703e49f7c67004e0e62004d030a63afa5f5184c2a26428a07bb1e6",
+          "at": "2026-06-27T16:45:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e9d8db98c6703e49f7c67004e0e62004d030a63afa5f5184c2a26428a07bb1e6",
+          "at": "2026-06-27T16:47:58Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:81d63ac4abbe47745215e9280d17c446e8638bd271d02046709485bf41e35040",
+          "at": "2026-06-27T13:46:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:81d63ac4abbe47745215e9280d17c446e8638bd271d02046709485bf41e35040",
+          "at": "2026-06-27T13:49:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a29d6da6a7c91675cbfe8900a118d1045794a97a91682ab2a54f9969944244d8",
+          "at": "2026-06-27T16:09:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a29d6da6a7c91675cbfe8900a118d1045794a97a91682ab2a54f9969944244d8",
+          "at": "2026-06-27T16:12:41Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cc0d115b6bb167040272c41f983e7e930caa32425e32f2cfee94ffee30f9eb6a",
+          "at": "2026-06-27T13:47:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TaskContractDocument::new` documents that a contract with no attributed entries is invalid, but it only rejects an empty map. A value like `{ T001: vec![] }` is accepted even though it contains zero `ContractedEntryRef`s, so the domain type can represent the fail-closed-empty contract the constructor claims to reject. Tighten the constructor to reject no actual attributions, and likely empty per-task lists as well.",
+              "severity": "P1",
+              "file": "libs/domain/src/task_contract.rs",
+              "line": 83,
+              "category": "broken invariant in newtype constructor"
+            },
+            {
+              "message": "`Blocked` is documented as carrying one or more gate violations, but the public variant stores a raw `Vec<PreReviewGateViolation>`, so callers can construct `PreReviewGateOutcome::Blocked { violations: vec![] }`. That makes an illegal gate state representable; follow the project’s non-empty findings pattern with a validated non-empty wrapper or constructor.",
+              "severity": "P1",
+              "file": "libs/domain/src/task_contract.rs",
+              "line": 169,
+              "category": "primitive obsession"
+            }
+          ],
+          "hash": "rvw1:sha256:cc0d115b6bb167040272c41f983e7e930caa32425e32f2cfee94ffee30f9eb6a",
+          "at": "2026-06-27T13:53:16Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The new gate parses `--group`, but the actual review-fix wrapper contract still uses `--scope` on the caller side and `bin/sotp review fix-local` itself expects `--scope`. That means the pre-review gate is unreachable for the documented invocation path, and any invocation that does pass `--group` will be forwarded unchanged to `review fix-local` and fail there. The task-contract check/briefing append therefore does not wire into the real fix workflow.",
+              "message": "P1: `PreReviewGateOutcome::blocked()` validates that `violations` is non-empty, but the `Blocked { violations: Vec<_> }` variant is public and can still be constructed directly with `vec![]`. That means the returned type does not encode the invariant the constructor just checked, so the non-empty gate result can be bypassed at the API boundary.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/Makefile.toml",
-              "line": 645,
-              "category": "command wiring breakage"
+              "file": "libs/domain/src/task_contract.rs",
+              "line": 173,
+              "category": "typestate / parse-don't-validate gap"
             }
           ],
-          "hash": "rvw1:sha256:39d377d23f43855d211805b91d2b48cf61edc815f2be47191afd8c7ed27c1a2a",
-          "at": "2026-06-27T15:22:18Z"
+          "hash": "rvw1:sha256:fd1304d844f5bdf07e8c097d917931c8bcfe6dfa46481965d066bcfb89040f97",
+          "at": "2026-06-27T14:29:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`PreReviewGateOutcome::Blocked` no longer matches the tracked domain contract: the variant lost `#[non_exhaustive]` and its payload type changed from `Vec<PreReviewGateViolation>` to the new `PreReviewGateViolations` wrapper. That diverges from `track/items/pre-review-task-contract-conformance-gate-2026-06-27/domain-types.json` and breaks consumers generated against the declared shape.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/domain/src/task_contract.rs",
+              "line": 217,
+              "category": "catalogue-contract"
+            }
+          ],
+          "hash": "rvw1:sha256:9fc1eb27af24e4ea5a2d676c4f0d065fe04b6e8934e2ca420f14fbf4ad9271cc",
+          "at": "2026-06-27T14:37:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`PreReviewGateOutcome::Blocked` no longer matches the declared domain contract: `domain-types.json` says the payload is `Vec<PreReviewGateViolation>` (and marks the variant non-exhaustive), but this implementation exposes the new public `PreReviewGateViolations` wrapper instead. That breaks shape parity for generated consumers and makes the domain API diverge from the catalog the rest of the track is built against.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/domain/src/task_contract.rs",
+              "line": 217,
+              "category": "typestate / parse-don't-validate gap"
+            }
+          ],
+          "hash": "rvw1:sha256:9fc1eb27af24e4ea5a2d676c4f0d065fe04b6e8934e2ca420f14fbf4ad9271cc",
+          "at": "2026-06-27T14:54:38Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:3c836db749917efcff22cb7ef95cc71d527d891eb4ae2af510928f6a237f6f2a",
-          "at": "2026-06-27T15:24:42Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d4aff7afa048fea304d3b0653c95ecbf55bb7957838277f3a9d60c603f77e87c",
-          "at": "2026-06-27T16:09:47Z"
+          "hash": "rvw1:sha256:fd1304d844f5bdf07e8c097d917931c8bcfe6dfa46481965d066bcfb89040f97",
+          "at": "2026-06-27T15:02:32Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d4aff7afa048fea304d3b0653c95ecbf55bb7957838277f3a9d60c603f77e87c",
-          "at": "2026-06-27T16:12:13Z"
+          "hash": "rvw1:sha256:fd1304d844f5bdf07e8c097d917931c8bcfe6dfa46481965d066bcfb89040f97",
+          "at": "2026-06-27T15:07:01Z"
         }
       ]
     }
