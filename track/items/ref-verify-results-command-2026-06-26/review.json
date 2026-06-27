@@ -1,226 +1,50 @@
 {
   "schema_version": 2,
   "scopes": {
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:02613a3a89fea445d75ae9c64e5c67afe7812003b24a7915e02978d23916742d",
-          "at": "2026-06-26T05:52:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:02613a3a89fea445d75ae9c64e5c67afe7812003b24a7915e02978d23916742d",
-          "at": "2026-06-26T05:56:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9eebd493ef8295cc4250f8227ec63d9fb465e34f06d6c7e3c49e60d9076d3084",
-          "at": "2026-06-26T07:48:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9eebd493ef8295cc4250f8227ec63d9fb465e34f06d6c7e3c49e60d9076d3084",
-          "at": "2026-06-26T07:51:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0faf6dcffce55fcf9c8d2dbe2d883115eefc05f037c7fd671e3294d5c0186dc8",
-          "at": "2026-06-26T12:14:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0faf6dcffce55fcf9c8d2dbe2d883115eefc05f037c7fd671e3294d5c0186dc8",
-          "at": "2026-06-26T12:17:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The cache rebuild here matches verdicts only on `(claim_hash, evidence_hash)`, so a pair in one `cache_scope` can accidentally reuse the verdict from another scope when the same hashes appear in both. That can persist the wrong verdict/origin combination because the lookup ignores the same scope partitioning used during cache load.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify/interactor.rs",
-              "line": 302,
-              "category": "business logic leak"
-            }
-          ],
-          "hash": "rvw1:sha256:eaf69cec6a2506c88f9cdf58049b200d7d8b9431186cc2935a8230fd51e26579",
-          "at": "2026-06-27T03:29:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Skipping `SemanticVerdict::Pending` while rebuilding a scope rewrites that cache file without any pending entries before returning `HumanEscalationRequired` (both the D12 fast path here and the later save loop at lines 321-345). Because `save_entries` replaces the whole artifact, any scope that mixes pending with pass/fail loses the unresolved pair from the cache, so the next run re-verifies it as a miss instead of preserving the prior unresolved state.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify/interactor.rs",
-              "line": 170,
-              "category": "cache semantics"
-            }
-          ],
-          "hash": "rvw1:sha256:1d5b4c062c95d339e11a5c7f4dc034677e8acf0f3bc77a270fbf62e5f757ac2a",
-          "at": "2026-06-27T03:38:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d6f5fe36413600cab919d09dffb700c48e59af1f0550c403df0ca979e8470dac",
-          "at": "2026-06-27T03:46:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d6f5fe36413600cab919d09dffb700c48e59af1f0550c403df0ca979e8470dac",
-          "at": "2026-06-27T03:48:29Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e4378b99ef188edf534cc44dcf7370191de70db814863d31a94ea5e3e5034f38",
-          "at": "2026-06-26T05:50:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e4378b99ef188edf534cc44dcf7370191de70db814863d31a94ea5e3e5034f38",
-          "at": "2026-06-26T05:53:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:94da838097d36ee152e41bcbee1a102243b422f8a160707868e38fc88ec62337",
-          "at": "2026-06-26T07:52:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:94da838097d36ee152e41bcbee1a102243b422f8a160707868e38fc88ec62337",
-          "at": "2026-06-26T07:55:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1504d19c7bd36ebb1bbfee56de9e85183ef42765deeff4857ca441fae06c20c3",
-          "at": "2026-06-26T14:18:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1504d19c7bd36ebb1bbfee56de9e85183ef42765deeff4857ca441fae06c20c3",
-          "at": "2026-06-26T14:21:18Z"
-        }
-      ]
-    },
-    "cli_driver": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c0699d1af1ddf7a1267fc9edf59cab97b28ca06132625d51a2abcc1103cb60fc",
-          "at": "2026-06-26T07:55:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c0699d1af1ddf7a1267fc9edf59cab97b28ca06132625d51a2abcc1103cb60fc",
-          "at": "2026-06-26T07:57:30Z"
-        }
-      ]
-    },
-    "harness-policy": {
+    "cli": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "Step 0b still says the per-scope ceiling is a \"hard upper bound at split time\". That preserves the old hard-cap semantics and conflicts with the new advisory behavior in Rule 3, where over-ceiling singleton batches are explicitly allowed to proceed.",
+              "message": "Both `chain` and `filter` are custom `ValueEnum`s, but these fields are missing `#[arg(value_enum)]`. As written, clap will not wire the enum parser here, so valid inputs like `--chain 1` and `--filter pass` will not be accepted by `ref-verify results`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/full-cycle.md",
-              "line": 87,
-              "category": "convention contradiction"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/ref_verify.rs",
+              "line": 150,
+              "category": "cli parsing"
             }
           ],
-          "hash": "rvw1:sha256:5093e40888ea5c5fa5bf7c16aa5ca9f038e0bb9725d55ee3d0343e012688c872",
-          "at": "2026-06-26T05:51:26Z"
+          "hash": "rvw1:sha256:6f1f2a5f6af6e5fec280c20f29885ef1176ffc7752d625ff6d836673a634a3f4",
+          "at": "2026-06-26T08:00:27Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:20deb4cc45e56320b3f1f40682d880a61cf173a5bfb134cbd31a95474358bdfb",
-          "at": "2026-06-26T05:53:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 1b now defines ceiling overflow as advisory and says to log and continue, but the DFP `completed` branch still gates Review on the batch fitting the ceiling. An over-ceiling singleton that Rule 3 explicitly permits will pass Step 1b, then be blocked here before Review, so the command still behaves like a hard cap.",
-              "severity": "P1",
-              "file": ".claude/commands/track/full-cycle.md",
-              "line": 169,
-              "category": "command wiring breakage"
-            },
-            {
-              "message": "The Review/DFP fixpoint still requires `actual diff stays within ceiling` as a precondition for Commit. That contradicts the new advisory overflow behavior in Step 1b and makes any legitimate over-ceiling atomic batch impossible to finish after review fixes, reintroducing the hard-cap semantics the change is meant to remove.",
-              "severity": "P1",
-              "file": ".claude/commands/track/full-cycle.md",
-              "line": 190,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:20deb4cc45e56320b3f1f40682d880a61cf173a5bfb134cbd31a95474358bdfb",
-          "at": "2026-06-26T06:12:32Z"
+          "hash": "rvw1:sha256:0f3cb10ac67f6ab84e3dfa1ff98c2ac21e4697b79e51f0caffc3a11577f45ffc",
+          "at": "2026-06-26T08:05:12Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:01124d701f57f1c269540ad0cddcac31504429cb2f3bf38cdbf042f33e98a6c0",
-          "at": "2026-06-26T06:15:45Z"
+          "hash": "rvw1:sha256:0f3cb10ac67f6ab84e3dfa1ff98c2ac21e4697b79e51f0caffc3a11577f45ffc",
+          "at": "2026-06-26T08:07:51Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:6a53dd1eb1bae5c3bc794c857c166239e140be50b3c5b49c7d45f82d63fcc0ab",
-          "at": "2026-06-26T07:52:24Z"
+          "hash": "rvw1:sha256:637c657210928deecc89cb4f91f2527bad4ffff663bf80ccb0d40069ce9232a7",
+          "at": "2026-06-26T14:19:03Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:6a53dd1eb1bae5c3bc794c857c166239e140be50b3c5b49c7d45f82d63fcc0ab",
-          "at": "2026-06-26T07:55:16Z"
+          "hash": "rvw1:sha256:637c657210928deecc89cb4f91f2527bad4ffff663bf80ccb0d40069ce9232a7",
+          "at": "2026-06-26T14:22:06Z"
         }
       ]
     },
@@ -716,50 +540,136 @@
         }
       ]
     },
-    "cli": {
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e4378b99ef188edf534cc44dcf7370191de70db814863d31a94ea5e3e5034f38",
+          "at": "2026-06-26T05:50:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e4378b99ef188edf534cc44dcf7370191de70db814863d31a94ea5e3e5034f38",
+          "at": "2026-06-26T05:53:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:94da838097d36ee152e41bcbee1a102243b422f8a160707868e38fc88ec62337",
+          "at": "2026-06-26T07:52:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:94da838097d36ee152e41bcbee1a102243b422f8a160707868e38fc88ec62337",
+          "at": "2026-06-26T07:55:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1504d19c7bd36ebb1bbfee56de9e85183ef42765deeff4857ca441fae06c20c3",
+          "at": "2026-06-26T14:18:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1504d19c7bd36ebb1bbfee56de9e85183ef42765deeff4857ca441fae06c20c3",
+          "at": "2026-06-26T14:21:18Z"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c0699d1af1ddf7a1267fc9edf59cab97b28ca06132625d51a2abcc1103cb60fc",
+          "at": "2026-06-26T07:55:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c0699d1af1ddf7a1267fc9edf59cab97b28ca06132625d51a2abcc1103cb60fc",
+          "at": "2026-06-26T07:57:30Z"
+        }
+      ]
+    },
+    "harness-policy": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "Both `chain` and `filter` are custom `ValueEnum`s, but these fields are missing `#[arg(value_enum)]`. As written, clap will not wire the enum parser here, so valid inputs like `--chain 1` and `--filter pass` will not be accepted by `ref-verify results`.",
+              "message": "Step 0b still says the per-scope ceiling is a \"hard upper bound at split time\". That preserves the old hard-cap semantics and conflicts with the new advisory behavior in Rule 3, where over-ceiling singleton batches are explicitly allowed to proceed.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/ref_verify.rs",
-              "line": 150,
-              "category": "cli parsing"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/full-cycle.md",
+              "line": 87,
+              "category": "convention contradiction"
             }
           ],
-          "hash": "rvw1:sha256:6f1f2a5f6af6e5fec280c20f29885ef1176ffc7752d625ff6d836673a634a3f4",
-          "at": "2026-06-26T08:00:27Z"
+          "hash": "rvw1:sha256:5093e40888ea5c5fa5bf7c16aa5ca9f038e0bb9725d55ee3d0343e012688c872",
+          "at": "2026-06-26T05:51:26Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0f3cb10ac67f6ab84e3dfa1ff98c2ac21e4697b79e51f0caffc3a11577f45ffc",
-          "at": "2026-06-26T08:05:12Z"
+          "hash": "rvw1:sha256:20deb4cc45e56320b3f1f40682d880a61cf173a5bfb134cbd31a95474358bdfb",
+          "at": "2026-06-26T05:53:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 1b now defines ceiling overflow as advisory and says to log and continue, but the DFP `completed` branch still gates Review on the batch fitting the ceiling. An over-ceiling singleton that Rule 3 explicitly permits will pass Step 1b, then be blocked here before Review, so the command still behaves like a hard cap.",
+              "severity": "P1",
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 169,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "The Review/DFP fixpoint still requires `actual diff stays within ceiling` as a precondition for Commit. That contradicts the new advisory overflow behavior in Step 1b and makes any legitimate over-ceiling atomic batch impossible to finish after review fixes, reintroducing the hard-cap semantics the change is meant to remove.",
+              "severity": "P1",
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 190,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:20deb4cc45e56320b3f1f40682d880a61cf173a5bfb134cbd31a95474358bdfb",
+          "at": "2026-06-26T06:12:32Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0f3cb10ac67f6ab84e3dfa1ff98c2ac21e4697b79e51f0caffc3a11577f45ffc",
-          "at": "2026-06-26T08:07:51Z"
+          "hash": "rvw1:sha256:01124d701f57f1c269540ad0cddcac31504429cb2f3bf38cdbf042f33e98a6c0",
+          "at": "2026-06-26T06:15:45Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:637c657210928deecc89cb4f91f2527bad4ffff663bf80ccb0d40069ce9232a7",
-          "at": "2026-06-26T14:19:03Z"
+          "hash": "rvw1:sha256:6a53dd1eb1bae5c3bc794c857c166239e140be50b3c5b49c7d45f82d63fcc0ab",
+          "at": "2026-06-26T07:52:24Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:637c657210928deecc89cb4f91f2527bad4ffff663bf80ccb0d40069ce9232a7",
-          "at": "2026-06-26T14:22:06Z"
+          "hash": "rvw1:sha256:6a53dd1eb1bae5c3bc794c857c166239e140be50b3c5b49c7d45f82d63fcc0ab",
+          "at": "2026-06-26T07:55:16Z"
         }
       ]
     },
@@ -1171,6 +1081,110 @@
           "findings": [],
           "hash": "rvw1:sha256:4488eff928ed4a77bb0d1ab5b0b3ab537bdb94818aabf0cadec628e82f27e866",
           "at": "2026-06-27T01:37:46Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:02613a3a89fea445d75ae9c64e5c67afe7812003b24a7915e02978d23916742d",
+          "at": "2026-06-26T05:52:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:02613a3a89fea445d75ae9c64e5c67afe7812003b24a7915e02978d23916742d",
+          "at": "2026-06-26T05:56:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9eebd493ef8295cc4250f8227ec63d9fb465e34f06d6c7e3c49e60d9076d3084",
+          "at": "2026-06-26T07:48:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9eebd493ef8295cc4250f8227ec63d9fb465e34f06d6c7e3c49e60d9076d3084",
+          "at": "2026-06-26T07:51:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0faf6dcffce55fcf9c8d2dbe2d883115eefc05f037c7fd671e3294d5c0186dc8",
+          "at": "2026-06-26T12:14:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0faf6dcffce55fcf9c8d2dbe2d883115eefc05f037c7fd671e3294d5c0186dc8",
+          "at": "2026-06-26T12:17:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The cache rebuild here matches verdicts only on `(claim_hash, evidence_hash)`, so a pair in one `cache_scope` can accidentally reuse the verdict from another scope when the same hashes appear in both. That can persist the wrong verdict/origin combination because the lookup ignores the same scope partitioning used during cache load.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify/interactor.rs",
+              "line": 302,
+              "category": "business logic leak"
+            }
+          ],
+          "hash": "rvw1:sha256:eaf69cec6a2506c88f9cdf58049b200d7d8b9431186cc2935a8230fd51e26579",
+          "at": "2026-06-27T03:29:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Skipping `SemanticVerdict::Pending` while rebuilding a scope rewrites that cache file without any pending entries before returning `HumanEscalationRequired` (both the D12 fast path here and the later save loop at lines 321-345). Because `save_entries` replaces the whole artifact, any scope that mixes pending with pass/fail loses the unresolved pair from the cache, so the next run re-verifies it as a miss instead of preserving the prior unresolved state.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify/interactor.rs",
+              "line": 170,
+              "category": "cache semantics"
+            }
+          ],
+          "hash": "rvw1:sha256:1d5b4c062c95d339e11a5c7f4dc034677e8acf0f3bc77a270fbf62e5f757ac2a",
+          "at": "2026-06-27T03:38:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d6f5fe36413600cab919d09dffb700c48e59af1f0550c403df0ca979e8470dac",
+          "at": "2026-06-27T03:46:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d6f5fe36413600cab919d09dffb700c48e59af1f0550c403df0ca979e8470dac",
+          "at": "2026-06-27T03:48:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ccbd2fc7316fa92a63603932d089fd3b6f5b2253757688f3b952a906a13830a2",
+          "at": "2026-06-27T05:31:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ccbd2fc7316fa92a63603932d089fd3b6f5b2253757688f3b952a906a13830a2",
+          "at": "2026-06-27T05:33:50Z"
         }
       ]
     }
