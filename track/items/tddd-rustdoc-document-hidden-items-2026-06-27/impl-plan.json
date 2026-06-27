@@ -4,7 +4,8 @@
     {
       "id": "T001",
       "description": "In `libs/infrastructure/src/schema_export/bin_target.rs`, add `\"--document-hidden-items\"` to the flag slice appended by the `args` closure in `run_rustdoc` (current extend call: `[\"--\", \"-Z\", \"unstable-options\", \"--output-format\", \"json\"]`; add `\"--document-hidden-items\"` to that array). Extract the inline `args` closure body into a private `build_rustdoc_args(crate_name: &str, target: &[&str]) -> Vec<String>` function so the flag-list construction is unit-testable without a real cargo invocation. Replace the two `.args(args(&[...]))` call sites in `run_rustdoc` with `build_rustdoc_args(crate_name, &[...])`. Add a unit test in the existing `#[cfg(test)]` module that calls `build_rustdoc_args(\"my_crate\", &[\"--lib\"])` and asserts `\"--document-hidden-items\"` is contained in the returned `Vec<String>`. No caller changes outside of `bin_target.rs` are permitted (CN-01). No new toolchain dependency is introduced: the flag is already covered by the existing `-Z unstable-options` nightly requirement (CN-02).",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "dbcbbaf9f57d642612a42b7d4fad78c6a54f9b7f"
     }
   ],
   "plan": {
