@@ -647,7 +647,8 @@ for _A in "$@"; do
   [ "$_PREV" = "--track-id" ] && _TRACK_ID="$_A"
   _PREV="$_A"
 done
-bin/sotp task-contract check --track-id "$_TRACK_ID" --items-dir track/items \
+bin/sotp signal calc-impl-catalog \
+  && bin/sotp task-contract check --track-id "$_TRACK_ID" --items-dir track/items \
   && CODEX_BIN="${CODEX_BIN:-$(asdf which codex 2>/dev/null || command -v codex)}" bin/sotp review fix-local "$@"
 ''']
 

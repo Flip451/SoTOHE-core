@@ -102,11 +102,27 @@ impl TaskContractReaderPort for FsTaskContractReader {
             }
         };
 
-        task_contract_codec::decode(&bytes).map_err(|e| {
+        let doc = task_contract_codec::decode(&bytes).map_err(|e| {
             PreReviewGateError::TaskContractReadFailed {
                 message: format!("codec error reading {}: {e}", path.display()),
             }
-        })
+        })?;
+
+        // PR #175 round 2 P1: refuse contract whose embedded track_id does not
+        // match the requested track_id. Without this, a contract copied from
+        // another track (or generated with a stale track id) would silently
+        // evaluate attribution for unrelated data.
+        if doc.track_id() != track_id {
+            return Err(PreReviewGateError::TaskContractReadFailed {
+                message: format!(
+                    "track_id mismatch: requested '{}' but task-contract.json contains '{}'",
+                    track_id.as_ref(),
+                    doc.track_id().as_ref()
+                ),
+            });
+        }
+
+        Ok(doc)
     }
 }
 
@@ -155,6 +171,32 @@ mod tests {
         let reader = FsTaskContractReader::new(dir.path().to_path_buf());
         let doc = reader.read(&track_id("my-track")).unwrap();
         assert_eq!(doc.track_id().as_ref(), "my-track");
+    }
+
+    #[test]
+    fn read_returns_read_failed_for_embedded_track_id_mismatch() {
+        // PR #175 round 2 P1: contract whose embedded track_id does not match
+        // the requested track_id must fail closed, not silently evaluate
+        // attribution for unrelated data.
+        let dir = temp_items_dir();
+        let track_dir = dir.path().join("other-track");
+        fs::create_dir_all(&track_dir).unwrap();
+        // SAMPLE_JSON embeds track_id "my-track" but we request "other-track".
+        fs::write(track_dir.join("task-contract.json"), SAMPLE_JSON).unwrap();
+
+        let reader = FsTaskContractReader::new(dir.path().to_path_buf());
+        let err = reader.read(&track_id("other-track")).unwrap_err();
+        match err {
+            PreReviewGateError::TaskContractReadFailed { message } => {
+                assert!(
+                    message.contains("track_id mismatch"),
+                    "expected track_id mismatch diagnostic, got: {message}"
+                );
+                assert!(message.contains("other-track"), "expected requested id in message");
+                assert!(message.contains("my-track"), "expected embedded id in message");
+            }
+            other => panic!("expected TaskContractReadFailed, got: {other}"),
+        }
     }
 
     #[test]
