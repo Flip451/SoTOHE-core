@@ -1,0 +1,150 @@
+{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "TDDD chain ③ の cargo rustdoc 呼び出しに --document-hidden-items を追加する",
+  "goal": [
+    {
+      "id": "GO-01",
+      "text": "TDDD chain ③ の `cargo rustdoc` 呼び出しに `--document-hidden-items` を付与することで、`pub` かつ `#[doc(hidden)]` な要素が rustdoc paths に含まれるようになり、catalogue 突合での `DanglingId` Yellow/Red 発火を構造的に解消して track-active-gate のブロックを防ぐ。`#[doc(hidden)]` を semver hazard hiding / internal API marker / unstable API 非公開などの本来用途で引き続き使用できるようになる。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-27-0440-tddd-rustdoc-document-hidden-items.md",
+          "anchor": "D1"
+        }
+      ]
+    }
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "id": "IN-01",
+        "text": "`libs/infrastructure/src/schema_export/bin_target.rs` の `run_rustdoc` 関数内 `args` クロージャが `cargo rustdoc` に渡すフラグ列 (`[\"--\", \"-Z\", \"unstable-options\", \"--output-format\", \"json\"]`) に `\"--document-hidden-items\"` を追加する。`--lib` パスと `--bin` パスは同一の `args` クロージャを共有しているため、この 1 箇所の変更が baseline capture (TypeGraph B 取得) と actual capture (TypeGraph C 取得) の両経路に適用される。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-27-0440-tddd-rustdoc-document-hidden-items.md",
+            "anchor": "D1"
+          },
+          {
+            "file": "knowledge/adr/2026-06-27-0440-tddd-rustdoc-document-hidden-items.md",
+            "anchor": "D2"
+          }
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "id": "OS-01",
+        "text": "user-facing `cargo doc` / `docs.rs` への `--document-hidden-items` 適用。本変更は chain ③ 内部の catalogue 生成 (`calc-impl-catalog`) に限定し、プロジェクト全体の rustdoc 設定や公開 doc 生成には適用しない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-27-0440-tddd-rustdoc-document-hidden-items.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "OS-02",
+        "text": "source レベルの `#[doc(hidden)]` 禁止 gate の導入。`syn` AST scanner、grep ベース scanner、コンパイラ lint いずれの形態の source-level 禁止機構も本 track では導入しない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-27-0440-tddd-rustdoc-document-hidden-items.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "OS-03",
+        "text": "機械チェックなしの convention-only による `#[doc(hidden)]` 抑止。rustdoc invocation 側での構造的解消 (D1) で chain ③ の DanglingId は防げるため、convention-only 運用は採用しない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-27-0440-tddd-rustdoc-document-hidden-items.md",
+            "anchor": "D1"
+          },
+          {
+            "file": "knowledge/adr/2026-06-27-0440-tddd-rustdoc-document-hidden-items.md",
+            "anchor": "D3"
+          }
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "id": "CN-01",
+      "text": "flag の適用は `libs/infrastructure/src/schema_export/bin_target.rs` の `run_rustdoc` が構築する `args` クロージャ 1 箇所のみとし、`RustdocSchemaExporter` 呼び出し側 (`baseline_capture.rs`, `rustdoc_baseline_capture_adapter.rs`, `type_signals_evaluator.rs`) は変更しない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-27-0440-tddd-rustdoc-document-hidden-items.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "CN-02",
+      "text": "新規 toolchain 依存を導入しない。`--document-hidden-items` は `-Z unstable-options` 傘下の nightly 限定 feature であり、chain ③ が既に要求する nightly + `-Z unstable-options` に追加 toolchain コストなく付与できる。安定 Rust での `cargo build` / `cargo test` には影響しない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-27-0440-tddd-rustdoc-document-hidden-items.md",
+          "anchor": "D1"
+        }
+      ],
+      "convention_refs": [
+        {
+          "file": "knowledge/conventions/nightly-dev-tool.md",
+          "anchor": "Rules"
+        }
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-01",
+      "text": "`run_rustdoc` の `args` クロージャが返すフラグ列に `\"--document-hidden-items\"` が含まれることをユニットテストで確認できる。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-27-0440-tddd-rustdoc-document-hidden-items.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-02",
+      "text": "`pub` かつ `#[doc(hidden)]` な要素を含む対象 layer crate に対して `bin/sotp signal calc-impl-catalog` を実行したとき、当該要素に起因する `DanglingId` Yellow/Red シグナルが出力されない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-27-0440-tddd-rustdoc-document-hidden-items.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-03",
+      "text": "`cargo make ci` (fmt-check + clippy + nextest + deny + check-layers + verify-*) が pass し、既存テストへのリグレッションがない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-27-0440-tddd-rustdoc-document-hidden-items.md",
+          "anchor": "D1"
+        }
+      ]
+    }
+  ],
+  "related_conventions": [
+    {
+      "file": "knowledge/conventions/nightly-dev-tool.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/coding-principles.md",
+      "anchor": "No Panics in Library Code"
+    },
+    {
+      "file": "knowledge/conventions/hexagonal-architecture.md",
+      "anchor": "Layer Dependencies"
+    }
+  ],
+  "signals": {
+    "blue": 10,
+    "yellow": 0,
+    "red": 0
+  }
+}

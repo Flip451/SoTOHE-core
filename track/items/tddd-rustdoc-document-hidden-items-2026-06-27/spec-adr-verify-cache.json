@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "c136751d959ff0e43b19c645419b6f862bebaf5a243fcb9736e5351cf2866c8f",
+      "evidence_hash": "7404c9b6b7cafdb317e036a3cbed882383d2db3ae6ec3716f78a637c3dc6b39c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`#[doc(hidden)]` のついた pub 要素も rustdoc paths に含まれ、catalogue 突合で `DanglingId` を発火しなくなる"
+      }
+    },
+    {
+      "claim_hash": "81863bd02af1abc3011c033805a27886d634defc271230f904e71742ff12f977",
+      "evidence_hash": "7404c9b6b7cafdb317e036a3cbed882383d2db3ae6ec3716f78a637c3dc6b39c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "TDDD chain ③ の baseline 取得 / actual 取得双方が呼ぶ `cargo rustdoc --output-format json` の引数に `-Z unstable-options --document-hidden-items` を追加する。"
+      }
+    },
+    {
+      "claim_hash": "81863bd02af1abc3011c033805a27886d634defc271230f904e71742ff12f977",
+      "evidence_hash": "7404c9b6b7cafdb317e036a3cbed882383d2db3ae6ec3716f78a637c3dc6b39c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本フラグの適用は `bin/sotp signal calc-impl-catalog` が直接実行する `cargo rustdoc` 呼び出し 1 箇所のみとする。"
+      }
+    },
+    {
+      "claim_hash": "646ec2b5395df18b9ce9f4124c86ee81dcfa2803a334ef943be4b3886ce24f97",
+      "evidence_hash": "7404c9b6b7cafdb317e036a3cbed882383d2db3ae6ec3716f78a637c3dc6b39c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp signal calc-impl-catalog` が直接実行する `cargo rustdoc` 呼び出し 1 箇所のみとする。プロジェクト全体の rustdoc 設定や `cargo doc` 経由の user-facing doc 生成には適用しない。"
+      }
+    },
+    {
+      "claim_hash": "afdf93cd9dbbad0c4422213ef30d3bb37007bc7e13c7b516c6490e3bbe588c12",
+      "evidence_hash": "7404c9b6b7cafdb317e036a3cbed882383d2db3ae6ec3716f78a637c3dc6b39c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "### D3: source レベルでの `#[doc(hidden)]` 禁止 gate は導入しない\n\n既存提案 (`forbid-doc-hidden` / `prohibit-doc-hidden-attribute`) の syn AST scanner 案は採用しない。"
+      }
+    },
+    {
+      "claim_hash": "2fedf9ad27f772f9c0267b23f37ebf4d8994df18c6c2a68ffa0730e11d84790d",
+      "evidence_hash": "7404c9b6b7cafdb317e036a3cbed882383d2db3ae6ec3716f78a637c3dc6b39c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "TDDD chain ③ の baseline 取得 / actual 取得双方が呼ぶ `cargo rustdoc --output-format json` の引数に `-Z unstable-options --document-hidden-items` を追加する。これにより `#[doc(hidden)]` のついた pub 要素も rustdoc paths に含まれ、catalogue 突合で `DanglingId` を発火しなくなる。"
+      }
+    },
+    {
+      "claim_hash": "2fedf9ad27f772f9c0267b23f37ebf4d8994df18c6c2a68ffa0730e11d84790d",
+      "evidence_hash": "7404c9b6b7cafdb317e036a3cbed882383d2db3ae6ec3716f78a637c3dc6b39c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「chain ③ の DanglingId 問題は rustdoc invocation 側の解決 (D1) で十分。」"
+      }
+    },
+    {
+      "claim_hash": "d091701a5abdb535ff1dd608013f1ebfcfab85f7d8abe49fcfb6e66555c485b0",
+      "evidence_hash": "7404c9b6b7cafdb317e036a3cbed882383d2db3ae6ec3716f78a637c3dc6b39c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本フラグの適用は `bin/sotp signal calc-impl-catalog` が直接実行する `cargo rustdoc` 呼び出し 1 箇所のみとする。プロジェクト全体の rustdoc 設定や `cargo doc` 経由の user-facing doc 生成には適用しない。"
+      }
+    },
+    {
+      "claim_hash": "7089615d19c03fff51cc35c71b068ccc0350a43c1e3515be2f12430d1f4d18e9",
+      "evidence_hash": "7404c9b6b7cafdb317e036a3cbed882383d2db3ae6ec3716f78a637c3dc6b39c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "TDDD chain ③ の baseline 取得 / actual 取得双方が呼ぶ `cargo rustdoc --output-format json` の引数に `-Z unstable-options --document-hidden-items` を追加する。"
+      }
+    },
+    {
+      "claim_hash": "96a616db8d26f4db1e7267978fc5d72d8aa017578f50b623741dca101202d9ea",
+      "evidence_hash": "7404c9b6b7cafdb317e036a3cbed882383d2db3ae6ec3716f78a637c3dc6b39c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "TDDD chain ③ の baseline 取得 / actual 取得双方が呼ぶ `cargo rustdoc --output-format json` の引数に `-Z unstable-options --document-hidden-items` を追加する。"
+      }
+    },
+    {
+      "claim_hash": "7e8e876d6a1a6de6e708fc2b09c7172bbcad1c811c082738c9a0c985d82680c8",
+      "evidence_hash": "7404c9b6b7cafdb317e036a3cbed882383d2db3ae6ec3716f78a637c3dc6b39c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "TDDD chain ③ の baseline 取得 / actual 取得双方が呼ぶ `cargo rustdoc --output-format json` の引数に `-Z unstable-options --document-hidden-items` を追加する。これにより `#[doc(hidden)]` のついた pub 要素も rustdoc paths に含まれ、catalogue 突合で `DanglingId` を発火しなくなる。"
+      }
+    },
+    {
+      "claim_hash": "99c0a935d9d0e0c2ae6bd44330392309b8fa55146d5a15207b49aaadf22ac759",
+      "evidence_hash": "7404c9b6b7cafdb317e036a3cbed882383d2db3ae6ec3716f78a637c3dc6b39c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "TDDD chain ③ の baseline 取得 / actual 取得双方が呼ぶ `cargo rustdoc --output-format json` の引数に `-Z unstable-options --document-hidden-items` を追加する。これにより `#[doc(hidden)]` のついた pub 要素も rustdoc paths に含まれ、catalogue 突合で `DanglingId` を発火しなくなる。"
+      }
+    }
+  ]
+}
