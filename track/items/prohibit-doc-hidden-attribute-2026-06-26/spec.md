@@ -8,7 +8,7 @@ signals: { blue: 24, yellow: 0, red: 0 }
 
 ## Goal
 
-- [GO-01] 新サブコマンド `sotp verify doc-hidden` を導入し、workspace の全 crate ソースから `#[doc(hidden)]` 相当の属性宣言を syn AST 走査で検出して CI (`ci-local`) でブロックする。スコープは `architecture-rules.json` の `layers[]` を実行時に読み取ることで自動的に全層に及ぶ。 [adr: knowledge/adr/2026-06-26-0810-prohibit-doc-hidden-attribute.md#D2, knowledge/adr/2026-06-26-0810-prohibit-doc-hidden-attribute.md#D1]
+- [GO-01] 新サブコマンド `sotp verify doc-hidden` を導入し、`architecture-rules.json` の `layers[]` 対象 crate 配下の全 `.rs` ソースから `#[doc(hidden)]` 相当の属性宣言を syn AST 走査で検出して CI (`ci-local`) でブロックする。スコープは `layers[]` を実行時に読み取ることで自動的に全層に及ぶ。 [adr: knowledge/adr/2026-06-26-0810-prohibit-doc-hidden-attribute.md#D2, knowledge/adr/2026-06-26-0810-prohibit-doc-hidden-attribute.md#D1]
 - [GO-02] `#[doc(hidden)]` に起因する TDDD chain ③ の DanglingId 副作用検出（エラーメッセージが不明瞭で根本原因を伝えられない）を、属性名を明示する専用ゲートエラーに置き換え、開発者がメッセージを見た時点で対処方針（属性を外すか item を削除する）を判断できるようにする。 [adr: knowledge/adr/2026-06-26-0810-prohibit-doc-hidden-attribute.md#D2]
 
 ## Scope

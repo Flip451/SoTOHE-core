@@ -5,7 +5,7 @@
   "goal": [
     {
       "id": "GO-01",
-      "text": "新サブコマンド `sotp verify doc-hidden` を導入し、workspace の全 crate ソースから `#[doc(hidden)]` 相当の属性宣言を syn AST 走査で検出して CI (`ci-local`) でブロックする。スコープは `architecture-rules.json` の `layers[]` を実行時に読み取ることで自動的に全層に及ぶ。",
+      "text": "新サブコマンド `sotp verify doc-hidden` を導入し、`architecture-rules.json` の `layers[]` 対象 crate 配下の全 `.rs` ソースから `#[doc(hidden)]` 相当の属性宣言を syn AST 走査で検出して CI (`ci-local`) でブロックする。スコープは `layers[]` を実行時に読み取ることで自動的に全層に及ぶ。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-06-26-0810-prohibit-doc-hidden-attribute.md",

@@ -281,6 +281,30 @@
         "kind": "pass",
         "citation": "ゲートの有効化スコープを `architecture-rules.json` の `layers[]` から実行時に取得する。per-layer フラグや特定 crate パスのハードコードは持たず、`layers[]` に新 crate が追加されれば自動的に対象に含まれる。走査対象は各 layer crate ディレクトリ配下の `.rs` ファイル全体とし、`tests/` / `examples/` / `benches/` も除外しない。"
       }
+    },
+    {
+      "claim_hash": "155a0e0f92e89c5c67144673c414227ab1081057e9fbb0c8a59836bb8e25b5c4",
+      "evidence_hash": "d259a014d3d53f1ff63cf23f5b31958f15b24e8f5a02a9a3ac787a1c9e835a80",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ゲートの有効化スコープを `architecture-rules.json` の `layers[]` から実行時に取得する。per-layer フラグや特定 crate パスのハードコードは持たず、`layers[]` に新 crate が追加されれば自動的に対象に含まれる。走査対象は各 layer crate の **`src/` ディレクトリ**配下の `.rs` ファイルとする。"
+      }
+    },
+    {
+      "claim_hash": "155a0e0f92e89c5c67144673c414227ab1081057e9fbb0c8a59836bb8e25b5c4",
+      "evidence_hash": "7c39d284678c8577fe6be6744cfd255d523c5eb86d89f78333d8bfc89f66bf5c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`layers[]` のいずれかの crate の **`src/` ディレクトリ配下**の Rust ソース（インラインテストモジュール含む）に `#[doc(hidden)]` 相当の属性が存在する場合、ゲートが exit non-zero を返し、`#[doc(hidden)]` 属性の存在をファイルパス・行情報とともに示す finding を出力する。"
+      }
+    },
+    {
+      "claim_hash": "7aa1060e127b7a24a33a6e3b3398b0761dccb44d984759e93282421beaf1f976",
+      "evidence_hash": "d259a014d3d53f1ff63cf23f5b31958f15b24e8f5a02a9a3ac787a1c9e835a80",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ゲートの有効化スコープを `architecture-rules.json` の `layers[]` から実行時に取得する。per-layer フラグや特定 crate パスのハードコードは持たず、`layers[]` に新 crate が追加されれば自動的に対象に含まれる。走査対象は各 layer crate の **`src/` ディレクトリ**配下の `.rs` ファイルとする。"
+      }
     }
   ]
 }
