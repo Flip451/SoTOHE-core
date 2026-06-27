@@ -72,18 +72,25 @@ pub(crate) fn resolve_results_chain2_target_layers(
 
 /// Classify one pair against a cache lookup map and derive its origin references.
 ///
-/// - `Pass`: origins from cache entry; empty reason.
-/// - `Fail`: origins from cache entry; reason from cached `Fail { reason }`.
-/// - `Pending` (cache miss or `Pending` verdict in cache): origins from the
-///   `current_claim_origin` / `current_evidence_origin` parameters — always
-///   the calling pair's own origins, so pairs in different layers that share
-///   identical `(claim_hash, evidence_hash)` values each carry the correct
-///   per-layer origin reference.
+/// The cache map holds `Vec<&SemanticVerifyEntry>` per `(claim_hash, evidence_hash)` key
+/// to handle duplicate catalogue entries that share the same hash pair but have different
+/// `claim_origin` / `evidence_origin` (e.g. two catalogue entries with identical canonical
+/// JSON but distinct entry keys).  When multiple entries share a key, the Vec is searched
+/// for an entry whose origins exactly match `current_claim_origin` and
+/// `current_evidence_origin`; only that entry's verdict is used.  If no exact origin match
+/// is found, the pair is treated as a cache miss (pending).
+///
+/// - `Pass`: origins from the origin-matched cache entry; empty reason.
+/// - `Fail`: origins from the origin-matched cache entry; reason from cached `Fail { reason }`.
+/// - `Pending` (no origin-matched entry or `Pending` verdict in matched entry): origins from
+///   the `current_claim_origin` / `current_evidence_origin` parameters — always the calling
+///   pair's own origins, so pairs in different layers that share identical
+///   `(claim_hash, evidence_hash)` values each carry the correct per-layer origin reference.
 fn extract_verdict_and_origins(
     key: &(domain::ContentHash, domain::ContentHash),
     cache_map: &std::collections::HashMap<
         (domain::ContentHash, domain::ContentHash),
-        &domain::tddd::semantic_verify::SemanticVerifyEntry,
+        Vec<&domain::tddd::semantic_verify::SemanticVerifyEntry>,
     >,
     current_claim_origin: &domain::tddd::semantic_verify::VerifyOriginRef,
     current_evidence_origin: &domain::tddd::semantic_verify::VerifyOriginRef,
@@ -95,7 +102,21 @@ fn extract_verdict_and_origins(
 ) {
     use domain::tddd::semantic_verify::SemanticVerdict;
 
-    match cache_map.get(key) {
+    // Find the cache entry whose origins exactly match the current pair.
+    // When multiple entries share the same hash pair (duplicate catalogue entries with
+    // identical canonical JSON but distinct entry_keys), only the entry whose
+    // claim_origin + evidence_origin match is selected; others are ignored for this pair.
+    let matching_entry = cache_map.get(key).and_then(|entries| {
+        entries
+            .iter()
+            .find(|e| {
+                &e.claim_origin == current_claim_origin
+                    && &e.evidence_origin == current_evidence_origin
+            })
+            .copied()
+    });
+
+    match matching_entry {
         Some(entry) => match &entry.verdict {
             SemanticVerdict::Pass { .. } => (
                 entry.verdict.clone(),
@@ -117,7 +138,8 @@ fn extract_verdict_and_origins(
                 current_evidence_origin.clone(),
             ),
         },
-        // Cache miss → pending; use current pair's origin (per-layer correct).
+        // Cache miss (no entry for key, or no origin-matched entry) → pending;
+        // use current pair's origin (per-layer correct).
         None => (
             SemanticVerdict::Pending,
             "pair not yet verified".to_owned(),
@@ -193,17 +215,25 @@ pub(crate) fn compute_results(
         records: Vec<RefVerifyPairRecord>,
     }
 
-    // Build cache lookup maps keyed by (claim_hash, evidence_hash).
-    let chain1_map: HashMap<HashKey, &SemanticVerifyEntry> =
-        chain1_cache.iter().map(|e| ((e.claim_hash.clone(), e.evidence_hash.clone()), e)).collect();
+    // Build cache lookup maps keyed by (claim_hash, evidence_hash), collecting all
+    // entries per key into a Vec.  When multiple cache entries share the same hash
+    // pair (e.g. duplicate catalogue entries with identical canonical JSON but
+    // distinct entry keys), all are retained so that extract_verdict_and_origins can
+    // select the entry whose origins exactly match each current pair.
+    let chain1_map: HashMap<HashKey, Vec<&SemanticVerifyEntry>> =
+        chain1_cache.iter().fold(HashMap::new(), |mut acc, e| {
+            acc.entry((e.claim_hash.clone(), e.evidence_hash.clone())).or_default().push(e);
+            acc
+        });
 
-    let chain2_maps: HashMap<String, HashMap<HashKey, &SemanticVerifyEntry>> = chain2_caches
+    let chain2_maps: HashMap<String, HashMap<HashKey, Vec<&SemanticVerifyEntry>>> = chain2_caches
         .iter()
         .map(|(layer_id, entries)| {
-            let map = entries
-                .iter()
-                .map(|e| ((e.claim_hash.clone(), e.evidence_hash.clone()), e))
-                .collect();
+            let map: HashMap<HashKey, Vec<&SemanticVerifyEntry>> =
+                entries.iter().fold(HashMap::new(), |mut acc, e| {
+                    acc.entry((e.claim_hash.clone(), e.evidence_hash.clone())).or_default().push(e);
+                    acc
+                });
             (layer_id.as_ref().to_owned(), map)
         })
         .collect();
@@ -256,7 +286,7 @@ pub(crate) fn compute_results(
         }
     }
 
-    let empty_map: HashMap<HashKey, &SemanticVerifyEntry> = HashMap::new();
+    let empty_map: HashMap<HashKey, Vec<&SemanticVerifyEntry>> = HashMap::new();
 
     // Classify pairs and increment the pre-initialized lane counts.
     // Pairs whose lane is absent (excluded by chain or layer filter) are skipped.
@@ -685,6 +715,18 @@ mod tests {
         )
     }
 
+    /// Chain-2 pass cache entry: claim_origin is CatalogueEntry, evidence_origin is
+    /// SpecElement — matching the origin shape produced by `chain2_pair`.
+    fn chain2_pass_cache_entry(claim: u8, evidence: u8, layer: &str) -> SemanticVerifyEntry {
+        SemanticVerifyEntry::new(
+            test_hash(claim),
+            test_hash(evidence),
+            SemanticVerdict::Pass { citation: EvidenceCitation::try_new("ok".to_owned()).unwrap() },
+            catalogue_origin(claim, layer),
+            spec_origin(evidence),
+        )
+    }
+
     #[test]
     fn load_results_tddd_bindings_missing_rules_returns_empty() {
         // Absent architecture-rules.json → pre-TDDD repository state.
@@ -1090,7 +1132,7 @@ mod tests {
         let layer_id = LayerId::try_new("domain".to_owned()).unwrap();
         let out = compute_results(
             vec![], // chain1 cache absent — not loaded for chain=Chain2 (F1 fix)
-            vec![(layer_id.clone(), vec![pass_cache_entry(0x01, 0x02)])],
+            vec![(layer_id.clone(), vec![chain2_pass_cache_entry(0x01, 0x02, "domain")])],
             vec![chain2_pair(0x01, 0x02, "domain")],
             RefVerifyChainFilter::Chain2,
             RefVerifyLayerFilter::All,
@@ -1115,7 +1157,7 @@ mod tests {
         // chain2_caches has only domain (simulating F2 fix: usecase cache not loaded).
         let out = compute_results(
             vec![],
-            vec![(domain_id.clone(), vec![pass_cache_entry(0x01, 0x02)])],
+            vec![(domain_id.clone(), vec![chain2_pass_cache_entry(0x01, 0x02, "domain")])],
             vec![chain2_pair(0x01, 0x02, "domain")],
             RefVerifyChainFilter::Chain2,
             RefVerifyLayerFilter::Specific(domain_id),
@@ -1136,7 +1178,7 @@ mod tests {
         // current_pairs contains only Chain2 pairs (F3: pair source used Chain2 scope).
         let out = compute_results(
             vec![], // chain1 cache empty (F1: not loaded)
-            vec![(layer_id.clone(), vec![pass_cache_entry(0x01, 0x02)])],
+            vec![(layer_id.clone(), vec![chain2_pass_cache_entry(0x01, 0x02, "domain")])],
             vec![chain2_pair(0x01, 0x02, "domain")], // only Chain2 pairs (F3 invariant)
             RefVerifyChainFilter::Chain2,
             RefVerifyLayerFilter::All,
@@ -1730,5 +1772,116 @@ mod tests {
                     && msg.contains("refusing to follow symlink")),
             "expected Wiring error for symlinked track path, got: {err:?}"
         );
+    }
+
+    // ── duplicate hash, distinct origin (P1 finding — round 22) ─────────────────
+
+    /// Two Chain-2 catalogue entries in the same layer share identical canonical JSON
+    /// (same `claim_hash` + `evidence_hash`) but have different `claim_origin` values
+    /// (distinct `entry_key` in the same catalogue section).
+    ///
+    /// Previously, `chain2_map` was built as `HashMap<HashKey, &SemanticVerifyEntry>`
+    /// (first-wins or last-wins), so one of the two cache entries was silently dropped.
+    /// After the fix both are retained in a `Vec`, and each current pair is matched by
+    /// origin, so each pair sees its own cached verdict rather than collapsing to one.
+    ///
+    /// Invariant: `pair_a` (TypeA, cached as Pass) → `Pass`; `pair_b` (TypeB, cached
+    /// as Fail) → `Fail { reason }`.  No cross-contamination of verdicts or origins.
+    #[test]
+    fn compute_results_duplicate_hash_distinct_origin_keeps_per_origin_verdict() {
+        let layer = "domain";
+        let layer_id = LayerId::try_new(layer.to_owned()).unwrap();
+
+        // Both entries share (claim_hash=0x01, evidence_hash=0x02) but have different
+        // claim_origin: CatalogueEntry with entry_key "TypeA" vs "TypeB".
+        let entry_key_a = CatalogueEntryKey::try_new("TypeA".to_owned()).unwrap();
+        let entry_key_b = CatalogueEntryKey::try_new("TypeB".to_owned()).unwrap();
+        let shared_evidence_origin = spec_origin(0x02);
+
+        let origin_a = VerifyOriginRef::CatalogueEntry(CatalogueEntryRef::new(
+            format!("{layer}-types.json"),
+            CatalogueSectionKey::Types,
+            entry_key_a,
+        ));
+        let origin_b = VerifyOriginRef::CatalogueEntry(CatalogueEntryRef::new(
+            format!("{layer}-types.json"),
+            CatalogueSectionKey::Types,
+            entry_key_b,
+        ));
+
+        // Cache entry A: Pass verdict
+        let cache_entry_a = SemanticVerifyEntry::new(
+            test_hash(0x01),
+            test_hash(0x02),
+            SemanticVerdict::Pass {
+                citation: EvidenceCitation::try_new("spec says TypeA is covered".to_owned())
+                    .unwrap(),
+            },
+            origin_a.clone(),
+            shared_evidence_origin.clone(),
+        );
+        // Cache entry B: Fail verdict — shares the same hash pair as entry A
+        let cache_entry_b = SemanticVerifyEntry::new(
+            test_hash(0x01),
+            test_hash(0x02),
+            SemanticVerdict::Fail { reason: "mismatch for TypeB".to_owned() },
+            origin_b.clone(),
+            shared_evidence_origin.clone(),
+        );
+
+        // Two current pairs with the same hashes but each matching a different cached origin.
+        let pair_a = RefVerifyPair {
+            claim: "claim-TypeA".to_owned(),
+            evidence: "evidence-02".to_owned(),
+            claim_hash: test_hash(0x01),
+            evidence_hash: test_hash(0x02),
+            cache_scope: RefVerifyCacheScope::CatalogueSpec { layer: layer_id.clone() },
+            known_bad: false,
+            claim_origin: origin_a.clone(),
+            evidence_origin: shared_evidence_origin.clone(),
+        };
+        let pair_b = RefVerifyPair {
+            claim: "claim-TypeB".to_owned(),
+            evidence: "evidence-02".to_owned(),
+            claim_hash: test_hash(0x01),
+            evidence_hash: test_hash(0x02),
+            cache_scope: RefVerifyCacheScope::CatalogueSpec { layer: layer_id.clone() },
+            known_bad: false,
+            claim_origin: origin_b.clone(),
+            evidence_origin: shared_evidence_origin.clone(),
+        };
+
+        let out = compute_results(
+            vec![],
+            vec![(layer_id, vec![cache_entry_a, cache_entry_b])],
+            vec![pair_a, pair_b],
+            RefVerifyChainFilter::Chain2,
+            RefVerifyLayerFilter::All,
+            RefVerifyVerdictFilter::All,
+        )
+        .unwrap();
+
+        // Both pairs are classified without collapse.
+        assert_eq!(out.total_pass, 1, "pair_a (TypeA) should be Pass");
+        assert_eq!(out.total_fail, 1, "pair_b (TypeB) should be Fail");
+        assert_eq!(out.total_pending, 0, "no pair should fall through to Pending");
+        assert_eq!(out.pair_records.len(), 2, "both records must be present");
+
+        // pair_a → Pass with origin_a
+        let rec_a = out.pair_records.iter().find(|r| r.claim_origin == origin_a).unwrap();
+        assert!(
+            matches!(rec_a.verdict, SemanticVerdict::Pass { .. }),
+            "TypeA record should carry Pass verdict, got {:?}",
+            rec_a.verdict
+        );
+
+        // pair_b → Fail with origin_b and the correct reason
+        let rec_b = out.pair_records.iter().find(|r| r.claim_origin == origin_b).unwrap();
+        assert!(
+            matches!(rec_b.verdict, SemanticVerdict::Fail { .. }),
+            "TypeB record should carry Fail verdict, got {:?}",
+            rec_b.verdict
+        );
+        assert_eq!(rec_b.reason, "mismatch for TypeB", "Fail reason must not be contaminated");
     }
 }
