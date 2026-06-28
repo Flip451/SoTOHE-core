@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-28T14:26:09Z",
-  "declaration_hash": "70cc8781c7cf5cfd2cbddee45a4bf6f51f4b5f511cbab382cc1f609c75ac66bf",
+  "generated_at": "2026-06-28T15:47:41Z",
+  "declaration_hash": "37e0a52f2ed0c908ec2fdfb1ba5bc85eeaa69bc325b018db7189ce24dd95b54e",
   "signals": [
     {
       "type_name": "CliCommand",
@@ -65,6 +65,18 @@
     },
     {
       "type_name": "cli::commands::task_contract::execute_task_contract_coverage",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::task_contract::task_contract_check_core",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::task_contract::task_contract_coverage_core",
       "kind_tag": "free_function",
       "signal": "blue",
       "found_type": true

@@ -363,11 +363,11 @@
       }
     },
     {
-      "claim_hash": "3e7fbdd09871f87cbc1d220e7ac6cadc9f8056a97fa3b563186f187dcae7f691",
+      "claim_hash": "f4428a515fdbecbbab5e10c343dbe086077b00e8a0b9bf896b5675b4b5f7fcc8",
       "evidence_hash": "0635256c1afb73b788d9b65d2a8ecde86d0c85f8a0fe21d138ec6969917b8f41",
       "verdict": {
         "kind": "pass",
-        "citation": "pre-review blocking binary check ゲートの実装（`bin/sotp task-contract check`）: 現在のタスク（in_progress）と完了済タスク（done）に帰属するエントリの impl_catalog 信号を既存信号テーブルと entry キーで JOIN し、全エントリが 🔵 かを確認する。判定対象タスクは `impl-plan.json` のタスク状態を参照して特定する。`--track-id` 引数が省略された場合は現在の git ブランチ (`track/<id>` 形式) から active track を auto-resolve する。ゲートは fail-closed（artifact 不在・非 🔵 エントリ存在のいずれでもブロック）。"
+        "citation": "`--track-id` 引数が省略された場合は現在の git ブランチ (`track/<id>` 形式) から active track を auto-resolve する。ゲートは fail-closed（artifact 不在・非 🔵 エントリ存在のいずれでもブロック）。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -387,7 +387,7 @@
       }
     },
     {
-      "claim_hash": "3e7fbdd09871f87cbc1d220e7ac6cadc9f8056a97fa3b563186f187dcae7f691",
+      "claim_hash": "f4428a515fdbecbbab5e10c343dbe086077b00e8a0b9bf896b5675b4b5f7fcc8",
       "evidence_hash": "30461c6b545d8238ecb541a5f3b5aa98ce1ec61949842964cfe767e0dc6a98ec",
       "verdict": {
         "kind": "pass",
@@ -411,7 +411,7 @@
       }
     },
     {
-      "claim_hash": "3a88364262a0d39b95030e4a266b1fb891625a2bf9b232ba09076f85208cddcb",
+      "claim_hash": "40506cc717e82115f759d51dc6c7f136ea35448be93149aad28167216143ee96",
       "evidence_hash": "224be3888edb61b6a4a53d8498f0ca5ab96542e6bfb580eecaffb85c567e6455",
       "verdict": {
         "kind": "pass",
@@ -435,11 +435,11 @@
       }
     },
     {
-      "claim_hash": "3a88364262a0d39b95030e4a266b1fb891625a2bf9b232ba09076f85208cddcb",
+      "claim_hash": "40506cc717e82115f759d51dc6c7f136ea35448be93149aad28167216143ee96",
       "evidence_hash": "55101e77aed5b394bde03f1e88c85e0484d8b204835d92183adb3199607d81c2",
       "verdict": {
         "kind": "pass",
-        "citation": "`bin/sotp task-contract coverage` が実装されており、`cargo make task-contract-coverage` として呼び出せる。... attribution 不完全（orphan あり）の場合、coverage がブロックし check は実行されない。"
+        "citation": "`bin/sotp task-contract coverage` が実装されており、`cargo make task-contract-coverage` として呼び出せる。`cargo make task-contract-check` は `dependencies = [\"task-contract-coverage\"]` を宣言し、coverage → check の順で必ず実行される。attribution 不完全（orphan あり）の場合、coverage がブロックし check は実行されない。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -455,6 +455,102 @@
           "section": "acceptance_criteria",
           "element_id": "AC-08",
           "text_label": "`bin/sotp task-contract coverage` が実装されており、`cargo make task-contract-coverage` として呼び出せる。`cargo make task-contract-check` は `dependencies = [\"task-contract-coverage\"]` を宣言し、coverage → check の順で必ず実行される。attribution 不完全（orphan あり）の場合、coverage がブロックし check は実行されない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "2c13adc0c945f04798248c8a6e2e36803c5fd9e22263261488a48e966e2390cf",
+      "evidence_hash": "0635256c1afb73b788d9b65d2a8ecde86d0c85f8a0fe21d138ec6969917b8f41",
+      "verdict": {
+        "kind": "pass",
+        "citation": "pre-review blocking binary check ゲートの実装（`bin/sotp task-contract check`）: 現在のタスク（in_progress）と完了済タスク（done）に帰属するエントリの impl_catalog 信号を既存信号テーブルと entry キーで JOIN し、全エントリが 🔵 かを確認する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::task_contract::task_contract_check_core"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "pre-review blocking binary check ゲートの実装（`bin/sotp task-contract check`）: 現在のタスク（in_progress）と完了済タスク（done）に帰属するエントリの impl_catalog 信号を既存信号テーブルと entry キーで JOIN し、全エントリが 🔵 かを確認する。判定対象タスクは `impl-plan.json` のタスク状態を参照して特定する。`--track-id` 引数が省略された場合は現在の git ブランチ (`track/<id>` 形式) から active track を auto-resolve する。ゲートは fail-closed（artifact 不在・非 🔵 エントリ存在のいずれでもブロック）。todo タスクに帰属するエントリは 🔵 必須の対象からは外すが、🔴 はタスク状態に関わらず常にブロックし、🟡 のみ未着手として許容する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "2c13adc0c945f04798248c8a6e2e36803c5fd9e22263261488a48e966e2390cf",
+      "evidence_hash": "26bf63df065f42f2d090a7593fe94fdd50148ee76b3eafb9a17a0ffea47e17da",
+      "verdict": {
+        "kind": "pass",
+        "citation": "cargo-make `dependencies` による pre-review ゲートの配線: `cargo make track-local-review` と `cargo make track-local-review-fix` の両方の `dependencies` に `task-contract-check` タスクを追加し、per-review-round で完全性判定（coverage）→ 生存性判定（check）の順で自動発火させる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::task_contract::task_contract_check_core"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "cargo-make `dependencies` による pre-review ゲートの配線: `cargo make track-local-review` と `cargo make track-local-review-fix` の両方の `dependencies` に `task-contract-check` タスクを追加し、per-review-round で完全性判定（coverage）→ 生存性判定（check）の順で自動発火させる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f483ff122244941bfa8ea5fe511d957edbad92f07dfd4b81b752acd1cce63544",
+      "evidence_hash": "224be3888edb61b6a4a53d8498f0ca5ab96542e6bfb580eecaffb85c567e6455",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp task-contract coverage` サブコマンドの実装: 型カタログの全エントリが漏れなくタスクに attribution されているか（完全性）を専用に検証する subcommand。cargo make ci の検証 chain に統合し、commit ごとに attribution drift を検出する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::task_contract::task_contract_coverage_core"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "`bin/sotp task-contract coverage` サブコマンドの実装: 型カタログの全エントリが漏れなくタスクに attribution されているか（完全性）を専用に検証する subcommand。cargo make ci の検証 chain に統合し、commit ごとに attribution drift を検出する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f483ff122244941bfa8ea5fe511d957edbad92f07dfd4b81b752acd1cce63544",
+      "evidence_hash": "26bf63df065f42f2d090a7593fe94fdd50148ee76b3eafb9a17a0ffea47e17da",
+      "verdict": {
+        "kind": "pass",
+        "citation": "cargo make `track-local-review` と `cargo make track-local-review-fix` の両方の `dependencies` に `task-contract-check` タスクを追加し、per-review-round で完全性判定（coverage）→ 生存性判定（check）の順で自動発火させる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::task_contract::task_contract_coverage_core"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "cargo-make `dependencies` による pre-review ゲートの配線: `cargo make track-local-review` と `cargo make track-local-review-fix` の両方の `dependencies` に `task-contract-check` タスクを追加し、per-review-round で完全性判定（coverage）→ 生存性判定（check）の順で自動発火させる。"
         }
       }
     }

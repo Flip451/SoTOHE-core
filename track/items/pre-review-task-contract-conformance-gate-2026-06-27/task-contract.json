@@ -27,7 +27,8 @@
       { "layer": "cli", "entry_key": "CliCommand" },
       { "layer": "cli", "entry_key": "TaskContractCheckArgs" },
       { "layer": "cli", "entry_key": "cli::commands::task_contract::execute_task_contract_check" },
-      { "layer": "cli", "entry_key": "cli::commands::task_contract::detect_active_track_from_branch_cwd" }
+      { "layer": "cli", "entry_key": "cli::commands::task_contract::detect_active_track_from_branch_cwd" },
+      { "layer": "cli", "entry_key": "cli::commands::task_contract::task_contract_check_core" }
     ],
     "T009": [
       { "layer": "domain", "entry_key": "CoverageViolation" },
@@ -53,7 +54,8 @@
       { "layer": "cli", "entry_key": "TaskContractCommand" },
       { "layer": "cli", "entry_key": "TaskContractCoverageArgs" },
       { "layer": "cli", "entry_key": "cli::commands::task_contract::execute" },
-      { "layer": "cli", "entry_key": "cli::commands::task_contract::execute_task_contract_coverage" }
+      { "layer": "cli", "entry_key": "cli::commands::task_contract::execute_task_contract_coverage" },
+      { "layer": "cli", "entry_key": "cli::commands::task_contract::task_contract_coverage_core" }
     ],
     "T014": [
       { "layer": "cli_composition", "entry_key": "TaskContractCompositionRoot" }

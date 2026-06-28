@@ -366,6 +366,32 @@ impl CoverageVerifyService for CoverageVerifyInteractor {
             }
         }
 
+        // ── Phase 3: Non-canonical layer attribution check ────────────────────
+        // Walk all attributed entries and emit `InvalidEntryRef` for any entry
+        // whose layer is not one of the 6 canonical TDDD layers. Such entries
+        // are unreachable by the per-layer iteration above and would silently
+        // bypass orphan detection and referential integrity checks, allowing
+        // typos (e.g. `"doman"` for `"domain"`) to produce false-pass results.
+        {
+            let canonical_set: std::collections::HashSet<&str> =
+                CANONICAL_LAYERS.iter().copied().collect();
+            for refs in contract_doc.entries().values() {
+                for entry in refs {
+                    if !canonical_set.contains(entry.layer().as_ref()) {
+                        all_violations.push(
+                            domain::task_contract::CoverageViolation::InvalidEntryRef {
+                                entry: entry.clone(),
+                                reason: format!(
+                                    "layer '{}' is not a canonical TDDD layer",
+                                    entry.layer().as_ref()
+                                ),
+                            },
+                        );
+                    }
+                }
+            }
+        }
+
         if all_violations.is_empty() {
             Ok(CoverageVerifyOutcome::Passed)
         } else {
@@ -1372,6 +1398,66 @@ mod tests {
                 );
             }
             other => panic!("expected Blocked with MissingSignalDocument, got {other:?}"),
+        }
+    }
+
+    // ── Coverage (f): non-canonical layer attribution → InvalidEntryRef ──────────
+    //
+    // When task-contract.json attributes an entry to a layer that is not one of
+    // the 6 canonical TDDD layers (e.g. "doman" as a typo for "domain"), the
+    // per-layer CANONICAL_LAYERS iteration never visits it. Without Phase 3, the
+    // entry would silently bypass both orphan detection and referential integrity
+    // checks, producing a false-pass result.
+    // Phase 3 detects these entries and emits `InvalidEntryRef` for each one.
+
+    #[test]
+    fn coverage_non_canonical_layer_attribution_yields_invalid_entry_ref() {
+        // task-contract attributes "Foo" to "doman" (typo for "domain").
+        // All 6 canonical layers have present-but-empty signal docs so that
+        // MissingSignalDocument violations do not obscure the assertion.
+        let mut signal_docs = std::collections::HashMap::new();
+        for layer_name in
+            &["domain", "usecase", "infrastructure", "cli_driver", "cli", "cli_composition"]
+        {
+            signal_docs.insert((*layer_name).to_owned(), make_signals(vec![]));
+        }
+        let svc = coverage_interactor(
+            Ok(make_contract(
+                "my-track",
+                vec![(
+                    task_id("T001"),
+                    // "doman" is a non-canonical layer (typo for "domain").
+                    vec![ContractedEntryRef::new(layer("doman"), entry_key("Foo"))],
+                )],
+            )),
+            signal_docs,
+        );
+        let outcome = svc.verify_coverage(coverage_cmd("my-track")).unwrap();
+        match outcome {
+            CoverageVerifyOutcome::Blocked { violations, .. } => {
+                let invalid_refs: Vec<_> = violations
+                    .iter()
+                    .filter_map(|v| {
+                        if let CoverageViolation::InvalidEntryRef { entry, reason } = v {
+                            Some((entry, reason))
+                        } else {
+                            None
+                        }
+                    })
+                    .collect();
+                assert!(
+                    !invalid_refs.is_empty(),
+                    "expected at least one InvalidEntryRef for non-canonical layer 'doman', got: {violations:?}"
+                );
+                let (entry, reason) = invalid_refs[0];
+                assert_eq!(entry.layer().as_ref(), "doman", "expected layer 'doman' in violation");
+                assert_eq!(entry.entry_key().as_str(), "Foo");
+                assert!(
+                    reason.contains("not a canonical TDDD layer"),
+                    "expected reason to mention canonical TDDD layer, got: {reason}"
+                );
+            }
+            other => panic!("expected Blocked with InvalidEntryRef, got {other:?}"),
         }
     }
 

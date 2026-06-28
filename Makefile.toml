@@ -397,7 +397,7 @@ dependencies = ["fmt-check-local", "clippy-local", "test-local", "deny-local", "
 [tasks.ci-local]
 private = true
 description = "[internal] Run local CI checks"
-dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-hooks-path-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-adr-signals-local", "verify-spec-states-current-local", "signal-check-impl-catalog-local", "verify-catalogue-spec-refs-local", "check-catalogue-spec-signals-local"]
+dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-hooks-path-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-adr-signals-local", "verify-spec-states-current-local", "signal-check-impl-catalog-local", "verify-catalogue-spec-refs-local", "check-catalogue-spec-signals-local", "task-contract-coverage-local"]
 
 [tasks.ci-rust-container]
 description = "[gate] Run Rust-only CI checks inside a pre-existing container (no docker compose)"
@@ -405,7 +405,7 @@ dependencies = ["fmt-check-local", "clippy-local", "test-local", "deny-local", "
 
 [tasks.ci-container]
 description = "[gate] Run CI checks inside a pre-existing container (no docker compose)"
-dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-hooks-path-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-adr-signals-local", "verify-spec-states-current-local", "signal-check-impl-catalog-local", "verify-catalogue-spec-refs-local", "check-catalogue-spec-signals-local"]
+dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-hooks-path-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-adr-signals-local", "verify-spec-states-current-local", "signal-check-impl-catalog-local", "verify-catalogue-spec-refs-local", "check-catalogue-spec-signals-local", "task-contract-coverage-local"]
 
 # Compose wrappers
 [tasks.fmt]
@@ -653,6 +653,24 @@ description = "[gate] Run pre-review liveness gate (D5/D7): verifies all in_prog
 dependencies = ["task-contract-coverage"]
 command = "bin/sotp"
 args = ["task-contract", "check"]
+
+[tasks.task-contract-coverage-local]
+private = true
+description = "[internal] Run attribution-completeness coverage check (D5) with branch-aware graceful skip. Skips gracefully when not on a track/* branch so that cargo make ci does not break on main or fresh checkouts. On track/* branches: runs coverage against the freshness signals already produced by signal-check-impl-catalog-local (which runs earlier in the ci-local dependency chain — coverage reads existing type-signals.json files, no rustdoc invocation here, so this task does not need nightly toolchain access). Uses cargo run for container compatibility."
+script_runner = "@shell"
+script = ['''
+set -e
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+case "$BRANCH" in
+  track/*)
+    cargo run --quiet -p cli -- task-contract coverage
+    ;;
+  *)
+    printf "[SKIP] task-contract-coverage-local: not on a track branch; skipping\n"
+    exit 0
+    ;;
+esac
+''']
 
 [tasks.track-local-review]
 description = "[wrapper] Fire attribution-completeness + liveness gates via task-contract-check dependency (D6: signal refresh → coverage → check chained by cargo-make dependencies; active track auto-resolved from the current git branch in each gate), then invoke a single reviewer round via bin/sotp review local. Provider-agnostic: both Claude `.claude/agents/review-fix-lead.md` and Codex `.agents/skills/review-fix-lead/SKILL.md` skills call this task per round (the agent / skill owns the fix loop itself)."
