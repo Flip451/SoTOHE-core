@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "6cfce747019080061efa9b2d98f4560eee343cba047876afb74e15e904948a6c",
+  "catalogue_declaration_hash": "0de7581806a484580cad1e44ffa5ab06e7793fae6989629273756e3dd9d78b75",
   "signals": [
     {
       "type_name": "ContractedEntryRef",
@@ -10,12 +10,12 @@
     {
       "type_name": "CoverageVerifyOutcome",
       "signal": "blue",
-      "entry_hash": "da8376e32064452319dd7b4e8cabe8cb72d6a7b59a7bca5204363a142e95bdba"
+      "entry_hash": "51a97525c91d6eb5df3faf526e3942874b1ec1bc82c025b7632bf17c267520b9"
     },
     {
       "type_name": "CoverageViolation",
       "signal": "blue",
-      "entry_hash": "e3df884022cb2d6dd4e158c4b7057fb0b63d603560f0ad910af90e8d6145dc17"
+      "entry_hash": "b02c19263b49039553f320f09a0342231b26064bad21a28115b8897f217c45ec"
     },
     {
       "type_name": "PreReviewGateOutcome",

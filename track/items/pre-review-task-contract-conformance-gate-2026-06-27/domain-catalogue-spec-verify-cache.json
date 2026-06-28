@@ -75,7 +75,7 @@
       }
     },
     {
-      "claim_hash": "da8376e32064452319dd7b4e8cabe8cb72d6a7b59a7bca5204363a142e95bdba",
+      "claim_hash": "51a97525c91d6eb5df3faf526e3942874b1ec1bc82c025b7632bf17c267520b9",
       "evidence_hash": "224be3888edb61b6a4a53d8498f0ca5ab96542e6bfb580eecaffb85c567e6455",
       "verdict": {
         "kind": "pass",
@@ -99,7 +99,7 @@
       }
     },
     {
-      "claim_hash": "da8376e32064452319dd7b4e8cabe8cb72d6a7b59a7bca5204363a142e95bdba",
+      "claim_hash": "51a97525c91d6eb5df3faf526e3942874b1ec1bc82c025b7632bf17c267520b9",
       "evidence_hash": "1968f8bf1bea6f58d52f8284887308a02d225416a89de53733a533c8f1f20a4b",
       "verdict": {
         "kind": "pass",
@@ -123,11 +123,11 @@
       }
     },
     {
-      "claim_hash": "da8376e32064452319dd7b4e8cabe8cb72d6a7b59a7bca5204363a142e95bdba",
+      "claim_hash": "51a97525c91d6eb5df3faf526e3942874b1ec1bc82c025b7632bf17c267520b9",
       "evidence_hash": "55101e77aed5b394bde03f1e88c85e0484d8b204835d92183adb3199607d81c2",
       "verdict": {
         "kind": "pass",
-        "citation": "`attribution 不完全（orphan あり）の場合、coverage がブロックし check は実行されない。`"
+        "citation": "attribution 不完全（orphan あり）の場合、coverage がブロックし check は実行されない。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -147,7 +147,7 @@
       }
     },
     {
-      "claim_hash": "e3df884022cb2d6dd4e158c4b7057fb0b63d603560f0ad910af90e8d6145dc17",
+      "claim_hash": "b02c19263b49039553f320f09a0342231b26064bad21a28115b8897f217c45ec",
       "evidence_hash": "3ca500eaaa5882767865ad14d8abba77b5aae37e7824118685ccd0b7c433c278",
       "verdict": {
         "kind": "pass",
@@ -171,7 +171,7 @@
       }
     },
     {
-      "claim_hash": "e3df884022cb2d6dd4e158c4b7057fb0b63d603560f0ad910af90e8d6145dc17",
+      "claim_hash": "b02c19263b49039553f320f09a0342231b26064bad21a28115b8897f217c45ec",
       "evidence_hash": "224be3888edb61b6a4a53d8498f0ca5ab96542e6bfb580eecaffb85c567e6455",
       "verdict": {
         "kind": "pass",
@@ -195,7 +195,7 @@
       }
     },
     {
-      "claim_hash": "e3df884022cb2d6dd4e158c4b7057fb0b63d603560f0ad910af90e8d6145dc17",
+      "claim_hash": "b02c19263b49039553f320f09a0342231b26064bad21a28115b8897f217c45ec",
       "evidence_hash": "d2156ec6a3d64618f3e0422a6781df8d24b6cfba9eb32fec0df2dede63bf3b76",
       "verdict": {
         "kind": "pass",
@@ -219,7 +219,7 @@
       }
     },
     {
-      "claim_hash": "e3df884022cb2d6dd4e158c4b7057fb0b63d603560f0ad910af90e8d6145dc17",
+      "claim_hash": "b02c19263b49039553f320f09a0342231b26064bad21a28115b8897f217c45ec",
       "evidence_hash": "0957258327aa3ace5fb1a56480fbb425b5ea9f50b3818968ffb33ef316877894",
       "verdict": {
         "kind": "pass",
@@ -243,11 +243,11 @@
       }
     },
     {
-      "claim_hash": "e3df884022cb2d6dd4e158c4b7057fb0b63d603560f0ad910af90e8d6145dc17",
+      "claim_hash": "b02c19263b49039553f320f09a0342231b26064bad21a28115b8897f217c45ec",
       "evidence_hash": "6dfe414194bae09187a3002279da54cf5dcd925b094c7fbc5f1e882f60b52e15",
       "verdict": {
         "kind": "pass",
-        "citation": "attribution 完全性（completeness）の検証と生存性（liveness）の検証は別 subcommand に分割する（`bin/sotp task-contract coverage` と `bin/sotp task-contract check`）"
+        "citation": "attribution 完全性（completeness）の検証と生存性（liveness）の検証は別 subcommand に分割する（`bin/sotp task-contract coverage` と `bin/sotp task-contract check`）。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",

@@ -288,31 +288,24 @@ impl CoverageVerifyService for CoverageVerifyInteractor {
                 continue;
             };
 
-            // Read signal document for this layer. If a contract attributes
-            // entries to an absent layer document, coverage must fail closed:
-            // those attributed entries cannot be proven to exist in catalogue.
-            let signal_doc = match self
-                .signal_reader
-                .read_optional_signals(&cmd.track_id, &layer)?
-            {
-                Some(doc) => doc,
-                None => {
-                    for entry in
-                        contract_doc.entries().values().flatten().filter(|e| e.layer() == &layer)
-                    {
+            // Read signal document for this layer. Absence of the signal
+            // document is always a coverage violation (fail-closed), regardless
+            // of whether any entries are attributed to this layer in
+            // task-contract.json. A single MissingSignalDocument violation is
+            // emitted per absent layer so that the gate does not silently skip
+            // layers that have not yet produced a signal document.
+            let signal_doc =
+                match self.signal_reader.read_optional_signals(&cmd.track_id, &layer)? {
+                    Some(doc) => doc,
+                    None => {
                         all_violations.push(
-                            domain::task_contract::CoverageViolation::InvalidEntryRef {
-                                entry: entry.clone(),
-                                reason: format!(
-                                    "signal document not found for layer '{}'; cannot verify entry",
-                                    layer.as_ref()
-                                ),
+                            domain::task_contract::CoverageViolation::MissingSignalDocument {
+                                layer: layer.clone(),
                             },
                         );
+                        continue;
                     }
-                    continue;
-                }
-            };
+                };
 
             // Build lookup: entry_key → ContractedEntryRef for scope entries.
             let mut scope_entries: HashMap<String, ContractedEntryRef> = HashMap::new();
@@ -1287,7 +1280,10 @@ mod tests {
     }
 
     #[test]
-    fn coverage_absent_signal_doc_for_contracted_layer_yields_invalid_entry_ref() {
+    fn coverage_absent_signal_doc_for_contracted_layer_yields_missing_signal_document() {
+        // Attributed entries exist for "domain", but the signal document is absent.
+        // Under the new fail-closed rule, MissingSignalDocument is emitted for the
+        // absent layer regardless of attribution — one violation per absent layer.
         let svc = coverage_interactor(
             Ok(make_contract(
                 "my-track",
@@ -1296,38 +1292,112 @@ mod tests {
                     vec![ContractedEntryRef::new(layer("domain"), entry_key("Missing"))],
                 )],
             )),
-            std::collections::HashMap::new(),
+            std::collections::HashMap::new(), // no signal docs for any layer
         );
 
         let outcome = svc.verify_coverage(coverage_cmd("my-track")).unwrap();
         match outcome {
             CoverageVerifyOutcome::Blocked { violations, .. } => {
-                assert_eq!(violations.len(), 1);
-                match &violations[0] {
-                    CoverageViolation::InvalidEntryRef { entry, reason } => {
-                        assert_eq!(entry.entry_key().as_str(), "Missing");
-                        assert!(
-                            reason.contains("signal document not found"),
-                            "expected missing-document diagnostic, got: {reason}"
-                        );
-                    }
-                    other => panic!("expected InvalidEntryRef, got {other:?}"),
-                }
+                // All 6 canonical TDDD layers are absent → 6 MissingSignalDocument violations.
+                let missing_layers: Vec<&str> = violations
+                    .iter()
+                    .filter_map(|v| {
+                        if let CoverageViolation::MissingSignalDocument { layer } = v {
+                            Some(layer.as_ref())
+                        } else {
+                            None
+                        }
+                    })
+                    .collect();
+                assert!(
+                    missing_layers.contains(&"domain"),
+                    "expected MissingSignalDocument for domain, got violations: {violations:?}"
+                );
+                // Ensure no InvalidEntryRef is produced when the signal doc is absent.
+                let has_invalid_ref = violations
+                    .iter()
+                    .any(|v| matches!(v, CoverageViolation::InvalidEntryRef { .. }));
+                assert!(
+                    !has_invalid_ref,
+                    "InvalidEntryRef should not be emitted when signal document is absent"
+                );
             }
-            other => panic!("expected Blocked with InvalidEntryRef, got {other:?}"),
+            other => panic!("expected Blocked with MissingSignalDocument, got {other:?}"),
+        }
+    }
+
+    // ── Coverage: no attribution AND no signal doc → MissingSignalDocument ────────
+    //
+    // F1 fix: MissingSignalDocument must be emitted regardless of whether entries are
+    // attributed to the absent layer. The previous behavior was to silently `continue`
+    // when no entries were attributed to the absent layer, leaving the gap invisible.
+
+    #[test]
+    fn coverage_absent_signal_doc_with_no_attribution_yields_missing_signal_document() {
+        // Contract only attributes to "usecase"; "domain" has neither a signal doc
+        // nor any attribution. Under the new rule, "domain" must still emit
+        // MissingSignalDocument so the absent signal document is surfaced.
+        let mut signal_docs = std::collections::HashMap::new();
+        signal_docs.insert("usecase".to_owned(), make_signals(vec![blue_signal("UseBar")]));
+        // "infrastructure", "cli_driver", "cli", "cli_composition" absent too but
+        // we focus on "domain" which has zero attribution as the key test case.
+
+        let svc = coverage_interactor(
+            Ok(make_contract(
+                "my-track",
+                vec![(
+                    task_id("T001"),
+                    vec![ContractedEntryRef::new(layer("usecase"), entry_key("UseBar"))],
+                )],
+            )),
+            signal_docs,
+        );
+
+        let outcome = svc.verify_coverage(coverage_cmd("my-track")).unwrap();
+        match outcome {
+            CoverageVerifyOutcome::Blocked { violations, .. } => {
+                let missing_layers: Vec<&str> = violations
+                    .iter()
+                    .filter_map(|v| {
+                        if let CoverageViolation::MissingSignalDocument { layer } = v {
+                            Some(layer.as_ref())
+                        } else {
+                            None
+                        }
+                    })
+                    .collect();
+                assert!(
+                    missing_layers.contains(&"domain"),
+                    "expected MissingSignalDocument for domain (no attribution, no signal doc), got: {missing_layers:?}"
+                );
+            }
+            other => panic!("expected Blocked with MissingSignalDocument, got {other:?}"),
         }
     }
 
     // ── Coverage (e): all entries attributed and consistent → Passed ───────────
+    //
+    // All 6 canonical TDDD layers must have signal documents present to avoid
+    // MissingSignalDocument violations. Layers with no entries in the signal doc
+    // and no attribution in task-contract.json produce zero violations (no orphans,
+    // no invalid refs) when their signal documents are present (even if empty).
 
     #[test]
     fn coverage_all_entries_attributed_and_consistent_yields_passed() {
-        // domain has Foo (attributed T001) and Bar (attributed T001) — all consistent.
+        // domain has Foo and Bar (both attributed T001) — all consistent.
+        // Remaining 5 canonical layers have empty signal docs (no entries) to
+        // satisfy the MissingSignalDocument gate without adding noise.
         let mut signal_docs = std::collections::HashMap::new();
         signal_docs.insert(
             "domain".to_owned(),
             make_signals(vec![blue_signal("Foo"), blue_signal("Bar")]),
         );
+        // Provide present (empty) signal docs for the other 5 canonical layers
+        // so that CoverageVerifyInteractor finds a document for each and does
+        // not emit MissingSignalDocument violations.
+        for layer_name in &["usecase", "infrastructure", "cli_driver", "cli", "cli_composition"] {
+            signal_docs.insert((*layer_name).to_owned(), make_signals(vec![]));
+        }
         let svc = coverage_interactor(
             Ok(make_contract(
                 "my-track",

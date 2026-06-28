@@ -151,6 +151,10 @@ pub enum PreReviewGateViolation {
 /// - `InvalidEntryRef`: an entry attributed in `task-contract.json` does not
 ///   exist in the current catalogue (referential integrity failure).
 ///   `reason` is an opaque diagnostic string (R9 exception: error message).
+/// - `MissingSignalDocument`: the per-layer `<layer>-type-signals.json` document
+///   is absent for a canonical TDDD layer. Emitted regardless of whether any
+///   entries are attributed to that layer in `task-contract.json`, so that
+///   coverage fails closed when a signal document cannot be found.
 ///
 /// These violations are data inside [`CoverageVerifyOutcome::Blocked`].
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -172,6 +176,16 @@ pub enum CoverageViolation {
         entry: ContractedEntryRef,
         /// Opaque diagnostic message explaining why the reference is invalid.
         reason: String,
+    },
+
+    /// The per-layer `<layer>-type-signals.json` document is absent for this
+    /// canonical TDDD layer. Emitted by `CoverageVerifyInteractor` whenever
+    /// `read_optional_signals` returns `None`, regardless of whether any
+    /// entries are attributed to that layer, so that the coverage gate fails
+    /// closed when a signal document cannot be located.
+    MissingSignalDocument {
+        /// The canonical TDDD layer whose signal document is absent.
+        layer: LayerId,
     },
 }
 
@@ -360,6 +374,9 @@ mod tests {
             reason: "not found".to_owned(),
         };
         assert_eq!(v3.clone(), v3);
+
+        let v4 = CoverageViolation::MissingSignalDocument { layer: layer("domain") };
+        assert_eq!(v4.clone(), v4);
     }
 
     #[test]

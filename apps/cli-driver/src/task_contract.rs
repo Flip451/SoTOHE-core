@@ -237,6 +237,13 @@ fn render_coverage_violations(violations: &[CoverageViolation]) -> String {
                     entry.entry_key().as_str()
                 )
             }
+            CoverageViolation::MissingSignalDocument { layer } => {
+                format!(
+                    "  - MissingSignalDocument: {}-type-signals.json is absent; \
+                     run `bin/sotp signal calc-impl-catalog` to generate it",
+                    layer.as_ref()
+                )
+            }
         };
         lines.push(line);
     }

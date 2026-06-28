@@ -47,6 +47,7 @@ subgraph domain["domain"]
     T31_domain_domain_CoverageViolation_MissingTaskContract[MissingTaskContract]
     T31_domain_domain_CoverageViolation_OrphanEntry[OrphanEntry]
     T31_domain_domain_CoverageViolation_InvalidEntryRef[InvalidEntryRef]
+    T31_domain_domain_CoverageViolation_MissingSignalDocument[MissingSignalDocument]
   end
   subgraph T34_domain_domain_PreReviewGateOutcome["task_contract::PreReviewGateOutcome"]
     direction TB
@@ -317,6 +318,7 @@ class T35_domain_domain_CoverageVerifyOutcome__self value_object
 class T31_domain_domain_CoverageViolation_MissingTaskContract variant_node
 class T31_domain_domain_CoverageViolation_OrphanEntry variant_node
 class T31_domain_domain_CoverageViolation_InvalidEntryRef variant_node
+class T31_domain_domain_CoverageViolation_MissingSignalDocument variant_node
 class T31_domain_domain_CoverageViolation__self value_object
 class T34_domain_domain_PreReviewGateOutcome_Passed variant_node
 class T34_domain_domain_PreReviewGateOutcome_Blocked variant_node
