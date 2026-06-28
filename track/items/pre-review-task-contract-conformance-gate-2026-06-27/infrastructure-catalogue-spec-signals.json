@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "4f6474ed2d159938f7849eb1a5737cbd77ad75238af465b74d051ed3701de94e",
+  "catalogue_declaration_hash": "4b4c68a24f7045b3418e3433c931e9b9fafa77af4761fcbcc68d877532f56a26",
   "signals": [
     {
       "type_name": "ContractedEntryRefDto",
@@ -10,12 +10,17 @@
     {
       "type_name": "FsImplCatalogSignalReader",
       "signal": "blue",
-      "entry_hash": "afcec3a11f3f236053b4e56b8ab46831827ad230a10d8cbc39252657ad01c2a1"
+      "entry_hash": "6d71ffa5806b247aa28a4be7119644f272f71dd615919562182db4df4a4d9c33"
+    },
+    {
+      "type_name": "FsImplPlanReader",
+      "signal": "blue",
+      "entry_hash": "a4d3738d2b89b7545450c058ecb8ef422437c3606583a02a7882c4907414a13d"
     },
     {
       "type_name": "FsTaskContractReader",
       "signal": "blue",
-      "entry_hash": "c647eda6b25f4f2efb2b0a1f0ef69d401410fde20c376f9d431dd19805a936b5"
+      "entry_hash": "c046f27e021c8e76c5a16ae0381e58f08717471e1a29fde69f79dd69d92d4876"
     },
     {
       "type_name": "TaskContractCodecError",

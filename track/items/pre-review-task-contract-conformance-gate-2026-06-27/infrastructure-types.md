@@ -18,6 +18,7 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | FsImplCatalogSignalReader | secondary_adapter | add | impl Debug, impl ImplCatalogSignalReaderPort | 🔵 | 🔵 |
+| FsImplPlanReader | secondary_adapter | add | impl Debug, impl ImplPlanReaderPort | 🔵 | 🔵 |
 | FsTaskContractReader | secondary_adapter | add | impl Debug, impl TaskContractReaderPort | 🔵 | 🔵 |
 
 ## Free Functions

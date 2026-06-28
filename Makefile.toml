@@ -636,20 +636,36 @@ description = "[wrapper] Switch to main branch and pull latest"
 command = "bin/sotp"
 args = ["git", "switch-and-pull", "main"]
 
-[tasks.track-contract-gate]
-description = "[gate] Refresh impl-catalog signals, then run the pre-review task-contract conformance check for all TDDD layers (fail-closed). `bin/sotp task-contract check` auto-resolves the active track from the current git branch (track/<id>) internally — no shell-side branch parse here."
-script_runner = "@shell"
-script = ['bin/sotp signal calc-impl-catalog && bin/sotp task-contract check']
+[tasks.task-contract-refresh-impl-catalog]
+private = true
+description = "[gate] Refresh impl-catalog signals before task-contract coverage/check gates. Active track auto-resolved from current git branch."
+command = "bin/sotp"
+args = ["signal", "calc-impl-catalog"]
+
+[tasks.task-contract-coverage]
+description = "[gate] Run attribution-completeness coverage check (D5): verifies every catalogue entry in all 6 canonical TDDD layers is attributed to at least one task in task-contract.json, and every attributed entry exists in the catalogue. Active track auto-resolved from current git branch. Exits 0 on Passed, non-zero on Blocked."
+dependencies = ["task-contract-refresh-impl-catalog"]
+command = "bin/sotp"
+args = ["task-contract", "coverage"]
+
+[tasks.task-contract-check]
+description = "[gate] Run pre-review liveness gate (D5/D7): verifies all in_progress/done attributed entries have Blue impl_catalog signals; todo-only entries tolerate Yellow; Red always blocks. Active track auto-resolved from current git branch. Declares task-contract-coverage dependency so attribution completeness (coverage) always precedes liveness (check) on every invocation. Exits 0 on Passed, non-zero on Blocked."
+dependencies = ["task-contract-coverage"]
+command = "bin/sotp"
+args = ["task-contract", "check"]
 
 [tasks.track-local-review]
-description = "[wrapper] Run the task-contract pre-review gate (via dependencies), then launch the local reviewer via bin/sotp review local."
-dependencies = ["track-contract-gate"]
+description = "[wrapper] Fire attribution-completeness + liveness gates via task-contract-check dependency (D6: signal refresh → coverage → check chained by cargo-make dependencies; active track auto-resolved from the current git branch in each gate), then invoke a single reviewer round via bin/sotp review local. Provider-agnostic: both Claude `.claude/agents/review-fix-lead.md` and Codex `.agents/skills/review-fix-lead/SKILL.md` skills call this task per round (the agent / skill owns the fix loop itself)."
+dependencies = ["task-contract-check"]
 script_runner = "@shell"
-script = ['case "${1:-}" in --) shift ;; esac; bin/sotp review local "$@"']
+script = ['''
+case "${1:-}" in --) shift ;; esac
+CODEX_BIN="${CODEX_BIN:-$(asdf which codex 2>/dev/null || command -v codex)}" bin/sotp review local "$@"
+''']
 
 [tasks.track-local-review-fix]
-description = "[wrapper] Run the task-contract pre-review gate (via dependencies), then launch the review-fix-lead loop via bin/sotp review fix-local. Provider-agnostic: bin/sotp resolves provider/model from .harness/config/agent-profiles.json; CODEX_BIN is set for asdf shim resolution when the resolved provider is codex (harmless when the provider is claude)."
-dependencies = ["track-contract-gate"]
+description = "[wrapper] Fire attribution-completeness + liveness gates via task-contract-check dependency (D6: signal refresh → coverage → check chained by cargo-make dependencies; active track auto-resolved from the current git branch in each gate), then launch the review-fix-lead loop via bin/sotp review fix-local. Provider-agnostic: bin/sotp resolves provider/model from .harness/config/agent-profiles.json; CODEX_BIN is set for asdf shim resolution when the resolved provider is codex (harmless when the provider is claude)."
+dependencies = ["task-contract-check"]
 script_runner = "@shell"
 script = ['''
 case "${1:-}" in --) shift ;; esac

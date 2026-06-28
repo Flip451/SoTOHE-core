@@ -87,7 +87,7 @@ cargo make track-local-review-fix -- --scope {scope} \
   --track-id {track-id} --round-type fast
 ```
 
-The `cargo make track-local-review-fix` task depends on `track-contract-gate` (signal refresh
+The `cargo make track-local-review-fix` task runs an inline `signal calc-impl-catalog` refresh
 + pre-review task-contract check, fail-closed) and then delegates to `bin/sotp review fix-local`.
 The CLI resolves `capabilities.review-fix-lead.provider` from `.harness/config/agent-profiles.json`
 and branches internally — the orchestrator skill carries **no `provider:` conditional**:
@@ -116,7 +116,7 @@ and branches internally — the orchestrator skill carries **no `provider:` cond
   owns the fix loop and prints `REVIEW_FIX_STATUS: completed` / `blocked_cross_scope` /
   `failed` exactly as the codex path does. See `.claude/agents/review-fix-lead.md` for the
   subagent's internal workflow (per-round reviewer invocation uses
-  `cargo make track-local-review`, which also depends on `track-contract-gate`).
+  `cargo make track-local-review`, which inlines the same signal + task-contract chain).
 
 The fixer (whether codex subprocess or claude subagent) self-resolves its modification
 boundary via `bin/sotp review files --scope {scope}`; the orchestrator passes neither

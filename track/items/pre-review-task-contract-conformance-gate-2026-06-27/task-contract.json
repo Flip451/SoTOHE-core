@@ -10,9 +10,7 @@
     ],
     "T002": [
       { "layer": "usecase", "entry_key": "PreReviewGateService" },
-      { "layer": "usecase", "entry_key": "PreReviewGateInteractor" },
       { "layer": "usecase", "entry_key": "PreReviewGateCommand" },
-      { "layer": "usecase", "entry_key": "PreReviewGateError" },
       { "layer": "usecase", "entry_key": "TaskContractReaderPort" },
       { "layer": "usecase", "entry_key": "ImplCatalogSignalReaderPort" }
     ],
@@ -25,20 +23,43 @@
       { "layer": "infrastructure", "entry_key": "infrastructure::task_contract_codec::decode" },
       { "layer": "infrastructure", "entry_key": "infrastructure::task_contract_codec::encode" }
     ],
-    "T004": [
-      { "layer": "cli_driver", "entry_key": "TaskContractInput" },
-      { "layer": "cli_driver", "entry_key": "TaskContractDriver" }
-    ],
     "T005": [
       { "layer": "cli", "entry_key": "CliCommand" },
-      { "layer": "cli", "entry_key": "TaskContractCommand" },
       { "layer": "cli", "entry_key": "TaskContractCheckArgs" },
-      { "layer": "cli", "entry_key": "cli::commands::task_contract::execute" },
       { "layer": "cli", "entry_key": "cli::commands::task_contract::execute_task_contract_check" },
       { "layer": "cli", "entry_key": "cli::commands::task_contract::detect_active_track_from_branch_cwd" }
     ],
-    "T006": [
+    "T009": [
+      { "layer": "domain", "entry_key": "CoverageViolation" },
+      { "layer": "domain", "entry_key": "CoverageVerifyOutcome" }
+    ],
+    "T010": [
+      { "layer": "usecase", "entry_key": "CoverageVerifyCommand" },
+      { "layer": "usecase", "entry_key": "CoverageVerifyService" },
+      { "layer": "usecase", "entry_key": "CoverageVerifyInteractor" },
+      { "layer": "usecase", "entry_key": "ImplPlanReaderPort" },
+      { "layer": "usecase", "entry_key": "PreReviewGateError" },
+      { "layer": "usecase", "entry_key": "PreReviewGateInteractor" }
+    ],
+    "T011": [
+      { "layer": "infrastructure", "entry_key": "FsImplPlanReader" },
       { "layer": "cli_composition", "entry_key": "TaskContractCompositionRoot" }
+    ],
+    "T012": [
+      { "layer": "cli_driver", "entry_key": "TaskContractInput" },
+      { "layer": "cli_driver", "entry_key": "TaskContractDriver" }
+    ],
+    "T013": [
+      { "layer": "cli", "entry_key": "TaskContractCommand" },
+      { "layer": "cli", "entry_key": "TaskContractCoverageArgs" },
+      { "layer": "cli", "entry_key": "cli::commands::task_contract::execute" },
+      { "layer": "cli", "entry_key": "cli::commands::task_contract::execute_task_contract_coverage" }
+    ],
+    "T014": [
+      { "layer": "cli_composition", "entry_key": "TaskContractCompositionRoot" }
+    ],
+    "T015": [
+      { "layer": "usecase", "entry_key": "PreReviewGateInteractor" }
     ]
   }
 }

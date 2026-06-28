@@ -1,8 +1,10 @@
 //! `task-contract` command family — primary adapter driver.
 //!
-//! [`TaskContractDriver`] holds a single injected
-//! [`usecase::pre_review_gate::PreReviewGateService`] and exposes
-//! `handle(input) -> CommandOutcome`.
+//! [`TaskContractDriver`] holds two injected services:
+//! - `Arc<dyn PreReviewGateService>` for `check` (liveness gate), and
+//! - `Arc<dyn CoverageVerifyService>` for `coverage` (attribution completeness).
+//!
+//! It exposes `handle(input) -> CommandOutcome`.
 //!
 //! Input strings (`layer`, `track_id`) are validated into domain value objects
 //! (`Option<LayerId>`, `TrackId`) inside `handle`, so that parsing errors are
@@ -12,9 +14,10 @@ use std::sync::Arc;
 
 use usecase::LayerId;
 use usecase::pre_review_gate::{
-    PreReviewGateCommand, PreReviewGateError, PreReviewGateOutcome, PreReviewGateService,
-    PreReviewGateViolation,
+    CoverageVerifyCommand, CoverageVerifyService, PreReviewGateCommand, PreReviewGateError,
+    PreReviewGateOutcome, PreReviewGateService, PreReviewGateViolation,
 };
+pub use usecase::pre_review_gate::{CoverageVerifyOutcome, CoverageViolation};
 use usecase::{TrackId, ValidationError};
 
 use crate::render::CommandOutcome;
@@ -25,22 +28,30 @@ use crate::render::CommandOutcome;
 
 /// Typed input for the task-contract command family.
 ///
-/// `Check`: run the pre-review conformance gate for the given optional TDDD
+/// `Check`: run the pre-review liveness gate for the given optional TDDD
 /// layer and track. `layer` is an optional opaque CLI string validated into
 /// `Option<LayerId>` by this primary adapter; when `None`, the gate iterates
 /// all 6 canonical TDDD layers internally. `track_id` is validated into
 /// `TrackId`.
 ///
+/// `Coverage`: run the attribution-completeness check for the given track.
+/// Always iterates all 6 canonical TDDD layers (no per-layer flag).
+///
 /// The filesystem root is not part of this primary-adapter input;
-/// `cli_composition` builds the injected service with the requested `items_dir`
+/// `cli_composition` builds the injected services with the requested `items_dir`
 /// before constructing the driver.
 #[derive(Debug, Clone)]
 pub enum TaskContractInput {
-    /// Run the pre-review conformance gate check.
+    /// Run the pre-review liveness gate check.
     Check {
         /// Optional TDDD layer (e.g. `Some("domain")`, `Some("usecase")`).
         /// `None` iterates all 6 canonical TDDD layers.
         layer: Option<String>,
+        /// Active track identifier.
+        track_id: String,
+    },
+    /// Run the attribution-completeness coverage check.
+    Coverage {
         /// Active track identifier.
         track_id: String,
     },
@@ -52,13 +63,17 @@ pub enum TaskContractInput {
 
 /// Primary adapter for the task-contract command family.
 ///
-/// Holds a private `Arc<dyn PreReviewGateService>` and dispatches
-/// [`TaskContractInput`] variants to the appropriate use-case operation.
-/// Converts CLI strings to domain value objects (`TrackId`, `Option<LayerId>`)
-/// and renders the [`PreReviewGateOutcome`] as a [`CommandOutcome`] (exit 0 on
-/// `Passed`, exit 1 with violation list on `Blocked`).
+/// Holds two private service ports:
+/// - `Arc<dyn PreReviewGateService>` for `check` (liveness gate).
+/// - `Arc<dyn CoverageVerifyService>` for `coverage` (attribution completeness).
+///
+/// Dispatches [`TaskContractInput`] variants to the appropriate use-case
+/// operation. Converts CLI strings to domain value objects (`TrackId`,
+/// `Option<LayerId>`) and renders the outcome as a [`CommandOutcome`] (exit 0
+/// on `Passed`, exit 1 with violation list on `Blocked`).
 pub struct TaskContractDriver {
-    service: Arc<dyn PreReviewGateService>,
+    check_service: Arc<dyn PreReviewGateService>,
+    coverage_service: Arc<dyn CoverageVerifyService>,
 }
 
 impl std::fmt::Debug for TaskContractDriver {
@@ -68,11 +83,15 @@ impl std::fmt::Debug for TaskContractDriver {
 }
 
 impl TaskContractDriver {
-    /// Construct a `TaskContractDriver` by injecting the primary application
-    /// service port.
+    /// Construct a `TaskContractDriver` by injecting the check service
+    /// ([`PreReviewGateService`] for liveness) and coverage service
+    /// ([`CoverageVerifyService`] for attribution completeness).
     #[must_use]
-    pub fn new(service: Arc<dyn PreReviewGateService>) -> Self {
-        Self { service }
+    pub fn new(
+        check_service: Arc<dyn PreReviewGateService>,
+        coverage_service: Arc<dyn CoverageVerifyService>,
+    ) -> Self {
+        Self { check_service, coverage_service }
     }
 
     /// Dispatch a [`TaskContractInput`] variant to the appropriate use-case
@@ -80,6 +99,7 @@ impl TaskContractDriver {
     pub fn handle(&self, input: TaskContractInput) -> CommandOutcome {
         match input {
             TaskContractInput::Check { layer, track_id } => self.handle_check(layer, track_id),
+            TaskContractInput::Coverage { track_id } => self.handle_coverage(track_id),
         }
     }
 
@@ -113,26 +133,35 @@ impl TaskContractDriver {
 
         let cmd = PreReviewGateCommand { track_id: tid, layer: layer_opt };
 
-        match self.service.check(cmd) {
-            Ok(PreReviewGateOutcome::Passed { conformance_summary }) => {
-                CommandOutcome::success(Some(conformance_summary))
-            }
+        match self.check_service.check(cmd) {
+            Ok(PreReviewGateOutcome::Passed) => CommandOutcome::success(None),
             Ok(PreReviewGateOutcome::Blocked { violations, .. }) => {
-                let message = render_violations(&violations);
+                let message = render_check_violations(&violations);
                 CommandOutcome::failure(Some(message))
             }
-            Err(PreReviewGateError::TaskContractNotFound) => CommandOutcome::failure(Some(
-                "task-contract.json not found for track — run the impl-planner to generate it"
-                    .to_owned(),
-            )),
-            Err(PreReviewGateError::TaskContractReadFailed { message }) => CommandOutcome::failure(
-                Some(format!("failed to read task-contract.json: {message}")),
-            ),
-            Err(PreReviewGateError::SignalReadFailed { layer, message }) => {
-                CommandOutcome::failure(Some(format!(
-                    "failed to read type-signals for layer '{layer}': {message}"
-                )))
+            Err(e) => CommandOutcome::failure(Some(render_gate_error(e))),
+        }
+    }
+
+    fn handle_coverage(&self, track_id: String) -> CommandOutcome {
+        let tid = match TrackId::try_new(track_id.clone()) {
+            Ok(t) => t,
+            Err(e) => {
+                return CommandOutcome::failure(Some(format!(
+                    "invalid track_id '{track_id}': {e}"
+                )));
             }
+        };
+
+        let cmd = CoverageVerifyCommand { track_id: tid };
+
+        match self.coverage_service.verify_coverage(cmd) {
+            Ok(CoverageVerifyOutcome::Passed) => CommandOutcome::success(None),
+            Ok(CoverageVerifyOutcome::Blocked { violations, .. }) => {
+                let message = render_coverage_violations(&violations);
+                CommandOutcome::failure(Some(message))
+            }
+            Err(e) => CommandOutcome::failure(Some(render_gate_error(e))),
         }
     }
 }
@@ -141,28 +170,33 @@ impl TaskContractDriver {
 // Rendering helpers
 // ---------------------------------------------------------------------------
 
-fn render_violations(violations: &[PreReviewGateViolation]) -> String {
-    let mut lines: Vec<String> =
-        vec!["pre-review gate BLOCKED — the following violations must be resolved:".to_owned()];
+fn render_gate_error(e: PreReviewGateError) -> String {
+    match e {
+        PreReviewGateError::TaskContractNotFound => {
+            "task-contract.json not found for track — run the impl-planner to generate it"
+                .to_owned()
+        }
+        PreReviewGateError::TaskContractReadFailed { message } => {
+            format!("failed to read task-contract.json: {message}")
+        }
+        PreReviewGateError::SignalReadFailed { layer, message } => {
+            format!("failed to read type-signals for layer '{layer}': {message}")
+        }
+        PreReviewGateError::ImplPlanReadFailed { message } => {
+            format!("failed to read impl-plan.json: {message}")
+        }
+    }
+}
+
+fn render_check_violations(violations: &[PreReviewGateViolation]) -> String {
+    let mut lines: Vec<String> = vec![
+        "pre-review liveness gate BLOCKED — the following violations must be resolved:".to_owned(),
+    ];
 
     for v in violations {
         let line = match v {
             PreReviewGateViolation::MissingTaskContract => {
                 "  - MissingTaskContract: task-contract.json is absent for this track".to_owned()
-            }
-            PreReviewGateViolation::OrphanEntry { entry } => {
-                format!(
-                    "  - OrphanEntry: {} / {} has no task attribution in task-contract.json",
-                    entry.layer().as_ref(),
-                    entry.entry_key().as_str()
-                )
-            }
-            PreReviewGateViolation::InvalidEntryRef { entry, reason } => {
-                format!(
-                    "  - InvalidEntryRef: {} / {} — {reason}",
-                    entry.layer().as_ref(),
-                    entry.entry_key().as_str()
-                )
             }
             PreReviewGateViolation::NonBlueSignal { entry, signal } => {
                 format!(
@@ -170,6 +204,37 @@ fn render_violations(violations: &[PreReviewGateViolation]) -> String {
                     entry.layer().as_ref(),
                     entry.entry_key().as_str(),
                     signal
+                )
+            }
+        };
+        lines.push(line);
+    }
+
+    lines.join("\n")
+}
+
+fn render_coverage_violations(violations: &[CoverageViolation]) -> String {
+    let mut lines: Vec<String> = vec![
+        "task-contract coverage BLOCKED — attribution violations must be resolved:".to_owned(),
+    ];
+
+    for v in violations {
+        let line = match v {
+            CoverageViolation::MissingTaskContract => {
+                "  - MissingTaskContract: task-contract.json is absent for this track".to_owned()
+            }
+            CoverageViolation::OrphanEntry { entry } => {
+                format!(
+                    "  - OrphanEntry: {} / {} has no task attribution in task-contract.json",
+                    entry.layer().as_ref(),
+                    entry.entry_key().as_str()
+                )
+            }
+            CoverageViolation::InvalidEntryRef { entry, reason } => {
+                format!(
+                    "  - InvalidEntryRef: {} / {} — {reason}",
+                    entry.layer().as_ref(),
+                    entry.entry_key().as_str()
                 )
             }
         };

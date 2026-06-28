@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "91e24add6c4d3d2d8d3d390d1bf241c31f47ff3a01037f2c9806d2b7daae41b7",
+  "catalogue_declaration_hash": "60bfa979124c9bc3322973bf2287f26603148a145eec941366f72b3494ffcb82",
   "signals": [
     {
       "type_name": "TaskContractCompositionRoot",
       "signal": "blue",
-      "entry_hash": "63e3a03343cb81a08e92c340ce659a5b708a639502625bd3ce5f59147feec281"
+      "entry_hash": "93b29360785d49eca3895ba1180523c62e551514fca68a25fb82a8356cac6312"
     }
   ]
 }

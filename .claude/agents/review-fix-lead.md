@@ -63,7 +63,7 @@ severity filter for this round.
 
 **Always invoke review via `cargo make track-local-review`.** The cargo-make
 task is the canonical per-round entry point. It declares
-`dependencies = ["track-contract-gate"]`, so before each reviewer invocation
+an inline `signal calc-impl-catalog && task-contract check` chain, so before each reviewer invocation
 the runner first refreshes the impl-catalog signals and runs the task-contract
 pre-review gate (`bin/sotp task-contract check`, fail-closed); on gate pass it
 delegates to `bin/sotp review local`, which auto-resolves the reviewer provider

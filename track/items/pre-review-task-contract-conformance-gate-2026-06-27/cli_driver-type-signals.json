@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-28T03:29:10Z",
-  "declaration_hash": "25d7f1292de6f3d02b654c20b4193cda8ccc59e90677086cd5e020e00cc2110b",
+  "generated_at": "2026-06-28T13:35:03Z",
+  "declaration_hash": "83959aaf275f0085349d5cf5bbb5e79200f1416e906be25ad1853c0fc9da2ae6",
   "signals": [
     {
       "type_name": "TaskContractDriver",

@@ -18,7 +18,16 @@ decisions:
     candidate_selection: "from:[extend-impl_catalog-chain,new-task_conformance-chain,binary-check-reuse-signals] chose:binary-check-reuse-signals"
     status: accepted
   - id: D5
-    user_decision_ref: "chat_segment:session_013pQgnVvMR775h8tsD1mya4:2026-06-26"
+    user_decision_ref: "chat_segment:session_013pQgnVvMR775h8tsD1mya4:2026-06-28"
+    candidate_selection: "from:[combined-single-command,coverage-check-split-task-contract-domain,coverage-check-split-verify-domain,attribution-liveness-rename] chose:coverage-check-split-task-contract-domain"
+    status: accepted
+  - id: D6
+    user_decision_ref: "chat_segment:session_013pQgnVvMR775h8tsD1mya4:2026-06-28"
+    candidate_selection: "from:[wire-via-bin-sotp-hardcode,wire-via-cargo-make-dependencies,no-wiring-document-only] chose:wire-via-cargo-make-dependencies"
+    status: accepted
+  - id: D7
+    user_decision_ref: "chat_segment:session_013pQgnVvMR775h8tsD1mya4:2026-06-28"
+    candidate_selection: "from:[impl-plan-status,task-contract-extension-with-status,external-state-file,git-blame-derivation] chose:impl-plan-status"
     status: accepted
 ---
 # タスク単位の契約履行 pre-review ゲート — Phase 3 attribution artifact と impl_catalog 信号の binary 再利用
@@ -35,7 +44,7 @@ decisions:
 
 shift-left の前提と不足ピース：
 
-- **信号機が判定するのは「構造的な型契約の履行」だけで、body の意味論検証は LLM レビューが担う——これは制約ではなく意図した責任分界点である.** SoT chain ③ の信号機（型カタログ ↔ 実装）は宣言シンボルの存在と shape（signature / field / variant）の一致のみを判定対象とし、body の意味論的正しさは見ない（前 bullet の通り、入力が rustdoc JSON ＝ body を含まない）。「**構造的整合＝機械的信号 / 意味論的整合＝ LLM レビュー**」という層分けはプロジェクトが既に採る分界であり（`2026-05-27-1601-sot-chain-semantic-review-gate` が presence/構造 信号と意味論検証を別レーンに分離する3層モデルを定義。同 ADR の対象は chain①②で、**chain ③ の body 意味論は実装がコードそのものゆえ通常の `/track:review` が担う**）、本 ADR が shift-left するのは分界の **構造側（信号機）だけ**で、意味論側（reviewer）は不変のまま残す。帰結として signature だけ揃った stub は構造的には契約一致＝ 🔵 になり（body の liveness は信号機の管轄外）、その検証は分界の向こう＝ reviewer の責務に残る。この責任分界点が D3（判定は 🔵 のみ）と D5（briefing は「shape 一致・body 未検証」と明記）の根拠になる。
+- **信号機が判定するのは「構造的な型契約の履行」だけで、body の意味論検証は LLM レビューが担う——これは制約ではなく意図した責任分界点である.** SoT chain ③ の信号機（型カタログ ↔ 実装）は宣言シンボルの存在と shape（signature / field / variant）の一致のみを判定対象とし、body の意味論的正しさは見ない（前 bullet の通り、入力が rustdoc JSON ＝ body を含まない）。「**構造的整合＝機械的信号 / 意味論的整合＝ LLM レビュー**」という層分けはプロジェクトが既に採る分界であり（`2026-05-27-1601-sot-chain-semantic-review-gate` が presence/構造 信号と意味論検証を別レーンに分離する3層モデルを定義。同 ADR の対象は chain①②で、**chain ③ の body 意味論は実装がコードそのものゆえ通常の `/track:review` が担う**）、本 ADR が shift-left するのは分界の **構造側（信号機）だけ**で、意味論側（reviewer）は不変のまま残す。帰結として signature だけ揃った stub は構造的には契約一致＝ 🔵 になり（body の liveness は信号機の管轄外）、その検証は分界の向こう＝ reviewer の責務に残る。この責任分界点が D3（判定は 🔵 のみ）の根拠になる。
 - **不足は task→entry の辺だけ.** 信号は layer doc 内で type/method 単位（per-entry）に 🔵🟡🔴 を持つ（`libs/domain/src/tddd/type_signals_doc.rs:30`）一方、計算は per-layer 反復で **per-task の紐付けが無い**（`apps/cli-composition/src/signal.rs:386-398`）。前倒しを per-task で行うのに足りないのは「どのタスクがどの entry を履行するか」のマッピングであり、この辺は gate 対象 scope 内の関連 entry を漏れなく覆う complete relation として扱う。
 - **置き場所は専用の新 Phase 3 artifact.** この task→entry マッピングは `task-coverage.json`（責務＝ spec coverage）には混ぜず、独立した Phase 3 artifact として持つ（責務分離。詳細は D1）。writer は impl-planner: 既に spec / カタログを読み task を author しているため、新 artifact の author も自然。
 
@@ -45,37 +54,69 @@ shift-left の前提と不足ピース：
 
 「どのタスクがどの型契約 entry を履行するか」のマッピングを、Phase 3 の **新規 artifact `task-contract.json`**（作業名）に持つ。**writer は impl-planner（Phase 3）**。型カタログ（Phase 2 / type-designer）にも `task-coverage.json` にも混ぜない。
 
-`task-contract.json` は一方向の任意メモではなく、gate 対象 scope に対する **complete attribution relation** として扱う。invariant は (a) scope 内でこの review / task 群が履行責務を持つ catalogue entry が少なくとも1 task に attribution されること、(b) attribution された entry がカタログに実在し当該 scope 内であること、(c) scope 内の entry に orphan（どの task にも attribution されない関連 entry）が残らないこと。orphan entry を許すと、その entry の `impl_catalog` が 🟡/🔴 でも pre-review gate の入力から漏れ、merge-gate まで先送りされるため、shift-left の保証が崩れる。
+`task-contract.json` は「pre-review ゲートに見せたい信号を漏れなくタスクに紐付けたか」だけを言う契約。1 件でも未紐付けのエントリが残ると、ゲートはそのエントリの信号 (🟡/🔴) を見ないまま素通りさせるので、結局 merge まで止まらない＝ shift-left の意味がなくなる。
 
 型カタログに載せない理由: (a) task は Phase 3 で初めて生まれる概念であり、Phase 2 成果物に task→entry を載せると Phase 3 概念への**後方依存**（SoT Chain 逆流・順序違反）になる。(b) 型カタログは肥大化しがちで、task 知識を背負わせると type-designer の責務が膨張する。
 
-`task-coverage.json` に混ぜない理由（責務分離）: `task-coverage.json` の責務は **spec coverage**（Phase1↔Phase3 の完全性: 全 spec 要素が ≥1 タスクで覆われているか）。本マッピングの責務は **型契約の履行 attribution**（Phase2↔Phase3: 各タスクが履行する catalogue entry を pre-review ゲートへ供給する）。両者は (i) 参照する上流 SSoT が違い（spec.json vs `<layer>-types.json`）、(ii) 供給先ゲートが違い（coverage 完全性 vs pre-review conformance）、(iii) invariant が違う（spec 要素への全射 vs 型契約 entry の attribution completeness + referential integrity）。同一ファイルに同居させると「変更理由」と gate evaluator が二重化する（artifact 単位の SRP 違反）。両者は別々の単一責務 artifact とし、ともに impl-planner が author する（1 writer が複数の単一責務 artifact を持つのは type-designer の per-layer カタログと同じ）。
+`task-coverage.json` に混ぜない理由 (責務分離): `task-coverage.json` の責務は**仕様被覆** (Phase1↔Phase3 の完全性: 全仕様要素が ≥1 タスクで覆われているか)。本マッピングの責務は**型契約の履行帰属** (Phase2↔Phase3: 各タスクが履行するカタログエントリを pre-review ゲートへ供給する)。両者は (i) 参照する上流 SSoT が違い (`spec.json` vs `<layer>-types.json`)、(ii) 供給先ゲートが違い (被覆完全性 vs pre-review 履行性)、(iii) 不変条件が違う (仕様要素への全射 vs 型契約エントリの帰属完備性 + 参照整合性)。同一ファイルに同居させると「変更理由」とゲート評価器が二重化する (artifact 単位の SRP 違反)。両者は別々の単一責務 artifact とし、いずれも impl-planner が著作する (1 writer が複数の単一責務 artifact を持つのはレイヤー別カタログの type-designer と同じ)。
 
 ### D2: pre-review の blocking 入場ゲートを binary check として新設する
 
-reviewer 起動の前に、「**gate 対象 scope の `task-contract.json` が complete であり、そこに含まれる全関連 entry の `impl_catalog` 信号が 🔵 か**」を判定する binary check を置く。complete でない、または 🔵 でない entry があれば review に入れない（fail-closed・前倒し）。これは既存の freshness prepend（再計算）とは別の、**入場条件としての blocking 判定**である。SoT Chain（🔵🟡🔴）ではなく binary check として実装する（`knowledge/conventions/workflow-ceremony-minimization.md` の「SoT Chain 信号 + binary check」枠組みに乗る）。これにより、merge まで先送りされていた契約一致確認の最初の hard gate が reviewer 入場前・per-task に移る。
+reviewer 起動の前に、「`task-contract.json` で**現在のタスクと完了済タスクに帰属するエントリの `impl_catalog` 信号が全て 🔵 か**」を判定する binary check (`bin/sotp task-contract check`) を置く。🔵 でないエントリがあれば review に入れない (fail-closed・前倒し)。これは既存の freshness prepend (再計算) とは別の、**入場条件としての blocking 判定**である。SoT Chain (🔵🟡🔴) ではなく binary check として実装する (`knowledge/conventions/workflow-ceremony-minimization.md` の「SoT Chain 信号 + binary check」枠組みに乗る)。これにより、merge まで先送りされていた契約履行確認の最初の hard gate が reviewer 入場前・per-task に移る。
 
-通過時には verified-conformance サマリを生成し、reviewer briefing に流す（D5 の文言規律に従う）。
+なお attribution 完全性 (`task-contract.json` が型カタログの全エントリをタスクに帰属させているか) は別責務として `bin/sotp task-contract coverage` で扱う (D5 参照)。
 
 ### D3: 「履行を試みている」の判定は 🔵 のみとする（body は検証しない）
 
-ゲートの合否基準は「scope 内の関連 entry が `task-contract.json` で完全に attribution され、その全 entry の信号が 🔵」だけとする。test-pass や stub-scan による body-aware な liveness 判定は**採らない**。
+ゲートの合否基準は「`task-contract.json` が型カタログの全エントリをいずれかのタスクに帰属させており (attribution 完全性)、かつ現在のタスクと完了済タスクに帰属するエントリの信号が全て 🔵 (生存性判定)」だけとする。test-pass (テスト通過) や stub-scan (スタブ走査) による本体認識型 (body-aware) の生存性判定は**採らない**。
 
-これは意図的なスコープ確定であり、ゲートの保証は「**宣言した API surface が存在し shape が一致**」までで、「body が `todo!()` でない」ことは保証しない。本命の取りこぼし（構造不一致 / シンボル欠落 / shape ずれ）は 🔵 が確実に弾く。すり抜ける「正しい signature の stub」という狭いケースは下流（body を読む reviewer が trivial finding として即却下、加えて commit-gate / merge-gate の test）が安く backstop する。
+これは意図的な責務分離である。ゲートは**型契約履行のカバレッジ**（構造的整合 — 宣言した API surface が型カタログと shape 一致しているか）のみを保証し、body の意味論的妥当性（実装が意図通りか、`todo!()` で済まされていないか、等）はゲートの保証範囲外として LLM レビューに残置する。Context 節で確立した「構造 = 機械的信号 / 意味論 = LLM レビュー」の責任分界点を、本 ADR が導入するゲートも踏襲している。
 
 ### D4: 信号値は既存 impl_catalog chain を再利用し、新 chain も型カタログ拡張も行わない
 
-ゲートは、`task-contract.json` の complete task→entry relation と、既存 `impl_catalog` の per-entry 信号値を **entry をキーに突き合わせて**読むだけ（scope 内の関連 entry が漏れなく attribution され、その全 entry の信号が 🔵 か）。新 chain（`task_conformance` 等）を切らず、型カタログにも何も足さない。
+ゲートは、`task-contract.json` のタスク→エントリ完全帰属関係と、既存 `impl_catalog` のエントリ毎の信号値を**エントリをキーに突き合わせて**読むだけ (具体的な判定基準は D3 参照)。新 chain (`task_conformance` 等) を切らず、型カタログにも何も足さない。
 
-理由: 新 chain は gate matrix / strictness / views の表面積を増やす。per-task 判定に必要なのは既存信号 + Phase 3 マッピングの JOIN で足り、binary check で実装できる。検証エンジン（`SignalEvaluatorV2`）は丸ごと再利用する。
+理由: 新 chain はゲート構成 (ゲート行列 / 厳格度 / view) の表面積を増やす。タスク毎の判定に必要なのは既存信号と Phase 3 帰属マッピングの JOIN で足り、binary check で実装できる。検証エンジン (`SignalEvaluatorV2`) は丸ごと再利用する。
 
-唯一必要な追加検証は **attribution completeness + referential integrity**（scope 内の関連 entry が orphan なく task に attribution され、attribution された entry がカタログに実在し、当該 scope 内であること）。ただしこれは `task-coverage.json` が今 spec に対して負っている coverage / drift と同種で、新しいリスククラスではない（`/track:plan` の back-and-forth + binary gate の既存機構で吸収）。
+唯一必要な追加検証は**帰属完備性 + 参照整合性** (型カタログの全エントリが漏れなくタスクに帰属され、帰属されたエントリがカタログに実在すること)。これは `task-coverage.json` が今 spec に対して負っている被覆 / drift と同種で、新しいリスククラスではない (`/track:plan` の back-and-forth + binary gate の既存機構で吸収)。
 
-### D5: reviewer briefing の verified-conformance 行は「shape 一致（body 未検証）」と正確に書く
+### D5: attribution 完全性 (coverage) と生存性 (check) を別 subcommand に分割する
 
-ゲート通過を reviewer に伝える際の文言は「**declare した API surface が型契約と shape 一致（body は未検証 — stub / liveness は reviewer が確認せよ）**」とする。「契約 satisfied」「実装済み」のように書いてはならない。
+`task-contract.json` に対する検証は (a) 型カタログの全エントリが漏れなくタスクに帰属されているか (**attribution 完全性** / drift 検出) と (b) 現在のタスクと完了済タスクに帰属するエントリの `impl_catalog` 信号が全て 🔵 か (**生存性** / progression gate) の 2 責務を持つ。両者は失敗時の責任者 (planner が attribution を author する vs implementer が impl を 🔵 化する) と修正経路 (`task-contract.json` 再 author vs impl 修正) が異なり、混在させると fixer の判断分岐コストが恒久化する。
 
-理由: lossy な要約を下流が over-trust すると、stub の精査が落ちて D3 で受容したすり抜けが「捕まらないすり抜け」に悪化する。ゲートの保証範囲を文言で正確に伝えることで、安価さ（D3）と健全さ（reviewer が liveness を担保）を両立する。
+そこで 2 subcommand に分割する:
+
+- `bin/sotp task-contract coverage` — attribution 完全性のみ。`cargo make ci` の検証 chain に統合し、commit ごとに drift を検出する。
+- `bin/sotp task-contract check` — 生存性のみ。pre-review blocking gate として `cargo make track-local-review` chain に置く (D2)。
+
+両者は **`task-contract` ドメイン配下** に置く。一般 verifier ファミリー (`verify-*`) は既に肥大化しており、domain ownership を希釈するため `verify-task-contract-coverage` のような形には逃さない。
+
+### D6: 生存性判定 task に完全性判定 task を cargo-make `dependencies` で連結する
+
+D5 で 2 subcommand に分割した `task-contract coverage` (完全性) と `task-contract check` (生存性) は、コマンドとしては独立だが**実行順は固定**: 生存性判定は完全性判定が通った状態でのみ意味を持つ (orphan エントリが存在すると、その signal が 🟡/🔴 でもゲート入力から漏れ、生存性判定は「自分が知っているエントリだけ全部 🔵」という誤った安心を返してしまう)。
+
+そこで cargo make 上で 2 task を定義し、**生存性判定 task の `dependencies` に完全性判定 task を組み込む**:
+
+- `cargo make task-contract-coverage` — `bin/sotp task-contract coverage` を呼ぶ
+- `cargo make task-contract-check` — `bin/sotp task-contract check` を呼び、`dependencies = ["task-contract-coverage"]` を宣言
+
+これにより、`cargo make task-contract-check` を呼ぶだけで完全性判定 → 生存性判定の順で必ず走り、両者が同期する。`bin/sotp` バイナリ内部で連結する案 (バイナリ内 hardcode) は採らない — 配線は cargo make 層に局所化し、各 `bin/sotp` subcommand は単一責務のままに保つ (`knowledge/conventions/` の cargo-make 配線方針)。
+
+`cargo make track-local-review` と `cargo make track-local-review-fix` の両方の `dependencies` に `task-contract-check` を追加する。これにより per-review-round で完全性 + 生存性の両判定が自動で発火する。
+
+### D7: 「現在のタスク」「完了済タスク」の識別は `impl-plan.json` のタスク状態を参照する
+
+D3 P1 で定義した生存性判定 (「現在のタスクと完了済タスクに帰属するエントリの信号が全て 🔵」) は、識別ソースを必要とする — どのタスクが「現在 (in_progress)」で、どのタスクが「完了済 (done)」で、どのタスクが「未着手 (todo)」か。これは Phase 3 で impl-planner が author する `impl-plan.json` がタスク状態 (status: todo / in_progress / done) として既に保持している情報なので、ゲートはここを SSoT として読む。
+
+これにより:
+
+- **done タスク**に帰属するエントリ → signal 🔵 を要求
+- **in_progress タスク** (= 現在のタスク) に帰属するエントリ → signal 🔵 を要求 (生存性判定が走るのは review 前なので、当該タスクの impl はそこまでで完了している前提)
+- **todo タスク** (= 未来のタスク) に帰属するエントリ → 🟡 のみ許容 (まだ実装していないので shape mismatch 等は当然発生する)。🔴 は task status に関わらず常に blocker
+
+実装上は、`bin/sotp task-contract check` の usecase 層 (`PreReviewGateInteractor`) に **impl-plan を読む secondary port** (`ImplPlanReaderPort` 等) を追加し、`task-contract.json` から得た task → entry 帰属を impl-plan.json の status フィルタで絞り込む。
+
+`task-contract.json` 自身に status を載せる代替案は採らない — 状態 (動的・進行に応じて変化) と帰属 (静的・planner が一度 author) を 1 ファイルに混在させると SRP 違反になる。impl-plan が SSoT として既に状態を持っているので、そこを単に参照する。
 
 ## Rejected Alternatives
 
@@ -84,7 +125,7 @@ reviewer 起動の前に、「**gate 対象 scope の `task-contract.json` が c
 - **C. task→entry を既存 `task-coverage.json` に同居させる**: 却下。spec coverage（完全性）と型契約 attribution（conformance ゲート入力）という別責務が混在し、別 SSoT（spec vs カタログ）・別ゲート・別 invariant を1ファイル / 1 evaluator が抱える（artifact 単位の SRP 違反）。ファイル増を避ける安価さより責務分離を優先する。
 - **D. 新 chain（task_conformance）を切る**: 却下。gate matrix / strictness / views の表面積が増える。per-task は既存 `impl_catalog` 信号 + Phase 3 マッピングの JOIN で足り、binary check で実装可能。
 - **E. shift-left せず現状維持（pre-review prepend は freshness のみ、blocking は commit=interim / merge=strict）**: 却下。契約一致の hard gate が merge までかからず、違反が track 最終盤まで遅延する。早期・per-task の検出という本 ADR の目的を満たさない。
-- **F. reviewer に prose の「ソースコード理解キャッシュ」を渡して前倒しの代替とする**: 却下。review は adversarial であり、lossy な散文サマリは「キャッシュを信じて見落とす」穴を作る。安全なのは契約 SSoT（型カタログ）と信号状態を渡すことであり、本 ADR の (D2)+(D5) はその安全形に限定する。
+- **F. reviewer に prose の「ソースコード理解キャッシュ」を渡して前倒しの代替とする**: 却下。review は adversarial であり、lossy な散文サマリは「キャッシュを信じて見落とす」穴を作る。安全なのは契約 SSoT（型カタログ）と信号状態を渡すことであり、本 ADR の D2 はその安全形に限定する。
 
 ## Consequences
 
@@ -95,7 +136,6 @@ reviewer 起動の前に、「**gate 対象 scope の `task-contract.json` が c
 - 既存 `impl_catalog` 信号を再利用し、型カタログ / type-designer は不変、新 chain も不要。変更面は (D1) 新 Phase 3 artifact `task-contract.json` と (D2) binary check の新設に限られる（検証エンジンは再利用）。
 - task→entry マッピングは副次的に review の split-key（cohesion 境界での分割）としても再利用できる。
 - ゲートは deterministic / binary で、SoT-chain-binary-check の枠組みに乗る。
-- verified-conformance を briefing に正確に渡すことで、reviewer の予算を behavior / 非局所検査に集中できる。
 
 ### Negative
 

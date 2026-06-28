@@ -69,7 +69,7 @@ it fresh — the policy file may have been updated since the last review session
 ## Workflow
 
 **Always invoke review via `cargo make track-local-review` (never an inner `bin/sotp review`
-command directly).** The cargo-make wrapper runs `track-contract-gate` before the review,
+command directly).** The cargo-make wrapper runs `signal calc-impl-catalog && task-contract check` before the review,
 refreshing impl-catalog signals and running the task-contract pre-review gate. It then delegates
 to `bin/sotp review local`, which resolves the reviewer provider/model and records the verdict.
 Run `bin/sotp track views sync` manually before the invocation when you need fresh rendered views

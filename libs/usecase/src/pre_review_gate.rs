@@ -1,29 +1,32 @@
-//! Pre-review contract conformance gate use case.
+//! Pre-review contract conformance gate use case (D5 split).
 //!
-//! Implements the three-phase gate that verifies all contracted catalogue entries
-//! for a given TDDD layer have blue `impl_catalog` signals before allowing review
-//! to proceed (ADR `knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md`).
+//! Provides two complementary use cases:
 //!
-//! ## Gate logic (three phases, per layer)
+//! ## Liveness gate (`PreReviewGateService` / `bin/sotp task-contract check`)
 //!
-//! 1. **Scope discovery + orphan detection**: reads the `TypeSignalsDocument` for
-//!    the layer derived from `cmd.layer`, derives the set of scope-relevant catalogue
-//!    entry keys from that document, then checks that every scope-relevant signal
-//!    entry is covered by at least one task attribution in `task-contract.json`.
-//!    Uncovered entries produce [`PreReviewGateViolation::OrphanEntry`].
-//!
-//! 2. **Referential integrity**: verifies that every contracted entry for
-//!    the layer exists in the `TypeSignalsDocument`. Non-existent entries
-//!    produce [`PreReviewGateViolation::InvalidEntryRef`].
-//!
-//! 3. **Signal check**: verifies that every contracted entry that exists in the
-//!    `TypeSignalsDocument` has an `impl_catalog` signal of `Blue`. Non-blue
-//!    entries produce [`PreReviewGateViolation::NonBlueSignal`].
+//! Verifies that all contracted catalogue entries for tasks that are
+//! `in_progress` or `done` have Blue `impl_catalog` signals (D7 status filter).
+//! Attributed entries with no `in_progress` or `done` owner tolerate Yellow; Red
+//! always blocks regardless of task status. Operates per-layer or across all 6
+//! canonical TDDD layers.
+//! Non-Blue entries produce [`PreReviewGateViolation::NonBlueSignal`].
 //!
 //! When `cmd.layer` is `None`, all 6 canonical TDDD layers are iterated and the
 //! outcomes are combined into a single result. Layers reported missing by the
 //! signal reader are skipped silently — that is "no entries to verify", not an
 //! error — while other signal read or validation failures still propagate.
+//!
+//! ## Attribution-completeness gate (`CoverageVerifyService` / `bin/sotp task-contract coverage`)
+//!
+//! Verifies attribution completeness across all 6 canonical TDDD layers:
+//!
+//! 1. **Orphan detection**: every scope-relevant signal entry must be attributed
+//!    to at least one task. Uncovered entries produce [`CoverageViolation::OrphanEntry`].
+//!
+//! 2. **Referential integrity**: every attributed entry must exist in the signal
+//!    document. Missing entries produce [`CoverageViolation::InvalidEntryRef`].
+//!
+//! ADR: `knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md`.
 
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
@@ -33,7 +36,9 @@ use domain::TypeSignalsDocument;
 use domain::task_contract::ContractedEntryRef;
 // Re-export domain task_contract types accessible to the cli_driver primary adapter
 // via usecase module path (architecture-rules.json: cli_driver may_depend_on [usecase] only).
-pub use domain::task_contract::{PreReviewGateOutcome, PreReviewGateViolation};
+pub use domain::task_contract::{
+    CoverageVerifyOutcome, CoverageViolation, PreReviewGateOutcome, PreReviewGateViolation,
+};
 use thiserror::Error;
 
 // ---------------------------------------------------------------------------
@@ -63,7 +68,10 @@ pub struct PreReviewGateCommand {
 // PreReviewGateError
 // ---------------------------------------------------------------------------
 
-/// Error type returned by [`PreReviewGateService::check`].
+/// Error type returned by [`PreReviewGateService::check`] and
+/// [`CoverageVerifyService::verify_coverage`].
+///
+/// Both services share this error type because they share the same secondary ports.
 ///
 /// - `TaskContractNotFound`: the `task-contract.json` for the given `track_id`
 ///   does not exist (gate short-circuits to `MissingTaskContract` violation).
@@ -73,9 +81,12 @@ pub struct PreReviewGateCommand {
 ///   document; `layer` is typed as `domain::tddd::LayerId` (the port takes
 ///   `&LayerId` so the error always originates from a valid `LayerId`), `message`
 ///   is an opaque diagnostic string.
+/// - `ImplPlanReadFailed`: I/O or decode error reading `impl-plan.json` (D7:
+///   added for [`ImplPlanReaderPort`]); `message` is an opaque diagnostic string.
 ///
-/// Gate violations (`NonBlueSignal` etc.) are NOT errors — they are data inside
-/// [`PreReviewGateOutcome::Blocked`].
+/// Gate violations (`NonBlueSignal`, `OrphanEntry` etc.) are NOT errors — they
+/// are data inside [`PreReviewGateOutcome::Blocked`] or
+/// [`CoverageVerifyOutcome::Blocked`].
 #[derive(Debug, Error)]
 pub enum PreReviewGateError {
     /// The `task-contract.json` for the given track does not exist.
@@ -94,6 +105,13 @@ pub enum PreReviewGateError {
     SignalReadFailed {
         /// The TDDD layer whose signal document could not be read.
         layer: domain::tddd::LayerId,
+        /// Opaque diagnostic message from the infrastructure adapter.
+        message: String,
+    },
+
+    /// I/O or decode error reading `impl-plan.json` (D7).
+    #[error("failed to read impl-plan.json: {message}")]
+    ImplPlanReadFailed {
         /// Opaque diagnostic message from the infrastructure adapter.
         message: String,
     },
@@ -147,6 +165,222 @@ pub trait ImplCatalogSignalReaderPort: Send + Sync {
     }
 }
 
+/// Secondary port for reading task statuses from `impl-plan.json` (D7).
+///
+/// Implemented by `infrastructure::impl_plan_reader::FsImplPlanReader`.
+/// Injected into [`PreReviewGateInteractor`] to supply the task status filter
+/// for the liveness gate: `in_progress` and `done` entries require Blue signal;
+/// entries with no `in_progress` or `done` owner are skipped unless Red.
+pub trait ImplPlanReaderPort: Send + Sync {
+    /// Read `impl-plan.json` for the given track and return a map of
+    /// `TaskId → TaskStatusKind`.
+    ///
+    /// Returns [`PreReviewGateError::ImplPlanReadFailed`] on I/O or decode errors.
+    fn read_task_statuses(
+        &self,
+        track_id: &domain::TrackId,
+    ) -> Result<HashMap<domain::TaskId, domain::TaskStatusKind>, PreReviewGateError>;
+}
+
+// ---------------------------------------------------------------------------
+// CoverageVerifyCommand
+// ---------------------------------------------------------------------------
+
+/// CQRS command for the attribution-completeness coverage check use case
+/// (`bin/sotp task-contract coverage`).
+///
+/// `track_id` identifies the active track whose `task-contract.json` is
+/// evaluated for attribution completeness across all 6 canonical TDDD layers.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CoverageVerifyCommand {
+    /// The active track whose task-contract.json is evaluated.
+    pub track_id: domain::TrackId,
+}
+
+// ---------------------------------------------------------------------------
+// CoverageVerifyService (primary application service port)
+// ---------------------------------------------------------------------------
+
+/// Primary application service port for the attribution-completeness coverage
+/// check use case (`bin/sotp task-contract coverage`).
+///
+/// Called by `cli_driver::task_contract::TaskContractDriver` when handling
+/// `TaskContractInput::Coverage`. Shares [`PreReviewGateError`] as the I/O
+/// error type with [`PreReviewGateService`] because both services use the same
+/// secondary ports.
+pub trait CoverageVerifyService: Send + Sync {
+    /// Run the attribution-completeness coverage check for the active track.
+    ///
+    /// Returns [`CoverageVerifyOutcome::Passed`] when all catalogue entries are
+    /// attributed to at least one task and all attributed entries exist in the
+    /// catalogue. Returns [`CoverageVerifyOutcome::Blocked`] with a list of
+    /// attribution violations on failure.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`PreReviewGateError`] on infrastructure read failures.
+    fn verify_coverage(
+        &self,
+        cmd: CoverageVerifyCommand,
+    ) -> Result<CoverageVerifyOutcome, PreReviewGateError>;
+}
+
+// ---------------------------------------------------------------------------
+// CoverageVerifyInteractor
+// ---------------------------------------------------------------------------
+
+/// Interactor implementing [`CoverageVerifyService`] (attribution-completeness check).
+///
+/// Holds two injected secondary ports: `task_contract_reader` reads
+/// `task-contract.json`; `signal_reader` reads per-layer type-signals documents
+/// to enumerate all catalogue entry keys.  Checks that every signaled entry is
+/// attributed to at least one task (orphan detection) and every attributed
+/// entry has a signal (referential integrity). Shares `TaskContractReaderPort`
+/// and `ImplCatalogSignalReaderPort` with `PreReviewGateInteractor` (reuse per
+/// spec `IN-07`).
+pub struct CoverageVerifyInteractor {
+    task_contract_reader: Arc<dyn TaskContractReaderPort>,
+    signal_reader: Arc<dyn ImplCatalogSignalReaderPort>,
+}
+
+impl CoverageVerifyInteractor {
+    /// Construct a `CoverageVerifyInteractor` by injecting two secondary ports.
+    #[must_use]
+    pub fn new(
+        task_contract_reader: Arc<dyn TaskContractReaderPort>,
+        signal_reader: Arc<dyn ImplCatalogSignalReaderPort>,
+    ) -> Self {
+        Self { task_contract_reader, signal_reader }
+    }
+}
+
+fn blocked_coverage_outcome(
+    violations: Vec<domain::task_contract::CoverageViolation>,
+) -> Result<CoverageVerifyOutcome, PreReviewGateError> {
+    CoverageVerifyOutcome::blocked(violations).map_err(|_| {
+        PreReviewGateError::TaskContractReadFailed {
+            message: "coverage verify blocked outcome invariant failed".to_owned(),
+        }
+    })
+}
+
+impl CoverageVerifyService for CoverageVerifyInteractor {
+    fn verify_coverage(
+        &self,
+        cmd: CoverageVerifyCommand,
+    ) -> Result<CoverageVerifyOutcome, PreReviewGateError> {
+        // ── Step 0: read task-contract.json ──────────────────────────────────
+        let contract_doc = match self.task_contract_reader.read(&cmd.track_id) {
+            Ok(doc) => doc,
+            Err(PreReviewGateError::TaskContractNotFound) => {
+                return blocked_coverage_outcome(vec![
+                    domain::task_contract::CoverageViolation::MissingTaskContract,
+                ]);
+            }
+            Err(e) => return Err(e),
+        };
+
+        let mut all_violations: Vec<domain::task_contract::CoverageViolation> = Vec::new();
+
+        for &layer_str in CANONICAL_LAYERS {
+            let Ok(layer) = domain::tddd::LayerId::try_new(layer_str.to_owned()) else {
+                // Unreachable: CANONICAL_LAYERS contains only valid identifiers.
+                continue;
+            };
+
+            // Read signal document for this layer. If a contract attributes
+            // entries to an absent layer document, coverage must fail closed:
+            // those attributed entries cannot be proven to exist in catalogue.
+            let signal_doc = match self
+                .signal_reader
+                .read_optional_signals(&cmd.track_id, &layer)?
+            {
+                Some(doc) => doc,
+                None => {
+                    for entry in
+                        contract_doc.entries().values().flatten().filter(|e| e.layer() == &layer)
+                    {
+                        all_violations.push(
+                            domain::task_contract::CoverageViolation::InvalidEntryRef {
+                                entry: entry.clone(),
+                                reason: format!(
+                                    "signal document not found for layer '{}'; cannot verify entry",
+                                    layer.as_ref()
+                                ),
+                            },
+                        );
+                    }
+                    continue;
+                }
+            };
+
+            // Build lookup: entry_key → ContractedEntryRef for scope entries.
+            let mut scope_entries: HashMap<String, ContractedEntryRef> = HashMap::new();
+            for signal in signal_doc.signals() {
+                let entry_key = match domain::tddd::semantic_verify::CatalogueEntryKey::try_new(
+                    signal.type_name().to_owned(),
+                ) {
+                    Ok(k) => k,
+                    Err(_) => {
+                        return Err(PreReviewGateError::SignalReadFailed {
+                            layer: layer.clone(),
+                            message: format!(
+                                "invalid entry key '{}' in {}-type-signals.json",
+                                signal.type_name(),
+                                layer.as_ref()
+                            ),
+                        });
+                    }
+                };
+                let key = entry_key.as_str().to_owned();
+                scope_entries
+                    .entry(key.clone())
+                    .or_insert_with(|| ContractedEntryRef::new(layer.clone(), entry_key));
+            }
+
+            // Build set of attributed entry keys for this layer.
+            let attributed_entries: Vec<&ContractedEntryRef> =
+                contract_doc.entries().values().flatten().filter(|e| e.layer() == &layer).collect();
+            let attributed_keys: HashSet<&str> =
+                attributed_entries.iter().map(|e| e.entry_key().as_str()).collect();
+
+            // ── Phase 1: Orphan detection ─────────────────────────────────────
+            // Every scope-relevant signal entry must be attributed to ≥1 task.
+            for (type_name, entry) in &scope_entries {
+                if !attributed_keys.contains(type_name.as_str()) {
+                    all_violations.push(domain::task_contract::CoverageViolation::OrphanEntry {
+                        entry: entry.clone(),
+                    });
+                }
+            }
+
+            // ── Phase 2: Referential integrity ────────────────────────────────
+            // Every attributed entry must exist in the signal document.
+            for entry in &attributed_entries {
+                let key = entry.entry_key().as_str();
+                if !scope_entries.contains_key(key) {
+                    all_violations.push(
+                        domain::task_contract::CoverageViolation::InvalidEntryRef {
+                            entry: (*entry).clone(),
+                            reason: format!(
+                                "entry_key '{}' not found in {}-type-signals.json",
+                                key,
+                                layer.as_ref()
+                            ),
+                        },
+                    );
+                }
+            }
+        }
+
+        if all_violations.is_empty() {
+            Ok(CoverageVerifyOutcome::Passed)
+        } else {
+            blocked_coverage_outcome(all_violations)
+        }
+    }
+}
+
 // ---------------------------------------------------------------------------
 // PreReviewGateService (primary application service port)
 // ---------------------------------------------------------------------------
@@ -158,7 +392,7 @@ pub trait ImplCatalogSignalReaderPort: Send + Sync {
 pub trait PreReviewGateService: Send + Sync {
     /// Run the pre-review gate check for the active track.
     ///
-    /// Returns [`PreReviewGateOutcome::Passed`] with a conformance summary, or
+    /// Returns [`PreReviewGateOutcome::Passed`] (binary OK signal) or
     /// [`PreReviewGateOutcome::Blocked`] with a list of violations.
     ///
     /// # Errors
@@ -171,35 +405,34 @@ pub trait PreReviewGateService: Send + Sync {
 // PreReviewGateInteractor
 // ---------------------------------------------------------------------------
 
-/// Interactor implementing [`PreReviewGateService`].
+/// Interactor implementing [`PreReviewGateService`] (liveness check).
 ///
-/// Holds two injected secondary ports: `task_contract_reader` reads the
-/// `task-contract.json` for the active track; `signal_reader` reads per-layer
-/// `impl_catalog` type-signal documents. The interactor joins task attribution
-/// from the contract document with blue/non-blue classification from the
-/// type-signals document to produce a [`PreReviewGateOutcome`].
+/// Holds three injected secondary ports:
+/// - `task_contract_reader` reads `task-contract.json` for the active track.
+/// - `signal_reader` reads per-layer `impl_catalog` type-signal documents.
+/// - `impl_plan_reader` reads `impl-plan.json` for task-status filtering (D7).
+///
+/// The interactor checks that all attributed entries for current/done tasks
+/// have Blue `impl_catalog` signals.
 pub struct PreReviewGateInteractor {
     task_contract_reader: Arc<dyn TaskContractReaderPort>,
     signal_reader: Arc<dyn ImplCatalogSignalReaderPort>,
+    impl_plan_reader: Arc<dyn ImplPlanReaderPort>,
 }
 
 impl PreReviewGateInteractor {
-    /// Construct a `PreReviewGateInteractor` by injecting the two secondary ports.
+    /// Construct a `PreReviewGateInteractor` by injecting three secondary ports:
+    /// task-contract reader, signal reader, and impl-plan reader (D7 addition
+    /// for task status filtering).
     #[must_use]
     pub fn new(
         task_contract_reader: Arc<dyn TaskContractReaderPort>,
         signal_reader: Arc<dyn ImplCatalogSignalReaderPort>,
+        impl_plan_reader: Arc<dyn ImplPlanReaderPort>,
     ) -> Self {
-        Self { task_contract_reader, signal_reader }
+        Self { task_contract_reader, signal_reader, impl_plan_reader }
     }
 }
-
-/// Conformance summary for per-layer (single-layer) gate passes.
-const SINGLE_LAYER_SUMMARY: &str = "宣言した API surface が型契約と shape 一致（body は未検証 — stub / liveness は reviewer が確認）";
-
-/// Conformance summary for all-layer gate passes.
-const ALL_LAYERS_SUMMARY: &str = "全 6 TDDD レイヤー（domain / usecase / infrastructure / cli_driver / cli / cli_composition）\
-の API surface が型契約と shape 一致（body は未検証 — stub / liveness は reviewer が確認）";
 
 /// Canonical TDDD layer identifiers iterated in all-layers mode.
 const CANONICAL_LAYERS: &[&str] =
@@ -218,6 +451,23 @@ fn blocked_outcome(
 impl PreReviewGateInteractor {
     /// Evaluate one already-loaded signal document against the task contract.
     ///
+    /// Performs liveness check only (Phase 3, D7 variant): verifies that every
+    /// contracted entry that exists in the signal document has a Blue
+    /// `impl_catalog` signal, with the following task-status filtering rules
+    /// (D7):
+    ///
+    /// - Entries whose owning tasks include no `done` or `in_progress` task in
+    ///   `impl-plan.json` are **skipped** from the Blue requirement (Yellow
+    ///   tolerated).
+    /// - If ANY owning task is `done` or `in_progress`, the entry **requires**
+    ///   Blue.
+    /// - Red signal is a blocker **regardless** of task status.
+    /// - Entries absent from `impl-plan.json` are treated conservatively
+    ///   (required to be Blue).
+    ///
+    /// Attribution checks (orphan detection, referential integrity) are
+    /// handled by [`CoverageVerifyInteractor`].
+    ///
     /// Returns the list of violations found for this layer (empty = passed).
     /// The caller is responsible for combining per-layer results into a final
     /// [`PreReviewGateOutcome`].
@@ -226,13 +476,13 @@ impl PreReviewGateInteractor {
         layer: &domain::tddd::LayerId,
         contract_doc: &domain::task_contract::TaskContractDocument,
         signal_doc: &TypeSignalsDocument,
+        task_statuses: &HashMap<domain::TaskId, domain::TaskStatusKind>,
     ) -> Result<Vec<PreReviewGateViolation>, PreReviewGateError> {
-        // ── Build lookup structures ───────────────────────────────────────────
+        // ── Build signal lookup ───────────────────────────────────────────────
         //
         // scope_signals: type_name -> ConfidenceSignal for entries in the signal doc.
         // Validate entry-key shape up front so malformed signal documents fail closed.
         let mut scope_signals: HashMap<String, ConfidenceSignal> = HashMap::new();
-        let mut scope_entries: HashMap<String, ContractedEntryRef> = HashMap::new();
         for signal in signal_doc.signals() {
             let entry_key = domain::tddd::semantic_verify::CatalogueEntryKey::try_new(
                 signal.type_name().to_owned(),
@@ -245,67 +495,60 @@ impl PreReviewGateInteractor {
                     layer.as_ref()
                 ),
             })?;
-            let key = entry_key.as_str().to_owned();
-            scope_entries
-                .entry(key.clone())
-                .or_insert_with(|| ContractedEntryRef::new(layer.clone(), entry_key));
-            scope_signals.insert(key, signal.signal());
+            scope_signals.insert(entry_key.as_str().to_owned(), signal.signal());
         }
 
-        // attributed_keys: set of entry_key strings contracted to layer
-        let attributed_entries: Vec<&ContractedEntryRef> =
-            contract_doc.entries().values().flatten().filter(|e| e.layer() == layer).collect();
-
-        let attributed_keys: HashSet<&str> =
-            attributed_entries.iter().map(|e| e.entry_key().as_str()).collect();
-
-        // ── Phase 1: Scope discovery + orphan detection ───────────────────────
-        //
-        // Every scope-relevant signal entry must have at least one task attribution.
-        let mut violations: Vec<PreReviewGateViolation> = Vec::new();
-
-        for (type_name, entry) in &scope_entries {
-            if !attributed_keys.contains(type_name.as_str()) {
-                violations.push(PreReviewGateViolation::OrphanEntry { entry: entry.clone() });
-            }
-        }
-
-        // ── Phase 2: Referential integrity ────────────────────────────────────
-        //
-        // Every contracted entry for layer must exist in the signal document.
-        for entry in &attributed_entries {
-            let key = entry.entry_key().as_str();
-            if !scope_signals.contains_key(key) {
-                violations.push(PreReviewGateViolation::InvalidEntryRef {
-                    entry: (*entry).clone(),
-                    reason: format!(
-                        "entry_key '{}' not found in {}-type-signals.json",
-                        key,
-                        layer.as_ref()
-                    ),
-                });
-            }
-        }
-
-        // ── Phase 3: Signal check ─────────────────────────────────────────────
-        //
-        // Every contracted entry that exists in the signal document must have Blue signal.
-        for entry in &attributed_entries {
-            let key = entry.entry_key().as_str();
-            if let Some(&signal) = scope_signals.get(key) {
-                if signal != ConfidenceSignal::Blue {
-                    violations.push(PreReviewGateViolation::NonBlueSignal {
-                        entry: (*entry).clone(),
-                        signal,
-                    });
+        // Build a map: entry_key → set of task statuses that attribute it for this layer.
+        // We need this to determine if any owning task requires Blue.
+        let entries = contract_doc.entries();
+        let mut entry_task_statuses: HashMap<&str, Vec<domain::TaskStatusKind>> = HashMap::new();
+        for (task_id, refs) in entries {
+            let status =
+                task_statuses.get(task_id).copied().unwrap_or(domain::TaskStatusKind::Done); // conservative default
+            for entry_ref in refs {
+                if entry_ref.layer() == layer {
+                    entry_task_statuses
+                        .entry(entry_ref.entry_key().as_str())
+                        .or_default()
+                        .push(status);
                 }
             }
+        }
+
+        // ── Phase 3 (D7): Signal check with task-status filtering ─────────────
+        //
+        // For each attributed entry present in the signal document:
+        // - If the signal is Red → always block (status-independent).
+        // - If any owning task is done or in_progress → require Blue.
+        // - Otherwise, skip Blue check (Yellow tolerated).
+        // Entries not present in the signal document are skipped (coverage concern).
+        let mut violations: Vec<PreReviewGateViolation> = Vec::new();
+        for (key, statuses) in &entry_task_statuses {
+            let Some(&signal) = scope_signals.get(*key) else {
+                continue; // Not in signal doc → coverage concern, skip here.
+            };
+
+            let is_red = signal == ConfidenceSignal::Red;
+            let requires_blue = statuses.iter().any(|&status| {
+                matches!(status, domain::TaskStatusKind::InProgress | domain::TaskStatusKind::Done)
+            });
+
+            if is_red {
+                // Red is always a blocker regardless of task status.
+                let entry_ref = entry_key_to_contracted_ref(contract_doc, layer, key)?;
+                violations.push(PreReviewGateViolation::NonBlueSignal { entry: entry_ref, signal });
+            } else if requires_blue && signal != ConfidenceSignal::Blue {
+                // Done/in_progress task with non-blue, non-red signal → block.
+                let entry_ref = entry_key_to_contracted_ref(contract_doc, layer, key)?;
+                violations.push(PreReviewGateViolation::NonBlueSignal { entry: entry_ref, signal });
+            }
+            // No done/in_progress owner + Yellow → skip (no violation)
         }
 
         Ok(violations)
     }
 
-    /// Run the three-phase gate for a single TDDD layer.
+    /// Run the liveness gate for a single TDDD layer.
     ///
     /// Returns the list of violations found for this layer (empty = passed).
     /// The caller is responsible for combining per-layer results into a final
@@ -315,11 +558,37 @@ impl PreReviewGateInteractor {
         track_id: &domain::TrackId,
         layer: &domain::tddd::LayerId,
         contract_doc: &domain::task_contract::TaskContractDocument,
+        task_statuses: &HashMap<domain::TaskId, domain::TaskStatusKind>,
     ) -> Result<Vec<PreReviewGateViolation>, PreReviewGateError> {
         // ── Step 1: read type-signals for layer ───────────────────────────────
         let signal_doc = self.signal_reader.read_signals(track_id, layer)?;
-        self.check_signal_document(layer, contract_doc, &signal_doc)
+        self.check_signal_document(layer, contract_doc, &signal_doc, task_statuses)
     }
+}
+
+/// Extract a `ContractedEntryRef` for an `entry_key` from the contract document
+/// for the given layer. Used by `check_signal_document` to produce violation data.
+///
+/// Returns the first matching `ContractedEntryRef` found in the document.
+/// Fails with `SignalReadFailed` if the key is not found (should be unreachable
+/// since we iterate from the contract's own entries, but guards against logic errors).
+fn entry_key_to_contracted_ref(
+    contract_doc: &domain::task_contract::TaskContractDocument,
+    layer: &domain::tddd::LayerId,
+    key: &str,
+) -> Result<ContractedEntryRef, PreReviewGateError> {
+    contract_doc
+        .entries()
+        .values()
+        .flatten()
+        .find(|e| e.layer() == layer && e.entry_key().as_str() == key)
+        .cloned()
+        .ok_or_else(|| PreReviewGateError::TaskContractReadFailed {
+            message: format!(
+                "internal error: entry_key '{key}' not found in contract for layer '{}'",
+                layer.as_ref()
+            ),
+        })
 }
 
 impl PreReviewGateService for PreReviewGateInteractor {
@@ -335,14 +604,20 @@ impl PreReviewGateService for PreReviewGateInteractor {
             Err(e) => return Err(e),
         };
 
+        // ── Step 0b: load impl-plan.json task statuses (D7) ──────────────────
+        //
+        // Used to filter attributions by task status: done/in_progress entries
+        // require Blue; entries without a done/in_progress owner tolerate Yellow;
+        // Red always blocks.
+        let task_statuses = self.impl_plan_reader.read_task_statuses(&cmd.track_id)?;
+
         match cmd.layer {
             Some(layer) => {
                 // ── Per-layer mode ────────────────────────────────────────────
-                let violations = self.check_layer(&cmd.track_id, &layer, &contract_doc)?;
+                let violations =
+                    self.check_layer(&cmd.track_id, &layer, &contract_doc, &task_statuses)?;
                 if violations.is_empty() {
-                    Ok(PreReviewGateOutcome::Passed {
-                        conformance_summary: SINGLE_LAYER_SUMMARY.to_owned(),
-                    })
+                    Ok(PreReviewGateOutcome::Passed)
                 } else {
                     blocked_outcome(violations)
                 }
@@ -362,44 +637,28 @@ impl PreReviewGateService for PreReviewGateInteractor {
                     };
                     match self.signal_reader.read_optional_signals(&cmd.track_id, &layer)? {
                         Some(signal_doc) => {
-                            let violations =
-                                self.check_signal_document(&layer, &contract_doc, &signal_doc)?;
+                            let violations = self.check_signal_document(
+                                &layer,
+                                &contract_doc,
+                                &signal_doc,
+                                &task_statuses,
+                            )?;
                             all_violations.extend(violations);
                         }
                         None => {
-                            // No signal document for this layer.
+                            // No signal document for this layer — skip silently.
                             //
-                            // If task-contract.json has entries attributing
-                            // catalogue keys to this layer, the gate cannot
-                            // verify them — emit InvalidEntryRef violations so
-                            // the unverified surface fails closed instead of
-                            // silently passing (PR #175 P1 finding).
-                            //
-                            // If no contract entries attribute anything to this
-                            // layer, the absence is genuinely "nothing to
-                            // verify" and skipping silently is correct.
-                            let contracted_for_layer: Vec<&ContractedEntryRef> = contract_doc
-                                .entries()
-                                .values()
-                                .flatten()
-                                .filter(|e| e.layer() == &layer)
-                                .collect();
-                            for entry in contracted_for_layer {
-                                all_violations.push(PreReviewGateViolation::InvalidEntryRef {
-                                    entry: entry.clone(),
-                                    reason: format!(
-                                        "signal document not found for layer '{}'; cannot verify entry",
-                                        layer.as_ref()
-                                    ),
-                                });
-                            }
+                            // Attribution completeness (orphan detection,
+                            // referential integrity) is handled by
+                            // CoverageVerifyInteractor. The liveness check only
+                            // verifies Blue signals for entries that are present in
+                            // the signal document; absent layers have nothing to
+                            // verify here.
                         }
                     }
                 }
                 if all_violations.is_empty() {
-                    Ok(PreReviewGateOutcome::Passed {
-                        conformance_summary: ALL_LAYERS_SUMMARY.to_owned(),
-                    })
+                    Ok(PreReviewGateOutcome::Passed)
                 } else {
                     blocked_outcome(all_violations)
                 }
@@ -418,15 +677,18 @@ mod tests {
     use std::collections::BTreeMap;
     use std::sync::Arc;
 
+    use domain::TaskStatusKind;
     use domain::task_contract::{
-        ContractedEntryRef, PreReviewGateOutcome, PreReviewGateViolation, TaskContractDocument,
+        ContractedEntryRef, CoverageVerifyOutcome, CoverageViolation, PreReviewGateOutcome,
+        PreReviewGateViolation, TaskContractDocument,
     };
     use domain::tddd::semantic_verify::CatalogueEntryKey;
     use domain::tddd::{LayerId, type_signals_doc::TypeSignalsDocument};
     use domain::{ConfidenceSignal, TaskId, Timestamp, TrackId, TypeSignal};
 
     use super::{
-        ImplCatalogSignalReaderPort, PreReviewGateCommand, PreReviewGateError,
+        CoverageVerifyCommand, CoverageVerifyInteractor, CoverageVerifyService,
+        ImplCatalogSignalReaderPort, ImplPlanReaderPort, PreReviewGateCommand, PreReviewGateError,
         PreReviewGateInteractor, PreReviewGateService, TaskContractReaderPort,
     };
 
@@ -497,6 +759,9 @@ mod tests {
                         layer: layer.clone(),
                         message: message.clone(),
                     })
+                }
+                Err(PreReviewGateError::ImplPlanReadFailed { message }) => {
+                    Err(PreReviewGateError::ImplPlanReadFailed { message: message.clone() })
                 }
             }
         }
@@ -570,6 +835,18 @@ mod tests {
         }
     }
 
+    /// Const impl-plan reader that always returns an empty task-status map.
+    struct EmptyImplPlanReader;
+
+    impl ImplPlanReaderPort for EmptyImplPlanReader {
+        fn read_task_statuses(
+            &self,
+            _track_id: &TrackId,
+        ) -> Result<std::collections::HashMap<TaskId, TaskStatusKind>, PreReviewGateError> {
+            Ok(std::collections::HashMap::new())
+        }
+    }
+
     fn interactor(
         contract: Result<TaskContractDocument, PreReviewGateError>,
         signals: Result<TypeSignalsDocument, PreReviewGateError>,
@@ -577,6 +854,7 @@ mod tests {
         PreReviewGateInteractor::new(
             Arc::new(ConstContractReader(contract)),
             Arc::new(ConstSignalReader(signals)),
+            Arc::new(EmptyImplPlanReader),
         )
     }
 
@@ -597,52 +875,6 @@ mod tests {
             PreReviewGateOutcome::Blocked { violations, .. } => {
                 assert_eq!(violations.len(), 1);
                 assert!(matches!(violations[0], PreReviewGateViolation::MissingTaskContract));
-            }
-            other => panic!("expected Blocked, got {other:?}"),
-        }
-    }
-
-    // ── AC-07 (b): signal doc entry absent from task attribution → OrphanEntry ─
-
-    #[test]
-    fn signal_entry_not_attributed_yields_orphan_entry_violation() {
-        // Signal doc has "Foo" in domain layer.
-        // task-contract.json has no attribution for "Foo" in domain.
-        let svc = interactor(
-            Ok(make_contract(
-                "my-track",
-                vec![(
-                    task_id("T001"),
-                    vec![ContractedEntryRef::new(layer("domain"), entry_key("Bar"))],
-                )],
-            )),
-            Ok(make_signals(vec![blue_signal("Foo"), blue_signal("Bar")])),
-        );
-        let outcome = svc.check(cmd("my-track", "domain")).unwrap();
-        match outcome {
-            PreReviewGateOutcome::Blocked { violations, .. } => {
-                let orphans: Vec<_> = violations
-                    .iter()
-                    .filter(|v| matches!(v, PreReviewGateViolation::OrphanEntry { .. }))
-                    .collect();
-                assert!(
-                    !orphans.is_empty(),
-                    "expected at least one OrphanEntry violation, got: {violations:?}"
-                );
-                let orphan_keys: Vec<&str> = orphans
-                    .iter()
-                    .filter_map(|v| {
-                        if let PreReviewGateViolation::OrphanEntry { entry } = v {
-                            Some(entry.entry_key().as_str())
-                        } else {
-                            None
-                        }
-                    })
-                    .collect();
-                assert!(
-                    orphan_keys.contains(&"Foo"),
-                    "Foo must be the orphan, got: {orphan_keys:?}"
-                );
             }
             other => panic!("expected Blocked, got {other:?}"),
         }
@@ -672,51 +904,6 @@ mod tests {
                 );
             }
             other => panic!("expected SignalReadFailed, got {other}"),
-        }
-    }
-
-    // ── AC-07 (c): contracted key not in signal doc → InvalidEntryRef ─────────
-
-    #[test]
-    fn contracted_key_absent_from_signal_doc_yields_invalid_entry_ref() {
-        // task-contract.json attributes "Missing" in domain, but signal doc only has "Foo".
-        let svc = interactor(
-            Ok(make_contract(
-                "my-track",
-                vec![(
-                    task_id("T001"),
-                    vec![
-                        ContractedEntryRef::new(layer("domain"), entry_key("Foo")),
-                        ContractedEntryRef::new(layer("domain"), entry_key("Missing")),
-                    ],
-                )],
-            )),
-            Ok(make_signals(vec![blue_signal("Foo")])),
-        );
-        let outcome = svc.check(cmd("my-track", "domain")).unwrap();
-        match outcome {
-            PreReviewGateOutcome::Blocked { violations, .. } => {
-                let invalid: Vec<_> = violations
-                    .iter()
-                    .filter(|v| matches!(v, PreReviewGateViolation::InvalidEntryRef { .. }))
-                    .collect();
-                assert!(!invalid.is_empty(), "expected InvalidEntryRef violation");
-                let invalid_keys: Vec<&str> = invalid
-                    .iter()
-                    .filter_map(|v| {
-                        if let PreReviewGateViolation::InvalidEntryRef { entry, .. } = v {
-                            Some(entry.entry_key().as_str())
-                        } else {
-                            None
-                        }
-                    })
-                    .collect();
-                assert!(
-                    invalid_keys.contains(&"Missing"),
-                    "Missing must be the invalid key, got: {invalid_keys:?}"
-                );
-            }
-            other => panic!("expected Blocked, got {other:?}"),
         }
     }
 
@@ -750,10 +937,10 @@ mod tests {
         }
     }
 
-    // ── AC-07 (e): all blue + complete attribution → Passed with D5 summary ───
+    // ── AC-07 (e): all blue + complete attribution → Passed (binary) ──────────
 
     #[test]
-    fn all_blue_and_complete_attribution_yields_passed_with_d5_summary() {
+    fn all_blue_and_complete_attribution_yields_passed() {
         let svc = interactor(
             Ok(make_contract(
                 "my-track",
@@ -765,19 +952,41 @@ mod tests {
             Ok(make_signals(vec![blue_signal("Foo")])),
         );
         let outcome = svc.check(cmd("my-track", "domain")).unwrap();
-        match outcome {
-            PreReviewGateOutcome::Passed { conformance_summary } => {
-                assert!(
-                    conformance_summary.contains("型契約と shape 一致"),
-                    "expected D5 summary to contain '型契約と shape 一致', got: {conformance_summary}"
-                );
-                assert!(
-                    conformance_summary.contains("未検証"),
-                    "expected D5 summary to contain '未検証', got: {conformance_summary}"
-                );
-            }
-            other => panic!("expected Passed, got {other:?}"),
-        }
+        assert!(
+            matches!(outcome, PreReviewGateOutcome::Passed),
+            "expected Passed, got {outcome:?}"
+        );
+    }
+
+    // ── Narrowed check: contracted key absent from signal doc is skipped ───────
+    //
+    // After D5 split, the check interactor no longer emits InvalidEntryRef for
+    // entries absent from the signal doc. That is now a coverage concern.
+    // Attributed entries without a signal document entry are simply skipped.
+
+    #[test]
+    fn contracted_key_absent_from_signal_doc_is_skipped_by_check() {
+        // task-contract.json attributes "Missing" in domain, but signal doc only has "Foo".
+        // After D5 narrowing: check must pass for "Foo" (blue) and skip "Missing".
+        let svc = interactor(
+            Ok(make_contract(
+                "my-track",
+                vec![(
+                    task_id("T001"),
+                    vec![
+                        ContractedEntryRef::new(layer("domain"), entry_key("Foo")),
+                        ContractedEntryRef::new(layer("domain"), entry_key("Missing")),
+                    ],
+                )],
+            )),
+            Ok(make_signals(vec![blue_signal("Foo")])),
+        );
+        let outcome = svc.check(cmd("my-track", "domain")).unwrap();
+        // Check no longer emits InvalidEntryRef; "Missing" is skipped.
+        assert!(
+            matches!(outcome, PreReviewGateOutcome::Passed),
+            "expected Passed, got {outcome:?}"
+        );
     }
 
     // ── All-layers mode: None layer → iterate all 6 TDDD layers ─────────────
@@ -802,29 +1011,61 @@ mod tests {
                 )],
             )))),
             Arc::new(LayerAwareSignalReader(signal_docs)),
+            Arc::new(EmptyImplPlanReader),
         );
 
         let outcome = svc
             .check(PreReviewGateCommand { track_id: track_id("my-track"), layer: None })
             .unwrap();
 
-        match outcome {
-            PreReviewGateOutcome::Passed { conformance_summary } => {
-                assert!(
-                    conformance_summary.contains("全 6"),
-                    "all-layer summary must mention all 6 layers, got: {conformance_summary}"
-                );
-                assert!(
-                    conformance_summary.contains("shape 一致"),
-                    "all-layer summary must contain D5 phrasing 'shape 一致', got: {conformance_summary}"
-                );
-                assert!(
-                    conformance_summary.contains("未検証"),
-                    "all-layer summary must contain D5 phrasing '未検証', got: {conformance_summary}"
-                );
-            }
-            other => panic!("expected Passed, got {other:?}"),
-        }
+        assert!(
+            matches!(outcome, PreReviewGateOutcome::Passed),
+            "expected Passed, got {outcome:?}"
+        );
+    }
+
+    // ── All-layers mode: missing signal doc for contracted layer is now skipped ─
+    //
+    // After D5 narrowing: the check interactor silently skips layers with absent
+    // signal documents. Attribution concerns (InvalidEntryRef for missing layers)
+    // are now handled by CoverageVerifyInteractor.
+
+    #[test]
+    fn all_layer_iterate_missing_signal_doc_for_contracted_layer_passes_check() {
+        // task-contract attributes 2 entries to "domain" and 1 to "usecase".
+        // signal_docs only registers "usecase" → "domain" returns Ok(None).
+        // After D5: check passes because "domain" is silently skipped (no check violation).
+        let mut signal_docs = std::collections::HashMap::new();
+        signal_docs.insert("usecase".to_owned(), make_signals(vec![blue_signal("UseFoo")]));
+        let svc = PreReviewGateInteractor::new(
+            Arc::new(ConstContractReader(Ok(make_contract(
+                "my-track",
+                vec![
+                    (
+                        task_id("T001"),
+                        vec![
+                            ContractedEntryRef::new(layer("domain"), entry_key("DomFoo")),
+                            ContractedEntryRef::new(layer("domain"), entry_key("DomBar")),
+                        ],
+                    ),
+                    (
+                        task_id("T002"),
+                        vec![ContractedEntryRef::new(layer("usecase"), entry_key("UseFoo"))],
+                    ),
+                ],
+            )))),
+            Arc::new(LayerAwareSignalReader(signal_docs)),
+            Arc::new(EmptyImplPlanReader),
+        );
+
+        let outcome = svc
+            .check(PreReviewGateCommand { track_id: track_id("my-track"), layer: None })
+            .unwrap();
+
+        assert!(
+            matches!(outcome, PreReviewGateOutcome::Passed),
+            "expected Passed after D5 narrowing (missing domain layer skipped), got {outcome:?}"
+        );
     }
 
     #[test]
@@ -843,6 +1084,7 @@ mod tests {
                 )],
             )))),
             Arc::new(LayerAwareSignalReader(signal_docs)),
+            Arc::new(EmptyImplPlanReader),
         );
 
         let err = svc
@@ -874,6 +1116,7 @@ mod tests {
             Arc::new(FailingSignalReader {
                 message: "codec error reading domain-type-signals.json",
             }),
+            Arc::new(EmptyImplPlanReader),
         );
 
         let err = svc
@@ -905,6 +1148,7 @@ mod tests {
             Arc::new(FailingSignalReader {
                 message: "signal file not found: codec emitted misleading diagnostic",
             }),
+            Arc::new(EmptyImplPlanReader),
         );
 
         let err = svc
@@ -923,74 +1167,367 @@ mod tests {
         }
     }
 
-    // ── PR #175 P1: missing signal doc for a contracted layer must fail closed ─
-    //
-    // In all-layers mode, a layer with absent <layer>-type-signals.json must NOT
-    // be silently skipped if task-contract.json has entries attributing keys to
-    // that layer. Each such contracted entry must emit InvalidEntryRef so that
-    // the unverified surface fails closed (cannot pass with empty
-    // all_violations when a layer's signal doc is missing).
+    // ── CoverageVerifyInteractor tests (AC-07 cases b, c, e-coverage) ─────────
+
+    fn coverage_interactor(
+        contract: Result<TaskContractDocument, PreReviewGateError>,
+        signal_docs: std::collections::HashMap<String, TypeSignalsDocument>,
+    ) -> CoverageVerifyInteractor {
+        CoverageVerifyInteractor::new(
+            Arc::new(ConstContractReader(contract)),
+            Arc::new(LayerAwareSignalReader(signal_docs)),
+        )
+    }
+
+    fn coverage_cmd(track: &str) -> CoverageVerifyCommand {
+        CoverageVerifyCommand { track_id: track_id(track) }
+    }
+
+    // ── Coverage (a): MissingTaskContract ─────────────────────────────────────
 
     #[test]
-    fn all_layer_iterate_missing_signal_doc_for_contracted_layer_yields_invalid_entry_refs() {
-        // task-contract attributes 2 entries to "domain" and 1 to "usecase".
-        // signal_docs only registers "usecase" (so "domain" returns Ok(None) via read_optional_signals).
-        let mut signal_docs = std::collections::HashMap::new();
-        signal_docs.insert("usecase".to_owned(), make_signals(vec![blue_signal("UseFoo")]));
-        let svc = PreReviewGateInteractor::new(
-            Arc::new(ConstContractReader(Ok(make_contract(
-                "my-track",
-                vec![
-                    (
-                        task_id("T001"),
-                        vec![
-                            ContractedEntryRef::new(layer("domain"), entry_key("DomFoo")),
-                            ContractedEntryRef::new(layer("domain"), entry_key("DomBar")),
-                        ],
-                    ),
-                    (
-                        task_id("T002"),
-                        vec![ContractedEntryRef::new(layer("usecase"), entry_key("UseFoo"))],
-                    ),
-                ],
-            )))),
-            Arc::new(LayerAwareSignalReader(signal_docs)),
+    fn coverage_missing_task_contract_yields_blocked_with_missing_task_contract() {
+        let svc = CoverageVerifyInteractor::new(
+            Arc::new(ConstContractReader(Err(PreReviewGateError::TaskContractNotFound))),
+            Arc::new(LayerAwareSignalReader(std::collections::HashMap::new())),
         );
-
-        let outcome = svc
-            .check(PreReviewGateCommand { track_id: track_id("my-track"), layer: None })
-            .unwrap();
-
+        let outcome = svc.verify_coverage(coverage_cmd("my-track")).unwrap();
         match outcome {
-            PreReviewGateOutcome::Blocked { violations, .. } => {
-                let invalid_for_domain: Vec<&str> = violations
+            CoverageVerifyOutcome::Blocked { violations, .. } => {
+                assert_eq!(violations.len(), 1);
+                assert!(matches!(violations[0], CoverageViolation::MissingTaskContract));
+            }
+            other => panic!("expected Blocked/MissingTaskContract, got {other:?}"),
+        }
+    }
+
+    // ── Coverage (b): signal entry absent from task attribution → OrphanEntry ──
+
+    #[test]
+    fn coverage_signal_entry_not_attributed_yields_orphan_entry_violation() {
+        // Signal doc has "Foo" in domain layer.
+        // task-contract.json only attributes "Bar" to domain (not "Foo").
+        let mut signal_docs = std::collections::HashMap::new();
+        signal_docs.insert(
+            "domain".to_owned(),
+            make_signals(vec![blue_signal("Foo"), blue_signal("Bar")]),
+        );
+        let svc = coverage_interactor(
+            Ok(make_contract(
+                "my-track",
+                vec![(
+                    task_id("T001"),
+                    vec![ContractedEntryRef::new(layer("domain"), entry_key("Bar"))],
+                )],
+            )),
+            signal_docs,
+        );
+        let outcome = svc.verify_coverage(coverage_cmd("my-track")).unwrap();
+        match outcome {
+            CoverageVerifyOutcome::Blocked { violations, .. } => {
+                let orphan_keys: Vec<&str> = violations
                     .iter()
                     .filter_map(|v| {
-                        if let PreReviewGateViolation::InvalidEntryRef { entry, reason } = v {
-                            if entry.layer().as_ref() == "domain"
-                                && reason.contains("signal document not found")
-                            {
-                                Some(entry.entry_key().as_str())
-                            } else {
-                                None
-                            }
+                        if let CoverageViolation::OrphanEntry { entry } = v {
+                            Some(entry.entry_key().as_str())
                         } else {
                             None
                         }
                     })
                     .collect();
                 assert!(
-                    invalid_for_domain.contains(&"DomFoo"),
-                    "expected DomFoo in InvalidEntryRef for missing-signal layer, got: {invalid_for_domain:?}"
-                );
-                assert!(
-                    invalid_for_domain.contains(&"DomBar"),
-                    "expected DomBar in InvalidEntryRef for missing-signal layer, got: {invalid_for_domain:?}"
+                    orphan_keys.contains(&"Foo"),
+                    "expected OrphanEntry for Foo, got: {orphan_keys:?}"
                 );
             }
-            other => panic!(
-                "expected Blocked with InvalidEntryRef for unverified contracted layer, got {other:?}"
-            ),
+            other => panic!("expected Blocked with OrphanEntry, got {other:?}"),
+        }
+    }
+
+    // ── Coverage (c): attributed key absent from signal doc → InvalidEntryRef ──
+
+    #[test]
+    fn coverage_contracted_key_absent_from_signal_doc_yields_invalid_entry_ref() {
+        // task-contract attributes "Missing" to domain, but signal doc only has "Foo".
+        let mut signal_docs = std::collections::HashMap::new();
+        signal_docs.insert("domain".to_owned(), make_signals(vec![blue_signal("Foo")]));
+        let svc = coverage_interactor(
+            Ok(make_contract(
+                "my-track",
+                vec![(
+                    task_id("T001"),
+                    vec![
+                        ContractedEntryRef::new(layer("domain"), entry_key("Foo")),
+                        ContractedEntryRef::new(layer("domain"), entry_key("Missing")),
+                    ],
+                )],
+            )),
+            signal_docs,
+        );
+        let outcome = svc.verify_coverage(coverage_cmd("my-track")).unwrap();
+        match outcome {
+            CoverageVerifyOutcome::Blocked { violations, .. } => {
+                let invalid_keys: Vec<&str> = violations
+                    .iter()
+                    .filter_map(|v| {
+                        if let CoverageViolation::InvalidEntryRef { entry, .. } = v {
+                            Some(entry.entry_key().as_str())
+                        } else {
+                            None
+                        }
+                    })
+                    .collect();
+                assert!(
+                    invalid_keys.contains(&"Missing"),
+                    "expected InvalidEntryRef for Missing, got: {invalid_keys:?}"
+                );
+            }
+            other => panic!("expected Blocked with InvalidEntryRef, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn coverage_absent_signal_doc_for_contracted_layer_yields_invalid_entry_ref() {
+        let svc = coverage_interactor(
+            Ok(make_contract(
+                "my-track",
+                vec![(
+                    task_id("T001"),
+                    vec![ContractedEntryRef::new(layer("domain"), entry_key("Missing"))],
+                )],
+            )),
+            std::collections::HashMap::new(),
+        );
+
+        let outcome = svc.verify_coverage(coverage_cmd("my-track")).unwrap();
+        match outcome {
+            CoverageVerifyOutcome::Blocked { violations, .. } => {
+                assert_eq!(violations.len(), 1);
+                match &violations[0] {
+                    CoverageViolation::InvalidEntryRef { entry, reason } => {
+                        assert_eq!(entry.entry_key().as_str(), "Missing");
+                        assert!(
+                            reason.contains("signal document not found"),
+                            "expected missing-document diagnostic, got: {reason}"
+                        );
+                    }
+                    other => panic!("expected InvalidEntryRef, got {other:?}"),
+                }
+            }
+            other => panic!("expected Blocked with InvalidEntryRef, got {other:?}"),
+        }
+    }
+
+    // ── Coverage (e): all entries attributed and consistent → Passed ───────────
+
+    #[test]
+    fn coverage_all_entries_attributed_and_consistent_yields_passed() {
+        // domain has Foo (attributed T001) and Bar (attributed T001) — all consistent.
+        let mut signal_docs = std::collections::HashMap::new();
+        signal_docs.insert(
+            "domain".to_owned(),
+            make_signals(vec![blue_signal("Foo"), blue_signal("Bar")]),
+        );
+        let svc = coverage_interactor(
+            Ok(make_contract(
+                "my-track",
+                vec![(
+                    task_id("T001"),
+                    vec![
+                        ContractedEntryRef::new(layer("domain"), entry_key("Foo")),
+                        ContractedEntryRef::new(layer("domain"), entry_key("Bar")),
+                    ],
+                )],
+            )),
+            signal_docs,
+        );
+        let outcome = svc.verify_coverage(coverage_cmd("my-track")).unwrap();
+        assert!(
+            matches!(outcome, CoverageVerifyOutcome::Passed),
+            "expected Passed, got {outcome:?}"
+        );
+    }
+
+    // ── D7 task-status filtering tests ───────────────────────────────────────────
+
+    /// Impl-plan reader that returns a fixed, caller-supplied task status map.
+    struct FixedImplPlanReader(std::collections::HashMap<TaskId, TaskStatusKind>);
+
+    impl ImplPlanReaderPort for FixedImplPlanReader {
+        fn read_task_statuses(
+            &self,
+            _track_id: &TrackId,
+        ) -> Result<std::collections::HashMap<TaskId, TaskStatusKind>, PreReviewGateError> {
+            Ok(self.0.clone())
+        }
+    }
+
+    /// Impl-plan reader that always fails with `ImplPlanReadFailed`.
+    struct FailingImplPlanReader;
+
+    impl ImplPlanReaderPort for FailingImplPlanReader {
+        fn read_task_statuses(
+            &self,
+            _track_id: &TrackId,
+        ) -> Result<std::collections::HashMap<TaskId, TaskStatusKind>, PreReviewGateError> {
+            Err(PreReviewGateError::ImplPlanReadFailed {
+                message: "test: impl-plan.json read failed".to_owned(),
+            })
+        }
+    }
+
+    fn red_signal(name: &str) -> TypeSignal {
+        TypeSignal::new(name, "struct", ConfidenceSignal::Red, false, vec![], vec![], vec![])
+    }
+
+    // ── D7 case (d): Red signal on todo task → always blocked ────────────────────
+
+    #[test]
+    fn d7_red_signal_on_todo_task_is_always_blocked() {
+        // Even when the owning task is `todo`, Red must block.
+        let mut statuses = std::collections::HashMap::new();
+        statuses.insert(task_id("T001"), TaskStatusKind::Todo);
+
+        let svc = PreReviewGateInteractor::new(
+            Arc::new(ConstContractReader(Ok(make_contract(
+                "my-track",
+                vec![(
+                    task_id("T001"),
+                    vec![ContractedEntryRef::new(layer("domain"), entry_key("Foo"))],
+                )],
+            )))),
+            Arc::new(ConstSignalReader(Ok(make_signals(vec![red_signal("Foo")])))),
+            Arc::new(FixedImplPlanReader(statuses)),
+        );
+
+        let outcome = svc.check(cmd("my-track", "domain")).unwrap();
+        match outcome {
+            PreReviewGateOutcome::Blocked { violations, .. } => {
+                assert_eq!(violations.len(), 1);
+                match &violations[0] {
+                    PreReviewGateViolation::NonBlueSignal { entry, signal } => {
+                        assert_eq!(entry.entry_key().as_str(), "Foo");
+                        assert_eq!(*signal, ConfidenceSignal::Red);
+                    }
+                    other => panic!("expected NonBlueSignal(Red), got {other:?}"),
+                }
+            }
+            other => panic!("expected Blocked, got {other:?}"),
+        }
+    }
+
+    // ── D7 case (e): in_progress + done tasks with Blue signals → Passed ─────────
+
+    #[test]
+    fn d7_in_progress_and_done_tasks_with_blue_signals_yields_passed() {
+        let mut statuses = std::collections::HashMap::new();
+        statuses.insert(task_id("T001"), TaskStatusKind::InProgress);
+        statuses.insert(task_id("T002"), TaskStatusKind::Done);
+
+        let svc = PreReviewGateInteractor::new(
+            Arc::new(ConstContractReader(Ok(make_contract(
+                "my-track",
+                vec![
+                    (
+                        task_id("T001"),
+                        vec![ContractedEntryRef::new(layer("domain"), entry_key("Foo"))],
+                    ),
+                    (
+                        task_id("T002"),
+                        vec![ContractedEntryRef::new(layer("domain"), entry_key("Bar"))],
+                    ),
+                ],
+            )))),
+            Arc::new(ConstSignalReader(Ok(make_signals(vec![
+                blue_signal("Foo"),
+                blue_signal("Bar"),
+            ])))),
+            Arc::new(FixedImplPlanReader(statuses)),
+        );
+
+        let outcome = svc.check(cmd("my-track", "domain")).unwrap();
+        assert!(
+            matches!(outcome, PreReviewGateOutcome::Passed),
+            "expected Passed for in_progress/done tasks with Blue signals, got {outcome:?}"
+        );
+    }
+
+    // ── D7 case (f): todo-only task with Yellow signal → Passed (skipped) ────────
+
+    #[test]
+    fn d7_todo_task_with_yellow_signal_is_tolerated() {
+        // Yellow is tolerated when the owning task is still `todo`.
+        let mut statuses = std::collections::HashMap::new();
+        statuses.insert(task_id("T001"), TaskStatusKind::Todo);
+
+        let svc = PreReviewGateInteractor::new(
+            Arc::new(ConstContractReader(Ok(make_contract(
+                "my-track",
+                vec![(
+                    task_id("T001"),
+                    vec![ContractedEntryRef::new(layer("domain"), entry_key("Foo"))],
+                )],
+            )))),
+            Arc::new(ConstSignalReader(Ok(make_signals(vec![yellow_signal("Foo")])))),
+            Arc::new(FixedImplPlanReader(statuses)),
+        );
+
+        let outcome = svc.check(cmd("my-track", "domain")).unwrap();
+        assert!(
+            matches!(outcome, PreReviewGateOutcome::Passed),
+            "expected Passed (todo + Yellow tolerated by D7), got {outcome:?}"
+        );
+    }
+
+    #[test]
+    fn d7_skipped_task_with_yellow_signal_is_tolerated() {
+        let mut statuses = std::collections::HashMap::new();
+        statuses.insert(task_id("T001"), TaskStatusKind::Skipped);
+
+        let svc = PreReviewGateInteractor::new(
+            Arc::new(ConstContractReader(Ok(make_contract(
+                "my-track",
+                vec![(
+                    task_id("T001"),
+                    vec![ContractedEntryRef::new(layer("domain"), entry_key("Foo"))],
+                )],
+            )))),
+            Arc::new(ConstSignalReader(Ok(make_signals(vec![yellow_signal("Foo")])))),
+            Arc::new(FixedImplPlanReader(statuses)),
+        );
+
+        let outcome = svc.check(cmd("my-track", "domain")).unwrap();
+        assert!(
+            matches!(outcome, PreReviewGateOutcome::Passed),
+            "expected Passed (skipped + Yellow tolerated by D7), got {outcome:?}"
+        );
+    }
+
+    // ── D7: ImplPlanReadFailed propagates as an error ────────────────────────────
+
+    #[test]
+    fn d7_impl_plan_read_failed_propagates_as_error() {
+        let svc = PreReviewGateInteractor::new(
+            Arc::new(ConstContractReader(Ok(make_contract(
+                "my-track",
+                vec![(
+                    task_id("T001"),
+                    vec![ContractedEntryRef::new(layer("domain"), entry_key("Foo"))],
+                )],
+            )))),
+            Arc::new(ConstSignalReader(Ok(make_signals(vec![blue_signal("Foo")])))),
+            Arc::new(FailingImplPlanReader),
+        );
+
+        let err = svc.check(cmd("my-track", "domain")).unwrap_err();
+        match err {
+            PreReviewGateError::ImplPlanReadFailed { message } => {
+                assert!(
+                    message.contains("read failed"),
+                    "expected read-failed diagnostic, got: {message}"
+                );
+            }
+            other => panic!("expected ImplPlanReadFailed, got {other}"),
         }
     }
 }

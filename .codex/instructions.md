@@ -72,7 +72,6 @@ Use guarded project wrappers for git, review, DRY, PR, and commit flows:
 - `cargo make track-pr-review`
 - `cargo make track-local-review-fix`
 - `cargo make track-local-review`
-- `cargo make track-contract-gate`
 - `cargo make track-local-dry-fix`
 
 Allowed direct Git usage is read-only inspection such as `git status`, `git diff`, `git log`,

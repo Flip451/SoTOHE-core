@@ -15,6 +15,7 @@ pub mod gh_cli;
 pub mod git_cli;
 pub mod impl_catalog_signal_reader;
 pub mod impl_plan_codec;
+pub mod impl_plan_reader;
 pub mod pr_review;
 pub mod ref_verify;
 pub mod review_v2;

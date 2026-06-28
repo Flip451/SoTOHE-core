@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "e0acfb3421ecc2e5fa1bd638a9fc543b136a354d56914296d46a1e7c54db008e",
+  "catalogue_declaration_hash": "6cfce747019080061efa9b2d98f4560eee343cba047876afb74e15e904948a6c",
   "signals": [
     {
       "type_name": "ContractedEntryRef",
@@ -8,14 +8,24 @@
       "entry_hash": "a2461e70441859dd842c822b6c66594ccd5874ab84a9285f3560f53b870e0839"
     },
     {
+      "type_name": "CoverageVerifyOutcome",
+      "signal": "blue",
+      "entry_hash": "da8376e32064452319dd7b4e8cabe8cb72d6a7b59a7bca5204363a142e95bdba"
+    },
+    {
+      "type_name": "CoverageViolation",
+      "signal": "blue",
+      "entry_hash": "e3df884022cb2d6dd4e158c4b7057fb0b63d603560f0ad910af90e8d6145dc17"
+    },
+    {
       "type_name": "PreReviewGateOutcome",
       "signal": "blue",
-      "entry_hash": "377afe0169c8fdae9d68524f5a488511d09728d5b90011479b6e5fbeec9e88de"
+      "entry_hash": "0adeaa159717cfcb16c2436fcf607a9fe211fb6138bcbfc4be44ba875b16ec6b"
     },
     {
       "type_name": "PreReviewGateViolation",
       "signal": "blue",
-      "entry_hash": "963ba265339924932aefa90918591826d6843515aee4909f7c9d82a6dd3a0149"
+      "entry_hash": "4881e4c683311cb1a2081193cc8a9bbfe01835ce5cba18b7a64b4f72e219ce47"
     },
     {
       "type_name": "TaskContractDocument",

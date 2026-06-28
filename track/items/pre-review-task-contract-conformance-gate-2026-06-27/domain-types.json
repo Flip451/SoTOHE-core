@@ -55,6 +55,69 @@
             "payload": { "kind": "unit" }
           },
           {
+            "name": "NonBlueSignal",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "entry", "ty": "ContractedEntryRef" },
+                { "name": "signal", "ty": "ConfidenceSignal" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "task_contract",
+      "docs": "A single liveness-gate violation found during `bin/sotp task-contract check`. Narrowed to check-specific violations after D5 split: MissingTaskContract (task-contract.json absent, gate cannot proceed) and NonBlueSignal (an attributed entry fails the D7 liveness rule: current/done task ownership with a non-blue impl_catalog signal, or todo-only ownership with a red signal; todo-only yellow is tolerated). Attribution violations (OrphanEntry, InvalidEntryRef) moved to CoverageViolation used by the coverage subcommand. Modelled as a finding record (ValueObject), not an error type: it is data carried inside PreReviewGateOutcome::Blocked.",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "CN-03" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "CN-07" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "GO-03" }
+      ],
+      "informal_grounds": []
+    },
+    "PreReviewGateOutcome": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Passed",
+            "payload": { "kind": "unit" }
+          },
+          {
+            "name": "Blocked",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "violations", "ty": "Vec<PreReviewGateViolation>" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "task_contract",
+      "docs": "Outcome of the `bin/sotp task-contract check` liveness gate. Passed is a binary OK signal: all current/done attributed entries have blue impl_catalog signals and no todo-only attributed entry has a red signal (todo-only yellow is tolerated). Blocked carries the list of liveness violations (MissingTaskContract, NonBlueSignal). The Blocked variant is #[non_exhaustive]. Use PreReviewGateOutcome::blocked() to construct a Blocked outcome so the non-empty invariant is checked.",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "GO-03" }
+      ],
+      "informal_grounds": []
+    },
+    "CoverageViolation": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "MissingTaskContract",
+            "payload": { "kind": "unit" }
+          },
+          {
             "name": "OrphanEntry",
             "payload": {
               "kind": "struct",
@@ -72,31 +135,22 @@
                 { "name": "reason", "ty": "String" }
               ]
             }
-          },
-          {
-            "name": "NonBlueSignal",
-            "payload": {
-              "kind": "struct",
-              "fields": [
-                { "name": "entry", "ty": "ContractedEntryRef" },
-                { "name": "signal", "ty": "ConfidenceSignal" }
-              ]
-            }
           }
         ]
       },
       "methods": [],
       "module_path": "task_contract",
-      "docs": "A single gate violation found during pre-review conformance checking. Modelled as a finding record (ValueObject), not an error type: it is data carried inside PreReviewGateOutcome::Blocked. InvalidEntryRef.reason is an opaque diagnostic string with no domain invariant (R9 exception: error message string).",
+      "docs": "A single attribution-completeness violation found during `bin/sotp task-contract coverage`. MissingTaskContract: task-contract.json is absent so coverage cannot check anything (fail-closed). OrphanEntry: a catalogue entry exists but is not attributed to any task in task-contract.json (attribution completeness failure). InvalidEntryRef: an entry attributed in task-contract.json does not exist in the current catalogue (referential integrity failure). InvalidEntryRef.reason is an opaque diagnostic string (R9 exception: error message). These violations are data inside CoverageVerifyOutcome::Blocked.",
       "spec_refs": [
         { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-03" },
-        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-07" },
         { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "CN-01" },
-        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "CN-03" }
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "CN-02" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "CN-07" }
       ],
       "informal_grounds": []
     },
-    "PreReviewGateOutcome": {
+    "CoverageVerifyOutcome": {
       "action": "add",
       "role": { "ValueObject": {} },
       "kind": {
@@ -104,19 +158,14 @@
         "variants": [
           {
             "name": "Passed",
-            "payload": {
-              "kind": "struct",
-              "fields": [
-                { "name": "conformance_summary", "ty": "String" }
-              ]
-            }
+            "payload": { "kind": "unit" }
           },
           {
             "name": "Blocked",
             "payload": {
               "kind": "struct",
               "fields": [
-                { "name": "violations", "ty": "Vec<PreReviewGateViolation>" }
+                { "name": "violations", "ty": "Vec<CoverageViolation>" }
               ]
             }
           }
@@ -124,12 +173,11 @@
       },
       "methods": [],
       "module_path": "task_contract",
-      "docs": "Outcome of the pre-review gate check. Passed carries a human-readable conformance summary to be appended to the reviewer briefing (IN-06, GO-04). Blocked carries all violations found. conformance_summary is an opaque prose string with no cross-domain identity (R9: content of the summary is not a domain concept). The Blocked variant is #[non_exhaustive]. Use PreReviewGateOutcome::blocked() to construct a Blocked outcome so the non-empty invariant is checked.",
+      "docs": "Outcome of the `bin/sotp task-contract coverage` attribution-completeness check. Passed: all catalogue entries are attributed to at least one task, and all attributed entries exist in the catalogue. Blocked carries the list of attribution violations (MissingTaskContract, OrphanEntry, InvalidEntryRef). The Blocked variant is #[non_exhaustive]. Use CoverageVerifyOutcome::blocked() to construct a Blocked outcome so the non-empty invariant is checked.",
       "spec_refs": [
-        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-04" },
-        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-06" },
-        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "GO-03" },
-        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "GO-04" }
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-07" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-06" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-08" }
       ],
       "informal_grounds": []
     }
@@ -244,7 +292,25 @@
           "generics": [],
           "has_default_impl": false,
           "where_predicates": [],
-          "docs": "Constructs a Blocked outcome with at least one violation. Returns ValidationError when violations is empty."
+          "docs": "Constructs a Blocked outcome with at least one liveness violation. Returns ValidationError when violations is empty."
+        }
+      ]
+    },
+    {
+      "type_name": "CoverageVerifyOutcome",
+      "methods": [
+        {
+          "name": "blocked",
+          "receiver": null,
+          "params": [
+            { "name": "violations", "ty": "Vec<CoverageViolation>" }
+          ],
+          "returns": "Result<Self, ValidationError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Constructs a Blocked outcome with at least one attribution-completeness violation. Returns ValidationError when violations is empty."
         }
       ]
     }
@@ -265,6 +331,14 @@
     { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "PreReviewGateOutcome" },
     { "action": "add", "trait_ref": "core::clone::Clone", "for_type": "PreReviewGateOutcome" },
     { "action": "add", "trait_ref": "core::cmp::PartialEq", "for_type": "PreReviewGateOutcome" },
-    { "action": "add", "trait_ref": "core::cmp::Eq", "for_type": "PreReviewGateOutcome" }
+    { "action": "add", "trait_ref": "core::cmp::Eq", "for_type": "PreReviewGateOutcome" },
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "CoverageViolation" },
+    { "action": "add", "trait_ref": "core::clone::Clone", "for_type": "CoverageViolation" },
+    { "action": "add", "trait_ref": "core::cmp::PartialEq", "for_type": "CoverageViolation" },
+    { "action": "add", "trait_ref": "core::cmp::Eq", "for_type": "CoverageViolation" },
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "CoverageVerifyOutcome" },
+    { "action": "add", "trait_ref": "core::clone::Clone", "for_type": "CoverageVerifyOutcome" },
+    { "action": "add", "trait_ref": "core::cmp::PartialEq", "for_type": "CoverageVerifyOutcome" },
+    { "action": "add", "trait_ref": "core::cmp::Eq", "for_type": "CoverageVerifyOutcome" }
   ]
 }

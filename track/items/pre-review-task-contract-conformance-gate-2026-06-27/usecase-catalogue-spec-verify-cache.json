@@ -3,11 +3,227 @@
   "layer": "usecase",
   "entries": [
     {
-      "claim_hash": "e20294086579500054d433cd692c289d6207adeeab053e53cb6691298e8983ed",
-      "evidence_hash": "a1d0161f82fb1e359219bf20fe13ea166879459cc9479416e655b084f689460c",
+      "claim_hash": "54b228fca510bab5dcbda38d322b32196b4b0a529aa87bb22b0e05903b2e8231",
+      "evidence_hash": "3ca500eaaa5882767865ad14d8abba77b5aae37e7824118685ccd0b7c433c278",
       "verdict": {
         "kind": "pass",
-        "citation": "attribution の complete relation invariant 検証: (a) review scope 内の関連カタログ entry が全て ≥1 タスクに attribution されていること、(b) orphan entry（review scope 内だがどのタスクにも attribution されていない関連 entry）が存在しないこと、(c) attribution された entry がカタログに実在し当該 scope 内であること（referential integrity）。"
+        "citation": "attribution の complete relation invariant 検証: (a) 型カタログの全エントリが ≥1 タスクに attribution されていること（completeness）、(b) orphan entry（どのタスクにも attribution されていないカタログ entry）が存在しないこと、(c) attribution された entry がカタログに実在すること（referential integrity）。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CoverageVerifyCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "attribution の complete relation invariant 検証: (a) 型カタログの全エントリが ≥1 タスクに attribution されていること（completeness）、(b) orphan entry（どのタスクにも attribution されていないカタログ entry）が存在しないこと、(c) attribution された entry がカタログに実在すること（referential integrity）。"
+        }
+      }
+    },
+    {
+      "claim_hash": "54b228fca510bab5dcbda38d322b32196b4b0a529aa87bb22b0e05903b2e8231",
+      "evidence_hash": "224be3888edb61b6a4a53d8498f0ca5ab96542e6bfb580eecaffb85c567e6455",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp task-contract coverage` サブコマンドの実装: 型カタログの全エントリが漏れなくタスクに attribution されているか（完全性）を専用に検証する subcommand。cargo make ci の検証 chain に統合し、commit ごとに attribution drift を検出する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CoverageVerifyCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "`bin/sotp task-contract coverage` サブコマンドの実装: 型カタログの全エントリが漏れなくタスクに attribution されているか（完全性）を専用に検証する subcommand。cargo make ci の検証 chain に統合し、commit ごとに attribution drift を検出する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "54b228fca510bab5dcbda38d322b32196b4b0a529aa87bb22b0e05903b2e8231",
+      "evidence_hash": "3951baa0d8facc3f4cf6526007c65fe889ed93dfd2fa788d0b6a0e57012c68d6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "attribution の complete relation invariant が機械的に検証可能である: (a) 型カタログの全エントリが ≥1 タスクに attribution されている、(b) orphan entry が存在しない、(c) attribution 対象 entry がカタログに実在する。invariant 違反時にゲートが非ゼロ終了コードで返り、違反内容（orphan entry リスト・存在しない entry 識別子）を出力する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CoverageVerifyCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "attribution の complete relation invariant が機械的に検証可能である: (a) 型カタログの全エントリが ≥1 タスクに attribution されている、(b) orphan entry が存在しない、(c) attribution 対象 entry がカタログに実在する。invariant 違反時にゲートが非ゼロ終了コードで返り、違反内容（orphan entry リスト・存在しない entry 識別子）を出力する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "54b228fca510bab5dcbda38d322b32196b4b0a529aa87bb22b0e05903b2e8231",
+      "evidence_hash": "55101e77aed5b394bde03f1e88c85e0484d8b204835d92183adb3199607d81c2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp task-contract coverage` が実装されており、`cargo make task-contract-coverage` として呼び出せる。`cargo make task-contract-check` は `dependencies = [\"task-contract-coverage\"]` を宣言し、coverage → check の順で必ず実行される。attribution 不完全（orphan あり）の場合、coverage がブロックし check は実行されない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CoverageVerifyCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "`bin/sotp task-contract coverage` が実装されており、`cargo make task-contract-coverage` として呼び出せる。`cargo make task-contract-check` は `dependencies = [\"task-contract-coverage\"]` を宣言し、coverage → check の順で必ず実行される。attribution 不完全（orphan あり）の場合、coverage がブロックし check は実行されない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ac632febd65ebac0169ccb109a0da00b4c93a317128cdc03f5055d8857320e21",
+      "evidence_hash": "3ca500eaaa5882767865ad14d8abba77b5aae37e7824118685ccd0b7c433c278",
+      "verdict": {
+        "kind": "pass",
+        "citation": "attribution の complete relation invariant 検証: (a) 型カタログの全エントリが ≥1 タスクに attribution されていること（completeness）、(b) orphan entry（どのタスクにも attribution されていないカタログ entry）が存在しないこと、(c) attribution された entry がカタログに実在すること（referential integrity）。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CoverageVerifyInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "attribution の complete relation invariant 検証: (a) 型カタログの全エントリが ≥1 タスクに attribution されていること（completeness）、(b) orphan entry（どのタスクにも attribution されていないカタログ entry）が存在しないこと、(c) attribution された entry がカタログに実在すること（referential integrity）。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ac632febd65ebac0169ccb109a0da00b4c93a317128cdc03f5055d8857320e21",
+      "evidence_hash": "224be3888edb61b6a4a53d8498f0ca5ab96542e6bfb580eecaffb85c567e6455",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp task-contract coverage` サブコマンドの実装: 型カタログの全エントリが漏れなくタスクに attribution されているか（完全性）を専用に検証する subcommand。cargo make ci の検証 chain に統合し、commit ごとに attribution drift を検出する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CoverageVerifyInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "`bin/sotp task-contract coverage` サブコマンドの実装: 型カタログの全エントリが漏れなくタスクに attribution されているか（完全性）を専用に検証する subcommand。cargo make ci の検証 chain に統合し、commit ごとに attribution drift を検出する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ac632febd65ebac0169ccb109a0da00b4c93a317128cdc03f5055d8857320e21",
+      "evidence_hash": "6dfe414194bae09187a3002279da54cf5dcd925b094c7fbc5f1e882f60b52e15",
+      "verdict": {
+        "kind": "pass",
+        "citation": "attribution 完全性（completeness）の検証と生存性（liveness）の検証は別 subcommand に分割する（`bin/sotp task-contract coverage` と `bin/sotp task-contract check`）。両者は `task-contract` ドメイン配下に置き、`verify-*` ファミリーには逃さない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CoverageVerifyInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-07",
+          "text_label": "attribution 完全性（completeness）の検証と生存性（liveness）の検証は別 subcommand に分割する（`bin/sotp task-contract coverage` と `bin/sotp task-contract check`）。両者は失敗時の責任者と修正経路が異なり（planner が attribution を author する vs implementer が impl を 🔵 化する）、1 コマンドに混在させると fixer の判断分岐コストが恒久化する。両者は `task-contract` ドメイン配下に置き、`verify-*` ファミリーには逃さない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ac632febd65ebac0169ccb109a0da00b4c93a317128cdc03f5055d8857320e21",
+      "evidence_hash": "3951baa0d8facc3f4cf6526007c65fe889ed93dfd2fa788d0b6a0e57012c68d6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "attribution の complete relation invariant が機械的に検証可能である: (a) 型カタログの全エントリが ≥1 タスクに attribution されている、(b) orphan entry が存在しない、(c) attribution 対象 entry がカタログに実在する。invariant 違反時にゲートが非ゼロ終了コードで返り、違反内容（orphan entry リスト・存在しない entry 識別子）を出力する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CoverageVerifyInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "attribution の complete relation invariant が機械的に検証可能である: (a) 型カタログの全エントリが ≥1 タスクに attribution されている、(b) orphan entry が存在しない、(c) attribution 対象 entry がカタログに実在する。invariant 違反時にゲートが非ゼロ終了コードで返り、違反内容（orphan entry リスト・存在しない entry 識別子）を出力する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ac632febd65ebac0169ccb109a0da00b4c93a317128cdc03f5055d8857320e21",
+      "evidence_hash": "55101e77aed5b394bde03f1e88c85e0484d8b204835d92183adb3199607d81c2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp task-contract coverage` が実装されており、`cargo make task-contract-coverage` として呼び出せる。`cargo make task-contract-check` は `dependencies = [\"task-contract-coverage\"]` を宣言し、coverage → check の順で必ず実行される。attribution 不完全（orphan あり）の場合、coverage がブロックし check は実行されない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CoverageVerifyInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "`bin/sotp task-contract coverage` が実装されており、`cargo make task-contract-coverage` として呼び出せる。`cargo make task-contract-check` は `dependencies = [\"task-contract-coverage\"]` を宣言し、coverage → check の順で必ず実行される。attribution 不完全（orphan あり）の場合、coverage がブロックし check は実行されない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "e10ccd73288f8cc93ea86b631706bfd0985adc67617d9eb921b266ba7e1649a7",
+      "evidence_hash": "0635256c1afb73b788d9b65d2a8ecde86d0c85f8a0fe21d138ec6969917b8f41",
+      "verdict": {
+        "kind": "pass",
+        "citation": "pre-review blocking binary check ゲートの実装（`bin/sotp task-contract check`）: 現在のタスク（in_progress）と完了済タスク（done）に帰属するエントリの impl_catalog 信号を既存信号テーブルと entry キーで JOIN し、全エントリが 🔵 かを確認する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -21,17 +237,17 @@
         "kind": "spec_element",
         "data": {
           "section": "in_scope",
-          "element_id": "IN-03",
-          "text_label": "attribution の complete relation invariant 検証: (a) review scope 内の関連カタログ entry が全て ≥1 タスクに attribution されていること、(b) orphan entry（review scope 内だがどのタスクにも attribution されていない関連 entry）が存在しないこと、(c) attribution された entry がカタログに実在し当該 scope 内であること（referential integrity）。"
+          "element_id": "IN-04",
+          "text_label": "pre-review blocking binary check ゲートの実装（`bin/sotp task-contract check`）: 現在のタスク（in_progress）と完了済タスク（done）に帰属するエントリの impl_catalog 信号を既存信号テーブルと entry キーで JOIN し、全エントリが 🔵 かを確認する。判定対象タスクは `impl-plan.json` のタスク状態を参照して特定する。`--track-id` 引数が省略された場合は現在の git ブランチ (`track/<id>` 形式) から active track を auto-resolve する。ゲートは fail-closed（artifact 不在・非 🔵 エントリ存在のいずれでもブロック）。todo タスクに帰属するエントリは 🔵 必須の対象からは外すが、🔴 はタスク状態に関わらず常にブロックし、🟡 のみ未着手として許容する。"
         }
       }
     },
     {
-      "claim_hash": "e20294086579500054d433cd692c289d6207adeeab053e53cb6691298e8983ed",
-      "evidence_hash": "0328c46d2ea160bdb4a50550c0994bb547d768770ee5f2477759e71e1eccceb6",
+      "claim_hash": "e10ccd73288f8cc93ea86b631706bfd0985adc67617d9eb921b266ba7e1649a7",
+      "evidence_hash": "a87c1a1900f39923c1f2cde1331119d57154050bb2f44a42ab895d1fae109e63",
       "verdict": {
         "kind": "pass",
-        "citation": "attribution の complete relation invariant が機械的に検証可能である: (a) review scope 内の関連カタログ entry が全て ≥1 タスクに attribution されている、(b) orphan entry が存在しない、(c) attribution 対象 entry がカタログに実在し scope 内である。invariant 違反時にゲートが非ゼロ終了コードで返り、違反内容（orphan entry リスト・存在しない entry 識別子）を出力する。"
+        "citation": "現在のタスク（in_progress）と完了済タスク（done）に帰属するエントリの impl_catalog 信号が全て 🔵 のとき、ゲートが unit/binary OK としてパスする。todo タスクに帰属するエントリの 🟡 はパス条件に影響しない。🔴 エントリはタスク状態に関わらず常にゲートをブロックし、非 🔵 エントリの一覧と信号状態を出力する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -45,17 +261,17 @@
         "kind": "spec_element",
         "data": {
           "section": "acceptance_criteria",
-          "element_id": "AC-02",
-          "text_label": "attribution の complete relation invariant が機械的に検証可能である: (a) review scope 内の関連カタログ entry が全て ≥1 タスクに attribution されている、(b) orphan entry が存在しない、(c) attribution 対象 entry がカタログに実在し scope 内である。invariant 違反時にゲートが非ゼロ終了コードで返り、違反内容（orphan entry リスト・存在しない entry 識別子）を出力する。"
+          "element_id": "AC-04",
+          "text_label": "現在のタスク（in_progress）と完了済タスク（done）に帰属するエントリの impl_catalog 信号が全て 🔵 のとき、ゲートが unit/binary OK としてパスする。todo タスクに帰属するエントリの 🟡 はパス条件に影響しない。🔴 エントリはタスク状態に関わらず常にゲートをブロックし、非 🔵 エントリの一覧と信号状態を出力する。"
         }
       }
     },
     {
-      "claim_hash": "ec286d56dbe4bb5d995b6602b04aa931c70f63f97c786dddd2e2d9b8b6686fdb",
-      "evidence_hash": "a1d0161f82fb1e359219bf20fe13ea166879459cc9479416e655b084f689460c",
+      "claim_hash": "18feb1a211464131c5e381d6b81b08088c9e34fe139e725d67259884a4c26606",
+      "evidence_hash": "3ca500eaaa5882767865ad14d8abba77b5aae37e7824118685ccd0b7c433c278",
       "verdict": {
         "kind": "pass",
-        "citation": "attribution の complete relation invariant 検証: (a) review scope 内の関連カタログ entry が全て ≥1 タスクに attribution されていること、(b) orphan entry（review scope 内だがどのタスクにも attribution されていない関連 entry）が存在しないこと、(c) attribution された entry がカタログに実在し当該 scope 内であること（referential integrity）."
+        "citation": "attribution の complete relation invariant 検証: (a) 型カタログの全エントリが ≥1 タスクに attribution されていること（completeness）、(b) orphan entry（どのタスクにも attribution されていないカタログ entry）が存在しないこと、(c) attribution された entry がカタログに実在すること（referential integrity）。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -70,16 +286,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-03",
-          "text_label": "attribution の complete relation invariant 検証: (a) review scope 内の関連カタログ entry が全て ≥1 タスクに attribution されていること、(b) orphan entry（review scope 内だがどのタスクにも attribution されていない関連 entry）が存在しないこと、(c) attribution された entry がカタログに実在し当該 scope 内であること（referential integrity）。"
+          "text_label": "attribution の complete relation invariant 検証: (a) 型カタログの全エントリが ≥1 タスクに attribution されていること（completeness）、(b) orphan entry（どのタスクにも attribution されていないカタログ entry）が存在しないこと、(c) attribution された entry がカタログに実在すること（referential integrity）。"
         }
       }
     },
     {
-      "claim_hash": "ec286d56dbe4bb5d995b6602b04aa931c70f63f97c786dddd2e2d9b8b6686fdb",
-      "evidence_hash": "4776c2bc5cd2dad2214630005d3ccd1cb935b6ddae6278553aa61a8bea32b22b",
+      "claim_hash": "18feb1a211464131c5e381d6b81b08088c9e34fe139e725d67259884a4c26606",
+      "evidence_hash": "0635256c1afb73b788d9b65d2a8ecde86d0c85f8a0fe21d138ec6969917b8f41",
       "verdict": {
         "kind": "pass",
-        "citation": "task-contract.json の attribution completeness を検証した後、attribution された全カタログ entry の impl_catalog 信号を既存信号テーブルと entry キーで JOIN し、全 entry が 🔵 かを確認する。ゲートは sotp CLI サブコマンドとして実装し、fail-closed（artifact 不在・attribution 不完全・非 🔵 entry のいずれでもブロック）とする。"
+        "citation": "ゲートは fail-closed（artifact 不在・非 🔵 エントリ存在のいずれでもブロック）."
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -94,16 +310,40 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-04",
-          "text_label": "pre-review blocking binary check ゲートの実装: task-contract.json の attribution completeness を検証した後、attribution された全カタログ entry の impl_catalog 信号を既存信号テーブルと entry キーで JOIN し、全 entry が 🔵 かを確認する。ゲートは sotp CLI サブコマンドとして実装し、fail-closed（artifact 不在・attribution 不完全・非 🔵 entry のいずれでもブロック）とする。"
+          "text_label": "pre-review blocking binary check ゲートの実装（`bin/sotp task-contract check`）: 現在のタスク（in_progress）と完了済タスク（done）に帰属するエントリの impl_catalog 信号を既存信号テーブルと entry キーで JOIN し、全エントリが 🔵 かを確認する。判定対象タスクは `impl-plan.json` のタスク状態を参照して特定する。`--track-id` 引数が省略された場合は現在の git ブランチ (`track/<id>` 形式) から active track を auto-resolve する。ゲートは fail-closed（artifact 不在・非 🔵 エントリ存在のいずれでもブロック）。todo タスクに帰属するエントリは 🔵 必須の対象からは外すが、🔴 はタスク状態に関わらず常にブロックし、🟡 のみ未着手として許容する。"
         }
       }
     },
     {
-      "claim_hash": "5228b70c1dfa961751b4432ffb027448afdc7f4d7225a249e8d90f4e6023cf82",
-      "evidence_hash": "a1d0161f82fb1e359219bf20fe13ea166879459cc9479416e655b084f689460c",
+      "claim_hash": "18feb1a211464131c5e381d6b81b08088c9e34fe139e725d67259884a4c26606",
+      "evidence_hash": "e7847218edb024572cb7c8b146e4668d548219d2fffbc5de77da51a2512accab",
       "verdict": {
         "kind": "pass",
-        "citation": "attribution の complete relation invariant 検証: (a) review scope 内の関連カタログ entry が全て ≥1 タスクに attribution されていること、(b) orphan entry（review scope 内だがどのタスクにも attribution されていない関連 entry）が存在しないこと、(c) attribution された entry がカタログに実在し当該 scope 内であること（referential integrity）。"
+        "citation": "usecase 層への `ImplPlanReaderPort`（secondary port）追加: `bin/sotp task-contract check` の usecase 層（`PreReviewGateInteractor` 等）に `impl-plan.json` を読む secondary port を追加し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-09",
+          "text_label": "usecase 層への `ImplPlanReaderPort`（secondary port）追加: `bin/sotp task-contract check` の usecase 層（`PreReviewGateInteractor` 等）に `impl-plan.json` を読む secondary port を追加し、`task-contract.json` の attribution を impl-plan.json のタスク状態（todo / in_progress / done）でフィルタする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0b41b63eded72ffb06615aa29f81735cf34d2d0153ab7e5c04fb74a48f4d70c0",
+      "evidence_hash": "0635256c1afb73b788d9b65d2a8ecde86d0c85f8a0fe21d138ec6969917b8f41",
+      "verdict": {
+        "kind": "pass",
+        "citation": "現在のタスク（in_progress）と完了済タスク（done）に帰属するエントリの impl_catalog 信号を既存信号テーブルと entry キーで JOIN し、全エントリが 🔵 かを確認する。判定対象タスクは `impl-plan.json` のタスク状態を参照して特定する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -117,17 +357,65 @@
         "kind": "spec_element",
         "data": {
           "section": "in_scope",
-          "element_id": "IN-03",
-          "text_label": "attribution の complete relation invariant 検証: (a) review scope 内の関連カタログ entry が全て ≥1 タスクに attribution されていること、(b) orphan entry（review scope 内だがどのタスクにも attribution されていない関連 entry）が存在しないこと、(c) attribution された entry がカタログに実在し当該 scope 内であること（referential integrity）。"
+          "element_id": "IN-04",
+          "text_label": "pre-review blocking binary check ゲートの実装（`bin/sotp task-contract check`）: 現在のタスク（in_progress）と完了済タスク（done）に帰属するエントリの impl_catalog 信号を既存信号テーブルと entry キーで JOIN し、全エントリが 🔵 かを確認する。判定対象タスクは `impl-plan.json` のタスク状態を参照して特定する。`--track-id` 引数が省略された場合は現在の git ブランチ (`track/<id>` 形式) から active track を auto-resolve する。ゲートは fail-closed（artifact 不在・非 🔵 エントリ存在のいずれでもブロック）。todo タスクに帰属するエントリは 🔵 必須の対象からは外すが、🔴 はタスク状態に関わらず常にブロックし、🟡 のみ未着手として許容する。"
         }
       }
     },
     {
-      "claim_hash": "5228b70c1dfa961751b4432ffb027448afdc7f4d7225a249e8d90f4e6023cf82",
-      "evidence_hash": "0328c46d2ea160bdb4a50550c0994bb547d768770ee5f2477759e71e1eccceb6",
+      "claim_hash": "0b41b63eded72ffb06615aa29f81735cf34d2d0153ab7e5c04fb74a48f4d70c0",
+      "evidence_hash": "e7847218edb024572cb7c8b146e4668d548219d2fffbc5de77da51a2512accab",
       "verdict": {
         "kind": "pass",
-        "citation": "attribution の complete relation invariant が機械的に検証可能である: (a) review scope 内の関連カタログ entry が全て ≥1 タスクに attribution されている、(b) orphan entry が存在しない、(c) attribution 対象 entry がカタログに実在し scope 内である。invariant 違反時にゲートが非ゼロ終了コードで返り、違反内容（orphan entry リスト・存在しない entry 識別子）を出力する。"
+        "citation": "usecase 層への `ImplPlanReaderPort`（secondary port）追加: `bin/sotp task-contract check` の usecase 層（`PreReviewGateInteractor` 等）に `impl-plan.json` を読む secondary port を追加し、`task-contract.json` の attribution を impl-plan.json のタスク状態（todo / in_progress / done）でフィルタする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-09",
+          "text_label": "usecase 層への `ImplPlanReaderPort`（secondary port）追加: `bin/sotp task-contract check` の usecase 層（`PreReviewGateInteractor` 等）に `impl-plan.json` を読む secondary port を追加し、`task-contract.json` の attribution を impl-plan.json のタスク状態（todo / in_progress / done）でフィルタする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0b41b63eded72ffb06615aa29f81735cf34d2d0153ab7e5c04fb74a48f4d70c0",
+      "evidence_hash": "0978b296102d32031a8ad9ea70cf8314e3cdff64d98ac2fbf6f31efcae7d1c51",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ゲートの合否基準は「現在のタスク（in_progress）と完了済タスク（done）に帰属するエントリの impl_catalog 信号が全て 🔵 か」。todo タスクに帰属するエントリは 🟡 を許容する（まだ実装していないため shape mismatch 等は想定範囲内）。🔴 はタスク状態に関わらず常に blocker。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "ゲートの合否基準は「現在のタスク（in_progress）と完了済タスク（done）に帰属するエントリの impl_catalog 信号が全て 🔵 か」。todo タスクに帰属するエントリは 🟡 を許容する（まだ実装していないため shape mismatch 等は想定範囲内）。🔴 はタスク状態に関わらず常に blocker。body の確認・test 結果・stub 走査は判定に含めない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0b41b63eded72ffb06615aa29f81735cf34d2d0153ab7e5c04fb74a48f4d70c0",
+      "evidence_hash": "a87c1a1900f39923c1f2cde1331119d57154050bb2f44a42ab895d1fae109e63",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「現在のタスク（in_progress）と完了済タスク（done）に帰属するエントリの impl_catalog 信号が全て 🔵 のとき、ゲートが unit/binary OK としてパスする。todo タスクに帰属するエントリの 🟡 はパス条件に影響しない。🔴 エントリはタスク状態に関わらず常にゲートをブロックし、非 🔵 エントリの一覧と信号状態を出力する。」"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -141,17 +429,137 @@
         "kind": "spec_element",
         "data": {
           "section": "acceptance_criteria",
-          "element_id": "AC-02",
-          "text_label": "attribution の complete relation invariant が機械的に検証可能である: (a) review scope 内の関連カタログ entry が全て ≥1 タスクに attribution されている、(b) orphan entry が存在しない、(c) attribution 対象 entry がカタログに実在し scope 内である。invariant 違反時にゲートが非ゼロ終了コードで返り、違反内容（orphan entry リスト・存在しない entry 識別子）を出力する。"
+          "element_id": "AC-04",
+          "text_label": "現在のタスク（in_progress）と完了済タスク（done）に帰属するエントリの impl_catalog 信号が全て 🔵 のとき、ゲートが unit/binary OK としてパスする。todo タスクに帰属するエントリの 🟡 はパス条件に影響しない。🔴 エントリはタスク状態に関わらず常にゲートをブロックし、非 🔵 エントリの一覧と信号状態を出力する。"
         }
       }
     },
     {
-      "claim_hash": "e08bb0a2dc9c06704e5e43ce711047d491780cf8d7b4b63efc088c03bcb47175",
-      "evidence_hash": "4776c2bc5cd2dad2214630005d3ccd1cb935b6ddae6278553aa61a8bea32b22b",
+      "claim_hash": "cbebc70c27259c6d13f52bf964c1dd8189cde87b18426f4b79ffdcef65e80c6e",
+      "evidence_hash": "3ca500eaaa5882767865ad14d8abba77b5aae37e7824118685ccd0b7c433c278",
       "verdict": {
         "kind": "pass",
-        "citation": "task-contract.json の attribution completeness を検証した後、attribution された全カタログ entry の impl_catalog 信号を既存信号テーブルと entry キーで JOIN し、全 entry が 🔵 かを確認する。ゲートは sotp CLI サブコマンドとして実装し、fail-closed（artifact 不在・attribution 不完全・非 🔵 entry のいずれでもブロック）とする。"
+        "citation": "attribution の complete relation invariant 検証: (a) 型カタログの全エントリが ≥1 タスクに attribution されていること（completeness）、(b) orphan entry（どのタスクにも attribution されていないカタログ entry）が存在しないこと、(c) attribution された entry がカタログに実在すること（referential integrity）。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "CoverageVerifyService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "attribution の complete relation invariant 検証: (a) 型カタログの全エントリが ≥1 タスクに attribution されていること（completeness）、(b) orphan entry（どのタスクにも attribution されていないカタログ entry）が存在しないこと、(c) attribution された entry がカタログに実在すること（referential integrity）。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cbebc70c27259c6d13f52bf964c1dd8189cde87b18426f4b79ffdcef65e80c6e",
+      "evidence_hash": "224be3888edb61b6a4a53d8498f0ca5ab96542e6bfb580eecaffb85c567e6455",
+      "verdict": {
+        "kind": "pass",
+        "citation": "型カタログの全エントリが漏れなくタスクに attribution されているか（完全性）を専用に検証する subcommand。cargo make ci の検証 chain に統合し、commit ごとに attribution drift を検出する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "CoverageVerifyService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "`bin/sotp task-contract coverage` サブコマンドの実装: 型カタログの全エントリが漏れなくタスクに attribution されているか（完全性）を専用に検証する subcommand。cargo make ci の検証 chain に統合し、commit ごとに attribution drift を検出する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cbebc70c27259c6d13f52bf964c1dd8189cde87b18426f4b79ffdcef65e80c6e",
+      "evidence_hash": "6dfe414194bae09187a3002279da54cf5dcd925b094c7fbc5f1e882f60b52e15",
+      "verdict": {
+        "kind": "pass",
+        "citation": "attribution 完全性（completeness）の検証と生存性（liveness）の検証は別 subcommand に分割する（`bin/sotp task-contract coverage` と `bin/sotp task-contract check`）。…両者は `task-contract` ドメイン配下に置き、`verify-*` ファミリーには逃さない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "CoverageVerifyService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-07",
+          "text_label": "attribution 完全性（completeness）の検証と生存性（liveness）の検証は別 subcommand に分割する（`bin/sotp task-contract coverage` と `bin/sotp task-contract check`）。両者は失敗時の責任者と修正経路が異なり（planner が attribution を author する vs implementer が impl を 🔵 化する）、1 コマンドに混在させると fixer の判断分岐コストが恒久化する。両者は `task-contract` ドメイン配下に置き、`verify-*` ファミリーには逃さない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cbebc70c27259c6d13f52bf964c1dd8189cde87b18426f4b79ffdcef65e80c6e",
+      "evidence_hash": "3951baa0d8facc3f4cf6526007c65fe889ed93dfd2fa788d0b6a0e57012c68d6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "attribution の complete relation invariant が機械的に検証可能である: (a) 型カタログの全エントリが ≥1 タスクに attribution されている、(b) orphan entry が存在しない、(c) attribution 対象 entry がカタログに実在する。invariant 違反時にゲートが非ゼロ終了コードで返り、違反内容（orphan entry リスト・存在しない entry 識別子）を出力する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "CoverageVerifyService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "attribution の complete relation invariant が機械的に検証可能である: (a) 型カタログの全エントリが ≥1 タスクに attribution されている、(b) orphan entry が存在しない、(c) attribution 対象 entry がカタログに実在する。invariant 違反時にゲートが非ゼロ終了コードで返り、違反内容（orphan entry リスト・存在しない entry 識別子）を出力する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cbebc70c27259c6d13f52bf964c1dd8189cde87b18426f4b79ffdcef65e80c6e",
+      "evidence_hash": "55101e77aed5b394bde03f1e88c85e0484d8b204835d92183adb3199607d81c2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp task-contract coverage` が実装されており、`cargo make task-contract-coverage` として呼び出せる。`cargo make task-contract-check` は `dependencies = [\"task-contract-coverage\"]` を宣言し、coverage → check の順で必ず実行される。attribution 不完全（orphan あり）の場合、coverage がブロックし check は実行されない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "CoverageVerifyService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "`bin/sotp task-contract coverage` が実装されており、`cargo make task-contract-coverage` として呼び出せる。`cargo make task-contract-check` は `dependencies = [\"task-contract-coverage\"]` を宣言し、coverage → check の順で必ず実行される。attribution 不完全（orphan あり）の場合、coverage がブロックし check は実行されない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "adba7815c04b9b321312ffe87a310ad5c4b137ed8415d14ef8dd91cf8221122f",
+      "evidence_hash": "0635256c1afb73b788d9b65d2a8ecde86d0c85f8a0fe21d138ec6969917b8f41",
+      "verdict": {
+        "kind": "pass",
+        "citation": "impl_catalog 信号を既存信号テーブルと entry キーで JOIN し、全エントリが 🔵 かを確認する。ゲートは fail-closed（artifact 不在・非 🔵 エントリ存在のいずれでもブロック）"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -166,12 +574,12 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-04",
-          "text_label": "pre-review blocking binary check ゲートの実装: task-contract.json の attribution completeness を検証した後、attribution された全カタログ entry の impl_catalog 信号を既存信号テーブルと entry キーで JOIN し、全 entry が 🔵 かを確認する。ゲートは sotp CLI サブコマンドとして実装し、fail-closed（artifact 不在・attribution 不完全・非 🔵 entry のいずれでもブロック）とする。"
+          "text_label": "pre-review blocking binary check ゲートの実装（`bin/sotp task-contract check`）: 現在のタスク（in_progress）と完了済タスク（done）に帰属するエントリの impl_catalog 信号を既存信号テーブルと entry キーで JOIN し、全エントリが 🔵 かを確認する。判定対象タスクは `impl-plan.json` のタスク状態を参照して特定する。`--track-id` 引数が省略された場合は現在の git ブランチ (`track/<id>` 形式) から active track を auto-resolve する。ゲートは fail-closed（artifact 不在・非 🔵 エントリ存在のいずれでもブロック）。todo タスクに帰属するエントリは 🔵 必須の対象からは外すが、🔴 はタスク状態に関わらず常にブロックし、🟡 のみ未着手として許容する。"
         }
       }
     },
     {
-      "claim_hash": "e08bb0a2dc9c06704e5e43ce711047d491780cf8d7b4b63efc088c03bcb47175",
+      "claim_hash": "adba7815c04b9b321312ffe87a310ad5c4b137ed8415d14ef8dd91cf8221122f",
       "evidence_hash": "214168b37d83d6faf1f99c96412c9c16d4efc3cc77482c75f4975b6977d09363",
       "verdict": {
         "kind": "pass",
@@ -195,11 +603,35 @@
       }
     },
     {
-      "claim_hash": "e9ab494bd7b9beb2e3ace363bc13833851f1c90fc9f75124250df714738507d2",
-      "evidence_hash": "a1d0161f82fb1e359219bf20fe13ea166879459cc9479416e655b084f689460c",
+      "claim_hash": "0178ea7cd9ff4c3c39a568e8eb52a2e52e6814e822353bde86baff48368becda",
+      "evidence_hash": "e7847218edb024572cb7c8b146e4668d548219d2fffbc5de77da51a2512accab",
       "verdict": {
         "kind": "pass",
-        "citation": "attribution の complete relation invariant 検証: (a) review scope 内の関連カタログ entry が全て ≥1 タスクに attribution されていること、(b) orphan entry（review scope 内だがどのタスクにも attribution されていない関連 entry）が存在しないこと、(c) attribution された entry がカタログに実在し当該 scope 内であること（referential integrity）。"
+        "citation": "usecase 層への `ImplPlanReaderPort`（secondary port）追加: `bin/sotp task-contract check` の usecase 層（`PreReviewGateInteractor` 等）に `impl-plan.json` を読む secondary port を追加し、`task-contract.json` の attribution を impl-plan.json のタスク状態（todo / in_progress / done）でフィルタする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "ImplPlanReaderPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-09",
+          "text_label": "usecase 層への `ImplPlanReaderPort`（secondary port）追加: `bin/sotp task-contract check` の usecase 層（`PreReviewGateInteractor` 等）に `impl-plan.json` を読む secondary port を追加し、`task-contract.json` の attribution を impl-plan.json のタスク状態（todo / in_progress / done）でフィルタする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b5304cac25fe94caba2645443bc72ee8917604b3836ec6be926e6fe09cbbf012",
+      "evidence_hash": "0635256c1afb73b788d9b65d2a8ecde86d0c85f8a0fe21d138ec6969917b8f41",
+      "verdict": {
+        "kind": "pass",
+        "citation": "現在のタスク（in_progress）と完了済タスク（done）に帰属するエントリの impl_catalog 信号を既存信号テーブルと entry キーで JOIN し、全エントリが 🔵 かを確認する。判定対象タスクは `impl-plan.json` のタスク状態を参照して特定する。`--track-id` 引数が省略された場合は現在の git ブランチ (`track/<id>` 形式) から active track を auto-resolve する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -213,17 +645,17 @@
         "kind": "spec_element",
         "data": {
           "section": "in_scope",
-          "element_id": "IN-03",
-          "text_label": "attribution の complete relation invariant 検証: (a) review scope 内の関連カタログ entry が全て ≥1 タスクに attribution されていること、(b) orphan entry（review scope 内だがどのタスクにも attribution されていない関連 entry）が存在しないこと、(c) attribution された entry がカタログに実在し当該 scope 内であること（referential integrity）。"
+          "element_id": "IN-04",
+          "text_label": "pre-review blocking binary check ゲートの実装（`bin/sotp task-contract check`）: 現在のタスク（in_progress）と完了済タスク（done）に帰属するエントリの impl_catalog 信号を既存信号テーブルと entry キーで JOIN し、全エントリが 🔵 かを確認する。判定対象タスクは `impl-plan.json` のタスク状態を参照して特定する。`--track-id` 引数が省略された場合は現在の git ブランチ (`track/<id>` 形式) から active track を auto-resolve する。ゲートは fail-closed（artifact 不在・非 🔵 エントリ存在のいずれでもブロック）。todo タスクに帰属するエントリは 🔵 必須の対象からは外すが、🔴 はタスク状態に関わらず常にブロックし、🟡 のみ未着手として許容する。"
         }
       }
     },
     {
-      "claim_hash": "e9ab494bd7b9beb2e3ace363bc13833851f1c90fc9f75124250df714738507d2",
-      "evidence_hash": "0328c46d2ea160bdb4a50550c0994bb547d768770ee5f2477759e71e1eccceb6",
+      "claim_hash": "b5304cac25fe94caba2645443bc72ee8917604b3836ec6be926e6fe09cbbf012",
+      "evidence_hash": "a87c1a1900f39923c1f2cde1331119d57154050bb2f44a42ab895d1fae109e63",
       "verdict": {
         "kind": "pass",
-        "citation": "attribution の complete relation invariant が機械的に検証可能である: (a) review scope 内の関連カタログ entry が全て ≥1 タスクに attribution されている、(b) orphan entry が存在しない、(c) attribution 対象 entry がカタログに実在し scope 内である。invariant 違反時にゲートが非ゼロ終了コードで返り、違反内容（orphan entry リスト・存在しない entry 識別子）を出力する。"
+        "citation": "「現在のタスク（in_progress）と完了済タスク（done）に帰属するエントリの impl_catalog 信号が全て 🔵 のとき、ゲートが unit/binary OK としてパスする。todo タスクに帰属するエントリの 🟡 はパス条件に影響しない。🔴 エントリはタスク状態に関わらず常にゲートをブロックし」"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -237,13 +669,13 @@
         "kind": "spec_element",
         "data": {
           "section": "acceptance_criteria",
-          "element_id": "AC-02",
-          "text_label": "attribution の complete relation invariant が機械的に検証可能である: (a) review scope 内の関連カタログ entry が全て ≥1 タスクに attribution されている、(b) orphan entry が存在しない、(c) attribution 対象 entry がカタログに実在し scope 内である。invariant 違反時にゲートが非ゼロ終了コードで返り、違反内容（orphan entry リスト・存在しない entry 識別子）を出力する。"
+          "element_id": "AC-04",
+          "text_label": "現在のタスク（in_progress）と完了済タスク（done）に帰属するエントリの impl_catalog 信号が全て 🔵 のとき、ゲートが unit/binary OK としてパスする。todo タスクに帰属するエントリの 🟡 はパス条件に影響しない。🔴 エントリはタスク状態に関わらず常にゲートをブロックし、非 🔵 エントリの一覧と信号状態を出力する。"
         }
       }
     },
     {
-      "claim_hash": "9f7f19a235071e7e4d9e45933ddfb0c1f08b940868cfa50eb5642f091969559e",
+      "claim_hash": "688ccb29e9744760209688817b636d38b96d800e8266b957754debe07390a1fa",
       "evidence_hash": "443217435b97a1d007284f3c64a7c38ea0650489d73e3f8ae6b4cf2de635f685",
       "verdict": {
         "kind": "pass",
@@ -267,11 +699,11 @@
       }
     },
     {
-      "claim_hash": "9f7f19a235071e7e4d9e45933ddfb0c1f08b940868cfa50eb5642f091969559e",
-      "evidence_hash": "804aac23c761cf53a1f9eebd865037751bbaf86dde5b06d0a87bb2c2e26f62de",
+      "claim_hash": "688ccb29e9744760209688817b636d38b96d800e8266b957754debe07390a1fa",
+      "evidence_hash": "d2156ec6a3d64618f3e0422a6781df8d24b6cfba9eb32fec0df2dede63bf3b76",
       "verdict": {
         "kind": "pass",
-        "citation": "attribution は review scope 内の全関連カタログ entry に対する complete relation でなければならない。"
+        "citation": "attribution は型カタログの全エントリに対する complete relation でなければならない。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -286,7 +718,7 @@
         "data": {
           "section": "constraint",
           "element_id": "CN-01",
-          "text_label": "attribution は review scope 内の全関連カタログ entry に対する complete relation でなければならない。orphan entry（scope 内で attribution されていない関連 entry）が存在する場合、その entry の impl_catalog 信号がゲート入力から漏れ shift-left の保証が崩れるため、ゲートは orphan 検出時に明示的にブロックする。"
+          "text_label": "attribution は型カタログの全エントリに対する complete relation でなければならない。orphan entry（どのタスクにも attribution されていないカタログ entry）が存在する場合、その entry の impl_catalog 信号がゲート入力から漏れ shift-left の保証が崩れるため、ゲートは orphan 検出時に明示的にブロックする。"
         }
       }
     }

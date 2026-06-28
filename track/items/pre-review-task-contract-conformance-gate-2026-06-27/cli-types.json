@@ -34,9 +34,10 @@
       },
       "methods": [],
       "module_path": "",
-      "docs": "Top-level sotp CLI command dispatcher. Routes sotp subcommands to their respective handlers. TaskContract variant added by this track (T005) to expose the pre-review conformance gate check (sotp task-contract check).",
+      "docs": "Top-level sotp CLI command dispatcher. Routes sotp subcommands to their respective handlers. TaskContract variant added by this track to expose the pre-review conformance gate subcommands (sotp task-contract check and sotp task-contract coverage).",
       "spec_refs": [
-        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-04" }
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-07" }
       ],
       "informal_grounds": []
     },
@@ -52,15 +53,25 @@
               "kind": "tuple",
               "fields": ["TaskContractCheckArgs"]
             }
+          },
+          {
+            "name": "Coverage",
+            "payload": {
+              "kind": "tuple",
+              "fields": ["TaskContractCoverageArgs"]
+            }
           }
         ]
       },
       "methods": [],
       "module_path": "commands::task_contract",
-      "docs": "Subcommands for `sotp task-contract`. Check: run the pre-review conformance gate check for the given optional TDDD layer and track. When --layer is omitted, all 6 canonical TDDD layers are checked in sequence and their violations combined.",
+      "docs": "Subcommands for `sotp task-contract`. Check: run the pre-review liveness gate check for the given optional TDDD layer and track. Coverage: run the attribution-completeness coverage check for the given track. When --track-id is omitted for either subcommand, the active track is auto-resolved from the current git branch (track/<id>).",
       "spec_refs": [
         { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-04" },
-        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-03" }
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-07" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "CN-07" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-03" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-08" }
       ],
       "informal_grounds": []
     },
@@ -81,10 +92,33 @@
       },
       "methods": [],
       "module_path": "commands::task_contract",
-      "docs": "Arguments for `sotp task-contract check`. layer: optional TDDD layer (domain, usecase, infrastructure, cli_driver, cli, or cli_composition) identifying the layer signal document to check; passed as an opaque CLI string validated as LayerId in the primary adapter; when omitted (None), all 6 canonical TDDD layers are iterated internally and their results combined. track_id: active track identifier (also opaque at this boundary). items_dir: path to the track items directory; defaults to 'track/items' (same default convention as all other track-reading commands in this workspace).",
+      "docs": "Arguments for `sotp task-contract check`. layer: optional TDDD layer (domain, usecase, infrastructure, cli_driver, cli, or cli_composition) identifying the layer signal document to check; passed as an opaque CLI string validated as LayerId in the primary adapter; when omitted (None), all 6 canonical TDDD layers are iterated internally and their results combined. track_id: active track identifier (also opaque at this boundary); when omitted, auto-resolved from the current git branch (track/<id>). items_dir: path to the track items directory; defaults to 'track/items'.",
       "spec_refs": [
         { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-04" },
         { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-03" }
+      ],
+      "informal_grounds": []
+    },
+    "TaskContractCoverageArgs": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "track_id", "ty": "Option<String>" },
+            { "name": "items_dir", "ty": "std::path::PathBuf" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "commands::task_contract",
+      "docs": "Arguments for `sotp task-contract coverage`. track_id: active track identifier (opaque CLI string); when omitted, auto-resolved from the current git branch (track/<id>). items_dir: path to the track items directory; defaults to 'track/items'. Coverage checks all 6 canonical TDDD layers simultaneously (no per-layer flag; attribution completeness is a whole-catalogue invariant that cannot be checked per-layer in isolation).",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-07" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-08" }
       ],
       "informal_grounds": []
     }
@@ -101,9 +135,10 @@
       "is_async": false,
       "generics": [],
       "where_predicates": [],
-      "docs": "Dispatch `sotp task-contract <subcommand>` to the appropriate execute_* handler.",
+      "docs": "Dispatch `sotp task-contract <subcommand>` to the appropriate execute_* handler. Check dispatches to execute_task_contract_check; Coverage dispatches to execute_task_contract_coverage.",
       "spec_refs": [
-        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-04" }
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-07" }
       ],
       "informal_grounds": []
     },
@@ -121,6 +156,23 @@
       "spec_refs": [
         { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-04" },
         { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-03" }
+      ],
+      "informal_grounds": []
+    },
+    "cli::commands::task_contract::execute_task_contract_coverage": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "args", "ty": "TaskContractCoverageArgs" }
+      ],
+      "returns": "std::process::ExitCode",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Execute `sotp task-contract coverage`. Resolves track_id (auto from track/<id> branch when not explicit), constructs a TaskContractCompositionRoot, calls task_contract_coverage(track_id, items_dir), and converts the CommandOutcome to a process ExitCode (0 on Passed, non-zero on Blocked or error).",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-07" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-08" }
       ],
       "informal_grounds": []
     },
@@ -151,6 +203,10 @@
     { "action": "add", "trait_ref": "core::fmt::Debug",                             "for_type": "TaskContractCheckArgs" },
     { "action": "add", "trait_ref": "core::clone::Clone",                           "for_type": "TaskContractCheckArgs" },
     { "action": "add", "trait_ref": "clap_builder::derive::Args",                   "for_type": "TaskContractCheckArgs" },
-    { "action": "add", "trait_ref": "clap_builder::derive::FromArgMatches",         "for_type": "TaskContractCheckArgs" }
+    { "action": "add", "trait_ref": "clap_builder::derive::FromArgMatches",         "for_type": "TaskContractCheckArgs" },
+    { "action": "add", "trait_ref": "core::fmt::Debug",                             "for_type": "TaskContractCoverageArgs" },
+    { "action": "add", "trait_ref": "core::clone::Clone",                           "for_type": "TaskContractCoverageArgs" },
+    { "action": "add", "trait_ref": "clap_builder::derive::Args",                   "for_type": "TaskContractCoverageArgs" },
+    { "action": "add", "trait_ref": "clap_builder::derive::FromArgMatches",         "for_type": "TaskContractCoverageArgs" }
   ]
 }

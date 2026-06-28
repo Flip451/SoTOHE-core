@@ -1,36 +1,56 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "a5b54ff085b972f471868ab5d28487936b91839ca56b838e29539cbf6c82773d",
+  "catalogue_declaration_hash": "f37f27d5d9f5bf991b1d305015e5293d094b25caa37cbf516a8901b7d1abd85b",
   "signals": [
+    {
+      "type_name": "CoverageVerifyCommand",
+      "signal": "blue",
+      "entry_hash": "54b228fca510bab5dcbda38d322b32196b4b0a529aa87bb22b0e05903b2e8231"
+    },
+    {
+      "type_name": "CoverageVerifyInteractor",
+      "signal": "blue",
+      "entry_hash": "ac632febd65ebac0169ccb109a0da00b4c93a317128cdc03f5055d8857320e21"
+    },
     {
       "type_name": "PreReviewGateCommand",
       "signal": "blue",
-      "entry_hash": "e20294086579500054d433cd692c289d6207adeeab053e53cb6691298e8983ed"
+      "entry_hash": "e10ccd73288f8cc93ea86b631706bfd0985adc67617d9eb921b266ba7e1649a7"
     },
     {
       "type_name": "PreReviewGateError",
       "signal": "blue",
-      "entry_hash": "ec286d56dbe4bb5d995b6602b04aa931c70f63f97c786dddd2e2d9b8b6686fdb"
+      "entry_hash": "18feb1a211464131c5e381d6b81b08088c9e34fe139e725d67259884a4c26606"
     },
     {
       "type_name": "PreReviewGateInteractor",
       "signal": "blue",
-      "entry_hash": "5228b70c1dfa961751b4432ffb027448afdc7f4d7225a249e8d90f4e6023cf82"
+      "entry_hash": "0b41b63eded72ffb06615aa29f81735cf34d2d0153ab7e5c04fb74a48f4d70c0"
+    },
+    {
+      "type_name": "CoverageVerifyService",
+      "signal": "blue",
+      "entry_hash": "cbebc70c27259c6d13f52bf964c1dd8189cde87b18426f4b79ffdcef65e80c6e"
     },
     {
       "type_name": "ImplCatalogSignalReaderPort",
       "signal": "blue",
-      "entry_hash": "e08bb0a2dc9c06704e5e43ce711047d491780cf8d7b4b63efc088c03bcb47175"
+      "entry_hash": "adba7815c04b9b321312ffe87a310ad5c4b137ed8415d14ef8dd91cf8221122f"
+    },
+    {
+      "type_name": "ImplPlanReaderPort",
+      "signal": "blue",
+      "entry_hash": "0178ea7cd9ff4c3c39a568e8eb52a2e52e6814e822353bde86baff48368becda"
     },
     {
       "type_name": "PreReviewGateService",
       "signal": "blue",
-      "entry_hash": "e9ab494bd7b9beb2e3ace363bc13833851f1c90fc9f75124250df714738507d2"
+      "entry_hash": "b5304cac25fe94caba2645443bc72ee8917604b3836ec6be926e6fe09cbbf012"
     },
     {
       "type_name": "TaskContractReaderPort",
       "signal": "blue",
-      "entry_hash": "9f7f19a235071e7e4d9e45933ddfb0c1f08b940868cfa50eb5642f091969559e"
+      "entry_hash": "688ccb29e9744760209688817b636d38b96d800e8266b957754debe07390a1fa"
     }
   ]
 }

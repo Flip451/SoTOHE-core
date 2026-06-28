@@ -1,16 +1,16 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "25d7f1292de6f3d02b654c20b4193cda8ccc59e90677086cd5e020e00cc2110b",
+  "catalogue_declaration_hash": "83959aaf275f0085349d5cf5bbb5e79200f1416e906be25ad1853c0fc9da2ae6",
   "signals": [
     {
       "type_name": "TaskContractDriver",
       "signal": "blue",
-      "entry_hash": "d9df6e8f6eef75472f0c5e5a1603da457a3adda93b510d7689dc72f0947b4818"
+      "entry_hash": "3b767d92aa2f87bd9bec7914aa69cc9410eda8d9fea1d6d8739b2f2c8d1f8a4d"
     },
     {
       "type_name": "TaskContractInput",
       "signal": "blue",
-      "entry_hash": "ef19974b9998f64c6fb0e7385713bc963c71298c8951ffbf0f00fa56a698d3fa"
+      "entry_hash": "a70a6ca86a768daf3fec1e4d043824b5d25bd6e938eef22d8ca126bb1db8ec21"
     }
   ]
 }

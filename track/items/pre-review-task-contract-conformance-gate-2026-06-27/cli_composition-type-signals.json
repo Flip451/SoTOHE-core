@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-28T03:29:16Z",
-  "declaration_hash": "91e24add6c4d3d2d8d3d390d1bf241c31f47ff3a01037f2c9806d2b7daae41b7",
+  "generated_at": "2026-06-28T13:35:09Z",
+  "declaration_hash": "60bfa979124c9bc3322973bf2287f26603148a145eec941366f72b3494ffcb82",
   "signals": [
     {
       "type_name": "TaskContractCompositionRoot",

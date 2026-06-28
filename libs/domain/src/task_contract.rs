@@ -111,19 +111,55 @@ impl TaskContractDocument {
 // PreReviewGateViolation
 // ---------------------------------------------------------------------------
 
-/// A single gate violation found during pre-review conformance checking.
+/// A single liveness-gate violation found during `bin/sotp task-contract check`.
 ///
+/// Narrowed to check-specific violations after D5 split:
+/// - `MissingTaskContract`: `task-contract.json` is absent, gate cannot proceed.
+/// - `NonBlueSignal`: an attributed entry for a current/done task has a
+///   non-blue `impl_catalog` signal.
+///
+/// Attribution violations (`OrphanEntry`, `InvalidEntryRef`) moved to
+/// [`CoverageViolation`] used by the `coverage` subcommand.
 /// Modelled as a finding record (`ValueObject`), not an error type: it is data
 /// carried inside [`PreReviewGateOutcome::Blocked`].
-/// `InvalidEntryRef.reason` is an opaque diagnostic string with no domain
-/// invariant (R9 exception: error message string).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum PreReviewGateViolation {
     /// `task-contract.json` is absent for the given track.
     MissingTaskContract,
 
-    /// A scope-relevant catalogue entry has no task attribution in
-    /// `task-contract.json` for the reviewed layer.
+    /// A contracted entry exists in the `TypeSignalsDocument` but its
+    /// `impl_catalog` signal is not `Blue` for a current/done task.
+    NonBlueSignal {
+        /// The contracted entry whose signal is not blue.
+        entry: ContractedEntryRef,
+        /// The actual confidence signal recorded in the type-signals document.
+        signal: crate::ConfidenceSignal,
+    },
+}
+
+// ---------------------------------------------------------------------------
+// CoverageViolation
+// ---------------------------------------------------------------------------
+
+/// A single attribution-completeness violation found during
+/// `bin/sotp task-contract coverage`.
+///
+/// - `MissingTaskContract`: `task-contract.json` is absent, coverage check
+///   cannot proceed (fail-closed).
+/// - `OrphanEntry`: a catalogue entry exists but is not attributed to any task
+///   in `task-contract.json` (attribution completeness failure).
+/// - `InvalidEntryRef`: an entry attributed in `task-contract.json` does not
+///   exist in the current catalogue (referential integrity failure).
+///   `reason` is an opaque diagnostic string (R9 exception: error message).
+///
+/// These violations are data inside [`CoverageVerifyOutcome::Blocked`].
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum CoverageViolation {
+    /// `task-contract.json` is absent for the given track.
+    MissingTaskContract,
+
+    /// A catalogue entry exists but has no task attribution in
+    /// `task-contract.json`.
     OrphanEntry {
         /// The catalogue entry that has no corresponding task attribution.
         entry: ContractedEntryRef,
@@ -137,52 +173,83 @@ pub enum PreReviewGateViolation {
         /// Opaque diagnostic message explaining why the reference is invalid.
         reason: String,
     },
-
-    /// A contracted entry exists in the `TypeSignalsDocument` but its
-    /// `impl_catalog` signal is not `Blue`.
-    NonBlueSignal {
-        /// The contracted entry whose signal is not blue.
-        entry: ContractedEntryRef,
-        /// The actual confidence signal recorded in the type-signals document.
-        signal: crate::ConfidenceSignal,
-    },
 }
 
 // ---------------------------------------------------------------------------
 // PreReviewGateOutcome
 // ---------------------------------------------------------------------------
 
-/// Outcome of the pre-review gate check.
+/// Outcome of the `bin/sotp task-contract check` liveness gate.
 ///
-/// `Passed` carries a human-readable conformance summary to be appended to the
-/// reviewer briefing (`IN-06`, `GO-04`). `Blocked` carries all violations found.
-/// `conformance_summary` is an opaque prose string with no cross-domain identity
-/// (R9: content of the summary is not a domain concept).
+/// `Passed` is a binary OK signal — all current/done attributed entries have
+/// blue `impl_catalog` signals, no further data attached. `Blocked` carries
+/// the list of liveness violations (`MissingTaskContract`, `NonBlueSignal`).
+/// The `Blocked` variant is `#[non_exhaustive]`. Use
+/// [`PreReviewGateOutcome::blocked`] to construct a `Blocked` outcome so the
+/// non-empty invariant is checked.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum PreReviewGateOutcome {
-    /// All contracted entries have blue impl_catalog signals.
-    Passed {
-        /// Human-readable conformance summary to be prepended to the reviewer briefing.
-        conformance_summary: String,
-    },
-    /// One or more gate violations were found.
+    /// All current/done attributed entries have blue impl_catalog signals.
+    Passed,
+    /// One or more liveness gate violations were found.
     ///
     /// Use [`PreReviewGateOutcome::blocked`] to construct this variant so the
     /// non-empty invariant is checked at the crate boundary.
     #[non_exhaustive]
     Blocked {
-        /// All violations collected during the gate check.
+        /// All liveness violations collected during the gate check.
         violations: Vec<PreReviewGateViolation>,
     },
 }
 
 impl PreReviewGateOutcome {
-    /// Constructs a blocked outcome with at least one violation.
+    /// Constructs a blocked outcome with at least one liveness violation.
     ///
     /// # Errors
     ///
     /// Returns [`ValidationError::EmptyString`] when `violations` is empty.
     pub fn blocked(violations: Vec<PreReviewGateViolation>) -> Result<Self, ValidationError> {
+        if violations.is_empty() {
+            return Err(ValidationError::EmptyString);
+        }
+        Ok(Self::Blocked { violations })
+    }
+}
+
+// ---------------------------------------------------------------------------
+// CoverageVerifyOutcome
+// ---------------------------------------------------------------------------
+
+/// Outcome of the `bin/sotp task-contract coverage` attribution-completeness check.
+///
+/// `Passed` means all catalogue entries are attributed to at least one task,
+/// and all attributed entries exist in the catalogue. `Blocked` carries the
+/// list of attribution violations (`MissingTaskContract`, `OrphanEntry`,
+/// `InvalidEntryRef`). The `Blocked` variant is `#[non_exhaustive]`. Use
+/// [`CoverageVerifyOutcome::blocked`] to construct a `Blocked` outcome so the
+/// non-empty invariant is checked.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum CoverageVerifyOutcome {
+    /// All catalogue entries are attributed and referentially consistent.
+    Passed,
+    /// One or more attribution-completeness violations were found.
+    ///
+    /// Use [`CoverageVerifyOutcome::blocked`] to construct this variant so the
+    /// non-empty invariant is checked at the crate boundary.
+    #[non_exhaustive]
+    Blocked {
+        /// All attribution violations collected during the coverage check.
+        violations: Vec<CoverageViolation>,
+    },
+}
+
+impl CoverageVerifyOutcome {
+    /// Constructs a blocked outcome with at least one attribution-completeness violation.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`ValidationError::EmptyString`] when `violations` is empty.
+    pub fn blocked(violations: Vec<CoverageViolation>) -> Result<Self, ValidationError> {
         if violations.is_empty() {
             return Err(ValidationError::EmptyString);
         }
@@ -272,15 +339,52 @@ mod tests {
         let c = v.clone();
         assert_eq!(v, c);
 
-        let v2 = PreReviewGateViolation::OrphanEntry { entry: sample_entry() };
+        let v2 = PreReviewGateViolation::NonBlueSignal {
+            entry: sample_entry(),
+            signal: crate::ConfidenceSignal::Yellow,
+        };
         let c2 = v2.clone();
         assert_eq!(v2, c2);
     }
 
     #[test]
+    fn coverage_violation_debug_and_clone() {
+        let v = CoverageViolation::MissingTaskContract;
+        assert_eq!(v.clone(), v);
+
+        let v2 = CoverageViolation::OrphanEntry { entry: sample_entry() };
+        assert_eq!(v2.clone(), v2);
+
+        let v3 = CoverageViolation::InvalidEntryRef {
+            entry: sample_entry(),
+            reason: "not found".to_owned(),
+        };
+        assert_eq!(v3.clone(), v3);
+    }
+
+    #[test]
+    fn coverage_verify_outcome_passed() {
+        let outcome = CoverageVerifyOutcome::Passed;
+        assert!(matches!(outcome, CoverageVerifyOutcome::Passed));
+    }
+
+    #[test]
+    fn coverage_verify_outcome_blocked() {
+        let outcome =
+            CoverageVerifyOutcome::blocked(vec![CoverageViolation::MissingTaskContract]).unwrap();
+        assert!(matches!(outcome, CoverageVerifyOutcome::Blocked { .. }));
+    }
+
+    #[test]
+    fn coverage_verify_outcome_rejects_empty_blocked_violations() {
+        let result = CoverageVerifyOutcome::blocked(Vec::new());
+        assert!(result.is_err());
+    }
+
+    #[test]
     fn pre_review_gate_outcome_passed() {
-        let outcome = PreReviewGateOutcome::Passed { conformance_summary: "all blue".to_owned() };
-        assert!(matches!(outcome, PreReviewGateOutcome::Passed { .. }));
+        let outcome = PreReviewGateOutcome::Passed;
+        assert!(matches!(outcome, PreReviewGateOutcome::Passed));
     }
 
     #[test]

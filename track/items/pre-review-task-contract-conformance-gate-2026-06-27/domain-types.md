@@ -4,8 +4,10 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
+| CoverageVerifyOutcome | enum | add | Passed, Blocked | 🔵 | 🔵 |
+| CoverageViolation | enum | add | MissingTaskContract, OrphanEntry, InvalidEntryRef | 🔵 | 🔵 |
 | PreReviewGateOutcome | enum | add | Passed, Blocked | 🔵 | 🔵 |
-| PreReviewGateViolation | enum | add | MissingTaskContract, OrphanEntry, InvalidEntryRef, NonBlueSignal | 🔵 | 🔵 |
+| PreReviewGateViolation | enum | add | MissingTaskContract, NonBlueSignal | 🔵 | 🔵 |
 
 ## Value Objects
 

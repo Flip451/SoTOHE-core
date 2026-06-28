@@ -4,7 +4,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| TaskContractInput | enum | add | Check | 🔵 | 🔵 |
+| TaskContractInput | enum | add | Check, Coverage | 🔵 | 🔵 |
 
 ## Primary Adapters
 

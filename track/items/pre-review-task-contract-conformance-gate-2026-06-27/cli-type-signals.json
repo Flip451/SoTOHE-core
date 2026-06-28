@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-28T03:29:13Z",
-  "declaration_hash": "1173465cf2303c9aef3bd4f3e8359431ca6abbc66d35ac2bfbefcf961e3c4b0b",
+  "generated_at": "2026-06-28T13:35:06Z",
+  "declaration_hash": "70cc8781c7cf5cfd2cbddee45a4bf6f51f4b5f511cbab382cc1f609c75ac66bf",
   "signals": [
     {
       "type_name": "CliCommand",
@@ -34,6 +34,18 @@
       ]
     },
     {
+      "type_name": "TaskContractCoverageArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "clap_builder::derive::Args",
+        "clap_builder::derive::FromArgMatches",
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
+    },
+    {
       "type_name": "cli::commands::task_contract::detect_active_track_from_branch_cwd",
       "kind_tag": "free_function",
       "signal": "blue",
@@ -47,6 +59,12 @@
     },
     {
       "type_name": "cli::commands::task_contract::execute_task_contract_check",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::task_contract::execute_task_contract_coverage",
       "kind_tag": "free_function",
       "signal": "blue",
       "found_type": true
