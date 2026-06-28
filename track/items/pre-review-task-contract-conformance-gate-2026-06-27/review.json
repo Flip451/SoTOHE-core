@@ -1,6 +1,144 @@
 {
   "schema_version": 2,
   "scopes": {
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c1710adc9047981e16a2e2c53cdbec58d4ffa31f931f63f7f01c68a6b0dfe914",
+          "at": "2026-06-27T13:47:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c1710adc9047981e16a2e2c53cdbec58d4ffa31f931f63f7f01c68a6b0dfe914",
+          "at": "2026-06-27T13:52:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5f325deb0bafec9596ff2af1fef0a16a19b5ef8644288eaed8763aff13bebc8c",
+          "at": "2026-06-27T14:29:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5f325deb0bafec9596ff2af1fef0a16a19b5ef8644288eaed8763aff13bebc8c",
+          "at": "2026-06-27T14:32:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c10814f8285d01927215342f8d85b91d8a5a414cffe9435a9487bce5ec85b5d9",
+          "at": "2026-06-27T16:09:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c10814f8285d01927215342f8d85b91d8a5a414cffe9435a9487bce5ec85b5d9",
+          "at": "2026-06-27T16:12:21Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cc0d115b6bb167040272c41f983e7e930caa32425e32f2cfee94ffee30f9eb6a",
+          "at": "2026-06-27T13:47:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TaskContractDocument::new` documents that a contract with no attributed entries is invalid, but it only rejects an empty map. A value like `{ T001: vec![] }` is accepted even though it contains zero `ContractedEntryRef`s, so the domain type can represent the fail-closed-empty contract the constructor claims to reject. Tighten the constructor to reject no actual attributions, and likely empty per-task lists as well.",
+              "severity": "P1",
+              "file": "libs/domain/src/task_contract.rs",
+              "line": 83,
+              "category": "broken invariant in newtype constructor"
+            },
+            {
+              "message": "`Blocked` is documented as carrying one or more gate violations, but the public variant stores a raw `Vec<PreReviewGateViolation>`, so callers can construct `PreReviewGateOutcome::Blocked { violations: vec![] }`. That makes an illegal gate state representable; follow the project’s non-empty findings pattern with a validated non-empty wrapper or constructor.",
+              "severity": "P1",
+              "file": "libs/domain/src/task_contract.rs",
+              "line": 169,
+              "category": "primitive obsession"
+            }
+          ],
+          "hash": "rvw1:sha256:cc0d115b6bb167040272c41f983e7e930caa32425e32f2cfee94ffee30f9eb6a",
+          "at": "2026-06-27T13:53:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `PreReviewGateOutcome::blocked()` validates that `violations` is non-empty, but the `Blocked { violations: Vec<_> }` variant is public and can still be constructed directly with `vec![]`. That means the returned type does not encode the invariant the constructor just checked, so the non-empty gate result can be bypassed at the API boundary.",
+              "severity": "P1",
+              "file": "libs/domain/src/task_contract.rs",
+              "line": 173,
+              "category": "typestate / parse-don't-validate gap"
+            }
+          ],
+          "hash": "rvw1:sha256:fd1304d844f5bdf07e8c097d917931c8bcfe6dfa46481965d066bcfb89040f97",
+          "at": "2026-06-27T14:29:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`PreReviewGateOutcome::Blocked` no longer matches the tracked domain contract: the variant lost `#[non_exhaustive]` and its payload type changed from `Vec<PreReviewGateViolation>` to the new `PreReviewGateViolations` wrapper. That diverges from `track/items/pre-review-task-contract-conformance-gate-2026-06-27/domain-types.json` and breaks consumers generated against the declared shape.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/domain/src/task_contract.rs",
+              "line": 217,
+              "category": "catalogue-contract"
+            }
+          ],
+          "hash": "rvw1:sha256:9fc1eb27af24e4ea5a2d676c4f0d065fe04b6e8934e2ca420f14fbf4ad9271cc",
+          "at": "2026-06-27T14:37:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`PreReviewGateOutcome::Blocked` no longer matches the declared domain contract: `domain-types.json` says the payload is `Vec<PreReviewGateViolation>` (and marks the variant non-exhaustive), but this implementation exposes the new public `PreReviewGateViolations` wrapper instead. That breaks shape parity for generated consumers and makes the domain API diverge from the catalog the rest of the track is built against.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/domain/src/task_contract.rs",
+              "line": 217,
+              "category": "typestate / parse-don't-validate gap"
+            }
+          ],
+          "hash": "rvw1:sha256:9fc1eb27af24e4ea5a2d676c4f0d065fe04b6e8934e2ca420f14fbf4ad9271cc",
+          "at": "2026-06-27T14:54:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fd1304d844f5bdf07e8c097d917931c8bcfe6dfa46481965d066bcfb89040f97",
+          "at": "2026-06-27T15:02:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fd1304d844f5bdf07e8c097d917931c8bcfe6dfa46481965d066bcfb89040f97",
+          "at": "2026-06-27T15:07:01Z"
+        }
+      ]
+    },
     "cli_composition": {
       "rounds": [
         {
@@ -61,452 +199,195 @@
         }
       ]
     },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:14d8205a81db5609a9e50d81a704134e95ea462fcb24f4c40a4fa62ae7fdbde4",
-          "at": "2026-06-27T13:45:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:14d8205a81db5609a9e50d81a704134e95ea462fcb24f4c40a4fa62ae7fdbde4",
-          "at": "2026-06-27T13:49:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3f94ef835677874e6d60897ad815f3f03eb567d33080dd15428c44a61d99e3be",
-          "at": "2026-06-27T16:09:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3f94ef835677874e6d60897ad815f3f03eb567d33080dd15428c44a61d99e3be",
-          "at": "2026-06-27T16:12:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e9d8db98c6703e49f7c67004e0e62004d030a63afa5f5184c2a26428a07bb1e6",
-          "at": "2026-06-27T16:45:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e9d8db98c6703e49f7c67004e0e62004d030a63afa5f5184c2a26428a07bb1e6",
-          "at": "2026-06-27T16:47:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:53fb2b5aa5ee3032561d9e39cf23810a0fcd813c4a1883b26d07dfdd97e1f044",
-          "at": "2026-06-28T02:29:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:53fb2b5aa5ee3032561d9e39cf23810a0fcd813c4a1883b26d07dfdd97e1f044",
-          "at": "2026-06-28T02:32:40Z"
-        }
-      ]
-    },
-    "harness-policy": {
+    "infrastructure": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The ownership paragraph is stale: it still says this capability owns only `impl-plan.json` and `task-coverage.json`, but the same file now declares `task-contract.json` as a third Phase 3 artifact and allows writing it. That leaves the harness contract internally inconsistent about what `impl-planner` owns.",
+              "message": "This adapter reads `<items_dir>/<track_id>/task-contract.json` directly with `std::fs::read` and never rejects symlinks on the leaf or ancestor chain. A symlinked track directory or file can redirect the pre-review gate to attacker-controlled content; the existing filesystem loaders in this repo use `symlink_metadata`/`reject_symlinks_below` and fail closed here.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.harness/capabilities/impl-planner.md",
-              "line": 25,
-              "category": "convention contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:5c88d3e73fd515fed176ee8772485ed7fd45327646121cd4cd5e663dd7889ff3",
-          "at": "2026-06-27T13:46:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c0b457c465272b82b435c5f3966b08fd7ac30a457868f939c97e28709ed3614f",
-          "at": "2026-06-27T13:50:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c0b457c465272b82b435c5f3966b08fd7ac30a457868f939c97e28709ed3614f",
-          "at": "2026-06-27T13:54:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new gate parses `--group`, but the actual review-fix wrapper contract still uses `--scope` on the caller side and `bin/sotp review fix-local` itself expects `--scope`. That means the pre-review gate is unreachable for the documented invocation path, and any invocation that does pass `--group` will be forwarded unchanged to `review fix-local` and fail there. The task-contract check/briefing append therefore does not wire into the real fix workflow.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/Makefile.toml",
-              "line": 645,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:39d377d23f43855d211805b91d2b48cf61edc815f2be47191afd8c7ed27c1a2a",
-          "at": "2026-06-27T15:22:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3c836db749917efcff22cb7ef95cc71d527d891eb4ae2af510928f6a237f6f2a",
-          "at": "2026-06-27T15:24:42Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d4aff7afa048fea304d3b0653c95ecbf55bb7957838277f3a9d60c603f77e87c",
-          "at": "2026-06-27T16:09:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d4aff7afa048fea304d3b0653c95ecbf55bb7957838277f3a9d60c603f77e87c",
-          "at": "2026-06-27T16:12:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3a836ba5b2f6095bcaa921ba37f1c3f609314f369e3fd2017ee4130015644b24",
-          "at": "2026-06-27T23:15:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 3 now makes surfaced PR-review comments non-terminal and requires fixing, committing, and re-running until an explicit zero-findings signal or user-approved Accepted Deviations. However, the stale Behavior summary still describes comments-surfaced as a reportable end state with only an actionability assessment and a next command. Agents following this summary can stop after the first non-pass round, which breaks the new MUST-continue loop contract. Update the Behavior section to report only terminal states and include the per-round trace/fix commits described above.",
-              "severity": "P1",
-              "file": ".claude/commands/track/pr-review.md",
-              "line": 132,
-              "category": "command_wiring_breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:3a836ba5b2f6095bcaa921ba37f1c3f609314f369e3fd2017ee4130015644b24",
-          "at": "2026-06-27T23:18:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 3 still tells the operator to proceed to `/track:commit` after a zero-findings PR review, while the same command's terminal-state report now points to `/track:merge` once 👍 is reached. That leaves two conflicting next-command wirings for the same terminal state; following the older `/track:commit` path after a clean PR review can send the workflow back to the guarded local commit command instead of the CI-gated PR merge flow described by this command and `/track:merge`. Update this terminal-state branch to match the new merge/report behavior.",
-              "severity": "P1",
-              "file": ".claude/commands/track/pr-review.md",
-              "line": 64,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:1c12ec2090613e13e787910cd381cc1a2ffbe831dd2e24a94f443d6e65fe30f9",
-          "at": "2026-06-27T23:21:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f97556ac6ebbffd35cbbb6984ab0821f5e4337fd395b7350fab240246b8a510d",
-          "at": "2026-06-27T23:24:16Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7aed6bbddb1775fd97a4f2ce306b210fd9a2019fd3ae9cbb17b274ab62521d59",
-          "at": "2026-06-27T23:37:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7aed6bbddb1775fd97a4f2ce306b210fd9a2019fd3ae9cbb17b274ab62521d59",
-          "at": "2026-06-27T23:41:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`track-contract-gate` lost the non-`track/<id>` branch guard from the briefing. It now always runs `bin/sotp task-contract check --items-dir track/items`, and that command self-resolves from the current branch and fails on `main`/detached HEAD. As a result, `cargo make track-local-review-fix-codex` now hard-fails outside a track branch instead of skipping cleanly.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/Makefile.toml",
-              "line": 642,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:6a29fe6e3f333921391f380e1976657b31cd7880d2ae3f4fe07f998f6938415a",
-          "at": "2026-06-28T01:55:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`.claude/commands/track/review.md` now tells both fast and final Codex rounds to run `cargo make track-local-review-fix`, and `.claude/settings.json` / `.codex/rules/default.rules` whitelist that same task name, but `Makefile.toml` only defines `[tasks.track-local-review]` at line 655. As written, the orchestrator will invoke a non-existent cargo-make task, while the real task name is not permitted by the sandbox allowlist, so the Codex review path cannot launch.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.claude/commands/track/review.md",
-              "line": 87,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:a22a86482ac02ffe078bdd53bef5402a39ab452675133afe00448f19f7e1ae19",
-          "at": "2026-06-28T02:05:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b904b1feaae141253136a1c716a7aae9cf63fdfed3334c2874d2c6542aac6041",
-          "at": "2026-06-28T02:09:36Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`review-fix-lead-codex.md` still says the `cargo make track-local-review` wrapper chains `track-sync-views` before review, but `Makefile.toml` now wires `track-local-review` through `track-contract-gate` only. That makes the briefing describe a pre-review view sync that no longer happens, so the fixer can run against stale rendered views.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.harness/briefings/review-fix-lead-codex.md",
-              "line": 72,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:8c0e57250c0ed15f567c510570f5eb7ae2e7d0b26efb587c9963b20ab4477ac5",
-          "at": "2026-06-28T02:44:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:786040831b7083b3e915a7fda0028249f4ff87e0a2fa522324764defe12d25f1",
-          "at": "2026-06-28T02:52:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 1 still tells the orchestrator to read `capabilities.review-fix-lead.provider` and choose between launching the Claude subagent directly or the Codex wrapper. That contradicts the new Step 4/5 contract where `/track:review` must always call the provider-agnostic `cargo make track-local-review-fix` wrapper and let the CLI return the exit-64 dispatch instruction for Claude. As written, the command has two inconsistent launch paths, so the Claude path can bypass the new wrapper/dispatch contract.",
-              "severity": "P1",
-              "file": ".claude/commands/track/review.md",
-              "line": 31,
-              "category": "command wiring breakage"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/task_contract_reader.rs",
+              "line": 44,
+              "category": "symlink not rejected at boundary"
             },
             {
-              "message": "The new routing text says the Codex wrapper exits `0` with any `REVIEW_FIX_STATUS` value or `2` for smoke-test failure, but the runner status contract maps `completed` to 0, `blocked_cross_scope` to 2, and `failed` to 1, with smoke-test also using 2 when there is no status sentinel. Step 4/5 therefore omit the exit-1 status path and make exit 2 ambiguous unless stdout is parsed, which can make the orchestrator mishandle `failed` or `blocked_cross_scope` results from `track-local-review-fix`.",
+              "message": "This adapter follows the same unchecked read path for `<items_dir>/<track_id>/<layer>-type-signals.json`. Because there is no boundary symlink rejection before `std::fs::read`, a symlinked `track_id` directory or signal file can bypass the intended real-file semantics used by the other infrastructure readers.",
               "severity": "P1",
-              "file": ".claude/commands/track/review.md",
-              "line": 99,
-              "category": "command wiring breakage"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/impl_catalog_signal_reader.rs",
+              "line": 50,
+              "category": "symlink not rejected at boundary"
             }
           ],
-          "hash": "rvw1:sha256:786040831b7083b3e915a7fda0028249f4ff87e0a2fa522324764defe12d25f1",
-          "at": "2026-06-28T02:58:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:15d2bc9c5436e61591120d26a9949f7774b0c189d2f7cc61c786ead82330a78e",
-          "at": "2026-06-28T03:02:28Z"
-        }
-      ]
-    },
-    "cli_driver": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c1710adc9047981e16a2e2c53cdbec58d4ffa31f931f63f7f01c68a6b0dfe914",
-          "at": "2026-06-27T13:47:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c1710adc9047981e16a2e2c53cdbec58d4ffa31f931f63f7f01c68a6b0dfe914",
-          "at": "2026-06-27T13:52:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5f325deb0bafec9596ff2af1fef0a16a19b5ef8644288eaed8763aff13bebc8c",
-          "at": "2026-06-27T14:29:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5f325deb0bafec9596ff2af1fef0a16a19b5ef8644288eaed8763aff13bebc8c",
-          "at": "2026-06-27T14:32:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c10814f8285d01927215342f8d85b91d8a5a414cffe9435a9487bce5ec85b5d9",
-          "at": "2026-06-27T16:09:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c10814f8285d01927215342f8d85b91d8a5a414cffe9435a9487bce5ec85b5d9",
-          "at": "2026-06-27T16:12:21Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The orphan-detection loop silently drops any signal entry whose `type_name` cannot be converted to `CatalogueEntryKey` (`Err(_) => { ... }`). That branch is reachable because `type_signals_codec::decode` accepts arbitrary `type_name` strings, so a malformed `<layer>-type-signals.json` can contain an uncovered entry that the gate never reports. This makes the gate fail open instead of blocking or surfacing an error.",
-              "severity": "P1",
-              "file": "libs/usecase/src/pre_review_gate.rs",
-              "line": 222,
-              "category": "error handling"
-            }
-          ],
-          "hash": "rvw1:sha256:98d3cee97dc45e07009f480db7930a9074f2ce4dd7909b4207936a6c63aa0f18",
-          "at": "2026-06-27T13:46:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:46ccc45e62b8a34cefec80c76ad613c3a182b16a464bd89708fefd84f59e8f6d",
-          "at": "2026-06-27T13:54:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7a2c0d59210a3afe96d888bb8c3a52b1cf7a98c369f307df5f1a82c396822554",
-          "at": "2026-06-27T14:30:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7a2c0d59210a3afe96d888bb8c3a52b1cf7a98c369f307df5f1a82c396822554",
-          "at": "2026-06-27T14:33:00Z"
+          "hash": "rvw1:sha256:d4f9fb6b11400c46722332f21b1289a90c4234fd8b61c8143711e7e8924fdabe",
+          "at": "2026-06-27T13:47:15Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The `None` branch swallows every `SignalReadFailed`, but `check_layer()` also raises that error for malformed signal documents (for example, invalid `type_name` values are converted to `SignalReadFailed` here). As a result, a corrupt or unreadable layer can be treated as if it simply had no document, and all-layers mode can return `Passed` instead of surfacing the failure.",
+              "message": "Reject `self.items_dir` itself before the below-root walk. `reject_symlinks_below(&path, &self.items_dir)` only checks descendants; if `--items-dir` is a symlink, `task-contract.json` can be read through the redirected root. `FsSpecFileLoader` shows the required fail-closed trusted_root check.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/pre_review_gate.rs",
-              "line": 338,
-              "category": "error handling"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/task_contract_reader.rs",
+              "line": 47,
+              "category": "trusted-root violation"
+            },
+            {
+              "message": "Reject `self.items_dir` itself before the below-root walk. `reject_symlinks_below(&path, &self.items_dir)` only checks descendants; if `--items-dir` is a symlink, `*-type-signals.json` can be read through the redirected root. `FsSpecFileLoader` shows the required fail-closed trusted_root check.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/impl_catalog_signal_reader.rs",
+              "line": 53,
+              "category": "trusted-root violation"
             }
           ],
-          "hash": "rvw1:sha256:dc958872f3aa50aab626e8d8f72055053ee315ec2426f800b1759c9b33645c09",
-          "at": "2026-06-27T16:09:33Z"
+          "hash": "rvw1:sha256:252b27b73c026a765b8eb8147c1cdd6b988b325226a08b26ab09bad83426efa5",
+          "at": "2026-06-27T13:55:58Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "All-layers skip logic keys off the human-readable `message` inside `PreReviewGateError::SignalReadFailed` instead of a typed not-found variant. Because that diagnostic is documented as opaque, a real read/decode failure can be misclassified as a missing document and silently skipped, which breaks the fail-closed behavior in the `None` branch.",
+              "message": "`entries` is deserialized as a plain `BTreeMap`, so duplicate task IDs in `task-contract.json` will be accepted with last-write-wins semantics during `serde_json::from_slice`. That silently drops contracted entries and can make the pre-review gate evaluate a different contract than the file actually encodes. Other strict infrastructure codecs in this repo reject duplicate map keys explicitly; this codec should fail closed too.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/pre_review_gate.rs",
-              "line": 204,
-              "category": "error type confusion"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/task_contract_codec.rs",
+              "line": 78,
+              "category": "serde codec break"
             }
           ],
-          "hash": "rvw1:sha256:0e11154af6a288eb3f0a6c13e4627f031745df3c50c9173c75f91e2e8b404cd5",
-          "at": "2026-06-27T16:16:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`None` mode decides whether to skip a layer by parsing the opaque `PreReviewGateError::SignalReadFailed.message` string. That makes control flow depend on diagnostic text instead of a typed not-found signal, so a genuine read/decode failure can be misclassified as \"missing\" and silently skipped, letting all-layers mode pass when it should fail closed.",
-              "severity": "P1",
-              "file": "libs/usecase/src/pre_review_gate.rs",
-              "line": 204,
-              "category": "error type confusion"
-            }
-          ],
-          "hash": "rvw1:sha256:0e11154af6a288eb3f0a6c13e4627f031745df3c50c9173c75f91e2e8b404cd5",
-          "at": "2026-06-27T16:24:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: `None`-layer mode now depends on `read_optional_signals()`, but this file only adds a default shim that calls `read_signals()`. The production filesystem adapter still reports a missing `*-type-signals.json` as `SignalReadFailed`, so the new all-layers path will still abort on absent layers instead of skipping them silently. The added passing test only uses a mock that overrides the new hook, so it does not cover the real adapter path.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/pre_review_gate.rs",
-              "line": 141,
-              "category": "error handling"
-            }
-          ],
-          "hash": "rvw1:sha256:5a24c9e3a48ad1676b97eb41ebef7eb3641fb4f6ea2c640862d6817e1e3e24d2",
-          "at": "2026-06-27T16:30:42Z"
+          "hash": "rvw1:sha256:d765ae8d718905da3c9535f12f5c38ca1ae6fc1009a634ab1fcc7cbe21e81195",
+          "at": "2026-06-27T14:31:48Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:5a24c9e3a48ad1676b97eb41ebef7eb3641fb4f6ea2c640862d6817e1e3e24d2",
-          "at": "2026-06-27T16:38:21Z"
+          "hash": "rvw1:sha256:51a1afa9b19b3b63c5b77e793cca97cd025fdc3daf2d75c0bdfc7b3e7dfeb908",
+          "at": "2026-06-27T14:39:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`FsTaskContractReader` reads `task-contract.json` with `std::fs::read` after the symlink check, but there is no file-size bound before loading the whole artifact into memory. The infrastructure review policy treats unbounded adapter reads as correctness issues: a malformed or unexpectedly large track artifact can force this gate path to allocate arbitrarily. Add a metadata length check or a bounded reader and map oversize files to `TaskContractReadFailed` before decoding.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/task_contract_reader.rs",
+              "line": 74,
+              "category": "unbounded_read"
+            },
+            {
+              "message": "`FsImplCatalogSignalReader` likewise loads `<layer>-type-signals.json` with unbounded `std::fs::read`. These signal files are adapter-boundary inputs, so the reader should enforce a maximum byte size before allocation/read and return `SignalReadFailed` on oversize input; otherwise a large artifact can exhaust memory during the pre-review gate.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/impl_catalog_signal_reader.rs",
+              "line": 88,
+              "category": "unbounded_read"
+            }
+          ],
+          "hash": "rvw1:sha256:51a1afa9b19b3b63c5b77e793cca97cd025fdc3daf2d75c0bdfc7b3e7dfeb908",
+          "at": "2026-06-27T14:43:09Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:5a24c9e3a48ad1676b97eb41ebef7eb3641fb4f6ea2c640862d6817e1e3e24d2",
-          "at": "2026-06-27T16:41:29Z"
+          "hash": "rvw1:sha256:3ed399f6e88939940ba66319b38bd89d9a3925d33691a48b41cbc2af101078fb",
+          "at": "2026-06-27T14:49:15Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1b727304fe222a3508891c0db704f59e86e94bca9f2fa83516fb02479f9f7c8d",
-          "at": "2026-06-27T23:16:14Z"
+          "hash": "rvw1:sha256:3ed399f6e88939940ba66319b38bd89d9a3925d33691a48b41cbc2af101078fb",
+          "at": "2026-06-27T14:54:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`items_dir` is caller/config supplied, but this adapter treats it as the trusted root and joins `track_id` under it without canonicalizing the resolved path against an independent workspace trusted_root. The symlink guard only verifies descendants below `items_dir`; it does not prove the requested `task-contract.json` remains inside the repository trust boundary. This violates the trusted-root/CN-04 fail-closed pattern used for path inputs such as safe briefing paths.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/task_contract_reader.rs",
+              "line": 47,
+              "category": "trusted-root violation"
+            },
+            {
+              "message": "`items_dir` is caller/config supplied, but the signal reader builds `<items_dir>/<track_id>/<layer>-type-signals.json` and then uses `items_dir` itself as the trust anchor. Without canonicalizing against an independent trusted workspace root, a configured items directory outside the repo can make the adapter read signal files outside the intended trust boundary; the descendant symlink checks do not close that gap.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/impl_catalog_signal_reader.rs",
+              "line": 53,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:3ed399f6e88939940ba66319b38bd89d9a3925d33691a48b41cbc2af101078fb",
+          "at": "2026-06-27T15:01:09Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1b727304fe222a3508891c0db704f59e86e94bca9f2fa83516fb02479f9f7c8d",
-          "at": "2026-06-27T23:18:45Z"
+          "hash": "rvw1:sha256:962cb7f835fd45a0dfee30ccc2fdf6230f1fd0e29e738119279cdd8139dd5d78",
+          "at": "2026-06-27T15:11:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`symlink_metadata(&path)` is used as the only presence probe before returning `Ok(None)`. That probe can traverse symlinked parent components, so a symlinked `track_id` directory that points outside the trusted root but has no leaf file is classified as “missing” instead of being rejected. This weakens the boundary check; use `reject_symlinks_below` (or an equivalent fail-closed check) before treating `NotFound` as absence.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/impl_catalog_signal_reader.rs",
+              "line": 61,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:b8b4223ec4173d7500efd8a06ce93d891f2538bfc76cebfc72c761f14b85db3c",
+          "at": "2026-06-27T16:46:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ae0cd6e70fae299aab66d9cadaf92a40bc0f6201f1f3f9406b7017bcbac72a10",
+          "at": "2026-06-27T16:51:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ae0cd6e70fae299aab66d9cadaf92a40bc0f6201f1f3f9406b7017bcbac72a10",
+          "at": "2026-06-27T16:54:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c8ee3247dc4e8f05e606ba03dc487bdf00586f2898a5d97217c273fc440c37a",
+          "at": "2026-06-27T23:38:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c8ee3247dc4e8f05e606ba03dc487bdf00586f2898a5d97217c273fc440c37a",
+          "at": "2026-06-27T23:40:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:53a1f826555eac452af8d12163d637d77a8922c8f8a9aee86a933591573692ee",
+          "at": "2026-06-28T03:25:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:53a1f826555eac452af8d12163d637d77a8922c8f8a9aee86a933591573692ee",
+          "at": "2026-06-28T03:28:34Z"
         }
       ]
     },
@@ -924,273 +805,406 @@
         }
       ]
     },
-    "infrastructure": {
+    "harness-policy": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "This adapter reads `<items_dir>/<track_id>/task-contract.json` directly with `std::fs::read` and never rejects symlinks on the leaf or ancestor chain. A symlinked track directory or file can redirect the pre-review gate to attacker-controlled content; the existing filesystem loaders in this repo use `symlink_metadata`/`reject_symlinks_below` and fail closed here.",
+              "message": "The ownership paragraph is stale: it still says this capability owns only `impl-plan.json` and `task-coverage.json`, but the same file now declares `task-contract.json` as a third Phase 3 artifact and allows writing it. That leaves the harness contract internally inconsistent about what `impl-planner` owns.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/task_contract_reader.rs",
-              "line": 44,
-              "category": "symlink not rejected at boundary"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.harness/capabilities/impl-planner.md",
+              "line": 25,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:5c88d3e73fd515fed176ee8772485ed7fd45327646121cd4cd5e663dd7889ff3",
+          "at": "2026-06-27T13:46:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c0b457c465272b82b435c5f3966b08fd7ac30a457868f939c97e28709ed3614f",
+          "at": "2026-06-27T13:50:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c0b457c465272b82b435c5f3966b08fd7ac30a457868f939c97e28709ed3614f",
+          "at": "2026-06-27T13:54:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new gate parses `--group`, but the actual review-fix wrapper contract still uses `--scope` on the caller side and `bin/sotp review fix-local` itself expects `--scope`. That means the pre-review gate is unreachable for the documented invocation path, and any invocation that does pass `--group` will be forwarded unchanged to `review fix-local` and fail there. The task-contract check/briefing append therefore does not wire into the real fix workflow.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/Makefile.toml",
+              "line": 645,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:39d377d23f43855d211805b91d2b48cf61edc815f2be47191afd8c7ed27c1a2a",
+          "at": "2026-06-27T15:22:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c836db749917efcff22cb7ef95cc71d527d891eb4ae2af510928f6a237f6f2a",
+          "at": "2026-06-27T15:24:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d4aff7afa048fea304d3b0653c95ecbf55bb7957838277f3a9d60c603f77e87c",
+          "at": "2026-06-27T16:09:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d4aff7afa048fea304d3b0653c95ecbf55bb7957838277f3a9d60c603f77e87c",
+          "at": "2026-06-27T16:12:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3a836ba5b2f6095bcaa921ba37f1c3f609314f369e3fd2017ee4130015644b24",
+          "at": "2026-06-27T23:15:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 3 now makes surfaced PR-review comments non-terminal and requires fixing, committing, and re-running until an explicit zero-findings signal or user-approved Accepted Deviations. However, the stale Behavior summary still describes comments-surfaced as a reportable end state with only an actionability assessment and a next command. Agents following this summary can stop after the first non-pass round, which breaks the new MUST-continue loop contract. Update the Behavior section to report only terminal states and include the per-round trace/fix commits described above.",
+              "severity": "P1",
+              "file": ".claude/commands/track/pr-review.md",
+              "line": 132,
+              "category": "command_wiring_breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:3a836ba5b2f6095bcaa921ba37f1c3f609314f369e3fd2017ee4130015644b24",
+          "at": "2026-06-27T23:18:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 3 still tells the operator to proceed to `/track:commit` after a zero-findings PR review, while the same command's terminal-state report now points to `/track:merge` once 👍 is reached. That leaves two conflicting next-command wirings for the same terminal state; following the older `/track:commit` path after a clean PR review can send the workflow back to the guarded local commit command instead of the CI-gated PR merge flow described by this command and `/track:merge`. Update this terminal-state branch to match the new merge/report behavior.",
+              "severity": "P1",
+              "file": ".claude/commands/track/pr-review.md",
+              "line": 64,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:1c12ec2090613e13e787910cd381cc1a2ffbe831dd2e24a94f443d6e65fe30f9",
+          "at": "2026-06-27T23:21:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f97556ac6ebbffd35cbbb6984ab0821f5e4337fd395b7350fab240246b8a510d",
+          "at": "2026-06-27T23:24:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7aed6bbddb1775fd97a4f2ce306b210fd9a2019fd3ae9cbb17b274ab62521d59",
+          "at": "2026-06-27T23:37:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7aed6bbddb1775fd97a4f2ce306b210fd9a2019fd3ae9cbb17b274ab62521d59",
+          "at": "2026-06-27T23:41:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track-contract-gate` lost the non-`track/<id>` branch guard from the briefing. It now always runs `bin/sotp task-contract check --items-dir track/items`, and that command self-resolves from the current branch and fails on `main`/detached HEAD. As a result, `cargo make track-local-review-fix-codex` now hard-fails outside a track branch instead of skipping cleanly.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/Makefile.toml",
+              "line": 642,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:6a29fe6e3f333921391f380e1976657b31cd7880d2ae3f4fe07f998f6938415a",
+          "at": "2026-06-28T01:55:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`.claude/commands/track/review.md` now tells both fast and final Codex rounds to run `cargo make track-local-review-fix`, and `.claude/settings.json` / `.codex/rules/default.rules` whitelist that same task name, but `Makefile.toml` only defines `[tasks.track-local-review]` at line 655. As written, the orchestrator will invoke a non-existent cargo-make task, while the real task name is not permitted by the sandbox allowlist, so the Codex review path cannot launch.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.claude/commands/track/review.md",
+              "line": 87,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:a22a86482ac02ffe078bdd53bef5402a39ab452675133afe00448f19f7e1ae19",
+          "at": "2026-06-28T02:05:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b904b1feaae141253136a1c716a7aae9cf63fdfed3334c2874d2c6542aac6041",
+          "at": "2026-06-28T02:09:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`review-fix-lead-codex.md` still says the `cargo make track-local-review` wrapper chains `track-sync-views` before review, but `Makefile.toml` now wires `track-local-review` through `track-contract-gate` only. That makes the briefing describe a pre-review view sync that no longer happens, so the fixer can run against stale rendered views.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.harness/briefings/review-fix-lead-codex.md",
+              "line": 72,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:8c0e57250c0ed15f567c510570f5eb7ae2e7d0b26efb587c9963b20ab4477ac5",
+          "at": "2026-06-28T02:44:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:786040831b7083b3e915a7fda0028249f4ff87e0a2fa522324764defe12d25f1",
+          "at": "2026-06-28T02:52:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 1 still tells the orchestrator to read `capabilities.review-fix-lead.provider` and choose between launching the Claude subagent directly or the Codex wrapper. That contradicts the new Step 4/5 contract where `/track:review` must always call the provider-agnostic `cargo make track-local-review-fix` wrapper and let the CLI return the exit-64 dispatch instruction for Claude. As written, the command has two inconsistent launch paths, so the Claude path can bypass the new wrapper/dispatch contract.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 31,
+              "category": "command wiring breakage"
             },
             {
-              "message": "This adapter follows the same unchecked read path for `<items_dir>/<track_id>/<layer>-type-signals.json`. Because there is no boundary symlink rejection before `std::fs::read`, a symlinked `track_id` directory or signal file can bypass the intended real-file semantics used by the other infrastructure readers.",
+              "message": "The new routing text says the Codex wrapper exits `0` with any `REVIEW_FIX_STATUS` value or `2` for smoke-test failure, but the runner status contract maps `completed` to 0, `blocked_cross_scope` to 2, and `failed` to 1, with smoke-test also using 2 when there is no status sentinel. Step 4/5 therefore omit the exit-1 status path and make exit 2 ambiguous unless stdout is parsed, which can make the orchestrator mishandle `failed` or `blocked_cross_scope` results from `track-local-review-fix`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/impl_catalog_signal_reader.rs",
-              "line": 50,
-              "category": "symlink not rejected at boundary"
+              "file": ".claude/commands/track/review.md",
+              "line": 99,
+              "category": "command wiring breakage"
             }
           ],
-          "hash": "rvw1:sha256:d4f9fb6b11400c46722332f21b1289a90c4234fd8b61c8143711e7e8924fdabe",
-          "at": "2026-06-27T13:47:15Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Reject `self.items_dir` itself before the below-root walk. `reject_symlinks_below(&path, &self.items_dir)` only checks descendants; if `--items-dir` is a symlink, `task-contract.json` can be read through the redirected root. `FsSpecFileLoader` shows the required fail-closed trusted_root check.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/task_contract_reader.rs",
-              "line": 47,
-              "category": "trusted-root violation"
-            },
-            {
-              "message": "Reject `self.items_dir` itself before the below-root walk. `reject_symlinks_below(&path, &self.items_dir)` only checks descendants; if `--items-dir` is a symlink, `*-type-signals.json` can be read through the redirected root. `FsSpecFileLoader` shows the required fail-closed trusted_root check.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/impl_catalog_signal_reader.rs",
-              "line": 53,
-              "category": "trusted-root violation"
-            }
-          ],
-          "hash": "rvw1:sha256:252b27b73c026a765b8eb8147c1cdd6b988b325226a08b26ab09bad83426efa5",
-          "at": "2026-06-27T13:55:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`entries` is deserialized as a plain `BTreeMap`, so duplicate task IDs in `task-contract.json` will be accepted with last-write-wins semantics during `serde_json::from_slice`. That silently drops contracted entries and can make the pre-review gate evaluate a different contract than the file actually encodes. Other strict infrastructure codecs in this repo reject duplicate map keys explicitly; this codec should fail closed too.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/task_contract_codec.rs",
-              "line": 78,
-              "category": "serde codec break"
-            }
-          ],
-          "hash": "rvw1:sha256:d765ae8d718905da3c9535f12f5c38ca1ae6fc1009a634ab1fcc7cbe21e81195",
-          "at": "2026-06-27T14:31:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:51a1afa9b19b3b63c5b77e793cca97cd025fdc3daf2d75c0bdfc7b3e7dfeb908",
-          "at": "2026-06-27T14:39:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`FsTaskContractReader` reads `task-contract.json` with `std::fs::read` after the symlink check, but there is no file-size bound before loading the whole artifact into memory. The infrastructure review policy treats unbounded adapter reads as correctness issues: a malformed or unexpectedly large track artifact can force this gate path to allocate arbitrarily. Add a metadata length check or a bounded reader and map oversize files to `TaskContractReadFailed` before decoding.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/task_contract_reader.rs",
-              "line": 74,
-              "category": "unbounded_read"
-            },
-            {
-              "message": "`FsImplCatalogSignalReader` likewise loads `<layer>-type-signals.json` with unbounded `std::fs::read`. These signal files are adapter-boundary inputs, so the reader should enforce a maximum byte size before allocation/read and return `SignalReadFailed` on oversize input; otherwise a large artifact can exhaust memory during the pre-review gate.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/impl_catalog_signal_reader.rs",
-              "line": 88,
-              "category": "unbounded_read"
-            }
-          ],
-          "hash": "rvw1:sha256:51a1afa9b19b3b63c5b77e793cca97cd025fdc3daf2d75c0bdfc7b3e7dfeb908",
-          "at": "2026-06-27T14:43:09Z"
+          "hash": "rvw1:sha256:786040831b7083b3e915a7fda0028249f4ff87e0a2fa522324764defe12d25f1",
+          "at": "2026-06-28T02:58:07Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:3ed399f6e88939940ba66319b38bd89d9a3925d33691a48b41cbc2af101078fb",
-          "at": "2026-06-27T14:49:15Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3ed399f6e88939940ba66319b38bd89d9a3925d33691a48b41cbc2af101078fb",
-          "at": "2026-06-27T14:54:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`items_dir` is caller/config supplied, but this adapter treats it as the trusted root and joins `track_id` under it without canonicalizing the resolved path against an independent workspace trusted_root. The symlink guard only verifies descendants below `items_dir`; it does not prove the requested `task-contract.json` remains inside the repository trust boundary. This violates the trusted-root/CN-04 fail-closed pattern used for path inputs such as safe briefing paths.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/task_contract_reader.rs",
-              "line": 47,
-              "category": "trusted-root violation"
-            },
-            {
-              "message": "`items_dir` is caller/config supplied, but the signal reader builds `<items_dir>/<track_id>/<layer>-type-signals.json` and then uses `items_dir` itself as the trust anchor. Without canonicalizing against an independent trusted workspace root, a configured items directory outside the repo can make the adapter read signal files outside the intended trust boundary; the descendant symlink checks do not close that gap.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/impl_catalog_signal_reader.rs",
-              "line": 53,
-              "category": "trusted-root violation"
-            }
-          ],
-          "hash": "rvw1:sha256:3ed399f6e88939940ba66319b38bd89d9a3925d33691a48b41cbc2af101078fb",
-          "at": "2026-06-27T15:01:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:962cb7f835fd45a0dfee30ccc2fdf6230f1fd0e29e738119279cdd8139dd5d78",
-          "at": "2026-06-27T15:11:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`symlink_metadata(&path)` is used as the only presence probe before returning `Ok(None)`. That probe can traverse symlinked parent components, so a symlinked `track_id` directory that points outside the trusted root but has no leaf file is classified as “missing” instead of being rejected. This weakens the boundary check; use `reject_symlinks_below` (or an equivalent fail-closed check) before treating `NotFound` as absence.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/impl_catalog_signal_reader.rs",
-              "line": 61,
-              "category": "symlink not rejected at boundary"
-            }
-          ],
-          "hash": "rvw1:sha256:b8b4223ec4173d7500efd8a06ce93d891f2538bfc76cebfc72c761f14b85db3c",
-          "at": "2026-06-27T16:46:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ae0cd6e70fae299aab66d9cadaf92a40bc0f6201f1f3f9406b7017bcbac72a10",
-          "at": "2026-06-27T16:51:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ae0cd6e70fae299aab66d9cadaf92a40bc0f6201f1f3f9406b7017bcbac72a10",
-          "at": "2026-06-27T16:54:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0c8ee3247dc4e8f05e606ba03dc487bdf00586f2898a5d97217c273fc440c37a",
-          "at": "2026-06-27T23:38:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0c8ee3247dc4e8f05e606ba03dc487bdf00586f2898a5d97217c273fc440c37a",
-          "at": "2026-06-27T23:40:49Z"
+          "hash": "rvw1:sha256:15d2bc9c5436e61591120d26a9949f7774b0c189d2f7cc61c786ead82330a78e",
+          "at": "2026-06-28T03:02:28Z"
         }
       ]
     },
-    "domain": {
+    "cli": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:cc0d115b6bb167040272c41f983e7e930caa32425e32f2cfee94ffee30f9eb6a",
-          "at": "2026-06-27T13:47:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TaskContractDocument::new` documents that a contract with no attributed entries is invalid, but it only rejects an empty map. A value like `{ T001: vec![] }` is accepted even though it contains zero `ContractedEntryRef`s, so the domain type can represent the fail-closed-empty contract the constructor claims to reject. Tighten the constructor to reject no actual attributions, and likely empty per-task lists as well.",
-              "severity": "P1",
-              "file": "libs/domain/src/task_contract.rs",
-              "line": 83,
-              "category": "broken invariant in newtype constructor"
-            },
-            {
-              "message": "`Blocked` is documented as carrying one or more gate violations, but the public variant stores a raw `Vec<PreReviewGateViolation>`, so callers can construct `PreReviewGateOutcome::Blocked { violations: vec![] }`. That makes an illegal gate state representable; follow the project’s non-empty findings pattern with a validated non-empty wrapper or constructor.",
-              "severity": "P1",
-              "file": "libs/domain/src/task_contract.rs",
-              "line": 169,
-              "category": "primitive obsession"
-            }
-          ],
-          "hash": "rvw1:sha256:cc0d115b6bb167040272c41f983e7e930caa32425e32f2cfee94ffee30f9eb6a",
-          "at": "2026-06-27T13:53:16Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: `PreReviewGateOutcome::blocked()` validates that `violations` is non-empty, but the `Blocked { violations: Vec<_> }` variant is public and can still be constructed directly with `vec![]`. That means the returned type does not encode the invariant the constructor just checked, so the non-empty gate result can be bypassed at the API boundary.",
-              "severity": "P1",
-              "file": "libs/domain/src/task_contract.rs",
-              "line": 173,
-              "category": "typestate / parse-don't-validate gap"
-            }
-          ],
-          "hash": "rvw1:sha256:fd1304d844f5bdf07e8c097d917931c8bcfe6dfa46481965d066bcfb89040f97",
-          "at": "2026-06-27T14:29:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`PreReviewGateOutcome::Blocked` no longer matches the tracked domain contract: the variant lost `#[non_exhaustive]` and its payload type changed from `Vec<PreReviewGateViolation>` to the new `PreReviewGateViolations` wrapper. That diverges from `track/items/pre-review-task-contract-conformance-gate-2026-06-27/domain-types.json` and breaks consumers generated against the declared shape.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/domain/src/task_contract.rs",
-              "line": 217,
-              "category": "catalogue-contract"
-            }
-          ],
-          "hash": "rvw1:sha256:9fc1eb27af24e4ea5a2d676c4f0d065fe04b6e8934e2ca420f14fbf4ad9271cc",
-          "at": "2026-06-27T14:37:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`PreReviewGateOutcome::Blocked` no longer matches the declared domain contract: `domain-types.json` says the payload is `Vec<PreReviewGateViolation>` (and marks the variant non-exhaustive), but this implementation exposes the new public `PreReviewGateViolations` wrapper instead. That breaks shape parity for generated consumers and makes the domain API diverge from the catalog the rest of the track is built against.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/domain/src/task_contract.rs",
-              "line": 217,
-              "category": "typestate / parse-don't-validate gap"
-            }
-          ],
-          "hash": "rvw1:sha256:9fc1eb27af24e4ea5a2d676c4f0d065fe04b6e8934e2ca420f14fbf4ad9271cc",
-          "at": "2026-06-27T14:54:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fd1304d844f5bdf07e8c097d917931c8bcfe6dfa46481965d066bcfb89040f97",
-          "at": "2026-06-27T15:02:32Z"
+          "hash": "rvw1:sha256:14d8205a81db5609a9e50d81a704134e95ea462fcb24f4c40a4fa62ae7fdbde4",
+          "at": "2026-06-27T13:45:25Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:fd1304d844f5bdf07e8c097d917931c8bcfe6dfa46481965d066bcfb89040f97",
-          "at": "2026-06-27T15:07:01Z"
+          "hash": "rvw1:sha256:14d8205a81db5609a9e50d81a704134e95ea462fcb24f4c40a4fa62ae7fdbde4",
+          "at": "2026-06-27T13:49:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3f94ef835677874e6d60897ad815f3f03eb567d33080dd15428c44a61d99e3be",
+          "at": "2026-06-27T16:09:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3f94ef835677874e6d60897ad815f3f03eb567d33080dd15428c44a61d99e3be",
+          "at": "2026-06-27T16:12:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e9d8db98c6703e49f7c67004e0e62004d030a63afa5f5184c2a26428a07bb1e6",
+          "at": "2026-06-27T16:45:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e9d8db98c6703e49f7c67004e0e62004d030a63afa5f5184c2a26428a07bb1e6",
+          "at": "2026-06-27T16:47:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:53fb2b5aa5ee3032561d9e39cf23810a0fcd813c4a1883b26d07dfdd97e1f044",
+          "at": "2026-06-28T02:29:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:53fb2b5aa5ee3032561d9e39cf23810a0fcd813c4a1883b26d07dfdd97e1f044",
+          "at": "2026-06-28T02:32:40Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The orphan-detection loop silently drops any signal entry whose `type_name` cannot be converted to `CatalogueEntryKey` (`Err(_) => { ... }`). That branch is reachable because `type_signals_codec::decode` accepts arbitrary `type_name` strings, so a malformed `<layer>-type-signals.json` can contain an uncovered entry that the gate never reports. This makes the gate fail open instead of blocking or surfacing an error.",
+              "severity": "P1",
+              "file": "libs/usecase/src/pre_review_gate.rs",
+              "line": 222,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:98d3cee97dc45e07009f480db7930a9074f2ce4dd7909b4207936a6c63aa0f18",
+          "at": "2026-06-27T13:46:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:46ccc45e62b8a34cefec80c76ad613c3a182b16a464bd89708fefd84f59e8f6d",
+          "at": "2026-06-27T13:54:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7a2c0d59210a3afe96d888bb8c3a52b1cf7a98c369f307df5f1a82c396822554",
+          "at": "2026-06-27T14:30:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7a2c0d59210a3afe96d888bb8c3a52b1cf7a98c369f307df5f1a82c396822554",
+          "at": "2026-06-27T14:33:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `None` branch swallows every `SignalReadFailed`, but `check_layer()` also raises that error for malformed signal documents (for example, invalid `type_name` values are converted to `SignalReadFailed` here). As a result, a corrupt or unreadable layer can be treated as if it simply had no document, and all-layers mode can return `Passed` instead of surfacing the failure.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/pre_review_gate.rs",
+              "line": 338,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:dc958872f3aa50aab626e8d8f72055053ee315ec2426f800b1759c9b33645c09",
+          "at": "2026-06-27T16:09:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "All-layers skip logic keys off the human-readable `message` inside `PreReviewGateError::SignalReadFailed` instead of a typed not-found variant. Because that diagnostic is documented as opaque, a real read/decode failure can be misclassified as a missing document and silently skipped, which breaks the fail-closed behavior in the `None` branch.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/pre_review_gate.rs",
+              "line": 204,
+              "category": "error type confusion"
+            }
+          ],
+          "hash": "rvw1:sha256:0e11154af6a288eb3f0a6c13e4627f031745df3c50c9173c75f91e2e8b404cd5",
+          "at": "2026-06-27T16:16:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`None` mode decides whether to skip a layer by parsing the opaque `PreReviewGateError::SignalReadFailed.message` string. That makes control flow depend on diagnostic text instead of a typed not-found signal, so a genuine read/decode failure can be misclassified as \"missing\" and silently skipped, letting all-layers mode pass when it should fail closed.",
+              "severity": "P1",
+              "file": "libs/usecase/src/pre_review_gate.rs",
+              "line": 204,
+              "category": "error type confusion"
+            }
+          ],
+          "hash": "rvw1:sha256:0e11154af6a288eb3f0a6c13e4627f031745df3c50c9173c75f91e2e8b404cd5",
+          "at": "2026-06-27T16:24:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `None`-layer mode now depends on `read_optional_signals()`, but this file only adds a default shim that calls `read_signals()`. The production filesystem adapter still reports a missing `*-type-signals.json` as `SignalReadFailed`, so the new all-layers path will still abort on absent layers instead of skipping them silently. The added passing test only uses a mock that overrides the new hook, so it does not cover the real adapter path.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/pre_review_gate.rs",
+              "line": 141,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:5a24c9e3a48ad1676b97eb41ebef7eb3641fb4f6ea2c640862d6817e1e3e24d2",
+          "at": "2026-06-27T16:30:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5a24c9e3a48ad1676b97eb41ebef7eb3641fb4f6ea2c640862d6817e1e3e24d2",
+          "at": "2026-06-27T16:38:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5a24c9e3a48ad1676b97eb41ebef7eb3641fb4f6ea2c640862d6817e1e3e24d2",
+          "at": "2026-06-27T16:41:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1b727304fe222a3508891c0db704f59e86e94bca9f2fa83516fb02479f9f7c8d",
+          "at": "2026-06-27T23:16:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1b727304fe222a3508891c0db704f59e86e94bca9f2fa83516fb02479f9f7c8d",
+          "at": "2026-06-27T23:18:45Z"
         }
       ]
     }
