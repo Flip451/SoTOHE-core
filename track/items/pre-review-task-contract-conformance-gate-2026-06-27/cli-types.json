@@ -73,7 +73,7 @@
           "kind": "plain",
           "fields": [
             { "name": "layer", "ty": "Option<String>" },
-            { "name": "track_id", "ty": "String" },
+            { "name": "track_id", "ty": "Option<String>" },
             { "name": "items_dir", "ty": "std::path::PathBuf" }
           ],
           "has_stripped_fields": false
@@ -117,7 +117,22 @@
       "is_async": false,
       "generics": [],
       "where_predicates": [],
-      "docs": "Execute `sotp task-contract check`. Constructs a TaskContractCompositionRoot, calls task_contract_check(layer, track_id, items_dir), and converts the CommandOutcome to a process ExitCode (0 on Passed, non-zero on Blocked or error).",
+      "docs": "Execute `sotp task-contract check`. Resolves track_id (auto from track/<id> branch when not explicit), constructs a TaskContractCompositionRoot, calls task_contract_check(layer, track_id, items_dir), and converts the CommandOutcome to a process ExitCode (0 on Passed, non-zero on Blocked or error).",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-03" }
+      ],
+      "informal_grounds": []
+    },
+    "cli::commands::task_contract::detect_active_track_from_branch_cwd": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "Option<String>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Auto-resolve the active track id from the current git branch. Returns Some(\"<id>\") when on a track/<id> branch, None otherwise (main, detached HEAD, git failure, etc.). Mirrors the convention used by `sotp ref-verify run`, `sotp track views sync`, and other track-aware commands.",
       "spec_refs": [
         { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-04" },
         { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-03" }

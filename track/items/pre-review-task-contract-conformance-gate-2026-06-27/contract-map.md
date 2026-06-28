@@ -204,6 +204,7 @@ subgraph cli["cli"]
     T27_cli_cli_TaskContractCommand__self[TaskContractCommand]
     T27_cli_cli_TaskContractCommand_Check[Check]
   end
+  F73_cli_cli_cli__commands__task_contract__detect_active_track_from_branch_cwd[[detect_active_track_from_branch_cwd]]
   F45_cli_cli_cli__commands__task_contract__execute[[execute]]
   F65_cli_cli_cli__commands__task_contract__execute_task_contract_check[[execute_task_contract_check]]
   end
@@ -322,6 +323,8 @@ class T18_cli_cli_CliCommand__self dto
 class T29_cli_cli_TaskContractCheckArgs__self dto
 class T27_cli_cli_TaskContractCommand_Check variant_node
 class T27_cli_cli_TaskContractCommand__self dto
+class F73_cli_cli_cli__commands__task_contract__detect_active_track_from_branch_cwd free_function
+class F73_cli_cli_cli__commands__task_contract__detect_active_track_from_branch_cwd function_node
 class F45_cli_cli_cli__commands__task_contract__execute free_function
 class F45_cli_cli_cli__commands__task_contract__execute function_node
 class F65_cli_cli_cli__commands__task_contract__execute_task_contract_check free_function

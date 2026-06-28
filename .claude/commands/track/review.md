@@ -28,14 +28,14 @@ Generated fixer prompts pass the review round, group, track id, and briefing fil
 ad-hoc `bin/sotp review local` calls may still omit `--track-id` when the current branch is
 `track/<id>`.
 
-Read `capabilities.review-fix-lead` to resolve the fixer-loop dispatch (used by the Step 4 / Step 5 dispatch):
-- `capabilities.review-fix-lead.provider` — `claude` (default) launches the `review-fix-lead` subagent; `codex` launches the Codex fixer wrapper instead.
-- `capabilities.review-fix-lead.model` — the fixer model passed to the chosen provider. **When `provider: codex`, this field must also be set to a Codex-compatible model; leaving a Claude model name here will cause `codex exec --model` to receive an invalid model name.**
-- If the `review-fix-lead` capability is absent, default to `provider: claude` (legacy behavior unchanged).
-
-The `provider: codex` fixer wrapper (`bin/sotp review fix-local`, Step 4 / Step 5) runs its own
-internal Codex reviewer; that reviewer auto-resolves its model from `agent-profiles.json`
-(`capabilities.reviewer`, round-type aware) — the orchestrator does not pass a reviewer model.
+The fixer-loop dispatch is owned by the provider-agnostic wrapper in Step 4 / Step 5.
+The orchestrator does not branch on `capabilities.review-fix-lead.provider`; it always invokes
+`cargo make track-local-review-fix` and handles the wrapper's exit/status contract. The wrapper
+delegates to `bin/sotp review fix-local`, which reads `capabilities.review-fix-lead` from
+`.harness/config/agent-profiles.json` and either runs the Codex fixer or emits the Claude
+subagent dispatch instruction. When the Codex fixer path runs, its internal reviewer
+auto-resolves its model from `capabilities.reviewer` (round-type aware) — the orchestrator does
+not pass a reviewer model.
 
 ## Step 2: Determine required scopes
 
@@ -78,45 +78,58 @@ Constraints:
 
 ## Step 4: Launch review-fix-lead fixers (parallel, fast round)
 
-For each `required` scope, launch one fixer in parallel (`run_in_background: true`),
-dispatching on `capabilities.review-fix-lead.provider` (resolved in Step 1):
+For each `required` scope, launch one fixer in parallel (`run_in_background: true`) via the
+**provider-agnostic** wrapper:
 
-- **`provider: claude`** (default) — launch a `review-fix-lead` subagent
-  (`subagent_type: "review-fix-lead"`). Use the prompt content below.
-- **`provider: codex`** — instead of the subagent, launch the Codex fixer wrapper via Bash:
-  `cargo make track-local-review-fix-codex -- --scope {scope} --briefing-file tmp/reviewer-runtime/briefing-{scope}.md --track-id {track-id} --round-type fast`
-  The `cargo make` wrapper resolves `CODEX_BIN` (asdf shim → real binary) then delegates to
-  `bin/sotp review fix-local`. The `--model` flag is optional; when omitted the CLI resolves it
-  from `agent-profiles.json` `review-fix-lead.model` (or `fast_model` for fast round).
-  The codex fixer self-resolves its modification boundary via `bin/sotp review files --scope`;
-  the orchestrator passes neither `--scope-files` nor `--reviewer-model`.
-  The wrapper runs the same review → fix → re-review loop inside a `workspace-write` sandbox
-  (`.git` is read-only there, so the fixer edits files but cannot stage/commit), performs
-  launch-time smoke-tests, isolates credentials, and prints `completed` /
-  `blocked_cross_scope` / `failed` — the same status contract as the subagent. The Claude
-  subagent definition (`.claude/agents/review-fix-lead.md`) is unchanged and remains the
-  `provider: claude` path.
+```
+cargo make track-local-review-fix -- --scope {scope} \
+  --briefing-file tmp/reviewer-runtime/briefing-{scope}.md \
+  --track-id {track-id} --round-type fast
+```
 
-Agent prompt minimum content (`provider: claude` path):
+The `cargo make track-local-review-fix` task depends on `track-contract-gate` (signal refresh
++ pre-review task-contract check, fail-closed) and then delegates to `bin/sotp review fix-local`.
+The CLI resolves `capabilities.review-fix-lead.provider` from `.harness/config/agent-profiles.json`
+and branches internally — the orchestrator skill carries **no `provider:` conditional**:
 
-- Track id, scope name, briefing path
-- `round_type: fast`, `model: {review-fix-lead.model}` (resolved from `capabilities.review-fix-lead.model`)
-- Pre-review gate (run before the reviewer invocation): `bin/sotp signal calc-impl-catalog`
-  and `bin/sotp signal calc-catalog-spec` (both argless — self-resolve the active track and
-  TDDD-enabled layers; absent catalogue layers are skipped automatically), then
-  `bin/sotp track views sync` — see `.claude/agents/review-fix-lead.md` § Workflow
-- Reviewer invocation: `bin/sotp review local --round-type fast --group {scope} --track-id {track-id} --briefing-file tmp/reviewer-runtime/briefing-{scope}.md`
-The agent self-resolves its modification boundary by running `bin/sotp review files --scope {scope}`
-(see `.claude/agents/review-fix-lead.md` § Scope Ownership). The orchestrator does NOT derive or
-pass a scope file list — neither provider path duplicates scope classification. The CLI injecting
-the scope file list into the *reviewer's* prompt (Step 3 constraint) is a
-separate concern (the reviewer's read scope, not the fixer's modification boundary).
+- **`provider: codex`** — the CLI constructs `CodexReviewFixRunner` and runs the entire fix loop
+  inside a codex CLI subprocess (`workspace-write` sandbox; the codex skill loops calling
+  `cargo make track-local-review` per round so the task-contract gate fires before every
+  reviewer round inside the sandbox). The wrapper sets `CODEX_BIN` (asdf shim → real binary)
+  for codex resolution. Normal fixer statuses are reported on stdout as the final
+  `REVIEW_FIX_STATUS: ...` line and use the runner status exit code: `0` for `completed`, `2`
+  for `blocked_cross_scope`, and `1` for `failed`. A launch-time smoke-test failure also exits
+  `2`, but has no `REVIEW_FIX_STATUS` line and carries the diagnostic on stderr.
+- **`provider: claude`** — the CLI **does not** spawn the fix loop. The loop is owned by a
+  Claude Code subagent that must run in-process. Instead the CLI emits a structured dispatch
+  instruction on stdout and exits with the dedicated subagent-dispatch exit code
+  (`SUBAGENT_DISPATCH_EXIT_CODE`, currently `64`). stdout layout:
+
+  ```
+  SUBAGENT_DISPATCH_REQUIRED
+  {"agent":"review-fix-lead","model":"<model>","scope":"<scope>","briefing_file":"<path>","track_id":"<id>","round_type":"<round>"}
+  ```
+
+  When the orchestrator sees exit code `64`, it parses the JSON object on the line after the
+  `SUBAGENT_DISPATCH_REQUIRED` sentinel and spawns a `review-fix-lead` Claude Code subagent
+  via the Agent tool (`subagent_type: "review-fix-lead"`) with those parameters. The subagent
+  owns the fix loop and prints `REVIEW_FIX_STATUS: completed` / `blocked_cross_scope` /
+  `failed` exactly as the codex path does. See `.claude/agents/review-fix-lead.md` for the
+  subagent's internal workflow (per-round reviewer invocation uses
+  `cargo make track-local-review`, which also depends on `track-contract-gate`).
+
+The fixer (whether codex subprocess or claude subagent) self-resolves its modification
+boundary via `bin/sotp review files --scope {scope}`; the orchestrator passes neither
+`--scope-files` nor `--reviewer-model`. The CLI injecting the scope file list into the
+*reviewer's* prompt (Step 3 constraint) is a separate concern (the reviewer's read scope, not
+the fixer's modification boundary).
 
 The agent's internal fix loop (review → fix → re-review until `zero_findings`),
-canonical-API verification, and status reporting are owned by `.claude/agents/review-fix-lead.md`.
+canonical-API verification, and status reporting are owned by
+`.claude/agents/review-fix-lead.md` (claude path) and the codex CLI subprocess (codex path).
 The orchestrator does not parse reviewer JSON directly.
 
-Agent statuses:
+Agent statuses (uniform across providers):
 
 - `completed` — fast `zero_findings` confirmed via canonical API → step 5 (final round)
 - `blocked_cross_scope` — fix dependencies in other scopes from the orchestrator, then relaunch
@@ -125,10 +138,18 @@ Agent statuses:
 ## Step 5: Escalate to final round (per-scope, immediate)
 
 When a scope's fast fixer reports `completed`, **immediately** launch the final round for the
-same scope (do not wait for other scopes), dispatching on `capabilities.review-fix-lead.provider`:
+same scope (do not wait for other scopes) via the same provider-agnostic wrapper:
 
-- **`provider: claude`** — launch a `review-fix-lead` subagent with `round_type: final`, `model: {review-fix-lead.model}` (resolved from `capabilities.review-fix-lead.model`).
-- **`provider: codex`** — run `cargo make track-local-review-fix-codex -- --scope {scope} --briefing-file tmp/reviewer-runtime/briefing-{scope}.md --track-id {track-id} --round-type final` (no `--reviewer-model` / `--scope-files`; the codex fixer self-resolves boundary + reviewer model; `--model` omitted = auto-resolved from `agent-profiles.json`).
+```
+cargo make track-local-review-fix -- --scope {scope} \
+  --briefing-file tmp/reviewer-runtime/briefing-{scope}.md \
+  --track-id {track-id} --round-type final
+```
+
+Provider routing follows the same rule as Step 4. Exit code `64` with the
+`SUBAGENT_DISPATCH_REQUIRED` sentinel means spawn the Claude subagent. Exit codes `0`, `1`, or
+`2` with a final stdout `REVIEW_FIX_STATUS` line mean handle that status directly. Exit code `2`
+without a status sentinel is a smoke-test failure.
 
 Agent status handling for the `final` agent:
 

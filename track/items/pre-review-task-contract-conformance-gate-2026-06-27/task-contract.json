@@ -34,7 +34,8 @@
       { "layer": "cli", "entry_key": "TaskContractCommand" },
       { "layer": "cli", "entry_key": "TaskContractCheckArgs" },
       { "layer": "cli", "entry_key": "cli::commands::task_contract::execute" },
-      { "layer": "cli", "entry_key": "cli::commands::task_contract::execute_task_contract_check" }
+      { "layer": "cli", "entry_key": "cli::commands::task_contract::execute_task_contract_check" },
+      { "layer": "cli", "entry_key": "cli::commands::task_contract::detect_active_track_from_branch_cwd" }
     ],
     "T006": [
       { "layer": "cli_composition", "entry_key": "TaskContractCompositionRoot" }

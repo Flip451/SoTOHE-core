@@ -17,6 +17,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
+| cli::commands::task_contract::detect_active_track_from_branch_cwd | free_function | add | fn() -> Option<String> | 🔵 | 🔵 |
 | cli::commands::task_contract::execute | free_function | add | fn(cmd: TaskContractCommand) -> std::process::ExitCode | 🔵 | 🔵 |
 | cli::commands::task_contract::execute_task_contract_check | free_function | add | fn(args: TaskContractCheckArgs) -> std::process::ExitCode | 🔵 | 🔵 |
 

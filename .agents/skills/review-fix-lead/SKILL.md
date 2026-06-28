@@ -13,7 +13,7 @@ orchestrator. Loop: review → fix → re-review until the **canonical reviewer*
 
 The authoritative verdict is the one **recorded in `review.json` by the canonical reviewer
 command**, NOT your own judgment. You MUST obtain the verdict by running the **Reviewer
-invocation** command in step 1 below (the `bin/sotp review local ...` command given in
+invocation** command in step 1 below (the `cargo make track-local-review ...` command given in
 your orchestrator assignment) — not the `bin/sotp review files --scope` pre-step, which only
 resolves your modification boundary and never produces a verdict. Do NOT substitute your own file
 inspection, ad-hoc `grep`, or reproduction tests for it, and do NOT print
@@ -41,10 +41,16 @@ description of the failure. Do not proceed to step 1.
 
 1. **Review (records the round).** Run the **"Reviewer invocation"** command given in your
    orchestrator assignment, EXACTLY as provided, on every round. It is the canonical
-   `bin/sotp review local ...` command (it dispatches the reviewer and writes the verdict to `review.json`). Run `bin/sotp track views sync` manually before invoking if you need up-to-date rendered views. Do not drop, add,
-   or alter any of its arguments. The reviewer resolves its own model from `agent-profiles.json`
-   — do not add or change `--model` on the reviewer invocation. Never decide the verdict by your
-   own inspection, ad-hoc greps, or reproduction tests.
+   `cargo make track-local-review -- --round-type <round_type> --group <scope> --track-id <track-id> --briefing-file <path>`
+   command. The cargo-make task declares `dependencies = ["track-contract-gate"]`, so before each
+   reviewer invocation the runner refreshes impl-catalog signals and runs the task-contract
+   pre-review gate (fail-closed); on gate pass it delegates to `bin/sotp review local`, which
+   writes the verdict to `review.json`. Run `bin/sotp track views sync` manually before invoking
+   if you need up-to-date rendered views (the cargo-make dependency only covers signals + the
+   task-contract gate, not view rendering). Do not drop, add, or alter any of the orchestrator-
+   provided arguments. The reviewer resolves its own model from `agent-profiles.json` — do not
+   add or change `--model` on the reviewer invocation. Never decide the verdict by your own
+   inspection, ad-hoc greps, or reproduction tests.
 
 2. **Parse the verdict** from the command output:
    - `zero_findings` → go to step 3 (confirm it was recorded).

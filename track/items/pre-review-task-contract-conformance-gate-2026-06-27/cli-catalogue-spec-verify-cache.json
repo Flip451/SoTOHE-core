@@ -27,11 +27,11 @@
       }
     },
     {
-      "claim_hash": "36db979a8580ee57962c51c54179cc1b1ca66abd2f127a56e7bb744a5c035951",
+      "claim_hash": "5f11f9194019c3553bf32dac1730c945fb2d270eb5f3f473e11e2227f41af63f",
       "evidence_hash": "4776c2bc5cd2dad2214630005d3ccd1cb935b6ddae6278553aa61a8bea32b22b",
       "verdict": {
         "kind": "pass",
-        "citation": "pre-review blocking binary check ゲートの実装: task-contract.json の attribution completeness を検証した後、attribution された全カタログ entry の impl_catalog 信号を既存信号テーブルと entry キーで JOIN し、全 entry が 🔵 かを確認する。ゲートは sotp CLI サブコマンドとして実装し、fail-closed"
+        "citation": "ゲートは sotp CLI サブコマンドとして実装し、fail-closed（artifact 不在・attribution 不完全・非 🔵 entry のいずれでもブロック）とする。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -51,7 +51,7 @@
       }
     },
     {
-      "claim_hash": "36db979a8580ee57962c51c54179cc1b1ca66abd2f127a56e7bb744a5c035951",
+      "claim_hash": "5f11f9194019c3553bf32dac1730c945fb2d270eb5f3f473e11e2227f41af63f",
       "evidence_hash": "d57e40abf0c5bfe042a3ad635e207d2efdff37274ac637d06c6c39d3c0da3822",
       "verdict": {
         "kind": "pass",
@@ -123,6 +123,54 @@
       }
     },
     {
+      "claim_hash": "529eacdea62a00d4046ec4bee535a96018f65bdf3fc13290fe7306decafed906",
+      "evidence_hash": "4776c2bc5cd2dad2214630005d3ccd1cb935b6ddae6278553aa61a8bea32b22b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ゲートは sotp CLI サブコマンドとして実装し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::task_contract::detect_active_track_from_branch_cwd"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "pre-review blocking binary check ゲートの実装: task-contract.json の attribution completeness を検証した後、attribution された全カタログ entry の impl_catalog 信号を既存信号テーブルと entry キーで JOIN し、全 entry が 🔵 かを確認する。ゲートは sotp CLI サブコマンドとして実装し、fail-closed（artifact 不在・attribution 不完全・非 🔵 entry のいずれでもブロック）とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "529eacdea62a00d4046ec4bee535a96018f65bdf3fc13290fe7306decafed906",
+      "evidence_hash": "d57e40abf0c5bfe042a3ad635e207d2efdff37274ac637d06c6c39d3c0da3822",
+      "verdict": {
+        "kind": "pass",
+        "citation": "pre-review ゲートのコマンド（`sotp` CLI サブコマンドまたは Makefile.toml タスク）が追加されており、review-fix ワークフロー内で `sotp review fix-local` が reviewer invocation を起動する前に実行される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::task_contract::detect_active_track_from_branch_cwd"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "pre-review ゲートのコマンド（`sotp` CLI サブコマンドまたは Makefile.toml タスク）が追加されており、review-fix ワークフロー内で `sotp review fix-local` が reviewer invocation を起動する前に実行される。task-contract.json が不在の場合、ゲートはファイル不在を明示するエラーメッセージで失敗する。"
+        }
+      }
+    },
+    {
       "claim_hash": "7aca7177c77f0168c83adbf85be9f9eff67ee7d6c38715b16e2813e0cdb5855c",
       "evidence_hash": "4776c2bc5cd2dad2214630005d3ccd1cb935b6ddae6278553aa61a8bea32b22b",
       "verdict": {
@@ -147,7 +195,7 @@
       }
     },
     {
-      "claim_hash": "a2ac502a6595122e652dd012e4069af483104cd24aef3a404cfb6487fbf21485",
+      "claim_hash": "3e7fbdd09871f87cbc1d220e7ac6cadc9f8056a97fa3b563186f187dcae7f691",
       "evidence_hash": "4776c2bc5cd2dad2214630005d3ccd1cb935b6ddae6278553aa61a8bea32b22b",
       "verdict": {
         "kind": "pass",
@@ -171,11 +219,11 @@
       }
     },
     {
-      "claim_hash": "a2ac502a6595122e652dd012e4069af483104cd24aef3a404cfb6487fbf21485",
+      "claim_hash": "3e7fbdd09871f87cbc1d220e7ac6cadc9f8056a97fa3b563186f187dcae7f691",
       "evidence_hash": "d57e40abf0c5bfe042a3ad635e207d2efdff37274ac637d06c6c39d3c0da3822",
       "verdict": {
         "kind": "pass",
-        "citation": "pre-review ゲートのコマンド（`sotp` CLI サブコマンドまたは Makefile.toml タスク）が追加されており、review-fix ワークフロー内で `sotp review fix-local` が reviewer invocation を起動する前に実行される。task-contract.json が不在の場合、ゲートはファイル不在を明示するエラーメッセージで失敗する。"
+        "citation": "pre-review ゲートのコマンド（`sotp` CLI サブコマンドまたは Makefile.toml タスク）が追加されており、review-fix ワークフロー内で `sotp review fix-local` が reviewer invocation を起動する前に実行される。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",

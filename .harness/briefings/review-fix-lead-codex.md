@@ -68,10 +68,12 @@ it fresh — the policy file may have been updated since the last review session
 
 ## Workflow
 
-**Always invoke review via `cargo make track-local-review` (never `bin/sotp review codex-local`
-directly).** The cargo-make wrapper chains `track-sync-views` before the review so the scope
-hash is computed against the up-to-date rendered views (`plan.md`, `contract-map.md`,
-`<layer>-types.md`). Calling the inner `bin/sotp` form directly skips sync-views.
+**Always invoke review via `cargo make track-local-review` (never an inner `bin/sotp review`
+command directly).** The cargo-make wrapper runs `track-contract-gate` before the review,
+refreshing impl-catalog signals and running the task-contract pre-review gate. It then delegates
+to `bin/sotp review local`, which resolves the reviewer provider/model and records the verdict.
+Run `bin/sotp track views sync` manually before the invocation when you need fresh rendered views
+(`plan.md`, `contract-map.md`, `<layer>-types.md`) for the scope hash.
 
 **Read prior-round findings via `cargo make track-review-results`, never by opening
 `review.json` directly.**
@@ -85,7 +87,7 @@ hash is computed against the up-to-date rendered views (`plan.md`, `contract-map
 
 Run the reviewer using the invocation command from the orchestrator prompt:
 ```sh
-cargo make track-local-review -- --model {reviewer_model} --round-type {round_type} --group {scope} --track-id {track-id} --briefing-file tmp/reviewer-runtime/briefing-{scope}.md
+cargo make track-local-review -- --round-type {round_type} --group {scope} --track-id {track-id} --briefing-file tmp/reviewer-runtime/briefing-{scope}.md
 ```
 
 ### Step 2: Parse verdict

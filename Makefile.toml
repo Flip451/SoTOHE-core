@@ -636,20 +636,24 @@ description = "[wrapper] Switch to main branch and pull latest"
 command = "bin/sotp"
 args = ["git", "switch-and-pull", "main"]
 
-[tasks.track-local-review-fix-codex]
-description = "[wrapper] Run task-contract pre-review gate (all TDDD layers), then launch Codex review-fix-lead via bin/sotp review fix-local"
+[tasks.track-contract-gate]
+description = "[gate] Refresh impl-catalog signals, then run the pre-review task-contract conformance check for all TDDD layers (fail-closed). `bin/sotp task-contract check` auto-resolves the active track from the current git branch (track/<id>) internally — no shell-side branch parse here."
+script_runner = "@shell"
+script = ['bin/sotp signal calc-impl-catalog && bin/sotp task-contract check']
+
+[tasks.track-local-review]
+description = "[wrapper] Run the task-contract pre-review gate (via dependencies), then launch the local reviewer via bin/sotp review local."
+dependencies = ["track-contract-gate"]
+script_runner = "@shell"
+script = ['case "${1:-}" in --) shift ;; esac; bin/sotp review local "$@"']
+
+[tasks.track-local-review-fix]
+description = "[wrapper] Run the task-contract pre-review gate (via dependencies), then launch the review-fix-lead loop via bin/sotp review fix-local. Provider-agnostic: bin/sotp resolves provider/model from .harness/config/agent-profiles.json; CODEX_BIN is set for asdf shim resolution when the resolved provider is codex (harmless when the provider is claude)."
+dependencies = ["track-contract-gate"]
 script_runner = "@shell"
 script = ['''
 case "${1:-}" in --) shift ;; esac
-_TRACK_ID=""
-_PREV=""
-for _A in "$@"; do
-  [ "$_PREV" = "--track-id" ] && _TRACK_ID="$_A"
-  _PREV="$_A"
-done
-bin/sotp signal calc-impl-catalog \
-  && bin/sotp task-contract check --track-id "$_TRACK_ID" --items-dir track/items \
-  && CODEX_BIN="${CODEX_BIN:-$(asdf which codex 2>/dev/null || command -v codex)}" bin/sotp review fix-local "$@"
+CODEX_BIN="${CODEX_BIN:-$(asdf which codex 2>/dev/null || command -v codex)}" bin/sotp review fix-local "$@"
 ''']
 
 [tasks.track-local-dry-fix]
