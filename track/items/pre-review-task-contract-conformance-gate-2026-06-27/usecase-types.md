@@ -5,6 +5,7 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | PreReviewGateError | error_type | add | TaskContractNotFound, TaskContractReadFailed, SignalReadFailed, ImplPlanReadFailed | 🔵 | 🔵 |
+| RunReviewFixError | error_type | modify | InvalidScope, InvalidTrackId, InvalidRoundType, SmokeTestFailed, FixRunnerFailed, SubagentDispatchRequired | 🔵 | 🔵 |
 
 ## Secondary Ports
 

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "f37f27d5d9f5bf991b1d305015e5293d094b25caa37cbf516a8901b7d1abd85b",
+  "catalogue_declaration_hash": "01e032a076429a5d8b3850cef69342f0e1ea96df13cad3cb98e12935bbe447e6",
   "signals": [
     {
       "type_name": "CoverageVerifyCommand",
@@ -10,7 +10,7 @@
     {
       "type_name": "CoverageVerifyInteractor",
       "signal": "blue",
-      "entry_hash": "ac632febd65ebac0169ccb109a0da00b4c93a317128cdc03f5055d8857320e21"
+      "entry_hash": "f94d3c9c15eb065977580b8c33ace0a502cc8e4574f58f38132fc861fa295d14"
     },
     {
       "type_name": "PreReviewGateCommand",
@@ -28,6 +28,11 @@
       "entry_hash": "0b41b63eded72ffb06615aa29f81735cf34d2d0153ab7e5c04fb74a48f4d70c0"
     },
     {
+      "type_name": "RunReviewFixError",
+      "signal": "blue",
+      "entry_hash": "c49735e512b6a13d34d3a0bb790056c026bb22163d86ce2a07026d4cd672d1e4"
+    },
+    {
       "type_name": "CoverageVerifyService",
       "signal": "blue",
       "entry_hash": "cbebc70c27259c6d13f52bf964c1dd8189cde87b18426f4b79ffdcef65e80c6e"
@@ -35,7 +40,7 @@
     {
       "type_name": "ImplCatalogSignalReaderPort",
       "signal": "blue",
-      "entry_hash": "adba7815c04b9b321312ffe87a310ad5c4b137ed8415d14ef8dd91cf8221122f"
+      "entry_hash": "544921e6fe05e2a79045e7b33b13bc3f5c0b6a179c068c8fa8d6420688c11ad0"
     },
     {
       "type_name": "ImplPlanReaderPort",

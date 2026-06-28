@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # タスク単位の契約履行 pre-review ゲート
 
-## Tasks (8/16 resolved)
+## Tasks (9/17 resolved)
 
 ### S1 — Foundation: domain model and usecase gate contracts
 
@@ -86,3 +86,10 @@
 > T016 is committed as a separate Batch D, after all Batch C commits. This matches the pattern of T008 being a separate Batch B commit after the Rust feature batch.
 
 - [ ] **T016**: Makefile.toml wiring: add the cargo-make task-contract-coverage and task-contract-check tasks, wire task-contract-coverage into the cargo make ci chain, and wire task-contract-check into the review round dependencies (D6). (1) Add [tasks.task-contract-coverage] that invokes `bin/sotp task-contract coverage` for the active track (--track-id resolved from branch or $@ args) with --items-dir track/items and propagates the exit code. (2) Add [tasks.task-contract-check] that invokes `bin/sotp task-contract check` for the active track with --items-dir track/items, propagates exit code, and declares `dependencies = ["task-contract-coverage"]` so cargo-make guarantees attribution completeness (coverage) runs before liveness (check) on every invocation. (3) Add "task-contract-coverage" to the dependency list used by cargo make ci ([tasks.ci-local] and [tasks.ci-container]) so commit-time CI detects attribution drift even outside review invocation. (4) Add "task-contract-check" to the `dependencies` array of [tasks.track-local-review] and [tasks.track-local-review-fix] so every per-round review invocation fires coverage → check before the reviewer is invoked; omit or comment out the legacy inline gate in track-local-review-fix-codex (T008 artifact) if the dependency-chain invocation now supersedes it for the codex path to avoid double-checking. This wiring satisfies IN-07, D6 (CN-08, AC-08, AC-03), and ensures attribution completeness is a commit-time CI gate while attribution completeness plus liveness are both blocking gates in every review round. T016 is committed as Batch D, separate from Batch C.
+
+### S10 — Reference bookkeeping: review-fix error type
+
+> T017 records the D8 review-fix dispatch fix as a cross-layer pass-through already present in the working tree: cli_composition::review_v2::shim::ReviewServiceImpl::run_fix_local converts exit 64 + SUBAGENT_DISPATCH_REQUIRED into RunReviewFixError::SubagentDispatchRequired, and cli_driver::review_run_fix_local preserves that payload with exit_code 64 instead of remapping it to REVIEW_FIX_STATUS: failed.
+> T017 also anchors the usecase RunReviewFixError catalogue entry to D8 / IN-10 / AC-09. task-contract.json attributes only that usecase catalogue entry to T017 because task-contract attribution tracks catalogue entries, while the cli_composition/cli_driver behavior is covered by T017's implementation-and-test scope.
+
+- [x] **T017**: Review-fix D8 cross-layer pass-through and catalogue bookkeeping introduced by PR #175 review fix F6. Preserve the already-present implementation contract across cli_composition::review_v2::shim::ReviewServiceImpl::run_fix_local (detect exit 64 + SUBAGENT_DISPATCH_REQUIRED and return RunReviewFixError::SubagentDispatchRequired), cli_driver::review_run_fix_local (pass stdout payload through with exit_code 64 instead of remapping to REVIEW_FIX_STATUS: failed), and the unit/integration coverage described by AC-09. Declare RunReviewFixError in usecase-types.json as action modify with formal D8 / IN-10 / AC-09 anchors, so impl-catalog and task-contract coverage account for the typed usecase-boundary error shape without conflating it with the D1-D7 task-contract gate requirements. Attribute only the usecase RunReviewFixError catalogue entry to T017 because task-contract.json tracks catalogue entries, while the cli_composition/cli_driver behavior is covered by this task's implementation-and-test scope.

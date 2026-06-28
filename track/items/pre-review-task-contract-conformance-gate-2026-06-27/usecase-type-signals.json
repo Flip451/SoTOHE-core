@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-28T15:47:32Z",
-  "declaration_hash": "f37f27d5d9f5bf991b1d305015e5293d094b25caa37cbf516a8901b7d1abd85b",
+  "generated_at": "2026-06-28T22:18:29Z",
+  "declaration_hash": "01e032a076429a5d8b3850cef69342f0e1ea96df13cad3cb98e12935bbe447e6",
   "signals": [
     {
       "type_name": "CoverageVerifyCommand",
@@ -79,6 +79,17 @@
       "kind_tag": "application_service",
       "signal": "blue",
       "found_type": true
+    },
+    {
+      "type_name": "RunReviewFixError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
     },
     {
       "type_name": "TaskContractReaderPort",

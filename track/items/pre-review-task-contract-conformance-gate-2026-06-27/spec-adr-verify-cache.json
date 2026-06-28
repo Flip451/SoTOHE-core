@@ -3,10 +3,10 @@
   "entries": [
     {
       "claim_hash": "cc94e27b33840c0784817abfe23fe059ac6394df5b3e2d3c874b43edceb13167",
-      "evidence_hash": "d46b98c46acb9f6d29724c3457ba0ee646bbde21005cbca45ce9843cfc15c795",
+      "evidence_hash": "79e86fabf9620ec4c6599a3d7e4dfd1cc1b18903813abab7f13f4879647e2065",
       "verdict": {
         "kind": "pass",
-        "citation": "「これにより、merge まで先送りされていた契約履行確認の最初の hard gate が reviewer 入場前・per-task に移る。」"
+        "citation": "reviewer 起動の前に、「`task-contract.json` で**現在のタスクと完了済タスクに帰属するエントリの `impl_catalog` 信号が全て 🔵 か**」を判定する binary check (`bin/sotp task-contract check`) を置く。... これにより、merge  వరకు先送りされていた契約履行確認の最初の hard gate が reviewer 入場前・per-task に移る。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -26,10 +26,10 @@
     },
     {
       "claim_hash": "def10c907534773ee4cb403c2e8406627457d937cff80a6a6813acfd6b59ba26",
-      "evidence_hash": "d46b98c46acb9f6d29724c3457ba0ee646bbde21005cbca45ce9843cfc15c795",
+      "evidence_hash": "79e86fabf9620ec4c6599a3d7e4dfd1cc1b18903813abab7f13f4879647e2065",
       "verdict": {
         "kind": "pass",
-        "citation": "「どのタスクがどの型契約 entry を履行するか」のマッピングを、Phase 3 の **新規 artifact `task-contract.json`** に持つ。**writer は impl-planner（Phase 3）**。"
+        "citation": "「どのタスクがどの型契約 entry を履行するか」のマッピングを、Phase 3 の **新規 artifact `task-contract.json`**（作業名）に持つ。**writer は impl-planner（Phase 3）**。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -49,7 +49,7 @@
     },
     {
       "claim_hash": "2862e8c6b67a0408c9549d4b1f75f8cedb89af6c3098cc25a32dcd5fb4715cf7",
-      "evidence_hash": "d46b98c46acb9f6d29724c3457ba0ee646bbde21005cbca45ce9843cfc15c795",
+      "evidence_hash": "79e86fabf9620ec4c6599a3d7e4dfd1cc1b18903813abab7f13f4879647e2065",
       "verdict": {
         "kind": "pass",
         "citation": "done タスクに帰属するエントリ → signal 🔵 を要求 ... todo タスク (= 未来のタスク) に帰属するエントリ → 🟡 のみ許容 ... 🔴 は task status に関わらず常に blocker"
@@ -72,10 +72,10 @@
     },
     {
       "claim_hash": "443217435b97a1d007284f3c64a7c38ea0650489d73e3f8ae6b4cf2de635f685",
-      "evidence_hash": "d46b98c46acb9f6d29724c3457ba0ee646bbde21005cbca45ce9843cfc15c795",
+      "evidence_hash": "79e86fabf9620ec4c6599a3d7e4dfd1cc1b18903813abab7f13f4879647e2065",
       "verdict": {
         "kind": "pass",
-        "citation": "「どのタスクがどの型契約 entry を履行するか」のマッピングを、Phase 3 の **新規 artifact `task-contract.json`**（作業名）に持つ。"
+        "citation": "「どのタスクがどの型契約 entry を履行するか」のマッピングを、Phase 3 の **新規 artifact `task-contract.json`**（作業名）に持つ。**writer は impl-planner（Phase 3）**。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -95,10 +95,10 @@
     },
     {
       "claim_hash": "ca31a499241acaf08c6a7066472cc06a223cf19b68a2c709b8e4ae644ecddae1",
-      "evidence_hash": "d46b98c46acb9f6d29724c3457ba0ee646bbde21005cbca45ce9843cfc15c795",
+      "evidence_hash": "79e86fabf9620ec4c6599a3d7e4dfd1cc1b18903813abab7f13f4879647e2065",
       "verdict": {
         "kind": "pass",
-        "citation": "writer は impl-planner（Phase 3）. 型カタログ（Phase 2 / type-designer）にも `task-coverage.json` にも混ぜない."
+        "citation": "「どのタスクがどの型契約 entry を履行するか」のマッピングを、Phase 3 の **新規 artifact `task-contract.json`**（作業名）に持つ。**writer は impl-planner（Phase 3）**。型カタログ（Phase 2 / type-designer）にも `task-coverage.json` にも混ぜない。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -118,7 +118,7 @@
     },
     {
       "claim_hash": "3ca500eaaa5882767865ad14d8abba77b5aae37e7824118685ccd0b7c433c278",
-      "evidence_hash": "d46b98c46acb9f6d29724c3457ba0ee646bbde21005cbca45ce9843cfc15c795",
+      "evidence_hash": "79e86fabf9620ec4c6599a3d7e4dfd1cc1b18903813abab7f13f4879647e2065",
       "verdict": {
         "kind": "pass",
         "citation": "「どのタスクがどの型契約 entry を履行するか」のマッピング"
@@ -141,10 +141,10 @@
     },
     {
       "claim_hash": "0635256c1afb73b788d9b65d2a8ecde86d0c85f8a0fe21d138ec6969917b8f41",
-      "evidence_hash": "d46b98c46acb9f6d29724c3457ba0ee646bbde21005cbca45ce9843cfc15c795",
+      "evidence_hash": "79e86fabf9620ec4c6599a3d7e4dfd1cc1b18903813abab7f13f4879647e2065",
       "verdict": {
         "kind": "pass",
-        "citation": "reviewer 起動の前に、「`task-contract.json` で**現在のタスクと完了済タスクに帰属するエントリの `impl_catalog` 信号が全て 🔵 か**」を判定する binary check (`bin/sotp task-contract check`) を置く。🔵 でないエントリがあれば review に入れない (fail-closed・前倒し)."
+        "citation": "reviewer 起動の前に、「`task-contract.json` で**現在のタスクと完了済タスクに帰属するエントリの `impl_catalog` 信号が全て 🔵 か**」を判定する binary check (`bin/sotp task-contract check`) を置く。🔵 でないエントリがあれば review に入れない (fail-closed・前倒し)。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -164,10 +164,10 @@
     },
     {
       "claim_hash": "0635256c1afb73b788d9b65d2a8ecde86d0c85f8a0fe21d138ec6969917b8f41",
-      "evidence_hash": "d46b98c46acb9f6d29724c3457ba0ee646bbde21005cbca45ce9843cfc15c795",
+      "evidence_hash": "79e86fabf9620ec4c6599a3d7e4dfd1cc1b18903813abab7f13f4879647e2065",
       "verdict": {
         "kind": "pass",
-        "citation": "ゲートは、`task-contract.json` のタスク→エントリ完全帰属関係と、既存 `impl_catalog` のエントリ毎の信号値を**エントリをキーに突き合わせて**読むだけ"
+        "citation": "既存 `impl_catalog` のエントリ毎の信号値を**エントリをキーに突き合わせて**読むだけ"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -187,10 +187,10 @@
     },
     {
       "claim_hash": "0635256c1afb73b788d9b65d2a8ecde86d0c85f8a0fe21d138ec6969917b8f41",
-      "evidence_hash": "d46b98c46acb9f6d29724c3457ba0ee646bbde21005cbca45ce9843cfc15c795",
+      "evidence_hash": "79e86fabf9620ec4c6599a3d7e4dfd1cc1b18903813abab7f13f4879647e2065",
       "verdict": {
         "kind": "pass",
-        "citation": "done タスクに帰属するエントリ → signal 🔵 を要求 ... todo タスク (= 未来のタスク) に帰属するエントリ → 🟡 のみ許容 ... 🔴 は task status に関わらず常に blocker"
+        "citation": "これは Phase 3 で impl-planner が author する `impl-plan.json` がタスク状態 (status: todo / in_progress / done) として既に保持している情報なので、ゲートはここを SSoT として読む。これにより:\n\n- **done タスク**に帰属するエントリ → signal 🔵 を要求\n- **in_progress タスク** (= 現在のタスク) に帰属するエントリ → signal 🔵 を要求\n- **todo タスク** (= 未来のタスク) に帰属するエントリ → 🟡 のみ許容 ... 🔴 は task status に関わらず常に blocker"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -210,10 +210,10 @@
     },
     {
       "claim_hash": "17e6d4ae6dc2618ce228f5a8cff727725d63cf6bb36dc73f4bed5418e5caeacd",
-      "evidence_hash": "d46b98c46acb9f6d29724c3457ba0ee646bbde21005cbca45ce9843cfc15c795",
+      "evidence_hash": "79e86fabf9620ec4c6599a3d7e4dfd1cc1b18903813abab7f13f4879647e2065",
       "verdict": {
         "kind": "pass",
-        "citation": "reviewer 起動の前に、「`task-contract.json` で**現在のタスクと完了済タスクに帰属するエントリの `impl_catalog` 信号が全て 🔵 か**」を判定する binary check (`bin/sotp task-contract check`) を置く。🔵 でないエントリがあれば review に入れない (fail-closed・前倒し)。"
+        "citation": "reviewer 起動の前に、「`task-contract.json` で**現在のタスクと完了済タスクに帰属するエントリの `impl_catalog` 信号が全て 🔵 か**」を判定する binary check (`bin/sotp task-contract check`) を置く。🔵 でないエントリがあれば review に入れない (fail-closed・前倒し)。これは既存の freshness prepend (再計算) とは別の、**入場条件としての blocking 判定**である。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -233,7 +233,7 @@
     },
     {
       "claim_hash": "224be3888edb61b6a4a53d8498f0ca5ab96542e6bfb580eecaffb85c567e6455",
-      "evidence_hash": "d46b98c46acb9f6d29724c3457ba0ee646bbde21005cbca45ce9843cfc15c795",
+      "evidence_hash": "79e86fabf9620ec4c6599a3d7e4dfd1cc1b18903813abab7f13f4879647e2065",
       "verdict": {
         "kind": "pass",
         "citation": "- `bin/sotp task-contract coverage` — attribution 完全性のみ。`cargo make ci` の検証 chain に統合し、commit ごとに drift を検出する。"
@@ -256,10 +256,10 @@
     },
     {
       "claim_hash": "26bf63df065f42f2d090a7593fe94fdd50148ee76b3eafb9a17a0ffea47e17da",
-      "evidence_hash": "d46b98c46acb9f6d29724c3457ba0ee646bbde21005cbca45ce9843cfc15c795",
+      "evidence_hash": "79e86fabf9620ec4c6599a3d7e4dfd1cc1b18903813abab7f13f4879647e2065",
       "verdict": {
         "kind": "pass",
-        "citation": "`cargo make track-local-review` と `cargo make track-local-review-fix` の両方の `dependencies` に `task-contract-check` を追加する。これにより per-review-round で完全性 + 生存性の両判定が自動で発火する。"
+        "citation": "`cargo make task-contract-check` — `bin/sotp task-contract check` を呼び、`dependencies = [\"task-contract-coverage\"]` を宣言\n\n`cargo make track-local-review` と `cargo make track-local-review-fix` の両方の `dependencies` に `task-contract-check` を追加する。これにより per-review-round で完全性 + 生存性の両判定が自動で発火する。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -279,7 +279,7 @@
     },
     {
       "claim_hash": "e7847218edb024572cb7c8b146e4668d548219d2fffbc5de77da51a2512accab",
-      "evidence_hash": "d46b98c46acb9f6d29724c3457ba0ee646bbde21005cbca45ce9843cfc15c795",
+      "evidence_hash": "79e86fabf9620ec4c6599a3d7e4dfd1cc1b18903813abab7f13f4879647e2065",
       "verdict": {
         "kind": "pass",
         "citation": "実装上は、`bin/sotp task-contract check` の usecase 層 (`PreReviewGateInteractor`) に **impl-plan を読む secondary port** (`ImplPlanReaderPort` 等) を追加し、`task-contract.json` から得た task → entry 帰属を impl-plan.json の status フィルタで絞り込む。"
@@ -301,11 +301,34 @@
       }
     },
     {
-      "claim_hash": "73c56b78faf7b26ac6535f74767f83a610638556d9eb1daae20d1c9401901851",
-      "evidence_hash": "d46b98c46acb9f6d29724c3457ba0ee646bbde21005cbca45ce9843cfc15c795",
+      "claim_hash": "be13e33e10d8eaf40fc4e0266aca795dec71950fd89b0da5a76dd5bbf8fb6228",
+      "evidence_hash": "79e86fabf9620ec4c6599a3d7e4dfd1cc1b18903813abab7f13f4879647e2065",
       "verdict": {
         "kind": "pass",
-        "citation": "「test-pass (テスト通過) や stub-scan (スタブ走査) による本体認識型 (body-aware) の生存性判定は採らない」「ゲートは型契約履行のカバレッジ...のみを保証し、body の意味論的妥当性はゲートの保証範囲外」"
+        "citation": "`SubagentDispatchRequired(String)` ... `Err(RunReviewFixError::SubagentDispatchRequired(payload))` ... `CommandOutcome { stdout: Some(payload), stderr: None, exit_code: 64 }`"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-10",
+          "text_label": "Claude provider 経由の review-fix dispatch sentinel (exit code 64 + stdout `SUBAGENT_DISPATCH_REQUIRED` + JSON payload) の cross-layer pass-through 機構の実装: usecase 層 `RunReviewFixError` enum に `SubagentDispatchRequired(String)` variant を追加し、payload を typed error として運ぶ。cli_composition 層 shim が composition root から exit 64 + sentinel prefix を検出したとき、`Err(RunReviewFixError::SubagentDispatchRequired(payload))` を return する。cli_driver 層 dispatch arm は payload を `CommandOutcome { stdout: Some(payload), exit_code: 64 }` に reflect して呼び元 (orchestrator) に届ける。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "decision_id": "D8"
+        }
+      }
+    },
+    {
+      "claim_hash": "73c56b78faf7b26ac6535f74767f83a610638556d9eb1daae20d1c9401901851",
+      "evidence_hash": "79e86fabf9620ec4c6599a3d7e4dfd1cc1b18903813abab7f13f4879647e2065",
+      "verdict": {
+        "kind": "pass",
+        "citation": "test-pass (テスト通過) や stub-scan (スタブ走査) による本体認識型 (body-aware) の生存性判定は**採らない**。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -325,10 +348,10 @@
     },
     {
       "claim_hash": "d693ba14c41d108f78839f048124a6f35a32553da8e2304f1e94040d77f03d5b",
-      "evidence_hash": "d46b98c46acb9f6d29724c3457ba0ee646bbde21005cbca45ce9843cfc15c795",
+      "evidence_hash": "79e86fabf9620ec4c6599a3d7e4dfd1cc1b18903813abab7f13f4879647e2065",
       "verdict": {
         "kind": "pass",
-        "citation": "「新 chain (`task_conformance` 等) を切らず、型カタログにも何も足さない。」／「binary check で実装できる。」／「ゲート構成 (ゲート行列 / 厳格度 / view) の表面積を増やす。」"
+        "citation": "「新 chain (`task_conformance` 等) を切らず、型カタログにも何も足さない。」 「binary check で実装できる。」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -348,10 +371,10 @@
     },
     {
       "claim_hash": "3c977b19fd66ec30a76d7d1fff7f5e71d9fbb4799ff7dccdaa2a49edd0732b88",
-      "evidence_hash": "d46b98c46acb9f6d29724c3457ba0ee646bbde21005cbca45ce9843cfc15c795",
+      "evidence_hash": "79e86fabf9620ec4c6599a3d7e4dfd1cc1b18903813abab7f13f4879647e2065",
       "verdict": {
         "kind": "pass",
-        "citation": "「型カタログ（Phase 2 / type-designer）にも `task-coverage.json` にも混ぜない。\n\n型カタログに載せない理由: (a) task は Phase 3 で初めて生まれる概念であり、Phase 2 成果物に task→entry を載せると Phase 3 概念への**後方依存**（SoT Chain 逆流・順序違反）になる。」"
+        "citation": "「型カタログ（Phase 2 / type-designer）にも `task-coverage.json` にも混ぜない。」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -371,10 +394,10 @@
     },
     {
       "claim_hash": "075c35c62af8b34ca1d67708bfad29917e3a05c598963c9acdc9405adc5189ee",
-      "evidence_hash": "d46b98c46acb9f6d29724c3457ba0ee646bbde21005cbca45ce9843cfc15c795",
+      "evidence_hash": "79e86fabf9620ec4c6599a3d7e4dfd1cc1b18903813abab7f13f4879647e2065",
       "verdict": {
         "kind": "pass",
-        "citation": "`task-coverage.json` に混ぜない理由 (責務分離): `task-coverage.json` の責務は**仕様被覆** (Phase1↔Phase3 の完全性: 全仕様要素が ≥1 タスクで覆われているか)。本マッピングの責務は**型契約の履行帰属** (Phase2↔Phase3: 各タスクが履行するカタログエントリを pre-review ゲートへ供給する)。両者は (i) 参照する上流 SSoT が違い (`spec.json` vs `<layer>-types.json`)、(ii) 供給先ゲートが違い (被覆完全性 vs pre-review 履行性)、(iii) 不変条件が違う (仕様要素への全射 vs 型契約エントリの帰属完備性 + 参照整合性)。"
+        "citation": "task-coverage.json に混ぜない理由 (責務分離): `task-coverage.json` の責務は**仕様被覆** (Phase1↔Phase3 の完全性: 全仕様要素が ≥1 タスクで覆われているか)。本マッピングの責務は**型契約の履行帰属** (Phase2↔Phase3: 各タスクが履行するカタログエントリを pre-review ゲートへ供給する)。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -394,10 +417,10 @@
     },
     {
       "claim_hash": "00f0485410c3b28bf08b70a263f66ff8ec03c8c9e63f548fe55dbff0c2a2daa3",
-      "evidence_hash": "d46b98c46acb9f6d29724c3457ba0ee646bbde21005cbca45ce9843cfc15c795",
+      "evidence_hash": "79e86fabf9620ec4c6599a3d7e4dfd1cc1b18903813abab7f13f4879647e2065",
       "verdict": {
         "kind": "pass",
-        "citation": "「pre-review の blocking 入場ゲートを binary check として新設する」「fail-closed・前倒し」"
+        "citation": "「入場条件としての blocking 判定」「fail-closed・前倒し」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -417,10 +440,10 @@
     },
     {
       "claim_hash": "b2e64de0483d6db83f61807b18e3da5ad6c9cdd0328e02adf3ef020c35c39bb9",
-      "evidence_hash": "d46b98c46acb9f6d29724c3457ba0ee646bbde21005cbca45ce9843cfc15c795",
+      "evidence_hash": "79e86fabf9620ec4c6599a3d7e4dfd1cc1b18903813abab7f13f4879647e2065",
       "verdict": {
         "kind": "pass",
-        "citation": "新 chain (`task_conformance` 等) を切らず、型カタログにも何も足さない。… 検証エンジン (`SignalEvaluatorV2`) は丸ごと再利用する。"
+        "citation": "検証エンジン (`SignalEvaluatorV2`) は丸ごと再利用する。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -440,10 +463,10 @@
     },
     {
       "claim_hash": "d2156ec6a3d64618f3e0422a6781df8d24b6cfba9eb32fec0df2dede63bf3b76",
-      "evidence_hash": "d46b98c46acb9f6d29724c3457ba0ee646bbde21005cbca45ce9843cfc15c795",
+      "evidence_hash": "79e86fabf9620ec4c6599a3d7e4dfd1cc1b18903813abab7f13f4879647e2065",
       "verdict": {
         "kind": "pass",
-        "citation": "「『どのタスクがどの型契約 entry を履行するか』のマッピングを、Phase 3 の 新規 artifact `task-contract.json` に持つ。」 / 「1 件でも未紐付けのエントリが残ると、ゲートはそのエントリの信号 (🟡/🔴) を見ないまま素通りさせるので、結局 merge まで止まらない＝ shift-left の意味がなくなる。」"
+        "citation": "「1 件でも未紐付けのエントリが残ると、ゲートはそのエントリの信号 (🟡/🔴) を見ないまま素通りさせる」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -463,10 +486,10 @@
     },
     {
       "claim_hash": "0957258327aa3ace5fb1a56480fbb425b5ea9f50b3818968ffb33ef316877894",
-      "evidence_hash": "d46b98c46acb9f6d29724c3457ba0ee646bbde21005cbca45ce9843cfc15c795",
+      "evidence_hash": "79e86fabf9620ec4c6599a3d7e4dfd1cc1b18903813abab7f13f4879647e2065",
       "verdict": {
         "kind": "pass",
-        "citation": "「どのタスクがどの型契約 entry を履行するか」のマッピングを、Phase 3 の **新規 artifact `task-contract.json`**（作業名）に持つ。… 1 件でも未紐付けのエントリが残ると、ゲートはそのエントリの信号 (🟡/🔴) を見ないまま素通りさせる"
+        "citation": "「どのタスクがどの型契約 entry を履行するか」のマッピングを、Phase 3 の **新規 artifact `task-contract.json`**（作業名）に持つ。**writer は impl-planner（Phase 3）**。型カタログ（Phase 2 / type-designer）にも `task-coverage.json` にも混ぜない。\n\n`task-contract.json` は「pre-review ゲートに見せたい信号を漏れなくタスクに紐付けたか」だけを言う契約。1 件でも未紐付けのエントリが残ると、ゲートはそのエントリの信号 (🟡/🔴) を見ないまま素通りさせる"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -486,7 +509,7 @@
     },
     {
       "claim_hash": "0978b296102d32031a8ad9ea70cf8314e3cdff64d98ac2fbf6f31efcae7d1c51",
-      "evidence_hash": "d46b98c46acb9f6d29724c3457ba0ee646bbde21005cbca45ce9843cfc15c795",
+      "evidence_hash": "79e86fabf9620ec4c6599a3d7e4dfd1cc1b18903813abab7f13f4879647e2065",
       "verdict": {
         "kind": "pass",
         "citation": "ゲートの合否基準は「`task-contract.json` が型カタログの全エントリをいずれかのタスクに帰属させており (attribution 完全性)、かつ現在のタスクと完了済タスクに帰属するエントリの信号が全て 🔵 (生存性判定)」だけとする。test-pass (テスト通過) や stub-scan (スタブ走査) による本体認識型 (body-aware) の生存性判定は**採らない**。"
@@ -509,10 +532,10 @@
     },
     {
       "claim_hash": "0978b296102d32031a8ad9ea70cf8314e3cdff64d98ac2fbf6f31efcae7d1c51",
-      "evidence_hash": "d46b98c46acb9f6d29724c3457ba0ee646bbde21005cbca45ce9843cfc15c795",
+      "evidence_hash": "79e86fabf9620ec4c6599a3d7e4dfd1cc1b18903813abab7f13f4879647e2065",
       "verdict": {
         "kind": "pass",
-        "citation": "done タスクに帰属するエントリ → signal 🔵 を要求\nin_progress タスク (= 現在のタスク) に帰属するエントリ → signal 🔵 を要求\ntodo タスク (= 未来のタスク) に帰属するエントリ → 🟡 のみ許容 (まだ実装していないので shape mismatch 等は当然発生する)。🔴 は task status に関わらず常に blocker"
+        "citation": "「done タスク」...「🔵 を要求」「todo タスク」...「🟡 のみ許容」「🔴 は task status に関わらず常に blocker」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -532,10 +555,10 @@
     },
     {
       "claim_hash": "214168b37d83d6faf1f99c96412c9c16d4efc3cc77482c75f4975b6977d09363",
-      "evidence_hash": "d46b98c46acb9f6d29724c3457ba0ee646bbde21005cbca45ce9843cfc15c795",
+      "evidence_hash": "79e86fabf9620ec4c6599a3d7e4dfd1cc1b18903813abab7f13f4879647e2065",
       "verdict": {
         "kind": "pass",
-        "citation": "ゲートは、`task-contract.json` のタスク→エントリ完全帰属関係と、既存 `impl_catalog` のエントリ毎の信号値を**エントリをキーに突き合わせて**読むだけ。新 chain (`task_conformance` 等) を切らず、型カタログにも何も足さない。検証エンジン (`SignalEvaluatorV2`) は丸ごと再利用する。"
+        "citation": "既存 `impl_catalog` のエントリ毎の信号値を**エントリをキーに突き合わせて**読むだけ。… 検証エンジン (`SignalEvaluatorV2`) は丸ごと再利用する。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -555,10 +578,10 @@
     },
     {
       "claim_hash": "467e3c3ebe283ac06726d019d230c99f9db99338cd3ce8c0effbccb0306994e8",
-      "evidence_hash": "d46b98c46acb9f6d29724c3457ba0ee646bbde21005cbca45ce9843cfc15c795",
+      "evidence_hash": "79e86fabf9620ec4c6599a3d7e4dfd1cc1b18903813abab7f13f4879647e2065",
       "verdict": {
         "kind": "pass",
-        "citation": "「writer は impl-planner（Phase 3）。型カタログ（Phase 2 / type-designer）にも `task-coverage.json` にも混ぜない。」「task は Phase 3 で初めて生まれる概念であり、Phase 2 成果物に task→entry を載せると Phase 3 概念への後方依存（SoT Chain 逆流・順序違反）になる。」"
+        "citation": "「writer は impl-planner（Phase 3）」「Phase 2 成果物に task→entry を載せると Phase 3 概念への後方依存（SoT Chain 逆流・順序違反）になる」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -578,10 +601,10 @@
     },
     {
       "claim_hash": "6dfe414194bae09187a3002279da54cf5dcd925b094c7fbc5f1e882f60b52e15",
-      "evidence_hash": "d46b98c46acb9f6d29724c3457ba0ee646bbde21005cbca45ce9843cfc15c795",
+      "evidence_hash": "79e86fabf9620ec4c6599a3d7e4dfd1cc1b18903813abab7f13f4879647e2065",
       "verdict": {
         "kind": "pass",
-        "citation": "そこで 2 subcommand に分割する: - `bin/sotp task-contract coverage` — attribution 完全性のみ。 ... - `bin/sotp task-contract check` — 生存性のみ。 ... 両者は **`task-contract` ドメイン配下** に置く。一般 verifier ファミリー (`verify-*`) は既に肥大化しており、domain ownership を希釈するため `verify-task-contract-coverage` のような形には逃さない。"
+        "citation": "そこで 2 subcommand に分割する: - `bin/sotp task-contract coverage` — attribution 完全性のみ。- `bin/sotp task-contract check` — 生存性のみ。両者は **`task-contract` ドメイン配下** に置く。一般 verifier ファミリー (`verify-*`) は既に肥大化しており、domain ownership を希釈するため `verify-task-contract-coverage` のような形には逃さない。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -601,10 +624,10 @@
     },
     {
       "claim_hash": "1ac291f3f9acd02df724d4e982eed27265ae154d0f37a8ae6cc2b12c7886b68a",
-      "evidence_hash": "d46b98c46acb9f6d29724c3457ba0ee646bbde21005cbca45ce9843cfc15c795",
+      "evidence_hash": "79e86fabf9620ec4c6599a3d7e4dfd1cc1b18903813abab7f13f4879647e2065",
       "verdict": {
         "kind": "pass",
-        "citation": "生存性判定 task の `dependencies` に完全性判定 task を組み込む: `cargo make task-contract-check` — `bin/sotp task-contract check` を呼び、`dependencies = [\"task-contract-coverage\"]` を宣言。`bin/sotp` バイナリ内部で連結する案 (バイナリ内 hardcode) は採らない — 配線は cargo make 層に局所化し、各 `bin/sotp` subcommand は単一責務のままに保つ。"
+        "citation": "「生存性判定 task の `dependencies` に完全性判定 task を組み込む」および「バイナリ内 hardcode は採らない — 配線は cargo make 層に局所化し、各 `bin/sotp` subcommand は単一責務のまま」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -624,10 +647,10 @@
     },
     {
       "claim_hash": "91c5c462efaf4aebaa314c9cb8d5e54695bcad6d171f65361cca1962cb224c0d",
-      "evidence_hash": "d46b98c46acb9f6d29724c3457ba0ee646bbde21005cbca45ce9843cfc15c795",
+      "evidence_hash": "79e86fabf9620ec4c6599a3d7e4dfd1cc1b18903813abab7f13f4879647e2065",
       "verdict": {
         "kind": "pass",
-        "citation": "「Phase 3 の新規 artifact `task-contract.json`」; 「writer は impl-planner（Phase 3）」"
+        "citation": "「どのタスクがどの型契約 entry を履行するか」のマッピングを、Phase 3 の新規 artifact `task-contract.json` に持つ。writer は impl-planner（Phase 3）。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -647,10 +670,10 @@
     },
     {
       "claim_hash": "3951baa0d8facc3f4cf6526007c65fe889ed93dfd2fa788d0b6a0e57012c68d6",
-      "evidence_hash": "d46b98c46acb9f6d29724c3457ba0ee646bbde21005cbca45ce9843cfc15c795",
+      "evidence_hash": "79e86fabf9620ec4c6599a3d7e4dfd1cc1b18903813abab7f13f4879647e2065",
       "verdict": {
         "kind": "pass",
-        "citation": "「1 件でも未紐付けのエントリが残ると、ゲートはそのエントリの信号 (🟡/🔴) を見ないまま素通りさせるので、結局 merge まで止まらない」および「型契約エントリの帰属完備性 + 参照整合性」"
+        "citation": "「1 件でも未紐付けのエントリが残ると」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -670,7 +693,7 @@
     },
     {
       "claim_hash": "30461c6b545d8238ecb541a5f3b5aa98ce1ec61949842964cfe767e0dc6a98ec",
-      "evidence_hash": "d46b98c46acb9f6d29724c3457ba0ee646bbde21005cbca45ce9843cfc15c795",
+      "evidence_hash": "79e86fabf9620ec4c6599a3d7e4dfd1cc1b18903813abab7f13f4879647e2065",
       "verdict": {
         "kind": "pass",
         "citation": "reviewer 起動の前に、「`task-contract.json` で**現在のタスクと完了済タスクに帰属するエントリの `impl_catalog` 信号が全て 🔵 か**」を判定する binary check (`bin/sotp task-contract check`) を置く。🔵 でないエントリがあれば review に入れない (fail-closed・前倒し)。"
@@ -693,10 +716,10 @@
     },
     {
       "claim_hash": "30461c6b545d8238ecb541a5f3b5aa98ce1ec61949842964cfe767e0dc6a98ec",
-      "evidence_hash": "d46b98c46acb9f6d29724c3457ba0ee646bbde21005cbca45ce9843cfc15c795",
+      "evidence_hash": "79e86fabf9620ec4c6599a3d7e4dfd1cc1b18903813abab7f13f4879647e2065",
       "verdict": {
         "kind": "pass",
-        "citation": "「`cargo make track-local-review` と `cargo make track-local-review-fix` の両方の `dependencies` に `task-contract-check` を追加する。」"
+        "citation": "`cargo make task-contract-check` — `bin/sotp task-contract check` を呼び、`dependencies = [\"task-contract-coverage\"]` を宣言; `cargo make track-local-review` と `cargo make track-local-review-fix` の両方の `dependencies` に `task-contract-check` を追加"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -716,10 +739,10 @@
     },
     {
       "claim_hash": "a87c1a1900f39923c1f2cde1331119d57154050bb2f44a42ab895d1fae109e63",
-      "evidence_hash": "d46b98c46acb9f6d29724c3457ba0ee646bbde21005cbca45ce9843cfc15c795",
+      "evidence_hash": "79e86fabf9620ec4c6599a3d7e4dfd1cc1b18903813abab7f13f4879647e2065",
       "verdict": {
         "kind": "pass",
-        "citation": "「現在のタスクと完了済タスクに帰属するエントリの `impl_catalog` 信号が全て 🔵 か」を判定する binary check"
+        "citation": "`task-contract.json` で**現在のタスクと完了済タスクに帰属するエントリの `impl_catalog` 信号が全て 🔵 か**」を判定する binary check (`bin/sotp task-contract check`) を置く。🔵 でないエントリがあれば review に入れない (fail-closed・前倒し)."
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -739,7 +762,7 @@
     },
     {
       "claim_hash": "a87c1a1900f39923c1f2cde1331119d57154050bb2f44a42ab895d1fae109e63",
-      "evidence_hash": "d46b98c46acb9f6d29724c3457ba0ee646bbde21005cbca45ce9843cfc15c795",
+      "evidence_hash": "79e86fabf9620ec4c6599a3d7e4dfd1cc1b18903813abab7f13f4879647e2065",
       "verdict": {
         "kind": "pass",
         "citation": "done タスクに帰属するエントリ → signal 🔵 を要求 ... todo タスクに帰属するエントリ → 🟡 のみ許容 ... 🔴 は task status に関わらず常に blocker"
@@ -762,7 +785,7 @@
     },
     {
       "claim_hash": "1968f8bf1bea6f58d52f8284887308a02d225416a89de53733a533c8f1f20a4b",
-      "evidence_hash": "d46b98c46acb9f6d29724c3457ba0ee646bbde21005cbca45ce9843cfc15c795",
+      "evidence_hash": "79e86fabf9620ec4c6599a3d7e4dfd1cc1b18903813abab7f13f4879647e2065",
       "verdict": {
         "kind": "pass",
         "citation": "reviewer 起動の前に、「`task-contract.json` で**現在のタスクと完了済タスクに帰属するエントリの `impl_catalog` 信号が全て 🔵 か**」を判定する binary check (`bin/sotp task-contract check`) を置く。🔵 でないエントリがあれば review に入れない (fail-closed・前倒し)。"
@@ -785,10 +808,10 @@
     },
     {
       "claim_hash": "3b44e5fba977a940456d1352a3d57e38ad01cdab57d858d60adbd80d38fb779e",
-      "evidence_hash": "d46b98c46acb9f6d29724c3457ba0ee646bbde21005cbca45ce9843cfc15c795",
+      "evidence_hash": "79e86fabf9620ec4c6599a3d7e4dfd1cc1b18903813abab7f13f4879647e2065",
       "verdict": {
         "kind": "pass",
-        "citation": "実行順は固定: 生存性判定は完全性判定が通った状態でのみ意味を持つ"
+        "citation": "生存性判定 task の `dependencies` に完全性判定 task を組み込む\n\n`cargo make track-local-review` と `cargo make track-local-review-fix` の両方の `dependencies` に `task-contract-check` を追加する。これにより per-review-round で完全性 + 生存性の両判定が自動で発火する。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -808,10 +831,10 @@
     },
     {
       "claim_hash": "3b44e5fba977a940456d1352a3d57e38ad01cdab57d858d60adbd80d38fb779e",
-      "evidence_hash": "d46b98c46acb9f6d29724c3457ba0ee646bbde21005cbca45ce9843cfc15c795",
+      "evidence_hash": "79e86fabf9620ec4c6599a3d7e4dfd1cc1b18903813abab7f13f4879647e2065",
       "verdict": {
         "kind": "pass",
-        "citation": "「done タスクに帰属するエントリ → signal 🔵 を要求」「in_progress タスク (= 現在のタスク) に帰属するエントリ → signal 🔵 を要求」「todo タスク (= 未来のタスク) に帰属するエントリ → 🟡 のみ許容 (まだ実装していないので shape mismatch 等は当然発生する)。🔴 は task status に関わらず常に blocker」「`task-contract.json` から得た task → entry 帰属を impl-plan.json の status フィルタで絞り込む。」"
+        "citation": "done タスクに帰属するエントリ → signal 🔵 を要求 ... todo タスクに帰属するエントリ → 🟡 のみ許容 ... 🔴 は task status に関わらず常に blocker"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -831,10 +854,10 @@
     },
     {
       "claim_hash": "55101e77aed5b394bde03f1e88c85e0484d8b204835d92183adb3199607d81c2",
-      "evidence_hash": "d46b98c46acb9f6d29724c3457ba0ee646bbde21005cbca45ce9843cfc15c795",
+      "evidence_hash": "79e86fabf9620ec4c6599a3d7e4dfd1cc1b18903813abab7f13f4879647e2065",
       "verdict": {
         "kind": "pass",
-        "citation": "`bin/sotp task-contract coverage` — attribution 完全性のみ。`bin/sotp task-contract check` — 生存性のみ。"
+        "citation": "- `bin/sotp task-contract coverage` — attribution 完全性のみ。`cargo make ci` の検証 chain に統合し、commit ごとに drift を検出する。\n- `bin/sotp task-contract check` — 生存性のみ。pre-review blocking gate として `cargo make track-local-review` chain に置く"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -854,10 +877,10 @@
     },
     {
       "claim_hash": "55101e77aed5b394bde03f1e88c85e0484d8b204835d92183adb3199607d81c2",
-      "evidence_hash": "d46b98c46acb9f6d29724c3457ba0ee646bbde21005cbca45ce9843cfc15c795",
+      "evidence_hash": "79e86fabf9620ec4c6599a3d7e4dfd1cc1b18903813abab7f13f4879647e2065",
       "verdict": {
         "kind": "pass",
-        "citation": "- `cargo make task-contract-coverage` — `bin/sotp task-contract coverage` を呼ぶ\n- `cargo make task-contract-check` — `bin/sotp task-contract check` を呼び、`dependencies = [\"task-contract-coverage\"]` を宣言\n\nこれにより、`cargo make task-contract-check` を呼ぶだけで完全性判定 → 生存性判定の順で必ず走り"
+        "citation": "D5 で 2 subcommand に分割した `task-contract coverage` (完全性) と `task-contract check` (生存性) は、コマンドとしては独立だが**実行順は固定**: 生存性判定は完全性判定が通った状態でのみ意味を持つ (orphan エントリが存在すると、その signal が 🟡/🔴 でもゲート入力から漏れ、生存性判定は「自分が知っているエントリだけ全部 🔵」という誤った安心を返してしまう)。\n\n- `cargo make task-contract-coverage` — `bin/sotp task-contract coverage` を呼ぶ\n- `cargo make task-contract-check` — `bin/sotp task-contract check` を呼び、`dependencies = [\"task-contract-coverage\"]` を宣言\n\nこれにより、`cargo make task-contract-check` を呼ぶだけで完全性判定 → 生存性判定の順で必ず走り"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -872,6 +895,29 @@
         "data": {
           "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
           "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "b68691e73fadbbbf1b01e52545040a2e65f5ad93dc7cf017caff61b1728cfdbf",
+      "evidence_hash": "79e86fabf9620ec4c6599a3d7e4dfd1cc1b18903813abab7f13f4879647e2065",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- usecase 層 `RunReviewFixError` enum に新 variant `SubagentDispatchRequired(String)` を追加。tuple field は exit 64 + sentinel + JSON payload を1つの opaque string として carry する。\n- `ReviewServiceImpl::run_fix_local` (cli_composition 層 shim) は composition root から exit 64 + SUBAGENT_DISPATCH_REQUIRED prefix を検出したとき、`Err(RunReviewFixError::SubagentDispatchRequired(payload))` を return する。\n- cli_driver 層 `review_run_fix_local` は `Err(RunReviewFixError::SubagentDispatchRequired(payload))` 受領時、`CommandOutcome { stdout: Some(payload), stderr: None, exit_code: 64 }` を生成して呼び元に pass-through する。これにより stdout の sentinel + JSON payload + exit 64 が orchestrator に届く。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "ユニットテストで以下を検証する: (a) composition root が exit 64 + `SUBAGENT_DISPATCH_REQUIRED` prefix を含む CommandOutcome を return した場合、`ReviewServiceImpl::run_fix_local` は `Err(RunReviewFixError::SubagentDispatchRequired(payload))` を返す (payload は exit 64 出力の stdout 文字列をそのまま carry)、(b) cli_driver の `review_run_fix_local` が `Err(RunReviewFixError::SubagentDispatchRequired(payload))` を受け取ったとき、`CommandOutcome { stdout: Some(payload), stderr: None, exit_code: 64 }` を return し、`REVIEW_FIX_STATUS: failed` への remap が発生しない、(c) Claude provider 経由で `ReviewCompositionRoot::review_driver().handle(RunFixLocal {...})` を呼ぶと exit 64 + sentinel が stdout に preserve される。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "decision_id": "D8"
         }
       }
     }

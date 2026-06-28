@@ -161,6 +161,21 @@ impl ReviewService for ReviewServiceImpl {
         };
         match root.review_run_fix_local(comp_input) {
             Ok(outcome) => {
+                // Detect claude subagent dispatch sentinel: exit 64 +
+                // `SUBAGENT_DISPATCH_REQUIRED` on the first stdout line.
+                // The composition root already handles the claude provider
+                // path correctly — this shim must NOT map exit 64 to
+                // "failed" and overwrite stdout with "REVIEW_FIX_STATUS:
+                // failed". Propagate as a typed error so the driver can
+                // pass the payload through verbatim without knowing the
+                // sentinel string or exit code itself.
+                let stdout_str = outcome.stdout.as_deref().unwrap_or("");
+                if outcome.exit_code == super::run_fix::SUBAGENT_DISPATCH_EXIT_CODE
+                    && stdout_str.starts_with(super::run_fix::SUBAGENT_DISPATCH_SENTINEL)
+                {
+                    let payload = outcome.stdout.unwrap_or_default();
+                    return Err(RunReviewFixError::SubagentDispatchRequired(payload));
+                }
                 // Smoke-test failures from cli_composition::review_v2::run_fix
                 // return exit 2 with `[ERROR] smoke test failed: ...` on stderr
                 // and no stdout sentinel. Distinguish them from genuine

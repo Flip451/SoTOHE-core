@@ -1121,6 +1121,54 @@ exit 0
         assert!(json.contains("\"round_type\":\"fast\""), "JSON must carry round_type: {json}");
     }
 
+    /// Regression: exit 64 + `SUBAGENT_DISPATCH_REQUIRED` sentinel must pass through
+    /// the full `ReviewDriver` → `ReviewServiceImpl` chain unchanged when
+    /// `review-fix-lead.provider` is `"claude"`.
+    ///
+    /// Before the fix, `ReviewServiceImpl::run_fix_local` mapped exit 64 to
+    /// `status: "failed"` and the driver then rewrote stdout to
+    /// `"REVIEW_FIX_STATUS: failed"` with exit code 1, so the orchestrator never
+    /// saw the dispatch sentinel and could not launch the Claude subagent.
+    #[test]
+    fn review_driver_handle_claude_provider_passes_through_subagent_dispatch_sentinel() {
+        let _lock = cwd_lock().lock().unwrap();
+
+        let dir = tempfile::tempdir().unwrap();
+        GitRunner::at(dir.path()).assert_success(&["init", "-b", "main"]);
+        write_agent_profiles(dir.path(), "claude");
+        let briefing = dir.path().join("briefing.md");
+        fs::write(&briefing, "# Briefing\n").unwrap();
+
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(dir.path()).unwrap();
+
+        let input = cli_driver::review::ReviewInput::RunFixLocal {
+            scope: "cli_composition".to_owned(),
+            briefing_file: briefing,
+            track_id: "review-fix-codex-rustify-2026-05-31".to_owned(),
+            round_type: "fast".to_owned(),
+            model: Some("gpt-5.5".to_owned()),
+        };
+        let outcome = crate::review_v2::ReviewCompositionRoot::new().review_driver().handle(input);
+
+        assert_eq!(
+            outcome.exit_code,
+            crate::review_v2::run_fix::SUBAGENT_DISPATCH_EXIT_CODE,
+            "driver must pass through SUBAGENT_DISPATCH_EXIT_CODE (64) for claude provider; \
+             got {} — was it remapped to 1 by the failed-status path?",
+            outcome.exit_code
+        );
+        let stdout = outcome.stdout.expect("dispatch sentinel must appear on stdout");
+        assert!(
+            stdout.starts_with(crate::review_v2::run_fix::SUBAGENT_DISPATCH_SENTINEL),
+            "stdout first line must be SUBAGENT_DISPATCH_SENTINEL, got: {stdout:?}"
+        );
+        assert!(
+            !stdout.contains("REVIEW_FIX_STATUS:"),
+            "driver must NOT rewrite sentinel to REVIEW_FIX_STATUS line, got: {stdout:?}"
+        );
+    }
+
     #[test]
     fn review_run_claude_returns_branch_error_not_discovery_error_for_non_track_branch() {
         let dir = tempfile::tempdir().unwrap();

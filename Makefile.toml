@@ -672,6 +672,8 @@ case "$BRANCH" in
 esac
 ''']
 
+# Cargo-make dependencies run before task scripts, so pre-gate track/branch
+# guards must live outside these wrappers or inside the gate commands.
 [tasks.track-local-review]
 description = "[wrapper] Fire attribution-completeness + liveness gates via task-contract-check dependency (D6: signal refresh → coverage → check chained by cargo-make dependencies; active track auto-resolved from the current git branch in each gate), then invoke a single reviewer round via bin/sotp review local. Provider-agnostic: both Claude `.claude/agents/review-fix-lead.md` and Codex `.agents/skills/review-fix-lead/SKILL.md` skills call this task per round (the agent / skill owns the fix loop itself)."
 dependencies = ["task-contract-check"]

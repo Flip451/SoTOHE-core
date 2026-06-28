@@ -135,13 +135,36 @@
       },
       "methods": [],
       "module_path": "pre_review_gate",
-      "docs": "Interactor implementing CoverageVerifyService (attribution-completeness check). Holds two injected secondary ports: task_contract_reader reads task-contract.json; signal_reader reads each required per-layer type-signals document via read_signals so absent/read/decode failures fail closed, and those documents enumerate all catalogue entry keys. Checks that every signaled entry is attributed to at least one task (orphan detection) and every attributed entry has a signal (referential integrity). All fields are private (Arc<dyn Port>). Shares TaskContractReaderPort and ImplCatalogSignalReaderPort with PreReviewGateInteractor (reuse per spec IN-07 notes).",
+      "docs": "Interactor implementing CoverageVerifyService (attribution-completeness check). Holds two injected secondary ports: task_contract_reader reads task-contract.json; signal_reader visits each canonical layer via read_optional_signals so Ok(Some(document)) enumerates catalogue entry keys, Ok(None) becomes CoverageViolation::MissingSignalDocument, and read/decode failures propagate as SignalReadFailed. Checks that every signaled entry is attributed to at least one task (orphan detection) and every attributed entry has a signal (referential integrity). All fields are private (Arc<dyn Port>). Shares TaskContractReaderPort and ImplCatalogSignalReaderPort with PreReviewGateInteractor (reuse per spec IN-07 notes).",
       "spec_refs": [
         { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-03" },
         { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-07" },
         { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "CN-07" },
         { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-02" },
         { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-08" }
+      ],
+      "informal_grounds": []
+    },
+    "RunReviewFixError": {
+      "action": "modify",
+      "role": { "ErrorType": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "InvalidScope",              "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "InvalidTrackId",            "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "InvalidRoundType",          "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "SmokeTestFailed",           "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "FixRunnerFailed",           "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "SubagentDispatchRequired",  "payload": { "kind": "tuple", "fields": ["String"] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "review_v2::run_review_fix",
+      "docs": "Error type for RunReviewFixService, the usecase boundary for the review-fix workflow. InvalidScope / InvalidTrackId / InvalidRoundType cover argument validation failures. SmokeTestFailed covers forbidden sandbox flag detection or codex version range failure. FixRunnerFailed wraps ReviewFixRunnerError from the port without leaking infrastructure types. SubagentDispatchRequired (D8 / IN-10 / AC-09) signals that the request must be delegated to an external review-fix runner — carries the exit-64 + SUBAGENT_DISPATCH_REQUIRED sentinel + JSON payload as an opaque string so the dispatch sentinel reaches the orchestrator unmodified through the cli_driver dispatch arm.",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-10" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-09" }
       ],
       "informal_grounds": []
     }
@@ -261,7 +284,7 @@
           "generics": [],
           "has_default_impl": true,
           "where_predicates": [],
-          "docs": "Read the per-layer impl-catalog type-signals document when absence is an expected state. Returns Ok(None) only when the adapter can positively classify the document as absent (e.g. NotFound). Other read/decode failures must return SignalReadFailed. Used by the all-layer iterate path of PreReviewGateInteractor::check (cmd.layer = None), where missing signal documents are an expected no-entries state for liveness-only review gating. CoverageVerifyInteractor must use read_signals instead so attribution completeness fails closed when a required layer signal document is absent."
+          "docs": "Read the per-layer impl-catalog type-signals document when absence must be distinguished from other read failures. Returns Ok(None) only when the adapter can positively classify the document as absent (e.g. NotFound). Other read/decode failures must return SignalReadFailed. Used by the all-layer iterate path of PreReviewGateInteractor::check (cmd.layer = None), where missing signal documents are an expected no-entries state for liveness-only review gating. CoverageVerifyInteractor also uses this method over canonical layers, but converts Ok(None) into CoverageViolation::MissingSignalDocument so attribution completeness fails closed as a Blocked outcome."
         }
       ],
       "supertrait_bounds": ["Send", "Sync"],
@@ -355,6 +378,9 @@
     { "action": "add", "trait_ref": "core::cmp::PartialEq", "for_type": "CoverageVerifyCommand" },
     { "action": "add", "trait_ref": "core::cmp::Eq", "for_type": "CoverageVerifyCommand" },
     { "action": "add", "trait_ref": "PreReviewGateService", "for_type": "PreReviewGateInteractor" },
-    { "action": "add", "trait_ref": "CoverageVerifyService", "for_type": "CoverageVerifyInteractor" }
+    { "action": "add", "trait_ref": "CoverageVerifyService", "for_type": "CoverageVerifyInteractor" },
+    { "action": "modify", "trait_ref": "core::fmt::Debug", "for_type": "RunReviewFixError" },
+    { "action": "modify", "trait_ref": "core::fmt::Display", "for_type": "RunReviewFixError" },
+    { "action": "modify", "trait_ref": "core::error::Error", "for_type": "RunReviewFixError" }
   ]
 }

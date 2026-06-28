@@ -1,7 +1,7 @@
 <!-- Generated from spec.json — DO NOT EDIT DIRECTLY -->
 ---
 version: "1.0"
-signals: { blue: 31, yellow: 0, red: 0 }
+signals: { blue: 33, yellow: 0, red: 0 }
 ---
 
 # タスク単位の契約履行 pre-review ゲート
@@ -23,6 +23,7 @@ signals: { blue: 31, yellow: 0, red: 0 }
 - [IN-07] `bin/sotp task-contract coverage` サブコマンドの実装: 型カタログの全エントリが漏れなくタスクに attribution されているか（完全性）を専用に検証する subcommand。cargo make ci の検証 chain に統合し、commit ごとに attribution drift を検出する。 [adr: knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md#D5] [tasks: T009, T010, T011, T012, T013, T014, T016]
 - [IN-08] cargo-make `dependencies` による pre-review ゲートの配線: `cargo make track-local-review` と `cargo make track-local-review-fix` の両方の `dependencies` に `task-contract-check` タスクを追加し、per-review-round で完全性判定（coverage）→ 生存性判定（check）の順で自動発火させる。 [adr: knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md#D6] [tasks: T016]
 - [IN-09] usecase 層への `ImplPlanReaderPort`（secondary port）追加: `bin/sotp task-contract check` の usecase 層（`PreReviewGateInteractor` 等）に `impl-plan.json` を読む secondary port を追加し、`task-contract.json` の attribution を impl-plan.json のタスク状態（todo / in_progress / done）でフィルタする。 [adr: knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md#D7] [tasks: T010, T011, T014, T015]
+- [IN-10] Claude provider 経由の review-fix dispatch sentinel (exit code 64 + stdout `SUBAGENT_DISPATCH_REQUIRED` + JSON payload) の cross-layer pass-through 機構の実装: usecase 層 `RunReviewFixError` enum に `SubagentDispatchRequired(String)` variant を追加し、payload を typed error として運ぶ。cli_composition 層 shim が composition root から exit 64 + sentinel prefix を検出したとき、`Err(RunReviewFixError::SubagentDispatchRequired(payload))` を return する。cli_driver 層 dispatch arm は payload を `CommandOutcome { stdout: Some(payload), exit_code: 64 }` に reflect して呼び元 (orchestrator) に届ける。 [adr: knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md#D8] [tasks: T017]
 
 ### Out of Scope
 - [OS-01] body の liveness / stub 検査（test-pass・stub-scan・syn による body walking）。ゲートの直接入力は既存 impl_catalog / type-signals document であり、上流の impl_catalog 信号は rustdoc JSON（body を含まない）から生成されるため、🔵 判定は宣言シンボルの存在と shape 一致のみを保証する。stub が通過することは意図的なスコープ限定である。 [adr: knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md#D3]
@@ -49,6 +50,7 @@ signals: { blue: 31, yellow: 0, red: 0 }
 - [ ] [AC-06] ゲートがブロックした場合、`sotp review fix-local` 経由の reviewer invocation が実行されない。`bin/sotp task-contract coverage` および `bin/sotp task-contract check` はいずれも fail-closed であり、どちらかのゲートエラーが上位ワークフローに伝播して review invocation を中断する。 [adr: knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md#D2] [tasks: T008, T016]
 - [ ] [AC-07] `cargo make ci`（fmt-check + clippy + nextest + deny + check-layers + verify-*）が pass する。ゲートロジックのユニットテストとして次のケースを網羅する: (a) `task-contract.json` 不在で check がブロック、(b) orphan entry 存在で coverage がブロック、(c) attribution referential integrity 違反で coverage がブロック、(d) 🔴 エントリ存在でタスク状態に関わらず check がブロック、(e) in_progress / done タスクの全 attributed entry が 🔵 かつ coverage 完全でパス、(f) todo タスクに 🟡 エントリが存在しても check がパス（🔴 なし前提）、(g) `cargo make track-local-review` 実行時に coverage → check の dependency が順序通り発火する。既存テストへのリグレッションがない。 [adr: knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md#D6, knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md#D7] [tasks: T007, T010, T015, T016]
 - [ ] [AC-08] `bin/sotp task-contract coverage` が実装されており、`cargo make task-contract-coverage` として呼び出せる。`cargo make task-contract-check` は `dependencies = ["task-contract-coverage"]` を宣言し、coverage → check の順で必ず実行される。attribution 不完全（orphan あり）の場合、coverage がブロックし check は実行されない。 [adr: knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md#D5, knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md#D6] [tasks: T009, T010, T011, T012, T013, T014, T016]
+- [ ] [AC-09] ユニットテストで以下を検証する: (a) composition root が exit 64 + `SUBAGENT_DISPATCH_REQUIRED` prefix を含む CommandOutcome を return した場合、`ReviewServiceImpl::run_fix_local` は `Err(RunReviewFixError::SubagentDispatchRequired(payload))` を返す (payload は exit 64 出力の stdout 文字列をそのまま carry)、(b) cli_driver の `review_run_fix_local` が `Err(RunReviewFixError::SubagentDispatchRequired(payload))` を受け取ったとき、`CommandOutcome { stdout: Some(payload), stderr: None, exit_code: 64 }` を return し、`REVIEW_FIX_STATUS: failed` への remap が発生しない、(c) Claude provider 経由で `ReviewCompositionRoot::review_driver().handle(RunFixLocal {...})` を呼ぶと exit 64 + sentinel が stdout に preserve される。 [adr: knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md#D8] [tasks: T017]
 
 ## Related Conventions (Required Reading)
 - knowledge/conventions/coding-principles.md#No Panics in Library Code
@@ -59,5 +61,5 @@ signals: { blue: 31, yellow: 0, red: 0 }
 ## Signal Summary
 
 ### Stage 1: Spec Signals
-🔵 31  🟡 0  🔴 0
+🔵 33  🟡 0  🔴 0
 

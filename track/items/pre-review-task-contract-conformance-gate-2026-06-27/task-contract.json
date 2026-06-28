@@ -62,6 +62,9 @@
     ],
     "T015": [
       { "layer": "usecase", "entry_key": "PreReviewGateInteractor" }
+    ],
+    "T017": [
+      { "layer": "usecase", "entry_key": "RunReviewFixError" }
     ]
   }
 }

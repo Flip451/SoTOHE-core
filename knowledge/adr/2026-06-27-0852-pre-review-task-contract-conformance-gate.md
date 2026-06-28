@@ -29,6 +29,10 @@ decisions:
     user_decision_ref: "chat_segment:session_013pQgnVvMR775h8tsD1mya4:2026-06-28"
     candidate_selection: "from:[impl-plan-status,task-contract-extension-with-status,external-state-file,git-blame-derivation] chose:impl-plan-status"
     status: accepted
+  - id: D8
+    user_decision_ref: "chat_segment:session_013pQgnVvMR775h8tsD1mya4:2026-06-29"
+    candidate_selection: "from:[stdout-string-matching,magic-exit-codes,typed-error-variant-pass-through] chose:typed-error-variant-pass-through"
+    status: accepted
 ---
 # タスク単位の契約履行 pre-review ゲート — Phase 3 attribution artifact と impl_catalog 信号の binary 再利用
 
@@ -117,6 +121,25 @@ D3 P1 で定義した生存性判定 (「現在のタスクと完了済タスク
 実装上は、`bin/sotp task-contract check` の usecase 層 (`PreReviewGateInteractor`) に **impl-plan を読む secondary port** (`ImplPlanReaderPort` 等) を追加し、`task-contract.json` から得た task → entry 帰属を impl-plan.json の status フィルタで絞り込む。
 
 `task-contract.json` 自身に status を載せる代替案は採らない — 状態 (動的・進行に応じて変化) と帰属 (静的・planner が一度 author) を 1 ファイルに混在させると SRP 違反になる。impl-plan が SSoT として既に状態を持っているので、そこを単に参照する。
+
+### D8: Claude provider 経由の review-fix dispatch は usecase boundary の typed error として cli_composition から cli_driver へ pass-through する
+
+D2/D6 で新しい task-contract gate の配線対象に含める既存の `bin/sotp review fix-local` (review-fix-lead 用 wrapper) は、`agent-profiles.json` の `review-fix-lead.provider` を見て codex/claude を内部で切り替える。**Claude provider 経由のとき**、CLI は subagent を直接 spawn できず、stdout に `SUBAGENT_DISPATCH_REQUIRED` sentinel + JSON payload を出力し exit code 64 で終了することで、orchestrator (Claude Code) に subagent 起動を delegation する仕組みを採る。
+
+しかしこの dispatch path が `ReviewServiceImpl::run_fix_local` (cli_composition 層で usecase 層 `ReviewService` boundary を実装する shim) を経由したとき、`ReviewServiceImpl` が exit 64 を **「failed」と remap し stdout を REVIEW_FIX_STATUS: failed に書き換えてしまう** 不具合が発覚した。orchestrator は sentinel を受け取れず、Claude provider routing が壊れていた。
+
+そこで以下のとおり修正する:
+
+- usecase 層 `RunReviewFixError` enum に新 variant `SubagentDispatchRequired(String)` を追加。tuple field は exit 64 + sentinel + JSON payload を1つの opaque string として carry する。
+- `ReviewServiceImpl::run_fix_local` (cli_composition 層 shim) は composition root から exit 64 + SUBAGENT_DISPATCH_REQUIRED prefix を検出したとき、`Err(RunReviewFixError::SubagentDispatchRequired(payload))` を return する。
+- cli_driver 層 `review_run_fix_local` は `Err(RunReviewFixError::SubagentDispatchRequired(payload))` 受領時、`CommandOutcome { stdout: Some(payload), stderr: None, exit_code: 64 }` を生成して呼び元に pass-through する。これにより stdout の sentinel + JSON payload + exit 64 が orchestrator に届く。
+
+代替案 (却下):
+
+- **magic exit codes 全層 propagation**: cli_driver が exit code 64 を string match して特殊扱いする案。usecase 層が exit code を直接扱うのは layering 違反。
+- **stdout 文字列 sniffing**: stdout から `SUBAGENT_DISPATCH_REQUIRED` prefix を全層で string match する案。typed error より fragile で、テストもしづらい。
+
+`SubagentDispatchRequired` variant は dispatch contract を表す usecase 層の意味論であり、結果として cli_driver 層 dispatch arm の挙動が決まる。本 ADR の主軸 (`task-contract` gate) とは layer も responsibility も異なる隣接決定であり、review-fix wiring の Claude path における structural 不具合の修正を記録する。
 
 ## Rejected Alternatives
 

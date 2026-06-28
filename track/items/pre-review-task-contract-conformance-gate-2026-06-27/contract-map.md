@@ -129,6 +129,19 @@ subgraph usecase["usecase"]
     R38_usecase_usecase_TaskContractReaderPort_read([read])
   end
   end
+  subgraph usecase_usecase_module_review_v2["usecase::review_v2"]
+    direction TB
+  subgraph T33_usecase_usecase_RunReviewFixError["review_v2::run_review_fix::RunReviewFixError"]
+    direction TB
+    T33_usecase_usecase_RunReviewFixError__self[RunReviewFixError]
+    T33_usecase_usecase_RunReviewFixError_InvalidScope[InvalidScope]
+    T33_usecase_usecase_RunReviewFixError_InvalidTrackId[InvalidTrackId]
+    T33_usecase_usecase_RunReviewFixError_InvalidRoundType[InvalidRoundType]
+    T33_usecase_usecase_RunReviewFixError_SmokeTestFailed[SmokeTestFailed]
+    T33_usecase_usecase_RunReviewFixError_FixRunnerFailed[FixRunnerFailed]
+    T33_usecase_usecase_RunReviewFixError_SubagentDispatchRequired[SubagentDispatchRequired]
+  end
+  end
 end
 subgraph infrastructure["infrastructure"]
   direction TB
@@ -356,6 +369,13 @@ class R36_usecase_usecase_PreReviewGateService_check method_node
 class R36_usecase_usecase_PreReviewGateService__self app_service
 class R38_usecase_usecase_TaskContractReaderPort_read method_node
 class R38_usecase_usecase_TaskContractReaderPort__self secondary_port
+class T33_usecase_usecase_RunReviewFixError_InvalidScope variant_node
+class T33_usecase_usecase_RunReviewFixError_InvalidTrackId variant_node
+class T33_usecase_usecase_RunReviewFixError_InvalidRoundType variant_node
+class T33_usecase_usecase_RunReviewFixError_SmokeTestFailed variant_node
+class T33_usecase_usecase_RunReviewFixError_FixRunnerFailed variant_node
+class T33_usecase_usecase_RunReviewFixError_SubagentDispatchRequired variant_node
+class T33_usecase_usecase_RunReviewFixError__self error_type
 class T55_infrastructure_infrastructure_FsImplCatalogSignalReader_new method_node
 class T55_infrastructure_infrastructure_FsImplCatalogSignalReader__self secondary_adapter
 class T46_infrastructure_infrastructure_FsImplPlanReader_new method_node

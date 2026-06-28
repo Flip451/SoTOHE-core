@@ -81,6 +81,9 @@ pub enum ReviewFixRunnerError {
 /// wraps the [`ReviewFixRunnerError`] from the port without leaking
 /// infrastructure types. `EmptyScopeFiles` is removed — the fixer skill
 /// self-resolves the scope boundary (ADR 2026-06-01-2300 D1).
+/// `SubagentDispatchRequired` signals that the request must be delegated to an
+/// external review-fix runner. The tuple field is an opaque dispatch
+/// instruction; adapters decide how to transport it.
 #[derive(Debug, Error)]
 pub enum RunReviewFixError {
     #[error("invalid scope: {0}")]
@@ -93,6 +96,10 @@ pub enum RunReviewFixError {
     SmokeTestFailed(String),
     #[error("fix runner failed: {0}")]
     FixRunnerFailed(String),
+    /// The request must be delegated to an external review-fix runner. The
+    /// payload is an opaque instruction owned by the adapter boundary.
+    #[error("external review-fix runner dispatch required")]
+    SubagentDispatchRequired(String),
 }
 
 // ── ReviewFixRunner ───────────────────────────────────────────────────────────
