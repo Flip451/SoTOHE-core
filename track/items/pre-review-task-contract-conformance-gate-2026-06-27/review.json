@@ -1,165 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:81d63ac4abbe47745215e9280d17c446e8638bd271d02046709485bf41e35040",
-          "at": "2026-06-27T13:46:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:81d63ac4abbe47745215e9280d17c446e8638bd271d02046709485bf41e35040",
-          "at": "2026-06-27T13:49:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a29d6da6a7c91675cbfe8900a118d1045794a97a91682ab2a54f9969944244d8",
-          "at": "2026-06-27T16:09:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a29d6da6a7c91675cbfe8900a118d1045794a97a91682ab2a54f9969944244d8",
-          "at": "2026-06-27T16:12:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7f092b89230d81260f6fe9756a8917e0cdf33c1dad72a47917cd903b8aebafec",
-          "at": "2026-06-28T02:30:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7f092b89230d81260f6fe9756a8917e0cdf33c1dad72a47917cd903b8aebafec",
-          "at": "2026-06-28T02:33:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:743e729fa57b6c6067ee660bc09fd49591b7f705a2de23611214412ff7787591",
-          "at": "2026-06-28T03:08:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:743e729fa57b6c6067ee660bc09fd49591b7f705a2de23611214412ff7787591",
-          "at": "2026-06-28T03:11:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ef289497d7700e9d3113626e1ff91b8b1c1f8336a9d8e523f6ea3e7a1b29b5a2",
-          "at": "2026-06-28T04:07:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "[render leak] The composition root formats the final user-facing failure string here (`format!(...)`) and injects the raw append error into it. That output construction belongs in `cli_driver`; this layer should surface a typed composition error or let the driver render the failure, otherwise the wiring layer is leaking presentation concerns and may expose filesystem details in the message.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/apps/cli-composition/src/task_contract.rs",
-              "line": 84,
-              "category": "render leak"
-            }
-          ],
-          "hash": "rvw1:sha256:ef289497d7700e9d3113626e1ff91b8b1c1f8336a9d8e523f6ea3e7a1b29b5a2",
-          "at": "2026-06-28T04:11:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9459389c3b86245556fe494896b7e6b2d30f677d06d44e68e7e0464d5486b119",
-          "at": "2026-06-28T04:14:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9459389c3b86245556fe494896b7e6b2d30f677d06d44e68e7e0464d5486b119",
-          "at": "2026-06-28T04:20:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9459389c3b86245556fe494896b7e6b2d30f677d06d44e68e7e0464d5486b119",
-          "at": "2026-06-28T04:35:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f243976129bde6fa39ea128cbbfcd6f7183c4cef8dc5ab341345c6220cf668bb",
-          "at": "2026-06-28T10:29:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f243976129bde6fa39ea128cbbfcd6f7183c4cef8dc5ab341345c6220cf668bb",
-          "at": "2026-06-28T10:32:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:731658de4e94460fcabca47171a42a8f31fc23ed98d6edbf1a1e98354f365da3",
-          "at": "2026-06-28T16:26:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:731658de4e94460fcabca47171a42a8f31fc23ed98d6edbf1a1e98354f365da3",
-          "at": "2026-06-28T16:29:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c569843a389c020a384fc3ffdd2a9835308fae96cc8e0592d1502660a106afec",
-          "at": "2026-06-29T06:56:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c569843a389c020a384fc3ffdd2a9835308fae96cc8e0592d1502660a106afec",
-          "at": "2026-06-29T06:59:49Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e7b13c1c59ee5d941c7bfe81f3f55b84e1c70c6bb7bb94d11ef0482383563f2f",
-          "at": "2026-06-29T11:42:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e7b13c1c59ee5d941c7bfe81f3f55b84e1c70c6bb7bb94d11ef0482383563f2f",
-          "at": "2026-06-29T11:45:24Z"
-        }
-      ]
-    },
     "harness-policy": {
       "rounds": [
         {
@@ -735,6 +576,20 @@
           "findings": [],
           "hash": "rvw1:sha256:131569d39d5b0dd5478e5479f2adffafe6e5863db1d69990592f68e3e39f9ec2",
           "at": "2026-06-29T17:39:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f5f596e7f90d102cc53c8533d409788dd11145289bbb225f5ae06d1d71909bcd",
+          "at": "2026-06-29T18:42:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f5f596e7f90d102cc53c8533d409788dd11145289bbb225f5ae06d1d71909bcd",
+          "at": "2026-06-29T18:45:31Z"
         }
       ]
     },
@@ -2073,407 +1928,6 @@
         }
       ]
     },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The orphan-detection loop silently drops any signal entry whose `type_name` cannot be converted to `CatalogueEntryKey` (`Err(_) => { ... }`). That branch is reachable because `type_signals_codec::decode` accepts arbitrary `type_name` strings, so a malformed `<layer>-type-signals.json` can contain an uncovered entry that the gate never reports. This makes the gate fail open instead of blocking or surfacing an error.",
-              "severity": "P1",
-              "file": "libs/usecase/src/pre_review_gate.rs",
-              "line": 222,
-              "category": "error handling"
-            }
-          ],
-          "hash": "rvw1:sha256:98d3cee97dc45e07009f480db7930a9074f2ce4dd7909b4207936a6c63aa0f18",
-          "at": "2026-06-27T13:46:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:46ccc45e62b8a34cefec80c76ad613c3a182b16a464bd89708fefd84f59e8f6d",
-          "at": "2026-06-27T13:54:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7a2c0d59210a3afe96d888bb8c3a52b1cf7a98c369f307df5f1a82c396822554",
-          "at": "2026-06-27T14:30:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7a2c0d59210a3afe96d888bb8c3a52b1cf7a98c369f307df5f1a82c396822554",
-          "at": "2026-06-27T14:33:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The `None` branch swallows every `SignalReadFailed`, but `check_layer()` also raises that error for malformed signal documents (for example, invalid `type_name` values are converted to `SignalReadFailed` here). As a result, a corrupt or unreadable layer can be treated as if it simply had no document, and all-layers mode can return `Passed` instead of surfacing the failure.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/pre_review_gate.rs",
-              "line": 338,
-              "category": "error handling"
-            }
-          ],
-          "hash": "rvw1:sha256:dc958872f3aa50aab626e8d8f72055053ee315ec2426f800b1759c9b33645c09",
-          "at": "2026-06-27T16:09:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "All-layers skip logic keys off the human-readable `message` inside `PreReviewGateError::SignalReadFailed` instead of a typed not-found variant. Because that diagnostic is documented as opaque, a real read/decode failure can be misclassified as a missing document and silently skipped, which breaks the fail-closed behavior in the `None` branch.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/pre_review_gate.rs",
-              "line": 204,
-              "category": "error type confusion"
-            }
-          ],
-          "hash": "rvw1:sha256:0e11154af6a288eb3f0a6c13e4627f031745df3c50c9173c75f91e2e8b404cd5",
-          "at": "2026-06-27T16:16:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`None` mode decides whether to skip a layer by parsing the opaque `PreReviewGateError::SignalReadFailed.message` string. That makes control flow depend on diagnostic text instead of a typed not-found signal, so a genuine read/decode failure can be misclassified as \"missing\" and silently skipped, letting all-layers mode pass when it should fail closed.",
-              "severity": "P1",
-              "file": "libs/usecase/src/pre_review_gate.rs",
-              "line": 204,
-              "category": "error type confusion"
-            }
-          ],
-          "hash": "rvw1:sha256:0e11154af6a288eb3f0a6c13e4627f031745df3c50c9173c75f91e2e8b404cd5",
-          "at": "2026-06-27T16:24:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: `None`-layer mode now depends on `read_optional_signals()`, but this file only adds a default shim that calls `read_signals()`. The production filesystem adapter still reports a missing `*-type-signals.json` as `SignalReadFailed`, so the new all-layers path will still abort on absent layers instead of skipping them silently. The added passing test only uses a mock that overrides the new hook, so it does not cover the real adapter path.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/pre_review_gate.rs",
-              "line": 141,
-              "category": "error handling"
-            }
-          ],
-          "hash": "rvw1:sha256:5a24c9e3a48ad1676b97eb41ebef7eb3641fb4f6ea2c640862d6817e1e3e24d2",
-          "at": "2026-06-27T16:30:42Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5a24c9e3a48ad1676b97eb41ebef7eb3641fb4f6ea2c640862d6817e1e3e24d2",
-          "at": "2026-06-27T16:38:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5a24c9e3a48ad1676b97eb41ebef7eb3641fb4f6ea2c640862d6817e1e3e24d2",
-          "at": "2026-06-27T16:41:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1b727304fe222a3508891c0db704f59e86e94bca9f2fa83516fb02479f9f7c8d",
-          "at": "2026-06-27T23:16:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1b727304fe222a3508891c0db704f59e86e94bca9f2fa83516fb02479f9f7c8d",
-          "at": "2026-06-27T23:18:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d00608ee1a1e456be05eb9e9957cfcbf423121a99eab16ef861add3d5209c36a",
-          "at": "2026-06-28T10:30:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`verify_coverage` treats an absent layer signal document as `continue` without checking whether `task-contract.json` has entries for that layer. If a layer's `<layer>-type-signals.json` is missing but the contract still attributes entries to it, `all_violations` can stay empty and the coverage gate returns `Passed`, even though those attributed entries do not exist in the catalogue. The coverage path should block with `InvalidEntryRef` or equivalent for contracted entries in absent layers.",
-              "severity": "P1",
-              "file": "libs/usecase/src/pre_review_gate.rs",
-              "line": 291,
-              "category": "orchestration correctness"
-            },
-            {
-              "message": "The D7 status filter only exempts entries when all owning tasks are `Todo`; every other status is treated as requiring Blue. `TaskStatusKind::Skipped` is a valid impl-plan status, so a skipped-only task with a Yellow signal will incorrectly block even though the gate contract only requires Blue for `in_progress` and `done` tasks and treats Red as the status-independent blocker. The active-status decision should distinguish `InProgress | Done` from skipped tasks instead of using `!all_todo`.",
-              "severity": "P1",
-              "file": "libs/usecase/src/pre_review_gate.rs",
-              "line": 511,
-              "category": "business logic leak"
-            }
-          ],
-          "hash": "rvw1:sha256:d00608ee1a1e456be05eb9e9957cfcbf423121a99eab16ef861add3d5209c36a",
-          "at": "2026-06-28T10:34:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e46c0220646557ac7e02964231d183d80a2a333c902d4eeaee93c2ade63bdc0f",
-          "at": "2026-06-28T10:42:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:83dcc56dc5a30757c49ced8c31aa92c945e72664e118dd70ac37274e01844e24",
-          "at": "2026-06-28T14:05:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:83dcc56dc5a30757c49ced8c31aa92c945e72664e118dd70ac37274e01844e24",
-          "at": "2026-06-28T14:09:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:56c7416494fa04be194809c251cbb0b92cc6f9ca2d125bcb5aa3ae3b45dd78c3",
-          "at": "2026-06-28T15:02:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:56c7416494fa04be194809c251cbb0b92cc6f9ca2d125bcb5aa3ae3b45dd78c3",
-          "at": "2026-06-28T15:05:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1eefc1d36eccd07257c518ef46eb323cf4ab1bbdcc040cc09bd61c7907aa73ec",
-          "at": "2026-06-28T16:27:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`RunReviewFixError::SubagentDispatchRequired(String)` adds CLI/composition transport details to the usecase public error type: the docs bind it to the `claude` provider, a `SUBAGENT_DISPATCH_REQUIRED` stdout payload, and exit code 64. That forces usecase callers to understand and preserve a CLI dispatch protocol instead of letting the CLI composition root map a pure usecase outcome to stdout and exit status, which breaks the usecase error abstraction / CLI-as-composition-root boundary.",
-              "severity": "P1",
-              "file": "libs/usecase/src/review_v2/run_review_fix.rs",
-              "line": 106,
-              "category": "error_type_confusion"
-            }
-          ],
-          "hash": "rvw1:sha256:1eefc1d36eccd07257c518ef46eb323cf4ab1bbdcc040cc09bd61c7907aa73ec",
-          "at": "2026-06-28T16:31:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4e9b2493a7e07b7de7b30e6ce3bccf9f3b20a991b5d1a4d70df820fc4aade3bc",
-          "at": "2026-06-28T16:34:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f8fe868a580e8e33c9276a4743b9991f8a161dddc40777896e278b1955d1ac25",
-          "at": "2026-06-29T11:44:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f8fe868a580e8e33c9276a4743b9991f8a161dddc40777896e278b1955d1ac25",
-          "at": "2026-06-29T11:48:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:488dfdbf96170ef1ba47f47af8de99691f4040bd1782264d64d3626456e51e23",
-          "at": "2026-06-29T14:46:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1 business logic leak: `CoverageVerifyInteractor` now decides catalogue membership by branching on the raw signal tag string `\"unknown\"`. That classification is domain knowledge about `TypeSignal`/catalogue entry semantics, so the usecase layer is no longer just orchestrating domain rules; it should call a domain-owned predicate/value type such as `TypeSignal::is_catalogue_entry()` instead of encoding the sentinel string here.",
-              "severity": "P1",
-              "file": "libs/usecase/src/pre_review_gate.rs",
-              "line": 270,
-              "category": "business_logic_leak"
-            }
-          ],
-          "hash": "rvw1:sha256:488dfdbf96170ef1ba47f47af8de99691f4040bd1782264d64d3626456e51e23",
-          "at": "2026-06-29T14:50:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:890c6d0f67750d45d9a71a5608ac674d9922bedaa56e17221db5846480a1f4ac",
-          "at": "2026-06-29T15:49:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:890c6d0f67750d45d9a71a5608ac674d9922bedaa56e17221db5846480a1f4ac",
-          "at": "2026-06-29T15:52:02Z"
-        }
-      ]
-    },
-    "cli_driver": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c1710adc9047981e16a2e2c53cdbec58d4ffa31f931f63f7f01c68a6b0dfe914",
-          "at": "2026-06-27T13:47:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c1710adc9047981e16a2e2c53cdbec58d4ffa31f931f63f7f01c68a6b0dfe914",
-          "at": "2026-06-27T13:52:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5f325deb0bafec9596ff2af1fef0a16a19b5ef8644288eaed8763aff13bebc8c",
-          "at": "2026-06-27T14:29:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5f325deb0bafec9596ff2af1fef0a16a19b5ef8644288eaed8763aff13bebc8c",
-          "at": "2026-06-27T14:32:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c10814f8285d01927215342f8d85b91d8a5a414cffe9435a9487bce5ec85b5d9",
-          "at": "2026-06-27T16:09:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c10814f8285d01927215342f8d85b91d8a5a414cffe9435a9487bce5ec85b5d9",
-          "at": "2026-06-27T16:12:21Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0b33580998dd5e9e09e4b374876071d0ee99e2ec6086ef80a6d8043be4be2951",
-          "at": "2026-06-28T04:05:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0b33580998dd5e9e09e4b374876071d0ee99e2ec6086ef80a6d8043be4be2951",
-          "at": "2026-06-28T04:12:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0b33580998dd5e9e09e4b374876071d0ee99e2ec6086ef80a6d8043be4be2951",
-          "at": "2026-06-28T04:20:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0b33580998dd5e9e09e4b374876071d0ee99e2ec6086ef80a6d8043be4be2951",
-          "at": "2026-06-28T04:35:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:69903591b7376678be3697b08e5e6d806cec2de13fd16453fb27000dd170a0fa",
-          "at": "2026-06-28T10:29:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:69903591b7376678be3697b08e5e6d806cec2de13fd16453fb27000dd170a0fa",
-          "at": "2026-06-28T10:32:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7a47731731af4efc157ce037eadb114bfd258dd05e51970f6e60833162ea8645",
-          "at": "2026-06-28T14:04:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7a47731731af4efc157ce037eadb114bfd258dd05e51970f6e60833162ea8645",
-          "at": "2026-06-28T14:07:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5496f3f7330d919134c3f5f7b31a24cb5d35eacac77825cc22c0e55d8f96e912",
-          "at": "2026-06-28T16:26:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5496f3f7330d919134c3f5f7b31a24cb5d35eacac77825cc22c0e55d8f96e912",
-          "at": "2026-06-28T16:28:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fa2b518983756f3f02f09aa56193ef2a2e671b1bf9c7bc247356671b40c4d598",
-          "at": "2026-06-29T11:41:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fa2b518983756f3f02f09aa56193ef2a2e671b1bf9c7bc247356671b40c4d598",
-          "at": "2026-06-29T11:44:42Z"
-        }
-      ]
-    },
     "infrastructure": {
       "rounds": [
         {
@@ -2944,6 +2398,436 @@
         }
       ]
     },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The orphan-detection loop silently drops any signal entry whose `type_name` cannot be converted to `CatalogueEntryKey` (`Err(_) => { ... }`). That branch is reachable because `type_signals_codec::decode` accepts arbitrary `type_name` strings, so a malformed `<layer>-type-signals.json` can contain an uncovered entry that the gate never reports. This makes the gate fail open instead of blocking or surfacing an error.",
+              "severity": "P1",
+              "file": "libs/usecase/src/pre_review_gate.rs",
+              "line": 222,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:98d3cee97dc45e07009f480db7930a9074f2ce4dd7909b4207936a6c63aa0f18",
+          "at": "2026-06-27T13:46:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:46ccc45e62b8a34cefec80c76ad613c3a182b16a464bd89708fefd84f59e8f6d",
+          "at": "2026-06-27T13:54:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7a2c0d59210a3afe96d888bb8c3a52b1cf7a98c369f307df5f1a82c396822554",
+          "at": "2026-06-27T14:30:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7a2c0d59210a3afe96d888bb8c3a52b1cf7a98c369f307df5f1a82c396822554",
+          "at": "2026-06-27T14:33:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `None` branch swallows every `SignalReadFailed`, but `check_layer()` also raises that error for malformed signal documents (for example, invalid `type_name` values are converted to `SignalReadFailed` here). As a result, a corrupt or unreadable layer can be treated as if it simply had no document, and all-layers mode can return `Passed` instead of surfacing the failure.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/pre_review_gate.rs",
+              "line": 338,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:dc958872f3aa50aab626e8d8f72055053ee315ec2426f800b1759c9b33645c09",
+          "at": "2026-06-27T16:09:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "All-layers skip logic keys off the human-readable `message` inside `PreReviewGateError::SignalReadFailed` instead of a typed not-found variant. Because that diagnostic is documented as opaque, a real read/decode failure can be misclassified as a missing document and silently skipped, which breaks the fail-closed behavior in the `None` branch.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/pre_review_gate.rs",
+              "line": 204,
+              "category": "error type confusion"
+            }
+          ],
+          "hash": "rvw1:sha256:0e11154af6a288eb3f0a6c13e4627f031745df3c50c9173c75f91e2e8b404cd5",
+          "at": "2026-06-27T16:16:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`None` mode decides whether to skip a layer by parsing the opaque `PreReviewGateError::SignalReadFailed.message` string. That makes control flow depend on diagnostic text instead of a typed not-found signal, so a genuine read/decode failure can be misclassified as \"missing\" and silently skipped, letting all-layers mode pass when it should fail closed.",
+              "severity": "P1",
+              "file": "libs/usecase/src/pre_review_gate.rs",
+              "line": 204,
+              "category": "error type confusion"
+            }
+          ],
+          "hash": "rvw1:sha256:0e11154af6a288eb3f0a6c13e4627f031745df3c50c9173c75f91e2e8b404cd5",
+          "at": "2026-06-27T16:24:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `None`-layer mode now depends on `read_optional_signals()`, but this file only adds a default shim that calls `read_signals()`. The production filesystem adapter still reports a missing `*-type-signals.json` as `SignalReadFailed`, so the new all-layers path will still abort on absent layers instead of skipping them silently. The added passing test only uses a mock that overrides the new hook, so it does not cover the real adapter path.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/pre_review_gate.rs",
+              "line": 141,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:5a24c9e3a48ad1676b97eb41ebef7eb3641fb4f6ea2c640862d6817e1e3e24d2",
+          "at": "2026-06-27T16:30:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5a24c9e3a48ad1676b97eb41ebef7eb3641fb4f6ea2c640862d6817e1e3e24d2",
+          "at": "2026-06-27T16:38:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5a24c9e3a48ad1676b97eb41ebef7eb3641fb4f6ea2c640862d6817e1e3e24d2",
+          "at": "2026-06-27T16:41:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1b727304fe222a3508891c0db704f59e86e94bca9f2fa83516fb02479f9f7c8d",
+          "at": "2026-06-27T23:16:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1b727304fe222a3508891c0db704f59e86e94bca9f2fa83516fb02479f9f7c8d",
+          "at": "2026-06-27T23:18:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d00608ee1a1e456be05eb9e9957cfcbf423121a99eab16ef861add3d5209c36a",
+          "at": "2026-06-28T10:30:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verify_coverage` treats an absent layer signal document as `continue` without checking whether `task-contract.json` has entries for that layer. If a layer's `<layer>-type-signals.json` is missing but the contract still attributes entries to it, `all_violations` can stay empty and the coverage gate returns `Passed`, even though those attributed entries do not exist in the catalogue. The coverage path should block with `InvalidEntryRef` or equivalent for contracted entries in absent layers.",
+              "severity": "P1",
+              "file": "libs/usecase/src/pre_review_gate.rs",
+              "line": 291,
+              "category": "orchestration correctness"
+            },
+            {
+              "message": "The D7 status filter only exempts entries when all owning tasks are `Todo`; every other status is treated as requiring Blue. `TaskStatusKind::Skipped` is a valid impl-plan status, so a skipped-only task with a Yellow signal will incorrectly block even though the gate contract only requires Blue for `in_progress` and `done` tasks and treats Red as the status-independent blocker. The active-status decision should distinguish `InProgress | Done` from skipped tasks instead of using `!all_todo`.",
+              "severity": "P1",
+              "file": "libs/usecase/src/pre_review_gate.rs",
+              "line": 511,
+              "category": "business logic leak"
+            }
+          ],
+          "hash": "rvw1:sha256:d00608ee1a1e456be05eb9e9957cfcbf423121a99eab16ef861add3d5209c36a",
+          "at": "2026-06-28T10:34:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e46c0220646557ac7e02964231d183d80a2a333c902d4eeaee93c2ade63bdc0f",
+          "at": "2026-06-28T10:42:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:83dcc56dc5a30757c49ced8c31aa92c945e72664e118dd70ac37274e01844e24",
+          "at": "2026-06-28T14:05:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:83dcc56dc5a30757c49ced8c31aa92c945e72664e118dd70ac37274e01844e24",
+          "at": "2026-06-28T14:09:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:56c7416494fa04be194809c251cbb0b92cc6f9ca2d125bcb5aa3ae3b45dd78c3",
+          "at": "2026-06-28T15:02:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:56c7416494fa04be194809c251cbb0b92cc6f9ca2d125bcb5aa3ae3b45dd78c3",
+          "at": "2026-06-28T15:05:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1eefc1d36eccd07257c518ef46eb323cf4ab1bbdcc040cc09bd61c7907aa73ec",
+          "at": "2026-06-28T16:27:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`RunReviewFixError::SubagentDispatchRequired(String)` adds CLI/composition transport details to the usecase public error type: the docs bind it to the `claude` provider, a `SUBAGENT_DISPATCH_REQUIRED` stdout payload, and exit code 64. That forces usecase callers to understand and preserve a CLI dispatch protocol instead of letting the CLI composition root map a pure usecase outcome to stdout and exit status, which breaks the usecase error abstraction / CLI-as-composition-root boundary.",
+              "severity": "P1",
+              "file": "libs/usecase/src/review_v2/run_review_fix.rs",
+              "line": 106,
+              "category": "error_type_confusion"
+            }
+          ],
+          "hash": "rvw1:sha256:1eefc1d36eccd07257c518ef46eb323cf4ab1bbdcc040cc09bd61c7907aa73ec",
+          "at": "2026-06-28T16:31:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4e9b2493a7e07b7de7b30e6ce3bccf9f3b20a991b5d1a4d70df820fc4aade3bc",
+          "at": "2026-06-28T16:34:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f8fe868a580e8e33c9276a4743b9991f8a161dddc40777896e278b1955d1ac25",
+          "at": "2026-06-29T11:44:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f8fe868a580e8e33c9276a4743b9991f8a161dddc40777896e278b1955d1ac25",
+          "at": "2026-06-29T11:48:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:488dfdbf96170ef1ba47f47af8de99691f4040bd1782264d64d3626456e51e23",
+          "at": "2026-06-29T14:46:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1 business logic leak: `CoverageVerifyInteractor` now decides catalogue membership by branching on the raw signal tag string `\"unknown\"`. That classification is domain knowledge about `TypeSignal`/catalogue entry semantics, so the usecase layer is no longer just orchestrating domain rules; it should call a domain-owned predicate/value type such as `TypeSignal::is_catalogue_entry()` instead of encoding the sentinel string here.",
+              "severity": "P1",
+              "file": "libs/usecase/src/pre_review_gate.rs",
+              "line": 270,
+              "category": "business_logic_leak"
+            }
+          ],
+          "hash": "rvw1:sha256:488dfdbf96170ef1ba47f47af8de99691f4040bd1782264d64d3626456e51e23",
+          "at": "2026-06-29T14:50:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:890c6d0f67750d45d9a71a5608ac674d9922bedaa56e17221db5846480a1f4ac",
+          "at": "2026-06-29T15:49:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:890c6d0f67750d45d9a71a5608ac674d9922bedaa56e17221db5846480a1f4ac",
+          "at": "2026-06-29T15:52:02Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:81d63ac4abbe47745215e9280d17c446e8638bd271d02046709485bf41e35040",
+          "at": "2026-06-27T13:46:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:81d63ac4abbe47745215e9280d17c446e8638bd271d02046709485bf41e35040",
+          "at": "2026-06-27T13:49:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a29d6da6a7c91675cbfe8900a118d1045794a97a91682ab2a54f9969944244d8",
+          "at": "2026-06-27T16:09:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a29d6da6a7c91675cbfe8900a118d1045794a97a91682ab2a54f9969944244d8",
+          "at": "2026-06-27T16:12:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7f092b89230d81260f6fe9756a8917e0cdf33c1dad72a47917cd903b8aebafec",
+          "at": "2026-06-28T02:30:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7f092b89230d81260f6fe9756a8917e0cdf33c1dad72a47917cd903b8aebafec",
+          "at": "2026-06-28T02:33:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:743e729fa57b6c6067ee660bc09fd49591b7f705a2de23611214412ff7787591",
+          "at": "2026-06-28T03:08:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:743e729fa57b6c6067ee660bc09fd49591b7f705a2de23611214412ff7787591",
+          "at": "2026-06-28T03:11:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ef289497d7700e9d3113626e1ff91b8b1c1f8336a9d8e523f6ea3e7a1b29b5a2",
+          "at": "2026-06-28T04:07:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "[render leak] The composition root formats the final user-facing failure string here (`format!(...)`) and injects the raw append error into it. That output construction belongs in `cli_driver`; this layer should surface a typed composition error or let the driver render the failure, otherwise the wiring layer is leaking presentation concerns and may expose filesystem details in the message.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/apps/cli-composition/src/task_contract.rs",
+              "line": 84,
+              "category": "render leak"
+            }
+          ],
+          "hash": "rvw1:sha256:ef289497d7700e9d3113626e1ff91b8b1c1f8336a9d8e523f6ea3e7a1b29b5a2",
+          "at": "2026-06-28T04:11:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9459389c3b86245556fe494896b7e6b2d30f677d06d44e68e7e0464d5486b119",
+          "at": "2026-06-28T04:14:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9459389c3b86245556fe494896b7e6b2d30f677d06d44e68e7e0464d5486b119",
+          "at": "2026-06-28T04:20:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9459389c3b86245556fe494896b7e6b2d30f677d06d44e68e7e0464d5486b119",
+          "at": "2026-06-28T04:35:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f243976129bde6fa39ea128cbbfcd6f7183c4cef8dc5ab341345c6220cf668bb",
+          "at": "2026-06-28T10:29:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f243976129bde6fa39ea128cbbfcd6f7183c4cef8dc5ab341345c6220cf668bb",
+          "at": "2026-06-28T10:32:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:731658de4e94460fcabca47171a42a8f31fc23ed98d6edbf1a1e98354f365da3",
+          "at": "2026-06-28T16:26:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:731658de4e94460fcabca47171a42a8f31fc23ed98d6edbf1a1e98354f365da3",
+          "at": "2026-06-28T16:29:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c569843a389c020a384fc3ffdd2a9835308fae96cc8e0592d1502660a106afec",
+          "at": "2026-06-29T06:56:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c569843a389c020a384fc3ffdd2a9835308fae96cc8e0592d1502660a106afec",
+          "at": "2026-06-29T06:59:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e7b13c1c59ee5d941c7bfe81f3f55b84e1c70c6bb7bb94d11ef0482383563f2f",
+          "at": "2026-06-29T11:42:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e7b13c1c59ee5d941c7bfe81f3f55b84e1c70c6bb7bb94d11ef0482383563f2f",
+          "at": "2026-06-29T11:45:24Z"
+        }
+      ]
+    },
     "cli": {
       "rounds": [
         {
@@ -3240,6 +3124,136 @@
           "findings": [],
           "hash": "rvw1:sha256:8f85e0c86f3269867d50d38e968b43a6f9df766d03a9f14af24cce836313b329",
           "at": "2026-06-29T18:26:14Z"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c1710adc9047981e16a2e2c53cdbec58d4ffa31f931f63f7f01c68a6b0dfe914",
+          "at": "2026-06-27T13:47:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c1710adc9047981e16a2e2c53cdbec58d4ffa31f931f63f7f01c68a6b0dfe914",
+          "at": "2026-06-27T13:52:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5f325deb0bafec9596ff2af1fef0a16a19b5ef8644288eaed8763aff13bebc8c",
+          "at": "2026-06-27T14:29:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5f325deb0bafec9596ff2af1fef0a16a19b5ef8644288eaed8763aff13bebc8c",
+          "at": "2026-06-27T14:32:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c10814f8285d01927215342f8d85b91d8a5a414cffe9435a9487bce5ec85b5d9",
+          "at": "2026-06-27T16:09:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c10814f8285d01927215342f8d85b91d8a5a414cffe9435a9487bce5ec85b5d9",
+          "at": "2026-06-27T16:12:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0b33580998dd5e9e09e4b374876071d0ee99e2ec6086ef80a6d8043be4be2951",
+          "at": "2026-06-28T04:05:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0b33580998dd5e9e09e4b374876071d0ee99e2ec6086ef80a6d8043be4be2951",
+          "at": "2026-06-28T04:12:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0b33580998dd5e9e09e4b374876071d0ee99e2ec6086ef80a6d8043be4be2951",
+          "at": "2026-06-28T04:20:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0b33580998dd5e9e09e4b374876071d0ee99e2ec6086ef80a6d8043be4be2951",
+          "at": "2026-06-28T04:35:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69903591b7376678be3697b08e5e6d806cec2de13fd16453fb27000dd170a0fa",
+          "at": "2026-06-28T10:29:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69903591b7376678be3697b08e5e6d806cec2de13fd16453fb27000dd170a0fa",
+          "at": "2026-06-28T10:32:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7a47731731af4efc157ce037eadb114bfd258dd05e51970f6e60833162ea8645",
+          "at": "2026-06-28T14:04:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7a47731731af4efc157ce037eadb114bfd258dd05e51970f6e60833162ea8645",
+          "at": "2026-06-28T14:07:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5496f3f7330d919134c3f5f7b31a24cb5d35eacac77825cc22c0e55d8f96e912",
+          "at": "2026-06-28T16:26:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5496f3f7330d919134c3f5f7b31a24cb5d35eacac77825cc22c0e55d8f96e912",
+          "at": "2026-06-28T16:28:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fa2b518983756f3f02f09aa56193ef2a2e671b1bf9c7bc247356671b40c4d598",
+          "at": "2026-06-29T11:41:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fa2b518983756f3f02f09aa56193ef2a2e671b1bf9c7bc247356671b40c4d598",
+          "at": "2026-06-29T11:44:42Z"
         }
       ]
     }

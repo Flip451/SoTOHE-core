@@ -359,8 +359,8 @@ dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local
 
 [tasks.ci-track-local]
 private = true
-description = "[internal] Run track-aware CI gates (task-contract coverage + signal chains spec/catalogue/impl). Assumes a track/<id> branch context — fails closed on main / non-track branches by design."
-dependencies = ["task-contract-coverage-local", "verify-spec-states-current-local", "signal-check-impl-catalog-local", "verify-catalogue-spec-refs-local", "check-catalogue-spec-signals-local"]
+description = "[internal] Run track-aware CI gates (task-contract coverage + check liveness + signal chains spec/catalogue/impl). Assumes a track/<id> branch context — fails closed on main / non-track branches by design."
+dependencies = ["task-contract-coverage-local", "task-contract-check-local", "verify-spec-states-current-local", "signal-check-impl-catalog-local", "verify-catalogue-spec-refs-local", "check-catalogue-spec-signals-local"]
 
 [tasks.ci-rust-container]
 description = "[gate] Run Rust-only CI checks inside a pre-existing container (no docker compose)"
@@ -371,8 +371,8 @@ description = "[gate] Run repo-wide CI checks inside a pre-existing container (n
 dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-hooks-path-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-adr-signals-local"]
 
 [tasks.ci-track-container]
-description = "[gate] Track-aware CI gates that require a track/<id> branch context (task-contract coverage + spec/catalogue/impl signal chains). Skip on main / non-track CI runs."
-dependencies = ["task-contract-coverage-local", "verify-spec-states-current-local", "signal-check-impl-catalog-local", "verify-catalogue-spec-refs-local", "check-catalogue-spec-signals-local"]
+description = "[gate] Track-aware CI gates that require a track/<id> branch context (task-contract coverage + check liveness + spec/catalogue/impl signal chains). Skip on main / non-track CI runs."
+dependencies = ["task-contract-coverage-local", "task-contract-check-local", "verify-spec-states-current-local", "signal-check-impl-catalog-local", "verify-catalogue-spec-refs-local", "check-catalogue-spec-signals-local"]
 
 # Compose wrappers
 [tasks.fmt]
@@ -632,6 +632,12 @@ private = true
 description = "[internal] Attribution-completeness coverage gate. Active track auto-resolved by CLI. Does NOT depend on `task-contract-refresh-impl-catalog` (unlike the `task-contract-coverage` public wrapper): CI containers lack the nightly toolchain required by `signal calc-impl-catalog`, and the signal artifacts are committed alongside catalogue changes by `track-commit-message`'s pre-commit gate, so CI-time refresh is unnecessary."
 command = "cargo"
 args = ["run", "--quiet", "-p", "cli", "--", "task-contract", "coverage"]
+
+[tasks.task-contract-check-local]
+private = true
+description = "[internal] Liveness gate (`sotp task-contract check`): verifies in_progress/done attributed entries have Blue impl_catalog signals (Yellow allowed for todo-only). Active track auto-resolved by CLI. Mirrors `task-contract-check` (public wrapper) without the refresh dependency — CI containers lack nightly, and signal artifacts are committed by `track-commit-message` (same reasoning as `task-contract-coverage-local`)."
+command = "cargo"
+args = ["run", "--quiet", "-p", "cli", "--", "task-contract", "check"]
 
 # Cargo-make dependencies run before task scripts, so pre-gate track/branch
 # guards must live outside these wrappers or inside the gate commands.
