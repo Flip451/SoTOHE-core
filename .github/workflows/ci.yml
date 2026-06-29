@@ -17,12 +17,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          # PR では default の merge ref (detached HEAD) ではなく source branch を
-          # checkout する。`git rev-parse --abbrev-ref HEAD` を track/<id> に解決
-          # させ、active-track-aware な CLI subcommand (signal check-spec-adr 等)
-          # が正しく動作するため。push (main) では従来通り。
-          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref }}
+
+      - name: Recreate local track branch on PR merge ref
+        # default の merge ref (detached HEAD) を維持しつつ、local branch 名を
+        # PR の source branch (`track/<id>`) として再作成する。これで
+        # `git rev-parse --abbrev-ref HEAD` が track/<id> を返し、active-track-aware
+        # な CLI subcommand (signal check-spec-adr 等) の auto-resolve が機能する。
+        # merge ref 上で CI が動くこと自体は変えないため、main の最新と PR の
+        # 統合状態に対する検証は従来通り保たれる。
+        if: github.event_name == 'pull_request' && startsWith(github.head_ref, 'track/')
+        run: git checkout -B "$GITHUB_HEAD_REF"
 
       - name: Configure git hooks path
         run: git config --local core.hooksPath .githooks
