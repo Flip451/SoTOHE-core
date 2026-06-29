@@ -125,9 +125,12 @@ pub fn execute(cmd: TaskContractCommand) -> ExitCode {
 /// Execute `sotp task-contract check`.
 ///
 /// Resolves `track_id` (auto from `track/<id>` branch when not explicit).
-/// When `--track-id` is omitted and the current branch is not a `track/<id>`
-/// branch, returns [`ExitCode::SUCCESS`] without output so that CI passes
-/// gracefully on `main` or any non-track branch.
+/// Fail-closed when no active track can be resolved (PR #175 round 20 P1):
+/// non-track context (e.g. `main`, detached HEAD, git read failure) returns
+/// `ExitCode::FAILURE` instead of silently passing. CI routes only invoke
+/// this from `ci-track-container` / `ci-track-local` after the workflow has
+/// recreated the `track/<id>` branch, so the fail-closed path never fires
+/// in normal CI; non-track invocations are caller bugs.
 pub fn execute_task_contract_check(args: TaskContractCheckArgs) -> ExitCode {
     let track_id_opt = match args.track_id {
         Some(id) => Some(id),
@@ -138,11 +141,10 @@ pub fn execute_task_contract_check(args: TaskContractCheckArgs) -> ExitCode {
 
 /// Core logic for `sotp task-contract check`, separated for testability.
 ///
-/// When `track_id_opt` is `None` (auto-resolve returned no `track/<id>` branch),
-/// returns [`ExitCode::SUCCESS`] without output so that CI passes gracefully on
-/// non-track branches (e.g. `main`, fresh checkout).
-///
-/// When `track_id_opt` is `Some(id)`, proceeds with the full liveness gate.
+/// Returns `ExitCode::FAILURE` with a diagnostic on stderr when `track_id_opt`
+/// is `None`. CI invokes this only from `ci-track-container` / `ci-track-local`
+/// after the workflow recreates the `track/<id>` branch, so a `None` here
+/// indicates a caller bug (called on `main` / detached HEAD / git failure).
 fn task_contract_check_core(
     track_id_opt: Option<String>,
     layer: Option<String>,
@@ -151,7 +153,12 @@ fn task_contract_check_core(
     let resolved_track_id = match track_id_opt {
         Some(id) => id,
         None => {
-            return ExitCode::SUCCESS;
+            eprintln!(
+                "[BLOCKED] sotp task-contract check requires an active track \
+                 (resolved from a `track/<id>` git branch); \
+                 pass --track-id or run on a track branch"
+            );
+            return ExitCode::FAILURE;
         }
     };
     match TaskContractCompositionRoot::new().task_contract_check(
@@ -170,9 +177,8 @@ fn task_contract_check_core(
 /// Execute `sotp task-contract coverage`.
 ///
 /// Resolves `track_id` (auto from `track/<id>` branch when not explicit).
-/// When `--track-id` is omitted and the current branch is not a `track/<id>`
-/// branch, returns [`ExitCode::SUCCESS`] without output so that CI passes
-/// gracefully on `main` or any non-track branch.
+/// Fail-closed when no active track can be resolved (PR #175 round 20 P1):
+/// same policy as `task-contract check`.
 pub fn execute_task_contract_coverage(args: TaskContractCoverageArgs) -> ExitCode {
     let track_id_opt = match args.track_id {
         Some(id) => Some(id),
@@ -183,17 +189,18 @@ pub fn execute_task_contract_coverage(args: TaskContractCoverageArgs) -> ExitCod
 
 /// Core logic for `sotp task-contract coverage`, separated for testability.
 ///
-/// When `track_id_opt` is `None` (auto-resolve returned no `track/<id>` branch),
-/// returns [`ExitCode::SUCCESS`] without output so that CI passes gracefully on
-/// non-track branches (e.g. `main`, fresh checkout).
-///
-/// When `track_id_opt` is `Some(id)`, proceeds with the full attribution-
-/// completeness check.
+/// Returns `ExitCode::FAILURE` with a diagnostic on stderr when `track_id_opt`
+/// is `None`. Same policy as `task_contract_check_core`.
 fn task_contract_coverage_core(track_id_opt: Option<String>, items_dir: PathBuf) -> ExitCode {
     let resolved_track_id = match track_id_opt {
         Some(id) => id,
         None => {
-            return ExitCode::SUCCESS;
+            eprintln!(
+                "[BLOCKED] sotp task-contract coverage requires an active track \
+                 (resolved from a `track/<id>` git branch); \
+                 pass --track-id or run on a track branch"
+            );
+            return ExitCode::FAILURE;
         }
     };
     match TaskContractCompositionRoot::new().task_contract_coverage(resolved_track_id, items_dir) {
@@ -358,20 +365,21 @@ mod tests {
         }
     }
 
-    // ── Graceful no-op on non-track branch (F5) ────────────────────────────────
+    // ── Fail-closed on non-track branch (PR #175 round 20 P1) ─────────────────
 
     #[test]
-    fn coverage_non_track_branch_yields_exit_success_without_output() {
+    fn coverage_non_track_branch_fails_closed() {
         // Simulate a non-track branch: track_id_opt = None (auto-resolve returned None).
-        // Expected: exit 0 (graceful pass) so that CI does not break on main or fresh checkout.
+        // Expected: ExitCode::FAILURE — feedback_no_graceful_skip_for_active_track
+        // requires that "active track unknown → error" so misrouted invocations
+        // (main / detached HEAD / git read failure) cannot silently pass the gate.
         let code = task_contract_coverage_core(None, PathBuf::from("track/items"));
-        assert_eq!(code, ExitCode::SUCCESS, "non-track branch with omitted --track-id must exit 0");
+        assert_eq!(code, ExitCode::FAILURE, "non-track branch must fail closed, not silently pass");
     }
 
     #[test]
-    fn check_non_track_branch_yields_exit_success_without_output() {
-        // Simulate a non-track branch for the liveness-gate check subcommand.
+    fn check_non_track_branch_fails_closed() {
         let code = task_contract_check_core(None, None, PathBuf::from("track/items"));
-        assert_eq!(code, ExitCode::SUCCESS, "non-track branch with omitted --track-id must exit 0");
+        assert_eq!(code, ExitCode::FAILURE, "non-track branch must fail closed, not silently pass");
     }
 }
