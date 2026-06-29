@@ -17,6 +17,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # PR では default の merge ref (detached HEAD) ではなく source branch を
+          # checkout する。`git rev-parse --abbrev-ref HEAD` を track/<id> に解決
+          # させ、active-track-aware な CLI subcommand (signal check-spec-adr 等)
+          # が正しく動作するため。push (main) では従来通り。
+          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref }}
 
       - name: Configure git hooks path
         run: git config --local core.hooksPath .githooks

@@ -1334,6 +1334,495 @@
         }
       ]
     },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ownership paragraph is stale: it still says this capability owns only `impl-plan.json` and `task-coverage.json`, but the same file now declares `task-contract.json` as a third Phase 3 artifact and allows writing it. That leaves the harness contract internally inconsistent about what `impl-planner` owns.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.harness/capabilities/impl-planner.md",
+              "line": 25,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:5c88d3e73fd515fed176ee8772485ed7fd45327646121cd4cd5e663dd7889ff3",
+          "at": "2026-06-27T13:46:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c0b457c465272b82b435c5f3966b08fd7ac30a457868f939c97e28709ed3614f",
+          "at": "2026-06-27T13:50:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c0b457c465272b82b435c5f3966b08fd7ac30a457868f939c97e28709ed3614f",
+          "at": "2026-06-27T13:54:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new gate parses `--group`, but the actual review-fix wrapper contract still uses `--scope` on the caller side and `bin/sotp review fix-local` itself expects `--scope`. That means the pre-review gate is unreachable for the documented invocation path, and any invocation that does pass `--group` will be forwarded unchanged to `review fix-local` and fail there. The task-contract check/briefing append therefore does not wire into the real fix workflow.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/Makefile.toml",
+              "line": 645,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:39d377d23f43855d211805b91d2b48cf61edc815f2be47191afd8c7ed27c1a2a",
+          "at": "2026-06-27T15:22:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c836db749917efcff22cb7ef95cc71d527d891eb4ae2af510928f6a237f6f2a",
+          "at": "2026-06-27T15:24:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d4aff7afa048fea304d3b0653c95ecbf55bb7957838277f3a9d60c603f77e87c",
+          "at": "2026-06-27T16:09:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d4aff7afa048fea304d3b0653c95ecbf55bb7957838277f3a9d60c603f77e87c",
+          "at": "2026-06-27T16:12:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3a836ba5b2f6095bcaa921ba37f1c3f609314f369e3fd2017ee4130015644b24",
+          "at": "2026-06-27T23:15:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 3 now makes surfaced PR-review comments non-terminal and requires fixing, committing, and re-running until an explicit zero-findings signal or user-approved Accepted Deviations. However, the stale Behavior summary still describes comments-surfaced as a reportable end state with only an actionability assessment and a next command. Agents following this summary can stop after the first non-pass round, which breaks the new MUST-continue loop contract. Update the Behavior section to report only terminal states and include the per-round trace/fix commits described above.",
+              "severity": "P1",
+              "file": ".claude/commands/track/pr-review.md",
+              "line": 132,
+              "category": "command_wiring_breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:3a836ba5b2f6095bcaa921ba37f1c3f609314f369e3fd2017ee4130015644b24",
+          "at": "2026-06-27T23:18:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 3 still tells the operator to proceed to `/track:commit` after a zero-findings PR review, while the same command's terminal-state report now points to `/track:merge` once 👍 is reached. That leaves two conflicting next-command wirings for the same terminal state; following the older `/track:commit` path after a clean PR review can send the workflow back to the guarded local commit command instead of the CI-gated PR merge flow described by this command and `/track:merge`. Update this terminal-state branch to match the new merge/report behavior.",
+              "severity": "P1",
+              "file": ".claude/commands/track/pr-review.md",
+              "line": 64,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:1c12ec2090613e13e787910cd381cc1a2ffbe831dd2e24a94f443d6e65fe30f9",
+          "at": "2026-06-27T23:21:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f97556ac6ebbffd35cbbb6984ab0821f5e4337fd395b7350fab240246b8a510d",
+          "at": "2026-06-27T23:24:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7aed6bbddb1775fd97a4f2ce306b210fd9a2019fd3ae9cbb17b274ab62521d59",
+          "at": "2026-06-27T23:37:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7aed6bbddb1775fd97a4f2ce306b210fd9a2019fd3ae9cbb17b274ab62521d59",
+          "at": "2026-06-27T23:41:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track-contract-gate` lost the non-`track/<id>` branch guard from the briefing. It now always runs `bin/sotp task-contract check --items-dir track/items`, and that command self-resolves from the current branch and fails on `main`/detached HEAD. As a result, `cargo make track-local-review-fix-codex` now hard-fails outside a track branch instead of skipping cleanly.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/Makefile.toml",
+              "line": 642,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:6a29fe6e3f333921391f380e1976657b31cd7880d2ae3f4fe07f998f6938415a",
+          "at": "2026-06-28T01:55:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`.claude/commands/track/review.md` now tells both fast and final Codex rounds to run `cargo make track-local-review-fix`, and `.claude/settings.json` / `.codex/rules/default.rules` whitelist that same task name, but `Makefile.toml` only defines `[tasks.track-local-review]` at line 655. As written, the orchestrator will invoke a non-existent cargo-make task, while the real task name is not permitted by the sandbox allowlist, so the Codex review path cannot launch.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.claude/commands/track/review.md",
+              "line": 87,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:a22a86482ac02ffe078bdd53bef5402a39ab452675133afe00448f19f7e1ae19",
+          "at": "2026-06-28T02:05:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b904b1feaae141253136a1c716a7aae9cf63fdfed3334c2874d2c6542aac6041",
+          "at": "2026-06-28T02:09:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`review-fix-lead-codex.md` still says the `cargo make track-local-review` wrapper chains `track-sync-views` before review, but `Makefile.toml` now wires `track-local-review` through `track-contract-gate` only. That makes the briefing describe a pre-review view sync that no longer happens, so the fixer can run against stale rendered views.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.harness/briefings/review-fix-lead-codex.md",
+              "line": 72,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:8c0e57250c0ed15f567c510570f5eb7ae2e7d0b26efb587c9963b20ab4477ac5",
+          "at": "2026-06-28T02:44:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:786040831b7083b3e915a7fda0028249f4ff87e0a2fa522324764defe12d25f1",
+          "at": "2026-06-28T02:52:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 1 still tells the orchestrator to read `capabilities.review-fix-lead.provider` and choose between launching the Claude subagent directly or the Codex wrapper. That contradicts the new Step 4/5 contract where `/track:review` must always call the provider-agnostic `cargo make track-local-review-fix` wrapper and let the CLI return the exit-64 dispatch instruction for Claude. As written, the command has two inconsistent launch paths, so the Claude path can bypass the new wrapper/dispatch contract.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 31,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "The new routing text says the Codex wrapper exits `0` with any `REVIEW_FIX_STATUS` value or `2` for smoke-test failure, but the runner status contract maps `completed` to 0, `blocked_cross_scope` to 2, and `failed` to 1, with smoke-test also using 2 when there is no status sentinel. Step 4/5 therefore omit the exit-1 status path and make exit 2 ambiguous unless stdout is parsed, which can make the orchestrator mishandle `failed` or `blocked_cross_scope` results from `track-local-review-fix`.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 99,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:786040831b7083b3e915a7fda0028249f4ff87e0a2fa522324764defe12d25f1",
+          "at": "2026-06-28T02:58:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:15d2bc9c5436e61591120d26a9949f7774b0c189d2f7cc61c786ead82330a78e",
+          "at": "2026-06-28T03:02:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Both `track-local-review` and `track-local-review-fix` now always forward `--track-id \"$ _TID\"` and `--briefing-file \"$ _BF\"` to `bin/sotp task-contract check`. When callers use the existing no-frills invocation style that omits one or both flags, the shell still passes empty strings, which disables the task’s branch auto-resolution path and turns the briefing append into a hard failure after a successful gate. That regresses a previously valid command path into a fail case.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 643,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:6deee3727b89059d297cc172da891be9365a09a78aa9fe4a7480ecf9427d47e7",
+          "at": "2026-06-28T03:49:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Deleting the `[tasks.track-contract-gate]` wrapper here makes the shipped review instructions incoherent: `.claude/commands/track/review.md` and the reviewer/fixer briefings still describe `cargo make track-local-review` / `track-local-review-fix` as running or depending on `track-contract-gate` before each round. In the final branch that task no longer exists, so the documented workflow now points at a dead command. Either keep a compatibility shim or update the distributed instructions in the same PR.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 639,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:35aa043f7496b7836ccc314ad8c3c75c002c4067e142540183a7b6ebc9fef44c",
+          "at": "2026-06-28T04:14:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aad8641d2ea0e1e0f1301867486f65e827ddb6ac1948c8074f6ad0d247a4f8e0",
+          "at": "2026-06-28T04:22:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aad8641d2ea0e1e0f1301867486f65e827ddb6ac1948c8074f6ad0d247a4f8e0",
+          "at": "2026-06-28T04:36:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track-local-review` / `track-local-review-fix` now make `task-contract-check` a cargo-make dependency, but their shell bodies still run `bin/sotp signal calc-impl-catalog` afterwards. Cargo-make dependencies execute before the script, so the pre-review gate now reads stale impl-catalog signals instead of the freshly refreshed ones documented in `.claude/commands/track/review.md` and `.claude/agents/review-fix-lead.md`. Move the signal refresh ahead of `task-contract-check`, or keep the inline `signal calc-impl-catalog && task-contract check && review ...` ordering.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 652,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:381b7cf96ca157a0bd5a5bfd24ec6f36e179e4edb56ee1bd4c23b7513da2014c",
+          "at": "2026-06-28T10:30:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track-local-review` and `track-local-review-fix` no longer propagate the caller-supplied `--track-id` into the pre-review `task-contract` gate; the dependency chain now auto-resolves from the current branch instead. That makes the review flow unsafe when the explicit track id and working branch diverge, because the gate can validate a different track than the one requested by `.claude/commands/track/review.md`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/Makefile.toml",
+              "line": 657,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:f03cc15e53aeceb6f5663d26f82c5c088e08fa7b9bfa8650623d000381b3bc96",
+          "at": "2026-06-28T10:36:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track-local-review` and `track-local-review-fix` now forward `--briefing-file` into `bin/sotp task-contract coverage/check`, but `apps/cli/src/commands/task_contract.rs` only accepts `--layer`, `--track-id`, and `--items-dir` for those subcommands. In the documented review flow (`cargo make track-local-review -- --round-type ... --briefing-file ...`), clap will reject the unexpected flag, so the pre-review gate fails before `bin/sotp review local` or `fix-local` runs.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 680,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:b5d06264b9e40f4c9712a01530295441ae77ee00d67d607c789a26c58c850f91",
+          "at": "2026-06-28T10:45:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:de9ab21f358c0271f1d1bf77bb8e5a637d3465c60f7cf2321526342f64a5b7c9",
+          "at": "2026-06-28T10:51:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:de9ab21f358c0271f1d1bf77bb8e5a637d3465c60f7cf2321526342f64a5b7c9",
+          "at": "2026-06-28T10:55:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e7cd8482e9b1ae7424bac3978467d4ff79f8d2c0752b8c317bc335ec72102797",
+          "at": "2026-06-28T14:07:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ci-local` and `ci-container` now depend on `task-contract-coverage`, but that task runs `bin/sotp task-contract coverage` without `--track-id` and therefore only auto-resolves on `track/<id>` branches. These are general CI/bootstrap gates for the template; from `main` or a fresh consumer checkout there is no active track, so `cargo make ci`/`bootstrap` become wired to a track-only command and fail before ordinary CI can run. Keep the task-contract gate on the track review wrappers or provide explicit track context instead of adding it to general CI.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 400,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:e7cd8482e9b1ae7424bac3978467d4ff79f8d2c0752b8c317bc335ec72102797",
+          "at": "2026-06-28T14:13:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `--track-id` parser runs inside the `track-local-review` script, but this task's `task-contract-check` dependency has already run before the script starts. For a mismatched invocation, the task-contract gates still refresh/check the current branch's active track and only then reject the requested `--track-id`, so the wrapper no longer behaves like the simplified pass-through review command described by the harness policy and can gate the wrong track without recording the requested review. The same issue is duplicated in `track-local-review-fix` at line 689.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 663,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:6dada2907fc10fcf1d3051bc6f16e5a577be5b539903abefc6cdf365b8a6dd01",
+          "at": "2026-06-28T14:16:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4f74aa82dee11798ea658a8d2a4b16028cb25c38821dc2bc48cde49b4b807ae6",
+          "at": "2026-06-28T15:02:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4f74aa82dee11798ea658a8d2a4b16028cb25c38821dc2bc48cde49b4b807ae6",
+          "at": "2026-06-28T15:05:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ad7401d72d7779012df4ecb1aa3e4d22804d9689236a69c5c92173f005331247",
+          "at": "2026-06-28T15:43:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ad7401d72d7779012df4ecb1aa3e4d22804d9689236a69c5c92173f005331247",
+          "at": "2026-06-28T15:46:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `--track-id` branch mismatch guard runs inside the task script, but `task-contract-check` is still a cargo-make dependency, so that gate executes before this check. On a wrong branch, the task will still auto-resolve and run the task-contract gates against the current branch, and only then exit 2; that defeats the stated protection for both `track-local-review` and `track-local-review-fix`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/Makefile.toml",
+              "line": 677,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:4ebf8f5150ac1d1bb71f918c4298f63442a5d01664cc9f83aba1a85d7f70174c",
+          "at": "2026-06-28T16:26:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0fd95d68af127b1864ae56b85b323bcc877256816c0f5d3e80fc8a4a2740fa94",
+          "at": "2026-06-28T16:31:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0fd95d68af127b1864ae56b85b323bcc877256816c0f5d3e80fc8a4a2740fa94",
+          "at": "2026-06-28T16:35:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track-local-review` and `track-local-review-fix` now run `bin/sotp task-contract coverage` before every review round. That changes the pre-review wiring: the accepted contract for this gate keeps `task-contract coverage` in `cargo make ci` and reserves `track-local-review` for `signal calc-impl-catalog && task-contract check` before `bin/sotp review local` (`knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md:93-109`). As written, any orphaned or missing `task-contract.json` entry will block reviewer entry, so review rounds can no longer start on tracks that should still be reviewable under the documented workflow.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/Makefile.toml",
+              "line": 700,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:7bf6ed52ae34f6e3dbcd49e2e5e14ed8aeea40704437951df8d4140b603f5727",
+          "at": "2026-06-28T22:33:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track-local-review` and `track-local-review-fix` now call `bin/sotp task-contract check` directly, which bypasses the cargo-make `task-contract-check` task and its `task-contract-coverage` dependency. That drops the required coverage-before-liveness gate chain, so orphan `task-contract.json` entries can reach reviewer rounds undetected. The ADR for this gate requires `cargo make task-contract-check` to depend on coverage and for both wrapper tasks to depend on that task.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 681,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:803c36b6bf5b53fb6a935252bf6acdcbfe83bcbc205b7a215b209de09ff324e4",
+          "at": "2026-06-28T22:37:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 2.5 still tells Codex to run `cargo make track-review-results`, but Makefile.toml no longer defines that task. The canonical review-results check is now unreachable from this briefing, so agents cannot verify `zero_findings` and complete the round.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.harness/briefings/review-fix-lead-codex.md",
+              "line": 103,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:d0e9d6e0a368a158b89491cf3fedb255d1d6a7b82e6d87d457d412966d8d65db",
+          "at": "2026-06-29T01:17:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d26a930b74374b8ce7451a900128e597709d872e59c8955d95491a549e2f07cb",
+          "at": "2026-06-29T01:23:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d26a930b74374b8ce7451a900128e597709d872e59c8955d95491a549e2f07cb",
+          "at": "2026-06-29T01:28:56Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:76ba5b6789fc6315fbdbc90bf202f519af85f08a87b274c7f42580b5fdf03372",
+          "at": "2026-06-29T08:57:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:76ba5b6789fc6315fbdbc90bf202f519af85f08a87b274c7f42580b5fdf03372",
+          "at": "2026-06-29T09:03:47Z"
+        }
+      ]
+    },
     "cli": {
       "rounds": [
         {
@@ -1616,227 +2105,6 @@
           "findings": [],
           "hash": "rvw1:sha256:6bebcb13fc14f620a5c8010f7106a1c69482bd9d01fb3bde16435c5cc42d3bbc",
           "at": "2026-06-29T07:09:40Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The orphan-detection loop silently drops any signal entry whose `type_name` cannot be converted to `CatalogueEntryKey` (`Err(_) => { ... }`). That branch is reachable because `type_signals_codec::decode` accepts arbitrary `type_name` strings, so a malformed `<layer>-type-signals.json` can contain an uncovered entry that the gate never reports. This makes the gate fail open instead of blocking or surfacing an error.",
-              "severity": "P1",
-              "file": "libs/usecase/src/pre_review_gate.rs",
-              "line": 222,
-              "category": "error handling"
-            }
-          ],
-          "hash": "rvw1:sha256:98d3cee97dc45e07009f480db7930a9074f2ce4dd7909b4207936a6c63aa0f18",
-          "at": "2026-06-27T13:46:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:46ccc45e62b8a34cefec80c76ad613c3a182b16a464bd89708fefd84f59e8f6d",
-          "at": "2026-06-27T13:54:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7a2c0d59210a3afe96d888bb8c3a52b1cf7a98c369f307df5f1a82c396822554",
-          "at": "2026-06-27T14:30:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7a2c0d59210a3afe96d888bb8c3a52b1cf7a98c369f307df5f1a82c396822554",
-          "at": "2026-06-27T14:33:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The `None` branch swallows every `SignalReadFailed`, but `check_layer()` also raises that error for malformed signal documents (for example, invalid `type_name` values are converted to `SignalReadFailed` here). As a result, a corrupt or unreadable layer can be treated as if it simply had no document, and all-layers mode can return `Passed` instead of surfacing the failure.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/pre_review_gate.rs",
-              "line": 338,
-              "category": "error handling"
-            }
-          ],
-          "hash": "rvw1:sha256:dc958872f3aa50aab626e8d8f72055053ee315ec2426f800b1759c9b33645c09",
-          "at": "2026-06-27T16:09:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "All-layers skip logic keys off the human-readable `message` inside `PreReviewGateError::SignalReadFailed` instead of a typed not-found variant. Because that diagnostic is documented as opaque, a real read/decode failure can be misclassified as a missing document and silently skipped, which breaks the fail-closed behavior in the `None` branch.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/pre_review_gate.rs",
-              "line": 204,
-              "category": "error type confusion"
-            }
-          ],
-          "hash": "rvw1:sha256:0e11154af6a288eb3f0a6c13e4627f031745df3c50c9173c75f91e2e8b404cd5",
-          "at": "2026-06-27T16:16:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`None` mode decides whether to skip a layer by parsing the opaque `PreReviewGateError::SignalReadFailed.message` string. That makes control flow depend on diagnostic text instead of a typed not-found signal, so a genuine read/decode failure can be misclassified as \"missing\" and silently skipped, letting all-layers mode pass when it should fail closed.",
-              "severity": "P1",
-              "file": "libs/usecase/src/pre_review_gate.rs",
-              "line": 204,
-              "category": "error type confusion"
-            }
-          ],
-          "hash": "rvw1:sha256:0e11154af6a288eb3f0a6c13e4627f031745df3c50c9173c75f91e2e8b404cd5",
-          "at": "2026-06-27T16:24:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: `None`-layer mode now depends on `read_optional_signals()`, but this file only adds a default shim that calls `read_signals()`. The production filesystem adapter still reports a missing `*-type-signals.json` as `SignalReadFailed`, so the new all-layers path will still abort on absent layers instead of skipping them silently. The added passing test only uses a mock that overrides the new hook, so it does not cover the real adapter path.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/pre_review_gate.rs",
-              "line": 141,
-              "category": "error handling"
-            }
-          ],
-          "hash": "rvw1:sha256:5a24c9e3a48ad1676b97eb41ebef7eb3641fb4f6ea2c640862d6817e1e3e24d2",
-          "at": "2026-06-27T16:30:42Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5a24c9e3a48ad1676b97eb41ebef7eb3641fb4f6ea2c640862d6817e1e3e24d2",
-          "at": "2026-06-27T16:38:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5a24c9e3a48ad1676b97eb41ebef7eb3641fb4f6ea2c640862d6817e1e3e24d2",
-          "at": "2026-06-27T16:41:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1b727304fe222a3508891c0db704f59e86e94bca9f2fa83516fb02479f9f7c8d",
-          "at": "2026-06-27T23:16:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1b727304fe222a3508891c0db704f59e86e94bca9f2fa83516fb02479f9f7c8d",
-          "at": "2026-06-27T23:18:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d00608ee1a1e456be05eb9e9957cfcbf423121a99eab16ef861add3d5209c36a",
-          "at": "2026-06-28T10:30:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`verify_coverage` treats an absent layer signal document as `continue` without checking whether `task-contract.json` has entries for that layer. If a layer's `<layer>-type-signals.json` is missing but the contract still attributes entries to it, `all_violations` can stay empty and the coverage gate returns `Passed`, even though those attributed entries do not exist in the catalogue. The coverage path should block with `InvalidEntryRef` or equivalent for contracted entries in absent layers.",
-              "severity": "P1",
-              "file": "libs/usecase/src/pre_review_gate.rs",
-              "line": 291,
-              "category": "orchestration correctness"
-            },
-            {
-              "message": "The D7 status filter only exempts entries when all owning tasks are `Todo`; every other status is treated as requiring Blue. `TaskStatusKind::Skipped` is a valid impl-plan status, so a skipped-only task with a Yellow signal will incorrectly block even though the gate contract only requires Blue for `in_progress` and `done` tasks and treats Red as the status-independent blocker. The active-status decision should distinguish `InProgress | Done` from skipped tasks instead of using `!all_todo`.",
-              "severity": "P1",
-              "file": "libs/usecase/src/pre_review_gate.rs",
-              "line": 511,
-              "category": "business logic leak"
-            }
-          ],
-          "hash": "rvw1:sha256:d00608ee1a1e456be05eb9e9957cfcbf423121a99eab16ef861add3d5209c36a",
-          "at": "2026-06-28T10:34:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e46c0220646557ac7e02964231d183d80a2a333c902d4eeaee93c2ade63bdc0f",
-          "at": "2026-06-28T10:42:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:83dcc56dc5a30757c49ced8c31aa92c945e72664e118dd70ac37274e01844e24",
-          "at": "2026-06-28T14:05:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:83dcc56dc5a30757c49ced8c31aa92c945e72664e118dd70ac37274e01844e24",
-          "at": "2026-06-28T14:09:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:56c7416494fa04be194809c251cbb0b92cc6f9ca2d125bcb5aa3ae3b45dd78c3",
-          "at": "2026-06-28T15:02:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:56c7416494fa04be194809c251cbb0b92cc6f9ca2d125bcb5aa3ae3b45dd78c3",
-          "at": "2026-06-28T15:05:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1eefc1d36eccd07257c518ef46eb323cf4ab1bbdcc040cc09bd61c7907aa73ec",
-          "at": "2026-06-28T16:27:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`RunReviewFixError::SubagentDispatchRequired(String)` adds CLI/composition transport details to the usecase public error type: the docs bind it to the `claude` provider, a `SUBAGENT_DISPATCH_REQUIRED` stdout payload, and exit code 64. That forces usecase callers to understand and preserve a CLI dispatch protocol instead of letting the CLI composition root map a pure usecase outcome to stdout and exit status, which breaks the usecase error abstraction / CLI-as-composition-root boundary.",
-              "severity": "P1",
-              "file": "libs/usecase/src/review_v2/run_review_fix.rs",
-              "line": 106,
-              "category": "error_type_confusion"
-            }
-          ],
-          "hash": "rvw1:sha256:1eefc1d36eccd07257c518ef46eb323cf4ab1bbdcc040cc09bd61c7907aa73ec",
-          "at": "2026-06-28T16:31:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4e9b2493a7e07b7de7b30e6ce3bccf9f3b20a991b5d1a4d70df820fc4aade3bc",
-          "at": "2026-06-28T16:34:33Z"
         }
       ]
     },
@@ -2370,474 +2638,224 @@
         }
       ]
     },
-    "harness-policy": {
+    "usecase": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The ownership paragraph is stale: it still says this capability owns only `impl-plan.json` and `task-coverage.json`, but the same file now declares `task-contract.json` as a third Phase 3 artifact and allows writing it. That leaves the harness contract internally inconsistent about what `impl-planner` owns.",
+              "message": "The orphan-detection loop silently drops any signal entry whose `type_name` cannot be converted to `CatalogueEntryKey` (`Err(_) => { ... }`). That branch is reachable because `type_signals_codec::decode` accepts arbitrary `type_name` strings, so a malformed `<layer>-type-signals.json` can contain an uncovered entry that the gate never reports. This makes the gate fail open instead of blocking or surfacing an error.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.harness/capabilities/impl-planner.md",
-              "line": 25,
-              "category": "convention contradiction"
+              "file": "libs/usecase/src/pre_review_gate.rs",
+              "line": 222,
+              "category": "error handling"
             }
           ],
-          "hash": "rvw1:sha256:5c88d3e73fd515fed176ee8772485ed7fd45327646121cd4cd5e663dd7889ff3",
-          "at": "2026-06-27T13:46:31Z"
+          "hash": "rvw1:sha256:98d3cee97dc45e07009f480db7930a9074f2ce4dd7909b4207936a6c63aa0f18",
+          "at": "2026-06-27T13:46:48Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:c0b457c465272b82b435c5f3966b08fd7ac30a457868f939c97e28709ed3614f",
-          "at": "2026-06-27T13:50:43Z"
+          "hash": "rvw1:sha256:46ccc45e62b8a34cefec80c76ad613c3a182b16a464bd89708fefd84f59e8f6d",
+          "at": "2026-06-27T13:54:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7a2c0d59210a3afe96d888bb8c3a52b1cf7a98c369f307df5f1a82c396822554",
+          "at": "2026-06-27T14:30:05Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:c0b457c465272b82b435c5f3966b08fd7ac30a457868f939c97e28709ed3614f",
-          "at": "2026-06-27T13:54:18Z"
+          "hash": "rvw1:sha256:7a2c0d59210a3afe96d888bb8c3a52b1cf7a98c369f307df5f1a82c396822554",
+          "at": "2026-06-27T14:33:00Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The new gate parses `--group`, but the actual review-fix wrapper contract still uses `--scope` on the caller side and `bin/sotp review fix-local` itself expects `--scope`. That means the pre-review gate is unreachable for the documented invocation path, and any invocation that does pass `--group` will be forwarded unchanged to `review fix-local` and fail there. The task-contract check/briefing append therefore does not wire into the real fix workflow.",
+              "message": "The `None` branch swallows every `SignalReadFailed`, but `check_layer()` also raises that error for malformed signal documents (for example, invalid `type_name` values are converted to `SignalReadFailed` here). As a result, a corrupt or unreadable layer can be treated as if it simply had no document, and all-layers mode can return `Passed` instead of surfacing the failure.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/Makefile.toml",
-              "line": 645,
-              "category": "command wiring breakage"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/pre_review_gate.rs",
+              "line": 338,
+              "category": "error handling"
             }
           ],
-          "hash": "rvw1:sha256:39d377d23f43855d211805b91d2b48cf61edc815f2be47191afd8c7ed27c1a2a",
-          "at": "2026-06-27T15:22:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3c836db749917efcff22cb7ef95cc71d527d891eb4ae2af510928f6a237f6f2a",
-          "at": "2026-06-27T15:24:42Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d4aff7afa048fea304d3b0653c95ecbf55bb7957838277f3a9d60c603f77e87c",
-          "at": "2026-06-27T16:09:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d4aff7afa048fea304d3b0653c95ecbf55bb7957838277f3a9d60c603f77e87c",
-          "at": "2026-06-27T16:12:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3a836ba5b2f6095bcaa921ba37f1c3f609314f369e3fd2017ee4130015644b24",
-          "at": "2026-06-27T23:15:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 3 now makes surfaced PR-review comments non-terminal and requires fixing, committing, and re-running until an explicit zero-findings signal or user-approved Accepted Deviations. However, the stale Behavior summary still describes comments-surfaced as a reportable end state with only an actionability assessment and a next command. Agents following this summary can stop after the first non-pass round, which breaks the new MUST-continue loop contract. Update the Behavior section to report only terminal states and include the per-round trace/fix commits described above.",
-              "severity": "P1",
-              "file": ".claude/commands/track/pr-review.md",
-              "line": 132,
-              "category": "command_wiring_breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:3a836ba5b2f6095bcaa921ba37f1c3f609314f369e3fd2017ee4130015644b24",
-          "at": "2026-06-27T23:18:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 3 still tells the operator to proceed to `/track:commit` after a zero-findings PR review, while the same command's terminal-state report now points to `/track:merge` once 👍 is reached. That leaves two conflicting next-command wirings for the same terminal state; following the older `/track:commit` path after a clean PR review can send the workflow back to the guarded local commit command instead of the CI-gated PR merge flow described by this command and `/track:merge`. Update this terminal-state branch to match the new merge/report behavior.",
-              "severity": "P1",
-              "file": ".claude/commands/track/pr-review.md",
-              "line": 64,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:1c12ec2090613e13e787910cd381cc1a2ffbe831dd2e24a94f443d6e65fe30f9",
-          "at": "2026-06-27T23:21:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f97556ac6ebbffd35cbbb6984ab0821f5e4337fd395b7350fab240246b8a510d",
-          "at": "2026-06-27T23:24:16Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7aed6bbddb1775fd97a4f2ce306b210fd9a2019fd3ae9cbb17b274ab62521d59",
-          "at": "2026-06-27T23:37:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7aed6bbddb1775fd97a4f2ce306b210fd9a2019fd3ae9cbb17b274ab62521d59",
-          "at": "2026-06-27T23:41:06Z"
+          "hash": "rvw1:sha256:dc958872f3aa50aab626e8d8f72055053ee315ec2426f800b1759c9b33645c09",
+          "at": "2026-06-27T16:09:33Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`track-contract-gate` lost the non-`track/<id>` branch guard from the briefing. It now always runs `bin/sotp task-contract check --items-dir track/items`, and that command self-resolves from the current branch and fails on `main`/detached HEAD. As a result, `cargo make track-local-review-fix-codex` now hard-fails outside a track branch instead of skipping cleanly.",
+              "message": "All-layers skip logic keys off the human-readable `message` inside `PreReviewGateError::SignalReadFailed` instead of a typed not-found variant. Because that diagnostic is documented as opaque, a real read/decode failure can be misclassified as a missing document and silently skipped, which breaks the fail-closed behavior in the `None` branch.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/Makefile.toml",
-              "line": 642,
-              "category": "command wiring breakage"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/pre_review_gate.rs",
+              "line": 204,
+              "category": "error type confusion"
             }
           ],
-          "hash": "rvw1:sha256:6a29fe6e3f333921391f380e1976657b31cd7880d2ae3f4fe07f998f6938415a",
-          "at": "2026-06-28T01:55:45Z"
+          "hash": "rvw1:sha256:0e11154af6a288eb3f0a6c13e4627f031745df3c50c9173c75f91e2e8b404cd5",
+          "at": "2026-06-27T16:16:33Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`.claude/commands/track/review.md` now tells both fast and final Codex rounds to run `cargo make track-local-review-fix`, and `.claude/settings.json` / `.codex/rules/default.rules` whitelist that same task name, but `Makefile.toml` only defines `[tasks.track-local-review]` at line 655. As written, the orchestrator will invoke a non-existent cargo-make task, while the real task name is not permitted by the sandbox allowlist, so the Codex review path cannot launch.",
+              "message": "`None` mode decides whether to skip a layer by parsing the opaque `PreReviewGateError::SignalReadFailed.message` string. That makes control flow depend on diagnostic text instead of a typed not-found signal, so a genuine read/decode failure can be misclassified as \"missing\" and silently skipped, letting all-layers mode pass when it should fail closed.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.claude/commands/track/review.md",
-              "line": 87,
-              "category": "command wiring breakage"
+              "file": "libs/usecase/src/pre_review_gate.rs",
+              "line": 204,
+              "category": "error type confusion"
             }
           ],
-          "hash": "rvw1:sha256:a22a86482ac02ffe078bdd53bef5402a39ab452675133afe00448f19f7e1ae19",
-          "at": "2026-06-28T02:05:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b904b1feaae141253136a1c716a7aae9cf63fdfed3334c2874d2c6542aac6041",
-          "at": "2026-06-28T02:09:36Z"
+          "hash": "rvw1:sha256:0e11154af6a288eb3f0a6c13e4627f031745df3c50c9173c75f91e2e8b404cd5",
+          "at": "2026-06-27T16:24:18Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`review-fix-lead-codex.md` still says the `cargo make track-local-review` wrapper chains `track-sync-views` before review, but `Makefile.toml` now wires `track-local-review` through `track-contract-gate` only. That makes the briefing describe a pre-review view sync that no longer happens, so the fixer can run against stale rendered views.",
+              "message": "P1: `None`-layer mode now depends on `read_optional_signals()`, but this file only adds a default shim that calls `read_signals()`. The production filesystem adapter still reports a missing `*-type-signals.json` as `SignalReadFailed`, so the new all-layers path will still abort on absent layers instead of skipping them silently. The added passing test only uses a mock that overrides the new hook, so it does not cover the real adapter path.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.harness/briefings/review-fix-lead-codex.md",
-              "line": 72,
-              "category": "command wiring breakage"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/pre_review_gate.rs",
+              "line": 141,
+              "category": "error handling"
             }
           ],
-          "hash": "rvw1:sha256:8c0e57250c0ed15f567c510570f5eb7ae2e7d0b26efb587c9963b20ab4477ac5",
-          "at": "2026-06-28T02:44:46Z"
+          "hash": "rvw1:sha256:5a24c9e3a48ad1676b97eb41ebef7eb3641fb4f6ea2c640862d6817e1e3e24d2",
+          "at": "2026-06-27T16:30:42Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:786040831b7083b3e915a7fda0028249f4ff87e0a2fa522324764defe12d25f1",
-          "at": "2026-06-28T02:52:12Z"
+          "hash": "rvw1:sha256:5a24c9e3a48ad1676b97eb41ebef7eb3641fb4f6ea2c640862d6817e1e3e24d2",
+          "at": "2026-06-27T16:38:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5a24c9e3a48ad1676b97eb41ebef7eb3641fb4f6ea2c640862d6817e1e3e24d2",
+          "at": "2026-06-27T16:41:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1b727304fe222a3508891c0db704f59e86e94bca9f2fa83516fb02479f9f7c8d",
+          "at": "2026-06-27T23:16:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1b727304fe222a3508891c0db704f59e86e94bca9f2fa83516fb02479f9f7c8d",
+          "at": "2026-06-27T23:18:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d00608ee1a1e456be05eb9e9957cfcbf423121a99eab16ef861add3d5209c36a",
+          "at": "2026-06-28T10:30:36Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "Step 1 still tells the orchestrator to read `capabilities.review-fix-lead.provider` and choose between launching the Claude subagent directly or the Codex wrapper. That contradicts the new Step 4/5 contract where `/track:review` must always call the provider-agnostic `cargo make track-local-review-fix` wrapper and let the CLI return the exit-64 dispatch instruction for Claude. As written, the command has two inconsistent launch paths, so the Claude path can bypass the new wrapper/dispatch contract.",
+              "message": "`verify_coverage` treats an absent layer signal document as `continue` without checking whether `task-contract.json` has entries for that layer. If a layer's `<layer>-type-signals.json` is missing but the contract still attributes entries to it, `all_violations` can stay empty and the coverage gate returns `Passed`, even though those attributed entries do not exist in the catalogue. The coverage path should block with `InvalidEntryRef` or equivalent for contracted entries in absent layers.",
               "severity": "P1",
-              "file": ".claude/commands/track/review.md",
-              "line": 31,
-              "category": "command wiring breakage"
+              "file": "libs/usecase/src/pre_review_gate.rs",
+              "line": 291,
+              "category": "orchestration correctness"
             },
             {
-              "message": "The new routing text says the Codex wrapper exits `0` with any `REVIEW_FIX_STATUS` value or `2` for smoke-test failure, but the runner status contract maps `completed` to 0, `blocked_cross_scope` to 2, and `failed` to 1, with smoke-test also using 2 when there is no status sentinel. Step 4/5 therefore omit the exit-1 status path and make exit 2 ambiguous unless stdout is parsed, which can make the orchestrator mishandle `failed` or `blocked_cross_scope` results from `track-local-review-fix`.",
+              "message": "The D7 status filter only exempts entries when all owning tasks are `Todo`; every other status is treated as requiring Blue. `TaskStatusKind::Skipped` is a valid impl-plan status, so a skipped-only task with a Yellow signal will incorrectly block even though the gate contract only requires Blue for `in_progress` and `done` tasks and treats Red as the status-independent blocker. The active-status decision should distinguish `InProgress | Done` from skipped tasks instead of using `!all_todo`.",
               "severity": "P1",
-              "file": ".claude/commands/track/review.md",
-              "line": 99,
-              "category": "command wiring breakage"
+              "file": "libs/usecase/src/pre_review_gate.rs",
+              "line": 511,
+              "category": "business logic leak"
             }
           ],
-          "hash": "rvw1:sha256:786040831b7083b3e915a7fda0028249f4ff87e0a2fa522324764defe12d25f1",
-          "at": "2026-06-28T02:58:07Z"
+          "hash": "rvw1:sha256:d00608ee1a1e456be05eb9e9957cfcbf423121a99eab16ef861add3d5209c36a",
+          "at": "2026-06-28T10:34:44Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:15d2bc9c5436e61591120d26a9949f7774b0c189d2f7cc61c786ead82330a78e",
-          "at": "2026-06-28T03:02:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Both `track-local-review` and `track-local-review-fix` now always forward `--track-id \"$ _TID\"` and `--briefing-file \"$ _BF\"` to `bin/sotp task-contract check`. When callers use the existing no-frills invocation style that omits one or both flags, the shell still passes empty strings, which disables the task’s branch auto-resolution path and turns the briefing append into a hard failure after a successful gate. That regresses a previously valid command path into a fail case.",
-              "severity": "P1",
-              "file": "Makefile.toml",
-              "line": 643,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:6deee3727b89059d297cc172da891be9365a09a78aa9fe4a7480ecf9427d47e7",
-          "at": "2026-06-28T03:49:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Deleting the `[tasks.track-contract-gate]` wrapper here makes the shipped review instructions incoherent: `.claude/commands/track/review.md` and the reviewer/fixer briefings still describe `cargo make track-local-review` / `track-local-review-fix` as running or depending on `track-contract-gate` before each round. In the final branch that task no longer exists, so the documented workflow now points at a dead command. Either keep a compatibility shim or update the distributed instructions in the same PR.",
-              "severity": "P1",
-              "file": "Makefile.toml",
-              "line": 639,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:35aa043f7496b7836ccc314ad8c3c75c002c4067e142540183a7b6ebc9fef44c",
-          "at": "2026-06-28T04:14:39Z"
+          "hash": "rvw1:sha256:e46c0220646557ac7e02964231d183d80a2a333c902d4eeaee93c2ade63bdc0f",
+          "at": "2026-06-28T10:42:03Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:aad8641d2ea0e1e0f1301867486f65e827ddb6ac1948c8074f6ad0d247a4f8e0",
-          "at": "2026-06-28T04:22:49Z"
+          "hash": "rvw1:sha256:83dcc56dc5a30757c49ced8c31aa92c945e72664e118dd70ac37274e01844e24",
+          "at": "2026-06-28T14:05:46Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:aad8641d2ea0e1e0f1301867486f65e827ddb6ac1948c8074f6ad0d247a4f8e0",
-          "at": "2026-06-28T04:36:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`track-local-review` / `track-local-review-fix` now make `task-contract-check` a cargo-make dependency, but their shell bodies still run `bin/sotp signal calc-impl-catalog` afterwards. Cargo-make dependencies execute before the script, so the pre-review gate now reads stale impl-catalog signals instead of the freshly refreshed ones documented in `.claude/commands/track/review.md` and `.claude/agents/review-fix-lead.md`. Move the signal refresh ahead of `task-contract-check`, or keep the inline `signal calc-impl-catalog && task-contract check && review ...` ordering.",
-              "severity": "P1",
-              "file": "Makefile.toml",
-              "line": 652,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:381b7cf96ca157a0bd5a5bfd24ec6f36e179e4edb56ee1bd4c23b7513da2014c",
-          "at": "2026-06-28T10:30:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`track-local-review` and `track-local-review-fix` no longer propagate the caller-supplied `--track-id` into the pre-review `task-contract` gate; the dependency chain now auto-resolves from the current branch instead. That makes the review flow unsafe when the explicit track id and working branch diverge, because the gate can validate a different track than the one requested by `.claude/commands/track/review.md`.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/Makefile.toml",
-              "line": 657,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:f03cc15e53aeceb6f5663d26f82c5c088e08fa7b9bfa8650623d000381b3bc96",
-          "at": "2026-06-28T10:36:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`track-local-review` and `track-local-review-fix` now forward `--briefing-file` into `bin/sotp task-contract coverage/check`, but `apps/cli/src/commands/task_contract.rs` only accepts `--layer`, `--track-id`, and `--items-dir` for those subcommands. In the documented review flow (`cargo make track-local-review -- --round-type ... --briefing-file ...`), clap will reject the unexpected flag, so the pre-review gate fails before `bin/sotp review local` or `fix-local` runs.",
-              "severity": "P1",
-              "file": "Makefile.toml",
-              "line": 680,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:b5d06264b9e40f4c9712a01530295441ae77ee00d67d607c789a26c58c850f91",
-          "at": "2026-06-28T10:45:27Z"
+          "hash": "rvw1:sha256:83dcc56dc5a30757c49ced8c31aa92c945e72664e118dd70ac37274e01844e24",
+          "at": "2026-06-28T14:09:00Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:de9ab21f358c0271f1d1bf77bb8e5a637d3465c60f7cf2321526342f64a5b7c9",
-          "at": "2026-06-28T10:51:59Z"
+          "hash": "rvw1:sha256:56c7416494fa04be194809c251cbb0b92cc6f9ca2d125bcb5aa3ae3b45dd78c3",
+          "at": "2026-06-28T15:02:17Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:de9ab21f358c0271f1d1bf77bb8e5a637d3465c60f7cf2321526342f64a5b7c9",
-          "at": "2026-06-28T10:55:47Z"
+          "hash": "rvw1:sha256:56c7416494fa04be194809c251cbb0b92cc6f9ca2d125bcb5aa3ae3b45dd78c3",
+          "at": "2026-06-28T15:05:44Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:e7cd8482e9b1ae7424bac3978467d4ff79f8d2c0752b8c317bc335ec72102797",
-          "at": "2026-06-28T14:07:58Z"
+          "hash": "rvw1:sha256:1eefc1d36eccd07257c518ef46eb323cf4ab1bbdcc040cc09bd61c7907aa73ec",
+          "at": "2026-06-28T16:27:32Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`ci-local` and `ci-container` now depend on `task-contract-coverage`, but that task runs `bin/sotp task-contract coverage` without `--track-id` and therefore only auto-resolves on `track/<id>` branches. These are general CI/bootstrap gates for the template; from `main` or a fresh consumer checkout there is no active track, so `cargo make ci`/`bootstrap` become wired to a track-only command and fail before ordinary CI can run. Keep the task-contract gate on the track review wrappers or provide explicit track context instead of adding it to general CI.",
+              "message": "`RunReviewFixError::SubagentDispatchRequired(String)` adds CLI/composition transport details to the usecase public error type: the docs bind it to the `claude` provider, a `SUBAGENT_DISPATCH_REQUIRED` stdout payload, and exit code 64. That forces usecase callers to understand and preserve a CLI dispatch protocol instead of letting the CLI composition root map a pure usecase outcome to stdout and exit status, which breaks the usecase error abstraction / CLI-as-composition-root boundary.",
               "severity": "P1",
-              "file": "Makefile.toml",
-              "line": 400,
-              "category": "command wiring breakage"
+              "file": "libs/usecase/src/review_v2/run_review_fix.rs",
+              "line": 106,
+              "category": "error_type_confusion"
             }
           ],
-          "hash": "rvw1:sha256:e7cd8482e9b1ae7424bac3978467d4ff79f8d2c0752b8c317bc335ec72102797",
-          "at": "2026-06-28T14:13:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new `--track-id` parser runs inside the `track-local-review` script, but this task's `task-contract-check` dependency has already run before the script starts. For a mismatched invocation, the task-contract gates still refresh/check the current branch's active track and only then reject the requested `--track-id`, so the wrapper no longer behaves like the simplified pass-through review command described by the harness policy and can gate the wrong track without recording the requested review. The same issue is duplicated in `track-local-review-fix` at line 689.",
-              "severity": "P1",
-              "file": "Makefile.toml",
-              "line": 663,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:6dada2907fc10fcf1d3051bc6f16e5a577be5b539903abefc6cdf365b8a6dd01",
-          "at": "2026-06-28T14:16:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4f74aa82dee11798ea658a8d2a4b16028cb25c38821dc2bc48cde49b4b807ae6",
-          "at": "2026-06-28T15:02:10Z"
+          "hash": "rvw1:sha256:1eefc1d36eccd07257c518ef46eb323cf4ab1bbdcc040cc09bd61c7907aa73ec",
+          "at": "2026-06-28T16:31:28Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4f74aa82dee11798ea658a8d2a4b16028cb25c38821dc2bc48cde49b4b807ae6",
-          "at": "2026-06-28T15:05:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ad7401d72d7779012df4ecb1aa3e4d22804d9689236a69c5c92173f005331247",
-          "at": "2026-06-28T15:43:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ad7401d72d7779012df4ecb1aa3e4d22804d9689236a69c5c92173f005331247",
-          "at": "2026-06-28T15:46:57Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new `--track-id` branch mismatch guard runs inside the task script, but `task-contract-check` is still a cargo-make dependency, so that gate executes before this check. On a wrong branch, the task will still auto-resolve and run the task-contract gates against the current branch, and only then exit 2; that defeats the stated protection for both `track-local-review` and `track-local-review-fix`.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/Makefile.toml",
-              "line": 677,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:4ebf8f5150ac1d1bb71f918c4298f63442a5d01664cc9f83aba1a85d7f70174c",
-          "at": "2026-06-28T16:26:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0fd95d68af127b1864ae56b85b323bcc877256816c0f5d3e80fc8a4a2740fa94",
-          "at": "2026-06-28T16:31:37Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0fd95d68af127b1864ae56b85b323bcc877256816c0f5d3e80fc8a4a2740fa94",
-          "at": "2026-06-28T16:35:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`track-local-review` and `track-local-review-fix` now run `bin/sotp task-contract coverage` before every review round. That changes the pre-review wiring: the accepted contract for this gate keeps `task-contract coverage` in `cargo make ci` and reserves `track-local-review` for `signal calc-impl-catalog && task-contract check` before `bin/sotp review local` (`knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md:93-109`). As written, any orphaned or missing `task-contract.json` entry will block reviewer entry, so review rounds can no longer start on tracks that should still be reviewable under the documented workflow.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/Makefile.toml",
-              "line": 700,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:7bf6ed52ae34f6e3dbcd49e2e5e14ed8aeea40704437951df8d4140b603f5727",
-          "at": "2026-06-28T22:33:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`track-local-review` and `track-local-review-fix` now call `bin/sotp task-contract check` directly, which bypasses the cargo-make `task-contract-check` task and its `task-contract-coverage` dependency. That drops the required coverage-before-liveness gate chain, so orphan `task-contract.json` entries can reach reviewer rounds undetected. The ADR for this gate requires `cargo make task-contract-check` to depend on coverage and for both wrapper tasks to depend on that task.",
-              "severity": "P1",
-              "file": "Makefile.toml",
-              "line": 681,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:803c36b6bf5b53fb6a935252bf6acdcbfe83bcbc205b7a215b209de09ff324e4",
-          "at": "2026-06-28T22:37:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 2.5 still tells Codex to run `cargo make track-review-results`, but Makefile.toml no longer defines that task. The canonical review-results check is now unreachable from this briefing, so agents cannot verify `zero_findings` and complete the round.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.harness/briefings/review-fix-lead-codex.md",
-              "line": 103,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:d0e9d6e0a368a158b89491cf3fedb255d1d6a7b82e6d87d457d412966d8d65db",
-          "at": "2026-06-29T01:17:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d26a930b74374b8ce7451a900128e597709d872e59c8955d95491a549e2f07cb",
-          "at": "2026-06-29T01:23:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d26a930b74374b8ce7451a900128e597709d872e59c8955d95491a549e2f07cb",
-          "at": "2026-06-29T01:28:56Z"
+          "hash": "rvw1:sha256:4e9b2493a7e07b7de7b30e6ce3bccf9f3b20a991b5d1a4d70df820fc4aade3bc",
+          "at": "2026-06-28T16:34:33Z"
         }
       ]
     }
