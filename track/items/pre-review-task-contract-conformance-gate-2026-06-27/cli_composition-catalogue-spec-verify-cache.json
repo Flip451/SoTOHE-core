@@ -3,6 +3,30 @@
   "layer": "cli_composition",
   "entries": [
     {
+      "claim_hash": "dcc072b2b5103b0a5f230f53ac5cd3e3014a110a097d983d3a9040810c9ff283",
+      "evidence_hash": "17e6d4ae6dc2618ce228f5a8cff727725d63cf6bb36dc73f4bed5418e5caeacd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "review-fix ワークフロー（`sotp review fix-local` / fixpoint_resolve または同等の呼び出し経路）への pre-review ゲートの配線。ゲートは `sotp review fix-local` が reviewer invocation を起動する前に実行され、ゲートがブロックした場合は reviewer invocation が実行されない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/cli_composition-types.json",
+          "section_key": "types",
+          "entry_key": "ReviewCompositionRoot"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "review-fix ワークフロー（`sotp review fix-local` / fixpoint_resolve または同等の呼び出し経路）への pre-review ゲートの配線。ゲートは `sotp review fix-local` が reviewer invocation を起動する前に実行され、ゲートがブロックした場合は reviewer invocation が実行されない。"
+        }
+      }
+    },
+    {
       "claim_hash": "93b29360785d49eca3895ba1180523c62e551514fca68a25fb82a8356cac6312",
       "evidence_hash": "0635256c1afb73b788d9b65d2a8ecde86d0c85f8a0fe21d138ec6969917b8f41",
       "verdict": {

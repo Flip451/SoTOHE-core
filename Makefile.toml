@@ -325,45 +325,15 @@ args = ["run", "--quiet", "-p", "cli", "--", "signal", "check-adr-user", "--gate
 
 [tasks.verify-spec-states-current-local]
 private = true
-description = "[internal] Chain ① check-spec-adr --gate commit: verify current track spec.json→ADR signals. Active track auto-resolved from branch; skips on non-track branches or absent spec.json."
-script_runner = "@shell"
-script = ['''
-set -e
-BRANCH=$(git rev-parse --abbrev-ref HEAD)
-case "$BRANCH" in
-  track/*)
-    TRACK_ID="${BRANCH#track/}"
-    SPEC_JSON="track/items/${TRACK_ID}/spec.json"
-    if [ ! -f "$SPEC_JSON" ]; then
-      printf "[SKIP] verify-spec-states-current-local: spec.json absent (Phase 0 or pre-Phase-1); skipping\n"
-      exit 0
-    fi
-    cargo run --quiet -p cli -- signal check-spec-adr --gate commit --spec-json "$SPEC_JSON"
-    ;;
-  *)
-    printf "[SKIP] verify-spec-states-current-local: not on a track branch; skipping\n"
-    exit 0
-    ;;
-esac
-''']
+description = "[internal] Chain ① spec→ADR signal gate. Active track / spec.json path auto-resolved by CLI; graceful skip on non-track branches or absent spec.json."
+command = "cargo"
+args = ["run", "--quiet", "-p", "cli", "--", "signal", "check-spec-adr", "--gate", "commit"]
 
 [tasks.signal-check-impl-catalog-local]
 private = true
-description = "[internal] Chain ③ check-impl-catalog --gate commit: argless impl↔catalog signal gate (T020 / D8 — active track and layers resolved internally). Skips gracefully when not on a track branch."
-script_runner = "@shell"
-script = ['''
-set -e
-BRANCH=$(git rev-parse --abbrev-ref HEAD)
-case "$BRANCH" in
-  track/*)
-    cargo run --quiet -p cli -- signal check-impl-catalog --gate commit
-    ;;
-  *)
-    printf "[SKIP] signal-check-impl-catalog-local: not on a track branch; skipping\n"
-    exit 0
-    ;;
-esac
-''']
+description = "[internal] Chain ③ impl↔catalog signal gate. Active track / layers auto-resolved by CLI; graceful skip on non-track branches."
+command = "cargo"
+args = ["run", "--quiet", "-p", "cli", "--", "signal", "check-impl-catalog", "--gate", "commit"]
 
 [tasks.verify-catalogue-spec-refs-local]
 private = true
@@ -373,21 +343,9 @@ args = ["run", "--quiet", "-p", "cli", "--", "verify", "catalogue-spec-refs"]
 
 [tasks.check-catalogue-spec-signals-local]
 private = true
-description = "[internal] Chain ② check-catalog-spec --gate commit: argless catalog→spec signal gate (T020 / D8 — active track and layers resolved internally). Skips gracefully when not on a track branch."
-script_runner = "@shell"
-script = ['''
-set -e
-BRANCH=$(git rev-parse --abbrev-ref HEAD)
-case "$BRANCH" in
-  track/*)
-    cargo run --quiet -p cli -- signal check-catalog-spec --gate commit
-    ;;
-  *)
-    printf "[SKIP] check-catalogue-spec-signals-local: not on a track branch; skipping\n"
-    exit 0
-    ;;
-esac
-''']
+description = "[internal] Chain ② catalog→spec signal gate. Active track / layers auto-resolved by CLI; graceful skip on non-track branches."
+command = "cargo"
+args = ["run", "--quiet", "-p", "cli", "--", "signal", "check-catalog-spec", "--gate", "commit"]
 
 [tasks.ci-rust-local]
 private = true
@@ -617,7 +575,7 @@ args = ["pr", "review-cycle", "${@}"]
 
 [tasks.track-active-gate]
 private = true
-description = "[gate] Regen sequence: signal calc-impl-catalog → signal calc-catalog-spec → views sync (T020 / D8: argless; active track and layers resolved internally). Both track-commit-message and review invocations depend on this shared task (D4 symmetry, CN-11 DRY). Fail-closed: non-zero exit aborts the chain (CN-09)."
+description = "[gate] Regen sequence: signal calc-impl-catalog → signal calc-catalog-spec → views sync. Both track-commit-message and review invocations depend on this shared task. Fail-closed: non-zero exit aborts the chain."
 script_runner = "@shell"
 script = ['''
 set -e
@@ -643,39 +601,27 @@ command = "bin/sotp"
 args = ["signal", "calc-impl-catalog"]
 
 [tasks.task-contract-coverage]
-description = "[gate] Run attribution-completeness coverage check (D5): verifies every catalogue entry in all 6 canonical TDDD layers is attributed to at least one task in task-contract.json, and every attributed entry exists in the catalogue. Active track auto-resolved from current git branch. Exits 0 on Passed, non-zero on Blocked."
+description = "[gate] Run attribution-completeness coverage check: verifies every catalogue entry in all 6 canonical TDDD layers is attributed to at least one task in task-contract.json, and every attributed entry exists in the catalogue. Active track auto-resolved from current git branch. Exits 0 on Passed, non-zero on Blocked."
 dependencies = ["task-contract-refresh-impl-catalog"]
 command = "bin/sotp"
 args = ["task-contract", "coverage"]
 
 [tasks.task-contract-check]
-description = "[gate] Run pre-review liveness gate (D5/D7): verifies all in_progress/done attributed entries have Blue impl_catalog signals; todo-only entries tolerate Yellow; Red always blocks. Active track auto-resolved from current git branch. Declares task-contract-coverage dependency so attribution completeness (coverage) always precedes liveness (check) on every invocation. Exits 0 on Passed, non-zero on Blocked."
+description = "[gate] Run pre-review liveness gate: verifies all in_progress/done attributed entries have Blue impl_catalog signals; todo-only entries tolerate Yellow; Red always blocks. Active track auto-resolved from current git branch. Declares task-contract-coverage dependency so attribution completeness (coverage) always precedes liveness (check) on every invocation. Exits 0 on Passed, non-zero on Blocked."
 dependencies = ["task-contract-coverage"]
 command = "bin/sotp"
 args = ["task-contract", "check"]
 
 [tasks.task-contract-coverage-local]
 private = true
-description = "[internal] Run attribution-completeness coverage check (D5) with branch-aware graceful skip. Skips gracefully when not on a track/* branch so that cargo make ci does not break on main or fresh checkouts. On track/* branches: runs coverage against the freshness signals already produced by signal-check-impl-catalog-local (which runs earlier in the ci-local dependency chain — coverage reads existing type-signals.json files, no rustdoc invocation here, so this task does not need nightly toolchain access). Uses cargo run for container compatibility."
-script_runner = "@shell"
-script = ['''
-set -e
-BRANCH=$(git rev-parse --abbrev-ref HEAD)
-case "$BRANCH" in
-  track/*)
-    cargo run --quiet -p cli -- task-contract coverage
-    ;;
-  *)
-    printf "[SKIP] task-contract-coverage-local: not on a track branch; skipping\n"
-    exit 0
-    ;;
-esac
-''']
+description = "[internal] Attribution-completeness coverage gate. Active track auto-resolved by CLI; graceful skip on non-track branches."
+command = "cargo"
+args = ["run", "--quiet", "-p", "cli", "--", "task-contract", "coverage"]
 
 # Cargo-make dependencies run before task scripts, so pre-gate track/branch
 # guards must live outside these wrappers or inside the gate commands.
 [tasks.track-local-review]
-description = "[wrapper] Fire attribution-completeness + liveness gates via task-contract-check dependency (D6: signal refresh → coverage → check chained by cargo-make dependencies; active track auto-resolved from the current git branch in each gate), then invoke a single reviewer round via bin/sotp review local. Provider-agnostic: both Claude `.claude/agents/review-fix-lead.md` and Codex `.agents/skills/review-fix-lead/SKILL.md` skills call this task per round (the agent / skill owns the fix loop itself)."
+description = "[wrapper] Fire attribution-completeness + liveness gates via task-contract-check dependency (active track auto-resolved from the current git branch in each gate), then invoke a single reviewer round via bin/sotp review local. bin/sotp review local auto-resolves the active track from the current git branch when --track-id is omitted. Provider-agnostic: both Claude and Codex skills call this task per round."
 dependencies = ["task-contract-check"]
 script_runner = "@shell"
 script = ['''
@@ -684,7 +630,7 @@ CODEX_BIN="${CODEX_BIN:-$(asdf which codex 2>/dev/null || command -v codex)}" bi
 ''']
 
 [tasks.track-local-review-fix]
-description = "[wrapper] Fire attribution-completeness + liveness gates via task-contract-check dependency (D6: signal refresh → coverage → check chained by cargo-make dependencies; active track auto-resolved from the current git branch in each gate), then launch the review-fix-lead loop via bin/sotp review fix-local. Provider-agnostic: bin/sotp resolves provider/model from .harness/config/agent-profiles.json; CODEX_BIN is set for asdf shim resolution when the resolved provider is codex (harmless when the provider is claude)."
+description = "[wrapper] Same as track-local-review but invokes bin/sotp review fix-local instead of review local. Provider-agnostic: bin/sotp resolves provider/model from .harness/config/agent-profiles.json. Active track auto-resolved from current git branch (--track-id is intentionally not accepted at the cargo-make layer)."
 dependencies = ["task-contract-check"]
 script_runner = "@shell"
 script = ['''

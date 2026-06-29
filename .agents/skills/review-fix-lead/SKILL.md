@@ -41,8 +41,9 @@ description of the failure. Do not proceed to step 1.
 
 1. **Review (records the round).** Run the **"Reviewer invocation"** command given in your
    orchestrator assignment, EXACTLY as provided, on every round. It is the canonical
-   `cargo make track-local-review -- --round-type <round_type> --group <scope> --track-id <track-id> --briefing-file <path>`
-   command. The cargo-make task inlines `signal calc-impl-catalog && task-contract check`, so before each
+   `cargo make track-local-review -- --round-type <round_type> --group <scope> --briefing-file <path>`
+   command. Do NOT pass `--track-id` — the wrapper auto-resolves the active track from the
+   current git branch. The cargo-make task inlines `signal calc-impl-catalog && task-contract check`, so before each
    reviewer invocation the runner refreshes impl-catalog signals and runs the task-contract
    pre-review gate (fail-closed); on gate pass it delegates to `bin/sotp review local`, which
    writes the verdict to `review.json`. Run `bin/sotp track views sync` manually before invoking

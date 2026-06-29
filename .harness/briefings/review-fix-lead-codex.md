@@ -75,19 +75,19 @@ to `bin/sotp review local`, which resolves the reviewer provider/model and recor
 Run `bin/sotp track views sync` manually before the invocation when you need fresh rendered views
 (`plan.md`, `contract-map.md`, `<layer>-types.md`) for the scope hash.
 
-**Read prior-round findings via `cargo make track-review-results`, never by opening
+**Read prior-round findings via `bin/sotp review results`, never by opening
 `review.json` directly.**
 
 - Latest fast-round findings only:
-  `cargo make track-review-results -- --track-id {track-id} --scope {scope} --round-type fast --limit 1`
+  `bin/sotp review results --track-id {track-id} --scope {scope} --round-type fast --limit 1`
 - Latest final-round findings only:
-  `cargo make track-review-results -- --track-id {track-id} --scope {scope} --round-type final --limit 1`
+  `bin/sotp review results --track-id {track-id} --scope {scope} --round-type final --limit 1`
 
 ### Step 1: Review
 
 Run the reviewer using the invocation command from the orchestrator prompt:
 ```sh
-cargo make track-local-review -- --round-type {round_type} --group {scope} --track-id {track-id} --briefing-file tmp/reviewer-runtime/briefing-{scope}.md
+cargo make track-local-review -- --round-type {round_type} --group {scope} --briefing-file tmp/reviewer-runtime/briefing-{scope}.md
 ```
 
 ### Step 2: Parse verdict
@@ -100,7 +100,7 @@ Read the verdict from command output.
 ### Step 2.5: Verify via canonical API (mandatory before reporting `completed`)
 
 ```sh
-cargo make track-review-results -- --track-id {track-id} --scope {scope} --round-type {round_type} --limit 1
+bin/sotp review results --track-id {track-id} --scope {scope} --round-type {round_type} --limit 1
 ```
 
 `--limit 1` prints the most recent round entry for the assigned round_type as a findings
@@ -137,7 +137,7 @@ not this agent's — do not re-loop on it.
   ```
 - To recall previous-round findings without re-running the reviewer:
   ```sh
-  cargo make track-review-results -- --track-id {track-id} --scope {scope} --round-type {round_type} --limit N
+  bin/sotp review results --track-id {track-id} --scope {scope} --round-type {round_type} --limit N
   ```
   Keep N small (1–3) to avoid context bloat.
 - P3 findings from pre-existing unchanged code: note but do not fix.

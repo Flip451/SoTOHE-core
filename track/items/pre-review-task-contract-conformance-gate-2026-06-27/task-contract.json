@@ -50,6 +50,10 @@
       { "layer": "cli_driver", "entry_key": "TaskContractInput" },
       { "layer": "cli_driver", "entry_key": "TaskContractDriver" }
     ],
+    "T008": [
+      { "layer": "cli", "entry_key": "FixLocalArgs" },
+      { "layer": "cli", "entry_key": "cli::commands::review::fix_local::build_review_fix_local_input" }
+    ],
     "T013": [
       { "layer": "cli", "entry_key": "TaskContractCommand" },
       { "layer": "cli", "entry_key": "TaskContractCoverageArgs" },
@@ -63,8 +67,12 @@
     "T015": [
       { "layer": "usecase", "entry_key": "PreReviewGateInteractor" }
     ],
+    "T016": [
+      { "layer": "cli", "entry_key": "cli::commands::track::views::detect_active_track_from_branch" }
+    ],
     "T017": [
-      { "layer": "usecase", "entry_key": "RunReviewFixError" }
+      { "layer": "usecase", "entry_key": "RunReviewFixError" },
+      { "layer": "cli_composition", "entry_key": "ReviewCompositionRoot" }
     ]
   }
 }

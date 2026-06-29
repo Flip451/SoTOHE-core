@@ -4,5 +4,6 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
+| ReviewCompositionRoot | composition_root | modify | — | 🔵 | 🔵 |
 | TaskContractCompositionRoot | composition_root | add | — | 🔵 | 🔵 |
 

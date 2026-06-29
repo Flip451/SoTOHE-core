@@ -91,7 +91,7 @@ right form when you just need to confirm `required (stale hash)` /
 § "sotp review results flag reference" for common flags; run
 `bin/sotp review results --help` for the complete option list.
 
-1. **Review**: Run `cargo make track-local-review -- --round-type {round_type} --group {scope} --track-id {track-id} --briefing-file {briefing-path}` with the assigned round type (`fast` or `final` — value comes from the orchestrator prompt; never substitute the other). The task-contract gate fires automatically via the cargo-make `dependencies` chain before `bin/sotp review local` is invoked; gate failure aborts the round.
+1. **Review**: Run `cargo make track-local-review -- --round-type {round_type} --group {scope} --briefing-file {briefing-path}` with the assigned round type (`fast` or `final` — value comes from the orchestrator prompt; never substitute the other). Do NOT pass `--track-id` — the wrapper auto-resolves the active track from the current git branch and must not receive an explicit track id. The task-contract gate fires automatically via the cargo-make `dependencies` chain before `bin/sotp review local` is invoked; gate failure aborts the round.
 2. **Parse verdict**: Read the verdict from command output.
    - `zero_findings` → proceed to step 2.5 (verify via canonical API).
    - `findings_remain` → proceed to fix phase.

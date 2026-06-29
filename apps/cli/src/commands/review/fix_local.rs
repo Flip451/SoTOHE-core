@@ -4,8 +4,10 @@
 //! Resolves the `review-fix-lead` capability for the given round type and
 //! dispatches to the infrastructure adapter (currently: `codex` only) via
 //! `CliApp.review_run_fix_local` (CN-02 / CN-03 / AC-03 / AC-04).
-//! The CLI accepts the 4 required fixer flags plus optional `--model`; the
-//! reviewer model and scope boundary are self-resolved by the fixer skill.
+//! Required flags: `--scope`, `--briefing-file`, `--round-type`.
+//! `--track-id` is optional: when omitted, the active track is auto-resolved
+//! from the current git branch (`track/<id>`). The reviewer model and scope
+//! boundary are self-resolved by the fixer skill.
 
 use std::io::{self, Write};
 use std::path::PathBuf;
@@ -13,6 +15,7 @@ use std::process::ExitCode;
 
 use clap::Args;
 use cli_composition::ReviewCompositionRoot;
+#[cfg(test)]
 use cli_driver::review::ReviewInput;
 
 use super::CodexRoundTypeArg;
@@ -28,9 +31,9 @@ pub struct FixLocalArgs {
     #[arg(long)]
     pub(super) briefing_file: PathBuf,
 
-    /// Track ID (required; used to identify the active track).
+    /// Track ID. When omitted, resolved from the current git branch (`track/<id>`).
     #[arg(long)]
-    pub(super) track_id: String,
+    pub(super) track_id: Option<String>,
 
     /// Round type: fast or final.
     #[arg(long, value_enum)]
@@ -41,9 +44,20 @@ pub struct FixLocalArgs {
     /// `review-fix-lead.model` (or `fast_model` for fast round).
     #[arg(long)]
     pub(super) model: Option<String>,
+
+    /// Path to track items directory (used for branch auto-resolve when `--track-id` is omitted).
+    #[arg(long, default_value = "track/items")]
+    pub(super) items_dir: PathBuf,
 }
 
-fn build_review_fix_local_input(args: &FixLocalArgs) -> ReviewInput {
+/// Build the driver input from already-resolved args.
+///
+/// Test-only helper retained for backwards-compatible parametric tests
+/// against the input shape. Production `execute_fix_local` delegates the
+/// resolve + dispatch to `cli_composition::ReviewCompositionRoot::review_run_fix_local_resolve`
+/// without constructing the input here (thin-bin policy).
+#[cfg(test)]
+fn build_review_fix_local_input(args: &FixLocalArgs, track_id: String) -> ReviewInput {
     let round_type = match args.round_type {
         CodexRoundTypeArg::Fast => "fast".to_owned(),
         CodexRoundTypeArg::Final => "final".to_owned(),
@@ -51,19 +65,32 @@ fn build_review_fix_local_input(args: &FixLocalArgs) -> ReviewInput {
     ReviewInput::RunFixLocal {
         scope: args.scope.clone(),
         briefing_file: args.briefing_file.clone(),
-        track_id: args.track_id.clone(),
+        track_id,
         round_type,
         model: args.model.clone(),
     }
 }
 
 pub(super) fn execute_fix_local(args: &FixLocalArgs) -> ExitCode {
-    let outcome =
-        ReviewCompositionRoot::new().review_driver().handle(build_review_fix_local_input(args));
-    // Smoke-test failures (exit_code 2) and normal outcomes all arrive
-    // as CommandOutcome — the typed RunReviewFixError::SmokeTestFailed
-    // mapping is made in cli-composition/run_fix.rs before stringification,
-    // keeping the exit-code decision on the typed boundary, not a string match.
+    // Thin-bin: delegate auto-resolve + fail-closed to cli_composition.
+    let round_type = match args.round_type {
+        CodexRoundTypeArg::Fast => "fast".to_owned(),
+        CodexRoundTypeArg::Final => "final".to_owned(),
+    };
+    let outcome = match ReviewCompositionRoot::new().review_run_fix_local_resolve(
+        args.track_id.clone(),
+        args.scope.clone(),
+        args.briefing_file.clone(),
+        round_type,
+        args.model.clone(),
+        args.items_dir.clone(),
+    ) {
+        Ok(o) => o,
+        Err(e) => {
+            eprintln!("{e}");
+            return ExitCode::FAILURE;
+        }
+    };
     match emit_fix_local_outcome(&outcome) {
         Ok(()) => ExitCode::from(outcome.exit_code),
         Err(e) => {
@@ -118,7 +145,7 @@ mod tests {
             "gpt-5.5",
         ]);
 
-        let input = build_review_fix_local_input(&cli.args);
+        let input = build_review_fix_local_input(&cli.args, "review-fix".to_owned());
 
         match input {
             ReviewInput::RunFixLocal { scope, briefing_file, track_id, round_type, model } => {
@@ -146,7 +173,7 @@ mod tests {
             "final",
         ]);
 
-        let input = build_review_fix_local_input(&cli.args);
+        let input = build_review_fix_local_input(&cli.args, "review-fix".to_owned());
 
         match input {
             ReviewInput::RunFixLocal { round_type, model, .. } => {
@@ -206,7 +233,7 @@ mod tests {
             "fast",
         ]);
 
-        let input = build_review_fix_local_input(&cli.args);
+        let input = build_review_fix_local_input(&cli.args, "review-fix".to_owned());
 
         match input {
             ReviewInput::RunFixLocal { model, .. } => {
@@ -237,7 +264,7 @@ mod tests {
             "my-override-model",
         ]);
 
-        let input = build_review_fix_local_input(&cli.args);
+        let input = build_review_fix_local_input(&cli.args, "review-fix".to_owned());
 
         match input {
             ReviewInput::RunFixLocal { model, .. } => {
@@ -266,5 +293,119 @@ mod tests {
         ]);
 
         assert!(err.is_err(), "missing --briefing-file must be rejected by clap");
+    }
+
+    // -----------------------------------------------------------------------
+    // --track-id optional / branch auto-resolve
+    // -----------------------------------------------------------------------
+
+    /// Omitting `--track-id` must parse successfully with `track_id = None`
+    /// so that branch auto-resolve can be attempted at runtime.
+    #[test]
+    fn test_fix_local_args_track_id_optional_parses_as_none_when_omitted() {
+        let cli = <TestCli as clap::Parser>::parse_from([
+            "test",
+            "--scope",
+            "cli",
+            "--briefing-file",
+            "tmp/reviewer-runtime/briefing.md",
+            "--round-type",
+            "fast",
+        ]);
+
+        assert_eq!(
+            cli.args.track_id, None,
+            "omitted --track-id must produce None so branch auto-resolve can be attempted"
+        );
+    }
+
+    /// Explicit `--track-id` is forwarded unchanged through `build_review_fix_local_input`.
+    #[test]
+    fn test_fix_local_args_explicit_track_id_maps_to_run_fix_local_input() {
+        let cli = <TestCli as clap::Parser>::parse_from([
+            "test",
+            "--scope",
+            "domain",
+            "--briefing-file",
+            "tmp/reviewer-runtime/briefing.md",
+            "--track-id",
+            "my-feature-2026",
+            "--round-type",
+            "fast",
+        ]);
+
+        assert_eq!(cli.args.track_id, Some("my-feature-2026".to_owned()));
+
+        let input = build_review_fix_local_input(&cli.args, "my-feature-2026".to_owned());
+
+        match input {
+            ReviewInput::RunFixLocal { track_id, .. } => {
+                assert_eq!(track_id, "my-feature-2026");
+            }
+            _ => panic!("expected RunFixLocal"),
+        }
+    }
+
+    /// On a non-`track/*` branch, `execute_fix_local` with `track_id = None` must
+    /// return a failure exit code (branch auto-resolve fails on non-track branches).
+    #[test]
+    fn test_execute_fix_local_returns_failure_on_non_track_branch() {
+        use std::env;
+        use std::fs;
+        use std::process::Command;
+        use std::sync::{Mutex, OnceLock};
+
+        fn cwd_lock() -> &'static Mutex<()> {
+            static LOCK: OnceLock<Mutex<()>> = OnceLock::new();
+            LOCK.get_or_init(|| Mutex::new(()))
+        }
+
+        let _guard = cwd_lock().lock().unwrap();
+        let original_dir = env::current_dir().unwrap();
+
+        let dir = tempfile::tempdir().unwrap();
+        let root = dir.path();
+
+        // Initialise a minimal git repo on "main" (a non-track branch).
+        Command::new("git").args(["init", "-b", "main"]).current_dir(root).output().unwrap();
+        Command::new("git")
+            .args(["config", "user.email", "test@test.com"])
+            .current_dir(root)
+            .output()
+            .unwrap();
+        Command::new("git")
+            .args(["config", "user.name", "Test"])
+            .current_dir(root)
+            .output()
+            .unwrap();
+
+        // Need at least one commit so git branch is set.
+        fs::write(root.join(".gitkeep"), "").unwrap();
+        Command::new("git").args(["add", "."]).current_dir(root).output().unwrap();
+        Command::new("git").args(["commit", "-m", "init"]).current_dir(root).output().unwrap();
+
+        // Create track/items so resolve_project_root does not fail.
+        fs::create_dir_all(root.join("track/items")).unwrap();
+
+        env::set_current_dir(root).unwrap();
+
+        let args = FixLocalArgs {
+            scope: "cli".to_owned(),
+            briefing_file: PathBuf::from("/nonexistent/briefing.md"),
+            track_id: None, // auto-resolve expected to fail (not a track branch)
+            round_type: CodexRoundTypeArg::Fast,
+            model: None,
+            items_dir: PathBuf::from("track/items"),
+        };
+
+        let exit = execute_fix_local(&args);
+
+        env::set_current_dir(&original_dir).unwrap();
+
+        assert_ne!(
+            exit,
+            std::process::ExitCode::SUCCESS,
+            "auto-resolve on a non-track branch must return a failure exit code"
+        );
     }
 }

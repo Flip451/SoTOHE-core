@@ -1,8 +1,14 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-28T22:18:40Z",
-  "declaration_hash": "60bfa979124c9bc3322973bf2287f26603148a145eec941366f72b3494ffcb82",
+  "generated_at": "2026-06-29T08:26:18Z",
+  "declaration_hash": "d42989924a14167de3bf205a9e41f91bc84a713248e02c465df45107374cca2b",
   "signals": [
+    {
+      "type_name": "ReviewCompositionRoot",
+      "kind_tag": "composition_root",
+      "signal": "blue",
+      "found_type": true
+    },
     {
       "type_name": "TaskContractCompositionRoot",
       "kind_tag": "composition_root",

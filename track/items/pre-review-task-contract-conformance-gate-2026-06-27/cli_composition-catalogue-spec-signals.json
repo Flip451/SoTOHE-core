@@ -1,7 +1,12 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "60bfa979124c9bc3322973bf2287f26603148a145eec941366f72b3494ffcb82",
+  "catalogue_declaration_hash": "d42989924a14167de3bf205a9e41f91bc84a713248e02c465df45107374cca2b",
   "signals": [
+    {
+      "type_name": "ReviewCompositionRoot",
+      "signal": "blue",
+      "entry_hash": "dcc072b2b5103b0a5f230f53ac5cd3e3014a110a097d983d3a9040810c9ff283"
+    },
     {
       "type_name": "TaskContractCompositionRoot",
       "signal": "blue",

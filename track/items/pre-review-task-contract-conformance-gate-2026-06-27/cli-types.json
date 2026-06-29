@@ -41,6 +41,32 @@
       ],
       "informal_grounds": []
     },
+    "FixLocalArgs": {
+      "action": "modify",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "scope",         "ty": "String" },
+            { "name": "briefing_file", "ty": "std::path::PathBuf" },
+            { "name": "track_id",      "ty": "Option<String>" },
+            { "name": "round_type",    "ty": "CodexRoundTypeArg" },
+            { "name": "model",         "ty": "Option<String>" },
+            { "name": "items_dir",     "ty": "std::path::PathBuf" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "commands::review::fix_local",
+      "docs": "Arguments for `sotp review fix-local`. The --track-id flag is optional; when omitted the active track is auto-resolved from the current git branch (track/<id>). The --items-dir flag provides the track items path used for branch auto-resolve when --track-id is omitted.",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-05" }
+      ],
+      "informal_grounds": []
+    },
     "TaskContractCommand": {
       "action": "add",
       "role": { "Dto": {} },
@@ -176,6 +202,39 @@
       ],
       "informal_grounds": []
     },
+    "cli::commands::review::fix_local::build_review_fix_local_input": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "args",     "ty": "&FixLocalArgs" },
+        { "name": "track_id", "ty": "String" }
+      ],
+      "returns": "cli_driver::review::ReviewInput",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Was public at track start; removed from the public API in this track (restricted to #[cfg(test)]-only under the thin-bin policy). Declared as delete so the baseline-present function is moved to D and DMinusC fires blue rather than SMinusC_Reference red.",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-05" }
+      ],
+      "informal_grounds": []
+    },
+    "cli::commands::track::views::detect_active_track_from_branch": {
+      "action": "reference",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "project_root", "ty": "&std::path::Path" }
+      ],
+      "returns": "Option<String>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Baseline track views helper retained as a reference entry. It remains part of the `sotp track views sync` path and delegates active-track branch detection through TrackCompositionRoot; it is not a task-contract subcommand implementation change.",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-04" }
+      ],
+      "informal_grounds": []
+    },
     "cli::commands::task_contract::detect_active_track_from_branch_cwd": {
       "action": "add",
       "role": "FreeFunction",
@@ -233,6 +292,9 @@
   "trait_impls": [
     { "action": "reference", "trait_ref": "clap_builder::derive::FromArgMatches", "for_type": "CliCommand" },
     { "action": "reference", "trait_ref": "clap_builder::derive::Subcommand",      "for_type": "CliCommand" },
+    { "action": "modify", "trait_ref": "core::fmt::Debug",                          "for_type": "FixLocalArgs" },
+    { "action": "modify", "trait_ref": "clap_builder::derive::Args",               "for_type": "FixLocalArgs" },
+    { "action": "modify", "trait_ref": "clap_builder::derive::FromArgMatches",     "for_type": "FixLocalArgs" },
     { "action": "add", "trait_ref": "core::fmt::Debug",                             "for_type": "TaskContractCommand" },
     { "action": "add", "trait_ref": "core::clone::Clone",                           "for_type": "TaskContractCommand" },
     { "action": "add", "trait_ref": "clap_builder::derive::FromArgMatches",         "for_type": "TaskContractCommand" },

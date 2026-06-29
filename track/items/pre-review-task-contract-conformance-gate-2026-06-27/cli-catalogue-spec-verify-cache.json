@@ -51,6 +51,30 @@
       }
     },
     {
+      "claim_hash": "b51ec0953590c216165f45f5b0a68cc3a2e051aa4823286c23bc357f8513710a",
+      "evidence_hash": "17e6d4ae6dc2618ce228f5a8cff727725d63cf6bb36dc73f4bed5418e5caeacd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "review-fix ワークフロー（`sotp review fix-local` / fixpoint_resolve または同等の呼び出し経路）への pre-review ゲートの配線。ゲートは `sotp review fix-local` が reviewer invocation を起動する前に実行され、ゲートがブロックした場合は reviewer invocation が実行されない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/cli-types.json",
+          "section_key": "types",
+          "entry_key": "FixLocalArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "review-fix ワークフロー（`sotp review fix-local` / fixpoint_resolve または同等の呼び出し経路）への pre-review ゲートの配線。ゲートは `sotp review fix-local` が reviewer invocation を起動する前に実行され、ゲートがブロックした場合は reviewer invocation が実行されない。"
+        }
+      }
+    },
+    {
       "claim_hash": "adf178b9e06792589bdade71b25cfaef9631f58f234dabe0b317d5353ef6794b",
       "evidence_hash": "0635256c1afb73b788d9b65d2a8ecde86d0c85f8a0fe21d138ec6969917b8f41",
       "verdict": {
@@ -263,6 +287,30 @@
           "section": "acceptance_criteria",
           "element_id": "AC-08",
           "text_label": "`bin/sotp task-contract coverage` が実装されており、`cargo make task-contract-coverage` として呼び出せる。`cargo make task-contract-check` は `dependencies = [\"task-contract-coverage\"]` を宣言し、coverage → check の順で必ず実行される。attribution 不完全（orphan あり）の場合、coverage がブロックし check は実行されない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5c5f68d399057adbdf4c4e88996dfcb7bc5051f6cdf6c70b882fe551e6dbddfe",
+      "evidence_hash": "17e6d4ae6dc2618ce228f5a8cff727725d63cf6bb36dc73f4bed5418e5caeacd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "review-fix ワークフロー（`sotp review fix-local` / fixpoint_resolve または同等の呼び出し経路）への pre-review ゲートの配線。ゲートは `sotp review fix-local` が reviewer invocation を起動する前に実行され、ゲートがブロックした場合は reviewer invocation が実行されない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::review::fix_local::build_review_fix_local_input"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "review-fix ワークフロー（`sotp review fix-local` / fixpoint_resolve または同等の呼び出し経路）への pre-review ゲートの配線。ゲートは `sotp review fix-local` が reviewer invocation を起動する前に実行され、ゲートがブロックした場合は reviewer invocation が実行されない。"
         }
       }
     },
@@ -551,6 +599,30 @@
           "section": "in_scope",
           "element_id": "IN-08",
           "text_label": "cargo-make `dependencies` による pre-review ゲートの配線: `cargo make track-local-review` と `cargo make track-local-review-fix` の両方の `dependencies` に `task-contract-check` タスクを追加し、per-review-round で完全性判定（coverage）→ 生存性判定（check）の順で自動発火させる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "4b8a7f2ba41a3f4ade1194d91d255f77fb2475c68d2e8a18a9e941809a9b4170",
+      "evidence_hash": "0635256c1afb73b788d9b65d2a8ecde86d0c85f8a0fe21d138ec6969917b8f41",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`--track-id` 引数が省略された場合は現在の git ブランチ (`track/<id>` 形式) から active track を auto-resolve する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::track::views::detect_active_track_from_branch"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "pre-review blocking binary check ゲートの実装（`bin/sotp task-contract check`）: 現在のタスク（in_progress）と完了済タスク（done）に帰属するエントリの impl_catalog 信号を既存信号テーブルと entry キーで JOIN し、全エントリが 🔵 かを確認する。判定対象タスクは `impl-plan.json` のタスク状態を参照して特定する。`--track-id` 引数が省略された場合は現在の git ブランチ (`track/<id>` 形式) から active track を auto-resolve する。ゲートは fail-closed（artifact 不在・非 🔵 エントリ存在のいずれでもブロック）。todo タスクに帰属するエントリは 🔵 必須の対象からは外すが、🔴 はタスク状態に関わらず常にブロックし、🟡 のみ未着手として許容する。"
         }
       }
     }

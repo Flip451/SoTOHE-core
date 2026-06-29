@@ -3,6 +3,215 @@
   "crate_name": "cli_composition",
   "layer": "cli_composition",
   "types": {
+    "ReviewCompositionRoot": {
+      "action": "modify",
+      "role": { "CompositionRoot": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "unit" }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Create a new ReviewCompositionRoot."
+        },
+        {
+          "name": "review_driver",
+          "receiver": "&self",
+          "params": [],
+          "returns": "cli_driver::review::ReviewDriver",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Construct a fully-wired ReviewDriver."
+        },
+        {
+          "name": "review_run_codex",
+          "receiver": "&self",
+          "params": [
+            { "name": "input", "ty": "ReviewRunCodexInput" }
+          ],
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Run the local Codex-backed reviewer."
+        },
+        {
+          "name": "review_run_claude",
+          "receiver": "&self",
+          "params": [
+            { "name": "input", "ty": "ReviewRunClaudeInput" }
+          ],
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Run the local Claude-backed reviewer."
+        },
+        {
+          "name": "review_run_local",
+          "receiver": "&self",
+          "params": [
+            { "name": "input", "ty": "ReviewRunLocalInput" }
+          ],
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Run the local reviewer with provider auto-resolved from agent-profiles.json."
+        },
+        {
+          "name": "review_run_fix_local",
+          "receiver": "&self",
+          "params": [
+            { "name": "input", "ty": "RunReviewFixLocalInput" }
+          ],
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Run the review-fix-lead fixer with provider auto-resolved from agent-profiles.json."
+        },
+        {
+          "name": "review_run_fix_local_resolve",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id_opt", "ty": "Option<String>" },
+            { "name": "scope", "ty": "String" },
+            { "name": "briefing_file", "ty": "std::path::PathBuf" },
+            { "name": "round_type", "ty": "String" },
+            { "name": "model", "ty": "Option<String>" },
+            { "name": "items_dir", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Run the review-fix-lead fixer, resolving track_id from the current git branch when omitted. New in this track (T017) — pushes track-id resolution into the composition root (thin-bin policy)."
+        },
+        {
+          "name": "review_check_approved",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id", "ty": "Option<String>" },
+            { "name": "items_dir", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Check if the review state is approved and code hash is current."
+        },
+        {
+          "name": "review_results",
+          "receiver": "&self",
+          "params": [
+            { "name": "input", "ty": "ReviewResultsInput" }
+          ],
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Show review results: per-scope state summary, optional round history."
+        },
+        {
+          "name": "review_classify",
+          "receiver": "&self",
+          "params": [
+            { "name": "paths", "ty": "Vec<String>" },
+            { "name": "track_id", "ty": "Option<String>" },
+            { "name": "items_dir", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Classify each given path into review scopes."
+        },
+        {
+          "name": "review_files",
+          "receiver": "&self",
+          "params": [
+            { "name": "scope", "ty": "String" },
+            { "name": "track_id", "ty": "Option<String>" },
+            { "name": "items_dir", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "List the diff files belonging to the given scope."
+        },
+        {
+          "name": "review_validate_scope",
+          "receiver": "&self",
+          "params": [
+            { "name": "scope", "ty": "String" },
+            { "name": "track_id", "ty": "Option<String>" },
+            { "name": "items_dir", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Validate a scope name for the given track."
+        },
+        {
+          "name": "review_get_briefing",
+          "receiver": "&self",
+          "params": [
+            { "name": "scope", "ty": "String" },
+            { "name": "track_id", "ty": "Option<String>" },
+            { "name": "items_dir", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Get the briefing for a review scope."
+        },
+        {
+          "name": "review_persist_commit_hash",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id", "ty": "Option<String>" },
+            { "name": "items_dir", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Persist a commit hash for the review cycle."
+        }
+      ],
+      "module_path": "review_v2",
+      "docs": "Composition root for the review_v2 command family. Modified in this track (T017) to add review_run_fix_local_resolve which pushes track-id resolution into the composition root (thin-bin policy). Pre-existing methods (review_driver, review_run_codex, review_run_claude, etc.) are unchanged from baseline.",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-05" }
+      ],
+      "informal_grounds": []
+    },
     "TaskContractCompositionRoot": {
       "action": "add",
       "role": { "CompositionRoot": {} },
@@ -81,6 +290,7 @@
   "functions": {},
   "inherent_impls": [],
   "trait_impls": [
-    { "action": "add", "trait_ref": "core::default::Default", "for_type": "TaskContractCompositionRoot" }
+    { "action": "add", "trait_ref": "core::default::Default", "for_type": "TaskContractCompositionRoot" },
+    { "action": "reference", "trait_ref": "core::default::Default", "for_type": "ReviewCompositionRoot" }
   ]
 }

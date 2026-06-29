@@ -433,6 +433,32 @@ impl ReviewCompositionRoot {
         run_fix::run_fix_local(input).map_err(CompositionError::Infrastructure)
     }
 
+    /// Run the review-fix-lead fixer, resolving `track_id` from the current
+    /// git branch when omitted.
+    ///
+    /// Accepts an optional `track_id`. When `None`, performs branch-driven
+    /// write-side resolution via `track_resolve_id_for_write` (fail-closed
+    /// when not on a `track/<id>` branch). The caller (CLI handler) does not
+    /// make the resolution / fail-closed decision — it is delegated here so
+    /// the thin-bin layer stays free of orchestration logic.
+    ///
+    /// # Errors
+    /// Returns `Err` when track ID resolution, profile loading, provider
+    /// resolution, arg validation, or the fix runner fails.
+    pub fn review_run_fix_local_resolve(
+        &self,
+        track_id_opt: Option<String>,
+        scope: String,
+        briefing_file: PathBuf,
+        round_type: String,
+        model: Option<String>,
+        items_dir: PathBuf,
+    ) -> Result<CommandOutcome, CompositionError> {
+        let track_id = resolve_track_id_or_branch_write(track_id_opt, &items_dir)?;
+        let input = RunReviewFixLocalInput { scope, briefing_file, track_id, round_type, model };
+        self.review_run_fix_local(input)
+    }
+
     /// Check if the review state is approved and code hash is current.
     ///
     /// Resolves `track_id` from the current git branch when `None`. Delegates to

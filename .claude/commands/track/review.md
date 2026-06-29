@@ -84,7 +84,7 @@ For each `required` scope, launch one fixer in parallel (`run_in_background: tru
 ```
 cargo make track-local-review-fix -- --scope {scope} \
   --briefing-file tmp/reviewer-runtime/briefing-{scope}.md \
-  --track-id {track-id} --round-type fast
+  --round-type fast
 ```
 
 The `cargo make track-local-review-fix` task runs an inline `signal calc-impl-catalog` refresh
@@ -143,7 +143,7 @@ same scope (do not wait for other scopes) via the same provider-agnostic wrapper
 ```
 cargo make track-local-review-fix -- --scope {scope} \
   --briefing-file tmp/reviewer-runtime/briefing-{scope}.md \
-  --track-id {track-id} --round-type final
+  --round-type final
 ```
 
 Provider routing follows the same rule as Step 4. Exit code `64` with the
