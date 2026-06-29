@@ -205,6 +205,25 @@
         { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-10" }
       ],
       "informal_grounds": []
+    },
+    "TypeSignal": {
+      "action": "modify",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "tddd::catalogue",
+      "docs": "Per-type signal evaluation result: the confidence signal for one catalogue entry, derived from the 3-way diff (catalogue declaration / merged baseline / live scanned code). Element type of TypeSignalsDocument. This modify entry records the addition of is_unknown_kind(), an encapsulation helper that keeps the 'unknown' kind-tag detection inside the domain layer. The pre-review gate (IN-04) JOINs impl_catalog signals with entry keys; synthetic report-only rows (kind_tag = 'unknown') must be excluded from this JOIN, and is_unknown_kind() provides the predicate without leaking the string literal into usecase callers.",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-04" }
+      ],
+      "informal_grounds": []
     }
   },
   "traits": {},
@@ -338,6 +357,129 @@
           "docs": "Constructs a Blocked outcome with at least one coverage-verification violation. Returns ValidationError when violations is empty."
         }
       ]
+    },
+    {
+      "type_name": "TypeSignal",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "type_name", "ty": "impl Into<String>" },
+            { "name": "kind_tag", "ty": "impl Into<String>" },
+            { "name": "signal", "ty": "ConfidenceSignal" },
+            { "name": "found_type", "ty": "bool" },
+            { "name": "found_items", "ty": "Vec<String>" },
+            { "name": "missing_items", "ty": "Vec<String>" },
+            { "name": "extra_items", "ty": "Vec<String>" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Creates a new TypeSignal."
+        },
+        {
+          "name": "type_name",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns the type name."
+        },
+        {
+          "name": "kind_tag",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns the canonical kind tag string."
+        },
+        {
+          "name": "signal",
+          "receiver": "&self",
+          "params": [],
+          "returns": "ConfidenceSignal",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns the confidence signal computed from the scan result."
+        },
+        {
+          "name": "signal_as_str",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&'static str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns the confidence signal as a lowercase string (blue, yellow, or red)."
+        },
+        {
+          "name": "found_type",
+          "receiver": "&self",
+          "params": [],
+          "returns": "bool",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns true if the type was found during the code scan."
+        },
+        {
+          "name": "found_items",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[String]",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns the list of items that were found in the scanned code."
+        },
+        {
+          "name": "missing_items",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[String]",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns the list of expected items not found in the scanned code."
+        },
+        {
+          "name": "extra_items",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[String]",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns the list of items found in code but not declared in the entry."
+        },
+        {
+          "name": "is_unknown_kind",
+          "receiver": "&self",
+          "params": [],
+          "returns": "bool",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns true if this signal represents a synthetic report-only row marker. The signal evaluator emits rows with kind_tag = \"unknown\" for catalogue entries whose kind falls outside the evaluator's handling. Callers that iterate signals and want to skip synthetic rows should call this predicate rather than comparing kind_tag() against the string literal \"unknown\"."
+        }
+      ]
     }
   ],
   "trait_impls": [
@@ -364,6 +506,10 @@
     { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "CoverageVerifyOutcome" },
     { "action": "add", "trait_ref": "core::clone::Clone", "for_type": "CoverageVerifyOutcome" },
     { "action": "add", "trait_ref": "core::cmp::PartialEq", "for_type": "CoverageVerifyOutcome" },
-    { "action": "add", "trait_ref": "core::cmp::Eq", "for_type": "CoverageVerifyOutcome" }
+    { "action": "add", "trait_ref": "core::cmp::Eq", "for_type": "CoverageVerifyOutcome" },
+    { "action": "reference", "trait_ref": "core::fmt::Debug", "for_type": "TypeSignal" },
+    { "action": "reference", "trait_ref": "core::clone::Clone", "for_type": "TypeSignal" },
+    { "action": "reference", "trait_ref": "core::cmp::PartialEq", "for_type": "TypeSignal" },
+    { "action": "reference", "trait_ref": "core::cmp::Eq", "for_type": "TypeSignal" }
   ]
 }

@@ -601,6 +601,30 @@
           "text_label": "`task-contract.json` のスキーマが定義されており、impl-planner が Phase 3 output として本 artifact を author する。artifact には schema_version・track id・タスクリスト（各タスクが履行責務を持つ型カタログ entry 識別子のリスト）が含まれる。"
         }
       }
+    },
+    {
+      "claim_hash": "80c1d49c49648dc232cf8d89ae9f0edbc539db60f54d6cd1c539dbd989ef5eac",
+      "evidence_hash": "0635256c1afb73b788d9b65d2a8ecde86d0c85f8a0fe21d138ec6969917b8f41",
+      "verdict": {
+        "kind": "pass",
+        "citation": "impl_catalog 信号を既存信号テーブルと entry キーで JOIN し、全エントリが 🔵 かを確認する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignal"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "pre-review blocking binary check ゲートの実装（`bin/sotp task-contract check`）: 現在のタスク（in_progress）と完了済タスク（done）に帰属するエントリの impl_catalog 信号を既存信号テーブルと entry キーで JOIN し、全エントリが 🔵 かを確認する。判定対象タスクは `impl-plan.json` のタスク状態を参照して特定する。`--track-id` 引数が省略された場合は現在の git ブランチ (`track/<id>` 形式) から active track を auto-resolve する。ゲートは fail-closed（artifact 不在・非 🔵 エントリ存在のいずれでもブロック）。todo タスクに帰属するエントリは 🔵 必須の対象からは外すが、🔴 はタスク状態に関わらず常にブロックし、🟡 のみ未着手として許容する。"
+        }
+      }
     }
   ]
 }

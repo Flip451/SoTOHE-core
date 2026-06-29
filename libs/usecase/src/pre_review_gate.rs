@@ -260,13 +260,16 @@ fn blocked_coverage_outcome(
     })
 }
 
-/// Build the lookup `entry_key -> ContractedEntryRef` for one layer's signal doc.
+/// Build `entry_key -> ContractedEntryRef` per layer (skip `kind_tag == "unknown"` rows).
 fn build_scope_entries(
     signal_doc: &TypeSignalsDocument,
     layer: &domain::tddd::LayerId,
 ) -> Result<HashMap<String, ContractedEntryRef>, PreReviewGateError> {
     let mut entries: HashMap<String, ContractedEntryRef> = HashMap::new();
     for signal in signal_doc.signals() {
+        if signal.is_unknown_kind() {
+            continue;
+        }
         let entry_key = domain::tddd::semantic_verify::CatalogueEntryKey::try_new(
             signal.type_name().to_owned(),
         )
@@ -744,6 +747,10 @@ mod tests {
 
     fn yellow_signal(name: &str) -> TypeSignal {
         TypeSignal::new(name, "struct", ConfidenceSignal::Yellow, false, vec![], vec![], vec![])
+    }
+
+    fn unknown_signal(name: &str) -> TypeSignal {
+        TypeSignal::new(name, "unknown", ConfidenceSignal::Yellow, true, vec![], vec![], vec![])
     }
 
     fn make_contract(
@@ -1536,6 +1543,39 @@ mod tests {
         assert!(
             matches!(outcome, CoverageVerifyOutcome::Passed),
             "expected Passed, got {outcome:?}"
+        );
+    }
+
+    // ── Coverage: synthetic kind_tag="unknown" rows must be ignored (round 15 P1) ─
+
+    #[test]
+    fn coverage_synthetic_unknown_signal_row_does_not_demand_attribution() {
+        // Signal doc has Foo (catalogue entry, blue) AND ImplOnlyType (synthetic
+        // report-only row with kind_tag="unknown"). task-contract.json attributes
+        // Foo only — ImplOnlyType is NOT a catalogue entry so demanding attribution
+        // for it would block the gate spuriously.
+        let mut signal_docs = std::collections::HashMap::new();
+        signal_docs.insert(
+            "domain".to_owned(),
+            make_signals(vec![blue_signal("Foo"), unknown_signal("ImplOnlyType")]),
+        );
+        for layer_name in &["usecase", "infrastructure", "cli_driver", "cli", "cli_composition"] {
+            signal_docs.insert((*layer_name).to_owned(), make_signals(vec![]));
+        }
+        let svc = coverage_interactor(
+            Ok(make_contract(
+                "my-track",
+                vec![(
+                    task_id("T001"),
+                    vec![ContractedEntryRef::new(layer("domain"), entry_key("Foo"))],
+                )],
+            )),
+            signal_docs,
+        );
+        let outcome = svc.verify_coverage(coverage_cmd("my-track")).unwrap();
+        assert!(
+            matches!(outcome, CoverageVerifyOutcome::Passed),
+            "expected Passed (unknown row excluded from scope), got {outcome:?}"
         );
     }
 

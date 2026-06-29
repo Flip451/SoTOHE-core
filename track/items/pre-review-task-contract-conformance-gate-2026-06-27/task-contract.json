@@ -73,6 +73,9 @@
     "T017": [
       { "layer": "usecase", "entry_key": "RunReviewFixError" },
       { "layer": "cli_composition", "entry_key": "ReviewCompositionRoot" }
+    ],
+    "T018": [
+      { "layer": "domain", "entry_key": "TypeSignal" }
     ]
   }
 }

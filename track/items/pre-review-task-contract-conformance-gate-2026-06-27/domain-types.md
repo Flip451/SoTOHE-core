@@ -15,4 +15,5 @@
 |------|------|--------|---------|--------|----------|
 | ContractedEntryRef | value_object | add | — | 🔵 | 🔵 |
 | TaskContractDocument | value_object | add | — | 🔵 | 🔵 |
+| TypeSignal | value_object | modify | — | 🔵 | 🔵 |
 

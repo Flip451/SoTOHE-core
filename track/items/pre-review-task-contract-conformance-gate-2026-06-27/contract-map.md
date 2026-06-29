@@ -72,6 +72,23 @@ subgraph domain["domain"]
     T34_domain_domain_TaskContractDocument_entries([entries])
   end
   end
+  subgraph domain_domain_module_tddd["domain::tddd"]
+    direction TB
+  subgraph T24_domain_domain_TypeSignal["tddd::catalogue::TypeSignal"]
+    direction TB
+    T24_domain_domain_TypeSignal__self[TypeSignal]
+    T24_domain_domain_TypeSignal_new([new])
+    T24_domain_domain_TypeSignal_type_name([type_name])
+    T24_domain_domain_TypeSignal_kind_tag([kind_tag])
+    T24_domain_domain_TypeSignal_signal([signal])
+    T24_domain_domain_TypeSignal_signal_as_str([signal_as_str])
+    T24_domain_domain_TypeSignal_found_type([found_type])
+    T24_domain_domain_TypeSignal_found_items([found_items])
+    T24_domain_domain_TypeSignal_missing_items([missing_items])
+    T24_domain_domain_TypeSignal_extra_items([extra_items])
+    T24_domain_domain_TypeSignal_is_unknown_kind([is_unknown_kind])
+  end
+  end
 end
 subgraph usecase["usecase"]
   direction TB
@@ -314,6 +331,7 @@ T36_domain_domain_PreReviewGateViolation_NonBlueSignal --o|entry| T32_domain_dom
 T34_domain_domain_TaskContractDocument_new --o T32_domain_domain_ContractedEntryRef__self
 T34_domain_domain_TaskContractDocument_new --> T34_domain_domain_TaskContractDocument__self
 T34_domain_domain_TaskContractDocument_entries --> T32_domain_domain_ContractedEntryRef__self
+T24_domain_domain_TypeSignal_new --> T24_domain_domain_TypeSignal__self
 T40_usecase_usecase_CoverageVerifyInteractor_new --> T40_usecase_usecase_CoverageVerifyInteractor__self
 T39_usecase_usecase_PreReviewGateInteractor_new --> T39_usecase_usecase_PreReviewGateInteractor__self
 R37_usecase_usecase_CoverageVerifyService_verify_coverage --o T37_usecase_usecase_CoverageVerifyCommand__self
@@ -377,6 +395,17 @@ class T34_domain_domain_TaskContractDocument_schema_version method_node
 class T34_domain_domain_TaskContractDocument_track_id method_node
 class T34_domain_domain_TaskContractDocument_entries method_node
 class T34_domain_domain_TaskContractDocument__self value_object
+class T24_domain_domain_TypeSignal_new method_node
+class T24_domain_domain_TypeSignal_type_name method_node
+class T24_domain_domain_TypeSignal_kind_tag method_node
+class T24_domain_domain_TypeSignal_signal method_node
+class T24_domain_domain_TypeSignal_signal_as_str method_node
+class T24_domain_domain_TypeSignal_found_type method_node
+class T24_domain_domain_TypeSignal_found_items method_node
+class T24_domain_domain_TypeSignal_missing_items method_node
+class T24_domain_domain_TypeSignal_extra_items method_node
+class T24_domain_domain_TypeSignal_is_unknown_kind method_node
+class T24_domain_domain_TypeSignal__self value_object
 class T37_usecase_usecase_CoverageVerifyCommand__self command
 class T40_usecase_usecase_CoverageVerifyInteractor_new method_node
 class T40_usecase_usecase_CoverageVerifyInteractor__self interactor

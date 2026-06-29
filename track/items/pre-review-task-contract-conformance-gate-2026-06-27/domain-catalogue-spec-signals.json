@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "4c92b4e511649858e6fe9fe1b38718b19630470cd6ef3ff5314505fd08f8c540",
+  "catalogue_declaration_hash": "4ad6b16c14dda9eea5064c68abc62529ceeba1578e5eed78cdb54bd208fed901",
   "signals": [
     {
       "type_name": "ContractedEntryRef",
@@ -31,6 +31,11 @@
       "type_name": "TaskContractDocument",
       "signal": "blue",
       "entry_hash": "509df0ce979d3aed33c25767611fac8a85f52d800326d5e6ec09fbd43b85d691"
+    },
+    {
+      "type_name": "TypeSignal",
+      "signal": "blue",
+      "entry_hash": "80c1d49c49648dc232cf8d89ae9f0edbc539db60f54d6cd1c539dbd989ef5eac"
     }
   ]
 }
