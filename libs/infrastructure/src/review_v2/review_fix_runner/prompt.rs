@@ -57,13 +57,18 @@ pub(super) fn build_prompt(
     let track_id = prompt_path_string(Path::new(&command.track_id), "track_id")?;
     let scope = prompt_path_string(Path::new(scope), "scope")?;
     let round_type = prompt_path_string(Path::new(&command.round_type), "round_type")?;
+    // Do NOT pass `--track-id` to the reviewer wrapper: the task-contract
+    // gates are cargo-make dependencies that auto-resolve the track from the
+    // current branch, and any explicit `--track-id` on the script line would
+    // create a mismatch (the dependencies could skip or validate a different
+    // track while the reviewer reviews the explicit one — bypassing the
+    // pre-review contract gate).  The reviewer auto-resolves the same way.
     let reviewer_invocation = format!(
         "bin/sotp track views sync && \
          cargo make track-local-review -- --round-type {} \
-         --group {} --track-id {} --briefing-file {}",
+         --group {} --briefing-file {}",
         shell_quote_arg(&round_type),
         shell_quote_arg(&scope),
-        shell_quote_arg(&track_id),
         shell_quote_arg(&briefing_path),
     );
     let prompt = format!(

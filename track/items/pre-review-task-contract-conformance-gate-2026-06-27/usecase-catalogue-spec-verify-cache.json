@@ -99,11 +99,11 @@
       }
     },
     {
-      "claim_hash": "f94d3c9c15eb065977580b8c33ace0a502cc8e4574f58f38132fc861fa295d14",
+      "claim_hash": "0cbc4360ba834bc43d1c90218aa15d4b74491384a3865b5f5a10ca79839886dc",
       "evidence_hash": "3ca500eaaa5882767865ad14d8abba77b5aae37e7824118685ccd0b7c433c278",
       "verdict": {
         "kind": "pass",
-        "citation": "attribution の complete relation invariant 検証: (a) 型カタログの全エントリが ≥1 タスクに attribution されていること（completeness）、(b) orphan entry（どのタスクにも attribution されていないカタログ entry）が存在しないこと、(c) attribution された entry がカタログに実在すること（referential integrity）."
+        "citation": "attribution の complete relation invariant 検証: (a) 型カタログの全エントリが ≥1 タスクに attribution されていること（completeness）、(b) orphan entry（どのタスクにも attribution されていないカタログ entry）が存在しないこと、(c) attribution された entry がカタログに実在すること（referential integrity）。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -123,11 +123,11 @@
       }
     },
     {
-      "claim_hash": "f94d3c9c15eb065977580b8c33ace0a502cc8e4574f58f38132fc861fa295d14",
+      "claim_hash": "0cbc4360ba834bc43d1c90218aa15d4b74491384a3865b5f5a10ca79839886dc",
       "evidence_hash": "224be3888edb61b6a4a53d8498f0ca5ab96542e6bfb580eecaffb85c567e6455",
       "verdict": {
         "kind": "pass",
-        "citation": "型カタログの全エントリが漏れなくタスクに attribution されているか（完全性）を専用に検証する subcommand。cargo make ci の検証 chain に統合し、commit ごとに attribution drift を検出する。"
+        "citation": "`bin/sotp task-contract coverage` サブコマンドの実装: 型カタログの全エントリが漏れなくタスクに attribution されているか（完全性）を専用に検証する subcommand。cargo make ci の検証 chain に統合し、commit ごとに attribution drift を検出する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -147,11 +147,11 @@
       }
     },
     {
-      "claim_hash": "f94d3c9c15eb065977580b8c33ace0a502cc8e4574f58f38132fc861fa295d14",
+      "claim_hash": "0cbc4360ba834bc43d1c90218aa15d4b74491384a3865b5f5a10ca79839886dc",
       "evidence_hash": "6dfe414194bae09187a3002279da54cf5dcd925b094c7fbc5f1e882f60b52e15",
       "verdict": {
         "kind": "pass",
-        "citation": "attribution 完全性（completeness）の検証と生存性（liveness）の検証は別 subcommand に分割する（`bin/sotp task-contract coverage` と `bin/sotp task-contract check`）"
+        "citation": "attribution 完全性（completeness）の検証と生存性（liveness）の検証は別 subcommand に分割する（`bin/sotp task-contract coverage` と `bin/sotp task-contract check`）。両者は `task-contract` ドメイン配下に置き、`verify-*` ファミリーには逃さない。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -171,11 +171,11 @@
       }
     },
     {
-      "claim_hash": "f94d3c9c15eb065977580b8c33ace0a502cc8e4574f58f38132fc861fa295d14",
+      "claim_hash": "0cbc4360ba834bc43d1c90218aa15d4b74491384a3865b5f5a10ca79839886dc",
       "evidence_hash": "3951baa0d8facc3f4cf6526007c65fe889ed93dfd2fa788d0b6a0e57012c68d6",
       "verdict": {
         "kind": "pass",
-        "citation": "attribution の complete relation invariant が機械的に検証可能である: (a) 型カタログの全エントリが ≥1 タスクに attribution されている、(b) orphan entry が存在しない、(c) attribution 対象 entry がカタログに実在する。invariant 違反時にゲートが非ゼロ終了コードで返り、違反内容（orphan entry リスト・存在しない entry 識別子）を出力する。"
+        "citation": "型カタログの全エントリが ≥1 タスクに attribution されている、(b) orphan entry が存在しない、(c) attribution 対象 entry がカタログに実在する"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -195,11 +195,11 @@
       }
     },
     {
-      "claim_hash": "f94d3c9c15eb065977580b8c33ace0a502cc8e4574f58f38132fc861fa295d14",
+      "claim_hash": "0cbc4360ba834bc43d1c90218aa15d4b74491384a3865b5f5a10ca79839886dc",
       "evidence_hash": "55101e77aed5b394bde03f1e88c85e0484d8b204835d92183adb3199607d81c2",
       "verdict": {
         "kind": "pass",
-        "citation": "`bin/sotp task-contract coverage` が実装されており、`cargo make task-contract-coverage` として呼び出せる。`cargo make task-contract-check` は `dependencies = [\"task-contract-coverage\"]` を宣言し、coverage → check の順で必ず実行される。attribution 不完全（orphan あり）の場合、coverage がブロックし check は実行されない。"
+        "citation": "attribution 不完全（orphan あり）の場合、coverage がブロックし check は実行されない。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -215,6 +215,78 @@
           "section": "acceptance_criteria",
           "element_id": "AC-08",
           "text_label": "`bin/sotp task-contract coverage` が実装されており、`cargo make task-contract-coverage` として呼び出せる。`cargo make task-contract-check` は `dependencies = [\"task-contract-coverage\"]` を宣言し、coverage → check の順で必ず実行される。attribution 不完全（orphan あり）の場合、coverage がブロックし check は実行されない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0cbc4360ba834bc43d1c90218aa15d4b74491384a3865b5f5a10ca79839886dc",
+      "evidence_hash": "8698bb833c4800cefae0e42138e205f9d999b6f3283e6cd861df29cfa6610d86",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`task-contract.json` の `entries` map の各 task キーは `impl-plan.json` の `tasks[].id` 集合に必ず含まれる必要がある。`coverage` 検証はこの referential integrity を併せて検証し、stale task キーが存在した場合は `CoverageViolation::InvalidTaskRef { task_id, entry_keys }` として fail-closed する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CoverageVerifyInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-11",
+          "text_label": "`task-contract.json` の `entries` map の各 task キーは `impl-plan.json` の `tasks[].id` 集合に必ず含まれる必要がある。`coverage` 検証はこの referential integrity を併せて検証し、stale task キーが存在した場合は `CoverageViolation::InvalidTaskRef { task_id, entry_keys }` として fail-closed する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0cbc4360ba834bc43d1c90218aa15d4b74491384a3865b5f5a10ca79839886dc",
+      "evidence_hash": "09b8b1ef00041b68f13f62820fc49d7a0ccacef559d3d2f2e5c870134058a2ef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`CoverageVerifyService` 実装は `task-contract.json` の各 task キーが `impl-plan.json` から取得した task IDs 集合に含まれるか確認する。含まれない task キー配下の全 entry は `CoverageViolation::InvalidTaskRef` として `CoverageVerifyOutcome.violations` に push する。violation が 1 件でも存在すれば exit ≠ 0 で fail-closed。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CoverageVerifyInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-09",
+          "text_label": "`CoverageVerifyService` 実装は `task-contract.json` の各 task キーが `impl-plan.json` から取得した task IDs 集合に含まれるか確認する。含まれない task キー配下の全 entry は `CoverageViolation::InvalidTaskRef` として `CoverageVerifyOutcome.violations` に push する。violation が 1 件でも存在すれば exit ≠ 0 で fail-closed。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0cbc4360ba834bc43d1c90218aa15d4b74491384a3865b5f5a10ca79839886dc",
+      "evidence_hash": "aeeeb3a81a55bac7107be12a5de906525cc0078d632f643b33f1e55bd69e7872",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`task-contract.json` に `impl-plan.json` に存在しない task キー (例: 削除済みタスク `T999`) 配下に entry が attribution されている状態を作る。`bin/sotp task-contract coverage` を実行すると、`CoverageViolation::InvalidTaskRef { task_id: \"T999\", entry_keys: [...] }` が報告され、exit ≠ 0 で終了する (silent pass しない) ことを確認。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CoverageVerifyInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-10",
+          "text_label": "`task-contract.json` に `impl-plan.json` に存在しない task キー (例: 削除済みタスク `T999`) 配下に entry が attribution されている状態を作る。`bin/sotp task-contract coverage` を実行すると、`CoverageViolation::InvalidTaskRef { task_id: \"T999\", entry_keys: [...] }` が報告され、exit ≠ 0 で終了する (silent pass しない) ことを確認。"
         }
       }
     },
@@ -483,7 +555,7 @@
       }
     },
     {
-      "claim_hash": "cbebc70c27259c6d13f52bf964c1dd8189cde87b18426f4b79ffdcef65e80c6e",
+      "claim_hash": "23e9170b79eee4ceacc16b0e69911888889bdee08efdc448d547b98ab8bd60fa",
       "evidence_hash": "3ca500eaaa5882767865ad14d8abba77b5aae37e7824118685ccd0b7c433c278",
       "verdict": {
         "kind": "pass",
@@ -507,11 +579,11 @@
       }
     },
     {
-      "claim_hash": "cbebc70c27259c6d13f52bf964c1dd8189cde87b18426f4b79ffdcef65e80c6e",
+      "claim_hash": "23e9170b79eee4ceacc16b0e69911888889bdee08efdc448d547b98ab8bd60fa",
       "evidence_hash": "224be3888edb61b6a4a53d8498f0ca5ab96542e6bfb580eecaffb85c567e6455",
       "verdict": {
         "kind": "pass",
-        "citation": "型カタログの全エントリが漏れなくタスクに attribution されているか（完全性）を専用に検証する subcommand。cargo make ci の検証 chain に統合し、commit ごとに attribution drift を検出する。"
+        "citation": "`bin/sotp task-contract coverage` サブコマンドの実装: 型カタログの全エントリが漏れなくタスクに attribution されているか（完全性）を専用に検証する subcommand。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -531,11 +603,11 @@
       }
     },
     {
-      "claim_hash": "cbebc70c27259c6d13f52bf964c1dd8189cde87b18426f4b79ffdcef65e80c6e",
+      "claim_hash": "23e9170b79eee4ceacc16b0e69911888889bdee08efdc448d547b98ab8bd60fa",
       "evidence_hash": "6dfe414194bae09187a3002279da54cf5dcd925b094c7fbc5f1e882f60b52e15",
       "verdict": {
         "kind": "pass",
-        "citation": "attribution 完全性（completeness）の検証と生存性（liveness）の検証は別 subcommand に分割する（`bin/sotp task-contract coverage` と `bin/sotp task-contract check`）。…両者は `task-contract` ドメイン配下に置き、`verify-*` ファミリーには逃さない。"
+        "citation": "attribution 完全性（completeness）の検証と生存性（liveness）の検証は別 subcommand に分割する（`bin/sotp task-contract coverage` と `bin/sotp task-contract check`）。両者は失敗時の責任者と修正経路が異なり（planner が attribution を author する vs implementer が impl を 🔵 化する）、1 コマンドに混在させると fixer の判断分岐コストが恒久化する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -555,7 +627,7 @@
       }
     },
     {
-      "claim_hash": "cbebc70c27259c6d13f52bf964c1dd8189cde87b18426f4b79ffdcef65e80c6e",
+      "claim_hash": "23e9170b79eee4ceacc16b0e69911888889bdee08efdc448d547b98ab8bd60fa",
       "evidence_hash": "3951baa0d8facc3f4cf6526007c65fe889ed93dfd2fa788d0b6a0e57012c68d6",
       "verdict": {
         "kind": "pass",
@@ -579,7 +651,7 @@
       }
     },
     {
-      "claim_hash": "cbebc70c27259c6d13f52bf964c1dd8189cde87b18426f4b79ffdcef65e80c6e",
+      "claim_hash": "23e9170b79eee4ceacc16b0e69911888889bdee08efdc448d547b98ab8bd60fa",
       "evidence_hash": "55101e77aed5b394bde03f1e88c85e0484d8b204835d92183adb3199607d81c2",
       "verdict": {
         "kind": "pass",
@@ -599,6 +671,78 @@
           "section": "acceptance_criteria",
           "element_id": "AC-08",
           "text_label": "`bin/sotp task-contract coverage` が実装されており、`cargo make task-contract-coverage` として呼び出せる。`cargo make task-contract-check` は `dependencies = [\"task-contract-coverage\"]` を宣言し、coverage → check の順で必ず実行される。attribution 不完全（orphan あり）の場合、coverage がブロックし check は実行されない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "23e9170b79eee4ceacc16b0e69911888889bdee08efdc448d547b98ab8bd60fa",
+      "evidence_hash": "8698bb833c4800cefae0e42138e205f9d999b6f3283e6cd861df29cfa6610d86",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`task-contract.json` の `entries` map の各 task キーは `impl-plan.json` の `tasks[].id` 集合に必ず含まれる必要がある。`coverage` 検証はこの referential integrity を併せて検証し、stale task キーが存在した場合は `CoverageViolation::InvalidTaskRef { task_id, entry_keys }` として fail-closed する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "CoverageVerifyService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-11",
+          "text_label": "`task-contract.json` の `entries` map の各 task キーは `impl-plan.json` の `tasks[].id` 集合に必ず含まれる必要がある。`coverage` 検証はこの referential integrity を併せて検証し、stale task キーが存在した場合は `CoverageViolation::InvalidTaskRef { task_id, entry_keys }` として fail-closed する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "23e9170b79eee4ceacc16b0e69911888889bdee08efdc448d547b98ab8bd60fa",
+      "evidence_hash": "09b8b1ef00041b68f13f62820fc49d7a0ccacef559d3d2f2e5c870134058a2ef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`CoverageVerifyService` 実装は `task-contract.json` の各 task キーが `impl-plan.json` から取得した task IDs 集合に含まれるか確認する。含まれない task キー配下の全 entry は `CoverageViolation::InvalidTaskRef` として `CoverageVerifyOutcome.violations` に push する。violation が 1 件でも存在すれば exit ≠ 0 で fail-closed。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "CoverageVerifyService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-09",
+          "text_label": "`CoverageVerifyService` 実装は `task-contract.json` の各 task キーが `impl-plan.json` から取得した task IDs 集合に含まれるか確認する。含まれない task キー配下の全 entry は `CoverageViolation::InvalidTaskRef` として `CoverageVerifyOutcome.violations` に push する。violation が 1 件でも存在すれば exit ≠ 0 で fail-closed。"
+        }
+      }
+    },
+    {
+      "claim_hash": "23e9170b79eee4ceacc16b0e69911888889bdee08efdc448d547b98ab8bd60fa",
+      "evidence_hash": "aeeeb3a81a55bac7107be12a5de906525cc0078d632f643b33f1e55bd69e7872",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`task-contract.json` に `impl-plan.json` に存在しない task キー (例: 削除済みタスク `T999`) 配下に entry が attribution されている状態を作る。`bin/sotp task-contract coverage` を実行すると、`CoverageViolation::InvalidTaskRef { task_id: \"T999\", entry_keys: [...] }` が報告され、exit ≠ 0 で終了する (silent pass しない) ことを確認。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "CoverageVerifyService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-10",
+          "text_label": "`task-contract.json` に `impl-plan.json` に存在しない task キー (例: 削除済みタスク `T999`) 配下に entry が attribution されている状態を作る。`bin/sotp task-contract coverage` を実行すると、`CoverageViolation::InvalidTaskRef { task_id: \"T999\", entry_keys: [...] }` が報告され、exit ≠ 0 で終了する (silent pass しない) ことを確認。"
         }
       }
     },
