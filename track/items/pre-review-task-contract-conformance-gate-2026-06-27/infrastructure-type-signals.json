@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-06-29T18:46:15Z",
+  "declaration_hash": "4b4c68a24f7045b3418e3433c931e9b9fafa77af4761fcbcc68d877532f56a26",
+  "signals": [
+    {
+      "type_name": "ContractedEntryRefDto",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::fmt::Debug",
+        "serde_core::de::Deserialize<'de>",
+        "serde_core::ser::Serialize"
+      ]
+    },
+    {
+      "type_name": "FsImplCatalogSignalReader",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "ImplCatalogSignalReaderPort",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "FsImplPlanReader",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "ImplPlanReaderPort",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "FsTaskContractReader",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "TaskContractReaderPort",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "TaskContractCodecError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::convert::From<Error>",
+        "core::convert::From<ValidationError>",
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "TaskContractDocumentDto",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::fmt::Debug",
+        "serde_core::de::Deserialize<'de>",
+        "serde_core::ser::Serialize"
+      ]
+    },
+    {
+      "type_name": "infrastructure::task_contract_codec::decode",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::task_contract_codec::encode",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

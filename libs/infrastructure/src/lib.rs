@@ -13,7 +13,9 @@ pub mod dry_check;
 pub mod file_port;
 pub mod gh_cli;
 pub mod git_cli;
+pub mod impl_catalog_signal_reader;
 pub mod impl_plan_codec;
+pub mod impl_plan_reader;
 pub mod pr_review;
 pub mod ref_verify;
 pub mod review_v2;
@@ -25,6 +27,8 @@ pub mod semantic_dup;
 pub mod shell;
 pub mod signal_layer_reader;
 pub mod spec;
+pub mod task_contract_codec;
+pub mod task_contract_reader;
 pub mod task_coverage_codec;
 pub mod tddd;
 pub mod telemetry;
@@ -47,6 +51,102 @@ pub use ref_verify::{
     FsRefVerifyAggregateAdapter, FsRefVerifyCheckApprovedAdapter, FsRefVerifyRunAdapter,
 };
 pub use verify_adapter::FsVerifyAdapter;
+
+pub(crate) fn resolve_items_dir_under_current_repo(
+    items_dir: &std::path::Path,
+) -> Result<std::path::PathBuf, std::io::Error> {
+    use std::path::Component;
+
+    use crate::git_cli::{GitRepository as _, SystemGitRepo};
+
+    if items_dir.as_os_str().is_empty() {
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::InvalidInput,
+            "items_dir must not be empty",
+        ));
+    }
+    if items_dir
+        .components()
+        .any(|component| matches!(component, Component::ParentDir | Component::Prefix(_)))
+    {
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::InvalidInput,
+            format!("items_dir cannot escape the current repository root: {}", items_dir.display()),
+        ));
+    }
+
+    let repo = SystemGitRepo::discover().map_err(|e| {
+        std::io::Error::new(
+            std::io::ErrorKind::InvalidInput,
+            format!("cannot discover current git repository: {e}"),
+        )
+    })?;
+    let repo_root = repo.root().canonicalize().map_err(|e| {
+        std::io::Error::new(
+            e.kind(),
+            format!(
+                "failed to canonicalize current repository root {}: {e}",
+                repo.root().display()
+            ),
+        )
+    })?;
+    match repo_root.symlink_metadata() {
+        Ok(meta) if meta.file_type().is_symlink() => {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::InvalidInput,
+                format!("refusing to use symlinked repository root: {}", repo_root.display()),
+            ));
+        }
+        Ok(_) => {}
+        Err(e) => {
+            return Err(std::io::Error::new(
+                e.kind(),
+                format!("failed to stat repository root {}: {e}", repo_root.display()),
+            ));
+        }
+    }
+
+    let absolute_items_dir =
+        if items_dir.is_absolute() { items_dir.to_path_buf() } else { repo_root.join(items_dir) };
+    if !absolute_items_dir.starts_with(&repo_root) {
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::InvalidInput,
+            format!(
+                "items_dir must resolve inside the current repository root {}; got {}",
+                repo_root.display(),
+                items_dir.display()
+            ),
+        ));
+    }
+
+    crate::track::symlink_guard::reject_symlinks_below(&absolute_items_dir, &repo_root)
+        .map(|_| ())?;
+
+    let canonical_items_dir = absolute_items_dir.canonicalize().map_err(|e| {
+        std::io::Error::new(
+            e.kind(),
+            format!("failed to canonicalize items_dir {}: {e}", items_dir.display()),
+        )
+    })?;
+    if !canonical_items_dir.starts_with(&repo_root) {
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::InvalidInput,
+            format!(
+                "items_dir resolves outside the current repository root {}; got {}",
+                repo_root.display(),
+                canonical_items_dir.display()
+            ),
+        ));
+    }
+    if !canonical_items_dir.is_dir() {
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::InvalidInput,
+            format!("items_dir is not a directory: {}", items_dir.display()),
+        ));
+    }
+
+    Ok(canonical_items_dir)
+}
 
 /// Returns a `Timestamp` for the current UTC instant, truncated to whole seconds.
 ///

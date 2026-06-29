@@ -11,7 +11,7 @@ mod inputs;
 pub(crate) mod null_reviewer;
 pub(crate) mod results;
 pub(crate) mod run;
-mod run_fix;
+pub mod run_fix;
 pub(crate) mod scope;
 pub(crate) mod shared;
 mod shim;
@@ -433,6 +433,32 @@ impl ReviewCompositionRoot {
         run_fix::run_fix_local(input).map_err(CompositionError::Infrastructure)
     }
 
+    /// Run the review-fix-lead fixer, resolving `track_id` from the current
+    /// git branch when omitted.
+    ///
+    /// Accepts an optional `track_id`. When `None`, performs branch-driven
+    /// write-side resolution via `track_resolve_id_for_write` (fail-closed
+    /// when not on a `track/<id>` branch). The caller (CLI handler) does not
+    /// make the resolution / fail-closed decision — it is delegated here so
+    /// the thin-bin layer stays free of orchestration logic.
+    ///
+    /// # Errors
+    /// Returns `Err` when track ID resolution, profile loading, provider
+    /// resolution, arg validation, or the fix runner fails.
+    pub fn review_run_fix_local_resolve(
+        &self,
+        track_id_opt: Option<String>,
+        scope: String,
+        briefing_file: PathBuf,
+        round_type: String,
+        model: Option<String>,
+        items_dir: PathBuf,
+    ) -> Result<CommandOutcome, CompositionError> {
+        let track_id = resolve_track_id_or_branch_write(track_id_opt, &items_dir)?;
+        let input = RunReviewFixLocalInput { scope, briefing_file, track_id, round_type, model };
+        self.review_run_fix_local(input)
+    }
+
     /// Check if the review state is approved and code hash is current.
     ///
     /// Resolves `track_id` from the current git branch when `None`. Delegates to
@@ -666,7 +692,7 @@ impl ReviewCompositionRoot {
 // ---------------------------------------------------------------------------
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used)]
+#[allow(clippy::unwrap_used, clippy::expect_used)]
 mod tests {
     use std::ffi::OsString;
     use std::fs;
@@ -1078,7 +1104,11 @@ exit 0
     }
 
     #[test]
-    fn review_run_fix_local_unsupported_provider_returns_error() {
+    fn review_run_fix_local_claude_provider_returns_subagent_dispatch_instruction() {
+        // PR #175 follow-up: review-fix-lead.provider = "claude" must return a
+        // structured dispatch instruction (stdout sentinel + JSON, exit code
+        // SUBAGENT_DISPATCH_EXIT_CODE), not an error, so the orchestrator can
+        // route to the Claude Code subagent without provider conditionals.
         let _lock = cwd_lock().lock().unwrap();
 
         let dir = tempfile::tempdir().unwrap();
@@ -1090,14 +1120,78 @@ exit 0
         let _cwd_guard = CwdGuard::save_current();
         std::env::set_current_dir(dir.path()).unwrap();
 
-        let result = crate::review_v2::ReviewCompositionRoot::new()
-            .review_run_fix_local(run_review_fix_input(briefing));
+        let outcome = crate::review_v2::ReviewCompositionRoot::new()
+            .review_run_fix_local(run_review_fix_input(briefing.clone()))
+            .expect("claude provider must succeed with a dispatch instruction");
 
-        assert!(result.is_err(), "expected unsupported provider error, got: {result:?}");
-        let msg = result.unwrap_err().to_string();
+        assert_eq!(
+            outcome.exit_code,
+            crate::review_v2::run_fix::SUBAGENT_DISPATCH_EXIT_CODE,
+            "claude provider must exit with SUBAGENT_DISPATCH_EXIT_CODE"
+        );
+        let stdout = outcome.stdout.expect("dispatch instruction must be on stdout");
+        let mut lines = stdout.lines();
+        let sentinel = lines.next().expect("first stdout line must be the dispatch sentinel");
+        assert_eq!(sentinel, crate::review_v2::run_fix::SUBAGENT_DISPATCH_SENTINEL);
+        let json = lines.next().expect("second stdout line must be the dispatch JSON payload");
+        assert!(json.contains("\"agent\":\"review-fix-lead\""), "JSON must name the agent: {json}");
+        assert!(json.contains("\"scope\":\"cli_composition\""), "JSON must carry scope: {json}");
         assert!(
-            msg.contains("unsupported review-fix-lead provider 'claude'"),
-            "expected unsupported provider error, got: {msg}"
+            json.contains(&format!("\"briefing_file\":\"{}\"", briefing.display())),
+            "JSON must carry briefing_file: {json}"
+        );
+        assert!(
+            json.contains("\"track_id\":\"review-fix-codex-rustify-2026-05-31\""),
+            "JSON must carry track_id: {json}"
+        );
+        assert!(json.contains("\"round_type\":\"fast\""), "JSON must carry round_type: {json}");
+    }
+
+    /// Regression: exit 64 + `SUBAGENT_DISPATCH_REQUIRED` sentinel must pass through
+    /// the full `ReviewDriver` → `ReviewServiceImpl` chain unchanged when
+    /// `review-fix-lead.provider` is `"claude"`.
+    ///
+    /// Before the fix, `ReviewServiceImpl::run_fix_local` mapped exit 64 to
+    /// `status: "failed"` and the driver then rewrote stdout to
+    /// `"REVIEW_FIX_STATUS: failed"` with exit code 1, so the orchestrator never
+    /// saw the dispatch sentinel and could not launch the Claude subagent.
+    #[test]
+    fn review_driver_handle_claude_provider_passes_through_subagent_dispatch_sentinel() {
+        let _lock = cwd_lock().lock().unwrap();
+
+        let dir = tempfile::tempdir().unwrap();
+        GitRunner::at(dir.path()).assert_success(&["init", "-b", "main"]);
+        write_agent_profiles(dir.path(), "claude");
+        let briefing = dir.path().join("briefing.md");
+        fs::write(&briefing, "# Briefing\n").unwrap();
+
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(dir.path()).unwrap();
+
+        let input = cli_driver::review::ReviewInput::RunFixLocal {
+            scope: "cli_composition".to_owned(),
+            briefing_file: briefing,
+            track_id: "review-fix-codex-rustify-2026-05-31".to_owned(),
+            round_type: "fast".to_owned(),
+            model: Some("gpt-5.5".to_owned()),
+        };
+        let outcome = crate::review_v2::ReviewCompositionRoot::new().review_driver().handle(input);
+
+        assert_eq!(
+            outcome.exit_code,
+            crate::review_v2::run_fix::SUBAGENT_DISPATCH_EXIT_CODE,
+            "driver must pass through SUBAGENT_DISPATCH_EXIT_CODE (64) for claude provider; \
+             got {} — was it remapped to 1 by the failed-status path?",
+            outcome.exit_code
+        );
+        let stdout = outcome.stdout.expect("dispatch sentinel must appear on stdout");
+        assert!(
+            stdout.starts_with(crate::review_v2::run_fix::SUBAGENT_DISPATCH_SENTINEL),
+            "stdout first line must be SUBAGENT_DISPATCH_SENTINEL, got: {stdout:?}"
+        );
+        assert!(
+            !stdout.contains("REVIEW_FIX_STATUS:"),
+            "driver must NOT rewrite sentinel to REVIEW_FIX_STATUS line, got: {stdout:?}"
         );
     }
 

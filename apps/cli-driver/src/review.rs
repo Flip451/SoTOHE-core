@@ -385,6 +385,17 @@ impl ReviewDriver {
                     exit_code,
                 }
             }
+            // SubagentDispatchRequired: the resolved provider is "claude" and the
+            // composition layer emitted a SUBAGENT_DISPATCH_REQUIRED sentinel.
+            // Pass the payload through verbatim on stdout with exit code 64 so the
+            // orchestrator skill can route to the Claude Code subagent without
+            // parsing provider names. Exit 64 is distinct from 0/1/2 so the
+            // orchestrator can branch on the exit code alone without parsing stdout.
+            Err(RunReviewFixError::SubagentDispatchRequired(payload)) => CommandOutcome {
+                stdout: Some(payload),
+                stderr: None,
+                exit_code: 64, // SUBAGENT_DISPATCH_EXIT_CODE (cli_composition::review_v2::run_fix)
+            },
             // SmokeTestFailed is a preflight failure (not a review outcome).
             // Preserve exit 2 + diagnostic on stderr without emitting a
             // `REVIEW_FIX_STATUS:` line so orchestrators do not classify it

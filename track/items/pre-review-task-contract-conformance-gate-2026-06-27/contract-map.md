@@ -1,0 +1,519 @@
+<!-- Generated contract-map-renderer — DO NOT EDIT DIRECTLY -->
+```mermaid
+flowchart LR
+classDef aggregate_root fill:#ede9fe,stroke:#4c1d95,stroke-width:2px
+classDef app_service fill:#ecfdf5,stroke:#059669,stroke-width:2px
+classDef command fill:#fff7ed,stroke:#c2410c,stroke-width:1px
+classDef domain_service fill:#fee2e2,stroke:#991b1b,stroke-width:1px
+classDef dto fill:#f8fafc,stroke:#64748b,stroke-width:1px
+classDef entity fill:#dbeafe,stroke:#1e40af,stroke-width:2px
+classDef error_type fill:#fef2f2,stroke:#b91c1c,stroke-width:1px,stroke-dasharray:4 2
+classDef factory fill:#e0f2fe,stroke:#0369a1,stroke-width:1px
+classDef free_function fill:#f5f3ff,stroke:#7c3aed,stroke-width:1px
+classDef function_node fill:#f5f3ff,stroke:#a78bfa,stroke-width:1px
+classDef interactor fill:#f0fdfa,stroke:#0d9488,stroke-width:1px
+classDef method_node fill:#f8fafc,stroke:#cbd5e1,stroke-width:1px
+classDef query fill:#f0f9ff,stroke:#0369a1,stroke-width:1px
+classDef secondary_adapter fill:#fafaf9,stroke:#57534e,stroke-width:1px
+classDef secondary_port fill:#fafaf9,stroke:#78716c,stroke-width:1px,stroke-dasharray:4 2
+classDef specification fill:#fdf4ff,stroke:#6b21a8,stroke-width:1px
+classDef specification_port fill:#fdf4ff,stroke:#9333ea,stroke-width:1px,stroke-dasharray:4 2
+classDef typestate_overlay stroke:#dc2626,stroke-width:3px
+classDef use_case fill:#ecfeff,stroke:#0e7490,stroke-width:1px
+classDef use_case_function fill:#eef2ff,stroke:#4338ca,stroke-width:1px
+classDef value_object fill:#d1fae5,stroke:#065f46,stroke-width:1px
+classDef variant_node fill:#fafaf9,stroke:#d6d3d1,stroke-width:1px
+subgraph domain["domain"]
+  direction TB
+  subgraph domain_domain_module_task_contract["domain::task_contract"]
+    direction TB
+  subgraph T32_domain_domain_ContractedEntryRef["task_contract::ContractedEntryRef"]
+    direction TB
+    T32_domain_domain_ContractedEntryRef__self[ContractedEntryRef]
+    T32_domain_domain_ContractedEntryRef_new([new])
+    T32_domain_domain_ContractedEntryRef_layer([layer])
+    T32_domain_domain_ContractedEntryRef_entry_key([entry_key])
+  end
+  subgraph T35_domain_domain_CoverageVerifyOutcome["task_contract::CoverageVerifyOutcome"]
+    direction TB
+    T35_domain_domain_CoverageVerifyOutcome__self[CoverageVerifyOutcome]
+    T35_domain_domain_CoverageVerifyOutcome_Passed[Passed]
+    T35_domain_domain_CoverageVerifyOutcome_Blocked[Blocked]
+    T35_domain_domain_CoverageVerifyOutcome_blocked([blocked])
+  end
+  subgraph T31_domain_domain_CoverageViolation["task_contract::CoverageViolation"]
+    direction TB
+    T31_domain_domain_CoverageViolation__self[CoverageViolation]
+    T31_domain_domain_CoverageViolation_MissingTaskContract[MissingTaskContract]
+    T31_domain_domain_CoverageViolation_OrphanEntry[OrphanEntry]
+    T31_domain_domain_CoverageViolation_InvalidEntryRef[InvalidEntryRef]
+    T31_domain_domain_CoverageViolation_MissingSignalDocument[MissingSignalDocument]
+    T31_domain_domain_CoverageViolation_InvalidTaskRef[InvalidTaskRef]
+  end
+  subgraph T34_domain_domain_PreReviewGateOutcome["task_contract::PreReviewGateOutcome"]
+    direction TB
+    T34_domain_domain_PreReviewGateOutcome__self[PreReviewGateOutcome]
+    T34_domain_domain_PreReviewGateOutcome_Passed[Passed]
+    T34_domain_domain_PreReviewGateOutcome_Blocked[Blocked]
+    T34_domain_domain_PreReviewGateOutcome_blocked([blocked])
+  end
+  subgraph T36_domain_domain_PreReviewGateViolation["task_contract::PreReviewGateViolation"]
+    direction TB
+    T36_domain_domain_PreReviewGateViolation__self[PreReviewGateViolation]
+    T36_domain_domain_PreReviewGateViolation_MissingTaskContract[MissingTaskContract]
+    T36_domain_domain_PreReviewGateViolation_NonBlueSignal[NonBlueSignal]
+  end
+  subgraph T34_domain_domain_TaskContractDocument["task_contract::TaskContractDocument"]
+    direction TB
+    T34_domain_domain_TaskContractDocument__self[TaskContractDocument]
+    T34_domain_domain_TaskContractDocument_new([new])
+    T34_domain_domain_TaskContractDocument_schema_version([schema_version])
+    T34_domain_domain_TaskContractDocument_track_id([track_id])
+    T34_domain_domain_TaskContractDocument_entries([entries])
+  end
+  end
+  subgraph domain_domain_module_tddd["domain::tddd"]
+    direction TB
+  subgraph T24_domain_domain_TypeSignal["tddd::catalogue::TypeSignal"]
+    direction TB
+    T24_domain_domain_TypeSignal__self[TypeSignal]
+    T24_domain_domain_TypeSignal_new([new])
+    T24_domain_domain_TypeSignal_type_name([type_name])
+    T24_domain_domain_TypeSignal_kind_tag([kind_tag])
+    T24_domain_domain_TypeSignal_signal([signal])
+    T24_domain_domain_TypeSignal_signal_as_str([signal_as_str])
+    T24_domain_domain_TypeSignal_found_type([found_type])
+    T24_domain_domain_TypeSignal_found_items([found_items])
+    T24_domain_domain_TypeSignal_missing_items([missing_items])
+    T24_domain_domain_TypeSignal_extra_items([extra_items])
+    T24_domain_domain_TypeSignal_is_unknown_kind([is_unknown_kind])
+  end
+  end
+end
+subgraph usecase["usecase"]
+  direction TB
+  subgraph usecase_usecase_module_pre_review_gate["usecase::pre_review_gate"]
+    direction TB
+  subgraph T37_usecase_usecase_CoverageVerifyCommand["pre_review_gate::CoverageVerifyCommand"]
+    direction TB
+    T37_usecase_usecase_CoverageVerifyCommand__self[CoverageVerifyCommand]
+  end
+  subgraph T40_usecase_usecase_CoverageVerifyInteractor["pre_review_gate::CoverageVerifyInteractor"]
+    direction TB
+    T40_usecase_usecase_CoverageVerifyInteractor__self[CoverageVerifyInteractor]
+    T40_usecase_usecase_CoverageVerifyInteractor_new([new])
+  end
+  subgraph T36_usecase_usecase_PreReviewGateCommand["pre_review_gate::PreReviewGateCommand"]
+    direction TB
+    T36_usecase_usecase_PreReviewGateCommand__self[PreReviewGateCommand]
+  end
+  subgraph T34_usecase_usecase_PreReviewGateError["pre_review_gate::PreReviewGateError"]
+    direction TB
+    T34_usecase_usecase_PreReviewGateError__self[PreReviewGateError]
+    T34_usecase_usecase_PreReviewGateError_TaskContractNotFound[TaskContractNotFound]
+    T34_usecase_usecase_PreReviewGateError_TaskContractReadFailed[TaskContractReadFailed]
+    T34_usecase_usecase_PreReviewGateError_SignalReadFailed[SignalReadFailed]
+    T34_usecase_usecase_PreReviewGateError_ImplPlanReadFailed[ImplPlanReadFailed]
+  end
+  subgraph T39_usecase_usecase_PreReviewGateInteractor["pre_review_gate::PreReviewGateInteractor"]
+    direction TB
+    T39_usecase_usecase_PreReviewGateInteractor__self[PreReviewGateInteractor]
+    T39_usecase_usecase_PreReviewGateInteractor_new([new])
+  end
+  subgraph R37_usecase_usecase_CoverageVerifyService["pre_review_gate::CoverageVerifyService"]
+    direction TB
+    R37_usecase_usecase_CoverageVerifyService__self[CoverageVerifyService]
+    R37_usecase_usecase_CoverageVerifyService_verify_coverage([verify_coverage])
+  end
+  subgraph R43_usecase_usecase_ImplCatalogSignalReaderPort["pre_review_gate::ImplCatalogSignalReaderPort"]
+    direction TB
+    R43_usecase_usecase_ImplCatalogSignalReaderPort__self[ImplCatalogSignalReaderPort]
+    R43_usecase_usecase_ImplCatalogSignalReaderPort_read_signals([read_signals])
+    R43_usecase_usecase_ImplCatalogSignalReaderPort_read_optional_signals([read_optional_signals])
+  end
+  subgraph R34_usecase_usecase_ImplPlanReaderPort["pre_review_gate::ImplPlanReaderPort"]
+    direction TB
+    R34_usecase_usecase_ImplPlanReaderPort__self[ImplPlanReaderPort]
+    R34_usecase_usecase_ImplPlanReaderPort_read_task_statuses([read_task_statuses])
+  end
+  subgraph R36_usecase_usecase_PreReviewGateService["pre_review_gate::PreReviewGateService"]
+    direction TB
+    R36_usecase_usecase_PreReviewGateService__self[PreReviewGateService]
+    R36_usecase_usecase_PreReviewGateService_check([check])
+  end
+  subgraph R38_usecase_usecase_TaskContractReaderPort["pre_review_gate::TaskContractReaderPort"]
+    direction TB
+    R38_usecase_usecase_TaskContractReaderPort__self[TaskContractReaderPort]
+    R38_usecase_usecase_TaskContractReaderPort_read([read])
+  end
+  end
+  subgraph usecase_usecase_module_review_v2["usecase::review_v2"]
+    direction TB
+  subgraph T33_usecase_usecase_RunReviewFixError["review_v2::run_review_fix::RunReviewFixError"]
+    direction TB
+    T33_usecase_usecase_RunReviewFixError__self[RunReviewFixError]
+    T33_usecase_usecase_RunReviewFixError_InvalidScope[InvalidScope]
+    T33_usecase_usecase_RunReviewFixError_InvalidTrackId[InvalidTrackId]
+    T33_usecase_usecase_RunReviewFixError_InvalidRoundType[InvalidRoundType]
+    T33_usecase_usecase_RunReviewFixError_SmokeTestFailed[SmokeTestFailed]
+    T33_usecase_usecase_RunReviewFixError_FixRunnerFailed[FixRunnerFailed]
+    T33_usecase_usecase_RunReviewFixError_SubagentDispatchRequired[SubagentDispatchRequired]
+  end
+  end
+end
+subgraph infrastructure["infrastructure"]
+  direction TB
+  subgraph infrastructure_infrastructure_module_impl_catalog_signal_reader["infrastructure::impl_catalog_signal_reader"]
+    direction TB
+  subgraph T55_infrastructure_infrastructure_FsImplCatalogSignalReader["impl_catalog_signal_reader::FsImplCatalogSignalReader"]
+    direction TB
+    T55_infrastructure_infrastructure_FsImplCatalogSignalReader__self[FsImplCatalogSignalReader]
+    T55_infrastructure_infrastructure_FsImplCatalogSignalReader_new([new])
+  end
+  end
+  subgraph infrastructure_infrastructure_module_impl_plan_reader["infrastructure::impl_plan_reader"]
+    direction TB
+  subgraph T46_infrastructure_infrastructure_FsImplPlanReader["impl_plan_reader::FsImplPlanReader"]
+    direction TB
+    T46_infrastructure_infrastructure_FsImplPlanReader__self[FsImplPlanReader]
+    T46_infrastructure_infrastructure_FsImplPlanReader_new([new])
+  end
+  end
+  subgraph infrastructure_infrastructure_module_task_contract_codec["infrastructure::task_contract_codec"]
+    direction TB
+  subgraph T51_infrastructure_infrastructure_ContractedEntryRefDto["task_contract_codec::ContractedEntryRefDto"]
+    direction TB
+    T51_infrastructure_infrastructure_ContractedEntryRefDto__self[ContractedEntryRefDto]
+  end
+  subgraph T52_infrastructure_infrastructure_TaskContractCodecError["task_contract_codec::TaskContractCodecError"]
+    direction TB
+    T52_infrastructure_infrastructure_TaskContractCodecError__self[TaskContractCodecError]
+    T52_infrastructure_infrastructure_TaskContractCodecError_Json[Json]
+    T52_infrastructure_infrastructure_TaskContractCodecError_UnsupportedSchemaVersion[UnsupportedSchemaVersion]
+    T52_infrastructure_infrastructure_TaskContractCodecError_Validation[Validation]
+  end
+  subgraph T53_infrastructure_infrastructure_TaskContractDocumentDto["task_contract_codec::TaskContractDocumentDto"]
+    direction TB
+    T53_infrastructure_infrastructure_TaskContractDocumentDto__self[TaskContractDocumentDto]
+  end
+  F73_infrastructure_infrastructure_infrastructure__task_contract_codec__decode[[decode]]
+  F73_infrastructure_infrastructure_infrastructure__task_contract_codec__encode[[encode]]
+  end
+  subgraph infrastructure_infrastructure_module_task_contract_reader["infrastructure::task_contract_reader"]
+    direction TB
+  subgraph T50_infrastructure_infrastructure_FsTaskContractReader["task_contract_reader::FsTaskContractReader"]
+    direction TB
+    T50_infrastructure_infrastructure_FsTaskContractReader__self[FsTaskContractReader]
+    T50_infrastructure_infrastructure_FsTaskContractReader_new([new])
+  end
+  end
+end
+subgraph cli_driver["cli_driver"]
+  direction TB
+  subgraph cli_driver_cli_driver_module_task_contract["cli_driver::task_contract"]
+    direction TB
+  subgraph T40_cli_driver_cli_driver_TaskContractDriver["task_contract::TaskContractDriver"]
+    direction TB
+    T40_cli_driver_cli_driver_TaskContractDriver__self[TaskContractDriver]
+    T40_cli_driver_cli_driver_TaskContractDriver_new([new])
+    T40_cli_driver_cli_driver_TaskContractDriver_handle([handle])
+  end
+  subgraph T39_cli_driver_cli_driver_TaskContractInput["task_contract::TaskContractInput"]
+    direction TB
+    T39_cli_driver_cli_driver_TaskContractInput__self[TaskContractInput]
+    T39_cli_driver_cli_driver_TaskContractInput_Check[Check]
+    T39_cli_driver_cli_driver_TaskContractInput_Coverage[Coverage]
+  end
+  end
+end
+subgraph cli_composition["cli_composition"]
+  direction TB
+  subgraph cli_composition_cli_composition_module_review_v2["cli_composition::review_v2"]
+    direction TB
+  subgraph T53_cli_composition_cli_composition_ReviewCompositionRoot["review_v2::ReviewCompositionRoot"]
+    direction TB
+    T53_cli_composition_cli_composition_ReviewCompositionRoot__self[ReviewCompositionRoot]
+    T53_cli_composition_cli_composition_ReviewCompositionRoot_new([new])
+    T53_cli_composition_cli_composition_ReviewCompositionRoot_review_driver([review_driver])
+    T53_cli_composition_cli_composition_ReviewCompositionRoot_review_run_codex([review_run_codex])
+    T53_cli_composition_cli_composition_ReviewCompositionRoot_review_run_claude([review_run_claude])
+    T53_cli_composition_cli_composition_ReviewCompositionRoot_review_run_local([review_run_local])
+    T53_cli_composition_cli_composition_ReviewCompositionRoot_review_run_fix_local([review_run_fix_local])
+    T53_cli_composition_cli_composition_ReviewCompositionRoot_review_run_fix_local_resolve([review_run_fix_local_resolve])
+    T53_cli_composition_cli_composition_ReviewCompositionRoot_review_check_approved([review_check_approved])
+    T53_cli_composition_cli_composition_ReviewCompositionRoot_review_results([review_results])
+    T53_cli_composition_cli_composition_ReviewCompositionRoot_review_classify([review_classify])
+    T53_cli_composition_cli_composition_ReviewCompositionRoot_review_files([review_files])
+    T53_cli_composition_cli_composition_ReviewCompositionRoot_review_validate_scope([review_validate_scope])
+    T53_cli_composition_cli_composition_ReviewCompositionRoot_review_get_briefing([review_get_briefing])
+    T53_cli_composition_cli_composition_ReviewCompositionRoot_review_persist_commit_hash([review_persist_commit_hash])
+  end
+  end
+  subgraph cli_composition_cli_composition_module_task_contract["cli_composition::task_contract"]
+    direction TB
+  subgraph T59_cli_composition_cli_composition_TaskContractCompositionRoot["task_contract::TaskContractCompositionRoot"]
+    direction TB
+    T59_cli_composition_cli_composition_TaskContractCompositionRoot__self[TaskContractCompositionRoot]
+    T59_cli_composition_cli_composition_TaskContractCompositionRoot_new([new])
+    T59_cli_composition_cli_composition_TaskContractCompositionRoot_task_contract_driver([task_contract_driver])
+    T59_cli_composition_cli_composition_TaskContractCompositionRoot_task_contract_check([task_contract_check])
+    T59_cli_composition_cli_composition_TaskContractCompositionRoot_task_contract_coverage([task_contract_coverage])
+  end
+  end
+end
+subgraph cli["cli"]
+  direction TB
+  subgraph T18_cli_cli_CliCommand["CliCommand"]
+    direction TB
+    T18_cli_cli_CliCommand__self[CliCommand]
+    T18_cli_cli_CliCommand_Arch[Arch]
+    T18_cli_cli_CliCommand_Conventions[Conventions]
+    T18_cli_cli_CliCommand_Domain[Domain]
+    T18_cli_cli_CliCommand_Guard[Guard]
+    T18_cli_cli_CliCommand_Hook[Hook]
+    T18_cli_cli_CliCommand_Track[Track]
+    T18_cli_cli_CliCommand_Git[Git]
+    T18_cli_cli_CliCommand_Pr[Pr]
+    T18_cli_cli_CliCommand_Plan[Plan]
+    T18_cli_cli_CliCommand_Review[Review]
+    T18_cli_cli_CliCommand_File[File]
+    T18_cli_cli_CliCommand_Verify[Verify]
+    T18_cli_cli_CliCommand_FindSimilar[FindSimilar]
+    T18_cli_cli_CliCommand_DupIndex[DupIndex]
+    T18_cli_cli_CliCommand_DupCheck[DupCheck]
+    T18_cli_cli_CliCommand_Telemetry[Telemetry]
+    T18_cli_cli_CliCommand_Dry[Dry]
+    T18_cli_cli_CliCommand_RefVerify[RefVerify]
+    T18_cli_cli_CliCommand_Signal[Signal]
+    T18_cli_cli_CliCommand_TaskContract[TaskContract]
+    T18_cli_cli_CliCommand_Demo[Demo]
+  end
+  subgraph cli_cli_module_commands["cli::commands"]
+    direction TB
+  subgraph T20_cli_cli_FixLocalArgs["commands::review::fix_local::FixLocalArgs"]
+    direction TB
+    T20_cli_cli_FixLocalArgs__self[FixLocalArgs]
+  end
+  subgraph T29_cli_cli_TaskContractCheckArgs["commands::task_contract::TaskContractCheckArgs"]
+    direction TB
+    T29_cli_cli_TaskContractCheckArgs__self[TaskContractCheckArgs]
+  end
+  subgraph T27_cli_cli_TaskContractCommand["commands::task_contract::TaskContractCommand"]
+    direction TB
+    T27_cli_cli_TaskContractCommand__self[TaskContractCommand]
+    T27_cli_cli_TaskContractCommand_Check[Check]
+    T27_cli_cli_TaskContractCommand_Coverage[Coverage]
+  end
+  subgraph T32_cli_cli_TaskContractCoverageArgs["commands::task_contract::TaskContractCoverageArgs"]
+    direction TB
+    T32_cli_cli_TaskContractCoverageArgs__self[TaskContractCoverageArgs]
+  end
+  F73_cli_cli_cli__commands__task_contract__detect_active_track_from_branch_cwd[[detect_active_track_from_branch_cwd]]
+  F45_cli_cli_cli__commands__task_contract__execute[[execute]]
+  F65_cli_cli_cli__commands__task_contract__execute_task_contract_check[[execute_task_contract_check]]
+  F68_cli_cli_cli__commands__task_contract__execute_task_contract_coverage[[execute_task_contract_coverage]]
+  F62_cli_cli_cli__commands__task_contract__task_contract_check_core[[task_contract_check_core]]
+  F65_cli_cli_cli__commands__task_contract__task_contract_coverage_core[[task_contract_coverage_core]]
+  F68_cli_cli_cli__commands__track__views__detect_active_track_from_branch[[detect_active_track_from_branch]]
+  end
+end
+T32_domain_domain_ContractedEntryRef_new --> T32_domain_domain_ContractedEntryRef__self
+T35_domain_domain_CoverageVerifyOutcome_Blocked --o|violations| T31_domain_domain_CoverageViolation__self
+T35_domain_domain_CoverageVerifyOutcome_blocked --o T31_domain_domain_CoverageViolation__self
+T35_domain_domain_CoverageVerifyOutcome_blocked --> T35_domain_domain_CoverageVerifyOutcome__self
+T31_domain_domain_CoverageViolation_OrphanEntry --o|entry| T32_domain_domain_ContractedEntryRef__self
+T31_domain_domain_CoverageViolation_InvalidEntryRef --o|entry| T32_domain_domain_ContractedEntryRef__self
+T31_domain_domain_CoverageViolation_InvalidTaskRef --o|entry_keys| T32_domain_domain_ContractedEntryRef__self
+T34_domain_domain_PreReviewGateOutcome_Blocked --o|violations| T36_domain_domain_PreReviewGateViolation__self
+T34_domain_domain_PreReviewGateOutcome_blocked --o T36_domain_domain_PreReviewGateViolation__self
+T34_domain_domain_PreReviewGateOutcome_blocked --> T34_domain_domain_PreReviewGateOutcome__self
+T36_domain_domain_PreReviewGateViolation_NonBlueSignal --o|entry| T32_domain_domain_ContractedEntryRef__self
+T34_domain_domain_TaskContractDocument_new --o T32_domain_domain_ContractedEntryRef__self
+T34_domain_domain_TaskContractDocument_new --> T34_domain_domain_TaskContractDocument__self
+T34_domain_domain_TaskContractDocument_entries --> T32_domain_domain_ContractedEntryRef__self
+T24_domain_domain_TypeSignal_new --> T24_domain_domain_TypeSignal__self
+T40_usecase_usecase_CoverageVerifyInteractor_new --> T40_usecase_usecase_CoverageVerifyInteractor__self
+T39_usecase_usecase_PreReviewGateInteractor_new --> T39_usecase_usecase_PreReviewGateInteractor__self
+R37_usecase_usecase_CoverageVerifyService_verify_coverage --o T37_usecase_usecase_CoverageVerifyCommand__self
+R37_usecase_usecase_CoverageVerifyService_verify_coverage --> T34_usecase_usecase_PreReviewGateError__self
+R37_usecase_usecase_CoverageVerifyService_verify_coverage --> T35_domain_domain_CoverageVerifyOutcome__self
+R43_usecase_usecase_ImplCatalogSignalReaderPort_read_signals --> T34_usecase_usecase_PreReviewGateError__self
+R43_usecase_usecase_ImplCatalogSignalReaderPort_read_optional_signals --> T34_usecase_usecase_PreReviewGateError__self
+R34_usecase_usecase_ImplPlanReaderPort_read_task_statuses --> T34_usecase_usecase_PreReviewGateError__self
+R36_usecase_usecase_PreReviewGateService_check --o T36_usecase_usecase_PreReviewGateCommand__self
+R36_usecase_usecase_PreReviewGateService_check --> T34_usecase_usecase_PreReviewGateError__self
+R36_usecase_usecase_PreReviewGateService_check --> T34_domain_domain_PreReviewGateOutcome__self
+R38_usecase_usecase_TaskContractReaderPort_read --> T34_usecase_usecase_PreReviewGateError__self
+R38_usecase_usecase_TaskContractReaderPort_read --> T34_domain_domain_TaskContractDocument__self
+T39_usecase_usecase_PreReviewGateInteractor__self -.impl.-> R36_usecase_usecase_PreReviewGateService__self
+T40_usecase_usecase_CoverageVerifyInteractor__self -.impl.-> R37_usecase_usecase_CoverageVerifyService__self
+T55_infrastructure_infrastructure_FsImplCatalogSignalReader_new --> T55_infrastructure_infrastructure_FsImplCatalogSignalReader__self
+T46_infrastructure_infrastructure_FsImplPlanReader_new --> T46_infrastructure_infrastructure_FsImplPlanReader__self
+T53_infrastructure_infrastructure_TaskContractDocumentDto__self --o|entries| T51_infrastructure_infrastructure_ContractedEntryRefDto__self
+F73_infrastructure_infrastructure_infrastructure__task_contract_codec__decode --> T52_infrastructure_infrastructure_TaskContractCodecError__self
+F73_infrastructure_infrastructure_infrastructure__task_contract_codec__decode --> T34_domain_domain_TaskContractDocument__self
+F73_infrastructure_infrastructure_infrastructure__task_contract_codec__encode --o T34_domain_domain_TaskContractDocument__self
+F73_infrastructure_infrastructure_infrastructure__task_contract_codec__encode --> T52_infrastructure_infrastructure_TaskContractCodecError__self
+T50_infrastructure_infrastructure_FsTaskContractReader_new --> T50_infrastructure_infrastructure_FsTaskContractReader__self
+T50_infrastructure_infrastructure_FsTaskContractReader__self -.impl.-> R38_usecase_usecase_TaskContractReaderPort__self
+T55_infrastructure_infrastructure_FsImplCatalogSignalReader__self -.impl.-> R43_usecase_usecase_ImplCatalogSignalReaderPort__self
+T46_infrastructure_infrastructure_FsImplPlanReader__self -.impl.-> R34_usecase_usecase_ImplPlanReaderPort__self
+T40_cli_driver_cli_driver_TaskContractDriver_new --> T40_cli_driver_cli_driver_TaskContractDriver__self
+T40_cli_driver_cli_driver_TaskContractDriver_handle --o T39_cli_driver_cli_driver_TaskContractInput__self
+T53_cli_composition_cli_composition_ReviewCompositionRoot_new --> T53_cli_composition_cli_composition_ReviewCompositionRoot__self
+T59_cli_composition_cli_composition_TaskContractCompositionRoot_new --> T59_cli_composition_cli_composition_TaskContractCompositionRoot__self
+T59_cli_composition_cli_composition_TaskContractCompositionRoot_task_contract_driver --> T40_cli_driver_cli_driver_TaskContractDriver__self
+T18_cli_cli_CliCommand_TaskContract --o|cmd| T27_cli_cli_TaskContractCommand__self
+T27_cli_cli_TaskContractCommand_Check --o T29_cli_cli_TaskContractCheckArgs__self
+T27_cli_cli_TaskContractCommand_Coverage --o T32_cli_cli_TaskContractCoverageArgs__self
+F45_cli_cli_cli__commands__task_contract__execute --o T27_cli_cli_TaskContractCommand__self
+F65_cli_cli_cli__commands__task_contract__execute_task_contract_check --o T29_cli_cli_TaskContractCheckArgs__self
+F68_cli_cli_cli__commands__task_contract__execute_task_contract_coverage --o T32_cli_cli_TaskContractCoverageArgs__self
+class T32_domain_domain_ContractedEntryRef_new method_node
+class T32_domain_domain_ContractedEntryRef_layer method_node
+class T32_domain_domain_ContractedEntryRef_entry_key method_node
+class T32_domain_domain_ContractedEntryRef__self value_object
+class T35_domain_domain_CoverageVerifyOutcome_Passed variant_node
+class T35_domain_domain_CoverageVerifyOutcome_Blocked variant_node
+class T35_domain_domain_CoverageVerifyOutcome_blocked method_node
+class T35_domain_domain_CoverageVerifyOutcome__self value_object
+class T31_domain_domain_CoverageViolation_MissingTaskContract variant_node
+class T31_domain_domain_CoverageViolation_OrphanEntry variant_node
+class T31_domain_domain_CoverageViolation_InvalidEntryRef variant_node
+class T31_domain_domain_CoverageViolation_MissingSignalDocument variant_node
+class T31_domain_domain_CoverageViolation_InvalidTaskRef variant_node
+class T31_domain_domain_CoverageViolation__self value_object
+class T34_domain_domain_PreReviewGateOutcome_Passed variant_node
+class T34_domain_domain_PreReviewGateOutcome_Blocked variant_node
+class T34_domain_domain_PreReviewGateOutcome_blocked method_node
+class T34_domain_domain_PreReviewGateOutcome__self value_object
+class T36_domain_domain_PreReviewGateViolation_MissingTaskContract variant_node
+class T36_domain_domain_PreReviewGateViolation_NonBlueSignal variant_node
+class T36_domain_domain_PreReviewGateViolation__self value_object
+class T34_domain_domain_TaskContractDocument_new method_node
+class T34_domain_domain_TaskContractDocument_schema_version method_node
+class T34_domain_domain_TaskContractDocument_track_id method_node
+class T34_domain_domain_TaskContractDocument_entries method_node
+class T34_domain_domain_TaskContractDocument__self value_object
+class T24_domain_domain_TypeSignal_new method_node
+class T24_domain_domain_TypeSignal_type_name method_node
+class T24_domain_domain_TypeSignal_kind_tag method_node
+class T24_domain_domain_TypeSignal_signal method_node
+class T24_domain_domain_TypeSignal_signal_as_str method_node
+class T24_domain_domain_TypeSignal_found_type method_node
+class T24_domain_domain_TypeSignal_found_items method_node
+class T24_domain_domain_TypeSignal_missing_items method_node
+class T24_domain_domain_TypeSignal_extra_items method_node
+class T24_domain_domain_TypeSignal_is_unknown_kind method_node
+class T24_domain_domain_TypeSignal__self value_object
+class T37_usecase_usecase_CoverageVerifyCommand__self command
+class T40_usecase_usecase_CoverageVerifyInteractor_new method_node
+class T40_usecase_usecase_CoverageVerifyInteractor__self interactor
+class T36_usecase_usecase_PreReviewGateCommand__self command
+class T34_usecase_usecase_PreReviewGateError_TaskContractNotFound variant_node
+class T34_usecase_usecase_PreReviewGateError_TaskContractReadFailed variant_node
+class T34_usecase_usecase_PreReviewGateError_SignalReadFailed variant_node
+class T34_usecase_usecase_PreReviewGateError_ImplPlanReadFailed variant_node
+class T34_usecase_usecase_PreReviewGateError__self error_type
+class T39_usecase_usecase_PreReviewGateInteractor_new method_node
+class T39_usecase_usecase_PreReviewGateInteractor__self interactor
+class R37_usecase_usecase_CoverageVerifyService_verify_coverage method_node
+class R37_usecase_usecase_CoverageVerifyService__self app_service
+class R43_usecase_usecase_ImplCatalogSignalReaderPort_read_signals method_node
+class R43_usecase_usecase_ImplCatalogSignalReaderPort_read_optional_signals method_node
+class R43_usecase_usecase_ImplCatalogSignalReaderPort__self secondary_port
+class R34_usecase_usecase_ImplPlanReaderPort_read_task_statuses method_node
+class R34_usecase_usecase_ImplPlanReaderPort__self secondary_port
+class R36_usecase_usecase_PreReviewGateService_check method_node
+class R36_usecase_usecase_PreReviewGateService__self app_service
+class R38_usecase_usecase_TaskContractReaderPort_read method_node
+class R38_usecase_usecase_TaskContractReaderPort__self secondary_port
+class T33_usecase_usecase_RunReviewFixError_InvalidScope variant_node
+class T33_usecase_usecase_RunReviewFixError_InvalidTrackId variant_node
+class T33_usecase_usecase_RunReviewFixError_InvalidRoundType variant_node
+class T33_usecase_usecase_RunReviewFixError_SmokeTestFailed variant_node
+class T33_usecase_usecase_RunReviewFixError_FixRunnerFailed variant_node
+class T33_usecase_usecase_RunReviewFixError_SubagentDispatchRequired variant_node
+class T33_usecase_usecase_RunReviewFixError__self error_type
+class T55_infrastructure_infrastructure_FsImplCatalogSignalReader_new method_node
+class T55_infrastructure_infrastructure_FsImplCatalogSignalReader__self secondary_adapter
+class T46_infrastructure_infrastructure_FsImplPlanReader_new method_node
+class T46_infrastructure_infrastructure_FsImplPlanReader__self secondary_adapter
+class T51_infrastructure_infrastructure_ContractedEntryRefDto__self dto
+class T52_infrastructure_infrastructure_TaskContractCodecError_Json variant_node
+class T52_infrastructure_infrastructure_TaskContractCodecError_UnsupportedSchemaVersion variant_node
+class T52_infrastructure_infrastructure_TaskContractCodecError_Validation variant_node
+class T52_infrastructure_infrastructure_TaskContractCodecError__self error_type
+class T53_infrastructure_infrastructure_TaskContractDocumentDto__self dto
+class F73_infrastructure_infrastructure_infrastructure__task_contract_codec__decode free_function
+class F73_infrastructure_infrastructure_infrastructure__task_contract_codec__decode function_node
+class F73_infrastructure_infrastructure_infrastructure__task_contract_codec__encode free_function
+class F73_infrastructure_infrastructure_infrastructure__task_contract_codec__encode function_node
+class T50_infrastructure_infrastructure_FsTaskContractReader_new method_node
+class T50_infrastructure_infrastructure_FsTaskContractReader__self secondary_adapter
+class T40_cli_driver_cli_driver_TaskContractDriver_new method_node
+class T40_cli_driver_cli_driver_TaskContractDriver_handle method_node
+class T39_cli_driver_cli_driver_TaskContractInput_Check variant_node
+class T39_cli_driver_cli_driver_TaskContractInput_Coverage variant_node
+class T39_cli_driver_cli_driver_TaskContractInput__self dto
+class T53_cli_composition_cli_composition_ReviewCompositionRoot_new method_node
+class T53_cli_composition_cli_composition_ReviewCompositionRoot_review_driver method_node
+class T53_cli_composition_cli_composition_ReviewCompositionRoot_review_run_codex method_node
+class T53_cli_composition_cli_composition_ReviewCompositionRoot_review_run_claude method_node
+class T53_cli_composition_cli_composition_ReviewCompositionRoot_review_run_local method_node
+class T53_cli_composition_cli_composition_ReviewCompositionRoot_review_run_fix_local method_node
+class T53_cli_composition_cli_composition_ReviewCompositionRoot_review_run_fix_local_resolve method_node
+class T53_cli_composition_cli_composition_ReviewCompositionRoot_review_check_approved method_node
+class T53_cli_composition_cli_composition_ReviewCompositionRoot_review_results method_node
+class T53_cli_composition_cli_composition_ReviewCompositionRoot_review_classify method_node
+class T53_cli_composition_cli_composition_ReviewCompositionRoot_review_files method_node
+class T53_cli_composition_cli_composition_ReviewCompositionRoot_review_validate_scope method_node
+class T53_cli_composition_cli_composition_ReviewCompositionRoot_review_get_briefing method_node
+class T53_cli_composition_cli_composition_ReviewCompositionRoot_review_persist_commit_hash method_node
+class T59_cli_composition_cli_composition_TaskContractCompositionRoot_new method_node
+class T59_cli_composition_cli_composition_TaskContractCompositionRoot_task_contract_driver method_node
+class T59_cli_composition_cli_composition_TaskContractCompositionRoot_task_contract_check method_node
+class T59_cli_composition_cli_composition_TaskContractCompositionRoot_task_contract_coverage method_node
+class T18_cli_cli_CliCommand_Arch variant_node
+class T18_cli_cli_CliCommand_Conventions variant_node
+class T18_cli_cli_CliCommand_Domain variant_node
+class T18_cli_cli_CliCommand_Guard variant_node
+class T18_cli_cli_CliCommand_Hook variant_node
+class T18_cli_cli_CliCommand_Track variant_node
+class T18_cli_cli_CliCommand_Git variant_node
+class T18_cli_cli_CliCommand_Pr variant_node
+class T18_cli_cli_CliCommand_Plan variant_node
+class T18_cli_cli_CliCommand_Review variant_node
+class T18_cli_cli_CliCommand_File variant_node
+class T18_cli_cli_CliCommand_Verify variant_node
+class T18_cli_cli_CliCommand_FindSimilar variant_node
+class T18_cli_cli_CliCommand_DupIndex variant_node
+class T18_cli_cli_CliCommand_DupCheck variant_node
+class T18_cli_cli_CliCommand_Telemetry variant_node
+class T18_cli_cli_CliCommand_Dry variant_node
+class T18_cli_cli_CliCommand_RefVerify variant_node
+class T18_cli_cli_CliCommand_Signal variant_node
+class T18_cli_cli_CliCommand_TaskContract variant_node
+class T18_cli_cli_CliCommand_Demo variant_node
+class T18_cli_cli_CliCommand__self dto
+class T20_cli_cli_FixLocalArgs__self dto
+class T29_cli_cli_TaskContractCheckArgs__self dto
+class T27_cli_cli_TaskContractCommand_Check variant_node
+class T27_cli_cli_TaskContractCommand_Coverage variant_node
+class T27_cli_cli_TaskContractCommand__self dto
+class T32_cli_cli_TaskContractCoverageArgs__self dto
+class F73_cli_cli_cli__commands__task_contract__detect_active_track_from_branch_cwd free_function
+class F73_cli_cli_cli__commands__task_contract__detect_active_track_from_branch_cwd function_node
+class F45_cli_cli_cli__commands__task_contract__execute free_function
+class F45_cli_cli_cli__commands__task_contract__execute function_node
+class F65_cli_cli_cli__commands__task_contract__execute_task_contract_check free_function
+class F65_cli_cli_cli__commands__task_contract__execute_task_contract_check function_node
+class F68_cli_cli_cli__commands__task_contract__execute_task_contract_coverage free_function
+class F68_cli_cli_cli__commands__task_contract__execute_task_contract_coverage function_node
+class F62_cli_cli_cli__commands__task_contract__task_contract_check_core free_function
+class F62_cli_cli_cli__commands__task_contract__task_contract_check_core function_node
+class F65_cli_cli_cli__commands__task_contract__task_contract_coverage_core free_function
+class F65_cli_cli_cli__commands__task_contract__task_contract_coverage_core function_node
+class F68_cli_cli_cli__commands__track__views__detect_active_track_from_branch free_function
+class F68_cli_cli_cli__commands__track__views__detect_active_track_from_branch function_node
+```

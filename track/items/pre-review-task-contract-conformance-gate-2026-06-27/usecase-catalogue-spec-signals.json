@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "e267adfe465a896df845f89caec0ccd6dac1efef85f1fa7a162e426ca9fc90f7",
+  "signals": [
+    {
+      "type_name": "CoverageVerifyCommand",
+      "signal": "blue",
+      "entry_hash": "54b228fca510bab5dcbda38d322b32196b4b0a529aa87bb22b0e05903b2e8231"
+    },
+    {
+      "type_name": "CoverageVerifyInteractor",
+      "signal": "blue",
+      "entry_hash": "0cbc4360ba834bc43d1c90218aa15d4b74491384a3865b5f5a10ca79839886dc"
+    },
+    {
+      "type_name": "PreReviewGateCommand",
+      "signal": "blue",
+      "entry_hash": "e10ccd73288f8cc93ea86b631706bfd0985adc67617d9eb921b266ba7e1649a7"
+    },
+    {
+      "type_name": "PreReviewGateError",
+      "signal": "blue",
+      "entry_hash": "18feb1a211464131c5e381d6b81b08088c9e34fe139e725d67259884a4c26606"
+    },
+    {
+      "type_name": "PreReviewGateInteractor",
+      "signal": "blue",
+      "entry_hash": "0b41b63eded72ffb06615aa29f81735cf34d2d0153ab7e5c04fb74a48f4d70c0"
+    },
+    {
+      "type_name": "RunReviewFixError",
+      "signal": "blue",
+      "entry_hash": "c49735e512b6a13d34d3a0bb790056c026bb22163d86ce2a07026d4cd672d1e4"
+    },
+    {
+      "type_name": "CoverageVerifyService",
+      "signal": "blue",
+      "entry_hash": "23e9170b79eee4ceacc16b0e69911888889bdee08efdc448d547b98ab8bd60fa"
+    },
+    {
+      "type_name": "ImplCatalogSignalReaderPort",
+      "signal": "blue",
+      "entry_hash": "544921e6fe05e2a79045e7b33b13bc3f5c0b6a179c068c8fa8d6420688c11ad0"
+    },
+    {
+      "type_name": "ImplPlanReaderPort",
+      "signal": "blue",
+      "entry_hash": "0178ea7cd9ff4c3c39a568e8eb52a2e52e6814e822353bde86baff48368becda"
+    },
+    {
+      "type_name": "PreReviewGateService",
+      "signal": "blue",
+      "entry_hash": "b5304cac25fe94caba2645443bc72ee8917604b3836ec6be926e6fe09cbbf012"
+    },
+    {
+      "type_name": "TaskContractReaderPort",
+      "signal": "blue",
+      "entry_hash": "688ccb29e9744760209688817b636d38b96d800e8266b957754debe07390a1fa"
+    }
+  ]
+}

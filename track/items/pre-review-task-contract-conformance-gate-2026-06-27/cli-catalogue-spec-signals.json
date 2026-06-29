@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "1a9af93fa4f391a9a3a1371b76bc430de5ac8fc78714bca96ed079dea90ef04b",
+  "signals": [
+    {
+      "type_name": "CliCommand",
+      "signal": "blue",
+      "entry_hash": "7b6f3b47a8c3f8287fd6d8e4f9d41deaa0ab2251498980d34dbb2b70a9574734"
+    },
+    {
+      "type_name": "FixLocalArgs",
+      "signal": "blue",
+      "entry_hash": "b51ec0953590c216165f45f5b0a68cc3a2e051aa4823286c23bc357f8513710a"
+    },
+    {
+      "type_name": "TaskContractCheckArgs",
+      "signal": "blue",
+      "entry_hash": "adf178b9e06792589bdade71b25cfaef9631f58f234dabe0b317d5353ef6794b"
+    },
+    {
+      "type_name": "TaskContractCommand",
+      "signal": "blue",
+      "entry_hash": "3cb2d20194b4320c437137c64fd425d8ff34a9f31df5c4dc11e65774bcb973ba"
+    },
+    {
+      "type_name": "TaskContractCoverageArgs",
+      "signal": "blue",
+      "entry_hash": "efd055c41f779dfe81de63cdf342365192d0b0bec3a0a5013c1156ca544ff8f3"
+    },
+    {
+      "type_name": "cli::commands::review::fix_local::build_review_fix_local_input",
+      "signal": "blue",
+      "entry_hash": "5c5f68d399057adbdf4c4e88996dfcb7bc5051f6cdf6c70b882fe551e6dbddfe"
+    },
+    {
+      "type_name": "cli::commands::task_contract::detect_active_track_from_branch_cwd",
+      "signal": "blue",
+      "entry_hash": "529eacdea62a00d4046ec4bee535a96018f65bdf3fc13290fe7306decafed906"
+    },
+    {
+      "type_name": "cli::commands::task_contract::execute",
+      "signal": "blue",
+      "entry_hash": "aac53ee7375b1e4c4affdf81d04d41608782f4363b294e0d4949999838c06b36"
+    },
+    {
+      "type_name": "cli::commands::task_contract::execute_task_contract_check",
+      "signal": "blue",
+      "entry_hash": "f4428a515fdbecbbab5e10c343dbe086077b00e8a0b9bf896b5675b4b5f7fcc8"
+    },
+    {
+      "type_name": "cli::commands::task_contract::execute_task_contract_coverage",
+      "signal": "blue",
+      "entry_hash": "40506cc717e82115f759d51dc6c7f136ea35448be93149aad28167216143ee96"
+    },
+    {
+      "type_name": "cli::commands::task_contract::task_contract_check_core",
+      "signal": "blue",
+      "entry_hash": "2c13adc0c945f04798248c8a6e2e36803c5fd9e22263261488a48e966e2390cf"
+    },
+    {
+      "type_name": "cli::commands::task_contract::task_contract_coverage_core",
+      "signal": "blue",
+      "entry_hash": "f483ff122244941bfa8ea5fe511d957edbad92f07dfd4b81b752acd1cce63544"
+    },
+    {
+      "type_name": "cli::commands::track::views::detect_active_track_from_branch",
+      "signal": "blue",
+      "entry_hash": "4b8a7f2ba41a3f4ade1194d91d255f77fb2475c68d2e8a18a9e941809a9b4170"
+    }
+  ]
+}

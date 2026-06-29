@@ -1,0 +1,261 @@
+{
+  "schema_version": 1,
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "Domain: add libs/domain/src/task_contract.rs with TaskContractDocument, ContractedEntryRef, PreReviewGateViolation, and PreReviewGateOutcome as specified in domain-types.json. Implement inherent impls (TaskContractDocument::new / schema_version / track_id / entries; ContractedEntryRef::new / layer / entry_key; PreReviewGateOutcome::blocked) and derive Debug + Clone + PartialEq + Eq for all four types. Wire the new module into libs/domain/src/lib.rs as `pub mod task_contract`. Also update .harness/capabilities/impl-planner.md to extend Phase 3 output responsibility: add task-contract.json as a third written artifact alongside impl-plan.json and task-coverage.json (IN-02, AC-01).",
+      "status": "done",
+      "commit_hash": "546bcd047ace56632c474384a881dfb5bf911959"
+    },
+    {
+      "id": "T002",
+      "description": "Usecase: add libs/usecase/src/pre_review_gate.rs with PreReviewGateCommand, PreReviewGateError, PreReviewGateInteractor, PreReviewGateService (primary application service trait), TaskContractReaderPort (secondary port), and ImplCatalogSignalReaderPort (secondary port) as specified in the initial usecase catalogue. Implement PreReviewGateInteractor::new(task_contract_reader, signal_reader) and impl PreReviewGateService for PreReviewGateInteractor. PreReviewGateCommand carries track_id: TrackId and layer: Option<LayerId>; Some(layer) checks one TDDD layer and None visits the 6 canonical TDDD layer ids. The initial check path reads task-contract.json, loads impl_catalog TypeSignalsDocument data for the selected layer(s), and blocks when attributed entries have non-blue signals. On Passed, return PreReviewGateOutcome::Passed as a unit/binary OK result with no summary payload. D5/D7 follow-up tasks narrow the final PreReviewGateInteractor to liveness-only, move orphan/referential-integrity checks into CoverageVerifyInteractor, and add impl-plan status filtering. Derive / trait impls per catalogue: Debug + Clone + PartialEq + Eq for Command; Debug + Display + Error for Error; PreReviewGateService for Interactor. Wire into libs/usecase/src/lib.rs.",
+      "status": "done",
+      "commit_hash": "546bcd047ace56632c474384a881dfb5bf911959"
+    },
+    {
+      "id": "T003",
+      "description": "Infrastructure: add three modules to libs/infrastructure/src/. (1) task_contract_codec: implement TaskContractDocumentDto (serde-serializable mirror of domain::task_contract::TaskContractDocument with schema_version / track_id / entries fields; derive Serialize + Deserialize + Debug) and TaskContractCodecError (Json(serde_json::Error) / UnsupportedSchemaVersion { found, expected } / Validation(String) variants; derive Debug + Display + Error + From<serde_json::Error>); add free functions `decode(&[u8]) -> Result<TaskContractDocument, TaskContractCodecError>` (validates schema_version before constructing the domain object) and `encode(&TaskContractDocument) -> Result<Vec<u8>, TaskContractCodecError>`. (2) task_contract_reader: implement FsTaskContractReader (items_dir: PathBuf injected via new(items_dir: PathBuf) -> Self) implementing usecase::pre_review_gate::TaskContractReaderPort; reads <items_dir>/<track_id>/task-contract.json via decode; maps missing file to PreReviewGateError::TaskContractNotFound, I/O and codec errors to TaskContractReadFailed. (3) impl_catalog_signal_reader: implement FsImplCatalogSignalReader (items_dir: PathBuf) implementing usecase::pre_review_gate::ImplCatalogSignalReaderPort; read_signals reads <items_dir>/<track_id>/<layer>-type-signals.json as domain::TypeSignalsDocument and maps absence/read/decode errors to SignalReadFailed; read_optional_signals returns Ok(None) only for positively classified absence and maps other errors to SignalReadFailed. Wire all three modules into libs/infrastructure/src/lib.rs.",
+      "status": "done",
+      "commit_hash": "546bcd047ace56632c474384a881dfb5bf911959"
+    },
+    {
+      "id": "T004",
+      "description": "CLI driver: add apps/cli-driver/src/task_contract.rs with TaskContractInput (enum with Check { layer: Option<String>, track_id: String }) and TaskContractDriver (struct holding Arc<dyn usecase::pre_review_gate::PreReviewGateService>). Implement TaskContractDriver::new(service: Arc<dyn PreReviewGateService>) -> Self and TaskContractDriver::handle(input: TaskContractInput) -> CommandOutcome: for the Check variant, parse track_id into TrackId and parse Some(layer) into LayerId while preserving None for all-layers mode, then call PreReviewGateService::check(PreReviewGateCommand { track_id, layer }); on Passed return CommandOutcome::Ok with no payload; on Blocked emit violation list to stderr and return CommandOutcome::Err(1); propagate PreReviewGateError variants as CommandOutcome::Err. items_dir is intentionally not part of TaskContractInput: the composition root injects filesystem adapters built from the requested items_dir before constructing the driver. Derive Debug + Clone for TaskContractInput; Debug for TaskContractDriver. Wire the module into apps/cli-driver/src/lib.rs.",
+      "status": "done",
+      "commit_hash": "546bcd047ace56632c474384a881dfb5bf911959"
+    },
+    {
+      "id": "T005",
+      "description": "CLI: add apps/cli/src/commands/task_contract.rs with TaskContractCommand (enum with Check(TaskContractCheckArgs) annotated with clap Subcommand derive), TaskContractCheckArgs (struct with layer: Option<String>, track_id: Option<String>, items_dir: PathBuf defaulting to 'track/items', annotated with clap Args derive), and free functions `execute(cmd: TaskContractCommand) -> ExitCode` (dispatch to execute_* handler), `execute_task_contract_check(args: TaskContractCheckArgs) -> ExitCode` (resolves track_id via detect_active_track_from_branch_cwd when None, constructs TaskContractCompositionRoot, calls task_contract_check(layer, track_id, items_dir), converts CommandOutcome to ExitCode: 0 on Passed, 1 on Blocked or error), and `detect_active_track_from_branch_cwd() -> Option<String>` for the no-flag invocation path. The `--layer` flag is optional; omitting it enters all-layers mode, which visits the 6 canonical TDDD layer ids and combines outcomes for readable signal documents while treating absent signal documents as no entries to verify. The `--track-id` flag is optional; omitting it auto-resolves the active track from a `track/<id>` branch and fails closed when no active track can be resolved. Derive Debug + Clone for TaskContractCommand and TaskContractCheckArgs. Register the `task-contract` top-level subcommand in the main CLI router (apps/cli/src/main.rs or the top-level clap Subcommand enum). Wire the module into apps/cli/src/commands/mod.rs.",
+      "status": "done",
+      "commit_hash": "546bcd047ace56632c474384a881dfb5bf911959"
+    },
+    {
+      "id": "T006",
+      "description": "CLI composition: add apps/cli-composition/src/task_contract.rs with TaskContractCompositionRoot (unit struct). Implement new() -> Self, task_contract_driver(&self, items_dir: PathBuf) -> cli_driver::task_contract::TaskContractDriver (constructs FsTaskContractReader and FsImplCatalogSignalReader from the requested items_dir, builds PreReviewGateInteractor, wraps as Arc<dyn PreReviewGateService>, returns TaskContractDriver::new(service)), and task_contract_check(&self, layer: Option<String>, track_id: String, items_dir: PathBuf) -> Result<cli_driver::CommandOutcome, CompositionError> (builds a driver via task_contract_driver(items_dir), then dispatches TaskContractInput::Check { layer, track_id }; the driver remains the single primary adapter responsible for parsing CLI strings, invoking the use case, and rendering Passed/Blocked outcomes). Impl Default. Wire the module into apps/cli-composition/src/lib.rs.",
+      "status": "done",
+      "commit_hash": "546bcd047ace56632c474384a881dfb5bf911959"
+    },
+    {
+      "id": "T007",
+      "description": "Unit tests: add the initial #[cfg(test)] unit tests for PreReviewGateInteractor using in-module mock struct implementations of TaskContractReaderPort and ImplCatalogSignalReaderPort (or rstest fixtures). Required initial cases include task-contract.json absence, non-blue impl_catalog signals, and the pre-D5 attribution cases that existed before coverage was split out. The final D5/D7 task sequence reconciles this completed test batch: T010 migrates orphan-entry and referential-integrity expectations to CoverageVerifyInteractor, and T015 narrows the surviving PreReviewGateInteractor tests to liveness only (MissingTaskContract, NonBlueSignal, and task-status Red/Yellow behavior). Do not retain OrphanEntry or InvalidEntryRef as PreReviewGateViolation expectations after T010. No integration tests required in this task; AC-07 is satisfied by the migrated unit coverage plus cargo make ci in the final batch commit.",
+      "status": "done",
+      "commit_hash": "546bcd047ace56632c474384a881dfb5bf911959"
+    },
+    {
+      "id": "T008",
+      "description": "Makefile.toml wiring: modify [tasks.track-local-review-fix-codex] to prepend the task-contract gate before `bin/sotp review fix-local`. The revised thin-chain script must: (1) strip a leading `--` separator when present and extract --track-id from the forwarded $@ arguments; (2) run `bin/sotp task-contract check --track-id \"$_TRACK_ID\" --items-dir track/items` without --layer so PreReviewGateCommand.layer is None and all-layers mode visits the 6 canonical TDDD layer ids, combines outcomes for readable signal documents, and treats absent signal documents as no entries to verify; (3) resolve CODEX_BIN and invoke `bin/sotp review fix-local \"$@\"` only after the gate exits 0; (4) propagate non-zero exit from task-contract check so review fix-local is not reached when the all-layers gate blocks on violations or signal read/decode errors. No sibling track-local-review-fix-claude task exists in Makefile.toml; only track-local-review-fix-codex requires modification. T008 is committed as a separate batch from T001-T007.",
+      "status": "done",
+      "commit_hash": "15bd28856fa981ee3d67b156336faa1c80908040"
+    },
+    {
+      "id": "T009",
+      "description": "Domain: extend libs/domain/src/task_contract.rs with CoverageViolation and CoverageVerifyOutcome as specified in domain-types.json (D5 split). CoverageViolation is an enum with four variants: MissingTaskContract (unit, task-contract.json absent so coverage cannot proceed), OrphanEntry { entry: ContractedEntryRef } (a catalogue entry exists but is not attributed to any task), InvalidEntryRef { entry: ContractedEntryRef, reason: String } (an attributed entry does not exist in the catalogue; reason is an opaque diagnostic string per R9), and MissingSignalDocument { layer: LayerId } (the per-layer type-signals.json document is absent for a canonical TDDD layer; emitted regardless of attribution presence so coverage fails closed when a signal document cannot be found). CoverageVerifyOutcome is an enum with Passed (unit) and Blocked { violations: Vec<CoverageViolation> } (#[non_exhaustive]) variants. Add inherent impl CoverageVerifyOutcome::blocked(violations: Vec<CoverageViolation>) -> Result<Self, ValidationError> enforcing the non-empty invariant. Derive Debug + Clone + PartialEq + Eq for both types. These types define the coverage subcommand's violation domain: attribution completeness (OrphanEntry), referential integrity (InvalidEntryRef), and coverage input availability (MissingTaskContract, MissingSignalDocument). PreReviewGateViolation remains narrowed to liveness-only violations for the check subcommand.",
+      "status": "done",
+      "commit_hash": "909888af34206b4009d6f76d64889f863c7e904e"
+    },
+    {
+      "id": "T010",
+      "description": "Usecase: extend libs/usecase/src/pre_review_gate.rs with four new items and two modifications required by D5 and D7. New items: (1) ImplPlanReaderPort secondary port trait with read_task_statuses(&self, track_id: &domain::TrackId) -> Result<std::collections::HashMap<domain::TaskId, domain::TaskStatusKind>, PreReviewGateError> and supertrait bounds Send + Sync; (2) CoverageVerifyCommand struct { track_id: domain::TrackId } with Debug + Clone + PartialEq + Eq derives (CQRS command for the coverage subcommand); (3) CoverageVerifyService primary port trait with verify_coverage(&self, cmd: CoverageVerifyCommand) -> Result<domain::task_contract::CoverageVerifyOutcome, PreReviewGateError> and supertrait bounds Send + Sync; (4) CoverageVerifyInteractor struct implementing CoverageVerifyService, with new(task_contract_reader: Arc<dyn TaskContractReaderPort>, signal_reader: Arc<dyn ImplCatalogSignalReaderPort>) -> Self. CoverageVerifyInteractor::verify_coverage iterates all 6 canonical TDDD layers via read_optional_signals, emits MissingSignalDocument when read_optional_signals returns Ok(None) for a canonical layer, propagates SignalReadFailed for read/decode failures, enumerates all loaded signal entries, checks that every signal entry is attributed to at least one task in task-contract.json (OrphanEntry violation if not), and checks that every attributed entry for each layer exists in the signal document (InvalidEntryRef violation if not). Returns CoverageVerifyOutcome::Passed or Blocked. Modifications: (D7) add ImplPlanReadFailed { message: String } variant to PreReviewGateError; update PreReviewGateInteractor::new to accept impl_plan_reader: Arc<dyn ImplPlanReaderPort> as a third parameter (store it but the filtering logic is added in T015). This constructor signature change is implemented in the C1 work slice after T011 updates the existing composition-root caller, so no intermediate state records the old two-argument call site. As part of the D5 split, migrate or remove the legacy T007 PreReviewGateInteractor tests for OrphanEntry and InvalidEntryRef so those expectations belong to CoverageVerifyInteractor, not the liveness check. Also add #[cfg(test)] unit tests for CoverageVerifyInteractor covering AC-07 cases b and c plus missing signal input availability: (b) a catalogue entry present in the signal document but absent from task-contract.json attribution → Blocked/OrphanEntry; (c) an entry attributed in task-contract.json that does not exist in the signal document → Blocked/InvalidEntryRef; (missing-signal) a canonical layer with no signal document → Blocked/MissingSignalDocument; and (e-coverage) all signal documents loaded, all entries attributed, and all attributed entries referentially consistent → Passed. Wire ImplPlanReaderPort and new items into libs/usecase/src/lib.rs. T010 depends on T009 (CoverageViolation, CoverageVerifyOutcome domain types).",
+      "status": "done",
+      "commit_hash": "909888af34206b4009d6f76d64889f863c7e904e"
+    },
+    {
+      "id": "T011",
+      "description": "Infrastructure: add libs/infrastructure/src/impl_plan_reader.rs as a new module containing FsImplPlanReader (struct with private items_dir: PathBuf field) implementing usecase::pre_review_gate::ImplPlanReaderPort (D7). FsImplPlanReader::new(items_dir: PathBuf) -> Self constructs the adapter. read_task_statuses(&self, track_id: &domain::TrackId) -> Result<HashMap<domain::TaskId, domain::TaskStatusKind>, PreReviewGateError> reads <items_dir>/<track_id>/impl-plan.json using the existing infrastructure impl-plan codec, extracts the task list, and returns a HashMap mapping each TaskId to its TaskStatusKind (todo / in_progress / done). Missing file or decode errors map to PreReviewGateError::ImplPlanReadFailed with a diagnostic message. Derive Debug for FsImplPlanReader. Implement usecase::pre_review_gate::ImplPlanReaderPort for FsImplPlanReader. Wire into libs/infrastructure/src/lib.rs. Also update the existing apps/cli-composition/src/task_contract.rs check-only TaskContractCompositionRoot::task_contract_driver path to construct FsImplPlanReader and pass it into the new three-port PreReviewGateInteractor::new constructor; this keeps the C1 work slice buildable before the later two-service coverage driver changes in T012-T014. T011 depends on T010 (ImplPlanReaderPort trait definition and three-port constructor).",
+      "status": "done",
+      "commit_hash": "909888af34206b4009d6f76d64889f863c7e904e"
+    },
+    {
+      "id": "T012",
+      "description": "CLI driver: modify apps/cli-driver/src/task_contract.rs to add the Coverage variant and update TaskContractDriver for the two-service design (D5). (1) Add Coverage { track_id: String } variant to TaskContractInput enum. (2) Update TaskContractDriver to hold two services: replace the single Arc<dyn PreReviewGateService> field with Arc<dyn PreReviewGateService> (check_service) and Arc<dyn CoverageVerifyService> (coverage_service). Update TaskContractDriver::new to accept both services: new(check_service: Arc<dyn PreReviewGateService>, coverage_service: Arc<dyn CoverageVerifyService>) -> Self. (3) Update TaskContractDriver::handle to dispatch the Coverage variant: parse track_id into domain::TrackId, call coverage_service.verify_coverage(CoverageVerifyCommand { track_id }); on CoverageVerifyOutcome::Passed emit a success message to stdout and return CommandOutcome::success(None); on Blocked emit the violation list (MissingTaskContract, OrphanEntry, InvalidEntryRef, MissingSignalDocument) to stderr, rendering entry identifiers for entry-scoped variants and the layer id for MissingSignalDocument, then return CommandOutcome::failure; propagate PreReviewGateError variants as appropriate. The existing Check variant dispatch is unchanged in behavior. T012 depends on T010 (CoverageVerifyService, CoverageVerifyCommand) and T009 (CoverageVerifyOutcome, CoverageViolation).",
+      "status": "done",
+      "commit_hash": "909888af34206b4009d6f76d64889f863c7e904e"
+    },
+    {
+      "id": "T013",
+      "description": "CLI: modify apps/cli/src/commands/task_contract.rs to add the Coverage subcommand (D5). (1) Add Coverage(TaskContractCoverageArgs) variant to TaskContractCommand enum. (2) Add TaskContractCoverageArgs struct with track_id: Option<String> (auto-resolved from branch when None) and items_dir: PathBuf (defaults to 'track/items'), with Debug + Clone derives and clap Args + FromArgMatches derives. (3) Add execute_task_contract_coverage(args: TaskContractCoverageArgs) -> ExitCode free function: resolve track_id via detect_active_track_from_branch_cwd when None, construct TaskContractCompositionRoot, call task_contract_coverage(track_id, items_dir), convert CommandOutcome to ExitCode (0 on Passed, non-zero on Blocked or error). (4) Update execute(cmd: TaskContractCommand) -> ExitCode dispatch to route Coverage to execute_task_contract_coverage. Update the clap Subcommand derive on TaskContractCommand to include the new Coverage variant. T013 depends on T012 (TaskContractInput::Coverage) and T014 (TaskContractCompositionRoot::task_contract_coverage). Implementation order within the batch: T012 → T014 → T013.",
+      "status": "done",
+      "commit_hash": "909888af34206b4009d6f76d64889f863c7e904e"
+    },
+    {
+      "id": "T014",
+      "description": "CLI composition: modify apps/cli-composition/src/task_contract.rs to wire the coverage subcommand and update the driver construction for the two-service design (D5, D7). (1) Update task_contract_driver(&self, items_dir: PathBuf) -> TaskContractDriver: preserve the FsImplPlanReader + three-port PreReviewGateInteractor wiring introduced by T011, build CoverageVerifyInteractor with the two-port constructor (task_contract_reader, signal_reader) from T010, wrap both as Arc<dyn PreReviewGateService> and Arc<dyn CoverageVerifyService>, and inject both into TaskContractDriver::new(check_service, coverage_service) from T012. (2) Add task_contract_coverage(&self, track_id: String, items_dir: PathBuf) -> Result<cli_driver::CommandOutcome, CompositionError>: build a driver via task_contract_driver(items_dir), dispatch TaskContractInput::Coverage { track_id }, return the CommandOutcome. T014 depends on T011 (FsImplPlanReader plus existing caller wiring), T010 (CoverageVerifyInteractor, updated PreReviewGateInteractor constructor), T012 (TaskContractDriver two-service constructor), and T009 (domain types used transitively).",
+      "status": "done",
+      "commit_hash": "909888af34206b4009d6f76d64889f863c7e904e"
+    },
+    {
+      "id": "T015",
+      "description": "Usecase: narrow PreReviewGateInteractor::check to filter task attributions by impl-plan.json task status (D7). The check method must now: (1) call impl_plan_reader.read_task_statuses(track_id) to load the HashMap<TaskId, TaskStatusKind>; (2) for each layer-scoped check, partition attributed entries by task status: entries where the owning task is done or in_progress require impl_catalog signal Blue (NonBlueSignal violation otherwise); entries where ALL owning tasks are todo are skipped from the blue requirement (Yellow tolerated), BUT if the signal is Red, it is always a blocker regardless of task status; (3) if read_task_statuses fails, propagate as PreReviewGateError::ImplPlanReadFailed. Tasks not present in impl-plan.json (unknown task ids) are treated conservatively: their entries are included in the blue-required set. The Passed outcome remains a unit/binary OK result with no summary payload. Add #[cfg(test)] unit tests for the D7-narrowed check behavior: (d) Red signal on a todo-only attributed entry → Blocked/NonBlueSignal (status-independent Red blocker); (e) in_progress + done attributed entries all Blue, coverage complete → Passed; (f) todo attributed entry with Yellow signal, no Red → Passed (yellow tolerated for todo); (impl_plan_reader_error) ImplPlanReadFailed propagates as Err. T015 depends on T010 (ImplPlanReaderPort injected into PreReviewGateInteractor via the three-port constructor) and T011 (FsImplPlanReader, used in integration context; unit tests use mocks). T015 belongs to the C3 work slice and is recorded in the completed implementation commit shared by T009-T016.",
+      "status": "done",
+      "commit_hash": "909888af34206b4009d6f76d64889f863c7e904e"
+    },
+    {
+      "id": "T016",
+      "description": "Makefile.toml wiring: add the cargo-make task-contract-coverage and task-contract-check tasks, wire task-contract-coverage into the cargo make ci chain, and wire task-contract-check into the review round dependencies (D6). (1) Add [tasks.task-contract-coverage] that invokes `bin/sotp task-contract coverage` for the active track (--track-id resolved from branch or $@ args) with --items-dir track/items and propagates the exit code. (2) Add [tasks.task-contract-check] that invokes `bin/sotp task-contract check` for the active track with --items-dir track/items, propagates exit code, and declares `dependencies = [\"task-contract-coverage\"]` so cargo-make guarantees attribution completeness (coverage) runs before liveness (check) on every invocation. (3) Add \"task-contract-coverage\" to the dependency list used by cargo make ci ([tasks.ci-local] and [tasks.ci-container]) so commit-time CI detects attribution drift even outside review invocation. (4) Add \"task-contract-check\" to the `dependencies` array of [tasks.track-local-review] and [tasks.track-local-review-fix] so every per-round review invocation fires coverage → check before the reviewer is invoked; omit or comment out the legacy inline gate in track-local-review-fix-codex (T008 artifact) if the dependency-chain invocation now supersedes it for the codex path to avoid double-checking. This wiring satisfies IN-07, D6 (CN-08, AC-08, AC-03), and ensures attribution completeness is a commit-time CI gate while attribution completeness plus liveness are both blocking gates in every review round. T016 belongs to the D work slice and is recorded in the completed implementation commit shared by T009-T016.",
+      "status": "done",
+      "commit_hash": "909888af34206b4009d6f76d64889f863c7e904e"
+    },
+    {
+      "id": "T017",
+      "description": "Review-fix D8 cross-layer pass-through and catalogue bookkeeping introduced by PR #175 review fix F6. Preserve the already-present implementation contract across cli_composition::review_v2::shim::ReviewServiceImpl::run_fix_local (detect exit 64 + SUBAGENT_DISPATCH_REQUIRED and return RunReviewFixError::SubagentDispatchRequired), cli_driver::review_run_fix_local (pass stdout payload through with exit_code 64 instead of remapping to REVIEW_FIX_STATUS: failed), and the unit/integration coverage described by AC-09. Declare RunReviewFixError in usecase-types.json as action modify with formal D8 / IN-10 / AC-09 anchors, so impl-catalog and task-contract coverage account for the typed usecase-boundary error shape without conflating it with the D1-D7 task-contract gate requirements. Attribute only the usecase RunReviewFixError catalogue entry to T017 because task-contract.json tracks catalogue entries, while the cli_composition/cli_driver behavior is covered by this task's implementation-and-test scope.",
+      "status": "done",
+      "commit_hash": "9157a731be65807d4c81d99481fcc57bbd1176e1"
+    },
+    {
+      "id": "T018",
+      "description": "Domain / Usecase: implement D9 task-key referential integrity check (IN-11, CN-09, AC-10). (1) Domain: implement CoverageViolation::InvalidTaskRef { task_id: TaskId, entry_keys: Vec<ContractedEntryRef> } variant in libs/domain/src/task_contract.rs — the variant is declared in domain-types.json and must be added to the CoverageViolation enum definition alongside the four existing variants (MissingTaskContract, OrphanEntry, InvalidEntryRef, MissingSignalDocument). (2) Usecase: extend CoverageVerifyInteractor in libs/usecase/src/pre_review_gate.rs: (a) update CoverageVerifyInteractor::new to accept a third injected port impl_plan_reader: Arc<dyn ImplPlanReaderPort> (parallel to the three-port PreReviewGateInteractor::new from T010); (b) within CoverageVerifyInteractor::verify_coverage, call impl_plan_reader.read_task_statuses(track_id) to obtain the impl-plan.json task ID set, then iterate the TaskContractDocument::entries map and for every task key not present in that set push CoverageViolation::InvalidTaskRef { task_id, entry_keys } to the violations accumulator; propagate ImplPlanReadFailed if read_task_statuses errors. The InvalidTaskRef check runs after the MissingTaskContract guard and alongside the orphan/referential-integrity checks, ensuring a single stale task key causes the coverage gate to fail closed (CN-09). (3) CLI composition: update apps/cli-composition/src/task_contract.rs (TaskContractCompositionRoot::task_contract_driver) to construct FsImplPlanReader and inject it as the third port into CoverageVerifyInteractor::new; mirrors the existing three-port injection for PreReviewGateInteractor from T011 and keeps the composition slice buildable after T018. (4) Tests: add #[cfg(test)] unit tests for CoverageVerifyInteractor covering the D9 RI check: (h) a stale task key in task-contract.json not present in impl-plan.json → Blocked/InvalidTaskRef with task_id and entry_keys populated; (i) all task keys present in impl-plan.json → Passed (no InvalidTaskRef when other invariants hold); (j) ImplPlanReadFailed propagation from the CoverageVerifyInteractor path. Add command-level coverage for AC-10 by exercising the `bin/sotp task-contract coverage` path (or the equivalent CLI execute/driver path with temp track artifacts): create a task-contract.json containing stale task key T999 while impl-plan.json omits T999, then assert the command reports InvalidTaskRef with the stale task_id and entry_keys and returns a non-zero exit. The interactor tests prove the usecase outcome; the command-level test proves rendering and exit behavior required by AC-10. T018 depends on T009 (CoverageViolation enum base, four existing variants) and T010 (CoverageVerifyInteractor two-port constructor base, ImplPlanReaderPort trait, verify_coverage method base). T018 is committed as a separate batch after T009-T016.",
+      "status": "done",
+      "commit_hash": "38a8e6d975b21108fe674336218a99af857efd39"
+    }
+  ],
+  "plan": {
+    "summary": [],
+    "sections": [
+      {
+        "id": "S1",
+        "title": "Foundation: domain model and usecase gate contracts",
+        "description": [
+          "T001 lays down the task_contract domain module with the four new types (TaskContractDocument, ContractedEntryRef, PreReviewGateViolation, PreReviewGateOutcome) and their inherent impls and derive trait impls. It also updates .harness/capabilities/impl-planner.md to declare task-contract.json as the third Phase 3 output artifact alongside impl-plan.json and task-coverage.json (IN-02).",
+          "T002 adds the pre_review_gate usecase module with the two secondary-port traits (TaskContractReaderPort, ImplCatalogSignalReaderPort), the primary service port (PreReviewGateService), the command and error types, and the initial PreReviewGateInteractor implementation. The initial interactor reads task-contract attribution and impl_catalog signal documents, then blocks on non-blue attributed entries; D5/D7 follow-up tasks split attribution completeness into CoverageVerifyInteractor and narrow PreReviewGateInteractor to liveness-only status-aware checks.",
+          "OQ-1 resolution (scope-relevant catalogue entries): task-contract checking is layer-scoped but can run in per-layer mode (Some(layer)) or all-layers mode (None). T008 invokes all-layers mode before review fix-local, so the 6 canonical TDDD layer ids (domain, usecase, infrastructure, cli_driver, cli, cli_composition) are visited in sequence; readable signal documents are checked and positively absent signal documents are treated as no entries to verify. Scope-relevant entries are the catalogue entries present in each loaded TypeSignalsDocument; task-contract.json ContractedEntryRef records are filtered where entry.layer equals that selected layer and compared against that full signal-derived set. Rationale: this uses the existing per-layer signal artifact as the authoritative scope catalogue, requires no filesystem probing or extra per-track declarations, and lets non-layer review scopes such as plan-artifacts reuse the same all-layers gate without inventing a signal document for the non-layer scope.",
+          "T001 must precede T002; both tasks are implemented in the same Rust feature batch (no commit between them)."
+        ],
+        "task_ids": [
+          "T001",
+          "T002"
+        ]
+      },
+      {
+        "id": "S2",
+        "title": "Infrastructure: codec and filesystem adapters",
+        "description": [
+          "T003 adds task_contract_codec (TaskContractDocumentDto, TaskContractCodecError, decode, encode), task_contract_reader (FsTaskContractReader implementing TaskContractReaderPort), and impl_catalog_signal_reader (FsImplCatalogSignalReader implementing ImplCatalogSignalReaderPort) to libs/infrastructure.",
+          "FsImplCatalogSignalReader read_signals reads <items_dir>/<track_id>/<layer>-type-signals.json as domain::TypeSignalsDocument and fails closed on absence/read/decode errors; read_optional_signals returns Ok(None) only for positively classified absence so all-layers mode can treat missing signal documents as no entries to verify. No changes to SignalEvaluatorV2 or existing signal infrastructure (CN-05, OS-06); the adapter is a thin reader over the existing on-disk artifact produced by the TDDD signal calculation pipeline.",
+          "T003 depends on T001 (domain types) and T002 (port traits). It is part of the same Rust feature batch."
+        ],
+        "task_ids": [
+          "T003"
+        ]
+      },
+      {
+        "id": "S3",
+        "title": "CLI stack: driver, subcommand, and composition root (check gate)",
+        "description": [
+          "T004 adds TaskContractInput and TaskContractDriver in apps/cli-driver. The driver parses CLI strings into domain value objects and dispatches to PreReviewGateService::check, rendering PreReviewGateOutcome as CommandOutcome.",
+          "T006 adds TaskContractCompositionRoot in apps/cli-composition, which wires FsTaskContractReader + FsImplCatalogSignalReader + PreReviewGateInteractor + TaskContractDriver into one sotp task-contract check execution path. The composition root uses the CLI-provided items_dir to build the service, then dispatches TaskContractInput::Check through TaskContractDriver.",
+          "T005 adds clap-annotated TaskContractCommand and TaskContractCheckArgs in apps/cli, the two execute free functions, and registers `task-contract` as a top-level sotp subcommand. The items_dir flag defaults to 'track/items', matching the workspace convention for all track-reading commands.",
+          "T004 depends on T002 (service port); T006 depends on T003 and T004; T005 depends on T004 and T006 because execute_task_contract_check constructs TaskContractCompositionRoot and calls task_contract_check. All three tasks are implemented in the same Rust feature batch, with S3 implementation order T004 -> T006 -> T005."
+        ],
+        "task_ids": [
+          "T004",
+          "T006",
+          "T005"
+        ]
+      },
+      {
+        "id": "S4",
+        "title": "Tests: gate logic unit test coverage (AC-07, original cases)",
+        "description": [
+          "T007 adds the initial #[cfg(test)] unit tests inside libs/usecase/src/pre_review_gate.rs with mock port implementations. After the D5 split, T010 migrates orphan-entry and referential-integrity expectations to CoverageVerifyInteractor, while T015 narrows the remaining PreReviewGateInteractor tests to liveness-only behavior: missing task-contract, non-blue/red signals, and todo/in_progress/done status filtering.",
+          "T007 depends on T002 (interactor under test) and T003 (concrete TypeSignalsDocument type used in mock responses). It is the final task in the Rust feature batch (T001-T007 committed together)."
+        ],
+        "task_ids": [
+          "T007"
+        ]
+      },
+      {
+        "id": "S5",
+        "title": "Workflow wiring: Makefile.toml inline gate for review fix-local (Batch B)",
+        "description": [
+          "T008 modifies [tasks.track-local-review-fix-codex] in Makefile.toml to run `bin/sotp task-contract check --track-id \"$_TRACK_ID\" --items-dir track/items` before `bin/sotp review fix-local \"$@\"`. The thin-chain shell script extracts --track-id from the forwarded $@ arguments, omits --layer so the use case enters all-layers mode, and then chains CODEX_BIN resolution plus review fix-local only if the gate succeeds. Gate failure from violations or signal read/decode errors halts the script before review fix-local is reached, satisfying AC-06 fail-closed semantics for loaded signal documents; positively absent signal documents are classified as no entries to verify by the optional reader.",
+          "No sibling track-local-review-fix-claude task exists; only track-local-review-fix-codex requires modification.",
+          "T008 is committed as a separate batch from the Rust feature batch (T001-T007)."
+        ],
+        "task_ids": [
+          "T008"
+        ]
+      },
+      {
+        "id": "S6",
+        "title": "C1 work slice: domain / usecase / infrastructure foundation for coverage subcommand (D5, D7)",
+        "description": [
+          "T009 adds CoverageViolation and CoverageVerifyOutcome to libs/domain/src/task_contract.rs. These types are the domain model for the D5 coverage verification subcommand: attribution completeness, referential integrity, and signal-document availability, distinct from PreReviewGateViolation / PreReviewGateOutcome which are narrowed to the liveness check gate by the partial edits preceding this batch.",
+          "T010 adds four new usecase items to libs/usecase/src/pre_review_gate.rs: ImplPlanReaderPort (secondary port for D7 task-status filtering), CoverageVerifyCommand (CQRS command for the coverage use case), CoverageVerifyService (primary port trait), and CoverageVerifyInteractor (full implementation of coverage verification across all 6 TDDD layers, including attribution completeness, referential integrity, and signal-document availability). T010 also makes two modifications required by D5 and D7: adds ImplPlanReadFailed variant to PreReviewGateError and updates PreReviewGateInteractor::new to accept impl_plan_reader as a third parameter (stored but not yet wired into check() logic; that narrowing is T015). T010 migrates the legacy T007 orphan-entry and referential-integrity test expectations out of PreReviewGateInteractor and into CoverageVerifyInteractor, then includes unit tests for CoverageVerifyInteractor covering AC-07 cases b and c plus the missing signal document case.",
+          "T011 adds FsImplPlanReader to libs/infrastructure/src/impl_plan_reader.rs, implementing ImplPlanReaderPort via the existing impl-plan codec. It also updates the existing check-only TaskContractCompositionRoot::task_contract_driver caller to construct FsImplPlanReader and pass it into the new three-port PreReviewGateInteractor constructor, keeping the C1 work slice buildable before the later coverage-driver rewrite.",
+          "T009 → T010 → T011 is the dependency order within the C1 work slice; the constructor signature change from T010 is recorded only with the T011 caller update included."
+        ],
+        "task_ids": [
+          "T009",
+          "T010",
+          "T011"
+        ]
+      },
+      {
+        "id": "S7",
+        "title": "C2 work slice: CLI stack for coverage subcommand — driver, subcommand, composition root (D5, D7)",
+        "description": [
+          "T012 modifies apps/cli-driver/src/task_contract.rs: adds Coverage variant to TaskContractInput, updates TaskContractDriver::new to accept both check_service and coverage_service (two-service design), and adds the Coverage arm to TaskContractDriver::handle. The Check arm is unchanged.",
+          "T014 modifies apps/cli-composition/src/task_contract.rs: preserves the FsImplPlanReader + three-port PreReviewGateInteractor wiring introduced in T011, adds CoverageVerifyInteractor (two-port), and injects both services into the updated TaskContractDriver. Adds task_contract_coverage method delegating to TaskContractInput::Coverage.",
+          "T013 modifies apps/cli/src/commands/task_contract.rs: adds Coverage variant to TaskContractCommand, adds TaskContractCoverageArgs struct (clap-annotated), adds execute_task_contract_coverage free function, and updates the execute dispatcher. Implementation order within the C2 work slice: T012 → T014 → T013 (T013 depends on T014 for task_contract_coverage composition method).",
+          "The C2 work slice follows C1 in dependency order because T012-T014 depend on T009-T011."
+        ],
+        "task_ids": [
+          "T012",
+          "T014",
+          "T013"
+        ]
+      },
+      {
+        "id": "S8",
+        "title": "C3 work slice: check gate narrow — D7 task-status filter + unit tests",
+        "description": [
+          "T015 narrows PreReviewGateInteractor::check to use impl_plan_reader.read_task_statuses for filtering: done/in_progress attributed entries require Blue; todo-only attributed entries tolerate Yellow (but Red is always a blocker regardless of task status). If impl_plan_reader fails, the gate propagates ImplPlanReadFailed.",
+          "T015 also adds unit tests for the D7-narrowed check behavior: AC-07 cases d (Red on todo entry blocks), e (done/in_progress all Blue → Passed), f (todo Yellow → Passed), and ImplPlanReadFailed propagation.",
+          "T015 depends on T010 (the three-port PreReviewGateInteractor constructor exists) and T011 (FsImplPlanReader, used via mock in unit tests). It belongs to the C3 work slice after the C2 coverage path and is recorded in the completed implementation commit shared by T009-T016.",
+          "After T015, the D7 shift-left gate is fully implemented: the check subcommand filters task attributions by impl-plan.json status before evaluating impl_catalog signals."
+        ],
+        "task_ids": [
+          "T015"
+        ]
+      },
+      {
+        "id": "S9",
+        "title": "D work slice: cargo-make CI and review dependency wiring (D6)",
+        "description": [
+          "T016 adds two new cargo-make tasks to Makefile.toml: task-contract-coverage (invokes `bin/sotp task-contract coverage` for the active track) and task-contract-check (invokes `bin/sotp task-contract check` for the active track, declares `dependencies = [\"task-contract-coverage\"]` so coverage always precedes check). This satisfies D6 / CN-08: the ordering guarantee is encoded in the cargo-make dependency graph, not in bin/sotp binary internals.",
+          "T016 adds \"task-contract-coverage\" to the cargo make ci dependency path ([tasks.ci-local] and [tasks.ci-container]) so attribution drift is detected at commit-time CI, satisfying IN-07 independently of review invocation.",
+          "T016 also adds \"task-contract-check\" to the dependencies of track-local-review and track-local-review-fix, ensuring every per-round review invocation fires attribution completeness (coverage) → liveness (check) before the reviewer. The legacy inline gate in track-local-review-fix-codex (from T008) is removed or commented out if the new dependency-chain invocation supersedes it for the codex path.",
+          "T016 belongs to the D work slice after the C coverage path and is recorded in the completed implementation commit shared by T009-T016."
+        ],
+        "task_ids": [
+          "T016"
+        ]
+      },
+      {
+        "id": "S10",
+        "title": "Reference bookkeeping: review-fix error type",
+        "description": [
+          "T017 records the D8 review-fix dispatch fix as a cross-layer pass-through already present in the working tree: cli_composition::review_v2::shim::ReviewServiceImpl::run_fix_local converts exit 64 + SUBAGENT_DISPATCH_REQUIRED into RunReviewFixError::SubagentDispatchRequired, and cli_driver::review_run_fix_local preserves that payload with exit_code 64 instead of remapping it to REVIEW_FIX_STATUS: failed.",
+          "T017 also anchors the usecase RunReviewFixError catalogue entry to D8 / IN-10 / AC-09. task-contract.json attributes only that usecase catalogue entry to T017 because task-contract attribution tracks catalogue entries, while the cli_composition/cli_driver behavior is covered by T017's implementation-and-test scope."
+        ],
+        "task_ids": [
+          "T017"
+        ]
+      },
+      {
+        "id": "S11",
+        "title": "D9 work slice: task-key referential integrity in coverage gate",
+        "description": [
+          "T018 implements the D9 task-key RI check (IN-11, CN-09, AC-10). The coverage subcommand must verify that every task key appearing in task-contract.json entries map is a valid task ID present in impl-plan.json; stale task keys (e.g. from a deleted or renamed task) are reported as CoverageViolation::InvalidTaskRef and cause the coverage gate to fail closed.",
+          "The work spans domain (add InvalidTaskRef variant to CoverageViolation), usecase (extend CoverageVerifyInteractor with a third impl_plan_reader port and the RI check logic inside verify_coverage), and cli_composition (inject FsImplPlanReader into the updated CoverageVerifyInteractor::new).",
+          "T018 depends on T009 (CoverageViolation enum base) and T010 (CoverageVerifyInteractor two-port constructor base and ImplPlanReaderPort trait). It is committed as a separate batch after T009-T016 and is the final task in this track."
+        ],
+        "task_ids": [
+          "T018"
+        ]
+      }
+    ]
+  }
+}

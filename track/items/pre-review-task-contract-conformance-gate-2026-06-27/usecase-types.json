@@ -1,0 +1,393 @@
+{
+  "schema_version": 5,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {
+    "PreReviewGateCommand": {
+      "action": "add",
+      "role": { "Command": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "track_id", "ty": "domain::TrackId" },
+            { "name": "layer", "ty": "Option<domain::tddd::LayerId>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "pre_review_gate",
+      "docs": "CQRS command for the pre-review liveness gate check use case (`bin/sotp task-contract check`). track_id identifies the active track whose task-contract.json is evaluated. layer is the optional TDDD layer scope: Some(layer_id) checks only the given layer (per-layer mode); None visits the 6 canonical TDDD layer ids and combines outcomes for layers with readable signal documents (all-layers mode). Missing signal documents in all-layers mode are classified as no entries to verify; read/decode failures still fail closed. Both fields are domain value objects: TrackId enforces non-empty identity; LayerId constrains explicit per-layer checks to layer scopes that have <layer>-type-signals.json documents.",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-04" }
+      ],
+      "informal_grounds": []
+    },
+    "PreReviewGateInteractor": {
+      "action": "add",
+      "role": { "Interactor": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "pre_review_gate",
+      "docs": "Interactor implementing PreReviewGateService (liveness gate). Holds three injected secondary ports: task_contract_reader reads the task-contract.json for the active track; signal_reader reads per-layer impl_catalog type-signal documents; impl_plan_reader reads impl-plan.json to derive task statuses (D7: todo/in_progress/done filter). The interactor filters task attributions by status (current=in_progress + done require blue; todo is skipped unless red) and checks impl_catalog signals to produce a PreReviewGateOutcome. All fields are private (Arc<dyn Port>).",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-09" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "CN-03" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-04" }
+      ],
+      "informal_grounds": []
+    },
+    "PreReviewGateError": {
+      "action": "add",
+      "role": { "ErrorType": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "TaskContractNotFound",
+            "payload": { "kind": "unit" }
+          },
+          {
+            "name": "TaskContractReadFailed",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "message", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "SignalReadFailed",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "layer", "ty": "domain::tddd::LayerId" },
+                { "name": "message", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "ImplPlanReadFailed",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "message", "ty": "String" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "pre_review_gate",
+      "docs": "Error type returned by PreReviewGateService::check and CoverageVerifyService::verify_coverage. Both services share this error type because they share the same secondary ports. TaskContractNotFound: the task-contract.json for the given track_id does not exist (gate fails closed; interactor converts this to a MissingTaskContract violation internally). TaskContractReadFailed: I/O or decode error reading the contract; message is an opaque diagnostic string (R9: opaque infrastructure error message). SignalReadFailed: I/O or decode error reading per-layer type-signals document; layer is typed as domain::tddd::LayerId; message is an opaque diagnostic string. ImplPlanReadFailed: I/O or decode error reading impl-plan.json (D7: added for ImplPlanReaderPort); message is an opaque diagnostic string. Gate violations (NonBlueSignal, OrphanEntry etc.) are NOT errors — they are data inside PreReviewGateOutcome::Blocked or CoverageVerifyOutcome::Blocked.",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-03" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-09" }
+      ],
+      "informal_grounds": []
+    },
+    "CoverageVerifyCommand": {
+      "action": "add",
+      "role": { "Command": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "track_id", "ty": "domain::TrackId" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "pre_review_gate",
+      "docs": "CQRS command for the attribution-completeness coverage check use case (`bin/sotp task-contract coverage`). track_id identifies the active track whose task-contract.json attribution completeness is evaluated. The check verifies that all catalogue entries (enumerated via the per-layer type-signals documents) are attributed to at least one task in task-contract.json, and that all attributed entries exist in the signal documents (referential integrity). TrackId enforces non-empty identity.",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-03" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-07" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-02" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-08" }
+      ],
+      "informal_grounds": []
+    },
+    "CoverageVerifyInteractor": {
+      "action": "add",
+      "role": { "Interactor": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "pre_review_gate",
+      "docs": "Interactor implementing CoverageVerifyService (attribution-completeness check). Holds three injected secondary ports: task_contract_reader reads task-contract.json; signal_reader visits each canonical layer via read_optional_signals so Ok(Some(document)) enumerates catalogue entry keys, Ok(None) becomes CoverageViolation::MissingSignalDocument, and read/decode failures propagate as SignalReadFailed; impl_plan_reader reads impl-plan.json task IDs for D9 task-key referential integrity. Checks that every signaled entry is attributed to at least one task (orphan detection) and every attributed entry has a signal (referential integrity). Additionally performs task-key referential integrity (D9/IN-11/CN-09): uses ImplPlanReaderPort::read_task_statuses to obtain the impl-plan.json task IDs set; any task key in task-contract.json not present in that set is reported as CoverageViolation::InvalidTaskRef carrying the stale TaskId and all its attributed entry_keys. All fields are private (Arc<dyn Port>). Shares TaskContractReaderPort and ImplCatalogSignalReaderPort with PreReviewGateInteractor (reuse per spec IN-07 notes).",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-03" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-07" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "CN-07" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-02" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-08" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-11" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "CN-09" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-10" }
+      ],
+      "informal_grounds": []
+    },
+    "RunReviewFixError": {
+      "action": "modify",
+      "role": { "ErrorType": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "InvalidScope",              "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "InvalidTrackId",            "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "InvalidRoundType",          "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "SmokeTestFailed",           "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "FixRunnerFailed",           "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "SubagentDispatchRequired",  "payload": { "kind": "tuple", "fields": ["String"] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "review_v2::run_review_fix",
+      "docs": "Error type for RunReviewFixService, the usecase boundary for the review-fix workflow. InvalidScope / InvalidTrackId / InvalidRoundType cover argument validation failures. SmokeTestFailed covers forbidden sandbox flag detection or codex version range failure. FixRunnerFailed wraps ReviewFixRunnerError from the port without leaking infrastructure types. SubagentDispatchRequired (D8 / IN-10 / AC-09) signals that the request must be delegated to an external review-fix runner — carries the exit-64 + SUBAGENT_DISPATCH_REQUIRED sentinel + JSON payload as an opaque string so the dispatch sentinel reaches the orchestrator unmodified through the cli_driver dispatch arm.",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-10" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-09" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {
+    "PreReviewGateService": {
+      "action": "add",
+      "role": { "ApplicationService": {} },
+      "methods": [
+        {
+          "name": "check",
+          "receiver": "&self",
+          "params": [
+            { "name": "cmd", "ty": "PreReviewGateCommand" }
+          ],
+          "returns": "Result<domain::task_contract::PreReviewGateOutcome, PreReviewGateError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Run the pre-review liveness gate check for the active track. Filters attributed entries by task status from impl-plan.json (D7) and checks impl_catalog signals. Returns Passed (binary OK) or Blocked with liveness violations."
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "pre_review_gate",
+      "docs": "Primary application service port for the pre-review liveness gate use case (`bin/sotp task-contract check`). Called by cli_driver::task_contract::TaskContractDriver when handling TaskContractInput::Check.",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-04" }
+      ],
+      "informal_grounds": []
+    },
+    "CoverageVerifyService": {
+      "action": "add",
+      "role": { "ApplicationService": {} },
+      "methods": [
+        {
+          "name": "verify_coverage",
+          "receiver": "&self",
+          "params": [
+            { "name": "cmd", "ty": "CoverageVerifyCommand" }
+          ],
+          "returns": "Result<domain::task_contract::CoverageVerifyOutcome, PreReviewGateError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Run the attribution-completeness coverage check for the active track. Returns Passed (all entries attributed with referential integrity) or Blocked with attribution violations. Shares PreReviewGateError as the error type because it shares secondary ports with the check service."
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "pre_review_gate",
+      "docs": "Primary application service port for the attribution-completeness coverage check (`bin/sotp task-contract coverage`). Called by cli_driver::task_contract::TaskContractDriver when handling TaskContractInput::Coverage. Shares PreReviewGateError as the I/O error type with PreReviewGateService because both services use the same secondary ports. Additionally performs task-key referential integrity (IN-11/D9): each task key in task-contract.json entries map must be present in impl-plan.json task IDs; absent task keys are reported as CoverageViolation::InvalidTaskRef and cause the coverage gate to fail closed.",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-03" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-07" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "CN-07" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-02" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-08" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-11" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "CN-09" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-10" }
+      ],
+      "informal_grounds": []
+    },
+    "TaskContractReaderPort": {
+      "action": "add",
+      "role": { "SecondaryPort": {} },
+      "methods": [
+        {
+          "name": "read",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id", "ty": "&domain::TrackId" }
+          ],
+          "returns": "Result<domain::task_contract::TaskContractDocument, PreReviewGateError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Read the task-contract.json for the given track. Returns TaskContractNotFound when the file does not exist; TaskContractReadFailed on I/O or decode errors."
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "pre_review_gate",
+      "docs": "Secondary port for reading a task-contract.json domain document. Implemented by infrastructure::task_contract_reader::FsTaskContractReader. Shared by PreReviewGateInteractor (check) and CoverageVerifyInteractor (coverage).",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-01" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "CN-01" }
+      ],
+      "informal_grounds": []
+    },
+    "ImplCatalogSignalReaderPort": {
+      "action": "add",
+      "role": { "SecondaryPort": {} },
+      "methods": [
+        {
+          "name": "read_signals",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id", "ty": "&domain::TrackId" },
+            { "name": "layer", "ty": "&domain::tddd::LayerId" }
+          ],
+          "returns": "Result<domain::TypeSignalsDocument, PreReviewGateError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Read the per-layer impl-catalog type-signals document for the given track and layer. Returns SignalReadFailed on absent-file, I/O, or decode errors."
+        },
+        {
+          "name": "read_optional_signals",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id", "ty": "&domain::TrackId" },
+            { "name": "layer", "ty": "&domain::tddd::LayerId" }
+          ],
+          "returns": "Result<Option<domain::TypeSignalsDocument>, PreReviewGateError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": true,
+          "where_predicates": [],
+          "docs": "Read the per-layer impl-catalog type-signals document when absence must be distinguished from other read failures. Returns Ok(None) only when the adapter can positively classify the document as absent (e.g. NotFound). Other read/decode failures must return SignalReadFailed. Used by the all-layer iterate path of PreReviewGateInteractor::check (cmd.layer = None), where missing signal documents are an expected no-entries state for liveness-only review gating. CoverageVerifyInteractor also uses this method over canonical layers, but converts Ok(None) into CoverageViolation::MissingSignalDocument so attribution completeness fails closed as a Blocked outcome."
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "pre_review_gate",
+      "docs": "Secondary port for reading a per-layer <layer>-type-signals.json document. Implemented by infrastructure::impl_catalog_signal_reader::FsImplCatalogSignalReader. Shared by PreReviewGateInteractor (check: liveness) and CoverageVerifyInteractor (coverage: entry enumeration).",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "CN-05" }
+      ],
+      "informal_grounds": []
+    },
+    "ImplPlanReaderPort": {
+      "action": "add",
+      "role": { "SecondaryPort": {} },
+      "methods": [
+        {
+          "name": "read_task_statuses",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id", "ty": "&domain::TrackId" }
+          ],
+          "returns": "Result<std::collections::HashMap<domain::TaskId, domain::TaskStatusKind>, PreReviewGateError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Read impl-plan.json for the given track and return a map of TaskId to TaskStatusKind. Used by PreReviewGateInteractor to filter task attributions by status before checking impl_catalog signals: in_progress and done entries require blue; todo entries are skipped unless red. Returns ImplPlanReadFailed on I/O or decode errors."
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "pre_review_gate",
+      "docs": "Secondary port for reading task statuses from impl-plan.json (D7). Implemented by infrastructure::impl_plan_reader::FsImplPlanReader. Injected into PreReviewGateInteractor to supply the task status filter for the liveness gate.",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-09" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "functions": {},
+  "inherent_impls": [
+    {
+      "type_name": "PreReviewGateInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "task_contract_reader", "ty": "std::sync::Arc<dyn TaskContractReaderPort>" },
+            { "name": "signal_reader", "ty": "std::sync::Arc<dyn ImplCatalogSignalReaderPort>" },
+            { "name": "impl_plan_reader", "ty": "std::sync::Arc<dyn ImplPlanReaderPort>" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Construct a PreReviewGateInteractor by injecting three secondary ports: task-contract reader, signal reader, and impl-plan reader (D7 addition for task status filtering)."
+        }
+      ]
+    },
+    {
+      "type_name": "CoverageVerifyInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "task_contract_reader", "ty": "std::sync::Arc<dyn TaskContractReaderPort>" },
+            { "name": "signal_reader", "ty": "std::sync::Arc<dyn ImplCatalogSignalReaderPort>" },
+            { "name": "impl_plan_reader", "ty": "std::sync::Arc<dyn ImplPlanReaderPort>" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Construct a CoverageVerifyInteractor by injecting three secondary ports: task-contract reader, signal reader (for entry enumeration), and impl-plan reader (D9 task-key referential integrity)."
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "PreReviewGateCommand" },
+    { "action": "add", "trait_ref": "core::clone::Clone", "for_type": "PreReviewGateCommand" },
+    { "action": "add", "trait_ref": "core::cmp::PartialEq", "for_type": "PreReviewGateCommand" },
+    { "action": "add", "trait_ref": "core::cmp::Eq", "for_type": "PreReviewGateCommand" },
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "PreReviewGateError" },
+    { "action": "add", "trait_ref": "core::fmt::Display", "for_type": "PreReviewGateError" },
+    { "action": "add", "trait_ref": "core::error::Error", "for_type": "PreReviewGateError" },
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "CoverageVerifyCommand" },
+    { "action": "add", "trait_ref": "core::clone::Clone", "for_type": "CoverageVerifyCommand" },
+    { "action": "add", "trait_ref": "core::cmp::PartialEq", "for_type": "CoverageVerifyCommand" },
+    { "action": "add", "trait_ref": "core::cmp::Eq", "for_type": "CoverageVerifyCommand" },
+    { "action": "add", "trait_ref": "PreReviewGateService", "for_type": "PreReviewGateInteractor" },
+    { "action": "add", "trait_ref": "CoverageVerifyService", "for_type": "CoverageVerifyInteractor" },
+    { "action": "modify", "trait_ref": "core::fmt::Debug", "for_type": "RunReviewFixError" },
+    { "action": "modify", "trait_ref": "core::fmt::Display", "for_type": "RunReviewFixError" },
+    { "action": "modify", "trait_ref": "core::error::Error", "for_type": "RunReviewFixError" }
+  ]
+}

@@ -1,0 +1,108 @@
+{
+  "schema_version": 5,
+  "crate_name": "cli_driver",
+  "layer": "cli_driver",
+  "types": {
+    "TaskContractInput": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Check",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "layer", "ty": "Option<String>" },
+                { "name": "track_id", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "Coverage",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "track_id", "ty": "String" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "task_contract",
+      "docs": "Typed input for the task-contract command family. Check: run the pre-review liveness gate for the given optional TDDD layer and track. Coverage: run the attribution-completeness coverage check for the given track. For both variants, layer/track_id are opaque CLI strings validated into domain types by the primary adapter; the filesystem root is not part of this input (cli_composition injects it at construction time). The coverage check always runs across all layers (no per-layer flag).",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-07" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-03" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-08" }
+      ],
+      "informal_grounds": []
+    },
+    "TaskContractDriver": {
+      "action": "add",
+      "role": { "PrimaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "task_contract",
+      "docs": "Primary adapter for the task-contract command family. Holds private Arc<dyn PreReviewGateService> and Arc<dyn CoverageVerifyService> and dispatches TaskContractInput variants to the appropriate use-case operation. Converts CLI strings to domain value objects (TrackId, LayerId) and renders the outcome as a CommandOutcome (Passed → CommandOutcome::success(None); Blocked → CommandOutcome::failure with the violation list).",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-07" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-03" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-08" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [
+    {
+      "type_name": "TaskContractDriver",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "check_service", "ty": "std::sync::Arc<dyn usecase::pre_review_gate::PreReviewGateService>" },
+            { "name": "coverage_service", "ty": "std::sync::Arc<dyn usecase::pre_review_gate::CoverageVerifyService>" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Construct a TaskContractDriver by injecting the check service (PreReviewGateService for liveness) and coverage service (CoverageVerifyService for attribution completeness)."
+        },
+        {
+          "name": "handle",
+          "receiver": "&self",
+          "params": [
+            { "name": "input", "ty": "TaskContractInput" }
+          ],
+          "returns": "CommandOutcome",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Dispatch a TaskContractInput variant to the appropriate use-case operation and render the result as a CommandOutcome. Check validates strings to TrackId/LayerId and calls check_service.check(); Coverage validates track_id to TrackId and calls coverage_service.verify_coverage(). Passed maps to CommandOutcome::success(None); Blocked maps to CommandOutcome::failure with the violation list."
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "TaskContractInput" },
+    { "action": "add", "trait_ref": "core::clone::Clone", "for_type": "TaskContractInput" },
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "TaskContractDriver" }
+  ]
+}

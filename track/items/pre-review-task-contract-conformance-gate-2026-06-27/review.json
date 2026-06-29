@@ -1,0 +1,3261 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ownership paragraph is stale: it still says this capability owns only `impl-plan.json` and `task-coverage.json`, but the same file now declares `task-contract.json` as a third Phase 3 artifact and allows writing it. That leaves the harness contract internally inconsistent about what `impl-planner` owns.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.harness/capabilities/impl-planner.md",
+              "line": 25,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:5c88d3e73fd515fed176ee8772485ed7fd45327646121cd4cd5e663dd7889ff3",
+          "at": "2026-06-27T13:46:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c0b457c465272b82b435c5f3966b08fd7ac30a457868f939c97e28709ed3614f",
+          "at": "2026-06-27T13:50:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c0b457c465272b82b435c5f3966b08fd7ac30a457868f939c97e28709ed3614f",
+          "at": "2026-06-27T13:54:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new gate parses `--group`, but the actual review-fix wrapper contract still uses `--scope` on the caller side and `bin/sotp review fix-local` itself expects `--scope`. That means the pre-review gate is unreachable for the documented invocation path, and any invocation that does pass `--group` will be forwarded unchanged to `review fix-local` and fail there. The task-contract check/briefing append therefore does not wire into the real fix workflow.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/Makefile.toml",
+              "line": 645,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:39d377d23f43855d211805b91d2b48cf61edc815f2be47191afd8c7ed27c1a2a",
+          "at": "2026-06-27T15:22:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c836db749917efcff22cb7ef95cc71d527d891eb4ae2af510928f6a237f6f2a",
+          "at": "2026-06-27T15:24:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d4aff7afa048fea304d3b0653c95ecbf55bb7957838277f3a9d60c603f77e87c",
+          "at": "2026-06-27T16:09:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d4aff7afa048fea304d3b0653c95ecbf55bb7957838277f3a9d60c603f77e87c",
+          "at": "2026-06-27T16:12:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3a836ba5b2f6095bcaa921ba37f1c3f609314f369e3fd2017ee4130015644b24",
+          "at": "2026-06-27T23:15:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 3 now makes surfaced PR-review comments non-terminal and requires fixing, committing, and re-running until an explicit zero-findings signal or user-approved Accepted Deviations. However, the stale Behavior summary still describes comments-surfaced as a reportable end state with only an actionability assessment and a next command. Agents following this summary can stop after the first non-pass round, which breaks the new MUST-continue loop contract. Update the Behavior section to report only terminal states and include the per-round trace/fix commits described above.",
+              "severity": "P1",
+              "file": ".claude/commands/track/pr-review.md",
+              "line": 132,
+              "category": "command_wiring_breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:3a836ba5b2f6095bcaa921ba37f1c3f609314f369e3fd2017ee4130015644b24",
+          "at": "2026-06-27T23:18:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 3 still tells the operator to proceed to `/track:commit` after a zero-findings PR review, while the same command's terminal-state report now points to `/track:merge` once 👍 is reached. That leaves two conflicting next-command wirings for the same terminal state; following the older `/track:commit` path after a clean PR review can send the workflow back to the guarded local commit command instead of the CI-gated PR merge flow described by this command and `/track:merge`. Update this terminal-state branch to match the new merge/report behavior.",
+              "severity": "P1",
+              "file": ".claude/commands/track/pr-review.md",
+              "line": 64,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:1c12ec2090613e13e787910cd381cc1a2ffbe831dd2e24a94f443d6e65fe30f9",
+          "at": "2026-06-27T23:21:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f97556ac6ebbffd35cbbb6984ab0821f5e4337fd395b7350fab240246b8a510d",
+          "at": "2026-06-27T23:24:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7aed6bbddb1775fd97a4f2ce306b210fd9a2019fd3ae9cbb17b274ab62521d59",
+          "at": "2026-06-27T23:37:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7aed6bbddb1775fd97a4f2ce306b210fd9a2019fd3ae9cbb17b274ab62521d59",
+          "at": "2026-06-27T23:41:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track-contract-gate` lost the non-`track/<id>` branch guard from the briefing. It now always runs `bin/sotp task-contract check --items-dir track/items`, and that command self-resolves from the current branch and fails on `main`/detached HEAD. As a result, `cargo make track-local-review-fix-codex` now hard-fails outside a track branch instead of skipping cleanly.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/Makefile.toml",
+              "line": 642,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:6a29fe6e3f333921391f380e1976657b31cd7880d2ae3f4fe07f998f6938415a",
+          "at": "2026-06-28T01:55:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`.claude/commands/track/review.md` now tells both fast and final Codex rounds to run `cargo make track-local-review-fix`, and `.claude/settings.json` / `.codex/rules/default.rules` whitelist that same task name, but `Makefile.toml` only defines `[tasks.track-local-review]` at line 655. As written, the orchestrator will invoke a non-existent cargo-make task, while the real task name is not permitted by the sandbox allowlist, so the Codex review path cannot launch.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.claude/commands/track/review.md",
+              "line": 87,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:a22a86482ac02ffe078bdd53bef5402a39ab452675133afe00448f19f7e1ae19",
+          "at": "2026-06-28T02:05:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b904b1feaae141253136a1c716a7aae9cf63fdfed3334c2874d2c6542aac6041",
+          "at": "2026-06-28T02:09:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`review-fix-lead-codex.md` still says the `cargo make track-local-review` wrapper chains `track-sync-views` before review, but `Makefile.toml` now wires `track-local-review` through `track-contract-gate` only. That makes the briefing describe a pre-review view sync that no longer happens, so the fixer can run against stale rendered views.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.harness/briefings/review-fix-lead-codex.md",
+              "line": 72,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:8c0e57250c0ed15f567c510570f5eb7ae2e7d0b26efb587c9963b20ab4477ac5",
+          "at": "2026-06-28T02:44:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:786040831b7083b3e915a7fda0028249f4ff87e0a2fa522324764defe12d25f1",
+          "at": "2026-06-28T02:52:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 1 still tells the orchestrator to read `capabilities.review-fix-lead.provider` and choose between launching the Claude subagent directly or the Codex wrapper. That contradicts the new Step 4/5 contract where `/track:review` must always call the provider-agnostic `cargo make track-local-review-fix` wrapper and let the CLI return the exit-64 dispatch instruction for Claude. As written, the command has two inconsistent launch paths, so the Claude path can bypass the new wrapper/dispatch contract.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 31,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "The new routing text says the Codex wrapper exits `0` with any `REVIEW_FIX_STATUS` value or `2` for smoke-test failure, but the runner status contract maps `completed` to 0, `blocked_cross_scope` to 2, and `failed` to 1, with smoke-test also using 2 when there is no status sentinel. Step 4/5 therefore omit the exit-1 status path and make exit 2 ambiguous unless stdout is parsed, which can make the orchestrator mishandle `failed` or `blocked_cross_scope` results from `track-local-review-fix`.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 99,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:786040831b7083b3e915a7fda0028249f4ff87e0a2fa522324764defe12d25f1",
+          "at": "2026-06-28T02:58:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:15d2bc9c5436e61591120d26a9949f7774b0c189d2f7cc61c786ead82330a78e",
+          "at": "2026-06-28T03:02:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Both `track-local-review` and `track-local-review-fix` now always forward `--track-id \"$ _TID\"` and `--briefing-file \"$ _BF\"` to `bin/sotp task-contract check`. When callers use the existing no-frills invocation style that omits one or both flags, the shell still passes empty strings, which disables the task’s branch auto-resolution path and turns the briefing append into a hard failure after a successful gate. That regresses a previously valid command path into a fail case.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 643,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:6deee3727b89059d297cc172da891be9365a09a78aa9fe4a7480ecf9427d47e7",
+          "at": "2026-06-28T03:49:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Deleting the `[tasks.track-contract-gate]` wrapper here makes the shipped review instructions incoherent: `.claude/commands/track/review.md` and the reviewer/fixer briefings still describe `cargo make track-local-review` / `track-local-review-fix` as running or depending on `track-contract-gate` before each round. In the final branch that task no longer exists, so the documented workflow now points at a dead command. Either keep a compatibility shim or update the distributed instructions in the same PR.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 639,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:35aa043f7496b7836ccc314ad8c3c75c002c4067e142540183a7b6ebc9fef44c",
+          "at": "2026-06-28T04:14:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aad8641d2ea0e1e0f1301867486f65e827ddb6ac1948c8074f6ad0d247a4f8e0",
+          "at": "2026-06-28T04:22:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aad8641d2ea0e1e0f1301867486f65e827ddb6ac1948c8074f6ad0d247a4f8e0",
+          "at": "2026-06-28T04:36:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track-local-review` / `track-local-review-fix` now make `task-contract-check` a cargo-make dependency, but their shell bodies still run `bin/sotp signal calc-impl-catalog` afterwards. Cargo-make dependencies execute before the script, so the pre-review gate now reads stale impl-catalog signals instead of the freshly refreshed ones documented in `.claude/commands/track/review.md` and `.claude/agents/review-fix-lead.md`. Move the signal refresh ahead of `task-contract-check`, or keep the inline `signal calc-impl-catalog && task-contract check && review ...` ordering.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 652,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:381b7cf96ca157a0bd5a5bfd24ec6f36e179e4edb56ee1bd4c23b7513da2014c",
+          "at": "2026-06-28T10:30:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track-local-review` and `track-local-review-fix` no longer propagate the caller-supplied `--track-id` into the pre-review `task-contract` gate; the dependency chain now auto-resolves from the current branch instead. That makes the review flow unsafe when the explicit track id and working branch diverge, because the gate can validate a different track than the one requested by `.claude/commands/track/review.md`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/Makefile.toml",
+              "line": 657,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:f03cc15e53aeceb6f5663d26f82c5c088e08fa7b9bfa8650623d000381b3bc96",
+          "at": "2026-06-28T10:36:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track-local-review` and `track-local-review-fix` now forward `--briefing-file` into `bin/sotp task-contract coverage/check`, but `apps/cli/src/commands/task_contract.rs` only accepts `--layer`, `--track-id`, and `--items-dir` for those subcommands. In the documented review flow (`cargo make track-local-review -- --round-type ... --briefing-file ...`), clap will reject the unexpected flag, so the pre-review gate fails before `bin/sotp review local` or `fix-local` runs.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 680,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:b5d06264b9e40f4c9712a01530295441ae77ee00d67d607c789a26c58c850f91",
+          "at": "2026-06-28T10:45:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:de9ab21f358c0271f1d1bf77bb8e5a637d3465c60f7cf2321526342f64a5b7c9",
+          "at": "2026-06-28T10:51:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:de9ab21f358c0271f1d1bf77bb8e5a637d3465c60f7cf2321526342f64a5b7c9",
+          "at": "2026-06-28T10:55:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e7cd8482e9b1ae7424bac3978467d4ff79f8d2c0752b8c317bc335ec72102797",
+          "at": "2026-06-28T14:07:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ci-local` and `ci-container` now depend on `task-contract-coverage`, but that task runs `bin/sotp task-contract coverage` without `--track-id` and therefore only auto-resolves on `track/<id>` branches. These are general CI/bootstrap gates for the template; from `main` or a fresh consumer checkout there is no active track, so `cargo make ci`/`bootstrap` become wired to a track-only command and fail before ordinary CI can run. Keep the task-contract gate on the track review wrappers or provide explicit track context instead of adding it to general CI.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 400,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:e7cd8482e9b1ae7424bac3978467d4ff79f8d2c0752b8c317bc335ec72102797",
+          "at": "2026-06-28T14:13:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `--track-id` parser runs inside the `track-local-review` script, but this task's `task-contract-check` dependency has already run before the script starts. For a mismatched invocation, the task-contract gates still refresh/check the current branch's active track and only then reject the requested `--track-id`, so the wrapper no longer behaves like the simplified pass-through review command described by the harness policy and can gate the wrong track without recording the requested review. The same issue is duplicated in `track-local-review-fix` at line 689.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 663,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:6dada2907fc10fcf1d3051bc6f16e5a577be5b539903abefc6cdf365b8a6dd01",
+          "at": "2026-06-28T14:16:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4f74aa82dee11798ea658a8d2a4b16028cb25c38821dc2bc48cde49b4b807ae6",
+          "at": "2026-06-28T15:02:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4f74aa82dee11798ea658a8d2a4b16028cb25c38821dc2bc48cde49b4b807ae6",
+          "at": "2026-06-28T15:05:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ad7401d72d7779012df4ecb1aa3e4d22804d9689236a69c5c92173f005331247",
+          "at": "2026-06-28T15:43:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ad7401d72d7779012df4ecb1aa3e4d22804d9689236a69c5c92173f005331247",
+          "at": "2026-06-28T15:46:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `--track-id` branch mismatch guard runs inside the task script, but `task-contract-check` is still a cargo-make dependency, so that gate executes before this check. On a wrong branch, the task will still auto-resolve and run the task-contract gates against the current branch, and only then exit 2; that defeats the stated protection for both `track-local-review` and `track-local-review-fix`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/Makefile.toml",
+              "line": 677,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:4ebf8f5150ac1d1bb71f918c4298f63442a5d01664cc9f83aba1a85d7f70174c",
+          "at": "2026-06-28T16:26:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0fd95d68af127b1864ae56b85b323bcc877256816c0f5d3e80fc8a4a2740fa94",
+          "at": "2026-06-28T16:31:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0fd95d68af127b1864ae56b85b323bcc877256816c0f5d3e80fc8a4a2740fa94",
+          "at": "2026-06-28T16:35:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track-local-review` and `track-local-review-fix` now run `bin/sotp task-contract coverage` before every review round. That changes the pre-review wiring: the accepted contract for this gate keeps `task-contract coverage` in `cargo make ci` and reserves `track-local-review` for `signal calc-impl-catalog && task-contract check` before `bin/sotp review local` (`knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md:93-109`). As written, any orphaned or missing `task-contract.json` entry will block reviewer entry, so review rounds can no longer start on tracks that should still be reviewable under the documented workflow.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/Makefile.toml",
+              "line": 700,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:7bf6ed52ae34f6e3dbcd49e2e5e14ed8aeea40704437951df8d4140b603f5727",
+          "at": "2026-06-28T22:33:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track-local-review` and `track-local-review-fix` now call `bin/sotp task-contract check` directly, which bypasses the cargo-make `task-contract-check` task and its `task-contract-coverage` dependency. That drops the required coverage-before-liveness gate chain, so orphan `task-contract.json` entries can reach reviewer rounds undetected. The ADR for this gate requires `cargo make task-contract-check` to depend on coverage and for both wrapper tasks to depend on that task.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 681,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:803c36b6bf5b53fb6a935252bf6acdcbfe83bcbc205b7a215b209de09ff324e4",
+          "at": "2026-06-28T22:37:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 2.5 still tells Codex to run `cargo make track-review-results`, but Makefile.toml no longer defines that task. The canonical review-results check is now unreachable from this briefing, so agents cannot verify `zero_findings` and complete the round.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.harness/briefings/review-fix-lead-codex.md",
+              "line": 103,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:d0e9d6e0a368a158b89491cf3fedb255d1d6a7b82e6d87d457d412966d8d65db",
+          "at": "2026-06-29T01:17:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d26a930b74374b8ce7451a900128e597709d872e59c8955d95491a549e2f07cb",
+          "at": "2026-06-29T01:23:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d26a930b74374b8ce7451a900128e597709d872e59c8955d95491a549e2f07cb",
+          "at": "2026-06-29T01:28:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4b3cfe3132b5ea69aa7fcd8ba40b0f887a493c062c72055bdce0c03f6a79a779",
+          "at": "2026-06-29T13:57:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cargo make ci` now delegates only to `ci-local`, but `ci-local` no longer depends on the track-aware signal gates (`verify-spec-states-current-local`, `signal-check-impl-catalog-local`, `verify-catalogue-spec-refs-local`, `check-catalogue-spec-signals-local`). This changes the established `[gate] Run CI checks` contract from a full gate to a partial repo-wide gate, so any caller that still runs `cargo make ci` alone will skip the spec/catalogue/impl consistency checks. The briefing calls for restoring branch-aware graceful skips around those gates, not removing them from CI; keep the gates wired into `ci`/`ci-local` and make the individual tasks skip on non-track/detached branches instead.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 533,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:4b3cfe3132b5ea69aa7fcd8ba40b0f887a493c062c72055bdce0c03f6a79a779",
+          "at": "2026-06-29T14:00:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d65525b7ec6217e55351c9e08d2f96d1fa5116e5ea8f06676645e5a98c3e88da",
+          "at": "2026-06-29T14:05:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:87c0332d99027180b1e2fe47f37b0b53ccf7297f6f5b3d0c3dc28800a157c0a6",
+          "at": "2026-06-29T14:23:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:87c0332d99027180b1e2fe47f37b0b53ccf7297f6f5b3d0c3dc28800a157c0a6",
+          "at": "2026-06-29T14:27:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track-local-review` and `track-local-review-fix` run `track-active-gate` before `task-contract-check`, but `task-contract-check` pulls in `task-contract-coverage -> task-contract-refresh-impl-catalog`, which rewrites the impl-catalog signals after the view sync has already happened. That means the reviewer can still start on stale `*-types.md`, so the new dependency does not actually guarantee the 'latest signal state' described here.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 656,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:0b168731a3e24ca901c33be388e819293b3320bffd98205fc47b35a666fc724d",
+          "at": "2026-06-29T16:33:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a96f13ef3aa89282048ff47390b91f127d8531a42b31dc5ac7234e8906542574",
+          "at": "2026-06-29T16:36:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a96f13ef3aa89282048ff47390b91f127d8531a42b31dc5ac7234e8906542574",
+          "at": "2026-06-29T16:42:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:18f29316373ac4fb8e880d60b4fd4b2ca0ce778030fdc500f624caa142379e09",
+          "at": "2026-06-29T16:58:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:18f29316373ac4fb8e880d60b4fd4b2ca0ce778030fdc500f624caa142379e09",
+          "at": "2026-06-29T17:03:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bc2bba0e5a414a283588d382f961e6aea48e90bb9797e8d9836b6c0598afb0b8",
+          "at": "2026-06-29T17:14:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:131569d39d5b0dd5478e5479f2adffafe6e5863db1d69990592f68e3e39f9ec2",
+          "at": "2026-06-29T17:34:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:131569d39d5b0dd5478e5479f2adffafe6e5863db1d69990592f68e3e39f9ec2",
+          "at": "2026-06-29T17:39:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f5f596e7f90d102cc53c8533d409788dd11145289bbb225f5ae06d1d71909bcd",
+          "at": "2026-06-29T18:42:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f5f596e7f90d102cc53c8533d409788dd11145289bbb225f5ae06d1d71909bcd",
+          "at": "2026-06-29T18:45:31Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:76ba5b6789fc6315fbdbc90bf202f519af85f08a87b274c7f42580b5fdf03372",
+          "at": "2026-06-29T08:57:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:76ba5b6789fc6315fbdbc90bf202f519af85f08a87b274c7f42580b5fdf03372",
+          "at": "2026-06-29T09:03:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:91f1cee94acf2bcdc63da5baa6955c1959f5497816b6409f727bbe58e6cd0349",
+          "at": "2026-06-29T10:20:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:91f1cee94acf2bcdc63da5baa6955c1959f5497816b6409f727bbe58e6cd0349",
+          "at": "2026-06-29T10:24:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c0c149366c0283757d59281aff4634317801900c169afdc02183ec789849a29b",
+          "at": "2026-06-29T13:55:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c0c149366c0283757d59281aff4634317801900c169afdc02183ec789849a29b",
+          "at": "2026-06-29T13:58:56Z"
+        }
+      ]
+    },
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:993b3b943951377f71a6a98d72766d4d1e3de48e2dc4a049e34d182a2318e792",
+          "at": "2026-06-27T09:17:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ADR limits the new `task-contract.json` validation to referential integrity, but the pre-review gate only checks entries that a task declares. That leaves an unattributed catalogue entry invisible to the new gate, so a Red/Yellow `impl_catalog` signal can still be deferred to merge-gate, contradicting the stated shift-left guarantee for contract violations. The plan needs a completeness invariant for relevant catalogue entries, not just RI of declared entries.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+              "line": 70,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:993b3b943951377f71a6a98d72766d4d1e3de48e2dc4a049e34d182a2318e792",
+          "at": "2026-06-27T09:21:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ADR includes shape-only stubs in the stated shift-left problem, saying unimplemented code with only the shape in place should be caught earlier, but D3/D5 later define the new gate as impl_catalog blue only and explicitly state correct-signature stubs pass because body/liveness is reviewer-owned. That makes the plan internally inconsistent about the gate's guarantee and can lead implementation to expect body-aware blocking that the decision forbids. Remove stubs from the shift-left target/benefit, or change the decision to include a body-aware check.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+              "line": 34,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f0e6c2a01b384db611087719bd2258c47fd0d682a12712fef47615a79f3fbc15",
+          "at": "2026-06-27T09:27:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ADR frontmatter records every decision D1-D5 as `status: accepted`, but the README index adds this ADR as `Proposed`. That makes the plan artifacts contradict each other about whether this baseline ADR is accepted; update the index status to match the ADR's accepted decisions.",
+              "severity": "P1",
+              "file": "knowledge/adr/README.md",
+              "line": 139,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:8a82e0a85fe5770bbe02a957eeff270f091dbb875500049d79013fc0cfa45f84",
+          "at": "2026-06-27T09:29:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ebdb9f3f8c06ae8e39a95335cf75f057f0935940245de18e9c98f4b5700baa27",
+          "at": "2026-06-27T09:31:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002's orphan-detection step is backwards: it only walks `ContractedEntryRef`s already present in `task-contract.json`, so it cannot detect scope entries that were never attributed. `IN-03`/`AC-02` require comparing the contract against the full in-scope catalogue entry set, so as written this step cannot satisfy the orphan-entry case (and T007(b) is impossible to implement literally).",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/plan.md",
+              "line": 14,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:ecb7995bb577e3433f73c2fc71c19225940712f558b4484d3cc6e36b8f347904",
+          "at": "2026-06-27T12:02:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d19753fed9a3ed85da4a6efe5d906692fe7443c7f1db6889675a7e7e8f8f0331",
+          "at": "2026-06-27T12:10:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-05 is marked covered by T002/T007, but those tasks only create and test the conformance summary text; the implementation plan routes successful checks to stdout and never adds a task that appends the verified-conformance line to the reviewer briefing required by IN-06/AC-05. As written, the plan can complete with no briefing update, so reviewers would not receive the promised scope-of-guarantee notice.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/task-coverage.json",
+              "line": 32,
+              "category": "contradiction"
+            },
+            {
+              "message": "This catalogue says the gate verifies all catalogue entries contracted to the track, while the spec and OQ-1 resolution define the gate as review-scope-specific via `cmd.group` and `<group>-type-signals.json`. If implemented from this contract, one scope review could be blocked by unrelated layers, defeating the per-scope pre-review gate design.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+              "line": 22,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:d19753fed9a3ed85da4a6efe5d906692fe7443c7f1db6889675a7e7e8f8f0331",
+          "at": "2026-06-27T12:16:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The plan makes `--group` do double duty as both the review scope and a TDDD layer: OQ-1 says the gate reads the TypeSignalsDocument for `cmd.group`, filters `ContractedEntryRef.layer == cmd.group`, and T008 then prepends that same gate to every `track-local-review-fix-codex` invocation. But the type catalogue models `group` as `ReviewGroupName` while the signal reader needs a `LayerId`, and review groups include non-layer scopes such as `plan-artifacts`. With the current universal wiring, those review runs will fail closed before the reviewer can start. The plan needs an explicit review-scope-to-layer mapping or a defined bypass for non-layer scopes before T008 is executable.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/plan.md",
+              "line": 10,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:d7e67a5b995da1a878afd62d7ba51a8c30032aa5983b6f7f47bdc561e65077c4",
+          "at": "2026-06-27T12:23:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`task_contract_check` is specified to build the filesystem adapters from the CLI `items_dir` and call the use case directly, while the same plan/catalogue makes `TaskContractDriver` the primary adapter responsible for parsing `TaskContractInput` and rendering `PreReviewGateOutcome` to `CommandOutcome`. That leaves two conflicting execution paths: using `task_contract_driver()` ignores the `--items-dir` value because it wires a default path, while using `task_contract_check()` bypasses the primary adapter and duplicates driver responsibilities in the composition root. The plan needs one coherent path, e.g. construct the driver with adapters built from the requested `items_dir` and dispatch `TaskContractInput::Check`, or remove `items_dir` from the driver input and keep rendering outside it.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/cli_composition-types.json",
+              "line": 49,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9ada25e935103ef5df7696e2c1df3d2e9e2e09652000df2f42e5a46a0ddb3e33",
+          "at": "2026-06-27T12:30:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The spec and implementation plan disagree on the workflow command being gated: IN-05/AC-03/AC-06 require the gate before/blocking `sotp review local`, while T008 wires only `bin/sotp review fix-local` via `track-local-review-fix-codex`. Because T008 is marked as satisfying those criteria, the artifacts can claim AC-06 coverage while implementing a different review invocation path. Align the spec criteria with `review fix-local` or change T008 to gate the command named by the spec.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json",
+              "line": 95,
+              "category": "contradiction"
+            },
+            {
+              "message": "The dependency narrative lets T005 run before the composition root it calls exists. T005 explicitly constructs `TaskContractCompositionRoot` and calls `task_contract_check`, but the section says T005 depends only on T004 while T006 is the task that adds `TaskContractCompositionRoot`. A task runner following this plan can schedule/assign T005 before T006 and produce an unbuildable CLI task; add a T005 dependency on T006 or reorder the composition task before the CLI execute task.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/impl-plan.json",
+              "line": 84,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:f6607d5a7ae69adb8dbaac9dedc7b9d899e1383ecccdf6636957352e883781cc",
+          "at": "2026-06-27T12:39:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ImplCatalogSignalReaderPort` is traced to `spec.json#IN-02`, but IN-02 is the impl-planner responsibility to author `task-contract.json`. This port reads existing per-layer impl_catalog signal documents, so the traceability should point to the gate/signal-join requirement such as IN-04/CN-05. The same mismatch appears on `FsImplCatalogSignalReader`, making the catalogue claim the signal-reader work satisfies the wrong spec element.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+              "line": 168,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:a6a8a14f269d383097eaae835ca78bdfd65bbbfdb644221a72b47d71321ef83e",
+          "at": "2026-06-27T12:48:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "OS-01 says the gate input is rustdoc JSON, but IN-04/CN-05 and the Phase 2/3 artifacts define the gate as reading existing impl_catalog/type-signals documents and explicitly not changing SignalEvaluatorV2. That gives implementers two incompatible input contracts; following OS-01 would push the design toward re-reading rustdoc instead of using the signal table, violating the intended signal-reuse boundary.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json",
+              "line": 121,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ef200d3ca77930923ee94ff4f2e50573b4c4cc785d62b9a6144fc4666992575e",
+          "at": "2026-06-27T12:54:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:26f6d712ab6968f84c03b5ddf64b90dd462a95aba14e96d7e76a1e74c502562a",
+          "at": "2026-06-27T13:01:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The rendered type views are inconsistent with the plan's completed state: `impl-plan.json` and `plan.md` mark T001/T003/T005 as done, but the matching artefacts still leave some newly added surfaces non-blue (`domain-types.md:14` keeps `ContractedEntryRef` 🟡; `cli-types.md:7-13` and `infrastructure-types.md:7-20` keep the new command/DTO/adapter entries 🔴). If those batches are meant to be finished, these views are stale and contradict the 'done' claim.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/domain-types.md",
+              "line": 14,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:eb4b2f756b40e3a33a043658a611b602b5fab35296236c2cbfdf7cc246fd5d77",
+          "at": "2026-06-27T13:48:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4fd7f1162622d8465056a0714845efd768f2c137e4676a218543e58a5e50b56b",
+          "at": "2026-06-27T14:29:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`commit_hash` was removed from the task records instead of being kept as `null` for the completed Batch A tasks. The briefing explicitly defines the lifecycle state as T001-T007 `done` with `commit_hash: null` until the D4 backfill records the batch commit; omitting the field means the plan artifact no longer represents that pending-backfill state and may leave the backfill step without a per-task slot to update.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/impl-plan.json",
+              "line": 7,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:4fd7f1162622d8465056a0714845efd768f2c137e4676a218543e58a5e50b56b",
+          "at": "2026-06-27T14:33:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 is marked `done` in `impl-plan.json`, and that task explicitly includes `PreReviewGateOutcome`, but the scoped type view still shows `PreReviewGateOutcome` with a Yellow implementation signal. That contradicts the plan's completed-state claim for T001 and leaves the plan asserting the batch is done while one of its contracted domain entries is non-Blue.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/domain-types.md",
+              "line": 7,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:deabecd86303d3593a98f88f39761f4ef23c90166bacca33c81d74ed7eb407a5",
+          "at": "2026-06-27T14:38:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The lifecycle-tail briefing says this batch should be limited to T001-T007 status transitions plus the rendered plan, with type/SoT artifacts unchanged, but this scoped diff adds a new domain catalogue type (`PreReviewGateViolations`) and corresponding contract-map/docs updates. That silently changes the domain contract while the plan marks T001 done with no commit hash, so the artifact set no longer represents a pure Batch A status transition. Revert/split the type-catalogue changes or run them through the appropriate design/plan review path instead of bundling them with the lifecycle update.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/domain-types.json",
+              "line": 99,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:1ea5ac44cfe9f864c990271eb3288afdb9196c31bddacbcda030a39dd9248a7b",
+          "at": "2026-06-27T14:45:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001's task text narrows the required domain inherent impls to TaskContractDocument accessors plus ContractedEntryRef::new, but domain-types.json also defines ContractedEntryRef::layer, ContractedEntryRef::entry_key, and PreReviewGateOutcome::blocked. Because ContractedEntryRef's fields are documented as stripped/private and Blocked construction is documented to go through blocked(), the plan artifact is internally inconsistent about the public API T001 must deliver.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/impl-plan.json",
+              "line": 6,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:deabecd86303d3593a98f88f39761f4ef23c90166bacca33c81d74ed7eb407a5",
+          "at": "2026-06-27T14:51:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:85c25bcc34a3b711121a06cfb66cfcf8522881f2da0877ddf6c218241b926fe8",
+          "at": "2026-06-27T14:59:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:85c25bcc34a3b711121a06cfb66cfcf8522881f2da0877ddf6c218241b926fe8",
+          "at": "2026-06-27T15:03:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d3a1882f9da1d200534db92acc82d1da7926735cff12af4e09f2908cd03bba21",
+          "at": "2026-06-27T15:20:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T008 is marked `done`, but its `commit_hash` field is missing instead of being present as `null`. The plan's lifecycle contract for this batch is that T008 remains hashless until the later Batch B backfill, so the artifact should preserve `commit_hash: null` rather than dropping the field.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/impl-plan.json",
+              "line": 49,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:d3a1882f9da1d200534db92acc82d1da7926735cff12af4e09f2908cd03bba21",
+          "at": "2026-06-27T15:22:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:caeb4e3044844c948755b8b14c0c6cba86159ebf1a2626700420bddd73e93dc7",
+          "at": "2026-06-27T15:25:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The generated plan still describes the task-contract API as `group`/`--group` in several places, but the updated catalogues now model it as optional `layer`/`--layer` (`usecase-types.json`, `cli_driver-types.json`, `cli_types.json`, `cli_composition-types.json`). In this file, T002/T004/T005/T006/T008 all keep the old `group` shape, so the plan is internally contradictory and the public CLI/service contract is ambiguous.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/pre-review-task-contract-conformance-gate-2026-06-27/impl-plan.json",
+              "line": 12,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9f1932a083142c8662207e580f97e9ca71de0a83998f14f6265726490e51a895",
+          "at": "2026-06-27T16:11:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9d7a8a63d2f698bd780a07cab171bd18d8785f2b16ce25076ceb9cff542050da",
+          "at": "2026-06-27T16:19:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9d7a8a63d2f698bd780a07cab171bd18d8785f2b16ce25076ceb9cff542050da",
+          "at": "2026-06-27T16:24:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9d7a8a63d2f698bd780a07cab171bd18d8785f2b16ce25076ceb9cff542050da",
+          "at": "2026-06-27T16:28:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `read_optional_signals` contract says a missing `<layer>-type-signals.json` can be classified as `Ok(None)` and then “skip layers without a signal document silently” (`usecase-types.json`), but the surrounding plan artifacts still describe the gate as checking all 6 canonical layers in sequence and `FsImplCatalogSignalReader` as mapping read failures to `SignalReadFailed`. As written, a canonical layer with an absent signal file can be ignored instead of blocking the gate, so the all-layers mode is no longer actually fail-closed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+              "line": 164,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e319e638d742b5f6c8f0e7f951588b79c3c38a1de6f62421b90d0bbad871d912",
+          "at": "2026-06-27T16:48:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:56229dfbcb2f85a373c55c1563ead60960358d1bd49335521b528b94cdb6ee3d",
+          "at": "2026-06-27T16:55:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:56229dfbcb2f85a373c55c1563ead60960358d1bd49335521b528b94cdb6ee3d",
+          "at": "2026-06-27T16:59:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69a34af9b4645c4e2556d82d3c39cb8cb96fc6cee34d021d3216cb3c50b00f36",
+          "at": "2026-06-27T17:06:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69a34af9b4645c4e2556d82d3c39cb8cb96fc6cee34d021d3216cb3c50b00f36",
+          "at": "2026-06-27T17:09:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5032cc87aa406728d333cec36607f25d8cd1af24f1c37eb29e29ced2578f9c84",
+          "at": "2026-06-28T02:29:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5032cc87aa406728d333cec36607f25d8cd1af24f1c37eb29e29ced2578f9c84",
+          "at": "2026-06-28T02:32:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TaskContractCheckArgs` now has a fourth field, `briefing_file`, but the doc string still enumerates only `layer`, `track_id`, and `items_dir`. That makes the artifact's contract text inaccurate and hides the new CLI input from downstream implementers.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/pre-review-task-contract-conformance-gate-2026-06-27/cli-types.json",
+              "line": 85,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:8ef9fdd088a7758576155a5caac42e94083793dbf67cded7ac23b3c21c662ff1",
+          "at": "2026-06-28T03:47:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c94e56d4ae569bd488ea349b54d998b39f4e0facfb2c7d1d966ee14834c230f6",
+          "at": "2026-06-28T04:12:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_task_contract_check` still says it calls `task_contract_check(layer, track_id, items_dir)`, but the updated composition-root contract in `cli_composition-types.json:39-52` now takes `briefing_file` as well. As written, the plan artifacts disagree on how the new reviewer-briefing path is propagated.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/cli-types.json",
+              "line": 121,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c94e56d4ae569bd488ea349b54d998b39f4e0facfb2c7d1d966ee14834c230f6",
+          "at": "2026-06-28T04:22:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:94b7b096e1e046e54a4b5112fb05523edd704d56fea58951bd21ba47939210f0",
+          "at": "2026-06-28T04:30:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:94b7b096e1e046e54a4b5112fb05523edd704d56fea58951bd21ba47939210f0",
+          "at": "2026-06-28T04:36:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T005` still specifies `TaskContractCheckArgs.track_id: String`, but the generated CLI catalogue for the same artifact makes `track_id` optional and adds `detect_active_track_from_branch_cwd` so `sotp task-contract check` can auto-resolve the active track when `--track-id` is omitted. As written, the plan would force the CLI to reject the documented no-flag invocation path.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/pre-review-task-contract-conformance-gate-2026-06-27/plan.md",
+              "line": 33,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:8fa11b485fd7ea871120854003804afc6bd04615d36592a01653618cd243928d",
+          "at": "2026-06-28T10:34:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan.md:14` still describes the Passed path as producing a `conformance_summary`, and the same assumption repeats later in `impl-plan.json:12`, `42`, and `90`. That conflicts with `domain-types.json:90-103`, where `PreReviewGateOutcome::Passed` is a unit variant. As written, the plan is asking the interactor outcome to carry data that the domain model no longer has.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/plan.md",
+              "line": 14,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:343285faacd8aedb06d2f1017e2bc11d865837f015a3547796095e847749af33",
+          "at": "2026-06-28T10:46:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`task-contract.json` attributes `PreReviewGateInteractor` only to `T010`, but the actual status-filtering work is introduced later in `T015` (`impl-plan.json` says `T015` narrows `PreReviewGateInteractor::check` with `impl-plan.json` task status). That leaves the final D7 gate logic outside the task contract, so the new per-task check can treat `T015` as out of scope and miss the code that makes the gate behave as specified.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/pre-review-task-contract-conformance-gate-2026-06-27/task-contract.json",
+              "line": 53,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:80479ca049621ebec6ecf00cac6f20d1d414dadb9b158a741bc92f043896b7db",
+          "at": "2026-06-28T10:54:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b6195cb066fdcca7994dae2c6afdfe80c26ab5d6657569e86445ca236dea77de",
+          "at": "2026-06-28T11:03:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-04 says todo-attributed entries are outside the check target, but GO-03/CN-03/AC-04 and ADR D7 all require Red entries to block regardless of task status. If implementers follow IN-04 literally, todo entries would be skipped entirely and Red impl_catalog failures could pass the pre-review gate. Reword IN-04 to distinguish 'todo Yellow is tolerated' from 'todo Red is still evaluated and blocking.'",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json",
+              "line": 75,
+              "category": "contradiction"
+            },
+            {
+              "message": "The spec requires `task-contract coverage` to be integrated into `cargo make ci` so attribution drift is detected on each commit, but the implementation plan only creates the coverage/check tasks and wires `task-contract-check` into review-round dependencies. No planned task covers adding the coverage gate to the ci chain, so the plan cannot satisfy IN-07's commit-time drift detection requirement.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/impl-plan.json",
+              "line": 96,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:b6195cb066fdcca7994dae2c6afdfe80c26ab5d6657569e86445ca236dea77de",
+          "at": "2026-06-28T11:08:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`task-contract.json` assigns final-shape entries such as `PreReviewGateInteractor` both to completed work (`T002`, status `done`) and to future work (`T010`/`T015`, status `todo`). The D7 check only tolerates yellow for entries whose owners are all `todo`; as written, these duplicated entries will be treated as completed and must already be blue, so the pre-review gate can block the very future tasks that are supposed to make those final shapes blue.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/task-contract.json",
+              "line": 52,
+              "category": "infeasibility"
+            },
+            {
+              "message": "The coverage verifier is specified to prove attribution completeness for all catalogue entries, but this port contract lets `CoverageVerifyInteractor` treat an absent per-layer signal document as “no entries.” That is a fail-open path for an entire layer: coverage can pass without attributing any entries from a missing signal document, contradicting D5/IN-07's drift check over all catalogue entries.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+              "line": 257,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:06f27c7330d14690fd519d7b983a25a563d1763e85842a4ef32d71e7bee3ce0a",
+          "at": "2026-06-28T11:17:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D5 splits attribution completeness into `task-contract coverage` and liveness into `task-contract check`, but the liveness catalogue entries still claim the completeness contract: `PreReviewGateInteractor` is documented as the liveness gate while its `spec_refs` point at `IN-03`/`AC-02`, and the same mismatch appears on `PreReviewGateService`/`PreReviewGateCommand`. Meanwhile `CoverageVerifyInteractor` is the component that actually documents orphan/referential-integrity checks but does not own `AC-02`. This keeps the plan semantically assigning completeness to `check`, contradicting the split and risking the wrong command owning the invariant. Move the IN-03/AC-02 ownership to the coverage command/service/interactor and keep check tied to the liveness specs.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+              "line": 43,
+              "category": "contradiction"
+            },
+            {
+              "message": "T007 still requires `PreReviewGateInteractor` tests for `OrphanEntry` and `InvalidEntryRef`, but the revised domain catalogue narrows `PreReviewGateViolation` to `MissingTaskContract`/`NonBlueSignal` and moves orphan/invalid-entry violations to `CoverageViolation`. Since T007 is marked done and the later tasks only add coverage tests rather than explicitly migrating/removing the old check tests, T009 makes the existing T007 expectations unrepresentable or forces `check` to keep coverage semantics. Add an explicit task step to migrate those tests to `CoverageVerifyInteractor` and narrow the pre-review check tests to liveness only.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/impl-plan.json",
+              "line": 42,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:b54af950c245db28b4035f3aef99988e8e02fc8581492545a7e4700d2dafbce9",
+          "at": "2026-06-28T11:27:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T010 changes `PreReviewGateInteractor::new` to require a third `ImplPlanReaderPort` argument, but the plan commits T009-T011 as Batch C1 and defers the only composition-root caller update to T014 in Batch C2. That leaves the Batch C1 checkpoint unbuildable: the T006 composition root still constructs the interactor with the old two-argument shape until the later batch. Move the caller wiring into C1, keep a backward-compatible constructor until C2, or delay the constructor break to the batch that updates callers.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/plan.md",
+              "line": 58,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:1ad3b12d1ca762dcdb2bcd8b67d5da2b6c697c27d3a988ba61f00df7ae603a1d",
+          "at": "2026-06-28T11:36:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c2788565e72ed2230f2e78bf984b106fac889a3a0fafa52a6686542b684dcb72",
+          "at": "2026-06-28T11:44:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`task-contract.json` now attributes the already-implemented CLI stack only to the future todo tasks (`T012`/`T013`/`T014`), while the done tasks that actually introduced those modules (`T004`/`T005`/`T006`) were removed from the map. Because `task-contract check` only treats `done`/`in_progress` ownership as blocking, the current `TaskContractInput`/`TaskContractDriver`/`TaskContractCommand`/`TaskContractCompositionRoot` code drops out of the gate entirely until the later batches land. That makes the planned pre-review gate blind to code that already exists on this branch.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/task-contract.json",
+              "line": 23,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:96f47a2650b28644642a35fffc10cf2bc4fbeaf8b5191777904b5c8920347b06",
+          "at": "2026-06-28T12:57:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 is still described in the plan as adding the initial `PreReviewGateInteractor` implementation and the related error type, but this contract entry only assigns the ports/service/command to T002 and moves `PreReviewGateInteractor`/`PreReviewGateError` to T010. That makes the ownership split inconsistent across the plan and the task contract.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/task-contract.json",
+              "line": 11,
+              "category": "contradiction"
+            },
+            {
+              "message": "T011 is described in the plan as updating `TaskContractCompositionRoot::task_contract_driver` to inject `FsImplPlanReader`, but this contract entry only assigns `FsImplPlanReader` to T011 and leaves the composition-root symbol to T014. The D7 wiring step is therefore attributed to different tasks in the plan and the contract.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/task-contract.json",
+              "line": 53,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:cf9ceb5e2d8fab2ecefe80fcfecb17c032b782b27df840e5b39ce7b8a3d8393f",
+          "at": "2026-06-28T13:05:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c3892e4c59415098e68384d2eae557cfa2df3a1fcf21e59c42546898b2ddc894",
+          "at": "2026-06-28T13:13:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`task-contract.json` attributes final-shape entries that are explicitly changed by future `todo` tasks back to already-`done` tasks. Under the D7 rule in `spec.json` that an entry is Yellow-tolerated only when all owning tasks are `todo`, entries such as `PreReviewGateInteractor`/`PreReviewGateError` (T010/T015), `TaskContractInput`/`TaskContractDriver` (T012), `TaskContractCommand` (T013), and `TaskContractCompositionRoot` (T011/T014) will be forced to Blue immediately because T002/T004/T005/T006 are done owners. That makes the per-task gate require future Batch C shapes before those tasks can run, defeating the intended todo tolerance and making the plan order unexecutable.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/task-contract.json",
+              "line": 13,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:c3892e4c59415098e68384d2eae557cfa2df3a1fcf21e59c42546898b2ddc894",
+          "at": "2026-06-28T13:19:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`PreReviewGateOutcome` defines `Passed` as “all current/done attributed entries have blue impl_catalog signals”, and the violation docs just above narrow `NonBlueSignal` to current/done tasks. That conflicts with the ADR/spec requirement that a red signal on a todo task is always a blocker (`spec.json` AC-04 / ADR D7). As written, the domain catalogue permits an implementation to return `Passed` when current/done entries are blue even if a todo-attributed entry is red, or at least leaves no documented liveness violation for that required blocker case.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/domain-types.json",
+              "line": 103,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:172417c758cf62ffb7ee13aba30686d1a05cdd7a9a31fe60cbca99809c1b12fa",
+          "at": "2026-06-28T13:24:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0d3d0f759283f885d8ffd3022b195b0d1d5e4298aaff28d0573bdc0c883431ab",
+          "at": "2026-06-28T13:32:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CoverageViolation` is still described as a pure \"attribution-completeness\" violation, but the newly added `MissingSignalDocument` variant is a signal-document availability failure, not an attribution failure. That makes the enum contract internally inconsistent and leaves implementors without a clear boundary between coverage and liveness handling.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/pre-review-task-contract-conformance-gate-2026-06-27/domain-types.json",
+              "line": 152,
+              "category": "factual error"
+            },
+            {
+              "message": "The coverage CLI path is still specified as if only `MissingTaskContract`, `OrphanEntry`, and `InvalidEntryRef` can be blocked. With `MissingSignalDocument` added in T009 and T010 explicitly failing closed on absent signal docs, the plan has no rendering or propagation rule for that fourth violation, so the new fail-closed case can be dropped at the CLI boundary.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/pre-review-task-contract-conformance-gate-2026-06-27/impl-plan.json",
+              "line": 72,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:13722a376e9d04174fe46aaf62f13f4af03d685dc384b5e510757357fc29334f",
+          "at": "2026-06-28T14:06:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:573e735d7a9ad44856c8d636615520dd630176a7434b49971010169ecbaac56d",
+          "at": "2026-06-28T14:16:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T010 requires CoverageVerifyInteractor to iterate layers “via read_signals” and emit MissingSignalDocument when a signal document is absent, but the same plan defines read_signals as mapping absence/read/decode failures to SignalReadFailed and reserves read_optional_signals for positively classified absence. As written, the task cannot distinguish a missing document to produce the planned CoverageVerifyOutcome::Blocked violation; it will either propagate an error or need to violate the port contract. Revise T010 to use the optional reader for coverage absence handling, or change the port semantics consistently.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/plan.md",
+              "line": 58,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:573e735d7a9ad44856c8d636615520dd630176a7434b49971010169ecbaac56d",
+          "at": "2026-06-28T14:19:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4afb20fab116a70e16eecede2af7174cf20e73c75806d22f7d9a978476aa74b4",
+          "at": "2026-06-28T14:23:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3bab9501fc495d163779fbbefb6d42d1d36479b1d53f5f87cc4c14d8b8f963ed",
+          "at": "2026-06-28T15:15:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`task_contract_check_core` is attributed to T013, which otherwise owns the coverage CLI work, but the catalogue entry describes it as the helper for `execute_task_contract_check` that invokes `task_contract_check(...)`; the check command path is owned by T005 in this same contract. This makes the task contract semantically inconsistent, so per-task responsibility for the check helper is assigned to the wrong task.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/task-contract.json",
+              "line": 57,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:3bab9501fc495d163779fbbefb6d42d1d36479b1d53f5f87cc4c14d8b8f963ed",
+          "at": "2026-06-28T15:19:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new core helpers define a successful skip when `track_id_opt` is `None`, but the existing public `execute_task_contract_check` / `execute_task_contract_coverage` catalogue docs still state that those commands resolve the track id, construct the composition root, and invoke the check/coverage service. That gives two conflicting implementation requirements for non-`track/<id>` branches, especially because the coverage helper says this skip is required for adding coverage to `cargo make ci` without breaking main/fresh checkouts. Update the public execute entries to describe the same skip path before delegating to the core helper.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/cli-types.json",
+              "line": 206,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:91ac18adf25cd7ed4c54a59aac05e4a38ae4711153d8bb7871c68d7ef05a5854",
+          "at": "2026-06-28T15:21:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c7a4f242e6159b44be9b9a0a266d9353da52a9b8a97e1f56c69e6899f68855b7",
+          "at": "2026-06-28T15:26:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:25e61619013851f85412cdd6d23e200c3f7f3ab9ae50cd8f237da6187e20b131",
+          "at": "2026-06-28T15:29:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`RunReviewFixError` still describes `SmokeTestFailed` as failing \"per CN-04\", but this track explicitly retired `CN-04`. That leaves a stale cross-document reference in the source JSON, and the generated markdown mirrors it.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+              "line": 164,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:6b9ae15a0c9697f6145da9d5399f700a69b9c793050f35c24e04778432763608",
+          "at": "2026-06-28T16:40:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`RunReviewFixError` is modeled as a usecase-layer `ErrorType`, but the new `SubagentDispatchRequired` variant is described as a control-flow sentinel that the CLI driver must print verbatim to stdout and exit with code 64. That mixes driver protocol into an error type and makes the contract semantically inconsistent with the rest of the usecase layer.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+              "line": 148,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:a80abe65fb133efeeaa9bcfbc11c9a9a59ed4850e1f0b188c3319d0a8e809f59",
+          "at": "2026-06-28T16:46:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`RunReviewFixError` is introduced as a `modify` entry with no `spec_refs`, so the generated catalogue stays `Cat-Spec` yellow. The briefing only accepted catalogue↔impl yellow; this leaves the new usecase type ungrounded in the spec and makes the task-contract / contract-map additions semantically inconsistent.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+              "line": 148,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:1b8e1ba9e080a41b5e4ff8fb379d89be342a6a918b944ee7d10403f5b3cc46fc",
+          "at": "2026-06-28T16:52:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`RunReviewFixError` is introduced here as a new catalogue entry, but it is attributed to `T015` in the task contract. The plan brief's checklist says the new catalogue entries for this batch should be assigned to `T009`-`T014`, so this allocation makes the batch ownership inconsistent.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/task-contract.json",
+              "line": 65,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a1731834544437215ab8770e37ab3d7e80a86cfbd8aa0b48f812385d4ee0cf69",
+          "at": "2026-06-28T16:58:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:30a4f84132b289fc36cc73ca6cba25dddf069fb5a8cf921553cb7b7e771b6a74",
+          "at": "2026-06-28T17:03:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CoverageVerifyInteractor is documented to read each required signal document via read_signals, and the port docs later require coverage to use read_signals rather than read_optional_signals. That makes an absent canonical layer signal document surface as PreReviewGateError::SignalReadFailed instead of the planned CoverageViolation::MissingSignalDocument/Blocked outcome, so implementers following this catalogue cannot satisfy the coverage-domain behavior described for missing signal inputs.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+              "line": 138,
+              "category": "contradiction"
+            },
+            {
+              "message": "RunReviewFixError is attributed to T010, but the catalogue entry itself says it belongs to review_v2::run_review_fix and covers the review-fix workflow requirements IN-05/AC-06. T010's surrounding entries are the pre_review_gate coverage/check usecase additions, so this task-contract mapping assigns a review-fix workflow change to the wrong task bucket and makes the per-task contract misleading.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/task-contract.json",
+              "line": 44,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:30a4f84132b289fc36cc73ca6cba25dddf069fb5a8cf921553cb7b7e771b6a74",
+          "at": "2026-06-28T17:08:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`RunReviewFixError` is introduced as the review_v2 error type carrying the new `SubagentDispatchRequired` dispatch variant, but `task-contract.json` attributes it to T008, which is the already-completed Makefile review-fix gate wiring task. That makes the contract claim a usecase API change is owned by the wrong task/status, so the pre-review contract gate can approve an unplanned usecase catalogue change under T008 instead of a task that actually describes that behavior.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/task-contract.json",
+              "line": 34,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:84eceab4993e3f3b33b5beaf9cfb8626acead03514166cda18c4df412e052163",
+          "at": "2026-06-28T17:16:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`task-contract.json` attributes `RunReviewFixError` to T016, but T016 is described in the briefing/plan as cargo-make dependency wiring for `task-contract-coverage` and `task-contract-check`, while the catalogue entry itself is a usecase-layer `review_v2::run_review_fix` error type grounded in IN-05/AC-06. That makes the task contract semantically misleading: the pre-review attribution gate can treat a review-fix usecase API change as owned by a Makefile wiring task rather than by a task that actually covers that usecase boundary.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/task-contract.json",
+              "line": 66,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:5737615d8d7bce5a220c756b75ff1e9473cc3dbbab7ed97485a4b304e32034e8",
+          "at": "2026-06-28T17:21:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T017 is attributed to IN-05/AC-06 here, but its own plan text describes a sentinel pass-through fix in `review_run_fix_local` / `run_fix_local`, not a change to the pre-review gate wiring or fail-closed gate behavior. That makes the coverage claim semantically too strong: the spec/task-coverage map now says the gate requirement is covered by a task that does not actually implement the gate requirement.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.md",
+              "line": 22,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:ad034fd62b73258ae3b18bee595ebf92fe44e24e90c7f96ec22fbf4e14108191",
+          "at": "2026-06-28T17:36:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T017 is under-attributed in the task contract: `impl-plan.json` says the task changes both `libs/usecase/src/review_v2/run_review_fix.rs` and `cli_driver::review::review_run_fix_local`, but `task-contract.json` records only the usecase entry `RunReviewFixError` for `T017`. That leaves the CLI-side work outside the contract the pre-review gate uses, so the plan artifacts are internally inconsistent.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/task-contract.json",
+              "line": 66,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:3c5c302150a1694dcdedbb0186f2406026d97485d93fa631efd438e844fb52a7",
+          "at": "2026-06-28T17:41:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8df36177bb7d33f8834c71f866faaf249aac3b4d1a1ed647d1babae471e029b4",
+          "at": "2026-06-28T17:49:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T017 is declared as a “Usecase layer only” task, but the same description says the cli_driver dispatch arm must adapt and then intentionally leaves that cli_driver-side change without any catalogue/task-contract attribution. That makes the plan internally inconsistent and bypasses the contract map for a required layer change; either keep T017 genuinely usecase-only or add/attribute the cli_driver entry that changes.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/impl-plan.json",
+              "line": 102,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:8df36177bb7d33f8834c71f866faaf249aac3b4d1a1ed647d1babae471e029b4",
+          "at": "2026-06-28T17:53:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`RunReviewFixError` is traced to `IN-05` / `AC-06`, but those spec items describe task-contract gate wiring and fail-closed interruption before review invocation, while this catalogue entry describes a Claude/external runner dispatch sentinel. That makes T017 appear to satisfy gate-wiring requirements even though its described behavior is a separate dispatch contract, so the plan traceability is semantically wrong.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+              "line": 166,
+              "category": "broken_reference"
+            }
+          ],
+          "hash": "rvw1:sha256:e79c8b9e1319fa59a4665322543a86713b1380a111a8e5cfa9c9036990a35092",
+          "at": "2026-06-28T17:59:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T017` is described as provisional bookkeeping that stays \"informally grounded\" until a formal spec/ADR anchor is added outside this scope, but this same change set already adds that anchor in `spec.json` (`IN-10` / `AC-09` with ADR `D8`) and marks `RunReviewFixError` blue in `usecase-types.json`. The plan is therefore self-contradictory: it says the entry is not yet formally grounded while the surrounding artifacts already treat it as a formal in-scope requirement.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/impl-plan.json",
+              "line": 102,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a7b7873157d8a96961e31a282bdd7625d0329efb4072d7cc34e432836ebc4282",
+          "at": "2026-06-28T21:51:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:573629d00e790996827878a8585fbb91853cd7737ca707f78dad400075b2df3a",
+          "at": "2026-06-28T21:57:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D8 describes `ReviewServiceImpl::run_fix_local` as both a usecase-layer path and a cli_composition-layer shim in the same decision. That is a semantic layer-placement contradiction in an ADR whose decision is specifically about cross-layer pass-through, and it can steer the implementation/catalogue ownership to the wrong layer.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+              "line": 129,
+              "category": "contradiction"
+            },
+            {
+              "message": "IN-10 and AC-09 require behavior across usecase, cli_composition, and cli_driver, plus unit coverage for those pass-through paths, but the only covering task T017 is explicitly limited to catalogue bookkeeping for the usecase `RunReviewFixError` entry. The plan therefore marks the full cross-layer requirement/test acceptance as covered by a task that does not implement or test the cli_composition/cli_driver obligations described by the spec.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/impl-plan.json",
+              "line": 101,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:573629d00e790996827878a8585fbb91853cd7737ca707f78dad400075b2df3a",
+          "at": "2026-06-28T22:00:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D8 says D2 introduced `bin/sotp review fix-local`, but D2 in this same ADR introduces the new `bin/sotp task-contract check` pre-review binary gate. That makes the D8 reference to the prior decision semantically wrong and blurs whether the review-fix wrapper itself or only the new gate wiring is owned by this ADR. Reword this to say D2 wires the gate into the existing review-fix path, or cite the actual decision that introduced `review fix-local`.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+              "line": 127,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:c6ecb7e1f5a9af994cfe39fa4dba5c77f91b8b68baab1db27cedd434c0eb5915",
+          "at": "2026-06-28T22:05:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2deecb0b60196a808279d523cf4824627acb3d09c59aa7fc648645118d0cfaee",
+          "at": "2026-06-28T22:10:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This change introduces `T017` in the task map and CLI docs (`FixLocalArgs` / `build_review_fix_local_input`), but the review briefing for this plan only extends the current task set through `T016`. That leaves these entries attached to a task bucket outside the plan, so the attribution matrix is internally inconsistent.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/task-contract.json",
+              "line": 65,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:f6b1cc65aca0e31d72031eaa5eb303cfe09ad3c7cf30236dd731cb0d19da1fee",
+          "at": "2026-06-29T01:16:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f047876c77ab983b7383a2f52a54cb315309557a5aacdaca3ce9147323ecafa1",
+          "at": "2026-06-29T01:38:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T017 is the D8 review-fix dispatch pass-through task and its plan text says task-contract attribution should cover only the usecase `RunReviewFixError` catalogue entry, but this contract also assigns the unrelated CLI `FixLocalArgs` and `build_review_fix_local_input` entries to T017. Those CLI entries are documented in `cli-types.json` as IN-05 review-fix wiring, not D8/IN-10/AC-09 pass-through behavior, so the per-task gate will apply T017's task status to entries owned by a different task and can block or pass the wrong work item. Keep T017 scoped to `RunReviewFixError` and attribute the CLI entries to their actual owning task.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/task-contract.json",
+              "line": 65,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f047876c77ab983b7383a2f52a54cb315309557a5aacdaca3ce9147323ecafa1",
+          "at": "2026-06-29T01:43:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T016 says the new common `resolve_active_track` centralizes branch detection that was previously duplicated in `task_contract`, but the contract only attributes the new helper plus the `track::views` deletion. The old `cli::commands::task_contract::detect_active_track_from_branch_cwd` entry was removed from T005 without a corresponding `delete` entry under T016, so the plan no longer contracts the task-contract-side cleanup even though it contracts the analogous views cleanup. That leaves the coverage/liveness gate blind to part of the advertised refactor.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/task-contract.json",
+              "line": 72,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e1acde5b71ef661b136b3454df24267d18b7b372744b9d6f6bf38f3a79ac8b10",
+          "at": "2026-06-29T01:47:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_active_track` is documented as returning `None` for git discovery failure, but the task-contract cores treat `None` as the success path for allowed non-track contexts. That conflates an infrastructure failure with an intentional skip, so the pre-review gate/coverage path can pass instead of fail-closed when git state cannot be discovered. The resolver contract needs a distinct error channel, or the cores must not treat resolver failure as a normal skip.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/cli-types.json",
+              "line": 278,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:673b97689e06d9b948626314bac63d199113a135c8a1960429399008330e15c6",
+          "at": "2026-06-29T01:54:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d5e43f166b2371f941ba4eeb88815cb413bb1899986a5ee4b9043aa1987332a6",
+          "at": "2026-06-29T01:58:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cli::commands::track::views::detect_active_track_from_branch` is modeled as a `reference` here, but its own docs say it was removed in this track. The same symbol is then still carried forward into `contract-map.md`, so the final plan is internally inconsistent about whether this helper exists or has been deleted.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/pre-review-task-contract-conformance-gate-2026-06-27/cli-types.json",
+              "line": 222,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:5ff1daa034410ac78080646e82b1d573b44e60aaf1521eaa5f9cf0c9336cd346",
+          "at": "2026-06-29T06:59:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eecab1fd74775b89104dd6bf2aa2b1e710477892f8a12907adced0be1fc9a491",
+          "at": "2026-06-29T07:21:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The catalogue declares `cli::commands::track::views::detect_active_track_from_branch` as `action: \"reference\"`, but the entry's own docs say it was removed in T016 and replaced by `cli::commands::common::resolve_active_track`. A reference action communicates that the old views helper remains a surviving dependency, contradicting the stated T016 consolidation/removal plan and the nearby removed-function pattern that uses `delete`. Mark this entry as a deletion, or revise the docs/attribution if the function is intentionally still part of the final design.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/cli-types.json",
+              "line": 223,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:03adc8f5be10dc090188a999706aeda659e07bcf71fed475c5ce822be29ef751",
+          "at": "2026-06-29T07:31:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`task-contract.json` now attributes the `cli_composition` `ReviewCompositionRoot` catalogue entry to T017, but the T017 plan text explicitly says only the usecase `RunReviewFixError` catalogue entry should be attributed because the cli_composition/cli_driver behavior is covered by implementation-and-test scope. This makes the task contract contradict the stated responsibility boundary for T017 and will drive coverage against an entry the plan says should not be part of the task-contract attribution.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/task-contract.json",
+              "line": 71,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:cc4c350a82418fd552063330673184ae1d84341efa3c1471f1dfcb05ef55c0fd",
+          "at": "2026-06-29T07:35:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `detect_active_track_from_branch` catalogue entry is internally contradictory: it is marked as `action: \"reference\"` and is also surfaced as a reference/blue entry in the generated artifacts, but its own docs say it was removed in T016 and replaced by `cli::commands::common::resolve_active_track`. That means the plan artifacts credit T016 to a surviving referenced function instead of representing the intended removal/replacement, so the task-contract attribution can appear satisfied while the semantic change it claims is not modeled.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/cli-types.json",
+              "line": 223,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:207a1d1007e1b97bf9799afda8fc395fdd630b9922e138fe781e0bf4207d9a56",
+          "at": "2026-06-29T08:11:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:43a53fe994ce3aeafd9285d297837a3213304b40d5f89e70701e50afcd6f0fb1",
+          "at": "2026-06-29T08:19:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e672a0e893ce8daacf5deaa62558a67d042510cf8d55fd66ebdca4de8cf59c50",
+          "at": "2026-06-29T10:39:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The completed task metadata contradicts the plan's own batch sequencing. T015 says it is a separate Batch C3 from C1/C2, and T016 says it is Batch D separate from Batch C, but T009-T016 all carry the same `commit_hash` (`909888af...`). That makes the plan artifacts internally inconsistent about whether these tasks were separate implementation batches or one commit, without needing to verify the hash against git history.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/impl-plan.json",
+              "line": 92,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e672a0e893ce8daacf5deaa62558a67d042510cf8d55fd66ebdca4de8cf59c50",
+          "at": "2026-06-29T10:41:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2f2bacfb422bb8a421d89fbaecfa4e17c2897cc41a6199e26eee1fa338512aa3",
+          "at": "2026-06-29T10:49:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CoverageVerifyInteractor` is described as holding \"two injected secondary ports\", but the constructor immediately below now takes three parameters (`impl_plan_reader` is included). This leaves the plan artifact internally inconsistent about the interactor's dependency shape for the D9 change.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+              "line": 138,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:eff054264cabce008bfdeb80d4aa509938a967ac92c3c7ab0bd6cb0a40dbc4b2",
+          "at": "2026-06-29T11:44:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:823b99171d0e1d7b96c23205530c4535e4d6664551cd44f7127b6225ebd821cd",
+          "at": "2026-06-29T11:50:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D9 restates the existing gate criteria as requiring “all entry signals” to be blue, which contradicts D7/CN-03’s status-aware rule that todo-only yellow entries are allowed and only done/in_progress entries require blue. Because D9 is adding a new invariant to the same gate, this wording can drive T018/coverage follow-up work toward a stricter all-blue interpretation that blocks valid todo work.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+              "line": 158,
+              "category": "contradiction"
+            },
+            {
+              "message": "The T018 test plan claims CoverageVerifyInteractor unit tests satisfy AC-10, including command exit behavior, but AC-10 requires running `bin/sotp task-contract coverage` and observing an InvalidTaskRef report plus non-zero exit. Interactor-only tests do not exercise the CLI driver/command rendering or exit-code path, so the plan leaves the command-level acceptance criterion uncovered.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/impl-plan.json",
+              "line": 108,
+              "category": "test coverage gap"
+            },
+            {
+              "message": "`CoverageVerifyOutcome` still defines Passed/Blocked only in terms of signal-document availability, catalogue attribution, and InvalidEntryRef-style catalogue RI, and its Blocked violation list omits `InvalidTaskRef`. That conflicts with D9/CN-09/AC-10 and the CoverageViolation catalogue, where an invalid task key must produce `CoverageViolation::InvalidTaskRef` and force a blocked outcome.",
+              "severity": "P1",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/domain-types.json",
+              "line": 198,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:823b99171d0e1d7b96c23205530c4535e4d6664551cd44f7127b6225ebd821cd",
+          "at": "2026-06-29T11:55:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fb761e81fed8551053865558d0d5591f97c91500944bc2c3646306118575dde7",
+          "at": "2026-06-29T12:03:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ae5a05370f0e63567a048367a81fca034a66d79e10a3b355af2c72d67dc16de7",
+          "at": "2026-06-29T15:50:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ae5a05370f0e63567a048367a81fca034a66d79e10a3b355af2c72d67dc16de7",
+          "at": "2026-06-29T15:53:46Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This adapter reads `<items_dir>/<track_id>/task-contract.json` directly with `std::fs::read` and never rejects symlinks on the leaf or ancestor chain. A symlinked track directory or file can redirect the pre-review gate to attacker-controlled content; the existing filesystem loaders in this repo use `symlink_metadata`/`reject_symlinks_below` and fail closed here.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/task_contract_reader.rs",
+              "line": 44,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "This adapter follows the same unchecked read path for `<items_dir>/<track_id>/<layer>-type-signals.json`. Because there is no boundary symlink rejection before `std::fs::read`, a symlinked `track_id` directory or signal file can bypass the intended real-file semantics used by the other infrastructure readers.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/impl_catalog_signal_reader.rs",
+              "line": 50,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:d4f9fb6b11400c46722332f21b1289a90c4234fd8b61c8143711e7e8924fdabe",
+          "at": "2026-06-27T13:47:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Reject `self.items_dir` itself before the below-root walk. `reject_symlinks_below(&path, &self.items_dir)` only checks descendants; if `--items-dir` is a symlink, `task-contract.json` can be read through the redirected root. `FsSpecFileLoader` shows the required fail-closed trusted_root check.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/task_contract_reader.rs",
+              "line": 47,
+              "category": "trusted-root violation"
+            },
+            {
+              "message": "Reject `self.items_dir` itself before the below-root walk. `reject_symlinks_below(&path, &self.items_dir)` only checks descendants; if `--items-dir` is a symlink, `*-type-signals.json` can be read through the redirected root. `FsSpecFileLoader` shows the required fail-closed trusted_root check.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/impl_catalog_signal_reader.rs",
+              "line": 53,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:252b27b73c026a765b8eb8147c1cdd6b988b325226a08b26ab09bad83426efa5",
+          "at": "2026-06-27T13:55:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`entries` is deserialized as a plain `BTreeMap`, so duplicate task IDs in `task-contract.json` will be accepted with last-write-wins semantics during `serde_json::from_slice`. That silently drops contracted entries and can make the pre-review gate evaluate a different contract than the file actually encodes. Other strict infrastructure codecs in this repo reject duplicate map keys explicitly; this codec should fail closed too.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/task_contract_codec.rs",
+              "line": 78,
+              "category": "serde codec break"
+            }
+          ],
+          "hash": "rvw1:sha256:d765ae8d718905da3c9535f12f5c38ca1ae6fc1009a634ab1fcc7cbe21e81195",
+          "at": "2026-06-27T14:31:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:51a1afa9b19b3b63c5b77e793cca97cd025fdc3daf2d75c0bdfc7b3e7dfeb908",
+          "at": "2026-06-27T14:39:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`FsTaskContractReader` reads `task-contract.json` with `std::fs::read` after the symlink check, but there is no file-size bound before loading the whole artifact into memory. The infrastructure review policy treats unbounded adapter reads as correctness issues: a malformed or unexpectedly large track artifact can force this gate path to allocate arbitrarily. Add a metadata length check or a bounded reader and map oversize files to `TaskContractReadFailed` before decoding.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/task_contract_reader.rs",
+              "line": 74,
+              "category": "unbounded_read"
+            },
+            {
+              "message": "`FsImplCatalogSignalReader` likewise loads `<layer>-type-signals.json` with unbounded `std::fs::read`. These signal files are adapter-boundary inputs, so the reader should enforce a maximum byte size before allocation/read and return `SignalReadFailed` on oversize input; otherwise a large artifact can exhaust memory during the pre-review gate.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/impl_catalog_signal_reader.rs",
+              "line": 88,
+              "category": "unbounded_read"
+            }
+          ],
+          "hash": "rvw1:sha256:51a1afa9b19b3b63c5b77e793cca97cd025fdc3daf2d75c0bdfc7b3e7dfeb908",
+          "at": "2026-06-27T14:43:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3ed399f6e88939940ba66319b38bd89d9a3925d33691a48b41cbc2af101078fb",
+          "at": "2026-06-27T14:49:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3ed399f6e88939940ba66319b38bd89d9a3925d33691a48b41cbc2af101078fb",
+          "at": "2026-06-27T14:54:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`items_dir` is caller/config supplied, but this adapter treats it as the trusted root and joins `track_id` under it without canonicalizing the resolved path against an independent workspace trusted_root. The symlink guard only verifies descendants below `items_dir`; it does not prove the requested `task-contract.json` remains inside the repository trust boundary. This violates the trusted-root/CN-04 fail-closed pattern used for path inputs such as safe briefing paths.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/task_contract_reader.rs",
+              "line": 47,
+              "category": "trusted-root violation"
+            },
+            {
+              "message": "`items_dir` is caller/config supplied, but the signal reader builds `<items_dir>/<track_id>/<layer>-type-signals.json` and then uses `items_dir` itself as the trust anchor. Without canonicalizing against an independent trusted workspace root, a configured items directory outside the repo can make the adapter read signal files outside the intended trust boundary; the descendant symlink checks do not close that gap.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/impl_catalog_signal_reader.rs",
+              "line": 53,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:3ed399f6e88939940ba66319b38bd89d9a3925d33691a48b41cbc2af101078fb",
+          "at": "2026-06-27T15:01:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:962cb7f835fd45a0dfee30ccc2fdf6230f1fd0e29e738119279cdd8139dd5d78",
+          "at": "2026-06-27T15:11:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`symlink_metadata(&path)` is used as the only presence probe before returning `Ok(None)`. That probe can traverse symlinked parent components, so a symlinked `track_id` directory that points outside the trusted root but has no leaf file is classified as “missing” instead of being rejected. This weakens the boundary check; use `reject_symlinks_below` (or an equivalent fail-closed check) before treating `NotFound` as absence.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/impl_catalog_signal_reader.rs",
+              "line": 61,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:b8b4223ec4173d7500efd8a06ce93d891f2538bfc76cebfc72c761f14b85db3c",
+          "at": "2026-06-27T16:46:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ae0cd6e70fae299aab66d9cadaf92a40bc0f6201f1f3f9406b7017bcbac72a10",
+          "at": "2026-06-27T16:51:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ae0cd6e70fae299aab66d9cadaf92a40bc0f6201f1f3f9406b7017bcbac72a10",
+          "at": "2026-06-27T16:54:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c8ee3247dc4e8f05e606ba03dc487bdf00586f2898a5d97217c273fc440c37a",
+          "at": "2026-06-27T23:38:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c8ee3247dc4e8f05e606ba03dc487bdf00586f2898a5d97217c273fc440c37a",
+          "at": "2026-06-27T23:40:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:53a1f826555eac452af8d12163d637d77a8922c8f8a9aee86a933591573692ee",
+          "at": "2026-06-28T03:25:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:53a1f826555eac452af8d12163d637d77a8922c8f8a9aee86a933591573692ee",
+          "at": "2026-06-28T03:28:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:df2276d9cd176e462ac3bb3d0911fe92c553eec569e4f7674c70fe1cef1c7536",
+          "at": "2026-06-28T04:11:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:df2276d9cd176e462ac3bb3d0911fe92c553eec569e4f7674c70fe1cef1c7536",
+          "at": "2026-06-28T04:20:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`append_conformance_summary_to_briefing` opens the caller-provided `briefing_file` directly with `OpenOptions`, which follows symlinks. Existing infrastructure handling for `briefing_file` rejects symlinks at the boundary because a PR author can place an in-workspace symlink that points outside the trusted root; this new append path bypasses that protection and can append the conformance block to the symlink target instead of the intended briefing file. Reject symlinked briefing paths before opening, following the `scope_config_loader.rs` pattern.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/briefing_appender.rs",
+              "line": 38,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:df2276d9cd176e462ac3bb3d0911fe92c553eec569e4f7674c70fe1cef1c7536",
+          "at": "2026-06-28T04:34:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`reject_symlink_briefing_path` only stats the leaf briefing path before `OpenOptions::open`, so a symlinked parent directory such as `tmp/reviewer-runtime -> /outside` is still followed and the append/create is redirected outside the intended briefing location. Infrastructure I/O conventions require rejecting symlinks at the target file and parent directories before file access; the shared `track::symlink_guard::reject_symlinks_below` tests cover this parent-symlink case. Guard the full path below a trusted root, or otherwise reject symlinked ancestors before opening.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/briefing_appender.rs",
+              "line": 51,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:6dd29d2d451a3b3062d7bc446ffe439e406216974d5021ab96f49dc1d63c3055",
+          "at": "2026-06-28T04:39:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`append_conformance_summary_to_briefing` opens the caller-provided `briefing_file` directly with `OpenOptions`, which follows symlinks. The infrastructure policy requires explicit symlink rejection at file I/O boundaries when real-file semantics are expected; otherwise a symlinked briefing path can redirect the conformance append to an unintended target. Add a `symlink_metadata().file_type().is_symlink()` reject before opening, following the existing `scope_config_loader.rs` pattern.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/briefing_appender.rs",
+              "line": 39,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:71baaa50b471ae10a5b7e4b3ff4f8e9501a12a9b7c212aad620da0ba5f79ee64",
+          "at": "2026-06-28T04:53:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`FsImplPlanReader` reads `<items_dir>/<track_id>/impl-plan.json` with `std::fs::read_to_string` but never performs the repo-root/symlink checks that the sibling filesystem readers use. A symlinked `items_dir` or leaf `impl-plan.json` can therefore redirect the pre-review gate to attacker-controlled content instead of failing closed.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/impl_plan_reader.rs",
+              "line": 47,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:68e2fa77d07f88d71ac9d84fbd25351f9fd4d346f3ba4659c59c5ac6667f540d",
+          "at": "2026-06-28T10:31:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fa538cd9a86856710ee61aa19e3d7b2da1ddb11fbd368ada912e8a97aff436e9",
+          "at": "2026-06-28T10:42:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fa538cd9a86856710ee61aa19e3d7b2da1ddb11fbd368ada912e8a97aff436e9",
+          "at": "2026-06-28T10:46:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dd7111cd3eb1cdabab9fe64bf4d0be3c569bcc0d29a1b62ec5eb5f6abfc898a4",
+          "at": "2026-06-28T11:52:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dd7111cd3eb1cdabab9fe64bf4d0be3c569bcc0d29a1b62ec5eb5f6abfc898a4",
+          "at": "2026-06-28T11:56:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7469e9a03b7fc95f5851b25043e07940b6d631e0e9e85e2ababf84270142156c",
+          "at": "2026-06-29T13:17:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7469e9a03b7fc95f5851b25043e07940b6d631e0e9e85e2ababf84270142156c",
+          "at": "2026-06-29T13:20:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f105408a8e8b1d08d57d44edc81a6b8993b11e82ef2833f1b3bc665a05c22d6d",
+          "at": "2026-06-29T17:43:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f105408a8e8b1d08d57d44edc81a6b8993b11e82ef2833f1b3bc665a05c22d6d",
+          "at": "2026-06-29T17:46:45Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cc0d115b6bb167040272c41f983e7e930caa32425e32f2cfee94ffee30f9eb6a",
+          "at": "2026-06-27T13:47:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TaskContractDocument::new` documents that a contract with no attributed entries is invalid, but it only rejects an empty map. A value like `{ T001: vec![] }` is accepted even though it contains zero `ContractedEntryRef`s, so the domain type can represent the fail-closed-empty contract the constructor claims to reject. Tighten the constructor to reject no actual attributions, and likely empty per-task lists as well.",
+              "severity": "P1",
+              "file": "libs/domain/src/task_contract.rs",
+              "line": 83,
+              "category": "broken invariant in newtype constructor"
+            },
+            {
+              "message": "`Blocked` is documented as carrying one or more gate violations, but the public variant stores a raw `Vec<PreReviewGateViolation>`, so callers can construct `PreReviewGateOutcome::Blocked { violations: vec![] }`. That makes an illegal gate state representable; follow the project’s non-empty findings pattern with a validated non-empty wrapper or constructor.",
+              "severity": "P1",
+              "file": "libs/domain/src/task_contract.rs",
+              "line": 169,
+              "category": "primitive obsession"
+            }
+          ],
+          "hash": "rvw1:sha256:cc0d115b6bb167040272c41f983e7e930caa32425e32f2cfee94ffee30f9eb6a",
+          "at": "2026-06-27T13:53:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `PreReviewGateOutcome::blocked()` validates that `violations` is non-empty, but the `Blocked { violations: Vec<_> }` variant is public and can still be constructed directly with `vec![]`. That means the returned type does not encode the invariant the constructor just checked, so the non-empty gate result can be bypassed at the API boundary.",
+              "severity": "P1",
+              "file": "libs/domain/src/task_contract.rs",
+              "line": 173,
+              "category": "typestate / parse-don't-validate gap"
+            }
+          ],
+          "hash": "rvw1:sha256:fd1304d844f5bdf07e8c097d917931c8bcfe6dfa46481965d066bcfb89040f97",
+          "at": "2026-06-27T14:29:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`PreReviewGateOutcome::Blocked` no longer matches the tracked domain contract: the variant lost `#[non_exhaustive]` and its payload type changed from `Vec<PreReviewGateViolation>` to the new `PreReviewGateViolations` wrapper. That diverges from `track/items/pre-review-task-contract-conformance-gate-2026-06-27/domain-types.json` and breaks consumers generated against the declared shape.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/domain/src/task_contract.rs",
+              "line": 217,
+              "category": "catalogue-contract"
+            }
+          ],
+          "hash": "rvw1:sha256:9fc1eb27af24e4ea5a2d676c4f0d065fe04b6e8934e2ca420f14fbf4ad9271cc",
+          "at": "2026-06-27T14:37:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`PreReviewGateOutcome::Blocked` no longer matches the declared domain contract: `domain-types.json` says the payload is `Vec<PreReviewGateViolation>` (and marks the variant non-exhaustive), but this implementation exposes the new public `PreReviewGateViolations` wrapper instead. That breaks shape parity for generated consumers and makes the domain API diverge from the catalog the rest of the track is built against.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/domain/src/task_contract.rs",
+              "line": 217,
+              "category": "typestate / parse-don't-validate gap"
+            }
+          ],
+          "hash": "rvw1:sha256:9fc1eb27af24e4ea5a2d676c4f0d065fe04b6e8934e2ca420f14fbf4ad9271cc",
+          "at": "2026-06-27T14:54:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fd1304d844f5bdf07e8c097d917931c8bcfe6dfa46481965d066bcfb89040f97",
+          "at": "2026-06-27T15:02:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fd1304d844f5bdf07e8c097d917931c8bcfe6dfa46481965d066bcfb89040f97",
+          "at": "2026-06-27T15:07:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dbf90dc0df70bc165dec0cbeb9c48a2c7cbe6eb70d7c0de70d0935c893c73942",
+          "at": "2026-06-28T10:28:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dbf90dc0df70bc165dec0cbeb9c48a2c7cbe6eb70d7c0de70d0935c893c73942",
+          "at": "2026-06-28T10:31:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b18a2d73c10f2ded604b85ef4c2467e66603aba50a37c1a8acff778017674d35",
+          "at": "2026-06-28T14:05:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b18a2d73c10f2ded604b85ef4c2467e66603aba50a37c1a8acff778017674d35",
+          "at": "2026-06-28T14:08:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7322c0ae910691e5bdb8a60141491e5ed80be9639a05ed8b614ebf4dad20ce8e",
+          "at": "2026-06-29T11:42:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7322c0ae910691e5bdb8a60141491e5ed80be9639a05ed8b614ebf4dad20ce8e",
+          "at": "2026-06-29T11:46:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bec40d291e19e5fe25121b030c66f4b31040c7cb70edeffb1f611ccf116223fc",
+          "at": "2026-06-29T15:48:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bec40d291e19e5fe25121b030c66f4b31040c7cb70edeffb1f611ccf116223fc",
+          "at": "2026-06-29T15:51:21Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The orphan-detection loop silently drops any signal entry whose `type_name` cannot be converted to `CatalogueEntryKey` (`Err(_) => { ... }`). That branch is reachable because `type_signals_codec::decode` accepts arbitrary `type_name` strings, so a malformed `<layer>-type-signals.json` can contain an uncovered entry that the gate never reports. This makes the gate fail open instead of blocking or surfacing an error.",
+              "severity": "P1",
+              "file": "libs/usecase/src/pre_review_gate.rs",
+              "line": 222,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:98d3cee97dc45e07009f480db7930a9074f2ce4dd7909b4207936a6c63aa0f18",
+          "at": "2026-06-27T13:46:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:46ccc45e62b8a34cefec80c76ad613c3a182b16a464bd89708fefd84f59e8f6d",
+          "at": "2026-06-27T13:54:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7a2c0d59210a3afe96d888bb8c3a52b1cf7a98c369f307df5f1a82c396822554",
+          "at": "2026-06-27T14:30:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7a2c0d59210a3afe96d888bb8c3a52b1cf7a98c369f307df5f1a82c396822554",
+          "at": "2026-06-27T14:33:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `None` branch swallows every `SignalReadFailed`, but `check_layer()` also raises that error for malformed signal documents (for example, invalid `type_name` values are converted to `SignalReadFailed` here). As a result, a corrupt or unreadable layer can be treated as if it simply had no document, and all-layers mode can return `Passed` instead of surfacing the failure.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/pre_review_gate.rs",
+              "line": 338,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:dc958872f3aa50aab626e8d8f72055053ee315ec2426f800b1759c9b33645c09",
+          "at": "2026-06-27T16:09:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "All-layers skip logic keys off the human-readable `message` inside `PreReviewGateError::SignalReadFailed` instead of a typed not-found variant. Because that diagnostic is documented as opaque, a real read/decode failure can be misclassified as a missing document and silently skipped, which breaks the fail-closed behavior in the `None` branch.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/pre_review_gate.rs",
+              "line": 204,
+              "category": "error type confusion"
+            }
+          ],
+          "hash": "rvw1:sha256:0e11154af6a288eb3f0a6c13e4627f031745df3c50c9173c75f91e2e8b404cd5",
+          "at": "2026-06-27T16:16:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`None` mode decides whether to skip a layer by parsing the opaque `PreReviewGateError::SignalReadFailed.message` string. That makes control flow depend on diagnostic text instead of a typed not-found signal, so a genuine read/decode failure can be misclassified as \"missing\" and silently skipped, letting all-layers mode pass when it should fail closed.",
+              "severity": "P1",
+              "file": "libs/usecase/src/pre_review_gate.rs",
+              "line": 204,
+              "category": "error type confusion"
+            }
+          ],
+          "hash": "rvw1:sha256:0e11154af6a288eb3f0a6c13e4627f031745df3c50c9173c75f91e2e8b404cd5",
+          "at": "2026-06-27T16:24:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `None`-layer mode now depends on `read_optional_signals()`, but this file only adds a default shim that calls `read_signals()`. The production filesystem adapter still reports a missing `*-type-signals.json` as `SignalReadFailed`, so the new all-layers path will still abort on absent layers instead of skipping them silently. The added passing test only uses a mock that overrides the new hook, so it does not cover the real adapter path.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/pre_review_gate.rs",
+              "line": 141,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:5a24c9e3a48ad1676b97eb41ebef7eb3641fb4f6ea2c640862d6817e1e3e24d2",
+          "at": "2026-06-27T16:30:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5a24c9e3a48ad1676b97eb41ebef7eb3641fb4f6ea2c640862d6817e1e3e24d2",
+          "at": "2026-06-27T16:38:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5a24c9e3a48ad1676b97eb41ebef7eb3641fb4f6ea2c640862d6817e1e3e24d2",
+          "at": "2026-06-27T16:41:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1b727304fe222a3508891c0db704f59e86e94bca9f2fa83516fb02479f9f7c8d",
+          "at": "2026-06-27T23:16:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1b727304fe222a3508891c0db704f59e86e94bca9f2fa83516fb02479f9f7c8d",
+          "at": "2026-06-27T23:18:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d00608ee1a1e456be05eb9e9957cfcbf423121a99eab16ef861add3d5209c36a",
+          "at": "2026-06-28T10:30:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verify_coverage` treats an absent layer signal document as `continue` without checking whether `task-contract.json` has entries for that layer. If a layer's `<layer>-type-signals.json` is missing but the contract still attributes entries to it, `all_violations` can stay empty and the coverage gate returns `Passed`, even though those attributed entries do not exist in the catalogue. The coverage path should block with `InvalidEntryRef` or equivalent for contracted entries in absent layers.",
+              "severity": "P1",
+              "file": "libs/usecase/src/pre_review_gate.rs",
+              "line": 291,
+              "category": "orchestration correctness"
+            },
+            {
+              "message": "The D7 status filter only exempts entries when all owning tasks are `Todo`; every other status is treated as requiring Blue. `TaskStatusKind::Skipped` is a valid impl-plan status, so a skipped-only task with a Yellow signal will incorrectly block even though the gate contract only requires Blue for `in_progress` and `done` tasks and treats Red as the status-independent blocker. The active-status decision should distinguish `InProgress | Done` from skipped tasks instead of using `!all_todo`.",
+              "severity": "P1",
+              "file": "libs/usecase/src/pre_review_gate.rs",
+              "line": 511,
+              "category": "business logic leak"
+            }
+          ],
+          "hash": "rvw1:sha256:d00608ee1a1e456be05eb9e9957cfcbf423121a99eab16ef861add3d5209c36a",
+          "at": "2026-06-28T10:34:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e46c0220646557ac7e02964231d183d80a2a333c902d4eeaee93c2ade63bdc0f",
+          "at": "2026-06-28T10:42:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:83dcc56dc5a30757c49ced8c31aa92c945e72664e118dd70ac37274e01844e24",
+          "at": "2026-06-28T14:05:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:83dcc56dc5a30757c49ced8c31aa92c945e72664e118dd70ac37274e01844e24",
+          "at": "2026-06-28T14:09:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:56c7416494fa04be194809c251cbb0b92cc6f9ca2d125bcb5aa3ae3b45dd78c3",
+          "at": "2026-06-28T15:02:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:56c7416494fa04be194809c251cbb0b92cc6f9ca2d125bcb5aa3ae3b45dd78c3",
+          "at": "2026-06-28T15:05:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1eefc1d36eccd07257c518ef46eb323cf4ab1bbdcc040cc09bd61c7907aa73ec",
+          "at": "2026-06-28T16:27:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`RunReviewFixError::SubagentDispatchRequired(String)` adds CLI/composition transport details to the usecase public error type: the docs bind it to the `claude` provider, a `SUBAGENT_DISPATCH_REQUIRED` stdout payload, and exit code 64. That forces usecase callers to understand and preserve a CLI dispatch protocol instead of letting the CLI composition root map a pure usecase outcome to stdout and exit status, which breaks the usecase error abstraction / CLI-as-composition-root boundary.",
+              "severity": "P1",
+              "file": "libs/usecase/src/review_v2/run_review_fix.rs",
+              "line": 106,
+              "category": "error_type_confusion"
+            }
+          ],
+          "hash": "rvw1:sha256:1eefc1d36eccd07257c518ef46eb323cf4ab1bbdcc040cc09bd61c7907aa73ec",
+          "at": "2026-06-28T16:31:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4e9b2493a7e07b7de7b30e6ce3bccf9f3b20a991b5d1a4d70df820fc4aade3bc",
+          "at": "2026-06-28T16:34:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f8fe868a580e8e33c9276a4743b9991f8a161dddc40777896e278b1955d1ac25",
+          "at": "2026-06-29T11:44:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f8fe868a580e8e33c9276a4743b9991f8a161dddc40777896e278b1955d1ac25",
+          "at": "2026-06-29T11:48:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:488dfdbf96170ef1ba47f47af8de99691f4040bd1782264d64d3626456e51e23",
+          "at": "2026-06-29T14:46:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1 business logic leak: `CoverageVerifyInteractor` now decides catalogue membership by branching on the raw signal tag string `\"unknown\"`. That classification is domain knowledge about `TypeSignal`/catalogue entry semantics, so the usecase layer is no longer just orchestrating domain rules; it should call a domain-owned predicate/value type such as `TypeSignal::is_catalogue_entry()` instead of encoding the sentinel string here.",
+              "severity": "P1",
+              "file": "libs/usecase/src/pre_review_gate.rs",
+              "line": 270,
+              "category": "business_logic_leak"
+            }
+          ],
+          "hash": "rvw1:sha256:488dfdbf96170ef1ba47f47af8de99691f4040bd1782264d64d3626456e51e23",
+          "at": "2026-06-29T14:50:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:890c6d0f67750d45d9a71a5608ac674d9922bedaa56e17221db5846480a1f4ac",
+          "at": "2026-06-29T15:49:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:890c6d0f67750d45d9a71a5608ac674d9922bedaa56e17221db5846480a1f4ac",
+          "at": "2026-06-29T15:52:02Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:81d63ac4abbe47745215e9280d17c446e8638bd271d02046709485bf41e35040",
+          "at": "2026-06-27T13:46:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:81d63ac4abbe47745215e9280d17c446e8638bd271d02046709485bf41e35040",
+          "at": "2026-06-27T13:49:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a29d6da6a7c91675cbfe8900a118d1045794a97a91682ab2a54f9969944244d8",
+          "at": "2026-06-27T16:09:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a29d6da6a7c91675cbfe8900a118d1045794a97a91682ab2a54f9969944244d8",
+          "at": "2026-06-27T16:12:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7f092b89230d81260f6fe9756a8917e0cdf33c1dad72a47917cd903b8aebafec",
+          "at": "2026-06-28T02:30:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7f092b89230d81260f6fe9756a8917e0cdf33c1dad72a47917cd903b8aebafec",
+          "at": "2026-06-28T02:33:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:743e729fa57b6c6067ee660bc09fd49591b7f705a2de23611214412ff7787591",
+          "at": "2026-06-28T03:08:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:743e729fa57b6c6067ee660bc09fd49591b7f705a2de23611214412ff7787591",
+          "at": "2026-06-28T03:11:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ef289497d7700e9d3113626e1ff91b8b1c1f8336a9d8e523f6ea3e7a1b29b5a2",
+          "at": "2026-06-28T04:07:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "[render leak] The composition root formats the final user-facing failure string here (`format!(...)`) and injects the raw append error into it. That output construction belongs in `cli_driver`; this layer should surface a typed composition error or let the driver render the failure, otherwise the wiring layer is leaking presentation concerns and may expose filesystem details in the message.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/apps/cli-composition/src/task_contract.rs",
+              "line": 84,
+              "category": "render leak"
+            }
+          ],
+          "hash": "rvw1:sha256:ef289497d7700e9d3113626e1ff91b8b1c1f8336a9d8e523f6ea3e7a1b29b5a2",
+          "at": "2026-06-28T04:11:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9459389c3b86245556fe494896b7e6b2d30f677d06d44e68e7e0464d5486b119",
+          "at": "2026-06-28T04:14:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9459389c3b86245556fe494896b7e6b2d30f677d06d44e68e7e0464d5486b119",
+          "at": "2026-06-28T04:20:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9459389c3b86245556fe494896b7e6b2d30f677d06d44e68e7e0464d5486b119",
+          "at": "2026-06-28T04:35:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f243976129bde6fa39ea128cbbfcd6f7183c4cef8dc5ab341345c6220cf668bb",
+          "at": "2026-06-28T10:29:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f243976129bde6fa39ea128cbbfcd6f7183c4cef8dc5ab341345c6220cf668bb",
+          "at": "2026-06-28T10:32:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:731658de4e94460fcabca47171a42a8f31fc23ed98d6edbf1a1e98354f365da3",
+          "at": "2026-06-28T16:26:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:731658de4e94460fcabca47171a42a8f31fc23ed98d6edbf1a1e98354f365da3",
+          "at": "2026-06-28T16:29:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c569843a389c020a384fc3ffdd2a9835308fae96cc8e0592d1502660a106afec",
+          "at": "2026-06-29T06:56:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c569843a389c020a384fc3ffdd2a9835308fae96cc8e0592d1502660a106afec",
+          "at": "2026-06-29T06:59:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e7b13c1c59ee5d941c7bfe81f3f55b84e1c70c6bb7bb94d11ef0482383563f2f",
+          "at": "2026-06-29T11:42:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e7b13c1c59ee5d941c7bfe81f3f55b84e1c70c6bb7bb94d11ef0482383563f2f",
+          "at": "2026-06-29T11:45:24Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:14d8205a81db5609a9e50d81a704134e95ea462fcb24f4c40a4fa62ae7fdbde4",
+          "at": "2026-06-27T13:45:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:14d8205a81db5609a9e50d81a704134e95ea462fcb24f4c40a4fa62ae7fdbde4",
+          "at": "2026-06-27T13:49:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3f94ef835677874e6d60897ad815f3f03eb567d33080dd15428c44a61d99e3be",
+          "at": "2026-06-27T16:09:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3f94ef835677874e6d60897ad815f3f03eb567d33080dd15428c44a61d99e3be",
+          "at": "2026-06-27T16:12:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e9d8db98c6703e49f7c67004e0e62004d030a63afa5f5184c2a26428a07bb1e6",
+          "at": "2026-06-27T16:45:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e9d8db98c6703e49f7c67004e0e62004d030a63afa5f5184c2a26428a07bb1e6",
+          "at": "2026-06-27T16:47:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:53fb2b5aa5ee3032561d9e39cf23810a0fcd813c4a1883b26d07dfdd97e1f044",
+          "at": "2026-06-28T02:29:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:53fb2b5aa5ee3032561d9e39cf23810a0fcd813c4a1883b26d07dfdd97e1f044",
+          "at": "2026-06-28T02:32:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This code performs application-level file I/O from the CLI layer (`OpenOptions::new().create(true).append(true)` plus `writeln!`). That breaks the thin-bin boundary in the scope policy/ADR D8; `apps/cli` should only parse and dispatch, with the append handled behind `cli_driver`/`cli_composition`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/apps/cli/src/commands/task_contract.rs",
+              "line": 145,
+              "category": "direct I/O in bin"
+            },
+            {
+              "message": "The new `--briefing-file` branch has no tests for either the append success path or the IO-error fail-closed path. The current tests only exercise clap parsing, so regressions in the new side effect and exit-code behavior can slip through undetected.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/apps/cli/src/commands/task_contract.rs",
+              "line": 103,
+              "category": "test coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:17349e1cdf21fe812f563b36fc834b5c853e0e7616ad0e59969870f5365c3f0b",
+          "at": "2026-06-28T03:48:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:306f6625b9334b7a0aba513cbabc1b5da694cea0583b5da5739006a6e5914c2d",
+          "at": "2026-06-28T04:11:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:306f6625b9334b7a0aba513cbabc1b5da694cea0583b5da5739006a6e5914c2d",
+          "at": "2026-06-28T04:21:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:306f6625b9334b7a0aba513cbabc1b5da694cea0583b5da5739006a6e5914c2d",
+          "at": "2026-06-28T04:34:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:64f4e9ea90efb50bb77a622c1f6aebdc3995b7e529ed7141f92d48c47099cb28",
+          "at": "2026-06-28T10:29:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:64f4e9ea90efb50bb77a622c1f6aebdc3995b7e529ed7141f92d48c47099cb28",
+          "at": "2026-06-28T10:32:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`task_contract_check_core` and the matching coverage helper print skip notices with `println!` before returning success. That is direct application output from the bin layer instead of flowing through a driver `CommandOutcome`, which violates the CLI boundary and can pollute stdout for scripted callers.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/apps/cli/src/commands/task_contract.rs",
+              "line": 155,
+              "category": "direct I/O in bin"
+            }
+          ],
+          "hash": "rvw1:sha256:54d790841280dfc079bb1645a22277aea86723f6341308e36f30a63fc3f938b4",
+          "at": "2026-06-28T15:02:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e94d3e937b1d41bbafcb153fb518dd89457df08ea65d8f5ddeee11d6f6ba3033",
+          "at": "2026-06-28T15:06:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e94d3e937b1d41bbafcb153fb518dd89457df08ea65d8f5ddeee11d6f6ba3033",
+          "at": "2026-06-28T15:10:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`check_spec_adr` now derives the fallback `spec.json` path from `std::env::current_dir()` and then appends `track/items/<id>/spec.json`. If the command is run from any subdirectory of the repo, this points at the wrong location and the command will incorrectly take the graceful-skip path even when the active track's spec exists at the repository root. Resolve the repo/workspace root first, then build the fallback path from that root.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/apps/cli/src/commands/signal/check_spec_adr.rs",
+              "line": 66,
+              "category": "business logic in bin"
+            },
+            {
+              "message": "The skip branches in `resolve_spec_json_path_or_skip` emit notices with `println!` before returning `CommandOutcome::success(None)`. That is direct stdout I/O in the thin-bin layer, bypassing the normal `CommandOutcome` emission path and making the skip output impossible to control consistently. Return the notice through `CommandOutcome::success(Some(...))` instead, or let the driver emit it.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/apps/cli/src/commands/signal/check_spec_adr.rs",
+              "line": 77,
+              "category": "direct I/O in bin"
+            }
+          ],
+          "hash": "rvw1:sha256:68a8f07888b5a90fb2a02a7fe1a6cf0abfe640a99a8277fdea4aebc37112ee61",
+          "at": "2026-06-29T01:17:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_track_id(...)` is the read resolver, so an explicit `--track-id` is returned unchanged here. That means `sotp review fix-local --track-id <other-track>` can bypass the branch-mismatch guard and operate on the wrong track, which is exactly the failure mode the write-side guard is meant to prevent. Use the `*_for_write` resolver for this path.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/apps/cli/src/commands/review/fix_local.rs",
+              "line": 72,
+              "category": "business logic in bin"
+            }
+          ],
+          "hash": "rvw1:sha256:ae955db0051b86ae954bfc6236b0b27c3867d192cfcc9fa0f9e3b89411c587e5",
+          "at": "2026-06-29T01:30:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "When `--workspace-root` is invalid or git discovery fails, `resolve_spec_json_path_or_skip()` returns `Ok(None)`, so `run()` emits a skip and exits 0. That suppresses the blocked/error outcome produced by `SignalCompositionRoot::signal_check_spec_adr` for the same failure modes, making bad workspaces look successful.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/signal/check_spec_adr.rs",
+              "line": 41,
+              "category": "ExitCode mapping inconsistency"
+            },
+            {
+              "message": "`check-catalog-spec` and `check-impl-catalog` now short-circuit in the CLI on `resolve_active_track(...).is_none()`. Because `resolve_active_track()` also returns `None` for git-discovery / bad `--workspace-root` failures, those cases are silently downgraded to a successful skip instead of letting the composition root report an error.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/signal/check_catalog_spec.rs",
+              "line": 29,
+              "category": "ExitCode mapping inconsistency"
+            }
+          ],
+          "hash": "rvw1:sha256:a78718efc92a0b43ba2ae51b4d5bf377d0aed1a6f2f2102cb2a3d033e69f31a3",
+          "at": "2026-06-29T01:40:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_task_contract_check` and `execute_task_contract_coverage` both collapse `resolve_active_track(None)` with `.ok().flatten()`. That discards the new helper's `Err` path, so a missing `git`, a non-work-tree cwd, or any other discovery failure is treated the same as \"no active track\" and the command exits `SUCCESS` without running the gate. This is a fail-open regression for the pre-review gate; propagate the error instead of converting it to `None`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/apps/cli/src/commands/task_contract.rs",
+              "line": 133,
+              "category": "missing error propagation"
+            },
+            {
+              "message": "The no-`--track-id` branch now routes through `common::resolve_active_track(Some(&project_root))`, which turns git-discovery failures into a hard error. `track views sync` is documented to preserve registry-only mode when no active track is resolvable, so this changes a supported fallback into an abort on non-git checkouts or broken git environments. Keep the previous `None` fallback here and only fail on explicit WRITE-guard mismatches.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/apps/cli/src/commands/track/views.rs",
+              "line": 31,
+              "category": "behavior regression"
+            }
+          ],
+          "hash": "rvw1:sha256:4e70bd7d0fa80172bca24347d4caf37b588121a4febb522abeda33e182bf6e02",
+          "at": "2026-06-29T01:52:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c37964f4d79de0176f7a4f46a047f76dace7734b08ccb461d115e9ecf6e5085",
+          "at": "2026-06-29T02:00:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_active_track` performs git discovery directly in the CLI bin layer and returns the branch-derived track decision before the command driver handles the request. This reintroduces application I/O/orchestration into `apps/cli` instead of keeping the bin at parse -> driver.handle -> emit as required by ADR 2026-06-21 D5/D8 and ADR 2026-05-27 D3. Move this resolution behind `cli_driver`/`cli_composition` and have command handlers pass only typed inputs.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/common.rs",
+              "line": 24,
+              "category": "direct I/O in bin"
+            },
+            {
+              "message": "`check-spec-adr` now constructs `track/items/<track>/spec.json`, probes it with `exists()`, and returns a success skip from the CLI handler before dispatching to the signal composition path. That is filesystem/application decision logic in the bin layer and can silently turn a missing spec for an active track into exit 0 instead of letting the driver/usecase render the gate result. Per ADR 2026-06-21 D5/D8, keep this resolution and skip policy behind the driver/composition boundary.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/signal/check_spec_adr.rs",
+              "line": 101,
+              "category": "business logic in bin"
+            }
+          ],
+          "hash": "rvw1:sha256:3c37964f4d79de0176f7a4f46a047f76dace7734b08ccb461d115e9ecf6e5085",
+          "at": "2026-06-29T02:04:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_fix_local` now resolves and validates the active track in the CLI handler before calling `ReviewCompositionRoot::new().review_driver().handle(...)`. That branch-derived track resolution and fail-closed decision is application orchestration in the thin-bin layer, so the command can emit/fail outside the review driver path and duplicates track write policy. Per the CLI scope policy and ADR D5/D8, this should be delegated behind `cli_driver`/`cli_composition` instead of being performed in `apps/cli`.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/fix_local.rs",
+              "line": 71,
+              "category": "business logic in bin"
+            }
+          ],
+          "hash": "rvw1:sha256:c80986af2094b4e47bf1dfcf8dd3b1eed652109895a23c121de0cb7ffe70dbce",
+          "at": "2026-06-29T02:10:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6bebcb13fc14f620a5c8010f7106a1c69482bd9d01fb3bde16435c5cc42d3bbc",
+          "at": "2026-06-29T07:04:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6bebcb13fc14f620a5c8010f7106a1c69482bd9d01fb3bde16435c5cc42d3bbc",
+          "at": "2026-06-29T07:09:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8f85e0c86f3269867d50d38e968b43a6f9df766d03a9f14af24cce836313b329",
+          "at": "2026-06-29T18:22:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8f85e0c86f3269867d50d38e968b43a6f9df766d03a9f14af24cce836313b329",
+          "at": "2026-06-29T18:26:14Z"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c1710adc9047981e16a2e2c53cdbec58d4ffa31f931f63f7f01c68a6b0dfe914",
+          "at": "2026-06-27T13:47:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c1710adc9047981e16a2e2c53cdbec58d4ffa31f931f63f7f01c68a6b0dfe914",
+          "at": "2026-06-27T13:52:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5f325deb0bafec9596ff2af1fef0a16a19b5ef8644288eaed8763aff13bebc8c",
+          "at": "2026-06-27T14:29:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5f325deb0bafec9596ff2af1fef0a16a19b5ef8644288eaed8763aff13bebc8c",
+          "at": "2026-06-27T14:32:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c10814f8285d01927215342f8d85b91d8a5a414cffe9435a9487bce5ec85b5d9",
+          "at": "2026-06-27T16:09:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c10814f8285d01927215342f8d85b91d8a5a414cffe9435a9487bce5ec85b5d9",
+          "at": "2026-06-27T16:12:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0b33580998dd5e9e09e4b374876071d0ee99e2ec6086ef80a6d8043be4be2951",
+          "at": "2026-06-28T04:05:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0b33580998dd5e9e09e4b374876071d0ee99e2ec6086ef80a6d8043be4be2951",
+          "at": "2026-06-28T04:12:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0b33580998dd5e9e09e4b374876071d0ee99e2ec6086ef80a6d8043be4be2951",
+          "at": "2026-06-28T04:20:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0b33580998dd5e9e09e4b374876071d0ee99e2ec6086ef80a6d8043be4be2951",
+          "at": "2026-06-28T04:35:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69903591b7376678be3697b08e5e6d806cec2de13fd16453fb27000dd170a0fa",
+          "at": "2026-06-28T10:29:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69903591b7376678be3697b08e5e6d806cec2de13fd16453fb27000dd170a0fa",
+          "at": "2026-06-28T10:32:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7a47731731af4efc157ce037eadb114bfd258dd05e51970f6e60833162ea8645",
+          "at": "2026-06-28T14:04:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7a47731731af4efc157ce037eadb114bfd258dd05e51970f6e60833162ea8645",
+          "at": "2026-06-28T14:07:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5496f3f7330d919134c3f5f7b31a24cb5d35eacac77825cc22c0e55d8f96e912",
+          "at": "2026-06-28T16:26:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5496f3f7330d919134c3f5f7b31a24cb5d35eacac77825cc22c0e55d8f96e912",
+          "at": "2026-06-28T16:28:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fa2b518983756f3f02f09aa56193ef2a2e671b1bf9c7bc247356671b40c4d598",
+          "at": "2026-06-29T11:41:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fa2b518983756f3f02f09aa56193ef2a2e671b1bf9c7bc247356671b40c4d598",
+          "at": "2026-06-29T11:44:42Z"
+        }
+      ]
+    }
+  }
+}

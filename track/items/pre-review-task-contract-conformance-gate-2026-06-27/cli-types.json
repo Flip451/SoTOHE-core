@@ -1,0 +1,311 @@
+{
+  "schema_version": 5,
+  "crate_name": "cli",
+  "layer": "cli",
+  "types": {
+    "CliCommand": {
+      "action": "modify",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Arch",        "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "ArchCommand" }] } },
+          { "name": "Conventions", "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "ConventionsCommand" }] } },
+          { "name": "Domain",      "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "DomainCommand" }] } },
+          { "name": "Guard",       "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "GuardCommand" }] } },
+          { "name": "Hook",        "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "HookCommand" }] } },
+          { "name": "Track",       "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "TrackCommand" }] } },
+          { "name": "Git",         "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "GitCommand" }] } },
+          { "name": "Pr",          "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "PrCommand" }] } },
+          { "name": "Plan",        "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "PlanCommand" }] } },
+          { "name": "Review",      "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "ReviewCommand" }] } },
+          { "name": "File",        "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "FileCommand" }] } },
+          { "name": "Verify",      "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "VerifyCommand" }] } },
+          { "name": "FindSimilar", "payload": { "kind": "tuple",  "fields": ["FindSimilarArgs"] } },
+          { "name": "DupIndex",    "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "DupIndexCommand" }] } },
+          { "name": "DupCheck",    "payload": { "kind": "tuple",  "fields": ["DupCheckArgs"] } },
+          { "name": "Telemetry",   "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "TelemetryCommand" }] } },
+          { "name": "Dry",         "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "DryCommand" }] } },
+          { "name": "RefVerify",   "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "RefVerifyCommand" }] } },
+          { "name": "Signal",      "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "SignalCommand" }] } },
+          { "name": "TaskContract","payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "TaskContractCommand" }] } },
+          { "name": "Demo",        "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "",
+      "docs": "Top-level sotp CLI command dispatcher. Routes sotp subcommands to their respective handlers. TaskContract variant added by this track to expose the pre-review conformance gate subcommands (sotp task-contract check and sotp task-contract coverage).",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-07" }
+      ],
+      "informal_grounds": []
+    },
+    "FixLocalArgs": {
+      "action": "modify",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "scope",         "ty": "String" },
+            { "name": "briefing_file", "ty": "std::path::PathBuf" },
+            { "name": "track_id",      "ty": "Option<String>" },
+            { "name": "round_type",    "ty": "CodexRoundTypeArg" },
+            { "name": "model",         "ty": "Option<String>" },
+            { "name": "items_dir",     "ty": "std::path::PathBuf" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "commands::review::fix_local",
+      "docs": "Arguments for `sotp review fix-local`. The --track-id flag is optional; when omitted the active track is auto-resolved from the current git branch (track/<id>). The --items-dir flag provides the track items path used for branch auto-resolve when --track-id is omitted.",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-05" }
+      ],
+      "informal_grounds": []
+    },
+    "TaskContractCommand": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Check",
+            "payload": {
+              "kind": "tuple",
+              "fields": ["TaskContractCheckArgs"]
+            }
+          },
+          {
+            "name": "Coverage",
+            "payload": {
+              "kind": "tuple",
+              "fields": ["TaskContractCoverageArgs"]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "commands::task_contract",
+      "docs": "Subcommands for `sotp task-contract`. Check: run the pre-review liveness gate check for the given optional TDDD layer and track. Coverage: run the attribution-completeness coverage check for the given track. When --track-id is omitted for either subcommand, the active track is auto-resolved from the current git branch (track/<id>).",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-07" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "CN-07" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-03" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-08" }
+      ],
+      "informal_grounds": []
+    },
+    "TaskContractCheckArgs": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "layer", "ty": "Option<String>" },
+            { "name": "track_id", "ty": "Option<String>" },
+            { "name": "items_dir", "ty": "std::path::PathBuf" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "commands::task_contract",
+      "docs": "Arguments for `sotp task-contract check`. layer: optional TDDD layer (domain, usecase, infrastructure, cli_driver, cli, or cli_composition) identifying the layer signal document to check; passed as an opaque CLI string validated as LayerId in the primary adapter; when omitted (None), all 6 canonical TDDD layers are iterated internally and their results combined. track_id: active track identifier (also opaque at this boundary); when omitted, auto-resolved from the current git branch (track/<id>). items_dir: path to the track items directory; defaults to 'track/items'.",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-03" }
+      ],
+      "informal_grounds": []
+    },
+    "TaskContractCoverageArgs": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "track_id", "ty": "Option<String>" },
+            { "name": "items_dir", "ty": "std::path::PathBuf" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "commands::task_contract",
+      "docs": "Arguments for `sotp task-contract coverage`. track_id: active track identifier (opaque CLI string); when omitted, auto-resolved from the current git branch (track/<id>). items_dir: path to the track items directory; defaults to 'track/items'. Coverage checks all 6 canonical TDDD layers simultaneously (no per-layer flag; attribution completeness is a whole-catalogue invariant that cannot be checked per-layer in isolation).",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-07" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-08" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {
+    "cli::commands::task_contract::execute": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "cmd", "ty": "TaskContractCommand" }
+      ],
+      "returns": "std::process::ExitCode",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Dispatch `sotp task-contract <subcommand>` to the appropriate execute_* handler. Check dispatches to execute_task_contract_check; Coverage dispatches to execute_task_contract_coverage.",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-07" }
+      ],
+      "informal_grounds": []
+    },
+    "cli::commands::task_contract::execute_task_contract_check": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "args", "ty": "TaskContractCheckArgs" }
+      ],
+      "returns": "std::process::ExitCode",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Execute `sotp task-contract check`. Resolves track_id_opt (explicit track_id or auto from track/<id> branch), then delegates to task_contract_check_core. When no track id can be resolved, the core helper returns ExitCode::SUCCESS without invoking the composition root so CI passes gracefully on main or non-track branches. When Some, the core helper constructs a TaskContractCompositionRoot, calls task_contract_check(layer, track_id, items_dir), and converts the CommandOutcome to a process ExitCode (0 on Passed, non-zero on Blocked or error).",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-03" }
+      ],
+      "informal_grounds": []
+    },
+    "cli::commands::task_contract::execute_task_contract_coverage": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "args", "ty": "TaskContractCoverageArgs" }
+      ],
+      "returns": "std::process::ExitCode",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Execute `sotp task-contract coverage`. Resolves track_id_opt (explicit track_id or auto from track/<id> branch), then delegates to task_contract_coverage_core. When no track id can be resolved, the core helper returns ExitCode::SUCCESS without invoking the composition root so CI passes gracefully on main or non-track branches. When Some, the core helper constructs a TaskContractCompositionRoot, calls task_contract_coverage(track_id, items_dir), and converts the CommandOutcome to a process ExitCode (0 on Passed, non-zero on Blocked or error).",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-07" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-08" }
+      ],
+      "informal_grounds": []
+    },
+    "cli::commands::review::fix_local::build_review_fix_local_input": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "args",     "ty": "&FixLocalArgs" },
+        { "name": "track_id", "ty": "String" }
+      ],
+      "returns": "cli_driver::review::ReviewInput",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Was public at track start; removed from the public API in this track (restricted to #[cfg(test)]-only under the thin-bin policy). Declared as delete so the baseline-present function is moved to D and DMinusC fires blue rather than SMinusC_Reference red.",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-05" }
+      ],
+      "informal_grounds": []
+    },
+    "cli::commands::track::views::detect_active_track_from_branch": {
+      "action": "reference",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "project_root", "ty": "&std::path::Path" }
+      ],
+      "returns": "Option<String>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Baseline track views helper retained as a reference entry. It remains part of the `sotp track views sync` path and delegates active-track branch detection through TrackCompositionRoot; it is not a task-contract subcommand implementation change.",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-04" }
+      ],
+      "informal_grounds": []
+    },
+    "cli::commands::task_contract::detect_active_track_from_branch_cwd": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "Option<String>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Auto-resolve the active track id from the current git branch. Returns Some(\"<id>\") when on a track/<id> branch, None otherwise (main, detached HEAD, git failure, etc.). Mirrors the convention used by `sotp ref-verify run`, `sotp track views sync`, and other track-aware commands.",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-03" }
+      ],
+      "informal_grounds": []
+    },
+    "cli::commands::task_contract::task_contract_check_core": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "track_id_opt", "ty": "Option<String>" },
+        { "name": "layer", "ty": "Option<String>" },
+        { "name": "items_dir", "ty": "std::path::PathBuf" }
+      ],
+      "returns": "std::process::ExitCode",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Internal helper invoked by execute_task_contract_check. When track_id_opt is None (non-track branch + --track-id omitted), returns ExitCode::SUCCESS without output so CI passes gracefully on main or non-track branches. When Some, constructs a TaskContractCompositionRoot and invokes task_contract_check(layer, track_id, items_dir).",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-08" }
+      ],
+      "informal_grounds": []
+    },
+    "cli::commands::task_contract::task_contract_coverage_core": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "track_id_opt", "ty": "Option<String>" },
+        { "name": "items_dir", "ty": "std::path::PathBuf" }
+      ],
+      "returns": "std::process::ExitCode",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Internal helper invoked by execute_task_contract_coverage. When track_id_opt is None (non-track branch + --track-id omitted), returns ExitCode::SUCCESS without output so CI passes gracefully on main or non-track branches; this allows task-contract-coverage-local to be added to cargo make ci's chain without breaking main / fresh checkouts. When Some, constructs a TaskContractCompositionRoot and invokes task_contract_coverage(track_id, items_dir).",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-07" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-08" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "inherent_impls": [],
+  "trait_impls": [
+    { "action": "reference", "trait_ref": "clap_builder::derive::FromArgMatches", "for_type": "CliCommand" },
+    { "action": "reference", "trait_ref": "clap_builder::derive::Subcommand",      "for_type": "CliCommand" },
+    { "action": "modify", "trait_ref": "core::fmt::Debug",                          "for_type": "FixLocalArgs" },
+    { "action": "modify", "trait_ref": "clap_builder::derive::Args",               "for_type": "FixLocalArgs" },
+    { "action": "modify", "trait_ref": "clap_builder::derive::FromArgMatches",     "for_type": "FixLocalArgs" },
+    { "action": "add", "trait_ref": "core::fmt::Debug",                             "for_type": "TaskContractCommand" },
+    { "action": "add", "trait_ref": "core::clone::Clone",                           "for_type": "TaskContractCommand" },
+    { "action": "add", "trait_ref": "clap_builder::derive::FromArgMatches",         "for_type": "TaskContractCommand" },
+    { "action": "add", "trait_ref": "clap_builder::derive::Subcommand",             "for_type": "TaskContractCommand" },
+    { "action": "add", "trait_ref": "core::fmt::Debug",                             "for_type": "TaskContractCheckArgs" },
+    { "action": "add", "trait_ref": "core::clone::Clone",                           "for_type": "TaskContractCheckArgs" },
+    { "action": "add", "trait_ref": "clap_builder::derive::Args",                   "for_type": "TaskContractCheckArgs" },
+    { "action": "add", "trait_ref": "clap_builder::derive::FromArgMatches",         "for_type": "TaskContractCheckArgs" },
+    { "action": "add", "trait_ref": "core::fmt::Debug",                             "for_type": "TaskContractCoverageArgs" },
+    { "action": "add", "trait_ref": "core::clone::Clone",                           "for_type": "TaskContractCoverageArgs" },
+    { "action": "add", "trait_ref": "clap_builder::derive::Args",                   "for_type": "TaskContractCoverageArgs" },
+    { "action": "add", "trait_ref": "clap_builder::derive::FromArgMatches",         "for_type": "TaskContractCoverageArgs" }
+  ]
+}

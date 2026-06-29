@@ -1,0 +1,994 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "cc94e27b33840c0784817abfe23fe059ac6394df5b3e2d3c874b43edceb13167",
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "reviewer 起動の前に、「task-contract.json で現在のタスクと完了済タスクに帰属するエントリの impl_catalog 信号が全て 🔵 か」を判定する binary check... これにより、merge まで先送りされていた契約履行確認の最初の hard gate が reviewer 入場前・per-task に移る。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "型カタログと実装の構造的一致（impl_catalog 信号）を確認する最初の hard gate を、現行の merge-gate（strict）から reviewer 入場前（per-task）へ shift-left する。契約違反（宣言シンボル欠落・shape ずれ）を authoring 直後・per-task で表面化させ、merge 直前まで遅延する手戻りコストを除去する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "def10c907534773ee4cb403c2e8406627457d937cff80a6a6813acfd6b59ba26",
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「『どのタスクがどの型契約 entry を履行するか』のマッピングを、Phase 3 の **新規 artifact `task-contract.json`**（作業名）に持つ。**writer は impl-planner（Phase 3）**。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-02",
+          "text_label": "新 Phase 3 artifact `task-contract.json` を導入し、タスク → 型カタログ entry の attribution を complete relation として保持する。impl-planner（Phase 3 writer）が本 artifact を author し、どのタスクがどの entry の履行責務を持つかを明記する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "2862e8c6b67a0408c9549d4b1f75f8cedb89af6c3098cc25a32dcd5fb4715cf7",
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "done タスクに帰属するエントリ → signal 🔵 を要求 / in_progress タスク (= 現在のタスク) に帰属するエントリ → signal 🔵 を要求 / todo タスク (= 未来のタスク) に帰属するエントリ → 🟡 のみ許容 (まだ実装していないので shape mismatch 等は当然発生する)。🔴 は task status に関わらず常に blocker"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-03",
+          "text_label": "ゲートの合否基準は「現在のタスク（in_progress）と完了済タスク（done）に帰属するエントリの impl_catalog 信号が全て 🔵 か」とし、未着手タスク（todo）に帰属するエントリは 🟡 を許容する。🔴 はタスク状態に関わらず常に blocker。body の liveness（`todo!()` でないか等）はゲートの管轄外として reviewer の責務に留置する（ゲート: 構造的型契約履行カバレッジ ⊥ LLM レビュー: body 意味論妥当性、の peer layer 責務分離）。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "443217435b97a1d007284f3c64a7c38ea0650489d73e3f8ae6b4cf2de635f685",
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「どのタスクがどの型契約 entry を履行するか」のマッピングを、Phase 3 の **新規 artifact `task-contract.json`**（作業名）に持つ。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "新 Phase 3 artifact `task-contract.json` のスキーマ定義と codec 実装。artifact はタスクリスト（各タスクが履行責務を持つ型カタログ entry 識別子のリスト）と schema_version を含む。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "ca31a499241acaf08c6a7066472cc06a223cf19b68a2c709b8e4ae644ecddae1",
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "writer は impl-planner（Phase 3）. 型カタログ（Phase 2 / type-designer）にも `task-coverage.json` にも混ぜない."
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "impl-planner の Phase 3 output 責務拡張: impl-plan.json・task-coverage.json に加えて `task-contract.json` を author する。type-designer（Phase 2）の責務は変更しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "3ca500eaaa5882767865ad14d8abba77b5aae37e7824118685ccd0b7c433c278",
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「どのタスクがどの型契約 entry を履行するか」のマッピングを、Phase 3 の **新規 artifact `task-contract.json`**（作業名）に持つ。… 1 件でも未紐付けのエントリが残ると、ゲートはそのエントリの信号 (🟡/🔴) を見ないまま素通りさせるので、結局 merge まで止まらない＝ shift-left の意味がなくなる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "attribution の complete relation invariant 検証: (a) 型カタログの全エントリが ≥1 タスクに attribution されていること（completeness）、(b) orphan entry（どのタスクにも attribution されていないカタログ entry）が存在しないこと、(c) attribution された entry がカタログに実在すること（referential integrity）。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "0635256c1afb73b788d9b65d2a8ecde86d0c85f8a0fe21d138ec6969917b8f41",
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "reviewer 起動の前に、「`task-contract.json` で**現在のタスクと完了済タスクに帰属するエントリの `impl_catalog` 信号が全て 🔵 か**」を判定する binary check (`bin/sotp task-contract check`) を置く。🔵 でないエントリがあれば review に入れない (fail-closed・前倒し)。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "pre-review blocking binary check ゲートの実装（`bin/sotp task-contract check`）: 現在のタスク（in_progress）と完了済タスク（done）に帰属するエントリの impl_catalog 信号を既存信号テーブルと entry キーで JOIN し、全エントリが 🔵 かを確認する。判定対象タスクは `impl-plan.json` のタスク状態を参照して特定する。`--track-id` 引数が省略された場合は現在の git ブランチ (`track/<id>` 形式) から active track を auto-resolve する。ゲートは fail-closed（artifact 不在・非 🔵 エントリ存在のいずれでもブロック）。todo タスクに帰属するエントリは 🔵 必須の対象からは外すが、🔴 はタスク状態に関わらず常にブロックし、🟡 のみ未着手として許容する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "0635256c1afb73b788d9b65d2a8ecde86d0c85f8a0fe21d138ec6969917b8f41",
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「既存 `impl_catalog` のエントリ毎の信号値を**エントリをキーに突き合わせて**読むだけ」「新 chain (`task_conformance` 等) を切らず」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "pre-review blocking binary check ゲートの実装（`bin/sotp task-contract check`）: 現在のタスク（in_progress）と完了済タスク（done）に帰属するエントリの impl_catalog 信号を既存信号テーブルと entry キーで JOIN し、全エントリが 🔵 かを確認する。判定対象タスクは `impl-plan.json` のタスク状態を参照して特定する。`--track-id` 引数が省略された場合は現在の git ブランチ (`track/<id>` 形式) から active track を auto-resolve する。ゲートは fail-closed（artifact 不在・非 🔵 エントリ存在のいずれでもブロック）。todo タスクに帰属するエントリは 🔵 必須の対象からは外すが、🔴 はタスク状態に関わらず常にブロックし、🟡 のみ未着手として許容する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "0635256c1afb73b788d9b65d2a8ecde86d0c85f8a0fe21d138ec6969917b8f41",
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "done タスクに帰属するエントリ → signal 🔵 を要求\n- **in_progress タスク** (= 現在のタスク) に帰属するエントリ → signal 🔵 を要求\n- **todo タスク** (= 未来のタスク) に帰属するエントリ → 🟡 のみ許容 (まだ実装していないので shape mismatch 等は当然発生する)。🔴 は task status に関わらず常に blocker"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "pre-review blocking binary check ゲートの実装（`bin/sotp task-contract check`）: 現在のタスク（in_progress）と完了済タスク（done）に帰属するエントリの impl_catalog 信号を既存信号テーブルと entry キーで JOIN し、全エントリが 🔵 かを確認する。判定対象タスクは `impl-plan.json` のタスク状態を参照して特定する。`--track-id` 引数が省略された場合は現在の git ブランチ (`track/<id>` 形式) から active track を auto-resolve する。ゲートは fail-closed（artifact 不在・非 🔵 エントリ存在のいずれでもブロック）。todo タスクに帰属するエントリは 🔵 必須の対象からは外すが、🔴 はタスク状態に関わらず常にブロックし、🟡 のみ未着手として許容する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "17e6d4ae6dc2618ce228f5a8cff727725d63cf6bb36dc73f4bed5418e5caeacd",
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "reviewer 起動の前に、「`task-contract.json` で**現在のタスクと完了済タスクに帰属するエントリの `impl_catalog` 信号が全て 🔵 か**」を判定する binary check (`bin/sotp task-contract check`) を置く。🔵 でないエントリがあれば review に入れない (fail-closed・前倒し)。これは既存の freshness prepend (再計算) とは別の、**入場条件としての blocking 判定**である。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "review-fix ワークフロー（`sotp review fix-local` / fixpoint_resolve または同等の呼び出し経路）への pre-review ゲートの配線。ゲートは `sotp review fix-local` が reviewer invocation を起動する前に実行され、ゲートがブロックした場合は reviewer invocation が実行されない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "224be3888edb61b6a4a53d8498f0ca5ab96542e6bfb580eecaffb85c567e6455",
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp task-contract coverage` — attribution 完全性のみ。`cargo make ci` の検証 chain に統合し、commit ごとに drift を検出する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "`bin/sotp task-contract coverage` サブコマンドの実装: 型カタログの全エントリが漏れなくタスクに attribution されているか（完全性）を専用に検証する subcommand。cargo make ci の検証 chain に統合し、commit ごとに attribution drift を検出する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "26bf63df065f42f2d090a7593fe94fdd50148ee76b3eafb9a17a0ffea47e17da",
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "生存性判定 task の `dependencies` に完全性判定 task を組み込む: - `cargo make task-contract-check` — `bin/sotp task-contract check` を呼び、`dependencies = [\"task-contract-coverage\"]` を宣言。`cargo make track-local-review` と `cargo make track-local-review-fix` の両方の `dependencies` に `task-contract-check` を追加する。これにより per-review-round で完全性 + 生存性の両判定が自動で発火する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "cargo-make `dependencies` による pre-review ゲートの配線: `cargo make track-local-review` と `cargo make track-local-review-fix` の両方の `dependencies` に `task-contract-check` タスクを追加し、per-review-round で完全性判定（coverage）→ 生存性判定（check）の順で自動発火させる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "e7847218edb024572cb7c8b146e4668d548219d2fffbc5de77da51a2512accab",
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "impl-plan を読む secondary port (`ImplPlanReaderPort` 等) を追加し、`task-contract.json` から得た task → entry 帰属を impl-plan.json の status フィルタで絞り込む"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-09",
+          "text_label": "usecase 層への `ImplPlanReaderPort`（secondary port）追加: `bin/sotp task-contract check` の usecase 層（`PreReviewGateInteractor` 等）に `impl-plan.json` を読む secondary port を追加し、`task-contract.json` の attribution を impl-plan.json のタスク状態（todo / in_progress / done）でフィルタする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "be13e33e10d8eaf40fc4e0266aca795dec71950fd89b0da5a76dd5bbf8fb6228",
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 層 `RunReviewFixError` enum に新 variant `SubagentDispatchRequired(String)` を追加。`ReviewServiceImpl::run_fix_local` ... `Err(RunReviewFixError::SubagentDispatchRequired(payload))` を return する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-10",
+          "text_label": "Claude provider 経由の review-fix dispatch sentinel (exit code 64 + stdout `SUBAGENT_DISPATCH_REQUIRED` + JSON payload) の cross-layer pass-through 機構の実装: usecase 層 `RunReviewFixError` enum に `SubagentDispatchRequired(String)` variant を追加し、payload を typed error として運ぶ。cli_composition 層 shim が composition root から exit 64 + sentinel prefix を検出したとき、`Err(RunReviewFixError::SubagentDispatchRequired(payload))` を return する。cli_driver 層 dispatch arm は payload を `CommandOutcome { stdout: Some(payload), exit_code: 64 }` に reflect して呼び元 (orchestrator) に届ける。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "decision_id": "D8"
+        }
+      }
+    },
+    {
+      "claim_hash": "8698bb833c4800cefae0e42138e205f9d999b6f3283e6cd861df29cfa6610d86",
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`task-contract.json` の `entries` map のキー (task ID, 例: `T001`, `T015`) は、`impl-plan.json` の `tasks[].id` 集合に **必ず含まれる** 必要がある。`coverage` ゲート (`bin/sotp task-contract coverage`) は attribution 完全性の検証時にこの referential integrity も併せて検証する。含まれない task キーが存在した場合、その task キー配下の全 entry を `CoverageViolation::InvalidTaskRef { task_id, entry_keys }` として報告し、`coverage` ゲートを fail-closed させる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-11",
+          "text_label": "`task-contract.json` の `entries` map の各 task キーは `impl-plan.json` の `tasks[].id` 集合に必ず含まれる必要がある。`coverage` 検証はこの referential integrity を併せて検証し、stale task キーが存在した場合は `CoverageViolation::InvalidTaskRef { task_id, entry_keys }` として fail-closed する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "decision_id": "D9"
+        }
+      }
+    },
+    {
+      "claim_hash": "73c56b78faf7b26ac6535f74767f83a610638556d9eb1daae20d1c9401901851",
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「test-pass (テスト通過) や stub-scan (スタブ走査) による本体認識型 (body-aware) の生存性判定は採らない。」「body の意味論的妥当性 ... はゲートの保証範囲外」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-01",
+          "text_label": "body の liveness / stub 検査（test-pass・stub-scan・syn による body walking）。ゲートの直接入力は既存 impl_catalog / type-signals document であり、上流の impl_catalog 信号は rustdoc JSON（body を含まない）から生成されるため、🔵 判定は宣言シンボルの存在と shape 一致のみを保証する。stub が通過することは意図的なスコープ限定である。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "d693ba14c41d108f78839f048124a6f35a32553da8e2304f1e94040d77f03d5b",
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「新 chain (`task_conformance` 等) を切らず、型カタログにも何も足さない。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-02",
+          "text_label": "新 SoT Chain（task_conformance 等）の追加。ゲートは binary check として実装し、既存 impl_catalog 信号を再利用する。chain matrix・strictness 設定・views の表面積は増やさない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "3c977b19fd66ec30a76d7d1fff7f5e71d9fbb4799ff7dccdaa2a49edd0732b88",
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "型カタログ（Phase 2 / type-designer）にも `task-coverage.json` にも混ぜない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-03",
+          "text_label": "型カタログ（`<layer>-types.json`）へのタスク情報の追加。Phase 2 成果物に Phase 3 概念（task）への後方依存を持たせることは SoT Chain 逆流であり禁止。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "075c35c62af8b34ca1d67708bfad29917e3a05c598963c9acdc9405adc5189ee",
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`task-coverage.json` に混ぜない理由 (責務分離): 両者は別々の単一責務 artifact とし"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-04",
+          "text_label": "`task-coverage.json`（spec coverage artifact）への attribution 情報の追加。参照 SSoT・供給先ゲート・invariant がいずれも異なる別責務 artifact とし、同居させない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "00f0485410c3b28bf08b70a263f66ff8ec03c8c9e63f548fe55dbff0c2a2daa3",
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "reviewer 起動の前に… binary check (bin/sotp task-contract check) を置く。🔵 でないエントリがあれば review に入れない (fail-closed・前倒し)。これは既存の freshness prepend (再計算) とは別の、**入場条件としての blocking 判定**である。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-05",
+          "text_label": "pre-review ゲートの advisory モード・緩和モード（per-task / per-track のブロック回避オプション）。ゲートは blocking かつ fail-closed で実装する。interim 的運用の緩和は本 track 対象外。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "b2e64de0483d6db83f61807b18e3da5ad6c9cdd0328e02adf3ef020c35c39bb9",
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「型カタログにも何も足さない」「検証エンジン (`SignalEvaluatorV2`) は丸ごと再利用する」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-06",
+          "text_label": "SignalEvaluatorV2（既存の型カタログ ↔ 実装比較エンジン）の変更。ゲートは本エンジンの評価結果（per-entry impl_catalog 信号）を読み取るだけであり、エンジン自体は変更しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "d2156ec6a3d64618f3e0422a6781df8d24b6cfba9eb32fec0df2dede63bf3b76",
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「『どのタスクがどの型契約 entry を履行するか』のマッピングを、Phase 3 の **新規 artifact `task-contract.json`**（作業名）に持つ。」「1 件でも未紐付けのエントリが残ると、ゲートはそのエントリの信号 (🟡/🔴) を見ないまま素通りさせるので、結局 merge まで止まらない＝ shift-left の意味がなくなる。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "attribution は型カタログの全エントリに対する complete relation でなければならない。orphan entry（どのタスクにも attribution されていないカタログ entry）が存在する場合、その entry の impl_catalog 信号がゲート入力から漏れ shift-left の保証が崩れるため、ゲートは orphan 検出時に明示的にブロックする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "0957258327aa3ace5fb1a56480fbb425b5ea9f50b3818968ffb33ef316877894",
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「どのタスクがどの型契約 entry を履行するか」のマッピングを、Phase 3 の **新規 artifact `task-contract.json`**（作業名）に持つ。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "task-contract.json が参照するカタログ entry 識別子は現行カタログに実在しなければならない（referential integrity）。存在しない entry への attribution はゲートエラーとし、stale な task-contract.json の検出手段とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "0978b296102d32031a8ad9ea70cf8314e3cdff64d98ac2fbf6f31efcae7d1c51",
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "task-contract.json が型カタログの全エントリをいずれかのタスクに帰属させており (attribution 完全性)、かつ現在のタスクと完了済タスクに帰属するエントリの信号が全て 🔵 (生存性判定)」だけとする。test-pass (テスト通過) や stub-scan (スタブ走査) による本体認識型 (body-aware) の生存性判定は**採らない**。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "ゲートの合否基準は「現在のタスク（in_progress）と完了済タスク（done）に帰属するエントリの impl_catalog 信号が全て 🔵 か」。todo タスクに帰属するエントリは 🟡 を許容する（まだ実装していないため shape mismatch 等は想定範囲内）。🔴 はタスク状態に関わらず常に blocker。body の確認・test 結果・stub 走査は判定に含めない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "0978b296102d32031a8ad9ea70cf8314e3cdff64d98ac2fbf6f31efcae7d1c51",
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "done タスクに帰属するエントリ → signal 🔵 を要求 … todo タスク (= 未来のタスク) に帰属するエントリ → 🟡 のみ許容 … 🔴 は task status に関わらず常に blocker"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "ゲートの合否基準は「現在のタスク（in_progress）と完了済タスク（done）に帰属するエントリの impl_catalog 信号が全て 🔵 か」。todo タスクに帰属するエントリは 🟡 を許容する（まだ実装していないため shape mismatch 等は想定範囲内）。🔴 はタスク状態に関わらず常に blocker。body の確認・test 結果・stub 走査は判定に含めない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "214168b37d83d6faf1f99c96412c9c16d4efc3cc77482c75f4975b6977d09363",
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ゲートは、`task-contract.json` のタスク→エントリ完全帰属関係と、既存 `impl_catalog` のエントリ毎の信号値を**エントリをキーに突き合わせて**読むだけ。新 chain (`task_conformance` 等) を切らず、型カタログにも何も足さない。検証エンジン (`SignalEvaluatorV2`) は丸ごと再利用する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-05",
+          "text_label": "pre-review ゲートは既存 impl_catalog 信号テーブルを entry キーで JOIN して動作し、新 chain・新信号エンジン・型カタログ拡張を必要としない。SignalEvaluatorV2 は変更せずに再利用する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "467e3c3ebe283ac06726d019d230c99f9db99338cd3ce8c0effbccb0306994e8",
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「writer は impl-planner（Phase 3）。型カタログ（Phase 2 / type-designer）にも `task-coverage.json` にも混ぜない。」／「task は Phase 3 で初めて生まれる概念であり、Phase 2 成果物に task→entry を載せると Phase 3 概念への**後方依存**（SoT Chain 逆流・順序違反）になる」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-06",
+          "text_label": "task-contract.json の author は impl-planner（Phase 3）に限定する。type-designer（Phase 2）は本 artifact を書かない。Phase 2 成果物が Phase 3 概念（task）を参照することは SoT Chain の順序違反であり禁止。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "6dfe414194bae09187a3002279da54cf5dcd925b094c7fbc5f1e882f60b52e15",
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「そこで 2 subcommand に分割する」/「両者は task-contract ドメイン配下 に置く」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-07",
+          "text_label": "attribution 完全性（completeness）の検証と生存性（liveness）の検証は別 subcommand に分割する（`bin/sotp task-contract coverage` と `bin/sotp task-contract check`）。両者は失敗時の責任者と修正経路が異なり（planner が attribution を author する vs implementer が impl を 🔵 化する）、1 コマンドに混在させると fixer の判断分岐コストが恒久化する。両者は `task-contract` ドメイン配下に置き、`verify-*` ファミリーには逃さない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "1ac291f3f9acd02df724d4e982eed27265ae154d0f37a8ae6cc2b12c7886b68a",
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "cargo make 上で 2 task を定義し、**生存性判定 task の `dependencies` に完全性判定 task を組み込む** ... `bin/sotp` バイナリ内部で連結する案 (バイナリ内 hardcode) は採らない — 配線は cargo make 層に局所化し、各 `bin/sotp` subcommand は単一責務のままに保つ"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-08",
+          "text_label": "`cargo make task-contract-check` の `dependencies` に `task-contract-coverage` を宣言することで完全性 → 生存性の実行順を保証する。`bin/sotp` バイナリ内部でのコマンド連結（hardcode）は禁止。各 subcommand は単一責務を維持し、配線は cargo-make 層に局所化する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "09b8b1ef00041b68f13f62820fc49d7a0ccacef559d3d2f2e5c870134058a2ef",
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「task-contract.json の各 task キーが impl-plan.json の `tasks[].id` 集合に含まれているかを確認する。含まれない task キーが存在した場合、その task キー配下の全 entry を `CoverageViolation::InvalidTaskRef` として報告し、`coverage` ゲートを fail-closed させる。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-09",
+          "text_label": "`CoverageVerifyService` 実装は `task-contract.json` の各 task キーが `impl-plan.json` から取得した task IDs 集合に含まれるか確認する。含まれない task キー配下の全 entry は `CoverageViolation::InvalidTaskRef` として `CoverageVerifyOutcome.violations` に push する。violation が 1 件でも存在すれば exit ≠ 0 で fail-closed。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "decision_id": "D9"
+        }
+      }
+    },
+    {
+      "claim_hash": "91c5c462efaf4aebaa314c9cb8d5e54695bcad6d171f65361cca1962cb224c0d",
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「どのタスクがどの型契約 entry を履行するか」のマッピングを、Phase 3 の **新規 artifact `task-contract.json`** に持つ。**writer は impl-planner（Phase 3）**。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`task-contract.json` のスキーマが定義されており、impl-planner が Phase 3 output として本 artifact を author する。artifact には schema_version・track id・タスクリスト（各タスクが履行責務を持つ型カタログ entry 識別子のリスト）が含まれる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "3951baa0d8facc3f4cf6526007c65fe889ed93dfd2fa788d0b6a0e57012c68d6",
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「task-contract.json` は『pre-review ゲートに見せたい信号を漏れなくタスクに紐付けたか』だけを言う契約。1 件でも未紐付けのエントリが残ると、ゲートはそのエントリの信号 (🟡/🔴) を見ないまま素通りさせるので、結局 merge まで止まらない＝ shift-left の意味がなくなる。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "attribution の complete relation invariant が機械的に検証可能である: (a) 型カタログの全エントリが ≥1 タスクに attribution されている、(b) orphan entry が存在しない、(c) attribution 対象 entry がカタログに実在する。invariant 違反時にゲートが非ゼロ終了コードで返り、違反内容（orphan entry リスト・存在しない entry 識別子）を出力する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "30461c6b545d8238ecb541a5f3b5aa98ce1ec61949842964cfe767e0dc6a98ec",
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「reviewer 起動の前に、... binary check (`bin/sotp task-contract check`) を置く」; 「fail-closed・前倒し」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "`bin/sotp task-contract check` が実装されており、`cargo make track-local-review` および `cargo make track-local-review-fix` の `dependencies` に `task-contract-check` タスクが組み込まれている。ゲートは reviewer invocation を起動する前に実行され、fail-closed。`task-contract.json` が不在の場合、ゲートはファイル不在を明示するエラーメッセージで失敗する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "30461c6b545d8238ecb541a5f3b5aa98ce1ec61949842964cfe767e0dc6a98ec",
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`cargo make track-local-review` と `cargo make track-local-review-fix` の両方の `dependencies` に `task-contract-check` を追加する。これにより per-review-round で完全性 + 生存性の両判定が自動で発火する。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "`bin/sotp task-contract check` が実装されており、`cargo make track-local-review` および `cargo make track-local-review-fix` の `dependencies` に `task-contract-check` タスクが組み込まれている。ゲートは reviewer invocation を起動する前に実行され、fail-closed。`task-contract.json` が不在の場合、ゲートはファイル不在を明示するエラーメッセージで失敗する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "a87c1a1900f39923c1f2cde1331119d57154050bb2f44a42ab895d1fae109e63",
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`task-contract.json` で**現在のタスクと完了済タスクに帰属するエントリの `impl_catalog` 信号が全て 🔵 か**」を判定する binary check (`bin/sotp task-contract check`) を置く。🔵 でないエントリがあれば review に入れない (fail-closed・前倒し)。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "現在のタスク（in_progress）と完了済タスク（done）に帰属するエントリの impl_catalog 信号が全て 🔵 のとき、ゲートが unit/binary OK としてパスする。todo タスクに帰属するエントリの 🟡 はパス条件に影響しない。🔴 エントリはタスク状態に関わらず常にゲートをブロックし、非 🔵 エントリの一覧と信号状態を出力する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "a87c1a1900f39923c1f2cde1331119d57154050bb2f44a42ab895d1fae109e63",
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- **done タスク**に帰属するエントリ → signal 🔵 を要求\n- **in_progress タスク** (= 現在のタスク) に帰属するエントリ → signal 🔵 を要求\n- **todo タスク** (= 未来のタスク) に帰属するエントリ → 🟡 のみ許容 (まだ実装していないので shape mismatch 等は当然発生する)。🔴 は task status に関わらず常に blocker"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "現在のタスク（in_progress）と完了済タスク（done）に帰属するエントリの impl_catalog 信号が全て 🔵 のとき、ゲートが unit/binary OK としてパスする。todo タスクに帰属するエントリの 🟡 はパス条件に影響しない。🔴 エントリはタスク状態に関わらず常にゲートをブロックし、非 🔵 エントリの一覧と信号状態を出力する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "1968f8bf1bea6f58d52f8284887308a02d225416a89de53733a533c8f1f20a4b",
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "🔵 でないエントリがあれば review に入れない (fail-closed・前倒し)."
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "ゲートがブロックした場合、`sotp review fix-local` 経由の reviewer invocation が実行されない。`bin/sotp task-contract coverage` および `bin/sotp task-contract check` はいずれも fail-closed であり、どちらかのゲートエラーが上位ワークフローに伝播して review invocation を中断する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "3b44e5fba977a940456d1352a3d57e38ad01cdab57d858d60adbd80d38fb779e",
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「生存性判定 task の `dependencies` に完全性判定 task を組み込む」「`cargo make task-contract-check` を呼ぶだけで完全性判定 → 生存性判定の順で必ず走り」「`cargo make track-local-review` と `cargo make track-local-review-fix` の両方の `dependencies` に `task-contract-check` を追加する」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "`cargo make ci`（fmt-check + clippy + nextest + deny + check-layers + verify-*）が pass する。ゲートロジックのユニットテストとして次のケースを網羅する: (a) `task-contract.json` 不在で check がブロック、(b) orphan entry 存在で coverage がブロック、(c) attribution referential integrity 違反で coverage がブロック、(d) 🔴 エントリ存在でタスク状態に関わらず check がブロック、(e) in_progress / done タスクの全 attributed entry が 🔵 かつ coverage 完全でパス、(f) todo タスクに 🟡 エントリが存在しても check がパス（🔴 なし前提）、(g) `cargo make track-local-review` 実行時に coverage → check の dependency が順序通り発火する。既存テストへのリグレッションがない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "3b44e5fba977a940456d1352a3d57e38ad01cdab57d858d60adbd80d38fb779e",
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "done タスクに帰属するエントリ → signal 🔵 を要求 / in_progress タスク (= 現在のタスク) に帰属するエントリ → signal 🔵 を要求 / todo タスク (= 未来のタスク) に帰属するエントリ → 🟡 のみ許容 ... 🔴 は task status に関わらず常に blocker"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "`cargo make ci`（fmt-check + clippy + nextest + deny + check-layers + verify-*）が pass する。ゲートロジックのユニットテストとして次のケースを網羅する: (a) `task-contract.json` 不在で check がブロック、(b) orphan entry 存在で coverage がブロック、(c) attribution referential integrity 違反で coverage がブロック、(d) 🔴 エントリ存在でタスク状態に関わらず check がブロック、(e) in_progress / done タスクの全 attributed entry が 🔵 かつ coverage 完全でパス、(f) todo タスクに 🟡 エントリが存在しても check がパス（🔴 なし前提）、(g) `cargo make track-local-review` 実行時に coverage → check の dependency が順序通り発火する。既存テストへのリグレッションがない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "55101e77aed5b394bde03f1e88c85e0484d8b204835d92183adb3199607d81c2",
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "そこで 2 subcommand に分割する:\n\n- `bin/sotp task-contract coverage` — attribution 完全性のみ。`cargo make ci` の検証 chain に統合し、commit ごとに drift を検出する。\n- `bin/sotp task-contract check` — 生存性のみ。pre-review blocking gate として `cargo make track-local-review` chain に置く (D2)。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "`bin/sotp task-contract coverage` が実装されており、`cargo make task-contract-coverage` として呼び出せる。`cargo make task-contract-check` は `dependencies = [\"task-contract-coverage\"]` を宣言し、coverage → check の順で必ず実行される。attribution 不完全（orphan あり）の場合、coverage がブロックし check は実行されない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "55101e77aed5b394bde03f1e88c85e0484d8b204835d92183adb3199607d81c2",
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- `cargo make task-contract-coverage` — `bin/sotp task-contract coverage` を呼ぶ\n- `cargo make task-contract-check` — `bin/sotp task-contract check` を呼び、`dependencies = [\"task-contract-coverage\"]` を宣言"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "`bin/sotp task-contract coverage` が実装されており、`cargo make task-contract-coverage` として呼び出せる。`cargo make task-contract-check` は `dependencies = [\"task-contract-coverage\"]` を宣言し、coverage → check の順で必ず実行される。attribution 不完全（orphan あり）の場合、coverage がブロックし check は実行されない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "b68691e73fadbbbf1b01e52545040a2e65f5ad93dc7cf017caff61b1728cfdbf",
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- usecase 層 `RunReviewFixError` enum に新 variant `SubagentDispatchRequired(String)` を追加。tuple field は exit 64 + sentinel + JSON payload を1つの opaque string として carry する.\n- `ReviewServiceImpl::run_fix_local` (cli_composition 層 shim) は composition root から exit 64 + SUBAGENT_DISPATCH_REQUIRED prefix を検出したとき、`Err(RunReviewFixError::SubagentDispatchRequired(payload))` を return する.\n- cli_driver 層 `review_run_fix_local` は `Err(RunReviewFixError::SubagentDispatchRequired(payload))` 受領時、`CommandOutcome { stdout: Some(payload), stderr: None, exit_code: 64 }` を生成して呼び元に pass-through する. これにより stdout の sentinel + JSON payload + exit 64 が orchestrator に届く."
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "ユニットテストで以下を検証する: (a) composition root が exit 64 + `SUBAGENT_DISPATCH_REQUIRED` prefix を含む CommandOutcome を return した場合、`ReviewServiceImpl::run_fix_local` は `Err(RunReviewFixError::SubagentDispatchRequired(payload))` を返す (payload は exit 64 出力の stdout 文字列をそのまま carry)、(b) cli_driver の `review_run_fix_local` が `Err(RunReviewFixError::SubagentDispatchRequired(payload))` を受け取ったとき、`CommandOutcome { stdout: Some(payload), stderr: None, exit_code: 64 }` を return し、`REVIEW_FIX_STATUS: failed` への remap が発生しない、(c) Claude provider 経由で `ReviewCompositionRoot::review_driver().handle(RunFixLocal {...})` を呼ぶと exit 64 + sentinel が stdout に preserve される。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "decision_id": "D8"
+        }
+      }
+    },
+    {
+      "claim_hash": "aeeeb3a81a55bac7107be12a5de906525cc0078d632f643b33f1e55bd69e7872",
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「含まれない task キーが存在した場合、その task キー配下の全 entry を `CoverageViolation::InvalidTaskRef { task_id, entry_keys }` として報告し、`coverage` ゲートを fail-closed させる。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-10",
+          "text_label": "`task-contract.json` に `impl-plan.json` に存在しない task キー (例: 削除済みタスク `T999`) 配下に entry が attribution されている状態を作る。`bin/sotp task-contract coverage` を実行すると、`CoverageViolation::InvalidTaskRef { task_id: \"T999\", entry_keys: [...] }` が報告され、exit ≠ 0 で終了する (silent pass しない) ことを確認。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "decision_id": "D9"
+        }
+      }
+    }
+  ]
+}

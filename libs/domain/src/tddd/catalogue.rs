@@ -330,6 +330,21 @@ impl TypeSignal {
     pub fn extra_items(&self) -> &[String] {
         &self.extra_items
     }
+
+    /// Returns `true` if this signal represents a synthetic report-only row marker.
+    ///
+    /// The signal evaluator emits rows with `kind_tag = "unknown"` for catalogue entries
+    /// whose kind falls outside the evaluator's handling (e.g., entries that cannot be
+    /// classified into a concrete kind). These rows are report-only and carry no meaningful
+    /// type-membership information.
+    ///
+    /// Callers that iterate signals and want to skip synthetic rows should call this
+    /// predicate rather than comparing `kind_tag()` against the string literal `"unknown"`,
+    /// so that the "unknown" semantics remain encapsulated in the domain layer.
+    #[must_use]
+    pub fn is_unknown_kind(&self) -> bool {
+        self.kind_tag == "unknown"
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -489,5 +504,28 @@ mod tests {
         assert_eq!(signal.found_items(), &["Active"]);
         assert_eq!(signal.missing_items(), &["Done"]);
         assert_eq!(signal.extra_items(), &["Legacy"]);
+    }
+
+    #[test]
+    fn test_type_signal_is_unknown_kind_returns_true_for_unknown_tag() {
+        let signal = TypeSignal::new(
+            "_synthetic",
+            "unknown",
+            ConfidenceSignal::Blue,
+            false,
+            vec![],
+            vec![],
+            vec![],
+        );
+        assert!(signal.is_unknown_kind());
+    }
+
+    #[test]
+    fn test_type_signal_is_unknown_kind_returns_false_for_known_tags() {
+        for tag in ["enum", "struct", "typestate", "value_object", ""] {
+            let signal =
+                TypeSignal::new("T", tag, ConfidenceSignal::Blue, false, vec![], vec![], vec![]);
+            assert!(!signal.is_unknown_kind(), "expected false for kind_tag={tag:?}");
+        }
     }
 }

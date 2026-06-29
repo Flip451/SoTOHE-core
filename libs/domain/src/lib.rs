@@ -23,6 +23,7 @@ pub mod skill_compliance;
 pub mod spec;
 pub mod spec_file_loader_port;
 pub mod symlink_guard_port;
+pub mod task_contract;
 pub mod task_coverage;
 pub mod tddd;
 mod timestamp;

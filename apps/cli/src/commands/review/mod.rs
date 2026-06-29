@@ -40,9 +40,10 @@ pub enum ReviewCommand {
     ///
     /// Resolves `review-fix-lead` capability from agent-profiles.json, constructs
     /// the fixer (currently Codex only), and executes the fix cycle. Accepts
-    /// `--scope` / `--briefing-file` / `--track-id` / `--round-type` (required)
-    /// and an optional `--model` override. The reviewer model and scope boundary
-    /// are self-resolved by the fixer skill (ADR 2026-06-01-2300 D1/D3).
+    /// `--scope` / `--briefing-file` / `--round-type` (required) plus optional
+    /// `--track-id` (auto-resolved from the current git branch when omitted) and
+    /// optional `--model` override. The reviewer model and scope boundary are
+    /// self-resolved by the fixer skill (ADR 2026-06-01-2300 D1/D3).
     FixLocal(FixLocalArgs),
     /// Check if review is approved for commit.
     CheckApproved(CheckApprovedArgs),

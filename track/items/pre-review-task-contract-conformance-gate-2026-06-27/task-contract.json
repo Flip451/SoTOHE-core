@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "track_id": "pre-review-task-contract-conformance-gate-2026-06-27",
+  "entries": {
+    "T001": [
+      { "layer": "domain", "entry_key": "TaskContractDocument" },
+      { "layer": "domain", "entry_key": "ContractedEntryRef" },
+      { "layer": "domain", "entry_key": "PreReviewGateViolation" },
+      { "layer": "domain", "entry_key": "PreReviewGateOutcome" }
+    ],
+    "T002": [
+      { "layer": "usecase", "entry_key": "PreReviewGateService" },
+      { "layer": "usecase", "entry_key": "PreReviewGateCommand" },
+      { "layer": "usecase", "entry_key": "TaskContractReaderPort" },
+      { "layer": "usecase", "entry_key": "ImplCatalogSignalReaderPort" }
+    ],
+    "T003": [
+      { "layer": "infrastructure", "entry_key": "TaskContractDocumentDto" },
+      { "layer": "infrastructure", "entry_key": "ContractedEntryRefDto" },
+      { "layer": "infrastructure", "entry_key": "TaskContractCodecError" },
+      { "layer": "infrastructure", "entry_key": "FsTaskContractReader" },
+      { "layer": "infrastructure", "entry_key": "FsImplCatalogSignalReader" },
+      { "layer": "infrastructure", "entry_key": "infrastructure::task_contract_codec::decode" },
+      { "layer": "infrastructure", "entry_key": "infrastructure::task_contract_codec::encode" }
+    ],
+    "T005": [
+      { "layer": "cli", "entry_key": "CliCommand" },
+      { "layer": "cli", "entry_key": "TaskContractCheckArgs" },
+      { "layer": "cli", "entry_key": "cli::commands::task_contract::execute_task_contract_check" },
+      { "layer": "cli", "entry_key": "cli::commands::task_contract::detect_active_track_from_branch_cwd" },
+      { "layer": "cli", "entry_key": "cli::commands::task_contract::task_contract_check_core" }
+    ],
+    "T009": [
+      { "layer": "domain", "entry_key": "CoverageViolation" },
+      { "layer": "domain", "entry_key": "CoverageVerifyOutcome" }
+    ],
+    "T010": [
+      { "layer": "usecase", "entry_key": "CoverageVerifyCommand" },
+      { "layer": "usecase", "entry_key": "CoverageVerifyService" },
+      { "layer": "usecase", "entry_key": "CoverageVerifyInteractor" },
+      { "layer": "usecase", "entry_key": "ImplPlanReaderPort" },
+      { "layer": "usecase", "entry_key": "PreReviewGateError" },
+      { "layer": "usecase", "entry_key": "PreReviewGateInteractor" }
+    ],
+    "T011": [
+      { "layer": "infrastructure", "entry_key": "FsImplPlanReader" },
+      { "layer": "cli_composition", "entry_key": "TaskContractCompositionRoot" }
+    ],
+    "T012": [
+      { "layer": "cli_driver", "entry_key": "TaskContractInput" },
+      { "layer": "cli_driver", "entry_key": "TaskContractDriver" }
+    ],
+    "T008": [
+      { "layer": "cli", "entry_key": "FixLocalArgs" },
+      { "layer": "cli", "entry_key": "cli::commands::review::fix_local::build_review_fix_local_input" }
+    ],
+    "T013": [
+      { "layer": "cli", "entry_key": "TaskContractCommand" },
+      { "layer": "cli", "entry_key": "TaskContractCoverageArgs" },
+      { "layer": "cli", "entry_key": "cli::commands::task_contract::execute" },
+      { "layer": "cli", "entry_key": "cli::commands::task_contract::execute_task_contract_coverage" },
+      { "layer": "cli", "entry_key": "cli::commands::task_contract::task_contract_coverage_core" }
+    ],
+    "T014": [
+      { "layer": "cli_composition", "entry_key": "TaskContractCompositionRoot" }
+    ],
+    "T015": [
+      { "layer": "usecase", "entry_key": "PreReviewGateInteractor" }
+    ],
+    "T016": [
+      { "layer": "cli", "entry_key": "cli::commands::track::views::detect_active_track_from_branch" }
+    ],
+    "T017": [
+      { "layer": "usecase", "entry_key": "RunReviewFixError" },
+      { "layer": "cli_composition", "entry_key": "ReviewCompositionRoot" }
+    ],
+    "T018": [
+      { "layer": "domain", "entry_key": "TypeSignal" }
+    ]
+  }
+}

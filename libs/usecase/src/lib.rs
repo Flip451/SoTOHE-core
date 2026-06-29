@@ -38,6 +38,7 @@ pub mod pr_review;
 pub mod pr_review_polling;
 pub mod pr_workflow;
 pub mod pre_commit_type_signals;
+pub mod pre_review_gate;
 pub mod ref_verify;
 pub mod review_v2;
 pub mod review_workflow;

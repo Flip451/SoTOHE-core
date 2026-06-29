@@ -1,0 +1,266 @@
+{
+  "schema_version": 5,
+  "crate_name": "infrastructure",
+  "layer": "infrastructure",
+  "types": {
+    "TaskContractDocumentDto": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "schema_version", "ty": "u32" },
+            { "name": "track_id",       "ty": "String" },
+            { "name": "entries",        "ty": "std::collections::BTreeMap<String, Vec<ContractedEntryRefDto>>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "task_contract_codec",
+      "docs": "JSON-serializable mirror of domain::task_contract::TaskContractDocument. Used exclusively as an intermediate serde representation inside task_contract_codec::decode and task_contract_codec::encode. Must derive Serialize + Deserialize; Debug for error diagnostics. All fields are pub. schema_version: u32 — opaque version tag (R9: truly opaque technical value). track_id and the BTreeMap String key: serde-boundary Strings converted to TrackId and TaskId domain types in the decode function (R9 justification: domain types are serde-free; conversion happens immediately on decode).",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-01" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-01" }
+      ],
+      "informal_grounds": []
+    },
+    "ContractedEntryRefDto": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "layer", "ty": "String" },
+            { "name": "entry_key", "ty": "String" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "task_contract_codec",
+      "docs": "Serde DTO for a single (layer, entry_key) pair. Used exclusively as an intermediate serde representation inside task_contract_codec::decode and task_contract_codec::encode. Both fields are String (wire format): layer is validated against LayerId and entry_key against CatalogueEntryKey in the decode function (R9 justification: these DTO fields exist solely at the serde boundary; the domain types LayerId and CatalogueEntryKey are serde-free, and conversion happens immediately on decode before any domain logic is invoked).",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-01" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-01" }
+      ],
+      "informal_grounds": []
+    },
+    "TaskContractCodecError": {
+      "action": "add",
+      "role": { "ErrorType": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Json",
+            "payload": {
+              "kind": "tuple",
+              "fields": ["serde_json::Error"]
+            }
+          },
+          {
+            "name": "UnsupportedSchemaVersion",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "found", "ty": "u32" },
+                { "name": "expected", "ty": "u32" }
+              ]
+            }
+          },
+          {
+            "name": "Validation",
+            "payload": {
+              "kind": "tuple",
+              "fields": ["String"]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "task_contract_codec",
+      "docs": "Error type for task-contract.json codec operations. Json: serde_json parse or serialization failure (#[from] serde_json::Error). UnsupportedSchemaVersion: the schema_version field in the file does not match the supported version. Validation: domain-level validation failed when constructing TaskContractDocument from the DTO (message is an opaque String from the domain ValidationError — converted via a manual From<ValidationError> impl). Used by decode/encode free functions.",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-01" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-01" }
+      ],
+      "informal_grounds": []
+    },
+    "FsTaskContractReader": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "task_contract_reader",
+      "docs": "Filesystem secondary adapter implementing usecase::pre_review_gate::TaskContractReaderPort. Reads <items_dir>/<track_id>/task-contract.json, decodes it via task_contract_codec::decode, and returns a domain::task_contract::TaskContractDocument. The items_dir is injected at construction time (stored as a private PathBuf field) so callers do not need to pass it on every read call. Missing file maps to PreReviewGateError::TaskContractNotFound; I/O and codec errors map to PreReviewGateError::TaskContractReadFailed. Shared by PreReviewGateInteractor (check) and CoverageVerifyInteractor (coverage).",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-01" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "CN-01" }
+      ],
+      "informal_grounds": []
+    },
+    "FsImplCatalogSignalReader": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "impl_catalog_signal_reader",
+      "docs": "Filesystem secondary adapter implementing usecase::pre_review_gate::ImplCatalogSignalReaderPort. Reads <items_dir>/<track_id>/<layer>-type-signals.json, decodes it as a domain::TypeSignalsDocument, and returns it. The items_dir is injected at construction time. I/O and decode errors map to PreReviewGateError::SignalReadFailed with the layer id and a diagnostic message. Shared by PreReviewGateInteractor (liveness check) and CoverageVerifyInteractor (entry enumeration for coverage).",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "CN-05" }
+      ],
+      "informal_grounds": []
+    },
+    "FsImplPlanReader": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "impl_plan_reader",
+      "docs": "Filesystem secondary adapter implementing usecase::pre_review_gate::ImplPlanReaderPort (D7). Reads <items_dir>/<track_id>/impl-plan.json via the existing infrastructure::impl_plan_codec::decode, extracts the task list from ImplPlanDocument.tasks(), and returns a HashMap<TaskId, TaskStatusKind> mapping each task id to its status kind. The items_dir is injected at construction time (private PathBuf field). Missing file or decode errors map to PreReviewGateError::ImplPlanReadFailed with a diagnostic message.",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-09" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {
+    "infrastructure::task_contract_codec::decode": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "bytes", "ty": "&[u8]" }
+      ],
+      "returns": "Result<domain::task_contract::TaskContractDocument, TaskContractCodecError>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Decode raw bytes (UTF-8 JSON) into a domain::task_contract::TaskContractDocument. Validates schema_version before constructing the domain object.",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-01" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-01" }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::task_contract_codec::encode": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "doc", "ty": "&domain::task_contract::TaskContractDocument" }
+      ],
+      "returns": "Result<Vec<u8>, TaskContractCodecError>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Encode a domain::task_contract::TaskContractDocument to UTF-8 JSON bytes. Used by the impl-planner subcommand to write task-contract.json.",
+      "spec_refs": [
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-01" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-01" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "inherent_impls": [
+    {
+      "type_name": "FsTaskContractReader",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Construct a FsTaskContractReader with the given items directory root."
+        }
+      ]
+    },
+    {
+      "type_name": "FsImplCatalogSignalReader",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Construct a FsImplCatalogSignalReader with the given items directory root."
+        }
+      ]
+    },
+    {
+      "type_name": "FsImplPlanReader",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Construct a FsImplPlanReader with the given items directory root."
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "TaskContractDocumentDto" },
+    { "action": "add", "trait_ref": "serde_core::ser::Serialize", "for_type": "TaskContractDocumentDto" },
+    { "action": "add", "trait_ref": "serde_core::de::Deserialize<'de>", "for_type": "TaskContractDocumentDto" },
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "ContractedEntryRefDto" },
+    { "action": "add", "trait_ref": "serde_core::ser::Serialize", "for_type": "ContractedEntryRefDto" },
+    { "action": "add", "trait_ref": "serde_core::de::Deserialize<'de>", "for_type": "ContractedEntryRefDto" },
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "TaskContractCodecError" },
+    { "action": "add", "trait_ref": "core::fmt::Display", "for_type": "TaskContractCodecError" },
+    { "action": "add", "trait_ref": "core::error::Error", "for_type": "TaskContractCodecError" },
+    { "action": "add", "trait_ref": "core::convert::From<serde_json::Error>", "for_type": "TaskContractCodecError" },
+    { "action": "add", "trait_ref": "core::convert::From<domain::ValidationError>", "for_type": "TaskContractCodecError" },
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "FsTaskContractReader" },
+    { "action": "add", "trait_ref": "usecase::pre_review_gate::TaskContractReaderPort", "for_type": "FsTaskContractReader" },
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "FsImplCatalogSignalReader" },
+    { "action": "add", "trait_ref": "usecase::pre_review_gate::ImplCatalogSignalReaderPort", "for_type": "FsImplCatalogSignalReader" },
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "FsImplPlanReader" },
+    { "action": "add", "trait_ref": "usecase::pre_review_gate::ImplPlanReaderPort", "for_type": "FsImplPlanReader" }
+  ]
+}

@@ -18,6 +18,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Recreate local track branch on PR merge ref
+        # default の merge ref (detached HEAD) を維持しつつ、local branch 名を
+        # PR の source branch (`track/<id>`) として再作成する。これで
+        # `git rev-parse --abbrev-ref HEAD` が track/<id> を返し、active-track-aware
+        # な CLI subcommand (signal check-spec-adr 等) の auto-resolve が機能する。
+        # merge ref 上で CI が動くこと自体は変えないため、main の最新と PR の
+        # 統合状態に対する検証は従来通り保たれる。
+        if: github.event_name == 'pull_request' && startsWith(github.head_ref, 'track/')
+        run: git checkout -B "$GITHUB_HEAD_REF"
+
       - name: Configure git hooks path
         run: git config --local core.hooksPath .githooks
 
@@ -81,13 +91,23 @@ jobs:
             --name ci-runner \
             tools tail -f /dev/null
 
-      - name: Run CI suite
+      - name: Run CI suite (repo-wide)
         # Override CARGO_HOME / CARGO_TARGET_DIR to the image-baked paths (outside
         # the /workspace bind mount) so the cook-baked deps are reused instead of
         # recompiled. These must match the build-time values for fingerprints to hit:
         # CARGO_HOME=/usr/local/cargo (baked registry), CARGO_TARGET_DIR=/cargo-target
         # (baked compiled deps, set via IMAGE_CARGO_TARGET_DIR at build time).
         run: docker exec -e CARGO_INCREMENTAL=0 -e CARGO_HOME=/usr/local/cargo -e CARGO_TARGET_DIR=/cargo-target ci-runner cargo make ci-container
+
+      - name: Run CI suite (track-aware gates)
+        # track-aware gates (spec/catalogue/impl signal chains) require a
+        # track/<id> branch context. PR runs land on a local track/<id> branch
+        # via the "Recreate local track branch on PR merge ref" step above, so
+        # the gates can auto-resolve the active track. push (main) runs have no
+        # such context — the gates are intentionally skipped at the workflow
+        # boundary (they would otherwise fail closed by design).
+        if: github.event_name == 'pull_request'
+        run: docker exec -e CARGO_INCREMENTAL=0 -e CARGO_HOME=/usr/local/cargo -e CARGO_TARGET_DIR=/cargo-target ci-runner cargo make ci-track-container
 
       - name: Show sccache stats
         if: always()

@@ -61,16 +61,19 @@ severity filter for this round.
 
 ## Workflow
 
-**Always invoke review via `bin/sotp review local`.** The native subcommand
-auto-resolves the provider and is the canonical entry point for the review cycle.
-Before every review round, regenerate the signals and views so the reviewer
-reads a fresh state. Run `bin/sotp signal calc-impl-catalog` and
-`bin/sotp signal calc-catalog-spec` — both are argless and self-resolve the
-active track plus the TDDD-enabled layer list; layers without a `<layer>-types.json`
-catalogue file (e.g., Phase <2 tracks) are skipped automatically. Finish with
-`bin/sotp track views sync` to refresh `plan.md` and `registry.md`.
+**Always invoke review via `cargo make track-local-review`.** The cargo-make
+task is the canonical per-round entry point. It declares
+an inline `signal calc-impl-catalog && task-contract check` chain, so before each reviewer invocation
+the runner first refreshes the impl-catalog signals and runs the task-contract
+pre-review gate (`bin/sotp task-contract check`, fail-closed); on gate pass it
+delegates to `bin/sotp review local`, which auto-resolves the reviewer provider
+and model from `.harness/config/agent-profiles.json`. You do not call
+`bin/sotp review local` or `bin/sotp signal calc-*` directly — both are wired
+through the cargo-make dependency chain.
 
-Then run `bin/sotp review local` with the assigned round type and briefing.
+`bin/sotp track views sync` is still useful when you need fresh `plan.md` /
+`registry.md` between rounds (e.g., after editing `impl-plan.json` mid-round);
+the cargo-make dependency only covers signals and the task-contract gate.
 
 **Read prior-round findings via `bin/sotp review results`, never by
 opening `review.json` directly.** The `sotp review results` subcommand is the
@@ -88,7 +91,7 @@ right form when you just need to confirm `required (stale hash)` /
 § "sotp review results flag reference" for common flags; run
 `bin/sotp review results --help` for the complete option list.
 
-1. **Review**: Run `bin/sotp review local` with the provided briefing and the assigned `--round-type` (`fast` or `final` — value comes from the orchestrator prompt; never substitute the other).
+1. **Review**: Run `cargo make track-local-review -- --round-type {round_type} --group {scope} --briefing-file {briefing-path}` with the assigned round type (`fast` or `final` — value comes from the orchestrator prompt; never substitute the other). Do NOT pass `--track-id` — the wrapper auto-resolves the active track from the current git branch and must not receive an explicit track id. The task-contract gate fires automatically via the cargo-make `dependencies` chain before `bin/sotp review local` is invoked; gate failure aborts the round.
 2. **Parse verdict**: Read the verdict from command output.
    - `zero_findings` → proceed to step 2.5 (verify via canonical API).
    - `findings_remain` → proceed to fix phase.
