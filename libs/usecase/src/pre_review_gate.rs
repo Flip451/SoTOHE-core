@@ -408,12 +408,10 @@ impl CoverageVerifyService for CoverageVerifyInteractor {
             let plan_task_ids = self.impl_plan_reader.read_task_statuses(&cmd.track_id)?;
             for (task_id, refs) in contract_doc.entries() {
                 if !plan_task_ids.contains_key(task_id) {
-                    all_violations.push(
-                        domain::task_contract::CoverageViolation::InvalidTaskRef {
-                            task_id: task_id.clone(),
-                            entry_keys: refs.clone(),
-                        },
-                    );
+                    all_violations.push(domain::task_contract::CoverageViolation::InvalidTaskRef {
+                        task_id: task_id.clone(),
+                        entry_keys: refs.clone(),
+                    });
                 }
             }
         }
@@ -1221,11 +1219,8 @@ mod tests {
     ) -> Arc<dyn ImplPlanReaderPort> {
         match contract {
             Ok(doc) => {
-                let map: std::collections::HashMap<TaskId, TaskStatusKind> = doc
-                    .entries()
-                    .keys()
-                    .map(|id| (id.clone(), TaskStatusKind::Todo))
-                    .collect();
+                let map: std::collections::HashMap<TaskId, TaskStatusKind> =
+                    doc.entries().keys().map(|id| (id.clone(), TaskStatusKind::Todo)).collect();
                 Arc::new(FixedImplPlanReader(map))
             }
             Err(_) => Arc::new(EmptyImplPlanReader),
@@ -1594,9 +1589,10 @@ mod tests {
             )],
         ));
         // impl-plan only knows about T001, so T999 in the contract is stale.
-        let plan_reader = Arc::new(FixedImplPlanReader(std::collections::HashMap::from([
-            (task_id("T001"), TaskStatusKind::Done),
-        ])));
+        let plan_reader = Arc::new(FixedImplPlanReader(std::collections::HashMap::from([(
+            task_id("T001"),
+            TaskStatusKind::Done,
+        )])));
         let svc = coverage_interactor_with_plan(contract, d9_signal_docs(vec!["Foo"]), plan_reader);
         let outcome = svc.verify_coverage(coverage_cmd("my-track")).unwrap();
         match outcome {
@@ -1649,20 +1645,15 @@ mod tests {
         let contract = Ok(make_contract(
             "my-track",
             vec![
-                (
-                    task_id("T100"),
-                    vec![ContractedEntryRef::new(layer("domain"), entry_key("Foo"))],
-                ),
-                (
-                    task_id("T200"),
-                    vec![ContractedEntryRef::new(layer("domain"), entry_key("Bar"))],
-                ),
+                (task_id("T100"), vec![ContractedEntryRef::new(layer("domain"), entry_key("Foo"))]),
+                (task_id("T200"), vec![ContractedEntryRef::new(layer("domain"), entry_key("Bar"))]),
             ],
         ));
         // impl-plan has neither T100 nor T200, so both are stale.
-        let plan_reader = Arc::new(FixedImplPlanReader(std::collections::HashMap::from([
-            (task_id("T001"), TaskStatusKind::Done),
-        ])));
+        let plan_reader = Arc::new(FixedImplPlanReader(std::collections::HashMap::from([(
+            task_id("T001"),
+            TaskStatusKind::Done,
+        )])));
         let svc = coverage_interactor_with_plan(
             contract,
             d9_signal_docs(vec!["Foo", "Bar"]),
