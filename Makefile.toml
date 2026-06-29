@@ -326,14 +326,26 @@ args = ["run", "--quiet", "-p", "cli", "--", "signal", "check-adr-user", "--gate
 [tasks.verify-spec-states-current-local]
 private = true
 description = "[internal] Chain ① spec→ADR signal gate. Active track / spec.json path auto-resolved by CLI; graceful skip on non-track branches or absent spec.json."
-command = "cargo"
-args = ["run", "--quiet", "-p", "cli", "--", "signal", "check-spec-adr", "--gate", "commit"]
+script_runner = "@shell"
+script = ['''
+BRANCH="$(git symbolic-ref --quiet --short HEAD 2>/dev/null || true)"
+case "$BRANCH" in
+  track/*) cargo run --quiet -p cli -- signal check-spec-adr --gate commit ;;
+  *) echo "[SKIP] signal check-spec-adr requires a track/* branch (current: ${BRANCH:-detached})" ;;
+esac
+''']
 
 [tasks.signal-check-impl-catalog-local]
 private = true
 description = "[internal] Chain ③ impl↔catalog signal gate. Active track / layers auto-resolved by CLI; graceful skip on non-track branches."
-command = "cargo"
-args = ["run", "--quiet", "-p", "cli", "--", "signal", "check-impl-catalog", "--gate", "commit"]
+script_runner = "@shell"
+script = ['''
+BRANCH="$(git symbolic-ref --quiet --short HEAD 2>/dev/null || true)"
+case "$BRANCH" in
+  track/*) cargo run --quiet -p cli -- signal check-impl-catalog --gate commit ;;
+  *) echo "[SKIP] signal check-impl-catalog requires a track/* branch (current: ${BRANCH:-detached})" ;;
+esac
+''']
 
 [tasks.verify-catalogue-spec-refs-local]
 private = true
@@ -344,8 +356,14 @@ args = ["run", "--quiet", "-p", "cli", "--", "verify", "catalogue-spec-refs"]
 [tasks.check-catalogue-spec-signals-local]
 private = true
 description = "[internal] Chain ② catalog→spec signal gate. Active track / layers auto-resolved by CLI; graceful skip on non-track branches."
-command = "cargo"
-args = ["run", "--quiet", "-p", "cli", "--", "signal", "check-catalog-spec", "--gate", "commit"]
+script_runner = "@shell"
+script = ['''
+BRANCH="$(git symbolic-ref --quiet --short HEAD 2>/dev/null || true)"
+case "$BRANCH" in
+  track/*) cargo run --quiet -p cli -- signal check-catalog-spec --gate commit ;;
+  *) echo "[SKIP] signal check-catalog-spec requires a track/* branch (current: ${BRANCH:-detached})" ;;
+esac
+''']
 
 [tasks.ci-rust-local]
 private = true
