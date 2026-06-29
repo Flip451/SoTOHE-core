@@ -155,6 +155,12 @@ pub enum PreReviewGateViolation {
 ///   is absent for a canonical TDDD layer. Emitted regardless of whether any
 ///   entries are attributed to that layer in `task-contract.json`, so that
 ///   coverage fails closed when a signal document cannot be found.
+/// - `InvalidTaskRef`: a task key in `task-contract.json` does not exist in
+///   `impl-plan.json` (referential integrity failure on the attribution map's
+///   task dimension). Emitted when `task-contract.json` has been rebased over
+///   an `impl-plan.json` that removed or renamed the task without updating
+///   the contract attributions, so coverage fails closed instead of letting
+///   stale entries silently pass.
 ///
 /// These violations are data inside [`CoverageVerifyOutcome::Blocked`].
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -186,6 +192,18 @@ pub enum CoverageViolation {
     MissingSignalDocument {
         /// The canonical TDDD layer whose signal document is absent.
         layer: LayerId,
+    },
+
+    /// A task key in `task-contract.json` does not exist in the current
+    /// `impl-plan.json` task list. Emitted when the contract attributes
+    /// catalogue entries to a task that has been renamed or removed from
+    /// `impl-plan.json` (referential integrity failure on the task dimension).
+    InvalidTaskRef {
+        /// The orphaned task id referenced by `task-contract.json` but absent
+        /// from `impl-plan.json`.
+        task_id: TaskId,
+        /// All catalogue entries currently attributed to that task id.
+        entry_keys: Vec<ContractedEntryRef>,
     },
 }
 

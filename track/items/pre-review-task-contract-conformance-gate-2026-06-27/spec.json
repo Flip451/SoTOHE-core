@@ -133,6 +133,16 @@
             "anchor": "D8"
           }
         ]
+      },
+      {
+        "id": "IN-11",
+        "text": "`task-contract.json` の `entries` map の各 task キーは `impl-plan.json` の `tasks[].id` 集合に必ず含まれる必要がある。`coverage` 検証はこの referential integrity を併せて検証し、stale task キーが存在した場合は `CoverageViolation::InvalidTaskRef { task_id, entry_keys }` として fail-closed する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+            "anchor": "D9"
+          }
+        ]
       }
     ],
     "out_of_scope": [
@@ -272,6 +282,16 @@
           "anchor": "D6"
         }
       ]
+    },
+    {
+      "id": "CN-09",
+      "text": "`CoverageVerifyService` 実装は `task-contract.json` の各 task キーが `impl-plan.json` から取得した task IDs 集合に含まれるか確認する。含まれない task キー配下の全 entry は `CoverageViolation::InvalidTaskRef` として `CoverageVerifyOutcome.violations` に push する。violation が 1 件でも存在すれば exit ≠ 0 で fail-closed。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "anchor": "D9"
+        }
+      ]
     }
   ],
   "acceptance_criteria": [
@@ -370,6 +390,16 @@
           "anchor": "D8"
         }
       ]
+    },
+    {
+      "id": "AC-10",
+      "text": "`task-contract.json` に `impl-plan.json` に存在しない task キー (例: 削除済みタスク `T999`) 配下に entry が attribution されている状態を作る。`bin/sotp task-contract coverage` を実行すると、`CoverageViolation::InvalidTaskRef { task_id: \"T999\", entry_keys: [...] }` が報告され、exit ≠ 0 で終了する (silent pass しない) ことを確認。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "anchor": "D9"
+        }
+      ]
     }
   ],
   "related_conventions": [
@@ -391,7 +421,7 @@
     }
   ],
   "signals": {
-    "blue": 33,
+    "blue": 36,
     "yellow": 0,
     "red": 0
   }

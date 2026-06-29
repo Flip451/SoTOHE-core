@@ -1,7 +1,7 @@
 <!-- Generated from spec.json — DO NOT EDIT DIRECTLY -->
 ---
 version: "1.0"
-signals: { blue: 33, yellow: 0, red: 0 }
+signals: { blue: 36, yellow: 0, red: 0 }
 ---
 
 # タスク単位の契約履行 pre-review ゲート
@@ -24,6 +24,7 @@ signals: { blue: 33, yellow: 0, red: 0 }
 - [IN-08] cargo-make `dependencies` による pre-review ゲートの配線: `cargo make track-local-review` と `cargo make track-local-review-fix` の両方の `dependencies` に `task-contract-check` タスクを追加し、per-review-round で完全性判定（coverage）→ 生存性判定（check）の順で自動発火させる。 [adr: knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md#D6] [tasks: T016]
 - [IN-09] usecase 層への `ImplPlanReaderPort`（secondary port）追加: `bin/sotp task-contract check` の usecase 層（`PreReviewGateInteractor` 等）に `impl-plan.json` を読む secondary port を追加し、`task-contract.json` の attribution を impl-plan.json のタスク状態（todo / in_progress / done）でフィルタする。 [adr: knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md#D7] [tasks: T010, T011, T014, T015]
 - [IN-10] Claude provider 経由の review-fix dispatch sentinel (exit code 64 + stdout `SUBAGENT_DISPATCH_REQUIRED` + JSON payload) の cross-layer pass-through 機構の実装: usecase 層 `RunReviewFixError` enum に `SubagentDispatchRequired(String)` variant を追加し、payload を typed error として運ぶ。cli_composition 層 shim が composition root から exit 64 + sentinel prefix を検出したとき、`Err(RunReviewFixError::SubagentDispatchRequired(payload))` を return する。cli_driver 層 dispatch arm は payload を `CommandOutcome { stdout: Some(payload), exit_code: 64 }` に reflect して呼び元 (orchestrator) に届ける。 [adr: knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md#D8] [tasks: T017]
+- [IN-11] `task-contract.json` の `entries` map の各 task キーは `impl-plan.json` の `tasks[].id` 集合に必ず含まれる必要がある。`coverage` 検証はこの referential integrity を併せて検証し、stale task キーが存在した場合は `CoverageViolation::InvalidTaskRef { task_id, entry_keys }` として fail-closed する。 [adr: knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md#D9] [tasks: T018]
 
 ### Out of Scope
 - [OS-01] body の liveness / stub 検査（test-pass・stub-scan・syn による body walking）。ゲートの直接入力は既存 impl_catalog / type-signals document であり、上流の impl_catalog 信号は rustdoc JSON（body を含まない）から生成されるため、🔵 判定は宣言シンボルの存在と shape 一致のみを保証する。stub が通過することは意図的なスコープ限定である。 [adr: knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md#D3]
@@ -41,6 +42,7 @@ signals: { blue: 33, yellow: 0, red: 0 }
 - [CN-06] task-contract.json の author は impl-planner（Phase 3）に限定する。type-designer（Phase 2）は本 artifact を書かない。Phase 2 成果物が Phase 3 概念（task）を参照することは SoT Chain の順序違反であり禁止。 [adr: knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md#D1] [tasks: T001]
 - [CN-07] attribution 完全性（completeness）の検証と生存性（liveness）の検証は別 subcommand に分割する（`bin/sotp task-contract coverage` と `bin/sotp task-contract check`）。両者は失敗時の責任者と修正経路が異なり（planner が attribution を author する vs implementer が impl を 🔵 化する）、1 コマンドに混在させると fixer の判断分岐コストが恒久化する。両者は `task-contract` ドメイン配下に置き、`verify-*` ファミリーには逃さない。 [adr: knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md#D5] [tasks: T009, T010, T011, T012, T013, T014, T016]
 - [CN-08] `cargo make task-contract-check` の `dependencies` に `task-contract-coverage` を宣言することで完全性 → 生存性の実行順を保証する。`bin/sotp` バイナリ内部でのコマンド連結（hardcode）は禁止。各 subcommand は単一責務を維持し、配線は cargo-make 層に局所化する。 [adr: knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md#D6] [tasks: T016]
+- [CN-09] `CoverageVerifyService` 実装は `task-contract.json` の各 task キーが `impl-plan.json` から取得した task IDs 集合に含まれるか確認する。含まれない task キー配下の全 entry は `CoverageViolation::InvalidTaskRef` として `CoverageVerifyOutcome.violations` に push する。violation が 1 件でも存在すれば exit ≠ 0 で fail-closed。 [adr: knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md#D9] [tasks: T018]
 
 ## Acceptance Criteria
 - [ ] [AC-01] `task-contract.json` のスキーマが定義されており、impl-planner が Phase 3 output として本 artifact を author する。artifact には schema_version・track id・タスクリスト（各タスクが履行責務を持つ型カタログ entry 識別子のリスト）が含まれる。 [adr: knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md#D1] [tasks: T001, T003]
@@ -51,6 +53,7 @@ signals: { blue: 33, yellow: 0, red: 0 }
 - [ ] [AC-07] `cargo make ci`（fmt-check + clippy + nextest + deny + check-layers + verify-*）が pass する。ゲートロジックのユニットテストとして次のケースを網羅する: (a) `task-contract.json` 不在で check がブロック、(b) orphan entry 存在で coverage がブロック、(c) attribution referential integrity 違反で coverage がブロック、(d) 🔴 エントリ存在でタスク状態に関わらず check がブロック、(e) in_progress / done タスクの全 attributed entry が 🔵 かつ coverage 完全でパス、(f) todo タスクに 🟡 エントリが存在しても check がパス（🔴 なし前提）、(g) `cargo make track-local-review` 実行時に coverage → check の dependency が順序通り発火する。既存テストへのリグレッションがない。 [adr: knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md#D6, knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md#D7] [tasks: T007, T010, T015, T016]
 - [ ] [AC-08] `bin/sotp task-contract coverage` が実装されており、`cargo make task-contract-coverage` として呼び出せる。`cargo make task-contract-check` は `dependencies = ["task-contract-coverage"]` を宣言し、coverage → check の順で必ず実行される。attribution 不完全（orphan あり）の場合、coverage がブロックし check は実行されない。 [adr: knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md#D5, knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md#D6] [tasks: T009, T010, T011, T012, T013, T014, T016]
 - [ ] [AC-09] ユニットテストで以下を検証する: (a) composition root が exit 64 + `SUBAGENT_DISPATCH_REQUIRED` prefix を含む CommandOutcome を return した場合、`ReviewServiceImpl::run_fix_local` は `Err(RunReviewFixError::SubagentDispatchRequired(payload))` を返す (payload は exit 64 出力の stdout 文字列をそのまま carry)、(b) cli_driver の `review_run_fix_local` が `Err(RunReviewFixError::SubagentDispatchRequired(payload))` を受け取ったとき、`CommandOutcome { stdout: Some(payload), stderr: None, exit_code: 64 }` を return し、`REVIEW_FIX_STATUS: failed` への remap が発生しない、(c) Claude provider 経由で `ReviewCompositionRoot::review_driver().handle(RunFixLocal {...})` を呼ぶと exit 64 + sentinel が stdout に preserve される。 [adr: knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md#D8] [tasks: T017]
+- [ ] [AC-10] `task-contract.json` に `impl-plan.json` に存在しない task キー (例: 削除済みタスク `T999`) 配下に entry が attribution されている状態を作る。`bin/sotp task-contract coverage` を実行すると、`CoverageViolation::InvalidTaskRef { task_id: "T999", entry_keys: [...] }` が報告され、exit ≠ 0 で終了する (silent pass しない) ことを確認。 [adr: knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md#D9] [tasks: T018]
 
 ## Related Conventions (Required Reading)
 - knowledge/conventions/coding-principles.md#No Panics in Library Code
@@ -61,5 +64,5 @@ signals: { blue: 33, yellow: 0, red: 0 }
 ## Signal Summary
 
 ### Stage 1: Spec Signals
-🔵 33  🟡 0  🔴 0
+🔵 36  🟡 0  🔴 0
 

@@ -135,13 +135,16 @@
       },
       "methods": [],
       "module_path": "pre_review_gate",
-      "docs": "Interactor implementing CoverageVerifyService (attribution-completeness check). Holds two injected secondary ports: task_contract_reader reads task-contract.json; signal_reader visits each canonical layer via read_optional_signals so Ok(Some(document)) enumerates catalogue entry keys, Ok(None) becomes CoverageViolation::MissingSignalDocument, and read/decode failures propagate as SignalReadFailed. Checks that every signaled entry is attributed to at least one task (orphan detection) and every attributed entry has a signal (referential integrity). All fields are private (Arc<dyn Port>). Shares TaskContractReaderPort and ImplCatalogSignalReaderPort with PreReviewGateInteractor (reuse per spec IN-07 notes).",
+      "docs": "Interactor implementing CoverageVerifyService (attribution-completeness check). Holds three injected secondary ports: task_contract_reader reads task-contract.json; signal_reader visits each canonical layer via read_optional_signals so Ok(Some(document)) enumerates catalogue entry keys, Ok(None) becomes CoverageViolation::MissingSignalDocument, and read/decode failures propagate as SignalReadFailed; impl_plan_reader reads impl-plan.json task IDs for D9 task-key referential integrity. Checks that every signaled entry is attributed to at least one task (orphan detection) and every attributed entry has a signal (referential integrity). Additionally performs task-key referential integrity (D9/IN-11/CN-09): uses ImplPlanReaderPort::read_task_statuses to obtain the impl-plan.json task IDs set; any task key in task-contract.json not present in that set is reported as CoverageViolation::InvalidTaskRef carrying the stale TaskId and all its attributed entry_keys. All fields are private (Arc<dyn Port>). Shares TaskContractReaderPort and ImplCatalogSignalReaderPort with PreReviewGateInteractor (reuse per spec IN-07 notes).",
       "spec_refs": [
         { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-03" },
         { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-07" },
         { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "CN-07" },
         { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-02" },
-        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-08" }
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-08" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-11" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "CN-09" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-10" }
       ],
       "informal_grounds": []
     },
@@ -217,13 +220,16 @@
       ],
       "supertrait_bounds": ["Send", "Sync"],
       "module_path": "pre_review_gate",
-      "docs": "Primary application service port for the attribution-completeness coverage check (`bin/sotp task-contract coverage`). Called by cli_driver::task_contract::TaskContractDriver when handling TaskContractInput::Coverage. Shares PreReviewGateError as the I/O error type with PreReviewGateService because both services use the same secondary ports.",
+      "docs": "Primary application service port for the attribution-completeness coverage check (`bin/sotp task-contract coverage`). Called by cli_driver::task_contract::TaskContractDriver when handling TaskContractInput::Coverage. Shares PreReviewGateError as the I/O error type with PreReviewGateService because both services use the same secondary ports. Additionally performs task-key referential integrity (IN-11/D9): each task key in task-contract.json entries map must be present in impl-plan.json task IDs; absent task keys are reported as CoverageViolation::InvalidTaskRef and cause the coverage gate to fail closed.",
       "spec_refs": [
         { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-03" },
         { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-07" },
         { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "CN-07" },
         { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-02" },
-        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-08" }
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-08" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "IN-11" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "CN-09" },
+        { "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.json", "anchor": "AC-10" }
       ],
       "informal_grounds": []
     },
@@ -353,14 +359,15 @@
           "receiver": null,
           "params": [
             { "name": "task_contract_reader", "ty": "std::sync::Arc<dyn TaskContractReaderPort>" },
-            { "name": "signal_reader", "ty": "std::sync::Arc<dyn ImplCatalogSignalReaderPort>" }
+            { "name": "signal_reader", "ty": "std::sync::Arc<dyn ImplCatalogSignalReaderPort>" },
+            { "name": "impl_plan_reader", "ty": "std::sync::Arc<dyn ImplPlanReaderPort>" }
           ],
           "returns": "Self",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
           "where_predicates": [],
-          "docs": "Construct a CoverageVerifyInteractor by injecting two secondary ports: task-contract reader and signal reader (for entry enumeration)."
+          "docs": "Construct a CoverageVerifyInteractor by injecting three secondary ports: task-contract reader, signal reader (for entry enumeration), and impl-plan reader (D9 task-key referential integrity)."
         }
       ]
     }

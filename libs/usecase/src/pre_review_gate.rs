@@ -241,16 +241,22 @@ pub trait CoverageVerifyService: Send + Sync {
 pub struct CoverageVerifyInteractor {
     task_contract_reader: Arc<dyn TaskContractReaderPort>,
     signal_reader: Arc<dyn ImplCatalogSignalReaderPort>,
+    impl_plan_reader: Arc<dyn ImplPlanReaderPort>,
 }
 
 impl CoverageVerifyInteractor {
-    /// Construct a `CoverageVerifyInteractor` by injecting two secondary ports.
+    /// Construct a `CoverageVerifyInteractor` by injecting three secondary ports.
+    ///
+    /// `impl_plan_reader` supplies the task ID set used for D9 referential
+    /// integrity: every task key in `task-contract.json` must exist in
+    /// `impl-plan.json`, otherwise an `InvalidTaskRef` violation is reported.
     #[must_use]
     pub fn new(
         task_contract_reader: Arc<dyn TaskContractReaderPort>,
         signal_reader: Arc<dyn ImplCatalogSignalReaderPort>,
+        impl_plan_reader: Arc<dyn ImplPlanReaderPort>,
     ) -> Self {
-        Self { task_contract_reader, signal_reader }
+        Self { task_contract_reader, signal_reader, impl_plan_reader }
     }
 }
 
@@ -388,6 +394,26 @@ impl CoverageVerifyService for CoverageVerifyInteractor {
                             },
                         );
                     }
+                }
+            }
+        }
+
+        // ── Phase 4: Task key referential integrity (D9) ─────────────────────
+        // Every task id used as a key in `task-contract.json` must exist in
+        // `impl-plan.json`. Stale task keys left after an `impl-plan.json`
+        // rename or removal would otherwise let coverage silently pass —
+        // emit `InvalidTaskRef` per stale task instead so the gate fails
+        // closed until the contract is realigned with the plan.
+        {
+            let plan_task_ids = self.impl_plan_reader.read_task_statuses(&cmd.track_id)?;
+            for (task_id, refs) in contract_doc.entries() {
+                if !plan_task_ids.contains_key(task_id) {
+                    all_violations.push(
+                        domain::task_contract::CoverageViolation::InvalidTaskRef {
+                            task_id: task_id.clone(),
+                            entry_keys: refs.clone(),
+                        },
+                    );
                 }
             }
         }
@@ -1188,13 +1214,45 @@ mod tests {
 
     // ── CoverageVerifyInteractor tests (AC-07 cases b, c, e-coverage) ─────────
 
+    /// Build a plan reader whose task-id set matches the contract's task keys,
+    /// so existing coverage tests that don't care about D9 RI keep passing.
+    fn plan_reader_matching_contract(
+        contract: &Result<TaskContractDocument, PreReviewGateError>,
+    ) -> Arc<dyn ImplPlanReaderPort> {
+        match contract {
+            Ok(doc) => {
+                let map: std::collections::HashMap<TaskId, TaskStatusKind> = doc
+                    .entries()
+                    .keys()
+                    .map(|id| (id.clone(), TaskStatusKind::Todo))
+                    .collect();
+                Arc::new(FixedImplPlanReader(map))
+            }
+            Err(_) => Arc::new(EmptyImplPlanReader),
+        }
+    }
+
     fn coverage_interactor(
         contract: Result<TaskContractDocument, PreReviewGateError>,
         signal_docs: std::collections::HashMap<String, TypeSignalsDocument>,
     ) -> CoverageVerifyInteractor {
+        let plan_reader = plan_reader_matching_contract(&contract);
         CoverageVerifyInteractor::new(
             Arc::new(ConstContractReader(contract)),
             Arc::new(LayerAwareSignalReader(signal_docs)),
+            plan_reader,
+        )
+    }
+
+    fn coverage_interactor_with_plan(
+        contract: Result<TaskContractDocument, PreReviewGateError>,
+        signal_docs: std::collections::HashMap<String, TypeSignalsDocument>,
+        plan_reader: Arc<dyn ImplPlanReaderPort>,
+    ) -> CoverageVerifyInteractor {
+        CoverageVerifyInteractor::new(
+            Arc::new(ConstContractReader(contract)),
+            Arc::new(LayerAwareSignalReader(signal_docs)),
+            plan_reader,
         )
     }
 
@@ -1209,6 +1267,7 @@ mod tests {
         let svc = CoverageVerifyInteractor::new(
             Arc::new(ConstContractReader(Err(PreReviewGateError::TaskContractNotFound))),
             Arc::new(LayerAwareSignalReader(std::collections::HashMap::new())),
+            Arc::new(EmptyImplPlanReader),
         );
         let outcome = svc.verify_coverage(coverage_cmd("my-track")).unwrap();
         match outcome {
@@ -1502,6 +1561,131 @@ mod tests {
             matches!(outcome, CoverageVerifyOutcome::Passed),
             "expected Passed, got {outcome:?}"
         );
+    }
+
+    // ── D9 task-key referential integrity tests ───────────────────────────────
+
+    /// Build a signal-docs map populated with empty docs for every canonical
+    /// TDDD layer plus the given `domain_entries`, so D9 tests can focus on the
+    /// task-key RI check without `MissingSignalDocument` / `OrphanEntry` noise.
+    fn d9_signal_docs(
+        domain_entries: Vec<&'static str>,
+    ) -> std::collections::HashMap<String, TypeSignalsDocument> {
+        let mut signal_docs = std::collections::HashMap::new();
+        signal_docs.insert(
+            "domain".to_owned(),
+            make_signals(domain_entries.into_iter().map(blue_signal).collect()),
+        );
+        for layer_name in &["usecase", "infrastructure", "cli_driver", "cli", "cli_composition"] {
+            signal_docs.insert((*layer_name).to_owned(), make_signals(vec![]));
+        }
+        signal_docs
+    }
+
+    // ── Coverage (h): stale task key absent from impl-plan → InvalidTaskRef ───
+
+    #[test]
+    fn coverage_stale_task_key_absent_from_impl_plan_yields_invalid_task_ref() {
+        let contract = Ok(make_contract(
+            "my-track",
+            vec![(
+                task_id("T999"),
+                vec![ContractedEntryRef::new(layer("domain"), entry_key("Foo"))],
+            )],
+        ));
+        // impl-plan only knows about T001, so T999 in the contract is stale.
+        let plan_reader = Arc::new(FixedImplPlanReader(std::collections::HashMap::from([
+            (task_id("T001"), TaskStatusKind::Done),
+        ])));
+        let svc = coverage_interactor_with_plan(contract, d9_signal_docs(vec!["Foo"]), plan_reader);
+        let outcome = svc.verify_coverage(coverage_cmd("my-track")).unwrap();
+        match outcome {
+            CoverageVerifyOutcome::Blocked { violations, .. } => {
+                let invalid_task_refs: Vec<_> = violations
+                    .iter()
+                    .filter_map(|v| match v {
+                        CoverageViolation::InvalidTaskRef { task_id: tid, entry_keys } => {
+                            Some((tid.clone(), entry_keys.clone()))
+                        }
+                        _ => None,
+                    })
+                    .collect();
+                assert_eq!(invalid_task_refs.len(), 1, "expected exactly 1 InvalidTaskRef");
+                assert_eq!(invalid_task_refs[0].0.as_ref(), "T999");
+                assert_eq!(invalid_task_refs[0].1.len(), 1);
+                assert_eq!(invalid_task_refs[0].1[0].entry_key().as_str(), "Foo");
+            }
+            other => panic!("expected Blocked with InvalidTaskRef, got {other:?}"),
+        }
+    }
+
+    // ── Coverage (i): every task key present in impl-plan → no InvalidTaskRef ─
+
+    #[test]
+    fn coverage_all_task_keys_present_in_impl_plan_emits_no_invalid_task_ref() {
+        let contract = Ok(make_contract(
+            "my-track",
+            vec![(
+                task_id("T001"),
+                vec![ContractedEntryRef::new(layer("domain"), entry_key("Foo"))],
+            )],
+        ));
+        let plan_reader = Arc::new(FixedImplPlanReader(std::collections::HashMap::from([
+            (task_id("T001"), TaskStatusKind::Done),
+            (task_id("T002"), TaskStatusKind::Todo),
+        ])));
+        let svc = coverage_interactor_with_plan(contract, d9_signal_docs(vec!["Foo"]), plan_reader);
+        let outcome = svc.verify_coverage(coverage_cmd("my-track")).unwrap();
+        assert!(
+            matches!(outcome, CoverageVerifyOutcome::Passed),
+            "expected Passed when every task key resolves in impl-plan, got {outcome:?}"
+        );
+    }
+
+    // ── Coverage (j): multiple stale task keys → one InvalidTaskRef each ──────
+
+    #[test]
+    fn coverage_multiple_stale_task_keys_yield_one_invalid_task_ref_each() {
+        let contract = Ok(make_contract(
+            "my-track",
+            vec![
+                (
+                    task_id("T100"),
+                    vec![ContractedEntryRef::new(layer("domain"), entry_key("Foo"))],
+                ),
+                (
+                    task_id("T200"),
+                    vec![ContractedEntryRef::new(layer("domain"), entry_key("Bar"))],
+                ),
+            ],
+        ));
+        // impl-plan has neither T100 nor T200, so both are stale.
+        let plan_reader = Arc::new(FixedImplPlanReader(std::collections::HashMap::from([
+            (task_id("T001"), TaskStatusKind::Done),
+        ])));
+        let svc = coverage_interactor_with_plan(
+            contract,
+            d9_signal_docs(vec!["Foo", "Bar"]),
+            plan_reader,
+        );
+        let outcome = svc.verify_coverage(coverage_cmd("my-track")).unwrap();
+        match outcome {
+            CoverageVerifyOutcome::Blocked { violations, .. } => {
+                let stale_ids: std::collections::BTreeSet<String> = violations
+                    .iter()
+                    .filter_map(|v| match v {
+                        CoverageViolation::InvalidTaskRef { task_id: tid, .. } => {
+                            Some(tid.as_ref().to_owned())
+                        }
+                        _ => None,
+                    })
+                    .collect();
+                assert_eq!(stale_ids.len(), 2);
+                assert!(stale_ids.contains("T100"));
+                assert!(stale_ids.contains("T200"));
+            }
+            other => panic!("expected Blocked with InvalidTaskRefs, got {other:?}"),
+        }
     }
 
     // ── D7 task-status filtering tests ───────────────────────────────────────────

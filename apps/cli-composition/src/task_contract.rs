@@ -6,8 +6,9 @@
 //!
 //! - `check`: liveness gate (D5) — wires three-port `PreReviewGateInteractor`
 //!   (task_contract_reader + signal_reader + impl_plan_reader, D7).
-//! - `coverage`: attribution-completeness gate (D5) — wires two-port
-//!   `CoverageVerifyInteractor` (task_contract_reader + signal_reader).
+//! - `coverage`: attribution-completeness gate (D5) — wires three-port
+//!   `CoverageVerifyInteractor` (task_contract_reader + signal_reader +
+//!   impl_plan_reader, D9 task-key referential integrity).
 
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -27,7 +28,7 @@ use crate::error::CompositionError;
 ///
 /// Wires `FsTaskContractReader`, `FsImplCatalogSignalReader`,
 /// `FsImplPlanReader`, `PreReviewGateInteractor` (check/liveness, 3-port D7),
-/// `CoverageVerifyInteractor` (coverage/attribution-completeness, 2-port), and
+/// `CoverageVerifyInteractor` (coverage/attribution-completeness, 3-port D9), and
 /// `TaskContractDriver` for the `sotp task-contract` subcommands.
 pub struct TaskContractCompositionRoot;
 
@@ -43,11 +44,12 @@ impl TaskContractCompositionRoot {
     /// Wires three filesystem adapters from `items_dir`:
     /// - `FsTaskContractReader` (shared by both services)
     /// - `FsImplCatalogSignalReader` (shared by both services)
-    /// - `FsImplPlanReader` (used by the liveness check service, D7)
+    /// - `FsImplPlanReader` (shared by both services — D7 liveness check
+    ///   reads task statuses; D9 coverage check reads task ids)
     ///
     /// Builds `PreReviewGateInteractor` (3-port, liveness check) and
-    /// `CoverageVerifyInteractor` (2-port, attribution completeness), then
-    /// injects both into `TaskContractDriver::new`.
+    /// `CoverageVerifyInteractor` (3-port, attribution completeness + task-key
+    /// referential integrity), then injects both into `TaskContractDriver::new`.
     #[must_use]
     pub fn task_contract_driver(&self, items_dir: PathBuf) -> TaskContractDriver {
         let task_contract_reader: Arc<dyn TaskContractReaderPort> =
@@ -60,12 +62,13 @@ impl TaskContractCompositionRoot {
         let check_service = Arc::new(PreReviewGateInteractor::new(
             Arc::clone(&task_contract_reader),
             Arc::clone(&signal_reader),
-            impl_plan_reader,
+            Arc::clone(&impl_plan_reader),
         ));
 
         let coverage_service = Arc::new(CoverageVerifyInteractor::new(
             Arc::clone(&task_contract_reader),
             Arc::clone(&signal_reader),
+            impl_plan_reader,
         ));
 
         TaskContractDriver::new(check_service, coverage_service)

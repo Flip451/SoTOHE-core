@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-29T10:50:55Z",
-  "declaration_hash": "0de7581806a484580cad1e44ffa5ab06e7793fae6989629273756e3dd9d78b75",
+  "generated_at": "2026-06-29T12:17:02Z",
+  "declaration_hash": "4c92b4e511649858e6fe9fe1b38718b19630470cd6ef3ff5314505fd08f8c540",
   "signals": [
     {
       "type_name": "ContractedEntryRef",

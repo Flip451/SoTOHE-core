@@ -244,6 +244,19 @@ fn render_coverage_violations(violations: &[CoverageViolation]) -> String {
                     layer.as_ref()
                 )
             }
+            CoverageViolation::InvalidTaskRef { task_id, entry_keys } => {
+                let keys = entry_keys
+                    .iter()
+                    .map(|e| format!("{}/{}", e.layer().as_ref(), e.entry_key().as_str()))
+                    .collect::<Vec<_>>()
+                    .join(", ");
+                format!(
+                    "  - InvalidTaskRef: task '{}' is not in impl-plan.json but task-contract.json \
+                     attributes entries [{keys}]; either update impl-plan.json or remove the stale \
+                     attributions",
+                    task_id.as_ref()
+                )
+            }
         };
         lines.push(line);
     }

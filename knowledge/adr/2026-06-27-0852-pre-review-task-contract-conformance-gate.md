@@ -33,6 +33,10 @@ decisions:
     user_decision_ref: "chat_segment:session_013pQgnVvMR775h8tsD1mya4:2026-06-29"
     candidate_selection: "from:[stdout-string-matching,magic-exit-codes,typed-error-variant-pass-through] chose:typed-error-variant-pass-through"
     status: accepted
+  - id: D9
+    user_decision_ref: "chat_segment:session_013pQgnVvMR775h8tsD1mya4:2026-06-29"
+    candidate_selection: "from:[coverage-external-verify-subcommand,silently-ignore-stale-task-keys,coverage-integrated-ri-check] chose:coverage-integrated-ri-check"
+    status: accepted
 ---
 # タスク単位の契約履行 pre-review ゲート — Phase 3 attribution artifact と impl_catalog 信号の binary 再利用
 
@@ -141,6 +145,20 @@ D2/D6 で新しい task-contract gate の配線対象に含める既存の `bin/
 
 `SubagentDispatchRequired` variant は dispatch contract を表す usecase 層の意味論であり、結果として cli_driver 層 dispatch arm の挙動が決まる。本 ADR の主軸 (`task-contract` gate) とは layer も responsibility も異なる隣接決定であり、review-fix wiring の Claude path における structural 不具合の修正を記録する。
 
+### D9: task-contract.json の task キー ↔ impl-plan.json task IDs の referential integrity 検証
+
+`task-contract.json` の `entries` map のキー (task ID, 例: `T001`, `T015`) は、`impl-plan.json` の `tasks[].id` 集合に **必ず含まれる** 必要がある。`coverage` ゲート (`bin/sotp task-contract coverage`) は attribution 完全性の検証時にこの referential integrity も併せて検証する。
+
+具体的には:
+
+1. `task-contract.json` の各 task キーが `impl-plan.json` の `tasks[].id` 集合に含まれているかを確認する。
+2. 含まれない task キーが存在した場合、その task キー配下の全 entry を `CoverageViolation::InvalidTaskRef { task_id, entry_keys }` として報告し、`coverage` ゲートを fail-closed させる。
+3. これにより、`impl-plan.json` から task が rename / 削除されたあと `task-contract.json` を更新し忘れて stale 参照が残った状態でも、coverage が silently pass するのを防ぐ。
+
+ゲートの合否基準への追加: 既存の「scope 内の関連 entry が漏れなく attribution されている」+「D7 の task status に基づく生存性判定 (done / in_progress は 🔵 必須、todo は 🟡 許容、🔴 は常に blocker)」に加えて、本 D9 で「全 task キーが impl-plan.json に存在する」を invariant として追加する。
+
+D1 が定めた attribution map の完全性概念を、本 D9 が referential integrity の側面で厳格化する。D3 の "完全性" 部分の補強であり、D7 で確立した impl-plan を SSoT とする方針と整合する。
+
 ## Rejected Alternatives
 
 - **A. 「履行」判定に test-pass / stub-scan（body-aware liveness）を含める**: 却下。body は rustdoc JSON に載らず現エンジンでは原理的に見られないため、別データ源（syn 走査 / nextest 名前フィルタ）と新検査系の新設・保守が要る。すり抜ける stub は reviewer（body を読む）と commit/merge gate の test が安く捕まえるので、その狭い残コストのために検査系を抱えるのは ROI が悪い。
@@ -149,6 +167,8 @@ D2/D6 で新しい task-contract gate の配線対象に含める既存の `bin/
 - **D. 新 chain（task_conformance）を切る**: 却下。gate matrix / strictness / views の表面積が増える。per-task は既存 `impl_catalog` 信号 + Phase 3 マッピングの JOIN で足り、binary check で実装可能。
 - **E. shift-left せず現状維持（pre-review prepend は freshness のみ、blocking は commit=interim / merge=strict）**: 却下。契約一致の hard gate が merge までかからず、違反が track 最終盤まで遅延する。早期・per-task の検出という本 ADR の目的を満たさない。
 - **F. reviewer に prose の「ソースコード理解キャッシュ」を渡して前倒しの代替とする**: 却下。review は adversarial であり、lossy な散文サマリは「キャッシュを信じて見落とす」穴を作る。安全なのは契約 SSoT（型カタログ）と信号状態を渡すことであり、本 ADR の D2 はその安全形に限定する。
+- **AA. task キー RI 検証を coverage 外の別 verify subcommand に切り出す**: 却下。D1/D3 の attribution 完全性は coverage の責務として既に確立。RI check も attribution 完全性の自然な拡張なので同一 subcommand 内に置くのが SRP として正しい。verify-* に新規 subcommand を切ると surface を不必要に増やす (`knowledge/conventions/workflow-ceremony-minimization.md` の精神に反する)。
+- **AB. stale task キー配下の entry を silently 無視する**: 却下。silently 無視すると stale entry が catalogue 全集合の attribution カバレッジ判定に含まれず、catalogue にあるはずの entry が attribution されていない bug を覆い隠す。fail-closed が安全。
 
 ## Consequences
 
@@ -159,6 +179,8 @@ D2/D6 で新しい task-contract gate の配線対象に含める既存の `bin/
 - 既存 `impl_catalog` 信号を再利用し、型カタログ / type-designer は不変、新 chain も不要。変更面は (D1) 新 Phase 3 artifact `task-contract.json` と (D2) binary check の新設に限られる（検証エンジンは再利用）。
 - task→entry マッピングは副次的に review の split-key（cohesion 境界での分割）としても再利用できる。
 - ゲートは deterministic / binary で、SoT-chain-binary-check の枠組みに乗る。
+- attribution map の参照整合性が機械検証されるようになり、impl-plan からタスクが消えた後の attribution drift が早期検知される。
+- coverage ゲートの「pass = catalogue 全 entry が active task に紐付き、active task は全て impl-plan に存在する」という統一的な不変条件が成立する。
 
 ### Negative
 
@@ -166,6 +188,8 @@ D2/D6 で新しい task-contract gate の配線対象に含める既存の `bin/
 - 新 Phase 3 artifact `task-contract.json` 1つ分の surface が増える（schema / codec / gate 配線、および attribution completeness / referential integrity の維持＝ entry の rename / 削除で orphan / drift し得る）。ただし drift は既存の task↔spec と同種で新しいリスククラスではない。
 - impl-planner の責務がわずかに増える（新 artifact `task-contract.json` の author を追加）。
 - ゲートが blocking なので、🔵 になっていない段階の探索的 / 部分実装に対して review を妨げ得る（interim 的運用や per-task scope での緩和は将来検討）。
+- 既存の task-contract.json を impl-plan.json と照合する必要があり、stale 残留があれば修正コストが発生する。
+- `CoverageVerifyService` 実装に `impl-plan.json` の task IDs 取得 step が増える (既存 `ImplPlanReaderPort` の拡張または method 追加)。
 
 ### Neutral
 
