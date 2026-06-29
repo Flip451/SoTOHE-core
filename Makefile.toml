@@ -654,8 +654,8 @@ args = ["run", "--quiet", "-p", "cli", "--", "task-contract", "coverage"]
 # Cargo-make dependencies run before task scripts, so pre-gate track/branch
 # guards must live outside these wrappers or inside the gate commands.
 [tasks.track-local-review]
-description = "[wrapper] Fire attribution-completeness + liveness gates via task-contract-check dependency (active track auto-resolved from the current git branch in each gate), then invoke a single reviewer round via bin/sotp review local. bin/sotp review local auto-resolves the active track from the current git branch when --track-id is omitted. Provider-agnostic: both Claude and Codex skills call this task per round."
-dependencies = ["task-contract-check"]
+description = "[wrapper] Fire attribution-completeness + liveness gates (via task-contract-check), refresh signals + rendered views (via track-active-gate), then invoke a single reviewer round via bin/sotp review local. Both gates auto-resolve the active track from the current git branch. Running track-active-gate after task-contract-check ensures the reviewer sees view artifacts rendered from the latest signal state (the fixer's between-rounds code edits would otherwise leave *-types.md stale)."
+dependencies = ["task-contract-check", "track-active-gate"]
 script_runner = "@shell"
 script = ['''
 case "${1:-}" in --) shift ;; esac
@@ -663,8 +663,8 @@ CODEX_BIN="${CODEX_BIN:-$(asdf which codex 2>/dev/null || command -v codex)}" bi
 ''']
 
 [tasks.track-local-review-fix]
-description = "[wrapper] Same as track-local-review but invokes bin/sotp review fix-local instead of review local. Provider-agnostic: bin/sotp resolves provider/model from .harness/config/agent-profiles.json. Active track auto-resolved from current git branch (--track-id is intentionally not accepted at the cargo-make layer)."
-dependencies = ["task-contract-check"]
+description = "[wrapper] Same as track-local-review but invokes bin/sotp review fix-local instead of review local. Runs task-contract gates, then refreshes signals + rendered views before delegation. Provider-agnostic: bin/sotp resolves provider/model from .harness/config/agent-profiles.json. Active track auto-resolved from current git branch (--track-id is intentionally not accepted at the cargo-make layer)."
+dependencies = ["task-contract-check", "track-active-gate"]
 script_runner = "@shell"
 script = ['''
 case "${1:-}" in --) shift ;; esac
