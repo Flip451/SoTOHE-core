@@ -150,12 +150,8 @@ pub trait ImplCatalogSignalReaderPort: Send + Sync {
         layer: &domain::tddd::LayerId,
     ) -> Result<TypeSignalsDocument, PreReviewGateError>;
 
-    /// Read the per-layer signal document when absence is an expected state.
-    ///
-    /// Returns `Ok(None)` only when the adapter can positively classify the
-    /// document as absent. Other read/decode failures must return
-    /// [`PreReviewGateError::SignalReadFailed`]. The default implementation is
-    /// fail-closed for adapters that only implement [`Self::read_signals`].
+    /// Read the per-layer signal document when absence is expected state.
+    /// `Ok(None)` only on positively-classified absent docs; default fail-closed.
     fn read_optional_signals(
         &self,
         track_id: &domain::TrackId,
@@ -172,10 +168,7 @@ pub trait ImplCatalogSignalReaderPort: Send + Sync {
 /// for the liveness gate: `in_progress` and `done` entries require Blue signal;
 /// entries with no `in_progress` or `done` owner are skipped unless Red.
 pub trait ImplPlanReaderPort: Send + Sync {
-    /// Read `impl-plan.json` for the given track and return a map of
-    /// `TaskId → TaskStatusKind`.
-    ///
-    /// Returns [`PreReviewGateError::ImplPlanReadFailed`] on I/O or decode errors.
+    /// Read `impl-plan.json` and return `TaskId → TaskStatusKind`.
     fn read_task_statuses(
         &self,
         track_id: &domain::TrackId,
@@ -245,11 +238,8 @@ pub struct CoverageVerifyInteractor {
 }
 
 impl CoverageVerifyInteractor {
-    /// Construct a `CoverageVerifyInteractor` by injecting three secondary ports.
-    ///
-    /// `impl_plan_reader` supplies the task ID set used for D9 referential
-    /// integrity: every task key in `task-contract.json` must exist in
-    /// `impl-plan.json`, otherwise an `InvalidTaskRef` violation is reported.
+    /// Construct by injecting three secondary ports; `impl_plan_reader` enables
+    /// the D9 task-key referential integrity check.
     #[must_use]
     pub fn new(
         task_contract_reader: Arc<dyn TaskContractReaderPort>,
@@ -270,12 +260,109 @@ fn blocked_coverage_outcome(
     })
 }
 
+/// Build the lookup `entry_key -> ContractedEntryRef` for one layer's signal doc.
+fn build_scope_entries(
+    signal_doc: &TypeSignalsDocument,
+    layer: &domain::tddd::LayerId,
+) -> Result<HashMap<String, ContractedEntryRef>, PreReviewGateError> {
+    let mut entries: HashMap<String, ContractedEntryRef> = HashMap::new();
+    for signal in signal_doc.signals() {
+        let entry_key = domain::tddd::semantic_verify::CatalogueEntryKey::try_new(
+            signal.type_name().to_owned(),
+        )
+        .map_err(|_| PreReviewGateError::SignalReadFailed {
+            layer: layer.clone(),
+            message: format!(
+                "invalid entry key '{}' in {}-type-signals.json",
+                signal.type_name(),
+                layer.as_ref()
+            ),
+        })?;
+        let key = entry_key.as_str().to_owned();
+        entries.entry(key).or_insert_with(|| ContractedEntryRef::new(layer.clone(), entry_key));
+    }
+    Ok(entries)
+}
+
+/// Phase 1+2: orphan detection + entry-key RI for one canonical layer.
+fn collect_per_layer_violations(
+    contract_doc: &domain::task_contract::TaskContractDocument,
+    layer: &domain::tddd::LayerId,
+    scope_entries: &HashMap<String, ContractedEntryRef>,
+) -> Vec<domain::task_contract::CoverageViolation> {
+    let attributed: Vec<&ContractedEntryRef> =
+        contract_doc.entries().values().flatten().filter(|e| e.layer() == layer).collect();
+    let attributed_keys: HashSet<&str> =
+        attributed.iter().map(|e| e.entry_key().as_str()).collect();
+    let mut out = Vec::new();
+    for (key, entry) in scope_entries {
+        if !attributed_keys.contains(key.as_str()) {
+            out.push(domain::task_contract::CoverageViolation::OrphanEntry {
+                entry: entry.clone(),
+            });
+        }
+    }
+    for entry in &attributed {
+        let key = entry.entry_key().as_str();
+        if !scope_entries.contains_key(key) {
+            out.push(domain::task_contract::CoverageViolation::InvalidEntryRef {
+                entry: (*entry).clone(),
+                reason: format!(
+                    "entry_key '{}' not found in {}-type-signals.json",
+                    key,
+                    layer.as_ref()
+                ),
+            });
+        }
+    }
+    out
+}
+
+/// Phase 3: any contract entry whose layer is outside the 6 canonical TDDD set.
+fn collect_non_canonical_layer_violations(
+    contract_doc: &domain::task_contract::TaskContractDocument,
+) -> Vec<domain::task_contract::CoverageViolation> {
+    let canonical: HashSet<&str> = CANONICAL_LAYERS.iter().copied().collect();
+    let mut out = Vec::new();
+    for refs in contract_doc.entries().values() {
+        for entry in refs {
+            if !canonical.contains(entry.layer().as_ref()) {
+                out.push(domain::task_contract::CoverageViolation::InvalidEntryRef {
+                    entry: entry.clone(),
+                    reason: format!(
+                        "layer '{}' is not a canonical TDDD layer",
+                        entry.layer().as_ref()
+                    ),
+                });
+            }
+        }
+    }
+    out
+}
+
+/// Phase 4 (D9): task keys present in `task-contract.json` but absent from
+/// `impl-plan.json` — emit one `InvalidTaskRef` per stale task so the gate
+/// fails closed instead of silently passing stale attributions.
+fn collect_task_key_ri_violations(
+    contract_doc: &domain::task_contract::TaskContractDocument,
+    plan_task_ids: &HashMap<domain::TaskId, domain::TaskStatusKind>,
+) -> Vec<domain::task_contract::CoverageViolation> {
+    contract_doc
+        .entries()
+        .iter()
+        .filter(|(task_id, _)| !plan_task_ids.contains_key(task_id))
+        .map(|(task_id, refs)| domain::task_contract::CoverageViolation::InvalidTaskRef {
+            task_id: task_id.clone(),
+            entry_keys: refs.clone(),
+        })
+        .collect()
+}
+
 impl CoverageVerifyService for CoverageVerifyInteractor {
     fn verify_coverage(
         &self,
         cmd: CoverageVerifyCommand,
     ) -> Result<CoverageVerifyOutcome, PreReviewGateError> {
-        // ── Step 0: read task-contract.json ──────────────────────────────────
         let contract_doc = match self.task_contract_reader.read(&cmd.track_id) {
             Ok(doc) => doc,
             Err(PreReviewGateError::TaskContractNotFound) => {
@@ -287,134 +374,28 @@ impl CoverageVerifyService for CoverageVerifyInteractor {
         };
 
         let mut all_violations: Vec<domain::task_contract::CoverageViolation> = Vec::new();
-
         for &layer_str in CANONICAL_LAYERS {
-            let Ok(layer) = domain::tddd::LayerId::try_new(layer_str.to_owned()) else {
-                // Unreachable: CANONICAL_LAYERS contains only valid identifiers.
+            let Ok(layer) = domain::tddd::LayerId::try_new(layer_str.to_owned()) else { continue };
+            let Some(signal_doc) =
+                self.signal_reader.read_optional_signals(&cmd.track_id, &layer)?
+            else {
+                all_violations.push(
+                    domain::task_contract::CoverageViolation::MissingSignalDocument {
+                        layer: layer.clone(),
+                    },
+                );
                 continue;
             };
-
-            // Read signal document for this layer. Absence of the signal
-            // document is always a coverage violation (fail-closed), regardless
-            // of whether any entries are attributed to this layer in
-            // task-contract.json. A single MissingSignalDocument violation is
-            // emitted per absent layer so that the gate does not silently skip
-            // layers that have not yet produced a signal document.
-            let signal_doc =
-                match self.signal_reader.read_optional_signals(&cmd.track_id, &layer)? {
-                    Some(doc) => doc,
-                    None => {
-                        all_violations.push(
-                            domain::task_contract::CoverageViolation::MissingSignalDocument {
-                                layer: layer.clone(),
-                            },
-                        );
-                        continue;
-                    }
-                };
-
-            // Build lookup: entry_key → ContractedEntryRef for scope entries.
-            let mut scope_entries: HashMap<String, ContractedEntryRef> = HashMap::new();
-            for signal in signal_doc.signals() {
-                let entry_key = match domain::tddd::semantic_verify::CatalogueEntryKey::try_new(
-                    signal.type_name().to_owned(),
-                ) {
-                    Ok(k) => k,
-                    Err(_) => {
-                        return Err(PreReviewGateError::SignalReadFailed {
-                            layer: layer.clone(),
-                            message: format!(
-                                "invalid entry key '{}' in {}-type-signals.json",
-                                signal.type_name(),
-                                layer.as_ref()
-                            ),
-                        });
-                    }
-                };
-                let key = entry_key.as_str().to_owned();
-                scope_entries
-                    .entry(key.clone())
-                    .or_insert_with(|| ContractedEntryRef::new(layer.clone(), entry_key));
-            }
-
-            // Build set of attributed entry keys for this layer.
-            let attributed_entries: Vec<&ContractedEntryRef> =
-                contract_doc.entries().values().flatten().filter(|e| e.layer() == &layer).collect();
-            let attributed_keys: HashSet<&str> =
-                attributed_entries.iter().map(|e| e.entry_key().as_str()).collect();
-
-            // ── Phase 1: Orphan detection ─────────────────────────────────────
-            // Every scope-relevant signal entry must be attributed to ≥1 task.
-            for (type_name, entry) in &scope_entries {
-                if !attributed_keys.contains(type_name.as_str()) {
-                    all_violations.push(domain::task_contract::CoverageViolation::OrphanEntry {
-                        entry: entry.clone(),
-                    });
-                }
-            }
-
-            // ── Phase 2: Referential integrity ────────────────────────────────
-            // Every attributed entry must exist in the signal document.
-            for entry in &attributed_entries {
-                let key = entry.entry_key().as_str();
-                if !scope_entries.contains_key(key) {
-                    all_violations.push(
-                        domain::task_contract::CoverageViolation::InvalidEntryRef {
-                            entry: (*entry).clone(),
-                            reason: format!(
-                                "entry_key '{}' not found in {}-type-signals.json",
-                                key,
-                                layer.as_ref()
-                            ),
-                        },
-                    );
-                }
-            }
+            let scope_entries = build_scope_entries(&signal_doc, &layer)?;
+            all_violations.extend(collect_per_layer_violations(
+                &contract_doc,
+                &layer,
+                &scope_entries,
+            ));
         }
-
-        // ── Phase 3: Non-canonical layer attribution check ────────────────────
-        // Walk all attributed entries and emit `InvalidEntryRef` for any entry
-        // whose layer is not one of the 6 canonical TDDD layers. Such entries
-        // are unreachable by the per-layer iteration above and would silently
-        // bypass orphan detection and referential integrity checks, allowing
-        // typos (e.g. `"doman"` for `"domain"`) to produce false-pass results.
-        {
-            let canonical_set: std::collections::HashSet<&str> =
-                CANONICAL_LAYERS.iter().copied().collect();
-            for refs in contract_doc.entries().values() {
-                for entry in refs {
-                    if !canonical_set.contains(entry.layer().as_ref()) {
-                        all_violations.push(
-                            domain::task_contract::CoverageViolation::InvalidEntryRef {
-                                entry: entry.clone(),
-                                reason: format!(
-                                    "layer '{}' is not a canonical TDDD layer",
-                                    entry.layer().as_ref()
-                                ),
-                            },
-                        );
-                    }
-                }
-            }
-        }
-
-        // ── Phase 4: Task key referential integrity (D9) ─────────────────────
-        // Every task id used as a key in `task-contract.json` must exist in
-        // `impl-plan.json`. Stale task keys left after an `impl-plan.json`
-        // rename or removal would otherwise let coverage silently pass —
-        // emit `InvalidTaskRef` per stale task instead so the gate fails
-        // closed until the contract is realigned with the plan.
-        {
-            let plan_task_ids = self.impl_plan_reader.read_task_statuses(&cmd.track_id)?;
-            for (task_id, refs) in contract_doc.entries() {
-                if !plan_task_ids.contains_key(task_id) {
-                    all_violations.push(domain::task_contract::CoverageViolation::InvalidTaskRef {
-                        task_id: task_id.clone(),
-                        entry_keys: refs.clone(),
-                    });
-                }
-            }
-        }
+        all_violations.extend(collect_non_canonical_layer_violations(&contract_doc));
+        let plan_task_ids = self.impl_plan_reader.read_task_statuses(&cmd.track_id)?;
+        all_violations.extend(collect_task_key_ri_violations(&contract_doc, &plan_task_ids));
 
         if all_violations.is_empty() {
             Ok(CoverageVerifyOutcome::Passed)
