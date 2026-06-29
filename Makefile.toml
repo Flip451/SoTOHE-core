@@ -325,12 +325,20 @@ args = ["run", "--quiet", "-p", "cli", "--", "signal", "check-adr-user", "--gate
 
 [tasks.verify-spec-states-current-local]
 private = true
-description = "[internal] Chain ① spec→ADR signal gate. Active track / spec.json path auto-resolved by CLI; graceful skip on non-track branches or absent spec.json."
+description = "[internal] Chain ① spec→ADR signal gate. Active track / spec.json path auto-resolved from branch; graceful skip on non-track branches or absent spec.json (Phase 0 / pre-Phase-1 tracks)."
 script_runner = "@shell"
 script = ['''
 BRANCH="$(git symbolic-ref --quiet --short HEAD 2>/dev/null || true)"
 case "$BRANCH" in
-  track/*) cargo run --quiet -p cli -- signal check-spec-adr --gate commit ;;
+  track/*)
+    TRACK_ID="${BRANCH#track/}"
+    SPEC_JSON="track/items/${TRACK_ID}/spec.json"
+    if [ ! -f "$SPEC_JSON" ]; then
+      echo "[SKIP] signal check-spec-adr: spec.json absent (Phase 0 / pre-Phase-1 track ${TRACK_ID})"
+      exit 0
+    fi
+    cargo run --quiet -p cli -- signal check-spec-adr --gate commit --spec-json "$SPEC_JSON"
+    ;;
   *) echo "[SKIP] signal check-spec-adr requires a track/* branch (current: ${BRANCH:-detached})" ;;
 esac
 ''']
