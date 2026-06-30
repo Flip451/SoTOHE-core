@@ -1,0 +1,140 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e50704fe2eb2bc03c6d0c003d66da523deb28490cd031324b954ba7edd062665",
+          "at": "2026-06-29T23:59:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e50704fe2eb2bc03c6d0c003d66da523deb28490cd031324b954ba7edd062665",
+          "at": "2026-06-30T00:01:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6307032938c3e80a59a0226bbec720ac3cfcce6057830651769a754a4ad99f0a",
+          "at": "2026-06-30T00:48:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6307032938c3e80a59a0226bbec720ac3cfcce6057830651769a754a4ad99f0a",
+          "at": "2026-06-30T00:51:21Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7899f270e2310497af429e838e7df82a1a08273028d80487d6b19f91fb501732",
+          "at": "2026-06-30T01:03:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7899f270e2310497af429e838e7df82a1a08273028d80487d6b19f91fb501732",
+          "at": "2026-06-30T01:07:19Z"
+        }
+      ]
+    },
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md#L146` adds D9 as a `PreReviewGate` missing-`task-contract.json` hotfix, but `track/items/phase-rollback-diagnose-skill-2026-06-29/metadata.json#L4` and `track/items/phase-rollback-diagnose-skill-2026-06-29/plan.md#L2` still present the branch as the diagnose-skill / capability addition only. That mixes two distinct change sets under one plan-artifact review, so the required gate-behavior change is easy to miss.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
+              "line": 146,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:fa383b018e4fc9d6fd5332e2caeec003aca115d50e8b9327b23192d61ffdcfa7",
+          "at": "2026-06-30T00:00:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`D3` explicitly says no new hook or bypass mechanism is introduced, but the Negative consequence at line 217 says a new hook is being added. That makes the consequence text incompatible with the chosen soft-prompt design and should be rewritten to avoid implying a hook change that this ADR does not approve.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
+              "line": 217,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f75d537030ddfad24aa8991bf0264183f5572e8339604ffe883307cee51caed3",
+          "at": "2026-06-30T00:12:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D9 cites implementation source paths and line ranges directly from the ADR (`libs/domain/src/task_contract.rs:78-87`, `libs/usecase/src/pre_review_gate.rs:369-377 / 626-632`). That conflicts with the pre-track ADR convention, which forbids ADRs from directly referencing track-internal artifacts. Move those details out of the ADR body or rewrite them as higher-level behavior only.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
+              "line": 148,
+              "category": "contradiction"
+            },
+            {
+              "message": "D9 makes this same track responsible for the hotfix that unblocks Phase 0, but the text also says Phase 0 baseline commit is already fail-closed by the current PreReviewGate. That creates a bootstrap deadlock: the track needs the hotfix to proceed, yet the hotfix is scheduled after the commit step it blocks. The plan needs an explicit bypass or a separate preexisting change to be executable.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
+              "line": 152,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:f7946d0174e108cb350e4f41daeaf6043ca79e5e78e0de90e20c3f11d26785a2",
+          "at": "2026-06-30T00:16:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0ef4c16b9d9d824188cd3809fe63f67187276963de3c20fcf63a04cf1385a0b3",
+          "at": "2026-06-30T00:21:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D9 states that PR #175's PreReviewGate is already present and has blocked the Phase 0 baseline flow, but the Negative consequences still describe the PreReviewGate trigger as inactive until PR #175 is merged. That leaves the ADR with two conflicting dependency states, so an implementer could incorrectly treat the `/track:diagnose` trigger as future-only while the same ADR requires an immediate bootstrap hotfix for the already-active gate.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
+              "line": 216,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0ef4c16b9d9d824188cd3809fe63f67187276963de3c20fcf63a04cf1385a0b3",
+          "at": "2026-06-30T00:25:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6bc629881e63fe935e8e87856f1f54c1b77a99b57773e0c3be60d5bee2d6c541",
+          "at": "2026-06-30T00:28:06Z"
+        }
+      ]
+    }
+  }
+}

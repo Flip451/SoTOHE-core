@@ -28,18 +28,28 @@
 //!
 //! ADR: `knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md`.
 
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 use std::sync::Arc;
 
 use domain::ConfidenceSignal;
 use domain::TypeSignalsDocument;
-use domain::task_contract::ContractedEntryRef;
 // Re-export domain task_contract types accessible to the cli_driver primary adapter
 // via usecase module path (architecture-rules.json: cli_driver may_depend_on [usecase] only).
 pub use domain::task_contract::{
     CoverageVerifyOutcome, CoverageViolation, PreReviewGateOutcome, PreReviewGateViolation,
 };
 use thiserror::Error;
+
+// Pure-helper free functions extracted to a sibling module to keep this file
+// under the workspace `verify-module-size` cap (700 non-test lines, see ADR
+// `2026-06-06-1609-enforce-module-size-limit-splitting`). The glob import
+// keeps call sites unchanged.
+mod helpers;
+use helpers::{
+    blocked_coverage_outcome, blocked_outcome, build_scope_entries,
+    collect_non_canonical_layer_violations, collect_per_layer_violations,
+    collect_task_key_ri_violations, entry_key_to_contracted_ref,
+};
 
 // ---------------------------------------------------------------------------
 // PreReviewGateCommand
@@ -74,7 +84,11 @@ pub struct PreReviewGateCommand {
 /// Both services share this error type because they share the same secondary ports.
 ///
 /// - `TaskContractNotFound`: the `task-contract.json` for the given `track_id`
-///   does not exist (gate short-circuits to `MissingTaskContract` violation).
+///   does not exist. D9 (knowledge/adr/2026-06-26-0503-...) tolerance: both
+///   `PreReviewGateInteractor::check` and `CoverageVerifyInteractor::verify_coverage`
+///   short-circuit to `Passed` (no contract → nothing to verify). The
+///   `MissingTaskContract` enum variant is retained for future refinement
+///   (e.g. enforcing the gate when `impl-plan.json` exists).
 /// - `TaskContractReadFailed`: I/O or decode error reading the contract;
 ///   `message` is an opaque diagnostic string (R9: opaque infrastructure error message).
 /// - `SignalReadFailed`: I/O or decode error reading the per-layer type-signals
@@ -250,128 +264,22 @@ impl CoverageVerifyInteractor {
     }
 }
 
-fn blocked_coverage_outcome(
-    violations: Vec<domain::task_contract::CoverageViolation>,
-) -> Result<CoverageVerifyOutcome, PreReviewGateError> {
-    CoverageVerifyOutcome::blocked(violations).map_err(|_| {
-        PreReviewGateError::TaskContractReadFailed {
-            message: "coverage verify blocked outcome invariant failed".to_owned(),
-        }
-    })
-}
-
-/// Build `entry_key -> ContractedEntryRef` per layer (skip `kind_tag == "unknown"` rows).
-fn build_scope_entries(
-    signal_doc: &TypeSignalsDocument,
-    layer: &domain::tddd::LayerId,
-) -> Result<HashMap<String, ContractedEntryRef>, PreReviewGateError> {
-    let mut entries: HashMap<String, ContractedEntryRef> = HashMap::new();
-    for signal in signal_doc.signals() {
-        if signal.is_unknown_kind() {
-            continue;
-        }
-        let entry_key = domain::tddd::semantic_verify::CatalogueEntryKey::try_new(
-            signal.type_name().to_owned(),
-        )
-        .map_err(|_| PreReviewGateError::SignalReadFailed {
-            layer: layer.clone(),
-            message: format!(
-                "invalid entry key '{}' in {}-type-signals.json",
-                signal.type_name(),
-                layer.as_ref()
-            ),
-        })?;
-        let key = entry_key.as_str().to_owned();
-        entries.entry(key).or_insert_with(|| ContractedEntryRef::new(layer.clone(), entry_key));
-    }
-    Ok(entries)
-}
-
-/// Phase 1+2: orphan detection + entry-key RI for one canonical layer.
-fn collect_per_layer_violations(
-    contract_doc: &domain::task_contract::TaskContractDocument,
-    layer: &domain::tddd::LayerId,
-    scope_entries: &HashMap<String, ContractedEntryRef>,
-) -> Vec<domain::task_contract::CoverageViolation> {
-    let attributed: Vec<&ContractedEntryRef> =
-        contract_doc.entries().values().flatten().filter(|e| e.layer() == layer).collect();
-    let attributed_keys: HashSet<&str> =
-        attributed.iter().map(|e| e.entry_key().as_str()).collect();
-    let mut out = Vec::new();
-    for (key, entry) in scope_entries {
-        if !attributed_keys.contains(key.as_str()) {
-            out.push(domain::task_contract::CoverageViolation::OrphanEntry {
-                entry: entry.clone(),
-            });
-        }
-    }
-    for entry in &attributed {
-        let key = entry.entry_key().as_str();
-        if !scope_entries.contains_key(key) {
-            out.push(domain::task_contract::CoverageViolation::InvalidEntryRef {
-                entry: (*entry).clone(),
-                reason: format!(
-                    "entry_key '{}' not found in {}-type-signals.json",
-                    key,
-                    layer.as_ref()
-                ),
-            });
-        }
-    }
-    out
-}
-
-/// Phase 3: any contract entry whose layer is outside the 6 canonical TDDD set.
-fn collect_non_canonical_layer_violations(
-    contract_doc: &domain::task_contract::TaskContractDocument,
-) -> Vec<domain::task_contract::CoverageViolation> {
-    let canonical: HashSet<&str> = CANONICAL_LAYERS.iter().copied().collect();
-    let mut out = Vec::new();
-    for refs in contract_doc.entries().values() {
-        for entry in refs {
-            if !canonical.contains(entry.layer().as_ref()) {
-                out.push(domain::task_contract::CoverageViolation::InvalidEntryRef {
-                    entry: entry.clone(),
-                    reason: format!(
-                        "layer '{}' is not a canonical TDDD layer",
-                        entry.layer().as_ref()
-                    ),
-                });
-            }
-        }
-    }
-    out
-}
-
-/// Phase 4 (D9): task keys present in `task-contract.json` but absent from
-/// `impl-plan.json` — emit one `InvalidTaskRef` per stale task so the gate
-/// fails closed instead of silently passing stale attributions.
-fn collect_task_key_ri_violations(
-    contract_doc: &domain::task_contract::TaskContractDocument,
-    plan_task_ids: &HashMap<domain::TaskId, domain::TaskStatusKind>,
-) -> Vec<domain::task_contract::CoverageViolation> {
-    contract_doc
-        .entries()
-        .iter()
-        .filter(|(task_id, _)| !plan_task_ids.contains_key(task_id))
-        .map(|(task_id, refs)| domain::task_contract::CoverageViolation::InvalidTaskRef {
-            task_id: task_id.clone(),
-            entry_keys: refs.clone(),
-        })
-        .collect()
-}
-
 impl CoverageVerifyService for CoverageVerifyInteractor {
     fn verify_coverage(
         &self,
         cmd: CoverageVerifyCommand,
     ) -> Result<CoverageVerifyOutcome, PreReviewGateError> {
+        // D9 (knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md):
+        // when `task-contract.json` is absent, return Passed — no contract to
+        // verify, gate has nothing to evaluate. Same precedent pattern as
+        // 2026-06-03-1241-spec-states-gate-tolerate-missing-spec-artifact and
+        // 2026-06-01-0406-review-gate-tolerate-missing-catalogue. When the file
+        // exists, every coverage check (orphan / referential integrity / task-ref
+        // RI) runs as before; no fail-open is introduced for malformed contracts.
         let contract_doc = match self.task_contract_reader.read(&cmd.track_id) {
             Ok(doc) => doc,
             Err(PreReviewGateError::TaskContractNotFound) => {
-                return blocked_coverage_outcome(vec![
-                    domain::task_contract::CoverageViolation::MissingTaskContract,
-                ]);
+                return Ok(CoverageVerifyOutcome::Passed);
             }
             Err(e) => return Err(e),
         };
@@ -464,16 +372,6 @@ impl PreReviewGateInteractor {
 /// Canonical TDDD layer identifiers iterated in all-layers mode.
 const CANONICAL_LAYERS: &[&str] =
     &["domain", "usecase", "infrastructure", "cli_driver", "cli", "cli_composition"];
-
-fn blocked_outcome(
-    violations: Vec<PreReviewGateViolation>,
-) -> Result<PreReviewGateOutcome, PreReviewGateError> {
-    PreReviewGateOutcome::blocked(violations).map_err(|_| {
-        PreReviewGateError::TaskContractReadFailed {
-            message: "pre-review gate blocked outcome invariant failed".to_owned(),
-        }
-    })
-}
 
 impl PreReviewGateInteractor {
     /// Evaluate one already-loaded signal document against the task contract.
@@ -593,40 +491,19 @@ impl PreReviewGateInteractor {
     }
 }
 
-/// Extract a `ContractedEntryRef` for an `entry_key` from the contract document
-/// for the given layer. Used by `check_signal_document` to produce violation data.
-///
-/// Returns the first matching `ContractedEntryRef` found in the document.
-/// Fails with `SignalReadFailed` if the key is not found (should be unreachable
-/// since we iterate from the contract's own entries, but guards against logic errors).
-fn entry_key_to_contracted_ref(
-    contract_doc: &domain::task_contract::TaskContractDocument,
-    layer: &domain::tddd::LayerId,
-    key: &str,
-) -> Result<ContractedEntryRef, PreReviewGateError> {
-    contract_doc
-        .entries()
-        .values()
-        .flatten()
-        .find(|e| e.layer() == layer && e.entry_key().as_str() == key)
-        .cloned()
-        .ok_or_else(|| PreReviewGateError::TaskContractReadFailed {
-            message: format!(
-                "internal error: entry_key '{key}' not found in contract for layer '{}'",
-                layer.as_ref()
-            ),
-        })
-}
-
 impl PreReviewGateService for PreReviewGateInteractor {
     fn check(&self, cmd: PreReviewGateCommand) -> Result<PreReviewGateOutcome, PreReviewGateError> {
         // ── Step 0: read task-contract.json ──────────────────────────────────
         //
-        // TaskContractNotFound short-circuits to MissingTaskContract violation.
+        // D9 (knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md):
+        // TaskContractNotFound returns Passed (no contract → no entries to
+        // verify). Same precedent pattern as the sibling tolerance ADRs
+        // (2026-06-03-1241-spec-states / 2026-06-01-0406-review-gate). When
+        // `task-contract.json` exists, the liveness check still runs in full.
         let contract_doc = match self.task_contract_reader.read(&cmd.track_id) {
             Ok(doc) => doc,
             Err(PreReviewGateError::TaskContractNotFound) => {
-                return blocked_outcome(vec![PreReviewGateViolation::MissingTaskContract]);
+                return Ok(PreReviewGateOutcome::Passed);
             }
             Err(e) => return Err(e),
         };
@@ -893,22 +770,23 @@ mod tests {
         PreReviewGateCommand { track_id: track_id(track), layer: Some(layer(group)) }
     }
 
-    // ── AC-07 (a): TaskContractNotFound → Blocked/MissingTaskContract ─────────
+    // ── D9 tolerance (knowledge/adr/2026-06-26-0503-...): TaskContractNotFound → Passed ──
+    //
+    // When `task-contract.json` is absent, the liveness check returns Passed —
+    // no contract means no entries to verify. Same precedent pattern as the
+    // sibling tolerance ADRs (2026-06-03-spec-states / 2026-06-01-review-gate).
 
     #[test]
-    fn missing_task_contract_yields_blocked_with_missing_task_contract() {
+    fn missing_task_contract_yields_passed_via_d9_tolerance() {
         let svc = interactor(
             Err(PreReviewGateError::TaskContractNotFound),
             Ok(make_signals(vec![blue_signal("Foo")])),
         );
         let outcome = svc.check(cmd("my-track", "domain")).unwrap();
-        match outcome {
-            PreReviewGateOutcome::Blocked { violations, .. } => {
-                assert_eq!(violations.len(), 1);
-                assert!(matches!(violations[0], PreReviewGateViolation::MissingTaskContract));
-            }
-            other => panic!("expected Blocked, got {other:?}"),
-        }
+        assert!(
+            matches!(outcome, PreReviewGateOutcome::Passed),
+            "expected Passed (D9 tolerance), got {outcome:?}"
+        );
     }
 
     #[test]
@@ -1243,23 +1121,23 @@ mod tests {
         CoverageVerifyCommand { track_id: track_id(track) }
     }
 
-    // ── Coverage (a): MissingTaskContract ─────────────────────────────────────
+    // ── Coverage (D9 tolerance): TaskContractNotFound → Passed ────────────────
+    //
+    // Same precondition as the liveness check (D9, ADR
+    // knowledge/adr/2026-06-26-0503-...). Empty contract → nothing to verify.
 
     #[test]
-    fn coverage_missing_task_contract_yields_blocked_with_missing_task_contract() {
+    fn coverage_missing_task_contract_yields_passed_via_d9_tolerance() {
         let svc = CoverageVerifyInteractor::new(
             Arc::new(ConstContractReader(Err(PreReviewGateError::TaskContractNotFound))),
             Arc::new(LayerAwareSignalReader(std::collections::HashMap::new())),
             Arc::new(EmptyImplPlanReader),
         );
         let outcome = svc.verify_coverage(coverage_cmd("my-track")).unwrap();
-        match outcome {
-            CoverageVerifyOutcome::Blocked { violations, .. } => {
-                assert_eq!(violations.len(), 1);
-                assert!(matches!(violations[0], CoverageViolation::MissingTaskContract));
-            }
-            other => panic!("expected Blocked/MissingTaskContract, got {other:?}"),
-        }
+        assert!(
+            matches!(outcome, CoverageVerifyOutcome::Passed),
+            "expected Passed (D9 tolerance), got {outcome:?}"
+        );
     }
 
     // ── Coverage (b): signal entry absent from task attribution → OrphanEntry ──

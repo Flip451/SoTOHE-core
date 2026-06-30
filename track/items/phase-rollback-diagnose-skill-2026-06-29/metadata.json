@@ -1,0 +1,8 @@
+{
+  "schema_version": 5,
+  "id": "phase-rollback-diagnose-skill-2026-06-29",
+  "title": "Phase Rollback Diagnose Skill — /track:diagnose と rollback-diagnoser capability の新設 + PreReviewGate 欠損 task-contract bootstrap hotfix",
+  "branch": "track/phase-rollback-diagnose-skill-2026-06-29",
+  "created_at": "2026-06-29T23:41:15Z",
+  "updated_at": "2026-06-30T00:16:53Z"
+}
