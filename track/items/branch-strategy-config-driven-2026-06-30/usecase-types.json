@@ -278,9 +278,9 @@
           "returns": "TrackCommandOutput",
           "is_async": false,
           "generics": [],
-          "has_default_impl": false,
+          "has_default_impl": true,
           "where_predicates": [],
-          "docs": "Switch to the base branch read from the active track's branch_strategy_snapshot."
+          "docs": "Switch to the base branch read from the active track's branch_strategy_snapshot. The default implementation returns a failure placeholder until composition-root wiring overrides it."
         }
       ],
       "supertrait_bounds": ["Send", "Sync"],

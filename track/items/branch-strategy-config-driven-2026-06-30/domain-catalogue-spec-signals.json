@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "7552197298234d0f5d2fe2e956775c2af415ef9e01b46eec7858b2d1426456d1",
+  "catalogue_declaration_hash": "5dbc02e2477e0424f39425423feefe461ede38b51beec46cbe6fc64ad2465768",
   "signals": [
     {
       "type_name": "BranchStrategySnapshot",

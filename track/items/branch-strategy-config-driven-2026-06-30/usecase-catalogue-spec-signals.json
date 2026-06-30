@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "fbe0f8381a44cd1c6fd6a8137a4ee0c324847d85064b581c0bd52159876685f6",
+  "catalogue_declaration_hash": "8a6089f9475eae5f12aa02ddaf40c6d9f2380224118a77271217be98943a366e",
   "signals": [
     {
       "type_name": "BranchStrategyPort",
@@ -10,7 +10,7 @@
     {
       "type_name": "TrackService",
       "signal": "blue",
-      "entry_hash": "9ee377d4ebd7edf4daf2162ac03b6c7a185eb490f34b6ee1b3674be62be3347c"
+      "entry_hash": "c8261e2aea547c1109aec7fa37713144a342d2e477a96e7b3eafb388a4f4db12"
     }
   ]
 }

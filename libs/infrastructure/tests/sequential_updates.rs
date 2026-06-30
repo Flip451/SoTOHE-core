@@ -15,12 +15,21 @@ use domain::{
 };
 use infrastructure::track::fs_store::FsTrackStore;
 
+fn test_snapshot() -> domain::branch_strategy::BranchStrategySnapshot {
+    domain::branch_strategy::BranchStrategySnapshot::new(
+        domain::NonEmptyString::try_new("main").unwrap(),
+        domain::NonEmptyString::try_new("main").unwrap(),
+        domain::branch_strategy::MergeMethod::Squash,
+    )
+}
+
 fn make_track() -> TrackMetadata {
     // Identity-only; no tasks/plan/status fields.
     TrackMetadata::new(
         TrackId::try_new("concurrency-test").unwrap(),
         "Concurrency Test Track",
         None,
+        test_snapshot(),
     )
     .unwrap()
 }

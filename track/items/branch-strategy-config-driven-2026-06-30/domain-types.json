@@ -244,6 +244,7 @@
     { "action": "add",       "trait_ref": "core::fmt::Debug",       "for_type": "MergeMethod" },
     { "action": "add",       "trait_ref": "core::clone::Clone",     "for_type": "MergeMethod" },
     { "action": "add",       "trait_ref": "core::marker::Copy",     "for_type": "MergeMethod" },
+    { "action": "add",       "trait_ref": "core::clone::TrivialClone", "for_type": "MergeMethod" },
     { "action": "add",       "trait_ref": "core::cmp::PartialEq",  "for_type": "MergeMethod" },
     { "action": "add",       "trait_ref": "core::cmp::Eq",         "for_type": "MergeMethod" },
     { "action": "add",       "trait_ref": "core::fmt::Debug",       "for_type": "BranchStrategySnapshot" },

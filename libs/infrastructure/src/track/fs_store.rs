@@ -417,9 +417,18 @@ mod tests {
 
     use domain::{StatusOverride, TrackId, TrackMetadata};
 
+    fn test_snapshot() -> domain::branch_strategy::BranchStrategySnapshot {
+        domain::branch_strategy::BranchStrategySnapshot::new(
+            domain::NonEmptyString::try_new("main").unwrap(),
+            domain::NonEmptyString::try_new("main").unwrap(),
+            domain::branch_strategy::MergeMethod::Squash,
+        )
+    }
+
     fn sample_track(id: &str) -> TrackMetadata {
         // Identity-only TrackMetadata; status is derived on demand via derive_track_status.
-        TrackMetadata::new(TrackId::try_new(id).unwrap(), "Test Track", None).unwrap()
+        TrackMetadata::new(TrackId::try_new(id).unwrap(), "Test Track", None, test_snapshot())
+            .unwrap()
     }
 
     #[test]

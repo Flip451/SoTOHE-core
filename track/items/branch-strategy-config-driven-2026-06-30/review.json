@@ -1,6 +1,78 @@
 {
   "schema_version": 2,
   "scopes": {
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c04aa88fc38d0c08b5922cf48806e23cae1ff712475ebd292dde703be6f2370",
+          "at": "2026-06-30T20:44:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c04aa88fc38d0c08b5922cf48806e23cae1ff712475ebd292dde703be6f2370",
+          "at": "2026-06-30T20:48:22Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a15176685f931a467e456eec499c489039622aa761ab63859c1b04ef0454157f",
+          "at": "2026-06-30T20:45:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a15176685f931a467e456eec499c489039622aa761ab63859c1b04ef0454157f",
+          "at": "2026-06-30T20:49:50Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:98b734ed377498cde2c2891058182452184459f591320a771ef203f48077cb39",
+          "at": "2026-06-30T20:44:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:98b734ed377498cde2c2891058182452184459f591320a771ef203f48077cb39",
+          "at": "2026-06-30T20:49:00Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6e8b1b6bb455fa563f4671a976af2882e4834b64f7446bf4f1874c39872343b6",
+          "at": "2026-06-30T20:42:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6e8b1b6bb455fa563f4671a976af2882e4834b64f7446bf4f1874c39872343b6",
+          "at": "2026-06-30T20:46:04Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -330,6 +402,102 @@
           "findings": [],
           "hash": "rvw1:sha256:1b20c2762385bd5a770eb874c86ad9a8205126c34a81a347be881c8802d8e839",
           "at": "2026-06-30T19:47:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`switch_base` is marked as having a default trait body here, but the surrounding plan treats it as real branch-switch behavior driven by the active track snapshot. That combination is inconsistent: a default implementation would let concrete `TrackService` implementers omit the operation entirely, yet no default behavior is specified anywhere in the plan and the doc comment says it should switch to the active track's base branch.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+              "line": 281,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:80b5abb12abd1c01a756915d004acb80a945763bf26682c6df9a992407816d32",
+          "at": "2026-06-30T20:43:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Marking `TrackService::switch_base` as `has_default_impl: true` in [usecase-types.json](/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json#L281) turns the new service API into an optional hook: a `TrackService` impl can now omit the override and still compile, with the failure only surfacing at runtime. That contradicts the surrounding plan in [plan.md](/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/branch-strategy-config-driven-2026-06-30/plan.md#L8), which treats `switch_base` as part of the compile-stable foundation for the branch-strategy flow.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+              "line": 281,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:d57f4f804caef6b3e2ca69dd56b52c9e3a8c220a7ad13fc70bcb308f46b64ff6",
+          "at": "2026-06-30T20:49:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`switch_base` is only given a temporary failure default here, but no later task actually adds a concrete `TrackService` implementation that overrides it. `T011` wires the call path and branch-strategy adapters, so as written the new `SwitchBase` flow will still invoke the placeholder and never reach real branch-switch behavior.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/plan.md",
+              "line": 89,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:57ae2a82b836c697d5971c13240dd8356c6cecc0657c8b7b3112fd06295ec2d4",
+          "at": "2026-06-30T20:54:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TrackServiceImpl::switch_base` is specified to delegate upward to `TrackCompositionRoot::track_switch_base`, which inverts the dependency direction between the service/infrastructure layer and the CLI composition root. That creates a layer cycle and cannot be implemented as written; the composition root should call the service, not the other way around.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/branch-strategy-config-driven-2026-06-30/impl-plan.json",
+              "line": 56,
+              "category": "infeasibility"
+            },
+            {
+              "message": "S7 says \"All changes are text replacements; no behavioral logic changes,\" but T015.5 explicitly removes the hardcoded merge-commit default and changes the omitted-method behavior of `bin/sotp pr wait-and-merge`. That is a behavioral change, so the section summary is inaccurate.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/branch-strategy-config-driven-2026-06-30/plan.md",
+              "line": 71,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:d3121e0917d8498c3c040b8e882590cd2ce0522fba8b3a08987a3f20918dc1a2",
+          "at": "2026-06-30T20:58:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T011 is infeasible as written: it places the shared `switch-base` helper in `apps/cli-composition`, then requires `libs/infrastructure`'s `TrackServiceImpl::switch_base` to use that same helper. That forces an upward dependency from infrastructure into the composition-root crate and creates a layering cycle unless the helper is moved into a lower-level shared module.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/branch-strategy-config-driven-2026-06-30/plan.md",
+              "line": 45,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:d5983ded48cc9900ff517e2c1db8f3279d82d150f6c4aa9ef9a76fff4df90e2f",
+          "at": "2026-06-30T21:03:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1fc5487ed2fee9e80acb886a098565ac473b93cd747cc9ae07d54354b2189b23",
+          "at": "2026-06-30T21:08:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1fc5487ed2fee9e80acb886a098565ac473b93cd747cc9ae07d54354b2189b23",
+          "at": "2026-06-30T21:19:07Z"
         }
       ]
     }

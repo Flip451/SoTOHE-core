@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-30T19:48:58Z",
-  "declaration_hash": "7552197298234d0f5d2fe2e956775c2af415ef9e01b46eec7858b2d1426456d1",
+  "generated_at": "2026-06-30T21:20:35Z",
+  "declaration_hash": "5dbc02e2477e0424f39425423feefe461ede38b51beec46cbe6fc64ad2465768",
   "signals": [
     {
       "type_name": "BranchStrategySnapshot",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -18,10 +18,11 @@
     {
       "type_name": "MergeMethod",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
+        "core::clone::TrivialClone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
         "core::fmt::Debug",
@@ -31,7 +32,7 @@
     {
       "type_name": "TrackMetadata",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     }
   ]

@@ -240,7 +240,11 @@ impl TrackCompositionRoot {
 
         let id = domain::TrackId::try_new(&track_id)
             .map_err(|e| CompositionError::WiringFailed(format!("invalid track ID: {e}")))?;
-        let track = domain::TrackMetadata::new(id, description, None)
+        // TODO(T011): replace with BranchStrategyPort-resolved snapshot
+        let b = domain::NonEmptyString::try_new("main")
+            .map_err(|e| CompositionError::WiringFailed(format!("branch name: {e}")))?;
+        let snap = domain::BranchStrategySnapshot::new(b.clone(), b, domain::MergeMethod::Squash);
+        let track = domain::TrackMetadata::new(id, description, None, snap)
             .map_err(|e| CompositionError::WiringFailed(format!("invalid track metadata: {e}")))?;
 
         let store = FsTrackStore::new(items_dir);

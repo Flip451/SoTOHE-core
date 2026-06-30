@@ -123,4 +123,15 @@ pub trait TrackService: Send + Sync {
 
     /// `track detect-active` — detect the active track ID from the current git branch.
     fn detect_active(&self, project_root: PathBuf) -> TrackCommandOutput;
+
+    /// `track switch-base` — switch to the base branch from the active track's
+    /// `branch_strategy_snapshot`.
+    ///
+    /// Default implementation returns a failure; overridden by the composition root
+    /// after `BranchStrategyPort` is wired (wiring happens in T009/T011).
+    fn switch_base(&self, _project_root: PathBuf) -> TrackCommandOutput {
+        TrackCommandOutput::failure(Some(
+            "switch_base is not yet implemented in this composition root".to_string(),
+        ))
+    }
 }

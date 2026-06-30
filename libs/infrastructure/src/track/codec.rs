@@ -143,7 +143,17 @@ fn track_metadata_from_document(doc: TrackDocumentV2) -> Result<TrackMetadata, C
     let status_override =
         doc.status_override.map(|o| parse_status_override(&o.status, o.reason)).transpose()?;
 
-    let track = TrackMetadata::with_branch(id, branch, doc.title, status_override)?;
+    // TODO(T003): decode branch_strategy_snapshot from document once schema_version is bumped.
+    // Bootstrap placeholder: existing schema v5 metadata has no snapshot; use main defaults.
+    let main_branch = domain::NonEmptyString::try_new("main")
+        .map_err(|e| CodecError::Domain(DomainError::Validation(e)))?;
+    let legacy_snapshot = domain::branch_strategy::BranchStrategySnapshot::new(
+        main_branch.clone(),
+        main_branch,
+        domain::branch_strategy::MergeMethod::Squash,
+    );
+    let track =
+        TrackMetadata::with_branch(id, branch, doc.title, status_override, legacy_snapshot)?;
 
     Ok(track)
 }

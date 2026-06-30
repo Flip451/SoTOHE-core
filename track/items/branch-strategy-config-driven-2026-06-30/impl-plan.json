@@ -4,92 +4,77 @@
     {
       "id": "T001",
       "description": "libs/domain/ — Add `MergeMethod` enum (Squash | Merge | Rebase, Copy + PartialEq + Eq + Clone + Debug) and `BranchStrategySnapshot` struct (base_branch: NonEmptyString, merge_target: NonEmptyString, merge_method: MergeMethod; PartialEq + Eq + Clone + Debug; accessors base_branch/merge_target/merge_method; constructor new) in new module libs/domain/src/branch_strategy.rs. Update TrackMetadata in libs/domain/src/track.rs: add branch_strategy_snapshot: BranchStrategySnapshot field, update constructors new() and with_branch() to accept branch_strategy_snapshot: BranchStrategySnapshot as a required argument, add branch_strategy_snapshot() accessor. Register branch_strategy module in libs/domain/src/lib.rs. Keep TrackBranch::try_new prefix invariant ('track/') unchanged (CN-04).",
-      "status": "todo",
-      "commit_hash": null
+      "status": "in_progress"
     },
     {
       "id": "T002",
-      "description": "libs/usecase/ — Add BranchStrategyPort trait (Send + Sync) in new module libs/usecase/src/branch_strategy.rs with methods: base_branch(&self) -> &str, merge_target(&self) -> &str, merge_method(&self) -> domain::branch_strategy::MergeMethod, track_prefix(&self) -> &str. Add switch_base(&self, project_root: PathBuf) -> TrackCommandOutput method to the TrackService trait in libs/usecase/src/track_service.rs. Register branch_strategy module in libs/usecase/src/lib.rs.",
-      "status": "todo",
-      "commit_hash": null
+      "description": "libs/usecase/ — Add BranchStrategyPort trait (Send + Sync) in new module libs/usecase/src/branch_strategy.rs with methods: base_branch(&self) -> &str, merge_target(&self) -> &str, merge_method(&self) -> domain::branch_strategy::MergeMethod, track_prefix(&self) -> &str. Add switch_base(&self, project_root: PathBuf) -> TrackCommandOutput method to the TrackService trait in libs/usecase/src/track_service.rs. For Batch A compile stability, give switch_base a default implementation that returns failure until T011 composition-root wiring overrides it with real branch-switch behavior. Register branch_strategy module in libs/usecase/src/lib.rs.",
+      "status": "in_progress"
     },
     {
       "id": "T003",
       "description": "libs/infrastructure/ (codec) — In libs/infrastructure/src/track/codec.rs: add MergeMethodDocument enum (Squash | Merge | Rebase; serde Serialize/Deserialize + Debug + Clone + Copy + PartialEq + Eq) with serde lowercase mapping (`rename_all = \"snake_case\"` or per-variant rename values `\"squash\"` / `\"merge\"` / `\"rebase\"`) so config and metadata JSON parse the literals required by AC-01/T012/ADR D1. Add BranchStrategySnapshotDocument struct (base_branch: String, merge_target: String, merge_method: MergeMethodDocument; serde Serialize/Deserialize + Debug + Clone). Update TrackDocumentV2 to add branch_strategy_snapshot: BranchStrategySnapshotDocument as a REQUIRED (non-Option) field (CN-03: fail-closed on missing field). Add domain conversion: BranchStrategySnapshotDocument <-> domain::branch_strategy::BranchStrategySnapshot. Bump the schema_version written to metadata.json documents from 1 to 2. Add unit tests confirming that serde_json::from_str() on a metadata.json payload without branch_strategy_snapshot returns Err (AC-10), that lowercase merge_method literals (`\"squash\"`, `\"merge\"`, `\"rebase\"`) round-trip through MergeMethodDocument, that a payload containing the deferred D3 `kind` field is rejected as an unknown field, and that newly serialized metadata.json samples omit `kind` (AC-07).",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T004",
       "description": "libs/infrastructure/ (adapters) — Create new module libs/infrastructure/src/branch_strategy.rs. Define BranchStrategyConfigError enum (variants: Io(std::io::Error), Parse(serde_json::Error)); implement Debug, Display, Error, From<std::io::Error>, and From<serde_json::Error> for it (fail-closed per D5: no fallback, no grace period). Implement JsonConfigBranchStrategyAdapter: reads .harness/config/branch-strategy.json from a provided PathBuf at construction time; stores parsed base_branch/merge_target/merge_method in memory; implements BranchStrategyPort (base_branch/merge_target/merge_method/track_prefix returning 'track/'). Constructor: new(config_path: PathBuf) -> Result<Self, BranchStrategyConfigError>. Implement SnapshotBranchStrategyAdapter: wraps a domain::branch_strategy::BranchStrategySnapshot captured at track init; implements BranchStrategyPort delegating to the snapshot's accessors; track_prefix() always returns 'track/'. Constructor: new(snapshot: BranchStrategySnapshot) -> Self (infallible, no I/O). Register module in libs/infrastructure/src/lib.rs.",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T005",
       "description": "libs/infrastructure/ (track service + init) — Update TrackServiceImpl (or equivalent TrackRepository write path) to receive &dyn BranchStrategyPort. During init, call port.base_branch(), port.merge_target(), port.merge_method() to construct a BranchStrategySnapshot and pass it to TrackMetadata::new. Update libs/infrastructure/src/tddd/baseline_capture.rs:40,193 doc comments: replace 'at pre-implementation main HEAD' with 'at pre-implementation HEAD of the configured base branch' and 'worktree at main' with 'worktree at the configured base branch'. Add unit test: after calling init with a stub BranchStrategyPort, the written metadata.json contains branch_strategy_snapshot matching the stub's values (AC-08).",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T006",
       "description": "libs/infrastructure/ (fallback) — Update libs/infrastructure/src/track/gate_state.rs:293-306 and :849: change the git rev-parse main fallback to accept a base_branch: &str parameter and invoke git with argv-style arguments (e.g. command/program = \"git\", args = [\"rev-parse\", base_branch]) instead of constructing a shell command string such as `format!(\"git rev-parse {base_branch}\")`. Treat configured branch names as external input at command boundaries: pass them as separate process arguments and never interpolate them into shell text. Update error messages to reference the configured branch name. Update libs/infrastructure/src/dry_check/commit_hash_store.rs:55 doc comment: replace 'main' with 'configured base branch'.",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T007",
       "description": "libs/infrastructure/ (PR test fixtures) — Parametrize PR-related test fixtures in libs/infrastructure/src/gh_cli.rs:552-682: change hardcoded 'main' base branch arguments to an injected base_branch parameter in PR creation tests. Add at least one test case using base_branch = 'develop' to verify that the PR creation logic correctly uses the injected branch name rather than a hardcoded value.",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T008",
       "description": "apps/cli-composition/ (fallback replacement) — Replace git rev-parse main fallback with base_branch parameter: (1) apps/cli-composition/src/dry/shared.rs:91-115: change the fallback function to accept base_branch: &str and pass it to git as a separate argv argument in the rev-parse invocation; do not construct shell command text from the configured branch name; update error message. (2) apps/cli-composition/src/review_v2/shared.rs:301-303,332,444: apply the same change or share the updated helper from dry/shared. (3) apps/cli-composition/src/track/fixpoint_resolve.rs:57,452: pass base_branch from the active track's branch_strategy_snapshot to the fallback. (4) apps/cli-composition/src/dry.rs:845-872: update tests to supply base_branch via a stub or parameter and assert the command runner receives argv entries rather than a formatted shell string; confirm cargo make test passes.",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T009",
       "description": "apps/cli-driver/ — Add TrackInput::SwitchBase { project_root: PathBuf } variant to apps/cli-driver/src/track.rs. Update the doc comment at the TrackInput level (line 48 area) to replace 'from main' / 'to main' with 'from configured base branch' / 'to configured base branch'. Add dispatch arm for SwitchBase in the TrackDriver execute function delegating to TrackService::switch_base.",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T010",
       "description": "apps/cli/ — (1) apps/cli/src/commands/track/mod.rs: add TrackCommand::SwitchBase { project_root: PathBuf } variant; update help text at line 281,299 (replace 'e.g. a git worktree at main' with 'e.g. a git worktree at the configured base branch'); update docstring at line 368 ('captured at pre-implementation main HEAD' -> 'captured at pre-implementation HEAD of the configured base branch'). (2) apps/cli/src/commands/pr.rs:45: change default_value = \"main\" on the ensure-pr base argument to Option<String> with no default (composition root will resolve via port), and change WaitAndMergeArgs.method from default_value = \"merge\" to Option<String> with no default so an omitted method can be resolved from the effective strategy's merge_method(). Explicit `--method merge|squash|rebase` still overrides the configured default. (3) apps/cli/src/commands/track/branch_ops.rs:107,190-192,336,369: replace hardcoded 'main' string literals used in branch name comparisons (e.g. current != \"main\") with values resolved from `BranchStrategyPort::base_branch()` / the active track's `branch_strategy_snapshot.base_branch`. Do not derive branch-operation guards from `EnsurePrArgs.base`, because that argument is the PR base / merge_target and may intentionally differ from base_branch.",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T011",
-      "description": "apps/cli-composition/ (wiring) — Wire branch strategy adapters in TrackCompositionRoot: (1) track_init method: call JsonConfigBranchStrategyAdapter::new(config_path) which returns Result<Self, BranchStrategyConfigError>; propagate the Err upward (fail-closed: if .harness/config/branch-strategy.json is missing or malformed, track_init returns an error without fallback or default); inject the successfully constructed adapter into TrackServiceImpl. (2) track_branch_create, track_branch_switch, track_resolve, pr_ensure, pr_wait_and_merge, and all post-init ops: read metadata.json from the items_dir/track_id path or the PR head branch's track metadata, deserialize branch_strategy_snapshot, construct SnapshotBranchStrategyAdapter::new(snapshot) (infallible, no I/O), supply base_branch/merge_target/merge_method to the operation. For git/gh process calls, pass these configured values as separate argv arguments and never interpolate them into shell command strings. (3) Add track_switch_base method: read active track metadata, extract snapshot, construct SnapshotBranchStrategyAdapter, call TrackService::switch_base. (4) apps/cli-composition/src/git.rs:125,278: replace literal 'track/' with port.track_prefix() call. (5) apps/cli-composition/src/pr.rs: replace hardcoded 'main' merge target with port.merge_target() from SnapshotBranchStrategyAdapter, and resolve omitted wait-and-merge method from port.merge_method() before invoking gh pr merge. Preserve explicit CLI method overrides. (6) apps/cli-composition/src/track/mod.rs:294,311-313,326: replace remaining 'main' literals with port-resolved base_branch values for branch-operation guards and merge_target values only for PR base/target behavior. Verify cargo make test passes.",
-      "status": "todo",
-      "commit_hash": null
+      "description": "apps/cli-composition/ (wiring) — Wire branch strategy adapters in TrackCompositionRoot: (1) track_init method: call JsonConfigBranchStrategyAdapter::new(config_path) which returns Result<Self, BranchStrategyConfigError>; propagate the Err upward (fail-closed: if .harness/config/branch-strategy.json is missing or malformed, track_init returns an error without fallback or default); inject the successfully constructed adapter into TrackServiceImpl. (2) track_branch_create, track_branch_switch, track_resolve, pr_ensure, pr_wait_and_merge, and all post-init ops: read metadata.json from the items_dir/track_id path or the PR head branch's track metadata, deserialize branch_strategy_snapshot, construct SnapshotBranchStrategyAdapter::new(snapshot) (infallible, no I/O), supply base_branch/merge_target/merge_method to the operation. For git/gh process calls, pass these configured values as separate argv arguments and never interpolate them into shell command strings. (3) Add the switch-base execution helper inside apps/cli-composition so it reads active track metadata, extracts snapshot, constructs SnapshotBranchStrategyAdapter, and switches to snapshot.base_branch using argv-style git invocation. Expose that helper through TrackCompositionRoot::track_switch_base, and in apps/cli-composition/src/track/service_impl.rs implement TrackServiceImpl::switch_base by converting TrackCompositionRoot::track_switch_base through the existing composition_to_output path. Keep lower layers limited to the codec/adapters and do not add any dependency from libs/* back to apps/cli-composition. This replaces the temporary failure default from T002. (4) apps/cli-composition/src/git.rs:125,278: replace literal 'track/' with port.track_prefix() call. (5) apps/cli-composition/src/pr.rs: replace hardcoded 'main' merge target with port.merge_target() from SnapshotBranchStrategyAdapter, and resolve omitted wait-and-merge method from port.merge_method() before invoking gh pr merge. Preserve explicit CLI method overrides. (6) apps/cli-composition/src/track/mod.rs:294,311-313,326: replace remaining 'main' literals with port-resolved base_branch values for branch-operation guards and merge_target values only for PR base/target behavior. Verify cargo make test passes.",
+      "status": "todo"
     },
     {
       "id": "T012",
       "description": "Build & Config — (1) Create .harness/config/branch-strategy.json: {\"base_branch\": \"develop\", \"merge_target\": \"develop\", \"merge_method\": \"squash\"} (IN-01, D8, AC-01). (2) Makefile.toml:575,616-619: rename [tasks.track-switch-main] to [tasks.track-switch-base], update description, delegate to bin/sotp track switch-base. (3) Makefile.toml:328,343,355,371,383: update gate task descriptions replacing 'main / non-track branches' and 'push/main' style text with 'base branch / non-track branches' equivalents. (4) .claude/settings.json:159: replace 'Bash(cargo make track-switch-main:*)' with 'Bash(cargo make track-switch-base:*)'. (5) .github/workflows/ci.yml:5,7,26,106: change branches: [main] to branches: [main, develop] for both push and pull_request triggers (AC-14). (6) README.md:109: change '# main に戻り完了サマリー' to '# 設定された base branch に戻り完了サマリー'. (7) track/items/branch-strategy-config-driven-2026-06-30/metadata.json: add branch_strategy_snapshot: {\"base_branch\": \"main\", \"merge_target\": \"main\", \"merge_method\": \"squash\"} (D5 bootstrap self-application, AC-11).",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T013",
       "description": "Convention files — Rewrite 5 knowledge/conventions/ files: (1) branch-strategy.md: full rewrite describing the config-driven model via .harness/config/branch-strategy.json; remove all hardcoded branch name assumptions; explain base_branch/merge_target/merge_method fields and BranchStrategyPort usage (AC-12). (2) task-completion-flow.md: 4 locations — replace 'マージ後の main 上で' with 'マージ後の merge_target 上で' and equivalent updates. (3) adr.md:132-136: replace 'git log main -- <adr-file>' with 'git log <merge_target> -- <adr-file>'; note that merge_target is the effective strategy's merge_target(). (4) dry-check-workflow.md:143: replace 'git rev-parse main' with 'git rev-parse <base_branch>' referencing the effective strategy. (5) review-protocol.md:47: update 'main でベースライン確認' to 'base branch (設定済み base_branch) でベースライン確認'.",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T014",
       "description": "Capability prompt and briefing injection (CN-05, AC-13) — (1) Rewrite .harness/capabilities/adr-editor.md:58-60,120: replace the 4 occurrences of 'git log main -- <adr-file>' used for pre-merge / post-merge ADR lifecycle judgment with instruction text directing the agent to use the merge_target value received via the orchestrator briefing. Do not hardcode any specific branch name; reference '{{merge_target}}' or the equivalent variable from the briefing. Retain the pre-merge / post-merge decision semantics (empty output = not yet merged = pre-merge; non-empty = post-merge). (2) Update the Invocation contract section of .harness/capabilities/adr-editor.md: add merge_target (the effective strategy's merge_target value, resolved by the orchestrator before invocation) as a required briefing field alongside the existing three required fields (ADR path, signal failure description, and edit-working-tree-only constraint). (3) Update .harness/workflows/track/plan.md Phase 1 loop step b: extend the briefing specification for the adr-editor invocation to require that the orchestrator resolves merge_target from the effective strategy before invoking adr-editor — reading metadata.json#branch_strategy_snapshot.merge_target when a track context exists, or .harness/config/branch-strategy.json#merge_target when no track has been initialized yet — and includes the resolved value in the briefing. Sub-items (1)+(2) implement the consumer side (adr-editor.md declares and uses merge_target from briefing); sub-item (3) implements the producer side (orchestrator resolves and injects merge_target). Together they close the CN-05 / D7 end-to-end circuit.",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T015",
       "description": "Workflow, commands & rules — Update all remaining hardcoded 'main' references in harness policy files: (1) .harness/workflows/track/init.md (6 occurrences): replace 'main' branch references with 'configured base branch (per .harness/config/branch-strategy.json)' or equivalent. (2) .harness/workflows/track/adr2pr.md:84,117 (2 occurrences): same replacement. (3) .harness/workflows/track/plan.md:33 (1 occurrence): same replacement. (4) .claude/commands/track/done.md: replace track-switch-main calls with track-switch-base; update description to 'switch to configured base'. (5) .claude/commands/track/merge.md: remove the hardcoded merge-commit default instruction; when the user omits a method, invoke bin/sotp pr wait-and-merge without --method so the CLI/composition layer resolves branch_strategy_snapshot.merge_method, and only pass --method when the user explicitly supplies merge|squash|rebase. Update post-merge next-action text to use merge_target/base branch terminology. (6) .agents/skills/track-init/SKILL.md:3: update description text. (7) .claude/rules/07-dev-environment.md:54,56: replace track-switch-main with track-switch-base in task name and description.",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     }
   ],
   "plan": {
@@ -101,9 +86,12 @@
         "description": [
           "Introduce MergeMethod and BranchStrategySnapshot in libs/domain/, extend TrackMetadata with a required branch_strategy_snapshot field.",
           "Define BranchStrategyPort in libs/usecase/ as the single abstraction boundary for reading the effective branch strategy; add TrackService::switch_base.",
-          "These two tasks form the compile-stable foundation that all downstream layers depend on."
+          "These two tasks provide the domain and usecase port foundation; switch_base's real branch-switch behavior is completed when T011 wiring overrides its temporary failure default."
         ],
-        "task_ids": ["T001", "T002"]
+        "task_ids": [
+          "T001",
+          "T002"
+        ]
       },
       {
         "id": "S2",
@@ -114,7 +102,11 @@
           "Update TrackServiceImpl::init to call BranchStrategyPort and write the snapshot into metadata.json at track creation time.",
           "Update baseline_capture.rs doc comments to remove hardcoded 'main' references."
         ],
-        "task_ids": ["T003", "T004", "T005"]
+        "task_ids": [
+          "T003",
+          "T004",
+          "T005"
+        ]
       },
       {
         "id": "S3",
@@ -124,18 +116,26 @@
           "Covers libs/infrastructure (gate_state, commit_hash_store), libs/infrastructure PR test fixtures (gh_cli.rs), and apps/cli-composition (dry/shared, review_v2/shared, fixpoint_resolve, dry.rs tests).",
           "Each sub-task is isolated to its review group to keep per-scope diffs reviewable."
         ],
-        "task_ids": ["T006", "T007", "T008"]
+        "task_ids": [
+          "T006",
+          "T007",
+          "T008"
+        ]
       },
       {
         "id": "S4",
         "title": "CLI layer: driver, args, and composition root wiring",
         "description": [
           "Add TrackInput::SwitchBase to cli-driver; add TrackCommand::SwitchBase and update EnsurePrArgs in cli.",
-          "Wire all branch strategy adapters in TrackCompositionRoot: JsonConfigBranchStrategyAdapter for track_init, SnapshotBranchStrategyAdapter for all post-init branch/PR/resolve operations; add track_switch_base method.",
+          "Wire all branch strategy adapters in TrackCompositionRoot: JsonConfigBranchStrategyAdapter for track_init, SnapshotBranchStrategyAdapter for all post-init branch/PR/resolve operations; add track_switch_base and the cli-composition TrackServiceImpl::switch_base override.",
           "Resolve PR merge defaults from branch_strategy_snapshot.merge_method when wait-and-merge is called without an explicit method, while preserving explicit method overrides.",
           "Replace remaining hardcoded 'main' literals in cli-composition git.rs, pr.rs, and track/mod.rs."
         ],
-        "task_ids": ["T009", "T010", "T011"]
+        "task_ids": [
+          "T009",
+          "T010",
+          "T011"
+        ]
       },
       {
         "id": "S5",
@@ -146,7 +146,9 @@
           "Update .github/workflows/ci.yml to trigger on both main and develop branches.",
           "Update README.md and apply D5 bootstrap: add branch_strategy_snapshot to this track's own metadata.json."
         ],
-        "task_ids": ["T012"]
+        "task_ids": [
+          "T012"
+        ]
       },
       {
         "id": "S6",
@@ -157,7 +159,10 @@
           "Rewrite .harness/capabilities/adr-editor.md: remove hardcoded 'git log main' from pre-merge detection, add merge_target as a required Invocation contract field (CN-05 consumer side).",
           "Update .harness/workflows/track/plan.md Phase 1 loop step b: require the orchestrator to resolve and inject merge_target into the adr-editor briefing before invocation (CN-05 producer side)."
         ],
-        "task_ids": ["T013", "T014"]
+        "task_ids": [
+          "T013",
+          "T014"
+        ]
       },
       {
         "id": "S7",
@@ -166,9 +171,11 @@
           "Update .harness/workflows/track/ (init.md, adr2pr.md, plan.md) to replace 'main' with configured base branch references.",
           "Update .claude/commands/track/done.md and merge.md; update .agents/skills/track-init/SKILL.md; update .claude/rules/07-dev-environment.md.",
           "Ensure the track merge command no longer hardcodes merge commit as the omitted-method default; the configured merge_method is the default unless the user explicitly overrides it.",
-          "All changes are text replacements; no behavioral logic changes."
+          "Most changes are text replacements; T015 also includes the intentional wait-and-merge omitted-method behavior change to use the configured merge_method default."
         ],
-        "task_ids": ["T015"]
+        "task_ids": [
+          "T015"
+        ]
       }
     ]
   }

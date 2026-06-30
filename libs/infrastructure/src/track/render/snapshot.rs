@@ -177,7 +177,16 @@ pub(crate) fn decode_legacy_metadata(
         None
     };
 
-    let track = TrackMetadata::with_branch(id, branch, title_str, status_override)
+    // TODO(T005): decode branch_strategy_snapshot from legacy metadata once schema_version is bumped.
+    // Bootstrap placeholder: legacy tracks have no snapshot; use main defaults.
+    let main_branch = domain::NonEmptyString::try_new("main")
+        .map_err(|e| codec::CodecError::Domain(domain::DomainError::Validation(e)))?;
+    let legacy_snapshot = domain::branch_strategy::BranchStrategySnapshot::new(
+        main_branch.clone(),
+        main_branch,
+        domain::branch_strategy::MergeMethod::Squash,
+    );
+    let track = TrackMetadata::with_branch(id, branch, title_str, status_override, legacy_snapshot)
         .map_err(codec::CodecError::Domain)?;
     let meta = DocumentMeta { schema_version, created_at, updated_at };
 
