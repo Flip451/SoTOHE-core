@@ -1,56 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e50704fe2eb2bc03c6d0c003d66da523deb28490cd031324b954ba7edd062665",
-          "at": "2026-06-29T23:59:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e50704fe2eb2bc03c6d0c003d66da523deb28490cd031324b954ba7edd062665",
-          "at": "2026-06-30T00:01:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6307032938c3e80a59a0226bbec720ac3cfcce6057830651769a754a4ad99f0a",
-          "at": "2026-06-30T00:48:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6307032938c3e80a59a0226bbec720ac3cfcce6057830651769a754a4ad99f0a",
-          "at": "2026-06-30T00:51:21Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7899f270e2310497af429e838e7df82a1a08273028d80487d6b19f91fb501732",
-          "at": "2026-06-30T01:03:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7899f270e2310497af429e838e7df82a1a08273028d80487d6b19f91fb501732",
-          "at": "2026-06-30T01:07:19Z"
-        }
-      ]
-    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -133,6 +83,70 @@
           "findings": [],
           "hash": "rvw1:sha256:6bc629881e63fe935e8e87856f1f54c1b77a99b57773e0c3be60d5bee2d6c541",
           "at": "2026-06-30T00:28:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:005b13a7dc235c2b6aec51c35ffa812fe22792480783f5293305b026ccb25c58",
+          "at": "2026-06-30T02:25:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:005b13a7dc235c2b6aec51c35ffa812fe22792480783f5293305b026ccb25c58",
+          "at": "2026-06-30T02:31:03Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7899f270e2310497af429e838e7df82a1a08273028d80487d6b19f91fb501732",
+          "at": "2026-06-30T01:03:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7899f270e2310497af429e838e7df82a1a08273028d80487d6b19f91fb501732",
+          "at": "2026-06-30T01:07:19Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e50704fe2eb2bc03c6d0c003d66da523deb28490cd031324b954ba7edd062665",
+          "at": "2026-06-29T23:59:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e50704fe2eb2bc03c6d0c003d66da523deb28490cd031324b954ba7edd062665",
+          "at": "2026-06-30T00:01:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6307032938c3e80a59a0226bbec720ac3cfcce6057830651769a754a4ad99f0a",
+          "at": "2026-06-30T00:48:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6307032938c3e80a59a0226bbec720ac3cfcce6057830651769a754a4ad99f0a",
+          "at": "2026-06-30T00:51:21Z"
         }
       ]
     }

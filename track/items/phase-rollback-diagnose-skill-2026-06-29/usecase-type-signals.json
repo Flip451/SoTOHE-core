@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-06-30T02:31:59Z",
+  "declaration_hash": "15e8113da6a2e19ae18f8b9af7ba6e7b2e53547ba48ac3c52dbe1bc1cc8e091b",
+  "signals": [
+    {
+      "type_name": "CoverageVerifyInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "CoverageVerifyService"
+      ]
+    },
+    {
+      "type_name": "PreReviewGateInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "PreReviewGateService"
+      ]
+    },
+    {
+      "type_name": "CoverageVerifyCommand",
+      "kind_tag": "command",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CoverageVerifyService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ImplCatalogSignalReaderPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ImplPlanReaderPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "PreReviewGateCommand",
+      "kind_tag": "command",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "PreReviewGateError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "PreReviewGateService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TaskContractReaderPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

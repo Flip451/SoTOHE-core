@@ -1,0 +1,340 @@
+{
+  "schema_version": 5,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {
+    "PreReviewGateInteractor": {
+      "action": "modify",
+      "role": { "Interactor": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "pre_review_gate",
+      "docs": "Interactor implementing PreReviewGateService. Holds three injected Arc<dyn Port> fields (all private). D9 (ADR 2026-06-26-0503): short-circuits to Passed when task-contract.json is absent — no contract means nothing to verify. When the contract exists, evaluates impl_catalog signals for attributed entries with done/in_progress task status.",
+      "spec_refs": [
+        {
+          "file": "track/items/phase-rollback-diagnose-skill-2026-06-29/spec.json",
+          "anchor": "IN-08"
+        },
+        {
+          "file": "track/items/phase-rollback-diagnose-skill-2026-06-29/spec.json",
+          "anchor": "AC-07"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "CoverageVerifyInteractor": {
+      "action": "modify",
+      "role": { "Interactor": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "pre_review_gate",
+      "docs": "Interactor implementing CoverageVerifyService. D9 (ADR 2026-06-26-0503): short-circuits to Passed when task-contract.json is absent — no contract means nothing to verify. When the contract exists, checks orphan detection and referential integrity. All fields are private (Arc<dyn Port>).",
+      "spec_refs": [
+        {
+          "file": "track/items/phase-rollback-diagnose-skill-2026-06-29/spec.json",
+          "anchor": "IN-08"
+        },
+        {
+          "file": "track/items/phase-rollback-diagnose-skill-2026-06-29/spec.json",
+          "anchor": "AC-08"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "PreReviewGateError": {
+      "action": "reference",
+      "role": { "ErrorType": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "TaskContractNotFound",
+            "payload": { "kind": "unit" }
+          },
+          {
+            "name": "TaskContractReadFailed",
+            "payload": {
+              "kind": "struct",
+              "fields": [{ "name": "message", "ty": "String" }]
+            }
+          },
+          {
+            "name": "SignalReadFailed",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "layer", "ty": "domain::tddd::LayerId" },
+                { "name": "message", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "ImplPlanReadFailed",
+            "payload": {
+              "kind": "struct",
+              "fields": [{ "name": "message", "ty": "String" }]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "pre_review_gate",
+      "docs": "Shared error type for PreReviewGateService and CoverageVerifyService. Shape is baseline-identical. D9 updates the docstring on TaskContractNotFound to clarify both interactors return Passed when absent — a docstring-only change.",
+      "spec_refs": [
+        {
+          "file": "track/items/phase-rollback-diagnose-skill-2026-06-29/spec.json",
+          "anchor": "IN-08"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "PreReviewGateCommand": {
+      "action": "reference",
+      "role": { "Command": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "track_id", "ty": "domain::TrackId" },
+            { "name": "layer", "ty": "Option<domain::tddd::LayerId>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "pre_review_gate",
+      "docs": "CQRS command for PreReviewGateService::check. Defined in the previous track; unchanged by this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "CoverageVerifyCommand": {
+      "action": "reference",
+      "role": { "Command": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "track_id", "ty": "domain::TrackId" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "pre_review_gate",
+      "docs": "CQRS command for CoverageVerifyService::verify_coverage. Defined in the previous track; unchanged by this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "traits": {
+    "PreReviewGateService": {
+      "action": "reference",
+      "role": { "ApplicationService": {} },
+      "methods": [
+        {
+          "name": "check",
+          "receiver": "&self",
+          "params": [
+            { "name": "cmd", "ty": "PreReviewGateCommand" }
+          ],
+          "returns": "Result<domain::task_contract::PreReviewGateOutcome, PreReviewGateError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "pre_review_gate",
+      "docs": "Primary application service port for the liveness gate. Unchanged by this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "CoverageVerifyService": {
+      "action": "reference",
+      "role": { "ApplicationService": {} },
+      "methods": [
+        {
+          "name": "verify_coverage",
+          "receiver": "&self",
+          "params": [
+            { "name": "cmd", "ty": "CoverageVerifyCommand" }
+          ],
+          "returns": "Result<domain::task_contract::CoverageVerifyOutcome, PreReviewGateError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "pre_review_gate",
+      "docs": "Primary application service port for coverage check. Unchanged by this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "TaskContractReaderPort": {
+      "action": "reference",
+      "role": { "SecondaryPort": {} },
+      "methods": [
+        {
+          "name": "read",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id", "ty": "&domain::TrackId" }
+          ],
+          "returns": "Result<domain::task_contract::TaskContractDocument, PreReviewGateError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "pre_review_gate",
+      "docs": "Secondary port for reading task-contract.json. Unchanged by this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "ImplCatalogSignalReaderPort": {
+      "action": "reference",
+      "role": { "SecondaryPort": {} },
+      "methods": [
+        {
+          "name": "read_signals",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id", "ty": "&domain::TrackId" },
+            { "name": "layer", "ty": "&domain::tddd::LayerId" }
+          ],
+          "returns": "Result<domain::TypeSignalsDocument, PreReviewGateError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "read_optional_signals",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id", "ty": "&domain::TrackId" },
+            { "name": "layer", "ty": "&domain::tddd::LayerId" }
+          ],
+          "returns": "Result<Option<domain::TypeSignalsDocument>, PreReviewGateError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": true,
+          "where_predicates": [],
+          "docs": null
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "pre_review_gate",
+      "docs": "Secondary port for reading per-layer type-signals documents. Unchanged by this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "ImplPlanReaderPort": {
+      "action": "reference",
+      "role": { "SecondaryPort": {} },
+      "methods": [
+        {
+          "name": "read_task_statuses",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id", "ty": "&domain::TrackId" }
+          ],
+          "returns": "Result<std::collections::HashMap<domain::TaskId, domain::TaskStatusKind>, PreReviewGateError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "pre_review_gate",
+      "docs": "Secondary port for reading task statuses from impl-plan.json. Unchanged by this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "functions": {},
+  "inherent_impls": [
+    {
+      "type_name": "PreReviewGateInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "task_contract_reader", "ty": "std::sync::Arc<dyn TaskContractReaderPort>" },
+            { "name": "signal_reader", "ty": "std::sync::Arc<dyn ImplCatalogSignalReaderPort>" },
+            { "name": "impl_plan_reader", "ty": "std::sync::Arc<dyn ImplPlanReaderPort>" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        }
+      ]
+    },
+    {
+      "type_name": "CoverageVerifyInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "task_contract_reader", "ty": "std::sync::Arc<dyn TaskContractReaderPort>" },
+            { "name": "signal_reader", "ty": "std::sync::Arc<dyn ImplCatalogSignalReaderPort>" },
+            { "name": "impl_plan_reader", "ty": "std::sync::Arc<dyn ImplPlanReaderPort>" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    { "action": "modify", "trait_ref": "PreReviewGateService", "for_type": "PreReviewGateInteractor" },
+    { "action": "modify", "trait_ref": "CoverageVerifyService", "for_type": "CoverageVerifyInteractor" },
+    { "action": "reference", "trait_ref": "core::fmt::Debug", "for_type": "PreReviewGateCommand" },
+    { "action": "reference", "trait_ref": "core::clone::Clone", "for_type": "PreReviewGateCommand" },
+    { "action": "reference", "trait_ref": "core::cmp::PartialEq", "for_type": "PreReviewGateCommand" },
+    { "action": "reference", "trait_ref": "core::cmp::Eq", "for_type": "PreReviewGateCommand" },
+    { "action": "reference", "trait_ref": "core::fmt::Debug", "for_type": "PreReviewGateError" },
+    { "action": "reference", "trait_ref": "core::fmt::Display", "for_type": "PreReviewGateError" },
+    { "action": "reference", "trait_ref": "core::error::Error", "for_type": "PreReviewGateError" },
+    { "action": "reference", "trait_ref": "core::fmt::Debug", "for_type": "CoverageVerifyCommand" },
+    { "action": "reference", "trait_ref": "core::clone::Clone", "for_type": "CoverageVerifyCommand" },
+    { "action": "reference", "trait_ref": "core::cmp::PartialEq", "for_type": "CoverageVerifyCommand" },
+    { "action": "reference", "trait_ref": "core::cmp::Eq", "for_type": "CoverageVerifyCommand" }
+  ]
+}

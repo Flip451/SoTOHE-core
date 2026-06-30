@@ -1,0 +1,925 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "f43dbb7795317606dffd43fbb67bc39a004c2e339d98327a680d1bd18394915f",
+      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "verdict": {
+        "kind": "pass",
+        "citation": "impl 段階以降で impl-plan の実装計画と食い違う 🟡 / 🔴 が surface した時に発火し、rollback 先 phase と次のアクションを返す診断 skill を新規定義する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "impl 段階以降で surface する設計文書との構造的不整合（PreReviewGate Blocked / step 6 plan-artifacts reviewer 指摘）に対し、rollback 先 phase（adr / spec / type / impl_plan / impl の 5 クラス）と次のアクションを LLM の意味判断で返す `/track:diagnose` スキルと `rollback-diagnoser` capability を新設する。orchestrator が「どの phase に戻るか」を ad-hoc に判断する負担を構造的に減らし、phase rollback のモチベーションを機械可読な routing 出力として明示化する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "f43dbb7795317606dffd43fbb67bc39a004c2e339d98327a680d1bd18394915f",
+      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「新規 capability `rollback-diagnoser` (仮称) を追加し、`/track:diagnose` 内部の LLM 呼び出しは ... D6 の出力契約 (routing_target / reason / recommended_next_action) を取得 → orchestrator に返す」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "impl 段階以降で surface する設計文書との構造的不整合（PreReviewGate Blocked / step 6 plan-artifacts reviewer 指摘）に対し、rollback 先 phase（adr / spec / type / impl_plan / impl の 5 クラス）と次のアクションを LLM の意味判断で返す `/track:diagnose` スキルと `rollback-diagnoser` capability を新設する。orchestrator が「どの phase に戻るか」を ad-hoc に判断する負担を構造的に減らし、phase rollback のモチベーションを機械可読な routing 出力として明示化する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
+          "decision_id": "D8"
+        }
+      }
+    },
+    {
+      "claim_hash": "ea9f73c5ca7cf6c8d1c2f2ba818dbf09c9cff430c03bde62d1b454fccc6f470d",
+      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「PR #175 PreReviewGate を欠損 `task-contract.json` に寛容にする (precondition hotfix)」および「PreReviewGate と coverage verification の双方で、`task-contract.json` が存在しない pre-impl phase は `Blocked` ではなく `Passed` として扱う。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-02",
+          "text_label": "PR #175 で導入された PreReviewGate が pre-impl phase（impl-plan / task-contract が未生成の Phase 0 基点コミット時点など）を「契約未提出」として fail-closed する事象を hotfix する。`task-contract.json` が不在の場合に PreReviewGate と coverage verification が Passed を返すよう修正し、Phase 0 baseline commit の gate 通過を回復する。兄弟 ADR の先例パターン（spec-states gate / review gate の欠損許容）を踏襲して 3 例目の precedent として明文化する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
+          "decision_id": "D9"
+        }
+      }
+    },
+    {
+      "claim_hash": "7adf5c8363d0258a9947371cdacaa5cad16045a7b4ada14ce86375cf35e3c61c",
+      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「impl-plan の実装計画と食い違う ... が surface した時に発火し、rollback 先 phase と次のアクションを返す診断 skill を新規定義する。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "`.claude/skills/` 配下に `/track:diagnose` スキル定義ファイルを新設する。スキルはトリガー条件（D2 の 2 主軸）・読み込むコンテキストファイル（spec.json / `<layer>-types.json` / impl-plan.json / `*-signals.json` / 対象 source）・routing 判断プロセス（LLM-semantic）・出力契約（3 フィールド）を記述し、呼び出し orchestrator が次のアクションを取れるよう完結した情報を返す。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "d5198194e33bc939854590f2ddd1f8dc89022ca00864ebc36817b0dfdae556be",
+      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/config/agent-profiles.json` に新規 capability `rollback-diagnoser` (仮称) を追加し、`/track:diagnose` 内部の LLM 呼び出しは `capabilities.rollback-diagnoser.provider` / `capabilities.rollback-diagnoser.model` を resolve した上で dispatch する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "`.harness/config/agent-profiles.json` の `capabilities` に `rollback-diagnoser` エントリを追加し、`provider` と `model` フィールドを設定する。`/track:diagnose` 内の LLM 呼び出しは `capabilities.rollback-diagnoser.provider` / `capabilities.rollback-diagnoser.model` を resolve した上で dispatch する。既存 capability アーキテクチャ（spec-designer / type-designer / impl-planner 等）と整合した JSON 構造で配置する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
+          "decision_id": "D8"
+        }
+      }
+    },
+    {
+      "claim_hash": "5e65c2a5f456a0c599faf693a882edbd9c17c26b42db45f1fa9c176045b4c815",
+      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`/track:diagnose` の routing 対象 trigger は次の 2 つを主とする。1. **PreReviewGate Blocked** ... 2. **step 6 plan-artifacts review findings** ... `step 10 ... は本 ADR の主軸 trigger ではないが、orchestrator が手動で診断スキルに渡すことは妨げない`"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "`/track:diagnose` の routing 対象 trigger は次の 2 つを主軸とする。(1) PreReviewGate Blocked（step 9 `/track:full-cycle` 中）: `bin/sotp task-contract check` が `PreReviewGateOutcome::Blocked` を返した際の blocked entries（どの layer のどの entry が 🔵 化されなかったか）を diagnostic input として渡す。(2) step 6 plan-artifacts review findings（`/track:review` plan-artifacts scope）: reviewer 指摘 / signal 🔴 等で surface した構造的不整合テキストを diagnostic input として渡す。step 10 `/track:pr-review` の外部 reviewer 指摘は主軸 trigger ではないが、orchestrator が手動で診断スキルに渡すことを妨げない（ADR Context 例 (a) の典型経路）。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "92bb37c213afa49455a311e933f40d2bfe8867dc45a9e8e5cc1a36ec2ba28ea8",
+      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「D3: invocation enforcement は PreReviewGate 出力内 soft prompt を採用する (専用 hook は不要)」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "`bin/sotp task-contract check`（PreReviewGate）が `PreReviewGateOutcome::Blocked` を返す際の stderr / 出力に `/track:diagnose` の呼び出しを推奨する soft prompt を含める。orchestrator は Blocked exit code とこの prompt を見て `/track:diagnose` を invoke するか自前で原因分類するかを判断する。新たな PreToolUse hook や lock file / bypass 機構は導入しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "6c6fee8d18e696deab026259b443b9dbd4d836e235a07b3010b540b78dbc72af",
+      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "verdict": {
+        "kind": "pass",
+        "citation": "\"### D4: routing 出力カテゴリは 5 クラス (adr / spec / type / impl_plan / impl) とする\"\n\n\"診断 skill は次の 5 categories のいずれかを返す。\"\n\n\"| `adr` | ADR に未記載の決定が必要 | `/adr:add` で新 ADR、または `adr-editor` で既存 ADR D 改訂 |\"\n\"| `spec` | ADR 決定はあるが Phase 1 spec author が表現し切れていない | `spec-designer` を再呼び出し (Phase 1 partial re-entry) |\"\n\"| `type` | catalogue にアーキテクチャなどの観点から瑕疵がある (= 役割配置 / シグネチャ / impl 宣言などが設計上問題) | `type-designer` を再呼び出し (Phase 2 partial re-entry) |\"\n\"| `impl_plan` | ADR / spec / catalogue は正しいが impl-plan task 記述に欠落 / 誤りがある | `impl-planner` を再呼び出し (Phase 3 partial re-entry) |\"\n\"| `impl` | 設計文書側の問題ではなく実装の契約違反 | 設計文書には触らず source 側で修正 (型カタログの責任ではなく実装の責任である旨を明示) |\"\n\n\"`impl` カテゴリは「out_of_scope」 (=何もしない) ではなく、「実装が設計契約を破っているという診断結果」を伝える明示的な出力である。\""
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "`/track:diagnose` の routing 出力クラスは次の 5 値とする。`adr`：ADR に未記載の決定が必要（`/adr:add` または `adr-editor` で既存 ADR D 改訂）。`spec`：ADR 決定はあるが Phase 1 spec が表現し切れていない（spec-designer の partial re-entry）。`type`：catalogue にアーキテクチャ観点の瑕疵（type-designer の partial re-entry）。`impl_plan`：ADR / spec / catalogue は正しいが impl-plan task 記述に欠落 / 誤り（impl-planner の partial re-entry）。`impl`：設計文書側の問題ではなく実装の契約違反（source 側のみ修正）。`impl` は「out_of_scope」（何もしない）ではなく「実装が設計契約を破っている」という積極的な診断結果である。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "f19267725ab003ccd8447463475e222640eb9b5970d01d6a29d901855b1a3960",
+      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`/track:diagnose` の routing は呼び出された LLM が 🔴 signal text / reviewer 指摘 text / 関連ファイル (spec.json / `<layer>-types.json` / impl-plan.json / 該当 source / `*-signals.json`) を読み取って **意味的に判断** する。\n\nregex / keyword ベースの決定的ルール ... は採用しない"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "`/track:diagnose` の routing 判断は呼び出された LLM が spec.json / `<layer>-types.json` / impl-plan.json / 対象 source / `*-signals.json` を読み取って意味的に判断する（LLM-semantic decision）。regex / keyword ベースの決定的ルール（例: signal text に特定キーワードを含めば特定 category に routing）は採用しない。SoT 階層（ADR → spec → catalogue → impl）における文脈から routing 先を判定する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "4fcd9a7c8ebb56135e775fd312682fcf4156fd45ff02de4472aa93fd08285495",
+      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`/track:diagnose` は次の 3 フィールドを構造化して返す。 / orchestrator は `routing_target` を読んで dispatch (D7) するか、`reason` をユーザに提示して判断を仰ぐ。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "`/track:diagnose` の出力スキーマは 3 フィールドとする。`routing_target`（enum: adr / spec / type / impl_plan / impl）、`reason`（string: 判断根拠、どの 🔴 / 🟡 signal / 構造的不整合を見てそのカテゴリと判定したかの semantic summary）、`recommended_next_action`（string: 呼び出し orchestrator が次に取るべき具体的アクション）。orchestrator は `routing_target` を読んで writer を dispatch するか、`reason` をユーザに提示して判断を仰ぐ。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "39df5c1a29b4300c803acad97f7010220c7722acbdf4563b3bfa548d0ba7f429",
+      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "verdict": {
+        "kind": "pass",
+        "citation": "pre-impl phase は `Blocked` ではなく `Passed` として扱う"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "D9 hotfix（baseline commit `7a50d745` 実装済み）: `libs/usecase/src/pre_review_gate.rs` の `PreReviewGateInteractor::check` と `CoverageVerifyInteractor::verify_coverage` を修正し、`task-contract.json` が不在（pre-impl phase）の場合に `Blocked` / `MissingTaskContract` ではなく `Passed` を返す。`task-contract.json` が存在する場合の entries coverage / impl_catalog liveness 評価は不変とし、fail-open は作らない。将来の精緻化（「impl-plan 存在時の task-contract 欠損」型 violation）に備え、missing-task-contract violation の概念は残す。テスト関数は `*_yields_passed_via_d9_tolerance` のパターンで改名して D9 起源を追跡可能にする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
+          "decision_id": "D9"
+        }
+      }
+    },
+    {
+      "claim_hash": "c1664b381f12c17a1c915537e1eb88fcd8b99b597aa5d447e2a75e2e1e79819b",
+      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`libs/usecase/src/pre_review_gate/helpers.rs` サブモジュールを新設し、`pre_review_gate.rs` から 7 本以上の純粋ヘルパー free function を `pub(super)` で抽出することで親モジュールを 700 行上限内に収める。分割パターンは `ref_verify.rs + ref_verify/*.rs` のサブモジュール分割を踏襲する。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-09",
+          "text_label": "D9 hotfix（baseline commit `7a50d745` 実装済み）: `libs/usecase/src/pre_review_gate/helpers.rs` を新設し、`pre_review_gate.rs` から 7 本以上の純粋ヘルパー free function を `pub(super)` で抽出する。親モジュールを verify-module-size (700 行上限) に準拠させる。`ref_verify.rs + ref_verify/*.rs` のサブモジュール分割パターンを踏襲する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
+          "decision_id": "D9"
+        }
+      }
+    },
+    {
+      "claim_hash": "5afc236335f9e727ef539b2bc894f384995e6e6f5683ccf9ea5874a2e3c8aba7",
+      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "verdict": {
+        "kind": "pass",
+        "citation": "兄弟 gate の寛容化 ADR (`2026-06-03-1241-spec-states-gate-tolerate-missing-spec-artifact` / `2026-06-01-0406-review-gate-tolerate-missing-catalogue`) と同型の precedent pattern を踏襲する."
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-10",
+          "text_label": "D9 hotfix（baseline commit `7a50d745` 実装済み）: `Makefile.toml` の `verify-spec-states-current-local` タスクを `script_runner = \"@shell\"` に切り替え、TRACK_ID + spec.json 存在ガードを付与する。spec.json が不在の場合は `[SKIP]` ログを出力して exit 0 とし、Phase 0（pre-spec）トラックで gate が fail-closed しないよう修正する（ADR `2026-06-03-1241-spec-states-gate-tolerate-missing-spec-artifact` の hot-restore パターン）。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
+          "decision_id": "D9"
+        }
+      }
+    },
+    {
+      "claim_hash": "a29a4e577524b58d46db4395bff5fe152d6c80c7a2e2ef324b109cf9af6d76b6",
+      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`/track:diagnose` の呼び出しを推奨する soft prompt を含める。orchestrator は Blocked exit code とこの prompt を見て、`/track:diagnose` を invoke するか自前で原因分類するかを判断する。新たな PreToolUse hook や lock file / bypass 機構は導入しない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-01",
+          "text_label": "Makefile.toml の `track-local-review-fix-codex` chain が PreReviewGate Blocked を受けたとき `/track:diagnose` を自動 invoke する hard enforcement（Alt A 却下）は対象外。Blocked exit code が確定的に次ステップを決定する機構は orchestrator が誤判定を override する余地を消し、「dispatch は orchestrator 責任」原則（D7）と衝突する。soft prompt → hard 化は将来可能だが逆は難しい。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "0077b7f3692b9e1ebe9212c720ac902169f5c1d6b1a39423198bccd2c641225a",
+      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`/track:diagnose` は D6 の出力を返すだけで、実際の writer (adr-editor / spec-designer / type-designer / impl-planner) 起動は呼び出し orchestrator が行う。診断と修正を別 skill に分離することで:\n\n- 診断結果をユーザが review してから dispatch する余地を残す (誤判定時に orchestrator が override 可能)\n- 診断 skill 自身が再帰的に writer を起動する複雑性 (chain orchestration) を避ける\n- 既存の `/track:plan` の back-and-forth loop と同型 (loop 主体は plan、escalation 先は writer) で skill 設計の一貫性を保つ"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-02",
+          "text_label": "`/track:diagnose` が routing 判定後に内部で writer subagent（adr-editor / spec-designer / type-designer / impl-planner）を chain 起動して設計文書修正まで完結させる one-shot resolution（Alt B 却下）は対象外。診断と修正を 1 skill に詰め込むと skill 責任範囲が膨れ、誤判定時のユーザ介入余地が失われる。既存 `/track:plan` の Phase loop（signal → 上流 writer escalation は orchestrator が担う）との設計一貫性を保つ。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "e0effce79427de9284fac02984879a06a78cb82418cac33303723e7008542ff9",
+      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "verdict": {
+        "kind": "pass",
+        "citation": "\"D5: routing 判断は LLM の意味判断に委ねる\" / \"regex / keyword ベースの決定的ルール ... は採用しない\""
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-03",
+          "text_label": "signal text / reviewer 指摘 text / signal source file name をキーにした決定的 routing rule（regex / keyword matching、Alt C 却下）は対象外。同一 keyword が複数 phase 由来の不整合に現れうる（`ApplicationService` の例）こと、新 check 追加のたびに rule table 保守コストが累積すること、ファイル名から semantic な routing 先が決定できないことを理由に却下。LLM-semantic 判断が文脈に応じた routing 精度を出しやすい。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "ac6a8e896048cb95740efb3b4d1e2b323c0297b0ee39a864448221d50ea8f388",
+      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "verdict": {
+        "kind": "pass",
+        "citation": "candidate_selection: from:[5-class,3-class-collapsed,4-class-no-impl] chose:5-class-with-impl\n\n| `spec` | ADR 決定はあるが Phase 1 spec author が表現し切れていない | `spec-designer` を再呼び出し (Phase 1 partial re-entry) |\n| `impl_plan` | ADR / spec / catalogue は正しいが impl-plan task 記述に欠落 / 誤りがある | `impl-planner` を再呼び出し (Phase 3 partial re-entry) |"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-04",
+          "text_label": "設計文書遡及の taxonomy を `adr`（決定欠落）/ `catalogue`（記載ミス）/ `out_of_scope` の 3 クラスに折り畳む案（Alt D 却下）は対象外。「ADR 決定は完全にあるが Phase 1 spec / Phase 3 impl-plan author が表現し切れていない」ケースを `adr` カテゴリに折り畳むと不必要な ADR re-author が走る。`spec` / `impl_plan` を独立 category にすることで降下方向の incompleteness を新 ADR 不要で表現できる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "b0d7d9688ee6a5e67e85819a8d0e3a7201665980777b5c65a26ea774a14875d9",
+      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "verdict": {
+        "kind": "pass",
+        "citation": "impl 段階以降で impl-plan の実装計画と食い違う 🟡 / 🔴 が surface した時に発火し、rollback 先 phase と次のアクションを返す診断 skill を新規定義する。... `/track:plan` 内の既存 Phase 1-3 loop はそのままに、impl phase 由来の遡及だけを別 skill に分離する"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-05",
+          "text_label": "`/track:plan` の back-and-forth section を拡張して impl 段階の構造的不整合 / 🟡 への rollback rule を追記し、独立 skill を立てない案（Alt E 却下）は対象外。`/track:plan` は phase 4 単位の plan 駆動 skill であり impl phase 中の ad-hoc trigger を観測できない。impl 中に `/track:plan` を呼ぶことは canonical flow を逸脱する。診断と planning は責務が異なる（SRP）。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "d28679499359e271d7ef3bce66cca7b3d1f7363e4c8b699243cfbfef12521dce",
+      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "verdict": {
+        "kind": "pass",
+        "citation": "impl phase 由来の遡及だけを別 skill に分離することで、orchestrator が「どこに戻るか」を ad-hoc 判断する負担を構造的に減らす。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-06",
+          "text_label": "`.claude/rules/` に「impl 中は設計文書を触らない」と記述するだけの passive な規約記述アプローチ（Alt F 却下）は対象外。規約記述は orchestrator が context 中に保持し続ける前提に依存し、長セッション / 多 tool call で forget される可能性がある。enforcement はゼロ。PR #170 cycle のような impl 中の ad-hoc 設計遡及は規約記述だけでは構造的に防げない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "5fb26b3374f1990a9b8c03a3c76989a61f01bee1fbd72c29e1e238624cda0595",
+      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/config/agent-profiles.json` に新規 capability `rollback-diagnoser` (仮称) を追加し、`/track:diagnose` 内部の LLM 呼び出しは `capabilities.rollback-diagnoser.provider` / `capabilities.rollback-diagnoser.model` を resolve した上で dispatch する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "`/track:diagnose` が routing 判断のために呼ぶ LLM の provider / model は `.harness/config/agent-profiles.json` の `capabilities.rollback-diagnoser.provider` / `capabilities.rollback-diagnoser.model` を resolve した上で dispatch する。ad-hoc な provider 選択は行わない。provider / model 変更は `agent-profiles.json` の差し替えのみで行えるようにする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
+          "decision_id": "D8"
+        }
+      }
+    },
+    {
+      "claim_hash": "06191cdd2359d1fa10a3ea9d534dfdf7108e5b78a00c74e07c820cd0af3d425b",
+      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`/track:diagnose` は D6 の出力を返すだけで、実際の writer (adr-editor / spec-designer / type-designer / impl-planner) 起動は呼び出し orchestrator が行う。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "`/track:diagnose` は one-shot 診断スキルであり、routing 結果（3 フィールド）を返した時点で終了する。writer subagent（adr-editor / spec-designer / type-designer / impl-planner）の起動は呼び出し orchestrator が行う。診断 skill 自身が再帰的に writer を起動する chain orchestration は行わない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "ccc4e065eaa7bde5bfdd17dddd30f1c14a307f74e15535ae82195bf10ad1ba84",
+      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`/track:diagnose` は次の 3 フィールドを構造化して返す。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "スキルの出力スキーマはトップレベルに `routing_target` / `reason` / `recommended_next_action` の 3 フィールドのみを持つ。追加のトップレベルフィールドは定義しない。`reason` と `recommended_next_action` は string（日本語可）であり非空とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "1cc6adb67cc2e5c7ff3fadbe5c990390c367a9d2226030b385d15240aed66aad",
+      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D4: routing 出力カテゴリは 5 クラス (adr / spec / type / impl_plan / impl) とする\n\n`impl` | 設計文書側の問題ではなく実装の契約違反 | 設計文書には触らず source 側で修正 (型カタログの責任ではなく実装の責任である旨を明示)\n\n`impl` カテゴリは「out_of_scope」 (=何もしない) ではなく、「実装が設計契約を破っているという診断結果」を伝える明示的な出力である。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "`routing_target` の値は `adr` / `spec` / `type` / `impl_plan` / `impl` の 5 値のいずれかに限定する。`impl` は「設計文書遡及は不要で実装の契約違反を source 側で直す」という積極的な診断結果であり、「何もしない」または「out_of_scope」ではない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "5345b8ad7c8e85434a26d4a2b8b8635f3f274536b9c1ed037436cfac5fb8eb10",
+      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「LLM が SoT 階層を理解した上で判断する方が」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-05",
+          "text_label": "routing 判断は LLM の意味判断のみに委ねる。スキル定義内に regex / keyword 照合ルール、特定 signal text への決定的 routing table、ファイル名ベースの分岐は含めない。判断には SoT 階層（ADR → spec → catalogue → impl）の文書コンテキストを用いる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "2e769952f9fc485b441c3aec347389655e9d69e712c6c361c4661293a31f79d1",
+      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "verdict": {
+        "kind": "pass",
+        "citation": "PreReviewGate 出力内 soft prompt を採用する (専用 hook は不要)"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-06",
+          "text_label": "invocation enforcement は PreReviewGate 出力内の soft prompt に限定する。新たな PreToolUse hook、lock file、bypass 機構、exit code 処理の強制機構は導入しない。orchestrator は Blocked exit code と soft prompt を見て `/track:diagnose` を invoke するかどうかを判断する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "05ec7e85ab513773918351278176a832e4cd2ea5026b6073b61bbc9ab37cfdf4",
+      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "verdict": {
+        "kind": "pass",
+        "citation": "PreReviewGate と coverage verification の双方で、`task-contract.json` が存在しない pre-impl phase は `Blocked` ではなく `Passed` として扱う。`task-contract.json` が存在する場合の挙動 ... は不変。fail-open は作らない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-07",
+          "text_label": "`task-contract.json` が不在の場合、PreReviewGate と coverage verification は `Passed` を返す（「評価対象なし」扱い）。`task-contract.json` が存在する場合の entries coverage / impl_catalog liveness 評価は不変。「impl-plan が存在するのに task-contract が無い」等の将来の精緻化に備え、missing-task-contract violation の概念自体は残す。fail-open は作らない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
+          "decision_id": "D9"
+        }
+      }
+    },
+    {
+      "claim_hash": "f78597a03d65cd7299b2a95937a8d14856017495ddbeff381cdf070e09de095f",
+      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "verdict": {
+        "kind": "pass",
+        "citation": "impl 段階以降で impl-plan の実装計画と食い違う 🟡 / 🔴 が surface した時に発火し、rollback 先 phase と次のアクションを返す診断 skill を新規定義する。主 trigger は `bin/sotp task-contract check` (PR #175 で導入される PreReviewGate) が `PreReviewGateOutcome::Blocked` を返した時。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`.claude/skills/` 配下に `/track:diagnose` のスキル定義ファイルが新設されており、(1) トリガー条件（PreReviewGate Blocked / step 6 plan-artifacts findings）、(2) 読み込むコンテキストファイル（spec.json / `<layer>-types.json` / impl-plan.json / `*-signals.json` / 対象 source）、(3) LLM-semantic routing 判断プロセス、(4) 出力契約（`routing_target` / `reason` / `recommended_next_action` の 3 フィールド）が記述されている。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "99613153accb399f64451312d927d7d52e82f0a9e5e7f19c902145f37dac4ba2",
+      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「新規 capability `rollback-diagnoser` (仮称) を追加し、`capabilities.rollback-diagnoser.provider` / `capabilities.rollback-diagnoser.model` を resolve」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "`.harness/config/agent-profiles.json` の `capabilities` に `rollback-diagnoser` エントリが追加されており、`provider` フィールド（および推奨される `model` フィールド）を持つ。既存 capability 形式（`spec-designer` / `type-designer` 等）と整合した JSON 構造である。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
+          "decision_id": "D8"
+        }
+      }
+    },
+    {
+      "claim_hash": "7f4452084b326714ab33e0152b9238eecabb6bd2ee575d56f9b768fe516b41e3",
+      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp task-contract check` (PreReviewGate) が `PreReviewGateOutcome::Blocked` を返す際の stderr / 出力に **`/track:diagnose` の呼び出しを推奨する soft prompt** を含める。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "`bin/sotp task-contract check`（PreReviewGate）が `PreReviewGateOutcome::Blocked` を返す際の stderr / stdout 出力に `/track:diagnose` の呼び出しを推奨するテキスト（soft prompt）が含まれている。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "431bdedcc3037cccec3e1cae2f34fe4588fc310b8745e462ce9ae93d8df3f1f4",
+      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "verdict": {
+        "kind": "pass",
+        "citation": "診断 skill はこの Blocked 時の blocked entries (どの layer のどの entry が 🔵 化されなかったか) を読み取り、原因を意味的に分類する (D4 5 categories のうち `type` / `impl_plan` / `spec` / `adr` / `impl` のいずれに routing するか)。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "`/track:diagnose` スキルを diagnostic input（PreReviewGate Blocked entries または step 6 / step 10 reviewer findings）とともに起動した場合、`routing_target` ∈ {adr, spec, type, impl_plan, impl}、非空の `reason`、非空の `recommended_next_action` を含む構造化レスポンスが返される。routing 先クラスは ADR D4 の 5 分類それぞれが到達可能である。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "431bdedcc3037cccec3e1cae2f34fe4588fc310b8745e462ce9ae93d8df3f1f4",
+      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「診断 skill は次の 5 categories のいずれかを返す。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "`/track:diagnose` スキルを diagnostic input（PreReviewGate Blocked entries または step 6 / step 10 reviewer findings）とともに起動した場合、`routing_target` ∈ {adr, spec, type, impl_plan, impl}、非空の `reason`、非空の `recommended_next_action` を含む構造化レスポンスが返される。routing 先クラスは ADR D4 の 5 分類それぞれが到達可能である。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "431bdedcc3037cccec3e1cae2f34fe4588fc310b8745e462ce9ae93d8df3f1f4",
+      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`routing_target` | enum (`adr` / `spec` / `type` / `impl_plan` / `impl`) | D4 の 5 カテゴリのいずれか"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "`/track:diagnose` スキルを diagnostic input（PreReviewGate Blocked entries または step 6 / step 10 reviewer findings）とともに起動した場合、`routing_target` ∈ {adr, spec, type, impl_plan, impl}、非空の `reason`、非空の `recommended_next_action` を含む構造化レスポンスが返される。routing 先クラスは ADR D4 の 5 分類それぞれが到達可能である。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "547e3f9bc875ac7e00b1457f821e195d88ad9577220fdd5112ce696b9fccf469",
+      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`/track:diagnose` の routing は呼び出された LLM が 🔴 signal text / reviewer 指摘 text / 関連ファイル (spec.json / `<layer>-types.json` / impl-plan.json / 該当 source / `*-signals.json`) を読み取って **意味的に判断** する。\nregex / keyword ベースの決定的ルール ... は採用しない"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "スキル定義内に LLM-semantic routing 判断のためのコンテキスト読み込み手順（SoT ドキュメント群の参照）が明記されており、regex / keyword マッチングルールテーブルが記述されていない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "bbb29ecb023bf58f842bcd7bc868e80afe23ad88ca7a3805ba5ad4a65027b1dd",
+      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「/track:diagnose は D6 の出力を返すだけで、実際の writer 起動は呼び出し orchestrator が行う。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "スキル定義内に writer subagent（adr-editor / spec-designer / type-designer / impl-planner）の起動手順が含まれていない。`routing_target` / `reason` / `recommended_next_action` の出力が terminal output であり、writer dispatch は呼び出し orchestrator の責任であることが明記されている。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "5a528a73e2589cd00033918d089df940f0a5a84373e703ba984e6d3bb06eb603",
+      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`task-contract.json` が存在しない pre-impl phase は `Blocked` ではなく `Passed` として扱う。`task-contract.json` が存在する場合の挙動 ... は不変。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "`libs/usecase/src/pre_review_gate.rs` — `PreReviewGateInteractor::check` が `task-contract.json` 不在時に `PreReviewGateOutcome::Passed` を返す。`task-contract.json` が存在する場合の entries coverage / liveness 評価は不変。少なくとも 1 つの test 関数が `*_yields_passed_via_d9_tolerance` パターンの名前を持ちこの挙動を検証している。（baseline commit `7a50d745` 実装済み）"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
+          "decision_id": "D9"
+        }
+      }
+    },
+    {
+      "claim_hash": "314e99c3bedf6a811552801c2e970b9f59cc4c9490ab12309052120d22326a41",
+      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- PreReviewGate と coverage verification の双方で、`task-contract.json` が存在しない pre-impl phase は `Blocked` ではなく `Passed` として扱う。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "`libs/usecase/src/pre_review_gate.rs` — `CoverageVerifyInteractor::verify_coverage` が `task-contract.json` 不在時に `Passed` を返す。少なくとも 1 つの test 関数が `*_yields_passed_via_d9_tolerance` パターンの名前を持ちこの挙動を検証している。（baseline commit `7a50d745` 実装済み）"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
+          "decision_id": "D9"
+        }
+      }
+    },
+    {
+      "claim_hash": "3d125592b43a898d996795bf82cd11bed406066b4f62299e5a9e3120081e497f",
+      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「上限超過時は圧縮ではなく分割を選ぶ方針に従い、`libs/usecase/src/pre_review_gate/helpers.rs` サブモジュールを新設し、`pre_review_gate.rs` から 7 本以上の純粋ヘルパー free function を `pub(super)` で抽出することで親モジュールを 700 行上限内に収める。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "`libs/usecase/src/pre_review_gate/helpers.rs` サブモジュールが存在し、`pre_review_gate.rs` から 7 本以上の `pub(super)` 純粋ヘルパー free function が抽出されている。`pre_review_gate.rs` の行数が `verify-module-size` ゲートの 700 行上限内に収まっている。（baseline commit `7a50d745` 実装済み）"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
+          "decision_id": "D9"
+        }
+      }
+    },
+    {
+      "claim_hash": "d655d662f318e1cc150f086f39642a1396e3a15ba8b964b7a4ddfaa3de64fb8a",
+      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "verdict": {
+        "kind": "pass",
+        "citation": "precondition として、PR #175 PreReviewGate を欠損 `task-contract.json` に寛容にする bootstrap hotfix を Phase 0 baseline gate の再実行前に成立させる。\n- PreReviewGate と coverage verification の双方で、`task-contract.json` が存在しない pre-impl phase は `Blocked` ではなく `Passed` として扱う。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-10",
+          "text_label": "`Makefile.toml` の `verify-spec-states-current-local` タスクが `script_runner = \"@shell\"` で実行され、TRACK_ID および spec.json 存在ガードを持つ。spec.json が不在の場合に `[SKIP]` ログを出力して exit 0 とし、`cargo make ci` が Phase 0 トラック（pre-spec 状態）で pass する。（baseline commit `7a50d745` 実装済み）"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
+          "decision_id": "D9"
+        }
+      }
+    },
+    {
+      "claim_hash": "1c3ec92b504c33c9c41f43d7f7f7e7ca83f2bcb4812135f253a43d3da4d8da90",
+      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "verdict": {
+        "kind": "pass",
+        "citation": "impl 段階以降で impl-plan の実装計画と食い違う 🟡 / 🔴 が surface した時に発火し、rollback 先 phase と次のアクションを返す診断 skill を新規定義する。主 trigger は `bin/sotp task-contract check` (PR #175 で導入される PreReviewGate) が `PreReviewGateOutcome::Blocked` を返した時。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-11",
+          "text_label": "`cargo make ci`（fmt-check + clippy + nextest + deny + check-layers + verify-*）が、D1-D8（新スキル + 新 capability + PreReviewGate soft prompt）および D9 hotfix（PreReviewGateInteractor 修正 + helpers.rs + Makefile.toml fix）の全変更を含む working tree で pass する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "1c3ec92b504c33c9c41f43d7f7f7e7ca83f2bcb4812135f253a43d3da4d8da90",
+      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "verdict": {
+        "kind": "pass",
+        "citation": "precondition として、PR #175 PreReviewGate を欠損 `task-contract.json` に寛容にする bootstrap hotfix を Phase 0 baseline gate の再実行前に成立させる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-11",
+          "text_label": "`cargo make ci`（fmt-check + clippy + nextest + deny + check-layers + verify-*）が、D1-D8（新スキル + 新 capability + PreReviewGate soft prompt）および D9 hotfix（PreReviewGateInteractor 修正 + helpers.rs + Makefile.toml fix）の全変更を含む working tree で pass する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
+          "decision_id": "D9"
+        }
+      }
+    }
+  ]
+}

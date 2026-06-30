@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "D9 usecase hotfix (baseline commit 7a50d745): modify libs/usecase/src/pre_review_gate.rs so that PreReviewGateInteractor::check and CoverageVerifyInteractor::verify_coverage short-circuit to Passed when task-contract.json is absent (TaskContractNotFound -> return Ok(Passed)). Rename the two affected test functions to the *_yields_passed_via_d9_tolerance pattern (missing_task_contract_yields_passed_via_d9_tolerance, coverage_missing_task_contract_yields_passed_via_d9_tolerance) to make D9 origin traceable. Update the TaskContractNotFound docstring on PreReviewGateError to clarify that both interactors return Passed when the file is absent. Also create libs/usecase/src/pre_review_gate/helpers.rs, extracting 7 pub(super) pure helper free functions (blocked_coverage_outcome, blocked_outcome, build_scope_entries, collect_non_canonical_layer_violations, collect_per_layer_violations, collect_task_key_ri_violations, entry_key_to_contracted_ref) from pre_review_gate.rs to keep the parent module under the 700-line verify-module-size cap. This follows the ref_verify.rs + ref_verify/*.rs submodule split pattern. All content delivered at baseline commit 7a50d745.",
+      "status": "done",
+      "commit_hash": "7a50d745"
+    },
+    {
+      "id": "T002",
+      "description": "D9 Makefile.toml hotfix (baseline commit 7a50d745): switch verify-spec-states-current-local to script_runner = \"@shell\" and add a TRACK_ID + spec.json existence guard. When spec.json is absent (Phase 0 / pre-Phase-1 tracks), emit [SKIP] and exit 0 so that cargo make ci passes on pre-spec tracks. Restores the absent-spec.json tolerance pattern (ADR 2026-06-03-1241-spec-states-gate-tolerate-missing-spec-artifact; same hot-restore as commit 04dcdaf6) as the third sibling precedent alongside review-gate and spec-states tolerances. Content delivered at baseline commit 7a50d745.",
+      "status": "done",
+      "commit_hash": "7a50d745"
+    },
+    {
+      "id": "T003",
+      "description": "D1 — Create .claude/skills/diagnose/SKILL.md: the /track:diagnose one-shot diagnostic skill definition. The file must document all of the following: (1) Trigger conditions — the two primary trigger axes are (a) bin/sotp task-contract check returns PreReviewGateOutcome::Blocked with a list of entries that failed liveness, and (b) step 6 plan-artifacts reviewer scope surfaces signal 🔴 or structural mismatch findings; the skill may also be invoked manually with any diagnostic text. (2) Context files — before rendering a routing decision, read spec.json, all <layer>-types.json catalogues, impl-plan.json, all <layer>-*-signals.json documents, and any source files cited in the findings. (3) LLM-semantic routing judgment process — traverse the SoT hierarchy (ADR -> spec -> catalogue -> impl) top-down, identify the most upstream phase where the root cause originates, assign routing_target from the 5-class taxonomy: adr (missing architectural decision), spec (ADR decision exists but spec.json failed to capture it), type (spec is correct but <layer>-types.json has architectural defect), impl_plan (types are correct but impl-plan task description is missing or wrong), impl (design chain is correct; the source implementation violates the contract). (4) Output contract — return exactly three top-level fields: routing_target (one of adr/spec/type/impl_plan/impl), reason (non-empty string explaining which signal/finding caused the routing decision), recommended_next_action (non-empty string specifying the concrete next step for the calling orchestrator). Constraints: SKILL.md must NOT cite the ADR by date-slug file path. SKILL.md must NOT include writer-subagent launch instructions (writer dispatch is the calling orchestrator's responsibility). No regex or keyword matching rule tables — routing is LLM-semantic only. Provider selection is documented as 'resolved from capabilities.rollback-diagnoser in .harness/config/agent-profiles.json'.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T004",
+      "description": "D8 — Add rollback-diagnoser capability entry to .harness/config/agent-profiles.json. Add a new key rollback-diagnoser inside the capabilities object, with provider and model fields in the same JSON structure as existing capability entries (e.g., spec-designer, type-designer, impl-planner). A defensible default provider (e.g., matching the existing spec-designer / orchestrator provider) should be chosen; consumers can override by editing agent-profiles.json. The /track:diagnose skill resolves its LLM invocation target from capabilities.rollback-diagnoser.provider and capabilities.rollback-diagnoser.model. No other files need modification for this task.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T005",
+      "description": "D3 — Modify apps/cli-driver/src/task_contract.rs: add a soft-prompt branch to TaskContractDriver::handle so that when the liveness gate returns PreReviewGateOutcome::Blocked, the stderr output includes advisory text recommending the caller invoke /track:diagnose with the blocked entries as diagnostic input. The public signature of handle is unchanged (same CommandOutcome return type, same TaskContractInput parameter — Chain 3 is already 🔵 on structural shape). The Blocked exit code and violation list rendering are already present; this task adds only the /track:diagnose suggestion text to the stderr output that accompanies a Blocked result. The Check variant of TaskContractInput triggers this path; the Coverage variant is not affected. No new PreToolUse hook, lock file, or bypass mechanism is introduced (CN-06).",
+      "status": "todo",
+      "commit_hash": null
+    }
+  ],
+  "plan": {
+    "summary": [
+      "Five tasks across three sections. S1 (T001-T002) records D9 hotfix work already committed at baseline 7a50d745: PreReviewGate absent-task-contract tolerance + helpers.rs module split (T001) and Makefile.toml spec-states skip restore (T002). S2 (T003-T004) covers the non-Rust new-artifact work for D1 and D8: SKILL.md for /track:diagnose (T003) and the rollback-diagnoser capability entry in agent-profiles.json (T004). S3 (T005) is the sole remaining Rust behavioral change: soft-prompt addition to TaskContractDriver::handle on Blocked outcome (D3)."
+    ],
+    "sections": [
+      {
+        "id": "S1",
+        "title": "D9 hotfix — baseline-commit work (done at 7a50d745)",
+        "description": [
+          "T001 implements the D9 usecase changes: PreReviewGateInteractor::check and CoverageVerifyInteractor::verify_coverage now short-circuit to Passed when task-contract.json is absent (TaskContractNotFound -> return Ok(Passed)), making Phase 0 baseline commits gate-pass without a task-contract.json on disk. Two test functions are renamed to the *_yields_passed_via_d9_tolerance pattern to make D9 origin traceable in the test suite. helpers.rs is created alongside pre_review_gate.rs, extracting 7 pub(super) pure helpers to keep the parent module under the 700-line verify-module-size cap.",
+          "T002 implements the Makefile.toml half of D9: verify-spec-states-current-local gains a TRACK_ID + spec.json existence guard that emits [SKIP] and exits 0 when spec.json is absent, restoring Phase 0 CI tolerance that was lost after PR #175 introduced the gate without a skip guard.",
+          "Both tasks are done at baseline commit 7a50d745 and require no further implementation work."
+        ],
+        "task_ids": ["T001", "T002"]
+      },
+      {
+        "id": "S2",
+        "title": "D1 + D8 — New skill definition and capability entry (non-Rust artifacts)",
+        "description": [
+          "T003 authors the /track:diagnose SKILL.md at .claude/skills/diagnose/SKILL.md. The skill is a one-shot LLM-semantic diagnostic: it reads the SoT chain context (spec, catalogues, signals, source), identifies the most upstream phase where the mismatch originates, and returns a 3-field routing decision (routing_target, reason, recommended_next_action). No regex or keyword tables. No writer subagent launch — dispatch is always the calling orchestrator's responsibility. ADR not cited by date-slug path per pre-track-adr-authoring.md constraint.",
+          "T004 adds the rollback-diagnoser capability to .harness/config/agent-profiles.json with provider and model fields. The /track:diagnose skill resolves its LLM invocation target from this entry, keeping provider selection out of the skill definition and allowing override without touching SKILL.md.",
+          "S2 has no Rust source changes. These tasks have no catalogue entries in task-contract.json."
+        ],
+        "task_ids": ["T003", "T004"]
+      },
+      {
+        "id": "S3",
+        "title": "D3 — CLI driver soft prompt for /track:diagnose on Blocked (Rust behavioral change)",
+        "description": [
+          "T005 is the only remaining Rust behavioral change from D1-D8. TaskContractDriver::handle gains a soft-prompt branch: when bin/sotp task-contract check returns Blocked, stderr now includes advisory text suggesting the caller invoke /track:diagnose with the blocked entries as diagnostic input.",
+          "The public API signature of handle is unchanged; Chain 3 is already 🔵 on structural shape match. The Blocked exit code and violation list rendering are unchanged; only the soft-prompt advisory text is added per D3.",
+          "T005 is attributed to cli_driver:TaskContractDriver (and the co-located cli_driver:TaskContractInput reference entry) in task-contract.json."
+        ],
+        "task_ids": ["T005"]
+      }
+    ]
+  }
+}
