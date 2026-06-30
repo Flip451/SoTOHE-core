@@ -61,9 +61,8 @@ impl ContractedEntryRef {
 ///
 /// Maps each `TaskId` in the active track to the catalogue entries
 /// (`layer + entry_key` pairs) that the task is responsible for implementing.
-/// Validated at construction: `track_id` must be non-empty (enforced by `TrackId`),
-/// `entries` map must be non-empty, and every task must carry at least one
-/// contracted entry.
+/// An empty `entries` map is accepted; the resulting contract has nothing to
+/// verify and behaves equivalently to a missing contract file (short-circuit Passed).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TaskContractDocument {
     track_id: TrackId,
@@ -73,18 +72,19 @@ pub struct TaskContractDocument {
 impl TaskContractDocument {
     /// Construct a `TaskContractDocument`.
     ///
+    /// An empty `entries` map or tasks with empty contracted-entry lists are
+    /// accepted. Such a contract has nothing to verify and is treated the same
+    /// as a missing contract file by the pre-review gate (short-circuit Passed).
+    ///
     /// # Errors
     ///
-    /// Returns [`ValidationError::EmptyString`] when `entries` is empty or any
-    /// task has an empty contracted-entry list, since a contract with no
-    /// attributed entries is not a meaningful gating document.
+    /// None — no validation error is produced from the `entries` argument.
+    /// The `Result` return type is retained so future constraints can be added
+    /// without a signature change.
     pub fn new(
         track_id: TrackId,
         entries: BTreeMap<TaskId, Vec<ContractedEntryRef>>,
     ) -> Result<Self, ValidationError> {
-        if entries.is_empty() || entries.values().any(Vec::is_empty) {
-            return Err(ValidationError::EmptyString);
-        }
         Ok(Self { track_id, entries })
     }
 
@@ -333,17 +333,17 @@ mod tests {
     }
 
     #[test]
-    fn task_contract_document_rejects_empty_entries() {
+    fn task_contract_document_accepts_empty_entries() {
         let result = TaskContractDocument::new(track_id("my-track"), BTreeMap::new());
-        assert!(result.is_err());
+        assert!(result.is_ok());
     }
 
     #[test]
-    fn task_contract_document_rejects_empty_task_entry_list() {
+    fn task_contract_document_accepts_empty_task_entry_list() {
         let mut entries = BTreeMap::new();
         entries.insert(task_id("T001"), Vec::new());
         let result = TaskContractDocument::new(track_id("my-track"), entries);
-        assert!(result.is_err());
+        assert!(result.is_ok());
     }
 
     #[test]

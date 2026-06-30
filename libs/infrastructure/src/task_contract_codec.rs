@@ -55,7 +55,7 @@ pub enum TaskContractCodecError {
         expected: u32,
     },
 
-    /// Domain validation failure (e.g. empty entries map, invalid ids).
+    /// Domain validation failure (e.g. invalid task id or layer id).
     #[error("validation error: {0}")]
     Validation(String),
 }
@@ -149,7 +149,7 @@ pub struct ContractedEntryRefDto {
 /// - [`TaskContractCodecError::UnsupportedSchemaVersion`]: `schema_version` is
 ///   not 1.
 /// - [`TaskContractCodecError::Validation`]: domain validation of the decoded
-///   data fails (e.g. empty entries, invalid task id or layer id).
+///   data fails (e.g. invalid task id or layer id).
 pub fn decode(bytes: &[u8]) -> Result<TaskContractDocument, TaskContractCodecError> {
     let dto: TaskContractDocumentDto = serde_json::from_slice(bytes)?;
 
