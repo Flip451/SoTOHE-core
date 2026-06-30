@@ -1,6 +1,24 @@
 {
   "schema_version": 2,
   "scopes": {
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:328569c23ffb36c16b693609f523b9067d53898d7d6c943c08a515525f565241",
+          "at": "2026-06-30T09:49:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:328569c23ffb36c16b693609f523b9067d53898d7d6c943c08a515525f565241",
+          "at": "2026-06-30T09:52:53Z"
+        }
+      ]
+    },
     "harness-policy": {
       "rounds": [
         {
@@ -133,24 +151,35 @@
           "findings": [],
           "hash": "rvw1:sha256:aeca131831badc7d6f4debcc351db64156ca20a53d7071b88eedd33b738e0ffe",
           "at": "2026-06-30T11:40:13Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 3.1 now says the lifecycle tail commit should stage review-operational artifacts produced by the tail review refresh (for example `review.json` and `<layer>-type-signals.json`), but Step 5 still aborts whenever `git status --short` contains anything outside `impl-plan.json` and `plan.md`. After a successful refresh, the workflow can legitimately have those extra files present and will then fail its own completion check.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.harness/workflows/track/full-cycle.md",
+              "line": 181,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:aea8797c2b5aab004f3002636af5c8dc27e0b87c9b70ab190ab3b327bb92cf7f",
+          "at": "2026-06-30T12:16:13Z"
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:328569c23ffb36c16b693609f523b9067d53898d7d6c943c08a515525f565241",
-          "at": "2026-06-30T09:49:29Z"
+          "hash": "rvw1:sha256:6e4f5b1f08809a36fda717cbe117e1e8fbafea35a0ea428445886d8251b6236c",
+          "at": "2026-06-30T12:19:48Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:328569c23ffb36c16b693609f523b9067d53898d7d6c943c08a515525f565241",
-          "at": "2026-06-30T09:52:53Z"
+          "hash": "rvw1:sha256:6e4f5b1f08809a36fda717cbe117e1e8fbafea35a0ea428445886d8251b6236c",
+          "at": "2026-06-30T12:23:49Z"
         }
       ]
     },

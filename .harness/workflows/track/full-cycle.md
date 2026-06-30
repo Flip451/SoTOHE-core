@@ -178,15 +178,20 @@ Procedure (after Step 3 of the **last** batch):
      `bin/sotp review check-approved` before committing, and after Step 3 mutates
      `impl-plan.json` / `plan.md`, the previous `plan-artifacts` review hash is stale.
 3. After the tail review refresh succeeds, stage and commit the lifecycle diff:
-   ```
-   cargo make add-all
-   # write: ops(track): D4 hash backfill for batch <name> (post-commit lifecycle)
-   cargo make track-commit-message
-   cargo make track-note  # optional but recommended
-   ```
-4. If no `impl-plan.json` / `plan.md` modifications are present, skip this step.
-5. If `git status --short` shows files outside the two expected paths, stop and report —
-   unexpected dirty state must be investigated before declaring the loop complete.
+   1. Run `cargo make add-all` to stage the D4 backfill (plus any review-operational artifacts produced by Step 2's review refresh, e.g. `review.json` / `<layer>-type-signals.json`).
+   2. Write the lifecycle tail commit message to `tmp/track-commit/commit-message.txt`. The wrapper in the next step reads this exact path (`bin/sotp git commit-from-file tmp/track-commit/commit-message.txt --cleanup`), so the file must exist before invoking it. A typical message is:
+
+      ```
+      ops(track): D4 hash backfill for batch <name> (post-commit lifecycle)
+      ```
+   3. Run `cargo make track-commit-message`. The wrapper runs CI + `bin/sotp review check-approved` + the DRY-gate precondition, then commits from the file and deletes it on success.
+   4. (Optional, recommended) Attach a git note via `cargo make track-note` (write `tmp/track-commit/note.md` first; the wrapper consumes that path).
+4. If no `impl-plan.json` / `plan.md` modifications were present in Step 1, skip this step.
+5. After Step 2, dirty files may include the two plan artifacts plus review-operational
+   artifacts produced by the refresh and staged by Step 3. If `git status --short` shows any
+   other files before the commit, stop and report. After `cargo make track-commit-message`
+   succeeds, `git status --short` must be empty; any remaining dirty file is unexpected and
+   must be investigated before declaring the loop complete.
 
 The workflow completes only when `git status --short` is empty after this step.
 
