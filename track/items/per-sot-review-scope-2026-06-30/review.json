@@ -31,6 +31,95 @@
           "findings": [],
           "hash": "rvw1:sha256:56a4f06f09b3140d59d2f92eeeeb2572a1211512832de8a9a00013b6b2d22418",
           "at": "2026-06-30T16:41:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`grep -r 'plan-artifacts' .` will also match this track's own plan artifacts (`plan.md`, `impl-plan.json`, `spec.json`, etc.), which still contain many planned uses of the term and are not scheduled for rewrite. As written, T005 cannot ever satisfy AC-13 unless the search scope excludes the track artifact directory or these files are rewritten too.",
+              "severity": "P1",
+              "file": "track/items/per-sot-review-scope-2026-06-30/plan.md",
+              "line": 39,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:057b7036272adcb6a67c166bce62a7801be9aad231c0a8faec5f7df419557170",
+          "at": "2026-06-30T17:24:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`task-coverage.json` only maps `IN-*` / `OS-*` / `CN-*` / `AC-*` entries to tasks; the three `GO-*` spec elements in `spec.md` are never assigned anywhere. That leaves 3 of the 28 stated spec elements without task coverage, so the plan's full-coverage claim is not actually represented by the artifact set.",
+              "severity": "P1",
+              "file": "track/items/per-sot-review-scope-2026-06-30/task-coverage.json",
+              "line": 3,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:2d1967044049a092e3afc27997708605c91562008c7e3567f353381d0680f711",
+          "at": "2026-06-30T17:31:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AC-10` requires removing `plan-artifacts` from both the `Mission` and `Trigger inputs` sections of `.harness/capabilities/rollback-diagnoser.md`, but `T003` only schedules edits for `Trigger inputs` plus the other trigger-description mirrors. If the `Mission` section still contains the old scope name, this plan leaves a required acceptance criterion unmet.",
+              "severity": "P1",
+              "file": "track/items/per-sot-review-scope-2026-06-30/impl-plan.json",
+              "line": 17,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:1c6d2b4c747a3036ea21092e5768afa7d6110d282d6184e6805d3666d0db88b9",
+          "at": "2026-06-30T17:39:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:896a7798ae83c52209a26609a1d7847f337bd89eaf894d80df51156644c330fa",
+          "at": "2026-06-30T17:45:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 narrows the rollback-diagnoser migration to `impl-plan scope` everywhere, but the spec’s stated goal is to replace the old `plan-artifacts` review surface with four SoT scopes (`adr` / `spec` / `types` / `impl-plan`) while keeping rollback-diagnoser aligned with those boundaries. Since the old `plan-artifacts findings` trigger covered findings from all upstream plan artifacts, changing it only to `impl-plan` drops `adr`, `spec`, and `types` review findings from the documented diagnoser trigger path. Update the task/AC wording to cover the relevant SoT review scopes, or explicitly justify why only impl-plan findings should be diagnosable.",
+              "severity": "P1",
+              "file": "track/items/per-sot-review-scope-2026-06-30/impl-plan.json",
+              "line": 18,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:896a7798ae83c52209a26609a1d7847f337bd89eaf894d80df51156644c330fa",
+          "at": "2026-06-30T17:51:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T005's verification is scoped too narrowly to satisfy CN-04's requirement that no live `plan-artifacts` scope-name references remain. The plan only greps T001-T004's listed change surface, but current non-historical docs outside that list still use the old scope name, for example `.claude/skills/diagnose/SKILL.md` refers to `/track:review plan-artifacts findings` and `knowledge/conventions/enforce-by-mechanism.md` says ADR changes are reviewed by the `plan-artifacts` scope. Since those files are not included in T003/T005, the implementation can complete while leaving stale operational guidance that points reviewers at the deleted scope.",
+              "severity": "P1",
+              "file": "track/items/per-sot-review-scope-2026-06-30/impl-plan.json",
+              "line": 30,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:fd7ff2c57a91e696cffe7c2378531338989c9ee1937f70cb2ac57fdce4df60ca",
+          "at": "2026-06-30T17:57:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:45a4cde78dcd6a0f3323486f96ed4f76ef7c0682c3ce62d7d30486ac43268dd3",
+          "at": "2026-06-30T18:06:43Z"
         }
       ]
     }
