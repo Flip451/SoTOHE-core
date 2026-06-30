@@ -1,0 +1,38 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e73bafee0c1eb87a122ec2734f118e946424b7b4fb457b3b55cbe11f2f7027ed",
+          "at": "2026-06-30T16:34:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2's `impl-plan` scope preserves `impl-plan.json` and `task-coverage.json` but omits `task-contract.json`. In this repository `task-contract.json` is an accepted Phase 3 artifact authored by `impl-planner` and consumed by the pre-review `task-contract` gate; the current `plan-artifacts` glob covers it via `track/items/<track-id>/**`. With the proposed split it falls into implicit `other`, leaving a Phase 3 SoT/pre-review contract artifact without a semantic review scope. Add it to `impl-plan` or explicitly classify it as operational if it is intentionally excluded.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-30-1549-per-sot-review-scope.md",
+              "line": 52,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e73bafee0c1eb87a122ec2734f118e946424b7b4fb457b3b55cbe11f2f7027ed",
+          "at": "2026-06-30T16:37:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:56a4f06f09b3140d59d2f92eeeeb2572a1211512832de8a9a00013b6b2d22418",
+          "at": "2026-06-30T16:41:18Z"
+        }
+      ]
+    }
+  }
+}

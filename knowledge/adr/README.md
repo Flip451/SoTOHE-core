@@ -227,3 +227,4 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [PR レビュー結果を解釈せず最新ラウンドのコメントを agent に渡す](2026-05-29-0526-pr-review-comment-passthrough.md) | — | 2026-05-29 |
 | [review fixer がスコープ境界を自己解決する — `--scope-files` 廃止](2026-06-01-2300-review-fixer-self-resolve-scope-files.md) | — | 2026-06-01 |
 | [レイヤー別 reviewer briefing prompt の導入と review-prompts ディレクトリの再配置](2026-06-18-1406-review-prompts-relocation-per-layer-briefings.md) | — | 2026-06-18 |
+| [内容レビューの SoT 別スコープ化](2026-06-30-1549-per-sot-review-scope.md) | — | 2026-06-30 |
