@@ -1,42 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:328569c23ffb36c16b693609f523b9067d53898d7d6c943c08a515525f565241",
-          "at": "2026-06-30T09:49:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:328569c23ffb36c16b693609f523b9067d53898d7d6c943c08a515525f565241",
-          "at": "2026-06-30T09:52:53Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:79f00ffc9ebda667175c2b60b41d6553458fa755bf5309ddbb1b534d57058d19",
-          "at": "2026-06-30T09:49:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:79f00ffc9ebda667175c2b60b41d6553458fa755bf5309ddbb1b534d57058d19",
-          "at": "2026-06-30T09:52:54Z"
-        }
-      ]
-    },
     "harness-policy": {
       "rounds": [
         {
@@ -172,6 +136,42 @@
         }
       ]
     },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:328569c23ffb36c16b693609f523b9067d53898d7d6c943c08a515525f565241",
+          "at": "2026-06-30T09:49:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:328569c23ffb36c16b693609f523b9067d53898d7d6c943c08a515525f565241",
+          "at": "2026-06-30T09:52:53Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:79f00ffc9ebda667175c2b60b41d6553458fa755bf5309ddbb1b534d57058d19",
+          "at": "2026-06-30T09:49:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:79f00ffc9ebda667175c2b60b41d6553458fa755bf5309ddbb1b534d57058d19",
+          "at": "2026-06-30T09:52:54Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -244,6 +244,35 @@
           "findings": [],
           "hash": "rvw1:sha256:7566f7b2dec8ccae669b77aa5c29c91e42d28312b28ff04a5ec2993f8ac41b36",
           "at": "2026-06-30T10:30:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0de20162d7ed7660e6c33c27f5abad43bf317bdcf99a9fdc3c016a440c9aea76",
+          "at": "2026-06-30T11:47:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The briefing states this lifecycle-tail round should modify only `impl-plan.json` and `plan.md`, and says any other plan-artifact change is an immediate finding. `git diff --name-status` shows additional modified plan artifacts: `cli-type-signals.json`, `cli_composition-type-signals.json`, `cli_driver-type-signals.json`, `domain-type-signals.json`, `infrastructure-type-signals.json`, `review.json`, and `usecase-type-signals.json`. That contradicts the round's stated D4 hash-backfill-only intent and should be reverted or explicitly re-scoped before approval.",
+              "severity": "P1",
+              "file": null,
+              "line": null,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0de20162d7ed7660e6c33c27f5abad43bf317bdcf99a9fdc3c016a440c9aea76",
+          "at": "2026-06-30T11:50:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0de20162d7ed7660e6c33c27f5abad43bf317bdcf99a9fdc3c016a440c9aea76",
+          "at": "2026-06-30T11:54:52Z"
         }
       ]
     }
