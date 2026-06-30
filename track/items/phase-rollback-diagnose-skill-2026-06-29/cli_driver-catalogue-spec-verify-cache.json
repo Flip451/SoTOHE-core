@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "layer": "cli_driver",
+  "entries": [
+    {
+      "claim_hash": "f09546865eab8135e4931a9f357386110dc9ec34b20236304a5580b026cbd3e1",
+      "evidence_hash": "92bb37c213afa49455a311e933f40d2bfe8867dc45a9e8e5cc1a36ec2ba28ea8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp task-contract check`（PreReviewGate）が `PreReviewGateOutcome::Blocked` を返す際の stderr / 出力に `/track:diagnose` の呼び出しを推奨する soft prompt を含める。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/phase-rollback-diagnose-skill-2026-06-29/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "TaskContractDriver"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "`bin/sotp task-contract check`（PreReviewGate）が `PreReviewGateOutcome::Blocked` を返す際の stderr / 出力に `/track:diagnose` の呼び出しを推奨する soft prompt を含める。orchestrator は Blocked exit code とこの prompt を見て `/track:diagnose` を invoke するか自前で原因分類するかを判断する。新たな PreToolUse hook や lock file / bypass 機構は導入しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f09546865eab8135e4931a9f357386110dc9ec34b20236304a5580b026cbd3e1",
+      "evidence_hash": "7f4452084b326714ab33e0152b9238eecabb6bd2ee575d56f9b768fe516b41e3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp task-contract check`（PreReviewGate）が `PreReviewGateOutcome::Blocked` を返す際の stderr / stdout 出力に `/track:diagnose` の呼び出しを推奨するテキスト（soft prompt）が含まれている。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/phase-rollback-diagnose-skill-2026-06-29/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "TaskContractDriver"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "`bin/sotp task-contract check`（PreReviewGate）が `PreReviewGateOutcome::Blocked` を返す際の stderr / stdout 出力に `/track:diagnose` の呼び出しを推奨するテキスト（soft prompt）が含まれている。"
+        }
+      }
+    }
+  ]
+}

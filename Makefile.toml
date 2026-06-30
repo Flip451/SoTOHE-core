@@ -325,9 +325,18 @@ args = ["run", "--quiet", "-p", "cli", "--", "signal", "check-adr-user", "--gate
 
 [tasks.verify-spec-states-current-local]
 private = true
-description = "[internal] Chain ① spec→ADR signal gate. Active track + spec.json path are resolved inside the CLI from the current git branch. Track-aware task: only invoked via ci-track-container / ci-track-local (PR CI, never push/main)."
-command = "cargo"
-args = ["run", "--quiet", "-p", "cli", "--", "signal", "check-spec-adr", "--gate", "commit"]
+description = "[internal] Chain ① spec→ADR signal gate. Active track auto-resolved from current branch; graceful skip when spec.json is absent (Phase 0 / pre-Phase-1 tracks — see ADR knowledge/adr/2026-06-03-1241-spec-states-gate-tolerate-missing-spec-artifact.md). Track-aware task: only invoked via ci-track-container / ci-track-local (PR CI, never push/main); the parent already fails-closed on non-track branches so the inner shell skips only on absent spec.json, not on branch shape."
+script_runner = "@shell"
+script = ['''
+BRANCH="$(git symbolic-ref --quiet --short HEAD 2>/dev/null || true)"
+TRACK_ID="${BRANCH#track/}"
+SPEC_JSON="track/items/${TRACK_ID}/spec.json"
+if [ ! -f "$SPEC_JSON" ]; then
+  echo "[SKIP] signal check-spec-adr: spec.json absent (Phase 0 / pre-Phase-1 track ${TRACK_ID})"
+  exit 0
+fi
+cargo run --quiet -p cli -- signal check-spec-adr --gate commit --spec-json "$SPEC_JSON"
+''']
 
 [tasks.signal-check-impl-catalog-local]
 private = true

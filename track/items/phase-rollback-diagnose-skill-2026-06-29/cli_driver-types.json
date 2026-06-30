@@ -1,0 +1,107 @@
+{
+  "schema_version": 5,
+  "crate_name": "cli_driver",
+  "layer": "cli_driver",
+  "types": {
+    "TaskContractDriver": {
+      "action": "modify",
+      "role": { "PrimaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "task_contract",
+      "docs": "CLI adapter for task-contract commands. D3 (ADR 2026-06-26-0503): the handle method gains a soft-prompt branch — when the gate returns Blocked, stderr includes a recommendation to call /track:diagnose. All fields are private (Arc<dyn Service>).",
+      "spec_refs": [
+        {
+          "file": "track/items/phase-rollback-diagnose-skill-2026-06-29/spec.json",
+          "anchor": "IN-04"
+        },
+        {
+          "file": "track/items/phase-rollback-diagnose-skill-2026-06-29/spec.json",
+          "anchor": "AC-03"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "TaskContractInput": {
+      "action": "reference",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Check",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "layer", "ty": "Option<String>" },
+                { "name": "track_id", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "Coverage",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "track_id", "ty": "String" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "task_contract",
+      "docs": "CLI input DTO capturing raw clap arguments before domain validation. Defined in the previous track; unchanged by this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [
+    {
+      "type_name": "TaskContractDriver",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "check_service", "ty": "std::sync::Arc<dyn usecase::pre_review_gate::PreReviewGateService>" },
+            { "name": "coverage_service", "ty": "std::sync::Arc<dyn usecase::pre_review_gate::CoverageVerifyService>" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "handle",
+          "receiver": "&self",
+          "params": [
+            { "name": "input", "ty": "TaskContractInput" }
+          ],
+          "returns": "CommandOutcome",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    { "action": "modify", "trait_ref": "core::fmt::Debug", "for_type": "TaskContractDriver" },
+    { "action": "reference", "trait_ref": "core::fmt::Debug", "for_type": "TaskContractInput" },
+    { "action": "reference", "trait_ref": "core::clone::Clone", "for_type": "TaskContractInput" }
+  ]
+}

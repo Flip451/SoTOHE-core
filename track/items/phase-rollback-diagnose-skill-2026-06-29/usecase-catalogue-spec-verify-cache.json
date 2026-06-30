@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "layer": "usecase",
+  "entries": [
+    {
+      "claim_hash": "c44601b8a2d77a81ae9ee71fecb1c608bbc7fe90b2a67a3f8e647d655e119f69",
+      "evidence_hash": "39df5c1a29b4300c803acad97f7010220c7722acbdf4563b3bfa548d0ba7f429",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`task-contract.json` が不在（pre-impl phase）の場合に `Blocked` / `MissingTaskContract` ではなく `Passed` を返す。`task-contract.json` が存在する場合の entries coverage / impl_catalog liveness 評価は不変"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/phase-rollback-diagnose-skill-2026-06-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CoverageVerifyInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "D9 hotfix（baseline commit `7a50d745` 実装済み）: `libs/usecase/src/pre_review_gate.rs` の `PreReviewGateInteractor::check` と `CoverageVerifyInteractor::verify_coverage` を修正し、`task-contract.json` が不在（pre-impl phase）の場合に `Blocked` / `MissingTaskContract` ではなく `Passed` を返す。`task-contract.json` が存在する場合の entries coverage / impl_catalog liveness 評価は不変とし、fail-open は作らない。将来の精緻化（「impl-plan 存在時の task-contract 欠損」型 violation）に備え、missing-task-contract violation の概念は残す。テスト関数は `*_yields_passed_via_d9_tolerance` のパターンで改名して D9 起源を追跡可能にする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c44601b8a2d77a81ae9ee71fecb1c608bbc7fe90b2a67a3f8e647d655e119f69",
+      "evidence_hash": "314e99c3bedf6a811552801c2e970b9f59cc4c9490ab12309052120d22326a41",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`CoverageVerifyInteractor::verify_coverage` が `task-contract.json` 不在時に `Passed` を返す。少なくとも 1 つの test 関数が `*_yields_passed_via_d9_tolerance` パターンの名前を持ちこの挙動を検証している。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/phase-rollback-diagnose-skill-2026-06-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CoverageVerifyInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "`libs/usecase/src/pre_review_gate.rs` — `CoverageVerifyInteractor::verify_coverage` が `task-contract.json` 不在時に `Passed` を返す。少なくとも 1 つの test 関数が `*_yields_passed_via_d9_tolerance` パターンの名前を持ちこの挙動を検証している。（baseline commit `7a50d745` 実装済み）"
+        }
+      }
+    },
+    {
+      "claim_hash": "7c7ab8d8883c08591b9718549368182994ed25762ed26843d5fc6244d7c7f29d",
+      "evidence_hash": "39df5c1a29b4300c803acad97f7010220c7722acbdf4563b3bfa548d0ba7f429",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`task-contract.json` が不在（pre-impl phase）の場合に `Blocked` / `MissingTaskContract` ではなく `Passed` を返す。... 将来の精緻化（「impl-plan 存在時の task-contract 欠損」型 violation）に備え、missing-task-contract violation の概念は残す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/phase-rollback-diagnose-skill-2026-06-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "D9 hotfix（baseline commit `7a50d745` 実装済み）: `libs/usecase/src/pre_review_gate.rs` の `PreReviewGateInteractor::check` と `CoverageVerifyInteractor::verify_coverage` を修正し、`task-contract.json` が不在（pre-impl phase）の場合に `Blocked` / `MissingTaskContract` ではなく `Passed` を返す。`task-contract.json` が存在する場合の entries coverage / impl_catalog liveness 評価は不変とし、fail-open は作らない。将来の精緻化（「impl-plan 存在時の task-contract 欠損」型 violation）に備え、missing-task-contract violation の概念は残す。テスト関数は `*_yields_passed_via_d9_tolerance` のパターンで改名して D9 起源を追跡可能にする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c670ff6495b7e8b6b4f10d2ffbaac339e940d7c6d49c228094fc7015a1f6b43e",
+      "evidence_hash": "39df5c1a29b4300c803acad97f7010220c7722acbdf4563b3bfa548d0ba7f429",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`task-contract.json` が不在（pre-impl phase）の場合に `Blocked` / `MissingTaskContract` ではなく `Passed` を返す。`task-contract.json` が存在する場合の entries coverage / impl_catalog liveness 評価は不変とし、fail-open は作らない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/phase-rollback-diagnose-skill-2026-06-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "D9 hotfix（baseline commit `7a50d745` 実装済み）: `libs/usecase/src/pre_review_gate.rs` の `PreReviewGateInteractor::check` と `CoverageVerifyInteractor::verify_coverage` を修正し、`task-contract.json` が不在（pre-impl phase）の場合に `Blocked` / `MissingTaskContract` ではなく `Passed` を返す。`task-contract.json` が存在する場合の entries coverage / impl_catalog liveness 評価は不変とし、fail-open は作らない。将来の精緻化（「impl-plan 存在時の task-contract 欠損」型 violation）に備え、missing-task-contract violation の概念は残す。テスト関数は `*_yields_passed_via_d9_tolerance` のパターンで改名して D9 起源を追跡可能にする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c670ff6495b7e8b6b4f10d2ffbaac339e940d7c6d49c228094fc7015a1f6b43e",
+      "evidence_hash": "5a528a73e2589cd00033918d089df940f0a5a84373e703ba984e6d3bb06eb603",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`PreReviewGateInteractor::check` が `task-contract.json` 不在時に `PreReviewGateOutcome::Passed` を返す。`task-contract.json` が存在する場合の entries coverage / liveness 評価は不変。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/phase-rollback-diagnose-skill-2026-06-29/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "`libs/usecase/src/pre_review_gate.rs` — `PreReviewGateInteractor::check` が `task-contract.json` 不在時に `PreReviewGateOutcome::Passed` を返す。`task-contract.json` が存在する場合の entries coverage / liveness 評価は不変。少なくとも 1 つの test 関数が `*_yields_passed_via_d9_tolerance` パターンの名前を持ちこの挙動を検証している。（baseline commit `7a50d745` 実装済み）"
+        }
+      }
+    }
+  ]
+}

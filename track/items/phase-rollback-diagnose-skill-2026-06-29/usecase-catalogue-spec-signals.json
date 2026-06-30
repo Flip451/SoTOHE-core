@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "15e8113da6a2e19ae18f8b9af7ba6e7b2e53547ba48ac3c52dbe1bc1cc8e091b",
+  "signals": [
+    {
+      "type_name": "CoverageVerifyCommand",
+      "signal": "blue",
+      "entry_hash": "9fb430e1b8479275fbf7523cd608217955933852f073b01c69ec42301d660281"
+    },
+    {
+      "type_name": "CoverageVerifyInteractor",
+      "signal": "blue",
+      "entry_hash": "c44601b8a2d77a81ae9ee71fecb1c608bbc7fe90b2a67a3f8e647d655e119f69"
+    },
+    {
+      "type_name": "PreReviewGateCommand",
+      "signal": "blue",
+      "entry_hash": "d14b1ed1ea093629fa9bf65ae3406dccc33f6b463b3ca6accfa65af499bd5418"
+    },
+    {
+      "type_name": "PreReviewGateError",
+      "signal": "blue",
+      "entry_hash": "7c7ab8d8883c08591b9718549368182994ed25762ed26843d5fc6244d7c7f29d"
+    },
+    {
+      "type_name": "PreReviewGateInteractor",
+      "signal": "blue",
+      "entry_hash": "c670ff6495b7e8b6b4f10d2ffbaac339e940d7c6d49c228094fc7015a1f6b43e"
+    },
+    {
+      "type_name": "CoverageVerifyService",
+      "signal": "blue",
+      "entry_hash": "cee655f7c8ec629db623d89fdd4df5d52f8b0749a922ee3843fcd9c8b8218a68"
+    },
+    {
+      "type_name": "ImplCatalogSignalReaderPort",
+      "signal": "blue",
+      "entry_hash": "fafb81ab2f614393bfaa27798f76d21a3b82ec9cb2d16fcc15a203c5afe91215"
+    },
+    {
+      "type_name": "ImplPlanReaderPort",
+      "signal": "blue",
+      "entry_hash": "f2d3256d4afa4caded07c06eecf0dbb897aebc30d7d7bcbd1bfb067833adf631"
+    },
+    {
+      "type_name": "PreReviewGateService",
+      "signal": "blue",
+      "entry_hash": "a5224fac7ca7f0b5205743dd5814e64263a671cc78c8ea7cd5731ef00596b658"
+    },
+    {
+      "type_name": "TaskContractReaderPort",
+      "signal": "blue",
+      "entry_hash": "bf8954285beccb95af00d33e93c3fa9218dfcf9adeaeac9109fb8ed4a5dca3d4"
+    }
+  ]
+}

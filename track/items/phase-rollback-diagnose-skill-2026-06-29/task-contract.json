@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "track_id": "phase-rollback-diagnose-skill-2026-06-29",
+  "entries": {
+    "T001": [
+      { "layer": "usecase", "entry_key": "PreReviewGateInteractor" },
+      { "layer": "usecase", "entry_key": "CoverageVerifyInteractor" },
+      { "layer": "usecase", "entry_key": "CoverageVerifyCommand" },
+      { "layer": "usecase", "entry_key": "CoverageVerifyService" },
+      { "layer": "usecase", "entry_key": "ImplCatalogSignalReaderPort" },
+      { "layer": "usecase", "entry_key": "ImplPlanReaderPort" },
+      { "layer": "usecase", "entry_key": "PreReviewGateCommand" },
+      { "layer": "usecase", "entry_key": "PreReviewGateError" },
+      { "layer": "usecase", "entry_key": "PreReviewGateService" },
+      { "layer": "usecase", "entry_key": "TaskContractReaderPort" }
+    ],
+    "T005": [
+      { "layer": "cli_driver", "entry_key": "TaskContractDriver" },
+      { "layer": "cli_driver", "entry_key": "TaskContractInput" }
+    ]
+  }
+}
