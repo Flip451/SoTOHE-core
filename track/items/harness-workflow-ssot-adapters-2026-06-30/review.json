@@ -19,6 +19,128 @@
         }
       ]
     },
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c7f9edafa82a6f4e3c0fcdc15be16b9a621924ac4ec0e1d01c040bb625a5fd3f",
+          "at": "2026-06-30T08:16:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c7f9edafa82a6f4e3c0fcdc15be16b9a621924ac4ec0e1d01c040bb625a5fd3f",
+          "at": "2026-06-30T08:20:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6136654197e24a2b6311ebafe05a35ca4d07b20be68693dfebd6b49d7a6dbd90",
+          "at": "2026-06-30T09:04:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`task-coverage.json` assigns CN-05 to T004, and the rendered spec shows T004 as a CN-05 task, but CN-05 specifically requires adapters to reference `.harness/workflows/track/<name>.md`. T004 is for capability adapters whose SSoT is `.harness/capabilities/review-fix-lead.md` / `dry-fix-lead.md`, so this coverage is semantically inconsistent and can steer implementers toward the wrong SSoT path for capability adapters. Remove T004 from CN-05 coverage or broaden CN-05 to cover capability SSoT paths explicitly.",
+              "severity": "P1",
+              "file": "track/items/harness-workflow-ssot-adapters-2026-06-30/task-coverage.json",
+              "line": 22,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:6136654197e24a2b6311ebafe05a35ca4d07b20be68693dfebd6b49d7a6dbd90",
+          "at": "2026-06-30T09:10:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:172f02e58841090a2630b1621dfbfe70cd5cf61ca132b778bbb8a805a2d2a7b5",
+          "at": "2026-06-30T09:15:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bdc52c4ed2b90af15e520cd4930181f2420bc8622a34e21f54bc10d1a91fc834",
+          "at": "2026-06-30T09:49:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bdc52c4ed2b90af15e520cd4930181f2420bc8622a34e21f54bc10d1a91fc834",
+          "at": "2026-06-30T09:53:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7566f7b2dec8ccae669b77aa5c29c91e42d28312b28ff04a5ec2993f8ac41b36",
+          "at": "2026-06-30T10:26:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7566f7b2dec8ccae669b77aa5c29c91e42d28312b28ff04a5ec2993f8ac41b36",
+          "at": "2026-06-30T10:30:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0de20162d7ed7660e6c33c27f5abad43bf317bdcf99a9fdc3c016a440c9aea76",
+          "at": "2026-06-30T11:47:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The briefing states this lifecycle-tail round should modify only `impl-plan.json` and `plan.md`, and says any other plan-artifact change is an immediate finding. `git diff --name-status` shows additional modified plan artifacts: `cli-type-signals.json`, `cli_composition-type-signals.json`, `cli_driver-type-signals.json`, `domain-type-signals.json`, `infrastructure-type-signals.json`, `review.json`, and `usecase-type-signals.json`. That contradicts the round's stated D4 hash-backfill-only intent and should be reverted or explicitly re-scoped before approval.",
+              "severity": "P1",
+              "file": null,
+              "line": null,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0de20162d7ed7660e6c33c27f5abad43bf317bdcf99a9fdc3c016a440c9aea76",
+          "at": "2026-06-30T11:50:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0de20162d7ed7660e6c33c27f5abad43bf317bdcf99a9fdc3c016a440c9aea76",
+          "at": "2026-06-30T11:54:52Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:79f00ffc9ebda667175c2b60b41d6553458fa755bf5309ddbb1b534d57058d19",
+          "at": "2026-06-30T09:49:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:79f00ffc9ebda667175c2b60b41d6553458fa755bf5309ddbb1b534d57058d19",
+          "at": "2026-06-30T09:52:54Z"
+        }
+      ]
+    },
     "harness-policy": {
       "rounds": [
         {
@@ -180,128 +302,20 @@
           "findings": [],
           "hash": "rvw1:sha256:6e4f5b1f08809a36fda717cbe117e1e8fbafea35a0ea428445886d8251b6236c",
           "at": "2026-06-30T12:23:49Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:79f00ffc9ebda667175c2b60b41d6553458fa755bf5309ddbb1b534d57058d19",
-          "at": "2026-06-30T09:49:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:79f00ffc9ebda667175c2b60b41d6553458fa755bf5309ddbb1b534d57058d19",
-          "at": "2026-06-30T09:52:54Z"
-        }
-      ]
-    },
-    "plan-artifacts": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c7f9edafa82a6f4e3c0fcdc15be16b9a621924ac4ec0e1d01c040bb625a5fd3f",
-          "at": "2026-06-30T08:16:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c7f9edafa82a6f4e3c0fcdc15be16b9a621924ac4ec0e1d01c040bb625a5fd3f",
-          "at": "2026-06-30T08:20:32Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:6136654197e24a2b6311ebafe05a35ca4d07b20be68693dfebd6b49d7a6dbd90",
-          "at": "2026-06-30T09:04:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`task-coverage.json` assigns CN-05 to T004, and the rendered spec shows T004 as a CN-05 task, but CN-05 specifically requires adapters to reference `.harness/workflows/track/<name>.md`. T004 is for capability adapters whose SSoT is `.harness/capabilities/review-fix-lead.md` / `dry-fix-lead.md`, so this coverage is semantically inconsistent and can steer implementers toward the wrong SSoT path for capability adapters. Remove T004 from CN-05 coverage or broaden CN-05 to cover capability SSoT paths explicitly.",
-              "severity": "P1",
-              "file": "track/items/harness-workflow-ssot-adapters-2026-06-30/task-coverage.json",
-              "line": 22,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:6136654197e24a2b6311ebafe05a35ca4d07b20be68693dfebd6b49d7a6dbd90",
-          "at": "2026-06-30T09:10:22Z"
+          "hash": "rvw1:sha256:22a1e1e1742712f7244f8f85e21ea8ddc6685af2871ac0566af6efb9bd990b26",
+          "at": "2026-06-30T12:35:36Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:172f02e58841090a2630b1621dfbfe70cd5cf61ca132b778bbb8a805a2d2a7b5",
-          "at": "2026-06-30T09:15:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bdc52c4ed2b90af15e520cd4930181f2420bc8622a34e21f54bc10d1a91fc834",
-          "at": "2026-06-30T09:49:42Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bdc52c4ed2b90af15e520cd4930181f2420bc8622a34e21f54bc10d1a91fc834",
-          "at": "2026-06-30T09:53:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7566f7b2dec8ccae669b77aa5c29c91e42d28312b28ff04a5ec2993f8ac41b36",
-          "at": "2026-06-30T10:26:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7566f7b2dec8ccae669b77aa5c29c91e42d28312b28ff04a5ec2993f8ac41b36",
-          "at": "2026-06-30T10:30:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0de20162d7ed7660e6c33c27f5abad43bf317bdcf99a9fdc3c016a440c9aea76",
-          "at": "2026-06-30T11:47:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The briefing states this lifecycle-tail round should modify only `impl-plan.json` and `plan.md`, and says any other plan-artifact change is an immediate finding. `git diff --name-status` shows additional modified plan artifacts: `cli-type-signals.json`, `cli_composition-type-signals.json`, `cli_driver-type-signals.json`, `domain-type-signals.json`, `infrastructure-type-signals.json`, `review.json`, and `usecase-type-signals.json`. That contradicts the round's stated D4 hash-backfill-only intent and should be reverted or explicitly re-scoped before approval.",
-              "severity": "P1",
-              "file": null,
-              "line": null,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:0de20162d7ed7660e6c33c27f5abad43bf317bdcf99a9fdc3c016a440c9aea76",
-          "at": "2026-06-30T11:50:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0de20162d7ed7660e6c33c27f5abad43bf317bdcf99a9fdc3c016a440c9aea76",
-          "at": "2026-06-30T11:54:52Z"
+          "hash": "rvw1:sha256:22a1e1e1742712f7244f8f85e21ea8ddc6685af2871ac0566af6efb9bd990b26",
+          "at": "2026-06-30T12:38:41Z"
         }
       ]
     }

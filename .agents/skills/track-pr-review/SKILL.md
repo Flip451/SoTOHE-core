@@ -27,6 +27,8 @@ or failure-recovery procedures here.
 
 - PR creation and push are performed via `bin/sotp pr` and `cargo make track-pr-push`.
 - PR-level review is triggered via `cargo make track-pr-review` (which dispatches `@codex review`).
+- Codex-specific prerequisite: the **Codex Cloud GitHub App** must be installed on the
+  repository so `@codex review` is acted upon.
 
 ### (4) Reporting format
 

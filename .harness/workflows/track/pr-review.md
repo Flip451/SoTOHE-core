@@ -25,7 +25,10 @@ separate caller decision.
   for local review leaves PR-based review on the `pr-reviewer` provider unchanged.
 - **`gh` CLI** — must be authenticated.
 - **`bin/sotp pr ensure-pr`** — used to create or reuse the PR.
-- **Codex Cloud GitHub App** — must be installed on the repository (for structured PR review).
+- **Provider-specific PR-review backend** — whatever the active `pr-reviewer` provider requires
+  must be set up. Concrete prerequisites (e.g. a specific GitHub App, API key, webhook) live in
+  the per-provider adapter (`.claude/commands/track/pr-review.md` /
+  `.agents/skills/track-pr-review/SKILL.md`), not in this workflow SSoT.
 
 ## Sequence
 
