@@ -67,6 +67,15 @@ Report findings ONLY for the following categories:
   durable reference; a `knowledge/conventions/**` rule that points at a
   removed file. Cite `knowledge/conventions/responsibility-boundary.md`
   for the distribution surface boundary.
+- **adapter-SSoT 同期 check**: `harness-policy` review scope が trigger されたとき、
+  adapter と workflow SSoT の整合について以下の 3 要件を adapter / SSoT 両方について検査する。
+  - adapter (`.claude/commands/track/*.md` および `.agents/skills/track-*/SKILL.md`)
+    が冒頭で明示する `.harness/workflows/<path>.md` が実在すること。
+  - adapter 本文に workflow logic (step 番号、gate 条件、状態遷移、失敗復旧手順) が
+    長文複製されていないこと。
+  - workflow SSoT (`.harness/workflows/**/*.md`) に provider 固有の起動細部
+    (subagent / skill 起動方法、provider 固有の sandbox / 権限 flag 等) が
+    漏れ込んでいないこと。
 
 ## What NOT to report
 
