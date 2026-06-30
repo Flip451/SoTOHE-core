@@ -396,11 +396,11 @@ mod tests {
     #[test]
     fn test_format_fixpoint_step_run_rfp_single_scope() {
         let mut set = BTreeSet::new();
-        set.insert("plan-artifacts".to_owned());
+        set.insert("impl-plan".to_owned());
         let scopes = ReviewScopeSet::try_new(set).unwrap();
         assert_eq!(
             format_fixpoint_step(FixpointStep::RunRfp { scopes }),
-            "run-rfp scopes=plan-artifacts"
+            "run-rfp scopes=impl-plan"
         );
     }
 
@@ -408,12 +408,12 @@ mod tests {
     fn test_format_fixpoint_step_run_rfp_multiple_scopes_in_btreeset_order() {
         let mut set = BTreeSet::new();
         set.insert("code".to_owned());
-        set.insert("plan-artifacts".to_owned());
+        set.insert("impl-plan".to_owned());
         let scopes = ReviewScopeSet::try_new(set).unwrap();
-        // "code" < "plan-artifacts" in BTreeSet order.
+        // "code" < "impl-plan" in BTreeSet order.
         assert_eq!(
             format_fixpoint_step(FixpointStep::RunRfp { scopes }),
-            "run-rfp scopes=code,plan-artifacts"
+            "run-rfp scopes=code,impl-plan"
         );
     }
 

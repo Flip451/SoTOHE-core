@@ -26,17 +26,41 @@
       "patterns": ["apps/cli-driver/**"],
       "briefing_file": ".harness/custom/review-prompts/cli_driver.md"
     },
-    "plan-artifacts": {
+    "adr": {
       "patterns": [
-        "track/items/<track-id>/**",
         "knowledge/adr/**",
         "knowledge/research/**"
       ],
-      "briefing_file": ".harness/custom/review-prompts/plan-artifacts.md"
+      "briefing_file": ".harness/custom/review-prompts/adr.md"
+    },
+    "spec": {
+      "patterns": [
+        "track/items/<track-id>/spec.json",
+        "track/items/<track-id>/spec.md"
+      ],
+      "briefing_file": ".harness/custom/review-prompts/spec.md"
+    },
+    "types": {
+      "patterns": [
+        "track/items/<track-id>/*-types.json",
+        "track/items/<track-id>/contract-map.md"
+      ],
+      "briefing_file": ".harness/custom/review-prompts/types.md"
+    },
+    "impl-plan": {
+      "patterns": [
+        "track/items/<track-id>/impl-plan.json",
+        "track/items/<track-id>/task-coverage.json",
+        "track/items/<track-id>/task-contract.json",
+        "track/items/<track-id>/plan.md",
+        "track/items/<track-id>/observations.md"
+      ],
+      "briefing_file": ".harness/custom/review-prompts/impl-plan.md"
     },
     "harness-policy": {
       "patterns": [
         ".claude/commands/**", ".claude/rules/**", ".claude/agents/**",
+        ".claude/skills/**",
         ".agents/**", ".harness/**", ".codex/**",
         ".claude/settings*.json",
         ".claude/permission-extensions.json",
@@ -53,6 +77,9 @@
     "track/items/<track-id>/dry-check.json",
     "track/items/<track-id>/dry-check-corpus-root.json",
     "track/items/<track-id>/dry-check-coverage.json",
+    "track/items/<track-id>/metadata.json",
+    "track/items/<track-id>/*-types.md",
+    "track/items/<track-id>/*-types-baseline.json",
     "track/items/<track-id>/*-type-signals.json",
     "track/items/<track-id>/*-catalogue-spec-signals.json",
     "track/items/<track-id>/spec-adr-verify-cache.json",

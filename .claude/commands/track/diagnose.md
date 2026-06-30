@@ -21,7 +21,8 @@ boundary with other capabilities — lives in
 ## Arguments
 
 - `$ARGUMENTS`: the diagnostic input — a `bin/sotp task-contract check` (PreReviewGate) Blocked
-  summary, a `/track:review` plan-artifacts finding, or a free-form reviewer comment. May be
+  summary, a `/track:review` finding on any SoT scope (`adr` / `spec` / `types` /
+  `impl-plan`), or a free-form reviewer comment. May be
   passed inline or via a `--briefing-file <path>` reference. If empty, ask the user for the
   diagnostic input and stop.
 
@@ -33,7 +34,8 @@ Invoke from the orchestrator's main loop in one of these scenarios (see also
 1. **PreReviewGate Blocked**: `bin/sotp task-contract check` returns
    `PreReviewGateOutcome::Blocked`. The CLI surfaces a soft prompt suggesting this command in
    the Blocked stderr output (`apps/cli-driver/src/task_contract.rs` `render_check_violations`).
-2. **plan-artifacts review findings**: `/track:review` on `plan-artifacts` scope surfaced 🔴
+2. **SoT-scope review findings**: `/track:review` on any of the `adr` / `spec` / `types` /
+   `impl-plan` scopes surfaced 🔴
    signals or structural mismatch findings inconclusive for orchestrator-level classification.
 3. **External PR-reviewer comments**: any `/track:pr-review` (Codex Cloud) comment whose
    routing target is not self-evident. Manual passthrough; the orchestrator decides.

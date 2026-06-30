@@ -1,5 +1,5 @@
 name = "rollback-diagnoser"
-description = "Diagnostic-only specialist that returns a phase-rollback routing decision when called by /track:diagnose with a PreReviewGate Blocked summary, a plan-artifacts review finding, or an external PR-reviewer comment."
+description = "Diagnostic-only specialist that returns a phase-rollback routing decision when called by /track:diagnose with a PreReviewGate Blocked summary, a SoT-scope review finding on adr/spec/types/impl-plan, or an external PR-reviewer comment."
 developer_instructions = """
 Use the rollback-diagnoser skill before acting.
 
