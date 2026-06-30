@@ -215,14 +215,19 @@ fn render_check_violations(violations: &[PreReviewGateViolation]) -> String {
     // change, no PreToolUse hook, no lock-file mechanism (CN-06). The orchestrator
     // (`/track:full-cycle` / `/track:adr2pr`) sees the Blocked exit and this
     // prompt and decides whether to invoke `/track:diagnose` or self-classify the
-    // root cause.
+    // root cause. The path reference is host-agnostic: the operational SSoT
+    // (`.harness/capabilities/rollback-diagnoser.md`) is read by both the Claude
+    // and Codex hosts when the `rollback-diagnoser` capability is dispatched.
     lines.push(String::new());
     lines.push(
         "Suggest: run `/track:diagnose` with the violations above as diagnostic input to \
          identify whether the rollback target is `adr` / `spec` / `type` / `impl_plan` / `impl`. \
-         See `.claude/skills/diagnose/SKILL.md` for the routing taxonomy. The orchestrator \
-         dispatches the corresponding writer (adr-editor / spec-designer / type-designer / \
-         impl-planner) or applies a source fix; `/track:diagnose` is diagnose-only."
+         The slash command spec lives at `.claude/commands/track/diagnose.md` (Claude host) and \
+         the provider-agnostic operational SSoT (routing taxonomy / output contract) lives at \
+         `.harness/capabilities/rollback-diagnoser.md` (read by both Claude and Codex hosts). \
+         The orchestrator dispatches the corresponding writer (adr-editor / spec-designer / \
+         type-designer / impl-planner) or applies a source fix; `/track:diagnose` is \
+         diagnose-only."
             .to_owned(),
     );
 
@@ -294,7 +299,8 @@ mod tests {
     /// D3 / AC-03: the liveness-gate Blocked rendering surfaces the
     /// `/track:diagnose` soft prompt so the calling orchestrator sees it on
     /// stderr alongside the violation list. The prompt names the 5-class routing
-    /// taxonomy and the SKILL.md location for the calling LLM to pick up.
+    /// taxonomy, the Claude slash-command spec, and the provider-agnostic
+    /// operational SSoT path for the calling LLM to pick up.
     #[test]
     fn render_check_violations_includes_track_diagnose_soft_prompt() {
         let message = render_check_violations(&[PreReviewGateViolation::MissingTaskContract]);
@@ -303,9 +309,13 @@ mod tests {
             "Blocked render must include the /track:diagnose soft prompt, got: {message}"
         );
         assert!(
-            message.contains(".claude/skills/diagnose/SKILL.md"),
-            "Blocked render must cite the SKILL.md path so the orchestrator can locate the \
-             routing taxonomy, got: {message}"
+            message.contains(".claude/commands/track/diagnose.md"),
+            "Blocked render must cite the Claude slash-command spec, got: {message}"
+        );
+        assert!(
+            message.contains(".harness/capabilities/rollback-diagnoser.md"),
+            "Blocked render must cite the provider-agnostic rollback-diagnoser SSoT, got: \
+             {message}"
         );
     }
 

@@ -66,4 +66,3 @@ signals: { blue: 36, yellow: 0, red: 0 }
 
 ### Stage 1: Spec Signals
 🔵 36  🟡 0  🔴 0
-

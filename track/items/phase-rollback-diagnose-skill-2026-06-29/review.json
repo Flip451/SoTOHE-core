@@ -1,120 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7899f270e2310497af429e838e7df82a1a08273028d80487d6b19f91fb501732",
-          "at": "2026-06-30T01:03:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7899f270e2310497af429e838e7df82a1a08273028d80487d6b19f91fb501732",
-          "at": "2026-06-30T01:07:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6cdcc4111e34e5e42a52987570ebd1e5989b0a5f987547e6ac95c64d0c4d843f",
-          "at": "2026-06-30T02:47:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6cdcc4111e34e5e42a52987570ebd1e5989b0a5f987547e6ac95c64d0c4d843f",
-          "at": "2026-06-30T02:50:43Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:38d30ec4b8bccb159704429c1af3b5d3c991379c2b8188c5fdf5bf21af11dd7e",
-          "at": "2026-06-30T02:47:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:38d30ec4b8bccb159704429c1af3b5d3c991379c2b8188c5fdf5bf21af11dd7e",
-          "at": "2026-06-30T02:52:45Z"
-        }
-      ]
-    },
-    "cli_driver": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5fe85382c0c50bd87b26e7fa7cebbacb8e2cdbd087a744e2031d95c0ff10ce98",
-          "at": "2026-06-30T02:46:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5fe85382c0c50bd87b26e7fa7cebbacb8e2cdbd087a744e2031d95c0ff10ce98",
-          "at": "2026-06-30T02:51:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3eaec42725808ecd3cc9e50ff24d3380c2b8014e13c3f0e4a3fd9b3ef0946c90",
-          "at": "2026-06-30T02:58:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3eaec42725808ecd3cc9e50ff24d3380c2b8014e13c3f0e4a3fd9b3ef0946c90",
-          "at": "2026-06-30T03:01:41Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e50704fe2eb2bc03c6d0c003d66da523deb28490cd031324b954ba7edd062665",
-          "at": "2026-06-29T23:59:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e50704fe2eb2bc03c6d0c003d66da523deb28490cd031324b954ba7edd062665",
-          "at": "2026-06-30T00:01:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6307032938c3e80a59a0226bbec720ac3cfcce6057830651769a754a4ad99f0a",
-          "at": "2026-06-30T00:48:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6307032938c3e80a59a0226bbec720ac3cfcce6057830651769a754a4ad99f0a",
-          "at": "2026-06-30T00:51:21Z"
-        }
-      ]
-    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -239,6 +125,301 @@
           "findings": [],
           "hash": "rvw1:sha256:91683c80aa032b73b6229cc8e45ec056972a72688355447b1f735f934f3abe30",
           "at": "2026-06-30T03:10:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new D8 artifact-set paragraph says the configuration is \"4 kinds\", but the list immediately below contains five bullet items (and six artifacts plus `.codex/instructions.md`), so the section contradicts itself about the intended cross-host surface.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
+              "line": 146,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f06fc28ddf53a1ed0bd02820bfbbafd4a74a8ae4b6ce4474e1eef80d4fb57208",
+          "at": "2026-06-30T03:39:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3cda037060d23e9761df7d2204d39dfdaa041648092d7b4c1ffc318cc6bb7fb7",
+          "at": "2026-06-30T03:45:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3cda037060d23e9761df7d2204d39dfdaa041648092d7b4c1ffc318cc6bb7fb7",
+          "at": "2026-06-30T03:47:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bafe5c1ce7ce506cb93ab321ff0f836b91afe16e6289f5ea27c5a5bbb261ba2c",
+          "at": "2026-06-30T04:33:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-11 was narrowed to only require `cargo make ci` for the D9 hotfix, but the same rendered criterion is still mapped to T003/T004/T005, which are the D1-D8 diagnose skill, capability, and soft-prompt tasks described above. That makes the plan claim those feature tasks are covered by a CI acceptance criterion whose text no longer includes them, leaving the D1-D8 branch changes outside the stated CI requirement.",
+              "severity": "P1",
+              "file": "track/items/phase-rollback-diagnose-skill-2026-06-29/spec.md",
+              "line": 56,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:bafe5c1ce7ce506cb93ab321ff0f836b91afe16e6289f5ea27c5a5bbb261ba2c",
+          "at": "2026-06-30T04:37:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7cf7c7c53fd092505eaa8c78f7ed3042c913a43967f1dea30bdde3671316047e",
+          "at": "2026-06-30T04:40:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fd4cfaad7eeac146d0b0ffb13be96e0bb6cbca4aab383a6dcdbb4caf284e818a",
+          "at": "2026-06-30T04:45:32Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:38d30ec4b8bccb159704429c1af3b5d3c991379c2b8188c5fdf5bf21af11dd7e",
+          "at": "2026-06-30T02:47:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:38d30ec4b8bccb159704429c1af3b5d3c991379c2b8188c5fdf5bf21af11dd7e",
+          "at": "2026-06-30T02:52:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d31cc8edab4d831c64832f5dedd4009f3fbe6b534619198bd5a70992089a9544",
+          "at": "2026-06-30T03:38:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d31cc8edab4d831c64832f5dedd4009f3fbe6b534619198bd5a70992089a9544",
+          "at": "2026-06-30T03:42:15Z"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5fe85382c0c50bd87b26e7fa7cebbacb8e2cdbd087a744e2031d95c0ff10ce98",
+          "at": "2026-06-30T02:46:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5fe85382c0c50bd87b26e7fa7cebbacb8e2cdbd087a744e2031d95c0ff10ce98",
+          "at": "2026-06-30T02:51:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3eaec42725808ecd3cc9e50ff24d3380c2b8014e13c3f0e4a3fd9b3ef0946c90",
+          "at": "2026-06-30T02:58:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3eaec42725808ecd3cc9e50ff24d3380c2b8014e13c3f0e4a3fd9b3ef0946c90",
+          "at": "2026-06-30T03:01:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `render_check_violations_includes_track_diagnose_soft_prompt` test still requires `.claude/skills/diagnose/SKILL.md`, but `render_check_violations` now renders `.claude/commands/track/diagnose.md` and `.harness/capabilities/rollback-diagnoser.md` instead. This makes the added test fail immediately and leaves the branch with a red unit test in the reviewed file.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-driver/src/task_contract.rs",
+              "line": 311,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:56f7ecfb2d4062eb47373d2b06270ff2dc5e0c226090ff08e477e26b9a6f3eb9",
+          "at": "2026-06-30T03:39:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d5bc9e8053d3072649f22858b53d5f85a354b5fc530c8bf9fa289305a530d5f5",
+          "at": "2026-06-30T03:42:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d5bc9e8053d3072649f22858b53d5f85a354b5fc530c8bf9fa289305a530d5f5",
+          "at": "2026-06-30T03:45:55Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e50704fe2eb2bc03c6d0c003d66da523deb28490cd031324b954ba7edd062665",
+          "at": "2026-06-29T23:59:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e50704fe2eb2bc03c6d0c003d66da523deb28490cd031324b954ba7edd062665",
+          "at": "2026-06-30T00:01:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6307032938c3e80a59a0226bbec720ac3cfcce6057830651769a754a4ad99f0a",
+          "at": "2026-06-30T00:48:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6307032938c3e80a59a0226bbec720ac3cfcce6057830651769a754a4ad99f0a",
+          "at": "2026-06-30T00:51:21Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7899f270e2310497af429e838e7df82a1a08273028d80487d6b19f91fb501732",
+          "at": "2026-06-30T01:03:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7899f270e2310497af429e838e7df82a1a08273028d80487d6b19f91fb501732",
+          "at": "2026-06-30T01:07:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6cdcc4111e34e5e42a52987570ebd1e5989b0a5f987547e6ac95c64d0c4d843f",
+          "at": "2026-06-30T02:47:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6cdcc4111e34e5e42a52987570ebd1e5989b0a5f987547e6ac95c64d0c4d843f",
+          "at": "2026-06-30T02:50:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`knowledge/adr/2026-06-26-0503-...` is not a resolvable path in a fresh checkout; this distributed capability doc now points at an abbreviated/nonexistent ADR reference instead of the concrete ADR file, so the cross-reference cannot be followed by consumers.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/.harness/capabilities/rollback-diagnoser.md",
+              "line": 65,
+              "category": "template-distribution reference leak"
+            }
+          ],
+          "hash": "rvw1:sha256:de59878cb7379fd939441c5f7b2d5f69050478158c36e029d94a4d07ef706e5f",
+          "at": "2026-06-30T03:38:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:018dc3ebfc22ea606f02a3ac18bb6fdf5e37de797b35a952d43aebefae1a0ff8",
+          "at": "2026-06-30T03:47:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Codex provider path allows invoking the specialist \"directly via the codex CLI\" without requiring `--sandbox read-only`. In this repo the tracked `.codex/config.toml` defaults to `sandbox_mode = \"workspace-write\"`, and `.claude/rules/10-guardrails.md` warns that Codex workspace-write subprocesses can write files and run git operations outside Claude hook coverage. Since rollback-diagnoser is explicitly diagnose-only, this path should either require a repo-owned read-only wrapper or spell out `codex exec --sandbox read-only` and forbid `--full-auto`.",
+              "severity": "P1",
+              "file": ".claude/commands/track/diagnose.md",
+              "line": 50,
+              "category": "hook coverage gap"
+            },
+            {
+              "message": "This command classifies `bin/sotp signal calc-*` as read-only inspection, but the existing signal command surfaces are compute-and-persist operations: `calc-spec-adr` persists into `spec.json`, and `calc-catalog-spec` / `calc-impl-catalog` generate signal JSON files. Allowing a diagnose-only command to run them can mutate SoT artifacts despite the command's \"does not edit any SoT artifact\" boundary. Limit this path to true read-only commands such as check/results, or make signal refresh an orchestrator-owned step outside rollback-diagnoser.",
+              "severity": "P1",
+              "file": ".claude/commands/track/diagnose.md",
+              "line": 81,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:018dc3ebfc22ea606f02a3ac18bb6fdf5e37de797b35a952d43aebefae1a0ff8",
+          "at": "2026-06-30T03:51:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Codex wrapper still classifies `signal calc-*` as a permitted read-only inspection command, but the capability SSoT now says rollback-diagnoser must not run mutating refresh commands such as `signal calc-*` and that signal refresh is orchestrator-owned. When `capabilities.rollback-diagnoser.provider` is switched to `codex`, these agent-level instructions are what the specialist receives, so the Codex path can mutate persisted signal artifacts during a diagnose-only flow while the Claude command/subagent path forbids it. This breaks the responsibility boundary and cross-host parity for the new capability; update the Codex agent boundary to match the SSoT/read-only command policy.",
+              "severity": "P1",
+              "file": ".codex/agents/rollback-diagnoser.toml",
+              "line": 27,
+              "category": "responsibility-boundary cross"
+            }
+          ],
+          "hash": "rvw1:sha256:90d2decd75c16c8163e63403f8345a99a65af086bd3b5ca090a478af14ea795f",
+          "at": "2026-06-30T04:01:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:34840d84b60f445a5aac1560c80df4d2d55477b8e64663e3aaedfbd642edc34f",
+          "at": "2026-06-30T04:09:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:34840d84b60f445a5aac1560c80df4d2d55477b8e64663e3aaedfbd642edc34f",
+          "at": "2026-06-30T04:14:06Z"
         }
       ]
     }

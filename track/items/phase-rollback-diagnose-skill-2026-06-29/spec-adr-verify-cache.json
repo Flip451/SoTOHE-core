@@ -3,10 +3,10 @@
   "entries": [
     {
       "claim_hash": "f43dbb7795317606dffd43fbb67bc39a004c2e339d98327a680d1bd18394915f",
-      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "evidence_hash": "cb7cd0556ca2f5beabe7bc6b951af98737daf5dc55de5ca6be0f92fd36afcb2e",
       "verdict": {
         "kind": "pass",
-        "citation": "impl 段階以降で impl-plan の実装計画と食い違う 🟡 / 🔴 が surface した時に発火し、rollback 先 phase と次のアクションを返す診断 skill を新規定義する。"
+        "citation": "「impl 段階以降で impl-plan の実装計画と食い違う 🟡 / 🔴 が surface した時に発火し、rollback 先 phase と次のアクションを返す診断 skill を新規定義する。主 trigger は `bin/sotp task-contract check` ... が `PreReviewGateOutcome::Blocked` を返した時。... orchestrator が「どこに戻るか」を ad-hoc 判断する負担を構造的に減らす。」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -26,10 +26,10 @@
     },
     {
       "claim_hash": "f43dbb7795317606dffd43fbb67bc39a004c2e339d98327a680d1bd18394915f",
-      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "evidence_hash": "cb7cd0556ca2f5beabe7bc6b951af98737daf5dc55de5ca6be0f92fd36afcb2e",
       "verdict": {
         "kind": "pass",
-        "citation": "「新規 capability `rollback-diagnoser` (仮称) を追加し、`/track:diagnose` 内部の LLM 呼び出しは ... D6 の出力契約 (routing_target / reason / recommended_next_action) を取得 → orchestrator に返す」"
+        "citation": "D5 で routing 判断を LLM の semantic 判断に委ねることを決定したが、その LLM の provider / model 選択を ad-hoc にしない。`.harness/config/agent-profiles.json` に新規 capability `rollback-diagnoser` (仮称) を追加し、`/track:diagnose` 内部の LLM 呼び出しは `capabilities.rollback-diagnoser.provider` / `capabilities.rollback-diagnoser.model` を resolve した上で dispatch する。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -49,10 +49,10 @@
     },
     {
       "claim_hash": "ea9f73c5ca7cf6c8d1c2f2ba818dbf09c9cff430c03bde62d1b454fccc6f470d",
-      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "evidence_hash": "cb7cd0556ca2f5beabe7bc6b951af98737daf5dc55de5ca6be0f92fd36afcb2e",
       "verdict": {
         "kind": "pass",
-        "citation": "「PR #175 PreReviewGate を欠損 `task-contract.json` に寛容にする (precondition hotfix)」および「PreReviewGate と coverage verification の双方で、`task-contract.json` が存在しない pre-impl phase は `Blocked` ではなく `Passed` として扱う。」"
+        "citation": "- PreReviewGate と coverage verification の双方で、`task-contract.json` が存在しない pre-impl phase は `Blocked` ではなく `Passed` として扱う。\n- `task-contract.json` が存在する場合の挙動 (entries の coverage / impl_catalog の liveness 評価) は不変。fail-open は作らない。\n- 兄弟 gate の寛容化 ADR (`2026-06-03-1241-spec-states-gate-tolerate-missing-spec-artifact` / `2026-06-01-0406-review-gate-tolerate-missing-catalogue`) と同型の precedent pattern を踏襲する。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -72,10 +72,10 @@
     },
     {
       "claim_hash": "7adf5c8363d0258a9947371cdacaa5cad16045a7b4ada14ce86375cf35e3c61c",
-      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "evidence_hash": "cb7cd0556ca2f5beabe7bc6b951af98737daf5dc55de5ca6be0f92fd36afcb2e",
       "verdict": {
         "kind": "pass",
-        "citation": "「impl-plan の実装計画と食い違う ... が surface した時に発火し、rollback 先 phase と次のアクションを返す診断 skill を新規定義する。」"
+        "citation": "「rollback 先 phase と次のアクションを返す診断 skill」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -95,7 +95,7 @@
     },
     {
       "claim_hash": "d5198194e33bc939854590f2ddd1f8dc89022ca00864ebc36817b0dfdae556be",
-      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "evidence_hash": "cb7cd0556ca2f5beabe7bc6b951af98737daf5dc55de5ca6be0f92fd36afcb2e",
       "verdict": {
         "kind": "pass",
         "citation": "`.harness/config/agent-profiles.json` に新規 capability `rollback-diagnoser` (仮称) を追加し、`/track:diagnose` 内部の LLM 呼び出しは `capabilities.rollback-diagnoser.provider` / `capabilities.rollback-diagnoser.model` を resolve した上で dispatch する。"
@@ -118,10 +118,10 @@
     },
     {
       "claim_hash": "5e65c2a5f456a0c599faf693a882edbd9c17c26b42db45f1fa9c176045b4c815",
-      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "evidence_hash": "cb7cd0556ca2f5beabe7bc6b951af98737daf5dc55de5ca6be0f92fd36afcb2e",
       "verdict": {
         "kind": "pass",
-        "citation": "`/track:diagnose` の routing 対象 trigger は次の 2 つを主とする。1. **PreReviewGate Blocked** ... 2. **step 6 plan-artifacts review findings** ... `step 10 ... は本 ADR の主軸 trigger ではないが、orchestrator が手動で診断スキルに渡すことは妨げない`"
+        "citation": "`/track:diagnose` の routing 対象 trigger は次の 2 つを主とする。\n\n1. **PreReviewGate Blocked** ... 診断 skill はこの Blocked 時の blocked entries (どの layer のどの entry が 🔵 化されなかったか) を読み取り...\n2. **step 6 plan-artifacts review findings** ... reviewer 指摘 / signal 🔴 等で surface した構造的不整合。\n\n加えて step 10 (`/track:pr-review`) の Codex Cloud / 外部 reviewer 指摘は本 ADR の主軸 trigger ではないが、orchestrator が手動で診断スキルに渡すことは妨げない"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -141,10 +141,10 @@
     },
     {
       "claim_hash": "92bb37c213afa49455a311e933f40d2bfe8867dc45a9e8e5cc1a36ec2ba28ea8",
-      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "evidence_hash": "cb7cd0556ca2f5beabe7bc6b951af98737daf5dc55de5ca6be0f92fd36afcb2e",
       "verdict": {
         "kind": "pass",
-        "citation": "「D3: invocation enforcement は PreReviewGate 出力内 soft prompt を採用する (専用 hook は不要)」"
+        "citation": "`bin/sotp task-contract check` (PreReviewGate) が `PreReviewGateOutcome::Blocked` を返す際の stderr / 出力に **`/track:diagnose` の呼び出しを推奨する soft prompt** を含める。orchestrator は Blocked exit code とこの prompt を見て、`/track:diagnose` を invoke するか自前で原因分類するかを判断する。新たな PreToolUse hook や lock file / bypass 機構は導入しない。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -164,10 +164,10 @@
     },
     {
       "claim_hash": "6c6fee8d18e696deab026259b443b9dbd4d836e235a07b3010b540b78dbc72af",
-      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "evidence_hash": "cb7cd0556ca2f5beabe7bc6b951af98737daf5dc55de5ca6be0f92fd36afcb2e",
       "verdict": {
         "kind": "pass",
-        "citation": "\"### D4: routing 出力カテゴリは 5 クラス (adr / spec / type / impl_plan / impl) とする\"\n\n\"診断 skill は次の 5 categories のいずれかを返す。\"\n\n\"| `adr` | ADR に未記載の決定が必要 | `/adr:add` で新 ADR、または `adr-editor` で既存 ADR D 改訂 |\"\n\"| `spec` | ADR 決定はあるが Phase 1 spec author が表現し切れていない | `spec-designer` を再呼び出し (Phase 1 partial re-entry) |\"\n\"| `type` | catalogue にアーキテクチャなどの観点から瑕疵がある (= 役割配置 / シグネチャ / impl 宣言などが設計上問題) | `type-designer` を再呼び出し (Phase 2 partial re-entry) |\"\n\"| `impl_plan` | ADR / spec / catalogue は正しいが impl-plan task 記述に欠落 / 誤りがある | `impl-planner` を再呼び出し (Phase 3 partial re-entry) |\"\n\"| `impl` | 設計文書側の問題ではなく実装の契約違反 | 設計文書には触らず source 側で修正 (型カタログの責任ではなく実装の責任である旨を明示) |\"\n\n\"`impl` カテゴリは「out_of_scope」 (=何もしない) ではなく、「実装が設計契約を破っているという診断結果」を伝える明示的な出力である。\""
+        "citation": "診断 skill は次の 5 categories のいずれかを返す。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -187,7 +187,7 @@
     },
     {
       "claim_hash": "f19267725ab003ccd8447463475e222640eb9b5970d01d6a29d901855b1a3960",
-      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "evidence_hash": "cb7cd0556ca2f5beabe7bc6b951af98737daf5dc55de5ca6be0f92fd36afcb2e",
       "verdict": {
         "kind": "pass",
         "citation": "`/track:diagnose` の routing は呼び出された LLM が 🔴 signal text / reviewer 指摘 text / 関連ファイル (spec.json / `<layer>-types.json` / impl-plan.json / 該当 source / `*-signals.json`) を読み取って **意味的に判断** する。\n\nregex / keyword ベースの決定的ルール ... は採用しない"
@@ -210,10 +210,10 @@
     },
     {
       "claim_hash": "4fcd9a7c8ebb56135e775fd312682fcf4156fd45ff02de4472aa93fd08285495",
-      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "evidence_hash": "cb7cd0556ca2f5beabe7bc6b951af98737daf5dc55de5ca6be0f92fd36afcb2e",
       "verdict": {
         "kind": "pass",
-        "citation": "`/track:diagnose` は次の 3 フィールドを構造化して返す。 / orchestrator は `routing_target` を読んで dispatch (D7) するか、`reason` をユーザに提示して判断を仰ぐ。"
+        "citation": "`/track:diagnose` は次の 3 フィールドを構造化して返す。... orchestrator は `routing_target` を読んで dispatch (D7) するか、`reason` をユーザに提示して判断を仰ぐ。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -233,10 +233,10 @@
     },
     {
       "claim_hash": "39df5c1a29b4300c803acad97f7010220c7722acbdf4563b3bfa548d0ba7f429",
-      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "evidence_hash": "cb7cd0556ca2f5beabe7bc6b951af98737daf5dc55de5ca6be0f92fd36afcb2e",
       "verdict": {
         "kind": "pass",
-        "citation": "pre-impl phase は `Blocked` ではなく `Passed` として扱う"
+        "citation": "「task-contract.json` が存在しない pre-impl phase は `Blocked` ではなく `Passed` として扱う。」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -256,10 +256,10 @@
     },
     {
       "claim_hash": "c1664b381f12c17a1c915537e1eb88fcd8b99b597aa5d447e2a75e2e1e79819b",
-      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "evidence_hash": "cb7cd0556ca2f5beabe7bc6b951af98737daf5dc55de5ca6be0f92fd36afcb2e",
       "verdict": {
         "kind": "pass",
-        "citation": "「`libs/usecase/src/pre_review_gate/helpers.rs` サブモジュールを新設し、`pre_review_gate.rs` から 7 本以上の純粋ヘルパー free function を `pub(super)` で抽出することで親モジュールを 700 行上限内に収める。分割パターンは `ref_verify.rs + ref_verify/*.rs` のサブモジュール分割を踏襲する。」"
+        "citation": "`libs/usecase/src/pre_review_gate/helpers.rs` サブモジュールを新設し、`pre_review_gate.rs` から 7 本以上の純粋ヘルパー free function を `pub(super)` で抽出することで親モジュールを 700 行上限内に収める。分割パターンは `ref_verify.rs + ref_verify/*.rs` のサブモジュール分割を踏襲する。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -279,10 +279,10 @@
     },
     {
       "claim_hash": "5afc236335f9e727ef539b2bc894f384995e6e6f5683ccf9ea5874a2e3c8aba7",
-      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "evidence_hash": "cb7cd0556ca2f5beabe7bc6b951af98737daf5dc55de5ca6be0f92fd36afcb2e",
       "verdict": {
         "kind": "pass",
-        "citation": "兄弟 gate の寛容化 ADR (`2026-06-03-1241-spec-states-gate-tolerate-missing-spec-artifact` / `2026-06-01-0406-review-gate-tolerate-missing-catalogue`) と同型の precedent pattern を踏襲する."
+        "citation": "Phase 0 では task-contract artifact は未生成であるため、この入力欠損は契約違反ではなく「評価対象なし」として扱う必要がある。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -302,7 +302,7 @@
     },
     {
       "claim_hash": "a29a4e577524b58d46db4395bff5fe152d6c80c7a2e2ef324b109cf9af6d76b6",
-      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "evidence_hash": "cb7cd0556ca2f5beabe7bc6b951af98737daf5dc55de5ca6be0f92fd36afcb2e",
       "verdict": {
         "kind": "pass",
         "citation": "`/track:diagnose` の呼び出しを推奨する soft prompt を含める。orchestrator は Blocked exit code とこの prompt を見て、`/track:diagnose` を invoke するか自前で原因分類するかを判断する。新たな PreToolUse hook や lock file / bypass 機構は導入しない。"
@@ -325,10 +325,10 @@
     },
     {
       "claim_hash": "0077b7f3692b9e1ebe9212c720ac902169f5c1d6b1a39423198bccd2c641225a",
-      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "evidence_hash": "cb7cd0556ca2f5beabe7bc6b951af98737daf5dc55de5ca6be0f92fd36afcb2e",
       "verdict": {
         "kind": "pass",
-        "citation": "`/track:diagnose` は D6 の出力を返すだけで、実際の writer (adr-editor / spec-designer / type-designer / impl-planner) 起動は呼び出し orchestrator が行う。診断と修正を別 skill に分離することで:\n\n- 診断結果をユーザが review してから dispatch する余地を残す (誤判定時に orchestrator が override 可能)\n- 診断 skill 自身が再帰的に writer を起動する複雑性 (chain orchestration) を避ける\n- 既存の `/track:plan` の back-and-forth loop と同型 (loop 主体は plan、escalation 先は writer) で skill 設計の一貫性を保つ"
+        "citation": "`/track:diagnose` は D6 の出力を返すだけで、実際の writer 起動は呼び出し orchestrator が行う。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -348,10 +348,10 @@
     },
     {
       "claim_hash": "e0effce79427de9284fac02984879a06a78cb82418cac33303723e7008542ff9",
-      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "evidence_hash": "cb7cd0556ca2f5beabe7bc6b951af98737daf5dc55de5ca6be0f92fd36afcb2e",
       "verdict": {
         "kind": "pass",
-        "citation": "\"D5: routing 判断は LLM の意味判断に委ねる\" / \"regex / keyword ベースの決定的ルール ... は採用しない\""
+        "citation": "`regex / keyword ベースの決定的ルール ... は採用しない` / `同じ keyword が複数 phase 由来の構造的不整合に現れうる` / `LLM が SoT 階層を理解した上で判断する方が`"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -371,10 +371,10 @@
     },
     {
       "claim_hash": "ac6a8e896048cb95740efb3b4d1e2b323c0297b0ee39a864448221d50ea8f388",
-      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "evidence_hash": "cb7cd0556ca2f5beabe7bc6b951af98737daf5dc55de5ca6be0f92fd36afcb2e",
       "verdict": {
         "kind": "pass",
-        "citation": "candidate_selection: from:[5-class,3-class-collapsed,4-class-no-impl] chose:5-class-with-impl\n\n| `spec` | ADR 決定はあるが Phase 1 spec author が表現し切れていない | `spec-designer` を再呼び出し (Phase 1 partial re-entry) |\n| `impl_plan` | ADR / spec / catalogue は正しいが impl-plan task 記述に欠落 / 誤りがある | `impl-planner` を再呼び出し (Phase 3 partial re-entry) |"
+        "citation": "`spec` | ADR 決定はあるが Phase 1 spec author が表現し切れていない / `impl_plan` | ADR / spec / catalogue は正しいが impl-plan task 記述に欠落 / 誤りがある"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -394,10 +394,10 @@
     },
     {
       "claim_hash": "b0d7d9688ee6a5e67e85819a8d0e3a7201665980777b5c65a26ea774a14875d9",
-      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "evidence_hash": "cb7cd0556ca2f5beabe7bc6b951af98737daf5dc55de5ca6be0f92fd36afcb2e",
       "verdict": {
         "kind": "pass",
-        "citation": "impl 段階以降で impl-plan の実装計画と食い違う 🟡 / 🔴 が surface した時に発火し、rollback 先 phase と次のアクションを返す診断 skill を新規定義する。... `/track:plan` 内の既存 Phase 1-3 loop はそのままに、impl phase 由来の遡及だけを別 skill に分離する"
+        "citation": "「既存 Phase 1-3 loop はそのままに、impl phase 由来の遡及だけを別 skill に分離」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -417,10 +417,10 @@
     },
     {
       "claim_hash": "d28679499359e271d7ef3bce66cca7b3d1f7363e4c8b699243cfbfef12521dce",
-      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "evidence_hash": "cb7cd0556ca2f5beabe7bc6b951af98737daf5dc55de5ca6be0f92fd36afcb2e",
       "verdict": {
         "kind": "pass",
-        "citation": "impl phase 由来の遡及だけを別 skill に分離することで、orchestrator が「どこに戻るか」を ad-hoc 判断する負担を構造的に減らす。"
+        "citation": "「impl phase 由来の遡及だけを別 skill に分離することで、orchestrator が『どこに戻るか』を ad-hoc 判断する負担を構造的に減らす。」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -440,10 +440,10 @@
     },
     {
       "claim_hash": "5fb26b3374f1990a9b8c03a3c76989a61f01bee1fbd72c29e1e238624cda0595",
-      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "evidence_hash": "cb7cd0556ca2f5beabe7bc6b951af98737daf5dc55de5ca6be0f92fd36afcb2e",
       "verdict": {
         "kind": "pass",
-        "citation": "`.harness/config/agent-profiles.json` に新規 capability `rollback-diagnoser` (仮称) を追加し、`/track:diagnose` 内部の LLM 呼び出しは `capabilities.rollback-diagnoser.provider` / `capabilities.rollback-diagnoser.model` を resolve した上で dispatch する。"
+        "citation": "`capabilities.rollback-diagnoser.provider` / `capabilities.rollback-diagnoser.model` を resolve した上で dispatch する"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -463,10 +463,10 @@
     },
     {
       "claim_hash": "06191cdd2359d1fa10a3ea9d534dfdf7108e5b78a00c74e07c820cd0af3d425b",
-      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "evidence_hash": "cb7cd0556ca2f5beabe7bc6b951af98737daf5dc55de5ca6be0f92fd36afcb2e",
       "verdict": {
         "kind": "pass",
-        "citation": "`/track:diagnose` は D6 の出力を返すだけで、実際の writer (adr-editor / spec-designer / type-designer / impl-planner) 起動は呼び出し orchestrator が行う。"
+        "citation": "`/track:diagnose` は D6 の出力を返すだけで、実際の writer 起動は呼び出し orchestrator が行う"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -486,10 +486,10 @@
     },
     {
       "claim_hash": "ccc4e065eaa7bde5bfdd17dddd30f1c14a307f74e15535ae82195bf10ad1ba84",
-      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "evidence_hash": "cb7cd0556ca2f5beabe7bc6b951af98737daf5dc55de5ca6be0f92fd36afcb2e",
       "verdict": {
         "kind": "pass",
-        "citation": "`/track:diagnose` は次の 3 フィールドを構造化して返す。"
+        "citation": "`/track:diagnose` は次の 3 フィールドを構造化して返す。\n\n| field | type | 意味 |\n|------|------|------|\n| `routing_target` | enum (`adr` / `spec` / `type` / `impl_plan` / `impl`) | D4 の 5 カテゴリのいずれか |\n| `reason` | string (日本語) | 判断根拠 (どの 🔴 / 🟡 signal / 構造的不整合を見て、なぜそのカテゴリと判定したかの semantic summary) |\n| `recommended_next_action` | string (日本語) | 呼び出し orchestrator が次に取るべき具体的アクション |"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -509,10 +509,10 @@
     },
     {
       "claim_hash": "1cc6adb67cc2e5c7ff3fadbe5c990390c367a9d2226030b385d15240aed66aad",
-      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "evidence_hash": "cb7cd0556ca2f5beabe7bc6b951af98737daf5dc55de5ca6be0f92fd36afcb2e",
       "verdict": {
         "kind": "pass",
-        "citation": "D4: routing 出力カテゴリは 5 クラス (adr / spec / type / impl_plan / impl) とする\n\n`impl` | 設計文書側の問題ではなく実装の契約違反 | 設計文書には触らず source 側で修正 (型カタログの責任ではなく実装の責任である旨を明示)\n\n`impl` カテゴリは「out_of_scope」 (=何もしない) ではなく、「実装が設計契約を破っているという診断結果」を伝える明示的な出力である。"
+        "citation": "「診断 skill は次の 5 categories のいずれかを返す。」/「`impl` カテゴリは「out_of_scope」 (=何もしない) ではなく」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -532,10 +532,10 @@
     },
     {
       "claim_hash": "5345b8ad7c8e85434a26d4a2b8b8635f3f274536b9c1ed037436cfac5fb8eb10",
-      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "evidence_hash": "cb7cd0556ca2f5beabe7bc6b951af98737daf5dc55de5ca6be0f92fd36afcb2e",
       "verdict": {
         "kind": "pass",
-        "citation": "「LLM が SoT 階層を理解した上で判断する方が」"
+        "citation": "`/track:diagnose` の routing は呼び出された LLM が 🔴 signal text / reviewer 指摘 text / 関連ファイル (spec.json / `<layer>-types.json` / impl-plan.json / 該当 source / `*-signals.json`) を読み取って **意味的に判断** する。\n\nregex / keyword ベースの決定的ルール ... は採用しない"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -555,10 +555,10 @@
     },
     {
       "claim_hash": "2e769952f9fc485b441c3aec347389655e9d69e712c6c361c4661293a31f79d1",
-      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "evidence_hash": "cb7cd0556ca2f5beabe7bc6b951af98737daf5dc55de5ca6be0f92fd36afcb2e",
       "verdict": {
         "kind": "pass",
-        "citation": "PreReviewGate 出力内 soft prompt を採用する (専用 hook は不要)"
+        "citation": "「orchestrator は Blocked exit code とこの prompt を見て」および「新たな PreToolUse hook や lock file / bypass 機構は導入しない」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -578,10 +578,10 @@
     },
     {
       "claim_hash": "05ec7e85ab513773918351278176a832e4cd2ea5026b6073b61bbc9ab37cfdf4",
-      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "evidence_hash": "cb7cd0556ca2f5beabe7bc6b951af98737daf5dc55de5ca6be0f92fd36afcb2e",
       "verdict": {
         "kind": "pass",
-        "citation": "PreReviewGate と coverage verification の双方で、`task-contract.json` が存在しない pre-impl phase は `Blocked` ではなく `Passed` として扱う。`task-contract.json` が存在する場合の挙動 ... は不変。fail-open は作らない。"
+        "citation": "- PreReviewGate と coverage verification の双方で、`task-contract.json` が存在しない pre-impl phase は `Blocked` ではなく `Passed` として扱う。\n- `task-contract.json` が存在する場合の挙動 (entries の coverage / impl_catalog の liveness 評価) は不変。fail-open は作らない。\n- Phase 0 では task-contract artifact は未生成であるため、この入力欠損は契約違反ではなく「評価対象なし」として扱う必要がある。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -601,7 +601,7 @@
     },
     {
       "claim_hash": "f78597a03d65cd7299b2a95937a8d14856017495ddbeff381cdf070e09de095f",
-      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "evidence_hash": "cb7cd0556ca2f5beabe7bc6b951af98737daf5dc55de5ca6be0f92fd36afcb2e",
       "verdict": {
         "kind": "pass",
         "citation": "impl 段階以降で impl-plan の実装計画と食い違う 🟡 / 🔴 が surface した時に発火し、rollback 先 phase と次のアクションを返す診断 skill を新規定義する。主 trigger は `bin/sotp task-contract check` (PR #175 で導入される PreReviewGate) が `PreReviewGateOutcome::Blocked` を返した時。"
@@ -624,10 +624,10 @@
     },
     {
       "claim_hash": "99613153accb399f64451312d927d7d52e82f0a9e5e7f19c902145f37dac4ba2",
-      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "evidence_hash": "cb7cd0556ca2f5beabe7bc6b951af98737daf5dc55de5ca6be0f92fd36afcb2e",
       "verdict": {
         "kind": "pass",
-        "citation": "「新規 capability `rollback-diagnoser` (仮称) を追加し、`capabilities.rollback-diagnoser.provider` / `capabilities.rollback-diagnoser.model` を resolve」"
+        "citation": "`.harness/config/agent-profiles.json` に新規 capability `rollback-diagnoser` (仮称) を追加し、`capabilities.rollback-diagnoser.provider` / `capabilities.rollback-diagnoser.model` を resolve した上で dispatch する。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -647,7 +647,7 @@
     },
     {
       "claim_hash": "7f4452084b326714ab33e0152b9238eecabb6bd2ee575d56f9b768fe516b41e3",
-      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "evidence_hash": "cb7cd0556ca2f5beabe7bc6b951af98737daf5dc55de5ca6be0f92fd36afcb2e",
       "verdict": {
         "kind": "pass",
         "citation": "`bin/sotp task-contract check` (PreReviewGate) が `PreReviewGateOutcome::Blocked` を返す際の stderr / 出力に **`/track:diagnose` の呼び出しを推奨する soft prompt** を含める。"
@@ -670,10 +670,10 @@
     },
     {
       "claim_hash": "431bdedcc3037cccec3e1cae2f34fe4588fc310b8745e462ce9ae93d8df3f1f4",
-      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "evidence_hash": "cb7cd0556ca2f5beabe7bc6b951af98737daf5dc55de5ca6be0f92fd36afcb2e",
       "verdict": {
         "kind": "pass",
-        "citation": "診断 skill はこの Blocked 時の blocked entries (どの layer のどの entry が 🔵 化されなかったか) を読み取り、原因を意味的に分類する (D4 5 categories のうち `type` / `impl_plan` / `spec` / `adr` / `impl` のいずれに routing するか)。"
+        "citation": "`PreReviewGate Blocked` ... `step 6 plan-artifacts review findings` ... `type` / `impl_plan` / `spec` / `adr` / `impl`"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -693,7 +693,7 @@
     },
     {
       "claim_hash": "431bdedcc3037cccec3e1cae2f34fe4588fc310b8745e462ce9ae93d8df3f1f4",
-      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "evidence_hash": "cb7cd0556ca2f5beabe7bc6b951af98737daf5dc55de5ca6be0f92fd36afcb2e",
       "verdict": {
         "kind": "pass",
         "citation": "「診断 skill は次の 5 categories のいずれかを返す。」"
@@ -716,7 +716,7 @@
     },
     {
       "claim_hash": "431bdedcc3037cccec3e1cae2f34fe4588fc310b8745e462ce9ae93d8df3f1f4",
-      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "evidence_hash": "cb7cd0556ca2f5beabe7bc6b951af98737daf5dc55de5ca6be0f92fd36afcb2e",
       "verdict": {
         "kind": "pass",
         "citation": "`routing_target` | enum (`adr` / `spec` / `type` / `impl_plan` / `impl`) | D4 の 5 カテゴリのいずれか"
@@ -739,10 +739,10 @@
     },
     {
       "claim_hash": "547e3f9bc875ac7e00b1457f821e195d88ad9577220fdd5112ce696b9fccf469",
-      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "evidence_hash": "cb7cd0556ca2f5beabe7bc6b951af98737daf5dc55de5ca6be0f92fd36afcb2e",
       "verdict": {
         "kind": "pass",
-        "citation": "`/track:diagnose` の routing は呼び出された LLM が 🔴 signal text / reviewer 指摘 text / 関連ファイル (spec.json / `<layer>-types.json` / impl-plan.json / 該当 source / `*-signals.json`) を読み取って **意味的に判断** する。\nregex / keyword ベースの決定的ルール ... は採用しない"
+        "citation": "「LLM が … 関連ファイル (…) を読み取って **意味的に判断** する。」「regex / keyword ベースの決定的ルール … は採用しない」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -762,10 +762,10 @@
     },
     {
       "claim_hash": "bbb29ecb023bf58f842bcd7bc868e80afe23ad88ca7a3805ba5ad4a65027b1dd",
-      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "evidence_hash": "cb7cd0556ca2f5beabe7bc6b951af98737daf5dc55de5ca6be0f92fd36afcb2e",
       "verdict": {
         "kind": "pass",
-        "citation": "「/track:diagnose は D6 の出力を返すだけで、実際の writer 起動は呼び出し orchestrator が行う。」"
+        "citation": "`/track:diagnose` は D6 の出力を返すだけで、実際の writer (adr-editor / spec-designer / type-designer / impl-planner) 起動は呼び出し orchestrator が行う。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -785,10 +785,10 @@
     },
     {
       "claim_hash": "5a528a73e2589cd00033918d089df940f0a5a84373e703ba984e6d3bb06eb603",
-      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "evidence_hash": "cb7cd0556ca2f5beabe7bc6b951af98737daf5dc55de5ca6be0f92fd36afcb2e",
       "verdict": {
         "kind": "pass",
-        "citation": "「`task-contract.json` が存在しない pre-impl phase は `Blocked` ではなく `Passed` として扱う。`task-contract.json` が存在する場合の挙動 ... は不変。」"
+        "citation": "\"PreReviewGate と coverage verification の双方で、`task-contract.json` が存在しない pre-impl phase は `Blocked` ではなく `Passed` として扱う。\"\n\"`task-contract.json` が存在する場合の挙動 (entries の coverage / impl_catalog の liveness 評価) は不変。fail-open は作らない。\""
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -808,10 +808,10 @@
     },
     {
       "claim_hash": "314e99c3bedf6a811552801c2e970b9f59cc4c9490ab12309052120d22326a41",
-      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "evidence_hash": "cb7cd0556ca2f5beabe7bc6b951af98737daf5dc55de5ca6be0f92fd36afcb2e",
       "verdict": {
         "kind": "pass",
-        "citation": "- PreReviewGate と coverage verification の双方で、`task-contract.json` が存在しない pre-impl phase は `Blocked` ではなく `Passed` として扱う。"
+        "citation": "PreReviewGate と coverage verification の双方で、`task-contract.json` が存在しない pre-impl phase は `Blocked` ではなく `Passed` として扱う。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -831,10 +831,10 @@
     },
     {
       "claim_hash": "3d125592b43a898d996795bf82cd11bed406066b4f62299e5a9e3120081e497f",
-      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "evidence_hash": "cb7cd0556ca2f5beabe7bc6b951af98737daf5dc55de5ca6be0f92fd36afcb2e",
       "verdict": {
         "kind": "pass",
-        "citation": "「上限超過時は圧縮ではなく分割を選ぶ方針に従い、`libs/usecase/src/pre_review_gate/helpers.rs` サブモジュールを新設し、`pre_review_gate.rs` から 7 本以上の純粋ヘルパー free function を `pub(super)` で抽出することで親モジュールを 700 行上限内に収める。」"
+        "citation": "`libs/usecase/src/pre_review_gate/helpers.rs` サブモジュールを新設し、`pre_review_gate.rs` から 7 本以上の純粋ヘルパー free function を `pub(super)` で抽出することで親モジュールを 700 行上限内に収める。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -854,10 +854,10 @@
     },
     {
       "claim_hash": "d655d662f318e1cc150f086f39642a1396e3a15ba8b964b7a4ddfaa3de64fb8a",
-      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "evidence_hash": "cb7cd0556ca2f5beabe7bc6b951af98737daf5dc55de5ca6be0f92fd36afcb2e",
       "verdict": {
         "kind": "pass",
-        "citation": "precondition として、PR #175 PreReviewGate を欠損 `task-contract.json` に寛容にする bootstrap hotfix を Phase 0 baseline gate の再実行前に成立させる。\n- PreReviewGate と coverage verification の双方で、`task-contract.json` が存在しない pre-impl phase は `Blocked` ではなく `Passed` として扱う。"
+        "citation": "兄弟 gate の寛容化 ADR (`2026-06-03-1241-spec-states-gate-tolerate-missing-spec-artifact` / `2026-06-01-0406-review-gate-tolerate-missing-catalogue`) と同型の precedent pattern を踏襲する。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -877,7 +877,7 @@
     },
     {
       "claim_hash": "1c3ec92b504c33c9c41f43d7f7f7e7ca83f2bcb4812135f253a43d3da4d8da90",
-      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "evidence_hash": "cb7cd0556ca2f5beabe7bc6b951af98737daf5dc55de5ca6be0f92fd36afcb2e",
       "verdict": {
         "kind": "pass",
         "citation": "impl 段階以降で impl-plan の実装計画と食い違う 🟡 / 🔴 が surface した時に発火し、rollback 先 phase と次のアクションを返す診断 skill を新規定義する。主 trigger は `bin/sotp task-contract check` (PR #175 で導入される PreReviewGate) が `PreReviewGateOutcome::Blocked` を返した時。"
@@ -900,10 +900,10 @@
     },
     {
       "claim_hash": "1c3ec92b504c33c9c41f43d7f7f7e7ca83f2bcb4812135f253a43d3da4d8da90",
-      "evidence_hash": "1d1c9addb1f62f4f4108e5cfdf9a6751e96e68460adf128898f8a49632b2f273",
+      "evidence_hash": "cb7cd0556ca2f5beabe7bc6b951af98737daf5dc55de5ca6be0f92fd36afcb2e",
       "verdict": {
         "kind": "pass",
-        "citation": "precondition として、PR #175 PreReviewGate を欠損 `task-contract.json` に寛容にする bootstrap hotfix を Phase 0 baseline gate の再実行前に成立させる。"
+        "citation": "PreReviewGate と coverage verification の双方で、`task-contract.json` が存在しない pre-impl phase は `Blocked` ではなく `Passed` として扱う。 ... `libs/usecase/src/pre_review_gate/helpers.rs` サブモジュールを新設し、`pre_review_gate.rs` から 7 本以上の純粋ヘルパー free function を `pub(super)` で抽出することで親モジュールを 700 行上限内に収める。"
       },
       "claim_origin": {
         "kind": "spec_element",
