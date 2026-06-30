@@ -13,8 +13,9 @@
 ## Mission
 
 Receive a diagnostic input — typically a `bin/sotp task-contract check` (PreReviewGate)
-`PreReviewGateOutcome::Blocked` summary, a `/track:review` plan-artifacts finding, or any free-form
-reviewer comment — and return a structured **routing decision** identifying which phase
+`PreReviewGateOutcome::Blocked` summary, a `/track:review` finding on any SoT scope
+(`adr` / `spec` / `types` / `impl-plan`), or any free-form reviewer comment — and return a
+structured **routing decision** identifying which phase
 (`adr` / `spec` / `type` / `impl_plan` / `impl`) the calling orchestrator should rollback to in
 order to close the finding. This capability **never** edits SoT artifacts or invokes writer
 subagents; the dispatch belongs to the calling orchestrator.
@@ -28,9 +29,9 @@ The capability is invoked by the orchestrator in three primary scenarios:
    (catalogue entries declared by some task as "going to be 🔵" but still 🟡 / 🔴 after
    implementation). The CLI surfaces a soft prompt suggesting `/track:diagnose`; the orchestrator
    passes through the Blocked summary verbatim.
-2. **plan-artifacts findings (primary trigger)**: `/track:review` on the `plan-artifacts` scope
-   surfaced 🔴 signals or structural mismatch findings that the local reviewer judged
-   inconclusive for orchestrator-level classification.
+2. **SoT-scope review findings (primary trigger)**: `/track:review` on any of the
+   `adr` / `spec` / `types` / `impl-plan` scopes surfaced 🔴 signals or structural mismatch
+   findings that the local reviewer judged inconclusive for orchestrator-level classification.
 3. **External PR-reviewer comments (manual passthrough)**: any reviewer comment from
    `/track:pr-review` (Codex Cloud or another external reviewer) whose routing target is not
    self-evident. The orchestrator decides when to delegate; this path is never auto-triggered.

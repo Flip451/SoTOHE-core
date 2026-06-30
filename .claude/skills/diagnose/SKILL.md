@@ -5,7 +5,8 @@ description: |
   inconsistency the internal signal pipeline cannot localize on its own. Triggers
   automatically when `bin/sotp task-contract check` (PreReviewGate) returns
   `PreReviewGateOutcome::Blocked`, and may also be invoked when step 6
-  `/track:review` plan-artifacts findings or external PR-reviewer comments need
+  `/track:review` findings on any SoT scope (adr/spec/types/impl-plan) or
+  external PR-reviewer comments need
   back-and-forth routing. Reads the SoT chain (ADR → spec → catalogue → impl-plan →
   source), judges the most upstream phase where the root cause originates, and
   returns a structured routing decision the calling orchestrator dispatches. This

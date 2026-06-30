@@ -411,9 +411,9 @@ mod tests {
             r#"{
                 "version": 2,
                 "groups": {
-                    "plan-artifacts": {
+                    "impl-plan": {
                         "patterns": ["track/items/**"],
-                        "briefing_file": ".harness/custom/review-prompts/plan-artifacts.md"
+                        "briefing_file": ".harness/custom/review-prompts/impl-plan.md"
                     }
                 }
             }"#,
@@ -422,11 +422,11 @@ mod tests {
         let config = load_v2_scope_config(&path, &track_id, dir.path()).unwrap();
 
         let scope = domain::review_v2::ScopeName::Main(
-            domain::review_v2::MainScopeName::new("plan-artifacts").unwrap(),
+            domain::review_v2::MainScopeName::new("impl-plan").unwrap(),
         );
         assert_eq!(
             config.briefing_file_for_scope(&scope),
-            Some(".harness/custom/review-prompts/plan-artifacts.md")
+            Some(".harness/custom/review-prompts/impl-plan.md")
         );
     }
 
@@ -464,9 +464,9 @@ mod tests {
             r#"{
                 "version": 2,
                 "groups": {
-                    "plan-artifacts": {
+                    "impl-plan": {
                         "patterns": ["track/items/**"],
-                        "briefng_file": ".harness/custom/review-prompts/plan-artifacts.md"
+                        "briefng_file": ".harness/custom/review-prompts/impl-plan.md"
                     }
                 }
             }"#,
@@ -487,7 +487,7 @@ mod tests {
             r#"{
                 "version": 2,
                 "groups": {
-                    "plan-artifacts": {
+                    "impl-plan": {
                         "patterns": ["track/items/**"],
                         "briefing_file": "/etc/passwd"
                     }
@@ -514,7 +514,7 @@ mod tests {
             r#"{
                 "version": 2,
                 "groups": {
-                    "plan-artifacts": {
+                    "impl-plan": {
                         "patterns": ["track/items/**"],
                         "briefing_file": "../outside.md"
                     }
@@ -556,7 +556,7 @@ mod tests {
             r#"{
                 "version": 2,
                 "groups": {
-                    "plan-artifacts": {
+                    "impl-plan": {
                         "patterns": ["track/items/**"],
                         "briefing_file": ".harness/custom/review-prompts/policy.md"
                     }

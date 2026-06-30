@@ -784,7 +784,7 @@ mod tests {
     #[test]
     fn interactor_resolve_dry_approved_review_needs_review_returns_run_rfp_with_scopes() {
         let mut scope_set = BTreeSet::new();
-        scope_set.insert("plan-artifacts".to_owned());
+        scope_set.insert("impl-plan".to_owned());
         scope_set.insert("code".to_owned());
         let scopes = ReviewScopeSet::try_new(scope_set).unwrap();
 
