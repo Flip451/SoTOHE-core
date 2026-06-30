@@ -1,0 +1,1109 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "376d7544c14052877dfa8b2aad048c3c50a3b50bd12553e63ed57bce7580d9f8",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Claude/Codex 共通の運用 workflow は `.harness` 配下の provider 非依存文書を SSoT とし、`.claude/commands` と `.agents/skills` はその SSoT を参照する thin adapter にする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "Claude/Codex 共通の track workflow を `.harness/workflows/` に provider 非依存の SSoT として集約し、`.claude/commands/track/` と `.agents/skills/track-*/` を thin adapter にすることで、workflow logic の二重管理と provider 切り替え時の運用 drift を排除する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "376d7544c14052877dfa8b2aad048c3c50a3b50bd12553e63ed57bce7580d9f8",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "provider 非依存の workflow SSoT は `.harness/workflows/` 配下に配置する。track 系 workflow は `.harness/workflows/track/` に置き、Claude command と Codex skill はこの文書を参照する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "Claude/Codex 共通の track workflow を `.harness/workflows/` に provider 非依存の SSoT として集約し、`.claude/commands/track/` と `.agents/skills/track-*/` を thin adapter にすることで、workflow logic の二重管理と provider 切り替え時の運用 drift を排除する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "b17fedd3161bb9041407a28e244f1b11b4a3141aa5312c8820d8debe1f40898e",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「1 つの track で `/track:adr2pr` と、それが参照するすべての Claude command / skill を芋づる式に移植する。移植対象は `/track:adr2pr` 単体に限定せず、実行時に参照される下位 workflow と capability adapter も同じ SSoT 化 track の範囲に含める。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-02",
+          "text_label": "pilot として `/track:adr2pr` の実行閉包（直接列挙する下位 command、その実行計画作成に読む command section、それらが invoke / delegate する capability、当該 capability の Claude/Codex adapter）を 1 track で芋づる式に SSoT 化し、主要な track workflow と capability adapter の境界を一度に検証する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "b17fedd3161bb9041407a28e244f1b11b4a3141aa5312c8820d8debe1f40898e",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`/track:adr2pr` SSoT 化 track の移植閉包は、(a) `/track:adr2pr` が直接列挙する下位 command、(b) その実行 plan を作るために直接読むよう指示される command section、(c) それらの command が直接 invoke / delegate する capability、(d) 当該 capability の Claude / Codex adapter である。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-02",
+          "text_label": "pilot として `/track:adr2pr` の実行閉包（直接列挙する下位 command、その実行計画作成に読む command section、それらが invoke / delegate する capability、当該 capability の Claude/Codex adapter）を 1 track で芋づる式に SSoT 化し、主要な track workflow と capability adapter の境界を一度に検証する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D9"
+        }
+      }
+    },
+    {
+      "claim_hash": "eb441f459b399c520aa2f2505160cbbcbb4326db82cf1f094313a8ef20d3ebb5",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "provider 非依存の workflow SSoT は `.harness/workflows/` 配下に配置する。track 系 workflow は `.harness/workflows/track/` に置き、Claude command と Codex skill はこの文書を参照する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "`.harness/workflows/track/` ディレクトリを新規作成し、`/track:adr2pr` 実行閉包内で参照されるすべての下位 workflow の SSoT ファイルを作成する。各ファイルは `Mission / Inputs / Sequence / Gates / Failure-or-recovery / Outputs` 章構成を持つ markdown prose とし、provider 非依存の状態遷移と停止条件を本文に記述する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "eb441f459b399c520aa2f2505160cbbcbb4326db82cf1f094313a8ef20d3ebb5",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": ".harness/workflows/**/*.md は、既存の `.harness/capabilities/*.md` と同じく front-matter なしの markdown 章構成 prose として作成する。workflow SSoT は少なくとも `Mission`、`Inputs`、`Sequence`、`Gates`、`Failure / recovery`、`Outputs` に相当する章を持ち、provider 非依存の状態遷移と停止条件を本文に記述する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "`.harness/workflows/track/` ディレクトリを新規作成し、`/track:adr2pr` 実行閉包内で参照されるすべての下位 workflow の SSoT ファイルを作成する。各ファイルは `Mission / Inputs / Sequence / Gates / Failure-or-recovery / Outputs` 章構成を持つ markdown prose とし、provider 非依存の状態遷移と停止条件を本文に記述する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "cb20660d524a7f0ccb819135a7cd08a4d270c46a5b6b5c980a3bb154f375bc6a",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Claude command と Codex skill には workflow logic、状態遷移、gate 条件、失敗時の復旧手順を重複記述しない。provider 固有の呼び出し方法、ツール制約、報告形式だけを adapter 側に残す。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "閉包内の `.claude/commands/track/*.md` を thin adapter に更新する。各 command 冒頭に対応する `.harness/workflows/track/<name>.md` を operational SSoT として明示参照し、step 番号・gate 条件・状態遷移・失敗復旧手順を adapter 本文から除去してその参照先に移す。provider 固有の呼び出し方法・権限制約・報告形式のみ adapter 側に残す。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "cb20660d524a7f0ccb819135a7cd08a4d270c46a5b6b5c980a3bb154f375bc6a",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "adapter は冒頭で参照先 SSoT path を明示する。Claude command では `/track:*` のコマンド本文冒頭に `.harness/workflows/<path>.md` を operational SSoT として示し"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "閉包内の `.claude/commands/track/*.md` を thin adapter に更新する。各 command 冒頭に対応する `.harness/workflows/track/<name>.md` を operational SSoT として明示参照し、step 番号・gate 条件・状態遷移・失敗復旧手順を adapter 本文から除去してその参照先に移す。provider 固有の呼び出し方法・権限制約・報告形式のみ adapter 側に残す。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "cb20660d524a7f0ccb819135a7cd08a4d270c46a5b6b5c980a3bb154f375bc6a",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「adapter に残せる provider 固有情報は、(1) 呼び出し面の名前と起動方法、(2) provider 固有 tool / 権限制約、(3) subagent / skill / command の起動形態、(4) provider ごとの報告形式に限る。step 番号、gate 条件、状態遷移、失敗時復旧手順、commit / PR までの全体 sequence は workflow SSoT 側に置く。Claude 側は既存 slash command 名を維持する。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "閉包内の `.claude/commands/track/*.md` を thin adapter に更新する。各 command 冒頭に対応する `.harness/workflows/track/<name>.md` を operational SSoT として明示参照し、step 番号・gate 条件・状態遷移・失敗復旧手順を adapter 本文から除去してその参照先に移す。provider 固有の呼び出し方法・権限制約・報告形式のみ adapter 側に残す。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D8"
+        }
+      }
+    },
+    {
+      "claim_hash": "6890130817c6f11a1f6c9784f5c0031fb5533d678765da6611e59da9b2d541c9",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "provider ごとの呼び出し面は維持する\n\n移植後も Claude 側 slash command 名は維持する。Codex 側は同名 slash command の複製ではなく、対応する Codex skill 名で呼び出せる adapter を提供する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "閉包内の `.agents/skills/track-*/SKILL.md` を thin adapter として作成または更新する。SKILL.md 本文冒頭で対応する `.harness/workflows/track/<name>.md` を読むよう明示参照し、workflow logic の複製を持たない。Codex skill の呼び出し面名は `/track:<slug>` を `track-<slug>` へ写像する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "6890130817c6f11a1f6c9784f5c0031fb5533d678765da6611e59da9b2d541c9",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "adapter は冒頭で参照先 SSoT path を明示する。Codex skill では `SKILL.md` の本文冒頭で同じ path を読むよう指示する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "閉包内の `.agents/skills/track-*/SKILL.md` を thin adapter として作成または更新する。SKILL.md 本文冒頭で対応する `.harness/workflows/track/<name>.md` を読むよう明示参照し、workflow logic の複製を持たない。Codex skill の呼び出し面名は `/track:<slug>` を `track-<slug>` へ写像する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "6890130817c6f11a1f6c9784f5c0031fb5533d678765da6611e59da9b2d541c9",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "step 番号、gate 条件、状態遷移、失敗時復旧手順、commit / PR までの全体 sequence は workflow SSoT 側に置く。Codex 側は `/track:<slug>` を `track-<slug>` の skill 名へ写像する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "閉包内の `.agents/skills/track-*/SKILL.md` を thin adapter として作成または更新する。SKILL.md 本文冒頭で対応する `.harness/workflows/track/<name>.md` を読むよう明示参照し、workflow logic の複製を持たない。Codex skill の呼び出し面名は `/track:<slug>` を `track-<slug>` へ写像する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D8"
+        }
+      }
+    },
+    {
+      "claim_hash": "66122a5c08fe451df4416b7d5f4468609c0f8338be92382691e2d522018acdf7",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "workflow が capability を呼ぶときは、capability 内部の文脈を複製せず `.harness/capabilities/<name>.md` に委譲する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "閉包内の capability で `.harness/capabilities/<name>.md` が未存在のもの（`review-fix-lead`、`dry-fix-lead`）の capability SSoT ファイルを同一 track 内で新規作成する。既存の capability SSoT はそのまま正本として参照し、内部手順を workflow 文書にコピーしない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "66122a5c08fe451df4416b7d5f4468609c0f8338be92382691e2d522018acdf7",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "この閉包に含まれる capability で `.harness/capabilities/<name>.md` が存在しない場合、同じ track で capability SSoT を補う。既存 `.harness/capabilities/` にある capability は、その文書を正本として参照し、workflow 側へ内部手順をコピーしない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "閉包内の capability で `.harness/capabilities/<name>.md` が未存在のもの（`review-fix-lead`、`dry-fix-lead`）の capability SSoT ファイルを同一 track 内で新規作成する。既存の capability SSoT はそのまま正本として参照し、内部手順を workflow 文書にコピーしない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D9"
+        }
+      }
+    },
+    {
+      "claim_hash": "b1ce227ef92260030f97f7fc0d958c38b7b30a72500f4ac11ac8c4472a17527f",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "修正対象ファイルは `.harness/custom/review-prompts/harness-policy.md` のみで、ここに「adapter-SSoT 同期 check」項目を追加する。最小要件は以下である:\n\n- adapter (`.claude/commands/track/*.md` および `.agents/skills/track-*/SKILL.md`) が冒頭で明示する `.harness/workflows/<path>.md` が実在すること。\n- adapter 本文に workflow logic (step 番号、gate 条件、状態遷移、失敗復旧手順) が長文複製されていないこと。\n- workflow SSoT (`.harness/workflows/**/*.md`) に provider 固有の起動細部 (subagent / skill 起動方法、provider 固有の sandbox / 権限 flag 等) が漏れ込んでいないこと。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "`.harness/custom/review-prompts/harness-policy.md` に「adapter-SSoT 同期 check」項目を追加する。追加内容は D10 の 3 つの最小要件（① adapter 冒頭参照 path の実在確認 ② adapter に workflow logic の長文複製がないこと ③ workflow SSoT に provider 固有の起動細部が漏れ込んでいないこと）をすべてカバーする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D10"
+        }
+      }
+    },
+    {
+      "claim_hash": "ce60c7353943cb9e98b598e11c963369eaa76dd3ef3919595bb269dc3dc57842",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「1 つの track で `/track:adr2pr` と、それが参照するすべての Claude command / skill を芋づる式に移植する。移植対象は `/track:adr2pr` 単体に限定せず、実行時に参照される下位 workflow と capability adapter も同じ SSoT 化 track の範囲に含める。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-01",
+          "text_label": "`/track:adr2pr` の実行閉包に含まれない command / capability の workflow SSoT 化は本 track の対象外とする。閉包の定義は D9 の (a)-(d) に従い、芋づる参照で到達しないものは含まない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "ce60c7353943cb9e98b598e11c963369eaa76dd3ef3919595bb269dc3dc57842",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`/track:adr2pr` SSoT 化 track の移植閉包は、(a) `/track:adr2pr` が直接列挙する下位 command、(b) その実行 plan を作るために直接読むよう指示される command section、(c) それらの command が直接 invoke / delegate する capability、(d) 当該 capability の Claude / Codex adapter である。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-01",
+          "text_label": "`/track:adr2pr` の実行閉包に含まれない command / capability の workflow SSoT 化は本 track の対象外とする。閉包の定義は D9 の (a)-(d) に従い、芋づる参照で到達しないものは含まない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D9"
+        }
+      }
+    },
+    {
+      "claim_hash": "b01119e61d49f97915546ad0a152231f4c23d96ed909ba4a570cc62f86bff793",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "初期移行では `agent-profiles.json` に workflow 参照 schema を追加せず、path 参照は adapter 本文に置く."
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-02",
+          "text_label": "`agent-profiles.json` への workflow 参照 schema の追加は行わない。workflow SSoT への path 参照は adapter 本文の明示参照に留め、設定ファイルへの集約は初期移行の blast radius を広げるため採用しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "de5cc71dcf2b23945426474793a6c25321413bfb0995bea8a9eccf2bf50d2373",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「修正対象ファイルは `.harness/custom/review-prompts/harness-policy.md` のみ」および「bin/sotp の一般的な workflow verifier や既存 architecture check への追加は行わない。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-03",
+          "text_label": "`bin/sotp` や既存 architecture check への adapter-SSoT 同期 verifier の一般機構としての追加は行わない。sync 検証は `.harness/custom/review-prompts/harness-policy.md` の専用 check に限定し、一般機構化は運用文書の柔軟性を損なうため採用しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D10"
+        }
+      }
+    },
+    {
+      "claim_hash": "be0d35a54f1d8f91aae64368fda8dee22e39c7d49be39016edcf424104fee0ea",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/briefings/` は provider / scope 固有の review prompt や一時的な briefing injection を置く補助面として維持する。workflow SSoT や capability SSoT に昇格できる恒久手順が見つかった場合は、当該 workflow / capability 文書へ移す。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-04",
+          "text_label": "`.harness/briefings/` と `.claude/skills/` の整理は本 track の主要移行対象外とする。これらは補助面として現状維持し、必要に応じて後続 track で整理する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "691d2656a1efc38cc80a19c04be430b6eecd135cfb1c28235e5ec202ceb88134",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "移植後も Claude 側 slash command 名は維持する。Codex 側は同名 slash command の複製ではなく、対応する Codex skill 名で呼び出せる adapter を提供する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-05",
+          "text_label": "Claude 側 slash command 名（`/track:<slug>` 形式）は変更しない。既存の `/track:*` user-facing command surface を維持する。Codex 側は同名複製ではなく `track-<slug>` の skill 名で呼び出せる adapter を提供する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "691d2656a1efc38cc80a19c04be430b6eecd135cfb1c28235e5ec202ceb88134",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Claude 側は既存 slash command 名を維持する。Codex 側は `/track:<slug>` を `track-<slug>` の skill 名へ写像する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-05",
+          "text_label": "Claude 側 slash command 名（`/track:<slug>` 形式）は変更しない。既存の `/track:*` user-facing command surface を維持する。Codex 側は同名複製ではなく `track-<slug>` の skill 名で呼び出せる adapter を提供する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D8"
+        }
+      }
+    },
+    {
+      "claim_hash": "afa4829e295425e4bc5fc5c04f6a019e1bd09db842c4b9bf5b42015409a0b735",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Claude command と Codex skill には workflow logic、状態遷移、gate 条件、失敗時の復旧手順を重複記述しない。provider 固有の呼び出し方法、ツール制約、報告形式だけを adapter 側に残す。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "workflow SSoT（`.harness/workflows/**/*.md`）には provider 固有の起動細部（subagent / skill 起動方法、sandbox フラグ、provider 固有の権限設定等）を記述しない。provider 非依存の状態遷移・gate・停止条件・復旧方針のみを置く。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "afa4829e295425e4bc5fc5c04f6a019e1bd09db842c4b9bf5b42015409a0b735",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「workflow には、オーケストレーターや専門家が従う手順を置く。対象は入力、前提条件、状態遷移、複数 capability を順序付ける invocation 連鎖、gate、停止条件、復旧方針、全体の output contract である。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "workflow SSoT（`.harness/workflows/**/*.md`）には provider 固有の起動細部（subagent / skill 起動方法、sandbox フラグ、provider 固有の権限設定等）を記述しない。provider 非依存の状態遷移・gate・停止条件・復旧方針のみを置く。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "afa4829e295425e4bc5fc5c04f6a019e1bd09db842c4b9bf5b42015409a0b735",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「adapter に残せる provider 固有情報は、(1) 呼び出し面の名前と起動方法、(2) provider 固有 tool / 権限制約、(3) subagent / skill / command の起動形態」および「step 番号、gate 条件、状態遷移、失敗時復旧手順…は workflow SSoT 側に置く。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "workflow SSoT（`.harness/workflows/**/*.md`）には provider 固有の起動細部（subagent / skill 起動方法、sandbox フラグ、provider 固有の権限設定等）を記述しない。provider 非依存の状態遷移・gate・停止条件・復旧方針のみを置く。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D8"
+        }
+      }
+    },
+    {
+      "claim_hash": "fa5bf9f6ddc59c3cd4ed83166afd18901d09d825b8a5541729e882d1c6f661d7",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "workflow logic、状態遷移、gate 条件、失敗時の復旧手順を重複記述しない。provider 固有の呼び出し方法、ツール制約、報告形式だけを adapter 側に残す。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "adapter 本文（`.claude/commands/track/*.md` と `.agents/skills/track-*/SKILL.md`）に step 番号・gate 条件・状態遷移・失敗復旧手順を長文複製しない。adapter に残せるのは D8 whitelist に従い、(1) 呼び出し面の名前と起動方法、(2) provider 固有 tool / 権限制約、(3) subagent / skill / command の起動形態、(4) provider ごとの報告形式に限る。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "fa5bf9f6ddc59c3cd4ed83166afd18901d09d825b8a5541729e882d1c6f661d7",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "adapter に残せる provider 固有情報は、(1) 呼び出し面の名前と起動方法、(2) provider 固有 tool / 権限制約、(3) subagent / skill / command の起動形態、(4) provider ごとの報告形式に限る。step 番号、gate 条件、状態遷移、失敗時復旧手順は workflow SSoT 側に置く。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "adapter 本文（`.claude/commands/track/*.md` と `.agents/skills/track-*/SKILL.md`）に step 番号・gate 条件・状態遷移・失敗復旧手順を長文複製しない。adapter に残せるのは D8 whitelist に従い、(1) 呼び出し面の名前と起動方法、(2) provider 固有 tool / 権限制約、(3) subagent / skill / command の起動形態、(4) provider ごとの報告形式に限る。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D8"
+        }
+      }
+    },
+    {
+      "claim_hash": "9ec71100d427ba5dcc27b7fa1a2895f6071d48d89484689466d31c972b47c69c",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「workflow が capability を呼ぶときは、capability 内部の文脈を複製せず `.harness/capabilities/<name>.md` に委譲する。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "workflow SSoT が capability を呼ぶ際は、capability の内部手順を workflow 文書にコピーせず `.harness/capabilities/<name>.md` に委譲する。workflow と capability の境界は D7 の定義（workflow = 手順の順序付け・invocation 連鎖、capability = 専門家が保有する文脈）に従う。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "bd734947373d5ce2239b43a92f9a1ae6b32c9b0b4c04723446a97ce4589d2910",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "修正対象ファイルは `.harness/custom/review-prompts/harness-policy.md` のみで、ここに「adapter-SSoT 同期 check」項目を追加する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "adapter と workflow SSoT の同期 enforcement は `.harness/custom/review-prompts/harness-policy.md` の専用 check に限定し、CI 一般機構（`bin/sotp` subcommand や architecture check）として追加しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D10"
+        }
+      }
+    },
+    {
+      "claim_hash": "dee5b2b6418ab3251be38f1b00f34b0fce900b1a52218042da8339cb99b8044d",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「adapter は冒頭で参照先 SSoT path を明示する。 ... 初期移行では `agent-profiles.json` に workflow 参照 schema を追加せず、path 参照は adapter 本文に置く。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-05",
+          "text_label": "adapter（command / skill）は冒頭で参照する `.harness/workflows/track/<name>.md` の path を明示し、その path が実在することが実装後の review で確認できる。初期移行では path 参照は adapter 本文に置き、`agent-profiles.json` への workflow 参照 schema 追加は行わない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "f02d9b0b766a028fcd1c8169ae6ce3fec1505d1966790fc9d2d71722dde1f806",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Claude/Codex 共通の運用 workflow は `.harness` 配下の provider 非依存文書を SSoT とし、`.claude/commands` と `.agents/skills` はその SSoT を参照する thin adapter にする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "SSoT 化後の `/track:adr2pr` の振る舞い（Step 順・gate 条件・back-and-forth ループ規則・output artifact 種別）が SSoT 化前と等価である。adapter 経由で workflow SSoT を読んだ場合と、以前の command 本文を読んだ場合で、実行経路と停止条件に相違がない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "f02d9b0b766a028fcd1c8169ae6ce3fec1505d1966790fc9d2d71722dde1f806",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実行時に参照される下位 workflow と capability adapter も同じ SSoT 化 track の範囲に含める。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "SSoT 化後の `/track:adr2pr` の振る舞い（Step 順・gate 条件・back-and-forth ループ規則・output artifact 種別）が SSoT 化前と等価である。adapter 経由で workflow SSoT を読んだ場合と、以前の command 本文を読んだ場合で、実行経路と停止条件に相違がない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "f02d9b0b766a028fcd1c8169ae6ce3fec1505d1966790fc9d2d71722dde1f806",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "provider ごとの呼び出し面は維持する\n\n移植後も Claude 側 slash command 名は維持する。Codex 側は同名 slash command の複製ではなく、対応する Codex skill 名で呼び出せる adapter を提供する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "SSoT 化後の `/track:adr2pr` の振る舞い（Step 順・gate 条件・back-and-forth ループ規則・output artifact 種別）が SSoT 化前と等価である。adapter 経由で workflow SSoT を読んだ場合と、以前の command 本文を読んだ場合で、実行経路と停止条件に相違がない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "92cf0e50938b162b83694e005efdcda00cb5e3b8c51c3ede3172027622772242",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`Mission`、`Inputs`、`Sequence`、`Gates`、`Failure / recovery`、`Outputs` に相当する章を持ち、provider 非依存の状態遷移と停止条件を本文に記述する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "`.harness/workflows/track/adr2pr.md` が実在し、`Mission / Inputs / Sequence / Gates / Failure-or-recovery / Outputs` 章構成を持ち、provider 非依存の状態遷移と停止条件を本文に含む。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "96b57249e9c044e425836e13db24b8a59e6b6c64d448efd110065316d6203f64",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「移植対象は `/track:adr2pr` 単体に限定せず、実行時に参照される下位 workflow と capability adapter も同じ SSoT 化 track の範囲に含める。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "`/track:adr2pr` の実行閉包（D9 の (a)-(d) 定義）内で参照されるすべての下位 workflow の SSoT ファイルが `.harness/workflows/track/` に実在する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "96b57249e9c044e425836e13db24b8a59e6b6c64d448efd110065316d6203f64",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`/track:adr2pr` SSoT 化 track の移植閉包は、(a) `/track:adr2pr` が直接列挙する下位 command、(b) その実行 plan を作るために直接読むよう指示される command section、(c) それらの command が直接 invoke / delegate する capability、(d) 当該 capability の Claude / Codex adapter である。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "`/track:adr2pr` の実行閉包（D9 の (a)-(d) 定義）内で参照されるすべての下位 workflow の SSoT ファイルが `.harness/workflows/track/` に実在する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D9"
+        }
+      }
+    },
+    {
+      "claim_hash": "17be0c20980e8f2d54a0198a83d75dd9ce0813518a0fcd9debba942e2b2bedb8",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Claude command では `/track:*` のコマンド本文冒頭に `.harness/workflows/<path>.md` を operational SSoT として示し"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "閉包内の `.claude/commands/track/*.md` は各々の冒頭で対応する `.harness/workflows/track/<name>.md` を operational SSoT として明示参照している。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "17be0c20980e8f2d54a0198a83d75dd9ce0813518a0fcd9debba942e2b2bedb8",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "step 番号、gate 条件、状態遷移、失敗時復旧手順、commit / PR までの全体 sequence は workflow SSoT 側に置く。Claude 側は既存 slash command 名を維持する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "閉包内の `.claude/commands/track/*.md` は各々の冒頭で対応する `.harness/workflows/track/<name>.md` を operational SSoT として明示参照している。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D8"
+        }
+      }
+    },
+    {
+      "claim_hash": "f6b117dee87be5bc4570eccb69e7177399e9e6d881744a62d11c22e70e761d79",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Codex skill では `SKILL.md` の本文冒頭で同じ path を読むよう指示する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "閉包内の `.agents/skills/track-*/SKILL.md` は各々の本文冒頭で対応する `.harness/workflows/track/<name>.md` を読むよう明示参照している。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "f6b117dee87be5bc4570eccb69e7177399e9e6d881744a62d11c22e70e761d79",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「step 番号、gate 条件、状態遷移、失敗時復旧手順、commit / PR までの全体 sequence は workflow SSoT 側に置く。 ... Codex 側は `/track:<slug>` を `track-<slug>` の skill 名へ写像する。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "閉包内の `.agents/skills/track-*/SKILL.md` は各々の本文冒頭で対応する `.harness/workflows/track/<name>.md` を読むよう明示参照している。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D8"
+        }
+      }
+    },
+    {
+      "claim_hash": "31a11385f055864c8500a5853ba1a0707a213dbf771979c74927caaa3fcd44e1",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "workflow logic、状態遷移、gate 条件、失敗時の復旧手順を重複記述しない。provider 固有の呼び出し方法、ツール制約、報告形式だけを adapter 側に残す。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "adapter 本文（command / skill 両方）に step 番号・gate 条件・状態遷移・失敗復旧手順が長文複製されていない。adapter に残るのは provider 固有の呼び出し面・権限制約・起動形態・報告形式のみである。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "31a11385f055864c8500a5853ba1a0707a213dbf771979c74927caaa3fcd44e1",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "adapter に残せる provider 固有情報は、(1) 呼び出し面の名前と起動方法、(2) provider 固有 tool / 権限制約、(3) subagent / skill / command の起動形態、(4) provider ごとの報告形式に限る。step 番号、gate 条件、状態遷移、失敗時復旧手順、commit / PR までの全体 sequence は workflow SSoT 側に置く。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "adapter 本文（command / skill 両方）に step 番号・gate 条件・状態遷移・失敗復旧手順が長文複製されていない。adapter に残るのは provider 固有の呼び出し面・権限制約・起動形態・報告形式のみである。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D8"
+        }
+      }
+    },
+    {
+      "claim_hash": "e182acff51dcf266dfafa633fac43d8db1d40bb4aafa3de037653a80a1f51a90",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "provider 固有の呼び出し方法、ツール制約、報告形式だけを adapter 側に残す。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "workflow SSoT（`.harness/workflows/**/*.md`）本文に provider 固有の起動細部（subagent / skill 起動方法、provider 固有の sandbox / 権限 flag 等）が含まれていない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "e182acff51dcf266dfafa633fac43d8db1d40bb4aafa3de037653a80a1f51a90",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/workflows/` には、オーケストレーターや専門家が従う手順を置く。対象は入力、前提条件、状態遷移、複数 capability を順序付ける invocation 連鎖、gate、停止条件、復旧方針、全体の output contract である。workflow が capability を呼ぶときは、capability 内部の文脈を複製せず `.harness/capabilities/<name>.md` に委譲する。\n\n`.harness/briefings/` は provider / scope 固有の review prompt や一時的な briefing injection を置く補助面として維持する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "workflow SSoT（`.harness/workflows/**/*.md`）本文に provider 固有の起動細部（subagent / skill 起動方法、provider 固有の sandbox / 権限 flag 等）が含まれていない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "e182acff51dcf266dfafa633fac43d8db1d40bb4aafa3de037653a80a1f51a90",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "adapter に残せる provider 固有情報は、(1) 呼び出し面の名前と起動方法、(2) provider 固有 tool / 権限制約、(3) subagent / skill / command の起動形態、(4) provider ごとの報告形式に限る。step 番号、gate 条件、状態遷移、失敗時復旧手順、commit / PR までの全体 sequence は workflow SSoT 側に置く。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "workflow SSoT（`.harness/workflows/**/*.md`）本文に provider 固有の起動細部（subagent / skill 起動方法、provider 固有の sandbox / 権限 flag 等）が含まれていない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D8"
+        }
+      }
+    },
+    {
+      "claim_hash": "99deadc37f8f5452ec3ace7f970a3bd611e1284b9f4ef241a4d20ca60daaba01",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「この閉包に含まれる capability で `.harness/capabilities/<name>.md` が存在しない場合、同じ track で capability SSoT を補う。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "`review-fix-lead` および `dry-fix-lead` の `.harness/capabilities/<name>.md` が同一 track の実装で新規作成される。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D9"
+        }
+      }
+    },
+    {
+      "claim_hash": "b54210cab4195e4580cb93e18002f4ccc3064f260d9b72ddb22f6e668207bcfb",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "修正対象ファイルは `.harness/custom/review-prompts/harness-policy.md` のみで、ここに「adapter-SSoT 同期 check」項目を追加する。最小要件は以下である:"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "`.harness/custom/review-prompts/harness-policy.md` の更新後に「adapter-SSoT 同期 check」項目が存在し、D10 の 3 つの最小要件（① adapter 冒頭参照 path の実在確認 ② adapter に workflow logic の長文複製がないこと ③ workflow SSoT に provider 固有起動細部が漏れ込んでいないこと）をすべて含む。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D10"
+        }
+      }
+    },
+    {
+      "claim_hash": "a194a06ef752d2ce9dd1012f0c743c224b53ee66399f3e75a3b090a12a4eebe9",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/config/review-scope.json` の `harness-policy` グループは既に `.harness/**` / `.claude/commands/**` / `.agents/**` を patterns に含むため、scope 定義の変更は不要である。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-10",
+          "text_label": "`.harness/config/review-scope.json` の `harness-policy` グループの patterns が `.harness/**`・`.claude/commands/**`・`.agents/**` を含んでおり、scope 定義の変更が不要であることが実装前に確認されている。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D10"
+        }
+      }
+    }
+  ]
+}

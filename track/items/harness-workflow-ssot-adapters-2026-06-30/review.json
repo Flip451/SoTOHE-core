@@ -16,6 +16,35 @@
           "findings": [],
           "hash": "rvw1:sha256:c7f9edafa82a6f4e3c0fcdc15be16b9a621924ac4ec0e1d01c040bb625a5fd3f",
           "at": "2026-06-30T08:20:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6136654197e24a2b6311ebafe05a35ca4d07b20be68693dfebd6b49d7a6dbd90",
+          "at": "2026-06-30T09:04:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`task-coverage.json` assigns CN-05 to T004, and the rendered spec shows T004 as a CN-05 task, but CN-05 specifically requires adapters to reference `.harness/workflows/track/<name>.md`. T004 is for capability adapters whose SSoT is `.harness/capabilities/review-fix-lead.md` / `dry-fix-lead.md`, so this coverage is semantically inconsistent and can steer implementers toward the wrong SSoT path for capability adapters. Remove T004 from CN-05 coverage or broaden CN-05 to cover capability SSoT paths explicitly.",
+              "severity": "P1",
+              "file": "track/items/harness-workflow-ssot-adapters-2026-06-30/task-coverage.json",
+              "line": 22,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:6136654197e24a2b6311ebafe05a35ca4d07b20be68693dfebd6b49d7a6dbd90",
+          "at": "2026-06-30T09:10:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:172f02e58841090a2630b1621dfbfe70cd5cf61ca132b778bbb8a805a2d2a7b5",
+          "at": "2026-06-30T09:15:31Z"
         }
       ]
     }
