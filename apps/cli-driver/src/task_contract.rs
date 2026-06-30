@@ -210,6 +210,22 @@ fn render_check_violations(violations: &[PreReviewGateViolation]) -> String {
         lines.push(line);
     }
 
+    // D3 soft prompt: surface the `/track:diagnose` rollback-routing skill as a
+    // suggestion when the liveness gate is Blocked. Soft only — no exit-code
+    // change, no PreToolUse hook, no lock-file mechanism (CN-06). The orchestrator
+    // (`/track:full-cycle` / `/track:adr2pr`) sees the Blocked exit and this
+    // prompt and decides whether to invoke `/track:diagnose` or self-classify the
+    // root cause.
+    lines.push(String::new());
+    lines.push(
+        "Suggest: run `/track:diagnose` with the violations above as diagnostic input to \
+         identify whether the rollback target is `adr` / `spec` / `type` / `impl_plan` / `impl`. \
+         See `.claude/skills/diagnose/SKILL.md` for the routing taxonomy. The orchestrator \
+         dispatches the corresponding writer (adr-editor / spec-designer / type-designer / \
+         impl-planner) or applies a source fix; `/track:diagnose` is diagnose-only."
+            .to_owned(),
+    );
+
     lines.join("\n")
 }
 
@@ -262,4 +278,49 @@ fn render_coverage_violations(violations: &[CoverageViolation]) -> String {
     }
 
     lines.join("\n")
+}
+
+// ---------------------------------------------------------------------------
+// Tests (D3 soft-prompt rendering)
+// ---------------------------------------------------------------------------
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::expect_used)]
+mod tests {
+    use usecase::pre_review_gate::PreReviewGateViolation;
+
+    use super::{render_check_violations, render_coverage_violations};
+
+    /// D3 / AC-03: the liveness-gate Blocked rendering surfaces the
+    /// `/track:diagnose` soft prompt so the calling orchestrator sees it on
+    /// stderr alongside the violation list. The prompt names the 5-class routing
+    /// taxonomy and the SKILL.md location for the calling LLM to pick up.
+    #[test]
+    fn render_check_violations_includes_track_diagnose_soft_prompt() {
+        let message = render_check_violations(&[PreReviewGateViolation::MissingTaskContract]);
+        assert!(
+            message.contains("/track:diagnose"),
+            "Blocked render must include the /track:diagnose soft prompt, got: {message}"
+        );
+        assert!(
+            message.contains(".claude/skills/diagnose/SKILL.md"),
+            "Blocked render must cite the SKILL.md path so the orchestrator can locate the \
+             routing taxonomy, got: {message}"
+        );
+    }
+
+    /// D3 scope boundary: the soft prompt is added only to the Check path; the
+    /// Coverage path renders attribution violations without the diagnose
+    /// suggestion (T005 description, AC-03 anchor on D3 only).
+    #[test]
+    fn render_coverage_violations_does_not_include_track_diagnose_soft_prompt() {
+        let message = render_coverage_violations(&[
+            usecase::pre_review_gate::CoverageViolation::MissingTaskContract,
+        ]);
+        assert!(
+            !message.contains("/track:diagnose"),
+            "Coverage render must NOT include the /track:diagnose soft prompt — that path is \
+             a separate concern (AC-03 anchors on D3 / Check only), got: {message}"
+        );
+    }
 }

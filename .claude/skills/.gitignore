@@ -8,6 +8,8 @@
 !architecture-customizer/**
 !codex-system/
 !codex-system/**
+!diagnose/
+!diagnose/**
 !gemini-system/
 !gemini-system/**
 !repomix-snapshot/
