@@ -1,0 +1,323 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:328569c23ffb36c16b693609f523b9067d53898d7d6c943c08a515525f565241",
+          "at": "2026-06-30T09:49:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:328569c23ffb36c16b693609f523b9067d53898d7d6c943c08a515525f565241",
+          "at": "2026-06-30T09:52:53Z"
+        }
+      ]
+    },
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c7f9edafa82a6f4e3c0fcdc15be16b9a621924ac4ec0e1d01c040bb625a5fd3f",
+          "at": "2026-06-30T08:16:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c7f9edafa82a6f4e3c0fcdc15be16b9a621924ac4ec0e1d01c040bb625a5fd3f",
+          "at": "2026-06-30T08:20:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6136654197e24a2b6311ebafe05a35ca4d07b20be68693dfebd6b49d7a6dbd90",
+          "at": "2026-06-30T09:04:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`task-coverage.json` assigns CN-05 to T004, and the rendered spec shows T004 as a CN-05 task, but CN-05 specifically requires adapters to reference `.harness/workflows/track/<name>.md`. T004 is for capability adapters whose SSoT is `.harness/capabilities/review-fix-lead.md` / `dry-fix-lead.md`, so this coverage is semantically inconsistent and can steer implementers toward the wrong SSoT path for capability adapters. Remove T004 from CN-05 coverage or broaden CN-05 to cover capability SSoT paths explicitly.",
+              "severity": "P1",
+              "file": "track/items/harness-workflow-ssot-adapters-2026-06-30/task-coverage.json",
+              "line": 22,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:6136654197e24a2b6311ebafe05a35ca4d07b20be68693dfebd6b49d7a6dbd90",
+          "at": "2026-06-30T09:10:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:172f02e58841090a2630b1621dfbfe70cd5cf61ca132b778bbb8a805a2d2a7b5",
+          "at": "2026-06-30T09:15:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bdc52c4ed2b90af15e520cd4930181f2420bc8622a34e21f54bc10d1a91fc834",
+          "at": "2026-06-30T09:49:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bdc52c4ed2b90af15e520cd4930181f2420bc8622a34e21f54bc10d1a91fc834",
+          "at": "2026-06-30T09:53:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7566f7b2dec8ccae669b77aa5c29c91e42d28312b28ff04a5ec2993f8ac41b36",
+          "at": "2026-06-30T10:26:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7566f7b2dec8ccae669b77aa5c29c91e42d28312b28ff04a5ec2993f8ac41b36",
+          "at": "2026-06-30T10:30:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0de20162d7ed7660e6c33c27f5abad43bf317bdcf99a9fdc3c016a440c9aea76",
+          "at": "2026-06-30T11:47:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The briefing states this lifecycle-tail round should modify only `impl-plan.json` and `plan.md`, and says any other plan-artifact change is an immediate finding. `git diff --name-status` shows additional modified plan artifacts: `cli-type-signals.json`, `cli_composition-type-signals.json`, `cli_driver-type-signals.json`, `domain-type-signals.json`, `infrastructure-type-signals.json`, `review.json`, and `usecase-type-signals.json`. That contradicts the round's stated D4 hash-backfill-only intent and should be reverted or explicitly re-scoped before approval.",
+              "severity": "P1",
+              "file": null,
+              "line": null,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0de20162d7ed7660e6c33c27f5abad43bf317bdcf99a9fdc3c016a440c9aea76",
+          "at": "2026-06-30T11:50:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0de20162d7ed7660e6c33c27f5abad43bf317bdcf99a9fdc3c016a440c9aea76",
+          "at": "2026-06-30T11:54:52Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:79f00ffc9ebda667175c2b60b41d6553458fa755bf5309ddbb1b534d57058d19",
+          "at": "2026-06-30T09:49:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:79f00ffc9ebda667175c2b60b41d6553458fa755bf5309ddbb1b534d57058d19",
+          "at": "2026-06-30T09:52:54Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This adapter points implementer delegation at `.codex/agents/implementer.toml`, but that file is not present in the template distribution. In a fresh consumer checkout the reference resolves to a dead path, so the delegation note is broken.",
+              "severity": "P1",
+              "file": ".agents/skills/track-implement/SKILL.md",
+              "line": 28,
+              "category": "template-distribution reference leak"
+            },
+            {
+              "message": "This wrapper has the same dead reference to `.codex/agents/implementer.toml`; the template does not ship that file, so the implementer delegation note cannot resolve in a fresh checkout.",
+              "severity": "P1",
+              "file": ".agents/skills/track-full-cycle/SKILL.md",
+              "line": 27,
+              "category": "template-distribution reference leak"
+            }
+          ],
+          "hash": "rvw1:sha256:42e5c64ceeda51a3e1c9f8024a240a1fc313fee2c0ec2fbdcab1ba3dccfcd999",
+          "at": "2026-06-30T10:34:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/review-fix-lead.md:13-16` still describes this wrapper as a Claude subagent with `model: opus`, but the routing source of truth in `/home/flip451/individual/t-rust/templates/SoTOHE-core/.harness/config/agent-profiles.json:51-54` sends `review-fix-lead` to `provider: codex` / `model: gpt-5.5`. That leaves the wrapper inconsistent with the active dispatch contract and can misroute anyone following it.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/review-fix-lead.md",
+              "line": 15,
+              "category": "capability routing mismatch"
+            },
+            {
+              "message": "`/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/dry-fix-lead.md:13-16` has the same mismatch: it still claims the capability runs as a Claude subagent with `model: opus`, while `/home/flip451/individual/t-rust/templates/SoTOHE-core/.harness/config/agent-profiles.json:62-64` routes `dry-fix-lead` to `provider: codex` / `model: gpt-5.5`. The thin wrapper no longer matches the routing contract it is supposed to reflect.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/dry-fix-lead.md",
+              "line": 15,
+              "category": "capability routing mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:6f40184b5b4ba0d879282034f23ae9fc56b0c645eef5710716d8381248f926d3",
+          "at": "2026-06-30T10:48:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "[`track-init` skill](/home/flip451/individual/t-rust/templates/SoTOHE-core/.agents/skills/track-init/SKILL.md#L23) tells Codex to use `cargo make track-commit-message` during Phase 0, but the matching `/track:init` adapter is wired around `cargo make track-branch-create`, `bin/sotp track views sync`, and `cargo make verify-track-metadata`. That leaves the init skill pointing at a commit-stage wrapper that does not belong to the init flow, so the adapter and command surface diverge.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.agents/skills/track-init/SKILL.md",
+              "line": 23,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:c90dc94958b05648149df39da6538a882772599e298d1e5cfa8c465901e9421d",
+          "at": "2026-06-30T10:57:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This says `implementer` is wired through a provider-specific Codex agent definition, but the current harness routes `implementer` to `claude` in `.harness/config/agent-profiles.json`, and `.claude/agents/README.md` documents it as main-session/ad-hoc delegation. The adapter is therefore pointing implementer consumers at the wrong provider path.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.agents/skills/track-implement/SKILL.md",
+              "line": 28,
+              "category": "convention contradiction"
+            },
+            {
+              "message": "This says `implementer` is wired through a provider-specific Codex agent definition, but the current harness routes `implementer` to `claude` in `.harness/config/agent-profiles.json`, and `.claude/agents/README.md` documents it as main-session/ad-hoc delegation. The adapter is therefore pointing implementer consumers at the wrong provider path.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.agents/skills/track-full-cycle/SKILL.md",
+              "line": 27,
+              "category": "convention contradiction"
+            },
+            {
+              "message": "This pins implementation verification to `cargo make ci-rust`, but `.harness/workflows/track/implement.md` Step 4 requires `cargo make ci`-equivalent validation before completion. As written, the skill can report completion after only the Rust subset and miss non-Rust gates.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.agents/skills/track-implement/SKILL.md",
+              "line": 31,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:21ff36d4d40262263b25355d43f98a1d128db40a324e4fe197bf4b4665263ab8",
+          "at": "2026-06-30T11:12:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2f0f090a699b341614119c48874c47a6c9a79c183be4b62e5c7c12f1a1237991",
+          "at": "2026-06-30T11:22:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Codex `track-pr-review` adapter marks success as `PR <url> review triggered`, but the workflow SSoT requires continuing after trigger/poll/parse until the reviewer signals explicit zero findings or the user approves an Accepted Deviations exception. Following this adapter can stop immediately after posting the review request, bypassing required PR review result handling.",
+              "severity": "P1",
+              "file": ".agents/skills/track-pr-review/SKILL.md",
+              "line": 33,
+              "category": "adapter-SSoT sync"
+            },
+            {
+              "message": "The Codex `track-adr2pr` adapter marks the whole ADR-to-PR lane completed when a PR is created, while the SSoT's final gate requires `pr-review` to reach the explicit zero-findings terminal state. This can report completion before the final PR review has actually passed.",
+              "severity": "P1",
+              "file": ".agents/skills/track-adr2pr/SKILL.md",
+              "line": 33,
+              "category": "adapter-SSoT sync"
+            },
+            {
+              "message": "The adapter says implementation verification runs `cargo make ci-rust`, but the implement workflow SSoT requires `cargo make ci`-equivalent validation before completion. This weaker command can skip non-Rust harness checks while still being presented as correctness verification.",
+              "severity": "P1",
+              "file": ".agents/skills/track-implement/SKILL.md",
+              "line": 22,
+              "category": "adapter-SSoT sync"
+            }
+          ],
+          "hash": "rvw1:sha256:2f0f090a699b341614119c48874c47a6c9a79c183be4b62e5c7c12f1a1237991",
+          "at": "2026-06-30T11:31:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aeca131831badc7d6f4debcc351db64156ca20a53d7071b88eedd33b738e0ffe",
+          "at": "2026-06-30T11:40:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 3.1 now says the lifecycle tail commit should stage review-operational artifacts produced by the tail review refresh (for example `review.json` and `<layer>-type-signals.json`), but Step 5 still aborts whenever `git status --short` contains anything outside `impl-plan.json` and `plan.md`. After a successful refresh, the workflow can legitimately have those extra files present and will then fail its own completion check.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.harness/workflows/track/full-cycle.md",
+              "line": 181,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:aea8797c2b5aab004f3002636af5c8dc27e0b87c9b70ab190ab3b327bb92cf7f",
+          "at": "2026-06-30T12:16:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6e4f5b1f08809a36fda717cbe117e1e8fbafea35a0ea428445886d8251b6236c",
+          "at": "2026-06-30T12:19:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6e4f5b1f08809a36fda717cbe117e1e8fbafea35a0ea428445886d8251b6236c",
+          "at": "2026-06-30T12:23:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:22a1e1e1742712f7244f8f85e21ea8ddc6685af2871ac0566af6efb9bd990b26",
+          "at": "2026-06-30T12:35:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:22a1e1e1742712f7244f8f85e21ea8ddc6685af2871ac0566af6efb9bd990b26",
+          "at": "2026-06-30T12:38:41Z"
+        }
+      ]
+    }
+  }
+}

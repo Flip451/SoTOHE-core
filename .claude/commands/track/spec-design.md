@@ -2,33 +2,22 @@
 description: Author the track's spec.json via the spec-designer subagent (Phase 1).
 ---
 
-Canonical command for Phase 1 spec authoring.
+> Operational SSoT: `.harness/workflows/track/spec-design.md` — provider 非依存 workflow logic はそちらを参照。本ファイルは Claude Code 固有 adapter として、起動形態 / Tool 制約 / 報告形式のみを残す。
 
-Writer: spec-designer subagent. The command body contains only (a) the subagent invocation and (b) the receipt of its signal-evaluation result. All file writes (spec.json), rendered views (spec.md), and spec → ADR signal evaluation run **inside** the spec-designer subagent.
+## Invocation
 
-Resolve the track id from the current branch (`track/<id>`).
+User invokes this command as `/track:spec-design`. No arguments.
 
-Pre-check:
+## Claude Code invocation constraints
 
-- Confirm `track/items/<track-id>/metadata.json` exists. If not, stop and instruct the user to run `/track:init <feature>` first.
+Invoke the spec-designer via the Agent tool (`subagent_type: "spec-designer"`, `run_in_background: true`). Briefing must include:
 
-Execution:
+- Track id and `track/items/<track-id>/metadata.json` path
+- Paths to the referenced ADR(s) under `knowledge/adr/`
+- Paths to the related conventions under `knowledge/conventions/`
 
-1. Invoke the spec-designer subagent via the Agent tool (`subagent_type: "spec-designer"`).
-   Briefing must include:
-   - Track id and `track/items/<track-id>/metadata.json` path
-   - Paths to the referenced ADR(s) under `knowledge/adr/`
-   - Paths to the related conventions under `knowledge/conventions/`
-   - The subagent owns writing `track/items/<track-id>/spec.json`, rendering `spec.md`, and evaluating the spec → ADR signal (🔵🟡🔴).
-2. Receive the signal-evaluation result from the subagent and surface it as the `/track:spec-design` output.
+The subagent owns: writing `spec.json`, rendering `spec.md`, and evaluating the spec → ADR signal (🔵🟡🔴). No direct CLI calls from this adapter body.
 
-Report:
+## Report format
 
-- Track id
-- `spec.json` path
-- Signal counts (blue / yellow / red)
-
-Behavior:
-
-- No direct CLI invocation from this command body — all CLI calls execute inside the spec-designer subagent.
-- Single-shot: invoke once, receive the signal result, return.
+Report: track id, `spec.json` path, signal counts (blue / yellow / red).

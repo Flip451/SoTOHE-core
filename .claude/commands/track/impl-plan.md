@@ -2,33 +2,21 @@
 description: Author the track's impl-plan.json + task-coverage.json via the impl-planner subagent (Phase 3).
 ---
 
-Canonical command for Phase 3 implementation-plan authoring.
+> Operational SSoT: `.harness/workflows/track/impl-plan.md` — provider 非依存 workflow logic はそちらを参照。本ファイルは Claude Code 固有 adapter として、起動形態 / Tool 制約 / 報告形式のみを残す。
 
-Writer: impl-planner subagent. The command body contains only (a) the subagent invocation and (b) the receipt of its gate-evaluation result. All file writes (impl-plan.json, task-coverage.json) and the task-coverage binary gate run **inside** the impl-planner subagent.
+## Invocation
 
-Resolve the track id from the current branch (`track/<id>`).
+User invokes this command as `/track:impl-plan`. No arguments.
 
-Pre-check:
+## Claude Code invocation constraints
 
-- Confirm `track/items/<track-id>/spec.json` exists (Phase 1 output). If not, stop and instruct the user to run `/track:spec-design` first.
-- Confirm at least one `track/items/<track-id>/<layer>-types.json` exists for every TDDD-enabled layer (Phase 2 output). If not, stop and instruct the user to run `/track:type-design` first.
+Provider routing from `.harness/config/agent-profiles.json` (`capabilities.impl-planner.provider`):
 
-Execution:
+- **Claude (default)**: Agent tool (`subagent_type: "impl-planner"`, `run_in_background: true`). Briefing must include: track id, paths to `spec.json` and each `<layer>-types.json`, paths to related ADR(s) and conventions.
+- **Codex**: `bin/sotp plan codex-local --model {model} --briefing-file tmp/impl-planner-briefing.md`
 
-1. Invoke the impl-planner subagent via the Agent tool (`subagent_type: "impl-planner"`).
-   Briefing must include:
-   - Track id and paths to `track/items/<track-id>/spec.json` and each `<layer>-types.json`
-   - Paths to the related ADR(s) under `knowledge/adr/` and conventions under `knowledge/conventions/`
-   - The subagent owns writing `track/items/<track-id>/impl-plan.json` and `track/items/<track-id>/task-coverage.json`, and evaluating the task-coverage binary gate.
-2. Receive the gate-evaluation result (OK / ERROR) from the subagent and surface it as the `/track:impl-plan` output.
+The subagent owns: writing `impl-plan.json` and `task-coverage.json`, and evaluating the task-coverage binary gate (OK / ERROR). No direct CLI calls from this adapter body (Claude path).
 
-Report:
+## Report format
 
-- Track id
-- `impl-plan.json` and `task-coverage.json` paths
-- Task count and gate verdict (OK / ERROR)
-
-Behavior:
-
-- No direct CLI invocation from this command body — all CLI calls execute inside the impl-planner subagent.
-- Single-shot: invoke once, receive the gate verdict, return.
+Report: track id, `impl-plan.json` and `task-coverage.json` paths, task count, gate verdict (OK / ERROR).
