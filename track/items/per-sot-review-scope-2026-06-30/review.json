@@ -1,57 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new continuation line is dedented out of the `description: |` block, so this frontmatter is no longer valid YAML and the `rollback-diagnoser` skill wrapper can fail to load. Keep `external PR-reviewer comments need` indented with the rest of the block.",
-              "severity": "P1",
-              "file": ".claude/skills/diagnose/SKILL.md",
-              "line": 9,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:0de706c7acdb1ac61c3049d2815a4ab80599434e92fabdb72098f441d827c400",
-          "at": "2026-06-30T18:34:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:975c53ef881d66e3acdf4888b41e94cc33b223cb40c19f4196dc593b6d06f15b",
-          "at": "2026-06-30T18:48:37Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:975c53ef881d66e3acdf4888b41e94cc33b223cb40c19f4196dc593b6d06f15b",
-          "at": "2026-06-30T18:54:07Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:71c9a65ef8c0f82f95c184e2856275ecd6b3f34a3a06a086101894bb4efc3324",
-          "at": "2026-06-30T18:28:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:71c9a65ef8c0f82f95c184e2856275ecd6b3f34a3a06a086101894bb4efc3324",
-          "at": "2026-06-30T18:33:40Z"
-        }
-      ]
-    },
     "cli": {
       "rounds": [
         {
@@ -85,6 +34,144 @@
           "findings": [],
           "hash": "rvw1:sha256:2a6fac96faab96dff8e759f63a3dae9384d762fadec98160604a2a894911a6c9",
           "at": "2026-06-30T18:33:03Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c10edad35d7451700d0f28c66ae41ee3e955220c8c6d6e434f6d945137e10856",
+          "at": "2026-06-30T18:28:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c10edad35d7451700d0f28c66ae41ee3e955220c8c6d6e434f6d945137e10856",
+          "at": "2026-06-30T18:34:04Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 only budgets the `.harness/config/review-scope.json` rewrite plus `review_operational` additions, but `observations.md:38` says the batch also had to add `.claude/skills/**` to the `harness-policy` patterns so T003's `.claude/skills/diagnose/SKILL.md` edit is inside scope. That prerequisite boundary update is not described anywhere in the plan, so T003 is not fully executable from this impl-plan as written.",
+              "severity": "P1",
+              "file": "track/items/per-sot-review-scope-2026-06-30/impl-plan.json",
+              "line": 6,
+              "category": "task description non-executable"
+            }
+          ],
+          "hash": "rvw1:sha256:99a5cc79536a0f3ac44bd5b73f7d25d9af10556e68c386b273a6e10158d74c22",
+          "at": "2026-06-30T18:31:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:742f47eaf8889e09c6cb325d9c5c40abc3b9e31c9a7fb9f1db1356e7ffaec3b4",
+          "at": "2026-06-30T18:45:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`observations.md` records AC-13 as passed from `grep -rn 'plan-artifacts\\|plan_artifacts' . ...`, but that command scans the whole worktree rather than the T005-scoped surface and is not reproducible with the listed residuals. In the current tree it also matches generated/worktree paths outside the three exclusions documented here, so the recorded “残存ヒットは以下のみ” / AC-13 pass evidence is incomplete. Since T005’s acceptance depends on recording the verification command and result, this observations step has not carried the AC-13 recording mandate through to completion.",
+              "severity": "P1",
+              "file": "track/items/per-sot-review-scope-2026-06-30/observations.md",
+              "line": 44,
+              "category": "observations.md mandate without trigger"
+            }
+          ],
+          "hash": "rvw1:sha256:742f47eaf8889e09c6cb325d9c5c40abc3b9e31c9a7fb9f1db1356e7ffaec3b4",
+          "at": "2026-06-30T18:48:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`observations.md` records AC-13 as already verified and passing after “T001-T004” were applied, but the executable plan still has only T001 marked `in_progress` and leaves T002-T005 as `todo`; T005 itself says its prerequisite is that T001-T004 are complete. This makes the current impl-plan state incoherent: a future executor following the plan sees T005 evidence already written before the task can legally run, so the AC-13 observation is not tied to the declared task ordering.",
+              "severity": "P1",
+              "file": "track/items/per-sot-review-scope-2026-06-30/observations.md",
+              "line": 5,
+              "category": "dependency/order"
+            }
+          ],
+          "hash": "rvw1:sha256:afb7ca4a717cdc0702148d4c2f98ce55ff49ab7819b697ebec48a8711958c080",
+          "at": "2026-06-30T18:54:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:661609214761d6c6d2df61fdbafe4ba7e12f4837e5405c52034f95a6bd8ae1d2",
+          "at": "2026-06-30T18:58:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:931b494a1810ddd22b47e5f3202e3939f47744124fb23efc7c82c2564763854c",
+          "at": "2026-06-30T19:04:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:931b494a1810ddd22b47e5f3202e3939f47744124fb23efc7c82c2564763854c",
+          "at": "2026-06-30T19:06:42Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f46c3ffd17927b242e3e479ef0b090c1d78f6cb77b3fb1f4b8a2aaf45a7c0ce3",
+          "at": "2026-06-30T18:28:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f46c3ffd17927b242e3e479ef0b090c1d78f6cb77b3fb1f4b8a2aaf45a7c0ce3",
+          "at": "2026-06-30T18:34:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cfd0e74e43beb8a849406b42c5fffbb004562c01ebbb5727e0936b8f173fb99e",
+          "at": "2026-06-30T18:44:57Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:71c9a65ef8c0f82f95c184e2856275ecd6b3f34a3a06a086101894bb4efc3324",
+          "at": "2026-06-30T18:28:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:71c9a65ef8c0f82f95c184e2856275ecd6b3f34a3a06a086101894bb4efc3324",
+          "at": "2026-06-30T18:33:40Z"
         }
       ]
     },
@@ -210,109 +297,36 @@
         }
       ]
     },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c10edad35d7451700d0f28c66ae41ee3e955220c8c6d6e434f6d945137e10856",
-          "at": "2026-06-30T18:28:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c10edad35d7451700d0f28c66ae41ee3e955220c8c6d6e434f6d945137e10856",
-          "at": "2026-06-30T18:34:04Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f46c3ffd17927b242e3e479ef0b090c1d78f6cb77b3fb1f4b8a2aaf45a7c0ce3",
-          "at": "2026-06-30T18:28:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f46c3ffd17927b242e3e479ef0b090c1d78f6cb77b3fb1f4b8a2aaf45a7c0ce3",
-          "at": "2026-06-30T18:34:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cfd0e74e43beb8a849406b42c5fffbb004562c01ebbb5727e0936b8f173fb99e",
-          "at": "2026-06-30T18:44:57Z"
-        }
-      ]
-    },
-    "impl-plan": {
+    "harness-policy": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "T001 only budgets the `.harness/config/review-scope.json` rewrite plus `review_operational` additions, but `observations.md:38` says the batch also had to add `.claude/skills/**` to the `harness-policy` patterns so T003's `.claude/skills/diagnose/SKILL.md` edit is inside scope. That prerequisite boundary update is not described anywhere in the plan, so T003 is not fully executable from this impl-plan as written.",
+              "message": "The new continuation line is dedented out of the `description: |` block, so this frontmatter is no longer valid YAML and the `rollback-diagnoser` skill wrapper can fail to load. Keep `external PR-reviewer comments need` indented with the rest of the block.",
               "severity": "P1",
-              "file": "track/items/per-sot-review-scope-2026-06-30/impl-plan.json",
-              "line": 6,
-              "category": "task description non-executable"
+              "file": ".claude/skills/diagnose/SKILL.md",
+              "line": 9,
+              "category": "command wiring breakage"
             }
           ],
-          "hash": "rvw1:sha256:99a5cc79536a0f3ac44bd5b73f7d25d9af10556e68c386b273a6e10158d74c22",
-          "at": "2026-06-30T18:31:26Z"
+          "hash": "rvw1:sha256:0de706c7acdb1ac61c3049d2815a4ab80599434e92fabdb72098f441d827c400",
+          "at": "2026-06-30T18:34:10Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:742f47eaf8889e09c6cb325d9c5c40abc3b9e31c9a7fb9f1db1356e7ffaec3b4",
-          "at": "2026-06-30T18:45:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`observations.md` records AC-13 as passed from `grep -rn 'plan-artifacts\\|plan_artifacts' . ...`, but that command scans the whole worktree rather than the T005-scoped surface and is not reproducible with the listed residuals. In the current tree it also matches generated/worktree paths outside the three exclusions documented here, so the recorded “残存ヒットは以下のみ” / AC-13 pass evidence is incomplete. Since T005’s acceptance depends on recording the verification command and result, this observations step has not carried the AC-13 recording mandate through to completion.",
-              "severity": "P1",
-              "file": "track/items/per-sot-review-scope-2026-06-30/observations.md",
-              "line": 44,
-              "category": "observations.md mandate without trigger"
-            }
-          ],
-          "hash": "rvw1:sha256:742f47eaf8889e09c6cb325d9c5c40abc3b9e31c9a7fb9f1db1356e7ffaec3b4",
-          "at": "2026-06-30T18:48:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`observations.md` records AC-13 as already verified and passing after “T001-T004” were applied, but the executable plan still has only T001 marked `in_progress` and leaves T002-T005 as `todo`; T005 itself says its prerequisite is that T001-T004 are complete. This makes the current impl-plan state incoherent: a future executor following the plan sees T005 evidence already written before the task can legally run, so the AC-13 observation is not tied to the declared task ordering.",
-              "severity": "P1",
-              "file": "track/items/per-sot-review-scope-2026-06-30/observations.md",
-              "line": 5,
-              "category": "dependency/order"
-            }
-          ],
-          "hash": "rvw1:sha256:afb7ca4a717cdc0702148d4c2f98ce55ff49ab7819b697ebec48a8711958c080",
-          "at": "2026-06-30T18:54:00Z"
+          "hash": "rvw1:sha256:975c53ef881d66e3acdf4888b41e94cc33b223cb40c19f4196dc593b6d06f15b",
+          "at": "2026-06-30T18:48:37Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:661609214761d6c6d2df61fdbafe4ba7e12f4837e5405c52034f95a6bd8ae1d2",
-          "at": "2026-06-30T18:58:18Z"
+          "hash": "rvw1:sha256:975c53ef881d66e3acdf4888b41e94cc33b223cb40c19f4196dc593b6d06f15b",
+          "at": "2026-06-30T18:54:07Z"
         }
       ]
     }
