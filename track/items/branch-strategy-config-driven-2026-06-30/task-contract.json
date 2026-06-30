@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "track_id": "branch-strategy-config-driven-2026-06-30",
+  "entries": {
+    "T001": [
+      { "layer": "domain", "entry_key": "MergeMethod" },
+      { "layer": "domain", "entry_key": "BranchStrategySnapshot" },
+      { "layer": "domain", "entry_key": "TrackMetadata" }
+    ],
+    "T002": [
+      { "layer": "usecase", "entry_key": "BranchStrategyPort" },
+      { "layer": "usecase", "entry_key": "TrackService" }
+    ],
+    "T003": [
+      { "layer": "infrastructure", "entry_key": "MergeMethodDocument" },
+      { "layer": "infrastructure", "entry_key": "BranchStrategySnapshotDocument" },
+      { "layer": "infrastructure", "entry_key": "TrackDocumentV2" }
+    ],
+    "T004": [
+      { "layer": "infrastructure", "entry_key": "JsonConfigBranchStrategyAdapter" },
+      { "layer": "infrastructure", "entry_key": "SnapshotBranchStrategyAdapter" },
+      { "layer": "infrastructure", "entry_key": "BranchStrategyConfigError" }
+    ],
+    "T005": [
+      { "layer": "usecase", "entry_key": "BranchStrategyPort" },
+      { "layer": "domain", "entry_key": "BranchStrategySnapshot" },
+      { "layer": "domain", "entry_key": "TrackMetadata" }
+    ],
+    "T006": [],
+    "T007": [],
+    "T008": [],
+    "T009": [
+      { "layer": "cli_driver", "entry_key": "TrackInput" }
+    ],
+    "T010": [
+      { "layer": "cli", "entry_key": "TrackCommand" },
+      { "layer": "cli", "entry_key": "EnsurePrArgs" },
+      { "layer": "cli", "entry_key": "WaitAndMergeArgs" }
+    ],
+    "T011": [
+      { "layer": "cli_composition", "entry_key": "TrackCompositionRoot" }
+    ],
+    "T012": [],
+    "T013": [],
+    "T014": [],
+    "T015": []
+  }
+}

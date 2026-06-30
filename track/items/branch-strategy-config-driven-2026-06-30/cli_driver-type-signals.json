@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-06-30T19:49:05Z",
+  "declaration_hash": "157e6c551cf95a6c691315c117cdba93cf7de8f27c786a7d46fc9ed705070092",
+  "signals": [
+    {
+      "type_name": "TrackInput",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": true
+    }
+  ]
+}

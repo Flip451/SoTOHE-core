@@ -1,0 +1,183 @@
+{
+  "schema_version": 5,
+  "crate_name": "cli_driver",
+  "layer": "cli_driver",
+  "types": {
+    "TrackInput": {
+      "action": "modify",
+      "role": { "PrimaryAdapter": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Init",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "items_dir",   "ty": "std::path::PathBuf" },
+                { "name": "track_id",   "ty": "String" },
+                { "name": "description","ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "Transition",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "items_dir",     "ty": "std::path::PathBuf" },
+                { "name": "track_id",      "ty": "Option<String>" },
+                { "name": "task_id",       "ty": "String" },
+                { "name": "target_status", "ty": "String" },
+                { "name": "commit_hash",   "ty": "Option<String>" }
+              ]
+            }
+          },
+          {
+            "name": "Resolve",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "items_dir", "ty": "std::path::PathBuf" },
+                { "name": "track_id",  "ty": "Option<String>" }
+              ]
+            }
+          },
+          {
+            "name": "BranchCreate",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "items_dir", "ty": "std::path::PathBuf" },
+                { "name": "track_id",  "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "BranchSwitch",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "items_dir", "ty": "std::path::PathBuf" },
+                { "name": "track_id",  "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "ViewsValidate",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "project_root", "ty": "std::path::PathBuf" }
+              ]
+            }
+          },
+          {
+            "name": "ViewsSync",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "project_root", "ty": "std::path::PathBuf" },
+                { "name": "track_id",     "ty": "Option<String>" }
+              ]
+            }
+          },
+          {
+            "name": "AddTask",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "items_dir",   "ty": "std::path::PathBuf" },
+                { "name": "track_id",    "ty": "Option<String>" },
+                { "name": "description", "ty": "String" },
+                { "name": "section",     "ty": "Option<String>" },
+                { "name": "after",       "ty": "Option<String>" }
+              ]
+            }
+          },
+          {
+            "name": "SetOverride",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "items_dir", "ty": "std::path::PathBuf" },
+                { "name": "track_id",  "ty": "Option<String>" },
+                { "name": "status",    "ty": "String" },
+                { "name": "reason",    "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "ClearOverride",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "items_dir", "ty": "std::path::PathBuf" },
+                { "name": "track_id",  "ty": "Option<String>" }
+              ]
+            }
+          },
+          {
+            "name": "NextTask",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "items_dir", "ty": "std::path::PathBuf" },
+                { "name": "track_id",  "ty": "Option<String>" }
+              ]
+            }
+          },
+          {
+            "name": "TaskCounts",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "items_dir", "ty": "std::path::PathBuf" },
+                { "name": "track_id",  "ty": "Option<String>" }
+              ]
+            }
+          },
+          {
+            "name": "Archive",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "items_dir", "ty": "std::path::PathBuf" },
+                { "name": "track_id",  "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "DetectActive",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "project_root", "ty": "std::path::PathBuf" }
+              ]
+            }
+          },
+          {
+            "name": "SwitchBase",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "project_root", "ty": "std::path::PathBuf" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "track",
+      "docs": "Typed input for the track command family. SwitchBase is new in this track (IN-05): switches to the base branch read from the active track's branch_strategy_snapshot.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-05" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [],
+  "trait_impls": []
+}

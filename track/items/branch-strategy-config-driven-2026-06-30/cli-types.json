@@ -1,0 +1,285 @@
+{
+  "schema_version": 5,
+  "crate_name": "cli",
+  "layer": "cli",
+  "types": {
+    "TrackCommand": {
+      "action": "modify",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Archive",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "items_dir", "ty": "std::path::PathBuf" },
+                { "name": "track_id",  "ty": "Option<String>" }
+              ]
+            }
+          },
+          {
+            "name": "Transition",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "items_dir",     "ty": "std::path::PathBuf" },
+                { "name": "track_id",      "ty": "Option<String>" },
+                { "name": "task_id",       "ty": "String" },
+                { "name": "target_status", "ty": "String" },
+                { "name": "commit_hash",   "ty": "Option<String>" }
+              ]
+            }
+          },
+          {
+            "name": "Branch",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "action", "ty": "BranchAction" }
+              ]
+            }
+          },
+          {
+            "name": "Resolve",
+            "payload": { "kind": "tuple", "fields": ["ResolveArgs"] }
+          },
+          {
+            "name": "Views",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "action", "ty": "ViewAction" }
+              ]
+            }
+          },
+          {
+            "name": "AddTask",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "items_dir",   "ty": "std::path::PathBuf" },
+                { "name": "track_id",    "ty": "Option<String>" },
+                { "name": "description", "ty": "String" },
+                { "name": "section",     "ty": "Option<String>" },
+                { "name": "after",       "ty": "Option<String>" }
+              ]
+            }
+          },
+          {
+            "name": "SetOverride",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "items_dir", "ty": "std::path::PathBuf" },
+                { "name": "track_id",  "ty": "Option<String>" },
+                { "name": "status",    "ty": "String" },
+                { "name": "reason",    "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "ClearOverride",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "items_dir", "ty": "std::path::PathBuf" },
+                { "name": "track_id",  "ty": "Option<String>" }
+              ]
+            }
+          },
+          {
+            "name": "NextTask",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "items_dir", "ty": "std::path::PathBuf" },
+                { "name": "track_id",  "ty": "Option<String>" }
+              ]
+            }
+          },
+          {
+            "name": "TaskCounts",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "items_dir", "ty": "std::path::PathBuf" },
+                { "name": "track_id",  "ty": "Option<String>" }
+              ]
+            }
+          },
+          {
+            "name": "TypeGraph",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "items_dir",     "ty": "std::path::PathBuf" },
+                { "name": "track_id",      "ty": "Option<String>" },
+                { "name": "workspace_root","ty": "std::path::PathBuf" },
+                { "name": "layer",         "ty": "Option<String>" },
+                { "name": "cluster_depth", "ty": "usize" },
+                { "name": "edges",         "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "BaselineGraph",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "items_dir",     "ty": "std::path::PathBuf" },
+                { "name": "track_id",      "ty": "Option<String>" },
+                { "name": "workspace_root","ty": "std::path::PathBuf" },
+                { "name": "layers",        "ty": "Option<String>" }
+              ]
+            }
+          },
+          {
+            "name": "ContractMap",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "items_dir",     "ty": "std::path::PathBuf" },
+                { "name": "track_id",      "ty": "Option<String>" },
+                { "name": "workspace_root","ty": "std::path::PathBuf" },
+                { "name": "layers",        "ty": "Option<String>" }
+              ]
+            }
+          },
+          {
+            "name": "SpecElementHash",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "items_dir", "ty": "std::path::PathBuf" },
+                { "name": "track_id",  "ty": "Option<String>" },
+                { "name": "anchor",    "ty": "Option<String>" }
+              ]
+            }
+          },
+          {
+            "name": "BaselineCapture",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "track_id",        "ty": "Option<String>" },
+                { "name": "workspace_root",  "ty": "std::path::PathBuf" },
+                { "name": "source_workspace","ty": "Option<std::path::PathBuf>" },
+                { "name": "layer",           "ty": "Option<String>" }
+              ]
+            }
+          },
+          {
+            "name": "Lint",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "track_id",      "ty": "Option<String>" },
+                { "name": "layer_id",      "ty": "String" },
+                { "name": "workspace_root","ty": "std::path::PathBuf" },
+                { "name": "rules_file",    "ty": "Option<std::path::PathBuf>" }
+              ]
+            }
+          },
+          {
+            "name": "CatalogueImplSignals",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "track_id",      "ty": "Option<String>" },
+                { "name": "workspace_root","ty": "std::path::PathBuf" },
+                { "name": "layer",         "ty": "Option<String>" }
+              ]
+            }
+          },
+          {
+            "name": "FixpointResolve",
+            "payload": { "kind": "tuple", "fields": ["FixpointResolveArgs"] }
+          },
+          {
+            "name": "SetCommitHash",
+            "payload": { "kind": "tuple", "fields": ["SetCommitHashArgs"] }
+          },
+          {
+            "name": "SwitchBase",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "project_root", "ty": "std::path::PathBuf" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "commands::track",
+      "docs": "CLI subcommand enum for track operations. SwitchBase is new in this track (IN-05): sotp track switch-base -- switches to the base branch from the active track's branch_strategy_snapshot.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-05" }
+      ],
+      "informal_grounds": []
+    },
+    "EnsurePrArgs": {
+      "action": "modify",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "track_id", "ty": "Option<String>" },
+            { "name": "base",     "ty": "Option<String>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "commands::pr",
+      "docs": "CLI args for 'sotp pr ensure-pr'. base changes from String (default 'main') to Option<String> to allow the composition root to resolve merge_target via port.merge_target() from the effective branch strategy when None (AC-03, D1).",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-03" }
+      ],
+      "informal_grounds": []
+    },
+    "WaitAndMergeArgs": {
+      "action": "modify",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "pr",       "ty": "String" },
+            { "name": "interval", "ty": "u64" },
+            { "name": "timeout",  "ty": "u64" },
+            { "name": "method",   "ty": "Option<String>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "commands::pr",
+      "docs": "CLI args for 'sotp pr wait-and-merge'. method changes from String (default_value='merge') to Option<String> so the composition root resolves merge_method() from branch_strategy_snapshot when None; explicit --method merge|squash|rebase overrides. cli layer may_depend_on=[cli_composition,cli_driver] only — Option<MergeMethod> is architecturally impossible here; domain MergeMethod conversion happens in cli_composition (AC-09, D1). pr/interval/timeout are opaque technical knobs with no domain model in this layer.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-03" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-09" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [],
+  "trait_impls": [
+    { "action": "reference", "trait_ref": "core::fmt::Debug",                    "for_type": "EnsurePrArgs" },
+    { "action": "reference", "trait_ref": "clap_builder::derive::Args",          "for_type": "EnsurePrArgs" },
+    { "action": "reference", "trait_ref": "clap_builder::derive::FromArgMatches","for_type": "EnsurePrArgs" },
+    { "action": "reference", "trait_ref": "core::fmt::Debug",                    "for_type": "TrackCommand" },
+    { "action": "reference", "trait_ref": "clap_builder::derive::Subcommand",    "for_type": "TrackCommand" },
+    { "action": "reference", "trait_ref": "clap_builder::derive::FromArgMatches","for_type": "TrackCommand" },
+    { "action": "reference", "trait_ref": "core::fmt::Debug",                    "for_type": "WaitAndMergeArgs" },
+    { "action": "reference", "trait_ref": "clap_builder::derive::Args",          "for_type": "WaitAndMergeArgs" },
+    { "action": "reference", "trait_ref": "clap_builder::derive::FromArgMatches","for_type": "WaitAndMergeArgs" }
+  ]
+}

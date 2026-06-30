@@ -1,0 +1,198 @@
+{
+  "schema_version": 1,
+  "layer": "infrastructure",
+  "entries": [
+    {
+      "claim_hash": "6b0acbdac1fcac27102676b038a55d501099b19b7d1ec300f34226cc39e479a4",
+      "evidence_hash": "2156210654ee69210a57760cf1ed63f924b158ac0cabf238d09d38bde0ad37c0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/infrastructure/` に JSON config ローダ adapter と metadata snapshot reader adapter を実装し、track context の有無で解決先を切り替える。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "BranchStrategyConfigError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "`BranchStrategyPort` trait を `libs/usecase/` に新設し、`base_branch() -> &str`、`merge_target() -> &str`、`merge_method() -> MergeMethod`、`track_prefix() -> &str` を expose する。`libs/infrastructure/` に JSON config ローダ adapter と metadata snapshot reader adapter を実装し、track context の有無で解決先を切り替える。"
+        }
+      }
+    },
+    {
+      "claim_hash": "360429f6aba400755c16fdb21a158661076386b27eb8ec1920039e6a5cff1569",
+      "evidence_hash": "a631b2ae241f34f35f966845be6c7ec58599d653be07295714b03ab5b05cc648",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`branch_strategy_snapshot` フィールドが存在しない `metadata.json` を fail-closed（parse 失敗）として扱うよう codec を更新する。D5 bootstrap exception として、本 track 自身の `metadata.json` に `branch_strategy_snapshot: {base_branch: \"main\", merge_target: \"main\", merge_method: \"squash\"}` を実装 PR 内で追加する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "BranchStrategySnapshotDocument"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "`branch_strategy_snapshot` フィールドが存在しない `metadata.json` を fail-closed（parse 失敗）として扱うよう codec を更新する。D5 bootstrap exception として、本 track 自身の `metadata.json` に `branch_strategy_snapshot: {base_branch: \"main\", merge_target: \"main\", merge_method: \"squash\"}` を実装 PR 内で追加する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "e6ac07a4edae016e5f47c533aebe91442c62921aa37dfa891141d22f98decaeb",
+      "evidence_hash": "2156210654ee69210a57760cf1ed63f924b158ac0cabf238d09d38bde0ad37c0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/infrastructure/` に JSON config ローダ adapter と metadata snapshot reader adapter を実装し、track context の有無で解決先を切り替える。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "JsonConfigBranchStrategyAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "`BranchStrategyPort` trait を `libs/usecase/` に新設し、`base_branch() -> &str`、`merge_target() -> &str`、`merge_method() -> MergeMethod`、`track_prefix() -> &str` を expose する。`libs/infrastructure/` に JSON config ローダ adapter と metadata snapshot reader adapter を実装し、track context の有無で解決先を切り替える。"
+        }
+      }
+    },
+    {
+      "claim_hash": "39b1b3bc636c19231f76720d85eba0ef764874c4b3396ae11949bb0aa042d3ac",
+      "evidence_hash": "a631b2ae241f34f35f966845be6c7ec58599d653be07295714b03ab5b05cc648",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D5 bootstrap exception として、本 track 自身の `metadata.json` に `branch_strategy_snapshot: {base_branch: \"main\", merge_target: \"main\", merge_method: \"squash\"}` を実装 PR 内で追加する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "MergeMethodDocument"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "`branch_strategy_snapshot` フィールドが存在しない `metadata.json` を fail-closed（parse 失敗）として扱うよう codec を更新する。D5 bootstrap exception として、本 track 自身の `metadata.json` に `branch_strategy_snapshot: {base_branch: \"main\", merge_target: \"main\", merge_method: \"squash\"}` を実装 PR 内で追加する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c81aaced9415fb3b35425bffcc58508626479b85e1e512e8d60ca77c17d98949",
+      "evidence_hash": "2156210654ee69210a57760cf1ed63f924b158ac0cabf238d09d38bde0ad37c0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/infrastructure/` に JSON config ローダ adapter と metadata snapshot reader adapter を実装し、track context の有無で解決先を切り替える。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "SnapshotBranchStrategyAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "`BranchStrategyPort` trait を `libs/usecase/` に新設し、`base_branch() -> &str`、`merge_target() -> &str`、`merge_method() -> MergeMethod`、`track_prefix() -> &str` を expose する。`libs/infrastructure/` に JSON config ローダ adapter と metadata snapshot reader adapter を実装し、track context の有無で解決先を切り替える。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c81aaced9415fb3b35425bffcc58508626479b85e1e512e8d60ca77c17d98949",
+      "evidence_hash": "f0d356fc0f7dd6a29caf05e5a437764fac86fe83209a4e05c979dbf901b3c399",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track 初期化後のすべての PR 作成・コミットゲート・ブランチ操作は `metadata.json#branch_strategy_snapshot` を effective strategy として使い、`.harness/config/branch-strategy.json` を再参照しない。global config の変更が in-flight track の PR base を変えない不変条件を持つ。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "SnapshotBranchStrategyAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "track 初期化後のすべての PR 作成・コミットゲート・ブランチ操作は `metadata.json#branch_strategy_snapshot` を effective strategy として使い、`.harness/config/branch-strategy.json` を再参照しない。global config の変更が in-flight track の PR base を変えない不変条件を持つ。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b06cc1517788a997e0ed4c72327eb1c79bbbccee5c0fb7c89ddbebbe801be21b",
+      "evidence_hash": "a631b2ae241f34f35f966845be6c7ec58599d653be07295714b03ab5b05cc648",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`branch_strategy_snapshot` フィールドが存在しない `metadata.json` を fail-closed（parse 失敗）として扱うよう codec を更新する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "TrackDocumentV2"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "`branch_strategy_snapshot` フィールドが存在しない `metadata.json` を fail-closed（parse 失敗）として扱うよう codec を更新する。D5 bootstrap exception として、本 track 自身の `metadata.json` に `branch_strategy_snapshot: {base_branch: \"main\", merge_target: \"main\", merge_method: \"squash\"}` を実装 PR 内で追加する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b06cc1517788a997e0ed4c72327eb1c79bbbccee5c0fb7c89ddbebbe801be21b",
+      "evidence_hash": "53ce0a169b60bb6279ea45b52b5a66390f7e1e74496613ed3cf0594e9f29db51",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`branch_strategy_snapshot` を持たない `metadata.json` は parse 時に失敗（fail-closed）とする。grace period・opt-out・フォールバック読み込みを設けない。既存 track の扱いは利用者判断に委ね、SoTOHE 側で migration 機構を持たない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "TrackDocumentV2"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "`branch_strategy_snapshot` を持たない `metadata.json` は parse 時に失敗（fail-closed）とする。grace period・opt-out・フォールバック読み込みを設けない。既存 track の扱いは利用者判断に委ね、SoTOHE 側で migration 機構を持たない。"
+        }
+      }
+    }
+  ]
+}

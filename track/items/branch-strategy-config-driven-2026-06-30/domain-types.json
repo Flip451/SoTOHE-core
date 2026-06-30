@@ -1,0 +1,258 @@
+{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "MergeMethod": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Squash", "payload": { "kind": "unit" } },
+          { "name": "Merge",  "payload": { "kind": "unit" } },
+          { "name": "Rebase", "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "branch_strategy",
+      "docs": "The merge method used when integrating a track branch into the merge target.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-02" }
+      ],
+      "informal_grounds": []
+    },
+    "BranchStrategySnapshot": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "branch_strategy",
+      "docs": "Immutable snapshot of branch strategy configuration captured at track init time (D4). Carries base_branch, merge_target, and merge_method.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-06" }
+      ],
+      "informal_grounds": []
+    },
+    "TrackMetadata": {
+      "action": "modify",
+      "role": { "Entity": { "identity": { "method_name": "id" } } },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "track",
+      "docs": null,
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-06" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [
+    {
+      "type_name": "BranchStrategySnapshot",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "base_branch", "ty": "NonEmptyString" },
+            { "name": "merge_target", "ty": "NonEmptyString" },
+            { "name": "merge_method", "ty": "MergeMethod" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "base_branch",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "merge_target",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "merge_method",
+          "receiver": "&self",
+          "params": [],
+          "returns": "MergeMethod",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        }
+      ]
+    },
+    {
+      "type_name": "TrackMetadata",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "id", "ty": "TrackId" },
+            { "name": "title", "ty": "impl std::convert::Into<String>" },
+            { "name": "status_override", "ty": "Option<StatusOverride>" },
+            { "name": "branch_strategy_snapshot", "ty": "BranchStrategySnapshot" }
+          ],
+          "returns": "Result<Self, DomainError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "with_branch",
+          "receiver": null,
+          "params": [
+            { "name": "id", "ty": "TrackId" },
+            { "name": "branch", "ty": "Option<TrackBranch>" },
+            { "name": "title", "ty": "impl std::convert::Into<String>" },
+            { "name": "status_override", "ty": "Option<StatusOverride>" },
+            { "name": "branch_strategy_snapshot", "ty": "BranchStrategySnapshot" }
+          ],
+          "returns": "Result<Self, DomainError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "id",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&TrackId",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "branch",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&TrackBranch>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "is_activated",
+          "receiver": "&self",
+          "params": [],
+          "returns": "bool",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "set_branch",
+          "receiver": "&mut self",
+          "params": [
+            { "name": "branch", "ty": "Option<TrackBranch>" }
+          ],
+          "returns": "Result<(), DomainError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "title",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "status_override",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&StatusOverride>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "set_status_override",
+          "receiver": "&mut self",
+          "params": [
+            { "name": "status_override", "ty": "Option<StatusOverride>" }
+          ],
+          "returns": "()",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "branch_strategy_snapshot",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&BranchStrategySnapshot",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns the branch strategy snapshot captured at track init time."
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    { "action": "add",       "trait_ref": "core::fmt::Debug",       "for_type": "MergeMethod" },
+    { "action": "add",       "trait_ref": "core::clone::Clone",     "for_type": "MergeMethod" },
+    { "action": "add",       "trait_ref": "core::marker::Copy",     "for_type": "MergeMethod" },
+    { "action": "add",       "trait_ref": "core::cmp::PartialEq",  "for_type": "MergeMethod" },
+    { "action": "add",       "trait_ref": "core::cmp::Eq",         "for_type": "MergeMethod" },
+    { "action": "add",       "trait_ref": "core::fmt::Debug",       "for_type": "BranchStrategySnapshot" },
+    { "action": "add",       "trait_ref": "core::clone::Clone",     "for_type": "BranchStrategySnapshot" },
+    { "action": "add",       "trait_ref": "core::cmp::PartialEq",  "for_type": "BranchStrategySnapshot" },
+    { "action": "add",       "trait_ref": "core::cmp::Eq",         "for_type": "BranchStrategySnapshot" },
+    { "action": "reference", "trait_ref": "core::fmt::Debug",       "for_type": "TrackMetadata" },
+    { "action": "reference", "trait_ref": "core::clone::Clone",     "for_type": "TrackMetadata" },
+    { "action": "reference", "trait_ref": "core::cmp::PartialEq",  "for_type": "TrackMetadata" },
+    { "action": "reference", "trait_ref": "core::cmp::Eq",         "for_type": "TrackMetadata" }
+  ]
+}

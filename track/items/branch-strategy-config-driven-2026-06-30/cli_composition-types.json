@@ -1,0 +1,597 @@
+{
+  "schema_version": 5,
+  "crate_name": "cli_composition",
+  "layer": "cli_composition",
+  "types": {
+    "TrackCompositionRoot": {
+      "action": "modify",
+      "role": { "CompositionRoot": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "unit" }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Create a new TrackCompositionRoot."
+        },
+        {
+          "name": "track_driver",
+          "receiver": "&self",
+          "params": [],
+          "returns": "cli_driver::track::TrackDriver",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Build a wired TrackDriver. Wires TrackServiceImpl as Arc<dyn TrackService> into TrackDriver."
+        },
+        {
+          "name": "track_add_task_resolved",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir",   "ty": "std::path::PathBuf" },
+            { "name": "track_id",   "ty": "String" },
+            { "name": "description","ty": "String" },
+            { "name": "section",    "ty": "Option<String>" },
+            { "name": "after",      "ty": "Option<String>" }
+          ],
+          "returns": "Result<cli_driver::render::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "track_set_override_resolved",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id",  "ty": "String" },
+            { "name": "status",    "ty": "String" },
+            { "name": "reason",    "ty": "String" }
+          ],
+          "returns": "Result<cli_driver::render::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "track_clear_override_resolved",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id",  "ty": "String" }
+          ],
+          "returns": "Result<cli_driver::render::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "track_next_task_resolved",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id",  "ty": "String" }
+          ],
+          "returns": "Result<cli_driver::render::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "track_task_counts_resolved",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id",  "ty": "String" }
+          ],
+          "returns": "Result<cli_driver::render::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "detect_active_track_from_branch",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "&std::path::Path" }
+          ],
+          "returns": "Option<String>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "track_set_commit_hash",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id", "ty": "&str" }
+          ],
+          "returns": "Result<cli_driver::render::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "track_type_signals",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id",       "ty": "Option<String>" },
+            { "name": "workspace_root", "ty": "std::path::PathBuf" },
+            { "name": "layer",          "ty": "Option<String>" }
+          ],
+          "returns": "Result<cli_driver::render::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "track_type_graph",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir",     "ty": "std::path::PathBuf" },
+            { "name": "track_id",      "ty": "Option<String>" },
+            { "name": "workspace_root","ty": "std::path::PathBuf" },
+            { "name": "layer",         "ty": "Option<String>" },
+            { "name": "cluster_depth", "ty": "usize" },
+            { "name": "edges",         "ty": "String" }
+          ],
+          "returns": "Result<cli_driver::render::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "track_baseline_graph",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir",     "ty": "std::path::PathBuf" },
+            { "name": "track_id",      "ty": "Option<String>" },
+            { "name": "workspace_root","ty": "std::path::PathBuf" },
+            { "name": "layers",        "ty": "Option<String>" }
+          ],
+          "returns": "Result<cli_driver::render::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "track_contract_map",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir",     "ty": "std::path::PathBuf" },
+            { "name": "track_id",      "ty": "Option<String>" },
+            { "name": "workspace_root","ty": "std::path::PathBuf" },
+            { "name": "layers",        "ty": "Option<String>" }
+          ],
+          "returns": "Result<cli_driver::render::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "track_catalogue_spec_signals",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir",     "ty": "std::path::PathBuf" },
+            { "name": "track_id",      "ty": "Option<String>" },
+            { "name": "workspace_root","ty": "std::path::PathBuf" },
+            { "name": "layer",         "ty": "Option<String>" }
+          ],
+          "returns": "Result<cli_driver::render::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "track_spec_element_hash",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id",  "ty": "Option<String>" },
+            { "name": "anchor",    "ty": "Option<String>" }
+          ],
+          "returns": "Result<cli_driver::render::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "track_baseline_capture",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id",        "ty": "Option<String>" },
+            { "name": "workspace_root",  "ty": "std::path::PathBuf" },
+            { "name": "source_workspace","ty": "Option<std::path::PathBuf>" },
+            { "name": "layer",           "ty": "Option<String>" }
+          ],
+          "returns": "Result<cli_driver::render::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "track_lint",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id",      "ty": "Option<String>" },
+            { "name": "layer_id",      "ty": "String" },
+            { "name": "workspace_root","ty": "std::path::PathBuf" },
+            { "name": "rules_file",    "ty": "Option<std::path::PathBuf>" }
+          ],
+          "returns": "Result<cli_driver::render::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "track_catalogue_impl_signals",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id",       "ty": "Option<String>" },
+            { "name": "workspace_root", "ty": "std::path::PathBuf" },
+            { "name": "layer",          "ty": "Option<String>" }
+          ],
+          "returns": "Result<cli_driver::render::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "track_resolve_id",
+          "receiver": "&self",
+          "params": [
+            { "name": "explicit_id", "ty": "Option<String>" },
+            { "name": "items_dir",   "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Result<String, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "track_resolve_id_from_root",
+          "receiver": "&self",
+          "params": [
+            { "name": "explicit_id",    "ty": "Option<String>" },
+            { "name": "workspace_root", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Result<String, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "track_resolve_id_for_write",
+          "receiver": "&self",
+          "params": [
+            { "name": "explicit_id", "ty": "Option<String>" },
+            { "name": "items_dir",   "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Result<String, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "track_resolve_id_from_root_for_write",
+          "receiver": "&self",
+          "params": [
+            { "name": "explicit_id",    "ty": "Option<String>" },
+            { "name": "workspace_root", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Result<String, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "track_validate_id",
+          "receiver": "&self",
+          "params": [
+            { "name": "value", "ty": "&str" }
+          ],
+          "returns": "Result<(), CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "track_resolve_project_root",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Result<std::path::PathBuf, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "fixpoint_resolve",
+          "receiver": "&self",
+          "params": [
+            { "name": "input", "ty": "FixpointResolveInput" }
+          ],
+          "returns": "Result<cli_driver::render::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "track_init",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir",   "ty": "std::path::PathBuf" },
+            { "name": "track_id",   "ty": "String" },
+            { "name": "description","ty": "String" }
+          ],
+          "returns": "Result<cli_driver::render::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "track_transition",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir",     "ty": "std::path::PathBuf" },
+            { "name": "track_id",      "ty": "Option<String>" },
+            { "name": "task_id",       "ty": "String" },
+            { "name": "target_status", "ty": "String" },
+            { "name": "commit_hash",   "ty": "Option<String>" }
+          ],
+          "returns": "Result<cli_driver::render::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "track_branch_create",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id",  "ty": "String" }
+          ],
+          "returns": "Result<cli_driver::render::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "track_branch_switch",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id",  "ty": "String" }
+          ],
+          "returns": "Result<cli_driver::render::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "track_resolve",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id",  "ty": "Option<String>" }
+          ],
+          "returns": "Result<cli_driver::render::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "track_views_validate",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Result<cli_driver::render::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "track_views_sync",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "std::path::PathBuf" },
+            { "name": "track_id",     "ty": "Option<String>" }
+          ],
+          "returns": "Result<cli_driver::render::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "track_add_task",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir",   "ty": "std::path::PathBuf" },
+            { "name": "track_id",    "ty": "Option<String>" },
+            { "name": "description", "ty": "String" },
+            { "name": "section",     "ty": "Option<String>" },
+            { "name": "after",       "ty": "Option<String>" }
+          ],
+          "returns": "Result<cli_driver::render::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "track_set_override",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id",  "ty": "Option<String>" },
+            { "name": "status",    "ty": "String" },
+            { "name": "reason",    "ty": "String" }
+          ],
+          "returns": "Result<cli_driver::render::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "track_clear_override",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id",  "ty": "Option<String>" }
+          ],
+          "returns": "Result<cli_driver::render::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "track_next_task",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id",  "ty": "Option<String>" }
+          ],
+          "returns": "Result<cli_driver::render::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "track_task_counts",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id",  "ty": "Option<String>" }
+          ],
+          "returns": "Result<cli_driver::render::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "track_archive",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id",  "ty": "String" }
+          ],
+          "returns": "Result<cli_driver::render::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        },
+        {
+          "name": "track_switch_base",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Result<cli_driver::render::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Switch to the base branch from the active track's branch_strategy_snapshot (IN-05). Reads metadata.json from project_root, resolves SnapshotBranchStrategyAdapter, and runs git switch + pull."
+        }
+      ],
+      "module_path": "track::composition_root",
+      "docs": "Composition root for the track command family. Unit struct: no adapter dependencies injected at construction; all port adapters are wired inline per-method.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-05" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [],
+  "trait_impls": [
+    {
+      "action": "reference",
+      "trait_ref": "core::default::Default",
+      "for_type": "TrackCompositionRoot"
+    }
+  ]
+}

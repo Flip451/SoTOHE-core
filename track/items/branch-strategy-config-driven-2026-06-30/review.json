@@ -96,6 +96,240 @@
           "findings": [],
           "hash": "rvw1:sha256:df90649c0171ade143d4b0b98537819a449dc6730515ff247d65074d53637d01",
           "at": "2026-06-30T15:22:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`JsonConfigBranchStrategyAdapter::new` is specified as infallible (`-> Self`) even though it reads and parses `.harness/config/branch-strategy.json` during construction. That leaves no way to propagate missing/invalid config through `TrackCompositionRoot::track_init`; the only outcomes are a panic or an implicit fallback, both of which violate the repo’s error-handling rule. Make the constructor fallible and thread that error through the wiring task.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/plan.md",
+              "line": 23,
+              "category": "missing error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:f59f64ec0555061cede20d00041335550a3a6c3d84e488e896716086634bbf39",
+          "at": "2026-06-30T17:16:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d395822e08d8571ad56439f5ff2f14103578415a1299bd12b6b1e27b1f970bdd",
+          "at": "2026-06-30T17:35:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-10/AC-15 make post-merge `develop` branch creation part of the tracked implementation and `task-coverage.json` maps it to T012, but T012 only edits config/CI/docs/metadata and cannot create or push a remote branch before the PR is merged. This leaves the plan with an acceptance criterion no implementation task can satisfy inside the PR; branch creation should be kept as post-merge ops outside task coverage, or modeled as an explicit post-merge gate.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json",
+              "line": 136,
+              "category": "infeasibility"
+            },
+            {
+              "message": "AC-07 says the updated metadata codec must not accept input containing `kind`, but the parenthetical allows either `deny_unknown_fields` or field ignoring. Ignoring unknown fields would accept a `kind`-bearing payload, which contradicts the criterion and leaves implementers unable to tell whether D3 requires rejecting `kind` on read or only omitting it on write.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json",
+              "line": 338,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:d395822e08d8571ad56439f5ff2f14103578415a1299bd12b6b1e27b1f970bdd",
+          "at": "2026-06-30T17:42:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`EnsurePrArgs` says the composition root should resolve the PR `base` argument from `base_branch`, but the ADR defines `merge_target` as the PR base and T011 also routes PR creation through `port.merge_target()`. If this catalogue wording drives implementation or tests, configurations where `base_branch != merge_target` will open PRs against the wrong branch.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/cli-types.json",
+              "line": 239,
+              "category": "contradiction"
+            },
+            {
+              "message": "CN-05 requires the adr-editor briefing to include the resolved `merge_target`, but the only covered task, T014, rewrites the prompt to consume that value without adding any task to compute or pass it in the briefing. Implementing this plan as written leaves the prompt depending on an undefined variable and does not satisfy D7/CN-05.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/impl-plan.json",
+              "line": 84,
+              "category": "infeasibility"
+            },
+            {
+              "message": "D1 first defines the abstraction as `BranchStrategyPort`, but this passage switches to passing a `BranchStrategy` value into the usecase layer. The spec and usecase catalogue only define `BranchStrategyPort`, so the ADR is internally inconsistent about whether the boundary is a port trait or a value object.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md",
+              "line": 115,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a09df9161de6e6c3161925902f624e0fa3187891fc613373018b05758c41b5aa",
+          "at": "2026-06-30T17:49:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TrackDocumentV2` says the missing `branch_strategy_snapshot` field will fail parsing \"via serde deny_unknown_fields\", but that attribute only rejects unknown extra keys, not absent required fields. The artifact is misdescribing the mechanism that enforces CN-03; it should say the field is non-optional and missing data fails because the DTO requires it.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/branch-strategy-config-driven-2026-06-30/infrastructure-types.json",
+              "line": 119,
+              "category": "factual error"
+            },
+            {
+              "message": "`task-coverage.json` omits `T015` from `IN-05`, even though `IN-05` explicitly includes the `.claude/commands/track/done.md` and `.claude/rules/07-dev-environment.md` updates that are implemented in `T015`. That leaves the coverage artifact internally inconsistent with the plan and can make the branch-switch rename scope look fully covered when part of it is not mapped.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/branch-strategy-config-driven-2026-06-30/task-coverage.json",
+              "line": 8,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9d2289c40e6935c45a7c926a770cf8c16848a3b9e61983c58e5b5c9b592f5b88",
+          "at": "2026-06-30T18:15:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:235ce3b798c49d429f20aa91f6b9cfdd89923dd35874e45368e824f4882bddb1",
+          "at": "2026-06-30T18:32:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1 defines `merge_method` as the default PR merge method and the shipped config sets it to `squash`, but the implementation plan only persists/exposes `merge_method` and wires PR creation to `merge_target`; the only `.claude/commands/track/merge.md` task updates next-action text. No task or AC routes `merge_method()` into `sotp pr wait-and-merge` or the track merge default, so this plan can pass while ignoring the configured merge method.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/impl-plan.json",
+              "line": 66,
+              "category": "contradiction"
+            },
+            {
+              "message": "`task-coverage.json` maps AC-07 to T003, but T003 only adds the required `branch_strategy_snapshot`, bumps schema_version, and tests the missing-snapshot parse error. AC-07 also requires rejecting payloads that still contain a `kind` field and confirming generated metadata omits `kind`; with the current task text, that acceptance criterion is not actually planned.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/impl-plan.json",
+              "line": 18,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:235ce3b798c49d429f20aa91f6b9cfdd89923dd35874e45368e824f4882bddb1",
+          "at": "2026-06-30T18:44:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T005 is the task that wires the branch strategy into track initialization, but `task-contract.json` maps it to an empty contract list. The task explicitly changes `TrackServiceImpl` to receive `BranchStrategyPort`, construct a `BranchStrategySnapshot`, and write it through `TrackMetadata`; those relevant contract entries already exist in the catalogues. Leaving T005 unbound breaks the spec → catalogue → implementation-plan chain, so the pre-review task-contract gate cannot enforce the key CN-02/AC-08 behavior for the task that actually implements it.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/task-contract.json",
+              "line": 24,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:d0a7b586032513e8daed0603e4b873d22f8b84a6e74a117093bec89ea158639c",
+          "at": "2026-06-30T18:54:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`MergeMethodDocument` is specified as a serde enum with `Squash | Merge | Rebase`, while the required config and metadata JSON literals use lowercase `\"squash\"`. Unless the plan explicitly requires lowercase serde renames/custom parsing, the DTO described here will not parse the JSON mandated by AC-01/T012/ADR D1, so the bootstrap config and self-applied metadata are internally inconsistent.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/impl-plan.json",
+              "line": 18,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f78286aaab58e0780d85b7efbe3d1137c973307d7d58e5edbe646064d345e9a2",
+          "at": "2026-06-30T18:59:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T010 conflates `base_branch` with the PR base argument. The ADR explicitly defines `merge_target` as the PR base and allows it to diverge from `base_branch`, and `cli-types.json` documents `EnsurePrArgs.base` as resolving from `port.merge_target()`. This task then says branch_ops should replace `current != \"main\"` comparisons with `base_branch` values injected from `EnsurePrArgs`, which would use the merge target as the base-branch guard whenever those two differ. The plan should route branch operation guards through the snapshot/port `base_branch()` only, not through `EnsurePrArgs.base`.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/impl-plan.json",
+              "line": 60,
+              "category": "contradiction"
+            },
+            {
+              "message": "The plan introduces user-configured branch names as only `NonEmptyString` values, but then directs T006 to build a `git rev-parse` command with `format!(\"git rev-parse {base_branch}\")`. Because `.harness/config/branch-strategy.json` is external input, this leaves illegal or shell-significant branch names representable and instructs implementers to interpolate them into a command string. The plan needs a validated branch-ref domain type and/or an explicit argv-style command contract before these values reach git invocation sites.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/impl-plan.json",
+              "line": 36,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:3214e29f7de5845d7f1de306d25b719ad8db0c5ea6971e477977a73dbd109dee",
+          "at": "2026-06-30T19:04:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR D1 still tells implementers to change the `git rev-parse main` fallback to `format!(\"git rev-parse {}\", strategy.base_branch())`, but the spec/impl-plan require configured branch names to be passed as separate argv entries and never interpolated into shell command text. This is a semantic contradiction in the plan artifacts and can lead the implementation to violate AC-04's command-boundary safety requirement.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md",
+              "line": 139,
+              "category": "contradiction"
+            },
+            {
+              "message": "T010 explicitly includes changing `WaitAndMergeArgs.method` from a hardcoded default to `Option<String>` so the configured merge method can be used, but the task-contract entry for T010 maps only `TrackCommand` and `EnsurePrArgs`, and the CLI catalogue has no `WaitAndMergeArgs` contract entry. That leaves a required public CLI shape change outside the type-contract gate, so the plan's task-to-contract mapping is incomplete for the merge-method default behavior.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/task-contract.json",
+              "line": 35,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:dd3e3fa9b3ad4072d0bfbf6d9b32972688cf37977667ea13ceb0c6c28db46b4a",
+          "at": "2026-06-30T19:11:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`task-coverage.json` maps `IN-06` only to `T001` and `T005`, but `spec.json` says `IN-06` also includes the `metadata.json` schema-version update. `T003` is the task that actually updates `TrackDocumentV2` / bumps `schema_version`, so leaving it out means the coverage gate does not cover the codec change that makes `branch_strategy_snapshot` usable.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/task-coverage.json",
+              "line": 9,
+              "category": "contradiction"
+            },
+            {
+              "message": "`task-coverage.json` maps `IN-07` only to `T003`, but `spec.json` says `IN-07` also includes the D5 bootstrap exception that writes `branch_strategy_snapshot` into this track's own `metadata.json`. `T012` is the task that performs that self-application, so the scope map omits the task that actually satisfies the bootstrap exception.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/task-coverage.json",
+              "line": 10,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:1842d3e64bf3e2605fc9a2a711b02c2658681bb08f1c033909f391c7e0c80a68",
+          "at": "2026-06-30T19:36:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1b20c2762385bd5a770eb874c86ad9a8205126c34a81a347be881c8802d8e839",
+          "at": "2026-06-30T19:41:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1b20c2762385bd5a770eb874c86ad9a8205126c34a81a347be881c8802d8e839",
+          "at": "2026-06-30T19:47:19Z"
         }
       ]
     }

@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "4a6a1339d0d1536afecc9684ad506c051eca1a941b6b6f1144c6dee441e058e1",
+  "signals": [
+    {
+      "type_name": "BranchStrategyConfigError",
+      "signal": "blue",
+      "entry_hash": "6b0acbdac1fcac27102676b038a55d501099b19b7d1ec300f34226cc39e479a4"
+    },
+    {
+      "type_name": "BranchStrategySnapshotDocument",
+      "signal": "blue",
+      "entry_hash": "360429f6aba400755c16fdb21a158661076386b27eb8ec1920039e6a5cff1569"
+    },
+    {
+      "type_name": "JsonConfigBranchStrategyAdapter",
+      "signal": "blue",
+      "entry_hash": "e6ac07a4edae016e5f47c533aebe91442c62921aa37dfa891141d22f98decaeb"
+    },
+    {
+      "type_name": "MergeMethodDocument",
+      "signal": "blue",
+      "entry_hash": "39b1b3bc636c19231f76720d85eba0ef764874c4b3396ae11949bb0aa042d3ac"
+    },
+    {
+      "type_name": "SnapshotBranchStrategyAdapter",
+      "signal": "blue",
+      "entry_hash": "c81aaced9415fb3b35425bffcc58508626479b85e1e512e8d60ca77c17d98949"
+    },
+    {
+      "type_name": "TrackDocumentV2",
+      "signal": "blue",
+      "entry_hash": "b06cc1517788a997e0ed4c72327eb1c79bbbccee5c0fb7c89ddbebbe801be21b"
+    }
+  ]
+}

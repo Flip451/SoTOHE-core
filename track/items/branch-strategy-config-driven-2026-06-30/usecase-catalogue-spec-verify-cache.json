@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "layer": "usecase",
+  "entries": [
+    {
+      "claim_hash": "fb37a03c1f14622e53eb2997e96ee72fbb476832fdbd82850ded2dd1279e5bf3",
+      "evidence_hash": "2156210654ee69210a57760cf1ed63f924b158ac0cabf238d09d38bde0ad37c0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`BranchStrategyPort` trait を `libs/usecase/` に新設し、`base_branch() -> &str`、`merge_target() -> &str`、`merge_method() -> MergeMethod`、`track_prefix() -> &str` を expose する。`libs/infrastructure/` に JSON config ローダ adapter と metadata snapshot reader adapter を実装し、track context の有無で解決先を切り替える。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "BranchStrategyPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "`BranchStrategyPort` trait を `libs/usecase/` に新設し、`base_branch() -> &str`、`merge_target() -> &str`、`merge_method() -> MergeMethod`、`track_prefix() -> &str` を expose する。`libs/infrastructure/` に JSON config ローダ adapter と metadata snapshot reader adapter を実装し、track context の有無で解決先を切り替える。"
+        }
+      }
+    },
+    {
+      "claim_hash": "fb37a03c1f14622e53eb2997e96ee72fbb476832fdbd82850ded2dd1279e5bf3",
+      "evidence_hash": "f1e1f98c935d7276c49612a4660b3e736649f4d86b8b0d6068bd438a24103280",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`BranchStrategyPort` は `libs/usecase/` に定義する（アプリケーション機能として usecase layer port の配置原則に従う）。adapter は `libs/infrastructure/` に実装し、usecase 側が infrastructure の実装を直接参照しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "BranchStrategyPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "`BranchStrategyPort` は `libs/usecase/` に定義する（アプリケーション機能として usecase layer port の配置原則に従う）。adapter は `libs/infrastructure/` に実装し、usecase 側が infrastructure の実装を直接参照しない。`cargo make check-layers` が通ることでレイヤー依存方向を機械検証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "9ee377d4ebd7edf4daf2162ac03b6c7a185eb490f34b6ee1b3674be62be3347c",
+      "evidence_hash": "6addf5a32c6222d234d96a82bd2402003c9dbe10f9a31b6d5817bdf32583fb7f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cargo make track-switch-main` タスクを `cargo make track-switch-base` にリネームし、本体を `bin/sotp track switch-base`（新規 native subcommand）に委譲する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TrackService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "`cargo make track-switch-main` タスクを `cargo make track-switch-base` にリネームし、本体を `bin/sotp track switch-base`（新規 native subcommand）に委譲する。`.claude/settings.json:159` の allowlist エントリ、`.claude/commands/track/done.md`、`.claude/rules/07-dev-environment.md:54,56` の参照を連動更新する。"
+        }
+      }
+    }
+  ]
+}

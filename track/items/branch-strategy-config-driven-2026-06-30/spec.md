@@ -1,0 +1,72 @@
+<!-- Generated from spec.json — DO NOT EDIT DIRECTLY -->
+---
+version: "1.0"
+signals: { blue: 39, yellow: 0, red: 0 }
+---
+
+# Git ブランチ戦略の設定駆動化と SoTOHE 本体 develop 採用
+
+## Goal
+
+- [GO-01] Git ブランチ戦略の base_branch / merge_target / merge_method を `.harness/config/branch-strategy.json` で外出しし、`BranchStrategyPort` 経由で読む構造に置き換えることで、利用者が Trunk-Based / GitHub Flow / Lite GitLab Flow 等の戦略を選択できるようにする。track 初期化時に設定を snapshot として `metadata.json` に焼き込み、以降の操作が global config を再読みしない不変条件を保証する。 [adr: knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md#D1, knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md#D4]
+- [GO-02] SoTOHE 本体が `develop` ブランチを採用する bootstrap を実施し、config 駆動の設計を dogfooding で実証する。convention 文書 5 ファイルおよび AI capability プロンプトのハードコード `main` を config 駆動の記述に書き換え、全表面で設定値が一貫して使われる状態を達成する。 [adr: knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md#D6, knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md#D7, knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md#D8]
+
+## Scope
+
+### In Scope
+- [IN-01] `.harness/config/branch-strategy.json` を新設し、`base_branch`、`merge_target`、`merge_method` の 3 フィールドを定義する。デフォルト値は D8 に従い `develop` / `develop` / `squash` でシップする。 [adr: knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md#D1, knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md#D8] [tasks: T012]
+- [IN-02] `BranchStrategyPort` trait を `libs/usecase/` に新設し、`base_branch() -> &str`、`merge_target() -> &str`、`merge_method() -> MergeMethod`、`track_prefix() -> &str` を expose する。`libs/infrastructure/` に JSON config ローダ adapter と metadata snapshot reader adapter を実装し、track context の有無で解決先を切り替える。 [adr: knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md#D1] [tasks: T001, T002, T004]
+- [IN-03] D1 の置換対象表に列挙された本番コード・delivery 層の全箇所（`apps/cli/src/commands/pr.rs`、`apps/cli/src/commands/track/branch_ops.rs`、`apps/cli-composition/src/track/mod.rs`、`apps/cli-composition/src/git.rs`、`apps/cli-composition/src/pr.rs`、`apps/cli-driver/src/track.rs`、CLI `--help` テキスト 2 箇所、`Makefile.toml` description 5 箇所、`README.md:109`、workflow SSoT 3 ファイル、command / rules / skill 5 箇所）のハードコード `main` を effective strategy の port 呼び出しまたは config 値参照に置き換える。 [adr: knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md#D1] [tasks: T009, T010, T011, T012, T015]
+- [IN-04] `git rev-parse main` フォールバック実装（`apps/cli-composition/src/dry/shared.rs:91-115` を正本とし、`review_v2/shared.rs`、`fixpoint_resolve.rs`、`gate_state.rs`、`commit_hash_store.rs`、`dry.rs` テストを含む）を effective strategy の `base_branch()` を受け取る形に置き換える。PR test fixture （`libs/infrastructure/src/gh_cli.rs:552-682` 周辺）を branch 戦略引数化する。 [adr: knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md#D1] [tasks: T006, T007, T008]
+- [IN-05] `cargo make track-switch-main` タスクを `cargo make track-switch-base` にリネームし、本体を `bin/sotp track switch-base`（新規 native subcommand）に委譲する。`.claude/settings.json:159` の allowlist エントリ、`.claude/commands/track/done.md`、`.claude/rules/07-dev-environment.md:54,56` の参照を連動更新する。 [adr: knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md#D1] [tasks: T002, T009, T010, T011, T012, T015]
+- [IN-06] `metadata.json` に `branch_strategy_snapshot` フィールドを追加し、`schema_version` を更新する。`/track:init` 実行時に `.harness/config/branch-strategy.json` の現在値を読み、snapshot として `metadata.json` に書き込む。以降の PR 作成・コミットゲート・ブランチ操作は snapshot を effective strategy として参照し、global config を再参照しない。 [adr: knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md#D4] [tasks: T001, T003, T005]
+- [IN-07] `branch_strategy_snapshot` フィールドが存在しない `metadata.json` を fail-closed（parse 失敗）として扱うよう codec を更新する。D5 bootstrap exception として、本 track 自身の `metadata.json` に `branch_strategy_snapshot: {base_branch: "main", merge_target: "main", merge_method: "squash"}` を実装 PR 内で追加する。 [adr: knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md#D5] [tasks: T003, T012]
+- [IN-08] `knowledge/conventions/` 配下の 5 ファイルを config 駆動の記述に書き換える: `branch-strategy.md`（全文書き換え）、`task-completion-flow.md`（merge_target 参照に 4 箇所）、`adr.md:132-136`（`git log main` → `git log <merge_target>`）、`dry-check-workflow.md:143`（`git rev-parse main` → `git rev-parse <base_branch>`）、`review-protocol.md:47`（base branch でのベースライン確認）。 [adr: knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md#D6] [tasks: T013]
+- [IN-09] `.harness/capabilities/adr-editor.md:58-60,120` の `git log main -- <adr-file>` 4 箇所を、briefing 経由で受け取った `merge_target` の値を使う指示に書き換える。pre-merge / post-merge 判定の意味（空か否か）は変えない。 [adr: knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md#D7] [tasks: T014]
+- [IN-10] `.github/workflows/ci.yml` の `branches: [main]` トリガを `branches: [main, develop]` に更新する（push および pull_request target の両方）。`develop` ブランチの作成と push は実装 PR のタスクではなく、ADR D8 の Implication に従う post-merge ops として扱う。 [adr: knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md#D8] [tasks: T012]
+
+### Out of Scope
+- [OS-01] `TrackBranch` 型の domain → infrastructure 層への移動は本 track の対象外とする。`track/` プレフィックスは設定可能化せず、`TrackBranch::try_new` の不変条件はそのまま維持する。 [adr: knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md#D2]
+- [OS-02] track kind（feature / hotfix / release）の `metadata.json` への追加は対象外とする。"1 track = 1 spec = 1 PR" 前提を変えない。 [adr: knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md#D3]
+- [OS-03] 既存（本 ADR 実装前に作成された）track の `metadata.json` に対する migration 機構・remediation 手順は提供しない。`branch_strategy_snapshot` 未持参の既存 track は parse 失敗として扱い、SoTOHE 側での対応は行わない。 [adr: knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md#D5]
+- [OS-04] 利用者リポジトリの GitHub Actions CI YAML の動的書き換えは対象外とする。利用者は `branches: [...]` を自分の base branch に合わせて手動更新する責務を負う。 [adr: knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md#D8]
+- [OS-05] develop と main の同期運用（main → develop の取り込みタイミング、develop → main のリリースカット頻度）は対象外とする。SoTOHE-core の運用判断として別途定める。 [adr: knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md#D8]
+- [OS-06] テスト fixture のうち `init -b main` 慣習で書かれた 40+ ファイル・100+ 箇所の parametrize は対象外とする。test-local の "default branch" 慣習として `"main"` を維持する。PR test fixture（`libs/infrastructure/src/gh_cli.rs`）のみ本 track で parametrize する。 [adr: knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md#D1]
+
+## Constraints
+- [CN-01] `BranchStrategyPort` は `libs/usecase/` に定義する（アプリケーション機能として usecase layer port の配置原則に従う）。adapter は `libs/infrastructure/` に実装し、usecase 側が infrastructure の実装を直接参照しない。`cargo make check-layers` が通ることでレイヤー依存方向を機械検証する。 [adr: knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md#D1] [tasks: T002, T004]
+- [CN-02] track 初期化後のすべての PR 作成・コミットゲート・ブランチ操作は `metadata.json#branch_strategy_snapshot` を effective strategy として使い、`.harness/config/branch-strategy.json` を再参照しない。global config の変更が in-flight track の PR base を変えない不変条件を持つ。 [adr: knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md#D4] [tasks: T005, T011]
+- [CN-03] `branch_strategy_snapshot` を持たない `metadata.json` は parse 時に失敗（fail-closed）とする。grace period・opt-out・フォールバック読み込みを設けない。既存 track の扱いは利用者判断に委ね、SoTOHE 側で migration 機構を持たない。 [adr: knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md#D5] [tasks: T003]
+- [CN-04] `TrackBranch::try_new`（`libs/domain/src/ids.rs`）の `"track/"` プレフィックス不変条件は変更しない。`.harness/config/branch-strategy.json` にプレフィックスフィールドを追加しない。`track_prefix()` は常に `"track/"` を返す固定実装とする。 [adr: knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md#D2] [tasks: T001, T012]
+- [CN-05] adr-editor を起動する briefing は effective strategy から解決した `merge_target` の実値を含めて渡す。`.harness/capabilities/adr-editor.md` 本体には branch 戦略としての `"main"` を pre-merge 判定ロジックに静的に埋め込まない。 [adr: knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md#D7] [tasks: T014]
+- [CN-06] 既存 track の `metadata.json` を新 schema に migrate する仕組みや推奨手順を実装しない。暫定 compatibility layer・alias・旧 schema フォールバック読み込みを作らない。 [adr: knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md#D5] [tasks: T003]
+
+## Acceptance Criteria
+- [ ] [AC-01] `.harness/config/branch-strategy.json` が存在し、`base_branch`、`merge_target`、`merge_method` の 3 フィールドを持つ valid な JSON であることを確認できる。フィールド値が `"develop"`、`"develop"`、`"squash"` でシップされることを JSON parse で確認できる。 [adr: knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md#D1, knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md#D8] [tasks: T012]
+- [ ] [AC-02] `BranchStrategyPort` trait が `libs/usecase/` に存在し、`base_branch()`、`merge_target()`、`merge_method()`、`track_prefix()` の 4 メソッドを持つ。`libs/infrastructure/` に config ローダ adapter と metadata snapshot reader adapter が実装されており、`cargo make check-layers` が pass する。 [adr: knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md#D1] [tasks: T002, T004]
+- [ ] [AC-03] D1 の置換対象表に列挙された各ファイル（`apps/cli/src/commands/pr.rs`、`apps/cli/src/commands/track/branch_ops.rs`、`apps/cli-composition/src/track/mod.rs`、`apps/cli-composition/src/git.rs`、`apps/cli-composition/src/pr.rs`、`apps/cli-driver/src/track.rs`）において、branch 名を意図した `default_value = "main"` リテラルおよび branch 名比較対象としての `"main"` リテラルが残っていない。CLI --help テキスト、Makefile.toml description、README.md:109、workflow SSoT 3 ファイル、command/rules/skill 各ファイルの対象箇所も同様に更新されている。 [adr: knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md#D1] [tasks: T009, T010, T011, T012, T015]
+- [ ] [AC-04] `apps/cli-composition/src/dry/shared.rs` の差分基底 fallback 関数が effective strategy の `base_branch()` から branch 名を受け取る実装になっている。`review_v2/shared.rs`、`fixpoint_resolve.rs`、`gate_state.rs` も同じ helper または port 経由に統一されており、これらのファイルに branch 戦略としての `"main"` リテラルが残っていない。設定由来の branch 名は git invocation に個別 argv として渡され、shell command 文字列へ補間されないことをテストで確認できる。`cargo make test` が pass する。 [adr: knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md#D1] [tasks: T006, T008]
+- [ ] [AC-05] `Makefile.toml` に `track-switch-base` タスクが存在し、`track-switch-main` タスクが削除されている。`bin/sotp track switch-base` native subcommand が実装されている。`.claude/settings.json` allowlist に `Bash(cargo make track-switch-base:*)` が存在し、`Bash(cargo make track-switch-main:*)` は存在しない。 [adr: knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md#D1] [tasks: T009, T010, T011, T012]
+- [ ] [AC-06] `TrackBranch::try_new` が `"track/"` プレフィックスを不変条件として検証するユニットテストが存在し、`cargo make test` が pass する。`.harness/config/branch-strategy.json` に `track_prefix` フィールドが存在しない。 [adr: knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md#D2] [tasks: T001, T012]
+- [ ] [AC-07] 更新後の `metadata.json` codec が `kind` フィールドを持つ入力を受け付けない。具体的には `deny_unknown_fields` 等で未知フィールドを検出し、`kind` を含む payload の parse が `Err` になることをユニットテストで確認できる。`schema_version` 更新後に書き込まれる `metadata.json` のサンプル出力に `kind` フィールドが存在しない。 [adr: knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md#D3] [tasks: T003]
+- [ ] [AC-08] `metadata.json` の `schema_version` が更新されており、`/track:init` 実行後に生成される `metadata.json` に `branch_strategy_snapshot` フィールドが存在し、その値が実行時の `.harness/config/branch-strategy.json` の 3 フィールドと一致することをユニットテストで確認できる。 [adr: knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md#D4] [tasks: T003, T005]
+- [ ] [AC-09] PR 作成・PR merge default・branch 作成・commit gate の各コードパスが `metadata.json` の `branch_strategy_snapshot` から effective strategy を読むことをテストで確認できる（`.harness/config/branch-strategy.json` を直接参照するコードパスがこれらの post-init 操作に存在しない）。branch 作成・switch・PR 作成・merge の git/gh invocation は branch_strategy_snapshot 由来の base_branch / merge_target / merge_method を個別 argv として渡し、shell command 文字列へ補間しない。`sotp pr wait-and-merge` は明示 `--method` がない場合に `branch_strategy_snapshot.merge_method` を既定メソッドとして使い、明示 `--method merge|squash|rebase` はその値を上書きする。 [adr: knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md#D4] [tasks: T005, T010, T011, T015]
+- [ ] [AC-10] `branch_strategy_snapshot` フィールドが欠落した `metadata.json` を codec に渡すと `Err` を返すことをユニットテストで確認できる（fail-closed 挙動の機械検証）。 [adr: knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md#D5] [tasks: T003]
+- [ ] [AC-11] `track/items/branch-strategy-config-driven-2026-06-30/metadata.json` に `branch_strategy_snapshot` フィールドが存在し、`base_branch: "main"`、`merge_target: "main"`、`merge_method: "squash"` の値を持つ（D5 bootstrap exception の自己適用）。 [adr: knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md#D5] [tasks: T012]
+- [ ] [AC-12] `knowledge/conventions/branch-strategy.md` の本文が `.harness/config/branch-strategy.json` を主要参照として記述されており、特定 branch 名を戦略値として埋め込んだ箇所がない。`adr.md:132-136` に `git log main` の代わりに `git log <merge_target>` が記述されている。`dry-check-workflow.md:143` に `git rev-parse main` の代わりに `git rev-parse <base_branch>` が記述されている。`task-completion-flow.md` の 4 箇所と `review-protocol.md:47` がそれぞれ `merge_target` / base branch 参照に更新されている。 [adr: knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md#D6] [tasks: T013]
+- [ ] [AC-13] `.harness/capabilities/adr-editor.md` に branch 戦略としての `git log main` 文字列が pre-merge / post-merge 判定の instruction として存在しない。该当箇所が briefing 経由で受け取った `merge_target` 変数を使う指示に書き換えられている。 [adr: knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md#D7] [tasks: T014]
+- [ ] [AC-14] `.github/workflows/ci.yml` の `push.branches` および `pull_request.branches` のリストに `develop` が含まれており、`main` も引き続きトリガー対象として残っている。 [adr: knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md#D8] [tasks: T012]
+- [ ] [AC-15] 実装 PR 内の bootstrap 状態として、`.harness/config/branch-strategy.json` は D8 の `develop` defaults を持ち、本 track 自身の `metadata.json` は D5 bootstrap exception として `main` / `main` / `squash` の `branch_strategy_snapshot` を持つことを確認できる。これにより fail-closed parser を有効化しても現行 main ベースの本 track は parse 可能で、post-merge の `develop` ブランチ作成後の最初の新規 track から D4 の snapshot 不変条件が dogfooding される。 [adr: knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md#D8] [tasks: T012]
+
+## Related Conventions (Required Reading)
+- knowledge/conventions/no-backward-compat.md#Rules
+- knowledge/conventions/hexagonal-architecture.md#Port Placement Rules
+- knowledge/conventions/pre-track-adr-authoring.md#Rules
+- knowledge/conventions/branch-strategy.md#Rules
+- knowledge/conventions/track-lifecycle.md#Rules
+
+## Signal Summary
+
+### Stage 1: Spec Signals
+🔵 39  🟡 0  🔴 0
+

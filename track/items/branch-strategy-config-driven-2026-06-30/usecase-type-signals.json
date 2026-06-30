@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-06-30T19:49:00Z",
+  "declaration_hash": "fbe0f8381a44cd1c6fd6a8137a4ee0c324847d85064b581c0bd52159876685f6",
+  "signals": [
+    {
+      "type_name": "BranchStrategyPort",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "TrackService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": true
+    }
+  ]
+}

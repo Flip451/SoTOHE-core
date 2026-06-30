@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "1bf7a3eb5206a3bc83f7cb7bdf047b2ca66b0802fc665da056729090d9a9ad3a",
+  "signals": [
+    {
+      "type_name": "EnsurePrArgs",
+      "signal": "blue",
+      "entry_hash": "2a255cc58c4da6dd73332b7241aa240fec9ef34cd1c01d6227e34d63a962faf5"
+    },
+    {
+      "type_name": "TrackCommand",
+      "signal": "blue",
+      "entry_hash": "52c5b09269d9de21bca4fb8b523e7c55b604e7587b2040e9d382e7101f5754dc"
+    },
+    {
+      "type_name": "WaitAndMergeArgs",
+      "signal": "blue",
+      "entry_hash": "0f94a77606a3c7e9e30257098eb5c9d068dd559db8770335c5d0cc11a34cee16"
+    }
+  ]
+}

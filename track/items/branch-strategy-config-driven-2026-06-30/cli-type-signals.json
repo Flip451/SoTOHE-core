@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-06-30T19:49:08Z",
+  "declaration_hash": "1bf7a3eb5206a3bc83f7cb7bdf047b2ca66b0802fc665da056729090d9a9ad3a",
+  "signals": [
+    {
+      "type_name": "EnsurePrArgs",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "TrackCommand",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "WaitAndMergeArgs",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": true
+    }
+  ]
+}
