@@ -1,0 +1,103 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:969a288607fdb2ff0bfd5c78e82a42b9e1380ca2d7b601da44b18db314a8ca8c",
+          "at": "2026-06-30T14:59:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1 and D4 define conflicting sources of truth for post-init track operations. D1 says the strategy is loaded from `.harness/config/branch-strategy.json` via `BranchStrategyPort` and the replacement table routes PR creation and branch operations through that port, but D4 says PR creation, commit gates, and branch operations must use the immutable `metadata.json` snapshot after track init and not the global config. The plan needs one coherent contract here; otherwise an implementation can still let an in-flight track change behavior when the global config changes, defeating D4's stated invariant.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md",
+              "line": 107,
+              "category": "contradiction"
+            },
+            {
+              "message": "D8 is internally inconsistent about the dogfooding/bootstrap sequence. The rationale says this ADR implementation track itself is the first develop-based track, but the explicit bootstrap steps say this same implementation track starts from the current main base, merges to main, creates develop only after that, and only subsequent new tracks are develop-based. This also leaves the current pre-implementation track outside the claimed dogfooding path, so the plan should clarify whether dogfooding starts with this track or with the first track after develop is created.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md",
+              "line": 259,
+              "category": "contradiction"
+            },
+            {
+              "message": "The Related section labels `.github/workflows/ci.yml` as out of scope/user responsibility, but D8 explicitly includes updating SoTOHE-core's own workflow to `branches: [main, develop]`, and the Out of Scope section separately limits the exclusion to user repository CI YAML rewriting. As written, this cross-reference can misroute implementation planning by treating the SoTOHE-core workflow update as excluded when D8 requires it.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md",
+              "line": 352,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:969a288607fdb2ff0bfd5c78e82a42b9e1380ca2d7b601da44b18db314a8ca8c",
+          "at": "2026-06-30T15:02:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1 allows `merge_target` to differ from `base_branch` and defines `merge_target` as the PR base, but this line then routes the ADR lifecycle checks (`git log main` replacement) through `base_branch()`. For any supported configuration where those fields diverge, an ADR already merged to the PR target can still be absent from the branch used for the check, so the adr-editor/pre-merge logic can misclassify immutable post-merge ADRs as editable. The ADR should either use `merge_target()` for merge-state checks or explicitly forbid divergence for workflows that depend on ADR immutability.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md",
+              "line": 124,
+              "category": "contradiction"
+            },
+            {
+              "message": "The bootstrap sequence says this implementation track starts under the current main-based system and then ships the fail-closed snapshot requirement, while D5 says all pre-implementation tracks without `branch_strategy_snapshot` parse-fail and receive no remediation. The current track metadata in this review has no snapshot, so once the parser is made fail-closed, the commands needed to finish this same transition track can no longer resolve it unless the plan adds an explicit bootstrap exception or requires snapshotting this track before enforcement.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md",
+              "line": 274,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:c21b2fe94c5731de5d9058f0a1394c679fc0dd1de2c1f05cb008b35a254a63b7",
+          "at": "2026-06-30T15:07:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:42876f0b0b799524b6579f81dabbe72ca0870145e9a5c1340372bde3d44aac2b",
+          "at": "2026-06-30T15:11:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f22f29efb55163791848fb838f7a58cac0af5024951fd015089083aa17afe0bf",
+          "at": "2026-06-30T15:17:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D7's frontmatter records the selected candidate as `base-branch-via-port`, but the ADR body explicitly says the adr-editor pre/post-merge check must use `merge_target()` because it is checking whether the ADR has landed on the PR base. That leaves two conflicting design signals for the same decision; an implementer following the frontmatter could wire adr-editor to the base branch and misclassify merged ADRs when `base_branch` and `merge_target` differ. Align the D7 candidate label with the body, e.g. `merge-target-via-port`.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-30-1441-branch-strategy-config-driven.md",
+              "line": 30,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f22f29efb55163791848fb838f7a58cac0af5024951fd015089083aa17afe0bf",
+          "at": "2026-06-30T15:20:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:df90649c0171ade143d4b0b98537819a449dc6730515ff247d65074d53637d01",
+          "at": "2026-06-30T15:22:39Z"
+        }
+      ]
+    }
+  }
+}
