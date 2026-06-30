@@ -88,7 +88,7 @@
       },
       "methods": [],
       "module_path": "branch_strategy",
-      "docs": "Error returned by JsonConfigBranchStrategyAdapter::new when the branch-strategy config file cannot be read (Io) or cannot be parsed as valid JSON (Parse). Fail-closed per CN-03: no fallback, no grace period.",
+      "docs": "Error returned by JsonConfigBranchStrategyAdapter::new when the branch-strategy config file cannot be read (Io) or cannot be parsed as valid JSON (Parse). Fail-closed per D5: no fallback, no grace period.",
       "spec_refs": [
         { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-02" }
       ],
@@ -168,6 +168,7 @@
     { "action": "add", "trait_ref": "core::fmt::Debug",                                       "for_type": "MergeMethodDocument" },
     { "action": "add", "trait_ref": "core::clone::Clone",                                     "for_type": "MergeMethodDocument" },
     { "action": "add", "trait_ref": "core::marker::Copy",                                     "for_type": "MergeMethodDocument" },
+    { "action": "add", "trait_ref": "core::clone::TrivialClone",                              "for_type": "MergeMethodDocument" },
     { "action": "add", "trait_ref": "core::cmp::PartialEq",                                  "for_type": "MergeMethodDocument" },
     { "action": "add", "trait_ref": "core::cmp::Eq",                                         "for_type": "MergeMethodDocument" },
     { "action": "add", "trait_ref": "serde_core::ser::Serialize",                            "for_type": "MergeMethodDocument" },

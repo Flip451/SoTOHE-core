@@ -3,6 +3,10 @@
 
 pub mod adr_decision;
 pub mod agent_profiles;
+pub mod branch_strategy;
+pub use branch_strategy::{
+    BranchStrategyConfigError, JsonConfigBranchStrategyAdapter, SnapshotBranchStrategyAdapter,
+};
 pub mod arch;
 pub mod code_profile_builder;
 pub mod codex_common;

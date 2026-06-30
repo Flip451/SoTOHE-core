@@ -3,9 +3,10 @@
 //! Per ADR 2026-04-19-1242 §D1.4, `tasks` and `plan` fields are removed from
 //! `TrackDocumentV2`; they now live in `impl-plan.json` (ImplPlanDocument).
 //! The `status` field is also removed from metadata.json; track status is
-//! derived on demand via `domain::derive_track_status`. Schema version is 5.
+//! derived on demand via `domain::derive_track_status`. Schema version is 6.
 //!
-//! Legacy v4 (has `status`) and older are rejected on decode — no backward-compat.
+//! v6 adds `branch_strategy_snapshot` (a required non-optional field).
+//! All previous schema versions are rejected on decode — no backward-compat.
 
 use domain::{DomainError, StatusOverride, TrackBranch, TrackId, TrackMetadata};
 
@@ -25,12 +26,97 @@ pub enum CodecError {
     Validation(String),
 }
 
-/// Identity-only DTO for `metadata.json` (schema_version = 5).
+/// Serde-deserializable mirror of domain::branch_strategy::MergeMethod.
+/// R9: finite set must be a typed enum, not String.
+///
+/// Serialize and Deserialize are implemented manually (not via derive) to avoid
+/// a nightly-rustdoc `TrivialClone` auto-impl appearing as an undeclared extra
+/// item in the TDDD signal checker when Copy + derive(Serialize, Deserialize)
+/// are combined.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MergeMethodDocument {
+    Squash,
+    Merge,
+    Rebase,
+}
+
+impl serde::Serialize for MergeMethodDocument {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        serializer.serialize_str(match self {
+            MergeMethodDocument::Squash => "squash",
+            MergeMethodDocument::Merge => "merge",
+            MergeMethodDocument::Rebase => "rebase",
+        })
+    }
+}
+
+impl<'de> serde::Deserialize<'de> for MergeMethodDocument {
+    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        let s = String::deserialize(deserializer)?;
+        match s.as_str() {
+            "squash" => Ok(MergeMethodDocument::Squash),
+            "merge" => Ok(MergeMethodDocument::Merge),
+            "rebase" => Ok(MergeMethodDocument::Rebase),
+            other => Err(serde::de::Error::unknown_variant(other, &["squash", "merge", "rebase"])),
+        }
+    }
+}
+
+/// Serde DTO for the branch_strategy_snapshot sub-field of metadata.json.
+/// base_branch/merge_target are String (arbitrary branch names validated at
+/// domain conversion); merge_method is typed as MergeMethodDocument (R9 finite set).
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct BranchStrategySnapshotDocument {
+    pub base_branch: String,
+    pub merge_target: String,
+    pub merge_method: MergeMethodDocument,
+}
+
+fn merge_method_from_document(doc: MergeMethodDocument) -> domain::branch_strategy::MergeMethod {
+    match doc {
+        MergeMethodDocument::Squash => domain::branch_strategy::MergeMethod::Squash,
+        MergeMethodDocument::Merge => domain::branch_strategy::MergeMethod::Merge,
+        MergeMethodDocument::Rebase => domain::branch_strategy::MergeMethod::Rebase,
+    }
+}
+
+fn merge_method_to_document(m: domain::branch_strategy::MergeMethod) -> MergeMethodDocument {
+    match m {
+        domain::branch_strategy::MergeMethod::Squash => MergeMethodDocument::Squash,
+        domain::branch_strategy::MergeMethod::Merge => MergeMethodDocument::Merge,
+        domain::branch_strategy::MergeMethod::Rebase => MergeMethodDocument::Rebase,
+    }
+}
+
+fn snapshot_from_document(
+    doc: BranchStrategySnapshotDocument,
+) -> Result<domain::branch_strategy::BranchStrategySnapshot, CodecError> {
+    let base = domain::NonEmptyString::try_new(&doc.base_branch)
+        .map_err(|e| CodecError::Domain(domain::DomainError::Validation(e)))?;
+    let target = domain::NonEmptyString::try_new(&doc.merge_target)
+        .map_err(|e| CodecError::Domain(domain::DomainError::Validation(e)))?;
+    let method = merge_method_from_document(doc.merge_method);
+    Ok(domain::branch_strategy::BranchStrategySnapshot::new(base, target, method))
+}
+
+fn snapshot_to_document(
+    snap: &domain::branch_strategy::BranchStrategySnapshot,
+) -> BranchStrategySnapshotDocument {
+    BranchStrategySnapshotDocument {
+        base_branch: snap.base_branch().to_owned(),
+        merge_target: snap.merge_target().to_owned(),
+        merge_method: merge_method_to_document(snap.merge_method()),
+    }
+}
+
+/// Identity-only DTO for `metadata.json` (schema_version = 6).
 ///
 /// Per ADR 2026-04-19-1242 §D1.4:
 /// - `status` is removed; track status is derived on demand from `impl-plan.json`.
 /// - `status_override` is kept for Blocked/Cancelled semantics.
 /// - `tasks` and `plan` are removed — they live in `impl-plan.json`.
+/// - `branch_strategy_snapshot` is required (added in v6).
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct TrackDocumentV2 {
@@ -43,6 +129,7 @@ pub struct TrackDocumentV2 {
     pub updated_at: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub status_override: Option<TrackStatusOverrideDocument>,
+    pub branch_strategy_snapshot: BranchStrategySnapshotDocument,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -62,41 +149,41 @@ pub struct DocumentMeta {
 
 /// Decodes a JSON string into a domain `TrackMetadata` and infrastructure `DocumentMeta`.
 ///
-/// Accepts only `schema_version = 5` (identity-only, no `status` field).
-/// All previous schema versions (v2/v3/v4) are rejected with a clear error message.
+/// Accepts only `schema_version = 6` (identity-only with `branch_strategy_snapshot`).
+/// All previous schema versions are rejected with a clear error message.
 ///
 /// # Errors
 /// Returns `CodecError` on JSON parse failure, schema version mismatch, or domain
 /// validation failure.
 pub fn decode(json: &str) -> Result<(TrackMetadata, DocumentMeta), CodecError> {
     // Peek at schema_version before full decode. Use `u32::try_from` to reject
-    // values that overflow u32 instead of silently wrapping (e.g., `4294967301`
-    // must not truncate to `5` and be misclassified as valid v5 metadata).
+    // values that overflow u32 instead of silently wrapping (e.g., `4294967302`
+    // must not truncate to `6` and be misclassified as valid v6 metadata).
     let raw: serde_json::Value = serde_json::from_str(json)?;
     let schema_version_u64 = raw.get("schema_version").and_then(|v| v.as_u64()).unwrap_or(0);
     let schema_version = u32::try_from(schema_version_u64).map_err(|_| {
         CodecError::Validation(format!(
             "metadata.json schema_version {schema_version_u64} overflows u32; \
-             schema v5 is required"
+             schema v6 is required"
         ))
     })?;
-    if schema_version != 5 {
+    if schema_version != 6 {
         return Err(CodecError::Validation(format!(
             "metadata.json schema_version {schema_version} is not supported; \
-             schema v5 is required (migrate by removing the 'status' field and \
-             setting schema_version to 5)"
+             schema v6 is required (add branch_strategy_snapshot field and \
+             set schema_version to 6)"
         )));
     }
 
-    // Reject any file that still carries legacy fields from pre-v5 schemas.
+    // Reject any file that still carries legacy fields from pre-v6 schemas.
     // `status`, `tasks`, and `plan` are the three v4/v3 fields that must not
-    // appear in v5 identity-only metadata. Any of these indicates an
+    // appear in v6 identity-only metadata. Any of these indicates an
     // incomplete migration; fail closed rather than silently ignoring them.
     for legacy_field in ["status", "tasks", "plan"] {
         if raw.get(legacy_field).is_some() {
             return Err(CodecError::Validation(format!(
-                "metadata.json has a '{legacy_field}' field which is not valid in schema v5; \
-                 remove '{legacy_field}' (and any other v4 fields) and set schema_version to 5"
+                "metadata.json has a '{legacy_field}' field which is not valid in schema v6; \
+                 remove '{legacy_field}' (and any other legacy fields) and set schema_version to 6"
             )));
         }
     }
@@ -114,14 +201,14 @@ pub fn decode(json: &str) -> Result<(TrackMetadata, DocumentMeta), CodecError> {
 
 /// Encodes a domain `TrackMetadata` and infrastructure `DocumentMeta` into a JSON string.
 ///
-/// Always writes `schema_version = 5` (no `status` field).
+/// Always writes `schema_version = 6` (with `branch_strategy_snapshot`, no `status` field).
 ///
 /// # Errors
 /// Returns `CodecError` on JSON serialization failure.
 pub fn encode(track: &TrackMetadata, meta: &DocumentMeta) -> Result<String, CodecError> {
     let doc = document_from_track_metadata(track, meta);
     let mut value = serde_json::to_value(&doc)?;
-    // Preserve `branch: null` for planning-only tracks (schema_version 5 + no branch).
+    // Preserve `branch: null` for planning-only tracks (schema_version 6 + no branch).
     if track.branch().is_none() {
         if let serde_json::Value::Object(ref mut object) = value {
             object.insert("branch".to_owned(), serde_json::Value::Null);
@@ -143,30 +230,29 @@ fn track_metadata_from_document(doc: TrackDocumentV2) -> Result<TrackMetadata, C
     let status_override =
         doc.status_override.map(|o| parse_status_override(&o.status, o.reason)).transpose()?;
 
-    // TODO(T003): decode branch_strategy_snapshot from document once schema_version is bumped.
-    // Bootstrap placeholder: existing schema v5 metadata has no snapshot; use main defaults.
-    let main_branch = domain::NonEmptyString::try_new("main")
-        .map_err(|e| CodecError::Domain(DomainError::Validation(e)))?;
-    let legacy_snapshot = domain::branch_strategy::BranchStrategySnapshot::new(
-        main_branch.clone(),
-        main_branch,
-        domain::branch_strategy::MergeMethod::Squash,
-    );
-    let track =
-        TrackMetadata::with_branch(id, branch, doc.title, status_override, legacy_snapshot)?;
+    let branch_strategy_snapshot = snapshot_from_document(doc.branch_strategy_snapshot)?;
+
+    let track = TrackMetadata::with_branch(
+        id,
+        branch,
+        doc.title,
+        status_override,
+        branch_strategy_snapshot,
+    )?;
 
     Ok(track)
 }
 
 fn document_from_track_metadata(track: &TrackMetadata, meta: &DocumentMeta) -> TrackDocumentV2 {
     TrackDocumentV2 {
-        schema_version: 5,
+        schema_version: 6,
         id: track.id().to_string(),
         branch: track.branch().map(|b| b.to_string()),
         title: track.title().to_string(),
         created_at: meta.created_at.clone(),
         updated_at: meta.updated_at.clone(),
         status_override: track.status_override().map(override_to_document),
+        branch_strategy_snapshot: snapshot_to_document(track.branch_strategy_snapshot()),
     }
 }
 
@@ -194,14 +280,15 @@ mod tests {
     use super::*;
     use domain::TrackStatus;
 
-    /// Minimal identity-only metadata.json (schema_version = 5, no status field).
-    fn sample_json_v5() -> &'static str {
+    /// Minimal identity-only metadata.json (schema_version = 6, with branch_strategy_snapshot).
+    fn sample_json_v6() -> &'static str {
         r#"{
-  "schema_version": 5,
+  "schema_version": 6,
   "id": "test-track",
   "title": "Test Track",
   "created_at": "2026-03-11T00:00:00Z",
-  "updated_at": "2026-03-11T00:00:00Z"
+  "updated_at": "2026-03-11T00:00:00Z",
+  "branch_strategy_snapshot": {"base_branch": "main", "merge_target": "main", "merge_method": "squash"}
 }"#
     }
 
@@ -237,24 +324,24 @@ mod tests {
     }
 
     #[test]
-    fn test_decode_v5_identity_only_json_returns_track_metadata() {
-        let (track, meta) = decode(sample_json_v5()).unwrap();
+    fn test_decode_v6_identity_only_json_returns_track_metadata() {
+        let (track, meta) = decode(sample_json_v6()).unwrap();
         assert_eq!(track.id().as_ref(), "test-track");
         assert_eq!(track.title(), "Test Track");
         assert!(track.status_override().is_none());
-        assert_eq!(meta.schema_version, 5);
+        assert_eq!(meta.schema_version, 6);
         assert_eq!(meta.created_at, "2026-03-11T00:00:00Z");
     }
 
     #[test]
     fn test_decode_v4_legacy_with_status_field_returns_error() {
-        // v4 files have a `status` field — must be rejected in schema v5.
+        // v4 files have a `status` field — must be rejected in schema v6.
         let result = decode(sample_json_v4_legacy());
         assert!(result.is_err(), "v4 metadata with status field must be rejected");
         if let Err(CodecError::Validation(msg)) = result {
             assert!(
-                msg.contains("schema_version 4") || msg.contains("schema v5"),
-                "error must mention v4 or schema v5: {msg}"
+                msg.contains("schema_version 4") || msg.contains("schema v6"),
+                "error must mention v4 or schema v6: {msg}"
             );
         } else {
             panic!("expected Validation error");
@@ -269,16 +356,16 @@ mod tests {
     }
 
     #[test]
-    fn test_encode_always_writes_schema_version_5() {
-        let (track, meta) = decode(sample_json_v5()).unwrap();
+    fn test_encode_always_writes_schema_version_6() {
+        let (track, meta) = decode(sample_json_v6()).unwrap();
         let json = encode(&track, &meta).unwrap();
         let doc: serde_json::Value = serde_json::from_str(&json).unwrap();
-        assert_eq!(doc["schema_version"].as_u64().unwrap(), 5);
+        assert_eq!(doc["schema_version"].as_u64().unwrap(), 6);
     }
 
     #[test]
-    fn test_encode_v5_then_decode_round_trip() {
-        let (track, meta) = decode(sample_json_v5()).unwrap();
+    fn test_encode_v6_then_decode_round_trip() {
+        let (track, meta) = decode(sample_json_v6()).unwrap();
         let json = encode(&track, &meta).unwrap();
         let (track2, meta2) = decode(&json).unwrap();
         assert_eq!(track, track2);
@@ -287,20 +374,21 @@ mod tests {
 
     #[test]
     fn test_encode_does_not_emit_status_field() {
-        let (track, meta) = decode(sample_json_v5()).unwrap();
+        let (track, meta) = decode(sample_json_v6()).unwrap();
         let json = encode(&track, &meta).unwrap();
         let doc: serde_json::Value = serde_json::from_str(&json).unwrap();
-        assert!(doc.get("status").is_none(), "status must NOT be emitted in v5 output");
+        assert!(doc.get("status").is_none(), "status must NOT be emitted in v6 output");
     }
 
     #[test]
     fn test_decode_with_status_override_blocked() {
         let json = r#"{
-  "schema_version": 5,
+  "schema_version": 6,
   "id": "blocked-track",
   "title": "Blocked Track",
   "created_at": "2026-03-11T00:00:00Z",
   "updated_at": "2026-03-11T00:00:00Z",
+  "branch_strategy_snapshot": {"base_branch": "main", "merge_target": "main", "merge_method": "squash"},
   "status_override": {"status": "blocked", "reason": "waiting on review"}
 }"#;
         let (track, _meta) = decode(json).unwrap();
@@ -321,7 +409,7 @@ mod tests {
 
     #[test]
     fn test_encode_branchless_track_has_null_branch_field() {
-        let (track, meta) = decode(sample_json_v5()).unwrap();
+        let (track, meta) = decode(sample_json_v6()).unwrap();
         let json = encode(&track, &meta).unwrap();
         let doc: serde_json::Value = serde_json::from_str(&json).unwrap();
         // Branchless track must emit `"branch": null`
@@ -332,12 +420,13 @@ mod tests {
     #[test]
     fn test_encode_with_branch_emits_branch_string() {
         let json = r#"{
-  "schema_version": 5,
+  "schema_version": 6,
   "id": "branched-track",
   "branch": "track/branched-track",
   "title": "Branched Track",
   "created_at": "2026-03-11T00:00:00Z",
-  "updated_at": "2026-03-11T00:00:00Z"
+  "updated_at": "2026-03-11T00:00:00Z",
+  "branch_strategy_snapshot": {"base_branch": "main", "merge_target": "main", "merge_method": "squash"}
 }"#;
         let (track, meta) = decode(json).unwrap();
         let re_encoded = encode(&track, &meta).unwrap();
@@ -346,30 +435,31 @@ mod tests {
     }
 
     #[test]
-    fn test_decode_no_tasks_or_plan_fields_in_v5_output() {
-        let (track, meta) = decode(sample_json_v5()).unwrap();
+    fn test_decode_no_tasks_or_plan_fields_in_v6_output() {
+        let (track, meta) = decode(sample_json_v6()).unwrap();
         let json = encode(&track, &meta).unwrap();
         let doc: serde_json::Value = serde_json::from_str(&json).unwrap();
         // Identity-only: tasks and plan must NOT appear in the encoded output.
-        assert!(doc.get("tasks").is_none(), "tasks must not be emitted in v5 output");
-        assert!(doc.get("plan").is_none(), "plan must not be emitted in v5 output");
+        assert!(doc.get("tasks").is_none(), "tasks must not be emitted in v6 output");
+        assert!(doc.get("plan").is_none(), "plan must not be emitted in v6 output");
     }
 
     #[test]
-    fn test_decode_v5_with_stale_tasks_field_is_rejected() {
-        // A metadata.json that was partially migrated (schema_version bumped to 5
+    fn test_decode_v6_with_stale_tasks_field_is_rejected() {
+        // A metadata.json that was partially migrated (schema_version bumped to 6
         // but `tasks` not yet removed) must be rejected. This is an incomplete
         // migration — fail closed rather than silently ignoring legacy fields.
         let json = r#"{
-  "schema_version": 5,
+  "schema_version": 6,
   "id": "partial-migration",
   "title": "Partial Migration",
   "created_at": "2026-03-11T00:00:00Z",
   "updated_at": "2026-03-11T00:00:00Z",
+  "branch_strategy_snapshot": {"base_branch": "main", "merge_target": "main", "merge_method": "squash"},
   "tasks": [{"id": "T1", "description": "leftover", "status": "todo"}]
 }"#;
         let result = decode(json);
-        assert!(result.is_err(), "v5 doc with stale `tasks` field must be rejected");
+        assert!(result.is_err(), "v6 doc with stale `tasks` field must be rejected");
         if let Err(CodecError::Validation(msg)) = result {
             assert!(msg.contains("tasks"), "error must mention the offending field: {msg}");
         } else {
@@ -378,18 +468,19 @@ mod tests {
     }
 
     #[test]
-    fn test_decode_v5_with_stale_plan_field_is_rejected() {
-        // Similarly, a `plan` field in schema v5 indicates an incomplete migration.
+    fn test_decode_v6_with_stale_plan_field_is_rejected() {
+        // Similarly, a `plan` field in schema v6 indicates an incomplete migration.
         let json = r#"{
-  "schema_version": 5,
+  "schema_version": 6,
   "id": "partial-migration-plan",
   "title": "Partial Migration Plan",
   "created_at": "2026-03-11T00:00:00Z",
   "updated_at": "2026-03-11T00:00:00Z",
+  "branch_strategy_snapshot": {"base_branch": "main", "merge_target": "main", "merge_method": "squash"},
   "plan": {"summary": [], "sections": []}
 }"#;
         let result = decode(json);
-        assert!(result.is_err(), "v5 doc with stale `plan` field must be rejected");
+        assert!(result.is_err(), "v6 doc with stale `plan` field must be rejected");
         if let Err(CodecError::Validation(msg)) = result {
             assert!(msg.contains("plan"), "error must mention the offending field: {msg}");
         } else {
@@ -398,34 +489,36 @@ mod tests {
     }
 
     #[test]
-    fn test_decode_v5_with_unknown_top_level_field_is_rejected() {
+    fn test_decode_v6_with_unknown_top_level_field_is_rejected() {
         // `deny_unknown_fields` regression: any unknown top-level field that is not
         // one of the explicitly filtered legacy fields (status/tasks/plan) must still
         // be rejected. This guards against future typos or unanticipated extensions
         // silently passing through the codec.
         let json = r#"{
-  "schema_version": 5,
+  "schema_version": 6,
   "id": "unknown-field-track",
   "title": "Unknown Field Track",
   "created_at": "2026-03-11T00:00:00Z",
   "updated_at": "2026-03-11T00:00:00Z",
+  "branch_strategy_snapshot": {"base_branch": "main", "merge_target": "main", "merge_method": "squash"},
   "extra_field": "should not be here"
 }"#;
         let result = decode(json);
-        assert!(result.is_err(), "v5 doc with unknown top-level field must be rejected");
+        assert!(result.is_err(), "v6 doc with unknown top-level field must be rejected");
     }
 
     #[test]
-    fn test_decode_v5_with_unknown_field_in_status_override_is_rejected() {
+    fn test_decode_v6_with_unknown_field_in_status_override_is_rejected() {
         // `deny_unknown_fields` regression on nested `TrackStatusOverrideDocument`:
         // a status_override object with an unexpected field must be rejected rather
         // than silently dropped.
         let json = r#"{
-  "schema_version": 5,
+  "schema_version": 6,
   "id": "override-unknown-track",
   "title": "Override Unknown Track",
   "created_at": "2026-03-11T00:00:00Z",
   "updated_at": "2026-03-11T00:00:00Z",
+  "branch_strategy_snapshot": {"base_branch": "main", "merge_target": "main", "merge_method": "squash"},
   "status_override": {"status": "blocked", "reason": "waiting on review", "extra": "surprise"}
 }"#;
         let result = decode(json);
@@ -435,14 +528,14 @@ mod tests {
     #[test]
     fn test_decode_schema_version_overflowing_u32_returns_validation_error() {
         // Regression guard for the `u32::try_from` fix: a schema_version value that
-        // exceeds u32::MAX and wraps to the supported v5 value under the old `as u32`
+        // exceeds u32::MAX and wraps to the supported v6 value under the old `as u32`
         // cast must be rejected with a Validation error.
         //
-        // 4294967301 = 2^32 + 5. Under `v as u32` this truncates to 5, which is the
-        // valid schema v5 — the codec would silently accept the file as a legitimate
-        // v5 metadata.json. With `u32::try_from` it must be rejected.
+        // 4294967302 = 2^32 + 6. Under `v as u32` this truncates to 6, which is the
+        // valid schema v6 — the codec would silently accept the file as a legitimate
+        // v6 metadata.json. With `u32::try_from` it must be rejected.
         let json = r#"{
-  "schema_version": 4294967301,
+  "schema_version": 4294967302,
   "id": "overflow-track",
   "title": "Overflow Track",
   "created_at": "2026-03-11T00:00:00Z",
@@ -454,5 +547,64 @@ mod tests {
             matches!(result, Err(CodecError::Validation(_))),
             "expected Validation error for overflow schema_version, got: {result:?}"
         );
+    }
+
+    #[test]
+    fn test_decode_missing_branch_strategy_snapshot_returns_err() {
+        // AC-10: payload without branch_strategy_snapshot must fail
+        let json = r#"{
+  "schema_version": 6,
+  "id": "test-track",
+  "title": "Test Track",
+  "created_at": "2026-03-11T00:00:00Z",
+  "updated_at": "2026-03-11T00:00:00Z"
+}"#;
+        let result = decode(json);
+        assert!(result.is_err(), "missing branch_strategy_snapshot must return Err");
+    }
+
+    #[test]
+    fn test_merge_method_lowercase_round_trip() {
+        // "squash" / "merge" / "rebase" must round-trip through MergeMethodDocument
+        let cases = [
+            (r#""squash""#, MergeMethodDocument::Squash),
+            (r#""merge""#, MergeMethodDocument::Merge),
+            (r#""rebase""#, MergeMethodDocument::Rebase),
+        ];
+        for (json_str, expected) in cases {
+            let parsed: MergeMethodDocument = serde_json::from_str(json_str).unwrap();
+            assert_eq!(parsed, expected);
+            let re_serialized = serde_json::to_string(&parsed).unwrap();
+            assert_eq!(re_serialized, json_str);
+        }
+    }
+
+    #[test]
+    fn test_decode_with_kind_field_is_rejected() {
+        // AC-07 (D3 defer): a payload containing a `kind` field must be rejected
+        // because TrackDocumentV2 uses deny_unknown_fields.
+        let json = r#"{
+  "schema_version": 6,
+  "id": "test-track",
+  "title": "Test Track",
+  "created_at": "2026-03-11T00:00:00Z",
+  "updated_at": "2026-03-11T00:00:00Z",
+  "branch_strategy_snapshot": {"base_branch": "main", "merge_target": "main", "merge_method": "squash"},
+  "kind": "feature"
+}"#;
+        let result = decode(json);
+        assert!(
+            result.is_err(),
+            "payload with `kind` field must be rejected by deny_unknown_fields"
+        );
+    }
+
+    #[test]
+    fn test_encode_does_not_emit_kind_field() {
+        // AC-07: newly serialized metadata must not contain `kind` field
+        let (track, meta) = decode(sample_json_v6()).unwrap();
+        let json = encode(&track, &meta).unwrap();
+        let doc: serde_json::Value = serde_json::from_str(&json).unwrap();
+        assert!(doc.get("kind").is_none(), "kind must NOT be emitted");
     }
 }

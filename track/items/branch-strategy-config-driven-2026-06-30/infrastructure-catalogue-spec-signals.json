@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "4a6a1339d0d1536afecc9684ad506c051eca1a941b6b6f1144c6dee441e058e1",
+  "catalogue_declaration_hash": "0add0b568ac049561ee9621d9e56016321946566d8e275516d761a2294eccc6e",
   "signals": [
     {
       "type_name": "BranchStrategyConfigError",
       "signal": "blue",
-      "entry_hash": "6b0acbdac1fcac27102676b038a55d501099b19b7d1ec300f34226cc39e479a4"
+      "entry_hash": "f3327a7df406099b1ce2c1b63029e16def5c30be4b2385cda3e9782e3b83b88b"
     },
     {
       "type_name": "BranchStrategySnapshotDocument",

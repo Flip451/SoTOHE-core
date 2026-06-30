@@ -37,7 +37,7 @@ impl std::fmt::Display for CaptureBaselineError {
 ///
 /// `workspace_root` is the Cargo workspace from which rustdoc is invoked.
 /// It may differ from the workspace that contains `items_dir`; this is the
-/// intended use-case when capturing a baseline from a git worktree at `main`
+/// intended use-case when capturing a baseline from a git worktree at the configured base branch
 /// while writing the output into the current branch's track directory via
 /// `--source-workspace`.
 ///
@@ -196,7 +196,7 @@ mod tests {
         //
         // Expected: the function reaches "track directory not found" (the track dir
         // does not exist in the tempdir), proving no spurious containment check fires.
-        let source_workspace = tempfile::tempdir().unwrap(); // rustdoc source (different tree)
+        let source_workspace = tempfile::tempdir().unwrap(); // rustdoc source (configured base branch worktree — different tree)
         let items_workspace = tempfile::tempdir().unwrap(); // write target (current branch)
         let items_dir = items_workspace.path().join("track").join("items");
         std::fs::create_dir_all(&items_dir).unwrap();

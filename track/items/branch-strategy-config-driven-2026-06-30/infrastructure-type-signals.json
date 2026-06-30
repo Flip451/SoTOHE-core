@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-30T21:20:40Z",
-  "declaration_hash": "4a6a1339d0d1536afecc9684ad506c051eca1a941b6b6f1144c6dee441e058e1",
+  "generated_at": "2026-06-30T23:43:48Z",
+  "declaration_hash": "0add0b568ac049561ee9621d9e56016321946566d8e275516d761a2294eccc6e",
   "signals": [
     {
       "type_name": "BranchStrategyConfigError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::convert::From<Error>",
         "core::error::Error",
         "core::fmt::Debug",
@@ -18,9 +18,9 @@
     {
       "type_name": "BranchStrategySnapshotDocument",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::fmt::Debug",
         "serde_core::de::Deserialize<'de>",
@@ -30,19 +30,20 @@
     {
       "type_name": "JsonConfigBranchStrategyAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "BranchStrategyPort"
       ]
     },
     {
       "type_name": "MergeMethodDocument",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
+        "core::clone::TrivialClone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
         "core::fmt::Debug",
@@ -54,16 +55,16 @@
     {
       "type_name": "SnapshotBranchStrategyAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "BranchStrategyPort"
       ]
     },
     {
       "type_name": "TrackDocumentV2",
       "kind_tag": "dto",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     }
   ]

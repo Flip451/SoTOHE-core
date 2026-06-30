@@ -278,7 +278,7 @@ pub enum TrackCommand {
     /// To re-capture, delete the baseline file first and then run this command again.
     ///
     /// `--source-workspace` lets you capture the API from a different Cargo
-    /// workspace (e.g. a git worktree at `main`) while writing the baseline files
+    /// workspace (e.g. a git worktree at the configured base branch) while writing the baseline files
     /// into the current branch's track directory.
     BaselineCapture {
         /// Track ID (directory name under `workspace_root/track/items`).
@@ -296,7 +296,7 @@ pub enum TrackCommand {
 
         /// Optional source workspace for rustdoc export. When supplied,
         /// rustdoc is invoked from this workspace instead of `workspace_root`.
-        /// Useful for capturing a baseline from a git worktree at `main`.
+        /// Useful for capturing a baseline from a git worktree at the configured base branch.
         #[arg(long)]
         source_workspace: Option<PathBuf>,
 
@@ -365,7 +365,7 @@ pub enum TrackCommand {
     ///
     /// A = ExtendedCrate built from `<layer>-types.json` via `CatalogueToExtendedCrateCodec`.
     /// B = `rustdoc_types::Crate` loaded from `<layer>-types-baseline.json` via
-    ///     `BaselineRustdocCodec` (captured at pre-implementation main HEAD).
+    ///     `BaselineRustdocCodec` (captured at pre-implementation HEAD of the configured base branch).
     /// C = `rustdoc_types::Crate` captured live via `cargo +nightly rustdoc`.
     ///
     /// Processes every `tddd.enabled` layer in `architecture-rules.json`.

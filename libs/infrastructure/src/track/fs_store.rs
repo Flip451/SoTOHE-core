@@ -144,7 +144,7 @@ impl TrackWriter for FsTrackStore {
                 meta
             }
             None => DocumentMeta {
-                schema_version: 5,
+                schema_version: 6,
                 created_at: Self::now_iso8601().map_err(TrackWriteError::from)?,
                 updated_at: Self::now_iso8601().map_err(TrackWriteError::from)?,
             },
@@ -619,5 +619,45 @@ mod tests {
         // File must be unchanged.
         let json_after = std::fs::read_to_string(&path).unwrap();
         assert_eq!(json_before, json_after);
+    }
+
+    #[test]
+    fn test_init_with_branch_strategy_port_writes_snapshot() {
+        use crate::branch_strategy::SnapshotBranchStrategyAdapter;
+        use domain::NonEmptyString;
+        use domain::branch_strategy::{BranchStrategySnapshot, MergeMethod};
+        use usecase::branch_strategy::BranchStrategyPort;
+
+        // Stub port via SnapshotBranchStrategyAdapter
+        let snapshot = BranchStrategySnapshot::new(
+            NonEmptyString::try_new("develop").unwrap(),
+            NonEmptyString::try_new("develop").unwrap(),
+            MergeMethod::Squash,
+        );
+        let port = SnapshotBranchStrategyAdapter::new(snapshot.clone());
+
+        // Simulate what init would do: create TrackMetadata using port values
+        let branch_strategy_snapshot = BranchStrategySnapshot::new(
+            NonEmptyString::try_new(port.base_branch()).unwrap(),
+            NonEmptyString::try_new(port.merge_target()).unwrap(),
+            port.merge_method(),
+        );
+        let track = TrackMetadata::new(
+            TrackId::try_new("init-test-track").unwrap(),
+            "Init Test",
+            None,
+            branch_strategy_snapshot,
+        )
+        .unwrap();
+
+        let dir = tempfile::tempdir().unwrap();
+        let store = FsTrackStore::new(dir.path());
+        store.save(&track).unwrap();
+
+        let loaded = store.find(track.id()).unwrap().unwrap();
+        let loaded_snap = loaded.branch_strategy_snapshot();
+        assert_eq!(loaded_snap.base_branch(), "develop");
+        assert_eq!(loaded_snap.merge_target(), "develop");
+        assert_eq!(loaded_snap.merge_method(), MergeMethod::Squash);
     }
 }
