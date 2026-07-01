@@ -1,0 +1,74 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f365b57fe0712fd9cf66e3b474f480dd7db21e0486eabae30092a2010367eb58",
+          "at": "2026-07-01T07:41:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2 decides that the syn walker recursively visits every generic argument without container special cases, so a type like `MyContainer<String>` should already be detected the same way as `Vec<String>`. The Reassess trigger here says custom generic containers are outside the current detectable set and may need future support, which contradicts D1/D2 and leaves downstream spec/type work unsure whether to implement a whitelist of known transparent containers or a true full recursive TypeRef walk.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+              "line": 266,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:f365b57fe0712fd9cf66e3b474f480dd7db21e0486eabae30092a2010367eb58",
+          "at": "2026-07-01T07:43:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:393004989ed1523fb3ccd000a5ae5a54a6ebcc2f351c8f19d7eff2eb0baeecef",
+          "at": "2026-07-01T07:47:34Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3532bf0532568e83db7f1259bb2c0509fdcad04bcf9bfba8e861bf892387a0d8",
+          "at": "2026-07-01T07:38:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3532bf0532568e83db7f1259bb2c0509fdcad04bcf9bfba8e861bf892387a0d8",
+          "at": "2026-07-01T07:41:10Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f40bb4d80e685ed64b94d4e698180d3d2396bbeb2964ed37ef8b42a1e99a2c4f",
+          "at": "2026-07-01T07:39:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f40bb4d80e685ed64b94d4e698180d3d2396bbeb2964ed37ef8b42a1e99a2c4f",
+          "at": "2026-07-01T07:41:32Z"
+        }
+      ]
+    }
+  }
+}
