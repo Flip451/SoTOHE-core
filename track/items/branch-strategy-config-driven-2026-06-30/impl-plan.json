@@ -15,18 +15,21 @@
     },
     {
       "id": "T003",
-      "description": "libs/infrastructure/ (codec) — In libs/infrastructure/src/track/codec.rs: add MergeMethodDocument enum (Squash | Merge | Rebase; serde Serialize/Deserialize + Debug + Clone + Copy + PartialEq + Eq) with serde lowercase mapping (`rename_all = \"snake_case\"` or per-variant rename values `\"squash\"` / `\"merge\"` / `\"rebase\"`) so config and metadata JSON parse the literals required by AC-01/T012/ADR D1. Add BranchStrategySnapshotDocument struct (base_branch: String, merge_target: String, merge_method: MergeMethodDocument; serde Serialize/Deserialize + Debug + Clone). Update TrackDocumentV2 to add branch_strategy_snapshot: BranchStrategySnapshotDocument as a REQUIRED (non-Option) field (CN-03: fail-closed on missing field). Add domain conversion: BranchStrategySnapshotDocument <-> domain::branch_strategy::BranchStrategySnapshot. Bump the schema_version written to metadata.json documents from 1 to 2. Add unit tests confirming that serde_json::from_str() on a metadata.json payload without branch_strategy_snapshot returns Err (AC-10), that lowercase merge_method literals (`\"squash\"`, `\"merge\"`, `\"rebase\"`) round-trip through MergeMethodDocument, that a payload containing the deferred D3 `kind` field is rejected as an unknown field, and that newly serialized metadata.json samples omit `kind` (AC-07).",
-      "status": "in_progress"
+      "description": "libs/infrastructure/ (codec) — In libs/infrastructure/src/track/codec.rs: add MergeMethodDocument enum (Squash | Merge | Rebase; serde Serialize/Deserialize + Debug + Clone + Copy + PartialEq + Eq) with serde lowercase mapping (`rename_all = \"snake_case\"` or per-variant rename values `\"squash\"` / `\"merge\"` / `\"rebase\"`) so config and metadata JSON parse the literals required by AC-01/T012/ADR D1. Add BranchStrategySnapshotDocument struct (base_branch: String, merge_target: String, merge_method: MergeMethodDocument; serde Serialize/Deserialize + Debug + Clone). Update TrackDocumentV2 to add branch_strategy_snapshot: BranchStrategySnapshotDocument as a REQUIRED (non-Option) field (CN-03: fail-closed on missing field). Add domain conversion: BranchStrategySnapshotDocument <-> domain::branch_strategy::BranchStrategySnapshot. Bump the schema_version written to metadata.json documents from 5 to 6. Add unit tests confirming that serde_json::from_str() on a metadata.json payload without branch_strategy_snapshot returns Err (AC-10), that lowercase merge_method literals (`\"squash\"`, `\"merge\"`, `\"rebase\"`) round-trip through MergeMethodDocument, that a payload containing the deferred D3 `kind` field is rejected as an unknown field, and that newly serialized metadata.json samples omit `kind` (AC-07).",
+      "status": "done",
+      "commit_hash": "09b6acfc84f653dbd8ae8247422711a37abbf2b7"
     },
     {
       "id": "T004",
       "description": "libs/infrastructure/ (adapters) — Create new module libs/infrastructure/src/branch_strategy.rs. Define BranchStrategyConfigError enum (variants: Io(std::io::Error), Parse(serde_json::Error)); implement Debug, Display, Error, From<std::io::Error>, and From<serde_json::Error> for it (fail-closed per D5: no fallback, no grace period). Implement JsonConfigBranchStrategyAdapter: reads .harness/config/branch-strategy.json from a provided PathBuf at construction time; stores parsed base_branch/merge_target/merge_method in memory; implements BranchStrategyPort (base_branch/merge_target/merge_method/track_prefix returning 'track/'). Constructor: new(config_path: PathBuf) -> Result<Self, BranchStrategyConfigError>. Implement SnapshotBranchStrategyAdapter: wraps a domain::branch_strategy::BranchStrategySnapshot captured at track init; implements BranchStrategyPort delegating to the snapshot's accessors; track_prefix() always returns 'track/'. Constructor: new(snapshot: BranchStrategySnapshot) -> Self (infallible, no I/O). Register module in libs/infrastructure/src/lib.rs.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "09b6acfc84f653dbd8ae8247422711a37abbf2b7"
     },
     {
       "id": "T005",
       "description": "libs/infrastructure/ (track service + init) — Update TrackServiceImpl (or equivalent TrackRepository write path) to receive &dyn BranchStrategyPort. During init, call port.base_branch(), port.merge_target(), port.merge_method() to construct a BranchStrategySnapshot and pass it to TrackMetadata::new. Update libs/infrastructure/src/tddd/baseline_capture.rs:40,193 doc comments: replace 'at pre-implementation main HEAD' with 'at pre-implementation HEAD of the configured base branch' and 'worktree at main' with 'worktree at the configured base branch'. Add unit test: after calling init with a stub BranchStrategyPort, the written metadata.json contains branch_strategy_snapshot matching the stub's values (AC-08).",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "09b6acfc84f653dbd8ae8247422711a37abbf2b7"
     },
     {
       "id": "T006",

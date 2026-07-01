@@ -1,6 +1,148 @@
 {
   "schema_version": 2,
   "scopes": {
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f9572fc47d468f9941bb85d47917920024275dde36fb9f11f23632d9efbf2184",
+          "at": "2026-06-30T22:39:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f9572fc47d468f9941bb85d47917920024275dde36fb9f11f23632d9efbf2184",
+          "at": "2026-06-30T22:43:23Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c04aa88fc38d0c08b5922cf48806e23cae1ff712475ebd292dde703be6f2370",
+          "at": "2026-06-30T20:44:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c04aa88fc38d0c08b5922cf48806e23cae1ff712475ebd292dde703be6f2370",
+          "at": "2026-06-30T20:48:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`JsonConfigBranchStrategyAdapter::new` reads the config path directly with `read_to_string` and never rejects symlinks or verifies containment under a trusted root. A symlinked `.harness/config/branch-strategy.json` can therefore redirect this adapter to attacker-controlled content outside the repository, which matches the symlink-boundary issue this layer is supposed to fail closed on.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/branch_strategy.rs",
+              "line": 55,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:29c2c84dadf1c1a8bc867535c4d2ff80d8b4d37514e937f994e9e1798eb4a15d",
+          "at": "2026-06-30T22:44:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "A symlinked `track/items/<id>` or `track/archive/<id>` directory is accepted here because `entry.path().is_dir()` follows symlinks, and the later `metadata.json` / `impl-plan.json` / `task-coverage.json` reads never re-check that the resolved path stays under `root`. A repo-controlled symlink can therefore escape the trusted root and feed external files into the render pipeline.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render/snapshot.rs",
+              "line": 306,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "`all_track_directories()` follows symlinked `track/items/<id>` / `track/archive/<id>` entries with `is_dir()`, and `load_track_metadata()` then reads `metadata.json` and `impl-plan.json` from that symlink target without a containment check. That lets the latest-track verifier select and parse data outside `root` if a track directory is replaced with a symlink.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/latest_track.rs",
+              "line": 103,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:b8a75d58f32bdb24889d48ded48b260884fc83158f3b2f895cbee079aae2cdce",
+          "at": "2026-06-30T22:56:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Leaf symlinks are still followed when loading track state for latest-track/freshness checks. `latest_track.rs` reads `metadata.json` directly at line 254, `track/render/snapshot.rs` reads `impl-plan.json` directly at line 66, and `verify/view_freshness.rs` reads `metadata.json` directly at line 173. Those paths never do the same `symlink_metadata()` + reject step used elsewhere in the repo, so a symlinked file inside an otherwise real track directory can redirect these checks to content outside `track/items`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/latest_track.rs",
+              "line": 254,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "`sync_rendered_views` still accepts symlinked track inputs. `catalogue_path_exists()` explicitly counts symlinks as present, and the render path then reads `spec.json` at line 180 and `*-types.json` at line 325 with `read_to_string()`. That lets a symlink under `track/items/<id>` feed arbitrary outside JSON into generated views instead of enforcing real-file semantics.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render/sync.rs",
+              "line": 325,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:aa1c55a0c6df87b84666a3e861406ce125015b08fad2e7a10674436cfdd13ceb",
+          "at": "2026-06-30T23:06:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `metadata_path.is_file()` pre-check runs before `reject_symlinks_below`, so a dangling symlink or other non-regular-file `metadata.json` is treated as absent and silently skipped instead of being rejected at the boundary. That bypasses the fail-closed guard that follows and can hide corrupted track state.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/view_freshness.rs",
+              "line": 84,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:e45a22c8fa6308ea3c2f5161102260aeaeb83a02eb254a0317275941b8da216f",
+          "at": "2026-06-30T23:26:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c80cc7a3300a83f8cfb23872448c52782977665287270ddb89db62ca0babd43a",
+          "at": "2026-06-30T23:35:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c80cc7a3300a83f8cfb23872448c52782977665287270ddb89db62ca0babd43a",
+          "at": "2026-06-30T23:41:58Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6e8b1b6bb455fa563f4671a976af2882e4834b64f7446bf4f1874c39872343b6",
+          "at": "2026-06-30T20:42:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6e8b1b6bb455fa563f4671a976af2882e4834b64f7446bf4f1874c39872343b6",
+          "at": "2026-06-30T20:46:04Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -455,6 +597,35 @@
           "findings": [],
           "hash": "rvw1:sha256:bef917d65a7df6e78fd91959bc5d7d9e907e3756dc9a6e933a80f58571ba0a7d",
           "at": "2026-06-30T22:46:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T003` still describes the codec change as bumping `schema_version` from `1 -> 2`, but this track artifact is already at `schema_version: 6`, and the briefing for this batch says the metadata transition is `v5 -> v6`. That makes the plan internally inconsistent about the version being introduced. The same wording is repeated in the rendered plan view.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/impl-plan.json",
+              "line": 18,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0a3cba463421fe11c41916646fe2b037eef17282dd9605fd8ad7aeeab924e352",
+          "at": "2026-06-30T23:51:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:29b61f82d4a45582f4d0b27ecb46f9de8e8f65188e092b570dedadc3ec5d0a49",
+          "at": "2026-06-30T23:55:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:29b61f82d4a45582f4d0b27ecb46f9de8e8f65188e092b570dedadc3ec5d0a49",
+          "at": "2026-06-30T23:58:36Z"
         }
       ]
     },
@@ -476,42 +647,6 @@
         }
       ]
     },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f9572fc47d468f9941bb85d47917920024275dde36fb9f11f23632d9efbf2184",
-          "at": "2026-06-30T22:39:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f9572fc47d468f9941bb85d47917920024275dde36fb9f11f23632d9efbf2184",
-          "at": "2026-06-30T22:43:23Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6e8b1b6bb455fa563f4671a976af2882e4834b64f7446bf4f1874c39872343b6",
-          "at": "2026-06-30T20:42:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6e8b1b6bb455fa563f4671a976af2882e4834b64f7446bf4f1874c39872343b6",
-          "at": "2026-06-30T20:46:04Z"
-        }
-      ]
-    },
     "domain": {
       "rounds": [
         {
@@ -527,112 +662,6 @@
           "findings": [],
           "hash": "rvw1:sha256:98b734ed377498cde2c2891058182452184459f591320a771ef203f48077cb39",
           "at": "2026-06-30T20:49:00Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0c04aa88fc38d0c08b5922cf48806e23cae1ff712475ebd292dde703be6f2370",
-          "at": "2026-06-30T20:44:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0c04aa88fc38d0c08b5922cf48806e23cae1ff712475ebd292dde703be6f2370",
-          "at": "2026-06-30T20:48:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`JsonConfigBranchStrategyAdapter::new` reads the config path directly with `read_to_string` and never rejects symlinks or verifies containment under a trusted root. A symlinked `.harness/config/branch-strategy.json` can therefore redirect this adapter to attacker-controlled content outside the repository, which matches the symlink-boundary issue this layer is supposed to fail closed on.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/branch_strategy.rs",
-              "line": 55,
-              "category": "symlink not rejected at boundary"
-            }
-          ],
-          "hash": "rvw1:sha256:29c2c84dadf1c1a8bc867535c4d2ff80d8b4d37514e937f994e9e1798eb4a15d",
-          "at": "2026-06-30T22:44:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "A symlinked `track/items/<id>` or `track/archive/<id>` directory is accepted here because `entry.path().is_dir()` follows symlinks, and the later `metadata.json` / `impl-plan.json` / `task-coverage.json` reads never re-check that the resolved path stays under `root`. A repo-controlled symlink can therefore escape the trusted root and feed external files into the render pipeline.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render/snapshot.rs",
-              "line": 306,
-              "category": "symlink not rejected at boundary"
-            },
-            {
-              "message": "`all_track_directories()` follows symlinked `track/items/<id>` / `track/archive/<id>` entries with `is_dir()`, and `load_track_metadata()` then reads `metadata.json` and `impl-plan.json` from that symlink target without a containment check. That lets the latest-track verifier select and parse data outside `root` if a track directory is replaced with a symlink.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/latest_track.rs",
-              "line": 103,
-              "category": "symlink not rejected at boundary"
-            }
-          ],
-          "hash": "rvw1:sha256:b8a75d58f32bdb24889d48ded48b260884fc83158f3b2f895cbee079aae2cdce",
-          "at": "2026-06-30T22:56:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Leaf symlinks are still followed when loading track state for latest-track/freshness checks. `latest_track.rs` reads `metadata.json` directly at line 254, `track/render/snapshot.rs` reads `impl-plan.json` directly at line 66, and `verify/view_freshness.rs` reads `metadata.json` directly at line 173. Those paths never do the same `symlink_metadata()` + reject step used elsewhere in the repo, so a symlinked file inside an otherwise real track directory can redirect these checks to content outside `track/items`.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/latest_track.rs",
-              "line": 254,
-              "category": "symlink not rejected at boundary"
-            },
-            {
-              "message": "`sync_rendered_views` still accepts symlinked track inputs. `catalogue_path_exists()` explicitly counts symlinks as present, and the render path then reads `spec.json` at line 180 and `*-types.json` at line 325 with `read_to_string()`. That lets a symlink under `track/items/<id>` feed arbitrary outside JSON into generated views instead of enforcing real-file semantics.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render/sync.rs",
-              "line": 325,
-              "category": "symlink not rejected at boundary"
-            }
-          ],
-          "hash": "rvw1:sha256:aa1c55a0c6df87b84666a3e861406ce125015b08fad2e7a10674436cfdd13ceb",
-          "at": "2026-06-30T23:06:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new `metadata_path.is_file()` pre-check runs before `reject_symlinks_below`, so a dangling symlink or other non-regular-file `metadata.json` is treated as absent and silently skipped instead of being rejected at the boundary. That bypasses the fail-closed guard that follows and can hide corrupted track state.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/view_freshness.rs",
-              "line": 84,
-              "category": "symlink not rejected at boundary"
-            }
-          ],
-          "hash": "rvw1:sha256:e45a22c8fa6308ea3c2f5161102260aeaeb83a02eb254a0317275941b8da216f",
-          "at": "2026-06-30T23:26:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c80cc7a3300a83f8cfb23872448c52782977665287270ddb89db62ca0babd43a",
-          "at": "2026-06-30T23:35:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c80cc7a3300a83f8cfb23872448c52782977665287270ddb89db62ca0babd43a",
-          "at": "2026-06-30T23:41:58Z"
         }
       ]
     }
