@@ -31,7 +31,7 @@
           "generics": [],
           "has_default_impl": false,
           "where_predicates": [],
-          "docs": "Build a wired TrackDriver. Wires TrackServiceImpl as Arc<dyn TrackService> into TrackDriver."
+          "docs": "Build a wired TrackDriver. Wires TrackServiceImpl as Arc<dyn TrackService>, and usecase::fixpoint_resolve_driver::FixpointResolveDriverInteractor (constructed from the four infrastructure::track::fixpoint_resolve_driver adapters -- FsFixpointWorkspaceContextAdapter, FsDryCheckConfigLoaderAdapter, FsFixpointDryGateFactoryAdapter, FsFixpointGateStateFactoryAdapter -- each implementing one fine-grained usecase secondary port) as Arc<dyn FixpointResolveDriverService>, into TrackDriver (IN-12/AC-17). Constructs and injects both -- does not invoke either service itself (ADR 1328 D2: composition root is wire-only). The orchestration itself (repo discovery, base_branch resolution, dry-gate invocation, FixpointResolveService::resolve invocation) lives inside FixpointResolveDriverInteractor (ADR 1328 D4), not in this composition root and not in an infrastructure adapter."
         },
         {
           "name": "track_add_task_resolved",
@@ -360,19 +360,6 @@
           "docs": null
         },
         {
-          "name": "fixpoint_resolve",
-          "receiver": "&self",
-          "params": [
-            { "name": "input", "ty": "FixpointResolveInput" }
-          ],
-          "returns": "Result<cli_driver::render::CommandOutcome, CompositionError>",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": [],
-          "docs": null
-        },
-        {
           "name": "track_init",
           "receiver": "&self",
           "params": [
@@ -577,9 +564,113 @@
         }
       ],
       "module_path": "track::composition_root",
-      "docs": "Composition root for the track command family. Unit struct: no adapter dependencies injected at construction; all port adapters are wired inline per-method.",
+      "docs": "Composition root for the track command family. Unit struct: no adapter dependencies injected at construction; all port adapters are wired inline per-method. IN-12/AC-17: the former `fixpoint_resolve` method (which directly constructed and invoked FixpointResolveInteractor, then formatted the result) is removed; the composition root no longer owns any part of the fixpoint-resolve invoke/render path. Orchestration for `sotp track fixpoint-resolve` (repo discovery, base_branch resolution, dry-gate + review + ref-verify gate invocation, FixpointResolveService::resolve invocation) now lives in usecase::fixpoint_resolve_driver::FixpointResolveDriverInteractor (ADR 1328 D4: application orchestration belongs in usecase, not composition or an infrastructure SecondaryAdapter); the four infrastructure::track::fixpoint_resolve_driver adapters it is constructed from each perform only a single narrow I/O concern (ADR 1328 D7: port-impl adapters belong in libs/infrastructure). Render lives in cli_driver::track::TrackDriver. `apps/cli` now dispatches via `TrackCompositionRoot::track_driver().handle(TrackInput::FixpointResolve { .. })` instead of calling this composition root directly.",
       "spec_refs": [
-        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-05" }
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-05" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-12" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-17" }
+      ],
+      "informal_grounds": []
+    },
+    "FixpointResolveInput": {
+      "action": "delete",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "track_id", "ty": "String" },
+            { "name": "current_branch", "ty": "String" },
+            { "name": "items_dir", "ty": "std::path::PathBuf" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "track::fixpoint_resolve",
+      "docs": "Superseded by usecase::fixpoint_resolve_driver::FixpointResolveDriverInput (IN-12): `apps/cli` now routes `sotp track fixpoint-resolve` through TrackCompositionRoot::track_driver().handle(TrackInput::FixpointResolve) instead of calling TrackCompositionRoot::fixpoint_resolve(FixpointResolveInput) directly, per no-backward-compat.md (no permanent parallel entrypoint retained). Role note: this entry's role (Dto) is not R1-legal for cli_composition (R1: Dto is forbidden in cli_composition) -- that placement was itself part of the layer violation IN-12 corrects; recorded here for audit-trail accuracy of the removed item, not as an endorsed placement. The former method's wiring, invoke, and render responsibilities are now split across three layers per ADR 1328 D2/D3/D4: the four fine-grained infrastructure::track::fixpoint_resolve_driver adapters (FsFixpointWorkspaceContextAdapter / FsDryCheckConfigLoaderAdapter / FsFixpointDryGateFactoryAdapter / FsFixpointGateStateFactoryAdapter, each implementing one usecase secondary port; R1: SecondaryAdapter is infrastructure-only) perform only narrow I/O concerns and do not invoke FixpointResolveService; the actual orchestration and FixpointResolveService::resolve invocation live in usecase::fixpoint_resolve_driver::FixpointResolveDriverInteractor (ADR 1328 D4: application orchestration belongs in usecase, not composition or an infrastructure SecondaryAdapter -- an earlier draft that pushed this invocation into a single infrastructure adapter was flagged as a D4 violation, 2026-07-02 plan-artifacts final-review P1 finding, and corrected here); TrackCompositionRoot::track_driver() only constructs and injects the four adapters plus the interactor built from them (wire-only, ADR 1328 D2) and never invokes FixpointResolveDriverService itself. This differs from the pre-existing DryDriverAdapter / TrackServiceImpl (both genuinely pub, both out of this track's IN/AC scope, both structurally coupled to their respective CompositionRoot -- DryDriverAdapter holds DryCompositionRoot + DryFixRunnerCompositionRoot fields and delegates to their methods, TrackServiceImpl calls TrackCompositionRoot::new().track_*() per method -- so neither is relocatable to infrastructure without further restructuring; left as an out-of-scope pre-existing gap, not a pattern to replicate here). The four fixpoint-resolve adapters have no such composition-root dependency (their wiring logic uses only domain / usecase / infrastructure types), so they follow the D7 default placement.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-12" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-17" }
+      ],
+      "informal_grounds": []
+    },
+    "DryCompositionRoot": {
+      "action": "modify",
+      "role": { "CompositionRoot": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "unit" }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Create a new `DryCompositionRoot`."
+        },
+        {
+          "name": "dry_write",
+          "receiver": "&self",
+          "params": [
+            { "name": "input", "ty": "DryWriteInput" }
+          ],
+          "returns": "Result<usecase::dry_driver::DryWriteOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Run `sotp dry write`: detect DRY violations for the current diff scope and record results to dry-check.json. IN-13/AC-18: returns the structured DryWriteOutcome instead of a pre-formatted CommandOutcome; the former dry_write_outcome text formatting moves to cli_driver."
+        },
+        {
+          "name": "dry_results",
+          "receiver": "&self",
+          "params": [
+            { "name": "input", "ty": "DryResultsInput" }
+          ],
+          "returns": "Result<cli_driver::render::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Run `sotp dry results`: read and display the historical dry-check results. Unchanged by IN-13 (only dry_write / dry_check_approved are in scope)."
+        },
+        {
+          "name": "dry_check_approved",
+          "receiver": "&self",
+          "params": [
+            { "name": "input", "ty": "DryCheckApprovedInput" }
+          ],
+          "returns": "Result<usecase::dry_driver::DryCheckApprovedOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Run `sotp dry check-approved`: gate that reports unresolved pairs. IN-13/AC-18: returns the structured DryCheckApprovedOutcome instead of a pre-formatted CommandOutcome; the former dry_check_approved_outcome text formatting moves to cli_driver."
+        },
+        {
+          "name": "dry_driver",
+          "receiver": "&self",
+          "params": [],
+          "returns": "cli_driver::dry::DryDriver",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Construct a wired `cli_driver::dry::DryDriver` for injection into the CLI. Unchanged by IN-13."
+        }
+      ],
+      "module_path": "dry::shim",
+      "docs": "Composition root for the `dry` command family. Unit struct: no adapter dependencies are injected at construction time.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-13" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-18" }
       ],
       "informal_grounds": []
     }
@@ -592,6 +683,11 @@
       "action": "reference",
       "trait_ref": "core::default::Default",
       "for_type": "TrackCompositionRoot"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::default::Default",
+      "for_type": "DryCompositionRoot"
     }
   ]
 }

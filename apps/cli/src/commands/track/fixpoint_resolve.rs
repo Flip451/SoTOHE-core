@@ -211,6 +211,15 @@ mod tests {
         let head_sha = String::from_utf8_lossy(&head_sha_output.stdout).trim().to_owned();
         std::fs::write(track_dir.join(".commit_hash"), &head_sha).unwrap();
 
+        // Write metadata.json with branch_strategy_snapshot so fixpoint_resolve can read base_branch.
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            format!(
+                r#"{{"schema_version":6,"id":"{track_id_str}","title":"Test Track","created_at":"2026-01-01T00:00:00Z","updated_at":"2026-01-01T00:00:00Z","branch_strategy_snapshot":{{"base_branch":"main","merge_target":"main","merge_method":"squash"}}}}"#
+            ),
+        )
+        .unwrap();
+
         // Write `.harness/config/dry-check.json` with `enabled: true` so the dry gate
         // runs (rather than bypassing via the enabled=false short-circuit).
         let harness_config_dir = root.join(".harness").join("config");

@@ -86,6 +86,13 @@ fn setup_check_approved_repo(root: &Path) -> (PathBuf, PathBuf) {
     let track_dir = items_dir.join("test-track");
     fs::create_dir_all(&track_dir).unwrap();
 
+    // Write metadata.json with branch_strategy_snapshot so build_v2_shared can read base_branch.
+    fs::write(
+        track_dir.join("metadata.json"),
+        r#"{"schema_version":6,"id":"test-track","title":"Test Track","created_at":"2026-01-01T00:00:00Z","updated_at":"2026-01-01T00:00:00Z","branch_strategy_snapshot":{"base_branch":"main","merge_target":"main","merge_method":"squash"}}"#,
+    )
+    .unwrap();
+
     (items_dir, track_dir)
 }
 

@@ -1,21 +1,56 @@
 {
   "schema_version": 2,
   "scopes": {
-    "cli": {
+    "usecase": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:f9572fc47d468f9941bb85d47917920024275dde36fb9f11f23632d9efbf2184",
-          "at": "2026-06-30T22:39:41Z"
+          "hash": "rvw1:sha256:a15176685f931a467e456eec499c489039622aa761ab63859c1b04ef0454157f",
+          "at": "2026-06-30T20:45:14Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:f9572fc47d468f9941bb85d47917920024275dde36fb9f11f23632d9efbf2184",
-          "at": "2026-06-30T22:43:23Z"
+          "hash": "rvw1:sha256:a15176685f931a467e456eec499c489039622aa761ab63859c1b04ef0454157f",
+          "at": "2026-06-30T20:49:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c25264bf5ba9291c1339bf568fe0a851c539e5b2abb14e21152a8f84266bb292",
+          "at": "2026-07-01T08:00:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c25264bf5ba9291c1339bf568fe0a851c539e5b2abb14e21152a8f84266bb292",
+          "at": "2026-07-01T08:03:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7612b23c9d1754f949a5a8519ed0dac18c420516ac8c4f74270a1d8753e19ed9",
+          "at": "2026-07-01T11:40:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:80c8126ae8e17bcf59c468544a747c799363f80aab7d8e0edcbd0aa80bd71d5b",
+          "at": "2026-07-01T17:25:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:80c8126ae8e17bcf59c468544a747c799363f80aab7d8e0edcbd0aa80bd71d5b",
+          "at": "2026-07-01T17:28:59Z"
         }
       ]
     },
@@ -122,24 +157,184 @@
           "findings": [],
           "hash": "rvw1:sha256:c80cc7a3300a83f8cfb23872448c52782977665287270ddb89db62ca0babd43a",
           "at": "2026-06-30T23:41:58Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:6e8b1b6bb455fa563f4671a976af2882e4834b64f7446bf4f1874c39872343b6",
-          "at": "2026-06-30T20:42:20Z"
+          "hash": "rvw1:sha256:720eb2e859862e8ff252da394b9b064a31733f8a6a1e7026b0e96b0e94e8db53",
+          "at": "2026-07-01T01:22:08Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:6e8b1b6bb455fa563f4671a976af2882e4834b64f7446bf4f1874c39872343b6",
-          "at": "2026-06-30T20:46:04Z"
+          "hash": "rvw1:sha256:720eb2e859862e8ff252da394b9b064a31733f8a6a1e7026b0e96b0e94e8db53",
+          "at": "2026-07-01T01:25:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7898bd45df8cb7262e279bea8abacdd0bc66ea88e03e4595736f6a067af207a3",
+          "at": "2026-07-01T02:12:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7898bd45df8cb7262e279bea8abacdd0bc66ea88e03e4595736f6a067af207a3",
+          "at": "2026-07-01T02:16:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:644f5371f66f0d2ade074f09ebedf9256e6d52efccbde791e8622d8a568d9ac4",
+          "at": "2026-07-01T08:09:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:644f5371f66f0d2ade074f09ebedf9256e6d52efccbde791e8622d8a568d9ac4",
+          "at": "2026-07-01T08:12:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1bd5947dd17b0e3961707627ebdd810fbc3c19acbe67a295e5ec1d5b30900cff",
+          "at": "2026-07-01T12:08:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1bd5947dd17b0e3961707627ebdd810fbc3c19acbe67a295e5ec1d5b30900cff",
+          "at": "2026-07-01T17:26:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_diff_base` builds `track_dir.join(\".commit_hash\")` and hands it to `FsDryCheckCommitHashStore` without first proving the resolved path remains under `canonical_root`. The store only rejects symlinks before `read_to_string`; it does not canonicalize and enforce `starts_with(canonical_root)`, so a path-traversing `track_dir` supplied at this adapter boundary can make the dry-gate read a `.commit_hash` outside the trusted repo root. This should fail closed using the existing trusted-root containment pattern (`is_safe_briefing_path`/CN-04 style) before any file read or fallback decision.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/dry_check/diff_base_resolver.rs",
+              "line": 51,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:1bd5947dd17b0e3961707627ebdd810fbc3c19acbe67a295e5ec1d5b30900cff",
+          "at": "2026-07-01T17:33:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ad7955493c1701621abdfdfe8357b01d68d7eff78253a8d0673d23741c24bbcc",
+          "at": "2026-07-01T17:39:44Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f9572fc47d468f9941bb85d47917920024275dde36fb9f11f23632d9efbf2184",
+          "at": "2026-06-30T22:39:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f9572fc47d468f9941bb85d47917920024275dde36fb9f11f23632d9efbf2184",
+          "at": "2026-06-30T22:43:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new happy-path test exercises `TrackCompositionRoot::fixpoint_resolve` directly and only asserts the returned `ExitCode`; it never captures stdout/stderr from `execute_fixpoint_resolve`, so a regression in the CLI wrapper's emit path would still pass. This leaves the only bin-layer behavior in this handler effectively untested.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/fixpoint_resolve.rs",
+              "line": 242,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:cd715242f471a9d720d387eb3f9bbc02536632fb0990b8407fd7180c0f5ea086",
+          "at": "2026-07-01T01:22:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:35b798c758fbd5d2547492157571a7c8d65dfd9df3f82860428f5a6ea97489b3",
+          "at": "2026-07-01T01:40:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:35b798c758fbd5d2547492157571a7c8d65dfd9df3f82860428f5a6ea97489b3",
+          "at": "2026-07-01T01:42:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:13a5bdcfda6e7caca9c4af69252bea224cf9e789ed2c3f177cd6bccf4adb2f64",
+          "at": "2026-07-01T07:48:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:13a5bdcfda6e7caca9c4af69252bea224cf9e789ed2c3f177cd6bccf4adb2f64",
+          "at": "2026-07-01T07:50:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fa376ada81ce7a8669626c209ba57b6ca4b652baf890c299a45a807143cb9612",
+          "at": "2026-07-01T12:03:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fa376ada81ce7a8669626c209ba57b6ca4b652baf890c299a45a807143cb9612",
+          "at": "2026-07-01T17:23:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fa376ada81ce7a8669626c209ba57b6ca4b652baf890c299a45a807143cb9612",
+          "at": "2026-07-01T17:27:05Z"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:498e3310ab0076f4ff8be931588e8d97b2d9251f45ca8d7e51b7dfa4eff79fdc",
+          "at": "2026-07-01T07:53:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:498e3310ab0076f4ff8be931588e8d97b2d9251f45ca8d7e51b7dfa4eff79fdc",
+          "at": "2026-07-01T07:56:45Z"
         }
       ]
     },
@@ -626,24 +821,637 @@
           "findings": [],
           "hash": "rvw1:sha256:29b61f82d4a45582f4d0b27ecb46f9de8e8f65188e092b570dedadc3ec5d0a49",
           "at": "2026-06-30T23:58:36Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a15176685f931a467e456eec499c489039622aa761ab63859c1b04ef0454157f",
-          "at": "2026-06-30T20:45:14Z"
+          "hash": "rvw1:sha256:21474b7923d92fc487f76a33071aed3b581b31836b33ea165047a7d841f1f030",
+          "at": "2026-07-01T01:19:52Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a15176685f931a467e456eec499c489039622aa761ab63859c1b04ef0454157f",
-          "at": "2026-06-30T20:49:50Z"
+          "hash": "rvw1:sha256:21474b7923d92fc487f76a33071aed3b581b31836b33ea165047a7d841f1f030",
+          "at": "2026-07-01T01:22:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T011 makes `track_init` fail closed on `.harness/config/branch-strategy.json`, but that file is only introduced later in T012. As ordered, the init path is broken until the later section lands, so the plan needs an explicit dependency or T012 moved ahead of T011.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/branch-strategy-config-driven-2026-06-30/impl-plan.json",
+              "line": 61,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:897d1f9219b4e6f000dcac6af83dccf41a578a125e252a4775f34c54bc296682",
+          "at": "2026-07-01T11:40:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8bca5f481d559fd424f0871670ffcf30c7b7c80f8a788b9e7496fb0f51a887e6",
+          "at": "2026-07-01T12:03:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`OS-07` says the `apps/cli-composition/src/review_v2/` diff-base / agent-profile logic is out of scope, but `IN-04` still explicitly includes `apps/cli-composition/src/review_v2/shared.rs` in the `git rev-parse main` fallback replacement set. As written, the spec both includes and excludes the same subtree, so it is unclear whether `review_v2/shared.rs` is meant to change in this track.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json",
+              "line": 280,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:3af3ce5ab41671a2f406e3be779e4c407bc3e428a46feffdd817fbdbae07033f",
+          "at": "2026-07-01T17:32:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dae8ff8edc892382eb0e32f8c207f5fcb2806d9a52a25033966217a37e9992d5",
+          "at": "2026-07-01T17:41:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T022 and T023 explicitly require moving dry write/check-approved rendering into `apps/cli-driver/src/dry.rs`, but the task contract attributes both tasks only to `cli_composition:DryCompositionRoot`, and `cli_driver-types.json` contains no `DryDriver` entry representing the new renderer responsibility. This leaves AC-18's cli-driver render migration outside the catalogue/task contract, so the plan can appear covered while omitting the artifact that is supposed to own the behavior.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/task-contract.json",
+              "line": 81,
+              "category": "contradiction"
+            },
+            {
+              "message": "IN-12/AC-17 state that fixpoint-resolve invoke and render move to `apps/cli-driver` and that the composition-root successor should not directly call the use case interactor, but T019 instructs a new `apps/cli-composition` adapter to construct and invoke `FixpointResolveInteractor`. Those are conflicting implementation targets: following T019 keeps the old interactor invocation in cli-composition, while following AC-17 requires the driver to own invoke+render.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/impl-plan.json",
+              "line": 101,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:dae8ff8edc892382eb0e32f8c207f5fcb2806d9a52a25033966217a37e9992d5",
+          "at": "2026-07-01T17:46:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "OS-07 is internally inconsistent: it is listed under `out_of_scope`, but its first sentence says the `review_v2/shared.rs` `build_v2_shared` / `resolve_diff_base` base-branch parameterization \"is within this track's scope\". That leaves the scope boundary for IN-04 ambiguous.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/branch-strategy-config-driven-2026-06-30/spec.json",
+              "line": 281,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:2dff487bc82813b60049abaaa080a2cdac53f8852117f4d372993906b3e5c813",
+          "at": "2026-07-01T19:17:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`GO-03` is attached to the wrong task set: it says the ADR 1328 layer-splitting cleanup is what `T006〜T008 (IN-04)` changes, but those tasks are the `git rev-parse main` fallback/fixture edits. The actual ADR 1328 split work is grouped under `S7` / `T016〜T023`, so this goal text mislabels the plan and makes the goal-to-task mapping internally inconsistent. `spec.md` repeats the same mismatch at line 13.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/branch-strategy-config-driven-2026-06-30/spec.json",
+              "line": 40,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:50c902ef69dae3d23097563833945f3e55013f8625d540a101d9696ae952b6f3",
+          "at": "2026-07-01T19:25:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8da0b68f3628f21ac23ba45a83424017d7e7a202a214cf373e2a5986fe1bac7a",
+          "at": "2026-07-01T19:34:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T019 moves the actual `FixpointResolveService::resolve` invocation and surrounding orchestration into an infrastructure `SecondaryAdapter`, while IN-12/AC-17 require the fixpoint-resolve invoke+render path to live in `cli_driver` and ADR D4 puts application orchestration in usecase. The planned `FixpointResolveDriverService` becomes only a pass-through to a secondary port whose adapter invokes the real use case, so implementing this plan would shift the invoke/orchestration leak out of `cli_composition` rather than satisfying the stated layer split.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/plan.md",
+              "line": 80,
+              "category": "architecture violation"
+            },
+            {
+              "message": "The task order breaks the staged-compatibility claim for S7: T018 first changes `TrackDriver::new` to require a second service, T019 then deletes `FixpointResolveInput` and the `TrackCompositionRoot::fixpoint_resolve` entrypoint, and only T020 updates the `apps/cli` caller. At the T019 boundary the surviving CLI still imports/calls symbols that T019 removed, so the T017->T018->T019->T020 chain is not executable as staged work despite CN-07/S7 claiming compatibility is preserved through the relocation.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/plan.md",
+              "line": 82,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:8da0b68f3628f21ac23ba45a83424017d7e7a202a214cf373e2a5986fe1bac7a",
+          "at": "2026-07-01T19:42:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`impl-plan.json` tells `FixpointResolveDriverInteractor` to change the process CWD itself around `dry_gate.resolve_dry_gate` (`set CWD to repo_root beforehand, restore ... afterward`). That puts process-global environment mutation into the usecase layer without any trait boundary, which conflicts with the repo’s layering rules and makes the new interactor depend on infrastructure concerns directly.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/branch-strategy-config-driven-2026-06-30/impl-plan.json",
+              "line": 91,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:e8a24c6603a196feb9286af727f301ca2917f6ff88b672e77c4bec0cc8b58cb8",
+          "at": "2026-07-01T21:40:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:526697a552a2588d1b7feb7feff8a3e627487a046ca5c55c7ab64bcfc0a1727e",
+          "at": "2026-07-01T21:50:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T017 asks for a `FixpointDryGateFactoryPort` port-failure test, but the same task defines `build(&self, base_branch) -> Arc<dyn FixpointDryGateService>` with no error channel, and the catalogue marks that build method infallible. Implementing this literally would require changing the declared port signature or leaving the requested error-path test impossible. If the intended coverage is a failing `FixpointDryGateService::resolve_dry_gate`, the task should say that instead.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/impl-plan.json",
+              "line": 91,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:526697a552a2588d1b7feb7feff8a3e627487a046ca5c55c7ab64bcfc0a1727e",
+          "at": "2026-07-01T21:58:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T018 tells the new `FsFixpointWorkspaceContextAdapter` to fall back to hardcoded `\"main\"` when `<items>/<track_id>/metadata.json` is missing, but the same spec requires branch strategy to come from `metadata.json#branch_strategy_snapshot` after init and explicitly forbids compatibility/fallback handling for old or missing snapshot metadata. This would preserve a branch-strategy fallback in the new fixpoint-resolve path instead of failing closed or using the effective strategy, contradicting IN-06/IN-07/CN-03/CN-06 and undermining the branch-strategy migration plan.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/plan.md",
+              "line": 85,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:4734ca134d1f168d556fc68c295c12da16797b8d26ce5bae2d2732f7b9916b2f",
+          "at": "2026-07-01T22:04:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: The plan is internally contradictory about how `FixpointWorkspaceContextPort::resolve_context` handles a missing track `metadata.json`. The type catalogue says the resolved `base_branch` falls back to `\"main\"` when `metadata.json` is absent, but T018 in `impl-plan.json` explicitly requires missing metadata and decode errors to become `FixpointWorkspaceContextError::Unavailable` with fail-closed behavior and no branch-name fallback. This is a semantic behavior choice, not a mechanical link check; leaving both instructions means the implementation can satisfy one artifact while violating the other and the track's fail-closed branch-strategy invariant.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+              "line": 103,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e7180645ce9fa13de289c7aaa7d93785bdabddd2c240a107e56e50aac9d39a8d",
+          "at": "2026-07-01T22:10:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new S7 work is described as an ordered chain in the briefing and task text (`T017 -> T018 -> T019 -> T020` and `T021 -> T022/T023`), but `impl-plan.json` does not encode any of those prerequisites with machine-readable dependency edges. Every new task record in the S7 block has only `id`/`description`/`status`, so the scheduler can still run the later cutover tasks before their setup tasks. That makes the plan unenforceable as written.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/branch-strategy-config-driven-2026-06-30/impl-plan.json",
+              "line": 90,
+              "category": "infeasibility"
+            },
+            {
+              "message": "The S7 summary says, \"Every relocation in this section preserves existing CLI output text, exit codes, and test coverage; no behavior visible to users changes,\" but `T018` explicitly changes `FsFixpointWorkspaceContextAdapter` to fail closed and remove the previous branch-name fallback when `metadata.json` is missing or unreadable. If that path is reachable, the summary is false: the user-visible error/exit behavior does change.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/branch-strategy-config-driven-2026-06-30/plan.md",
+              "line": 75,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:7938c0b79fe1e86b2ff9d4a427716090d6a15e9008f4ec70fc4226a4f80a8929",
+          "at": "2026-07-01T22:39:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ebd67470afe9df0c33e67b6aa1cbf1cf5927b0f674f2e33101d8559840f15f0e",
+          "at": "2026-07-01T22:52:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ebd67470afe9df0c33e67b6aa1cbf1cf5927b0f674f2e33101d8559840f15f0e",
+          "at": "2026-07-01T22:59:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0b938b4ea41eb87735be54f1f5d26b736bfda9ef53f1ee4ed80835baf40f9491",
+          "at": "2026-07-01T23:11:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0b938b4ea41eb87735be54f1f5d26b736bfda9ef53f1ee4ed80835baf40f9491",
+          "at": "2026-07-01T23:17:55Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:83cd3a8ed3fb6acf06c363984a9e4d8a415f0cf9a03741e5c74d2a3a0b551982",
+          "at": "2026-07-01T01:18:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:83cd3a8ed3fb6acf06c363984a9e4d8a415f0cf9a03741e5c74d2a3a0b551982",
+          "at": "2026-07-01T01:22:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cbd2e6484e6c906f016d7c3b15dbda4bfa37a92089e59e70fecb3954055dc0b0",
+          "at": "2026-07-01T08:50:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cbd2e6484e6c906f016d7c3b15dbda4bfa37a92089e59e70fecb3954055dc0b0",
+          "at": "2026-07-01T08:54:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new carve-out cites stale source locations: `DryDriverAdapter::dry_write` is at `apps/cli-composition/src/dry_driver_adapter.rs:55`, `DryCompositionRoot::dry_write` is at `apps/cli-composition/src/dry.rs:371`, and `DryCompositionRoot::dry_results` is at `apps/cli-composition/src/dry.rs:465`, not `dry_driver_adapter.rs:71`, `dry.rs:310`, and `dry.rs:404`. As written, reviewers will validate the wrong call sites and the exception will not reliably cover the intended request-time invokes.",
+              "severity": "P1",
+              "file": ".harness/custom/review-prompts/cli_composition.md",
+              "line": 29,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:4e41e355d872d6346e573e8d8e3eb7769158df8de42844d8dad718ab0295eda9",
+          "at": "2026-07-01T11:39:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:83cd3a8ed3fb6acf06c363984a9e4d8a415f0cf9a03741e5c74d2a3a0b551982",
+          "at": "2026-07-01T12:00:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cf4375c1ceb9ceb37c5b82a48e44647f754f87a4ea8400bca7b33d05d68416db",
+          "at": "2026-07-01T17:27:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cf4375c1ceb9ceb37c5b82a48e44647f754f87a4ea8400bca7b33d05d68416db",
+          "at": "2026-07-01T17:32:18Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6e8b1b6bb455fa563f4671a976af2882e4834b64f7446bf4f1874c39872343b6",
+          "at": "2026-06-30T20:42:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6e8b1b6bb455fa563f4671a976af2882e4834b64f7446bf4f1874c39872343b6",
+          "at": "2026-06-30T20:46:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This reads `metadata.json` through `infrastructure::track::codec::decode`, which hard-rejects every `schema_version != 6`. The promised fallback to `main` therefore never runs for existing v5 tracks/fixtures (for example `track/items/cli-composition-split-presentation-layer-2026-06-21/metadata.json`), so the new branch-strategy lookup will fail with `ConfigLoad` on older tracks instead of being backward-compatible. The same bug is duplicated in [review_v2/shared.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/review_v2/shared.rs#L208) and [track/fixpoint_resolve.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/track/fixpoint_resolve.rs#L318).",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "line": 233,
+              "category": "compatibility"
+            }
+          ],
+          "hash": "rvw1:sha256:38523286fa0d8e076b158f68bbbeca7bc7507c8ca528c6dcf0b45055f70b45a5",
+          "at": "2026-07-01T01:26:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f9194cba8c44a0846709dcd118156a79c9608865f046e87999ca49825c137d81",
+          "at": "2026-07-01T01:56:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f9194cba8c44a0846709dcd118156a79c9608865f046e87999ca49825c137d81",
+          "at": "2026-07-01T01:57:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The change keeps `FsDiffBaseResolverAdapter` as a `DiffBaseResolverPort` implementation inside `cli_composition` and now extends it with `base_branch` state. Per ADR D7 / the cli_composition scope policy, secondary adapter implementations belong in `libs/infrastructure`; this layer should only construct and inject them. Move this port implementation to infrastructure and wire that adapter here.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+              "line": 59,
+              "category": "adapter defined here"
+            }
+          ],
+          "hash": "rvw1:sha256:f9194cba8c44a0846709dcd118156a79c9608865f046e87999ca49825c137d81",
+          "at": "2026-07-01T02:00:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`FsDiffBaseResolverAdapter` is a secondary adapter implemented inside `cli_composition`: the struct stores the configured base branch here and its impl of `DiffBaseResolverPort` performs the `.commit_hash`/git fallback behavior. Under the cli_composition scope policy and ADR D7, port implementations belong in `libs/infrastructure`; this layer should only construct and inject that adapter. Move this resolver implementation, including the new `base_branch` state, into infrastructure and wire it from here.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+              "line": 59,
+              "category": "adapter defined here"
+            }
+          ],
+          "hash": "rvw1:sha256:f9194cba8c44a0846709dcd118156a79c9608865f046e87999ca49825c137d81",
+          "at": "2026-07-01T02:01:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d7a27efb165feb3e2d352b8b261826b561200f3dbb581837bdafadbd46bc2dd1",
+          "at": "2026-07-01T02:23:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d7a27efb165feb3e2d352b8b261826b561200f3dbb581837bdafadbd46bc2dd1",
+          "at": "2026-07-01T02:27:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:78781525bc4b85d6506cae9d11d0ba286ec88432835c8bddb5f20b8ac4601409",
+          "at": "2026-07-01T02:39:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c01c8138f26fa534055a11365e07ef788a23ed1b18bcf3dd2213816f231bfbd8",
+          "at": "2026-07-01T02:53:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`FsDryApprovalFactoryAdapter` is still defined in `cli_composition` and implements the usecase `DryApprovalFactoryPort`. Per the cli_composition scope policy and ADR D7, port adapter implementations belong in `libs/infrastructure`; this layer should only construct and inject the infrastructure adapter.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+              "line": 55,
+              "category": "adapter defined here"
+            },
+            {
+              "message": "`fixpoint_resolve` constructs `FixpointResolveInteractor` and immediately invokes `.resolve(&cmd)`. That is a use-case invocation from the composition root; ADR D2 requires this layer to wire drivers/adapters only, with command execution handled by the driving adapter layer.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+              "line": 358,
+              "category": "invoke leak"
+            },
+            {
+              "message": "`dispatch_review_cycle` directly invokes the review use case via `cycle.review(&scope)` and `cycle.fast_review(&scope)`. This keeps command execution in `cli_composition` instead of wiring a driver and handing it to the CLI, which violates the scope's invoke-leak rule.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/review_v2/run.rs",
+              "line": 90,
+              "category": "invoke leak"
+            },
+            {
+              "message": "`dry_check_approved_outcome` and `dry_write_outcome` assemble user-facing command output strings in `cli_composition`. Rendering belongs in `cli_driver` per ADR D2/D3; this layer should return wired behavior/data, not format CLI text.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry/shared.rs",
+              "line": 273,
+              "category": "render leak"
+            },
+            {
+              "message": "`run_codex_review_str` is a public crate wiring entry point returning `Result<CodexReviewOutcome, String>`; `run_claude_review_str` mirrors the same shape. The scope policy forbids `Result<_, String>` in public `cli_composition` APIs; use a typed error such as `ReviewSharedError` or `CompositionError`.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/review_v2/run.rs",
+              "line": 296,
+              "category": "Result<_, String> in public API"
+            }
+          ],
+          "hash": "rvw1:sha256:c01c8138f26fa534055a11365e07ef788a23ed1b18bcf3dd2213816f231bfbd8",
+          "at": "2026-07-01T02:56:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aef50c72791fc27c77ec9b860b0c07e8f138a817ab23f4f59893ca5c35f8a79a",
+          "at": "2026-07-01T04:35:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TrackCompositionRoot::fixpoint_resolve` still invokes the use-case dry gate while composing the driver. The call to `dry_gate.resolve_dry_gate(...)` performs the dry-gate interactor work before `FixpointResolveDriver` is returned, so this public composition method is still doing use-case execution at wiring time rather than only constructing an object graph. Per the cli_composition severity policy, this remains an invoke leak; move the dry-gate command/interactor into the returned driver or another driver-layer boundary so invocation happens only when the driver is run.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+              "line": 323,
+              "category": "invoke leak"
+            },
+            {
+              "message": "`FixpointResolveDriver::run` renders the user-facing fixpoint command output inside `cli_composition` by converting the `FixpointStep` into strings and returning a `CommandOutcome`. Rendering/output templating is owned by `cli_driver` under ADR D2/D3 and the scope policy; this driver should return or hand off raw result data and let `cli_driver` format `run-dfp`, `run-rfp scopes=...`, etc.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+              "line": 144,
+              "category": "render leak"
+            }
+          ],
+          "hash": "rvw1:sha256:aef50c72791fc27c77ec9b860b0c07e8f138a817ab23f4f59893ca5c35f8a79a",
+          "at": "2026-07-01T04:38:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f39f57ca1b39b56aa33b21a6c412883fc697989a33e27c355c913cf8c91424d9",
+          "at": "2026-07-01T05:02:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ReviewCycleDriver::run` is still defined and executed inside `cli_composition`, and it directly invokes the review use case via `cycle.review(&scope)` / `cycle.fast_review(&scope)`. Wrapping the call in a private driver inside the composition crate does not satisfy the D2 composition-root boundary: `cli_composition` should wire a `cli_driver` driving adapter and hand it off, not invoke the use case itself. See ADR D2 and `hexagonal-architecture.md` §CLI as Composition Root.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/review_v2/run.rs",
+              "line": 119,
+              "category": "invoke leak"
+            },
+            {
+              "message": "`FixpointResolveDriver::run` is a public driver implemented in `cli_composition` and directly invokes both `resolve_dry_gate` and `FixpointResolveInteractor::resolve`. Per ADR D2 and `hexagonal-architecture.md` §CLI as Composition Root, the composition crate should only construct the object graph and inject it into a driving adapter from `cli_driver`; use-case execution should not live in `cli_composition`.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+              "line": 172,
+              "category": "invoke leak"
+            },
+            {
+              "message": "`render_verdict_payload` still assembles and serializes the command output payload in `cli_composition` before it is returned as stdout. Rendering/output templating belongs in `cli_driver` per ADR D2/D3, so the review-v2 dispatch path still has a render leak.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/review_v2/run.rs",
+              "line": 32,
+              "category": "render leak"
+            }
+          ],
+          "hash": "rvw1:sha256:f39f57ca1b39b56aa33b21a6c412883fc697989a33e27c355c913cf8c91424d9",
+          "at": "2026-07-01T05:09:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TrackCompositionRoot::fixpoint_resolve` still performs use-case work: it calls `dry_gate.resolve_dry_gate(...)` and later `interactor.resolve(&cmd)` instead of only assembling the `FixpointDryGateCommand` / `FixpointResolveCommand` data and returning a wired driver. That keeps invocation inside `cli_composition` and violates the composition-root boundary the scope brief calls for.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/track/fixpoint_resolve.rs",
+              "line": 282,
+              "category": "invoke leak"
+            }
+          ],
+          "hash": "rvw1:sha256:922d99d5bdbea901d9b9fe87473f5850a395d0cd26d9b4a3e3df6afd7aa68a75",
+          "at": "2026-07-01T07:34:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:72ac824bf5ccc21eab4cd16188d3e8fe9decce3781ec9648ad3171d89f903fed",
+          "at": "2026-07-01T08:31:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1 invoke leak: `TrackCompositionRoot::fixpoint_resolve` still invokes the wired use cases inside `cli_composition`: it calls `dry_gate.resolve_dry_gate(...)` here and then `interactor.resolve(&cmd)` below. Per the cli_composition policy, this layer should only construct and inject the graph into a driver; the driver/usecase boundary should perform the invocation.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+              "line": 282,
+              "category": "invoke leak"
+            },
+            {
+              "message": "P1 invoke leak: `run_review_cycle` directly dispatches the usecase `ReviewCycle` with `cycle.review(&scope)` (and the fast branch calls `cycle.fast_review(&scope)`). Moving the call into a private helper still leaves usecase invocation in `cli_composition`; this should be injected into a driver/service boundary rather than invoked from the composition root module.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/review_v2/run.rs",
+              "line": 91,
+              "category": "invoke leak"
+            }
+          ],
+          "hash": "rvw1:sha256:72ac824bf5ccc21eab4cd16188d3e8fe9decce3781ec9648ad3171d89f903fed",
+          "at": "2026-07-01T08:35:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2abc80a67bf2f6b4fc73b5610483f4449b4590fbb887dc1c5ad75ad0da500de8",
+          "at": "2026-07-01T08:46:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This struct still implements `DryApprovalFactoryPort` inside `cli_composition`. That is a secondary adapter implementation in the composition root; per D7 it belongs in `libs/infrastructure`, not here.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+              "line": 64,
+              "category": "adapter defined here"
+            },
+            {
+              "message": "`dry_check_approved_outcome` and `dry_write_outcome` still assemble user-facing stdout/stderr strings in the composition root, and `dry.rs` returns them directly from production paths. Rendering belongs in `cli_driver`, not `cli_composition`.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry/shared.rs",
+              "line": 273,
+              "category": "render leak"
+            },
+            {
+              "message": "`format_fixpoint_step` is still producing the CLI command strings in the composition root, and `fixpoint_resolve` returns the rendered string directly via `CommandOutcome::success(...)`. That is presentation logic and should live in `cli_driver`.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+              "line": 143,
+              "category": "render leak"
+            }
+          ],
+          "hash": "rvw1:sha256:1860b1fca0699b37ef10c0d15101db3d9276f654cc2d74e8ba6286efb3e0a631",
+          "at": "2026-07-01T12:03:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1860b1fca0699b37ef10c0d15101db3d9276f654cc2d74e8ba6286efb3e0a631",
+          "at": "2026-07-01T17:28:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1860b1fca0699b37ef10c0d15101db3d9276f654cc2d74e8ba6286efb3e0a631",
+          "at": "2026-07-01T17:32:35Z"
         }
       ]
     },

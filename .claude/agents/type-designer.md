@@ -1,6 +1,6 @@
 ---
 name: type-designer
-model: opus
+model: claude-opus-4-8[1m]
 effort: max
 tools:
   - Read

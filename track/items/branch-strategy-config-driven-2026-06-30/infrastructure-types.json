@@ -122,6 +122,120 @@
         { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "CN-03" }
       ],
       "informal_grounds": []
+    },
+    "FsReviewGateStateAdapter": {
+      "action": "modify",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "track::gate_state",
+      "docs": "Filesystem-backed adapter implementing usecase::fixpoint_resolve::ReviewGateStatePort. This track adds a base_branch field: the .commit_hash-miss fallback now runs `git rev-parse <base_branch>` via argv-style git invocation instead of the previous hardcoded 'main' literal (D1/IN-04, AC-04 command-boundary safety).",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-04" }
+      ],
+      "informal_grounds": []
+    },
+    "FsDiffBaseResolverAdapter": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "dry_check::diff_base_resolver",
+      "docs": "Filesystem adapter implementing usecase::fixpoint_resolve::DiffBaseResolverPort. Owns the configured base_branch (read from the active track's branch_strategy_snapshot) and falls back to `git rev-parse <base_branch>` (argv-style, AC-04 command-boundary safety) when .commit_hash is absent, non-ancestor, or unreadable (D1/IN-04).",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-04" }
+      ],
+      "informal_grounds": []
+    },
+    "FsDryApprovalFactoryAdapter": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "unit" }
+      },
+      "methods": [],
+      "module_path": "dry_check::approval_factory",
+      "docs": "Relocated from apps/cli-composition/src/track/fixpoint_resolve.rs (IN-11 / ADR 1328 D7: port-impl adapters belong in libs/infrastructure). Implements usecase::fixpoint_resolve::DryApprovalFactoryPort by constructing a DryCheckApprovalInteractor from the injected dry-check config and resolved corpus metadata. Zero-field unit struct, constructed by name (no constructor function), matching FsDryCorpusMetaAdapter's existing sibling pattern in this module family.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-11" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-16" }
+      ],
+      "informal_grounds": []
+    },
+    "FsFixpointWorkspaceContextAdapter": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "unit" }
+      },
+      "methods": [],
+      "module_path": "track::fixpoint_resolve_driver",
+      "docs": "Implements usecase::fixpoint_resolve_driver::FixpointWorkspaceContextPort (IN-12/AC-17, corrects the 2026-07-02 plan-artifacts final-review P1 finding: this adapter performs only the workspace-path-resolution I/O concern -- it does not invoke FixpointResolveService or perform gate orchestration, which now live in usecase::fixpoint_resolve_driver::FixpointResolveDriverInteractor per ADR 1328 D4). Reproduces the CWD-anchored repo discovery, items_dir canonicalization/containment validation, and project-root derivation previously inline in the removed `TrackCompositionRoot::fixpoint_resolve`, and reads metadata.json's branch_strategy_snapshot.base_branch via infrastructure::track::codec::decode. Fail-closed per CN-03/CN-06: unlike the removed inline code's temporary \"main\" fallback used only when metadata.json was absent, this adapter maps a missing metadata.json (and any other I/O/decode error) to FixpointWorkspaceContextError::Unavailable, with no branch-name fallback. Zero-field unit struct, constructed by name (no constructor function), matching FsDryApprovalFactoryAdapter's sibling pattern.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-12" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-17" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "CN-03" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "CN-06" }
+      ],
+      "informal_grounds": []
+    },
+    "FsDryCheckConfigLoaderAdapter": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "unit" }
+      },
+      "methods": [],
+      "module_path": "track::fixpoint_resolve_driver",
+      "docs": "Implements usecase::fixpoint_resolve_driver::DryCheckConfigLoaderPort (IN-12/AC-17). Wraps the existing infrastructure::dry_check::DryCheckConfig::load(...) file read plus the existing infra-DTO-to-usecase-config conversion, previously called inline (via crate::dry::build_usecase_dry_check_config_pub) from the removed `TrackCompositionRoot::fixpoint_resolve`. Zero-field unit struct, constructed by name (no constructor function), matching FsDryApprovalFactoryAdapter's sibling pattern.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-12" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-17" }
+      ],
+      "informal_grounds": []
+    },
+    "FsFixpointDryGateFactoryAdapter": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "unit" }
+      },
+      "methods": [],
+      "module_path": "track::fixpoint_resolve_driver",
+      "docs": "Implements usecase::fixpoint_resolve_driver::FixpointDryGateFactoryPort (IN-12/AC-17). Reproduces the wiring previously done by the removed `TrackCompositionRoot::make_dry_gate_interactor` helper: constructs `usecase::fixpoint_resolve::FixpointDryGateInteractor` from `infrastructure::dry_check::noop_approval::NoOpDryApprovalService`, `infrastructure::dry_check::diff_base_resolver::FsDiffBaseResolverAdapter::new(base_branch)`, `infrastructure::dry_check::FsDryCorpusMetaAdapter`, a `usecase::dry_check::DryFragmentPipelineInteractor` wired with `infrastructure::dry_check::GitDryCheckDiffGetter` + `infrastructure::semantic_dup::CodeFragmentExtractorAdapter`, and `infrastructure::dry_check::approval_factory::FsDryApprovalFactoryAdapter`. Returns it as `Arc<dyn usecase::fixpoint_resolve::FixpointDryGateService>`. Zero-field unit struct, constructed by name (no constructor function), matching FsDryApprovalFactoryAdapter's sibling pattern.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-12" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-17" }
+      ],
+      "informal_grounds": []
+    },
+    "FsFixpointGateStateFactoryAdapter": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "unit" }
+      },
+      "methods": [],
+      "module_path": "track::fixpoint_resolve_driver",
+      "docs": "Implements usecase::fixpoint_resolve_driver::FixpointGateStateFactoryPort (IN-12/AC-17). `build_review_gate` constructs `infrastructure::track::gate_state::FsReviewGateStateAdapter::new(items_dir, base_branch)`; `build_ref_verify_gate` constructs `infrastructure::track::gate_state::FsRefVerifyGateStateAdapter::new(items_dir)`. Both were previously constructed inline in the removed `TrackCompositionRoot::fixpoint_resolve`. Zero-field unit struct, constructed by name (no constructor function), matching FsDryApprovalFactoryAdapter's sibling pattern.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-12" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-17" }
+      ],
+      "informal_grounds": []
     }
   },
   "traits": {},
@@ -162,6 +276,43 @@
           "docs": "Create an adapter backed by a captured BranchStrategySnapshot."
         }
       ]
+    },
+    {
+      "type_name": "FsReviewGateStateAdapter",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "base_branch", "ty": "String" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Creates a new adapter anchored to items_dir (the track/items directory) with the configured base_branch used for .commit_hash-miss fallback resolution."
+        }
+      ]
+    },
+    {
+      "type_name": "FsDiffBaseResolverAdapter",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "base_branch", "ty": "String" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Construct with the configured base branch."
+        }
+      ]
     }
   ],
   "trait_impls": [
@@ -187,6 +338,13 @@
     { "action": "reference", "trait_ref": "core::fmt::Debug",                    "for_type": "TrackDocumentV2" },
     { "action": "reference", "trait_ref": "core::clone::Clone",                  "for_type": "TrackDocumentV2" },
     { "action": "reference", "trait_ref": "serde_core::ser::Serialize",          "for_type": "TrackDocumentV2" },
-    { "action": "reference", "trait_ref": "serde_core::de::Deserialize<'de>",   "for_type": "TrackDocumentV2" }
+    { "action": "reference", "trait_ref": "serde_core::de::Deserialize<'de>",   "for_type": "TrackDocumentV2" },
+    { "action": "reference", "trait_ref": "usecase::fixpoint_resolve::ReviewGateStatePort",  "for_type": "FsReviewGateStateAdapter" },
+    { "action": "add",       "trait_ref": "usecase::fixpoint_resolve::DiffBaseResolverPort", "for_type": "FsDiffBaseResolverAdapter" },
+    { "action": "add",       "trait_ref": "usecase::fixpoint_resolve::DryApprovalFactoryPort", "for_type": "FsDryApprovalFactoryAdapter" },
+    { "action": "add",       "trait_ref": "usecase::fixpoint_resolve_driver::FixpointWorkspaceContextPort", "for_type": "FsFixpointWorkspaceContextAdapter" },
+    { "action": "add",       "trait_ref": "usecase::fixpoint_resolve_driver::DryCheckConfigLoaderPort",     "for_type": "FsDryCheckConfigLoaderAdapter" },
+    { "action": "add",       "trait_ref": "usecase::fixpoint_resolve_driver::FixpointDryGateFactoryPort",   "for_type": "FsFixpointDryGateFactoryAdapter" },
+    { "action": "add",       "trait_ref": "usecase::fixpoint_resolve_driver::FixpointGateStateFactoryPort", "for_type": "FsFixpointGateStateFactoryAdapter" }
   ]
 }

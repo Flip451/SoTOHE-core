@@ -11,23 +11,21 @@
 use std::path::PathBuf;
 use std::sync::Arc;
 
-use domain::CommitHash;
 use domain::TrackId;
 use domain::dry_check::{DryCheckConfigFingerprint, DryCheckCorpusFingerprint};
 use infrastructure::dry_check::GitDryCheckDiffGetter;
 use infrastructure::dry_check::{
-    DryCheckConfig as InfraDryCheckConfig, FsDryCheckCoverageAdapter, FsDryCheckStore,
-    FsDryCorpusMetaAdapter,
+    DryCheckConfig as InfraDryCheckConfig, FsDiffBaseResolverAdapter, FsDryCheckCoverageAdapter,
+    FsDryCheckStore, FsDryCorpusMetaAdapter,
 };
 use infrastructure::semantic_dup::CodeFragmentExtractorAdapter;
 use usecase::dry_check::{
     DryCheckApprovalInteractor, DryCheckApprovalService, DryFragmentPipelineInteractor,
 };
 use usecase::fixpoint_resolve::{
-    DiffBaseResolverError, DiffBaseResolverPort, DryApprovalFactoryPort, FixpointDryGateCommand,
-    FixpointDryGateInteractor, FixpointDryGateService as _, FixpointResolveCommand,
-    FixpointResolveInteractor, FixpointResolveService as _, RefVerifyGateStatePort,
-    ReviewGateStatePort,
+    DryApprovalFactoryPort, FixpointDryGateCommand, FixpointDryGateInteractor,
+    FixpointDryGateService as _, FixpointResolveCommand, FixpointResolveInteractor,
+    FixpointResolveService as _, RefVerifyGateStatePort, ReviewGateStatePort,
 };
 // Domain / usecase types used internally by this composition module and
 // its in-crate unit tests. They are intentionally NOT re-exported through
@@ -49,31 +47,12 @@ use super::resolve_project_root;
 use infrastructure::dry_check::noop_approval::NoOpDryApprovalService;
 
 // ── FsDiffBaseResolverAdapter ─────────────────────────────────────────────────
-
-/// Infrastructure adapter implementing [`DiffBaseResolverPort`].
-///
-/// Wraps `crate::dry::resolve_dry_diff_base_from_store` which reads
-/// `.commit_hash` from the track directory and falls back to
-/// `git rev-parse main`. Stateless unit struct.
-struct FsDiffBaseResolverAdapter;
-
-impl DiffBaseResolverPort for FsDiffBaseResolverAdapter {
-    fn resolve_diff_base(
-        &self,
-        track_dir: &std::path::Path,
-        canonical_root: &std::path::Path,
-        repo_root: &std::path::Path,
-    ) -> Result<CommitHash, DiffBaseResolverError> {
-        let commit_hash_path = track_dir.join(".commit_hash");
-        crate::dry::resolve_dry_diff_base_from_store(
-            &commit_hash_path,
-            canonical_root,
-            Some(repo_root),
-            "fixpoint-resolve",
-        )
-        .map_err(|e| DiffBaseResolverError::Unavailable(e.to_string()))
-    }
-}
+//
+// Re-export shim: implementation relocated to `libs/infrastructure/src/dry_check/
+// diff_base_resolver.rs` per ADR 1328 D7 (port-impl adapters belong in
+// libs/infrastructure). The relocated adapter holds `base_branch: String` state
+// so it no longer needs to be a local stateless unit struct here.
+// (Imported directly via the `infrastructure::dry_check::{...}` use above.)
 
 // ── FsDryApprovalFactoryAdapter ───────────────────────────────────────────────
 
@@ -139,13 +118,13 @@ pub(crate) use infrastructure::track::gate_state::{
 // ── Dry-gate helper ───────────────────────────────────────────────────────────
 
 /// Build the [`FixpointDryGateInteractor`] wired with all infrastructure adapters.
-fn make_dry_gate_interactor() -> FixpointDryGateInteractor {
+fn make_dry_gate_interactor(base_branch: String) -> FixpointDryGateInteractor {
     let diff_source = Arc::new(GitDryCheckDiffGetter);
     let extractor = Arc::new(CodeFragmentExtractorAdapter::new());
     let fragment_pipeline = Arc::new(DryFragmentPipelineInteractor::new(diff_source, extractor));
     FixpointDryGateInteractor::new(
         Arc::new(NoOpDryApprovalService) as Arc<dyn DryCheckApprovalService + Send + Sync>,
-        Arc::new(FsDiffBaseResolverAdapter),
+        Arc::new(FsDiffBaseResolverAdapter::new(base_branch)),
         Arc::new(FsDryCorpusMetaAdapter),
         fragment_pipeline,
         Arc::new(FsDryApprovalFactoryAdapter),
@@ -298,6 +277,34 @@ impl TrackCompositionRoot {
 
         let track_dir = canonical_items_dir.join(track_id.as_ref());
 
+        // Read base_branch from metadata.json (branch_strategy_snapshot).
+        // Falls back to "main" only when metadata.json is absent (new tracks
+        // pre-init or ephemeral fixtures). Decode errors propagate as ConfigLoad;
+        // per ADR D5 (no backward compatibility), schema_version != 6 is not
+        // supported and must fail explicitly rather than silently degrade.
+        let base_branch = {
+            let metadata_path = track_dir.join("metadata.json");
+            match std::fs::read_to_string(&metadata_path) {
+                Ok(metadata_json) => {
+                    let (track_meta, _) = infrastructure::track::codec::decode(&metadata_json)
+                        .map_err(|e| {
+                            CompositionError::ConfigLoad(format!(
+                                "decode metadata.json for '{}': {e}",
+                                track_id.as_ref()
+                            ))
+                        })?;
+                    track_meta.branch_strategy_snapshot().base_branch().to_owned()
+                }
+                Err(e) if e.kind() == std::io::ErrorKind::NotFound => "main".to_owned(),
+                Err(e) => {
+                    return Err(CompositionError::ConfigLoad(format!(
+                        "read metadata.json for '{}': {e}",
+                        track_id.as_ref()
+                    )));
+                }
+            }
+        };
+
         // ── Build dry-gate dependencies via D4 FixpointDryGateInteractor ─────
         //
         // CWD guard: set CWD = repo_root before the dry-gate call so that
@@ -305,7 +312,7 @@ impl TrackCompositionRoot {
         // to the caller's repository. Restored after the call regardless of
         // success or failure (CN-07 / usecase purity: CWD guard stays here,
         // not inside the usecase interactor).
-        let dry_gate = make_dry_gate_interactor();
+        let dry_gate = make_dry_gate_interactor(base_branch.clone());
         let current_config_fingerprint = dry_infra_config.fingerprint();
 
         let original_cwd = std::env::current_dir().map_err(|e| {
@@ -340,8 +347,10 @@ impl TrackCompositionRoot {
         // ── Build review and ref-verify gate adapters ─────────────────────────
         // Use the canonical (absolute, validated) items_dir so that these adapters
         // resolve track artifacts correctly regardless of the caller's CWD.
-        let review_state = Arc::new(FsReviewGateStateAdapter::new(canonical_items_dir.clone()))
-            as Arc<dyn ReviewGateStatePort>;
+        let review_state = Arc::new(FsReviewGateStateAdapter::new(
+            canonical_items_dir.clone(),
+            base_branch.clone(),
+        )) as Arc<dyn ReviewGateStatePort>;
         let ref_verify_results =
             Arc::new(FsRefVerifyGateStateAdapter::new(canonical_items_dir.clone()))
                 as Arc<dyn RefVerifyGateStatePort>;
@@ -608,6 +617,15 @@ mod tests {
             .expect("git rev-parse HEAD must succeed");
         let head_sha = String::from_utf8_lossy(&head_sha_output.stdout).trim().to_owned();
         std::fs::write(track_dir.join(".commit_hash"), &head_sha).unwrap();
+
+        // Write metadata.json with branch_strategy_snapshot so fixpoint_resolve can read base_branch.
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            format!(
+                r#"{{"schema_version":6,"id":"{track_id_str}","title":"Test Track","created_at":"2026-01-01T00:00:00Z","updated_at":"2026-01-01T00:00:00Z","branch_strategy_snapshot":{{"base_branch":"main","merge_target":"main","merge_method":"squash"}}}}"#
+            ),
+        )
+        .unwrap();
 
         // Write `.harness/config/dry-check.json` with `enabled: true` so the dry
         // gate runs (rather than bypassing via the enabled=false short-circuit).

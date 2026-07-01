@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "0add0b568ac049561ee9621d9e56016321946566d8e275516d761a2294eccc6e",
+  "catalogue_declaration_hash": "e03a09ce996de453d85dd4945b95f97dc2af82b8eed5185ea752b7e5cc270754",
   "signals": [
     {
       "type_name": "BranchStrategyConfigError",
@@ -11,6 +11,41 @@
       "type_name": "BranchStrategySnapshotDocument",
       "signal": "blue",
       "entry_hash": "360429f6aba400755c16fdb21a158661076386b27eb8ec1920039e6a5cff1569"
+    },
+    {
+      "type_name": "FsDiffBaseResolverAdapter",
+      "signal": "blue",
+      "entry_hash": "84871b610f7fb73e6d1945e4c2f8a2f11d98a9c80bc7c018e43086150549e3f6"
+    },
+    {
+      "type_name": "FsDryApprovalFactoryAdapter",
+      "signal": "blue",
+      "entry_hash": "f54e0341d6b8535a5dddecc7e773a335dda59238c5593e908558beaf72f1fcd5"
+    },
+    {
+      "type_name": "FsDryCheckConfigLoaderAdapter",
+      "signal": "blue",
+      "entry_hash": "721ac61e2f611c3f61a0591be3bce0974d50b4e3b50f43b3a5c0c3725020ae3b"
+    },
+    {
+      "type_name": "FsFixpointDryGateFactoryAdapter",
+      "signal": "blue",
+      "entry_hash": "5cb5f04a4647c88becc7a7056dc711d0aeb8615aeac67e195da25b646ece960d"
+    },
+    {
+      "type_name": "FsFixpointGateStateFactoryAdapter",
+      "signal": "blue",
+      "entry_hash": "72da6c0489f9a0fdb296cbd2160b2660382b371c4d2860b8415326752f7fc890"
+    },
+    {
+      "type_name": "FsFixpointWorkspaceContextAdapter",
+      "signal": "blue",
+      "entry_hash": "058b3bdba36b5766002f51c5fd1a143982accaa8be202d8a4138b7d77f548edd"
+    },
+    {
+      "type_name": "FsReviewGateStateAdapter",
+      "signal": "blue",
+      "entry_hash": "bc02597c4076bfec410944fab7aab80c3fb5661773734a5c0f7d5f3bd4d4124a"
     },
     {
       "type_name": "JsonConfigBranchStrategyAdapter",

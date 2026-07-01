@@ -55,16 +55,23 @@ pub(super) fn blocked_outcome(
     })
 }
 
-/// Build `entry_key -> ContractedEntryRef` per layer (skip `kind_tag == "unknown"` rows).
+/// Build `entry_key -> ContractedEntryRef` per layer.
+///
+/// ADR `2026-06-27-0852-pre-review-task-contract-conformance-gate.md` D1/D3/D4/D9
+/// requires that "型カタログの全エントリが漏れなくタスクに帰属" — every catalogue entry
+/// must be counted, without silent exclusions. `kind: "unknown"` rows (newly added
+/// types not yet registered in the catalogue) are included so that coverage's
+/// `OrphanEntry` detection surfaces them at pre-review time; silently skipping
+/// them was the pattern explicitly rejected as Alternative AB in the same ADR
+/// ("silently 無視すると stale entry が catalogue 全集合の attribution カバレッジ判定に
+/// 含まれず、catalogue にあるはずの entry が attribution されていない bug を覆い隠す。
+/// fail-closed が安全").
 pub(super) fn build_scope_entries(
     signal_doc: &TypeSignalsDocument,
     layer: &domain::tddd::LayerId,
 ) -> Result<HashMap<String, ContractedEntryRef>, PreReviewGateError> {
     let mut entries: HashMap<String, ContractedEntryRef> = HashMap::new();
     for signal in signal_doc.signals() {
-        if signal.is_unknown_kind() {
-            continue;
-        }
         let entry_key = domain::tddd::semantic_verify::CatalogueEntryKey::try_new(
             signal.type_name().to_owned(),
         )

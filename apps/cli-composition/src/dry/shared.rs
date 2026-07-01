@@ -16,9 +16,9 @@ use crate::{CommandOutcome, error::CompositionError};
 ///
 /// Branch 1: `FsDryCheckCommitHashStore::read()` -> `Ok(Some(hash))` -> use it.
 /// Branch 2: `Ok(None)` (file absent or non-ancestor) -> fall back to
-///   `git rev-parse main`.
+///   `git rev-parse <base_branch>`.
 /// Branch 3: `Err(DryCheckCommitHashError::Format)` -> emit `eprintln!` warn
-///   and fall back to `git rev-parse main` (absorbed; must not abort the gate).
+///   and fall back to `git rev-parse <base_branch>` (absorbed; must not abort the gate).
 ///
 /// CN-01: uses dry-check's own `FsDryCheckCommitHashStore`, never
 /// `review_v2`'s `FsCommitHashStore`.
@@ -29,18 +29,19 @@ use crate::{CommandOutcome, error::CompositionError};
 /// # Errors
 ///
 /// Returns `Err` only when `base_commit_override` is invalid, or when
-/// `git rev-parse main` fails.
+/// `git rev-parse <base_branch>` fails.
 pub(super) fn resolve_dry_diff_base(
     base_commit_override: Option<&str>,
     commit_hash_path: &Path,
     trusted_root: &Path,
+    base_branch: &str,
 ) -> Result<CommitHash, CompositionError> {
     if let Some(s) = base_commit_override {
         return CommitHash::try_new(s)
             .map_err(|e| CompositionError::Infrastructure(format!("invalid --base-commit: {e}")));
     }
 
-    resolve_dry_diff_base_from_store(commit_hash_path, trusted_root, None, "dry-check")
+    resolve_dry_diff_base_from_store(commit_hash_path, trusted_root, None, "dry-check", base_branch)
 }
 
 /// Shared three-branch fail-closed diff-base resolution using the
@@ -48,9 +49,9 @@ pub(super) fn resolve_dry_diff_base(
 ///
 /// Branch 1: `FsDryCheckCommitHashStore::read()` -> `Ok(Some(hash))` -> use it.
 /// Branch 2: `Ok(None)` (file absent or non-ancestor) -> fall back to
-///   `git rev-parse main`.
+///   `git rev-parse <base_branch>`.
 /// Branch 3: `Err(DryCheckCommitHashError::Format)` / other -> emit `eprintln!`
-///   warn and fall back to `git rev-parse main` (absorbed; must not abort the gate).
+///   warn and fall back to `git rev-parse <base_branch>` (absorbed; must not abort the gate).
 ///
 /// `git_discovery_root`: when `Some`, git is discovered from that path via
 /// `SystemGitRepo::discover_from`; when `None`, `SystemGitRepo::discover()` is
@@ -61,12 +62,13 @@ pub(super) fn resolve_dry_diff_base(
 ///
 /// # Errors
 ///
-/// Returns `Err` only when `git rev-parse main` fails.
+/// Returns `Err` only when `git rev-parse <base_branch>` fails.
 pub(crate) fn resolve_dry_diff_base_from_store(
     commit_hash_path: &Path,
     trusted_root: &Path,
     git_discovery_root: Option<&Path>,
     warning_prefix: &str,
+    base_branch: &str,
 ) -> Result<CommitHash, CompositionError> {
     let store =
         FsDryCheckCommitHashStore::new(commit_hash_path.to_path_buf(), trusted_root.to_path_buf());
@@ -75,20 +77,25 @@ pub(crate) fn resolve_dry_diff_base_from_store(
         Ok(None) => {}
         Err(DryCheckCommitHashError::Format(detail)) => {
             eprintln!(
-                "[warn] {warning_prefix}: malformed .commit_hash ({detail}); falling back to main"
+                "[warn] {warning_prefix}: malformed .commit_hash ({detail}); falling back to {base_branch}"
             );
         }
         Err(other) => {
             eprintln!(
-                "[warn] {warning_prefix}: failed to read .commit_hash ({other}); falling back to main"
+                "[warn] {warning_prefix}: failed to read .commit_hash ({other}); falling back to {base_branch}"
             );
         }
     }
 
-    git_rev_parse_main_at(git_discovery_root)
+    git_rev_parse_base_at(git_discovery_root, base_branch)
 }
 
-/// Run `git rev-parse main` and return the resulting `CommitHash`.
+/// Run `git rev-parse <base_branch>` and return the resulting `CommitHash`.
+///
+/// `base_branch` is the configured base branch name (e.g. `"main"`, `"develop"`)
+/// taken from `metadata.json#branch_strategy_snapshot.base_branch`. It is passed
+/// as a separate process argument (argv-style) and never interpolated into a shell
+/// command string (AC-04 command-boundary safety).
 ///
 /// When `discovery_root` is `Some`, git is discovered from that path; otherwise
 /// CWD-based discovery is used.
@@ -97,8 +104,9 @@ pub(crate) fn resolve_dry_diff_base_from_store(
 ///
 /// Returns `Err` when git cannot be discovered, the command fails, or the
 /// output is not a valid commit hash.
-pub(crate) fn git_rev_parse_main_at(
+pub(crate) fn git_rev_parse_base_at(
     discovery_root: Option<&Path>,
+    base_branch: &str,
 ) -> Result<CommitHash, CompositionError> {
     use infrastructure::git_cli::{GitRepository, SystemGitRepo};
 
@@ -108,15 +116,17 @@ pub(crate) fn git_rev_parse_main_at(
         None => SystemGitRepo::discover()
             .map_err(|e| CompositionError::Infrastructure(format!("git discover: {e}")))?,
     };
-    let output = git
-        .output(&["rev-parse", "main"])
-        .map_err(|e| CompositionError::Infrastructure(format!("git rev-parse main: {e}")))?;
+    let output = git.output(&["rev-parse", base_branch]).map_err(|e| {
+        CompositionError::Infrastructure(format!("git rev-parse {base_branch}: {e}"))
+    })?;
     if !output.status.success() {
-        return Err(CompositionError::Infrastructure("git rev-parse main failed".to_owned()));
+        return Err(CompositionError::Infrastructure(format!(
+            "git rev-parse {base_branch} failed"
+        )));
     }
     let sha = String::from_utf8_lossy(&output.stdout).trim().to_owned();
     CommitHash::try_new(&sha)
-        .map_err(|e| CompositionError::Infrastructure(format!("invalid main SHA: {e}")))
+        .map_err(|e| CompositionError::Infrastructure(format!("invalid {base_branch} SHA: {e}")))
 }
 
 /// Build `diff_fragments` using the hunk-scope pipeline.

@@ -74,6 +74,135 @@ subgraph usecase["usecase"]
     R34_usecase_usecase_BranchStrategyPort_track_prefix([track_prefix])
   end
   end
+  subgraph usecase_usecase_module_dry_driver["usecase::dry_driver"]
+    direction TB
+  subgraph T39_usecase_usecase_DryCheckApprovedOutcome["dry_driver::DryCheckApprovedOutcome"]
+    direction TB
+    T39_usecase_usecase_DryCheckApprovedOutcome__self[DryCheckApprovedOutcome]
+    T39_usecase_usecase_DryCheckApprovedOutcome_Approved[Approved]
+    T39_usecase_usecase_DryCheckApprovedOutcome_Blocked[Blocked]
+    T39_usecase_usecase_DryCheckApprovedOutcome_Failure[Failure]
+  end
+  subgraph T35_usecase_usecase_DryDriverInteractor["dry_driver::DryDriverInteractor"]
+    direction TB
+    T35_usecase_usecase_DryDriverInteractor__self[DryDriverInteractor]
+  end
+  subgraph T38_usecase_usecase_DryWriteFindingSummary["dry_driver::DryWriteFindingSummary"]
+    direction TB
+    T38_usecase_usecase_DryWriteFindingSummary__self[DryWriteFindingSummary]
+  end
+  subgraph T31_usecase_usecase_DryWriteOutcome["dry_driver::DryWriteOutcome"]
+    direction TB
+    T31_usecase_usecase_DryWriteOutcome__self[DryWriteOutcome]
+    T31_usecase_usecase_DryWriteOutcome_Success[Success]
+    T31_usecase_usecase_DryWriteOutcome_Failure[Failure]
+  end
+  subgraph R29_usecase_usecase_DryDriverPort["dry_driver::DryDriverPort"]
+    direction TB
+    R29_usecase_usecase_DryDriverPort__self[DryDriverPort]
+    R29_usecase_usecase_DryDriverPort_dry_write([dry_write])
+    R29_usecase_usecase_DryDriverPort_dry_results([dry_results])
+    R29_usecase_usecase_DryDriverPort_dry_check_approved([dry_check_approved])
+    R29_usecase_usecase_DryDriverPort_dry_fix_local([dry_fix_local])
+  end
+  subgraph R32_usecase_usecase_DryDriverService["dry_driver::DryDriverService"]
+    direction TB
+    R32_usecase_usecase_DryDriverService__self[DryDriverService]
+    R32_usecase_usecase_DryDriverService_dry_write([dry_write])
+    R32_usecase_usecase_DryDriverService_dry_results([dry_results])
+    R32_usecase_usecase_DryDriverService_dry_check_approved([dry_check_approved])
+    R32_usecase_usecase_DryDriverService_dry_fix_local([dry_fix_local])
+  end
+  end
+  subgraph usecase_usecase_module_fixpoint_resolve["usecase::fixpoint_resolve"]
+    direction TB
+  subgraph R36_usecase_usecase_DiffBaseResolverPort["fixpoint_resolve::DiffBaseResolverPort"]
+    direction TB
+    R36_usecase_usecase_DiffBaseResolverPort__self[DiffBaseResolverPort]
+    R36_usecase_usecase_DiffBaseResolverPort_resolve_diff_base([resolve_diff_base])
+  end
+  subgraph R38_usecase_usecase_DryApprovalFactoryPort["fixpoint_resolve::DryApprovalFactoryPort"]
+    direction TB
+    R38_usecase_usecase_DryApprovalFactoryPort__self[DryApprovalFactoryPort]
+    R38_usecase_usecase_DryApprovalFactoryPort_build_approval([build_approval])
+  end
+  subgraph R38_usecase_usecase_FixpointDryGateService["fixpoint_resolve::FixpointDryGateService"]
+    direction TB
+    R38_usecase_usecase_FixpointDryGateService__self[FixpointDryGateService]
+    R38_usecase_usecase_FixpointDryGateService_resolve_dry_gate([resolve_dry_gate])
+  end
+  subgraph R38_usecase_usecase_RefVerifyGateStatePort["fixpoint_resolve::RefVerifyGateStatePort"]
+    direction TB
+    R38_usecase_usecase_RefVerifyGateStatePort__self[RefVerifyGateStatePort]
+    R38_usecase_usecase_RefVerifyGateStatePort_ref_verify_status([ref_verify_status])
+  end
+  subgraph R35_usecase_usecase_ReviewGateStatePort["fixpoint_resolve::ReviewGateStatePort"]
+    direction TB
+    R35_usecase_usecase_ReviewGateStatePort__self[ReviewGateStatePort]
+    R35_usecase_usecase_ReviewGateStatePort_review_status([review_status])
+  end
+  end
+  subgraph usecase_usecase_module_fixpoint_resolve_driver["usecase::fixpoint_resolve_driver"]
+    direction TB
+  subgraph T41_usecase_usecase_DryCheckConfigLoaderError["fixpoint_resolve_driver::DryCheckConfigLoaderError"]
+    direction TB
+    T41_usecase_usecase_DryCheckConfigLoaderError__self[DryCheckConfigLoaderError]
+    T41_usecase_usecase_DryCheckConfigLoaderError_Unavailable[Unavailable]
+  end
+  subgraph T42_usecase_usecase_FixpointResolveDriverInput["fixpoint_resolve_driver::FixpointResolveDriverInput"]
+    direction TB
+    T42_usecase_usecase_FixpointResolveDriverInput__self[FixpointResolveDriverInput]
+  end
+  subgraph T47_usecase_usecase_FixpointResolveDriverInteractor["fixpoint_resolve_driver::FixpointResolveDriverInteractor"]
+    direction TB
+    T47_usecase_usecase_FixpointResolveDriverInteractor__self[FixpointResolveDriverInteractor]
+    T47_usecase_usecase_FixpointResolveDriverInteractor_new([new])
+  end
+  subgraph T44_usecase_usecase_FixpointResolveDriverOutcome["fixpoint_resolve_driver::FixpointResolveDriverOutcome"]
+    direction TB
+    T44_usecase_usecase_FixpointResolveDriverOutcome__self[FixpointResolveDriverOutcome]
+    T44_usecase_usecase_FixpointResolveDriverOutcome_RunDfp[RunDfp]
+    T44_usecase_usecase_FixpointResolveDriverOutcome_RunRfp[RunRfp]
+    T44_usecase_usecase_FixpointResolveDriverOutcome_RunRefVerify[RunRefVerify]
+    T44_usecase_usecase_FixpointResolveDriverOutcome_Commit[Commit]
+    T44_usecase_usecase_FixpointResolveDriverOutcome_Failure[Failure]
+  end
+  subgraph T40_usecase_usecase_FixpointWorkspaceContext["fixpoint_resolve_driver::FixpointWorkspaceContext"]
+    direction TB
+    T40_usecase_usecase_FixpointWorkspaceContext__self[FixpointWorkspaceContext]
+  end
+  subgraph T45_usecase_usecase_FixpointWorkspaceContextError["fixpoint_resolve_driver::FixpointWorkspaceContextError"]
+    direction TB
+    T45_usecase_usecase_FixpointWorkspaceContextError__self[FixpointWorkspaceContextError]
+    T45_usecase_usecase_FixpointWorkspaceContextError_Unavailable[Unavailable]
+  end
+  subgraph R40_usecase_usecase_DryCheckConfigLoaderPort["fixpoint_resolve_driver::DryCheckConfigLoaderPort"]
+    direction TB
+    R40_usecase_usecase_DryCheckConfigLoaderPort__self[DryCheckConfigLoaderPort]
+    R40_usecase_usecase_DryCheckConfigLoaderPort_load([load])
+  end
+  subgraph R42_usecase_usecase_FixpointDryGateFactoryPort["fixpoint_resolve_driver::FixpointDryGateFactoryPort"]
+    direction TB
+    R42_usecase_usecase_FixpointDryGateFactoryPort__self[FixpointDryGateFactoryPort]
+    R42_usecase_usecase_FixpointDryGateFactoryPort_build([build])
+  end
+  subgraph R44_usecase_usecase_FixpointGateStateFactoryPort["fixpoint_resolve_driver::FixpointGateStateFactoryPort"]
+    direction TB
+    R44_usecase_usecase_FixpointGateStateFactoryPort__self[FixpointGateStateFactoryPort]
+    R44_usecase_usecase_FixpointGateStateFactoryPort_build_review_gate([build_review_gate])
+    R44_usecase_usecase_FixpointGateStateFactoryPort_build_ref_verify_gate([build_ref_verify_gate])
+  end
+  subgraph R44_usecase_usecase_FixpointResolveDriverService["fixpoint_resolve_driver::FixpointResolveDriverService"]
+    direction TB
+    R44_usecase_usecase_FixpointResolveDriverService__self[FixpointResolveDriverService]
+    R44_usecase_usecase_FixpointResolveDriverService_fixpoint_resolve([fixpoint_resolve])
+  end
+  subgraph R44_usecase_usecase_FixpointWorkspaceContextPort["fixpoint_resolve_driver::FixpointWorkspaceContextPort"]
+    direction TB
+    R44_usecase_usecase_FixpointWorkspaceContextPort__self[FixpointWorkspaceContextPort]
+    R44_usecase_usecase_FixpointWorkspaceContextPort_resolve_context([resolve_context])
+  end
+  end
   subgraph usecase_usecase_module_track_service["usecase::track_service"]
     direction TB
   subgraph R28_usecase_usecase_TrackService["track_service::TrackService"]
@@ -118,11 +247,44 @@ subgraph infrastructure["infrastructure"]
     T59_infrastructure_infrastructure_SnapshotBranchStrategyAdapter_new([new])
   end
   end
+  subgraph infrastructure_infrastructure_module_dry_check["infrastructure::dry_check"]
+    direction TB
+  subgraph T55_infrastructure_infrastructure_FsDiffBaseResolverAdapter["dry_check::diff_base_resolver::FsDiffBaseResolverAdapter"]
+    direction TB
+    T55_infrastructure_infrastructure_FsDiffBaseResolverAdapter__self[FsDiffBaseResolverAdapter]
+    T55_infrastructure_infrastructure_FsDiffBaseResolverAdapter_new([new])
+  end
+  subgraph T57_infrastructure_infrastructure_FsDryApprovalFactoryAdapter["dry_check::approval_factory::FsDryApprovalFactoryAdapter"]
+    direction TB
+    T57_infrastructure_infrastructure_FsDryApprovalFactoryAdapter__self[FsDryApprovalFactoryAdapter]
+  end
+  end
   subgraph infrastructure_infrastructure_module_track["infrastructure::track"]
     direction TB
   subgraph T60_infrastructure_infrastructure_BranchStrategySnapshotDocument["track::codec::BranchStrategySnapshotDocument"]
     direction TB
     T60_infrastructure_infrastructure_BranchStrategySnapshotDocument__self[BranchStrategySnapshotDocument]
+  end
+  subgraph T59_infrastructure_infrastructure_FsDryCheckConfigLoaderAdapter["track::fixpoint_resolve_driver::FsDryCheckConfigLoaderAdapter"]
+    direction TB
+    T59_infrastructure_infrastructure_FsDryCheckConfigLoaderAdapter__self[FsDryCheckConfigLoaderAdapter]
+  end
+  subgraph T61_infrastructure_infrastructure_FsFixpointDryGateFactoryAdapter["track::fixpoint_resolve_driver::FsFixpointDryGateFactoryAdapter"]
+    direction TB
+    T61_infrastructure_infrastructure_FsFixpointDryGateFactoryAdapter__self[FsFixpointDryGateFactoryAdapter]
+  end
+  subgraph T63_infrastructure_infrastructure_FsFixpointGateStateFactoryAdapter["track::fixpoint_resolve_driver::FsFixpointGateStateFactoryAdapter"]
+    direction TB
+    T63_infrastructure_infrastructure_FsFixpointGateStateFactoryAdapter__self[FsFixpointGateStateFactoryAdapter]
+  end
+  subgraph T63_infrastructure_infrastructure_FsFixpointWorkspaceContextAdapter["track::fixpoint_resolve_driver::FsFixpointWorkspaceContextAdapter"]
+    direction TB
+    T63_infrastructure_infrastructure_FsFixpointWorkspaceContextAdapter__self[FsFixpointWorkspaceContextAdapter]
+  end
+  subgraph T54_infrastructure_infrastructure_FsReviewGateStateAdapter["track::gate_state::FsReviewGateStateAdapter"]
+    direction TB
+    T54_infrastructure_infrastructure_FsReviewGateStateAdapter__self[FsReviewGateStateAdapter]
+    T54_infrastructure_infrastructure_FsReviewGateStateAdapter_new([new])
   end
   subgraph T49_infrastructure_infrastructure_MergeMethodDocument["track::codec::MergeMethodDocument"]
     direction TB
@@ -139,8 +301,23 @@ subgraph infrastructure["infrastructure"]
 end
 subgraph cli_driver["cli_driver"]
   direction TB
+  subgraph cli_driver_cli_driver_module_dry["cli_driver::dry"]
+    direction TB
+  subgraph T31_cli_driver_cli_driver_DryDriver["dry::DryDriver"]
+    direction TB
+    T31_cli_driver_cli_driver_DryDriver__self[DryDriver]
+    T31_cli_driver_cli_driver_DryDriver_new([new])
+    T31_cli_driver_cli_driver_DryDriver_handle([handle])
+  end
+  end
   subgraph cli_driver_cli_driver_module_track["cli_driver::track"]
     direction TB
+  subgraph T33_cli_driver_cli_driver_TrackDriver["track::TrackDriver"]
+    direction TB
+    T33_cli_driver_cli_driver_TrackDriver__self[TrackDriver]
+    T33_cli_driver_cli_driver_TrackDriver_new([new])
+    T33_cli_driver_cli_driver_TrackDriver_handle([handle])
+  end
   subgraph T32_cli_driver_cli_driver_TrackInput["track::TrackInput"]
     direction TB
     T32_cli_driver_cli_driver_TrackInput__self[TrackInput]
@@ -159,11 +336,24 @@ subgraph cli_driver["cli_driver"]
     T32_cli_driver_cli_driver_TrackInput_Archive[Archive]
     T32_cli_driver_cli_driver_TrackInput_DetectActive[DetectActive]
     T32_cli_driver_cli_driver_TrackInput_SwitchBase[SwitchBase]
+    T32_cli_driver_cli_driver_TrackInput_FixpointResolve[FixpointResolve]
   end
   end
 end
 subgraph cli_composition["cli_composition"]
   direction TB
+  subgraph cli_composition_cli_composition_module_dry["cli_composition::dry"]
+    direction TB
+  subgraph T50_cli_composition_cli_composition_DryCompositionRoot["dry::shim::DryCompositionRoot"]
+    direction TB
+    T50_cli_composition_cli_composition_DryCompositionRoot__self[DryCompositionRoot]
+    T50_cli_composition_cli_composition_DryCompositionRoot_new([new])
+    T50_cli_composition_cli_composition_DryCompositionRoot_dry_write([dry_write])
+    T50_cli_composition_cli_composition_DryCompositionRoot_dry_results([dry_results])
+    T50_cli_composition_cli_composition_DryCompositionRoot_dry_check_approved([dry_check_approved])
+    T50_cli_composition_cli_composition_DryCompositionRoot_dry_driver([dry_driver])
+  end
+  end
   subgraph cli_composition_cli_composition_module_track["cli_composition::track"]
     direction TB
   subgraph T52_cli_composition_cli_composition_TrackCompositionRoot["track::composition_root::TrackCompositionRoot"]
@@ -193,7 +383,6 @@ subgraph cli_composition["cli_composition"]
     T52_cli_composition_cli_composition_TrackCompositionRoot_track_resolve_id_from_root_for_write([track_resolve_id_from_root_for_write])
     T52_cli_composition_cli_composition_TrackCompositionRoot_track_validate_id([track_validate_id])
     T52_cli_composition_cli_composition_TrackCompositionRoot_track_resolve_project_root([track_resolve_project_root])
-    T52_cli_composition_cli_composition_TrackCompositionRoot_fixpoint_resolve([fixpoint_resolve])
     T52_cli_composition_cli_composition_TrackCompositionRoot_track_init([track_init])
     T52_cli_composition_cli_composition_TrackCompositionRoot_track_transition([track_transition])
     T52_cli_composition_cli_composition_TrackCompositionRoot_track_branch_create([track_branch_create])
@@ -258,15 +447,45 @@ T27_domain_domain_TrackMetadata_with_branch --o T36_domain_domain_BranchStrategy
 T27_domain_domain_TrackMetadata_with_branch --> T27_domain_domain_TrackMetadata__self
 T27_domain_domain_TrackMetadata_branch_strategy_snapshot --> T36_domain_domain_BranchStrategySnapshot__self
 R34_usecase_usecase_BranchStrategyPort_merge_method --> T25_domain_domain_MergeMethod__self
+T31_usecase_usecase_DryWriteOutcome_Success --o|findings| T38_usecase_usecase_DryWriteFindingSummary__self
+R29_usecase_usecase_DryDriverPort_dry_write --> T31_usecase_usecase_DryWriteOutcome__self
+R29_usecase_usecase_DryDriverPort_dry_check_approved --> T39_usecase_usecase_DryCheckApprovedOutcome__self
+R32_usecase_usecase_DryDriverService_dry_write --> T31_usecase_usecase_DryWriteOutcome__self
+R32_usecase_usecase_DryDriverService_dry_check_approved --> T39_usecase_usecase_DryCheckApprovedOutcome__self
+T47_usecase_usecase_FixpointResolveDriverInteractor_new --> T47_usecase_usecase_FixpointResolveDriverInteractor__self
+R40_usecase_usecase_DryCheckConfigLoaderPort_load --> T41_usecase_usecase_DryCheckConfigLoaderError__self
+R44_usecase_usecase_FixpointResolveDriverService_fixpoint_resolve --o T42_usecase_usecase_FixpointResolveDriverInput__self
+R44_usecase_usecase_FixpointResolveDriverService_fixpoint_resolve --> T44_usecase_usecase_FixpointResolveDriverOutcome__self
+R44_usecase_usecase_FixpointWorkspaceContextPort_resolve_context --> T40_usecase_usecase_FixpointWorkspaceContext__self
+R44_usecase_usecase_FixpointWorkspaceContextPort_resolve_context --> T45_usecase_usecase_FixpointWorkspaceContextError__self
+T35_usecase_usecase_DryDriverInteractor__self -.impl.-> R32_usecase_usecase_DryDriverService__self
+T47_usecase_usecase_FixpointResolveDriverInteractor__self -.impl.-> R44_usecase_usecase_FixpointResolveDriverService__self
 T61_infrastructure_infrastructure_JsonConfigBranchStrategyAdapter_new --> T55_infrastructure_infrastructure_BranchStrategyConfigError__self
 T61_infrastructure_infrastructure_JsonConfigBranchStrategyAdapter_new --> T61_infrastructure_infrastructure_JsonConfigBranchStrategyAdapter__self
 T59_infrastructure_infrastructure_SnapshotBranchStrategyAdapter_new --o T36_domain_domain_BranchStrategySnapshot__self
 T59_infrastructure_infrastructure_SnapshotBranchStrategyAdapter_new --> T59_infrastructure_infrastructure_SnapshotBranchStrategyAdapter__self
+T55_infrastructure_infrastructure_FsDiffBaseResolverAdapter_new --> T55_infrastructure_infrastructure_FsDiffBaseResolverAdapter__self
 T60_infrastructure_infrastructure_BranchStrategySnapshotDocument__self --o|merge_method| T49_infrastructure_infrastructure_MergeMethodDocument__self
+T54_infrastructure_infrastructure_FsReviewGateStateAdapter_new --> T54_infrastructure_infrastructure_FsReviewGateStateAdapter__self
 T45_infrastructure_infrastructure_TrackDocumentV2__self --o|branch_strategy_snapshot| T60_infrastructure_infrastructure_BranchStrategySnapshotDocument__self
 T61_infrastructure_infrastructure_JsonConfigBranchStrategyAdapter__self -.impl.-> R34_usecase_usecase_BranchStrategyPort__self
 T59_infrastructure_infrastructure_SnapshotBranchStrategyAdapter__self -.impl.-> R34_usecase_usecase_BranchStrategyPort__self
+T54_infrastructure_infrastructure_FsReviewGateStateAdapter__self -.impl.-> R35_usecase_usecase_ReviewGateStatePort__self
+T55_infrastructure_infrastructure_FsDiffBaseResolverAdapter__self -.impl.-> R36_usecase_usecase_DiffBaseResolverPort__self
+T57_infrastructure_infrastructure_FsDryApprovalFactoryAdapter__self -.impl.-> R38_usecase_usecase_DryApprovalFactoryPort__self
+T63_infrastructure_infrastructure_FsFixpointWorkspaceContextAdapter__self -.impl.-> R44_usecase_usecase_FixpointWorkspaceContextPort__self
+T59_infrastructure_infrastructure_FsDryCheckConfigLoaderAdapter__self -.impl.-> R40_usecase_usecase_DryCheckConfigLoaderPort__self
+T61_infrastructure_infrastructure_FsFixpointDryGateFactoryAdapter__self -.impl.-> R42_usecase_usecase_FixpointDryGateFactoryPort__self
+T63_infrastructure_infrastructure_FsFixpointGateStateFactoryAdapter__self -.impl.-> R44_usecase_usecase_FixpointGateStateFactoryPort__self
+T31_cli_driver_cli_driver_DryDriver_new --> T31_cli_driver_cli_driver_DryDriver__self
+T33_cli_driver_cli_driver_TrackDriver_new --> T33_cli_driver_cli_driver_TrackDriver__self
+T33_cli_driver_cli_driver_TrackDriver_handle --o T32_cli_driver_cli_driver_TrackInput__self
+T50_cli_composition_cli_composition_DryCompositionRoot_new --> T50_cli_composition_cli_composition_DryCompositionRoot__self
+T50_cli_composition_cli_composition_DryCompositionRoot_dry_write --> T31_usecase_usecase_DryWriteOutcome__self
+T50_cli_composition_cli_composition_DryCompositionRoot_dry_check_approved --> T39_usecase_usecase_DryCheckApprovedOutcome__self
+T50_cli_composition_cli_composition_DryCompositionRoot_dry_driver --> T31_cli_driver_cli_driver_DryDriver__self
 T52_cli_composition_cli_composition_TrackCompositionRoot_new --> T52_cli_composition_cli_composition_TrackCompositionRoot__self
+T52_cli_composition_cli_composition_TrackCompositionRoot_track_driver --> T33_cli_driver_cli_driver_TrackDriver__self
 class T36_domain_domain_BranchStrategySnapshot_new method_node
 class T36_domain_domain_BranchStrategySnapshot_base_branch method_node
 class T36_domain_domain_BranchStrategySnapshot_merge_target method_node
@@ -292,6 +511,60 @@ class R34_usecase_usecase_BranchStrategyPort_merge_target method_node
 class R34_usecase_usecase_BranchStrategyPort_merge_method method_node
 class R34_usecase_usecase_BranchStrategyPort_track_prefix method_node
 class R34_usecase_usecase_BranchStrategyPort__self secondary_port
+class T39_usecase_usecase_DryCheckApprovedOutcome_Approved variant_node
+class T39_usecase_usecase_DryCheckApprovedOutcome_Blocked variant_node
+class T39_usecase_usecase_DryCheckApprovedOutcome_Failure variant_node
+class T39_usecase_usecase_DryCheckApprovedOutcome__self dto
+class T35_usecase_usecase_DryDriverInteractor__self interactor
+class T38_usecase_usecase_DryWriteFindingSummary__self dto
+class T31_usecase_usecase_DryWriteOutcome_Success variant_node
+class T31_usecase_usecase_DryWriteOutcome_Failure variant_node
+class T31_usecase_usecase_DryWriteOutcome__self dto
+class R29_usecase_usecase_DryDriverPort_dry_write method_node
+class R29_usecase_usecase_DryDriverPort_dry_results method_node
+class R29_usecase_usecase_DryDriverPort_dry_check_approved method_node
+class R29_usecase_usecase_DryDriverPort_dry_fix_local method_node
+class R29_usecase_usecase_DryDriverPort__self secondary_port
+class R32_usecase_usecase_DryDriverService_dry_write method_node
+class R32_usecase_usecase_DryDriverService_dry_results method_node
+class R32_usecase_usecase_DryDriverService_dry_check_approved method_node
+class R32_usecase_usecase_DryDriverService_dry_fix_local method_node
+class R32_usecase_usecase_DryDriverService__self app_service
+class R36_usecase_usecase_DiffBaseResolverPort_resolve_diff_base method_node
+class R36_usecase_usecase_DiffBaseResolverPort__self secondary_port
+class R38_usecase_usecase_DryApprovalFactoryPort_build_approval method_node
+class R38_usecase_usecase_DryApprovalFactoryPort__self secondary_port
+class R38_usecase_usecase_FixpointDryGateService_resolve_dry_gate method_node
+class R38_usecase_usecase_FixpointDryGateService__self app_service
+class R38_usecase_usecase_RefVerifyGateStatePort_ref_verify_status method_node
+class R38_usecase_usecase_RefVerifyGateStatePort__self secondary_port
+class R35_usecase_usecase_ReviewGateStatePort_review_status method_node
+class R35_usecase_usecase_ReviewGateStatePort__self secondary_port
+class T41_usecase_usecase_DryCheckConfigLoaderError_Unavailable variant_node
+class T41_usecase_usecase_DryCheckConfigLoaderError__self error_type
+class T42_usecase_usecase_FixpointResolveDriverInput__self dto
+class T47_usecase_usecase_FixpointResolveDriverInteractor_new method_node
+class T47_usecase_usecase_FixpointResolveDriverInteractor__self interactor
+class T44_usecase_usecase_FixpointResolveDriverOutcome_RunDfp variant_node
+class T44_usecase_usecase_FixpointResolveDriverOutcome_RunRfp variant_node
+class T44_usecase_usecase_FixpointResolveDriverOutcome_RunRefVerify variant_node
+class T44_usecase_usecase_FixpointResolveDriverOutcome_Commit variant_node
+class T44_usecase_usecase_FixpointResolveDriverOutcome_Failure variant_node
+class T44_usecase_usecase_FixpointResolveDriverOutcome__self dto
+class T40_usecase_usecase_FixpointWorkspaceContext__self dto
+class T45_usecase_usecase_FixpointWorkspaceContextError_Unavailable variant_node
+class T45_usecase_usecase_FixpointWorkspaceContextError__self error_type
+class R40_usecase_usecase_DryCheckConfigLoaderPort_load method_node
+class R40_usecase_usecase_DryCheckConfigLoaderPort__self secondary_port
+class R42_usecase_usecase_FixpointDryGateFactoryPort_build method_node
+class R42_usecase_usecase_FixpointDryGateFactoryPort__self secondary_port
+class R44_usecase_usecase_FixpointGateStateFactoryPort_build_review_gate method_node
+class R44_usecase_usecase_FixpointGateStateFactoryPort_build_ref_verify_gate method_node
+class R44_usecase_usecase_FixpointGateStateFactoryPort__self secondary_port
+class R44_usecase_usecase_FixpointResolveDriverService_fixpoint_resolve method_node
+class R44_usecase_usecase_FixpointResolveDriverService__self app_service
+class R44_usecase_usecase_FixpointWorkspaceContextPort_resolve_context method_node
+class R44_usecase_usecase_FixpointWorkspaceContextPort__self secondary_port
 class R28_usecase_usecase_TrackService_init method_node
 class R28_usecase_usecase_TrackService_transition method_node
 class R28_usecase_usecase_TrackService_resolve method_node
@@ -315,12 +588,25 @@ class T61_infrastructure_infrastructure_JsonConfigBranchStrategyAdapter_new meth
 class T61_infrastructure_infrastructure_JsonConfigBranchStrategyAdapter__self secondary_adapter
 class T59_infrastructure_infrastructure_SnapshotBranchStrategyAdapter_new method_node
 class T59_infrastructure_infrastructure_SnapshotBranchStrategyAdapter__self secondary_adapter
+class T55_infrastructure_infrastructure_FsDiffBaseResolverAdapter_new method_node
+class T55_infrastructure_infrastructure_FsDiffBaseResolverAdapter__self secondary_adapter
+class T57_infrastructure_infrastructure_FsDryApprovalFactoryAdapter__self secondary_adapter
 class T60_infrastructure_infrastructure_BranchStrategySnapshotDocument__self dto
+class T59_infrastructure_infrastructure_FsDryCheckConfigLoaderAdapter__self secondary_adapter
+class T61_infrastructure_infrastructure_FsFixpointDryGateFactoryAdapter__self secondary_adapter
+class T63_infrastructure_infrastructure_FsFixpointGateStateFactoryAdapter__self secondary_adapter
+class T63_infrastructure_infrastructure_FsFixpointWorkspaceContextAdapter__self secondary_adapter
+class T54_infrastructure_infrastructure_FsReviewGateStateAdapter_new method_node
+class T54_infrastructure_infrastructure_FsReviewGateStateAdapter__self secondary_adapter
 class T49_infrastructure_infrastructure_MergeMethodDocument_Squash variant_node
 class T49_infrastructure_infrastructure_MergeMethodDocument_Merge variant_node
 class T49_infrastructure_infrastructure_MergeMethodDocument_Rebase variant_node
 class T49_infrastructure_infrastructure_MergeMethodDocument__self dto
 class T45_infrastructure_infrastructure_TrackDocumentV2__self dto
+class T31_cli_driver_cli_driver_DryDriver_new method_node
+class T31_cli_driver_cli_driver_DryDriver_handle method_node
+class T33_cli_driver_cli_driver_TrackDriver_new method_node
+class T33_cli_driver_cli_driver_TrackDriver_handle method_node
 class T32_cli_driver_cli_driver_TrackInput_Init variant_node
 class T32_cli_driver_cli_driver_TrackInput_Transition variant_node
 class T32_cli_driver_cli_driver_TrackInput_Resolve variant_node
@@ -336,6 +622,13 @@ class T32_cli_driver_cli_driver_TrackInput_TaskCounts variant_node
 class T32_cli_driver_cli_driver_TrackInput_Archive variant_node
 class T32_cli_driver_cli_driver_TrackInput_DetectActive variant_node
 class T32_cli_driver_cli_driver_TrackInput_SwitchBase variant_node
+class T32_cli_driver_cli_driver_TrackInput_FixpointResolve variant_node
+class T32_cli_driver_cli_driver_TrackInput__self dto
+class T50_cli_composition_cli_composition_DryCompositionRoot_new method_node
+class T50_cli_composition_cli_composition_DryCompositionRoot_dry_write method_node
+class T50_cli_composition_cli_composition_DryCompositionRoot_dry_results method_node
+class T50_cli_composition_cli_composition_DryCompositionRoot_dry_check_approved method_node
+class T50_cli_composition_cli_composition_DryCompositionRoot_dry_driver method_node
 class T52_cli_composition_cli_composition_TrackCompositionRoot_new method_node
 class T52_cli_composition_cli_composition_TrackCompositionRoot_track_driver method_node
 class T52_cli_composition_cli_composition_TrackCompositionRoot_track_add_task_resolved method_node
@@ -360,7 +653,6 @@ class T52_cli_composition_cli_composition_TrackCompositionRoot_track_resolve_id_
 class T52_cli_composition_cli_composition_TrackCompositionRoot_track_resolve_id_from_root_for_write method_node
 class T52_cli_composition_cli_composition_TrackCompositionRoot_track_validate_id method_node
 class T52_cli_composition_cli_composition_TrackCompositionRoot_track_resolve_project_root method_node
-class T52_cli_composition_cli_composition_TrackCompositionRoot_fixpoint_resolve method_node
 class T52_cli_composition_cli_composition_TrackCompositionRoot_track_init method_node
 class T52_cli_composition_cli_composition_TrackCompositionRoot_track_transition method_node
 class T52_cli_composition_cli_composition_TrackCompositionRoot_track_branch_create method_node

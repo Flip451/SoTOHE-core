@@ -52,7 +52,7 @@ pub enum DryCheckCommitHashError {
 /// 3. Hash is not an ancestor of HEAD → `Ok(None)` (fail-closed, main-tip fallback).
 ///
 /// The fail-closed policy (absorbing `Err(Format)` and falling through to
-/// `git rev-parse main`) is applied by the CLI composition layer (T007/T009),
+/// `git rev-parse <configured base branch>`) is applied by the CLI composition layer,
 /// not here.
 #[derive(Debug)]
 pub struct FsDryCheckCommitHashStore {

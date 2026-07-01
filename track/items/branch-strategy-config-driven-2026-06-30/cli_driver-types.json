@@ -3,9 +3,25 @@
   "crate_name": "cli_driver",
   "layer": "cli_driver",
   "types": {
+    "DryDriver": {
+      "action": "reference",
+      "role": { "PrimaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "dry",
+      "docs": "Primary adapter driver for the `dry` command family (baseline; public shape unchanged by this track). Referenced (not modified) so that this track's changes (IN-13/AC-18) to its private dry_write / dry_check_approved helper methods -- which now consume usecase::dry_driver::DryWriteOutcome / DryCheckApprovedOutcome (IN-13/AC-18) instead of the pre-formatted DryDriverOutcome, and render them into CommandOutcome text themselves instead of forwarding an already-formatted string -- are accounted for by the catalogue, mirroring the DryDriverInteractor precedent in usecase-types.json (a struct whose own shape is unchanged even though the trait it delegates to changes signature). DryDriver's own struct shape and its public new(service) / handle(input) signatures are unchanged; only the private (rustdoc-invisible) rendering logic inside dry_write / dry_check_approved changes.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-13" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-18" }
+      ],
+      "informal_grounds": []
+    },
     "TrackInput": {
       "action": "modify",
-      "role": { "PrimaryAdapter": {} },
+      "role": { "Dto": {} },
       "kind": {
         "kind": "enum",
         "variants": [
@@ -164,20 +180,113 @@
                 { "name": "project_root", "ty": "std::path::PathBuf" }
               ]
             }
+          },
+          {
+            "name": "FixpointResolve",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "track_id", "ty": "String" },
+                { "name": "current_branch", "ty": "String" },
+                { "name": "items_dir", "ty": "std::path::PathBuf" }
+              ]
+            }
           }
         ]
       },
       "methods": [],
       "module_path": "track",
-      "docs": "Typed input for the track command family. SwitchBase is new in this track (IN-05): switches to the base branch read from the active track's branch_strategy_snapshot.",
+      "docs": "Typed input for the track command family. SwitchBase is new in this track (IN-05): switches to the base branch read from the active track's branch_strategy_snapshot. FixpointResolve is new in this track (IN-12): fields mirror usecase::fixpoint_resolve_driver::FixpointResolveDriverInput field-for-field. Role corrected from PrimaryAdapter to Dto: this enum is a plain input DTO consumed by TrackDriver::handle, not itself the driving adapter (see R1: cli/cli_driver clap args and input DTOs use the Dto role).",
       "spec_refs": [
-        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-05" }
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-05" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-12" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-17" }
+      ],
+      "informal_grounds": []
+    },
+    "TrackDriver": {
+      "action": "modify",
+      "role": { "PrimaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "track",
+      "docs": "Primary adapter driver for the `track` command family. Holds injected TrackService (for the existing wide-facade subcommands) and, new in this track (IN-12/AC-17), an injected FixpointResolveDriverService used only by the FixpointResolve variant: `handle` invokes it and renders FixpointResolveDriverOutcome into CommandOutcome directly in this layer, instead of TrackCompositionRoot invoking FixpointResolveService and formatting the result itself.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-12" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-17" }
       ],
       "informal_grounds": []
     }
   },
   "traits": {},
   "functions": {},
-  "inherent_impls": [],
+  "inherent_impls": [
+    {
+      "type_name": "DryDriver",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "service", "ty": "std::sync::Arc<dyn usecase::dry_driver::DryDriverService>" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Create a new `DryDriver` with the given service."
+        },
+        {
+          "name": "handle",
+          "receiver": "&self",
+          "params": [
+            { "name": "input", "ty": "DryInput" }
+          ],
+          "returns": "CommandOutcome",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Handle a dry command."
+        }
+      ]
+    },
+    {
+      "type_name": "TrackDriver",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "service", "ty": "std::sync::Arc<dyn usecase::track_service::TrackService>" },
+            { "name": "fixpoint_resolve_service", "ty": "std::sync::Arc<dyn usecase::fixpoint_resolve_driver::FixpointResolveDriverService>" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Create a new `TrackDriver` with the given services."
+        },
+        {
+          "name": "handle",
+          "receiver": "&self",
+          "params": [
+            { "name": "input", "ty": "TrackInput" }
+          ],
+          "returns": "CommandOutcome",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Handle a track command."
+        }
+      ]
+    }
+  ],
   "trait_impls": []
 }

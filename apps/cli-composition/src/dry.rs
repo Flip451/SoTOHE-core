@@ -14,11 +14,11 @@
 //! (`FsDryCheckCommitHashStore`, `GitDryCheckDiffGetter`). The `review_v2`
 //! adapters (`FsCommitHashStore`, `GitDiffGetter`) are never imported.
 
-use std::path::Path;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use std::time::Instant;
 
+use domain::TrackId;
 use domain::dry_check::{DryCheckFinding, DryCheckReader as _, DryCheckVerdict};
 use domain::semantic_dup::SimilarityThreshold;
 use infrastructure::dry_check::{CodexDryChecker, FsDryCheckCoverageAdapter, FsDryCheckStore};
@@ -54,7 +54,6 @@ use persistent_index::open_persistent_index_with_corpus;
 use shared::git_diff_path_key;
 #[cfg(test)]
 use shared::normalize_fragment_paths;
-pub(crate) use shared::resolve_dry_diff_base_from_store;
 use shared::{
     build_diff_and_corpus_fragments, dry_check_approved_outcome, dry_write_outcome,
     parse_dry_track_id, parse_verdict_filter, resolve_dry_diff_base,
@@ -159,51 +158,35 @@ pub struct DryCheckApprovedInput {
     pub items_dir: PathBuf,
 }
 
-// These helpers are retained for existing tests that verify ephemeral-index
-// behavior (acceptance tests for the old API).  They are not used in production
-// code paths (which now use the persistent index via
-// `open_persistent_index_with_corpus`), so they are cfg(test) only.
-#[cfg(test)]
-#[derive(Debug, thiserror::Error)]
-#[error("{0}")]
-struct DryTestError(String);
-
-#[cfg(test)]
-fn ephemeral_index_parent(db_path: &Path, fallback_parent: &Path) -> PathBuf {
-    match db_path.parent() {
-        Some(parent) if !parent.as_os_str().is_empty() && parent.is_dir() => parent.to_path_buf(),
-        _ => fallback_parent.to_path_buf(),
+/// Read `base_branch` from `<track_dir>/metadata.json` via the branch_strategy_snapshot.
+///
+/// Falls back to "main" only when metadata.json is absent (new tracks pre-init or
+/// ephemeral fixtures). Decode errors propagate as `ConfigLoad`; per ADR D5 (no
+/// backward compatibility), schema_version != 6 is not supported and must fail
+/// explicitly rather than silently degrade.
+fn resolve_base_branch_from_metadata(
+    track_dir: &std::path::Path,
+    track_id: &TrackId,
+) -> Result<String, CompositionError> {
+    let metadata_path = track_dir.join("metadata.json");
+    match std::fs::read_to_string(&metadata_path) {
+        Ok(metadata_json) => {
+            let (track_meta, _) =
+                infrastructure::track::codec::decode(&metadata_json).map_err(|e| {
+                    CompositionError::ConfigLoad(format!(
+                        "decode metadata.json for '{}': {e} \
+                         (track metadata schema v6 required)",
+                        track_id.as_ref()
+                    ))
+                })?;
+            Ok(track_meta.branch_strategy_snapshot().base_branch().to_owned())
+        }
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok("main".to_owned()),
+        Err(e) => Err(CompositionError::ConfigLoad(format!(
+            "read metadata.json for '{}': {e}",
+            track_id.as_ref()
+        ))),
     }
-}
-
-#[cfg(test)]
-fn create_ephemeral_index_dir(
-    db_path: &Path,
-    fallback_parent: &Path,
-) -> Result<tempfile::TempDir, DryTestError> {
-    let parent = ephemeral_index_parent(db_path, fallback_parent);
-    tempfile::Builder::new()
-        .prefix("sotp-dry-index-")
-        .tempdir_in(&parent)
-        .map_err(|e| DryTestError(format!("failed to create ephemeral index dir: {e}")))
-}
-
-#[cfg(test)]
-fn create_ephemeral_index_adapter(
-    db_path: &Path,
-    fallback_parent: &Path,
-) -> Result<(tempfile::TempDir, LanceDbSemanticIndexAdapter), DryTestError> {
-    let temp_index_dir = create_ephemeral_index_dir(db_path, fallback_parent)?;
-    let ephemeral_db_path = temp_index_dir.path().to_path_buf();
-    let index_adapter =
-        LanceDbSemanticIndexAdapter::new(ephemeral_db_path.clone()).map_err(|e| {
-            DryTestError(format!(
-                "failed to open ephemeral index at {}: {e}",
-                ephemeral_db_path.display()
-            ))
-        })?;
-
-    Ok((temp_index_dir, index_adapter))
 }
 
 fn resolve_dry_write_telemetry_writer(
@@ -270,6 +253,8 @@ impl DryCompositionRoot {
             resolve_existing_dir_under_repo(&input.items_dir, &root, &canonical_root, "items_dir")?;
         let track_dir = items_dir_abs.join(track_id.as_ref());
 
+        let base_branch = resolve_base_branch_from_metadata(&track_dir, &track_id)?;
+
         let (fast_model, effective_model, fast_reasoning_effort, final_reasoning_effort) =
             match dry_checker_config {
                 Some(config) => config,
@@ -288,6 +273,7 @@ impl DryCompositionRoot {
             input.base_commit.as_deref(),
             &commit_hash_path,
             &canonical_root,
+            &base_branch,
         )?;
 
         // Always load infra config for max_parallelism (D3 / T010); --threshold overrides its threshold.
@@ -572,6 +558,8 @@ impl DryCompositionRoot {
         }
         let track_dir = items_dir_abs.join(track_id.as_ref());
 
+        let base_branch = resolve_base_branch_from_metadata(&track_dir, &track_id)?;
+
         let commit_hash_path = track_dir.join(".commit_hash");
         let dry_check_json_path = track_dir.join("dry-check.json");
         let dry_check_coverage_path = track_dir.join("dry-check-coverage.json");
@@ -581,6 +569,7 @@ impl DryCompositionRoot {
             input.base_commit.as_deref(),
             &commit_hash_path,
             &canonical_repo_root,
+            &base_branch,
         )?;
 
         // D5 / IN-05 (T005): pure-read gate — diff fragments only.
@@ -705,6 +694,49 @@ mod tests {
     use crate::test_support::make_executable;
     use crate::test_support::repo_root_for_tests;
 
+    // ── Ephemeral index helpers (moved from dry.rs outer scope) ──────────────
+
+    #[derive(Debug, thiserror::Error)]
+    #[error("{0}")]
+    struct DryTestError(String);
+
+    fn ephemeral_index_parent(db_path: &Path, fallback_parent: &Path) -> PathBuf {
+        match db_path.parent() {
+            Some(parent) if !parent.as_os_str().is_empty() && parent.is_dir() => {
+                parent.to_path_buf()
+            }
+            _ => fallback_parent.to_path_buf(),
+        }
+    }
+
+    fn create_ephemeral_index_dir(
+        db_path: &Path,
+        fallback_parent: &Path,
+    ) -> Result<tempfile::TempDir, DryTestError> {
+        let parent = ephemeral_index_parent(db_path, fallback_parent);
+        tempfile::Builder::new()
+            .prefix("sotp-dry-index-")
+            .tempdir_in(&parent)
+            .map_err(|e| DryTestError(format!("failed to create ephemeral index dir: {e}")))
+    }
+
+    fn create_ephemeral_index_adapter(
+        db_path: &Path,
+        fallback_parent: &Path,
+    ) -> Result<(tempfile::TempDir, LanceDbSemanticIndexAdapter), DryTestError> {
+        let temp_index_dir = create_ephemeral_index_dir(db_path, fallback_parent)?;
+        let ephemeral_db_path = temp_index_dir.path().to_path_buf();
+        let index_adapter =
+            LanceDbSemanticIndexAdapter::new(ephemeral_db_path.clone()).map_err(|e| {
+                DryTestError(format!(
+                    "failed to open ephemeral index at {}: {e}",
+                    ephemeral_db_path.display()
+                ))
+            })?;
+
+        Ok((temp_index_dir, index_adapter))
+    }
+
     fn temp_items_dir_under_repo() -> tempfile::TempDir {
         let base = repo_root_for_tests().join("target").join("dry-cli-composition-tests");
         std::fs::create_dir_all(&base).expect("test temp base must be creatable");
@@ -716,6 +748,26 @@ mod tests {
 
     fn valid_commit_hash_for_tests() -> String {
         "a".repeat(40)
+    }
+
+    /// Write a minimal schema_version=6 metadata.json into `track_dir`.
+    ///
+    /// T006 (Batch C): `dry_check_approved` reads `metadata.json` to obtain
+    /// `branch_strategy_snapshot.base_branch` before resolving the diff base.
+    /// Tests that exercise the diff step (or later) must create this file so the
+    /// config-load phase does not fail first.
+    fn write_minimal_metadata_json(track_dir: &Path, track_id: &str) {
+        let metadata = format!(
+            r#"{{
+  "schema_version": 6,
+  "id": "{track_id}",
+  "title": "Test Track",
+  "created_at": "2026-03-11T00:00:00Z",
+  "updated_at": "2026-03-11T00:00:00Z",
+  "branch_strategy_snapshot": {{"base_branch": "main", "merge_target": "main", "merge_method": "squash"}}
+}}"#
+        );
+        std::fs::write(track_dir.join("metadata.json"), metadata).unwrap();
     }
 
     fn setup_dry_telemetry_repo(root: &Path) -> PathBuf {
@@ -825,7 +877,8 @@ mod tests {
         // Provide a valid 40-char override — store is never consulted.
         let valid_hash = "a".repeat(40);
         let result =
-            resolve_dry_diff_base(Some(&valid_hash), &commit_hash_path, &trusted_root).unwrap();
+            resolve_dry_diff_base(Some(&valid_hash), &commit_hash_path, &trusted_root, "main")
+                .unwrap();
         assert_eq!(result.as_ref(), valid_hash);
     }
 
@@ -835,14 +888,15 @@ mod tests {
         let commit_hash_path = dir.path().join(".commit_hash");
         let trusted_root = dir.path().to_path_buf();
 
-        let result = resolve_dry_diff_base(Some("not-a-hash"), &commit_hash_path, &trusted_root);
+        let result =
+            resolve_dry_diff_base(Some("not-a-hash"), &commit_hash_path, &trusted_root, "main");
         assert!(result.is_err(), "invalid override must return Err");
         let msg = result.unwrap_err().to_string();
         assert!(msg.contains("--base-commit"), "error must mention --base-commit, got: {msg}");
     }
 
     /// When the store file is absent (Ok(None)), resolve_dry_diff_base falls back to
-    /// git rev-parse main. In the test environment we rely on the real git repo,
+    /// git rev-parse <configured base branch>. In the test environment we rely on the real git repo,
     /// so we just assert the fallback path doesn't produce a panic or abort.
     #[test]
     fn test_resolve_dry_diff_base_falls_back_on_absent_file() {
@@ -850,10 +904,10 @@ mod tests {
         let commit_hash_path = dir.path().join(".commit_hash");
         let trusted_root = dir.path().to_path_buf();
 
-        // File absent → Ok(None) → tries git rev-parse main.
+        // File absent → Ok(None) → tries git rev-parse <configured base branch>.
         // In this repo context git is available, so it should succeed or return Err
         // (not panic). We only assert it doesn't panic.
-        let _ = resolve_dry_diff_base(None, &commit_hash_path, &trusted_root);
+        let _ = resolve_dry_diff_base(None, &commit_hash_path, &trusted_root, "main");
         // Pass: no panic.
     }
 
@@ -869,10 +923,10 @@ mod tests {
         std::fs::write(&commit_hash_path, "not-a-valid-hash\n").unwrap();
 
         // Should NOT return Err — must absorb the Format error.
-        // (The fallback git rev-parse main may succeed or fail depending on env.)
+        // (The fallback git rev-parse <configured base branch> may succeed or fail depending on env.)
         // Key invariant: if git is available, result is Ok. If git fails, Err is OK.
         // What must NOT happen: a direct propagation of the Format error.
-        let result = resolve_dry_diff_base(None, &commit_hash_path, &trusted_root);
+        let result = resolve_dry_diff_base(None, &commit_hash_path, &trusted_root, "main");
         if let Err(ref e) = result {
             let msg = e.to_string();
             assert!(
@@ -2036,7 +2090,10 @@ exit 0
         let items_dir = root.join("track").join("items");
         std::fs::create_dir_all(&items_dir).unwrap();
         let track_id = "dry-check-approved-invalid-base";
-        std::fs::create_dir_all(items_dir.join(track_id)).unwrap();
+        let track_dir = items_dir.join(track_id);
+        std::fs::create_dir_all(&track_dir).unwrap();
+        // T006 (Batch C): metadata.json required before diff-base resolution.
+        write_minimal_metadata_json(&track_dir, track_id);
 
         let _cwd_guard = CwdGuard::save_current();
         std::env::set_current_dir(root).unwrap();
@@ -2089,9 +2146,10 @@ exit 0
     #[test]
     fn test_dry_check_approved_public_api_missing_track_dir_advances_to_diff_step() {
         // D5 (T003): dry_check_approved no longer consults `--threshold` /
-        // `db_path` (T005 removes those fields). A missing track dir is
-        // tolerated up to the diff acquisition step, which then fails on
-        // the synthetic base-commit hash.
+        // `db_path` (T005 removes those fields). The track dir (with metadata.json)
+        // must exist because T006 (Batch C) reads base_branch from metadata.json
+        // before reaching the diff step. The synthetic base-commit hash causes the
+        // diff step to fail with a merge-base error.
         let _lock = crate::test_support::process_env_lock().lock().unwrap();
 
         let repo = tempfile::tempdir().unwrap();
@@ -2121,12 +2179,17 @@ exit 0
 
         let items_dir = root.join("track").join("items");
         std::fs::create_dir_all(&items_dir).unwrap();
+        // T006 (Batch C): track dir and metadata.json required before diff-base resolution.
+        let missing_track_id = "dry-check-approved-missing-track-advances";
+        let track_dir = items_dir.join(missing_track_id);
+        std::fs::create_dir_all(&track_dir).unwrap();
+        write_minimal_metadata_json(&track_dir, missing_track_id);
 
         let _cwd_guard = CwdGuard::save_current();
         std::env::set_current_dir(root).unwrap();
 
         let result = DryCompositionRoot::new().dry_check_approved(DryCheckApprovedInput {
-            track_id: "dry-check-approved-missing-track-advances".to_owned(),
+            track_id: missing_track_id.to_owned(),
             base_commit: Some(valid_commit_hash_for_tests()),
             items_dir: items_dir.clone(),
         });
@@ -2138,7 +2201,84 @@ exit 0
         );
         assert!(
             message.contains("merge-base") || message.contains("dry-check diff failed"),
-            "missing track dir must advance to the diff step; got: {message}"
+            "must advance past metadata load to the diff step; got: {message}"
+        );
+    }
+
+    #[test]
+    fn test_dry_check_approved_old_schema_metadata_fails_closed() {
+        // ADR 2026-06-30-1441 D5: no backward compatibility. `codec::decode` hard-rejects
+        // every `schema_version != 6` (pre-v6 tracks have no `branch_strategy_snapshot`
+        // field). base_branch resolution must propagate this as a `ConfigLoad` error
+        // (fail-closed) rather than silently defaulting to "main" — SoTOHE does not
+        // provide a migration/fallback path for tracks created before this ADR.
+        let _lock = crate::test_support::process_env_lock().lock().unwrap();
+
+        let repo = tempfile::tempdir().unwrap();
+        let root = repo.path();
+
+        GitRunner::at(root).assert_success(&["init", "-b", "main"]);
+        GitRunner::at(root).assert_success(&["config", "user.email", "test@example.com"]);
+        GitRunner::at(root).assert_success(&["config", "user.name", "Test"]);
+        GitRunner::at(root).assert_success(&["config", "commit.gpgsign", "false"]);
+        std::fs::write(root.join("README.md"), "init\n").unwrap();
+        let harness_config_dir = root.join(".harness/config");
+        std::fs::create_dir_all(&harness_config_dir).unwrap();
+        std::fs::write(
+            harness_config_dir.join("dry-check.json"),
+            r#"{
+  "schema_version": 4,
+  "enabled": true,
+  "threshold": 0.85,
+  "max_parallelism": 4,
+  "known_bad_injection_rate_percent": 10,
+  "known_bad_detection_threshold_percent": 90
+}"#,
+        )
+        .unwrap();
+        GitRunner::at(root).assert_success(&["add", "."]);
+        GitRunner::at(root).assert_success(&["commit", "--no-gpg-sign", "-m", "init"]);
+
+        let items_dir = root.join("track").join("items");
+        std::fs::create_dir_all(&items_dir).unwrap();
+        let track_id = "dry-check-approved-old-schema-metadata";
+        let track_dir = items_dir.join(track_id);
+        std::fs::create_dir_all(&track_dir).unwrap();
+        // Pre-v6 metadata.json: no `branch_strategy_snapshot` field, which
+        // `infrastructure::track::codec::decode` hard-rejects on schema_version.
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            format!(
+                r#"{{
+  "branch": "track/{track_id}",
+  "created_at": "2026-01-01T00:00:00Z",
+  "id": "{track_id}",
+  "schema_version": 5,
+  "title": "Old Schema Track",
+  "updated_at": "2026-01-01T00:00:00Z"
+}}"#
+            ),
+        )
+        .unwrap();
+
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(root).unwrap();
+
+        let result = DryCompositionRoot::new().dry_check_approved(DryCheckApprovedInput {
+            track_id: track_id.to_owned(),
+            base_commit: Some(valid_commit_hash_for_tests()),
+            items_dir: items_dir.clone(),
+        });
+
+        let message = result.unwrap_err().to_string();
+        assert!(
+            message.contains("decode metadata.json"),
+            "old-schema metadata.json must fail closed with a decode error \
+             (ADR D5: no backward-compat fallback), got: {message}"
+        );
+        assert!(
+            !message.contains("merge-base") && !message.contains("dry-check diff failed"),
+            "must fail at metadata decode, before reaching the diff step; got: {message}"
         );
     }
 
@@ -2217,7 +2357,10 @@ exit 0
         let items_dir = root.join("track").join("items");
         std::fs::create_dir_all(&items_dir).unwrap();
         let track_id = "dry-check-approved-threshold-none";
-        std::fs::create_dir_all(items_dir.join(track_id)).unwrap();
+        let track_dir = items_dir.join(track_id);
+        std::fs::create_dir_all(&track_dir).unwrap();
+        // T006 (Batch C): metadata.json required before diff-base resolution.
+        write_minimal_metadata_json(&track_dir, track_id);
 
         let _cwd_guard = CwdGuard::save_current();
         std::env::set_current_dir(root).unwrap();
@@ -3329,6 +3472,8 @@ exit 0
         // empty current_fragment_refs → Approved.
         let track_dir = items_dir.join(track_id);
         std::fs::create_dir_all(&track_dir).unwrap();
+        // T006 (Batch C): metadata.json required before diff-base resolution.
+        write_minimal_metadata_json(&track_dir, track_id);
 
         // Compute the config fingerprint from the config written by setup_gate_eval_repo
         // so the coverage manifest contains a matching fingerprint.
@@ -3470,6 +3615,8 @@ exit 0
         write_dry_corpus_root_manifest(&track_dir, &scoped_root, &repo_root).unwrap();
         std::fs::write(track_dir.join("dry-check.json"), br#"{"schema_version":1,"records":[]}"#)
             .unwrap();
+        // T006 (Batch C): metadata.json required before diff-base resolution.
+        write_minimal_metadata_json(&track_dir, track_id);
 
         let dry_check_config_path = repo_root.join(".harness/config/dry-check.json");
         let dry_check_config =
@@ -3590,6 +3737,8 @@ exit 0
         std::fs::create_dir_all(&track_dir).unwrap();
         std::fs::write(track_dir.join("dry-check.json"), br#"{"schema_version":1,"records":[]}"#)
             .unwrap();
+        // T006 (Batch C): metadata.json required before diff-base resolution.
+        write_minimal_metadata_json(&track_dir, track_id);
         // dry-check-coverage.json intentionally absent.
 
         let telemetry_dir = tempfile::tempdir().unwrap();
