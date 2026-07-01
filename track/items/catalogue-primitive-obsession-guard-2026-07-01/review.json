@@ -1,6 +1,64 @@
 {
   "schema_version": 2,
   "scopes": {
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:088ae98d41128d86e4f8d79fad3f11a444b66aeb23849bf3845f8b55b1885775",
+          "at": "2026-07-01T12:15:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`PrimitiveOccurrencePosition` cannot represent type-alias targets even though the spec includes `type_alias.target`/TypeRef positions as scan targets. Since `CatalogueLinterRuleKind::ForbidPrimitiveInTypes.positions` is typed as `NonEmptyVec<PrimitiveOccurrencePosition>`, a catalogue entry such as a `type_alias` whose target is `String` cannot be configured or reported by the new rule, leaving an in-scope TypeRef position outside the contract. Add a type-alias-target position to this enum and have the evaluator classify that slot explicitly.",
+              "severity": "P1",
+              "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/domain-types.json",
+              "line": 12,
+              "category": "SoT integrity"
+            }
+          ],
+          "hash": "rvw1:sha256:088ae98d41128d86e4f8d79fad3f11a444b66aeb23849bf3845f8b55b1885775",
+          "at": "2026-07-01T12:22:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:473c6a8a644b0d8af373d56216071cec128f3c14e5a4db5ed50ca21f00db4903",
+          "at": "2026-07-01T13:33:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:473c6a8a644b0d8af373d56216071cec128f3c14e5a4db5ed50ca21f00db4903",
+          "at": "2026-07-01T13:38:38Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3532bf0532568e83db7f1259bb2c0509fdcad04bcf9bfba8e861bf892387a0d8",
+          "at": "2026-07-01T07:38:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3532bf0532568e83db7f1259bb2c0509fdcad04bcf9bfba8e861bf892387a0d8",
+          "at": "2026-07-01T07:41:10Z"
+        }
+      ]
+    },
     "adr": {
       "rounds": [
         {
@@ -34,21 +92,35 @@
         }
       ]
     },
-    "harness-policy": {
+    "spec": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:3532bf0532568e83db7f1259bb2c0509fdcad04bcf9bfba8e861bf892387a0d8",
-          "at": "2026-07-01T07:38:31Z"
+          "hash": "rvw1:sha256:e7bc048b44db338659c749fe485b15bce6cd8de7ee613ff3323b4afba982d3fd",
+          "at": "2026-07-01T12:12:58Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:3532bf0532568e83db7f1259bb2c0509fdcad04bcf9bfba8e861bf892387a0d8",
-          "at": "2026-07-01T07:41:10Z"
+          "hash": "rvw1:sha256:e7bc048b44db338659c749fe485b15bce6cd8de7ee613ff3323b4afba982d3fd",
+          "at": "2026-07-01T12:16:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c6ae9a87061c95b8b501328b801303febabdc76b38d7604391684e201e0b9b1b",
+          "at": "2026-07-01T13:50:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c6ae9a87061c95b8b501328b801303febabdc76b38d7604391684e201e0b9b1b",
+          "at": "2026-07-01T13:54:06Z"
         }
       ]
     },
@@ -67,6 +139,72 @@
           "findings": [],
           "hash": "rvw1:sha256:f40bb4d80e685ed64b94d4e698180d3d2396bbeb2964ed37ef8b42a1e99a2c4f",
           "at": "2026-07-01T07:41:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`task-coverage.json` omits `CN-02` entirely, even though T001 explicitly treats \"The domain crate must gain no syn dependency (CN-02)\" as a load-bearing constraint. That leaves the no-`syn` invariant untracked in the coverage artifact while adjacent constraints (`CN-01`, `CN-03`..`CN-09`) are mapped.",
+              "severity": "P1",
+              "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/task-coverage.json",
+              "line": 30,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:8b062466221d26649018ccf19ad55a3893bd39c7cafead67f623a9d8e945d044",
+          "at": "2026-07-01T12:15:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8b062466221d26649018ccf19ad55a3893bd39c7cafead67f623a9d8e945d044",
+          "at": "2026-07-01T12:21:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 defines PrimitiveOccurrenceReport as only ordinary()/result_err() sets, and T005 later treats any ordinary hit as belonging to the caller-known outer catalogue position. That collapses the ordinary position vocabulary, so T004 cannot actually satisfy IN-02/AC-02 for param/return/bound occurrences nested inside function-type signatures, or for other non-field TypeRef positions, despite task-coverage.json mapping IN-02 and AC-02 to these tasks. The plan needs a report shape or evaluation flow that preserves the occurrence position instead of only ordinary vs result_err.",
+              "severity": "P1",
+              "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/impl-plan.json",
+              "line": 6,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:8b062466221d26649018ccf19ad55a3893bd39c7cafead67f623a9d8e945d044",
+          "at": "2026-07-01T12:26:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`task-coverage.json` does not map T002, T003, or T006 to any spec element. Those tasks are present in `impl-plan.json`/`plan.md` (S2 and the first task in S4), but the coverage matrix only traces T001, T004, T005, T007, and T008, leaving three executable tasks without spec traceability.",
+              "severity": "P1",
+              "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/task-coverage.json",
+              "line": 3,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:819c950f90f40d017ddf670d8f2e46c6976853866f8c04ed023e8e7a035ef79a",
+          "at": "2026-07-01T13:31:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:80fec8c44c5473864e3386e7bfc85c1a26ecb7159538e1e3cdb288234d04178c",
+          "at": "2026-07-01T13:39:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:80fec8c44c5473864e3386e7bfc85c1a26ecb7159538e1e3cdb288234d04178c",
+          "at": "2026-07-01T13:44:38Z"
         }
       ]
     }

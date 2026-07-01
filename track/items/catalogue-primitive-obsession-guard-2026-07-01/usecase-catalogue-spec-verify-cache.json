@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "layer": "usecase",
+  "entries": [
+    {
+      "claim_hash": "2e8aa2a1fa56f1c4128715ff21e4e053dc450f38c534fc40332603227caab334",
+      "evidence_hash": "8e2f1e88cd41c5ee66e642f7f64b4455857190f9d77bfa827324c4621b7655d6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "新しい `CatalogueLinterRuleKind` variant が実装されており、その payload は (a) 設定可能な禁止プリミティブ集合、(b) `architecture-rules.json` を基準に存在検証される適用対象 layer 集合（未定義の layer 名は拒否、`\"all\"` 特殊値は存在しない）、(c) 検出位置集合、の3要素を持つ。role による絞り込みは新 variant に専用フィールドを持たず、既存の `RuleTarget`（`target_roles`）が引き続き使われる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalogue-primitive-obsession-guard-2026-07-01/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "LintRuleKind"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "新しい `CatalogueLinterRuleKind` variant が実装されており、その payload は (a) 設定可能な禁止プリミティブ集合、(b) `architecture-rules.json` を基準に存在検証される適用対象 layer 集合（未定義の layer 名は拒否、`\"all\"` 特殊値は存在しない）、(c) 検出位置集合、の3要素を持つ。role による絞り込みは新 variant に専用フィールドを持たず、既存の `RuleTarget`（`target_roles`）が引き続き使われる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "2e8aa2a1fa56f1c4128715ff21e4e053dc450f38c534fc40332603227caab334",
+      "evidence_hash": "93fe9aae2f2036b2557bb12722d42905e344fe577ae101245da70b142bec7427",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存の `CatalogueLinterRuleKind` に新しい variant を追加して実装する。新 variant の payload は (a) 禁止プリミティブ集合、(b) 適用対象 layer 集合、(c) 検出位置集合の3つを持つ。role 軸は新 variant にフィールドを持たせず、既存の `RuleTarget`（`target_roles`）をそのまま再利用する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalogue-primitive-obsession-guard-2026-07-01/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "LintRuleKind"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "既存の `CatalogueLinterRuleKind` に新しい variant を追加して実装する。新 variant の payload は (a) 禁止プリミティブ集合、(b) 適用対象 layer 集合、(c) 検出位置集合の3つを持つ。role 軸は新 variant にフィールドを持たせず、既存の `RuleTarget`（`target_roles`）をそのまま再利用する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "786cd1562dd1533719194776a04ac82be801b7a254aa4ff03aba35c24831c8c7",
+      "evidence_hash": "65d7237ca041e23422a673d95856ebff152645544444b3024b3dbac3ebe9a8bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "『この TypeRef の型木の指定位置に指定プリミティブが含まれるか』を判定する port が domain 層に定義されており、infrastructure 層の adapter がこれを syn ベースの走査で実装している。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalogue-primitive-obsession-guard-2026-07-01/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "RunCatalogueLintInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "『この TypeRef の型木の指定位置に指定プリミティブが含まれるか』を判定する port が domain 層に定義されており、infrastructure 層の adapter がこれを syn ベースの走査で実装している。domain crate が syn に依存していないことは `cargo make check-layers` および `cargo make deny` で検証できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "786cd1562dd1533719194776a04ac82be801b7a254aa4ff03aba35c24831c8c7",
+      "evidence_hash": "4d88e1ab7ab767c9d452fd9560232cae9986ec9e43e1c0d0290cb22fa3e002ba",
+      "verdict": {
+        "kind": "pass",
+        "citation": "『型木の指定位置に指定プリミティブが含まれるか』の判定は domain 層に port として定義し、infrastructure 層が既存の `type_ref_parser`（syn ベース）で実装する。domain は判定の意味論のみを持ち、syn への依存は infrastructure に閉じる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalogue-primitive-obsession-guard-2026-07-01/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "RunCatalogueLintInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "『型木の指定位置に指定プリミティブが含まれるか』の判定は domain 層に port として定義し、infrastructure 層が既存の `type_ref_parser`（syn ベース）で実装する。domain は判定の意味論のみを持ち、syn への依存は infrastructure に閉じる。"
+        }
+      }
+    }
+  ]
+}

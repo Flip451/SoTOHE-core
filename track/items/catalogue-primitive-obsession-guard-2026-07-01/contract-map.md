@@ -1,0 +1,315 @@
+<!-- Generated contract-map-renderer — DO NOT EDIT DIRECTLY -->
+```mermaid
+flowchart LR
+classDef aggregate_root fill:#ede9fe,stroke:#4c1d95,stroke-width:2px
+classDef app_service fill:#ecfdf5,stroke:#059669,stroke-width:2px
+classDef command fill:#fff7ed,stroke:#c2410c,stroke-width:1px
+classDef domain_service fill:#fee2e2,stroke:#991b1b,stroke-width:1px
+classDef dto fill:#f8fafc,stroke:#64748b,stroke-width:1px
+classDef entity fill:#dbeafe,stroke:#1e40af,stroke-width:2px
+classDef error_type fill:#fef2f2,stroke:#b91c1c,stroke-width:1px,stroke-dasharray:4 2
+classDef factory fill:#e0f2fe,stroke:#0369a1,stroke-width:1px
+classDef free_function fill:#f5f3ff,stroke:#7c3aed,stroke-width:1px
+classDef function_node fill:#f5f3ff,stroke:#a78bfa,stroke-width:1px
+classDef interactor fill:#f0fdfa,stroke:#0d9488,stroke-width:1px
+classDef method_node fill:#f8fafc,stroke:#cbd5e1,stroke-width:1px
+classDef query fill:#f0f9ff,stroke:#0369a1,stroke-width:1px
+classDef secondary_adapter fill:#fafaf9,stroke:#57534e,stroke-width:1px
+classDef secondary_port fill:#fafaf9,stroke:#78716c,stroke-width:1px,stroke-dasharray:4 2
+classDef specification fill:#fdf4ff,stroke:#6b21a8,stroke-width:1px
+classDef specification_port fill:#fdf4ff,stroke:#9333ea,stroke-width:1px,stroke-dasharray:4 2
+classDef typestate_overlay stroke:#dc2626,stroke-width:3px
+classDef use_case fill:#ecfeff,stroke:#0e7490,stroke-width:1px
+classDef use_case_function fill:#eef2ff,stroke:#4338ca,stroke-width:1px
+classDef value_object fill:#d1fae5,stroke:#065f46,stroke-width:1px
+classDef variant_node fill:#fafaf9,stroke:#d6d3d1,stroke-width:1px
+subgraph domain["domain"]
+  direction TB
+  subgraph domain_domain_module_tddd["domain::tddd"]
+    direction TB
+  subgraph T34_domain_domain_CatalogueLinterError["tddd::catalogue_linter::CatalogueLinterError"]
+    direction TB
+    T34_domain_domain_CatalogueLinterError__self[CatalogueLinterError]
+    T34_domain_domain_CatalogueLinterError_InvalidRuleConfig[InvalidRuleConfig]
+    T34_domain_domain_CatalogueLinterError_UnknownLayer[UnknownLayer]
+    T34_domain_domain_CatalogueLinterError_ScanFailed[ScanFailed]
+  end
+  subgraph T37_domain_domain_CatalogueLinterRuleKind["tddd::catalogue_linter::CatalogueLinterRuleKind"]
+    direction TB
+    T37_domain_domain_CatalogueLinterRuleKind__self[CatalogueLinterRuleKind]
+    T37_domain_domain_CatalogueLinterRuleKind_FieldEmpty[FieldEmpty]
+    T37_domain_domain_CatalogueLinterRuleKind_FieldNonEmpty[FieldNonEmpty]
+    T37_domain_domain_CatalogueLinterRuleKind_KindLayerConstraint[KindLayerConstraint]
+    T37_domain_domain_CatalogueLinterRuleKind_ReferencedRoleConstraint[ReferencedRoleConstraint]
+    T37_domain_domain_CatalogueLinterRuleKind_TraitImplRequired[TraitImplRequired]
+    T37_domain_domain_CatalogueLinterRuleKind_NoRoleInMethodSignature[NoRoleInMethodSignature]
+    T37_domain_domain_CatalogueLinterRuleKind_MethodReferenceSignature[MethodReferenceSignature]
+    T37_domain_domain_CatalogueLinterRuleKind_AccessorSignatureRequired[AccessorSignatureRequired]
+    T37_domain_domain_CatalogueLinterRuleKind_FieldElementUniqueAcrossEntries[FieldElementUniqueAcrossEntries]
+    T37_domain_domain_CatalogueLinterRuleKind_NoExternalReferenceInMethods[NoExternalReferenceInMethods]
+    T37_domain_domain_CatalogueLinterRuleKind_NoPublicField[NoPublicField]
+    T37_domain_domain_CatalogueLinterRuleKind_ForbiddenMethodReceiver[ForbiddenMethodReceiver]
+    T37_domain_domain_CatalogueLinterRuleKind_ForbidPrimitiveInTypes[ForbidPrimitiveInTypes]
+    T37_domain_domain_CatalogueLinterRuleKind_discriminant_name([discriminant_name])
+  end
+  subgraph T21_domain_domain_LayerId["tddd::layer_id::LayerId"]
+    direction TB
+    T21_domain_domain_LayerId__self[LayerId]
+    T21_domain_domain_LayerId_try_new([try_new])
+  end
+  subgraph T25_domain_domain_NonEmptyVec["tddd::catalogue_v2::roles::NonEmptyVec"]
+    direction TB
+    T25_domain_domain_NonEmptyVec__self[NonEmptyVec]
+    T25_domain_domain_NonEmptyVec_new([new])
+    T25_domain_domain_NonEmptyVec_try_new([try_new])
+    T25_domain_domain_NonEmptyVec_as_slice([as_slice])
+    T25_domain_domain_NonEmptyVec_first([first])
+  end
+  subgraph T27_domain_domain_PrimitiveName["tddd::primitive_occurrence_scanner::PrimitiveName"]
+    direction TB
+    T27_domain_domain_PrimitiveName__self[PrimitiveName]
+    T27_domain_domain_PrimitiveName_new([new])
+    T27_domain_domain_PrimitiveName_as_str([as_str])
+  end
+  subgraph T41_domain_domain_PrimitiveOccurrencePosition["tddd::primitive_occurrence_scanner::PrimitiveOccurrencePosition"]
+    direction TB
+    T41_domain_domain_PrimitiveOccurrencePosition__self[PrimitiveOccurrencePosition]
+    T41_domain_domain_PrimitiveOccurrencePosition_NamedField[NamedField]
+    T41_domain_domain_PrimitiveOccurrencePosition_VariantField[VariantField]
+    T41_domain_domain_PrimitiveOccurrencePosition_Param[Param]
+    T41_domain_domain_PrimitiveOccurrencePosition_Return[Return]
+    T41_domain_domain_PrimitiveOccurrencePosition_Bound[Bound]
+    T41_domain_domain_PrimitiveOccurrencePosition_TypeAliasTarget[TypeAliasTarget]
+    T41_domain_domain_PrimitiveOccurrencePosition_ResultErr[ResultErr]
+  end
+  subgraph T39_domain_domain_PrimitiveOccurrenceReport["tddd::primitive_occurrence_scanner::PrimitiveOccurrenceReport"]
+    direction TB
+    T39_domain_domain_PrimitiveOccurrenceReport__self[PrimitiveOccurrenceReport]
+    T39_domain_domain_PrimitiveOccurrenceReport_new([new])
+    T39_domain_domain_PrimitiveOccurrenceReport_by_position([by_position])
+  end
+  subgraph T42_domain_domain_PrimitiveOccurrenceScanError["tddd::primitive_occurrence_scanner::PrimitiveOccurrenceScanError"]
+    direction TB
+    T42_domain_domain_PrimitiveOccurrenceScanError__self[PrimitiveOccurrenceScanError]
+    T42_domain_domain_PrimitiveOccurrenceScanError_ParseFailure[ParseFailure]
+    T42_domain_domain_PrimitiveOccurrenceScanError_InvalidSitePosition[InvalidSitePosition]
+  end
+  subgraph T30_domain_domain_RolePayloadField["tddd::catalogue_linter::RolePayloadField"]
+    direction TB
+    T30_domain_domain_RolePayloadField__self[RolePayloadField]
+    T30_domain_domain_RolePayloadField_Invariants[Invariants]
+    T30_domain_domain_RolePayloadField_Identity[Identity]
+    T30_domain_domain_RolePayloadField_ExclusiveMembers[ExclusiveMembers]
+    T30_domain_domain_RolePayloadField_SharedValueObjects[SharedValueObjects]
+    T30_domain_domain_RolePayloadField_Emits[Emits]
+    T30_domain_domain_RolePayloadField_Handles[Handles]
+    T30_domain_domain_RolePayloadField_ReactsTo[ReactsTo]
+    T30_domain_domain_RolePayloadField_Aggregate[Aggregate]
+  end
+  subgraph T26_domain_domain_SelfReceiver["tddd::catalogue_v2::roles::SelfReceiver"]
+    direction TB
+    T26_domain_domain_SelfReceiver__self[SelfReceiver]
+    T26_domain_domain_SelfReceiver_Owned[Owned]
+    T26_domain_domain_SelfReceiver_SharedRef[SharedRef]
+    T26_domain_domain_SelfReceiver_ExclusiveRef[ExclusiveRef]
+  end
+  subgraph T21_domain_domain_TypeRef["tddd::catalogue_v2::identifiers::TypeRef"]
+    direction TB
+    T21_domain_domain_TypeRef__self[TypeRef]
+    T21_domain_domain_TypeRef_new([new])
+    T21_domain_domain_TypeRef_as_str([as_str])
+  end
+  subgraph R40_domain_domain_PrimitiveOccurrenceScanner["tddd::primitive_occurrence_scanner::PrimitiveOccurrenceScanner"]
+    direction TB
+    R40_domain_domain_PrimitiveOccurrenceScanner__self[PrimitiveOccurrenceScanner]
+    R40_domain_domain_PrimitiveOccurrenceScanner_scan([scan])
+  end
+  F75_domain_domain_domain__tddd__catalogue_linter__eval__evaluate_catalogue_lint[[evaluate_catalogue_lint]]
+  end
+end
+subgraph usecase["usecase"]
+  direction TB
+  subgraph usecase_usecase_module_catalogue_lint_workflow["usecase::catalogue_lint_workflow"]
+    direction TB
+  subgraph T28_usecase_usecase_LintRuleKind["catalogue_lint_workflow::LintRuleKind"]
+    direction TB
+    T28_usecase_usecase_LintRuleKind__self[LintRuleKind]
+    T28_usecase_usecase_LintRuleKind_FieldEmpty[FieldEmpty]
+    T28_usecase_usecase_LintRuleKind_FieldNonEmpty[FieldNonEmpty]
+    T28_usecase_usecase_LintRuleKind_KindLayerConstraint[KindLayerConstraint]
+    T28_usecase_usecase_LintRuleKind_ReferencedRoleConstraint[ReferencedRoleConstraint]
+    T28_usecase_usecase_LintRuleKind_TraitImplRequired[TraitImplRequired]
+    T28_usecase_usecase_LintRuleKind_NoRoleInMethodSignature[NoRoleInMethodSignature]
+    T28_usecase_usecase_LintRuleKind_MethodReferenceSignature[MethodReferenceSignature]
+    T28_usecase_usecase_LintRuleKind_AccessorSignatureRequired[AccessorSignatureRequired]
+    T28_usecase_usecase_LintRuleKind_FieldElementUniqueAcrossEntries[FieldElementUniqueAcrossEntries]
+    T28_usecase_usecase_LintRuleKind_NoExternalReferenceInMethods[NoExternalReferenceInMethods]
+    T28_usecase_usecase_LintRuleKind_NoPublicField[NoPublicField]
+    T28_usecase_usecase_LintRuleKind_ForbiddenMethodReceiver[ForbiddenMethodReceiver]
+    T28_usecase_usecase_LintRuleKind_ForbidPrimitiveInTypes[ForbidPrimitiveInTypes]
+  end
+  subgraph T42_usecase_usecase_RunCatalogueLintInteractor["catalogue_lint_workflow::RunCatalogueLintInteractor"]
+    direction TB
+    T42_usecase_usecase_RunCatalogueLintInteractor__self[RunCatalogueLintInteractor]
+    T42_usecase_usecase_RunCatalogueLintInteractor_new([new])
+  end
+  subgraph R32_usecase_usecase_LintConfigLoader["catalogue_lint_workflow::LintConfigLoader"]
+    direction TB
+    R32_usecase_usecase_LintConfigLoader__self[LintConfigLoader]
+    R32_usecase_usecase_LintConfigLoader_load([load])
+  end
+  subgraph R32_usecase_usecase_RunCatalogueLint["catalogue_lint_workflow::RunCatalogueLint"]
+    direction TB
+    R32_usecase_usecase_RunCatalogueLint__self[RunCatalogueLint]
+    R32_usecase_usecase_RunCatalogueLint_execute([execute])
+  end
+  end
+end
+subgraph infrastructure["infrastructure"]
+  direction TB
+  subgraph infrastructure_infrastructure_module_tddd["infrastructure::tddd"]
+    direction TB
+  subgraph T59_infrastructure_infrastructure_SynPrimitiveOccurrenceScanner["tddd::syn_primitive_occurrence_scanner::SynPrimitiveOccurrenceScanner"]
+    direction TB
+    T59_infrastructure_infrastructure_SynPrimitiveOccurrenceScanner__self[SynPrimitiveOccurrenceScanner]
+  end
+  end
+end
+subgraph cli_driver["cli_driver"]
+  direction TB
+end
+subgraph cli_composition["cli_composition"]
+  direction TB
+end
+subgraph cli["cli"]
+  direction TB
+end
+T34_domain_domain_CatalogueLinterError_ScanFailed --o T42_domain_domain_PrimitiveOccurrenceScanError__self
+T37_domain_domain_CatalogueLinterRuleKind_FieldEmpty --o|target_field| T30_domain_domain_RolePayloadField__self
+T37_domain_domain_CatalogueLinterRuleKind_FieldNonEmpty --o|target_field| T30_domain_domain_RolePayloadField__self
+T37_domain_domain_CatalogueLinterRuleKind_KindLayerConstraint --o|permitted_layers| T21_domain_domain_LayerId__self
+T37_domain_domain_CatalogueLinterRuleKind_KindLayerConstraint --o|permitted_layers| T25_domain_domain_NonEmptyVec__self
+T37_domain_domain_CatalogueLinterRuleKind_ReferencedRoleConstraint --o|target_field| T30_domain_domain_RolePayloadField__self
+T37_domain_domain_CatalogueLinterRuleKind_TraitImplRequired --o|required_traits| T25_domain_domain_NonEmptyVec__self
+T37_domain_domain_CatalogueLinterRuleKind_TraitImplRequired --o|required_traits| T21_domain_domain_TypeRef__self
+T37_domain_domain_CatalogueLinterRuleKind_NoRoleInMethodSignature --o|forbidden_roles| T25_domain_domain_NonEmptyVec__self
+T37_domain_domain_CatalogueLinterRuleKind_MethodReferenceSignature --o|target_field| T30_domain_domain_RolePayloadField__self
+T37_domain_domain_CatalogueLinterRuleKind_AccessorSignatureRequired --o|target_field| T30_domain_domain_RolePayloadField__self
+T37_domain_domain_CatalogueLinterRuleKind_FieldElementUniqueAcrossEntries --o|target_field| T30_domain_domain_RolePayloadField__self
+T37_domain_domain_CatalogueLinterRuleKind_NoExternalReferenceInMethods --o|target_field| T30_domain_domain_RolePayloadField__self
+T37_domain_domain_CatalogueLinterRuleKind_ForbiddenMethodReceiver --o|forbidden_receiver| T26_domain_domain_SelfReceiver__self
+T37_domain_domain_CatalogueLinterRuleKind_ForbidPrimitiveInTypes --o|primitives| T25_domain_domain_NonEmptyVec__self
+T37_domain_domain_CatalogueLinterRuleKind_ForbidPrimitiveInTypes --o|primitives| T27_domain_domain_PrimitiveName__self
+T37_domain_domain_CatalogueLinterRuleKind_ForbidPrimitiveInTypes --o|layers| T21_domain_domain_LayerId__self
+T37_domain_domain_CatalogueLinterRuleKind_ForbidPrimitiveInTypes --o|layers| T25_domain_domain_NonEmptyVec__self
+T37_domain_domain_CatalogueLinterRuleKind_ForbidPrimitiveInTypes --o|positions| T25_domain_domain_NonEmptyVec__self
+T37_domain_domain_CatalogueLinterRuleKind_ForbidPrimitiveInTypes --o|positions| T41_domain_domain_PrimitiveOccurrencePosition__self
+T21_domain_domain_LayerId_try_new --> T21_domain_domain_LayerId__self
+T25_domain_domain_NonEmptyVec_new --> T25_domain_domain_NonEmptyVec__self
+T25_domain_domain_NonEmptyVec_try_new --> T25_domain_domain_NonEmptyVec__self
+T27_domain_domain_PrimitiveName_new --> T27_domain_domain_PrimitiveName__self
+T39_domain_domain_PrimitiveOccurrenceReport_new --o T27_domain_domain_PrimitiveName__self
+T39_domain_domain_PrimitiveOccurrenceReport_new --o T41_domain_domain_PrimitiveOccurrencePosition__self
+T39_domain_domain_PrimitiveOccurrenceReport_new --> T39_domain_domain_PrimitiveOccurrenceReport__self
+T39_domain_domain_PrimitiveOccurrenceReport_by_position --> T27_domain_domain_PrimitiveName__self
+T39_domain_domain_PrimitiveOccurrenceReport_by_position --> T41_domain_domain_PrimitiveOccurrencePosition__self
+T42_domain_domain_PrimitiveOccurrenceScanError_ParseFailure --o|type_ref| T21_domain_domain_TypeRef__self
+T42_domain_domain_PrimitiveOccurrenceScanError_InvalidSitePosition --o|position| T41_domain_domain_PrimitiveOccurrencePosition__self
+T21_domain_domain_TypeRef_new --> T21_domain_domain_TypeRef__self
+R40_domain_domain_PrimitiveOccurrenceScanner_scan --o T21_domain_domain_TypeRef__self
+R40_domain_domain_PrimitiveOccurrenceScanner_scan --o T25_domain_domain_NonEmptyVec__self
+R40_domain_domain_PrimitiveOccurrenceScanner_scan --o T27_domain_domain_PrimitiveName__self
+R40_domain_domain_PrimitiveOccurrenceScanner_scan --o T41_domain_domain_PrimitiveOccurrencePosition__self
+R40_domain_domain_PrimitiveOccurrenceScanner_scan --> T39_domain_domain_PrimitiveOccurrenceReport__self
+R40_domain_domain_PrimitiveOccurrenceScanner_scan --> T42_domain_domain_PrimitiveOccurrenceScanError__self
+F75_domain_domain_domain__tddd__catalogue_linter__eval__evaluate_catalogue_lint --o T21_domain_domain_LayerId__self
+F75_domain_domain_domain__tddd__catalogue_linter__eval__evaluate_catalogue_lint --o T21_domain_domain_LayerId__self
+F75_domain_domain_domain__tddd__catalogue_linter__eval__evaluate_catalogue_lint --> T34_domain_domain_CatalogueLinterError__self
+T42_usecase_usecase_RunCatalogueLintInteractor_new --> T42_usecase_usecase_RunCatalogueLintInteractor__self
+T42_usecase_usecase_RunCatalogueLintInteractor__self -.impl.-> R32_usecase_usecase_RunCatalogueLint__self
+T59_infrastructure_infrastructure_SynPrimitiveOccurrenceScanner__self -.impl.-> R40_domain_domain_PrimitiveOccurrenceScanner__self
+class T34_domain_domain_CatalogueLinterError_InvalidRuleConfig variant_node
+class T34_domain_domain_CatalogueLinterError_UnknownLayer variant_node
+class T34_domain_domain_CatalogueLinterError_ScanFailed variant_node
+class T34_domain_domain_CatalogueLinterError__self error_type
+class T37_domain_domain_CatalogueLinterRuleKind_FieldEmpty variant_node
+class T37_domain_domain_CatalogueLinterRuleKind_FieldNonEmpty variant_node
+class T37_domain_domain_CatalogueLinterRuleKind_KindLayerConstraint variant_node
+class T37_domain_domain_CatalogueLinterRuleKind_ReferencedRoleConstraint variant_node
+class T37_domain_domain_CatalogueLinterRuleKind_TraitImplRequired variant_node
+class T37_domain_domain_CatalogueLinterRuleKind_NoRoleInMethodSignature variant_node
+class T37_domain_domain_CatalogueLinterRuleKind_MethodReferenceSignature variant_node
+class T37_domain_domain_CatalogueLinterRuleKind_AccessorSignatureRequired variant_node
+class T37_domain_domain_CatalogueLinterRuleKind_FieldElementUniqueAcrossEntries variant_node
+class T37_domain_domain_CatalogueLinterRuleKind_NoExternalReferenceInMethods variant_node
+class T37_domain_domain_CatalogueLinterRuleKind_NoPublicField variant_node
+class T37_domain_domain_CatalogueLinterRuleKind_ForbiddenMethodReceiver variant_node
+class T37_domain_domain_CatalogueLinterRuleKind_ForbidPrimitiveInTypes variant_node
+class T37_domain_domain_CatalogueLinterRuleKind_discriminant_name method_node
+class T37_domain_domain_CatalogueLinterRuleKind__self value_object
+class T21_domain_domain_LayerId_try_new method_node
+class T21_domain_domain_LayerId__self value_object
+class T25_domain_domain_NonEmptyVec_new method_node
+class T25_domain_domain_NonEmptyVec_try_new method_node
+class T25_domain_domain_NonEmptyVec_as_slice method_node
+class T25_domain_domain_NonEmptyVec_first method_node
+class T25_domain_domain_NonEmptyVec__self value_object
+class T27_domain_domain_PrimitiveName_new method_node
+class T27_domain_domain_PrimitiveName_as_str method_node
+class T27_domain_domain_PrimitiveName__self value_object
+class T41_domain_domain_PrimitiveOccurrencePosition_NamedField variant_node
+class T41_domain_domain_PrimitiveOccurrencePosition_VariantField variant_node
+class T41_domain_domain_PrimitiveOccurrencePosition_Param variant_node
+class T41_domain_domain_PrimitiveOccurrencePosition_Return variant_node
+class T41_domain_domain_PrimitiveOccurrencePosition_Bound variant_node
+class T41_domain_domain_PrimitiveOccurrencePosition_TypeAliasTarget variant_node
+class T41_domain_domain_PrimitiveOccurrencePosition_ResultErr variant_node
+class T41_domain_domain_PrimitiveOccurrencePosition__self value_object
+class T39_domain_domain_PrimitiveOccurrenceReport_new method_node
+class T39_domain_domain_PrimitiveOccurrenceReport_by_position method_node
+class T39_domain_domain_PrimitiveOccurrenceReport__self value_object
+class T42_domain_domain_PrimitiveOccurrenceScanError_ParseFailure variant_node
+class T42_domain_domain_PrimitiveOccurrenceScanError_InvalidSitePosition variant_node
+class T42_domain_domain_PrimitiveOccurrenceScanError__self error_type
+class T30_domain_domain_RolePayloadField_Invariants variant_node
+class T30_domain_domain_RolePayloadField_Identity variant_node
+class T30_domain_domain_RolePayloadField_ExclusiveMembers variant_node
+class T30_domain_domain_RolePayloadField_SharedValueObjects variant_node
+class T30_domain_domain_RolePayloadField_Emits variant_node
+class T30_domain_domain_RolePayloadField_Handles variant_node
+class T30_domain_domain_RolePayloadField_ReactsTo variant_node
+class T30_domain_domain_RolePayloadField_Aggregate variant_node
+class T30_domain_domain_RolePayloadField__self value_object
+class T26_domain_domain_SelfReceiver_Owned variant_node
+class T26_domain_domain_SelfReceiver_SharedRef variant_node
+class T26_domain_domain_SelfReceiver_ExclusiveRef variant_node
+class T26_domain_domain_SelfReceiver__self value_object
+class T21_domain_domain_TypeRef_new method_node
+class T21_domain_domain_TypeRef_as_str method_node
+class T21_domain_domain_TypeRef__self value_object
+class R40_domain_domain_PrimitiveOccurrenceScanner_scan method_node
+class R40_domain_domain_PrimitiveOccurrenceScanner__self secondary_port
+class F75_domain_domain_domain__tddd__catalogue_linter__eval__evaluate_catalogue_lint free_function
+class F75_domain_domain_domain__tddd__catalogue_linter__eval__evaluate_catalogue_lint function_node
+class T28_usecase_usecase_LintRuleKind_FieldEmpty variant_node
+class T28_usecase_usecase_LintRuleKind_FieldNonEmpty variant_node
+class T28_usecase_usecase_LintRuleKind_KindLayerConstraint variant_node
+class T28_usecase_usecase_LintRuleKind_ReferencedRoleConstraint variant_node
+class T28_usecase_usecase_LintRuleKind_TraitImplRequired variant_node
+class T28_usecase_usecase_LintRuleKind_NoRoleInMethodSignature variant_node
+class T28_usecase_usecase_LintRuleKind_MethodReferenceSignature variant_node
+class T28_usecase_usecase_LintRuleKind_AccessorSignatureRequired variant_node
+class T28_usecase_usecase_LintRuleKind_FieldElementUniqueAcrossEntries variant_node
+class T28_usecase_usecase_LintRuleKind_NoExternalReferenceInMethods variant_node
+class T28_usecase_usecase_LintRuleKind_NoPublicField variant_node
+class T28_usecase_usecase_LintRuleKind_ForbiddenMethodReceiver variant_node
+class T28_usecase_usecase_LintRuleKind_ForbidPrimitiveInTypes variant_node
+class T28_usecase_usecase_LintRuleKind__self dto
+class T42_usecase_usecase_RunCatalogueLintInteractor_new method_node
+class T42_usecase_usecase_RunCatalogueLintInteractor__self interactor
+class R32_usecase_usecase_LintConfigLoader_load method_node
+class R32_usecase_usecase_LintConfigLoader__self secondary_port
+class R32_usecase_usecase_RunCatalogueLint_execute method_node
+class R32_usecase_usecase_RunCatalogueLint__self app_service
+class T59_infrastructure_infrastructure_SynPrimitiveOccurrenceScanner__self secondary_adapter
+```

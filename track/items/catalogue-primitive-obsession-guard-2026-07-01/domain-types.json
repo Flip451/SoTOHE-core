@@ -1,0 +1,460 @@
+{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "PrimitiveOccurrencePosition": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "NamedField", "payload": { "kind": "unit" } },
+          { "name": "VariantField", "payload": { "kind": "unit" } },
+          { "name": "Param", "payload": { "kind": "unit" } },
+          { "name": "Return", "payload": { "kind": "unit" } },
+          { "name": "Bound", "payload": { "kind": "unit" } },
+          { "name": "TypeAliasTarget", "payload": { "kind": "unit" } },
+          { "name": "ResultErr", "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::primitive_occurrence_scanner",
+      "docs": "Position taxonomy for primitive-occurrence detection inside a single catalogue TypeRef's parsed type-tree (ADR 2026-07-01-0004 D1/D2, spec AC-02/AC-03/IN-02). NamedField / VariantField / Param / Return / Bound / TypeAliasTarget are the catalogue-structural call sites a TypeRef can be scanned from; the caller (evaluate_catalogue_lint) already knows which one applies before invoking the scanner, since it is iterating the corresponding catalogue slot, and passes it as PrimitiveOccurrenceScanner::scan's `position` argument. TypeAliasTarget is the 7th of these sites, added to close a gap where the original 6-variant enum could not represent a type_alias's target type as a scan site even though spec IN-02 explicitly lists it as in-scope. Param / Return / Bound are reused, not caller-exclusive: the scan additionally applies these same three labels to occurrences found by recursively descending into a nested callable-type signature's own parameter / return slots, or into a nested generic-bound clause, discovered anywhere inside the scanned TypeRef's tree independent of the outer `position` the caller supplied -- e.g. a String occurring as the parameter type of a Box<dyn Fn(String) -> _> field is labelled Param even though the field itself is scanned with position=NamedField, so both the nested Param occurrence and any top-level NamedField occurrence in the same tree are distinguishable in the resulting report instead of collapsing together. ResultErr is the one position that is exclusively scan-intrinsic and never caller-suppliable: the second generic argument of a 2-generic-argument Result path segment found anywhere in the tree (at any nesting depth), reclassified as ResultErr regardless of the outer `position` or of nested Param/Return/Bound detection, distinct from the Result's first (Ok) argument which keeps whichever classification otherwise applies to its own position in the tree. Passing ResultErr as the `position` argument to scan is a caller contract violation reported via PrimitiveOccurrenceScanError::InvalidSitePosition.",
+      "spec_refs": [
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "AC-02" },
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "AC-03" },
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "IN-02" }
+      ],
+      "informal_grounds": []
+    },
+    "PrimitiveOccurrenceReport": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "occurrences", "ty": "std::collections::BTreeMap<PrimitiveOccurrencePosition, std::collections::BTreeSet<PrimitiveName>>" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Constructs a report from the per-position primitive-name occurrence sets found during a scan."
+        },
+        {
+          "name": "by_position",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&std::collections::BTreeMap<PrimitiveOccurrencePosition, std::collections::BTreeSet<PrimitiveName>>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns the full per-position map of requested primitive names found during the scan, keyed by the PrimitiveOccurrencePosition each was found at."
+        }
+      ],
+      "module_path": "tddd::primitive_occurrence_scanner",
+      "docs": "Outcome of scanning one TypeRef's parsed type-tree for a requested set of forbidden-primitive names (ADR 2026-07-01-0004 D2, spec AC-02/AC-03/IN-02). Occurrences are grouped by PrimitiveOccurrencePosition rather than collapsed into an ordinary-vs-result_err split: each key is one position the scan is able to distinguish (the caller-supplied top-level site -- NamedField / VariantField / Param / Return / Bound / TypeAliasTarget -- for occurrences found at the top of the tree, or one of Param / Return / Bound / ResultErr for occurrences found via recursive descent into a nested callable-type signature, generic-bound clause, or Result error slot respectively, regardless of the top-level site), and each value is the subset of requested primitive names found at that position. This corrects an earlier two-bucket shape (an ordinary()/result_err() BTreeSet<PrimitiveName> accessor pair, with the outer catalogue position supplied entirely by the caller after the fact) that could not distinguish e.g. a nested Param occurrence inside a Box<dyn Fn(String) -> _> field's type from the field's own outer NamedField position when both occurred inside the same TypeRef tree, making T004/IN-02/AC-02 unsatisfiable for nested non-field positions. evaluate_catalogue_lint checks, for each position in a ForbidPrimitiveInTypes rule's `positions` set, whether by_position() holds a non-empty entry for that position. The map is private (has_stripped_fields: true); access is via the by_position() accessor. Keys are PrimitiveOccurrencePosition (Ord-derived for BTreeMap use) and set elements are PrimitiveName (a validated newtype -- see PrimitiveName's own docs for the full derivation) rather than raw String: this corrects this track's own prior draft, which reasoned that the forbidden-primitive set being user-configurable and open-ended (ADR D1) justified a bare String element type -- but R9's open-ended-value-space branch still calls for a validated identifier newtype, not an unvalidated primitive; 'open-ended' justifies a newtype over an enum, not a newtype over a raw String. Fixed in the same self-application (dogfooding) pass that introduces ForbidPrimitiveInTypes.",
+      "spec_refs": [
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "AC-02" },
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "AC-03" },
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "IN-02" }
+      ],
+      "informal_grounds": []
+    },
+    "PrimitiveOccurrenceScanError": {
+      "action": "add",
+      "role": { "ErrorType": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "ParseFailure", "payload": { "kind": "struct", "fields": [{ "name": "type_ref", "ty": "TypeRef" }] } },
+          { "name": "InvalidSitePosition", "payload": { "kind": "struct", "fields": [{ "name": "position", "ty": "PrimitiveOccurrencePosition" }] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::primitive_occurrence_scanner",
+      "docs": "Failure produced by a PrimitiveOccurrenceScanner adapter (ADR 2026-07-01-0004 D3, spec CN-01/AC-04). ParseFailure { type_ref } is returned when a catalogue TypeRef string cannot be parsed by syn; it carries the offending TypeRef (a domain value object) rather than a raw String so this error type does not itself introduce a primitive-obsession occurrence for the very rule it exists to support. InvalidSitePosition { position } is returned when PrimitiveOccurrenceScanner::scan is called with `position` set to PrimitiveOccurrencePosition::ResultErr, which is not a valid catalogue-structural call site -- ResultErr is exclusively scan-intrinsic (see PrimitiveOccurrencePosition's docs), so accepting it as `position` would be a caller contract violation; this variant lets the adapter fail closed instead of behaving ambiguously. Added during this track's Phase 2 finding-driven fix-up, alongside scan's new position parameter.",
+      "spec_refs": [
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "AC-04" },
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "CN-01" }
+      ],
+      "informal_grounds": []
+    },
+    "PrimitiveName": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "tuple", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [{ "name": "s", "ty": "impl Into<String>" }],
+          "returns": "Result<Self, IdentifierError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Constructs a PrimitiveName from any string-like input, validating it is a syntactically valid Rust identifier (non-empty, ASCII alphanumeric + underscore, no leading digit) -- the same shape a syn::Ident token itself requires, since PrimitiveName values are compared against parsed syn::Ident nodes by exact equality during a scan."
+        },
+        {
+          "name": "as_str",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns the underlying string slice."
+        }
+      ],
+      "module_path": "tddd::primitive_occurrence_scanner",
+      "docs": "Validated bare Rust identifier naming one forbidden/candidate primitive type (e.g. \"String\", \"i32\", \"u8\") for primitive-occurrence scanning (ADR 2026-07-01-0004 D1/D2, spec AC-02/AC-03). Introduced during this track's self-application (dogfooding) fix, replacing the prior draft's raw String element type on PrimitiveOccurrenceReport's per-position occurrence sets (originally an ordinary()/result_err() two-bucket split, generalized to a position-keyed BTreeMap<PrimitiveOccurrencePosition, BTreeSet<PrimitiveName>> during this track's later Finding-2 fix-up -- see PrimitiveOccurrenceReport's own docs), PrimitiveOccurrenceScanner::scan's primitives parameter, and CatalogueLinterRuleKind::ForbidPrimitiveInTypes.primitives. Deliberately a new type rather than reuse of an existing tddd::catalogue_v2::identifiers newtype: TypeName is scoped to 'CatalogueDocument::types map keys' and FieldName to 'FieldDecl.name' -- both are catalogue-authoring-surface concepts unrelated to 'a candidate identifier searched for during a syn AST walk'. TypeRef is too permissive for this purpose: it explicitly allows generics and :: path qualifiers (e.g. \"core::convert::From<MyError>\"), whereas primitive-occurrence matching is an exact syn::Ident comparison with no path or generic component -- reusing TypeRef would admit nonsensical configured values (e.g. \"Vec<String>\") that could never match any single ident during the scan. PrimitiveName shares TypeRef's exact validation shape and derive set (Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash) since both are Identifier-validated newtypes in the same family; Ord/PartialOrd are required because PrimitiveOccurrenceReport stores elements in BTreeSet<PrimitiveName>. Unlike RolePayloadField, this is a newtype rather than an enum because the forbidden-primitive-name set itself remains open-ended and user-configurable by design (ADR D1; no fixed project-defined enumeration of 'primitives' exists) -- R9's 'validated identifier, open-ended value space' branch, not its 'finite set' branch.",
+      "spec_refs": [
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "AC-02" },
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "AC-03" }
+      ],
+      "informal_grounds": []
+    },
+    "RolePayloadField": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Invariants", "payload": { "kind": "unit" } },
+          { "name": "Identity", "payload": { "kind": "unit" } },
+          { "name": "ExclusiveMembers", "payload": { "kind": "unit" } },
+          { "name": "SharedValueObjects", "payload": { "kind": "unit" } },
+          { "name": "Emits", "payload": { "kind": "unit" } },
+          { "name": "Handles", "payload": { "kind": "unit" } },
+          { "name": "ReactsTo", "payload": { "kind": "unit" } },
+          { "name": "Aggregate", "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::catalogue_linter",
+      "docs": "Closed enumeration of the DataRole / ContractRole payload field names a CatalogueLinterRuleKind variant can target. Introduced during this track's self-application (dogfooding) fix: this track's own primitive-obsession lint, once active under the ADR's default named_field/variant_field x String config, would otherwise flag CatalogueLinterRuleKind's own target_field: String fields. The 8 variants are drawn exhaustively from DataRole's variant payload field names (ValueObject.invariants; Entity.identity, Entity.invariants; AggregateRoot.identity, .invariants, .exclusive_members, .shared_value_objects, .emits; DomainService.emits; UseCase.handles; EventPolicy.reacts_to) and ContractRole's variant payload field name (Repository.aggregate) -- confirmed exhaustively against catalogue_linter_helpers::validate_data_role_field (6 values: invariants, exclusive_members, shared_value_objects, emits, handles, reacts_to), validate_contract_role_field (1 value: aggregate), and AccessorSignatureRequired's separately hardcoded 'identity' check. Deliberately NOT the pre-existing FieldName newtype (tddd::catalogue_v2::identifiers) -- FieldName validates 'is this a syntactically valid Rust identifier usable as a struct field name' (an open, unconstrained namespace used for FieldDecl.name), whereas RolePayloadField is a genuinely closed, code-defined 8-value set tied 1:1 to DataRole/ContractRole's actual variant payload fields; reusing FieldName would under-constrain a value space that is exhaustively enumerable today (R9 'finite set -> enum' branch). Replaces target_field: String on FieldEmpty, FieldNonEmpty, ReferencedRoleConstraint, MethodReferenceSignature, AccessorSignatureRequired, FieldElementUniqueAcrossEntries, and NoExternalReferenceInMethods. Per-variant subset restrictions (e.g. MethodReferenceSignature only accepting Invariants; AccessorSignatureRequired only accepting Identity; FieldElementUniqueAcrossEntries / NoExternalReferenceInMethods only accepting ExclusiveMembers) remain necessary runtime checks in evaluate_catalogue_lint -- an enum only enforces membership in the full 8-value set, not which subset is legal for a specific rule kind, so these narrower checks are restated as enum-variant equality instead of string equality, not eliminated. The now-provably-unreachable generic 'not a recognised field name at all' catch-all branches of validate_data_role_field / validate_contract_role_field, and the target_field.is_empty() checks inside CatalogueLinterRule::new, become dead code once this type lands; pruning them is an implementation-time decision left to impl-planner / implementer, out of this catalogue's scope.",
+      "spec_refs": [
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "AC-01" },
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "IN-06" }
+      ],
+      "informal_grounds": []
+    },
+    "CatalogueLinterRuleKind": {
+      "action": "modify",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "FieldEmpty", "payload": { "kind": "struct", "fields": [{ "name": "target_field", "ty": "RolePayloadField" }] } },
+          { "name": "FieldNonEmpty", "payload": { "kind": "struct", "fields": [{ "name": "target_field", "ty": "RolePayloadField" }] } },
+          { "name": "KindLayerConstraint", "payload": { "kind": "struct", "fields": [{ "name": "permitted_layers", "ty": "NonEmptyVec<LayerId>" }] } },
+          { "name": "ReferencedRoleConstraint", "payload": { "kind": "struct", "fields": [{ "name": "target_field", "ty": "RolePayloadField" }, { "name": "expected_role", "ty": "RoleKind" }] } },
+          { "name": "TraitImplRequired", "payload": { "kind": "struct", "fields": [{ "name": "required_traits", "ty": "NonEmptyVec<TypeRef>" }] } },
+          { "name": "NoRoleInMethodSignature", "payload": { "kind": "struct", "fields": [{ "name": "forbidden_roles", "ty": "NonEmptyVec<RoleKind>" }] } },
+          { "name": "MethodReferenceSignature", "payload": { "kind": "struct", "fields": [{ "name": "target_field", "ty": "RolePayloadField" }] } },
+          { "name": "AccessorSignatureRequired", "payload": { "kind": "struct", "fields": [{ "name": "target_field", "ty": "RolePayloadField" }] } },
+          { "name": "FieldElementUniqueAcrossEntries", "payload": { "kind": "struct", "fields": [{ "name": "target_field", "ty": "RolePayloadField" }] } },
+          { "name": "NoExternalReferenceInMethods", "payload": { "kind": "struct", "fields": [{ "name": "target_field", "ty": "RolePayloadField" }] } },
+          { "name": "NoPublicField", "payload": { "kind": "unit" } },
+          { "name": "ForbiddenMethodReceiver", "payload": { "kind": "struct", "fields": [{ "name": "forbidden_receiver", "ty": "SelfReceiver" }] } },
+          { "name": "ForbidPrimitiveInTypes", "payload": { "kind": "struct", "fields": [
+            { "name": "primitives", "ty": "NonEmptyVec<PrimitiveName>" },
+            { "name": "layers", "ty": "NonEmptyVec<LayerId>" },
+            { "name": "positions", "ty": "NonEmptyVec<PrimitiveOccurrencePosition>" }
+          ] } }
+        ]
+      },
+      "methods": [
+        {
+          "name": "discriminant_name",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&'static str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns the discriminant name for display / violation reporting."
+        }
+      ],
+      "module_path": "tddd::catalogue_linter",
+      "docs": "Classifies what invariant a catalogue linter rule asserts (D15). Modify from baseline: adds a 13th variant, ForbidPrimitiveInTypes { primitives: NonEmptyVec<PrimitiveName>, layers: NonEmptyVec<LayerId>, positions: NonEmptyVec<PrimitiveOccurrencePosition> }, asserting that none of `primitives` occurs at any of `positions` within catalogue entries in `layers` (ADR 2026-07-01-0004 D6, spec AC-01/IN-06). Role-axis filtering is deliberately NOT part of this variant's payload -- it reuses the existing RuleTarget.target_roles mechanism unchanged (CN-03). `layers` elements are validated against architecture-rules.json; there is no \"all\" sentinel value (CN-04/AC-11). The 12 pre-existing variants (FieldEmpty through ForbiddenMethodReceiver) and the discriminant_name method are restated below with 4 field-type changes; no variant, method, or externally observable behavior is otherwise altered from baseline. Additionally replaces String / NonEmptyVec<String> field types across both the 12 pre-existing variants and the new 13th variant with domain enums/newtypes, because this track's own primitive-obsession lint, once active under the ADR's default named_field/variant_field x String config, would otherwise flag CatalogueLinterRuleKind itself -- a self-referential dogfooding fix folded into this same track's Phase 2 pass rather than deferred: (1) target_field (String, 7 occurrences across FieldEmpty, FieldNonEmpty, ReferencedRoleConstraint, MethodReferenceSignature, AccessorSignatureRequired, FieldElementUniqueAcrossEntries, NoExternalReferenceInMethods) becomes RolePayloadField, a new closed 8-variant enum exhaustively derived from DataRole / ContractRole's actual variant payload field names (see RolePayloadField); (2) forbidden_receiver (String, ForbiddenMethodReceiver) becomes SelfReceiver, the pre-existing 3-variant enum (Owned / SharedRef / ExclusiveRef) already used to validate this exact field inside CatalogueLinterRule::new via forbidden_receiver.parse::<SelfReceiver>() -- that fallible parse now happens wherever a CatalogueLinterRuleKind value is constructed from external input (e.g. the usecase-layer interactor's LintRuleKind-to-CatalogueLinterRuleKind conversion) instead of inside CatalogueLinterRule::new, since a SelfReceiver-typed field can no longer be unparseable by construction; (3) required_traits (NonEmptyVec<String>, TraitImplRequired) becomes NonEmptyVec<TypeRef>, matching TraitImplDeclV2.trait_ref's existing TypeRef-typed field and has_trait_impl's prefix/suffix comparison against it -- both represent the same 'possibly path-qualified or generic trait reference' concept, so this is type reuse, not a new type; (4) ForbidPrimitiveInTypes.primitives (NonEmptyVec<String>) becomes NonEmptyVec<PrimitiveName>, a new validated-bare-identifier newtype (see PrimitiveName for why this is a newtype rather than an enum, and why it is not a reuse of TypeRef or the catalogue_v2::identifiers TypeName/FieldName newtypes). permitted_layers (KindLayerConstraint), expected_role (ReferencedRoleConstraint), forbidden_roles (NoRoleInMethodSignature), and layers / positions (ForbidPrimitiveInTypes) were already domain-typed at baseline (NonEmptyVec<LayerId> / RoleKind / NonEmptyVec<RoleKind> / NonEmptyVec<LayerId> / NonEmptyVec<PrimitiveOccurrencePosition> respectively) and are unaffected by this pass. Implementers should note that CatalogueLinterRule::new's existing target_field.is_empty() / forbidden_receiver.is_empty() / forbidden_receiver.parse::<SelfReceiver>() validation branches, and the generic 'not a recognised field name at all' catch-all arms of catalogue_linter_helpers::validate_data_role_field / validate_contract_role_field, become provably unreachable once these fields are enum/newtype-typed; whether to prune CatalogueLinterRuleError::EmptyTargetField and those catch-all arms is an implementation-time decision, out of this catalogue's scope.",
+      "spec_refs": [
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "AC-01" },
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "IN-06" },
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "CN-03" },
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "CN-04" }
+      ],
+      "informal_grounds": []
+    },
+    "CatalogueLinterError": {
+      "action": "modify",
+      "role": { "ErrorType": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "InvalidRuleConfig", "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "UnknownLayer", "payload": { "kind": "struct", "fields": [{ "name": "layer_id", "ty": "String" }] } },
+          { "name": "ScanFailed", "payload": { "kind": "tuple", "fields": ["PrimitiveOccurrenceScanError"] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::catalogue_linter",
+      "docs": "Errors returned by evaluate_catalogue_lint. Modify from baseline: adds ScanFailed(#[from] PrimitiveOccurrenceScanError) -- #[error(transparent)] -- propagating a PrimitiveOccurrenceScanner failure encountered while evaluating a ForbidPrimitiveInTypes rule (ADR 2026-07-01-0004 D3, spec AC-04/IN-05). InvalidRuleConfig(String) and UnknownLayer { layer_id: String } are restated unchanged from baseline; neither is touched by this track's primitive-obsession self-application fix. InvalidRuleConfig(String) carries a free-text, unstructured rule-configuration validation-failure message with no fixed vocabulary or format -- R9's opaque-value exception (judgement procedure step 3: 'truly unconstrained opaque value'), rationale recorded here per R9's docs-recording requirement. UnknownLayer { layer_id: String } is left as-is: whether it should instead be layer_id: LayerId is a pre-existing question this track's scope does not extend to (this track's assigned dogfooding-tension enumeration was target_field / forbidden_receiver / required_traits / primitives, not UnknownLayer) -- noted in Open Questions rather than resolved here.",
+      "spec_refs": [
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "AC-04" },
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "IN-05" }
+      ],
+      "informal_grounds": []
+    },
+    "TypeRef": {
+      "action": "reference",
+      "role": { "ValueObject": {} },
+      "kind": { "kind": "struct", "shape": { "kind": "tuple", "fields": [], "has_stripped_fields": true } },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [{ "name": "s", "ty": "impl Into<String>" }],
+          "returns": "Result<Self, IdentifierError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Constructs a TypeRef from any string-like input, validating the identifier."
+        },
+        {
+          "name": "as_str",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns the underlying string slice."
+        }
+      ],
+      "module_path": "tddd::catalogue_v2::identifiers",
+      "docs": "Referenced unchanged from baseline -- used as the field type of PrimitiveOccurrenceScanError::ParseFailure.type_ref, the `type_ref` parameter of PrimitiveOccurrenceScanner::scan, and (newly, as of this track's self-application dogfooding fix) the element type of CatalogueLinterRuleKind::TraitImplRequired.required_traits (NonEmptyVec<TypeRef>, replacing NonEmptyVec<String>) -- matching TraitImplDeclV2.trait_ref's existing TypeRef-typed field and has_trait_impl's prefix/suffix matching against it, since both represent the same 'possibly path-qualified or generic trait reference' concept.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "SelfReceiver": {
+      "action": "reference",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Owned", "payload": { "kind": "unit" } },
+          { "name": "SharedRef", "payload": { "kind": "unit" } },
+          { "name": "ExclusiveRef", "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::catalogue_v2::roles",
+      "docs": "Referenced unchanged from baseline (pre-existing type; already used by CatalogueLinterRule::new to validate a rule's forbidden_receiver string via forbidden_receiver.parse::<SelfReceiver>()) -- newly adopted here, during this track's self-application (dogfooding) fix, as the field type of CatalogueLinterRuleKind::ForbiddenMethodReceiver.forbidden_receiver, replacing raw String. strum::Display / strum::EnumString map Owned <-> \"self\", SharedRef <-> \"&self\", ExclusiveRef <-> \"&mut self\" -- the exact 3 canonical method-receiver string forms forbidden_receiver was already restricted to at runtime; this is a mechanical shape swap (validated-string -> already-validated enum), not a new concept, so no new type is introduced for it (per this track's briefing, which explicitly called for consulting existing runtime string-comparison forms before inventing a new receiver-kind type).",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "NonEmptyVec": {
+      "action": "reference",
+      "role": { "ValueObject": {} },
+      "kind": { "kind": "struct", "shape": { "kind": "tuple", "fields": [], "has_stripped_fields": true } },
+      "methods": [],
+      "module_path": "tddd::catalogue_v2::roles",
+      "docs": "Referenced unchanged from baseline -- used as the element-collection type for CatalogueLinterRuleKind::ForbidPrimitiveInTypes.primitives (NonEmptyVec<PrimitiveName>) / .layers / .positions, CatalogueLinterRuleKind::TraitImplRequired.required_traits (NonEmptyVec<TypeRef>), and the `primitives` parameter of PrimitiveOccurrenceScanner::scan (NonEmptyVec<PrimitiveName>). Generic methods are declared via the top-level inherent_impls entry (impl_generics), not here.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "LayerId": {
+      "action": "reference",
+      "role": { "ValueObject": {} },
+      "kind": { "kind": "struct", "shape": { "kind": "tuple", "fields": [], "has_stripped_fields": true } },
+      "methods": [
+        {
+          "name": "try_new",
+          "receiver": null,
+          "params": [{ "name": "value", "ty": "impl Into<String>" }],
+          "returns": "Result<Self, ValidationError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Constructs a LayerId from any string-like input, validating the identifier."
+        }
+      ],
+      "module_path": "tddd::layer_id",
+      "docs": "Referenced unchanged from baseline -- used as the element type of CatalogueLinterRuleKind::ForbidPrimitiveInTypes.layers (NonEmptyVec<LayerId>).",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "traits": {
+    "PrimitiveOccurrenceScanner": {
+      "action": "add",
+      "role": { "SecondaryPort": {} },
+      "methods": [
+        {
+          "name": "scan",
+          "receiver": "&self",
+          "params": [
+            { "name": "type_ref", "ty": "TypeRef" },
+            { "name": "primitives", "ty": "NonEmptyVec<PrimitiveName>" },
+            { "name": "position", "ty": "PrimitiveOccurrencePosition" }
+          ],
+          "returns": "Result<PrimitiveOccurrenceReport, PrimitiveOccurrenceScanError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Scans a single TypeRef's parsed type-tree for occurrences of any primitive name in `primitives`, returning a report keyed by PrimitiveOccurrencePosition. `position` is the caller-known catalogue-structural site (NamedField / VariantField / Param / Return / Bound / TypeAliasTarget) this type_ref was extracted from, and labels top-level occurrences not otherwise classified by a structurally-nested position; passing PrimitiveOccurrencePosition::ResultErr as `position` is invalid and yields PrimitiveOccurrenceScanError::InvalidSitePosition. Occurrences discovered by recursing into a nested callable-type signature's own parameter / return slots or a nested generic-bound clause are labelled Param / Return / Bound respectively regardless of `position`, and occurrences in the second generic argument of a Result path segment are labelled ResultErr regardless of `position` or nesting depth -- both independent of the top-level `position` argument, consistent with a full recursive walk that performs no other engine-side position special-casing (ADR 2026-07-01-0004 D2)."
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "tddd::primitive_occurrence_scanner",
+      "docs": "Secondary port judging whether a single TypeRef's parsed type-tree contains any of a requested set of forbidden primitive names, reporting each found occurrence's PrimitiveOccurrencePosition (ADR 2026-07-01-0004 D3, spec AC-04/IN-05/IN-02). Domain owns this port's semantics only; the syn-based implementation is confined to an infrastructure adapter (CN-02) -- domain itself has no dependency on syn. The primitives parameter is NonEmptyVec<PrimitiveName> (a validated newtype, not a raw String, and not a domain enum) because the forbidden-primitive-name set is user-configurable and open-ended (ADR D1) -- ruling out an enum -- while still being a well-formed identifier that should be validated at construction rather than passed as an unvalidated primitive (R9's open-ended-value-space branch; corrects this track's own prior draft, which had reasoned open-endedness alone justified a raw String). The position parameter was added during this track's Phase 2 finding-driven fix-up: the prior 2-parameter scan signature left the caller-known top-level site implicit, forcing evaluate_catalogue_lint to attribute every non-result_err occurrence to that site after the fact regardless of whether the occurrence was actually found nested inside a callable-type signature or bound clause deeper in the same TypeRef tree -- collapsing e.g. a nested Param occurrence into the outer NamedField position. Threading position into scan lets the returned PrimitiveOccurrenceReport distinguish the two without any engine-side position special-casing (D2): the scanner still performs one uninterrupted full recursive walk, it now simply has the caller-supplied label available for the top-level slot.",
+      "spec_refs": [
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "AC-04" },
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "IN-05" },
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "CN-02" },
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "IN-02" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "functions": {
+    "domain::tddd::catalogue_linter::eval::evaluate_catalogue_lint": {
+      "action": "modify",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "rules", "ty": "&[CatalogueLinterRule]" },
+        { "name": "all_catalogues", "ty": "&std::collections::BTreeMap<LayerId, CatalogueDocument>" },
+        { "name": "target_layer_id", "ty": "&LayerId" },
+        { "name": "scanner", "ty": "&S" }
+      ],
+      "returns": "Result<Vec<CatalogueLintViolation>, CatalogueLinterError>",
+      "is_async": false,
+      "generics": [
+        { "name": "S", "bounds": ["PrimitiveOccurrenceScanner"] }
+      ],
+      "where_predicates": [],
+      "docs": "Evaluates all rules against the target layer's catalogue. Modify from baseline: adds a `scanner: &S` parameter and a new generic `S: PrimitiveOccurrenceScanner`, used to evaluate ForbidPrimitiveInTypes rules by scanning each candidate entry's TypeRef occurrences (ADR 2026-07-01-0004 D6, spec AC-01/AC-02/AC-03/IN-02/IN-06). The 3 pre-existing parameters (rules, all_catalogues, target_layer_id) and the return type are restated unchanged from baseline. For each ForbidPrimitiveInTypes rule, iterates every TypeRef-bearing catalogue-structural slot of each candidate entry within `rule.layers` -- named struct field (NamedField), enum variant field (VariantField), method/function param (Param), method/function return (Return), generic bound (Bound), and type_alias target (TypeAliasTarget) -- calling `scanner.scan(type_ref, rule.primitives, position)` once per slot with `position` set to that slot's own PrimitiveOccurrencePosition variant (never ResultErr, which scan reserves exclusively for its own nested-Result-error-slot detection). For each `position` in `rule.positions`, checks whether the returned PrimitiveOccurrenceReport's by_position() map holds a non-empty entry for that position and emits a CatalogueLintViolation per matching (entry, position, primitive) combination. This replaces an earlier two-bucket wiring (ordinary()/result_err() on the report, with every non-result_err occurrence attributed to the slot's own outer position regardless of whether the occurrence was actually nested deeper in the same TypeRef tree) that could not distinguish a nested Param/Return/Bound occurrence from the slot's own outer position -- e.g. a NamedField slot whose type is Box<dyn Fn(String) -> _> would previously misattribute the nested String param occurrence to NamedField instead of Param.",
+      "spec_refs": [
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "AC-01" },
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "AC-02" },
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "AC-03" },
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "IN-02" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "inherent_impls": [
+    {
+      "type_name": "NonEmptyVec",
+      "impl_generics": [{ "name": "T", "bounds": [] }],
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [{ "name": "first", "ty": "T" }, { "name": "rest", "ty": "Vec<T>" }],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Creates a NonEmptyVec with at least one element."
+        },
+        {
+          "name": "try_new",
+          "receiver": null,
+          "params": [{ "name": "values", "ty": "Vec<T>" }],
+          "returns": "Result<Self, ConstructionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Creates a NonEmptyVec from a vector, rejecting empty input."
+        },
+        {
+          "name": "as_slice",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[T]",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns the elements as a slice."
+        },
+        {
+          "name": "first",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&T>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns the first element."
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "PrimitiveOccurrencePosition" },
+    { "action": "add", "trait_ref": "core::clone::Clone", "for_type": "PrimitiveOccurrencePosition" },
+    { "action": "add", "trait_ref": "core::marker::Copy", "for_type": "PrimitiveOccurrencePosition" },
+    { "action": "add", "trait_ref": "core::cmp::PartialEq", "for_type": "PrimitiveOccurrencePosition" },
+    { "action": "add", "trait_ref": "core::cmp::Eq", "for_type": "PrimitiveOccurrencePosition" },
+    { "action": "add", "trait_ref": "core::cmp::PartialOrd", "for_type": "PrimitiveOccurrencePosition" },
+    { "action": "add", "trait_ref": "core::cmp::Ord", "for_type": "PrimitiveOccurrencePosition" },
+    { "action": "add", "trait_ref": "core::hash::Hash", "for_type": "PrimitiveOccurrencePosition" },
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "PrimitiveOccurrenceReport" },
+    { "action": "add", "trait_ref": "core::clone::Clone", "for_type": "PrimitiveOccurrenceReport" },
+    { "action": "add", "trait_ref": "core::cmp::PartialEq", "for_type": "PrimitiveOccurrenceReport" },
+    { "action": "add", "trait_ref": "core::cmp::Eq", "for_type": "PrimitiveOccurrenceReport" },
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "PrimitiveOccurrenceScanError" },
+    { "action": "add", "trait_ref": "core::fmt::Display", "for_type": "PrimitiveOccurrenceScanError" },
+    { "action": "add", "trait_ref": "core::error::Error", "for_type": "PrimitiveOccurrenceScanError" },
+    { "action": "add", "trait_ref": "core::cmp::PartialEq", "for_type": "PrimitiveOccurrenceScanError" },
+    { "action": "add", "trait_ref": "core::cmp::Eq", "for_type": "PrimitiveOccurrenceScanError" },
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "PrimitiveName" },
+    { "action": "add", "trait_ref": "core::clone::Clone", "for_type": "PrimitiveName" },
+    { "action": "add", "trait_ref": "core::cmp::PartialEq", "for_type": "PrimitiveName" },
+    { "action": "add", "trait_ref": "core::cmp::Eq", "for_type": "PrimitiveName" },
+    { "action": "add", "trait_ref": "core::cmp::PartialOrd", "for_type": "PrimitiveName" },
+    { "action": "add", "trait_ref": "core::cmp::Ord", "for_type": "PrimitiveName" },
+    { "action": "add", "trait_ref": "core::hash::Hash", "for_type": "PrimitiveName" },
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "RolePayloadField" },
+    { "action": "add", "trait_ref": "core::clone::Clone", "for_type": "RolePayloadField" },
+    { "action": "add", "trait_ref": "core::marker::Copy", "for_type": "RolePayloadField" },
+    { "action": "add", "trait_ref": "core::cmp::PartialEq", "for_type": "RolePayloadField" },
+    { "action": "add", "trait_ref": "core::cmp::Eq", "for_type": "RolePayloadField" },
+    { "action": "add", "trait_ref": "core::hash::Hash", "for_type": "RolePayloadField" },
+    { "action": "add", "trait_ref": "core::fmt::Display", "for_type": "RolePayloadField" },
+    { "action": "add", "trait_ref": "core::str::FromStr", "for_type": "RolePayloadField" },
+    { "action": "modify", "trait_ref": "core::fmt::Debug", "for_type": "CatalogueLinterRuleKind" },
+    { "action": "modify", "trait_ref": "core::clone::Clone", "for_type": "CatalogueLinterRuleKind" },
+    { "action": "modify", "trait_ref": "core::cmp::PartialEq", "for_type": "CatalogueLinterRuleKind" },
+    { "action": "modify", "trait_ref": "core::cmp::Eq", "for_type": "CatalogueLinterRuleKind" },
+    { "action": "modify", "trait_ref": "core::fmt::Debug", "for_type": "CatalogueLinterError" },
+    { "action": "modify", "trait_ref": "core::fmt::Display", "for_type": "CatalogueLinterError" },
+    { "action": "modify", "trait_ref": "core::error::Error", "for_type": "CatalogueLinterError" },
+    { "action": "add", "trait_ref": "core::convert::From<PrimitiveOccurrenceScanError>", "for_type": "CatalogueLinterError" }
+  ]
+}

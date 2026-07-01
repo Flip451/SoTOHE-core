@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-01T13:55:00Z",
+  "declaration_hash": "30cc8e50a16bf19249d922997be838777116cc9d7284cd6da2d50ceabda3d694",
+  "signals": [
+    {
+      "type_name": "SynPrimitiveOccurrenceScanner",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "PrimitiveOccurrenceScanner",
+        "core::default::Default",
+        "core::fmt::Debug"
+      ]
+    }
+  ]
+}

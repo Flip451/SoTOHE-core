@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "track_id": "catalogue-primitive-obsession-guard-2026-07-01",
+  "entries": {
+    "T001": [
+      { "layer": "domain", "entry_key": "PrimitiveOccurrencePosition" },
+      { "layer": "domain", "entry_key": "PrimitiveOccurrenceReport" },
+      { "layer": "domain", "entry_key": "PrimitiveOccurrenceScanError" },
+      { "layer": "domain", "entry_key": "PrimitiveName" },
+      { "layer": "domain", "entry_key": "PrimitiveOccurrenceScanner" },
+      { "layer": "domain", "entry_key": "TypeRef" },
+      { "layer": "domain", "entry_key": "NonEmptyVec" }
+    ],
+    "T002": [
+      { "layer": "domain", "entry_key": "RolePayloadField" },
+      { "layer": "domain", "entry_key": "CatalogueLinterRuleKind" }
+    ],
+    "T003": [
+      { "layer": "domain", "entry_key": "CatalogueLinterRuleKind" },
+      { "layer": "domain", "entry_key": "SelfReceiver" }
+    ],
+    "T004": [
+      { "layer": "infrastructure", "entry_key": "SynPrimitiveOccurrenceScanner" }
+    ],
+    "T005": [
+      { "layer": "domain", "entry_key": "CatalogueLinterRuleKind" },
+      { "layer": "domain", "entry_key": "CatalogueLinterError" },
+      { "layer": "domain", "entry_key": "domain::tddd::catalogue_linter::eval::evaluate_catalogue_lint" },
+      { "layer": "domain", "entry_key": "LayerId" },
+      { "layer": "usecase", "entry_key": "RunCatalogueLintInteractor" },
+      { "layer": "usecase", "entry_key": "RunCatalogueLint" },
+      { "layer": "usecase", "entry_key": "LintConfigLoader" }
+    ],
+    "T006": [
+      { "layer": "usecase", "entry_key": "LintRuleKind" }
+    ],
+    "T007": [],
+    "T008": []
+  }
+}

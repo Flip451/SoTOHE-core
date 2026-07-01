@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "6eae7aaa7af5ca2b56fd709d2a6046ce484c5eabac1e0c6195887a64d35e0573",
+  "signals": [
+    {
+      "type_name": "CatalogueLinterError",
+      "signal": "blue",
+      "entry_hash": "cbaa596e24549c23a8e78188475d2b706791d71f692e8f338c5575ca15aac91f"
+    },
+    {
+      "type_name": "CatalogueLinterRuleKind",
+      "signal": "blue",
+      "entry_hash": "9e3b5137fd90efb1af52e32461f949fe432f8662eae995496791e6d3fb42ff20"
+    },
+    {
+      "type_name": "LayerId",
+      "signal": "blue",
+      "entry_hash": "8b10c34608515c3ad14ad35f61ea36d7670d4b27958b49b73a5a212d52a9624e"
+    },
+    {
+      "type_name": "NonEmptyVec",
+      "signal": "blue",
+      "entry_hash": "0dfb535ab6d04016455447040e2935376a3f9bc52c405ca6c8d415f4ca02a02a"
+    },
+    {
+      "type_name": "PrimitiveName",
+      "signal": "blue",
+      "entry_hash": "c4414db4245c8b2010a6c1f28093511dc643a453568689173ad54d7d1fbae4bb"
+    },
+    {
+      "type_name": "PrimitiveOccurrencePosition",
+      "signal": "blue",
+      "entry_hash": "d73c1d733bba82400a864706eecef1da7bd3e8f4a105d15963b71e942e858bb2"
+    },
+    {
+      "type_name": "PrimitiveOccurrenceReport",
+      "signal": "blue",
+      "entry_hash": "a314cd0a3c7bef594611eaafcc211e6c70d1e37f0435cd89a8f84d71e5a10fae"
+    },
+    {
+      "type_name": "PrimitiveOccurrenceScanError",
+      "signal": "blue",
+      "entry_hash": "eff129d26480eb3b2ff5954c106d4425ac1abf744ac04619239165b066148068"
+    },
+    {
+      "type_name": "RolePayloadField",
+      "signal": "blue",
+      "entry_hash": "d7e8f1e433881983e273f8d5e1b0ea06a78ffeaa8b1993d7e871047150d76391"
+    },
+    {
+      "type_name": "SelfReceiver",
+      "signal": "blue",
+      "entry_hash": "3cbdb39f03bc950403ee5f11ed4661ab4e48d37b94dfcf4507c87fe6e72c254f"
+    },
+    {
+      "type_name": "TypeRef",
+      "signal": "blue",
+      "entry_hash": "e8349acde4bdf53e3282a94f4797b9d1218aed1c45764dcb2f1dcb62050338fc"
+    },
+    {
+      "type_name": "PrimitiveOccurrenceScanner",
+      "signal": "blue",
+      "entry_hash": "c32686aa7daa396ae04c0c25871f9321aca46d1a6aff262f8339e4c3965e45d0"
+    },
+    {
+      "type_name": "domain::tddd::catalogue_linter::eval::evaluate_catalogue_lint",
+      "signal": "blue",
+      "entry_hash": "0f7e11c0256c0a3bd3b5410fd15faae1ddb2aa3aa18b3520dfd271af959570e6"
+    }
+  ]
+}
