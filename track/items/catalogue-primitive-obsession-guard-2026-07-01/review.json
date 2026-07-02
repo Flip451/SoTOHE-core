@@ -1,6 +1,42 @@
 {
   "schema_version": 2,
   "scopes": {
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce4145f55250ade74a179747fc54f02717497eca679b1e05a3d518caf755a7ff",
+          "at": "2026-07-02T01:28:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce4145f55250ade74a179747fc54f02717497eca679b1e05a3d518caf755a7ff",
+          "at": "2026-07-02T01:33:44Z"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2e521f1c9d6de36ba8f6c63d32fffa81807c57627d36f556b7b0d4991cb65f0f",
+          "at": "2026-07-02T02:27:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2e521f1c9d6de36ba8f6c63d32fffa81807c57627d36f556b7b0d4991cb65f0f",
+          "at": "2026-07-02T02:32:11Z"
+        }
+      ]
+    },
     "usecase": {
       "rounds": [
         {
@@ -30,165 +66,6 @@
           "findings": [],
           "hash": "rvw1:sha256:43a8983110d930d911d4a0f0cb0e0f226f1e10e52924559bb99bb7bcc35da710",
           "at": "2026-07-02T02:36:04Z"
-        }
-      ]
-    },
-    "types": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:088ae98d41128d86e4f8d79fad3f11a444b66aeb23849bf3845f8b55b1885775",
-          "at": "2026-07-01T12:15:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`PrimitiveOccurrencePosition` cannot represent type-alias targets even though the spec includes `type_alias.target`/TypeRef positions as scan targets. Since `CatalogueLinterRuleKind::ForbidPrimitiveInTypes.positions` is typed as `NonEmptyVec<PrimitiveOccurrencePosition>`, a catalogue entry such as a `type_alias` whose target is `String` cannot be configured or reported by the new rule, leaving an in-scope TypeRef position outside the contract. Add a type-alias-target position to this enum and have the evaluator classify that slot explicitly.",
-              "severity": "P1",
-              "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/domain-types.json",
-              "line": 12,
-              "category": "SoT integrity"
-            }
-          ],
-          "hash": "rvw1:sha256:088ae98d41128d86e4f8d79fad3f11a444b66aeb23849bf3845f8b55b1885775",
-          "at": "2026-07-01T12:22:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:473c6a8a644b0d8af373d56216071cec128f3c14e5a4db5ed50ca21f00db4903",
-          "at": "2026-07-01T13:33:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:473c6a8a644b0d8af373d56216071cec128f3c14e5a4db5ed50ca21f00db4903",
-          "at": "2026-07-01T13:38:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a54ae49134b5150744d16096ddc8533bd27858d9692adfeb1a16e2ebe3eba342",
-          "at": "2026-07-02T01:31:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a54ae49134b5150744d16096ddc8533bd27858d9692adfeb1a16e2ebe3eba342",
-          "at": "2026-07-02T01:40:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:987f7cedef6790f0e5a6d3c93a424ae6b4fbd2684fa2872cc57e84ae7f59a0c3",
-          "at": "2026-07-02T02:35:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:987f7cedef6790f0e5a6d3c93a424ae6b4fbd2684fa2872cc57e84ae7f59a0c3",
-          "at": "2026-07-02T02:41:59Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f365b57fe0712fd9cf66e3b474f480dd7db21e0486eabae30092a2010367eb58",
-          "at": "2026-07-01T07:41:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D2 decides that the syn walker recursively visits every generic argument without container special cases, so a type like `MyContainer<String>` should already be detected the same way as `Vec<String>`. The Reassess trigger here says custom generic containers are outside the current detectable set and may need future support, which contradicts D1/D2 and leaves downstream spec/type work unsure whether to implement a whitelist of known transparent containers or a true full recursive TypeRef walk.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
-              "line": 266,
-              "category": "inconsistent decisions within the same ADR"
-            }
-          ],
-          "hash": "rvw1:sha256:f365b57fe0712fd9cf66e3b474f480dd7db21e0486eabae30092a2010367eb58",
-          "at": "2026-07-01T07:43:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:393004989ed1523fb3ccd000a5ae5a54a6ebcc2f351c8f19d7eff2eb0baeecef",
-          "at": "2026-07-01T07:47:34Z"
-        }
-      ]
-    },
-    "cli_driver": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2e521f1c9d6de36ba8f6c63d32fffa81807c57627d36f556b7b0d4991cb65f0f",
-          "at": "2026-07-02T02:27:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2e521f1c9d6de36ba8f6c63d32fffa81807c57627d36f556b7b0d4991cb65f0f",
-          "at": "2026-07-02T02:32:11Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:72c8b748e4d8d1974de8ee8c7fab42cac45de96ae9e284834f0aded59842da33",
-          "at": "2026-07-02T01:26:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new command handler bypasses the `cli_driver` primary-adapter boundary by calling `TrackCompositionRoot::catalogue_lint_check_active_track(...)` directly from the bin layer. Per the CLI scope policy and ADR D5/D8, `apps/cli` should parse args into a typed `cli_driver` input, obtain a wired driver from `cli_composition`, call `driver.handle(input)`, and only emit the returned `CommandOutcome`; adding another composition-root workflow call keeps invoke/render coordination out of the driver layer and violates the thin-bin boundary.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/catalogue_lint.rs",
-              "line": 96,
-              "category": "driver coordinate in bin violated"
-            }
-          ],
-          "hash": "rvw1:sha256:72c8b748e4d8d1974de8ee8c7fab42cac45de96ae9e284834f0aded59842da33",
-          "at": "2026-07-02T01:31:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b4b7b46f0c161f4654cf11903b687f8976948706138eaa5a87f02ea09e1f21c5",
-          "at": "2026-07-02T02:28:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b4b7b46f0c161f4654cf11903b687f8976948706138eaa5a87f02ea09e1f21c5",
-          "at": "2026-07-02T02:32:21Z"
         }
       ]
     },
@@ -502,6 +379,93 @@
           "findings": [],
           "hash": "rvw1:sha256:bae177176ef137383513a0febfafbfa32745774b353107e3d3089e61ce26b604",
           "at": "2026-07-02T02:32:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d286cff265fb266909b7a8e182ee8e59f68247d2068cc5e3d266b2031d648206",
+          "at": "2026-07-02T03:45:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d286cff265fb266909b7a8e182ee8e59f68247d2068cc5e3d266b2031d648206",
+          "at": "2026-07-02T03:49:08Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f365b57fe0712fd9cf66e3b474f480dd7db21e0486eabae30092a2010367eb58",
+          "at": "2026-07-01T07:41:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2 decides that the syn walker recursively visits every generic argument without container special cases, so a type like `MyContainer<String>` should already be detected the same way as `Vec<String>`. The Reassess trigger here says custom generic containers are outside the current detectable set and may need future support, which contradicts D1/D2 and leaves downstream spec/type work unsure whether to implement a whitelist of known transparent containers or a true full recursive TypeRef walk.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+              "line": 266,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:f365b57fe0712fd9cf66e3b474f480dd7db21e0486eabae30092a2010367eb58",
+          "at": "2026-07-01T07:43:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:393004989ed1523fb3ccd000a5ae5a54a6ebcc2f351c8f19d7eff2eb0baeecef",
+          "at": "2026-07-01T07:47:34Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:72c8b748e4d8d1974de8ee8c7fab42cac45de96ae9e284834f0aded59842da33",
+          "at": "2026-07-02T01:26:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new command handler bypasses the `cli_driver` primary-adapter boundary by calling `TrackCompositionRoot::catalogue_lint_check_active_track(...)` directly from the bin layer. Per the CLI scope policy and ADR D5/D8, `apps/cli` should parse args into a typed `cli_driver` input, obtain a wired driver from `cli_composition`, call `driver.handle(input)`, and only emit the returned `CommandOutcome`; adding another composition-root workflow call keeps invoke/render coordination out of the driver layer and violates the thin-bin boundary.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/catalogue_lint.rs",
+              "line": 96,
+              "category": "driver coordinate in bin violated"
+            }
+          ],
+          "hash": "rvw1:sha256:72c8b748e4d8d1974de8ee8c7fab42cac45de96ae9e284834f0aded59842da33",
+          "at": "2026-07-02T01:31:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b4b7b46f0c161f4654cf11903b687f8976948706138eaa5a87f02ea09e1f21c5",
+          "at": "2026-07-02T02:28:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b4b7b46f0c161f4654cf11903b687f8976948706138eaa5a87f02ea09e1f21c5",
+          "at": "2026-07-02T02:32:21Z"
         }
       ]
     },
@@ -537,21 +501,71 @@
         }
       ]
     },
-    "infrastructure": {
+    "types": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ce4145f55250ade74a179747fc54f02717497eca679b1e05a3d518caf755a7ff",
-          "at": "2026-07-02T01:28:26Z"
+          "hash": "rvw1:sha256:088ae98d41128d86e4f8d79fad3f11a444b66aeb23849bf3845f8b55b1885775",
+          "at": "2026-07-01T12:15:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`PrimitiveOccurrencePosition` cannot represent type-alias targets even though the spec includes `type_alias.target`/TypeRef positions as scan targets. Since `CatalogueLinterRuleKind::ForbidPrimitiveInTypes.positions` is typed as `NonEmptyVec<PrimitiveOccurrencePosition>`, a catalogue entry such as a `type_alias` whose target is `String` cannot be configured or reported by the new rule, leaving an in-scope TypeRef position outside the contract. Add a type-alias-target position to this enum and have the evaluator classify that slot explicitly.",
+              "severity": "P1",
+              "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/domain-types.json",
+              "line": 12,
+              "category": "SoT integrity"
+            }
+          ],
+          "hash": "rvw1:sha256:088ae98d41128d86e4f8d79fad3f11a444b66aeb23849bf3845f8b55b1885775",
+          "at": "2026-07-01T12:22:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:473c6a8a644b0d8af373d56216071cec128f3c14e5a4db5ed50ca21f00db4903",
+          "at": "2026-07-01T13:33:07Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ce4145f55250ade74a179747fc54f02717497eca679b1e05a3d518caf755a7ff",
-          "at": "2026-07-02T01:33:44Z"
+          "hash": "rvw1:sha256:473c6a8a644b0d8af373d56216071cec128f3c14e5a4db5ed50ca21f00db4903",
+          "at": "2026-07-01T13:38:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a54ae49134b5150744d16096ddc8533bd27858d9692adfeb1a16e2ebe3eba342",
+          "at": "2026-07-02T01:31:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a54ae49134b5150744d16096ddc8533bd27858d9692adfeb1a16e2ebe3eba342",
+          "at": "2026-07-02T01:40:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:987f7cedef6790f0e5a6d3c93a424ae6b4fbd2684fa2872cc57e84ae7f59a0c3",
+          "at": "2026-07-02T02:35:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:987f7cedef6790f0e5a6d3c93a424ae6b4fbd2684fa2872cc57e84ae7f59a0c3",
+          "at": "2026-07-02T02:41:59Z"
         }
       ]
     }
