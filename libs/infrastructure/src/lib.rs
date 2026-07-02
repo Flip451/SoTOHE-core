@@ -3,6 +3,10 @@
 
 pub mod adr_decision;
 pub mod agent_profiles;
+pub mod branch_strategy;
+pub use branch_strategy::{
+    BranchStrategyConfigError, JsonConfigBranchStrategyAdapter, SnapshotBranchStrategyAdapter,
+};
 pub mod arch;
 pub mod code_profile_builder;
 pub mod codex_common;
@@ -231,12 +235,21 @@ mod tests {
 
     use super::InMemoryTrackStore;
 
+    fn test_snapshot() -> domain::branch_strategy::BranchStrategySnapshot {
+        domain::branch_strategy::BranchStrategySnapshot::new(
+            domain::NonEmptyString::try_new("main").unwrap(),
+            domain::NonEmptyString::try_new("main").unwrap(),
+            domain::branch_strategy::MergeMethod::Squash,
+        )
+    }
+
     fn sample_track() -> TrackMetadata {
         // TrackMetadata is identity-only; status derived from impl-plan + override.
         TrackMetadata::new(
             TrackId::try_new("track-state-machine").unwrap(),
             "Track state machine",
             None,
+            test_snapshot(),
         )
         .unwrap()
     }

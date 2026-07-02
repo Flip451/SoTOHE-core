@@ -156,7 +156,7 @@
       "Bash(cargo make track-pr-review)",
       "Bash(cargo make track-set-commit-hash)",
       "Bash(cargo make track-set-commit-hash:*)",
-      "Bash(cargo make track-switch-main)",
+      "Bash(cargo make track-switch-base)",
       "Bash(cargo make track-local-review)",
       "Bash(cargo make track-local-review:*)",
       "Bash(cargo make track-local-review-fix:*)",
@@ -213,6 +213,6 @@
   },
   "env": {
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
-    "CLAUDE_CODE_SUBAGENT_MODEL": "claude-sonnet-4-6"
+    "CLAUDE_CODE_SUBAGENT_MODEL": "claude-sonnet-5"
   }
 }

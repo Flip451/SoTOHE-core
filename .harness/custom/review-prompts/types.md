@@ -32,8 +32,8 @@ spec_refs/role/action mismatch.
 - **role / kind mismatch**: a struct / enum / trait whose declared `role`
   (DomainEntity / ValueObject / Port / PrimaryAdapter / SecondaryAdapter / etc.)
   does not match the `kind` discriminator or the layer the entry lives in
-  (e.g., a port placed in domain instead of usecase). Cite
-  `knowledge/conventions/hexagonal-architecture.md` §Port Placement.
+	  (e.g., a port placed in domain instead of usecase). Cite
+	  `knowledge/conventions/hexagonal-architecture.md` §Port Placement Rules.
 - **action incoherent with the diff**: an entry declared `action: add` that
   references a type already present in the rustdoc baseline, or `action: modify`
   on a method whose signature is identical to baseline — the catalogue's action
@@ -65,8 +65,8 @@ spec_refs/role/action mismatch.
   forcing implementors to stub methods they do not use.
 - **Dependency Inversion violation in catalogue placement**: a usecase or
   domain entry whose declared dependencies (via `params[]` / return types /
-  associated types) point at a concrete infrastructure type instead of a port.
-  Cite `hexagonal-architecture.md` §Dependency Direction.
+	  associated types) point at a concrete infrastructure type instead of a port.
+	  Cite `knowledge/conventions/hexagonal-architecture.md` §Layer Dependencies.
 
 ### CQRS findings
 

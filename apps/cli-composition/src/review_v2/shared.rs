@@ -198,6 +198,42 @@ pub(super) fn build_v2_shared(
         )));
     }
 
+    // Read base_branch from metadata.json (branch_strategy_snapshot).
+    // When metadata.json is absent (new tracks pre-init or ephemeral fixtures),
+    // fall back to `.harness/config/branch-strategy.json` via
+    // `JsonConfigBranchStrategyAdapter` (D5: no hard-coded `main`).
+    // Decode errors propagate as Config; per ADR D5 (no backward compatibility),
+    // schema_version != 6 is not supported and must fail explicitly rather
+    // than silently degrade.
+    let base_branch = {
+        use usecase::branch_strategy::BranchStrategyPort as _;
+
+        let metadata_path = track_dir.join("metadata.json");
+        match std::fs::read_to_string(&metadata_path) {
+            Ok(metadata_json) => {
+                let (track_meta, _) = infrastructure::track::codec::decode(&metadata_json)
+                    .map_err(|e| ReviewSharedError::Config(format!("decode metadata.json: {e}")))?;
+                track_meta.branch_strategy_snapshot().base_branch().to_owned()
+            }
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
+                let config_path = canonical_root.join(".harness/config/branch-strategy.json");
+                let adapter =
+                    infrastructure::branch_strategy::JsonConfigBranchStrategyAdapter::new(
+                        config_path,
+                    )
+                    .map_err(|e| {
+                        ReviewSharedError::Config(format!(
+                            "load .harness/config/branch-strategy.json (metadata.json absent): {e}"
+                        ))
+                    })?;
+                adapter.base_branch().to_owned()
+            }
+            Err(e) => {
+                return Err(ReviewSharedError::Config(format!("read metadata.json: {e}")));
+            }
+        }
+    };
+
     // Use the canonicalized repo root as the trusted_root for symlink guards:
     // `canonicalize()` resolves symlinks and returns the physical path, so
     // `canonical_root` is guaranteed non-symlink and safe as a trusted root.
@@ -210,7 +246,9 @@ pub(super) fn build_v2_shared(
     let review_store = FsReviewStore::new(review_json_path, canonical_root.clone());
     let commit_hash_store = FsCommitHashStore::new(commit_hash_path, canonical_root.clone());
 
-    let base = with_repo_cwd(&canonical_root, || resolve_diff_base(&commit_hash_store, &git))?;
+    let base = with_repo_cwd(&canonical_root, || {
+        resolve_diff_base(&commit_hash_store, &git, &base_branch)
+    })?;
 
     Ok((scope_config, review_store, commit_hash_store, base))
 }
@@ -287,24 +325,25 @@ pub(super) fn with_repo_cwd<T>(
 pub(super) fn resolve_diff_base(
     store: &FsCommitHashStore,
     git: &SystemGitRepo,
+    base_branch: &str,
 ) -> Result<CommitHash, ReviewSharedError> {
     match store.read() {
         Ok(Some(hash)) => return Ok(hash),
         Ok(None) => {}
         Err(e) => {
-            eprintln!("[warn] failed to read .commit_hash, falling back to main: {e}");
+            eprintln!("[warn] failed to read .commit_hash, falling back to {base_branch}: {e}");
         }
     }
 
     let output = git
-        .output(&["rev-parse", "main"])
-        .map_err(|e| ReviewSharedError::Git(format!("git rev-parse main: {e}")))?;
+        .output(&["rev-parse", base_branch])
+        .map_err(|e| ReviewSharedError::Git(format!("git rev-parse {base_branch}: {e}")))?;
     if !output.status.success() {
-        return Err(ReviewSharedError::Git("git rev-parse main failed".to_owned()));
+        return Err(ReviewSharedError::Git(format!("git rev-parse {base_branch} failed")));
     }
     let sha = String::from_utf8_lossy(&output.stdout).trim().to_owned();
     CommitHash::try_new(&sha)
-        .map_err(|e| ReviewSharedError::InvalidInput(format!("invalid main SHA: {e}")))
+        .map_err(|e| ReviewSharedError::InvalidInput(format!("invalid {base_branch} SHA: {e}")))
 }
 
 /// Builds the v2 review composition with a real `CodexReviewer`.
@@ -329,7 +368,7 @@ pub(crate) fn build_review_v2_with_reviewer(
 /// 1. Discovers git root
 /// 2. Validates that `items_dir` resolves under the repo root (path traversal guard)
 /// 3. Loads review-scope.json → `ReviewScopeConfig`
-/// 4. Reads `.commit_hash` → `CommitHash` (fallback: `git rev-parse main`)
+/// 4. Reads `.commit_hash` → `CommitHash` (fallback: `git rev-parse <configured base branch>`)
 /// 5. Constructs `FsReviewStore`, `FsCommitHashStore`
 /// 6. Returns `ReviewCycle` with `NullReviewer` (status/check-approved only)
 ///
@@ -441,7 +480,7 @@ pub(crate) fn build_scope_query_interactor_str(
 /// `sotp review classify` command which only calls
 /// [`usecase::review_v2::ScopeQueryService::classify_by_strings`].
 ///
-/// Skips the `.commit_hash` lookup and `git rev-parse main` fallback that the
+/// Skips the `.commit_hash` lookup and `git rev-parse <base_branch>` fallback that the
 /// full builder performs, so it works in repositories without a recorded diff
 /// base.
 ///

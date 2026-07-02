@@ -1,0 +1,190 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-02T10:07:35Z",
+  "declaration_hash": "acd6e65a833ba07556ac03a5ec7ef2774986583958a5868613b44787626fa6df",
+  "signals": [
+    {
+      "type_name": "BranchStrategyPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "DryCheckApprovedOutcome",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "DryCheckConfigLoaderError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "DryCheckConfigLoaderPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "DryDriverPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "DryDriverService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "DryWriteFindingSummary",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "DryWriteOutcome",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "FixpointDryGateFactoryPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "FixpointGateStateFactoryPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "FixpointResolveDriverInput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "FixpointResolveDriverInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "FixpointResolveDriverService"
+      ]
+    },
+    {
+      "type_name": "FixpointResolveDriverOutcome",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "FixpointResolveDriverService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "FixpointWorkspaceContext",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "FixpointWorkspaceContextError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "FixpointWorkspaceContextPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TrackService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "DiffBaseResolverPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "DryApprovalFactoryPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "DryDriverInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "FixpointDryGateService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "RefVerifyGateStatePort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ReviewGateStatePort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

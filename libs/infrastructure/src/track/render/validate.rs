@@ -6,6 +6,7 @@ use super::RenderError;
 use super::plan::render_plan;
 use super::registry::render_registry;
 use super::snapshot::{collect_track_snapshots, load_impl_plan_opt};
+use crate::track::symlink_guard::reject_symlinks_below;
 
 /// Validates all metadata documents under the project root.
 ///
@@ -27,12 +28,12 @@ use super::snapshot::{collect_track_snapshots, load_impl_plan_opt};
 pub fn validate_track_snapshots(root: &Path) -> Result<(), RenderError> {
     let snapshots = collect_track_snapshots(root)?;
     for snapshot in &snapshots {
-        // Only validate v5 (identity-only) tracks. Legacy v2/v3/v4 tracks
-        // predate the current renderer and their committed plan.md reflects
-        // whatever renderer shipped at their commit time. We intentionally
+        // Only validate v6 (identity-only with branch_strategy_snapshot) tracks.
+        // Legacy v2/v3/v4/v5 tracks predate the current renderer and their committed
+        // plan.md reflects whatever renderer shipped at their commit time. We intentionally
         // don't touch them; re-validating would create a false OutOfSync for
         // every legacy track without any actionable fix.
-        if snapshot.schema_version < 5 {
+        if snapshot.schema_version < 6 {
             continue;
         }
         let plan_path = snapshot.dir.join("plan.md");
@@ -41,44 +42,12 @@ pub fn validate_track_snapshots(root: &Path) -> Result<(), RenderError> {
         // "when plan.md is rendered"; if the file is absent, skip regardless
         // of whether impl-plan.json exists.
         //
-        // Presence is probed in two layers to disambiguate "absent" from
-        // "corrupted":
-        //   1. `symlink_metadata` checks whether any entry exists at the
-        //      path without following symlinks. `NotFound` here means the
-        //      file is genuinely absent (Phase 0 — skip). Other errors
-        //      (permission, etc.) are propagated rather than silently
-        //      treated as absent.
-        //   2. If the entry is a symlink, follow it via `metadata`. A
-        //      dangling symlink surfaces as `NotFound` from the follow
-        //      path; treat that as corrupted track state (the file
-        //      appears to exist but the target is gone) rather than as
-        //      "plan.md absent" — otherwise the freshness check would be
-        //      silently bypassed.
-        //   3. Any non-regular-file target (directory, FIFO, dangling
-        //      symlink, etc.) is rejected as corrupted track state.
-        let sym_meta = match std::fs::symlink_metadata(&plan_path) {
-            Ok(m) => m,
-            Err(e) if e.kind() == std::io::ErrorKind::NotFound => continue,
-            Err(e) => return Err(RenderError::Io(e)),
-        };
-        if sym_meta.file_type().is_symlink() {
-            match std::fs::metadata(&plan_path) {
-                Ok(target) if target.is_file() => {}
-                Ok(_) => {
-                    return Err(RenderError::InvalidTrackMetadata {
-                        path: plan_path.clone(),
-                        reason: "plan.md symlink target is not a regular file".to_owned(),
-                    });
-                }
-                Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
-                    return Err(RenderError::InvalidTrackMetadata {
-                        path: plan_path.clone(),
-                        reason: "plan.md is a dangling symlink (target missing)".to_owned(),
-                    });
-                }
-                Err(e) => return Err(RenderError::Io(e)),
-            }
-        } else if !sym_meta.is_file() {
+        // Presence is probed through the shared symlink guard. A missing file
+        // is a Phase 0 skip; an existing symlink or non-file is corrupted state.
+        if !reject_symlinks_below(&plan_path, &snapshot.dir)? {
+            continue;
+        }
+        if !plan_path.is_file() {
             return Err(RenderError::InvalidTrackMetadata {
                 path: plan_path.clone(),
                 reason: "plan.md exists but is not a regular file".to_owned(),
@@ -99,7 +68,13 @@ pub fn validate_track_snapshots(root: &Path) -> Result<(), RenderError> {
     // registry.md may be absent if it has been removed from git tracking
     // (e.g., to prevent merge conflicts in parallel track work).
     // In that case, skip the freshness check.
-    if registry_path.is_file() {
+    if reject_symlinks_below(&registry_path, root)? {
+        if !registry_path.is_file() {
+            return Err(RenderError::InvalidTrackMetadata {
+                path: registry_path,
+                reason: "registry.md exists but is not a regular file".to_owned(),
+            });
+        }
         let actual_registry = std::fs::read_to_string(&registry_path)?;
         let expected_registry = render_registry(&snapshots);
         if !super::rendered_matches(&actual_registry, &expected_registry) {

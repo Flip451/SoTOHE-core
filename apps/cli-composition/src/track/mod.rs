@@ -1,6 +1,6 @@
 //! `track` command family — core composition-root impl methods.
+mod branch_strategy;
 pub mod composition_root;
-pub mod fixpoint_resolve;
 mod ops;
 mod resolution;
 pub(crate) mod service_impl;
@@ -215,7 +215,6 @@ fn describe_archive_rollback(result: Result<(), CompositionError>) -> String {
         }
     }
 }
-
 impl TrackCompositionRoot {
     /// Initialize a new track by writing `metadata.json`.
     ///
@@ -240,7 +239,8 @@ impl TrackCompositionRoot {
 
         let id = domain::TrackId::try_new(&track_id)
             .map_err(|e| CompositionError::WiringFailed(format!("invalid track ID: {e}")))?;
-        let track = domain::TrackMetadata::new(id, description, None)
+        let snap = branch_strategy::resolve_branch_strategy_snapshot(&project_root)?;
+        let track = domain::TrackMetadata::new(id, description, None, snap)
             .map_err(|e| CompositionError::WiringFailed(format!("invalid track metadata: {e}")))?;
 
         let store = FsTrackStore::new(items_dir);
@@ -290,50 +290,6 @@ impl TrackCompositionRoot {
         )];
         lines.extend(sync_views_to_stdout(&project_root, &output.track_id));
         Ok(CommandOutcome::success(Some(lines.join("\n"))))
-    }
-    /// Create a new track branch from main.
-    /// # Errors
-    /// Returns `Err` when git discovery or branch creation fails.
-    pub fn track_branch_create(
-        &self,
-        items_dir: PathBuf,
-        track_id: String,
-    ) -> Result<CommandOutcome, CompositionError> {
-        use infrastructure::git_cli::GitRepository;
-        validate_track_id_str(&track_id)?;
-        let branch_name = format!("track/{track_id}");
-        resolve_project_root(&items_dir)?;
-        let repo = infrastructure::git_cli::SystemGitRepo::discover().map_err(|e| {
-            CompositionError::AdapterInit(format!("failed to discover git repository: {e}"))
-        })?;
-        let current = GitRepository::current_branch(&repo)
-            .map_err(|e| CompositionError::Infrastructure(e.to_string()))?;
-        if current.as_deref() != Some("main") {
-            return Err(CompositionError::WiringFailed(format!(
-                "branch create must start from 'main'; current branch is {}",
-                current.as_deref().unwrap_or("<detached>")
-            )));
-        }
-        let exists_output = repo
-            .output(&["rev-parse", "--verify", "--quiet", &branch_name])
-            .map_err(|e| CompositionError::Infrastructure(e.to_string()))?;
-        if exists_output.status.success() {
-            return Err(CompositionError::WiringFailed(format!(
-                "branch '{branch_name}' already exists"
-            )));
-        }
-        let code = repo
-            .status(&["switch", "-c", &branch_name, "main"])
-            .map_err(|e| CompositionError::Infrastructure(e.to_string()))?;
-        if code == 0 {
-            Ok(CommandOutcome::success(Some(format!(
-                "[OK] Created and switched to branch: {branch_name}"
-            ))))
-        } else {
-            Err(CompositionError::Infrastructure(format!(
-                "git switch -c {branch_name} main failed"
-            )))
-        }
     }
     /// Switch to an existing track branch.
     /// # Errors

@@ -170,4 +170,8 @@ impl TrackService for TrackServiceImpl {
             None => TrackCommandOutput { stdout: Some(String::new()), stderr: None, exit_code: 0 },
         }
     }
+
+    fn switch_base(&self, project_root: PathBuf) -> TrackCommandOutput {
+        composition_to_output(TrackCompositionRoot::new().track_switch_base(project_root))
+    }
 }

@@ -234,13 +234,14 @@ impl Reviewer for NullReviewer {
 /// `cli_composition::track::fixpoint_resolve` per ADR 1328 D7.
 pub struct FsReviewGateStateAdapter {
     items_dir: PathBuf,
+    base_branch: String,
 }
 
 impl FsReviewGateStateAdapter {
     /// Creates a new adapter anchored to `items_dir` (the `track/items` directory).
     #[must_use]
-    pub fn new(items_dir: PathBuf) -> Self {
-        Self { items_dir }
+    pub fn new(items_dir: PathBuf, base_branch: String) -> Self {
+        Self { items_dir, base_branch }
     }
 }
 
@@ -290,24 +291,28 @@ impl ReviewGateStatePort for FsReviewGateStateAdapter {
         let review_store = FsReviewStore::new(review_json_path, canonical_root.clone());
         let commit_hash_store = FsCommitHashStore::new(commit_hash_path, canonical_root.clone());
 
-        // Resolve diff base (read .commit_hash; fallback to git rev-parse main).
+        // Resolve diff base (read .commit_hash; fallback to git rev-parse <base_branch>).
         let base = with_repo_cwd(&canonical_root, || {
             use domain::review_v2::CommitHashReader as _;
             match commit_hash_store.read() {
                 Ok(Some(hash)) => Ok(hash),
                 Ok(None) | Err(_) => {
-                    // Fallback: git rev-parse main (same as build_v2_shared in cli_composition).
+                    // Fallback: git rev-parse <base_branch> (same as build_v2_shared in cli_composition).
                     let git = SystemGitRepo::discover()
                         .map_err(|e| GateStateError(format!("git discover: {e}")))?;
-                    let output = git
-                        .output(&["rev-parse", "main"])
-                        .map_err(|e| GateStateError(format!("git rev-parse main: {e}")))?;
+                    let output = git.output(&["rev-parse", &self.base_branch]).map_err(|e| {
+                        GateStateError(format!("git rev-parse {}: {e}", self.base_branch))
+                    })?;
                     if !output.status.success() {
-                        return Err(GateStateError("git rev-parse main failed".to_owned()));
+                        return Err(GateStateError(format!(
+                            "git rev-parse {} failed",
+                            self.base_branch
+                        )));
                     }
                     let sha = String::from_utf8_lossy(&output.stdout).trim().to_owned();
-                    domain::CommitHash::try_new(&sha)
-                        .map_err(|e| GateStateError(format!("invalid main SHA: {e}")))
+                    domain::CommitHash::try_new(&sha).map_err(|e| {
+                        GateStateError(format!("invalid {} SHA: {e}", self.base_branch))
+                    })
                 }
             }
         })
@@ -577,7 +582,7 @@ mod tests {
         let _cwd = CwdGuard::enter(dir.path());
 
         // No `.harness/config/review-scope.json` in the isolated repo.
-        let adapter = FsReviewGateStateAdapter::new(items_dir);
+        let adapter = FsReviewGateStateAdapter::new(items_dir, "main".to_owned());
         let track_id = TrackId::try_new("my-track-2026".to_owned()).unwrap();
         let result = adapter.review_status(&track_id);
 
@@ -599,7 +604,10 @@ mod tests {
         run_git(&repo_root, &["init", "-q"]);
 
         let _cwd = CwdGuard::enter(&repo_root);
-        let adapter = FsReviewGateStateAdapter::new(PathBuf::from("../outside/track/items"));
+        let adapter = FsReviewGateStateAdapter::new(
+            PathBuf::from("../outside/track/items"),
+            "main".to_owned(),
+        );
         let track_id = TrackId::try_new("my-track-2026".to_owned()).unwrap();
         let result = adapter.review_status(&track_id);
 
@@ -685,7 +693,7 @@ mod tests {
         std::fs::write(track_dir.join(".commit_hash"), head_sha).unwrap();
 
         let _cwd = CwdGuard::enter(&caller_root);
-        let adapter = FsReviewGateStateAdapter::new(nested_items_dir);
+        let adapter = FsReviewGateStateAdapter::new(nested_items_dir, "main".to_owned());
         let track_id = TrackId::try_new(track_id_str.to_owned()).unwrap();
         let result = adapter.review_status(&track_id);
 
@@ -790,7 +798,7 @@ mod tests {
         run_git(root, &["add", "."]);
         run_git(root, &["commit", "--no-gpg-sign", "-m", "init"]);
 
-        let adapter = FsReviewGateStateAdapter::new(items_dir);
+        let adapter = FsReviewGateStateAdapter::new(items_dir, "main".to_owned());
         let track_id = TrackId::try_new("missing-track-2026".to_owned()).unwrap();
         let _cwd = CwdGuard::enter(root);
         let result = adapter.review_status(&track_id);
@@ -846,7 +854,7 @@ mod tests {
                 let id = TrackId::try_new(fallback_id.to_owned()).unwrap();
                 drop(track_temp);
                 // Write .commit_hash anchored at HEAD so the adapter doesn't fall
-                // back to `git rev-parse main` (which is unavailable on shallow CI
+                // back to `git rev-parse <base_branch>` (which is unavailable on shallow CI
                 // checkouts that fetch only the PR branch).
                 let git = SystemGitRepo::discover_from(workspace_root)
                     .expect("outer workspace must be a git repo");
@@ -854,7 +862,7 @@ mod tests {
                 assert!(head_output.status.success(), "git rev-parse HEAD failed");
                 let head_sha = String::from_utf8_lossy(&head_output.stdout).trim().to_owned();
                 std::fs::write(fallback_dir.join(".commit_hash"), &head_sha).unwrap();
-                let adapter = FsReviewGateStateAdapter::new(items_dir.clone());
+                let adapter = FsReviewGateStateAdapter::new(items_dir.clone(), "main".to_owned());
                 let result = adapter.review_status(&id);
                 let _ = std::fs::remove_dir_all(&fallback_dir);
                 assert!(
@@ -876,7 +884,7 @@ mod tests {
         // Write .commit_hash into the temp track dir so the adapter uses HEAD as base.
         std::fs::write(track_temp.path().join(".commit_hash"), &head_sha).unwrap();
 
-        let adapter = FsReviewGateStateAdapter::new(items_dir);
+        let adapter = FsReviewGateStateAdapter::new(items_dir, "main".to_owned());
         let result = adapter.review_status(&track_id);
 
         drop(track_temp);
@@ -975,7 +983,7 @@ mod tests {
         std::fs::create_dir_all(&bad_items_dir).unwrap();
         let _cwd = CwdGuard::enter(root);
 
-        let adapter = FsReviewGateStateAdapter::new(bad_items_dir);
+        let adapter = FsReviewGateStateAdapter::new(bad_items_dir, "main".to_owned());
         let track_id = TrackId::try_new("my-track-2026".to_owned()).unwrap();
         let result = adapter.review_status(&track_id);
 

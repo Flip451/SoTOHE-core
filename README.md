@@ -106,7 +106,7 @@ cargo make bootstrap      # Docker イメージビルド + CI 一括
 /track:commit <message>       # ガード付きコミット + git note
 /track:pr                     # ブランチ push + PR 作成
 /track:merge <pr>             # CI 通過後に PR をマージ
-/track:done                   # main に戻り完了サマリー
+/track:done                   # 設定された base branch に戻り完了サマリー
 ```
 
 `/track:status` はどの段階でも呼べる。

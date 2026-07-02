@@ -1,0 +1,1086 @@
+{
+  "schema_version": 1,
+  "layer": "usecase",
+  "entries": [
+    {
+      "claim_hash": "82585738ecfbfc3be00f5d020d5ac1c7ca8cce6dc5ad079736e2b24b8e05aaf8",
+      "evidence_hash": "35f5c600dfc798587697f4c0f4f9a981192ae1d08c026cb4d554fa488ac86e50",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DryDriverService` の戻り値（`DryDriverOutcome`）を整形前の構造化データに変更し、整形処理自体を `apps/cli-driver` 側に実装し直す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "DryCheckApprovedOutcome"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-13",
+          "text_label": "`dry write` / `dry check-approved` コマンドについて、`apps/cli-composition/src/dry/shared.rs` の `dry_check_approved_outcome` / `dry_write_outcome` が担っている CLI 出力文字列への整形処理（render）を `apps/cli-driver` へ移す。既存の `apps/cli-driver/src/dry.rs` の `DryDriver` と `libs/usecase/src/dry_driver.rs` の `DryDriverService` は、`apps/cli-composition` 側の `DryCompositionRoot::dry_write` / `dry_check_approved` が組み立て済みの stdout/stderr 文字列をそのまま転送しているだけで実質的な render を行っていないため、`DryDriverService` の戻り値（`DryDriverOutcome`）を整形前の構造化データに変更し、整形処理自体を `apps/cli-driver` 側に実装し直す。"
+        }
+      }
+    },
+    {
+      "claim_hash": "82585738ecfbfc3be00f5d020d5ac1c7ca8cce6dc5ad079736e2b24b8e05aaf8",
+      "evidence_hash": "f88ff5a04d16e44140f019dfe4d2b037edfe4c41a994581fa2ddc3f9e8d01330",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli-composition/src/dry/shared.rs`（またはその後継）に `dry_check_approved_outcome` / `dry_write_outcome` が存在しない、またはこれらに相当する render 処理が `apps/cli-driver` に実装されており `apps/cli-composition` からは呼ばれない。`libs/usecase/src/dry_driver.rs` の `DryDriverService::dry_write` / `dry_check_approved` の戻り値は、整形済みの stdout/stderr 文字列をそのまま保持したものではなく、`apps/cli-driver` 側で整形する前の構造化データである。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "DryCheckApprovedOutcome"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-18",
+          "text_label": "`apps/cli-composition/src/dry/shared.rs`（またはその後継）に `dry_check_approved_outcome` / `dry_write_outcome` が存在しない、またはこれらに相当する render 処理が `apps/cli-driver` に実装されており `apps/cli-composition` からは呼ばれない。`libs/usecase/src/dry_driver.rs` の `DryDriverService::dry_write` / `dry_check_approved` の戻り値は、整形済みの stdout/stderr 文字列をそのまま保持したものではなく、`apps/cli-driver` 側で整形する前の構造化データである。"
+        }
+      }
+    },
+    {
+      "claim_hash": "82585738ecfbfc3be00f5d020d5ac1c7ca8cce6dc5ad079736e2b24b8e05aaf8",
+      "evidence_hash": "432120a45be4f6eb0e46de844caea04327fc966dacef4d618006501cf2ee68d6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "IN-11〜IN-13 の移設は既存ユーザー向け CLI 出力の内容（stdout/stderr 文言・exit code）を変更しない。移設は re-export shim や段階的 commit を用いて呼び出し互換性を保ちながら行う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "DryCheckApprovedOutcome"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-07",
+          "text_label": "IN-11〜IN-13 の移設は既存ユーザー向け CLI 出力の内容（stdout/stderr 文言・exit code）を変更しない。移設は re-export shim や段階的 commit を用いて呼び出し互換性を保ちながら行う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "bd5a6821a733c6a8a1f18015a3009c8aa5f8e2abec42f7c5de5d146269cea362",
+      "evidence_hash": "ed2817eadb35a48a3b798b5382f0e922c160b64efa3c91209e3a995f7a9acf62",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli-driver/src/track.rs` の `TrackDriver` が他の track サブコマンドに対して既に行っている invoke + render の構成に合わせ、`fixpoint-resolve` 用の入出力型を追加する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "DryCheckConfigLoaderError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-12",
+          "text_label": "`fixpoint-resolve` track サブコマンドについて、`apps/cli-composition/src/track/fixpoint_resolve.rs` の `TrackCompositionRoot::fixpoint_resolve` が担っている use case interactor の呼び出し（invoke）と、結果を CLI 出力文字列へ整形する処理（`format_fixpoint_step` を含む render）を `apps/cli-driver` へ移す。`apps/cli-driver/src/track.rs` の `TrackDriver` が他の track サブコマンドに対して既に行っている invoke + render の構成に合わせ、`fixpoint-resolve` 用の入出力型を追加する。移設後、`TrackCompositionRoot` に `fixpoint-resolve` 専用のメソッドは存在しない。他の track サブコマンドに対して既に使われている汎用の wire メソッド `TrackCompositionRoot::track_driver()` が `fixpoint-resolve` 用アダプタの構築と注入も担って `TrackDriver` を返し、`apps/cli` はその `TrackDriver` の `handle()` に `TrackInput::FixpointResolve` variant を渡して dispatch する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cc0db483390f196cac3ca89eedea9449d40bc966a77f3d0f5ea99a5201381483",
+      "evidence_hash": "35f5c600dfc798587697f4c0f4f9a981192ae1d08c026cb4d554fa488ac86e50",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli-composition` 側の `DryCompositionRoot::dry_write` / `dry_check_approved` が組み立て済みの stdout/stderr 文字列をそのまま転送しているだけで実質的な render を行っていないため、`DryDriverService` の戻り値（`DryDriverOutcome`）を整形前の構造化データに変更し、整形処理自体を `apps/cli-driver` 側に実装し直す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "DryDriverInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-13",
+          "text_label": "`dry write` / `dry check-approved` コマンドについて、`apps/cli-composition/src/dry/shared.rs` の `dry_check_approved_outcome` / `dry_write_outcome` が担っている CLI 出力文字列への整形処理（render）を `apps/cli-driver` へ移す。既存の `apps/cli-driver/src/dry.rs` の `DryDriver` と `libs/usecase/src/dry_driver.rs` の `DryDriverService` は、`apps/cli-composition` 側の `DryCompositionRoot::dry_write` / `dry_check_approved` が組み立て済みの stdout/stderr 文字列をそのまま転送しているだけで実質的な render を行っていないため、`DryDriverService` の戻り値（`DryDriverOutcome`）を整形前の構造化データに変更し、整形処理自体を `apps/cli-driver` 側に実装し直す。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cc0db483390f196cac3ca89eedea9449d40bc966a77f3d0f5ea99a5201381483",
+      "evidence_hash": "f88ff5a04d16e44140f019dfe4d2b037edfe4c41a994581fa2ddc3f9e8d01330",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/usecase/src/dry_driver.rs` の `DryDriverService::dry_write` / `dry_check_approved` の戻り値は、整形済みの stdout/stderr 文字列をそのまま保持したものではなく、`apps/cli-driver` 側で整形する前の構造化データである。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "DryDriverInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-18",
+          "text_label": "`apps/cli-composition/src/dry/shared.rs`（またはその後継）に `dry_check_approved_outcome` / `dry_write_outcome` が存在しない、またはこれらに相当する render 処理が `apps/cli-driver` に実装されており `apps/cli-composition` からは呼ばれない。`libs/usecase/src/dry_driver.rs` の `DryDriverService::dry_write` / `dry_check_approved` の戻り値は、整形済みの stdout/stderr 文字列をそのまま保持したものではなく、`apps/cli-driver` 側で整形する前の構造化データである。"
+        }
+      }
+    },
+    {
+      "claim_hash": "9a5e7fb8a47d46eabdfe732db1d1c83bfc4cd3f46279cb6182a86f2950a104ea",
+      "evidence_hash": "35f5c600dfc798587697f4c0f4f9a981192ae1d08c026cb4d554fa488ac86e50",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`dry write` / `dry check-approved` コマンドについて、`apps/cli-composition/src/dry/shared.rs` の `dry_check_approved_outcome` / `dry_write_outcome` が担っている CLI 出力文字列への整形処理（render）を `apps/cli-driver` へ移す。... `DryDriverService` の戻り値（`DryDriverOutcome`）を整形前の構造化データに変更し、整形処理自体を `apps/cli-driver` 側に実装し直す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "DryWriteFindingSummary"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-13",
+          "text_label": "`dry write` / `dry check-approved` コマンドについて、`apps/cli-composition/src/dry/shared.rs` の `dry_check_approved_outcome` / `dry_write_outcome` が担っている CLI 出力文字列への整形処理（render）を `apps/cli-driver` へ移す。既存の `apps/cli-driver/src/dry.rs` の `DryDriver` と `libs/usecase/src/dry_driver.rs` の `DryDriverService` は、`apps/cli-composition` 側の `DryCompositionRoot::dry_write` / `dry_check_approved` が組み立て済みの stdout/stderr 文字列をそのまま転送しているだけで実質的な render を行っていないため、`DryDriverService` の戻り値（`DryDriverOutcome`）を整形前の構造化データに変更し、整形処理自体を `apps/cli-driver` 側に実装し直す。"
+        }
+      }
+    },
+    {
+      "claim_hash": "9a5e7fb8a47d46eabdfe732db1d1c83bfc4cd3f46279cb6182a86f2950a104ea",
+      "evidence_hash": "f88ff5a04d16e44140f019dfe4d2b037edfe4c41a994581fa2ddc3f9e8d01330",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/usecase/src/dry_driver.rs` の `DryDriverService::dry_write` / `dry_check_approved` の戻り値は、整形済みの stdout/stderr 文字列をそのまま保持したものではなく、`apps/cli-driver` 側で整形する前の構造化データである。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "DryWriteFindingSummary"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-18",
+          "text_label": "`apps/cli-composition/src/dry/shared.rs`（またはその後継）に `dry_check_approved_outcome` / `dry_write_outcome` が存在しない、またはこれらに相当する render 処理が `apps/cli-driver` に実装されており `apps/cli-composition` からは呼ばれない。`libs/usecase/src/dry_driver.rs` の `DryDriverService::dry_write` / `dry_check_approved` の戻り値は、整形済みの stdout/stderr 文字列をそのまま保持したものではなく、`apps/cli-driver` 側で整形する前の構造化データである。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b808077e39ecfd68f5a97b01d8a905321f59e609ce7a094a435d7fc1f6c0c5e5",
+      "evidence_hash": "35f5c600dfc798587697f4c0f4f9a981192ae1d08c026cb4d554fa488ac86e50",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`DryDriverService` の戻り値（`DryDriverOutcome`）を整形前の構造化データに変更し、整形処理自体を `apps/cli-driver` 側に実装し直す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "DryWriteOutcome"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-13",
+          "text_label": "`dry write` / `dry check-approved` コマンドについて、`apps/cli-composition/src/dry/shared.rs` の `dry_check_approved_outcome` / `dry_write_outcome` が担っている CLI 出力文字列への整形処理（render）を `apps/cli-driver` へ移す。既存の `apps/cli-driver/src/dry.rs` の `DryDriver` と `libs/usecase/src/dry_driver.rs` の `DryDriverService` は、`apps/cli-composition` 側の `DryCompositionRoot::dry_write` / `dry_check_approved` が組み立て済みの stdout/stderr 文字列をそのまま転送しているだけで実質的な render を行っていないため、`DryDriverService` の戻り値（`DryDriverOutcome`）を整形前の構造化データに変更し、整形処理自体を `apps/cli-driver` 側に実装し直す。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b808077e39ecfd68f5a97b01d8a905321f59e609ce7a094a435d7fc1f6c0c5e5",
+      "evidence_hash": "f88ff5a04d16e44140f019dfe4d2b037edfe4c41a994581fa2ddc3f9e8d01330",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/usecase/src/dry_driver.rs` の `DryDriverService::dry_write` / `dry_check_approved` の戻り値は、整形済みの stdout/stderr 文字列をそのまま保持したものではなく、`apps/cli-driver` 側で整形する前の構造化データである。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "DryWriteOutcome"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-18",
+          "text_label": "`apps/cli-composition/src/dry/shared.rs`（またはその後継）に `dry_check_approved_outcome` / `dry_write_outcome` が存在しない、またはこれらに相当する render 処理が `apps/cli-driver` に実装されており `apps/cli-composition` からは呼ばれない。`libs/usecase/src/dry_driver.rs` の `DryDriverService::dry_write` / `dry_check_approved` の戻り値は、整形済みの stdout/stderr 文字列をそのまま保持したものではなく、`apps/cli-driver` 側で整形する前の構造化データである。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b808077e39ecfd68f5a97b01d8a905321f59e609ce7a094a435d7fc1f6c0c5e5",
+      "evidence_hash": "432120a45be4f6eb0e46de844caea04327fc966dacef4d618006501cf2ee68d6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "IN-11〜IN-13 の移設は既存ユーザー向け CLI 出力の内容（stdout/stderr 文言・exit code）を変更しない。移設は re-export shim や段階的 commit を用いて呼び出し互換性を保ちながら行う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "DryWriteOutcome"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-07",
+          "text_label": "IN-11〜IN-13 の移設は既存ユーザー向け CLI 出力の内容（stdout/stderr 文言・exit code）を変更しない。移設は re-export shim や段階的 commit を用いて呼び出し互換性を保ちながら行う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ea081a519daf4366c8572707ddd3f95408db3f96366244bd2c6cb715bb8e7d79",
+      "evidence_hash": "ed2817eadb35a48a3b798b5382f0e922c160b64efa3c91209e3a995f7a9acf62",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli-driver` へ移す。`apps/cli-driver/src/track.rs` の `TrackDriver` が他の track サブコマンドに対して既に行っている invoke + render の構成に合わせ、`fixpoint-resolve` 用の入出力型を追加する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "FixpointResolveDriverInput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-12",
+          "text_label": "`fixpoint-resolve` track サブコマンドについて、`apps/cli-composition/src/track/fixpoint_resolve.rs` の `TrackCompositionRoot::fixpoint_resolve` が担っている use case interactor の呼び出し（invoke）と、結果を CLI 出力文字列へ整形する処理（`format_fixpoint_step` を含む render）を `apps/cli-driver` へ移す。`apps/cli-driver/src/track.rs` の `TrackDriver` が他の track サブコマンドに対して既に行っている invoke + render の構成に合わせ、`fixpoint-resolve` 用の入出力型を追加する。移設後、`TrackCompositionRoot` に `fixpoint-resolve` 専用のメソッドは存在しない。他の track サブコマンドに対して既に使われている汎用の wire メソッド `TrackCompositionRoot::track_driver()` が `fixpoint-resolve` 用アダプタの構築と注入も担って `TrackDriver` を返し、`apps/cli` はその `TrackDriver` の `handle()` に `TrackInput::FixpointResolve` variant を渡して dispatch する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ea081a519daf4366c8572707ddd3f95408db3f96366244bd2c6cb715bb8e7d79",
+      "evidence_hash": "6d6d40b1fb2bc6d371f918d1f329ffa701c971d89a8d26738a7a890986591593",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli-driver/src/track.rs` の `TrackInput` に `fixpoint-resolve` 用の variant が存在する。`apps/cli-driver` 側の driver が invoke と render の両方を担う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "FixpointResolveDriverInput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-17",
+          "text_label": "`apps/cli-composition/src/track/fixpoint_resolve.rs`（またはその後継ファイル）に、`fixpoint-resolve` の結果を CLI 出力文字列へ整形する関数が存在しない。`TrackCompositionRoot::fixpoint_resolve`（またはその後継）は use case interactor を直接呼び出さず、`apps/cli-driver` 側の driver が invoke と render の両方を担う。`apps/cli-driver/src/track.rs` の `TrackInput` に `fixpoint-resolve` 用の variant が存在する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "94743126258ab5c43a97717de476120c383532a083c6efdc108b9825283c0e29",
+      "evidence_hash": "ed2817eadb35a48a3b798b5382f0e922c160b64efa3c91209e3a995f7a9acf62",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`TrackCompositionRoot::fixpoint_resolve` が担っている use case interactor の呼び出し（invoke）と、結果を CLI 出力文字列へ整形する処理（`format_fixpoint_step` を含む render）を `apps/cli-driver` へ移す。`apps/cli-driver/src/track.rs` の `TrackDriver` が他の track サブコマンドに対して既に行っている invoke + render の構成に合わせ、`fixpoint-resolve` 用の入出力型を追加する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "FixpointResolveDriverInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-12",
+          "text_label": "`fixpoint-resolve` track サブコマンドについて、`apps/cli-composition/src/track/fixpoint_resolve.rs` の `TrackCompositionRoot::fixpoint_resolve` が担っている use case interactor の呼び出し（invoke）と、結果を CLI 出力文字列へ整形する処理（`format_fixpoint_step` を含む render）を `apps/cli-driver` へ移す。`apps/cli-driver/src/track.rs` の `TrackDriver` が他の track サブコマンドに対して既に行っている invoke + render の構成に合わせ、`fixpoint-resolve` 用の入出力型を追加する。移設後、`TrackCompositionRoot` に `fixpoint-resolve` 専用のメソッドは存在しない。他の track サブコマンドに対して既に使われている汎用の wire メソッド `TrackCompositionRoot::track_driver()` が `fixpoint-resolve` 用アダプタの構築と注入も担って `TrackDriver` を返し、`apps/cli` はその `TrackDriver` の `handle()` に `TrackInput::FixpointResolve` variant を渡して dispatch する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "94743126258ab5c43a97717de476120c383532a083c6efdc108b9825283c0e29",
+      "evidence_hash": "6d6d40b1fb2bc6d371f918d1f329ffa701c971d89a8d26738a7a890986591593",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`TrackCompositionRoot::fixpoint_resolve`（またはその後継）は use case interactor を直接呼び出さず、`apps/cli-driver` 側の driver が invoke と render の両方を担う。`apps/cli-driver/src/track.rs` の `TrackInput` に `fixpoint-resolve` 用の variant が存在する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "FixpointResolveDriverInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-17",
+          "text_label": "`apps/cli-composition/src/track/fixpoint_resolve.rs`（またはその後継ファイル）に、`fixpoint-resolve` の結果を CLI 出力文字列へ整形する関数が存在しない。`TrackCompositionRoot::fixpoint_resolve`（またはその後継）は use case interactor を直接呼び出さず、`apps/cli-driver` 側の driver が invoke と render の両方を担う。`apps/cli-driver/src/track.rs` の `TrackInput` に `fixpoint-resolve` 用の variant が存在する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "1b36507f900dbc8f76f2bf027e11c33c8097d70f527b5ea454f8c28cae52a4ab",
+      "evidence_hash": "ed2817eadb35a48a3b798b5382f0e922c160b64efa3c91209e3a995f7a9acf62",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli-composition/src/track/fixpoint_resolve.rs` の `TrackCompositionRoot::fixpoint_resolve` が担っている use case interactor の呼び出し（invoke）と、結果を CLI 出力文字列へ整形する処理（`format_fixpoint_step` を含む render）を `apps/cli-driver` へ移す。... `fixpoint-resolve` 用の入出力型を追加する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "FixpointResolveDriverOutcome"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-12",
+          "text_label": "`fixpoint-resolve` track サブコマンドについて、`apps/cli-composition/src/track/fixpoint_resolve.rs` の `TrackCompositionRoot::fixpoint_resolve` が担っている use case interactor の呼び出し（invoke）と、結果を CLI 出力文字列へ整形する処理（`format_fixpoint_step` を含む render）を `apps/cli-driver` へ移す。`apps/cli-driver/src/track.rs` の `TrackDriver` が他の track サブコマンドに対して既に行っている invoke + render の構成に合わせ、`fixpoint-resolve` 用の入出力型を追加する。移設後、`TrackCompositionRoot` に `fixpoint-resolve` 専用のメソッドは存在しない。他の track サブコマンドに対して既に使われている汎用の wire メソッド `TrackCompositionRoot::track_driver()` が `fixpoint-resolve` 用アダプタの構築と注入も担って `TrackDriver` を返し、`apps/cli` はその `TrackDriver` の `handle()` に `TrackInput::FixpointResolve` variant を渡して dispatch する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "1b36507f900dbc8f76f2bf027e11c33c8097d70f527b5ea454f8c28cae52a4ab",
+      "evidence_hash": "6d6d40b1fb2bc6d371f918d1f329ffa701c971d89a8d26738a7a890986591593",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli-composition/src/track/fixpoint_resolve.rs`（またはその後継ファイル）に、`fixpoint-resolve` の結果を CLI 出力文字列へ整形する関数が存在しない。`TrackCompositionRoot::fixpoint_resolve`（またはその後継）は use case interactor を直接呼び出さず、`apps/cli-driver` 側の driver が invoke と render の両方を担う。`apps/cli-driver/src/track.rs` の `TrackInput` に `fixpoint-resolve` 用の variant が存在する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "FixpointResolveDriverOutcome"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-17",
+          "text_label": "`apps/cli-composition/src/track/fixpoint_resolve.rs`（またはその後継ファイル）に、`fixpoint-resolve` の結果を CLI 出力文字列へ整形する関数が存在しない。`TrackCompositionRoot::fixpoint_resolve`（またはその後継）は use case interactor を直接呼び出さず、`apps/cli-driver` 側の driver が invoke と render の両方を担う。`apps/cli-driver/src/track.rs` の `TrackInput` に `fixpoint-resolve` 用の variant が存在する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "1b36507f900dbc8f76f2bf027e11c33c8097d70f527b5ea454f8c28cae52a4ab",
+      "evidence_hash": "432120a45be4f6eb0e46de844caea04327fc966dacef4d618006501cf2ee68d6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "IN-11〜IN-13 の移設は既存ユーザー向け CLI 出力の内容（stdout/stderr 文言・exit code）を変更しない。移設は re-export shim や段階的 commit を用いて呼び出し互換性を保ちながら行う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "FixpointResolveDriverOutcome"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-07",
+          "text_label": "IN-11〜IN-13 の移設は既存ユーザー向け CLI 出力の内容（stdout/stderr 文言・exit code）を変更しない。移設は re-export shim や段階的 commit を用いて呼び出し互換性を保ちながら行う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "23e5c2111a5e64fd950981a4c8da4022804dd775d184aa9b5ea90fa5399c0299",
+      "evidence_hash": "ed2817eadb35a48a3b798b5382f0e922c160b64efa3c91209e3a995f7a9acf62",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli-driver/src/track.rs` の `TrackDriver` が他の track サブコマンドに対して既に行っている invoke + render の構成に合わせ、`fixpoint-resolve` 用の入出力型を追加する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "FixpointWorkspaceContext"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-12",
+          "text_label": "`fixpoint-resolve` track サブコマンドについて、`apps/cli-composition/src/track/fixpoint_resolve.rs` の `TrackCompositionRoot::fixpoint_resolve` が担っている use case interactor の呼び出し（invoke）と、結果を CLI 出力文字列へ整形する処理（`format_fixpoint_step` を含む render）を `apps/cli-driver` へ移す。`apps/cli-driver/src/track.rs` の `TrackDriver` が他の track サブコマンドに対して既に行っている invoke + render の構成に合わせ、`fixpoint-resolve` 用の入出力型を追加する。移設後、`TrackCompositionRoot` に `fixpoint-resolve` 専用のメソッドは存在しない。他の track サブコマンドに対して既に使われている汎用の wire メソッド `TrackCompositionRoot::track_driver()` が `fixpoint-resolve` 用アダプタの構築と注入も担って `TrackDriver` を返し、`apps/cli` はその `TrackDriver` の `handle()` に `TrackInput::FixpointResolve` variant を渡して dispatch する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "23e5c2111a5e64fd950981a4c8da4022804dd775d184aa9b5ea90fa5399c0299",
+      "evidence_hash": "53ce0a169b60bb6279ea45b52b5a66390f7e1e74496613ed3cf0594e9f29db51",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`branch_strategy_snapshot` を持たない `metadata.json` は parse 時に失敗（fail-closed）とする。grace period・opt-out・フォールバック読み込みを設けない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "FixpointWorkspaceContext"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "`branch_strategy_snapshot` を持たない `metadata.json` は parse 時に失敗（fail-closed）とする。grace period・opt-out・フォールバック読み込みを設けない。既存 track の扱いは利用者判断に委ね、SoTOHE 側で migration 機構を持たない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "23e5c2111a5e64fd950981a4c8da4022804dd775d184aa9b5ea90fa5399c0299",
+      "evidence_hash": "7550bc68ed5407ed667d38fb9039a3668c5109ca2bf1e72ab83516d2f5c25a47",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存 track の `metadata.json` を新 schema に migrate する仕組みや推奨手順を実装しない。暫定 compatibility layer・alias・旧 schema フォールバック読み込みを作らない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "FixpointWorkspaceContext"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-06",
+          "text_label": "既存 track の `metadata.json` を新 schema に migrate する仕組みや推奨手順を実装しない。暫定 compatibility layer・alias・旧 schema フォールバック読み込みを作らない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "1f67d33ede5809c35b4f437f119e4324b248bcc15cd86d7f2abc7efb63a2fc23",
+      "evidence_hash": "ed2817eadb35a48a3b798b5382f0e922c160b64efa3c91209e3a995f7a9acf62",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`fixpoint-resolve` 用の入出力型を追加する。移設後、`TrackCompositionRoot` に `fixpoint-resolve` 専用のメソッドは存在しない。他の track サブコマンドに対して既に使われている汎用の wire メソッド `TrackCompositionRoot::track_driver()` が `fixpoint-resolve` 用アダプタの構築と注入も担って `TrackDriver` を返し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "FixpointWorkspaceContextError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-12",
+          "text_label": "`fixpoint-resolve` track サブコマンドについて、`apps/cli-composition/src/track/fixpoint_resolve.rs` の `TrackCompositionRoot::fixpoint_resolve` が担っている use case interactor の呼び出し（invoke）と、結果を CLI 出力文字列へ整形する処理（`format_fixpoint_step` を含む render）を `apps/cli-driver` へ移す。`apps/cli-driver/src/track.rs` の `TrackDriver` が他の track サブコマンドに対して既に行っている invoke + render の構成に合わせ、`fixpoint-resolve` 用の入出力型を追加する。移設後、`TrackCompositionRoot` に `fixpoint-resolve` 専用のメソッドは存在しない。他の track サブコマンドに対して既に使われている汎用の wire メソッド `TrackCompositionRoot::track_driver()` が `fixpoint-resolve` 用アダプタの構築と注入も担って `TrackDriver` を返し、`apps/cli` はその `TrackDriver` の `handle()` に `TrackInput::FixpointResolve` variant を渡して dispatch する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "fb37a03c1f14622e53eb2997e96ee72fbb476832fdbd82850ded2dd1279e5bf3",
+      "evidence_hash": "2156210654ee69210a57760cf1ed63f924b158ac0cabf238d09d38bde0ad37c0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`BranchStrategyPort` trait を `libs/usecase/` に新設し、`base_branch() -> &str`、`merge_target() -> &str`、`merge_method() -> MergeMethod`、`track_prefix() -> &str` を expose する。`libs/infrastructure/` に JSON config ローダ adapter と metadata snapshot reader adapter を実装し、track context の有無で解決先を切り替える。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "BranchStrategyPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "`BranchStrategyPort` trait を `libs/usecase/` に新設し、`base_branch() -> &str`、`merge_target() -> &str`、`merge_method() -> MergeMethod`、`track_prefix() -> &str` を expose する。`libs/infrastructure/` に JSON config ローダ adapter と metadata snapshot reader adapter を実装し、track context の有無で解決先を切り替える。"
+        }
+      }
+    },
+    {
+      "claim_hash": "fb37a03c1f14622e53eb2997e96ee72fbb476832fdbd82850ded2dd1279e5bf3",
+      "evidence_hash": "f1e1f98c935d7276c49612a4660b3e736649f4d86b8b0d6068bd438a24103280",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`BranchStrategyPort` は `libs/usecase/` に定義する（アプリケーション機能として usecase layer port の配置原則に従う）。adapter は `libs/infrastructure/` に実装し、usecase 側が infrastructure の実装を直接参照しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "BranchStrategyPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "`BranchStrategyPort` は `libs/usecase/` に定義する（アプリケーション機能として usecase layer port の配置原則に従う）。adapter は `libs/infrastructure/` に実装し、usecase 側が infrastructure の実装を直接参照しない。`cargo make check-layers` が通ることでレイヤー依存方向を機械検証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "9fe91732206e9813d28e01b88d4ec64b90e79abfbab996deac8da1890b9fcf87",
+      "evidence_hash": "5bab5997f20c2110b2e7a19839c52b703dd646c38480b502c9eba3156213ed68",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`git rev-parse main` フォールバック実装（`apps/cli-composition/src/dry/shared.rs:91-115` を正本とし、`review_v2/shared.rs`、`fixpoint_resolve.rs`、`gate_state.rs`、`commit_hash_store.rs`、`dry.rs` テストを含む）を effective strategy の `base_branch()` を受け取る形に置き換える。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "DiffBaseResolverPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "`git rev-parse main` フォールバック実装（`apps/cli-composition/src/dry/shared.rs:91-115` を正本とし、`review_v2/shared.rs`、`fixpoint_resolve.rs`、`gate_state.rs`、`commit_hash_store.rs`、`dry.rs` テストを含む）を effective strategy の `base_branch()` を受け取る形に置き換える。PR test fixture （`libs/infrastructure/src/gh_cli.rs:552-682` 周辺）を branch 戦略引数化する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "9fe91732206e9813d28e01b88d4ec64b90e79abfbab996deac8da1890b9fcf87",
+      "evidence_hash": "f95193fa3b2db990cef98af734a7f8ec7c26067fb208a96f2d22adb6f2223135",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`review_v2/shared.rs`、`fixpoint_resolve.rs`、`gate_state.rs` も同じ helper または port 経由に統一されており、これらのファイルに branch 戦略としての `\"main\"` リテラルが残っていない。設定由来の branch 名は git invocation に個別 argv として渡され、shell command 文字列へ補間されないことをテストで確認できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "DiffBaseResolverPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "`apps/cli-composition/src/dry/shared.rs` の差分基底 fallback 関数が effective strategy の `base_branch()` から branch 名を受け取る実装になっている。`review_v2/shared.rs`、`fixpoint_resolve.rs`、`gate_state.rs` も同じ helper または port 経由に統一されており、これらのファイルに branch 戦略としての `\"main\"` リテラルが残っていない。設定由来の branch 名は git invocation に個別 argv として渡され、shell command 文字列へ補間されないことをテストで確認できる。`cargo make test` が pass する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b7b6d3c3c49d1c41f8acb2cfcb6fdd5432b0d3f2b2a126bb5b6838bc8aa1942f",
+      "evidence_hash": "61415421d244cf641a3b37725509f2a38c787f0caa46b3e67612de53ab011310",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/usecase` の `DryApprovalFactoryPort` を実装する adapter `FsDryApprovalFactoryAdapter` を `apps/cli-composition/src/track/fixpoint_resolve.rs` から `libs/infrastructure` へ移設する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "DryApprovalFactoryPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-11",
+          "text_label": "`libs/usecase` の `DryApprovalFactoryPort` を実装する adapter `FsDryApprovalFactoryAdapter` を `apps/cli-composition/src/track/fixpoint_resolve.rs` から `libs/infrastructure` へ移設する。同じコマンドの兄弟 adapter（diff base resolver、corpus meta、dry approval no-op、gate state 系）は既に `libs/infrastructure` に移設済みであり、本 IN はこの移設から取り残された最後の 1 件を対象とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b7b6d3c3c49d1c41f8acb2cfcb6fdd5432b0d3f2b2a126bb5b6838bc8aa1942f",
+      "evidence_hash": "21f087d6996f1410caca99637abb31e9c17f8231d658dc1a6e21eb339256c0ea",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli-composition` 配下に `DryApprovalFactoryPort` を実装する型定義が存在しない。同 port の実装は `libs/infrastructure` に存在し、`apps/cli-composition` からは注入のためだけに参照される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "DryApprovalFactoryPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-16",
+          "text_label": "`apps/cli-composition` 配下に `DryApprovalFactoryPort` を実装する型定義が存在しない。同 port の実装は `libs/infrastructure` に存在し、`apps/cli-composition` からは注入のためだけに参照される。`cargo make check-layers` が pass する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "72e192c6ebce0af6447ffd8bd92ed7ca39eb45a7452a206d0719e057b57ea425",
+      "evidence_hash": "ed2817eadb35a48a3b798b5382f0e922c160b64efa3c91209e3a995f7a9acf62",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`TrackCompositionRoot::track_driver()` が `fixpoint-resolve` 用アダプタの構築と注入も担って `TrackDriver` を返し、`apps/cli` はその `TrackDriver` の `handle()` に `TrackInput::FixpointResolve` variant を渡して dispatch する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "DryCheckConfigLoaderPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-12",
+          "text_label": "`fixpoint-resolve` track サブコマンドについて、`apps/cli-composition/src/track/fixpoint_resolve.rs` の `TrackCompositionRoot::fixpoint_resolve` が担っている use case interactor の呼び出し（invoke）と、結果を CLI 出力文字列へ整形する処理（`format_fixpoint_step` を含む render）を `apps/cli-driver` へ移す。`apps/cli-driver/src/track.rs` の `TrackDriver` が他の track サブコマンドに対して既に行っている invoke + render の構成に合わせ、`fixpoint-resolve` 用の入出力型を追加する。移設後、`TrackCompositionRoot` に `fixpoint-resolve` 専用のメソッドは存在しない。他の track サブコマンドに対して既に使われている汎用の wire メソッド `TrackCompositionRoot::track_driver()` が `fixpoint-resolve` 用アダプタの構築と注入も担って `TrackDriver` を返し、`apps/cli` はその `TrackDriver` の `handle()` に `TrackInput::FixpointResolve` variant を渡して dispatch する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d2d73ec97af367c080b4acbf07d29e8443b812cddc10041183bd500ae5c65371",
+      "evidence_hash": "35f5c600dfc798587697f4c0f4f9a981192ae1d08c026cb4d554fa488ac86e50",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`dry write` / `dry check-approved` コマンドについて、`apps/cli-composition/src/dry/shared.rs` の `dry_check_approved_outcome` / `dry_write_outcome` が担っている CLI 出力文字列への整形処理（render）を `apps/cli-driver` へ移す。既存の `apps/cli-driver/src/dry.rs` の `DryDriver` と `libs/usecase/src/dry_driver.rs` の `DryDriverService` は、`apps/cli-composition` 側の `DryCompositionRoot::dry_write` / `dry_check_approved` が組み立て済みの stdout/stderr 文字列をそのまま転送しているだけで実質的な render を行っていないため、`DryDriverService` の戻り値（`DryDriverOutcome`）を整形前の構造化データに変更し、整形処理自体を `apps/cli-driver` 側に実装し直す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "DryDriverPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-13",
+          "text_label": "`dry write` / `dry check-approved` コマンドについて、`apps/cli-composition/src/dry/shared.rs` の `dry_check_approved_outcome` / `dry_write_outcome` が担っている CLI 出力文字列への整形処理（render）を `apps/cli-driver` へ移す。既存の `apps/cli-driver/src/dry.rs` の `DryDriver` と `libs/usecase/src/dry_driver.rs` の `DryDriverService` は、`apps/cli-composition` 側の `DryCompositionRoot::dry_write` / `dry_check_approved` が組み立て済みの stdout/stderr 文字列をそのまま転送しているだけで実質的な render を行っていないため、`DryDriverService` の戻り値（`DryDriverOutcome`）を整形前の構造化データに変更し、整形処理自体を `apps/cli-driver` 側に実装し直す。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d2d73ec97af367c080b4acbf07d29e8443b812cddc10041183bd500ae5c65371",
+      "evidence_hash": "f88ff5a04d16e44140f019dfe4d2b037edfe4c41a994581fa2ddc3f9e8d01330",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli-composition/src/dry/shared.rs`（またはその後継）に `dry_check_approved_outcome` / `dry_write_outcome` が存在しない、またはこれらに相当する render 処理が `apps/cli-driver` に実装されており `apps/cli-composition` からは呼ばれない。`libs/usecase/src/dry_driver.rs` の `DryDriverService::dry_write` / `dry_check_approved` の戻り値は、整形済みの stdout/stderr 文字列をそのまま保持したものではなく、`apps/cli-driver` 側で整形する前の構造化データである。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "DryDriverPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-18",
+          "text_label": "`apps/cli-composition/src/dry/shared.rs`（またはその後継）に `dry_check_approved_outcome` / `dry_write_outcome` が存在しない、またはこれらに相当する render 処理が `apps/cli-driver` に実装されており `apps/cli-composition` からは呼ばれない。`libs/usecase/src/dry_driver.rs` の `DryDriverService::dry_write` / `dry_check_approved` の戻り値は、整形済みの stdout/stderr 文字列をそのまま保持したものではなく、`apps/cli-driver` 側で整形する前の構造化データである。"
+        }
+      }
+    },
+    {
+      "claim_hash": "9bfd6a742b218c2415c2ad8a1c4138bbd54a1c1edbe0ada7d5664ac63079699d",
+      "evidence_hash": "35f5c600dfc798587697f4c0f4f9a981192ae1d08c026cb4d554fa488ac86e50",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`dry write` / `dry check-approved` コマンドについて、`apps/cli-composition/src/dry/shared.rs` の `dry_check_approved_outcome` / `dry_write_outcome` が担っている CLI 出力文字列への整形処理（render）を `apps/cli-driver` へ移す。既存の `apps/cli-driver/src/dry.rs` の `DryDriver` と `libs/usecase/src/dry_driver.rs` の `DryDriverService` は、`apps/cli-composition` 側の `DryCompositionRoot::dry_write` / `dry_check_approved` が組み立て済みの stdout/stderr 文字列をそのまま転送しているだけで実質的な render を行っていないため、`DryDriverService` の戻り値（`DryDriverOutcome`）を整形前の構造化データに変更し、整形処理自体を `apps/cli-driver` 側に実装し直す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "DryDriverService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-13",
+          "text_label": "`dry write` / `dry check-approved` コマンドについて、`apps/cli-composition/src/dry/shared.rs` の `dry_check_approved_outcome` / `dry_write_outcome` が担っている CLI 出力文字列への整形処理（render）を `apps/cli-driver` へ移す。既存の `apps/cli-driver/src/dry.rs` の `DryDriver` と `libs/usecase/src/dry_driver.rs` の `DryDriverService` は、`apps/cli-composition` 側の `DryCompositionRoot::dry_write` / `dry_check_approved` が組み立て済みの stdout/stderr 文字列をそのまま転送しているだけで実質的な render を行っていないため、`DryDriverService` の戻り値（`DryDriverOutcome`）を整形前の構造化データに変更し、整形処理自体を `apps/cli-driver` 側に実装し直す。"
+        }
+      }
+    },
+    {
+      "claim_hash": "9bfd6a742b218c2415c2ad8a1c4138bbd54a1c1edbe0ada7d5664ac63079699d",
+      "evidence_hash": "f88ff5a04d16e44140f019dfe4d2b037edfe4c41a994581fa2ddc3f9e8d01330",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli-composition/src/dry/shared.rs`（またはその後継）に `dry_check_approved_outcome` / `dry_write_outcome` が存在しない、またはこれらに相当する render 処理が `apps/cli-driver` に実装されており `apps/cli-composition` からは呼ばれない。`libs/usecase/src/dry_driver.rs` の `DryDriverService::dry_write` / `dry_check_approved` の戻り値は、整形済みの stdout/stderr 文字列をそのまま保持したものではなく、`apps/cli-driver` 側で整形する前の構造化データである。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "DryDriverService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-18",
+          "text_label": "`apps/cli-composition/src/dry/shared.rs`（またはその後継）に `dry_check_approved_outcome` / `dry_write_outcome` が存在しない、またはこれらに相当する render 処理が `apps/cli-driver` に実装されており `apps/cli-composition` からは呼ばれない。`libs/usecase/src/dry_driver.rs` の `DryDriverService::dry_write` / `dry_check_approved` の戻り値は、整形済みの stdout/stderr 文字列をそのまま保持したものではなく、`apps/cli-driver` 側で整形する前の構造化データである。"
+        }
+      }
+    },
+    {
+      "claim_hash": "879bbce9559474636e5fc13be5c1b65a87ba9bb74cd9c8e7fb98ff85d8ae4608",
+      "evidence_hash": "ed2817eadb35a48a3b798b5382f0e922c160b64efa3c91209e3a995f7a9acf62",
+      "verdict": {
+        "kind": "pass",
+        "citation": "他の track サブコマンドに対して既に使われている汎用の wire メソッド `TrackCompositionRoot::track_driver()` が `fixpoint-resolve` 用アダプタの構築と注入も担って `TrackDriver` を返し、`apps/cli` はその `TrackDriver` の `handle()` に `TrackInput::FixpointResolve` variant を渡して dispatch する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "FixpointDryGateFactoryPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-12",
+          "text_label": "`fixpoint-resolve` track サブコマンドについて、`apps/cli-composition/src/track/fixpoint_resolve.rs` の `TrackCompositionRoot::fixpoint_resolve` が担っている use case interactor の呼び出し（invoke）と、結果を CLI 出力文字列へ整形する処理（`format_fixpoint_step` を含む render）を `apps/cli-driver` へ移す。`apps/cli-driver/src/track.rs` の `TrackDriver` が他の track サブコマンドに対して既に行っている invoke + render の構成に合わせ、`fixpoint-resolve` 用の入出力型を追加する。移設後、`TrackCompositionRoot` に `fixpoint-resolve` 専用のメソッドは存在しない。他の track サブコマンドに対して既に使われている汎用の wire メソッド `TrackCompositionRoot::track_driver()` が `fixpoint-resolve` 用アダプタの構築と注入も担って `TrackDriver` を返し、`apps/cli` はその `TrackDriver` の `handle()` に `TrackInput::FixpointResolve` variant を渡して dispatch する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a40e6e09073aaa982f8454016cad8872c12b971f532af75cdf3ea232e7f19f51",
+      "evidence_hash": "ed2817eadb35a48a3b798b5382f0e922c160b64efa3c91209e3a995f7a9acf62",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli-driver/src/track.rs` の `TrackDriver` が他の track サブコマンドに対して既に行っている invoke + render の構成に合わせ、`fixpoint-resolve` 用の入出力型を追加する。移設後、`TrackCompositionRoot` に `fixpoint-resolve` 専用のメソッドは存在しない。他の track サブコマンドに対して既に使われている汎用の wire メソッド `TrackCompositionRoot::track_driver()` が `fixpoint-resolve` 用アダプタの構築と注入も担って `TrackDriver` を返し、`apps/cli` はその `TrackDriver` の `handle()` に `TrackInput::FixpointResolve` variant を渡して dispatch する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "FixpointDryGateService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-12",
+          "text_label": "`fixpoint-resolve` track サブコマンドについて、`apps/cli-composition/src/track/fixpoint_resolve.rs` の `TrackCompositionRoot::fixpoint_resolve` が担っている use case interactor の呼び出し（invoke）と、結果を CLI 出力文字列へ整形する処理（`format_fixpoint_step` を含む render）を `apps/cli-driver` へ移す。`apps/cli-driver/src/track.rs` の `TrackDriver` が他の track サブコマンドに対して既に行っている invoke + render の構成に合わせ、`fixpoint-resolve` 用の入出力型を追加する。移設後、`TrackCompositionRoot` に `fixpoint-resolve` 専用のメソッドは存在しない。他の track サブコマンドに対して既に使われている汎用の wire メソッド `TrackCompositionRoot::track_driver()` が `fixpoint-resolve` 用アダプタの構築と注入も担って `TrackDriver` を返し、`apps/cli` はその `TrackDriver` の `handle()` に `TrackInput::FixpointResolve` variant を渡して dispatch する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "7a91e488e5cc940cfd4008d1f0da09738b5dd60e6d8bf6a4a86e56af5f6e4de2",
+      "evidence_hash": "ed2817eadb35a48a3b798b5382f0e922c160b64efa3c91209e3a995f7a9acf62",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`TrackCompositionRoot::track_driver()` が `fixpoint-resolve` 用アダプタの構築と注入も担って `TrackDriver` を返し、`apps/cli` はその `TrackDriver` の `handle()` に `TrackInput::FixpointResolve` variant を渡して dispatch する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "FixpointGateStateFactoryPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-12",
+          "text_label": "`fixpoint-resolve` track サブコマンドについて、`apps/cli-composition/src/track/fixpoint_resolve.rs` の `TrackCompositionRoot::fixpoint_resolve` が担っている use case interactor の呼び出し（invoke）と、結果を CLI 出力文字列へ整形する処理（`format_fixpoint_step` を含む render）を `apps/cli-driver` へ移す。`apps/cli-driver/src/track.rs` の `TrackDriver` が他の track サブコマンドに対して既に行っている invoke + render の構成に合わせ、`fixpoint-resolve` 用の入出力型を追加する。移設後、`TrackCompositionRoot` に `fixpoint-resolve` 専用のメソッドは存在しない。他の track サブコマンドに対して既に使われている汎用の wire メソッド `TrackCompositionRoot::track_driver()` が `fixpoint-resolve` 用アダプタの構築と注入も担って `TrackDriver` を返し、`apps/cli` はその `TrackDriver` の `handle()` に `TrackInput::FixpointResolve` variant を渡して dispatch する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "3473c06650f3c1cd30e433ebdbfaa75162e7bb9f5aa91b962e708b519a99e54c",
+      "evidence_hash": "ed2817eadb35a48a3b798b5382f0e922c160b64efa3c91209e3a995f7a9acf62",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli-composition/src/track/fixpoint_resolve.rs` の `TrackCompositionRoot::fixpoint_resolve` が担っている use case interactor の呼び出し（invoke）と、結果を CLI 出力文字列へ整形する処理（`format_fixpoint_step` を含む render）を `apps/cli-driver` へ移す。`apps/cli-driver/src/track.rs` の `TrackDriver` が他の track サブコマンドに対して既に行っている invoke + render の構成に合わせ、`fixpoint-resolve` 用の入出力型を追加する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "FixpointResolveDriverService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-12",
+          "text_label": "`fixpoint-resolve` track サブコマンドについて、`apps/cli-composition/src/track/fixpoint_resolve.rs` の `TrackCompositionRoot::fixpoint_resolve` が担っている use case interactor の呼び出し（invoke）と、結果を CLI 出力文字列へ整形する処理（`format_fixpoint_step` を含む render）を `apps/cli-driver` へ移す。`apps/cli-driver/src/track.rs` の `TrackDriver` が他の track サブコマンドに対して既に行っている invoke + render の構成に合わせ、`fixpoint-resolve` 用の入出力型を追加する。移設後、`TrackCompositionRoot` に `fixpoint-resolve` 専用のメソッドは存在しない。他の track サブコマンドに対して既に使われている汎用の wire メソッド `TrackCompositionRoot::track_driver()` が `fixpoint-resolve` 用アダプタの構築と注入も担って `TrackDriver` を返し、`apps/cli` はその `TrackDriver` の `handle()` に `TrackInput::FixpointResolve` variant を渡して dispatch する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "3473c06650f3c1cd30e433ebdbfaa75162e7bb9f5aa91b962e708b519a99e54c",
+      "evidence_hash": "6d6d40b1fb2bc6d371f918d1f329ffa701c971d89a8d26738a7a890986591593",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`TrackCompositionRoot::fixpoint_resolve`（またはその後継）は use case interactor を直接呼び出さず、`apps/cli-driver` 側の driver が invoke と render の両方を担う。`apps/cli-driver/src/track.rs` の `TrackInput` に `fixpoint-resolve` 用の variant が存在する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "FixpointResolveDriverService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-17",
+          "text_label": "`apps/cli-composition/src/track/fixpoint_resolve.rs`（またはその後継ファイル）に、`fixpoint-resolve` の結果を CLI 出力文字列へ整形する関数が存在しない。`TrackCompositionRoot::fixpoint_resolve`（またはその後継）は use case interactor を直接呼び出さず、`apps/cli-driver` 側の driver が invoke と render の両方を担う。`apps/cli-driver/src/track.rs` の `TrackInput` に `fixpoint-resolve` 用の variant が存在する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "57e5de550807a7412922eb371b58add3b08997ec26f121651d6a0da17fc7486c",
+      "evidence_hash": "ed2817eadb35a48a3b798b5382f0e922c160b64efa3c91209e3a995f7a9acf62",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`fixpoint-resolve` 用の入出力型を追加する。`TrackCompositionRoot::track_driver()` が `fixpoint-resolve` 用アダプタの構築と注入も担って `TrackDriver` を返し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "FixpointWorkspaceContextPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-12",
+          "text_label": "`fixpoint-resolve` track サブコマンドについて、`apps/cli-composition/src/track/fixpoint_resolve.rs` の `TrackCompositionRoot::fixpoint_resolve` が担っている use case interactor の呼び出し（invoke）と、結果を CLI 出力文字列へ整形する処理（`format_fixpoint_step` を含む render）を `apps/cli-driver` へ移す。`apps/cli-driver/src/track.rs` の `TrackDriver` が他の track サブコマンドに対して既に行っている invoke + render の構成に合わせ、`fixpoint-resolve` 用の入出力型を追加する。移設後、`TrackCompositionRoot` に `fixpoint-resolve` 専用のメソッドは存在しない。他の track サブコマンドに対して既に使われている汎用の wire メソッド `TrackCompositionRoot::track_driver()` が `fixpoint-resolve` 用アダプタの構築と注入も担って `TrackDriver` を返し、`apps/cli` はその `TrackDriver` の `handle()` に `TrackInput::FixpointResolve` variant を渡して dispatch する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "57e5de550807a7412922eb371b58add3b08997ec26f121651d6a0da17fc7486c",
+      "evidence_hash": "53ce0a169b60bb6279ea45b52b5a66390f7e1e74496613ed3cf0594e9f29db51",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`branch_strategy_snapshot` を持たない `metadata.json` は parse 時に失敗（fail-closed）とする。grace period・opt-out・フォールバック読み込みを設けない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "FixpointWorkspaceContextPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "`branch_strategy_snapshot` を持たない `metadata.json` は parse 時に失敗（fail-closed）とする。grace period・opt-out・フォールバック読み込みを設けない。既存 track の扱いは利用者判断に委ね、SoTOHE 側で migration 機構を持たない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "57e5de550807a7412922eb371b58add3b08997ec26f121651d6a0da17fc7486c",
+      "evidence_hash": "7550bc68ed5407ed667d38fb9039a3668c5109ca2bf1e72ab83516d2f5c25a47",
+      "verdict": {
+        "kind": "pass",
+        "citation": "暫定 compatibility layer・alias・旧 schema フォールバック読み込みを作らない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "FixpointWorkspaceContextPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-06",
+          "text_label": "既存 track の `metadata.json` を新 schema に migrate する仕組みや推奨手順を実装しない。暫定 compatibility layer・alias・旧 schema フォールバック読み込みを作らない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0ca71ecb465fc66ace23eb33fdae2c441d95cd75e5881093e565c384f9798fdd",
+      "evidence_hash": "ed2817eadb35a48a3b798b5382f0e922c160b64efa3c91209e3a995f7a9acf62",
+      "verdict": {
+        "kind": "pass",
+        "citation": "他の track サブコマンドに対して既に使われている汎用の wire メソッド `TrackCompositionRoot::track_driver()` が `fixpoint-resolve` 用アダプタの構築と注入も担って `TrackDriver` を返し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "RefVerifyGateStatePort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-12",
+          "text_label": "`fixpoint-resolve` track サブコマンドについて、`apps/cli-composition/src/track/fixpoint_resolve.rs` の `TrackCompositionRoot::fixpoint_resolve` が担っている use case interactor の呼び出し（invoke）と、結果を CLI 出力文字列へ整形する処理（`format_fixpoint_step` を含む render）を `apps/cli-driver` へ移す。`apps/cli-driver/src/track.rs` の `TrackDriver` が他の track サブコマンドに対して既に行っている invoke + render の構成に合わせ、`fixpoint-resolve` 用の入出力型を追加する。移設後、`TrackCompositionRoot` に `fixpoint-resolve` 専用のメソッドは存在しない。他の track サブコマンドに対して既に使われている汎用の wire メソッド `TrackCompositionRoot::track_driver()` が `fixpoint-resolve` 用アダプタの構築と注入も担って `TrackDriver` を返し、`apps/cli` はその `TrackDriver` の `handle()` に `TrackInput::FixpointResolve` variant を渡して dispatch する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "593d21a6bac5cc3959fb2fd7a36361a9762477705721d69b8851c45d75334eae",
+      "evidence_hash": "5bab5997f20c2110b2e7a19839c52b703dd646c38480b502c9eba3156213ed68",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`git rev-parse main` フォールバック実装（`apps/cli-composition/src/dry/shared.rs:91-115` を正本とし、`review_v2/shared.rs`、`fixpoint_resolve.rs`、`gate_state.rs`、`commit_hash_store.rs`、`dry.rs` テストを含む）を effective strategy の `base_branch()` を受け取る形に置き換える。PR test fixture （`libs/infrastructure/src/gh_cli.rs:552-682` 周辺）を branch 戦略引数化する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "ReviewGateStatePort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "`git rev-parse main` フォールバック実装（`apps/cli-composition/src/dry/shared.rs:91-115` を正本とし、`review_v2/shared.rs`、`fixpoint_resolve.rs`、`gate_state.rs`、`commit_hash_store.rs`、`dry.rs` テストを含む）を effective strategy の `base_branch()` を受け取る形に置き換える。PR test fixture （`libs/infrastructure/src/gh_cli.rs:552-682` 周辺）を branch 戦略引数化する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "593d21a6bac5cc3959fb2fd7a36361a9762477705721d69b8851c45d75334eae",
+      "evidence_hash": "f95193fa3b2db990cef98af734a7f8ec7c26067fb208a96f2d22adb6f2223135",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`review_v2/shared.rs`、`fixpoint_resolve.rs`、`gate_state.rs` も同じ helper または port 経由に統一されており、これらのファイルに branch 戦略としての `\"main\"` リテラルが残っていない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "ReviewGateStatePort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "`apps/cli-composition/src/dry/shared.rs` の差分基底 fallback 関数が effective strategy の `base_branch()` から branch 名を受け取る実装になっている。`review_v2/shared.rs`、`fixpoint_resolve.rs`、`gate_state.rs` も同じ helper または port 経由に統一されており、これらのファイルに branch 戦略としての `\"main\"` リテラルが残っていない。設定由来の branch 名は git invocation に個別 argv として渡され、shell command 文字列へ補間されないことをテストで確認できる。`cargo make test` が pass する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c8261e2aea547c1109aec7fa37713144a342d2e477a96e7b3eafb388a4f4db12",
+      "evidence_hash": "6addf5a32c6222d234d96a82bd2402003c9dbe10f9a31b6d5817bdf32583fb7f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cargo make track-switch-main` タスクを `cargo make track-switch-base` にリネームし、本体を `bin/sotp track switch-base`（新規 native subcommand）に委譲する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TrackService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "`cargo make track-switch-main` タスクを `cargo make track-switch-base` にリネームし、本体を `bin/sotp track switch-base`（新規 native subcommand）に委譲する。`.claude/settings.json:159` の allowlist エントリ、`.claude/commands/track/done.md`、`.claude/rules/07-dev-environment.md:54,56` の参照を連動更新する。"
+        }
+      }
+    }
+  ]
+}

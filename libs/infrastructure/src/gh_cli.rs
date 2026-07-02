@@ -689,6 +689,56 @@ mod tests {
         assert!(err.contains("could not determine PR number"), "got: {err}");
     }
 
+    #[test]
+    fn find_open_pr_with_uses_injected_base_branch() {
+        // When base_branch = "develop", the gh argv must use "develop", not "main".
+        let result = find_open_pr_with("track/feat", "develop", &|args| {
+            assert_eq!(
+                args,
+                [
+                    "pr",
+                    "list",
+                    "--head",
+                    "track/feat",
+                    "--base",
+                    "develop",
+                    "--state",
+                    "open",
+                    "--json",
+                    "number",
+                    "-q",
+                    ".[0].number"
+                ]
+            );
+            Ok(output(0, "7\n", ""))
+        });
+        assert_eq!(result.unwrap(), Some("7".to_owned()));
+    }
+
+    #[test]
+    fn create_pr_with_uses_injected_base_branch() {
+        // When base_branch = "develop", the gh argv must use "develop", not "main".
+        let result = create_pr_with("track/feat", "develop", "title", Path::new("b.md"), &|args| {
+            assert_eq!(
+                args,
+                [
+                    "pr",
+                    "create",
+                    "--head",
+                    "track/feat",
+                    "--base",
+                    "develop",
+                    "--title",
+                    "title",
+                    "--body-file",
+                    "b.md"
+                ]
+            );
+            Ok(output(0, "https://github.com/o/r/pull/3\n", ""))
+        });
+        assert_eq!(result.unwrap(), "3");
+    }
+
     // --- post_issue_comment_with tests ---
 
     #[test]

@@ -76,16 +76,21 @@ impl TrackStatusReaderPort for FsTrackStatusReaderAdapter {
 mod tests {
     use super::*;
 
-    /// Minimal valid `metadata.json` (schema v5, no status field → Planned).
+    /// Minimal valid `metadata.json` (schema v6, no status field → Planned).
     fn activated_metadata(track_id: &str) -> String {
         format!(
             r#"{{
-  "schema_version": 5,
+  "schema_version": 6,
   "id": "{track_id}",
   "branch": "track/{track_id}",
   "title": "Test",
   "created_at": "2026-01-01T00:00:00Z",
-  "updated_at": "2026-01-01T00:00:00Z"
+  "updated_at": "2026-01-01T00:00:00Z",
+  "branch_strategy_snapshot": {{
+    "base_branch": "main",
+    "merge_target": "main",
+    "merge_method": "squash"
+  }}
 }}"#
         )
     }

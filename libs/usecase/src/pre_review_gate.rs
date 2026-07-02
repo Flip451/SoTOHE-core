@@ -1424,14 +1424,26 @@ mod tests {
         );
     }
 
-    // ── Coverage: synthetic kind_tag="unknown" rows must be ignored (round 15 P1) ─
+    // ── Coverage: unknown-kind rows must trigger OrphanEntry (ADR fail-closed) ─
+    //
+    // ADR `2026-06-27-0852-pre-review-task-contract-conformance-gate.md` D1/D3/D4/D9
+    // require attribution completeness across **every** catalogue entry, and
+    // Rejected Alternative AB explicitly forbids silently ignoring rows. A
+    // `kind: "unknown"` signal typically means a newly-added type that is not yet
+    // registered in the catalogue — precisely the case that must fail-closed at
+    // pre-review time so `/track:diagnose` can route to `type-design`.
+    //
+    // The prior behavior (round 15 P1) silently excluded unknown-kind rows from
+    // orphan detection, which allowed such types to slip past the pre-review gate
+    // and only surface at commit time. That was a bug — the row now correctly
+    // triggers `OrphanEntry`.
 
     #[test]
-    fn coverage_synthetic_unknown_signal_row_does_not_demand_attribution() {
-        // Signal doc has Foo (catalogue entry, blue) AND ImplOnlyType (synthetic
-        // report-only row with kind_tag="unknown"). task-contract.json attributes
-        // Foo only — ImplOnlyType is NOT a catalogue entry so demanding attribution
-        // for it would block the gate spuriously.
+    fn coverage_unknown_kind_signal_row_yields_orphan_entry() {
+        // Signal doc has Foo (blue, attributed) AND ImplOnlyType (kind: unknown,
+        // NOT attributed). Under fail-closed semantics, ImplOnlyType must trigger
+        // OrphanEntry so the planner is forced to either add it to the catalogue
+        // (registering a proper kind) or remove the impl.
         let mut signal_docs = std::collections::HashMap::new();
         signal_docs.insert(
             "domain".to_owned(),
@@ -1451,10 +1463,27 @@ mod tests {
             signal_docs,
         );
         let outcome = svc.verify_coverage(coverage_cmd("my-track")).unwrap();
-        assert!(
-            matches!(outcome, CoverageVerifyOutcome::Passed),
-            "expected Passed (unknown row excluded from scope), got {outcome:?}"
-        );
+        match outcome {
+            CoverageVerifyOutcome::Blocked { violations, .. } => {
+                let orphan_keys: Vec<&str> = violations
+                    .iter()
+                    .filter_map(|v| {
+                        if let CoverageViolation::OrphanEntry { entry } = v {
+                            Some(entry.entry_key().as_str())
+                        } else {
+                            None
+                        }
+                    })
+                    .collect();
+                assert!(
+                    orphan_keys.contains(&"ImplOnlyType"),
+                    "expected OrphanEntry for ImplOnlyType (kind: unknown), got: {orphan_keys:?}"
+                );
+            }
+            other => {
+                panic!("expected Blocked with OrphanEntry for unknown-kind row, got {other:?}")
+            }
+        }
     }
 
     // ── D9 task-key referential integrity tests ───────────────────────────────

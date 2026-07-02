@@ -1,0 +1,582 @@
+{
+  "schema_version": 1,
+  "layer": "infrastructure",
+  "entries": [
+    {
+      "claim_hash": "f3327a7df406099b1ce2c1b63029e16def5c30be4b2385cda3e9782e3b83b88b",
+      "evidence_hash": "2156210654ee69210a57760cf1ed63f924b158ac0cabf238d09d38bde0ad37c0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/infrastructure/` に JSON config ローダ adapter と metadata snapshot reader adapter を実装し、track context の有無で解決先を切り替える。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "BranchStrategyConfigError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "`BranchStrategyPort` trait を `libs/usecase/` に新設し、`base_branch() -> &str`、`merge_target() -> &str`、`merge_method() -> MergeMethod`、`track_prefix() -> &str` を expose する。`libs/infrastructure/` に JSON config ローダ adapter と metadata snapshot reader adapter を実装し、track context の有無で解決先を切り替える。"
+        }
+      }
+    },
+    {
+      "claim_hash": "360429f6aba400755c16fdb21a158661076386b27eb8ec1920039e6a5cff1569",
+      "evidence_hash": "a631b2ae241f34f35f966845be6c7ec58599d653be07295714b03ab5b05cc648",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`branch_strategy_snapshot` フィールドが存在しない `metadata.json` を fail-closed（parse 失敗）として扱うよう codec を更新する。D5 bootstrap exception として、本 track 自身の `metadata.json` に `branch_strategy_snapshot: {base_branch: \"main\", merge_target: \"main\", merge_method: \"squash\"}` を実装 PR 内で追加する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "BranchStrategySnapshotDocument"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "`branch_strategy_snapshot` フィールドが存在しない `metadata.json` を fail-closed（parse 失敗）として扱うよう codec を更新する。D5 bootstrap exception として、本 track 自身の `metadata.json` に `branch_strategy_snapshot: {base_branch: \"main\", merge_target: \"main\", merge_method: \"squash\"}` を実装 PR 内で追加する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "84871b610f7fb73e6d1945e4c2f8a2f11d98a9c80bc7c018e43086150549e3f6",
+      "evidence_hash": "5bab5997f20c2110b2e7a19839c52b703dd646c38480b502c9eba3156213ed68",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`git rev-parse main` フォールバック実装（`apps/cli-composition/src/dry/shared.rs:91-115` を正本とし、`review_v2/shared.rs`、`fixpoint_resolve.rs`、`gate_state.rs`、`commit_hash_store.rs`、`dry.rs` テストを含む）を effective strategy の `base_branch()` を受け取る形に置き換える。PR test fixture （`libs/infrastructure/src/gh_cli.rs:552-682` 周辺）を branch 戦略引数化する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsDiffBaseResolverAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "`git rev-parse main` フォールバック実装（`apps/cli-composition/src/dry/shared.rs:91-115` を正本とし、`review_v2/shared.rs`、`fixpoint_resolve.rs`、`gate_state.rs`、`commit_hash_store.rs`、`dry.rs` テストを含む）を effective strategy の `base_branch()` を受け取る形に置き換える。PR test fixture （`libs/infrastructure/src/gh_cli.rs:552-682` 周辺）を branch 戦略引数化する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "84871b610f7fb73e6d1945e4c2f8a2f11d98a9c80bc7c018e43086150549e3f6",
+      "evidence_hash": "f95193fa3b2db990cef98af734a7f8ec7c26067fb208a96f2d22adb6f2223135",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli-composition/src/dry/shared.rs` の差分基底 fallback 関数が effective strategy の `base_branch()` から branch 名を受け取る実装になっている。設定由来の branch 名は git invocation に個別 argv として渡され、shell command 文字列へ補間されないことをテストで確認できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsDiffBaseResolverAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "`apps/cli-composition/src/dry/shared.rs` の差分基底 fallback 関数が effective strategy の `base_branch()` から branch 名を受け取る実装になっている。`review_v2/shared.rs`、`fixpoint_resolve.rs`、`gate_state.rs` も同じ helper または port 経由に統一されており、これらのファイルに branch 戦略としての `\"main\"` リテラルが残っていない。設定由来の branch 名は git invocation に個別 argv として渡され、shell command 文字列へ補間されないことをテストで確認できる。`cargo make test` が pass する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f54e0341d6b8535a5dddecc7e773a335dda59238c5593e908558beaf72f1fcd5",
+      "evidence_hash": "61415421d244cf641a3b37725509f2a38c787f0caa46b3e67612de53ab011310",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/usecase` の `DryApprovalFactoryPort` を実装する adapter `FsDryApprovalFactoryAdapter` を `apps/cli-composition/src/track/fixpoint_resolve.rs` から `libs/infrastructure` へ移設する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsDryApprovalFactoryAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-11",
+          "text_label": "`libs/usecase` の `DryApprovalFactoryPort` を実装する adapter `FsDryApprovalFactoryAdapter` を `apps/cli-composition/src/track/fixpoint_resolve.rs` から `libs/infrastructure` へ移設する。同じコマンドの兄弟 adapter（diff base resolver、corpus meta、dry approval no-op、gate state 系）は既に `libs/infrastructure` に移設済みであり、本 IN はこの移設から取り残された最後の 1 件を対象とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f54e0341d6b8535a5dddecc7e773a335dda59238c5593e908558beaf72f1fcd5",
+      "evidence_hash": "21f087d6996f1410caca99637abb31e9c17f8231d658dc1a6e21eb339256c0ea",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli-composition` 配下に `DryApprovalFactoryPort` を実装する型定義が存在しない。同 port の実装は `libs/infrastructure` に存在し、`apps/cli-composition` からは注入のためだけに参照される。`cargo make check-layers` が pass する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsDryApprovalFactoryAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-16",
+          "text_label": "`apps/cli-composition` 配下に `DryApprovalFactoryPort` を実装する型定義が存在しない。同 port の実装は `libs/infrastructure` に存在し、`apps/cli-composition` からは注入のためだけに参照される。`cargo make check-layers` が pass する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "721ac61e2f611c3f61a0591be3bce0974d50b4e3b50f43b3a5c0c3725020ae3b",
+      "evidence_hash": "ed2817eadb35a48a3b798b5382f0e922c160b64efa3c91209e3a995f7a9acf62",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli-driver` へ移す。`apps/cli-driver/src/track.rs` の `TrackDriver` が他の track サブコマンドに対して既に行っている invoke + render の構成に合わせ、`fixpoint-resolve` 用の入出力型を追加する。移設後、`TrackCompositionRoot` に `fixpoint-resolve` 専用のメソッドは存在しない。他の track サブコマンドに対して既に使われている汎用の wire メソッド `TrackCompositionRoot::track_driver()` が `fixpoint-resolve` 用アダプタの構築と注入も担って `TrackDriver` を返し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsDryCheckConfigLoaderAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-12",
+          "text_label": "`fixpoint-resolve` track サブコマンドについて、`apps/cli-composition/src/track/fixpoint_resolve.rs` の `TrackCompositionRoot::fixpoint_resolve` が担っている use case interactor の呼び出し（invoke）と、結果を CLI 出力文字列へ整形する処理（`format_fixpoint_step` を含む render）を `apps/cli-driver` へ移す。`apps/cli-driver/src/track.rs` の `TrackDriver` が他の track サブコマンドに対して既に行っている invoke + render の構成に合わせ、`fixpoint-resolve` 用の入出力型を追加する。移設後、`TrackCompositionRoot` に `fixpoint-resolve` 専用のメソッドは存在しない。他の track サブコマンドに対して既に使われている汎用の wire メソッド `TrackCompositionRoot::track_driver()` が `fixpoint-resolve` 用アダプタの構築と注入も担って `TrackDriver` を返し、`apps/cli` はその `TrackDriver` の `handle()` に `TrackInput::FixpointResolve` variant を渡して dispatch する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "721ac61e2f611c3f61a0591be3bce0974d50b4e3b50f43b3a5c0c3725020ae3b",
+      "evidence_hash": "6d6d40b1fb2bc6d371f918d1f329ffa701c971d89a8d26738a7a890986591593",
+      "verdict": {
+        "kind": "pass",
+        "citation": "TrackCompositionRoot::fixpoint_resolve（またはその後継）は use case interactor を直接呼び出さず、`apps/cli-driver` 側の driver が invoke と render の両方を担う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsDryCheckConfigLoaderAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-17",
+          "text_label": "`apps/cli-composition/src/track/fixpoint_resolve.rs`（またはその後継ファイル）に、`fixpoint-resolve` の結果を CLI 出力文字列へ整形する関数が存在しない。`TrackCompositionRoot::fixpoint_resolve`（またはその後継）は use case interactor を直接呼び出さず、`apps/cli-driver` 側の driver が invoke と render の両方を担う。`apps/cli-driver/src/track.rs` の `TrackInput` に `fixpoint-resolve` 用の variant が存在する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5cb5f04a4647c88becc7a7056dc711d0aeb8615aeac67e195da25b646ece960d",
+      "evidence_hash": "ed2817eadb35a48a3b798b5382f0e922c160b64efa3c91209e3a995f7a9acf62",
+      "verdict": {
+        "kind": "pass",
+        "citation": "他の track サブコマンドに対して既に使われている汎用の wire メソッド `TrackCompositionRoot::track_driver()` が `fixpoint-resolve` 用アダプタの構築と注入も担って `TrackDriver` を返し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsFixpointDryGateFactoryAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-12",
+          "text_label": "`fixpoint-resolve` track サブコマンドについて、`apps/cli-composition/src/track/fixpoint_resolve.rs` の `TrackCompositionRoot::fixpoint_resolve` が担っている use case interactor の呼び出し（invoke）と、結果を CLI 出力文字列へ整形する処理（`format_fixpoint_step` を含む render）を `apps/cli-driver` へ移す。`apps/cli-driver/src/track.rs` の `TrackDriver` が他の track サブコマンドに対して既に行っている invoke + render の構成に合わせ、`fixpoint-resolve` 用の入出力型を追加する。移設後、`TrackCompositionRoot` に `fixpoint-resolve` 専用のメソッドは存在しない。他の track サブコマンドに対して既に使われている汎用の wire メソッド `TrackCompositionRoot::track_driver()` が `fixpoint-resolve` 用アダプタの構築と注入も担って `TrackDriver` を返し、`apps/cli` はその `TrackDriver` の `handle()` に `TrackInput::FixpointResolve` variant を渡して dispatch する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5cb5f04a4647c88becc7a7056dc711d0aeb8615aeac67e195da25b646ece960d",
+      "evidence_hash": "6d6d40b1fb2bc6d371f918d1f329ffa701c971d89a8d26738a7a890986591593",
+      "verdict": {
+        "kind": "pass",
+        "citation": "TrackCompositionRoot::fixpoint_resolve（またはその後継）は use case interactor を直接呼び出さず、`apps/cli-driver` 側の driver が invoke と render の両方を担う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsFixpointDryGateFactoryAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-17",
+          "text_label": "`apps/cli-composition/src/track/fixpoint_resolve.rs`（またはその後継ファイル）に、`fixpoint-resolve` の結果を CLI 出力文字列へ整形する関数が存在しない。`TrackCompositionRoot::fixpoint_resolve`（またはその後継）は use case interactor を直接呼び出さず、`apps/cli-driver` 側の driver が invoke と render の両方を担う。`apps/cli-driver/src/track.rs` の `TrackInput` に `fixpoint-resolve` 用の variant が存在する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "72da6c0489f9a0fdb296cbd2160b2660382b371c4d2860b8415326752f7fc890",
+      "evidence_hash": "ed2817eadb35a48a3b798b5382f0e922c160b64efa3c91209e3a995f7a9acf62",
+      "verdict": {
+        "kind": "pass",
+        "citation": "他の track サブコマンドに対して既に使われている汎用の wire メソッド `TrackCompositionRoot::track_driver()` が `fixpoint-resolve` 用アダプタの構築と注入も担って `TrackDriver` を返し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsFixpointGateStateFactoryAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-12",
+          "text_label": "`fixpoint-resolve` track サブコマンドについて、`apps/cli-composition/src/track/fixpoint_resolve.rs` の `TrackCompositionRoot::fixpoint_resolve` が担っている use case interactor の呼び出し（invoke）と、結果を CLI 出力文字列へ整形する処理（`format_fixpoint_step` を含む render）を `apps/cli-driver` へ移す。`apps/cli-driver/src/track.rs` の `TrackDriver` が他の track サブコマンドに対して既に行っている invoke + render の構成に合わせ、`fixpoint-resolve` 用の入出力型を追加する。移設後、`TrackCompositionRoot` に `fixpoint-resolve` 専用のメソッドは存在しない。他の track サブコマンドに対して既に使われている汎用の wire メソッド `TrackCompositionRoot::track_driver()` が `fixpoint-resolve` 用アダプタの構築と注入も担って `TrackDriver` を返し、`apps/cli` はその `TrackDriver` の `handle()` に `TrackInput::FixpointResolve` variant を渡して dispatch する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "72da6c0489f9a0fdb296cbd2160b2660382b371c4d2860b8415326752f7fc890",
+      "evidence_hash": "6d6d40b1fb2bc6d371f918d1f329ffa701c971d89a8d26738a7a890986591593",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`TrackCompositionRoot::fixpoint_resolve`（またはその後継）は use case interactor を直接呼び出さず、`apps/cli-driver` 側の driver が invoke と render の両方を担う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsFixpointGateStateFactoryAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-17",
+          "text_label": "`apps/cli-composition/src/track/fixpoint_resolve.rs`（またはその後継ファイル）に、`fixpoint-resolve` の結果を CLI 出力文字列へ整形する関数が存在しない。`TrackCompositionRoot::fixpoint_resolve`（またはその後継）は use case interactor を直接呼び出さず、`apps/cli-driver` 側の driver が invoke と render の両方を担う。`apps/cli-driver/src/track.rs` の `TrackInput` に `fixpoint-resolve` 用の variant が存在する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "058b3bdba36b5766002f51c5fd1a143982accaa8be202d8a4138b7d77f548edd",
+      "evidence_hash": "ed2817eadb35a48a3b798b5382f0e922c160b64efa3c91209e3a995f7a9acf62",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「他の track サブコマンドに対して既に使われている汎用の wire メソッド `TrackCompositionRoot::track_driver()` が `fixpoint-resolve` 用アダプタの構築と注入も担って `TrackDriver` を返し」"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsFixpointWorkspaceContextAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-12",
+          "text_label": "`fixpoint-resolve` track サブコマンドについて、`apps/cli-composition/src/track/fixpoint_resolve.rs` の `TrackCompositionRoot::fixpoint_resolve` が担っている use case interactor の呼び出し（invoke）と、結果を CLI 出力文字列へ整形する処理（`format_fixpoint_step` を含む render）を `apps/cli-driver` へ移す。`apps/cli-driver/src/track.rs` の `TrackDriver` が他の track サブコマンドに対して既に行っている invoke + render の構成に合わせ、`fixpoint-resolve` 用の入出力型を追加する。移設後、`TrackCompositionRoot` に `fixpoint-resolve` 専用のメソッドは存在しない。他の track サブコマンドに対して既に使われている汎用の wire メソッド `TrackCompositionRoot::track_driver()` が `fixpoint-resolve` 用アダプタの構築と注入も担って `TrackDriver` を返し、`apps/cli` はその `TrackDriver` の `handle()` に `TrackInput::FixpointResolve` variant を渡して dispatch する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "058b3bdba36b5766002f51c5fd1a143982accaa8be202d8a4138b7d77f548edd",
+      "evidence_hash": "6d6d40b1fb2bc6d371f918d1f329ffa701c971d89a8d26738a7a890986591593",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`TrackCompositionRoot::fixpoint_resolve`（またはその後継）は use case interactor を直接呼び出さず、`apps/cli-driver` 側の driver が invoke と render の両方を担う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsFixpointWorkspaceContextAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-17",
+          "text_label": "`apps/cli-composition/src/track/fixpoint_resolve.rs`（またはその後継ファイル）に、`fixpoint-resolve` の結果を CLI 出力文字列へ整形する関数が存在しない。`TrackCompositionRoot::fixpoint_resolve`（またはその後継）は use case interactor を直接呼び出さず、`apps/cli-driver` 側の driver が invoke と render の両方を担う。`apps/cli-driver/src/track.rs` の `TrackInput` に `fixpoint-resolve` 用の variant が存在する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "058b3bdba36b5766002f51c5fd1a143982accaa8be202d8a4138b7d77f548edd",
+      "evidence_hash": "53ce0a169b60bb6279ea45b52b5a66390f7e1e74496613ed3cf0594e9f29db51",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`branch_strategy_snapshot` を持たない `metadata.json` は parse 時に失敗（fail-closed）とする。grace period・opt-out・フォールバック読み込みを設けない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsFixpointWorkspaceContextAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "`branch_strategy_snapshot` を持たない `metadata.json` は parse 時に失敗（fail-closed）とする。grace period・opt-out・フォールバック読み込みを設けない。既存 track の扱いは利用者判断に委ね、SoTOHE 側で migration 機構を持たない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "058b3bdba36b5766002f51c5fd1a143982accaa8be202d8a4138b7d77f548edd",
+      "evidence_hash": "7550bc68ed5407ed667d38fb9039a3668c5109ca2bf1e72ab83516d2f5c25a47",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存 track の `metadata.json` を新 schema に migrate する仕組みや推奨手順を実装しない。暫定 compatibility layer・alias・旧 schema フォールバック読み込みを作らない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsFixpointWorkspaceContextAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-06",
+          "text_label": "既存 track の `metadata.json` を新 schema に migrate する仕組みや推奨手順を実装しない。暫定 compatibility layer・alias・旧 schema フォールバック読み込みを作らない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "bc02597c4076bfec410944fab7aab80c3fb5661773734a5c0f7d5f3bd4d4124a",
+      "evidence_hash": "5bab5997f20c2110b2e7a19839c52b703dd646c38480b502c9eba3156213ed68",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`git rev-parse main` フォールバック実装（`apps/cli-composition/src/dry/shared.rs:91-115` を正本とし、`review_v2/shared.rs`、`fixpoint_resolve.rs`、`gate_state.rs`、`commit_hash_store.rs`、`dry.rs` テストを含む）を effective strategy の `base_branch()` を受け取る形に置き換える。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsReviewGateStateAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "`git rev-parse main` フォールバック実装（`apps/cli-composition/src/dry/shared.rs:91-115` を正本とし、`review_v2/shared.rs`、`fixpoint_resolve.rs`、`gate_state.rs`、`commit_hash_store.rs`、`dry.rs` テストを含む）を effective strategy の `base_branch()` を受け取る形に置き換える。PR test fixture （`libs/infrastructure/src/gh_cli.rs:552-682` 周辺）を branch 戦略引数化する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "bc02597c4076bfec410944fab7aab80c3fb5661773734a5c0f7d5f3bd4d4124a",
+      "evidence_hash": "f95193fa3b2db990cef98af734a7f8ec7c26067fb208a96f2d22adb6f2223135",
+      "verdict": {
+        "kind": "pass",
+        "citation": "review_v2/shared.rs、fixpoint_resolve.rs、gate_state.rs も同じ helper または port 経由に統一されており、これらのファイルに branch 戦略としての \"main\" リテラルが残っていない。設定由来の branch 名は git invocation に個別 argv として渡され、shell command 文字列へ補間されないことをテストで確認できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsReviewGateStateAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "`apps/cli-composition/src/dry/shared.rs` の差分基底 fallback 関数が effective strategy の `base_branch()` から branch 名を受け取る実装になっている。`review_v2/shared.rs`、`fixpoint_resolve.rs`、`gate_state.rs` も同じ helper または port 経由に統一されており、これらのファイルに branch 戦略としての `\"main\"` リテラルが残っていない。設定由来の branch 名は git invocation に個別 argv として渡され、shell command 文字列へ補間されないことをテストで確認できる。`cargo make test` が pass する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "e6ac07a4edae016e5f47c533aebe91442c62921aa37dfa891141d22f98decaeb",
+      "evidence_hash": "2156210654ee69210a57760cf1ed63f924b158ac0cabf238d09d38bde0ad37c0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/infrastructure/` に JSON config ローダ adapter と metadata snapshot reader adapter を実装し、track context の有無で解決先を切り替える。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "JsonConfigBranchStrategyAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "`BranchStrategyPort` trait を `libs/usecase/` に新設し、`base_branch() -> &str`、`merge_target() -> &str`、`merge_method() -> MergeMethod`、`track_prefix() -> &str` を expose する。`libs/infrastructure/` に JSON config ローダ adapter と metadata snapshot reader adapter を実装し、track context の有無で解決先を切り替える。"
+        }
+      }
+    },
+    {
+      "claim_hash": "39b1b3bc636c19231f76720d85eba0ef764874c4b3396ae11949bb0aa042d3ac",
+      "evidence_hash": "a631b2ae241f34f35f966845be6c7ec58599d653be07295714b03ab5b05cc648",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D5 bootstrap exception として、本 track 自身の `metadata.json` に `branch_strategy_snapshot: {base_branch: \"main\", merge_target: \"main\", merge_method: \"squash\"}` を実装 PR 内で追加する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "MergeMethodDocument"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "`branch_strategy_snapshot` フィールドが存在しない `metadata.json` を fail-closed（parse 失敗）として扱うよう codec を更新する。D5 bootstrap exception として、本 track 自身の `metadata.json` に `branch_strategy_snapshot: {base_branch: \"main\", merge_target: \"main\", merge_method: \"squash\"}` を実装 PR 内で追加する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c81aaced9415fb3b35425bffcc58508626479b85e1e512e8d60ca77c17d98949",
+      "evidence_hash": "2156210654ee69210a57760cf1ed63f924b158ac0cabf238d09d38bde0ad37c0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/infrastructure/` に JSON config ローダ adapter と metadata snapshot reader adapter を実装し、track context の有無で解決先を切り替える。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "SnapshotBranchStrategyAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "`BranchStrategyPort` trait を `libs/usecase/` に新設し、`base_branch() -> &str`、`merge_target() -> &str`、`merge_method() -> MergeMethod`、`track_prefix() -> &str` を expose する。`libs/infrastructure/` に JSON config ローダ adapter と metadata snapshot reader adapter を実装し、track context の有無で解決先を切り替える。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c81aaced9415fb3b35425bffcc58508626479b85e1e512e8d60ca77c17d98949",
+      "evidence_hash": "f0d356fc0f7dd6a29caf05e5a437764fac86fe83209a4e05c979dbf901b3c399",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track 初期化後のすべての PR 作成・コミットゲート・ブランチ操作は `metadata.json#branch_strategy_snapshot` を effective strategy として使い、`.harness/config/branch-strategy.json` を再参照しない。global config の変更が in-flight track の PR base を変えない不変条件を持つ。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "SnapshotBranchStrategyAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "track 初期化後のすべての PR 作成・コミットゲート・ブランチ操作は `metadata.json#branch_strategy_snapshot` を effective strategy として使い、`.harness/config/branch-strategy.json` を再参照しない。global config の変更が in-flight track の PR base を変えない不変条件を持つ。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b06cc1517788a997e0ed4c72327eb1c79bbbccee5c0fb7c89ddbebbe801be21b",
+      "evidence_hash": "a631b2ae241f34f35f966845be6c7ec58599d653be07295714b03ab5b05cc648",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`branch_strategy_snapshot` フィールドが存在しない `metadata.json` を fail-closed（parse 失敗）として扱うよう codec を更新する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "TrackDocumentV2"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "`branch_strategy_snapshot` フィールドが存在しない `metadata.json` を fail-closed（parse 失敗）として扱うよう codec を更新する。D5 bootstrap exception として、本 track 自身の `metadata.json` に `branch_strategy_snapshot: {base_branch: \"main\", merge_target: \"main\", merge_method: \"squash\"}` を実装 PR 内で追加する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b06cc1517788a997e0ed4c72327eb1c79bbbccee5c0fb7c89ddbebbe801be21b",
+      "evidence_hash": "53ce0a169b60bb6279ea45b52b5a66390f7e1e74496613ed3cf0594e9f29db51",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`branch_strategy_snapshot` を持たない `metadata.json` は parse 時に失敗（fail-closed）とする。grace period・opt-out・フォールバック読み込みを設けない。既存 track の扱いは利用者判断に委ね、SoTOHE 側で migration 機構を持たない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "TrackDocumentV2"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "`branch_strategy_snapshot` を持たない `metadata.json` は parse 時に失敗（fail-closed）とする。grace period・opt-out・フォールバック読み込みを設けない。既存 track の扱いは利用者判断に委ね、SoTOHE 側で migration 機構を持たない。"
+        }
+      }
+    }
+  ]
+}

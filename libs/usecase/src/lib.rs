@@ -11,6 +11,7 @@ pub use domain::{TrackId, ValidationError};
 pub mod arch;
 pub mod baseline_capture;
 pub mod baseline_graph_workflow;
+pub mod branch_strategy;
 pub mod catalogue_impl_signals;
 pub mod catalogue_lint_workflow;
 pub mod catalogue_spec_refs;
@@ -27,6 +28,7 @@ pub mod dry_driver;
 pub mod export_schema;
 pub mod file;
 pub mod fixpoint_resolve;
+pub mod fixpoint_resolve_driver;
 pub mod git_workflow;
 pub mod guard;
 pub mod hook;
@@ -59,6 +61,7 @@ pub mod type_signals;
 pub mod verify;
 pub mod verify_adr_signals;
 
+pub use branch_strategy::BranchStrategyPort;
 pub use telemetry::{
     ArchivedTrackTelemetryCommand, ArchivedTrackTelemetryError, ArchivedTrackTelemetryInteractor,
     ArchivedTrackTelemetryPort, ArchivedTrackTelemetryService, TelemetryAggregateService,
@@ -437,6 +440,14 @@ mod tests {
         }
     }
 
+    fn test_snapshot() -> domain::branch_strategy::BranchStrategySnapshot {
+        domain::branch_strategy::BranchStrategySnapshot::new(
+            domain::NonEmptyString::try_new("main").unwrap(),
+            domain::NonEmptyString::try_new("main").unwrap(),
+            domain::branch_strategy::MergeMethod::Squash,
+        )
+    }
+
     fn sample_track() -> TrackMetadata {
         // Identity-only TrackMetadata; tasks/plan live in impl-plan.json.
         // Status is derived on demand via derive_track_status.
@@ -444,6 +455,7 @@ mod tests {
             TrackId::try_new("track-state-machine").unwrap(),
             "Track state machine",
             None,
+            test_snapshot(),
         )
         .unwrap()
     }

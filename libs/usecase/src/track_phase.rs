@@ -179,10 +179,19 @@ mod tests {
         }
     }
 
+    fn test_snapshot() -> domain::branch_strategy::BranchStrategySnapshot {
+        domain::branch_strategy::BranchStrategySnapshot::new(
+            domain::NonEmptyString::try_new("main").unwrap(),
+            domain::NonEmptyString::try_new("main").unwrap(),
+            domain::branch_strategy::MergeMethod::Squash,
+        )
+    }
+
     const TRACK_ID: &str = "phase-test-track";
 
     fn sample_track() -> TrackMetadata {
-        TrackMetadata::new(TrackId::try_new(TRACK_ID).unwrap(), "Phase Test", None).unwrap()
+        TrackMetadata::new(TrackId::try_new(TRACK_ID).unwrap(), "Phase Test", None, test_snapshot())
+            .unwrap()
     }
 
     fn sample_plan_all_done() -> ImplPlanDocument {

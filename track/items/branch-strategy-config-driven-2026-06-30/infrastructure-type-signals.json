@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-02T10:07:40Z",
+  "declaration_hash": "e03a09ce996de453d85dd4945b95f97dc2af82b8eed5185ea752b7e5cc270754",
+  "signals": [
+    {
+      "type_name": "BranchStrategyConfigError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::convert::From<Error>",
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "BranchStrategySnapshotDocument",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug",
+        "serde_core::de::Deserialize<'de>",
+        "serde_core::ser::Serialize"
+      ]
+    },
+    {
+      "type_name": "FsDiffBaseResolverAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "DiffBaseResolverPort"
+      ]
+    },
+    {
+      "type_name": "FsDryApprovalFactoryAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "DryApprovalFactoryPort"
+      ]
+    },
+    {
+      "type_name": "FsDryCheckConfigLoaderAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "DryCheckConfigLoaderPort"
+      ]
+    },
+    {
+      "type_name": "FsFixpointDryGateFactoryAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "FixpointDryGateFactoryPort"
+      ]
+    },
+    {
+      "type_name": "FsFixpointGateStateFactoryAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "FixpointGateStateFactoryPort"
+      ]
+    },
+    {
+      "type_name": "FsFixpointWorkspaceContextAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "FixpointWorkspaceContextPort"
+      ]
+    },
+    {
+      "type_name": "FsReviewGateStateAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "JsonConfigBranchStrategyAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "BranchStrategyPort"
+      ]
+    },
+    {
+      "type_name": "MergeMethodDocument",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::clone::TrivialClone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::marker::Copy",
+        "serde_core::de::Deserialize<'de>",
+        "serde_core::ser::Serialize"
+      ]
+    },
+    {
+      "type_name": "SnapshotBranchStrategyAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "BranchStrategyPort"
+      ]
+    },
+    {
+      "type_name": "TrackDocumentV2",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

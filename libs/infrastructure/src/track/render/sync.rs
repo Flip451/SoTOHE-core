@@ -18,6 +18,7 @@ use crate::git_cli::{GitRepository, SystemGitRepo};
 use crate::spec;
 use crate::tddd::catalogue_document_codec::{CatalogueDocumentCodec, CatalogueDocumentCodecError};
 use crate::tddd::type_signals_codec;
+use crate::track::symlink_guard::reject_symlinks_below;
 use crate::type_catalogue_render;
 use crate::verify::tddd_layers::{LoadTdddLayersError, load_tddd_layers};
 
@@ -56,20 +57,26 @@ pub fn sync_rendered_views(
     };
 
     for track_dir in track_dirs {
-        let metadata_path = track_dir.join("metadata.json");
-        if !metadata_path.is_file() {
+        if !reject_symlinks_below(&track_dir, root)? {
             continue;
         }
-        let json = std::fs::read_to_string(&metadata_path)?;
+        if !track_dir.is_dir() {
+            continue;
+        }
+        let metadata_path = track_dir.join("metadata.json");
+        let Some(json) = read_optional_guarded_file(&metadata_path, &track_dir, "metadata.json")?
+        else {
+            continue;
+        };
         // Loose peek (same rationale as `collect_track_snapshots_inner`).
         let parsed: TrackSchemaPeek =
             serde_json::from_str(&json).map_err(|source| RenderError::InvalidMetadata {
                 path: metadata_path.clone(),
                 source: codec::CodecError::Json(source),
             })?;
-        // Schema version 5 is the identity-only format (no `status` field).
-        // Legacy v2/v3 tracks are also accepted for rendering.
-        if !matches!(parsed.schema_version, 2..=5) {
+        // Schema version 6 is the identity-only format (no `status` field,
+        // has `branch_strategy_snapshot`). Legacy v2/v3/v4/v5 tracks are also accepted for rendering.
+        if !matches!(parsed.schema_version, 2..=6) {
             return Err(RenderError::UnsupportedSchemaVersion {
                 path: metadata_path,
                 schema_version: parsed.schema_version,
@@ -87,9 +94,9 @@ pub fn sync_rendered_views(
         // `track/items/<track_id>` — passing an archived id resolves to a
         // missing metadata file and is silently skipped.
         //
-        // For v5 tracks, derive status from impl-plan.json + status_override.
-        // For legacy v2/v3 tracks, read the `status` field from raw JSON.
-        let (track, _) = if parsed.schema_version == 5 {
+        // For v6 tracks, derive status from impl-plan.json + status_override.
+        // For legacy v2/v3/v4/v5 tracks, read the `status` field from raw JSON.
+        let (track, _) = if parsed.schema_version == 6 {
             codec::decode(&json).map_err(|source| RenderError::InvalidMetadata {
                 path: metadata_path.clone(),
                 source,
@@ -142,11 +149,7 @@ pub fn sync_rendered_views(
         let impl_plan = load_impl_plan_opt(&track_dir)?;
         let rendered = render_plan(&track, impl_plan.as_ref());
         let plan_path = track_dir.join("plan.md");
-        let old = match std::fs::read_to_string(&plan_path) {
-            Ok(content) => Some(content),
-            Err(e) if e.kind() == std::io::ErrorKind::NotFound => None,
-            Err(e) => return Err(RenderError::Io(e)),
-        };
+        let old = read_optional_guarded_file(&plan_path, &track_dir, "plan.md")?;
         if old
             .as_deref()
             .is_none_or(|existing| !super::rendered_matches(existing, rendered.as_ref()))
@@ -161,7 +164,8 @@ pub fn sync_rendered_views(
         // still allowing full re-renders for the active track regardless of status.
         //
         let spec_json_path = track_dir.join("spec.json");
-        let branch_matches_track_for_spec: bool = if spec_json_path.is_file() {
+        let spec_json_present = guarded_file_present(&spec_json_path, &track_dir, "spec.json")?;
+        let branch_matches_track_for_spec: bool = if spec_json_present {
             match &branch_guard_result {
                 Ok(v) => *v,
                 Err(reason) => {
@@ -176,8 +180,9 @@ pub fn sync_rendered_views(
             // own protected-input check below.
             false
         };
-        if branch_matches_track_for_spec && spec_json_path.is_file() {
-            let spec_json_content = std::fs::read_to_string(&spec_json_path)?;
+        if branch_matches_track_for_spec && spec_json_present {
+            let spec_json_content =
+                read_required_guarded_file(&spec_json_path, &track_dir, "spec.json")?;
             match spec::codec::decode(&spec_json_content) {
                 Ok(spec_doc) => {
                     // Load sibling task-coverage.json when present so that spec.md
@@ -186,12 +191,8 @@ pub fn sync_rendered_views(
                     let rendered_spec =
                         spec::render::render_spec_with_coverage(&spec_doc, task_coverage.as_ref());
                     let spec_md_path = track_dir.join("spec.md");
-                    // Read existing spec.md: propagate real I/O errors, treat NotFound as absent.
-                    let old_spec = match std::fs::read_to_string(&spec_md_path) {
-                        Ok(content) => Some(content),
-                        Err(e) if e.kind() == std::io::ErrorKind::NotFound => None,
-                        Err(e) => return Err(RenderError::Io(e)),
-                    };
+                    let old_spec =
+                        read_optional_guarded_file(&spec_md_path, &track_dir, "spec.md")?;
                     if old_spec
                         .as_deref()
                         .is_none_or(|existing| !super::rendered_matches(existing, &rendered_spec))
@@ -251,14 +252,8 @@ pub fn sync_rendered_views(
             })
         };
         let catalogue_path_exists = |path: &Path| -> Result<bool, RenderError> {
-            match path.symlink_metadata() {
-                Ok(metadata) => {
-                    let file_type = metadata.file_type();
-                    Ok(file_type.is_file() || file_type.is_symlink())
-                }
-                Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(false),
-                Err(e) => Err(RenderError::Io(e)),
-            }
+            let label = path.file_name().and_then(|n| n.to_str()).unwrap_or("type catalogue");
+            guarded_file_present(path, &track_dir, label)
         };
         let has_default_type_catalogue_input = || -> Result<bool, RenderError> {
             for entry in std::fs::read_dir(&track_dir)? {
@@ -307,7 +302,7 @@ pub fn sync_rendered_views(
                 for binding in &bindings {
                     let catalogue_file = binding.catalogue_file();
                     let catalogue_path = track_dir.join(catalogue_file);
-                    if !catalogue_path.is_file() {
+                    if !catalogue_path_exists(&catalogue_path)? {
                         continue;
                     }
                     // Only check/reserve the rendered path slot after confirming
@@ -322,7 +317,8 @@ pub fn sync_rendered_views(
                         );
                         continue;
                     }
-                    let catalogue_content = std::fs::read_to_string(&catalogue_path)?;
+                    let catalogue_content =
+                        read_required_guarded_file(&catalogue_path, &track_dir, catalogue_file)?;
                     // T025 / CN-11: v3-native rendering — all catalogues MUST be schema_version 3.
                     // Decode directly with CatalogueDocumentCodec. A v2 (or other non-v3) catalogue
                     // fails closed (hard error) rather than silently rendering stale v2 content.
@@ -406,12 +402,13 @@ pub fn sync_rendered_views(
                                 v3_type_signals_opt.as_deref(),
                                 v3_spec_signals_doc.as_ref(),
                             );
-                            let rendered_md_path = track_dir.join(binding.rendered_file());
-                            let old_md = match std::fs::read_to_string(&rendered_md_path) {
-                                Ok(content) => Some(content),
-                                Err(e) if e.kind() == std::io::ErrorKind::NotFound => None,
-                                Err(e) => return Err(RenderError::Io(e)),
-                            };
+                            let rendered_file = binding.rendered_file();
+                            let rendered_md_path = track_dir.join(&rendered_file);
+                            let old_md = read_optional_guarded_file(
+                                &rendered_md_path,
+                                &track_dir,
+                                &rendered_file,
+                            )?;
                             if old_md.as_deref().is_none_or(|existing| {
                                 !super::rendered_matches(existing, &rendered)
                             }) {
@@ -481,11 +478,7 @@ pub fn sync_rendered_views(
     if let Some(parent) = registry_path.parent() {
         std::fs::create_dir_all(parent)?;
     }
-    let old = match std::fs::read_to_string(&registry_path) {
-        Ok(content) => Some(content),
-        Err(e) if e.kind() == std::io::ErrorKind::NotFound => None,
-        Err(e) => return Err(RenderError::Io(e)),
-    };
+    let old = read_optional_guarded_file(&registry_path, root, "registry.md")?;
     if old
         .as_deref()
         .is_none_or(|existing| !super::rendered_matches(existing, rendered_registry.as_ref()))
@@ -495,4 +488,46 @@ pub fn sync_rendered_views(
     }
 
     Ok(changed)
+}
+
+fn guarded_file_present(
+    path: &Path,
+    trusted_root: &Path,
+    label: &str,
+) -> Result<bool, RenderError> {
+    if !reject_symlinks_below(path, trusted_root)? {
+        return Ok(false);
+    }
+    if !path.is_file() {
+        return Err(RenderError::InvalidTrackMetadata {
+            path: path.to_path_buf(),
+            reason: format!("{label} exists but is not a regular file"),
+        });
+    }
+    Ok(true)
+}
+
+fn read_optional_guarded_file(
+    path: &Path,
+    trusted_root: &Path,
+    label: &str,
+) -> Result<Option<String>, RenderError> {
+    if !guarded_file_present(path, trusted_root, label)? {
+        return Ok(None);
+    }
+    std::fs::read_to_string(path).map(Some).map_err(RenderError::Io)
+}
+
+fn read_required_guarded_file(
+    path: &Path,
+    trusted_root: &Path,
+    label: &str,
+) -> Result<String, RenderError> {
+    if !guarded_file_present(path, trusted_root, label)? {
+        return Err(RenderError::InvalidTrackMetadata {
+            path: path.to_path_buf(),
+            reason: format!("{label} is missing"),
+        });
+    }
+    std::fs::read_to_string(path).map_err(RenderError::Io)
 }

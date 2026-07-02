@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "layer": "cli",
+  "entries": [
+    {
+      "claim_hash": "2a255cc58c4da6dd73332b7241aa240fec9ef34cd1c01d6227e34d63a962faf5",
+      "evidence_hash": "3f31f4b64b6c70569f6c85d8f596f063f53aead4801aa022b5e76d5ed8babd2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`main` を effective strategy の port 呼び出しまたは config 値参照に置き換える。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/cli-types.json",
+          "section_key": "types",
+          "entry_key": "EnsurePrArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "D1 の置換対象表に列挙された本番コード・delivery 層の全箇所（`apps/cli/src/commands/pr.rs`、`apps/cli/src/commands/track/branch_ops.rs`、`apps/cli-composition/src/track/mod.rs`、`apps/cli-composition/src/git.rs`、`apps/cli-composition/src/pr.rs`、`apps/cli-driver/src/track.rs`、CLI `--help` テキスト 2 箇所、`Makefile.toml` description 5 箇所、`README.md:109`、workflow SSoT 3 ファイル、command / rules / skill 5 箇所）のハードコード `main` を effective strategy の port 呼び出しまたは config 値参照に置き換える。"
+        }
+      }
+    },
+    {
+      "claim_hash": "4c2590e3259e21727fd8528fdd29acd49ee5d53aad36a9273fdfd45108487322",
+      "evidence_hash": "6addf5a32c6222d234d96a82bd2402003c9dbe10f9a31b6d5817bdf32583fb7f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cargo make track-switch-main` タスクを `cargo make track-switch-base` にリネームし、本体を `bin/sotp track switch-base`（新規 native subcommand）に委譲する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/cli-types.json",
+          "section_key": "types",
+          "entry_key": "TrackCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "`cargo make track-switch-main` タスクを `cargo make track-switch-base` にリネームし、本体を `bin/sotp track switch-base`（新規 native subcommand）に委譲する。`.claude/settings.json:159` の allowlist エントリ、`.claude/commands/track/done.md`、`.claude/rules/07-dev-environment.md:54,56` の参照を連動更新する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0f94a77606a3c7e9e30257098eb5c9d068dd559db8770335c5d0cc11a34cee16",
+      "evidence_hash": "3f31f4b64b6c70569f6c85d8f596f063f53aead4801aa022b5e76d5ed8babd2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ハードコード `main` を effective strategy の port 呼び出しまたは config 値参照に置き換える。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/cli-types.json",
+          "section_key": "types",
+          "entry_key": "WaitAndMergeArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "D1 の置換対象表に列挙された本番コード・delivery 層の全箇所（`apps/cli/src/commands/pr.rs`、`apps/cli/src/commands/track/branch_ops.rs`、`apps/cli-composition/src/track/mod.rs`、`apps/cli-composition/src/git.rs`、`apps/cli-composition/src/pr.rs`、`apps/cli-driver/src/track.rs`、CLI `--help` テキスト 2 箇所、`Makefile.toml` description 5 箇所、`README.md:109`、workflow SSoT 3 ファイル、command / rules / skill 5 箇所）のハードコード `main` を effective strategy の port 呼び出しまたは config 値参照に置き換える。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0f94a77606a3c7e9e30257098eb5c9d068dd559db8770335c5d0cc11a34cee16",
+      "evidence_hash": "3edebf3b5a6e965a1f14dbe2972b973396e597ab8520270ced93a10ff0fa076a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp pr wait-and-merge` は明示 `--method` がない場合に `branch_strategy_snapshot.merge_method` を既定メソッドとして使い、明示 `--method merge|squash|rebase` はその値を上書きする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/cli-types.json",
+          "section_key": "types",
+          "entry_key": "WaitAndMergeArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "PR 作成・PR merge default・branch 作成・commit gate の各コードパスが `metadata.json` の `branch_strategy_snapshot` から effective strategy を読むことをテストで確認できる（`.harness/config/branch-strategy.json` を直接参照するコードパスがこれらの post-init 操作に存在しない）。branch 作成・switch・PR 作成・merge の git/gh invocation は branch_strategy_snapshot 由来の base_branch / merge_target / merge_method を個別 argv として渡し、shell command 文字列へ補間しない。`sotp pr wait-and-merge` は明示 `--method` がない場合に `branch_strategy_snapshot.merge_method` を既定メソッドとして使い、明示 `--method merge|squash|rebase` はその値を上書きする。"
+        }
+      }
+    }
+  ]
+}

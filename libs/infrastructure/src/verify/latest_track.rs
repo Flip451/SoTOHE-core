@@ -10,6 +10,7 @@ use domain::{StatusOverride, derive_track_status};
 use regex::Regex;
 
 use crate::track::codec;
+use crate::track::symlink_guard::reject_symlinks_below;
 
 const TRACK_ITEMS_DIR: &str = "track/items";
 const TRACK_ARCHIVE_DIR: &str = "track/archive";
@@ -55,7 +56,16 @@ pub fn verify(root: &Path) -> VerifyOutcome {
             // artifact validation kicks in (per
             // knowledge/conventions/workflow-ceremony-minimization.md Rules
             // "file existence = phase status").
-            if !track_dir.join("impl-plan.json").is_file() {
+            let impl_plan_path = track_dir.join("impl-plan.json");
+            let impl_plan_present =
+                match guarded_file_present(&impl_plan_path, &track_dir, root, "impl-plan.json") {
+                    Ok(present) => present,
+                    Err(finding) => {
+                        outcome.add(finding);
+                        return outcome;
+                    }
+                };
+            if !impl_plan_present {
                 return outcome;
             }
 
@@ -64,12 +74,28 @@ pub fn verify(root: &Path) -> VerifyOutcome {
             // artifact exists; require at least one.
             let spec_json_path = track_dir.join("spec.json");
             let spec_md_path = track_dir.join("spec.md");
-            if spec_json_path.is_file() {
+            let spec_json_present =
+                match guarded_file_present(&spec_json_path, &track_dir, root, "spec.json") {
+                    Ok(present) => present,
+                    Err(finding) => {
+                        outcome.add(finding);
+                        return outcome;
+                    }
+                };
+            let spec_md_present =
+                match guarded_file_present(&spec_md_path, &track_dir, root, "spec.md") {
+                    Ok(present) => present,
+                    Err(finding) => {
+                        outcome.add(finding);
+                        return outcome;
+                    }
+                };
+            if spec_json_present {
                 // spec.json exists — validate it; spec.md is optional.
                 for finding in validate_spec_json_file(&spec_json_path, root) {
                     outcome.add(finding);
                 }
-            } else if spec_md_path.is_file() {
+            } else if spec_md_present {
                 for finding in validate_spec_file(&spec_md_path, root) {
                     outcome.add(finding);
                 }
@@ -83,7 +109,14 @@ pub fn verify(root: &Path) -> VerifyOutcome {
             let other_files: [(&str, FileValidator); 1] = [("plan.md", validate_plan_file)];
             for (filename, validator) in &other_files {
                 let path = track_dir.join(filename);
-                if !path.is_file() {
+                let file_present = match guarded_file_present(&path, &track_dir, root, filename) {
+                    Ok(present) => present,
+                    Err(finding) => {
+                        outcome.add(finding);
+                        return outcome;
+                    }
+                };
+                if !file_present {
                     outcome.add(VerifyFinding::error(format!(
                         "[ERROR] Latest track is missing {filename}: {}",
                         display_path(&path, root)
@@ -100,20 +133,79 @@ pub fn verify(root: &Path) -> VerifyOutcome {
 }
 
 /// Collect all track directories from `track/items/` and `track/archive/`, sorted by name.
-fn all_track_directories(root: &Path) -> Vec<PathBuf> {
+fn all_track_directories(root: &Path) -> Result<Vec<PathBuf>, Vec<VerifyFinding>> {
     let mut dirs = Vec::new();
+    let mut findings = Vec::new();
     for base in [TRACK_ITEMS_DIR, TRACK_ARCHIVE_DIR] {
         let base_path = root.join(base);
-        if let Ok(entries) = std::fs::read_dir(&base_path) {
-            for entry in entries.flatten() {
-                if entry.path().is_dir() {
-                    dirs.push(entry.path());
+        let base_meta = match base_path.symlink_metadata() {
+            Ok(meta) => meta,
+            Err(err) if err.kind() == std::io::ErrorKind::NotFound => continue,
+            Err(err) => {
+                findings.push(VerifyFinding::error(format!(
+                    "[ERROR] Cannot determine latest track because {base} cannot be inspected: {} ({err})",
+                    display_path(&base_path, root)
+                )));
+                continue;
+            }
+        };
+        if base_meta.file_type().is_symlink() {
+            findings.push(VerifyFinding::error(format!(
+                "[ERROR] Cannot determine latest track because track directory root is a symlink: {}",
+                display_path(&base_path, root)
+            )));
+            continue;
+        }
+        if !base_meta.is_dir() {
+            continue;
+        }
+
+        let entries = match std::fs::read_dir(&base_path) {
+            Ok(entries) => entries,
+            Err(err) => {
+                findings.push(VerifyFinding::error(format!(
+                    "[ERROR] Cannot determine latest track because {base} cannot be read: {} ({err})",
+                    display_path(&base_path, root)
+                )));
+                continue;
+            }
+        };
+        for entry in entries {
+            let entry = match entry {
+                Ok(entry) => entry,
+                Err(err) => {
+                    findings.push(VerifyFinding::error(format!(
+                        "[ERROR] Cannot determine latest track because {base} has an unreadable entry: {} ({err})",
+                        display_path(&base_path, root)
+                    )));
+                    continue;
                 }
+            };
+            let path = entry.path();
+            let file_type = match entry.file_type() {
+                Ok(file_type) => file_type,
+                Err(err) => {
+                    findings.push(VerifyFinding::error(format!(
+                        "[ERROR] Cannot determine latest track because track directory cannot be inspected: {} ({err})",
+                        display_path(&path, root)
+                    )));
+                    continue;
+                }
+            };
+            if file_type.is_symlink() {
+                findings.push(VerifyFinding::error(format!(
+                    "[ERROR] Cannot determine latest track because track directory is a symlink: {}",
+                    display_path(&path, root)
+                )));
+                continue;
+            }
+            if file_type.is_dir() {
+                dirs.push(path);
             }
         }
     }
     dirs.sort();
-    dirs
+    if findings.is_empty() { Ok(dirs) } else { Err(findings) }
 }
 
 /// Find the "latest" track directory that should be verified.
@@ -121,7 +213,7 @@ fn all_track_directories(root: &Path) -> Vec<PathBuf> {
 /// Returns `Ok(None)` when no tracks exist.
 /// Returns `Err(findings)` when any `metadata.json` is malformed.
 fn latest_track_dir(root: &Path) -> Result<Option<PathBuf>, Vec<VerifyFinding>> {
-    let dirs = all_track_directories(root);
+    let dirs = all_track_directories(root)?;
     if dirs.is_empty() {
         return Ok(None);
     }
@@ -185,9 +277,24 @@ fn load_track_metadata(
     root: &Path,
 ) -> Result<Option<TrackMeta>, Vec<VerifyFinding>> {
     let metadata_file = track_dir.join("metadata.json");
+    match reject_symlinks_below(&metadata_file, track_dir) {
+        Ok(true) => {}
+        Ok(false) => {
+            return Err(vec![VerifyFinding::error(format!(
+                "[ERROR] Cannot determine latest track because metadata.json is missing: {}",
+                display_path(&metadata_file, root)
+            ))]);
+        }
+        Err(e) => {
+            return Err(vec![VerifyFinding::error(format!(
+                "[ERROR] Cannot determine latest track because metadata.json is unsafe: {} ({e})",
+                display_path(&metadata_file, root)
+            ))]);
+        }
+    }
     if !metadata_file.is_file() {
         return Err(vec![VerifyFinding::error(format!(
-            "[ERROR] Cannot determine latest track because metadata.json is missing: {}",
+            "[ERROR] Cannot determine latest track because metadata.json is not a regular file: {}",
             display_path(&metadata_file, root)
         ))]);
     }
@@ -225,7 +332,7 @@ fn load_track_metadata(
     // Determine schema_version from the parsed JSON.
     // A missing or non-numeric `schema_version` is an error — do NOT silently
     // default to a legacy value (which would skip the track) or to `5` (which
-    // would let a malformed file pass as a valid v5 track). Require an explicit
+    // would let a malformed file pass as a valid v6 track). Require an explicit
     // integer value. Also reject values that overflow u32 instead of silently
     // wrapping (e.g. `4294967298` must not wrap to `2` and be skipped as legacy).
     let schema_version: u32 = match obj.get("schema_version").and_then(|v| v.as_u64()) {
@@ -246,20 +353,20 @@ fn load_track_metadata(
         }
     };
 
-    // Skip legacy (v2/v3/v4) tracks structurally — they predate the identity-only
-    // schema and carry a `status` field that is no longer supported. Only v5+
-    // tracks participate in latest-track selection and verification.
-    if schema_version < 5 {
+    // Skip legacy (v2/v3/v4/v5) tracks structurally — they predate the current
+    // identity-only schema and carry a `status` field that is no longer supported.
+    // Only v6+ tracks participate in latest-track selection and verification.
+    if schema_version < 6 {
         return Ok(None);
     }
 
-    // Full schema validation via the authoritative v5 codec. Any structural
+    // Full schema validation via the authoritative v6 codec. Any structural
     // inconsistency (missing required fields, malformed branch, invalid
     // status_override syntax, etc.) is surfaced as an error here rather than
     // being discovered later or silently ignored.
     let (_track, doc_meta) = codec::decode(&content).map_err(|e| {
         vec![VerifyFinding::error(format!(
-            "[ERROR] Cannot determine latest track because metadata.json fails v5 schema validation: {} ({e})",
+            "[ERROR] Cannot determine latest track because metadata.json fails v6 schema validation: {} ({e})",
             display_path(&metadata_file, root)
         ))]
     })?;
@@ -277,9 +384,9 @@ fn load_track_metadata(
         ))]
     })?;
 
-    // Derive status from impl-plan.json + status_override (v5 has no status field in JSON).
+    // Derive status from impl-plan.json + status_override (v6 has no status field in JSON).
     // Surface errors so that a broken track cannot silently be treated as a healthy "planned" track.
-    let status = derive_status_from_v5(impl_plan.as_ref(), obj).map_err(|e| {
+    let status = derive_status_from_v6(impl_plan.as_ref(), obj).map_err(|e| {
         vec![VerifyFinding::error(format!(
             "[ERROR] Cannot determine latest track because status derivation failed: {} ({e})",
             display_path(&metadata_file, root)
@@ -374,7 +481,7 @@ fn parse_updated_at(raw: &str) -> Result<i64, String> {
     Err(format!("cannot parse timestamp: '{value}'"))
 }
 
-/// Derive the track status string for a v5 metadata document.
+/// Derive the track status string for a v6 metadata document.
 ///
 /// Loads `impl-plan.json` (if present) from the same directory, parses
 /// `status_override` from the raw JSON, and delegates to
@@ -395,7 +502,7 @@ fn parse_updated_at(raw: &str) -> Result<i64, String> {
 /// enforcement (a branch-materialized track must carry an impl-plan.json) is
 /// the caller's responsibility — this helper only derives status from the
 /// already-loaded optional impl-plan plus the raw `status_override` JSON.
-fn derive_status_from_v5(
+fn derive_status_from_v6(
     impl_plan: Option<&domain::ImplPlanDocument>,
     obj: &serde_json::Map<String, serde_json::Value>,
 ) -> Result<String, String> {
@@ -446,8 +553,13 @@ fn derive_status_from_v5(
 /// or decoded.
 fn load_impl_plan_from_dir(track_dir: &Path) -> Result<Option<domain::ImplPlanDocument>, String> {
     let path = track_dir.join("impl-plan.json");
-    if !path.exists() {
-        return Ok(None);
+    match reject_symlinks_below(&path, track_dir) {
+        Ok(true) => {}
+        Ok(false) => return Ok(None),
+        Err(e) => return Err(format!("symlink guard rejected impl-plan.json: {e}")),
+    }
+    if !path.is_file() {
+        return Err("impl-plan.json exists but is not a regular file".to_owned());
     }
     let json =
         std::fs::read_to_string(&path).map_err(|e| format!("cannot read impl-plan.json: {e}"))?;
@@ -489,6 +601,31 @@ fn display_path(path: &Path, root: &Path) -> String {
     path.strip_prefix(root)
         .map(|rel| rel.to_string_lossy().replace('\\', "/"))
         .unwrap_or_else(|_| path.to_string_lossy().into_owned())
+}
+
+fn guarded_file_present(
+    path: &Path,
+    trusted_root: &Path,
+    root: &Path,
+    filename: &str,
+) -> Result<bool, VerifyFinding> {
+    match reject_symlinks_below(path, trusted_root) {
+        Ok(false) => Ok(false),
+        Ok(true) => {
+            if path.is_file() {
+                Ok(true)
+            } else {
+                Err(VerifyFinding::error(format!(
+                    "[ERROR] Latest track {filename} is not a regular file: {}",
+                    display_path(path, root)
+                )))
+            }
+        }
+        Err(e) => Err(VerifyFinding::error(format!(
+            "[ERROR] Latest track {filename} is unsafe: {} ({e})",
+            display_path(path, root)
+        ))),
+    }
 }
 
 // ---------------------------------------------------------------------------

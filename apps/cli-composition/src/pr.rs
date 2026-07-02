@@ -149,17 +149,33 @@ impl PrCompositionRoot {
 
     /// Create or reuse a PR for the current track branch.
     ///
+    /// `base` is the PR base (merge-target) branch. An explicit non-empty value
+    /// always wins; an empty string is the "omitted" sentinel used by
+    /// `apps/cli/src/commands/pr.rs` (no valid git branch name is empty), in
+    /// which case the current track's `branch_strategy_snapshot.merge_target`
+    /// is resolved via [`usecase::branch_strategy::BranchStrategyPort`] (T011 /
+    /// D4: post-init operations read the per-track snapshot, never the global
+    /// config).
+    ///
     /// # Errors
-    /// Returns `Err` when the underlying composition logic fails.
+    /// Returns `Err` when the underlying composition logic fails, or when
+    /// `base` is omitted and the active track/its metadata cannot be resolved.
     pub fn pr_ensure(
         &self,
         track_id: Option<String>,
         base: String,
     ) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::gh_cli::{GhClient as _, SystemGhClient};
+        use usecase::branch_strategy::BranchStrategyPort as _;
         use usecase::pr_workflow::pr_title;
 
         let ctx = resolve_branch_context(track_id.as_deref())?;
+        let base = if base.is_empty() {
+            let port = branch_strategy_port_for_track(&ctx.track_id)?;
+            port.merge_target().to_owned()
+        } else {
+            base
+        };
         let client = SystemGhClient;
 
         match client.find_open_pr(&ctx.branch, &base) {
@@ -225,8 +241,15 @@ impl PrCompositionRoot {
 
     /// Poll PR checks until they pass, then merge.
     ///
+    /// `method` is the merge method (`"merge"` / `"squash"` / `"rebase"`). An
+    /// explicit non-empty value always wins; an empty string is the "omitted"
+    /// sentinel used by `apps/cli/src/commands/pr.rs`, in which case the PR's
+    /// track `branch_strategy_snapshot.merge_method` is resolved via
+    /// [`usecase::branch_strategy::BranchStrategyPort`] (T011).
+    ///
     /// # Errors
-    /// Returns `Err` when the underlying composition logic fails.
+    /// Returns `Err` when the underlying composition logic fails, or when
+    /// `method` is omitted and the PR's track metadata cannot be resolved.
     pub fn pr_wait_and_merge(
         &self,
         pr: String,
@@ -236,6 +259,7 @@ impl PrCompositionRoot {
     ) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::gh_cli::{GhClient as _, SystemGhClient};
         use infrastructure::git_cli::{GitRepository as _, SystemGitRepo};
+        use usecase::branch_strategy::BranchStrategyPort as _;
         use usecase::pr_workflow::{WaitDecision, decide_wait_action};
 
         let client = SystemGhClient;
@@ -248,6 +272,12 @@ impl PrCompositionRoot {
         // refs/remotes/origin/<branch> is reliably updated. A bare `git fetch origin <branch>`
         // only refreshes FETCH_HEAD and does not guarantee that `origin/<branch>` is updated,
         // which would cause subsequent `git show origin/<branch>:…` reads to see a stale ref.
+        //
+        // Fetch runs BEFORE the merge-method resolution so that an omitted `--method` can be
+        // resolved from the PR head's `branch_strategy_snapshot.merge_method` via
+        // `git show origin/<branch>:track/items/<track_id>/metadata.json`, not from the local
+        // worktree (which may not contain the PR's track metadata when invoked from a fresh
+        // checkout or the configured base branch).
         let refspec = format!("+refs/heads/{branch}:refs/remotes/origin/{branch}");
         match repo.output(&["fetch", "origin", &refspec]) {
             Ok(o) if !o.status.success() => {
@@ -263,6 +293,13 @@ impl PrCompositionRoot {
             }
             Ok(_) => {}
         }
+        let method = if method.is_empty() {
+            let track_id = branch.strip_prefix("track/").unwrap_or(&branch);
+            let port = branch_strategy_port_for_pr_ref(&repo, &branch, track_id)?;
+            merge_method_to_arg(port.merge_method()).to_owned()
+        } else {
+            method
+        };
 
         let reader = infrastructure::verify::merge_gate_adapter::GitShowTrackBlobReader::new(
             repo.root().to_path_buf(),
@@ -568,5 +605,89 @@ impl PrCompositionRoot {
         }
 
         result
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Branch strategy resolution helpers (T011)
+// ---------------------------------------------------------------------------
+
+/// Resolve a [`infrastructure::branch_strategy::SnapshotBranchStrategyAdapter`]
+/// from `track_id`'s `metadata.json#branch_strategy_snapshot` (D4: post-init
+/// operations read the per-track snapshot, never the global config).
+fn branch_strategy_port_for_track(
+    track_id: &str,
+) -> Result<infrastructure::branch_strategy::SnapshotBranchStrategyAdapter, CompositionError> {
+    use domain::TrackReader as _;
+    use infrastructure::git_cli::{GitRepository as _, SystemGitRepo};
+    use infrastructure::track::fs_store::FsTrackStore;
+
+    let repo =
+        SystemGitRepo::discover().map_err(|e| CompositionError::AdapterInit(e.to_string()))?;
+    let items_dir = repo.root().join("track").join("items");
+    let id = domain::TrackId::try_new(track_id)
+        .map_err(|e| CompositionError::WiringFailed(format!("invalid track ID: {e}")))?;
+    let store = FsTrackStore::new(items_dir);
+    let metadata = store
+        .find(&id)
+        .map_err(|e| {
+            CompositionError::Infrastructure(format!("failed to read track metadata: {e}"))
+        })?
+        .ok_or_else(|| CompositionError::WiringFailed(format!("track '{track_id}' not found")))?;
+    Ok(infrastructure::branch_strategy::SnapshotBranchStrategyAdapter::new(
+        metadata.branch_strategy_snapshot().clone(),
+    ))
+}
+
+/// Resolve a [`infrastructure::branch_strategy::SnapshotBranchStrategyAdapter`] from
+/// `track_id`'s `metadata.json#branch_strategy_snapshot` on the fetched PR ref
+/// (`origin/<branch>`), rather than the local worktree.
+///
+/// Callers that dispatch on a PR head (e.g. `pr wait-and-merge`) must resolve the merge
+/// method from the PR's own committed metadata, not from whatever happens to be checked
+/// out locally — a fresh checkout or the configured base branch would otherwise `track
+/// not found` (or use stale metadata) for a PR whose track was created after the last
+/// pull.
+fn branch_strategy_port_for_pr_ref(
+    repo: &infrastructure::git_cli::SystemGitRepo,
+    branch: &str,
+    track_id: &str,
+) -> Result<infrastructure::branch_strategy::SnapshotBranchStrategyAdapter, CompositionError> {
+    use infrastructure::git_cli::GitRepository as _;
+
+    let path = format!("track/items/{track_id}/metadata.json");
+    let output = repo.output(&["show", &format!("origin/{branch}:{path}")]).map_err(|e| {
+        CompositionError::Infrastructure(format!(
+            "failed to run git show origin/{branch}:{path}: {e}"
+        ))
+    })?;
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        return Err(CompositionError::WiringFailed(format!(
+            "track '{track_id}' metadata not found on origin/{branch}: {stderr}"
+        )));
+    }
+    let json = String::from_utf8(output.stdout).map_err(|e| {
+        CompositionError::Infrastructure(format!(
+            "metadata.json on origin/{branch} is not UTF-8: {e}"
+        ))
+    })?;
+    let (metadata, _) = infrastructure::track::codec::decode(&json).map_err(|e| {
+        CompositionError::Infrastructure(format!(
+            "failed to decode metadata.json on origin/{branch}: {e}"
+        ))
+    })?;
+    Ok(infrastructure::branch_strategy::SnapshotBranchStrategyAdapter::new(
+        metadata.branch_strategy_snapshot().clone(),
+    ))
+}
+
+/// Render a [`domain::MergeMethod`] as the lowercase argument string accepted by
+/// `gh pr merge --merge|--squash|--rebase` (mirrors the CLI's `value_parser`).
+fn merge_method_to_arg(method: domain::MergeMethod) -> &'static str {
+    match method {
+        domain::MergeMethod::Squash => "squash",
+        domain::MergeMethod::Merge => "merge",
+        domain::MergeMethod::Rebase => "rebase",
     }
 }

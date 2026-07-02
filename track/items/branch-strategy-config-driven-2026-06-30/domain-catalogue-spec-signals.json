@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "5dbc02e2477e0424f39425423feefe461ede38b51beec46cbe6fc64ad2465768",
+  "signals": [
+    {
+      "type_name": "BranchStrategySnapshot",
+      "signal": "blue",
+      "entry_hash": "53c98d41f764c564146e550a588e061db3681755e5ac8592922c7717886dc3c5"
+    },
+    {
+      "type_name": "MergeMethod",
+      "signal": "blue",
+      "entry_hash": "61fa6a77c456e70e2d06ff73e8d5ff1bca680a19a8cfdd4bb8ee1a5f98063e86"
+    },
+    {
+      "type_name": "TrackMetadata",
+      "signal": "blue",
+      "entry_hash": "baf87f14827f6948fb8d1dea67e853e2ca96e7f3dc5a931463c2b5fbeccf7be2"
+    }
+  ]
+}

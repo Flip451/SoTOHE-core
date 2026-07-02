@@ -68,7 +68,14 @@ pub fn run_example_demo() -> Result<String, DemoRunError> {
 
     let id = domain::TrackId::try_new("track-state-machine")
         .map_err(|e| DemoRunError::Unavailable(format!("failed to build example track: {e}")))?;
-    let track = domain::TrackMetadata::new(id, "Track state machine", None)
+    let main_branch = domain::NonEmptyString::try_new("main")
+        .map_err(|e| DemoRunError::Unavailable(format!("failed to create branch snapshot: {e}")))?;
+    let snapshot = domain::branch_strategy::BranchStrategySnapshot::new(
+        main_branch.clone(),
+        main_branch,
+        domain::branch_strategy::MergeMethod::Squash,
+    );
+    let track = domain::TrackMetadata::new(id, "Track state machine", None, snapshot)
         .map_err(|e| DemoRunError::Unavailable(format!("failed to build example track: {e}")))?;
 
     save.execute(&track)

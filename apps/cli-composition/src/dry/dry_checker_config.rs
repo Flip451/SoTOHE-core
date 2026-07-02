@@ -5,18 +5,6 @@
 /// Lift infra `DryCheckConfig` fields (enabled + max_parallelism + known-bad percents) into the
 /// validated usecase newtypes (D2 / D3 / D4 / T004 / T011). All values come from
 /// `.harness/config/dry-check.json` v4.
-///
-/// Exposed as `pub(crate)` so that `apps/cli-composition/src/track/fixpoint_resolve.rs`
-/// (T008) can call the same lifting logic without duplicating it.
-pub(crate) fn build_usecase_dry_check_config_pub(
-    infra_config: &infrastructure::dry_check::DryCheckConfig,
-) -> Result<usecase::dry_check::DryCheckConfig, String> {
-    build_usecase_dry_check_config(infra_config)
-}
-
-/// Lift infra `DryCheckConfig` fields (enabled + max_parallelism + known-bad percents) into the
-/// validated usecase newtypes (D2 / D3 / D4 / T004 / T011). All values come from
-/// `.harness/config/dry-check.json` v4.
 pub(super) fn build_usecase_dry_check_config(
     infra_config: &infrastructure::dry_check::DryCheckConfig,
 ) -> Result<usecase::dry_check::DryCheckConfig, String> {

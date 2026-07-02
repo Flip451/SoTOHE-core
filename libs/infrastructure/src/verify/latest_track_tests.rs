@@ -16,12 +16,13 @@ fn write_file(root: &Path, rel: &str, content: &str) {
     fs::write(path, content).unwrap();
 }
 
-/// Build a minimal valid v5 identity-only metadata JSON for a track.
+/// Build a minimal valid v6 identity-only metadata JSON for a track.
 ///
-/// v5 has no `status`, `tasks`, or `plan` fields. Status is derived from
-/// `impl-plan.json` + `status_override` at runtime.
-fn make_metadata_v5(id: &str, branch_json: &str, status_override_json: &str) -> String {
-    make_metadata_v5_with_updated_at(
+/// v6 has no `status`, `tasks`, or `plan` fields. Status is derived from
+/// `impl-plan.json` + `status_override` at runtime. v6 adds the required
+/// `branch_strategy_snapshot` field.
+fn make_metadata_v6(id: &str, branch_json: &str, status_override_json: &str) -> String {
+    make_metadata_v6_with_updated_at(
         id,
         branch_json,
         "2026-01-15T00:00:00+00:00",
@@ -29,14 +30,14 @@ fn make_metadata_v5(id: &str, branch_json: &str, status_override_json: &str) -> 
     )
 }
 
-fn make_metadata_v5_with_updated_at(
+fn make_metadata_v6_with_updated_at(
     id: &str,
     branch_json: &str,
     updated_at: &str,
     status_override_json: &str,
 ) -> String {
     format!(
-        r#"{{"schema_version":5,"id":"{id}","title":"Track {id}","created_at":"2026-01-01T00:00:00+00:00","updated_at":"{updated_at}","branch":{branch_json}{status_override_json}}}"#
+        r#"{{"schema_version":6,"id":"{id}","title":"Track {id}","created_at":"2026-01-01T00:00:00+00:00","updated_at":"{updated_at}","branch":{branch_json},"branch_strategy_snapshot":{{"base_branch":"main","merge_target":"main","merge_method":"squash"}}{status_override_json}}}"#
     )
 }
 
@@ -57,12 +58,12 @@ fn setup_track(root: &Path, id: &str, branch: Option<&str>) {
         Some(b) => format!(r#""{b}""#),
         None => "null".to_owned(),
     };
-    let meta = make_metadata_v5(id, &branch_json, "");
+    let meta = make_metadata_v6(id, &branch_json, "");
     fs::write(dir.join("metadata.json"), meta).unwrap();
 }
 
 fn setup_track_planned(root: &Path, id: &str) {
-    // v5 track with no branch and no impl-plan.json → status derives to "planned".
+    // v6 track with no branch and no impl-plan.json → status derives to "planned".
     // Branchless tracks can no longer be created (plan-only lane removed); this
     // helper is retained for legacy-compatibility tests.
     setup_track(root, id, None);
@@ -109,12 +110,12 @@ fn test_no_tracks_passes() {
 }
 
 #[test]
-fn test_complete_v5_track_passes() {
+fn test_complete_v6_track_passes() {
     let tmp = TempDir::new().unwrap();
-    // v5 track with branch (in-progress derived from impl-plan) and all artifacts.
+    // v6 track with branch (in-progress derived from impl-plan) and all artifacts.
     setup_complete_track(tmp.path(), "my-feature", Some("track/my-feature"));
     let outcome = verify(tmp.path());
-    assert!(outcome.is_ok(), "complete v5 track should pass: {:#?}", outcome.findings());
+    assert!(outcome.is_ok(), "complete v6 track should pass: {:#?}", outcome.findings());
 }
 
 #[test]
@@ -130,7 +131,7 @@ fn test_legacy_v3_track_is_skipped() {
     let outcome = verify(tmp.path());
     assert!(
         outcome.is_ok(),
-        "v3 tracks must be skipped; no v5 track → pass: {:#?}",
+        "v3 tracks must be skipped; no v6 track → pass: {:#?}",
         outcome.findings()
     );
 }
@@ -222,7 +223,7 @@ fn test_latest_track_prefers_in_progress_over_newer_planned() {
 
     let planned_dir = tmp.path().join(TRACK_ITEMS_DIR).join("newer-planned");
     fs::create_dir_all(&planned_dir).unwrap();
-    let planned_meta = make_metadata_v5_with_updated_at(
+    let planned_meta = make_metadata_v6_with_updated_at(
         "newer-planned",
         r#""track/newer-planned""#,
         "2026-01-20T00:00:00+00:00",
@@ -232,7 +233,7 @@ fn test_latest_track_prefers_in_progress_over_newer_planned() {
 
     let in_progress_dir = tmp.path().join(TRACK_ITEMS_DIR).join("older-in-progress");
     fs::create_dir_all(&in_progress_dir).unwrap();
-    let in_progress_meta = make_metadata_v5_with_updated_at(
+    let in_progress_meta = make_metadata_v6_with_updated_at(
         "older-in-progress",
         r#""track/older-in-progress""#,
         "2026-01-10T00:00:00+00:00",
@@ -252,7 +253,7 @@ fn test_latest_track_tie_breaks_same_timestamp_by_track_id_ascending() {
     for id in ["track-b", "track-a"] {
         let track_dir = tmp.path().join(TRACK_ITEMS_DIR).join(id);
         fs::create_dir_all(&track_dir).unwrap();
-        let metadata = make_metadata_v5_with_updated_at(
+        let metadata = make_metadata_v6_with_updated_at(
             id,
             &format!(r#""track/{id}""#),
             "2026-01-10T00:00:00+00:00",
@@ -267,10 +268,10 @@ fn test_latest_track_tie_breaks_same_timestamp_by_track_id_ascending() {
 }
 
 #[test]
-fn test_v5_branchless_planned_valid() {
+fn test_v6_branchless_planned_valid() {
     let tmp = TempDir::new().unwrap();
-    // v5 track with no branch (legacy state): no impl-plan.json → status derives to "planned".
-    // Plan-only lane is removed; this test verifies that branchless legacy data does not
+    // v6 track with no branch (legacy state): no impl-plan.json → status derives to "planned".
+    // Plan-only lane is removed; this test verifies that branchless data does not
     // break verification (impl-plan.json absent → pre-Phase-3 → artifact checks are skipped).
     setup_track_planned(tmp.path(), "planning-track");
     write_file(
@@ -285,7 +286,7 @@ fn test_v5_branchless_planned_valid() {
     );
 
     let outcome = verify(tmp.path());
-    assert!(outcome.is_ok(), "v5 branchless planned track should pass: {:#?}", outcome.findings());
+    assert!(outcome.is_ok(), "v6 branchless planned track should pass: {:#?}", outcome.findings());
 }
 
 #[test]
@@ -294,8 +295,8 @@ fn test_archived_track_in_archive_dir_skipped() {
     // Track under track/archive/ is skipped by path, no markdown files needed.
     let archive_dir = tmp.path().join(TRACK_ARCHIVE_DIR).join("old-feat");
     fs::create_dir_all(&archive_dir).unwrap();
-    // Even v5 metadata in the archive directory is skipped by path.
-    let meta = make_metadata_v5("old-feat", r#""track/old-feat""#, "");
+    // Even v6 metadata in the archive directory is skipped by path.
+    let meta = make_metadata_v6("old-feat", r#""track/old-feat""#, "");
     fs::write(archive_dir.join("metadata.json"), meta).unwrap();
 
     let outcome = verify(tmp.path());
@@ -314,7 +315,7 @@ fn test_corrupt_impl_plan_surfaces_error() {
     let tmp = TempDir::new().unwrap();
     let dir = tmp.path().join(TRACK_ITEMS_DIR).join("corrupt-track");
     fs::create_dir_all(&dir).unwrap();
-    let meta = make_metadata_v5("corrupt-track", r#""track/corrupt-track""#, "");
+    let meta = make_metadata_v6("corrupt-track", r#""track/corrupt-track""#, "");
     fs::write(dir.join("metadata.json"), meta).unwrap();
     // Write invalid JSON to impl-plan.json.
     fs::write(dir.join("impl-plan.json"), "NOT VALID JSON").unwrap();
@@ -331,7 +332,7 @@ fn test_corrupt_impl_plan_surfaces_error() {
 fn test_phase0_track_with_no_artifacts_passes() {
     // T001 (phase-aware verify gates): when impl-plan.json is absent
     // (Phase 0 / 1 / 2 — pre-implementation), spec/plan existence checks
-    // are skipped. A branch-materialized v5 track that only has metadata
+    // are skipped. A branch-materialized v6 track that only has metadata
     // must therefore pass even without spec.md / spec.json / plan.md.
     // This implements "file existence = phase status" from
     // knowledge/conventions/workflow-ceremony-minimization.md and
@@ -340,7 +341,7 @@ fn test_phase0_track_with_no_artifacts_passes() {
     let tmp = TempDir::new().unwrap();
     let dir = tmp.path().join(TRACK_ITEMS_DIR).join("phase0-track");
     fs::create_dir_all(&dir).unwrap();
-    let meta = make_metadata_v5("phase0-track", r#""track/phase0-track""#, "");
+    let meta = make_metadata_v6("phase0-track", r#""track/phase0-track""#, "");
     fs::write(dir.join("metadata.json"), meta).unwrap();
     // Intentionally omit impl-plan.json, spec.json, spec.md, plan.md
     // (Phase 0 state — only metadata.json + branch exists).
@@ -363,14 +364,14 @@ fn test_phase0_track_with_no_artifacts_passes() {
 fn test_missing_schema_version_is_not_silently_skipped() {
     // A metadata.json without `schema_version` must NOT be treated as a
     // legacy v2/v3 track and silently skipped. It should fall through to
-    // v5 processing so that errors are surfaced (fail-closed).
+    // v6 processing so that errors are surfaced (fail-closed).
     let tmp = TempDir::new().unwrap();
     let dir = tmp.path().join(TRACK_ITEMS_DIR).join("no-version-track");
     fs::create_dir_all(&dir).unwrap();
     // metadata.json without schema_version — must not be silently skipped.
     let meta = r#"{"id":"no-version-track","branch":"track/no-version-track","title":"No Version","created_at":"2026-01-01T00:00:00Z","updated_at":"2026-01-15T00:00:00Z"}"#;
     fs::write(dir.join("metadata.json"), meta).unwrap();
-    // No impl-plan.json — if the track were processed as v5, status derives
+    // No impl-plan.json — if the track were processed as v6, status derives
     // to "planned" and the verifier proceeds to check artifacts. Without the
     // required spec.md / plan.md the outcome must be an error (not a silent pass).
     write_file(
@@ -390,7 +391,7 @@ fn test_missing_schema_version_is_not_silently_skipped() {
 #[test]
 fn test_schema_version_overflow_u32_is_rejected() {
     // u32::MAX + 1 == 4294967296; as u32 would silently wrap to 0 (which is
-    // < 5 and would cause the track to be silently skipped as legacy).
+    // < 6 and would cause the track to be silently skipped as legacy).
     // The fix using u32::try_from must surface an explicit error instead.
     let tmp = TempDir::new().unwrap();
     let dir = tmp.path().join(TRACK_ITEMS_DIR).join("overflow-track");
@@ -479,6 +480,78 @@ fn test_invalid_spec_json_fails() {
     assert!(
         msgs.iter().any(|m| m.contains("spec.json")),
         "error should mention spec.json, got: {msgs:?}"
+    );
+}
+
+#[test]
+#[cfg(unix)]
+fn test_symlinked_track_directory_fails_closed() {
+    let tmp = TempDir::new().unwrap();
+    let items_dir = tmp.path().join(TRACK_ITEMS_DIR);
+    fs::create_dir_all(&items_dir).unwrap();
+    let outside = TempDir::new().unwrap();
+    fs::write(
+        outside.path().join("metadata.json"),
+        make_metadata_v6("escape-track", r#""track/escape-track""#, ""),
+    )
+    .unwrap();
+    std::os::unix::fs::symlink(outside.path(), items_dir.join("escape-track")).unwrap();
+
+    let outcome = verify(tmp.path());
+    assert!(outcome.has_errors(), "symlinked track directory must fail closed");
+    let msgs: Vec<_> = outcome.findings().iter().map(|f| f.message()).collect();
+    assert!(
+        msgs.iter().any(|msg| msg.contains("track directory is a symlink")),
+        "error should mention symlinked track directory, got: {msgs:?}"
+    );
+}
+
+#[test]
+#[cfg(unix)]
+fn test_symlinked_metadata_file_fails_closed() {
+    let tmp = TempDir::new().unwrap();
+    let track_dir = tmp.path().join(TRACK_ITEMS_DIR).join("metadata-link-track");
+    fs::create_dir_all(&track_dir).unwrap();
+    let outside = TempDir::new().unwrap();
+    let target = outside.path().join("metadata.json");
+    fs::write(
+        &target,
+        make_metadata_v6("metadata-link-track", r#""track/metadata-link-track""#, ""),
+    )
+    .unwrap();
+    std::os::unix::fs::symlink(&target, track_dir.join("metadata.json")).unwrap();
+
+    let outcome = verify(tmp.path());
+    assert!(outcome.has_errors(), "symlinked metadata.json must fail closed");
+    let msgs: Vec<_> = outcome.findings().iter().map(|f| f.message()).collect();
+    assert!(
+        msgs.iter().any(|msg| msg.contains("metadata.json") && msg.contains("symlink")),
+        "error should mention symlinked metadata.json, got: {msgs:?}"
+    );
+}
+
+#[test]
+#[cfg(unix)]
+fn test_symlinked_impl_plan_file_fails_closed() {
+    let tmp = TempDir::new().unwrap();
+    let track_dir = tmp.path().join(TRACK_ITEMS_DIR).join("impl-plan-link-track");
+    fs::create_dir_all(&track_dir).unwrap();
+    fs::write(
+        track_dir.join("metadata.json"),
+        make_metadata_v6("impl-plan-link-track", r#""track/impl-plan-link-track""#, ""),
+    )
+    .unwrap();
+    let outside = TempDir::new().unwrap();
+    let target = outside.path().join("impl-plan.json");
+    fs::write(&target, IN_PROGRESS_IMPL_PLAN_JSON).unwrap();
+    std::os::unix::fs::symlink(&target, track_dir.join("impl-plan.json")).unwrap();
+
+    let outcome = verify(tmp.path());
+    assert!(outcome.has_errors(), "symlinked impl-plan.json must fail closed");
+    let msgs: Vec<_> = outcome.findings().iter().map(|f| f.message()).collect();
+    assert!(
+        msgs.iter().any(|msg| msg.contains("impl-plan.json") && msg.contains("symlink")),
+        "error should mention symlinked impl-plan.json, got: {msgs:?}"
     );
 }
 

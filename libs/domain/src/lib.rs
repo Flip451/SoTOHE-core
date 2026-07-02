@@ -3,6 +3,7 @@
 
 pub mod adr_decision;
 pub mod auto_phase;
+pub mod branch_strategy;
 pub mod chain;
 mod decision;
 pub mod dry_check;
@@ -38,6 +39,7 @@ pub use adr_decision::{
     DecisionGrounds, DeprecatedDecision, ImplementedDecision, ProposedDecision, SupersededDecision,
     evaluate_adr_decision,
 };
+pub use branch_strategy::{BranchStrategySnapshot, MergeMethod};
 pub use chain::{
     ChainGateEntry, ChainId, ChainIdentity, GateKind, PersistedSoTChainGate, SignalGateMatrix,
     Strictness, check_catalogue_spec_signals,
@@ -121,6 +123,14 @@ mod tests {
         TrackTask::new(TaskId::try_new(id).unwrap(), description).unwrap()
     }
 
+    fn test_snapshot() -> BranchStrategySnapshot {
+        BranchStrategySnapshot::new(
+            NonEmptyString::try_new("main").unwrap(),
+            NonEmptyString::try_new("main").unwrap(),
+            MergeMethod::Squash,
+        )
+    }
+
     #[test]
     fn track_id_rejects_non_slug_values() {
         let result = TrackId::try_new("Not A Slug");
@@ -165,6 +175,7 @@ mod tests {
             TrackId::try_new("track-state-machine").unwrap(),
             "Track state machine",
             None,
+            test_snapshot(),
         )
         .unwrap();
         // No impl-plan, no override → Planned
@@ -177,6 +188,7 @@ mod tests {
             TrackId::try_new("track-state-machine").unwrap(),
             "Track state machine",
             None,
+            test_snapshot(),
         )
         .unwrap();
 
@@ -266,6 +278,7 @@ mod tests {
             Some(TrackBranch::try_new("track/my-track").unwrap()),
             "My Track",
             None,
+            test_snapshot(),
         )
         .unwrap();
         assert_eq!(track.branch().unwrap().as_ref(), "track/my-track");
@@ -273,8 +286,13 @@ mod tests {
 
     #[test]
     fn track_metadata_without_branch_returns_none() {
-        let track =
-            TrackMetadata::new(TrackId::try_new("my-track").unwrap(), "My Track", None).unwrap();
+        let track = TrackMetadata::new(
+            TrackId::try_new("my-track").unwrap(),
+            "My Track",
+            None,
+            test_snapshot(),
+        )
+        .unwrap();
         assert!(track.branch().is_none());
     }
 }

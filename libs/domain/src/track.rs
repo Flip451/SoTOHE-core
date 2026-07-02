@@ -2,7 +2,7 @@ use std::fmt;
 
 use crate::{
     CommitHash, DomainError, ImplPlanDocument, NonEmptyString, PlanView, TaskId, TrackBranch,
-    TrackId, TransitionError, ValidationError,
+    TrackId, TransitionError, ValidationError, branch_strategy::BranchStrategySnapshot,
 };
 
 /// Derived status of a track, computed from its task states and optional override.
@@ -290,6 +290,7 @@ pub struct TrackMetadata {
     /// Optional override sub-field: Blocked/Cancelled with reason.
     /// Feeds into derived status via `derive_track_status`.
     status_override: Option<StatusOverride>,
+    branch_strategy_snapshot: BranchStrategySnapshot,
 }
 
 impl TrackMetadata {
@@ -301,8 +302,9 @@ impl TrackMetadata {
         id: TrackId,
         title: impl Into<String>,
         status_override: Option<StatusOverride>,
+        branch_strategy_snapshot: BranchStrategySnapshot,
     ) -> Result<Self, DomainError> {
-        Self::with_branch(id, None, title, status_override)
+        Self::with_branch(id, None, title, status_override, branch_strategy_snapshot)
     }
 
     /// Creates a new `TrackMetadata` with an optional branch field.
@@ -320,6 +322,7 @@ impl TrackMetadata {
         branch: Option<TrackBranch>,
         title: impl Into<String>,
         status_override: Option<StatusOverride>,
+        branch_strategy_snapshot: BranchStrategySnapshot,
     ) -> Result<Self, DomainError> {
         if let Some(ref b) = branch {
             let expected_prefix = format!("track/{}", id.as_ref());
@@ -331,7 +334,7 @@ impl TrackMetadata {
             }
         }
         let title = NonEmptyString::try_new(title).map_err(|_| ValidationError::EmptyTrackTitle)?;
-        Ok(Self { id, branch, title, status_override })
+        Ok(Self { id, branch, title, status_override, branch_strategy_snapshot })
     }
 
     #[must_use]
@@ -395,6 +398,12 @@ impl TrackMetadata {
     /// Sets or clears the status override sub-field.
     pub fn set_status_override(&mut self, status_override: Option<StatusOverride>) {
         self.status_override = status_override;
+    }
+
+    /// Returns the branch strategy snapshot captured at track init time.
+    #[must_use]
+    pub fn branch_strategy_snapshot(&self) -> &BranchStrategySnapshot {
+        &self.branch_strategy_snapshot
     }
 }
 
@@ -485,12 +494,25 @@ pub(crate) fn validate_plan_invariants(
 mod tests {
     use super::*;
 
+    fn test_snapshot() -> BranchStrategySnapshot {
+        BranchStrategySnapshot::new(
+            crate::NonEmptyString::try_new("main").unwrap(),
+            crate::NonEmptyString::try_new("main").unwrap(),
+            crate::branch_strategy::MergeMethod::Squash,
+        )
+    }
+
     // --- Identity-only TrackMetadata construction ---
 
     #[test]
     fn test_track_metadata_new_with_valid_title_succeeds() {
-        let track =
-            TrackMetadata::new(TrackId::try_new("my-track").unwrap(), "My Track", None).unwrap();
+        let track = TrackMetadata::new(
+            TrackId::try_new("my-track").unwrap(),
+            "My Track",
+            None,
+            test_snapshot(),
+        )
+        .unwrap();
         assert_eq!(track.id().as_ref(), "my-track");
         assert_eq!(track.title(), "My Track");
         assert!(track.branch().is_none());
@@ -499,7 +521,8 @@ mod tests {
 
     #[test]
     fn test_track_metadata_new_with_empty_title_returns_error() {
-        let result = TrackMetadata::new(TrackId::try_new("my-track").unwrap(), "", None);
+        let result =
+            TrackMetadata::new(TrackId::try_new("my-track").unwrap(), "", None, test_snapshot());
         assert!(matches!(result, Err(DomainError::Validation(ValidationError::EmptyTrackTitle))));
     }
 
@@ -510,6 +533,7 @@ mod tests {
             Some(TrackBranch::try_new("track/my-track").unwrap()),
             "My Track",
             None,
+            test_snapshot(),
         )
         .unwrap();
         assert_eq!(track.branch().unwrap().as_ref(), "track/my-track");
@@ -522,6 +546,7 @@ mod tests {
             Some(TrackBranch::try_new("track/other-track").unwrap()),
             "My Track",
             None,
+            test_snapshot(),
         );
         assert!(
             matches!(
@@ -534,15 +559,25 @@ mod tests {
 
     #[test]
     fn test_track_metadata_without_branch_returns_none() {
-        let track =
-            TrackMetadata::new(TrackId::try_new("my-track").unwrap(), "My Track", None).unwrap();
+        let track = TrackMetadata::new(
+            TrackId::try_new("my-track").unwrap(),
+            "My Track",
+            None,
+            test_snapshot(),
+        )
+        .unwrap();
         assert!(track.branch().is_none());
     }
 
     #[test]
     fn test_track_metadata_set_branch_updates_branch() {
-        let mut track =
-            TrackMetadata::new(TrackId::try_new("my-track").unwrap(), "My Track", None).unwrap();
+        let mut track = TrackMetadata::new(
+            TrackId::try_new("my-track").unwrap(),
+            "My Track",
+            None,
+            test_snapshot(),
+        )
+        .unwrap();
         assert!(track.branch().is_none());
         track.set_branch(Some(TrackBranch::try_new("track/my-track").unwrap())).unwrap();
         assert_eq!(track.branch().unwrap().as_ref(), "track/my-track");
@@ -554,6 +589,7 @@ mod tests {
             TrackId::try_new("blocked-track").unwrap(),
             "Blocked Track",
             Some(StatusOverride::blocked("waiting on review").unwrap()),
+            test_snapshot(),
         )
         .unwrap();
         // Derived status from override = Blocked
@@ -563,12 +599,30 @@ mod tests {
 
     #[test]
     fn test_track_metadata_set_status_override_stores_override() {
-        let mut track =
-            TrackMetadata::new(TrackId::try_new("my-track").unwrap(), "My Track", None).unwrap();
+        let mut track = TrackMetadata::new(
+            TrackId::try_new("my-track").unwrap(),
+            "My Track",
+            None,
+            test_snapshot(),
+        )
+        .unwrap();
         track.set_status_override(Some(StatusOverride::blocked("dep issue").unwrap()));
         assert!(track.status_override().is_some());
         // derive_track_status returns Blocked when override is set
         assert_eq!(derive_track_status(None, track.status_override()), TrackStatus::Blocked);
+    }
+
+    #[test]
+    fn test_track_metadata_branch_strategy_snapshot_accessor() {
+        let snap = test_snapshot();
+        let track = TrackMetadata::new(
+            TrackId::try_new("my-track").unwrap(),
+            "My Track",
+            None,
+            snap.clone(),
+        )
+        .unwrap();
+        assert_eq!(track.branch_strategy_snapshot(), &snap);
     }
 
     // --- derive_track_status tests ---

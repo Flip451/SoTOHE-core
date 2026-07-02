@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "acd6e65a833ba07556ac03a5ec7ef2774986583958a5868613b44787626fa6df",
+  "signals": [
+    {
+      "type_name": "DryCheckApprovedOutcome",
+      "signal": "blue",
+      "entry_hash": "82585738ecfbfc3be00f5d020d5ac1c7ca8cce6dc5ad079736e2b24b8e05aaf8"
+    },
+    {
+      "type_name": "DryCheckConfigLoaderError",
+      "signal": "blue",
+      "entry_hash": "bd5a6821a733c6a8a1f18015a3009c8aa5f8e2abec42f7c5de5d146269cea362"
+    },
+    {
+      "type_name": "DryDriverInteractor",
+      "signal": "blue",
+      "entry_hash": "cc0db483390f196cac3ca89eedea9449d40bc966a77f3d0f5ea99a5201381483"
+    },
+    {
+      "type_name": "DryWriteFindingSummary",
+      "signal": "blue",
+      "entry_hash": "9a5e7fb8a47d46eabdfe732db1d1c83bfc4cd3f46279cb6182a86f2950a104ea"
+    },
+    {
+      "type_name": "DryWriteOutcome",
+      "signal": "blue",
+      "entry_hash": "b808077e39ecfd68f5a97b01d8a905321f59e609ce7a094a435d7fc1f6c0c5e5"
+    },
+    {
+      "type_name": "FixpointResolveDriverInput",
+      "signal": "blue",
+      "entry_hash": "ea081a519daf4366c8572707ddd3f95408db3f96366244bd2c6cb715bb8e7d79"
+    },
+    {
+      "type_name": "FixpointResolveDriverInteractor",
+      "signal": "blue",
+      "entry_hash": "94743126258ab5c43a97717de476120c383532a083c6efdc108b9825283c0e29"
+    },
+    {
+      "type_name": "FixpointResolveDriverOutcome",
+      "signal": "blue",
+      "entry_hash": "1b36507f900dbc8f76f2bf027e11c33c8097d70f527b5ea454f8c28cae52a4ab"
+    },
+    {
+      "type_name": "FixpointWorkspaceContext",
+      "signal": "blue",
+      "entry_hash": "23e5c2111a5e64fd950981a4c8da4022804dd775d184aa9b5ea90fa5399c0299"
+    },
+    {
+      "type_name": "FixpointWorkspaceContextError",
+      "signal": "blue",
+      "entry_hash": "1f67d33ede5809c35b4f437f119e4324b248bcc15cd86d7f2abc7efb63a2fc23"
+    },
+    {
+      "type_name": "BranchStrategyPort",
+      "signal": "blue",
+      "entry_hash": "fb37a03c1f14622e53eb2997e96ee72fbb476832fdbd82850ded2dd1279e5bf3"
+    },
+    {
+      "type_name": "DiffBaseResolverPort",
+      "signal": "blue",
+      "entry_hash": "9fe91732206e9813d28e01b88d4ec64b90e79abfbab996deac8da1890b9fcf87"
+    },
+    {
+      "type_name": "DryApprovalFactoryPort",
+      "signal": "blue",
+      "entry_hash": "b7b6d3c3c49d1c41f8acb2cfcb6fdd5432b0d3f2b2a126bb5b6838bc8aa1942f"
+    },
+    {
+      "type_name": "DryCheckConfigLoaderPort",
+      "signal": "blue",
+      "entry_hash": "72e192c6ebce0af6447ffd8bd92ed7ca39eb45a7452a206d0719e057b57ea425"
+    },
+    {
+      "type_name": "DryDriverPort",
+      "signal": "blue",
+      "entry_hash": "d2d73ec97af367c080b4acbf07d29e8443b812cddc10041183bd500ae5c65371"
+    },
+    {
+      "type_name": "DryDriverService",
+      "signal": "blue",
+      "entry_hash": "9bfd6a742b218c2415c2ad8a1c4138bbd54a1c1edbe0ada7d5664ac63079699d"
+    },
+    {
+      "type_name": "FixpointDryGateFactoryPort",
+      "signal": "blue",
+      "entry_hash": "879bbce9559474636e5fc13be5c1b65a87ba9bb74cd9c8e7fb98ff85d8ae4608"
+    },
+    {
+      "type_name": "FixpointDryGateService",
+      "signal": "blue",
+      "entry_hash": "a40e6e09073aaa982f8454016cad8872c12b971f532af75cdf3ea232e7f19f51"
+    },
+    {
+      "type_name": "FixpointGateStateFactoryPort",
+      "signal": "blue",
+      "entry_hash": "7a91e488e5cc940cfd4008d1f0da09738b5dd60e6d8bf6a4a86e56af5f6e4de2"
+    },
+    {
+      "type_name": "FixpointResolveDriverService",
+      "signal": "blue",
+      "entry_hash": "3473c06650f3c1cd30e433ebdbfaa75162e7bb9f5aa91b962e708b519a99e54c"
+    },
+    {
+      "type_name": "FixpointWorkspaceContextPort",
+      "signal": "blue",
+      "entry_hash": "57e5de550807a7412922eb371b58add3b08997ec26f121651d6a0da17fc7486c"
+    },
+    {
+      "type_name": "RefVerifyGateStatePort",
+      "signal": "blue",
+      "entry_hash": "0ca71ecb465fc66ace23eb33fdae2c441d95cd75e5881093e565c384f9798fdd"
+    },
+    {
+      "type_name": "ReviewGateStatePort",
+      "signal": "blue",
+      "entry_hash": "593d21a6bac5cc3959fb2fd7a36361a9762477705721d69b8851c45d75334eae"
+    },
+    {
+      "type_name": "TrackService",
+      "signal": "blue",
+      "entry_hash": "c8261e2aea547c1109aec7fa37713144a342d2e477a96e7b3eafb388a4f4db12"
+    }
+  ]
+}
