@@ -199,11 +199,15 @@ pub(super) fn build_v2_shared(
     }
 
     // Read base_branch from metadata.json (branch_strategy_snapshot).
-    // Falls back to "main" only when metadata.json is absent (new tracks
-    // pre-init or ephemeral fixtures). Decode errors propagate as Config;
-    // per ADR D5 (no backward compatibility), schema_version != 6 is not
-    // supported and must fail explicitly rather than silently degrade.
+    // When metadata.json is absent (new tracks pre-init or ephemeral fixtures),
+    // fall back to `.harness/config/branch-strategy.json` via
+    // `JsonConfigBranchStrategyAdapter` (D5: no hard-coded `main`).
+    // Decode errors propagate as Config; per ADR D5 (no backward compatibility),
+    // schema_version != 6 is not supported and must fail explicitly rather
+    // than silently degrade.
     let base_branch = {
+        use usecase::branch_strategy::BranchStrategyPort as _;
+
         let metadata_path = track_dir.join("metadata.json");
         match std::fs::read_to_string(&metadata_path) {
             Ok(metadata_json) => {
@@ -211,7 +215,19 @@ pub(super) fn build_v2_shared(
                     .map_err(|e| ReviewSharedError::Config(format!("decode metadata.json: {e}")))?;
                 track_meta.branch_strategy_snapshot().base_branch().to_owned()
             }
-            Err(e) if e.kind() == std::io::ErrorKind::NotFound => "main".to_owned(),
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
+                let config_path = canonical_root.join(".harness/config/branch-strategy.json");
+                let adapter =
+                    infrastructure::branch_strategy::JsonConfigBranchStrategyAdapter::new(
+                        config_path,
+                    )
+                    .map_err(|e| {
+                        ReviewSharedError::Config(format!(
+                            "load .harness/config/branch-strategy.json (metadata.json absent): {e}"
+                        ))
+                    })?;
+                adapter.base_branch().to_owned()
+            }
             Err(e) => {
                 return Err(ReviewSharedError::Config(format!("read metadata.json: {e}")));
             }

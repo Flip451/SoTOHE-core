@@ -743,6 +743,11 @@ mod tests {
             r#"{"version":2,"groups":{"cli_composition":{"patterns":["src/**"]}}}"#,
         )
         .unwrap();
+        fs::write(
+            config_dir.join("branch-strategy.json"),
+            r#"{"base_branch":"main","merge_target":"main","merge_method":"squash"}"#,
+        )
+        .unwrap();
         fs::write(dir.path().join("README.md"), "init\n").unwrap();
         GitRunner::at(dir.path()).assert_success(&["add", "."]);
         GitRunner::at(dir.path()).assert_success(&["commit", "-m", "base"]);

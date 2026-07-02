@@ -95,11 +95,13 @@ pub use types::{DryCheckApprovedInput, DryResultsInput, DryWriteInput, RunDryFix
 
 /// Read `base_branch` from `<track_dir>/metadata.json` via the branch_strategy_snapshot.
 ///
-/// Falls back to "main" only when metadata.json is absent (new tracks pre-init or
-/// ephemeral fixtures). Decode errors propagate as `ConfigLoad`; per ADR D5 (no
-/// backward compatibility), schema_version != 6 is not supported and must fail
-/// explicitly rather than silently degrade.
+/// When metadata.json is absent (new tracks pre-init or ephemeral fixtures), fall back to
+/// `.harness/config/branch-strategy.json` via `JsonConfigBranchStrategyAdapter` (D5: no
+/// hard-coded `main`). Decode errors propagate as `ConfigLoad`; per ADR D5 (no backward
+/// compatibility), schema_version != 6 is not supported and must fail explicitly rather
+/// than silently degrade.
 fn resolve_base_branch_from_metadata(
+    trusted_repo_root: &std::path::Path,
     track_dir: &std::path::Path,
     track_id: &TrackId,
 ) -> Result<String, CompositionError> {
@@ -116,12 +118,38 @@ fn resolve_base_branch_from_metadata(
                 })?;
             Ok(track_meta.branch_strategy_snapshot().base_branch().to_owned())
         }
-        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok("main".to_owned()),
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
+            resolve_base_branch_from_global_config(trusted_repo_root, track_id)
+        }
         Err(e) => Err(CompositionError::ConfigLoad(format!(
             "read metadata.json for '{}': {e}",
             track_id.as_ref()
         ))),
     }
+}
+
+/// Fallback base_branch resolution when `<track_dir>/metadata.json` is absent.
+///
+/// Reads `.harness/config/branch-strategy.json` from the repo root via
+/// `JsonConfigBranchStrategyAdapter` (T011 fail-closed wiring — config load errors
+/// propagate as `ConfigLoad` rather than silently degrade to a hard-coded branch name).
+fn resolve_base_branch_from_global_config(
+    trusted_repo_root: &std::path::Path,
+    track_id: &TrackId,
+) -> Result<String, CompositionError> {
+    use usecase::branch_strategy::BranchStrategyPort as _;
+
+    let config_path = trusted_repo_root.join(".harness/config/branch-strategy.json");
+    let adapter =
+        infrastructure::branch_strategy::JsonConfigBranchStrategyAdapter::new(config_path)
+            .map_err(|e| {
+                CompositionError::ConfigLoad(format!(
+                    "load .harness/config/branch-strategy.json for '{}' (metadata.json absent): \
+                     {e}",
+                    track_id.as_ref()
+                ))
+            })?;
+    Ok(adapter.base_branch().to_owned())
 }
 
 fn resolve_dry_write_telemetry_writer(
@@ -188,7 +216,23 @@ impl DryCompositionRoot {
             resolve_existing_dir_under_repo(&input.items_dir, &root, &canonical_root, "items_dir")?;
         let track_dir = items_dir_abs.join(track_id.as_ref());
 
-        let base_branch = resolve_base_branch_from_metadata(&track_dir, &track_id)?;
+        // Always load infra config for max_parallelism (D3 / T010); --threshold overrides its threshold.
+        let config_path = root.join(".harness/config/dry-check.json");
+        let infra_config =
+            infrastructure::dry_check::DryCheckConfig::load(&config_path).map_err(|e| {
+                CompositionError::ConfigLoad(format!("failed to load dry-check config: {e}"))
+            })?;
+
+        // Validate --threshold before any I/O that depends on per-track state so an invalid
+        // caller-supplied threshold is rejected regardless of metadata / config-fallback state.
+        let threshold = match input.threshold {
+            Some(t) => SimilarityThreshold::new(t)
+                .map_err(|e| CompositionError::WiringFailed(format!("invalid --threshold: {e}")))?,
+            None => infra_config.threshold(),
+        };
+
+        let base_branch =
+            resolve_base_branch_from_metadata(&canonical_root, &track_dir, &track_id)?;
 
         let (fast_model, effective_model, fast_reasoning_effort, final_reasoning_effort) =
             match dry_checker_config {
@@ -210,19 +254,6 @@ impl DryCompositionRoot {
             &canonical_root,
             &base_branch,
         )?;
-
-        // Always load infra config for max_parallelism (D3 / T010); --threshold overrides its threshold.
-        let config_path = root.join(".harness/config/dry-check.json");
-        let infra_config =
-            infrastructure::dry_check::DryCheckConfig::load(&config_path).map_err(|e| {
-                CompositionError::ConfigLoad(format!("failed to load dry-check config: {e}"))
-            })?;
-
-        let threshold = match input.threshold {
-            Some(t) => SimilarityThreshold::new(t)
-                .map_err(|e| CompositionError::WiringFailed(format!("invalid --threshold: {e}")))?,
-            None => infra_config.threshold(),
-        };
 
         let usecase_config =
             build_usecase_dry_check_config(&infra_config).map_err(CompositionError::ConfigLoad)?;
@@ -517,7 +548,8 @@ impl DryCompositionRoot {
         }
         let track_dir = items_dir_abs.join(track_id.as_ref());
 
-        let base_branch = resolve_base_branch_from_metadata(&track_dir, &track_id)?;
+        let base_branch =
+            resolve_base_branch_from_metadata(&canonical_repo_root, &track_dir, &track_id)?;
 
         let commit_hash_path = track_dir.join(".commit_hash");
         let dry_check_json_path = track_dir.join("dry-check.json");

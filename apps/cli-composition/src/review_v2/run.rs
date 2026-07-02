@@ -548,6 +548,11 @@ mod tests {
             r#"{"version": 2, "groups": {"infra": {"patterns": ["src/**"]}}}"#,
         )
         .unwrap();
+        std::fs::write(
+            config_dir.join("branch-strategy.json"),
+            r#"{"base_branch":"main","merge_target":"main","merge_method":"squash"}"#,
+        )
+        .unwrap();
         std::fs::create_dir_all(root.join("track/items")).unwrap();
         run(&["add", "."]);
         run(&["commit", "-m", "base commit"]);

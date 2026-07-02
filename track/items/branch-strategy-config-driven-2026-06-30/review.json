@@ -1,578 +1,303 @@
 {
   "schema_version": 2,
   "scopes": {
-    "other": {
+    "infrastructure": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8d1e032150792c0be70de04a1661f3a4605a5daddfc0efd835f89ed6d31f69bd",
-          "at": "2026-07-02T02:47:16Z"
+          "hash": "rvw1:sha256:0c04aa88fc38d0c08b5922cf48806e23cae1ff712475ebd292dde703be6f2370",
+          "at": "2026-06-30T20:44:13Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8d1e032150792c0be70de04a1661f3a4605a5daddfc0efd835f89ed6d31f69bd",
-          "at": "2026-07-02T02:50:26Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6e8b1b6bb455fa563f4671a976af2882e4834b64f7446bf4f1874c39872343b6",
-          "at": "2026-06-30T20:42:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6e8b1b6bb455fa563f4671a976af2882e4834b64f7446bf4f1874c39872343b6",
-          "at": "2026-06-30T20:46:04Z"
+          "hash": "rvw1:sha256:0c04aa88fc38d0c08b5922cf48806e23cae1ff712475ebd292dde703be6f2370",
+          "at": "2026-06-30T20:48:22Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "This reads `metadata.json` through `infrastructure::track::codec::decode`, which hard-rejects every `schema_version != 6`. The promised fallback to `main` therefore never runs for existing v5 tracks/fixtures (for example `track/items/cli-composition-split-presentation-layer-2026-06-21/metadata.json`), so the new branch-strategy lookup will fail with `ConfigLoad` on older tracks instead of being backward-compatible. The same bug is duplicated in [review_v2/shared.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/review_v2/shared.rs#L208) and [track/fixpoint_resolve.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/track/fixpoint_resolve.rs#L318).",
+              "message": "`JsonConfigBranchStrategyAdapter::new` reads the config path directly with `read_to_string` and never rejects symlinks or verifies containment under a trusted root. A symlinked `.harness/config/branch-strategy.json` can therefore redirect this adapter to attacker-controlled content outside the repository, which matches the symlink-boundary issue this layer is supposed to fail closed on.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
-              "line": 233,
-              "category": "compatibility"
-            }
-          ],
-          "hash": "rvw1:sha256:38523286fa0d8e076b158f68bbbeca7bc7507c8ca528c6dcf0b45055f70b45a5",
-          "at": "2026-07-01T01:26:04Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f9194cba8c44a0846709dcd118156a79c9608865f046e87999ca49825c137d81",
-          "at": "2026-07-01T01:56:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f9194cba8c44a0846709dcd118156a79c9608865f046e87999ca49825c137d81",
-          "at": "2026-07-01T01:57:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The change keeps `FsDiffBaseResolverAdapter` as a `DiffBaseResolverPort` implementation inside `cli_composition` and now extends it with `base_branch` state. Per ADR D7 / the cli_composition scope policy, secondary adapter implementations belong in `libs/infrastructure`; this layer should only construct and inject them. Move this port implementation to infrastructure and wire that adapter here.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
-              "line": 59,
-              "category": "adapter defined here"
-            }
-          ],
-          "hash": "rvw1:sha256:f9194cba8c44a0846709dcd118156a79c9608865f046e87999ca49825c137d81",
-          "at": "2026-07-01T02:00:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`FsDiffBaseResolverAdapter` is a secondary adapter implemented inside `cli_composition`: the struct stores the configured base branch here and its impl of `DiffBaseResolverPort` performs the `.commit_hash`/git fallback behavior. Under the cli_composition scope policy and ADR D7, port implementations belong in `libs/infrastructure`; this layer should only construct and inject that adapter. Move this resolver implementation, including the new `base_branch` state, into infrastructure and wire it from here.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
-              "line": 59,
-              "category": "adapter defined here"
-            }
-          ],
-          "hash": "rvw1:sha256:f9194cba8c44a0846709dcd118156a79c9608865f046e87999ca49825c137d81",
-          "at": "2026-07-01T02:01:59Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d7a27efb165feb3e2d352b8b261826b561200f3dbb581837bdafadbd46bc2dd1",
-          "at": "2026-07-01T02:23:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d7a27efb165feb3e2d352b8b261826b561200f3dbb581837bdafadbd46bc2dd1",
-          "at": "2026-07-01T02:27:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:78781525bc4b85d6506cae9d11d0ba286ec88432835c8bddb5f20b8ac4601409",
-          "at": "2026-07-01T02:39:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c01c8138f26fa534055a11365e07ef788a23ed1b18bcf3dd2213816f231bfbd8",
-          "at": "2026-07-01T02:53:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`FsDryApprovalFactoryAdapter` is still defined in `cli_composition` and implements the usecase `DryApprovalFactoryPort`. Per the cli_composition scope policy and ADR D7, port adapter implementations belong in `libs/infrastructure`; this layer should only construct and inject the infrastructure adapter.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+              "file": "libs/infrastructure/src/branch_strategy.rs",
               "line": 55,
-              "category": "adapter defined here"
-            },
-            {
-              "message": "`fixpoint_resolve` constructs `FixpointResolveInteractor` and immediately invokes `.resolve(&cmd)`. That is a use-case invocation from the composition root; ADR D2 requires this layer to wire drivers/adapters only, with command execution handled by the driving adapter layer.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
-              "line": 358,
-              "category": "invoke leak"
-            },
-            {
-              "message": "`dispatch_review_cycle` directly invokes the review use case via `cycle.review(&scope)` and `cycle.fast_review(&scope)`. This keeps command execution in `cli_composition` instead of wiring a driver and handing it to the CLI, which violates the scope's invoke-leak rule.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/review_v2/run.rs",
-              "line": 90,
-              "category": "invoke leak"
-            },
-            {
-              "message": "`dry_check_approved_outcome` and `dry_write_outcome` assemble user-facing command output strings in `cli_composition`. Rendering belongs in `cli_driver` per ADR D2/D3; this layer should return wired behavior/data, not format CLI text.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/dry/shared.rs",
-              "line": 273,
-              "category": "render leak"
-            },
-            {
-              "message": "`run_codex_review_str` is a public crate wiring entry point returning `Result<CodexReviewOutcome, String>`; `run_claude_review_str` mirrors the same shape. The scope policy forbids `Result<_, String>` in public `cli_composition` APIs; use a typed error such as `ReviewSharedError` or `CompositionError`.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/review_v2/run.rs",
-              "line": 296,
-              "category": "Result<_, String> in public API"
+              "category": "symlink not rejected at boundary"
             }
           ],
-          "hash": "rvw1:sha256:c01c8138f26fa534055a11365e07ef788a23ed1b18bcf3dd2213816f231bfbd8",
-          "at": "2026-07-01T02:56:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:aef50c72791fc27c77ec9b860b0c07e8f138a817ab23f4f59893ca5c35f8a79a",
-          "at": "2026-07-01T04:35:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TrackCompositionRoot::fixpoint_resolve` still invokes the use-case dry gate while composing the driver. The call to `dry_gate.resolve_dry_gate(...)` performs the dry-gate interactor work before `FixpointResolveDriver` is returned, so this public composition method is still doing use-case execution at wiring time rather than only constructing an object graph. Per the cli_composition severity policy, this remains an invoke leak; move the dry-gate command/interactor into the returned driver or another driver-layer boundary so invocation happens only when the driver is run.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
-              "line": 323,
-              "category": "invoke leak"
-            },
-            {
-              "message": "`FixpointResolveDriver::run` renders the user-facing fixpoint command output inside `cli_composition` by converting the `FixpointStep` into strings and returning a `CommandOutcome`. Rendering/output templating is owned by `cli_driver` under ADR D2/D3 and the scope policy; this driver should return or hand off raw result data and let `cli_driver` format `run-dfp`, `run-rfp scopes=...`, etc.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
-              "line": 144,
-              "category": "render leak"
-            }
-          ],
-          "hash": "rvw1:sha256:aef50c72791fc27c77ec9b860b0c07e8f138a817ab23f4f59893ca5c35f8a79a",
-          "at": "2026-07-01T04:38:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f39f57ca1b39b56aa33b21a6c412883fc697989a33e27c355c913cf8c91424d9",
-          "at": "2026-07-01T05:02:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`ReviewCycleDriver::run` is still defined and executed inside `cli_composition`, and it directly invokes the review use case via `cycle.review(&scope)` / `cycle.fast_review(&scope)`. Wrapping the call in a private driver inside the composition crate does not satisfy the D2 composition-root boundary: `cli_composition` should wire a `cli_driver` driving adapter and hand it off, not invoke the use case itself. See ADR D2 and `hexagonal-architecture.md` §CLI as Composition Root.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/review_v2/run.rs",
-              "line": 119,
-              "category": "invoke leak"
-            },
-            {
-              "message": "`FixpointResolveDriver::run` is a public driver implemented in `cli_composition` and directly invokes both `resolve_dry_gate` and `FixpointResolveInteractor::resolve`. Per ADR D2 and `hexagonal-architecture.md` §CLI as Composition Root, the composition crate should only construct the object graph and inject it into a driving adapter from `cli_driver`; use-case execution should not live in `cli_composition`.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
-              "line": 172,
-              "category": "invoke leak"
-            },
-            {
-              "message": "`render_verdict_payload` still assembles and serializes the command output payload in `cli_composition` before it is returned as stdout. Rendering/output templating belongs in `cli_driver` per ADR D2/D3, so the review-v2 dispatch path still has a render leak.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/review_v2/run.rs",
-              "line": 32,
-              "category": "render leak"
-            }
-          ],
-          "hash": "rvw1:sha256:f39f57ca1b39b56aa33b21a6c412883fc697989a33e27c355c913cf8c91424d9",
-          "at": "2026-07-01T05:09:13Z"
+          "hash": "rvw1:sha256:29c2c84dadf1c1a8bc867535c4d2ff80d8b4d37514e937f994e9e1798eb4a15d",
+          "at": "2026-06-30T22:44:29Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`TrackCompositionRoot::fixpoint_resolve` still performs use-case work: it calls `dry_gate.resolve_dry_gate(...)` and later `interactor.resolve(&cmd)` instead of only assembling the `FixpointDryGateCommand` / `FixpointResolveCommand` data and returning a wired driver. That keeps invocation inside `cli_composition` and violates the composition-root boundary the scope brief calls for.",
+              "message": "A symlinked `track/items/<id>` or `track/archive/<id>` directory is accepted here because `entry.path().is_dir()` follows symlinks, and the later `metadata.json` / `impl-plan.json` / `task-coverage.json` reads never re-check that the resolved path stays under `root`. A repo-controlled symlink can therefore escape the trusted root and feed external files into the render pipeline.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/track/fixpoint_resolve.rs",
-              "line": 282,
-              "category": "invoke leak"
-            }
-          ],
-          "hash": "rvw1:sha256:922d99d5bdbea901d9b9fe87473f5850a395d0cd26d9b4a3e3df6afd7aa68a75",
-          "at": "2026-07-01T07:34:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:72ac824bf5ccc21eab4cd16188d3e8fe9decce3781ec9648ad3171d89f903fed",
-          "at": "2026-07-01T08:31:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1 invoke leak: `TrackCompositionRoot::fixpoint_resolve` still invokes the wired use cases inside `cli_composition`: it calls `dry_gate.resolve_dry_gate(...)` here and then `interactor.resolve(&cmd)` below. Per the cli_composition policy, this layer should only construct and inject the graph into a driver; the driver/usecase boundary should perform the invocation.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
-              "line": 282,
-              "category": "invoke leak"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render/snapshot.rs",
+              "line": 306,
+              "category": "symlink not rejected at boundary"
             },
             {
-              "message": "P1 invoke leak: `run_review_cycle` directly dispatches the usecase `ReviewCycle` with `cycle.review(&scope)` (and the fast branch calls `cycle.fast_review(&scope)`). Moving the call into a private helper still leaves usecase invocation in `cli_composition`; this should be injected into a driver/service boundary rather than invoked from the composition root module.",
+              "message": "`all_track_directories()` follows symlinked `track/items/<id>` / `track/archive/<id>` entries with `is_dir()`, and `load_track_metadata()` then reads `metadata.json` and `impl-plan.json` from that symlink target without a containment check. That lets the latest-track verifier select and parse data outside `root` if a track directory is replaced with a symlink.",
               "severity": "P1",
-              "file": "apps/cli-composition/src/review_v2/run.rs",
-              "line": 91,
-              "category": "invoke leak"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/latest_track.rs",
+              "line": 103,
+              "category": "symlink not rejected at boundary"
             }
           ],
-          "hash": "rvw1:sha256:72ac824bf5ccc21eab4cd16188d3e8fe9decce3781ec9648ad3171d89f903fed",
-          "at": "2026-07-01T08:35:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2abc80a67bf2f6b4fc73b5610483f4449b4590fbb887dc1c5ad75ad0da500de8",
-          "at": "2026-07-01T08:46:57Z"
+          "hash": "rvw1:sha256:b8a75d58f32bdb24889d48ded48b260884fc83158f3b2f895cbee079aae2cdce",
+          "at": "2026-06-30T22:56:38Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "This struct still implements `DryApprovalFactoryPort` inside `cli_composition`. That is a secondary adapter implementation in the composition root; per D7 it belongs in `libs/infrastructure`, not here.",
+              "message": "Leaf symlinks are still followed when loading track state for latest-track/freshness checks. `latest_track.rs` reads `metadata.json` directly at line 254, `track/render/snapshot.rs` reads `impl-plan.json` directly at line 66, and `verify/view_freshness.rs` reads `metadata.json` directly at line 173. Those paths never do the same `symlink_metadata()` + reject step used elsewhere in the repo, so a symlinked file inside an otherwise real track directory can redirect these checks to content outside `track/items`.",
               "severity": "P1",
-              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
-              "line": 64,
-              "category": "adapter defined here"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/latest_track.rs",
+              "line": 254,
+              "category": "symlink not rejected at boundary"
             },
             {
-              "message": "`dry_check_approved_outcome` and `dry_write_outcome` still assemble user-facing stdout/stderr strings in the composition root, and `dry.rs` returns them directly from production paths. Rendering belongs in `cli_driver`, not `cli_composition`.",
+              "message": "`sync_rendered_views` still accepts symlinked track inputs. `catalogue_path_exists()` explicitly counts symlinks as present, and the render path then reads `spec.json` at line 180 and `*-types.json` at line 325 with `read_to_string()`. That lets a symlink under `track/items/<id>` feed arbitrary outside JSON into generated views instead of enforcing real-file semantics.",
               "severity": "P1",
-              "file": "apps/cli-composition/src/dry/shared.rs",
-              "line": 273,
-              "category": "render leak"
-            },
-            {
-              "message": "`format_fixpoint_step` is still producing the CLI command strings in the composition root, and `fixpoint_resolve` returns the rendered string directly via `CommandOutcome::success(...)`. That is presentation logic and should live in `cli_driver`.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
-              "line": 143,
-              "category": "render leak"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render/sync.rs",
+              "line": 325,
+              "category": "symlink not rejected at boundary"
             }
           ],
-          "hash": "rvw1:sha256:1860b1fca0699b37ef10c0d15101db3d9276f654cc2d74e8ba6286efb3e0a631",
-          "at": "2026-07-01T12:03:49Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1860b1fca0699b37ef10c0d15101db3d9276f654cc2d74e8ba6286efb3e0a631",
-          "at": "2026-07-01T17:28:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1860b1fca0699b37ef10c0d15101db3d9276f654cc2d74e8ba6286efb3e0a631",
-          "at": "2026-07-01T17:32:35Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:059e64eb8ad864ecab92ef685124877818cb14e5b6fff24b8701e83e0697475c",
-          "at": "2026-07-02T02:53:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1 render leak: `track_branch_create` still assembles the user-facing success text inside `cli_composition` via `CommandOutcome::success(Some(format!(...)))`. Under the cli_composition policy and ADR D2/D3, this layer should wire the operation and return a typed outcome for `cli_driver` to render, not template CLI output itself.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/branch_strategy.rs",
-              "line": 80,
-              "category": "render leak"
-            }
-          ],
-          "hash": "rvw1:sha256:059e64eb8ad864ecab92ef685124877818cb14e5b6fff24b8701e83e0697475c",
-          "at": "2026-07-02T03:02:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dbee1009586161c1c4100bd2a892e0c4f18503c7d2785cb1676bed4e3b33c83a",
-          "at": "2026-07-02T03:10:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dbee1009586161c1c4100bd2a892e0c4f18503c7d2785cb1676bed4e3b33c83a",
-          "at": "2026-07-02T03:13:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:199b37e8cc1e0d75f56f03c19061c1a67b90980003e21f5a19ce64eacc7773ab",
-          "at": "2026-07-02T08:56:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:199b37e8cc1e0d75f56f03c19061c1a67b90980003e21f5a19ce64eacc7773ab",
-          "at": "2026-07-02T09:00:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7872033d4a4c336b04f2a51c444624572263ed159f17d19cb5f4341dc0e31732",
-          "at": "2026-07-02T09:23:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7872033d4a4c336b04f2a51c444624572263ed159f17d19cb5f4341dc0e31732",
-          "at": "2026-07-02T09:26:57Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:98b734ed377498cde2c2891058182452184459f591320a771ef203f48077cb39",
-          "at": "2026-06-30T20:44:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:98b734ed377498cde2c2891058182452184459f591320a771ef203f48077cb39",
-          "at": "2026-06-30T20:49:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c9c9639697e2daf17e427aa1fc80d00c7f84bc17a6dfc09dcbe841c0b0d42ebc",
-          "at": "2026-07-02T07:34:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c9c9639697e2daf17e427aa1fc80d00c7f84bc17a6dfc09dcbe841c0b0d42ebc",
-          "at": "2026-07-02T07:39:48Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f9572fc47d468f9941bb85d47917920024275dde36fb9f11f23632d9efbf2184",
-          "at": "2026-06-30T22:39:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f9572fc47d468f9941bb85d47917920024275dde36fb9f11f23632d9efbf2184",
-          "at": "2026-06-30T22:43:23Z"
+          "hash": "rvw1:sha256:aa1c55a0c6df87b84666a3e861406ce125015b08fad2e7a10674436cfdd13ceb",
+          "at": "2026-06-30T23:06:47Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The new happy-path test exercises `TrackCompositionRoot::fixpoint_resolve` directly and only asserts the returned `ExitCode`; it never captures stdout/stderr from `execute_fixpoint_resolve`, so a regression in the CLI wrapper's emit path would still pass. This leaves the only bin-layer behavior in this handler effectively untested.",
+              "message": "The new `metadata_path.is_file()` pre-check runs before `reject_symlinks_below`, so a dangling symlink or other non-regular-file `metadata.json` is treated as absent and silently skipped instead of being rejected at the boundary. That bypasses the fail-closed guard that follows and can hide corrupted track state.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/fixpoint_resolve.rs",
-              "line": 242,
-              "category": "test coverage"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/view_freshness.rs",
+              "line": 84,
+              "category": "symlink not rejected at boundary"
             }
           ],
-          "hash": "rvw1:sha256:cd715242f471a9d720d387eb3f9bbc02536632fb0990b8407fd7180c0f5ea086",
-          "at": "2026-07-01T01:22:52Z"
+          "hash": "rvw1:sha256:e45a22c8fa6308ea3c2f5161102260aeaeb83a02eb254a0317275941b8da216f",
+          "at": "2026-06-30T23:26:14Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:35b798c758fbd5d2547492157571a7c8d65dfd9df3f82860428f5a6ea97489b3",
-          "at": "2026-07-01T01:40:46Z"
+          "hash": "rvw1:sha256:c80cc7a3300a83f8cfb23872448c52782977665287270ddb89db62ca0babd43a",
+          "at": "2026-06-30T23:35:45Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:35b798c758fbd5d2547492157571a7c8d65dfd9df3f82860428f5a6ea97489b3",
-          "at": "2026-07-01T01:42:56Z"
+          "hash": "rvw1:sha256:c80cc7a3300a83f8cfb23872448c52782977665287270ddb89db62ca0babd43a",
+          "at": "2026-06-30T23:41:58Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:13a5bdcfda6e7caca9c4af69252bea224cf9e789ed2c3f177cd6bccf4adb2f64",
-          "at": "2026-07-01T07:48:33Z"
+          "hash": "rvw1:sha256:720eb2e859862e8ff252da394b9b064a31733f8a6a1e7026b0e96b0e94e8db53",
+          "at": "2026-07-01T01:22:08Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:13a5bdcfda6e7caca9c4af69252bea224cf9e789ed2c3f177cd6bccf4adb2f64",
-          "at": "2026-07-01T07:50:47Z"
+          "hash": "rvw1:sha256:720eb2e859862e8ff252da394b9b064a31733f8a6a1e7026b0e96b0e94e8db53",
+          "at": "2026-07-01T01:25:09Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:fa376ada81ce7a8669626c209ba57b6ca4b652baf890c299a45a807143cb9612",
-          "at": "2026-07-01T12:03:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fa376ada81ce7a8669626c209ba57b6ca4b652baf890c299a45a807143cb9612",
-          "at": "2026-07-01T17:23:30Z"
+          "hash": "rvw1:sha256:7898bd45df8cb7262e279bea8abacdd0bc66ea88e03e4595736f6a067af207a3",
+          "at": "2026-07-01T02:12:03Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:fa376ada81ce7a8669626c209ba57b6ca4b652baf890c299a45a807143cb9612",
-          "at": "2026-07-01T17:27:05Z"
+          "hash": "rvw1:sha256:7898bd45df8cb7262e279bea8abacdd0bc66ea88e03e4595736f6a067af207a3",
+          "at": "2026-07-01T02:16:17Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:92291026fc2ad7da3993a75f09a8f4dbe7a55e6e55a73f64a110a69f70a146a8",
-          "at": "2026-07-02T02:50:38Z"
+          "hash": "rvw1:sha256:644f5371f66f0d2ade074f09ebedf9256e6d52efccbde791e8622d8a568d9ac4",
+          "at": "2026-07-01T08:09:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:644f5371f66f0d2ade074f09ebedf9256e6d52efccbde791e8622d8a568d9ac4",
+          "at": "2026-07-01T08:12:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1bd5947dd17b0e3961707627ebdd810fbc3c19acbe67a295e5ec1d5b30900cff",
+          "at": "2026-07-01T12:08:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1bd5947dd17b0e3961707627ebdd810fbc3c19acbe67a295e5ec1d5b30900cff",
+          "at": "2026-07-01T17:26:57Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The PR handler now converts omitted `--base` and `--method` into an empty-string sentinel before calling the driver. That embeds the branch-strategy defaulting contract and the \"empty is not a valid branch/method\" invariant in the bin layer, instead of passing typed absence to `cli_driver` and letting driver/composition resolve it. This violates the CLI thin-bin policy from ADR D5/D8: keep this handler to parse-dispatch-emit and move the omission/default contract behind the driver boundary, e.g. with `Option` fields in `PrInput`.",
+              "message": "`resolve_diff_base` builds `track_dir.join(\".commit_hash\")` and hands it to `FsDryCheckCommitHashStore` without first proving the resolved path remains under `canonical_root`. The store only rejects symlinks before `read_to_string`; it does not canonicalize and enforce `starts_with(canonical_root)`, so a path-traversing `track_dir` supplied at this adapter boundary can make the dry-gate read a `.commit_hash` outside the trusted repo root. This should fail closed using the existing trusted-root containment pattern (`is_safe_briefing_path`/CN-04 style) before any file read or fallback decision.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/dry_check/diff_base_resolver.rs",
+              "line": 51,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:1bd5947dd17b0e3961707627ebdd810fbc3c19acbe67a295e5ec1d5b30900cff",
+          "at": "2026-07-01T17:33:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ad7955493c1701621abdfdfe8357b01d68d7eff78253a8d0673d23741c24bbcc",
+          "at": "2026-07-01T17:39:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_context` canonicalizes `--items-dir` but never rejects a symlinked root before the trust check. That lets a symlinked `items_dir` be redirected to a different tree, which is contrary to the existing symlink-rejection pattern used for trust-rooted filesystem inputs. Reject the root symlink before canonicalizing it.",
               "severity": "P1",
-              "file": "apps/cli/src/commands/pr.rs",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/fixpoint_resolve_driver.rs",
               "line": 113,
-              "category": "business logic in bin"
+              "category": "symlink not rejected at boundary"
             },
             {
-              "message": "This surviving comment still points readers to `apps/cli-composition/src/track/fixpoint_resolve.rs`, but this PR deletes that file. The same block later names a stale cli-composition test that no longer exists under that name/location, so the final branch leaves a dead reference in the CLI scope. Update the comment to the new test location or remove the path reference.",
+              "message": "`read_base_branch` reads `<canonical_items_dir>/<track_id>/metadata.json` with `std::fs::read_to_string` directly, so a symlinked `metadata.json` can redirect the load outside the track directory and feed an arbitrary base branch into fixpoint resolution. Existing infrastructure loaders reject symlinked metadata paths before reading; this one should too.",
               "severity": "P1",
-              "file": "apps/cli/src/commands/track/fixpoint_resolve.rs",
-              "line": 100,
-              "category": "dead-reference"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/fixpoint_resolve_driver.rs",
+              "line": 72,
+              "category": "symlink not rejected at boundary"
             }
           ],
-          "hash": "rvw1:sha256:92291026fc2ad7da3993a75f09a8f4dbe7a55e6e55a73f64a110a69f70a146a8",
-          "at": "2026-07-02T02:56:54Z"
+          "hash": "rvw1:sha256:4eda8e5fcfd6082712a01b2abb63ab3400531d36866cf1e9cff03949de700154",
+          "at": "2026-07-02T02:51:50Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:66eb1c545d5271c8d1b69b0902f928497dad55d0299e74a7de55fb5f932b285d",
-          "at": "2026-07-02T03:14:05Z"
+          "hash": "rvw1:sha256:a6d608710a7306fe0d208523853460560ad6a54447904febb21781945da29a31",
+          "at": "2026-07-02T03:03:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a6d608710a7306fe0d208523853460560ad6a54447904febb21781945da29a31",
+          "at": "2026-07-02T03:15:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`FsDryCheckConfigLoaderAdapter` builds `.harness/config/dry-check.json` under `repo_root` and immediately delegates to `InfraDryCheckConfig::load`, whose file read follows symlinks. Unlike the existing `scope_config_loader.rs` canonicalize + `reject_symlinks_below` pattern, this boundary does not reject a symlinked config file or parent, so fixpoint-resolve can read dry-check settings from outside the trusted checkout and change or disable the gate instead of failing closed. Add canonical containment and symlink rejection against `repo_root` before loading.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/fixpoint_resolve_driver.rs",
+              "line": 210,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:a6d608710a7306fe0d208523853460560ad6a54447904febb21781945da29a31",
+          "at": "2026-07-02T03:24:29Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:66eb1c545d5271c8d1b69b0902f928497dad55d0299e74a7de55fb5f932b285d",
-          "at": "2026-07-02T03:20:59Z"
+          "hash": "rvw1:sha256:6bd4e1303012a980a9dc5ce71e679a6d682f4209809a1771d8366f06344589c1",
+          "at": "2026-07-02T03:36:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6bd4e1303012a980a9dc5ce71e679a6d682f4209809a1771d8366f06344589c1",
+          "at": "2026-07-02T03:39:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`FsDryApprovalFactoryAdapter` derives `dry-check.json` and `dry-check-coverage.json` with `track_dir.join(...)` and then constructs filesystem stores without first proving the resolved paths remain below `canonical_root`. The downstream symlink guard rejects symlinks but does not reject paths outside the trusted root, so a caller that passes an absolute or `..`-based `track_dir` can bind the approval store to files outside the repository. This should fail closed with the same trusted-root containment discipline used by the `is_safe_briefing_path`/CN-04 path policy and the sibling `trusted_commit_hash_path` helper before constructing the stores.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/approval_factory.rs",
+              "line": 34,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:6bd4e1303012a980a9dc5ce71e679a6d682f4209809a1771d8366f06344589c1",
+          "at": "2026-07-02T03:46:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:45256f82c95e9a37a083b06c7499035919e2508d72a6e3d44993a85f3298da9f",
+          "at": "2026-07-02T03:57:02Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "Adding `metadata.json` here makes the supposed empty-diff approval test stop exercising the Approved path. `GitDiffGetter` includes untracked files, and this helper does not exclude `items/test-track/metadata.json`, so the new file becomes a diff in the implicit `Other` scope. The `check_approved_approved_path_exits_success_with_ok_message` case now covers the bypass/success path instead of the intended empty-diff Approved case.",
+              "message": "`briefing_file` validation here still accepts Windows drive-relative paths such as `C:review.md`. `FilePath::new()` only rejects absolute and `..` traversal, so `trusted_root.join(briefing)` can discard `trusted_root` on Windows and resolve the briefing outside the workspace. Add a post-join `starts_with(trusted_root)` check or tighten the domain validator to reject drive-relative prefixes.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/tests.rs",
-              "line": 89,
-              "category": "testing"
+              "file": "libs/infrastructure/src/review_v2/scope_config_loader.rs",
+              "line": 150,
+              "category": "trusted-root violation"
             }
           ],
-          "hash": "rvw1:sha256:ac9f377c491fb6bfe19621fa2cd9cc535f9b16f8814aef255637e734c3645e90",
-          "at": "2026-07-02T07:36:08Z"
+          "hash": "rvw1:sha256:2a6fac96faab96dff8e759f63a3dae9384d762fadec98160604a2a894911a6c9",
+          "at": "2026-07-02T07:44:10Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:2c4dba10810c5ef4aec4f4222d70953b198a340dba8cf3d16de57944e57be8ac",
-          "at": "2026-07-02T07:40:00Z"
+          "hash": "rvw1:sha256:6e8c1400b57ec4d0f49f28e52dab8d0c3ccbf39afd7b1fe7ae03c3afffb999e3",
+          "at": "2026-07-02T07:50:07Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:2c4dba10810c5ef4aec4f4222d70953b198a340dba8cf3d16de57944e57be8ac",
-          "at": "2026-07-02T07:44:24Z"
+          "hash": "rvw1:sha256:6e8c1400b57ec4d0f49f28e52dab8d0c3ccbf39afd7b1fe7ae03c3afffb999e3",
+          "at": "2026-07-02T07:54:41Z"
         }
       ]
     },
@@ -1427,81 +1152,238 @@
         }
       ]
     },
-    "types": {
+    "usecase": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:bac82630858af0d55b78ef571a0bd5fc4cce2397fb5401074b5f100e6ec29832",
-          "at": "2026-07-02T08:56:16Z"
+          "hash": "rvw1:sha256:a15176685f931a467e456eec499c489039622aa761ab63859c1b04ef0454157f",
+          "at": "2026-06-30T20:45:14Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:bac82630858af0d55b78ef571a0bd5fc4cce2397fb5401074b5f100e6ec29832",
-          "at": "2026-07-02T09:01:23Z"
+          "hash": "rvw1:sha256:a15176685f931a467e456eec499c489039622aa761ab63859c1b04ef0454157f",
+          "at": "2026-06-30T20:49:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c25264bf5ba9291c1339bf568fe0a851c539e5b2abb14e21152a8f84266bb292",
+          "at": "2026-07-01T08:00:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c25264bf5ba9291c1339bf568fe0a851c539e5b2abb14e21152a8f84266bb292",
+          "at": "2026-07-01T08:03:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7612b23c9d1754f949a5a8519ed0dac18c420516ac8c4f74270a1d8753e19ed9",
+          "at": "2026-07-01T11:40:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:80c8126ae8e17bcf59c468544a747c799363f80aab7d8e0edcbd0aa80bd71d5b",
+          "at": "2026-07-01T17:25:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:80c8126ae8e17bcf59c468544a747c799363f80aab7d8e0edcbd0aa80bd71d5b",
+          "at": "2026-07-01T17:28:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e3d9734911ba4d25fc211396a9e8cb387482466f7636bb1175eb88f77eb12e3a",
+          "at": "2026-07-02T02:51:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e3d9734911ba4d25fc211396a9e8cb387482466f7636bb1175eb88f77eb12e3a",
+          "at": "2026-07-02T03:00:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:457ad1a2bd585ac1ebc89aafdb3e00df7122ee7047e2c9d9111ebbdd51f1ac06",
+          "at": "2026-07-02T07:35:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:457ad1a2bd585ac1ebc89aafdb3e00df7122ee7047e2c9d9111ebbdd51f1ac06",
+          "at": "2026-07-02T07:41:32Z"
         }
       ]
     },
-    "cli_driver": {
+    "cli": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:498e3310ab0076f4ff8be931588e8d97b2d9251f45ca8d7e51b7dfa4eff79fdc",
-          "at": "2026-07-01T07:53:45Z"
+          "hash": "rvw1:sha256:f9572fc47d468f9941bb85d47917920024275dde36fb9f11f23632d9efbf2184",
+          "at": "2026-06-30T22:39:41Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:498e3310ab0076f4ff8be931588e8d97b2d9251f45ca8d7e51b7dfa4eff79fdc",
-          "at": "2026-07-01T07:56:45Z"
+          "hash": "rvw1:sha256:f9572fc47d468f9941bb85d47917920024275dde36fb9f11f23632d9efbf2184",
+          "at": "2026-06-30T22:43:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new happy-path test exercises `TrackCompositionRoot::fixpoint_resolve` directly and only asserts the returned `ExitCode`; it never captures stdout/stderr from `execute_fixpoint_resolve`, so a regression in the CLI wrapper's emit path would still pass. This leaves the only bin-layer behavior in this handler effectively untested.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/fixpoint_resolve.rs",
+              "line": 242,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:cd715242f471a9d720d387eb3f9bbc02536632fb0990b8407fd7180c0f5ea086",
+          "at": "2026-07-01T01:22:52Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:f2553c8d7edcd5795ba42df2fdef672fe1f908865718c5ab72fda1170e6e500d",
-          "at": "2026-07-02T02:50:43Z"
+          "hash": "rvw1:sha256:35b798c758fbd5d2547492157571a7c8d65dfd9df3f82860428f5a6ea97489b3",
+          "at": "2026-07-01T01:40:46Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:f2553c8d7edcd5795ba42df2fdef672fe1f908865718c5ab72fda1170e6e500d",
-          "at": "2026-07-02T02:56:02Z"
+          "hash": "rvw1:sha256:35b798c758fbd5d2547492157571a7c8d65dfd9df3f82860428f5a6ea97489b3",
+          "at": "2026-07-01T01:42:56Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d885d5b36f36cb03c6208a497f81fc9e1cc0ba42e9a23d645b33ee6a51681edd",
-          "at": "2026-07-02T03:14:16Z"
+          "hash": "rvw1:sha256:13a5bdcfda6e7caca9c4af69252bea224cf9e789ed2c3f177cd6bccf4adb2f64",
+          "at": "2026-07-01T07:48:33Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d885d5b36f36cb03c6208a497f81fc9e1cc0ba42e9a23d645b33ee6a51681edd",
-          "at": "2026-07-02T03:21:32Z"
+          "hash": "rvw1:sha256:13a5bdcfda6e7caca9c4af69252bea224cf9e789ed2c3f177cd6bccf4adb2f64",
+          "at": "2026-07-01T07:50:47Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:3a5a31477da8acf53bea9ac386f4f1d1b047d342029f67a40803965d683ac61e",
-          "at": "2026-07-02T07:33:29Z"
+          "hash": "rvw1:sha256:fa376ada81ce7a8669626c209ba57b6ca4b652baf890c299a45a807143cb9612",
+          "at": "2026-07-01T12:03:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fa376ada81ce7a8669626c209ba57b6ca4b652baf890c299a45a807143cb9612",
+          "at": "2026-07-01T17:23:30Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:3a5a31477da8acf53bea9ac386f4f1d1b047d342029f67a40803965d683ac61e",
-          "at": "2026-07-02T07:38:14Z"
+          "hash": "rvw1:sha256:fa376ada81ce7a8669626c209ba57b6ca4b652baf890c299a45a807143cb9612",
+          "at": "2026-07-01T17:27:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:92291026fc2ad7da3993a75f09a8f4dbe7a55e6e55a73f64a110a69f70a146a8",
+          "at": "2026-07-02T02:50:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The PR handler now converts omitted `--base` and `--method` into an empty-string sentinel before calling the driver. That embeds the branch-strategy defaulting contract and the \"empty is not a valid branch/method\" invariant in the bin layer, instead of passing typed absence to `cli_driver` and letting driver/composition resolve it. This violates the CLI thin-bin policy from ADR D5/D8: keep this handler to parse-dispatch-emit and move the omission/default contract behind the driver boundary, e.g. with `Option` fields in `PrInput`.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/pr.rs",
+              "line": 113,
+              "category": "business logic in bin"
+            },
+            {
+              "message": "This surviving comment still points readers to `apps/cli-composition/src/track/fixpoint_resolve.rs`, but this PR deletes that file. The same block later names a stale cli-composition test that no longer exists under that name/location, so the final branch leaves a dead reference in the CLI scope. Update the comment to the new test location or remove the path reference.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/fixpoint_resolve.rs",
+              "line": 100,
+              "category": "dead-reference"
+            }
+          ],
+          "hash": "rvw1:sha256:92291026fc2ad7da3993a75f09a8f4dbe7a55e6e55a73f64a110a69f70a146a8",
+          "at": "2026-07-02T02:56:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:66eb1c545d5271c8d1b69b0902f928497dad55d0299e74a7de55fb5f932b285d",
+          "at": "2026-07-02T03:14:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:66eb1c545d5271c8d1b69b0902f928497dad55d0299e74a7de55fb5f932b285d",
+          "at": "2026-07-02T03:20:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Adding `metadata.json` here makes the supposed empty-diff approval test stop exercising the Approved path. `GitDiffGetter` includes untracked files, and this helper does not exclude `items/test-track/metadata.json`, so the new file becomes a diff in the implicit `Other` scope. The `check_approved_approved_path_exits_success_with_ok_message` case now covers the bypass/success path instead of the intended empty-diff Approved case.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/tests.rs",
+              "line": 89,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:ac9f377c491fb6bfe19621fa2cd9cc535f9b16f8814aef255637e734c3645e90",
+          "at": "2026-07-02T07:36:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c4dba10810c5ef4aec4f4222d70953b198a340dba8cf3d16de57944e57be8ac",
+          "at": "2026-07-02T07:40:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c4dba10810c5ef4aec4f4222d70953b198a340dba8cf3d16de57944e57be8ac",
+          "at": "2026-07-02T07:44:24Z"
         }
       ]
     },
@@ -1763,84 +1645,95 @@
         }
       ]
     },
-    "usecase": {
+    "cli_driver": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a15176685f931a467e456eec499c489039622aa761ab63859c1b04ef0454157f",
-          "at": "2026-06-30T20:45:14Z"
+          "hash": "rvw1:sha256:498e3310ab0076f4ff8be931588e8d97b2d9251f45ca8d7e51b7dfa4eff79fdc",
+          "at": "2026-07-01T07:53:45Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a15176685f931a467e456eec499c489039622aa761ab63859c1b04ef0454157f",
-          "at": "2026-06-30T20:49:50Z"
+          "hash": "rvw1:sha256:498e3310ab0076f4ff8be931588e8d97b2d9251f45ca8d7e51b7dfa4eff79fdc",
+          "at": "2026-07-01T07:56:45Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:c25264bf5ba9291c1339bf568fe0a851c539e5b2abb14e21152a8f84266bb292",
-          "at": "2026-07-01T08:00:00Z"
+          "hash": "rvw1:sha256:f2553c8d7edcd5795ba42df2fdef672fe1f908865718c5ab72fda1170e6e500d",
+          "at": "2026-07-02T02:50:43Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:c25264bf5ba9291c1339bf568fe0a851c539e5b2abb14e21152a8f84266bb292",
-          "at": "2026-07-01T08:03:01Z"
+          "hash": "rvw1:sha256:f2553c8d7edcd5795ba42df2fdef672fe1f908865718c5ab72fda1170e6e500d",
+          "at": "2026-07-02T02:56:02Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7612b23c9d1754f949a5a8519ed0dac18c420516ac8c4f74270a1d8753e19ed9",
-          "at": "2026-07-01T11:40:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:80c8126ae8e17bcf59c468544a747c799363f80aab7d8e0edcbd0aa80bd71d5b",
-          "at": "2026-07-01T17:25:14Z"
+          "hash": "rvw1:sha256:d885d5b36f36cb03c6208a497f81fc9e1cc0ba42e9a23d645b33ee6a51681edd",
+          "at": "2026-07-02T03:14:16Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:80c8126ae8e17bcf59c468544a747c799363f80aab7d8e0edcbd0aa80bd71d5b",
-          "at": "2026-07-01T17:28:59Z"
+          "hash": "rvw1:sha256:d885d5b36f36cb03c6208a497f81fc9e1cc0ba42e9a23d645b33ee6a51681edd",
+          "at": "2026-07-02T03:21:32Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:e3d9734911ba4d25fc211396a9e8cb387482466f7636bb1175eb88f77eb12e3a",
-          "at": "2026-07-02T02:51:44Z"
+          "hash": "rvw1:sha256:3a5a31477da8acf53bea9ac386f4f1d1b047d342029f67a40803965d683ac61e",
+          "at": "2026-07-02T07:33:29Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:e3d9734911ba4d25fc211396a9e8cb387482466f7636bb1175eb88f77eb12e3a",
-          "at": "2026-07-02T03:00:15Z"
+          "hash": "rvw1:sha256:3a5a31477da8acf53bea9ac386f4f1d1b047d342029f67a40803965d683ac61e",
+          "at": "2026-07-02T07:38:14Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:98b734ed377498cde2c2891058182452184459f591320a771ef203f48077cb39",
+          "at": "2026-06-30T20:44:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:98b734ed377498cde2c2891058182452184459f591320a771ef203f48077cb39",
+          "at": "2026-06-30T20:49:00Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:457ad1a2bd585ac1ebc89aafdb3e00df7122ee7047e2c9d9111ebbdd51f1ac06",
-          "at": "2026-07-02T07:35:33Z"
+          "hash": "rvw1:sha256:c9c9639697e2daf17e427aa1fc80d00c7f84bc17a6dfc09dcbe841c0b0d42ebc",
+          "at": "2026-07-02T07:34:20Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:457ad1a2bd585ac1ebc89aafdb3e00df7122ee7047e2c9d9111ebbdd51f1ac06",
-          "at": "2026-07-02T07:41:32Z"
+          "hash": "rvw1:sha256:c9c9639697e2daf17e427aa1fc80d00c7f84bc17a6dfc09dcbe841c0b0d42ebc",
+          "at": "2026-07-02T07:39:48Z"
         }
       ]
     },
@@ -1880,303 +1773,439 @@
         }
       ]
     },
-    "infrastructure": {
+    "types": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0c04aa88fc38d0c08b5922cf48806e23cae1ff712475ebd292dde703be6f2370",
-          "at": "2026-06-30T20:44:13Z"
+          "hash": "rvw1:sha256:bac82630858af0d55b78ef571a0bd5fc4cce2397fb5401074b5f100e6ec29832",
+          "at": "2026-07-02T08:56:16Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0c04aa88fc38d0c08b5922cf48806e23cae1ff712475ebd292dde703be6f2370",
-          "at": "2026-06-30T20:48:22Z"
+          "hash": "rvw1:sha256:bac82630858af0d55b78ef571a0bd5fc4cce2397fb5401074b5f100e6ec29832",
+          "at": "2026-07-02T09:01:23Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6e8b1b6bb455fa563f4671a976af2882e4834b64f7446bf4f1874c39872343b6",
+          "at": "2026-06-30T20:42:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6e8b1b6bb455fa563f4671a976af2882e4834b64f7446bf4f1874c39872343b6",
+          "at": "2026-06-30T20:46:04Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`JsonConfigBranchStrategyAdapter::new` reads the config path directly with `read_to_string` and never rejects symlinks or verifies containment under a trusted root. A symlinked `.harness/config/branch-strategy.json` can therefore redirect this adapter to attacker-controlled content outside the repository, which matches the symlink-boundary issue this layer is supposed to fail closed on.",
+              "message": "This reads `metadata.json` through `infrastructure::track::codec::decode`, which hard-rejects every `schema_version != 6`. The promised fallback to `main` therefore never runs for existing v5 tracks/fixtures (for example `track/items/cli-composition-split-presentation-layer-2026-06-21/metadata.json`), so the new branch-strategy lookup will fail with `ConfigLoad` on older tracks instead of being backward-compatible. The same bug is duplicated in [review_v2/shared.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/review_v2/shared.rs#L208) and [track/fixpoint_resolve.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/track/fixpoint_resolve.rs#L318).",
               "severity": "P1",
-              "file": "libs/infrastructure/src/branch_strategy.rs",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "line": 233,
+              "category": "compatibility"
+            }
+          ],
+          "hash": "rvw1:sha256:38523286fa0d8e076b158f68bbbeca7bc7507c8ca528c6dcf0b45055f70b45a5",
+          "at": "2026-07-01T01:26:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f9194cba8c44a0846709dcd118156a79c9608865f046e87999ca49825c137d81",
+          "at": "2026-07-01T01:56:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f9194cba8c44a0846709dcd118156a79c9608865f046e87999ca49825c137d81",
+          "at": "2026-07-01T01:57:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The change keeps `FsDiffBaseResolverAdapter` as a `DiffBaseResolverPort` implementation inside `cli_composition` and now extends it with `base_branch` state. Per ADR D7 / the cli_composition scope policy, secondary adapter implementations belong in `libs/infrastructure`; this layer should only construct and inject them. Move this port implementation to infrastructure and wire that adapter here.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+              "line": 59,
+              "category": "adapter defined here"
+            }
+          ],
+          "hash": "rvw1:sha256:f9194cba8c44a0846709dcd118156a79c9608865f046e87999ca49825c137d81",
+          "at": "2026-07-01T02:00:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`FsDiffBaseResolverAdapter` is a secondary adapter implemented inside `cli_composition`: the struct stores the configured base branch here and its impl of `DiffBaseResolverPort` performs the `.commit_hash`/git fallback behavior. Under the cli_composition scope policy and ADR D7, port implementations belong in `libs/infrastructure`; this layer should only construct and inject that adapter. Move this resolver implementation, including the new `base_branch` state, into infrastructure and wire it from here.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+              "line": 59,
+              "category": "adapter defined here"
+            }
+          ],
+          "hash": "rvw1:sha256:f9194cba8c44a0846709dcd118156a79c9608865f046e87999ca49825c137d81",
+          "at": "2026-07-01T02:01:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d7a27efb165feb3e2d352b8b261826b561200f3dbb581837bdafadbd46bc2dd1",
+          "at": "2026-07-01T02:23:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d7a27efb165feb3e2d352b8b261826b561200f3dbb581837bdafadbd46bc2dd1",
+          "at": "2026-07-01T02:27:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:78781525bc4b85d6506cae9d11d0ba286ec88432835c8bddb5f20b8ac4601409",
+          "at": "2026-07-01T02:39:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c01c8138f26fa534055a11365e07ef788a23ed1b18bcf3dd2213816f231bfbd8",
+          "at": "2026-07-01T02:53:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`FsDryApprovalFactoryAdapter` is still defined in `cli_composition` and implements the usecase `DryApprovalFactoryPort`. Per the cli_composition scope policy and ADR D7, port adapter implementations belong in `libs/infrastructure`; this layer should only construct and inject the infrastructure adapter.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
               "line": 55,
-              "category": "symlink not rejected at boundary"
-            }
-          ],
-          "hash": "rvw1:sha256:29c2c84dadf1c1a8bc867535c4d2ff80d8b4d37514e937f994e9e1798eb4a15d",
-          "at": "2026-06-30T22:44:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "A symlinked `track/items/<id>` or `track/archive/<id>` directory is accepted here because `entry.path().is_dir()` follows symlinks, and the later `metadata.json` / `impl-plan.json` / `task-coverage.json` reads never re-check that the resolved path stays under `root`. A repo-controlled symlink can therefore escape the trusted root and feed external files into the render pipeline.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render/snapshot.rs",
-              "line": 306,
-              "category": "symlink not rejected at boundary"
+              "category": "adapter defined here"
             },
             {
-              "message": "`all_track_directories()` follows symlinked `track/items/<id>` / `track/archive/<id>` entries with `is_dir()`, and `load_track_metadata()` then reads `metadata.json` and `impl-plan.json` from that symlink target without a containment check. That lets the latest-track verifier select and parse data outside `root` if a track directory is replaced with a symlink.",
+              "message": "`fixpoint_resolve` constructs `FixpointResolveInteractor` and immediately invokes `.resolve(&cmd)`. That is a use-case invocation from the composition root; ADR D2 requires this layer to wire drivers/adapters only, with command execution handled by the driving adapter layer.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/latest_track.rs",
-              "line": 103,
-              "category": "symlink not rejected at boundary"
-            }
-          ],
-          "hash": "rvw1:sha256:b8a75d58f32bdb24889d48ded48b260884fc83158f3b2f895cbee079aae2cdce",
-          "at": "2026-06-30T22:56:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Leaf symlinks are still followed when loading track state for latest-track/freshness checks. `latest_track.rs` reads `metadata.json` directly at line 254, `track/render/snapshot.rs` reads `impl-plan.json` directly at line 66, and `verify/view_freshness.rs` reads `metadata.json` directly at line 173. Those paths never do the same `symlink_metadata()` + reject step used elsewhere in the repo, so a symlinked file inside an otherwise real track directory can redirect these checks to content outside `track/items`.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/latest_track.rs",
-              "line": 254,
-              "category": "symlink not rejected at boundary"
+              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+              "line": 358,
+              "category": "invoke leak"
             },
             {
-              "message": "`sync_rendered_views` still accepts symlinked track inputs. `catalogue_path_exists()` explicitly counts symlinks as present, and the render path then reads `spec.json` at line 180 and `*-types.json` at line 325 with `read_to_string()`. That lets a symlink under `track/items/<id>` feed arbitrary outside JSON into generated views instead of enforcing real-file semantics.",
+              "message": "`dispatch_review_cycle` directly invokes the review use case via `cycle.review(&scope)` and `cycle.fast_review(&scope)`. This keeps command execution in `cli_composition` instead of wiring a driver and handing it to the CLI, which violates the scope's invoke-leak rule.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render/sync.rs",
-              "line": 325,
-              "category": "symlink not rejected at boundary"
-            }
-          ],
-          "hash": "rvw1:sha256:aa1c55a0c6df87b84666a3e861406ce125015b08fad2e7a10674436cfdd13ceb",
-          "at": "2026-06-30T23:06:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new `metadata_path.is_file()` pre-check runs before `reject_symlinks_below`, so a dangling symlink or other non-regular-file `metadata.json` is treated as absent and silently skipped instead of being rejected at the boundary. That bypasses the fail-closed guard that follows and can hide corrupted track state.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/view_freshness.rs",
-              "line": 84,
-              "category": "symlink not rejected at boundary"
-            }
-          ],
-          "hash": "rvw1:sha256:e45a22c8fa6308ea3c2f5161102260aeaeb83a02eb254a0317275941b8da216f",
-          "at": "2026-06-30T23:26:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c80cc7a3300a83f8cfb23872448c52782977665287270ddb89db62ca0babd43a",
-          "at": "2026-06-30T23:35:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c80cc7a3300a83f8cfb23872448c52782977665287270ddb89db62ca0babd43a",
-          "at": "2026-06-30T23:41:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:720eb2e859862e8ff252da394b9b064a31733f8a6a1e7026b0e96b0e94e8db53",
-          "at": "2026-07-01T01:22:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:720eb2e859862e8ff252da394b9b064a31733f8a6a1e7026b0e96b0e94e8db53",
-          "at": "2026-07-01T01:25:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7898bd45df8cb7262e279bea8abacdd0bc66ea88e03e4595736f6a067af207a3",
-          "at": "2026-07-01T02:12:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7898bd45df8cb7262e279bea8abacdd0bc66ea88e03e4595736f6a067af207a3",
-          "at": "2026-07-01T02:16:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:644f5371f66f0d2ade074f09ebedf9256e6d52efccbde791e8622d8a568d9ac4",
-          "at": "2026-07-01T08:09:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:644f5371f66f0d2ade074f09ebedf9256e6d52efccbde791e8622d8a568d9ac4",
-          "at": "2026-07-01T08:12:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1bd5947dd17b0e3961707627ebdd810fbc3c19acbe67a295e5ec1d5b30900cff",
-          "at": "2026-07-01T12:08:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1bd5947dd17b0e3961707627ebdd810fbc3c19acbe67a295e5ec1d5b30900cff",
-          "at": "2026-07-01T17:26:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`resolve_diff_base` builds `track_dir.join(\".commit_hash\")` and hands it to `FsDryCheckCommitHashStore` without first proving the resolved path remains under `canonical_root`. The store only rejects symlinks before `read_to_string`; it does not canonicalize and enforce `starts_with(canonical_root)`, so a path-traversing `track_dir` supplied at this adapter boundary can make the dry-gate read a `.commit_hash` outside the trusted repo root. This should fail closed using the existing trusted-root containment pattern (`is_safe_briefing_path`/CN-04 style) before any file read or fallback decision.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/dry_check/diff_base_resolver.rs",
-              "line": 51,
-              "category": "trusted-root violation"
-            }
-          ],
-          "hash": "rvw1:sha256:1bd5947dd17b0e3961707627ebdd810fbc3c19acbe67a295e5ec1d5b30900cff",
-          "at": "2026-07-01T17:33:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ad7955493c1701621abdfdfe8357b01d68d7eff78253a8d0673d23741c24bbcc",
-          "at": "2026-07-01T17:39:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`resolve_context` canonicalizes `--items-dir` but never rejects a symlinked root before the trust check. That lets a symlinked `items_dir` be redirected to a different tree, which is contrary to the existing symlink-rejection pattern used for trust-rooted filesystem inputs. Reject the root symlink before canonicalizing it.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/fixpoint_resolve_driver.rs",
-              "line": 113,
-              "category": "symlink not rejected at boundary"
+              "file": "apps/cli-composition/src/review_v2/run.rs",
+              "line": 90,
+              "category": "invoke leak"
             },
             {
-              "message": "`read_base_branch` reads `<canonical_items_dir>/<track_id>/metadata.json` with `std::fs::read_to_string` directly, so a symlinked `metadata.json` can redirect the load outside the track directory and feed an arbitrary base branch into fixpoint resolution. Existing infrastructure loaders reject symlinked metadata paths before reading; this one should too.",
+              "message": "`dry_check_approved_outcome` and `dry_write_outcome` assemble user-facing command output strings in `cli_composition`. Rendering belongs in `cli_driver` per ADR D2/D3; this layer should return wired behavior/data, not format CLI text.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/fixpoint_resolve_driver.rs",
-              "line": 72,
-              "category": "symlink not rejected at boundary"
+              "file": "apps/cli-composition/src/dry/shared.rs",
+              "line": 273,
+              "category": "render leak"
+            },
+            {
+              "message": "`run_codex_review_str` is a public crate wiring entry point returning `Result<CodexReviewOutcome, String>`; `run_claude_review_str` mirrors the same shape. The scope policy forbids `Result<_, String>` in public `cli_composition` APIs; use a typed error such as `ReviewSharedError` or `CompositionError`.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/review_v2/run.rs",
+              "line": 296,
+              "category": "Result<_, String> in public API"
             }
           ],
-          "hash": "rvw1:sha256:4eda8e5fcfd6082712a01b2abb63ab3400531d36866cf1e9cff03949de700154",
-          "at": "2026-07-02T02:51:50Z"
+          "hash": "rvw1:sha256:c01c8138f26fa534055a11365e07ef788a23ed1b18bcf3dd2213816f231bfbd8",
+          "at": "2026-07-01T02:56:40Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a6d608710a7306fe0d208523853460560ad6a54447904febb21781945da29a31",
-          "at": "2026-07-02T03:03:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a6d608710a7306fe0d208523853460560ad6a54447904febb21781945da29a31",
-          "at": "2026-07-02T03:15:52Z"
+          "hash": "rvw1:sha256:aef50c72791fc27c77ec9b860b0c07e8f138a817ab23f4f59893ca5c35f8a79a",
+          "at": "2026-07-01T04:35:05Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`FsDryCheckConfigLoaderAdapter` builds `.harness/config/dry-check.json` under `repo_root` and immediately delegates to `InfraDryCheckConfig::load`, whose file read follows symlinks. Unlike the existing `scope_config_loader.rs` canonicalize + `reject_symlinks_below` pattern, this boundary does not reject a symlinked config file or parent, so fixpoint-resolve can read dry-check settings from outside the trusted checkout and change or disable the gate instead of failing closed. Add canonical containment and symlink rejection against `repo_root` before loading.",
+              "message": "`TrackCompositionRoot::fixpoint_resolve` still invokes the use-case dry gate while composing the driver. The call to `dry_gate.resolve_dry_gate(...)` performs the dry-gate interactor work before `FixpointResolveDriver` is returned, so this public composition method is still doing use-case execution at wiring time rather than only constructing an object graph. Per the cli_composition severity policy, this remains an invoke leak; move the dry-gate command/interactor into the returned driver or another driver-layer boundary so invocation happens only when the driver is run.",
               "severity": "P1",
-              "file": "libs/infrastructure/src/track/fixpoint_resolve_driver.rs",
-              "line": 210,
-              "category": "symlink not rejected at boundary"
+              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+              "line": 323,
+              "category": "invoke leak"
+            },
+            {
+              "message": "`FixpointResolveDriver::run` renders the user-facing fixpoint command output inside `cli_composition` by converting the `FixpointStep` into strings and returning a `CommandOutcome`. Rendering/output templating is owned by `cli_driver` under ADR D2/D3 and the scope policy; this driver should return or hand off raw result data and let `cli_driver` format `run-dfp`, `run-rfp scopes=...`, etc.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+              "line": 144,
+              "category": "render leak"
             }
           ],
-          "hash": "rvw1:sha256:a6d608710a7306fe0d208523853460560ad6a54447904febb21781945da29a31",
-          "at": "2026-07-02T03:24:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6bd4e1303012a980a9dc5ce71e679a6d682f4209809a1771d8366f06344589c1",
-          "at": "2026-07-02T03:36:32Z"
+          "hash": "rvw1:sha256:aef50c72791fc27c77ec9b860b0c07e8f138a817ab23f4f59893ca5c35f8a79a",
+          "at": "2026-07-01T04:38:54Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:6bd4e1303012a980a9dc5ce71e679a6d682f4209809a1771d8366f06344589c1",
-          "at": "2026-07-02T03:39:41Z"
+          "hash": "rvw1:sha256:f39f57ca1b39b56aa33b21a6c412883fc697989a33e27c355c913cf8c91424d9",
+          "at": "2026-07-01T05:02:26Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`FsDryApprovalFactoryAdapter` derives `dry-check.json` and `dry-check-coverage.json` with `track_dir.join(...)` and then constructs filesystem stores without first proving the resolved paths remain below `canonical_root`. The downstream symlink guard rejects symlinks but does not reject paths outside the trusted root, so a caller that passes an absolute or `..`-based `track_dir` can bind the approval store to files outside the repository. This should fail closed with the same trusted-root containment discipline used by the `is_safe_briefing_path`/CN-04 path policy and the sibling `trusted_commit_hash_path` helper before constructing the stores.",
+              "message": "`ReviewCycleDriver::run` is still defined and executed inside `cli_composition`, and it directly invokes the review use case via `cycle.review(&scope)` / `cycle.fast_review(&scope)`. Wrapping the call in a private driver inside the composition crate does not satisfy the D2 composition-root boundary: `cli_composition` should wire a `cli_driver` driving adapter and hand it off, not invoke the use case itself. See ADR D2 and `hexagonal-architecture.md` §CLI as Composition Root.",
               "severity": "P1",
-              "file": "libs/infrastructure/src/dry_check/approval_factory.rs",
-              "line": 34,
-              "category": "trusted-root violation"
+              "file": "apps/cli-composition/src/review_v2/run.rs",
+              "line": 119,
+              "category": "invoke leak"
+            },
+            {
+              "message": "`FixpointResolveDriver::run` is a public driver implemented in `cli_composition` and directly invokes both `resolve_dry_gate` and `FixpointResolveInteractor::resolve`. Per ADR D2 and `hexagonal-architecture.md` §CLI as Composition Root, the composition crate should only construct the object graph and inject it into a driving adapter from `cli_driver`; use-case execution should not live in `cli_composition`.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+              "line": 172,
+              "category": "invoke leak"
+            },
+            {
+              "message": "`render_verdict_payload` still assembles and serializes the command output payload in `cli_composition` before it is returned as stdout. Rendering/output templating belongs in `cli_driver` per ADR D2/D3, so the review-v2 dispatch path still has a render leak.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/review_v2/run.rs",
+              "line": 32,
+              "category": "render leak"
             }
           ],
-          "hash": "rvw1:sha256:6bd4e1303012a980a9dc5ce71e679a6d682f4209809a1771d8366f06344589c1",
-          "at": "2026-07-02T03:46:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:45256f82c95e9a37a083b06c7499035919e2508d72a6e3d44993a85f3298da9f",
-          "at": "2026-07-02T03:57:02Z"
+          "hash": "rvw1:sha256:f39f57ca1b39b56aa33b21a6c412883fc697989a33e27c355c913cf8c91424d9",
+          "at": "2026-07-01T05:09:13Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`briefing_file` validation here still accepts Windows drive-relative paths such as `C:review.md`. `FilePath::new()` only rejects absolute and `..` traversal, so `trusted_root.join(briefing)` can discard `trusted_root` on Windows and resolve the briefing outside the workspace. Add a post-join `starts_with(trusted_root)` check or tighten the domain validator to reject drive-relative prefixes.",
+              "message": "`TrackCompositionRoot::fixpoint_resolve` still performs use-case work: it calls `dry_gate.resolve_dry_gate(...)` and later `interactor.resolve(&cmd)` instead of only assembling the `FixpointDryGateCommand` / `FixpointResolveCommand` data and returning a wired driver. That keeps invocation inside `cli_composition` and violates the composition-root boundary the scope brief calls for.",
               "severity": "P1",
-              "file": "libs/infrastructure/src/review_v2/scope_config_loader.rs",
-              "line": 150,
-              "category": "trusted-root violation"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/track/fixpoint_resolve.rs",
+              "line": 282,
+              "category": "invoke leak"
             }
           ],
-          "hash": "rvw1:sha256:2a6fac96faab96dff8e759f63a3dae9384d762fadec98160604a2a894911a6c9",
-          "at": "2026-07-02T07:44:10Z"
+          "hash": "rvw1:sha256:922d99d5bdbea901d9b9fe87473f5850a395d0cd26d9b4a3e3df6afd7aa68a75",
+          "at": "2026-07-01T07:34:31Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:6e8c1400b57ec4d0f49f28e52dab8d0c3ccbf39afd7b1fe7ae03c3afffb999e3",
-          "at": "2026-07-02T07:50:07Z"
+          "hash": "rvw1:sha256:72ac824bf5ccc21eab4cd16188d3e8fe9decce3781ec9648ad3171d89f903fed",
+          "at": "2026-07-01T08:31:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1 invoke leak: `TrackCompositionRoot::fixpoint_resolve` still invokes the wired use cases inside `cli_composition`: it calls `dry_gate.resolve_dry_gate(...)` here and then `interactor.resolve(&cmd)` below. Per the cli_composition policy, this layer should only construct and inject the graph into a driver; the driver/usecase boundary should perform the invocation.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+              "line": 282,
+              "category": "invoke leak"
+            },
+            {
+              "message": "P1 invoke leak: `run_review_cycle` directly dispatches the usecase `ReviewCycle` with `cycle.review(&scope)` (and the fast branch calls `cycle.fast_review(&scope)`). Moving the call into a private helper still leaves usecase invocation in `cli_composition`; this should be injected into a driver/service boundary rather than invoked from the composition root module.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/review_v2/run.rs",
+              "line": 91,
+              "category": "invoke leak"
+            }
+          ],
+          "hash": "rvw1:sha256:72ac824bf5ccc21eab4cd16188d3e8fe9decce3781ec9648ad3171d89f903fed",
+          "at": "2026-07-01T08:35:28Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:6e8c1400b57ec4d0f49f28e52dab8d0c3ccbf39afd7b1fe7ae03c3afffb999e3",
-          "at": "2026-07-02T07:54:41Z"
+          "hash": "rvw1:sha256:2abc80a67bf2f6b4fc73b5610483f4449b4590fbb887dc1c5ad75ad0da500de8",
+          "at": "2026-07-01T08:46:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This struct still implements `DryApprovalFactoryPort` inside `cli_composition`. That is a secondary adapter implementation in the composition root; per D7 it belongs in `libs/infrastructure`, not here.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+              "line": 64,
+              "category": "adapter defined here"
+            },
+            {
+              "message": "`dry_check_approved_outcome` and `dry_write_outcome` still assemble user-facing stdout/stderr strings in the composition root, and `dry.rs` returns them directly from production paths. Rendering belongs in `cli_driver`, not `cli_composition`.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry/shared.rs",
+              "line": 273,
+              "category": "render leak"
+            },
+            {
+              "message": "`format_fixpoint_step` is still producing the CLI command strings in the composition root, and `fixpoint_resolve` returns the rendered string directly via `CommandOutcome::success(...)`. That is presentation logic and should live in `cli_driver`.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
+              "line": 143,
+              "category": "render leak"
+            }
+          ],
+          "hash": "rvw1:sha256:1860b1fca0699b37ef10c0d15101db3d9276f654cc2d74e8ba6286efb3e0a631",
+          "at": "2026-07-01T12:03:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1860b1fca0699b37ef10c0d15101db3d9276f654cc2d74e8ba6286efb3e0a631",
+          "at": "2026-07-01T17:28:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1860b1fca0699b37ef10c0d15101db3d9276f654cc2d74e8ba6286efb3e0a631",
+          "at": "2026-07-01T17:32:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:059e64eb8ad864ecab92ef685124877818cb14e5b6fff24b8701e83e0697475c",
+          "at": "2026-07-02T02:53:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1 render leak: `track_branch_create` still assembles the user-facing success text inside `cli_composition` via `CommandOutcome::success(Some(format!(...)))`. Under the cli_composition policy and ADR D2/D3, this layer should wire the operation and return a typed outcome for `cli_driver` to render, not template CLI output itself.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/branch_strategy.rs",
+              "line": 80,
+              "category": "render leak"
+            }
+          ],
+          "hash": "rvw1:sha256:059e64eb8ad864ecab92ef685124877818cb14e5b6fff24b8701e83e0697475c",
+          "at": "2026-07-02T03:02:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dbee1009586161c1c4100bd2a892e0c4f18503c7d2785cb1676bed4e3b33c83a",
+          "at": "2026-07-02T03:10:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dbee1009586161c1c4100bd2a892e0c4f18503c7d2785cb1676bed4e3b33c83a",
+          "at": "2026-07-02T03:13:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:199b37e8cc1e0d75f56f03c19061c1a67b90980003e21f5a19ce64eacc7773ab",
+          "at": "2026-07-02T08:56:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:199b37e8cc1e0d75f56f03c19061c1a67b90980003e21f5a19ce64eacc7773ab",
+          "at": "2026-07-02T09:00:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7872033d4a4c336b04f2a51c444624572263ed159f17d19cb5f4341dc0e31732",
+          "at": "2026-07-02T09:23:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7872033d4a4c336b04f2a51c444624572263ed159f17d19cb5f4341dc0e31732",
+          "at": "2026-07-02T09:26:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This fallback uses `repo_root` directly, but `JsonConfigBranchStrategyAdapter::new` rejects a symlinked trusted root. `dry_write` and `dry_check_approved` already compute `canonical_root`; passing the non-canonical path here will make metadata-missing tracks fail on symlinked checkouts instead of resolving the branch strategy config.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry.rs",
+              "line": 142,
+              "category": "path handling"
+            }
+          ],
+          "hash": "rvw1:sha256:3b49c75214dbc0a93208648ea349712a23dc847ae609248c403a6e8b64d8e297",
+          "at": "2026-07-02T09:53:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e68ecf06f2768bdec772989ac1ea8b76e95560001b2e673a0f10fbdb51034e16",
+          "at": "2026-07-02T10:01:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e68ecf06f2768bdec772989ac1ea8b76e95560001b2e673a0f10fbdb51034e16",
+          "at": "2026-07-02T10:06:41Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8d1e032150792c0be70de04a1661f3a4605a5daddfc0efd835f89ed6d31f69bd",
+          "at": "2026-07-02T02:47:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8d1e032150792c0be70de04a1661f3a4605a5daddfc0efd835f89ed6d31f69bd",
+          "at": "2026-07-02T02:50:26Z"
         }
       ]
     }
