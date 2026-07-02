@@ -46,6 +46,75 @@ struct PrimitiveSlot {
     position: PrimitiveOccurrencePosition,
 }
 
+#[derive(Debug, Clone, Copy)]
+struct BoundSlotFilter {
+    include_all: bool,
+    include_result_err: bool,
+    include_callable: bool,
+}
+
+impl BoundSlotFilter {
+    fn from_positions(positions: &NonEmptyVec<PrimitiveOccurrencePosition>) -> Self {
+        let requested = positions.as_slice();
+        Self {
+            include_all: requested.contains(&PrimitiveOccurrencePosition::Bound),
+            include_result_err: requested.contains(&PrimitiveOccurrencePosition::ResultErr),
+            include_callable: requested.contains(&PrimitiveOccurrencePosition::Param)
+                || requested.contains(&PrimitiveOccurrencePosition::Return),
+        }
+    }
+
+    fn should_collect(self, type_ref: &TypeRef) -> bool {
+        if self.include_all {
+            return true;
+        }
+
+        let type_ref = type_ref.as_str();
+        (self.include_result_err && contains_path_segment_followed_by(type_ref, "Result", b'<'))
+            || (self.include_callable
+                && (contains_path_segment_followed_by(type_ref, "Fn", b'(')
+                    || contains_path_segment_followed_by(type_ref, "FnMut", b'(')
+                    || contains_path_segment_followed_by(type_ref, "FnOnce", b'(')))
+    }
+}
+
+fn contains_path_segment_followed_by(type_ref: &str, segment: &str, delimiter: u8) -> bool {
+    let bytes = type_ref.as_bytes();
+    let segment = segment.as_bytes();
+    if segment.is_empty() {
+        return false;
+    }
+
+    for (start, window) in bytes.windows(segment.len()).enumerate() {
+        if window != segment {
+            continue;
+        }
+
+        let before = if start == 0 { None } else { bytes.get(start - 1).copied() };
+        if before.is_some_and(is_ident_byte) {
+            continue;
+        }
+
+        let mut after = start + segment.len();
+        while let Some(byte) = bytes.get(after).copied() {
+            if byte.is_ascii_whitespace() {
+                after += 1;
+                continue;
+            }
+            if byte == delimiter {
+                return true;
+            }
+            break;
+        }
+    }
+
+    false
+}
+
+fn is_ident_byte(byte: u8) -> bool {
+    byte.is_ascii_alphanumeric() || byte == b'_'
+}
+
 /// Evaluates a `ForbidPrimitiveInTypes` rule against `target_layer_id`'s
 /// catalogue only when `target_layer_id` is included in the rule's `layers`.
 ///
@@ -83,10 +152,18 @@ pub(super) fn evaluate_forbid_primitive_in_types<S: PrimitiveOccurrenceScanner>(
     let discriminant_name = rule.kind().discriminant_name();
     let mut violations = Vec::new();
 
+    // A catalogue bound slot's `TypeRef` may be a legal `syn::TypeParamBound`
+    // that is not a legal `syn::Type` (`?Sized`, lifetimes). When `Bound`
+    // itself is not requested, only collect bound slots whose text can carry a
+    // requested scan-intrinsic position; this keeps `result_err` / callable
+    // coverage inside type-like bounds without sending bound-only tokens to the
+    // scanner.
+    let bound_filter = BoundSlotFilter::from_positions(positions);
+
     let mut slots: Vec<PrimitiveSlot> = Vec::new();
-    collect_type_entry_slots(catalogue, rule, &mut slots)?;
-    collect_trait_entry_slots(catalogue, rule, &mut slots);
-    collect_function_entry_slots(catalogue, rule, &mut slots);
+    collect_type_entry_slots(catalogue, rule, bound_filter, &mut slots)?;
+    collect_trait_entry_slots(catalogue, rule, bound_filter, &mut slots);
+    collect_function_entry_slots(catalogue, rule, bound_filter, &mut slots);
 
     check_slots(discriminant_name, &slots, primitives, positions, scanner, &mut violations)?;
 
@@ -96,10 +173,12 @@ pub(super) fn evaluate_forbid_primitive_in_types<S: PrimitiveOccurrenceScanner>(
 /// Collects `NamedField` / `VariantField` / `TypeAliasTarget` slots from a
 /// type entry's own shape, plus `Param` / `Return` / `Bound` slots from its
 /// methods (`TypeEntry.methods` merged with matching `inherent_impls`, via
-/// `collect_methods_for_type`).
+/// `collect_methods_for_type`). `Bound` slots are collected according to
+/// `bound_filter`.
 fn collect_type_entry_slots(
     catalogue: &CatalogueDocument,
     rule: &CatalogueLinterRule,
+    bound_filter: BoundSlotFilter,
     slots: &mut Vec<PrimitiveSlot>,
 ) -> Result<(), CatalogueLinterError> {
     for (name, entry) in type_entries_for_target(catalogue, rule.target()) {
@@ -162,6 +241,7 @@ fn collect_type_entry_slots(
                 &method.returns,
                 &method.generics,
                 &method.where_predicates,
+                bound_filter,
                 slots,
             );
         }
@@ -172,10 +252,14 @@ fn collect_type_entry_slots(
 /// Collects `Param` / `Return` / `Bound` slots from a trait entry's methods,
 /// its own `generics` / `where_predicates`, its `supertrait_bounds`, and its
 /// associated types' `bounds`. Associated consts (`AssocConstDecl`) are out of
-/// scope (T005 covers the 6 named slot kinds only).
+/// scope (T005 covers the 6 named slot kinds only). `Bound` slots (including
+/// `supertrait_bounds` and associated-type `bounds`, which -- unlike
+/// generics/where-predicates -- are pushed directly rather than via
+/// `push_generic_and_where_slots`) are collected according to `bound_filter`.
 fn collect_trait_entry_slots(
     catalogue: &CatalogueDocument,
     rule: &CatalogueLinterRule,
+    bound_filter: BoundSlotFilter,
     slots: &mut Vec<PrimitiveSlot>,
 ) {
     for (name, entry) in trait_entries_for_target(catalogue, rule.target()) {
@@ -188,22 +272,21 @@ fn collect_trait_entry_slots(
                 &method.returns,
                 &method.generics,
                 &method.where_predicates,
+                bound_filter,
                 slots,
             );
         }
 
-        push_generic_and_where_slots(entry_name, &entry.generics, &entry.where_predicates, slots);
+        push_generic_and_where_slots(
+            entry_name,
+            &entry.generics,
+            &entry.where_predicates,
+            bound_filter,
+            slots,
+        );
 
         for bound in &entry.supertrait_bounds {
-            slots.push(PrimitiveSlot {
-                entry_name: entry_name.to_owned(),
-                type_ref: bound.clone(),
-                position: PrimitiveOccurrencePosition::Bound,
-            });
-        }
-
-        for assoc_type in &entry.assoc_types {
-            for bound in &assoc_type.bounds {
+            if bound_filter.should_collect(bound) {
                 slots.push(PrimitiveSlot {
                     entry_name: entry_name.to_owned(),
                     type_ref: bound.clone(),
@@ -211,13 +294,27 @@ fn collect_trait_entry_slots(
                 });
             }
         }
+
+        for assoc_type in &entry.assoc_types {
+            for bound in &assoc_type.bounds {
+                if bound_filter.should_collect(bound) {
+                    slots.push(PrimitiveSlot {
+                        entry_name: entry_name.to_owned(),
+                        type_ref: bound.clone(),
+                        position: PrimitiveOccurrencePosition::Bound,
+                    });
+                }
+            }
+        }
     }
 }
 
 /// Collects `Param` / `Return` / `Bound` slots from a free function entry.
+/// `Bound` slots are collected according to `bound_filter`.
 fn collect_function_entry_slots(
     catalogue: &CatalogueDocument,
     rule: &CatalogueLinterRule,
+    bound_filter: BoundSlotFilter,
     slots: &mut Vec<PrimitiveSlot>,
 ) {
     for (path, entry) in function_entries_for_target(catalogue, rule.target()) {
@@ -231,6 +328,7 @@ fn collect_function_entry_slots(
             &entry.returns,
             &entry.generics,
             &entry.where_predicates,
+            bound_filter,
             slots,
         );
     }
@@ -239,12 +337,14 @@ fn collect_function_entry_slots(
 /// Pushes a `Param` slot for each parameter, a `Return` slot for the return
 /// type, and `Bound` slots for `generics` / `where_predicates` — the four
 /// fields shared identically by both `MethodDeclaration` and `FunctionEntry`.
+/// `Bound` slots are collected according to `bound_filter`.
 fn push_param_return_generic_slots(
     entry_name: &str,
     params: &[ParamDeclaration],
     returns: &TypeRef,
     generics: &[MethodGenericParam],
     where_predicates: &[WherePredicateDecl],
+    bound_filter: BoundSlotFilter,
     slots: &mut Vec<PrimitiveSlot>,
 ) {
     for param in params {
@@ -259,40 +359,53 @@ fn push_param_return_generic_slots(
         type_ref: returns.clone(),
         position: PrimitiveOccurrencePosition::Return,
     });
-    push_generic_and_where_slots(entry_name, generics, where_predicates, slots);
+    push_generic_and_where_slots(entry_name, generics, where_predicates, bound_filter, slots);
 }
 
 /// Pushes a `Bound` slot for each generic param's bounds and each
 /// where-clause predicate type expression. Both `WherePredicateDecl.lhs` (the
 /// constrained type expression) and each `rhs` bound are `TypeRef`-bearing
 /// bound positions.
+///
+/// Filters each bound via `bound_filter`: a catalogue bound string may be a
+/// legal `syn::TypeParamBound` (e.g. `?Sized`, a lifetime) that is not
+/// parseable as the `syn::Type` every other slot kind is scanned as, but
+/// type-like bounds can still contain requested scan-intrinsic positions such
+/// as `ResultErr`.
 fn push_generic_and_where_slots(
     entry_name: &str,
     generics: &[MethodGenericParam],
     where_predicates: &[WherePredicateDecl],
+    bound_filter: BoundSlotFilter,
     slots: &mut Vec<PrimitiveSlot>,
 ) {
     for generic in generics {
         for bound in &generic.bounds {
-            slots.push(PrimitiveSlot {
-                entry_name: entry_name.to_owned(),
-                type_ref: bound.clone(),
-                position: PrimitiveOccurrencePosition::Bound,
-            });
+            if bound_filter.should_collect(bound) {
+                slots.push(PrimitiveSlot {
+                    entry_name: entry_name.to_owned(),
+                    type_ref: bound.clone(),
+                    position: PrimitiveOccurrencePosition::Bound,
+                });
+            }
         }
     }
     for pred in where_predicates {
-        slots.push(PrimitiveSlot {
-            entry_name: entry_name.to_owned(),
-            type_ref: pred.lhs.clone(),
-            position: PrimitiveOccurrencePosition::Bound,
-        });
-        for bound in &pred.rhs {
+        if bound_filter.should_collect(&pred.lhs) {
             slots.push(PrimitiveSlot {
                 entry_name: entry_name.to_owned(),
-                type_ref: bound.clone(),
+                type_ref: pred.lhs.clone(),
                 position: PrimitiveOccurrencePosition::Bound,
             });
+        }
+        for bound in &pred.rhs {
+            if bound_filter.should_collect(bound) {
+                slots.push(PrimitiveSlot {
+                    entry_name: entry_name.to_owned(),
+                    type_ref: bound.clone(),
+                    position: PrimitiveOccurrencePosition::Bound,
+                });
+            }
         }
     }
 }

@@ -641,6 +641,70 @@ mod tests {
         }
     }
 
+    /// Test double for [`PrimitiveOccurrenceScanner`]: fails with
+    /// [`PrimitiveOccurrenceScanError::ParseFailure`] whenever called with
+    /// `position == Bound`, and always succeeds (empty report) for every
+    /// other position. Reproduces PR #179's finding: the real
+    /// `syn`-based adapter parses every slot as a bare `syn::Type`, but a
+    /// catalogue bound string may be a legal `syn::TypeParamBound` only
+    /// (`?Sized`, a lifetime such as `'a`) that is not a valid `syn::Type` and
+    /// so fails to parse -- this double reproduces that failure mode without
+    /// pulling a `syn` dependency into a domain-only test.
+    struct BoundOnlyFailingScanner;
+
+    impl PrimitiveOccurrenceScanner for BoundOnlyFailingScanner {
+        fn scan(
+            &self,
+            type_ref: TypeRef,
+            _primitives: NonEmptyVec<PrimitiveName>,
+            position: PrimitiveOccurrencePosition,
+        ) -> Result<PrimitiveOccurrenceReport, PrimitiveOccurrenceScanError> {
+            if position == PrimitiveOccurrencePosition::Bound {
+                return Err(PrimitiveOccurrenceScanError::ParseFailure { type_ref });
+            }
+            Ok(PrimitiveOccurrenceReport::new(std::collections::BTreeMap::new()))
+        }
+    }
+
+    /// Test double for [`PrimitiveOccurrenceScanner`]: rejects bound-only
+    /// strings known not to be parseable as `syn::Type` (`?Sized`, lifetimes),
+    /// but reports a requested primitive found inside a `Result<_, _>` bound at
+    /// [`PrimitiveOccurrencePosition::ResultErr`].
+    struct BoundResultErrScanner;
+
+    impl PrimitiveOccurrenceScanner for BoundResultErrScanner {
+        fn scan(
+            &self,
+            type_ref: TypeRef,
+            primitives: NonEmptyVec<PrimitiveName>,
+            position: PrimitiveOccurrencePosition,
+        ) -> Result<PrimitiveOccurrenceReport, PrimitiveOccurrenceScanError> {
+            if position == PrimitiveOccurrencePosition::Bound {
+                let type_ref_text = type_ref.as_str();
+                if type_ref_text.starts_with('?') || type_ref_text.starts_with('\'') {
+                    return Err(PrimitiveOccurrenceScanError::ParseFailure { type_ref });
+                }
+
+                let mut found = std::collections::BTreeSet::new();
+                for primitive in primitives.as_slice() {
+                    if type_ref_text.contains("Result")
+                        && type_ref_text.contains(primitive.as_str())
+                    {
+                        found.insert(primitive.clone());
+                    }
+                }
+
+                let mut occurrences = std::collections::BTreeMap::new();
+                if !found.is_empty() {
+                    occurrences.insert(PrimitiveOccurrencePosition::ResultErr, found);
+                }
+                return Ok(PrimitiveOccurrenceReport::new(occurrences));
+            }
+
+            Ok(PrimitiveOccurrenceReport::new(std::collections::BTreeMap::new()))
+        }
+    }
+
     // ------------------------------------------------------------------
     // RoleKind — from_data_role covers all 17 DataRole variants
     // ------------------------------------------------------------------
@@ -4434,6 +4498,157 @@ mod tests {
         assert!(
             is_scan_failed,
             "expected ScanFailed error propagated from the scanner, got: {result:?}"
+        );
+    }
+
+    // ------------------------------------------------------------------
+    // PR #179 P1 regression: a `?Sized` / lifetime bound must not be scanned
+    // when the rule's `positions` does not request `Bound`. `push_generic_
+    // and_where_slots` collected bound slots unconditionally, so a legal
+    // catalogue bound like `?Sized` (a `syn::TypeParamBound`, not a
+    // `syn::Type`) reached the scanner even for rules that never asked to
+    // check `Bound`, failing the shipped default `result_err` /
+    // `named_field`+`variant_field` rules with `ScanFailed`.
+    // ------------------------------------------------------------------
+
+    #[test]
+    fn test_forbid_primitive_in_types_skips_method_generic_bound_when_bound_not_requested() {
+        // `T: ?Sized` on a method generic is legal at the catalogue layer
+        // (MethodGenericParam::bounds docs list `?Sized` as an example) but
+        // is not parseable as a `syn::Type`. positions requests only
+        // NamedField/VariantField/ResultErr (mirrors the shipped default
+        // rules), so the Bound slot must be skipped at collection time and
+        // never reach `BoundOnlyFailingScanner` with position == Bound.
+        let mut doc = make_doc("domain");
+        let method = MethodDeclaration {
+            generics: vec![MethodGenericParam {
+                name: ParamName::new("T").unwrap(),
+                bounds: vec![TypeRef::new("?Sized").unwrap()],
+            }],
+            ..method_shared_ref_no_params("do_thing", "()")
+        };
+        doc.types.insert(
+            TypeName::new("Money").unwrap(),
+            make_type_entry_with_methods(DataRole::value_object(), vec![method]),
+        );
+
+        let all = all_catalogues_single(&doc);
+        let target_layer = doc.layer.clone();
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::all_roles(),
+            CatalogueLinterRuleKind::ForbidPrimitiveInTypes {
+                primitives: NonEmptyVec::new(PrimitiveName::new("String").unwrap(), vec![]),
+                layers: NonEmptyVec::new(layer("domain"), vec![]),
+                positions: NonEmptyVec::new(
+                    PrimitiveOccurrencePosition::NamedField,
+                    vec![
+                        PrimitiveOccurrencePosition::VariantField,
+                        PrimitiveOccurrencePosition::ResultErr,
+                    ],
+                ),
+            },
+        )
+        .unwrap();
+
+        let result =
+            evaluate_catalogue_lint(&[rule], &all, &target_layer, &BoundOnlyFailingScanner);
+
+        assert!(
+            result.is_ok(),
+            "a `?Sized` generic-bound slot must be skipped at collection time when Bound is \
+             not requested, so evaluation must not fail with ScanFailed; got: {result:?}"
+        );
+    }
+
+    #[test]
+    fn test_forbid_primitive_in_types_skips_trait_supertrait_bound_when_bound_not_requested() {
+        // A trait's `supertrait_bounds` (e.g. `trait Foo: ?Sized`) is pushed
+        // directly in `collect_trait_entry_slots`, not via
+        // `push_generic_and_where_slots` -- a distinct code path that must
+        // also skip Bound slots when Bound is not requested.
+        let mut doc = make_doc("domain");
+        let trait_entry = TraitEntry {
+            supertrait_bounds: vec![TypeRef::new("?Sized").unwrap()],
+            ..make_trait_entry(ContractRole::SpecificationPort)
+        };
+        doc.traits.insert(TraitName::new("Checker").unwrap(), trait_entry);
+
+        let all = all_catalogues_single(&doc);
+        let target_layer = doc.layer.clone();
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::all_roles(),
+            CatalogueLinterRuleKind::ForbidPrimitiveInTypes {
+                primitives: NonEmptyVec::new(PrimitiveName::new("String").unwrap(), vec![]),
+                layers: NonEmptyVec::new(layer("domain"), vec![]),
+                positions: NonEmptyVec::new(
+                    PrimitiveOccurrencePosition::NamedField,
+                    vec![
+                        PrimitiveOccurrencePosition::VariantField,
+                        PrimitiveOccurrencePosition::ResultErr,
+                    ],
+                ),
+            },
+        )
+        .unwrap();
+
+        let result =
+            evaluate_catalogue_lint(&[rule], &all, &target_layer, &BoundOnlyFailingScanner);
+
+        assert!(
+            result.is_ok(),
+            "a `?Sized` supertrait-bound slot must be skipped at collection time when Bound is \
+             not requested, so evaluation must not fail with ScanFailed; got: {result:?}"
+        );
+    }
+
+    #[test]
+    fn test_forbid_primitive_in_types_scans_result_err_inside_type_like_bound() {
+        // The result_err default rule still needs to inspect type-like bounds:
+        // `Into<Result<(), String>>` can contain a primitive Err slot even
+        // though the rule does not request the top-level Bound position. The
+        // adjacent `?Sized` bound proves the collector still skips bound-only
+        // tokens that would fail a `syn::Type` scan.
+        let mut doc = make_doc("domain");
+        let method = MethodDeclaration {
+            generics: vec![MethodGenericParam {
+                name: ParamName::new("T").unwrap(),
+                bounds: vec![
+                    TypeRef::new("?Sized").unwrap(),
+                    TypeRef::new("Into<Result<(), String>>").unwrap(),
+                ],
+            }],
+            ..method_shared_ref_no_params("do_thing", "()")
+        };
+        doc.types.insert(
+            TypeName::new("Money").unwrap(),
+            make_type_entry_with_methods(DataRole::value_object(), vec![method]),
+        );
+
+        let all = all_catalogues_single(&doc);
+        let target_layer = doc.layer.clone();
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::all_roles(),
+            CatalogueLinterRuleKind::ForbidPrimitiveInTypes {
+                primitives: NonEmptyVec::new(PrimitiveName::new("String").unwrap(), vec![]),
+                layers: NonEmptyVec::new(layer("domain"), vec![]),
+                positions: NonEmptyVec::new(PrimitiveOccurrencePosition::ResultErr, vec![]),
+            },
+        )
+        .unwrap();
+
+        let violations =
+            evaluate_catalogue_lint(&[rule], &all, &target_layer, &BoundResultErrScanner).unwrap();
+
+        assert_eq!(
+            violations.len(),
+            1,
+            "expected exactly 1 ResultErr violation from the type-like bound, got: {violations:?}"
+        );
+        assert_eq!(violations[0].entry_name(), "Money");
+        assert!(
+            violations[0].message().contains("ResultErr"),
+            "expected the violation to be attributed to ResultErr, got: {}",
+            violations[0].message()
         );
     }
 }
