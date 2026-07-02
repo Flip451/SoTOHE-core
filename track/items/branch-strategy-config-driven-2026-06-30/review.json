@@ -1,6 +1,24 @@
 {
   "schema_version": 2,
   "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8d1e032150792c0be70de04a1661f3a4605a5daddfc0efd835f89ed6d31f69bd",
+          "at": "2026-07-02T02:47:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8d1e032150792c0be70de04a1661f3a4605a5daddfc0efd835f89ed6d31f69bd",
+          "at": "2026-07-02T02:50:26Z"
+        }
+      ]
+    },
     "cli_composition": {
       "rounds": [
         {
@@ -355,84 +373,20 @@
           "findings": [],
           "hash": "rvw1:sha256:199b37e8cc1e0d75f56f03c19061c1a67b90980003e21f5a19ce64eacc7773ab",
           "at": "2026-07-02T09:00:33Z"
-        }
-      ]
-    },
-    "cli_driver": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:498e3310ab0076f4ff8be931588e8d97b2d9251f45ca8d7e51b7dfa4eff79fdc",
-          "at": "2026-07-01T07:53:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:498e3310ab0076f4ff8be931588e8d97b2d9251f45ca8d7e51b7dfa4eff79fdc",
-          "at": "2026-07-01T07:56:45Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:f2553c8d7edcd5795ba42df2fdef672fe1f908865718c5ab72fda1170e6e500d",
-          "at": "2026-07-02T02:50:43Z"
+          "hash": "rvw1:sha256:7872033d4a4c336b04f2a51c444624572263ed159f17d19cb5f4341dc0e31732",
+          "at": "2026-07-02T09:23:09Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:f2553c8d7edcd5795ba42df2fdef672fe1f908865718c5ab72fda1170e6e500d",
-          "at": "2026-07-02T02:56:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d885d5b36f36cb03c6208a497f81fc9e1cc0ba42e9a23d645b33ee6a51681edd",
-          "at": "2026-07-02T03:14:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d885d5b36f36cb03c6208a497f81fc9e1cc0ba42e9a23d645b33ee6a51681edd",
-          "at": "2026-07-02T03:21:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3a5a31477da8acf53bea9ac386f4f1d1b047d342029f67a40803965d683ac61e",
-          "at": "2026-07-02T07:33:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3a5a31477da8acf53bea9ac386f4f1d1b047d342029f67a40803965d683ac61e",
-          "at": "2026-07-02T07:38:14Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:794c522b1cd34f3c48e0a89a08a49c24fb422abdd51a117c1ad4855fa0abc5f0",
-          "at": "2026-07-02T07:34:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:794c522b1cd34f3c48e0a89a08a49c24fb422abdd51a117c1ad4855fa0abc5f0",
-          "at": "2026-07-02T07:38:52Z"
+          "hash": "rvw1:sha256:7872033d4a4c336b04f2a51c444624572263ed159f17d19cb5f4341dc0e31732",
+          "at": "2026-07-02T09:26:57Z"
         }
       ]
     },
@@ -468,102 +422,157 @@
         }
       ]
     },
-    "types": {
+    "cli": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:bac82630858af0d55b78ef571a0bd5fc4cce2397fb5401074b5f100e6ec29832",
-          "at": "2026-07-02T08:56:16Z"
+          "hash": "rvw1:sha256:f9572fc47d468f9941bb85d47917920024275dde36fb9f11f23632d9efbf2184",
+          "at": "2026-06-30T22:39:41Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:bac82630858af0d55b78ef571a0bd5fc4cce2397fb5401074b5f100e6ec29832",
-          "at": "2026-07-02T09:01:23Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
+          "hash": "rvw1:sha256:f9572fc47d468f9941bb85d47917920024275dde36fb9f11f23632d9efbf2184",
+          "at": "2026-06-30T22:43:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new happy-path test exercises `TrackCompositionRoot::fixpoint_resolve` directly and only asserts the returned `ExitCode`; it never captures stdout/stderr from `execute_fixpoint_resolve`, so a regression in the CLI wrapper's emit path would still pass. This leaves the only bin-layer behavior in this handler effectively untested.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/fixpoint_resolve.rs",
+              "line": 242,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:cd715242f471a9d720d387eb3f9bbc02536632fb0990b8407fd7180c0f5ea086",
+          "at": "2026-07-01T01:22:52Z"
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a15176685f931a467e456eec499c489039622aa761ab63859c1b04ef0454157f",
-          "at": "2026-06-30T20:45:14Z"
+          "hash": "rvw1:sha256:35b798c758fbd5d2547492157571a7c8d65dfd9df3f82860428f5a6ea97489b3",
+          "at": "2026-07-01T01:40:46Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a15176685f931a467e456eec499c489039622aa761ab63859c1b04ef0454157f",
-          "at": "2026-06-30T20:49:50Z"
+          "hash": "rvw1:sha256:35b798c758fbd5d2547492157571a7c8d65dfd9df3f82860428f5a6ea97489b3",
+          "at": "2026-07-01T01:42:56Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:c25264bf5ba9291c1339bf568fe0a851c539e5b2abb14e21152a8f84266bb292",
-          "at": "2026-07-01T08:00:00Z"
+          "hash": "rvw1:sha256:13a5bdcfda6e7caca9c4af69252bea224cf9e789ed2c3f177cd6bccf4adb2f64",
+          "at": "2026-07-01T07:48:33Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:c25264bf5ba9291c1339bf568fe0a851c539e5b2abb14e21152a8f84266bb292",
-          "at": "2026-07-01T08:03:01Z"
+          "hash": "rvw1:sha256:13a5bdcfda6e7caca9c4af69252bea224cf9e789ed2c3f177cd6bccf4adb2f64",
+          "at": "2026-07-01T07:50:47Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7612b23c9d1754f949a5a8519ed0dac18c420516ac8c4f74270a1d8753e19ed9",
-          "at": "2026-07-01T11:40:26Z"
+          "hash": "rvw1:sha256:fa376ada81ce7a8669626c209ba57b6ca4b652baf890c299a45a807143cb9612",
+          "at": "2026-07-01T12:03:33Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:80c8126ae8e17bcf59c468544a747c799363f80aab7d8e0edcbd0aa80bd71d5b",
-          "at": "2026-07-01T17:25:14Z"
+          "hash": "rvw1:sha256:fa376ada81ce7a8669626c209ba57b6ca4b652baf890c299a45a807143cb9612",
+          "at": "2026-07-01T17:23:30Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:80c8126ae8e17bcf59c468544a747c799363f80aab7d8e0edcbd0aa80bd71d5b",
-          "at": "2026-07-01T17:28:59Z"
+          "hash": "rvw1:sha256:fa376ada81ce7a8669626c209ba57b6ca4b652baf890c299a45a807143cb9612",
+          "at": "2026-07-01T17:27:05Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:e3d9734911ba4d25fc211396a9e8cb387482466f7636bb1175eb88f77eb12e3a",
-          "at": "2026-07-02T02:51:44Z"
+          "hash": "rvw1:sha256:92291026fc2ad7da3993a75f09a8f4dbe7a55e6e55a73f64a110a69f70a146a8",
+          "at": "2026-07-02T02:50:38Z"
         },
         {
           "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e3d9734911ba4d25fc211396a9e8cb387482466f7636bb1175eb88f77eb12e3a",
-          "at": "2026-07-02T03:00:15Z"
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The PR handler now converts omitted `--base` and `--method` into an empty-string sentinel before calling the driver. That embeds the branch-strategy defaulting contract and the \"empty is not a valid branch/method\" invariant in the bin layer, instead of passing typed absence to `cli_driver` and letting driver/composition resolve it. This violates the CLI thin-bin policy from ADR D5/D8: keep this handler to parse-dispatch-emit and move the omission/default contract behind the driver boundary, e.g. with `Option` fields in `PrInput`.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/pr.rs",
+              "line": 113,
+              "category": "business logic in bin"
+            },
+            {
+              "message": "This surviving comment still points readers to `apps/cli-composition/src/track/fixpoint_resolve.rs`, but this PR deletes that file. The same block later names a stale cli-composition test that no longer exists under that name/location, so the final branch leaves a dead reference in the CLI scope. Update the comment to the new test location or remove the path reference.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/fixpoint_resolve.rs",
+              "line": 100,
+              "category": "dead-reference"
+            }
+          ],
+          "hash": "rvw1:sha256:92291026fc2ad7da3993a75f09a8f4dbe7a55e6e55a73f64a110a69f70a146a8",
+          "at": "2026-07-02T02:56:54Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:457ad1a2bd585ac1ebc89aafdb3e00df7122ee7047e2c9d9111ebbdd51f1ac06",
-          "at": "2026-07-02T07:35:33Z"
+          "hash": "rvw1:sha256:66eb1c545d5271c8d1b69b0902f928497dad55d0299e74a7de55fb5f932b285d",
+          "at": "2026-07-02T03:14:05Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:457ad1a2bd585ac1ebc89aafdb3e00df7122ee7047e2c9d9111ebbdd51f1ac06",
-          "at": "2026-07-02T07:41:32Z"
+          "hash": "rvw1:sha256:66eb1c545d5271c8d1b69b0902f928497dad55d0299e74a7de55fb5f932b285d",
+          "at": "2026-07-02T03:20:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Adding `metadata.json` here makes the supposed empty-diff approval test stop exercising the Approved path. `GitDiffGetter` includes untracked files, and this helper does not exclude `items/test-track/metadata.json`, so the new file becomes a diff in the implicit `Other` scope. The `check_approved_approved_path_exits_success_with_ok_message` case now covers the bypass/success path instead of the intended empty-diff Approved case.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/tests.rs",
+              "line": 89,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:ac9f377c491fb6bfe19621fa2cd9cc535f9b16f8814aef255637e734c3645e90",
+          "at": "2026-07-02T07:36:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c4dba10810c5ef4aec4f4222d70953b198a340dba8cf3d16de57944e57be8ac",
+          "at": "2026-07-02T07:40:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c4dba10810c5ef4aec4f4222d70953b198a340dba8cf3d16de57944e57be8ac",
+          "at": "2026-07-02T07:44:24Z"
         }
       ]
     },
@@ -1418,6 +1427,84 @@
         }
       ]
     },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bac82630858af0d55b78ef571a0bd5fc4cce2397fb5401074b5f100e6ec29832",
+          "at": "2026-07-02T08:56:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bac82630858af0d55b78ef571a0bd5fc4cce2397fb5401074b5f100e6ec29832",
+          "at": "2026-07-02T09:01:23Z"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:498e3310ab0076f4ff8be931588e8d97b2d9251f45ca8d7e51b7dfa4eff79fdc",
+          "at": "2026-07-01T07:53:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:498e3310ab0076f4ff8be931588e8d97b2d9251f45ca8d7e51b7dfa4eff79fdc",
+          "at": "2026-07-01T07:56:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2553c8d7edcd5795ba42df2fdef672fe1f908865718c5ab72fda1170e6e500d",
+          "at": "2026-07-02T02:50:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2553c8d7edcd5795ba42df2fdef672fe1f908865718c5ab72fda1170e6e500d",
+          "at": "2026-07-02T02:56:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d885d5b36f36cb03c6208a497f81fc9e1cc0ba42e9a23d645b33ee6a51681edd",
+          "at": "2026-07-02T03:14:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d885d5b36f36cb03c6208a497f81fc9e1cc0ba42e9a23d645b33ee6a51681edd",
+          "at": "2026-07-02T03:21:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3a5a31477da8acf53bea9ac386f4f1d1b047d342029f67a40803965d683ac61e",
+          "at": "2026-07-02T07:33:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3a5a31477da8acf53bea9ac386f4f1d1b047d342029f67a40803965d683ac61e",
+          "at": "2026-07-02T07:38:14Z"
+        }
+      ]
+    },
     "harness-policy": {
       "rounds": [
         {
@@ -1676,21 +1763,120 @@
         }
       ]
     },
-    "other": {
+    "usecase": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8d1e032150792c0be70de04a1661f3a4605a5daddfc0efd835f89ed6d31f69bd",
-          "at": "2026-07-02T02:47:16Z"
+          "hash": "rvw1:sha256:a15176685f931a467e456eec499c489039622aa761ab63859c1b04ef0454157f",
+          "at": "2026-06-30T20:45:14Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8d1e032150792c0be70de04a1661f3a4605a5daddfc0efd835f89ed6d31f69bd",
-          "at": "2026-07-02T02:50:26Z"
+          "hash": "rvw1:sha256:a15176685f931a467e456eec499c489039622aa761ab63859c1b04ef0454157f",
+          "at": "2026-06-30T20:49:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c25264bf5ba9291c1339bf568fe0a851c539e5b2abb14e21152a8f84266bb292",
+          "at": "2026-07-01T08:00:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c25264bf5ba9291c1339bf568fe0a851c539e5b2abb14e21152a8f84266bb292",
+          "at": "2026-07-01T08:03:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7612b23c9d1754f949a5a8519ed0dac18c420516ac8c4f74270a1d8753e19ed9",
+          "at": "2026-07-01T11:40:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:80c8126ae8e17bcf59c468544a747c799363f80aab7d8e0edcbd0aa80bd71d5b",
+          "at": "2026-07-01T17:25:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:80c8126ae8e17bcf59c468544a747c799363f80aab7d8e0edcbd0aa80bd71d5b",
+          "at": "2026-07-01T17:28:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e3d9734911ba4d25fc211396a9e8cb387482466f7636bb1175eb88f77eb12e3a",
+          "at": "2026-07-02T02:51:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e3d9734911ba4d25fc211396a9e8cb387482466f7636bb1175eb88f77eb12e3a",
+          "at": "2026-07-02T03:00:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:457ad1a2bd585ac1ebc89aafdb3e00df7122ee7047e2c9d9111ebbdd51f1ac06",
+          "at": "2026-07-02T07:35:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:457ad1a2bd585ac1ebc89aafdb3e00df7122ee7047e2c9d9111ebbdd51f1ac06",
+          "at": "2026-07-02T07:41:32Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ba0e9b6d288465fb2689610904477bf95e23eee8fbe7b96bb80d8e9a56dd38b2",
+          "at": "2026-07-02T08:54:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ba0e9b6d288465fb2689610904477bf95e23eee8fbe7b96bb80d8e9a56dd38b2",
+          "at": "2026-07-02T08:58:26Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:794c522b1cd34f3c48e0a89a08a49c24fb422abdd51a117c1ad4855fa0abc5f0",
+          "at": "2026-07-02T07:34:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:794c522b1cd34f3c48e0a89a08a49c24fb422abdd51a117c1ad4855fa0abc5f0",
+          "at": "2026-07-02T07:38:52Z"
         }
       ]
     },
@@ -1991,178 +2177,6 @@
           "findings": [],
           "hash": "rvw1:sha256:6e8c1400b57ec4d0f49f28e52dab8d0c3ccbf39afd7b1fe7ae03c3afffb999e3",
           "at": "2026-07-02T07:54:41Z"
-        }
-      ]
-    },
-    "impl-plan": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ba0e9b6d288465fb2689610904477bf95e23eee8fbe7b96bb80d8e9a56dd38b2",
-          "at": "2026-07-02T08:54:37Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ba0e9b6d288465fb2689610904477bf95e23eee8fbe7b96bb80d8e9a56dd38b2",
-          "at": "2026-07-02T08:58:26Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f9572fc47d468f9941bb85d47917920024275dde36fb9f11f23632d9efbf2184",
-          "at": "2026-06-30T22:39:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f9572fc47d468f9941bb85d47917920024275dde36fb9f11f23632d9efbf2184",
-          "at": "2026-06-30T22:43:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new happy-path test exercises `TrackCompositionRoot::fixpoint_resolve` directly and only asserts the returned `ExitCode`; it never captures stdout/stderr from `execute_fixpoint_resolve`, so a regression in the CLI wrapper's emit path would still pass. This leaves the only bin-layer behavior in this handler effectively untested.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/fixpoint_resolve.rs",
-              "line": 242,
-              "category": "test coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:cd715242f471a9d720d387eb3f9bbc02536632fb0990b8407fd7180c0f5ea086",
-          "at": "2026-07-01T01:22:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:35b798c758fbd5d2547492157571a7c8d65dfd9df3f82860428f5a6ea97489b3",
-          "at": "2026-07-01T01:40:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:35b798c758fbd5d2547492157571a7c8d65dfd9df3f82860428f5a6ea97489b3",
-          "at": "2026-07-01T01:42:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:13a5bdcfda6e7caca9c4af69252bea224cf9e789ed2c3f177cd6bccf4adb2f64",
-          "at": "2026-07-01T07:48:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:13a5bdcfda6e7caca9c4af69252bea224cf9e789ed2c3f177cd6bccf4adb2f64",
-          "at": "2026-07-01T07:50:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fa376ada81ce7a8669626c209ba57b6ca4b652baf890c299a45a807143cb9612",
-          "at": "2026-07-01T12:03:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fa376ada81ce7a8669626c209ba57b6ca4b652baf890c299a45a807143cb9612",
-          "at": "2026-07-01T17:23:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fa376ada81ce7a8669626c209ba57b6ca4b652baf890c299a45a807143cb9612",
-          "at": "2026-07-01T17:27:05Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:92291026fc2ad7da3993a75f09a8f4dbe7a55e6e55a73f64a110a69f70a146a8",
-          "at": "2026-07-02T02:50:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The PR handler now converts omitted `--base` and `--method` into an empty-string sentinel before calling the driver. That embeds the branch-strategy defaulting contract and the \"empty is not a valid branch/method\" invariant in the bin layer, instead of passing typed absence to `cli_driver` and letting driver/composition resolve it. This violates the CLI thin-bin policy from ADR D5/D8: keep this handler to parse-dispatch-emit and move the omission/default contract behind the driver boundary, e.g. with `Option` fields in `PrInput`.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/pr.rs",
-              "line": 113,
-              "category": "business logic in bin"
-            },
-            {
-              "message": "This surviving comment still points readers to `apps/cli-composition/src/track/fixpoint_resolve.rs`, but this PR deletes that file. The same block later names a stale cli-composition test that no longer exists under that name/location, so the final branch leaves a dead reference in the CLI scope. Update the comment to the new test location or remove the path reference.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/track/fixpoint_resolve.rs",
-              "line": 100,
-              "category": "dead-reference"
-            }
-          ],
-          "hash": "rvw1:sha256:92291026fc2ad7da3993a75f09a8f4dbe7a55e6e55a73f64a110a69f70a146a8",
-          "at": "2026-07-02T02:56:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:66eb1c545d5271c8d1b69b0902f928497dad55d0299e74a7de55fb5f932b285d",
-          "at": "2026-07-02T03:14:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:66eb1c545d5271c8d1b69b0902f928497dad55d0299e74a7de55fb5f932b285d",
-          "at": "2026-07-02T03:20:59Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Adding `metadata.json` here makes the supposed empty-diff approval test stop exercising the Approved path. `GitDiffGetter` includes untracked files, and this helper does not exclude `items/test-track/metadata.json`, so the new file becomes a diff in the implicit `Other` scope. The `check_approved_approved_path_exits_success_with_ok_message` case now covers the bypass/success path instead of the intended empty-diff Approved case.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/tests.rs",
-              "line": 89,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:ac9f377c491fb6bfe19621fa2cd9cc535f9b16f8814aef255637e734c3645e90",
-          "at": "2026-07-02T07:36:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2c4dba10810c5ef4aec4f4222d70953b198a340dba8cf3d16de57944e57be8ac",
-          "at": "2026-07-02T07:40:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2c4dba10810c5ef4aec4f4222d70953b198a340dba8cf3d16de57944e57be8ac",
-          "at": "2026-07-02T07:44:24Z"
         }
       ]
     }
