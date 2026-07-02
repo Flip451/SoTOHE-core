@@ -6,11 +6,13 @@
 //!
 //! Collects every catalogue-structural `TypeRef`-bearing slot (named struct
 //! field, enum variant field, method/function param, method/function return,
-//! generic bound, `type_alias` target) for entries selected by the rule's
-//! `RuleTarget` when the caller's target layer is one of the rule's `layers`,
-//! scans each slot via the injected [`PrimitiveOccurrenceScanner`], and emits a
-//! [`CatalogueLintViolation`] per (entry, position, primitive) match against
-//! the rule's requested `positions`.
+//! generic bound, where-predicate constrained type, `type_alias` target) for
+//! entries selected by the rule's `RuleTarget` when the caller's target layer
+//! is one of the rule's `layers`, scans each slot via the injected
+//! [`PrimitiveOccurrenceScanner`], and emits a [`CatalogueLintViolation`] per
+//! (entry, position, primitive) match against the rule's requested `positions`.
+
+use std::collections::{BTreeMap, BTreeSet};
 
 use super::helpers::{
     collect_methods_for_type, function_entries_for_target, trait_entries_for_target,
@@ -43,7 +45,53 @@ use crate::tddd::primitive_occurrence_scanner::{
 struct PrimitiveSlot {
     entry_name: String,
     type_ref: TypeRef,
-    position: PrimitiveOccurrencePosition,
+    scan_position: PrimitiveOccurrencePosition,
+    report_position: PrimitiveOccurrencePosition,
+}
+
+impl PrimitiveSlot {
+    fn new(entry_name: String, type_ref: TypeRef, position: PrimitiveOccurrencePosition) -> Self {
+        Self { entry_name, type_ref, scan_position: position, report_position: position }
+    }
+
+    fn where_predicate_lhs(entry_name: String, type_ref: TypeRef) -> Self {
+        Self {
+            entry_name,
+            type_ref,
+            scan_position: PrimitiveOccurrencePosition::TypeAliasTarget,
+            report_position: PrimitiveOccurrencePosition::Bound,
+        }
+    }
+
+    fn primitive_hits<'a>(
+        &self,
+        by_position: &'a BTreeMap<PrimitiveOccurrencePosition, BTreeSet<PrimitiveName>>,
+        requested_position: PrimitiveOccurrencePosition,
+    ) -> BTreeSet<&'a PrimitiveName> {
+        let mut hits = BTreeSet::new();
+
+        if self.scan_position == self.report_position {
+            if let Some(found) = by_position.get(&requested_position) {
+                hits.extend(found.iter());
+            }
+            return hits;
+        }
+
+        if requested_position == self.report_position {
+            if let Some(found) = by_position.get(&self.scan_position) {
+                hits.extend(found.iter());
+            }
+            if let Some(found) = by_position.get(&requested_position) {
+                hits.extend(found.iter());
+            }
+        } else if requested_position != self.scan_position {
+            if let Some(found) = by_position.get(&requested_position) {
+                hits.extend(found.iter());
+            }
+        }
+
+        hits
+    }
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -195,11 +243,11 @@ fn collect_type_entry_slots(
                 // `PrimitiveOccurrencePosition` variant, so they are excluded.
                 if let StructShape::Plain { fields, .. } = &struct_kind.shape {
                     for field in fields {
-                        slots.push(PrimitiveSlot {
-                            entry_name: entry_name.clone(),
-                            type_ref: field.ty.clone(),
-                            position: PrimitiveOccurrencePosition::NamedField,
-                        });
+                        slots.push(PrimitiveSlot::new(
+                            entry_name.clone(),
+                            field.ty.clone(),
+                            PrimitiveOccurrencePosition::NamedField,
+                        ));
                     }
                 }
             }
@@ -209,31 +257,31 @@ fn collect_type_entry_slots(
                         VariantPayload::Unit => {}
                         VariantPayload::Tuple(type_refs) => {
                             for type_ref in type_refs {
-                                slots.push(PrimitiveSlot {
-                                    entry_name: entry_name.clone(),
-                                    type_ref: type_ref.clone(),
-                                    position: PrimitiveOccurrencePosition::VariantField,
-                                });
+                                slots.push(PrimitiveSlot::new(
+                                    entry_name.clone(),
+                                    type_ref.clone(),
+                                    PrimitiveOccurrencePosition::VariantField,
+                                ));
                             }
                         }
                         VariantPayload::Struct(fields) => {
                             for field in fields {
-                                slots.push(PrimitiveSlot {
-                                    entry_name: entry_name.clone(),
-                                    type_ref: field.ty.clone(),
-                                    position: PrimitiveOccurrencePosition::VariantField,
-                                });
+                                slots.push(PrimitiveSlot::new(
+                                    entry_name.clone(),
+                                    field.ty.clone(),
+                                    PrimitiveOccurrencePosition::VariantField,
+                                ));
                             }
                         }
                     }
                 }
             }
             TypeKindV2::TypeAlias { target } => {
-                slots.push(PrimitiveSlot {
-                    entry_name: entry_name.clone(),
-                    type_ref: target.clone(),
-                    position: PrimitiveOccurrencePosition::TypeAliasTarget,
-                });
+                slots.push(PrimitiveSlot::new(
+                    entry_name.clone(),
+                    target.clone(),
+                    PrimitiveOccurrencePosition::TypeAliasTarget,
+                ));
             }
         }
 
@@ -310,22 +358,22 @@ fn collect_trait_entry_slots(
 
         for bound in &entry.supertrait_bounds {
             if bound_filter.should_collect(bound) {
-                slots.push(PrimitiveSlot {
-                    entry_name: entry_name.to_owned(),
-                    type_ref: bound.clone(),
-                    position: PrimitiveOccurrencePosition::Bound,
-                });
+                slots.push(PrimitiveSlot::new(
+                    entry_name.to_owned(),
+                    bound.clone(),
+                    PrimitiveOccurrencePosition::Bound,
+                ));
             }
         }
 
         for assoc_type in &entry.assoc_types {
             for bound in &assoc_type.bounds {
                 if bound_filter.should_collect(bound) {
-                    slots.push(PrimitiveSlot {
-                        entry_name: entry_name.to_owned(),
-                        type_ref: bound.clone(),
-                        position: PrimitiveOccurrencePosition::Bound,
-                    });
+                    slots.push(PrimitiveSlot::new(
+                        entry_name.to_owned(),
+                        bound.clone(),
+                        PrimitiveOccurrencePosition::Bound,
+                    ));
                 }
             }
         }
@@ -371,24 +419,31 @@ fn push_param_return_generic_slots(
     slots: &mut Vec<PrimitiveSlot>,
 ) {
     for param in params {
-        slots.push(PrimitiveSlot {
-            entry_name: entry_name.to_owned(),
-            type_ref: param.ty.clone(),
-            position: PrimitiveOccurrencePosition::Param,
-        });
+        slots.push(PrimitiveSlot::new(
+            entry_name.to_owned(),
+            param.ty.clone(),
+            PrimitiveOccurrencePosition::Param,
+        ));
     }
-    slots.push(PrimitiveSlot {
-        entry_name: entry_name.to_owned(),
-        type_ref: returns.clone(),
-        position: PrimitiveOccurrencePosition::Return,
-    });
+    slots.push(PrimitiveSlot::new(
+        entry_name.to_owned(),
+        returns.clone(),
+        PrimitiveOccurrencePosition::Return,
+    ));
     push_generic_and_where_slots(entry_name, generics, where_predicates, bound_filter, slots);
 }
 
-/// Pushes a `Bound` slot for each generic param's bounds and each
-/// where-clause predicate type expression. Both `WherePredicateDecl.lhs` (the
-/// constrained type expression) and each `rhs` bound are `TypeRef`-bearing
-/// bound positions.
+/// Pushes a `Bound` slot for each generic param's bounds, each where-clause
+/// predicate's `rhs` bounds, and each where-clause predicate's constrained
+/// `lhs` type expression.
+///
+/// `WherePredicateDecl.lhs` is the constrained *type expression* (e.g. `T`,
+/// `Vec<T>`, or `&'a T`), not a type-parameter bound. It must still be scanned
+/// because it is a TypeRef-bearing where-clause slot (`where Vec<String>:
+/// Clone` must not hide `String`), but it must not be sent through the
+/// Bound-only `syn::TypeParamBound` scan path. The slot therefore scans `lhs`
+/// as a normal type expression and remaps its top-level fallback hit back to
+/// `Bound` for rule-position matching.
 ///
 /// Filters each bound via `bound_filter`: a catalogue bound string may be a
 /// legal `syn::TypeParamBound` (e.g. `?Sized`, a lifetime) that is not
@@ -405,29 +460,25 @@ fn push_generic_and_where_slots(
     for generic in generics {
         for bound in &generic.bounds {
             if bound_filter.should_collect(bound) {
-                slots.push(PrimitiveSlot {
-                    entry_name: entry_name.to_owned(),
-                    type_ref: bound.clone(),
-                    position: PrimitiveOccurrencePosition::Bound,
-                });
+                slots.push(PrimitiveSlot::new(
+                    entry_name.to_owned(),
+                    bound.clone(),
+                    PrimitiveOccurrencePosition::Bound,
+                ));
             }
         }
     }
     for pred in where_predicates {
         if bound_filter.should_collect(&pred.lhs) {
-            slots.push(PrimitiveSlot {
-                entry_name: entry_name.to_owned(),
-                type_ref: pred.lhs.clone(),
-                position: PrimitiveOccurrencePosition::Bound,
-            });
+            slots.push(PrimitiveSlot::where_predicate_lhs(entry_name.to_owned(), pred.lhs.clone()));
         }
         for bound in &pred.rhs {
             if bound_filter.should_collect(bound) {
-                slots.push(PrimitiveSlot {
-                    entry_name: entry_name.to_owned(),
-                    type_ref: bound.clone(),
-                    position: PrimitiveOccurrencePosition::Bound,
-                });
+                slots.push(PrimitiveSlot::new(
+                    entry_name.to_owned(),
+                    bound.clone(),
+                    PrimitiveOccurrencePosition::Bound,
+                ));
             }
         }
     }
@@ -445,11 +496,12 @@ fn check_slots<S: PrimitiveOccurrenceScanner>(
     violations: &mut Vec<CatalogueLintViolation>,
 ) -> Result<(), CatalogueLinterError> {
     for slot in slots {
-        let report = scanner.scan(slot.type_ref.clone(), primitives.clone(), slot.position)?;
+        let report = scanner.scan(slot.type_ref.clone(), primitives.clone(), slot.scan_position)?;
         for position in positions.as_slice() {
-            let Some(found) = report.by_position().get(position) else {
+            let found = slot.primitive_hits(report.by_position(), *position);
+            if found.is_empty() {
                 continue;
-            };
+            }
             for primitive in found {
                 violations.push(CatalogueLintViolation::new(
                     discriminant_name,

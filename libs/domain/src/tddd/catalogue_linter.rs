@@ -4258,9 +4258,12 @@ mod tests {
 
     #[test]
     fn test_forbid_primitive_in_types_detects_bound_occurrence() {
-        // A generic bound (`T: Into<String>`), a where-predicate lhs
-        // (`Vec<String>: Clone`), and a where-predicate rhs (`U: String`) on
-        // the same method — all must be classified as Bound.
+        // A generic bound (`T: Into<String>`), a where-predicate lhs type
+        // expression (`Vec<String>: String`), and a where-predicate rhs bound
+        // on the same method must all be attributed to Bound for rule matching.
+        // The lhs is scanned as a normal type expression and remapped to Bound
+        // rather than being sent through the Bound-only scanner path (see
+        // `test_forbid_primitive_in_types_does_not_send_where_predicate_lhs_to_bound_scanner`).
         let mut doc = make_doc("domain");
         let method = MethodDeclaration {
             generics: vec![MethodGenericParam {
@@ -4292,10 +4295,154 @@ mod tests {
             violations.len(),
             3,
             "expected 1 violation for the generic bound + 1 for the where-predicate lhs \
-             + 1 for the where-predicate rhs, \
+             type expression + 1 for the where-predicate rhs, \
              got: {violations:?}"
         );
         assert!(violations.iter().all(|v| v.entry_name() == "Money"));
+    }
+
+    /// Test double for [`PrimitiveOccurrenceScanner`]: fails with
+    /// [`PrimitiveOccurrenceScanError::ParseFailure`] when called at `Bound`
+    /// position with a reference-shaped `type_ref` (leading `&`), and
+    /// otherwise behaves like [`StubPrimitiveScanner`] (substring primitive
+    /// match).
+    ///
+    /// Reproduces PR #179 round 4's finding: `push_generic_and_where_slots`
+    /// used to push `WherePredicateDecl.lhs` into the `Bound` slot alongside
+    /// its legitimate `rhs` bounds, but `lhs` is a type expression (e.g.
+    /// `&'a T`), not a type-parameter bound -- the real `syn`-based adapter's
+    /// `scan_bound` rejects reference types with `ParseFailure`, since
+    /// `syn::TypeParamBound` has no reference-type variant. Unlike
+    /// [`BoundOnlyFailingScanner`] (which fails unconditionally at `Bound`
+    /// position, including for legitimate `rhs` bounds), this double only
+    /// fails for the lhs's reference shape, so a single assertion can
+    /// distinguish "lhs wrongly scanned" from "rhs correctly scanned".
+    struct BoundReferenceLhsFailingScanner;
+
+    impl PrimitiveOccurrenceScanner for BoundReferenceLhsFailingScanner {
+        fn scan(
+            &self,
+            type_ref: TypeRef,
+            primitives: NonEmptyVec<PrimitiveName>,
+            position: PrimitiveOccurrencePosition,
+        ) -> Result<PrimitiveOccurrenceReport, PrimitiveOccurrenceScanError> {
+            if position == PrimitiveOccurrencePosition::Bound && type_ref.as_str().starts_with('&')
+            {
+                return Err(PrimitiveOccurrenceScanError::ParseFailure { type_ref });
+            }
+
+            use std::collections::{BTreeMap, BTreeSet};
+
+            let mut found = BTreeSet::new();
+            for primitive in primitives.as_slice() {
+                if type_ref.as_str().contains(primitive.as_str()) {
+                    found.insert(primitive.clone());
+                }
+            }
+            let mut occurrences = BTreeMap::new();
+            if !found.is_empty() {
+                occurrences.insert(position, found);
+            }
+            Ok(PrimitiveOccurrenceReport::new(occurrences))
+        }
+    }
+
+    #[test]
+    fn test_forbid_primitive_in_types_does_not_send_where_predicate_lhs_to_bound_scanner() {
+        // PR #179 round 4 P1: a where-predicate's lhs is a type expression
+        // (e.g. `&'a T`), not a type-parameter bound. Pushing it into the
+        // `Bound` slot alongside rhs sent reference-shaped text into the
+        // Bound-only `syn::TypeParamBound` parse path, which rejects `&'a T`
+        // with ParseFailure before the legitimate rhs bound could even be
+        // checked. Fix: `push_generic_and_where_slots` scans `lhs` through a
+        // normal type-expression path, then remaps top-level hits to Bound for
+        // rule matching.
+        //
+        // `BoundReferenceLhsFailingScanner` fails specifically on
+        // reference-shaped `Bound`-position input, simulating the real
+        // `SynPrimitiveOccurrenceScanner::scan_bound`'s rejection of `&'a T`.
+        // Before the fix this test would return
+        // `Err(CatalogueLinterError::ScanFailed(ParseFailure { .. }))`
+        // because `lhs` ("&'a T") was pushed as a Bound slot; after the fix
+        // the lhs still may be scanned, but never with `position == Bound`, so
+        // evaluation succeeds.
+        let mut doc = make_doc("domain");
+        let method = MethodDeclaration {
+            where_predicates: vec![WherePredicateDecl {
+                lhs: TypeRef::new("&'a T").unwrap(),
+                rhs: vec![TypeRef::new("MyTrait").unwrap()],
+                operator: BoundOp::Bound,
+            }],
+            ..method_shared_ref_no_params("do_thing", "()")
+        };
+        doc.types.insert(
+            TypeName::new("Money").unwrap(),
+            make_type_entry_with_methods(DataRole::value_object(), vec![method]),
+        );
+
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::all_roles(),
+            CatalogueLinterRuleKind::ForbidPrimitiveInTypes {
+                primitives: NonEmptyVec::new(PrimitiveName::new("String").unwrap(), vec![]),
+                layers: NonEmptyVec::new(layer("domain"), vec![]),
+                positions: NonEmptyVec::new(PrimitiveOccurrencePosition::Bound, vec![]),
+            },
+        )
+        .unwrap();
+        let all = all_catalogues_single(&doc);
+        let target_layer = doc.layer.clone();
+        let result =
+            evaluate_catalogue_lint(&[rule], &all, &target_layer, &BoundReferenceLhsFailingScanner);
+
+        assert!(
+            result.is_ok(),
+            "where-predicate lhs must never reach the Bound scanner slot (it is a type \
+             expression, not a bound); expected Ok, got: {result:?}"
+        );
+        assert!(
+            result.unwrap().is_empty(),
+            "rhs 'MyTrait' does not contain the primitive 'String', so no violation is expected"
+        );
+    }
+
+    #[test]
+    fn test_forbid_primitive_in_types_scans_where_predicate_lhs_type_expression_as_bound() {
+        let mut doc = make_doc("domain");
+        let method = MethodDeclaration {
+            where_predicates: vec![WherePredicateDecl {
+                lhs: TypeRef::new("Vec<String>").unwrap(),
+                rhs: vec![TypeRef::new("Clone").unwrap()],
+                operator: BoundOp::Bound,
+            }],
+            ..method_shared_ref_no_params("do_thing", "()")
+        };
+        doc.types.insert(
+            TypeName::new("Money").unwrap(),
+            make_type_entry_with_methods(DataRole::value_object(), vec![method]),
+        );
+
+        let violations = run_rule(
+            &doc,
+            RuleTarget::all_roles(),
+            CatalogueLinterRuleKind::ForbidPrimitiveInTypes {
+                primitives: NonEmptyVec::new(PrimitiveName::new("String").unwrap(), vec![]),
+                layers: NonEmptyVec::new(layer("domain"), vec![]),
+                positions: NonEmptyVec::new(PrimitiveOccurrencePosition::Bound, vec![]),
+            },
+        );
+
+        assert_eq!(
+            violations.len(),
+            1,
+            "expected the where-predicate lhs type expression to be reported as Bound, got: \
+             {violations:?}"
+        );
+        assert_eq!(violations[0].entry_name(), "Money");
+        assert!(
+            violations[0].message().contains("Bound"),
+            "expected lhs violation to be attributed to Bound, got: {}",
+            violations[0].message()
+        );
     }
 
     #[test]

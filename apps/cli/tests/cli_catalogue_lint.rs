@@ -252,6 +252,22 @@ fn run_catalogue_lint(root: &Path) -> std::process::Output {
     run_catalogue_lint_impl(root, None)
 }
 
+/// Invoke `sotp catalogue-lint check-active-track` with an explicit
+/// `--track-id` value (bypassing the fixed `"test-track"` id the other
+/// helpers use) and no `--rules-file` override.
+fn run_catalogue_lint_with_track_id(root: &Path, track_id: &str) -> std::process::Output {
+    let mut cmd = sotp_bin();
+    cmd.args([
+        "catalogue-lint",
+        "check-active-track",
+        "--track-id",
+        track_id,
+        "--workspace-root",
+        root.to_str().unwrap(),
+    ]);
+    cmd.output().unwrap()
+}
+
 // ---------------------------------------------------------------------------
 // Test 1: Happy path — config present, rules load, no violations, exit 0
 // ---------------------------------------------------------------------------
@@ -476,5 +492,57 @@ fn test_catalogue_lint_check_active_track_forbid_primitive_in_types_default_rule
         "expected exactly 2 violations: DtoFixture's bare String field ('label') must \
          NOT violate, since Dto is excluded from the named_field/variant_field rule\n\
          stdout: {stdout}\nstderr: {stderr}"
+    );
+}
+
+// ---------------------------------------------------------------------------
+// Test 7: An explicit --track-id that is not a structurally valid track id
+// must fail closed (non-zero exit), not be silently skipped. PR #179 round 4
+// P1: `resolve_track_id_from_root` returns an explicit --track-id string
+// as-is (no format validation in READ mode), and the pre-flight loop joined
+// it directly into a filesystem path (`track/items/<id>/<catalogue_file>`)
+// before any validation ran. For a structurally invalid id such as
+// `../missing`, the resulting path can land outside the intended
+// `track/items/<id>` shape; since nothing exists there, the loop's
+// legitimate "layer catalogue not created yet" NotFound arm fired and
+// returned exit 0, letting a bad --track-id silently bypass the blocking
+// gate. Fixed by validating the resolved id via `TrackId::try_new`
+// immediately after resolution, before any path is constructed or stat'd.
+// ---------------------------------------------------------------------------
+
+#[test]
+fn test_catalogue_lint_check_active_track_invalid_track_id_fails_closed() {
+    let root_dir = tempfile::tempdir().unwrap();
+    let root = root_dir.path();
+
+    write(&root.join("architecture-rules.json"), RULES_JSON);
+    write(&root.join(".harness/catalogue-lint/config.json"), LINT_CONFIG_WITH_INVARIANT_RULE);
+    // Deliberately no track/items/../missing/domain-types.json fixture -- a
+    // structurally invalid id must be rejected before the pre-flight loop
+    // ever reaches a filesystem stat.
+
+    let output = run_catalogue_lint_with_track_id(root, "../missing");
+
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let stderr = String::from_utf8_lossy(&output.stderr);
+
+    assert_eq!(
+        output.status.code(),
+        Some(1),
+        "a structurally invalid --track-id must fail closed with exit 1, not be \
+         silently skipped as an absent-catalogue NotFound case\nstdout: {stdout}\nstderr: {stderr}"
+    );
+    assert!(
+        stdout.trim().is_empty(),
+        "invalid --track-id errors must not be emitted to stdout\nstdout: {stdout}"
+    );
+    assert!(
+        stderr.contains("track id '../missing' must be a lowercase slug"),
+        "stderr must report the invalid track-id validation failure\nstderr: {stderr}"
+    );
+    assert!(
+        !stderr.contains("catalogue-lint skipped"),
+        "must not take the NotFound-skip path for a structurally invalid track id\n\
+         stderr: {stderr}"
     );
 }

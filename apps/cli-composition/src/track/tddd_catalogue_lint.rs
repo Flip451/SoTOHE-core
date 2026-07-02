@@ -54,6 +54,17 @@ impl TrackCompositionRoot {
 
         let resolved_id = crate::track::resolve_track_id_from_root(track_id, &workspace_root)?;
 
+        // Validate the resolved id BEFORE it is joined into any filesystem
+        // path below. `resolve_track_id_from_root` returns an explicit
+        // `--track-id` string as-is, with no format validation (READ-mode
+        // resolution trusts the caller). Without this check, a structurally
+        // invalid id (e.g. containing `..`) would be joined into `track_dir`
+        // and stat'd in the pre-flight loop below; a nonexistent path from
+        // such an id hits the loop's legitimate `NotFound` skip arm and
+        // returns exit 0, letting a bad id silently bypass the blocking gate
+        // instead of failing closed (PR #179 round 4 P1).
+        crate::track::validate_track_id_str(&resolved_id)?;
+
         // Resolve layers (fail-closed) — same helper track_catalogue_spec_signals
         // uses, so layer names are never hard-coded here.
         let rules_path = workspace_root.join("architecture-rules.json");
