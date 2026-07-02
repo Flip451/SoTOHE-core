@@ -87,6 +87,40 @@ impl TrackCompositionRoot {
         let items_dir = workspace_root.join("track/items");
         let track_dir = items_dir.join(&resolved_id);
 
+        // Resolve the config file path: --rules-file overrides the default
+        // location. Do this BEFORE the catalogue pre-flight so a missing config
+        // fails closed even on pre-Phase-2 tracks whose catalogues aren't yet
+        // written (PR #179 round 5 P1). Otherwise a mistyped `--rules-file` or
+        // an accidentally-deleted `.harness/catalogue-lint/config.json` would
+        // be silently accepted (exit 0) whenever any TDDD layer catalogue was
+        // absent, contradicting the fail-closed contract.
+        let config_path = rules_file
+            .unwrap_or_else(|| workspace_root.join(".harness/catalogue-lint/config.json"));
+        match config_path.symlink_metadata() {
+            Ok(meta) if meta.file_type().is_file() => {
+                // Present — proceed.
+            }
+            Ok(_) => {
+                // Non-file entry (symlink/dir) — let the loader below surface
+                // a precise error instead of masking it here.
+            }
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
+                let msg = format!(
+                    "lint config not found at {}. \
+                     Copy `.harness/catalogue-lint/presets/ddd-strict.json` to that location \
+                     to enable linting.",
+                    config_path.display()
+                );
+                return Ok(CommandOutcome { stdout: None, stderr: Some(msg), exit_code: 1 });
+            }
+            Err(e) => {
+                return Err(CompositionError::Infrastructure(format!(
+                    "cannot stat lint config '{}': {e}",
+                    config_path.display(),
+                )));
+            }
+        }
+
         // Pre-flight: CatalogueLoader::load_all requires every tddd.enabled
         // layer's catalogue file to be present at once (all-or-nothing). Skip
         // the whole gate gracefully until every layer has one, rather than
@@ -119,10 +153,6 @@ impl TrackCompositionRoot {
                 }
             }
         }
-
-        // Resolve the config file path: --rules-file overrides the default location.
-        let config_path = rules_file
-            .unwrap_or_else(|| workspace_root.join(".harness/catalogue-lint/config.json"));
 
         let loader = FsCatalogueLoader::new(items_dir, rules_path, workspace_root.clone());
         let config_loader = FsLintConfigLoader::new(config_path);
