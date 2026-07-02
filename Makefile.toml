@@ -597,14 +597,20 @@ description = "[wrapper] Run full PR review cycle: push, ensure PR, trigger @cod
 command = "bin/sotp"
 args = ["pr", "review-cycle", "${@}"]
 
+[tasks.catalogue-lint-check-active-track]
+description = "[gate] Run the default-config catalogue lint (primitive-obsession guard) across every tddd.enabled layer of the active track. Active track auto-resolved from current git branch. Layers whose catalogue file does not exist yet (Phase 2 type-design in progress) are tolerated (exit 0). Exits non-zero when any layer reports a violation or the lint config is missing."
+command = "bin/sotp"
+args = ["catalogue-lint", "check-active-track"]
+
 [tasks.track-active-gate]
 private = true
-description = "[gate] Regen sequence: signal calc-impl-catalog → signal calc-catalog-spec → views sync. Both track-commit-message and review invocations depend on this shared task. Fail-closed: non-zero exit aborts the chain."
+description = "[gate] Regen sequence: signal calc-impl-catalog → signal calc-catalog-spec → catalogue-lint check-active-track → views sync. Both track-commit-message and review invocations depend on this shared task. Fail-closed: non-zero exit aborts the chain."
 script_runner = "@shell"
 script = ['''
 set -e
 bin/sotp signal calc-impl-catalog
 bin/sotp signal calc-catalog-spec
+bin/sotp catalogue-lint check-active-track
 bin/sotp track views sync
 ''']
 

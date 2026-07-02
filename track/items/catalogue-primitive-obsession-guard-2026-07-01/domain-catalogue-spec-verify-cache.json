@@ -3,7 +3,7 @@
   "layer": "domain",
   "entries": [
     {
-      "claim_hash": "cbaa596e24549c23a8e78188475d2b706791d71f692e8f338c5575ca15aac91f",
+      "claim_hash": "5d5e8b7b4b37817d4b91fb9ac612f99dc27ee810aeb7857b483a65c6b531c3c1",
       "evidence_hash": "65d7237ca041e23422a673d95856ebff152645544444b3024b3dbac3ebe9a8bb",
       "verdict": {
         "kind": "pass",
@@ -27,7 +27,7 @@
       }
     },
     {
-      "claim_hash": "cbaa596e24549c23a8e78188475d2b706791d71f692e8f338c5575ca15aac91f",
+      "claim_hash": "5d5e8b7b4b37817d4b91fb9ac612f99dc27ee810aeb7857b483a65c6b531c3c1",
       "evidence_hash": "4d88e1ab7ab767c9d452fd9560232cae9986ec9e43e1c0d0290cb22fa3e002ba",
       "verdict": {
         "kind": "pass",
@@ -47,6 +47,198 @@
           "section": "in_scope",
           "element_id": "IN-05",
           "text_label": "『型木の指定位置に指定プリミティブが含まれるか』の判定は domain 層に port として定義し、infrastructure 層が既存の `type_ref_parser`（syn ベース）で実装する。domain は判定の意味論のみを持ち、syn への依存は infrastructure に閉じる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5d5e8b7b4b37817d4b91fb9ac612f99dc27ee810aeb7857b483a65c6b531c3c1",
+      "evidence_hash": "7104ff6c54aac2796c2bb6ff056f2cf933aeeda6b1a95fcf76acdd483d87dff1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`result_err` 位置の適用（全 role で ON、role 除外なし）と、named field / variant field 位置の適用（`Dto` / `Command` のみ除外）は独立に評価される。`Dto` または `Command` role のカタログエントリであっても、フィールド型が `Result<T, String>` であれば、その `String` の Err スロットは `result_err` 位置として引き続き違反になる — フィールド位置の role 除外は `result_err` 位置には及ばない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalogue-primitive-obsession-guard-2026-07-01/domain-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogueLinterError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-08",
+          "text_label": "`result_err` 位置の適用（全 role で ON、role 除外なし）と、named field / variant field 位置の適用（`Dto` / `Command` のみ除外）は独立に評価される。`Dto` または `Command` role のカタログエントリであっても、フィールド型が `Result<T, String>` であれば、その `String` の Err スロットは `result_err` 位置として引き続き違反になる — フィールド位置の role 除外は `result_err` 位置には及ばない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5d5e8b7b4b37817d4b91fb9ac612f99dc27ee810aeb7857b483a65c6b531c3c1",
+      "evidence_hash": "91146b821d4ee92c80ac397cd0b702512782aa164727cd5c08895c8962457c15",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ErrorType` role は本ルールのいかなる位置・いかなる評価経路においても特別扱い（専用の除外・専用の緩和ルール）を受けない。そのフィールド位置および `result_err` 位置の `String` 出現は、`Dto` / `Command` 以外の他の role と同一の一般ルールに従って判定される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalogue-primitive-obsession-guard-2026-07-01/domain-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogueLinterError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-09",
+          "text_label": "`ErrorType` role は本ルールのいかなる位置・いかなる評価経路においても特別扱い（専用の除外・専用の緩和ルール）を受けない。そのフィールド位置および `result_err` 位置の `String` 出現は、`Dto` / `Command` 以外の他の role と同一の一般ルールに従って判定される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5d5e8b7b4b37817d4b91fb9ac612f99dc27ee810aeb7857b483a65c6b531c3c1",
+      "evidence_hash": "1114c995af6787af57b3dd40e9c70a2bbbf1e835430dc500fd2415bbf18fecc9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "個別フィールド単位の escape hatch 注釈は一切設けない。唯一サポートする除外の粒度は (layer × role × 出現位置 × プリミティブ) というカテゴリ単位の宣言的 config である。真に自由文が本質のフィールドは、per-instance 例外ではなく意味を与えた汎用 newtype（`FreeText` / `LogLine` 等）で型付けする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalogue-primitive-obsession-guard-2026-07-01/domain-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogueLinterError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-11",
+          "text_label": "個別フィールド単位の escape hatch 注釈は一切設けない。唯一サポートする除外の粒度は (layer × role × 出現位置 × プリミティブ) というカテゴリ単位の宣言的 config である。真に自由文が本質のフィールドは、per-instance 例外ではなく意味を与えた汎用 newtype（`FreeText` / `LogLine` 等）で型付けする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a15d3fbb4b3fb43a4a80e6b7a19c9ab76f27be37123c2c1a2d059903677e8b6d",
+      "evidence_hash": "8e2f1e88cd41c5ee66e642f7f64b4455857190f9d77bfa827324c4621b7655d6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "role による絞り込みは新 variant に専用フィールドを持たず、既存の `RuleTarget`（`target_roles`）が引き続き使われる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalogue-primitive-obsession-guard-2026-07-01/domain-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogueLinterRuleError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "新しい `CatalogueLinterRuleKind` variant が実装されており、その payload は (a) 設定可能な禁止プリミティブ集合、(b) `architecture-rules.json` を基準に存在検証される適用対象 layer 集合（未定義の layer 名は拒否、`\"all\"` 特殊値は存在しない）、(c) 検出位置集合、の3要素を持つ。role による絞り込みは新 variant に専用フィールドを持たず、既存の `RuleTarget`（`target_roles`）が引き続き使われる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a15d3fbb4b3fb43a4a80e6b7a19c9ab76f27be37123c2c1a2d059903677e8b6d",
+      "evidence_hash": "93fe9aae2f2036b2557bb12722d42905e344fe577ae101245da70b142bec7427",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「既存の `CatalogueLinterRuleKind` に新しい variant を追加して実装する。新 variant の payload は (a) 禁止プリミティブ集合、(b) 適用対象 layer 集合、(c) 検出位置集合の3つを持つ。role 軸は新 variant にフィールドを持たせず、既存の `RuleTarget`（`target_roles`）をそのまま再利用する。」"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalogue-primitive-obsession-guard-2026-07-01/domain-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogueLinterRuleError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "既存の `CatalogueLinterRuleKind` に新しい variant を追加して実装する。新 variant の payload は (a) 禁止プリミティブ集合、(b) 適用対象 layer 集合、(c) 検出位置集合の3つを持つ。role 軸は新 variant にフィールドを持たせず、既存の `RuleTarget`（`target_roles`）をそのまま再利用する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a15d3fbb4b3fb43a4a80e6b7a19c9ab76f27be37123c2c1a2d059903677e8b6d",
+      "evidence_hash": "7104ff6c54aac2796c2bb6ff056f2cf933aeeda6b1a95fcf76acdd483d87dff1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`result_err` 位置の適用（全 role で ON、role 除外なし）と、named field / variant field 位置の適用（`Dto` / `Command` のみ除外）は独立に評価される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalogue-primitive-obsession-guard-2026-07-01/domain-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogueLinterRuleError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-08",
+          "text_label": "`result_err` 位置の適用（全 role で ON、role 除外なし）と、named field / variant field 位置の適用（`Dto` / `Command` のみ除外）は独立に評価される。`Dto` または `Command` role のカタログエントリであっても、フィールド型が `Result<T, String>` であれば、その `String` の Err スロットは `result_err` 位置として引き続き違反になる — フィールド位置の role 除外は `result_err` 位置には及ばない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a15d3fbb4b3fb43a4a80e6b7a19c9ab76f27be37123c2c1a2d059903677e8b6d",
+      "evidence_hash": "91146b821d4ee92c80ac397cd0b702512782aa164727cd5c08895c8962457c15",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ErrorType` role は本ルールのいかなる位置・いかなる評価経路においても特別扱い（専用の除外・専用の緩和ルール）を受けない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalogue-primitive-obsession-guard-2026-07-01/domain-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogueLinterRuleError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-09",
+          "text_label": "`ErrorType` role は本ルールのいかなる位置・いかなる評価経路においても特別扱い（専用の除外・専用の緩和ルール）を受けない。そのフィールド位置および `result_err` 位置の `String` 出現は、`Dto` / `Command` 以外の他の role と同一の一般ルールに従って判定される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a15d3fbb4b3fb43a4a80e6b7a19c9ab76f27be37123c2c1a2d059903677e8b6d",
+      "evidence_hash": "1114c995af6787af57b3dd40e9c70a2bbbf1e835430dc500fd2415bbf18fecc9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "真に自由文が本質のフィールドは、per-instance 例外ではなく意味を与えた汎用 newtype（`FreeText` / `LogLine` 等）で型付けする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalogue-primitive-obsession-guard-2026-07-01/domain-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogueLinterRuleError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-11",
+          "text_label": "個別フィールド単位の escape hatch 注釈は一切設けない。唯一サポートする除外の粒度は (layer × role × 出現位置 × プリミティブ) というカテゴリ単位の宣言的 config である。真に自由文が本質のフィールドは、per-instance 例外ではなく意味を与えた汎用 newtype（`FreeText` / `LogLine` 等）で型付けする。"
         }
       }
     },
@@ -143,6 +335,78 @@
           "section": "constraint",
           "element_id": "CN-04",
           "text_label": "新 variant の payload、および既定 config が列挙する layer 名は、`architecture-rules.json` に定義済みの名前のみを受け付ける。未定義の layer 名は検証で拒否し、`\"all\"` のような特殊値は設けない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "1cccea5c61e8f17f301e36649d3551c1d9b2cb3412af97b7e9216b3692ca3494",
+      "evidence_hash": "1114c995af6787af57b3dd40e9c70a2bbbf1e835430dc500fd2415bbf18fecc9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "個別フィールド単位の escape hatch 注釈は一切設けない。唯一サポートする除外の粒度は (layer × role × 出現位置 × プリミティブ) というカテゴリ単位の宣言的 config である。真に自由文が本質のフィールドは、per-instance 例外ではなく意味を与えた汎用 newtype（`FreeText` / `LogLine` 等）で型付けする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalogue-primitive-obsession-guard-2026-07-01/domain-types.json",
+          "section_key": "types",
+          "entry_key": "FreeText"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-11",
+          "text_label": "個別フィールド単位の escape hatch 注釈は一切設けない。唯一サポートする除外の粒度は (layer × role × 出現位置 × プリミティブ) というカテゴリ単位の宣言的 config である。真に自由文が本質のフィールドは、per-instance 例外ではなく意味を与えた汎用 newtype（`FreeText` / `LogLine` 等）で型付けする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "1cccea5c61e8f17f301e36649d3551c1d9b2cb3412af97b7e9216b3692ca3494",
+      "evidence_hash": "7104ff6c54aac2796c2bb6ff056f2cf933aeeda6b1a95fcf76acdd483d87dff1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`result_err` 位置の適用（全 role で ON、role 除外なし）と、named field / variant field 位置の適用（`Dto` / `Command` のみ除外）は独立に評価される。`Dto` または `Command` role のカタログエントリであっても、フィールド型が `Result<T, String>` であれば、その `String` の Err スロットは `result_err` 位置として引き続き違反になる — フィールド位置の role 除外は `result_err` 位置には及ばない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalogue-primitive-obsession-guard-2026-07-01/domain-types.json",
+          "section_key": "types",
+          "entry_key": "FreeText"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-08",
+          "text_label": "`result_err` 位置の適用（全 role で ON、role 除外なし）と、named field / variant field 位置の適用（`Dto` / `Command` のみ除外）は独立に評価される。`Dto` または `Command` role のカタログエントリであっても、フィールド型が `Result<T, String>` であれば、その `String` の Err スロットは `result_err` 位置として引き続き違反になる — フィールド位置の role 除外は `result_err` 位置には及ばない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "1cccea5c61e8f17f301e36649d3551c1d9b2cb3412af97b7e9216b3692ca3494",
+      "evidence_hash": "91146b821d4ee92c80ac397cd0b702512782aa164727cd5c08895c8962457c15",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ErrorType` role は本ルールのいかなる位置・いかなる評価経路においても特別扱い（専用の除外・専用の緩和ルール）を受けない。そのフィールド位置および `result_err` 位置の `String` 出現は、`Dto` / `Command` 以外の他の role と同一の一般ルールに従って判定される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalogue-primitive-obsession-guard-2026-07-01/domain-types.json",
+          "section_key": "types",
+          "entry_key": "FreeText"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-09",
+          "text_label": "`ErrorType` role は本ルールのいかなる位置・いかなる評価経路においても特別扱い（専用の除外・専用の緩和ルール）を受けない。そのフィールド位置および `result_err` 位置の `String` 出現は、`Dto` / `Command` 以外の他の role と同一の一般ルールに従って判定される。"
         }
       }
     },

@@ -224,6 +224,225 @@
       "docs": "Secondary port for loading lint configuration from a file. Abstracts the external I/O of reading .harness/catalogue-lint/config.json or a --rules-file path. Implementations live in the infrastructure layer (FsLintConfigLoader). Referenced unchanged from baseline — this track does not modify the LintConfigLoader interface; it is cited here because RunCatalogueLintInteractor's impl_generics restate the C: LintConfigLoader bound alongside the newly added S: PrimitiveOccurrenceScanner bound.",
       "spec_refs": [],
       "informal_grounds": []
+    },
+    "TrackService": {
+      "action": "modify",
+      "role": {
+        "ApplicationService": {}
+      },
+      "methods": [
+        {
+          "name": "init",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id", "ty": "String" },
+            { "name": "description", "ty": "String" }
+          ],
+          "returns": "TrackCommandOutput",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "transition",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id", "ty": "Option<String>" },
+            { "name": "task_id", "ty": "String" },
+            { "name": "target_status", "ty": "String" },
+            { "name": "commit_hash", "ty": "Option<String>" }
+          ],
+          "returns": "TrackCommandOutput",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "resolve",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id", "ty": "Option<String>" }
+          ],
+          "returns": "TrackCommandOutput",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "views_sync",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "std::path::PathBuf" },
+            { "name": "track_id", "ty": "Option<String>" }
+          ],
+          "returns": "TrackCommandOutput",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "branch_create",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id", "ty": "String" }
+          ],
+          "returns": "TrackCommandOutput",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "branch_switch",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id", "ty": "String" }
+          ],
+          "returns": "TrackCommandOutput",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "views_validate",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "TrackCommandOutput",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "add_task",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id", "ty": "Option<String>" },
+            { "name": "description", "ty": "String" },
+            { "name": "section", "ty": "Option<String>" },
+            { "name": "after", "ty": "Option<String>" }
+          ],
+          "returns": "TrackCommandOutput",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "set_override",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id", "ty": "Option<String>" },
+            { "name": "status", "ty": "String" },
+            { "name": "reason", "ty": "String" }
+          ],
+          "returns": "TrackCommandOutput",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "clear_override",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id", "ty": "Option<String>" }
+          ],
+          "returns": "TrackCommandOutput",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "next_task",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id", "ty": "Option<String>" }
+          ],
+          "returns": "TrackCommandOutput",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "task_counts",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id", "ty": "Option<String>" }
+          ],
+          "returns": "TrackCommandOutput",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "archive",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id", "ty": "String" }
+          ],
+          "returns": "TrackCommandOutput",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "detect_active",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "TrackCommandOutput",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "catalogue_lint_check_active_track",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id", "ty": "Option<String>" },
+            { "name": "workspace_root", "ty": "std::path::PathBuf" },
+            { "name": "rules_file", "ty": "Option<std::path::PathBuf>" }
+          ],
+          "returns": "TrackCommandOutput",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "track_service",
+      "docs": "Primary port for the track command family. Each method corresponds to one sotp track <subcommand> invocation. The first 14 methods (init through detect_active) are unchanged from the pre-existing declaration authored in track/items/cli-composition-split-presentation-layer-2026-06-21/usecase-types.json and are reproduced verbatim here since action=modify requires a complete post-modification declaration, not a partial diff. This track adds a 15th method, catalogue_lint_check_active_track, wiring `sotp catalogue-lint check-active-track` through this same TrackService/TrackDriver primary-adapter boundary as every other track subcommand, rather than calling TrackCompositionRoot directly from the cli (bin) layer — correcting a CLI-boundary violation flagged during review (CN-01/CN-02: cli must not call cli_composition workflow methods directly). workspace_root and rules_file are spelled with the full std::path::PathBuf path, matching this trait's own pre-existing items_dir/project_root params, which already spell PathBuf in full. R9 note: track_id / workspace_root / rules_file remain raw Option<String> / std::path::PathBuf / Option<std::path::PathBuf> rather than dedicated value objects — this mirrors the exact primitive types already used by all 14 pre-existing methods on this trait (track_id: Option<String>/String throughout; PathBuf-typed items_dir/project_root throughout) and by the already-written, catalogue-only-task-out-of-scope Rust trait method this entry documents; introducing e.g. a TrackId/WorkspaceRoot newtype here would diverge from the compiled trait signature (Phase 2 mismatch) and would require a Rust source change outside this task's authorized scope. Flagged for a possible future R9 follow-up pass across the whole TrackService surface, not resolved by this track.",
+      "spec_refs": [
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "IN-12" },
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "CN-07" }
+      ],
+      "informal_grounds": []
     }
   },
   "functions": {},

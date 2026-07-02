@@ -97,6 +97,54 @@
           "text_label": "『型木の指定位置に指定プリミティブが含まれるか』の判定は domain 層に port として定義し、infrastructure 層が既存の `type_ref_parser`（syn ベース）で実装する。domain は判定の意味論のみを持ち、syn への依存は infrastructure に閉じる。"
         }
       }
+    },
+    {
+      "claim_hash": "208b3cc01b41eb490fba90d9e5a20fd03f49c5da41ea4aeb143fd91426bc9495",
+      "evidence_hash": "aa690529053862a64534cbe5bf388fea7a6e1391a5337c0e0d651844d625ac88",
+      "verdict": {
+        "kind": "pass",
+        "citation": "lint は active track のカタログのみを検査する既存の active-track-scoped ツール群の一部として適用され、過去の完了トラックのカタログは遡及検査の対象にしない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalogue-primitive-obsession-guard-2026-07-01/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TrackService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-12",
+          "text_label": "gate は最初から blocking とし、warn → block の段階導入は行わない。lint は active track のカタログのみを検査する既存の active-track-scoped ツール群の一部として適用され、過去の完了トラックのカタログは遡及検査の対象にしない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "208b3cc01b41eb490fba90d9e5a20fd03f49c5da41ea4aeb143fd91426bc9495",
+      "evidence_hash": "a6fd34b8bd3755de570100e8b34dcf248221c0af890a211be7c76b2a33b69005",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本ルールの適用範囲は、既存の active-track-scoped ツール群と同様に現在アクティブなトラックのカタログに限定される。過去の完了トラックのカタログは、本ルールの導入によって遡及的に検査対象にはならない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalogue-primitive-obsession-guard-2026-07-01/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TrackService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-07",
+          "text_label": "本ルールの適用範囲は、既存の active-track-scoped ツール群と同様に現在アクティブなトラックのカタログに限定される。過去の完了トラックのカタログは、本ルールの導入によって遡及的に検査対象にはならない。"
+        }
+      }
     }
   ]
 }

@@ -1,16 +1,26 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "6eae7aaa7af5ca2b56fd709d2a6046ce484c5eabac1e0c6195887a64d35e0573",
+  "catalogue_declaration_hash": "60a09816f438371be22804ebabddde65f4b228ceb488becc82fc4cb576376c51",
   "signals": [
     {
       "type_name": "CatalogueLinterError",
       "signal": "blue",
-      "entry_hash": "cbaa596e24549c23a8e78188475d2b706791d71f692e8f338c5575ca15aac91f"
+      "entry_hash": "5d5e8b7b4b37817d4b91fb9ac612f99dc27ee810aeb7857b483a65c6b531c3c1"
+    },
+    {
+      "type_name": "CatalogueLinterRuleError",
+      "signal": "blue",
+      "entry_hash": "a15d3fbb4b3fb43a4a80e6b7a19c9ab76f27be37123c2c1a2d059903677e8b6d"
     },
     {
       "type_name": "CatalogueLinterRuleKind",
       "signal": "blue",
       "entry_hash": "9e3b5137fd90efb1af52e32461f949fe432f8662eae995496791e6d3fb42ff20"
+    },
+    {
+      "type_name": "FreeText",
+      "signal": "blue",
+      "entry_hash": "1cccea5c61e8f17f301e36649d3551c1d9b2cb3412af97b7e9216b3692ca3494"
     },
     {
       "type_name": "LayerId",

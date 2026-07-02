@@ -1,6 +1,13 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-01T13:55:07Z",
-  "declaration_hash": "0fd5a70a7b6e3b40ddb130ccde06e93b38c86fd9d9c96a7278e101e77384610e",
-  "signals": []
+  "generated_at": "2026-07-02T03:34:36Z",
+  "declaration_hash": "4e880d479e77b0a7b02eba843a576851f48e3ce31995186784842d8872c0d7cf",
+  "signals": [
+    {
+      "type_name": "TrackCompositionRoot",
+      "kind_tag": "composition_root",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
 }

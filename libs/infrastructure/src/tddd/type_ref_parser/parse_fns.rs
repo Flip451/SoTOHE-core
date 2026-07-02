@@ -85,6 +85,23 @@ where
     Ok(ctx.convert_type(&syn_type))
 }
 
+/// Parses a `TypeRef` string into a raw `syn::Type` AST, without resolving
+/// paths to `rustdoc_types::Type`.
+///
+/// Unlike [`parse_type_ref`] / [`parse_type_ref_with_generics`], which convert
+/// the parsed `syn::Type` into a `rustdoc_types::Type` via path-resolution
+/// callbacks, this function returns the bare `syn::Type` unchanged. Intended
+/// for adapters that only need the `syn` AST for structural traversal (e.g.
+/// `SynPrimitiveOccurrenceScanner`, ADR `2026-07-01-0004` D2/CN-01) and have no
+/// need for catalogue/local-crate path resolution.
+///
+/// # Errors
+///
+/// Returns `syn::Error` if `type_ref_str` cannot be parsed as a `syn::Type`.
+pub(crate) fn parse_syn_type(type_ref_str: &str) -> syn::Result<syn::Type> {
+    syn::parse_str(type_ref_str)
+}
+
 /// Parses a bound string (e.g. `"'static"`, `"Send"`, `"?Sized"`,
 /// `"for<'a> Fn(&'a str)"`) into a `rustdoc_types::GenericBound`.
 ///

@@ -123,4 +123,14 @@ pub trait TrackService: Send + Sync {
 
     /// `track detect-active` — detect the active track ID from the current git branch.
     fn detect_active(&self, project_root: PathBuf) -> TrackCommandOutput;
+
+    /// `catalogue-lint check-active-track` — run the catalogue lint ruleset
+    /// across every `tddd.enabled` layer of the active track and aggregate
+    /// violations.
+    fn catalogue_lint_check_active_track(
+        &self,
+        track_id: Option<String>,
+        workspace_root: PathBuf,
+        rules_file: Option<PathBuf>,
+    ) -> TrackCommandOutput;
 }

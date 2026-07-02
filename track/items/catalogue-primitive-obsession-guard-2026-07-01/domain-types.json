@@ -201,23 +201,90 @@
       ],
       "informal_grounds": []
     },
+    "FreeText": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "tuple", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [{ "name": "s", "ty": "impl Into<String>" }],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Constructs a FreeText from any string-like input. Infallible by design (returns Self, not Result<Self, _>): unlike PrimitiveName / TypeRef / LayerId (identifier-validated newtypes in this same catalogue, each rejecting ill-formed input via a Result-returning constructor), FreeText has no invariant beyond 'is a string' to enforce -- it represents R9's 'truly unconstrained opaque value' judgement-procedure branch (type-designer-kind-selection.md R9 step 3), not R9's validated-identifier branch."
+        },
+        {
+          "name": "as_str",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns the underlying string slice."
+        }
+      ],
+      "module_path": "tddd::catalogue_linter",
+      "docs": "General-purpose newtype wrapping a genuinely free-text, unstructured string with no finite value set or parseable format to validate (ADR 2026-07-01-0004 D4, spec IN-11/CN-08/CN-09). Added during this pass to close a rollback finding: the prior catalogue draft left CatalogueLinterError::InvalidRuleConfig and CatalogueLinterRuleError::InvalidRuleConfig as raw String, recorded as an R9 'truly unconstrained opaque value' docs-justified exception (type-designer-kind-selection.md R9 step 3) -- but ADR D4 (this track's own feature) forecloses a per-field docs exception for its own catalogue: 'per-instance の escape hatch は設けない...真に自由文が本質のフィールド...には、per-instance 例外ではなく意味を与えた汎用 newtype（FreeText / LogLine 等）を使う。これは「例外」ではなく「型付け」であり、規約と整合する' (D4). CN-09 additionally confirms ErrorType receives no special-casing at any position or evaluation path ('そのフィールド位置および result_err 位置の String 出現は、Dto / Command 以外の他の role と同一の一般ルールに従って判定される'), and CN-08 confirms the field-position rule (named_field/variant_field) and the result_err rule evaluate independently of one another -- together establishing that an ErrorType's free-text tuple-variant field is not exempt under either evaluation path, so it is retyped rather than left with a docs-recorded exception. FreeText is a newtype (not an enum: the value space is not enumerable) with an infallible constructor (not Result-returning: unlike PrimitiveName / TypeRef / LayerId, there is no invariant to reject against -- see FreeText::new's own docs). Structurally it still fits role: ValueObject under R3 (constructor establishes the held value, as_str is a read-only accessor, no compute/behavior methods) even though, unlike Email-style validated newtypes, its established 'invariant' is trivial (any string is accepted); the type-safety benefit is purely the semantic tag distinguishing a deliberately free-text payload from a validated identifier or other constrained value, not input rejection. Reused by CatalogueLinterError::InvalidRuleConfig and CatalogueLinterRuleError::InvalidRuleConfig -- both ad hoc rule-configuration-diagnostic messages assembled per call site with no fixed vocabulary (see CatalogueLinterRule::new's InvalidRuleConfig(format!(...)) call sites in libs/domain/src/tddd/catalogue_linter.rs) -- so this is one newtype shared by both consumers, not two. Also implements core::fmt::Display (delegating to the wrapped string): both consumers' #[error(\"...{0}\")] thiserror attributes bare-interpolate this field, which requires Display on the field type per thiserror's derive-macro semantics; CatalogueLinterRuleError additionally derives PartialEq/Eq at the enum level (#[derive(Debug, thiserror::Error, PartialEq, Eq)] in source), making FreeText's own PartialEq/Eq derives load-bearing, not merely descriptive. Placed in tddd::catalogue_linter (co-located with both current consumers, an existing module per libs/domain/src/tddd/mod.rs) rather than tddd::catalogue_v2::identifiers, which is reserved for identifier-validated newtypes (TypeName / FieldName / PrimitiveName / TypeRef) sharing a different validation shape and derive set (each includes PartialOrd/Ord for BTreeSet/BTreeMap use; FreeText deliberately omits PartialOrd/Ord since it is never stored as a sorted-collection element). Confirmed via repo-wide grep that no FreeText / LogLine / DisplayMessage newtype already exists in libs/ or any track's <layer>-types.json before adding this entry (reuse-over-duplication check).",
+      "spec_refs": [
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "IN-11" },
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "CN-08" },
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "CN-09" }
+      ],
+      "informal_grounds": []
+    },
     "CatalogueLinterError": {
       "action": "modify",
       "role": { "ErrorType": {} },
       "kind": {
         "kind": "enum",
         "variants": [
-          { "name": "InvalidRuleConfig", "payload": { "kind": "tuple", "fields": ["String"] } },
-          { "name": "UnknownLayer", "payload": { "kind": "struct", "fields": [{ "name": "layer_id", "ty": "String" }] } },
+          { "name": "InvalidRuleConfig", "payload": { "kind": "tuple", "fields": ["FreeText"] } },
+          { "name": "UnknownLayer", "payload": { "kind": "struct", "fields": [{ "name": "layer_id", "ty": "LayerId" }] } },
           { "name": "ScanFailed", "payload": { "kind": "tuple", "fields": ["PrimitiveOccurrenceScanError"] } }
         ]
       },
       "methods": [],
       "module_path": "tddd::catalogue_linter",
-      "docs": "Errors returned by evaluate_catalogue_lint. Modify from baseline: adds ScanFailed(#[from] PrimitiveOccurrenceScanError) -- #[error(transparent)] -- propagating a PrimitiveOccurrenceScanner failure encountered while evaluating a ForbidPrimitiveInTypes rule (ADR 2026-07-01-0004 D3, spec AC-04/IN-05). InvalidRuleConfig(String) and UnknownLayer { layer_id: String } are restated unchanged from baseline; neither is touched by this track's primitive-obsession self-application fix. InvalidRuleConfig(String) carries a free-text, unstructured rule-configuration validation-failure message with no fixed vocabulary or format -- R9's opaque-value exception (judgement procedure step 3: 'truly unconstrained opaque value'), rationale recorded here per R9's docs-recording requirement. UnknownLayer { layer_id: String } is left as-is: whether it should instead be layer_id: LayerId is a pre-existing question this track's scope does not extend to (this track's assigned dogfooding-tension enumeration was target_field / forbidden_receiver / required_traits / primitives, not UnknownLayer) -- noted in Open Questions rather than resolved here.",
+      "docs": "Errors returned by evaluate_catalogue_lint. Modify from baseline: adds ScanFailed(#[from] PrimitiveOccurrenceScanError) -- #[error(transparent)] -- propagating a PrimitiveOccurrenceScanner failure encountered while evaluating a ForbidPrimitiveInTypes rule (ADR 2026-07-01-0004 D3, spec AC-04/IN-05); ScanFailed is unchanged by this pass. InvalidRuleConfig(String) and UnknownLayer { layer_id: String } are retyped in this pass, correcting a rollback finding against this track's own prior draft: both fields previously stayed raw String on the strength of R9's 'truly unconstrained opaque value' exception (type-designer-kind-selection.md R9 step 3, a per-field docs-recorded justification), but ADR D4 (this track's own feature) forecloses that reading for the track's own catalogue -- 'per-instance の escape hatch は設けない...真に自由文が本質のフィールド...には、per-instance 例外ではなく意味を与えた汎用 newtype（FreeText / LogLine 等）を使う' (D4) -- and CN-09 confirms ErrorType receives no special-casing at any position or evaluation path, so this ErrorType's payload fields are not a distinct case; CN-08 confirms the field-position and result_err rules apply independently, reinforcing that no evaluation path exempts them. InvalidRuleConfig(String) becomes InvalidRuleConfig(FreeText): per #[error(\"invalid linter rule configuration: {0}\")] in source (libs/domain/src/tddd/catalogue_linter.rs), this message is a genuinely ad hoc, unstructured rule-configuration validation-failure string assembled per call site with no fixed vocabulary -- exactly the case ADR D4 calls for a general-purpose newtype rather than a docs-justified raw String (see FreeText's own docs). UnknownLayer { layer_id: String } becomes UnknownLayer { layer_id: LayerId }, reusing the pre-existing validated LayerId newtype rather than FreeText: at evaluate_catalogue_lint's construction site (libs/domain/src/tddd/catalogue_linter_eval.rs), `target_layer_id: &LayerId` is already a validated LayerId when UnknownLayer is constructed via `layer_id: target_layer_id.as_ref().to_owned()` -- the failure condition is 'not present as a key in all_catalogues' (a registered-but-missing BTreeMap<LayerId, CatalogueDocument> lookup miss), not an invalidly-shaped string that failed LayerId's own construction, so the value already carries LayerId's validated invariant and wrapping it in FreeText would discard that information for no benefit. This resolves this track's own prior-draft deferred Open Question ('whether it should instead be layer_id: LayerId ... noted in Open Questions rather than resolved here') by choosing LayerId over FreeText. LayerId already implements core::fmt::Display (libs/domain/src/tddd/layer_id.rs), satisfying the #[error(\"unknown target layer '{layer_id}': ...\")] bare named-field interpolation's Display requirement, so LayerId's own catalogue entry needs no new trait_impl and remains action: reference (baseline-identical, confirmed via source read of layer_id.rs before this edit).",
       "spec_refs": [
         { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "AC-04" },
-        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "IN-05" }
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "IN-05" },
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "CN-08" },
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "CN-09" },
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "IN-11" }
+      ],
+      "informal_grounds": []
+    },
+    "CatalogueLinterRuleError": {
+      "action": "modify",
+      "role": { "ErrorType": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "EmptyPermittedLayers", "payload": { "kind": "unit" } },
+          { "name": "EmptyRequiredTraits", "payload": { "kind": "unit" } },
+          { "name": "EmptyForbiddenRoles", "payload": { "kind": "unit" } },
+          { "name": "InvalidRuleConfig", "payload": { "kind": "tuple", "fields": ["FreeText"] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::catalogue_linter",
+      "docs": "Pre-existing error type for CatalogueLinterRule construction/validation failures (baseline-present, re-exported from libs/domain/src/lib.rs alongside CatalogueLinterError / CatalogueLinterRule); omitted from this track's original catalogue authoring pass despite being baseline-present, now added as a Phase 2 fix-up because Phase 4 implementation changed its shape. Modify from baseline: the EmptyTargetField variant is removed. Confirmed via this track's own baseline capture (domain-graph-d2/domain_tddd.md, generated from the pre-Phase-4 rustdoc snapshot) listing 5 baseline variants -- EmptyTargetField, EmptyPermittedLayers, EmptyRequiredTraits, EmptyForbiddenRoles, InvalidRuleConfig -- against the current source (libs/domain/src/tddd/catalogue_linter.rs), which has only the latter 4. EmptyTargetField became unreachable once RolePayloadField (this track's new closed 8-variant enum) replaced the raw String target_field fields it used to validate via CatalogueLinterRule::new's target_field.is_empty() check -- exactly the pruning CatalogueLinterRuleKind's own catalogue entry flagged as an 'implementation-time decision, out of this catalogue's scope' before Phase 4 ran (see CatalogueLinterRuleKind docs). EmptyPermittedLayers, EmptyRequiredTraits, and EmptyForbiddenRoles are restated unchanged from baseline. InvalidRuleConfig is additionally retyped in this pass, correcting a rollback finding against this track's own prior draft: per #[error(\"invalid rule configuration: {0}\")] in source, its String payload is a genuinely ad hoc diagnostic message assembled at each call site to describe whichever internal inconsistency was detected (e.g. a non-KindLayerConstraint rule targeting a FunctionRole discriminant), previously left raw on the strength of R9's 'truly unconstrained opaque value' exception (type-designer-kind-selection.md R9 step 3) -- but ADR D4 (this track's own feature) forecloses that per-field docs-exception reading for the track's own catalogue: 'per-instance の escape hatch は設けない...真に自由文が本質のフィールド...には、per-instance 例外ではなく意味を与えた汎用 newtype（FreeText / LogLine 等）を使う' (D4). CN-09 additionally confirms ErrorType receives no special-casing at any position or evaluation path, so this ErrorType's payload field is not a distinct case; CN-08 confirms the field-position and result_err rules apply independently, reinforcing that no evaluation path exempts it. InvalidRuleConfig(String) becomes InvalidRuleConfig(FreeText), reusing the same FreeText newtype introduced for CatalogueLinterError::InvalidRuleConfig in this same pass (see FreeText's own docs) -- both are the identical ad hoc rule-configuration-diagnostic concept, so this is type reuse within the pass, not a second newtype. This enum derives PartialEq/Eq (#[derive(Debug, thiserror::Error, PartialEq, Eq)] in source, confirmed via source read of catalogue_linter.rs before this edit), so FreeText's own PartialEq/Eq derives are load-bearing here, not merely descriptive.",
+      "spec_refs": [
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "AC-01" },
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "IN-06" },
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "CN-08" },
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "CN-09" },
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "IN-11" }
       ],
       "informal_grounds": []
     },
@@ -424,6 +491,7 @@
     { "action": "add", "trait_ref": "core::cmp::PartialOrd", "for_type": "PrimitiveOccurrencePosition" },
     { "action": "add", "trait_ref": "core::cmp::Ord", "for_type": "PrimitiveOccurrencePosition" },
     { "action": "add", "trait_ref": "core::hash::Hash", "for_type": "PrimitiveOccurrencePosition" },
+    { "action": "add", "trait_ref": "core::clone::TrivialClone", "for_type": "PrimitiveOccurrencePosition" },
     { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "PrimitiveOccurrenceReport" },
     { "action": "add", "trait_ref": "core::clone::Clone", "for_type": "PrimitiveOccurrenceReport" },
     { "action": "add", "trait_ref": "core::cmp::PartialEq", "for_type": "PrimitiveOccurrenceReport" },
@@ -447,14 +515,27 @@
     { "action": "add", "trait_ref": "core::cmp::Eq", "for_type": "RolePayloadField" },
     { "action": "add", "trait_ref": "core::hash::Hash", "for_type": "RolePayloadField" },
     { "action": "add", "trait_ref": "core::fmt::Display", "for_type": "RolePayloadField" },
-    { "action": "add", "trait_ref": "core::str::FromStr", "for_type": "RolePayloadField" },
+    { "action": "add", "trait_ref": "core::str::traits::FromStr", "for_type": "RolePayloadField" },
+    { "action": "add", "trait_ref": "core::convert::TryFrom<&str>", "for_type": "RolePayloadField" },
+    { "action": "add", "trait_ref": "core::clone::TrivialClone", "for_type": "RolePayloadField" },
     { "action": "modify", "trait_ref": "core::fmt::Debug", "for_type": "CatalogueLinterRuleKind" },
     { "action": "modify", "trait_ref": "core::clone::Clone", "for_type": "CatalogueLinterRuleKind" },
     { "action": "modify", "trait_ref": "core::cmp::PartialEq", "for_type": "CatalogueLinterRuleKind" },
     { "action": "modify", "trait_ref": "core::cmp::Eq", "for_type": "CatalogueLinterRuleKind" },
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "FreeText" },
+    { "action": "add", "trait_ref": "core::clone::Clone", "for_type": "FreeText" },
+    { "action": "add", "trait_ref": "core::cmp::PartialEq", "for_type": "FreeText" },
+    { "action": "add", "trait_ref": "core::cmp::Eq", "for_type": "FreeText" },
+    { "action": "add", "trait_ref": "core::hash::Hash", "for_type": "FreeText" },
+    { "action": "add", "trait_ref": "core::fmt::Display", "for_type": "FreeText" },
     { "action": "modify", "trait_ref": "core::fmt::Debug", "for_type": "CatalogueLinterError" },
     { "action": "modify", "trait_ref": "core::fmt::Display", "for_type": "CatalogueLinterError" },
     { "action": "modify", "trait_ref": "core::error::Error", "for_type": "CatalogueLinterError" },
-    { "action": "add", "trait_ref": "core::convert::From<PrimitiveOccurrenceScanError>", "for_type": "CatalogueLinterError" }
+    { "action": "add", "trait_ref": "core::convert::From<PrimitiveOccurrenceScanError>", "for_type": "CatalogueLinterError" },
+    { "action": "modify", "trait_ref": "core::fmt::Debug", "for_type": "CatalogueLinterRuleError" },
+    { "action": "modify", "trait_ref": "core::fmt::Display", "for_type": "CatalogueLinterRuleError" },
+    { "action": "modify", "trait_ref": "core::error::Error", "for_type": "CatalogueLinterRuleError" },
+    { "action": "modify", "trait_ref": "core::cmp::PartialEq", "for_type": "CatalogueLinterRuleError" },
+    { "action": "modify", "trait_ref": "core::cmp::Eq", "for_type": "CatalogueLinterRuleError" }
   ]
 }

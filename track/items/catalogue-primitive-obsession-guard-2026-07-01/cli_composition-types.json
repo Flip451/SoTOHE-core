@@ -2,9 +2,600 @@
   "schema_version": 5,
   "crate_name": "cli_composition",
   "layer": "cli_composition",
-  "types": {},
+  "types": {
+    "TrackCompositionRoot": {
+      "action": "modify",
+      "role": { "CompositionRoot": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "unit" }
+      },
+      "methods": [],
+      "module_path": "track::composition_root",
+      "docs": "Composition root for the track command family. Unit struct: no adapter dependencies are injected at construction time, each method wires its own adapters inline (in-method composition). Extended by this track with catalogue_lint_check_active_track(), which delegates to RunCatalogueLintInteractor to run the primitive-obsession catalogue lint gate across every tddd.enabled layer of the active track (ADR 2026-07-01-0004 D5: blocking from day one). All 39 of TrackCompositionRoot's inherent methods (38 pre-existing, spread across composition_root.rs / resolution.rs / ops.rs / fixpoint_resolve.rs / set_commit_hash.rs / mod.rs / tddd.rs under apps/cli-composition/src/track/, plus this track's 1 new method) are exhaustively declared below in inherent_impls, source-verified method-by-method against those 7 files (shim.rs / service_impl.rs, also declared as modules under track::, confirmed to contribute zero inherent TrackCompositionRoot methods). Exhaustive declaration -- not the partial, single-method declaration originally left here -- is required because action: modify's structural-equality evaluator (structs_structurally_equal in libs/infrastructure/src/tddd/signal_evaluator_v2/structural_eq.rs) performs an exact-match comparison against the type's full, merged inherent-method set; a partial declaration resolves to a non-blocking Yellow Mismatch signal that still blocks this track's own pre-review gate (bin/sotp task-contract check) for as long as the owning task remains done/in_progress, so partial declaration was not viable once Phase 4 implementation surfaced the mismatch. This exhaustive-declaration approach mirrors the pre-existing, currently-Blue precedent set by ReviewCompositionRoot (also a CompositionRoot-role unit struct, also action: modify) in track/items/pre-review-task-contract-conformance-gate-2026-06-27/cli_composition-types.json.",
+      "spec_refs": [
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "IN-12" },
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "CN-07" }
+      ],
+      "informal_grounds": []
+    }
+  },
   "traits": {},
   "functions": {},
-  "inherent_impls": [],
-  "trait_impls": []
+  "inherent_impls": [
+    {
+      "type_name": "TrackCompositionRoot",
+      "methods": [
+        {
+          "name": "catalogue_lint_check_active_track",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id",       "ty": "Option<String>" },
+            { "name": "workspace_root", "ty": "std::path::PathBuf" },
+            { "name": "rules_file",     "ty": "Option<std::path::PathBuf>" }
+          ],
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Run the catalogue-lint ruleset across every tddd.enabled layer of the active track and aggregate violations (ADR 2026-07-01-0004 D5). Resolves track_id via resolve_track_id_from_root, the same mechanism track_lint already uses (CN-07: no new track-scoping logic). Skips the whole gate (exit 0) until every tddd.enabled layer has a catalogue file, since CatalogueLoader::load_all requires all of them at once."
+        },
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Constructs a new TrackCompositionRoot. Unit struct: no adapter dependencies are injected at construction time."
+        },
+        {
+          "name": "track_driver",
+          "receiver": "&self",
+          "params": [],
+          "returns": "cli_driver::track::TrackDriver",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Wires and returns the TrackDriver adapter used by the track command family."
+        },
+        {
+          "name": "track_resolve_id",
+          "receiver": "&self",
+          "params": [
+            { "name": "explicit_id", "ty": "Option<String>" },
+            { "name": "items_dir", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Result<String, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Resolves the active track id from an explicit override or the active-track detection mechanism, given items_dir."
+        },
+        {
+          "name": "track_resolve_id_from_root",
+          "receiver": "&self",
+          "params": [
+            { "name": "explicit_id", "ty": "Option<String>" },
+            { "name": "workspace_root", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Result<String, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Resolves the active track id from an explicit override or active-track detection, given workspace_root."
+        },
+        {
+          "name": "track_resolve_id_for_write",
+          "receiver": "&self",
+          "params": [
+            { "name": "explicit_id", "ty": "Option<String>" },
+            { "name": "items_dir", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Result<String, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Resolves the active track id for a write operation, given items_dir."
+        },
+        {
+          "name": "track_resolve_id_from_root_for_write",
+          "receiver": "&self",
+          "params": [
+            { "name": "explicit_id", "ty": "Option<String>" },
+            { "name": "workspace_root", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Result<String, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Resolves the active track id for a write operation, given workspace_root."
+        },
+        {
+          "name": "track_validate_id",
+          "receiver": "&self",
+          "params": [
+            { "name": "value", "ty": "&str" }
+          ],
+          "returns": "Result<(), CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Validates a track id string."
+        },
+        {
+          "name": "track_resolve_project_root",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Result<std::path::PathBuf, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Resolves the project root directory from items_dir."
+        },
+        {
+          "name": "track_add_task_resolved",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id", "ty": "String" },
+            { "name": "description", "ty": "String" },
+            { "name": "section", "ty": "Option<String>" },
+            { "name": "after", "ty": "Option<String>" }
+          ],
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Adds a new task to an already-resolved track id."
+        },
+        {
+          "name": "track_set_override_resolved",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id", "ty": "String" },
+            { "name": "status", "ty": "String" },
+            { "name": "reason", "ty": "String" }
+          ],
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Sets a status override on an already-resolved track id."
+        },
+        {
+          "name": "track_clear_override_resolved",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id", "ty": "String" }
+          ],
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Clears a status override on an already-resolved track id."
+        },
+        {
+          "name": "track_next_task_resolved",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id", "ty": "String" }
+          ],
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Reports the next actionable task for an already-resolved track id."
+        },
+        {
+          "name": "track_task_counts_resolved",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id", "ty": "String" }
+          ],
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Reports task status counts for an already-resolved track id."
+        },
+        {
+          "name": "detect_active_track_from_branch",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "&std::path::Path" }
+          ],
+          "returns": "Option<String>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Detects the active track id from the current git branch name, if any."
+        },
+        {
+          "name": "fixpoint_resolve",
+          "receiver": "&self",
+          "params": [
+            { "name": "input", "ty": "FixpointResolveInput" }
+          ],
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Runs the fixpoint-resolve loop for a track's SoT chain from the given input."
+        },
+        {
+          "name": "track_set_commit_hash",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id", "ty": "&str" }
+          ],
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Records the current commit hash against the given track id."
+        },
+        {
+          "name": "track_init",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id", "ty": "String" },
+            { "name": "description", "ty": "String" }
+          ],
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Initializes a new track with the given id and description."
+        },
+        {
+          "name": "track_transition",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id", "ty": "Option<String>" },
+            { "name": "task_id", "ty": "String" },
+            { "name": "target_status", "ty": "String" },
+            { "name": "commit_hash", "ty": "Option<String>" }
+          ],
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Transitions a task to a target status, optionally recording a commit hash."
+        },
+        {
+          "name": "track_branch_create",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id", "ty": "String" }
+          ],
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Creates a new track branch from main."
+        },
+        {
+          "name": "track_branch_switch",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id", "ty": "String" }
+          ],
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Switches to an existing track branch."
+        },
+        {
+          "name": "track_resolve",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id", "ty": "Option<String>" }
+          ],
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Reports the current track phase, next command, and any blocker."
+        },
+        {
+          "name": "track_views_validate",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Validates that plan.md / registry.md views are in sync with metadata.json."
+        },
+        {
+          "name": "track_views_sync",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "std::path::PathBuf" },
+            { "name": "track_id", "ty": "Option<String>" }
+          ],
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Regenerates plan.md / registry.md from metadata.json."
+        },
+        {
+          "name": "track_add_task",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id", "ty": "Option<String>" },
+            { "name": "description", "ty": "String" },
+            { "name": "section", "ty": "Option<String>" },
+            { "name": "after", "ty": "Option<String>" }
+          ],
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Adds a new task, resolving the active track id if not given explicitly."
+        },
+        {
+          "name": "track_set_override",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id", "ty": "Option<String>" },
+            { "name": "status", "ty": "String" },
+            { "name": "reason", "ty": "String" }
+          ],
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Sets a status override, resolving the active track id if not given explicitly."
+        },
+        {
+          "name": "track_clear_override",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id", "ty": "Option<String>" }
+          ],
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Clears a status override, resolving the active track id if not given explicitly."
+        },
+        {
+          "name": "track_next_task",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id", "ty": "Option<String>" }
+          ],
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Reports the next actionable task, resolving the active track id if not given explicitly."
+        },
+        {
+          "name": "track_task_counts",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id", "ty": "Option<String>" }
+          ],
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Reports task status counts, resolving the active track id if not given explicitly."
+        },
+        {
+          "name": "track_archive",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id", "ty": "String" }
+          ],
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Archives a completed track."
+        },
+        {
+          "name": "track_type_signals",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id", "ty": "Option<String>" },
+            { "name": "workspace_root", "ty": "std::path::PathBuf" },
+            { "name": "layer", "ty": "Option<String>" }
+          ],
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Computes catalogue-vs-implementation (rustdoc) type signals for a layer."
+        },
+        {
+          "name": "track_type_graph",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id", "ty": "Option<String>" },
+            { "name": "workspace_root", "ty": "std::path::PathBuf" },
+            { "name": "layer", "ty": "Option<String>" },
+            { "name": "cluster_depth", "ty": "usize" },
+            { "name": "edges", "ty": "String" }
+          ],
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Removed in T008; all parameters are unused and the method always returns an error. Retained as a stub for backward source compatibility."
+        },
+        {
+          "name": "track_baseline_graph",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id", "ty": "Option<String>" },
+            { "name": "workspace_root", "ty": "std::path::PathBuf" },
+            { "name": "layers", "ty": "Option<String>" }
+          ],
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Renders the baseline (d1+d2) dependency graph for the given layers."
+        },
+        {
+          "name": "track_contract_map",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id", "ty": "Option<String>" },
+            { "name": "workspace_root", "ty": "std::path::PathBuf" },
+            { "name": "layers", "ty": "Option<String>" }
+          ],
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Renders the contract map (SoT chain signal overview) for the given layers."
+        },
+        {
+          "name": "track_catalogue_spec_signals",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id", "ty": "Option<String>" },
+            { "name": "workspace_root", "ty": "std::path::PathBuf" },
+            { "name": "layer", "ty": "Option<String>" }
+          ],
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Computes catalogue-vs-spec (chain 2) signals for a layer."
+        },
+        {
+          "name": "track_spec_element_hash",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id", "ty": "Option<String>" },
+            { "name": "anchor", "ty": "Option<String>" }
+          ],
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Computes a spec element hash, optionally scoped to a single anchor."
+        },
+        {
+          "name": "track_baseline_capture",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id", "ty": "Option<String>" },
+            { "name": "workspace_root", "ty": "std::path::PathBuf" },
+            { "name": "source_workspace", "ty": "Option<std::path::PathBuf>" },
+            { "name": "layer", "ty": "Option<String>" }
+          ],
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Captures a pre-implementation rustdoc baseline snapshot for the given layers."
+        },
+        {
+          "name": "track_lint",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id", "ty": "Option<String>" },
+            { "name": "layer_id", "ty": "String" },
+            { "name": "workspace_root", "ty": "std::path::PathBuf" },
+            { "name": "rules_file", "ty": "Option<std::path::PathBuf>" }
+          ],
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Runs the catalogue linter ruleset against a single layer's catalogue."
+        },
+        {
+          "name": "track_catalogue_impl_signals",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id", "ty": "Option<String>" },
+            { "name": "workspace_root", "ty": "std::path::PathBuf" },
+            { "name": "layer", "ty": "Option<String>" }
+          ],
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Computes catalogue-vs-implementation (rustdoc) signals via the impl-catalog chain (chain 3) for a layer."
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    { "action": "reference", "trait_ref": "core::default::Default", "for_type": "TrackCompositionRoot" }
+  ]
 }

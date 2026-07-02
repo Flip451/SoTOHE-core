@@ -2,9 +2,135 @@
   "schema_version": 5,
   "crate_name": "cli",
   "layer": "cli",
-  "types": {},
+  "types": {
+    "CliCommand": {
+      "action": "modify",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Arch",          "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "ArchCommand" }] } },
+          { "name": "Conventions",   "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "ConventionsCommand" }] } },
+          { "name": "Domain",        "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "DomainCommand" }] } },
+          { "name": "Guard",         "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "GuardCommand" }] } },
+          { "name": "Hook",          "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "HookCommand" }] } },
+          { "name": "Track",         "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "TrackCommand" }] } },
+          { "name": "Git",           "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "GitCommand" }] } },
+          { "name": "Pr",            "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "PrCommand" }] } },
+          { "name": "Plan",          "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "PlanCommand" }] } },
+          { "name": "Review",        "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "ReviewCommand" }] } },
+          { "name": "File",          "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "FileCommand" }] } },
+          { "name": "Verify",        "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "VerifyCommand" }] } },
+          { "name": "FindSimilar",   "payload": { "kind": "tuple",  "fields": ["FindSimilarArgs"] } },
+          { "name": "DupIndex",      "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "DupIndexCommand" }] } },
+          { "name": "DupCheck",      "payload": { "kind": "tuple",  "fields": ["DupCheckArgs"] } },
+          { "name": "Telemetry",     "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "TelemetryCommand" }] } },
+          { "name": "Dry",           "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "DryCommand" }] } },
+          { "name": "RefVerify",     "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "RefVerifyCommand" }] } },
+          { "name": "Signal",        "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "SignalCommand" }] } },
+          { "name": "TaskContract",  "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "TaskContractCommand" }] } },
+          { "name": "CatalogueLint", "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "CatalogueLintCommand" }] } },
+          { "name": "Demo",          "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "",
+      "docs": "Top-level sotp CLI command dispatcher. Routes sotp subcommands to their respective handlers. CatalogueLint variant added by this track to expose the primitive-obsession catalogue lint gate (sotp catalogue-lint check-active-track). The other 21 variants pre-date any catalogue coverage for this type; their shapes are reproduced verbatim from the prior full declaration in track/items/pre-review-task-contract-conformance-gate-2026-06-27/cli-types.json (unchanged by this track) so this modify keeps a complete, Blue-eligible declaration rather than a partial one.",
+      "spec_refs": [
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "IN-12" },
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "CN-07" }
+      ],
+      "informal_grounds": []
+    },
+    "CatalogueLintCommand": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "CheckActiveTrack", "payload": { "kind": "tuple", "fields": ["CatalogueLintCheckActiveTrackArgs"] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "commands::catalogue_lint",
+      "docs": "Subcommands for `sotp catalogue-lint`. CheckActiveTrack runs the default-config catalogue lint ruleset across every tddd.enabled layer of the active track and exits non-zero if any layer reports a violation (ADR 2026-07-01-0004 D5: blocking from day one, no warn-then-block staged migration).",
+      "spec_refs": [
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "IN-12" },
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "CN-07" }
+      ],
+      "informal_grounds": []
+    },
+    "CatalogueLintCheckActiveTrackArgs": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "track_id",       "ty": "Option<String>" },
+            { "name": "workspace_root", "ty": "std::path::PathBuf" },
+            { "name": "rules_file",     "ty": "Option<std::path::PathBuf>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "commands::catalogue_lint",
+      "docs": "Arguments for `sotp catalogue-lint check-active-track`. track_id is optional (auto-resolved from the current git branch, track/<id>, when omitted). workspace_root defaults to '.' (contains architecture-rules.json and track/items/). rules_file optionally overrides the default lint config location (.harness/catalogue-lint/config.json under workspace_root).",
+      "spec_refs": [
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "IN-12" },
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "CN-07" }
+      ],
+      "informal_grounds": []
+    }
+  },
   "traits": {},
-  "functions": {},
+  "functions": {
+    "cli::commands::catalogue_lint::execute": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [{ "name": "cmd", "ty": "CatalogueLintCommand" }],
+      "returns": "std::process::ExitCode",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Dispatch `sotp catalogue-lint <subcommand>` to the appropriate execute_* handler.",
+      "spec_refs": [
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "IN-12" },
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "CN-07" }
+      ],
+      "informal_grounds": []
+    },
+    "cli::commands::catalogue_lint::execute_check_active_track": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [{ "name": "args", "ty": "CatalogueLintCheckActiveTrackArgs" }],
+      "returns": "std::process::ExitCode",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Execute `sotp catalogue-lint check-active-track`. Routes through the `track` primary-adapter driver (cli_driver::track::TrackDriver) like every other track-family subcommand, rather than calling the composition root directly: builds TrackInput::CatalogueLintCheckActiveTrack and hands it to TrackCompositionRoot::new().track_driver().handle(...). The driver dispatches to TrackCompositionRoot::catalogue_lint_check_active_track (via the injected TrackService), which resolves the active track, enumerates tddd.enabled layers from architecture-rules.json, and aggregates violations across all of them. Corrected from an earlier direct TrackCompositionRoot::catalogue_lint_check_active_track call after review flagged the CLI-boundary violation (CN-01/CN-02: cli must not call cli_composition workflow methods directly).",
+      "spec_refs": [
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "IN-12" },
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "CN-07" }
+      ],
+      "informal_grounds": []
+    }
+  },
   "inherent_impls": [],
-  "trait_impls": []
+  "trait_impls": [
+    { "action": "reference", "trait_ref": "clap_builder::derive::FromArgMatches", "for_type": "CliCommand" },
+    { "action": "reference", "trait_ref": "clap_builder::derive::Subcommand",      "for_type": "CliCommand" },
+
+    { "trait_ref": "core::fmt::Debug",                     "for_type": "CatalogueLintCommand" },
+    { "trait_ref": "core::clone::Clone",                   "for_type": "CatalogueLintCommand" },
+    { "trait_ref": "clap_builder::derive::Subcommand",     "for_type": "CatalogueLintCommand" },
+    { "trait_ref": "clap_builder::derive::FromArgMatches", "for_type": "CatalogueLintCommand" },
+
+    { "trait_ref": "core::fmt::Debug",                     "for_type": "CatalogueLintCheckActiveTrackArgs" },
+    { "trait_ref": "core::clone::Clone",                   "for_type": "CatalogueLintCheckActiveTrackArgs" },
+    { "trait_ref": "clap_builder::derive::Args",           "for_type": "CatalogueLintCheckActiveTrackArgs" },
+    { "trait_ref": "clap_builder::derive::FromArgMatches", "for_type": "CatalogueLintCheckActiveTrackArgs" }
+  ]
 }

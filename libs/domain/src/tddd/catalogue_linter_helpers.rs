@@ -4,7 +4,7 @@
 //! a public module. All items are `pub(super)` so they are visible to
 //! `evaluate_catalogue_lint` in `catalogue_linter_eval.rs`.
 
-use super::{CatalogueLinterError, RoleKind, RuleTarget};
+use super::{CatalogueLinterError, FreeText, RoleKind, RolePayloadField, RuleTarget};
 use crate::tddd::catalogue_v2::CatalogueDocument;
 use crate::tddd::catalogue_v2::composite::{StructKind, StructShape};
 use crate::tddd::catalogue_v2::entries::{FunctionEntry, TraitEntry, TypeEntry};
@@ -29,15 +29,25 @@ pub(super) fn target_matches(target: &RuleTarget, role: RoleKind) -> bool {
 /// Iterates over `(type_name, entry)` pairs in `catalogue.types` where the
 /// entry's `DataRole` matches the rule's `RuleTarget`.
 ///
-/// Entries with `action: Delete` are excluded so that fail-closed semantics
-/// are preserved: a delete-marked entry is treated as absent and no lint rule
-/// is applied against it.
+/// Entries with `action: Delete` or `action: Reference` are excluded so that
+/// fail-closed semantics are preserved:
+/// - A delete-marked entry is treated as absent and no lint rule is applied
+///   against it.
+/// - A reference-marked entry cites a pre-existing type without restating its
+///   full structure (e.g. `trait_impls` established when the type was
+///   originally declared are not repeated in a reference entry). It is
+///   opaque to this catalogue's rule evaluations, so no lint rule is applied
+///   against it either — otherwise rules such as `TraitImplRequired` would
+///   false-positive on every reference entry whose trait impls live outside
+///   this catalogue's `trait_impls` list.
 pub(super) fn type_entries_for_target<'a>(
     catalogue: &'a CatalogueDocument,
     target: &RuleTarget,
 ) -> impl Iterator<Item = (&'a TypeName, &'a TypeEntry)> {
     catalogue.types.iter().filter(move |(_name, entry)| {
-        entry.action != ItemAction::Delete && target_matches(target, entry_role_kind(entry))
+        entry.action != ItemAction::Delete
+            && entry.action != ItemAction::Reference
+            && target_matches(target, entry_role_kind(entry))
     })
 }
 
@@ -107,13 +117,13 @@ pub(super) fn collect_methods_for_type<'a>(
     ) {
         if let Some(existing) = seen_names.get(method.name.as_str()) {
             if *existing != method {
-                return Err(CatalogueLinterError::InvalidRuleConfig(format!(
+                return Err(CatalogueLinterError::InvalidRuleConfig(FreeText::new(format!(
                     "method '{}' for type '{}' has inconsistent duplicate declarations \
                      across TypeEntry.methods and inherent_impls; keep one canonical \
                      declaration or make duplicate declarations identical",
                     method.name.as_str(),
                     type_name
-                )));
+                ))));
             }
             continue;
         }
@@ -126,37 +136,30 @@ pub(super) fn collect_methods_for_type<'a>(
 
 /// Returns the `TypeRef` for the named field of a `ContractRole`, if applicable.
 ///
-/// Returns `Ok(Some(...))` when the field is recognised and the role carries it.
-/// Returns `Ok(None)` when the field is recognised but the given role does not
-/// carry it (e.g. `"aggregate"` on `ContractRole::SecondaryPort`).
-/// Returns `Err(InvalidRuleConfig)` when `field` is not a recognised `ContractRole`
-/// field name (D19 fail-closed: unknown field names in lint config are rejected
-/// rather than silently treated as absent).
-pub(super) fn contract_role_type_ref<'a>(
-    role: &'a ContractRole,
-    field: &str,
-) -> Result<Option<&'a TypeRef>, CatalogueLinterError> {
+/// Returns `Some(...)` when the field is recognised and the role carries it.
+/// Returns `None` when the field is a recognised `RolePayloadField` variant but
+/// the given role does not carry it (e.g. `Aggregate` on `ContractRole::SecondaryPort`,
+/// or any DataRole-only field such as `Emits`). `RolePayloadField` is a closed
+/// enum (D19 fail-closed, enforced by the type system): an unrecognised field
+/// name is unrepresentable here, so this function is infallible.
+pub(super) fn contract_role_type_ref(
+    role: &ContractRole,
+    field: RolePayloadField,
+) -> Option<&TypeRef> {
     match field {
-        "aggregate" => match role {
-            ContractRole::Repository { aggregate } => Ok(Some(aggregate)),
-            _ => Ok(None),
+        RolePayloadField::Aggregate => match role {
+            ContractRole::Repository { aggregate } => Some(aggregate),
+            _ => None,
         },
         // DataRole-only fields — not carried by any ContractRole variant.
-        // Return Ok(None) so that the entry is skipped without a violation
-        // (the field is in the overall field vocabulary; only names unrecognised
-        // in any role's vocabulary are rejected).
-        "exclusive_members"
-        | "shared_value_objects"
-        | "emits"
-        | "handles"
-        | "reacts_to"
-        | "invariants" => Ok(None),
-        unknown => Err(CatalogueLinterError::InvalidRuleConfig(format!(
-            "unknown target_field '{}': not a recognised field name in any role; \
-             valid names are: exclusive_members, shared_value_objects, emits, handles, \
-             reacts_to, aggregate, invariants",
-            unknown
-        ))),
+        // Return None so that the entry is skipped without a violation.
+        RolePayloadField::ExclusiveMembers
+        | RolePayloadField::SharedValueObjects
+        | RolePayloadField::Emits
+        | RolePayloadField::Handles
+        | RolePayloadField::ReactsTo
+        | RolePayloadField::Invariants
+        | RolePayloadField::Identity => None,
     }
 }
 
@@ -295,142 +298,142 @@ pub(super) fn invariants_for_role(
     }
 }
 
-/// Validates that `field` is a recognised `DataRole` field name.
+/// Validates that `field` is a `DataRole` field (as opposed to a
+/// `ContractRole`-only field such as `Aggregate`, or the accessor-only
+/// `Identity` field).
 ///
-/// This must be called before any loop over type entries so that an unknown
-/// `target_field` is rejected even when the catalogue contains no matching
-/// entries for the rule's `RuleTarget` (D19 fail-closed).
+/// This must be called before any loop over type entries so that a
+/// wrong-category `target_field` is rejected even when the catalogue contains
+/// no matching entries for the rule's `RuleTarget` (D19 fail-closed).
+/// `RolePayloadField` is a closed enum, so a totally unrecognised field name
+/// is unrepresentable here (rejected earlier, at the usecase config-parsing
+/// boundary); this validation covers the remaining runtime-checkable failure
+/// mode — a syntactically valid field that is the wrong category for this use.
 ///
 /// # Errors
 ///
-/// Returns [`CatalogueLinterError::InvalidRuleConfig`] when `field` is not a
-/// recognised `DataRole` field name.
-pub(super) fn validate_data_role_field(field: &str) -> Result<(), CatalogueLinterError> {
+/// Returns [`CatalogueLinterError::InvalidRuleConfig`] when `field` is
+/// `Identity` or `Aggregate` (not `DataRole` fields).
+pub(super) fn validate_data_role_field(
+    field: RolePayloadField,
+) -> Result<(), CatalogueLinterError> {
     match field {
-        "invariants"
-        | "exclusive_members"
-        | "shared_value_objects"
-        | "emits"
-        | "handles"
-        | "reacts_to" => Ok(()),
-        other => Err(CatalogueLinterError::InvalidRuleConfig(format!(
-            "target_field '{}' is not a recognised DataRole field name; \
-             valid DataRole fields are: exclusive_members, shared_value_objects, emits, handles, \
-             reacts_to, invariants",
-            other
-        ))),
+        RolePayloadField::Invariants
+        | RolePayloadField::ExclusiveMembers
+        | RolePayloadField::SharedValueObjects
+        | RolePayloadField::Emits
+        | RolePayloadField::Handles
+        | RolePayloadField::ReactsTo => Ok(()),
+        RolePayloadField::Identity | RolePayloadField::Aggregate => {
+            Err(CatalogueLinterError::InvalidRuleConfig(FreeText::new(format!(
+                "target_field '{field}' is not a recognised DataRole field name; \
+                 valid DataRole fields are: exclusive_members, shared_value_objects, emits, handles, \
+                 reacts_to, invariants"
+            ))))
+        }
     }
 }
 
-/// Validates that `field` is a recognised `ContractRole` field name.
+/// Validates that `field` is a `ContractRole` field (currently only
+/// `Aggregate`).
 ///
-/// This must be called before any loop over trait entries so that an unknown
-/// `target_field` is rejected even when the catalogue contains no matching
-/// entries for the rule's `RuleTarget` (D19 fail-closed).
+/// This must be called before any loop over trait entries so that a
+/// wrong-category `target_field` is rejected even when the catalogue contains
+/// no matching entries for the rule's `RuleTarget` (D19 fail-closed).
+/// `RolePayloadField` is a closed enum, so a totally unrecognised field name
+/// is unrepresentable here (rejected earlier, at the usecase config-parsing
+/// boundary); this validation covers the remaining runtime-checkable failure
+/// mode — a syntactically valid field that is not a `ContractRole` field.
 ///
 /// # Errors
 ///
-/// Returns [`CatalogueLinterError::InvalidRuleConfig`] when `field` is not a
-/// recognised `ContractRole` field name.
-pub(super) fn validate_contract_role_field(field: &str) -> Result<(), CatalogueLinterError> {
+/// Returns [`CatalogueLinterError::InvalidRuleConfig`] when `field` is not
+/// `Aggregate`.
+pub(super) fn validate_contract_role_field(
+    field: RolePayloadField,
+) -> Result<(), CatalogueLinterError> {
     match field {
-        "aggregate" => Ok(()),
-        unknown => Err(CatalogueLinterError::InvalidRuleConfig(format!(
-            "unknown target_field '{}' for ContractRole: not a recognised ContractRole field name; \
-             valid names are: aggregate",
-            unknown
-        ))),
+        RolePayloadField::Aggregate => Ok(()),
+        RolePayloadField::Invariants
+        | RolePayloadField::Identity
+        | RolePayloadField::ExclusiveMembers
+        | RolePayloadField::SharedValueObjects
+        | RolePayloadField::Emits
+        | RolePayloadField::Handles
+        | RolePayloadField::ReactsTo => {
+            Err(CatalogueLinterError::InvalidRuleConfig(FreeText::new(format!(
+                "unknown target_field '{field}' for ContractRole: not a recognised ContractRole field name; \
+             valid names are: aggregate"
+            ))))
+        }
     }
 }
 
 /// Returns `true` when the named field Vec for the given role is empty (or the
 /// role does not carry that field).
 ///
-/// For `"invariants"`, delegates to [`invariants_for_role`] because invariants
+/// For `Invariants`, delegates to [`invariants_for_role`] because invariants
 /// use `InvariantDecl` rather than `TypeRef` and are not visible through
-/// [`field_type_refs`].
-///
-/// # Errors
-///
-/// Returns [`CatalogueLinterError::InvalidRuleConfig`] when `field` is not a
-/// recognised `DataRole` field name (D19 fail-closed: unknown field names in lint
-/// config are rejected rather than silently treated as empty).
-pub(super) fn field_vec_is_empty(
-    role: &DataRole,
-    field: &str,
-) -> Result<bool, CatalogueLinterError> {
-    if field == "invariants" {
-        return Ok(invariants_for_role(role).is_empty());
+/// [`field_type_refs`]. `RolePayloadField` is a closed enum, so an unrecognised
+/// field name is unrepresentable here; this function is infallible.
+pub(super) fn field_vec_is_empty(role: &DataRole, field: RolePayloadField) -> bool {
+    if field == RolePayloadField::Invariants {
+        return invariants_for_role(role).is_empty();
     }
-    Ok(field_type_refs(role, field)?.is_empty())
+    field_type_refs(role, field).is_empty()
 }
 
 /// Returns the `TypeRef` slice for a named field on a `DataRole`.
 ///
-/// Returns an empty slice when the field name is valid but the given role does
-/// not carry that field (e.g. `"emits"` on `DataRole::Entity`).
-///
-/// # Errors
-///
-/// Returns [`CatalogueLinterError::InvalidRuleConfig`] when `field` is not a
-/// recognised `DataRole` field name (D19 fail-closed: unknown field names in lint
-/// config are rejected rather than silently treated as empty).
-pub(super) fn field_type_refs<'a>(
-    role: &'a DataRole,
-    field: &str,
-) -> Result<&'a [crate::tddd::catalogue_v2::identifiers::TypeRef], CatalogueLinterError> {
+/// Returns an empty slice when the field is valid but the given role does not
+/// carry that field (e.g. `Emits` on `DataRole::Entity`), or when the field is
+/// not `TypeRef`-backed at all (`Invariants`) or is `ContractRole`-only
+/// (`Aggregate`, `Identity`). `RolePayloadField` is a closed enum, so an
+/// unrecognised field name is unrepresentable here; this function is
+/// infallible.
+pub(super) fn field_type_refs(
+    role: &DataRole,
+    field: RolePayloadField,
+) -> &[crate::tddd::catalogue_v2::identifiers::TypeRef] {
     match field {
-        "invariants" => {
-            // invariants use InvariantDecl, not TypeRef; callers that need
-            // invariants should use `invariants_for_role` directly.
-            Ok(&[])
-        }
-        "exclusive_members" => {
+        // `invariants` uses `InvariantDecl`, not `TypeRef`; callers that need
+        // invariants should use `invariants_for_role` directly.
+        RolePayloadField::Invariants => &[],
+        RolePayloadField::ExclusiveMembers => {
             if let DataRole::AggregateRoot { exclusive_members, .. } = role {
-                Ok(exclusive_members.as_slice())
+                exclusive_members.as_slice()
             } else {
-                Ok(&[])
+                &[]
             }
         }
-        "shared_value_objects" => {
+        RolePayloadField::SharedValueObjects => {
             if let DataRole::AggregateRoot { shared_value_objects, .. } = role {
-                Ok(shared_value_objects.as_slice())
+                shared_value_objects.as_slice()
             } else {
-                Ok(&[])
+                &[]
             }
         }
-        "emits" => match role {
+        RolePayloadField::Emits => match role {
             DataRole::AggregateRoot { emits, .. } | DataRole::DomainService { emits } => {
-                Ok(emits.as_slice())
+                emits.as_slice()
             }
-            _ => Ok(&[]),
+            _ => &[],
         },
-        "handles" => {
+        RolePayloadField::Handles => {
             if let DataRole::UseCase { handles } = role {
-                Ok(handles.as_slice())
+                handles.as_slice()
             } else {
-                Ok(&[])
+                &[]
             }
         }
-        "reacts_to" => {
+        RolePayloadField::ReactsTo => {
             if let DataRole::EventPolicy { reacts_to } = role {
-                Ok(reacts_to.as_slice())
+                reacts_to.as_slice()
             } else {
-                Ok(&[])
+                &[]
             }
         }
-        "aggregate" => {
-            // ContractRole-only field — no DataRole variant carries "aggregate".
-            // Return an empty slice so that the entry is skipped without a
-            // violation (the field is in the overall field vocabulary; only
-            // names unrecognised in any role's vocabulary are rejected).
-            Ok(&[])
-        }
-        unknown => Err(CatalogueLinterError::InvalidRuleConfig(format!(
-            "unknown target_field '{}': not a recognised field name in any role; \
-             valid names are: exclusive_members, shared_value_objects, emits, handles, \
-             reacts_to, aggregate, invariants",
-            unknown
-        ))),
+        // ContractRole-only fields — no DataRole variant carries these.
+        RolePayloadField::Aggregate | RolePayloadField::Identity => &[],
     }
 }

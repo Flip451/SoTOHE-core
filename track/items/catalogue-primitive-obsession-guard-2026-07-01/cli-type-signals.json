@@ -1,6 +1,49 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-01T13:55:04Z",
-  "declaration_hash": "fd66a84b83448f7e66287c14dc128dfd15ba8b12f8568d8bbf1f6709adac8f2d",
-  "signals": []
+  "generated_at": "2026-07-02T03:34:32Z",
+  "declaration_hash": "56b5e73610c70ae44de82e796aedd7748e41828aa2d7f3e1471bab51b38ff218",
+  "signals": [
+    {
+      "type_name": "CatalogueLintCheckActiveTrackArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "clap_builder::derive::Args",
+        "clap_builder::derive::FromArgMatches",
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "CatalogueLintCommand",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "clap_builder::derive::FromArgMatches",
+        "clap_builder::derive::Subcommand",
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "CliCommand",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::catalogue_lint::execute",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::catalogue_lint::execute_check_active_track",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
 }

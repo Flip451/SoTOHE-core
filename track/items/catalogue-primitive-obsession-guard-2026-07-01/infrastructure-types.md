@@ -4,5 +4,5 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| SynPrimitiveOccurrenceScanner | secondary_adapter | add | impl Debug, impl Default, impl PrimitiveOccurrenceScanner | 🟡 | 🔵 |
+| SynPrimitiveOccurrenceScanner | secondary_adapter | add | impl Debug, impl Default, impl PrimitiveOccurrenceScanner | 🔵 | 🔵 |
 

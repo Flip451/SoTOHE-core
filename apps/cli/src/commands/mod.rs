@@ -6,6 +6,7 @@ use cli_composition::{CommandOutcome, CompositionError};
 use cli_driver::CommandOutcome as DriverOutcome;
 
 pub mod arch;
+pub mod catalogue_lint;
 pub mod conventions;
 pub mod domain;
 pub mod dry;
