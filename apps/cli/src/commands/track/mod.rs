@@ -394,11 +394,20 @@ pub enum TrackCommand {
         #[arg(long)]
         layer: Option<String>,
     },
+
+    /// Switch to the configured base branch from the active track's
+    /// `branch_strategy_snapshot`, and pull the latest changes.
+    SwitchBase {
+        /// Project root directory. Defaults to current directory.
+        #[arg(long, default_value = ".")]
+        project_root: PathBuf,
+    },
 }
 
 #[derive(Debug, Subcommand)]
 pub enum BranchAction {
-    /// Create a new branch `track/<track-id>` from `main` and switch to it.
+    /// Create a new branch `track/<track-id>` from the configured base branch
+    /// and switch to it.
     Create(BranchArgs),
 
     /// Switch to an existing branch `track/<track-id>`.
@@ -458,12 +467,12 @@ impl TrackCommand {
             // Resolve embeds items_dir inside ResolveArgs.
             TrackCommand::Resolve(args) => args.items_dir.clone(),
 
-            // Views commands use project_root; derive items_dir from it so that
-            // a non-default --project-root is honoured for telemetry path resolution.
+            // Views and SwitchBase commands use project_root; derive items_dir from
+            // it so that a non-default --project-root is honoured for telemetry
+            // path resolution.
             TrackCommand::Views { action: ViewAction::Validate { project_root } }
-            | TrackCommand::Views { action: ViewAction::Sync { project_root, .. } } => {
-                project_root.join("track").join("items")
-            }
+            | TrackCommand::Views { action: ViewAction::Sync { project_root, .. } }
+            | TrackCommand::SwitchBase { project_root } => project_root.join("track").join("items"),
 
             // These variants derive their items path from workspace_root
             // internally; return <workspace_root>/track/items so that a

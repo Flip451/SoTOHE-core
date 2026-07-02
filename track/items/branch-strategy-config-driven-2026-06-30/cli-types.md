@@ -4,12 +4,12 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| TrackCommand | enum | modify | Archive, Transition, Branch, Resolve, Views, AddTask, SetOverride, ClearOverride, NextTask, TaskCounts, TypeGraph, BaselineGraph, ContractMap, SpecElementHash, BaselineCapture, Lint, CatalogueImplSignals, FixpointResolve, SetCommitHash, SwitchBase | 🟡 | 🔵 |
+| TrackCommand | enum | modify | Archive, Transition, Branch, Resolve, Views, AddTask, SetOverride, ClearOverride, NextTask, TaskCounts, TypeGraph, BaselineGraph, ContractMap, SpecElementHash, BaselineCapture, Lint, CatalogueImplSignals, FixpointResolve, SetCommitHash, SwitchBase | 🔵 | 🔵 |
 
 ## DTOs
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| EnsurePrArgs | dto | modify | — | 🟡 | 🔵 |
-| WaitAndMergeArgs | dto | modify | — | 🟡 | 🔵 |
+| EnsurePrArgs | dto | modify | — | 🔵 | 🔵 |
+| WaitAndMergeArgs | dto | modify | — | 🔵 | 🔵 |
 

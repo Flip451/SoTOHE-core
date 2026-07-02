@@ -41,7 +41,8 @@
     "T010": [
       { "layer": "cli", "entry_key": "TrackCommand" },
       { "layer": "cli", "entry_key": "EnsurePrArgs" },
-      { "layer": "cli", "entry_key": "WaitAndMergeArgs" }
+      { "layer": "cli", "entry_key": "WaitAndMergeArgs" },
+      { "layer": "cli_driver", "entry_key": "PrInput" }
     ],
     "T011": [
       { "layer": "cli_composition", "entry_key": "TrackCompositionRoot" }

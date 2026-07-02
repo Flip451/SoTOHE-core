@@ -1,29 +1,25 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-01T23:18:46Z",
+  "generated_at": "2026-07-02T05:52:17Z",
   "declaration_hash": "2a57e19a94a96388df8f8c19e41d94322c6c622626c65bf8267bdee65dd8049b",
   "signals": [
     {
       "type_name": "DryCompositionRoot",
       "kind_tag": "composition_root",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
       "type_name": "TrackCompositionRoot",
       "kind_tag": "composition_root",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
       "type_name": "FixpointResolveInput",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": true,
-      "missing_items": [
-        "core::clone::Clone",
-        "core::fmt::Debug"
-      ]
+      "signal": "blue",
+      "found_type": false
     }
   ]
 }

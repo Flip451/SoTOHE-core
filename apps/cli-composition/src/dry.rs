@@ -14,7 +14,9 @@
 //! (`FsDryCheckCommitHashStore`, `GitDryCheckDiffGetter`). The `review_v2`
 //! adapters (`FsCommitHashStore`, `GitDiffGetter`) are never imported.
 
-use std::path::{Path, PathBuf};
+use std::path::Path;
+#[cfg(test)]
+use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::Instant;
 
@@ -27,6 +29,7 @@ use usecase::dry_check::{
     DryCheckApprovalInteractor, DryCheckApprovalService as _, DryCheckInteractor,
     DryCheckResultsInteractor, DryCheckResultsService as _, DryCheckService as _, fragment_ref_of,
 };
+use usecase::dry_driver::{DryCheckApprovedOutcome, DryWriteFindingSummary, DryWriteOutcome};
 
 use crate::{CommandOutcome, error::CompositionError};
 
@@ -45,7 +48,6 @@ use corpus_root::{
     compute_dry_corpus_fingerprint_from_fragments, compute_dry_corpus_fingerprint_from_root,
     write_dry_corpus_root_manifest,
 };
-pub(crate) use dry_checker_config::build_usecase_dry_check_config_pub;
 use dry_checker_config::{build_usecase_dry_check_config, resolve_dry_checker_config};
 #[cfg(test)]
 use infrastructure::dry_check::recording_agent::DryAgentRunRecorder;
@@ -55,9 +57,8 @@ use shared::git_diff_path_key;
 #[cfg(test)]
 use shared::normalize_fragment_paths;
 use shared::{
-    build_diff_and_corpus_fragments, dry_check_approved_outcome, dry_write_outcome,
-    parse_dry_track_id, parse_verdict_filter, resolve_dry_diff_base,
-    resolve_existing_dir_under_repo,
+    build_diff_and_corpus_fragments, parse_dry_track_id, parse_verdict_filter,
+    resolve_dry_diff_base, resolve_existing_dir_under_repo,
 };
 use tier_telemetry::{
     RecordingDryAgent, dry_tiered_telemetry_for_result, emit_dry_tier_external_subprocess,
@@ -67,7 +68,7 @@ use tier_telemetry::{
 use tier_telemetry::{TieredDryAgentRecorder, dry_agent_error_is_subprocess_failure};
 
 #[cfg(test)]
-use domain::dry_check::{DryCheckApprovalVerdict, VerdictFilter, fragments_overlapping_hunks};
+use domain::dry_check::{VerdictFilter, fragments_overlapping_hunks};
 #[cfg(test)]
 use domain::semantic_dup::CodeFragment;
 #[cfg(test)]
@@ -89,74 +90,8 @@ use usecase::dry_check::{
     DryCheckJudgeTier,
 };
 
-// ── Input DTOs ────────────────────────────────────────────────────────────────
-
-/// Input DTO for `sotp dry write`.
-#[derive(Debug, Clone)]
-pub struct DryWriteInput {
-    /// Track ID used to locate the per-track dry-check.json and .commit_hash.
-    pub track_id: String,
-    /// Optional explicit base commit (overrides FsDryCheckCommitHashStore lookup).
-    pub base_commit: Option<String>,
-    /// Path to the LanceDB semantic index database.
-    pub db_path: PathBuf,
-    /// Cosine similarity threshold (0.0–1.0) for the dry-check gate.
-    pub threshold: Option<f32>,
-    /// Root of the workspace to scan for Rust sources (corpus extraction).
-    pub workspace_root: PathBuf,
-    /// Path to the track items directory.
-    pub items_dir: PathBuf,
-    /// Codex model name for the DryCheckAgentPort.
-    /// `None` means "use the model from `agent-profiles.json`".
-    /// An explicit value overrides the profile model.
-    pub model: Option<String>,
-    /// Capability name forwarded to CodexDryChecker.
-    pub capability_name: String,
-}
-
-/// Input DTO for `sotp dry results`.
-#[derive(Debug, Clone)]
-pub struct DryResultsInput {
-    /// Track ID used to locate the per-track dry-check.json.
-    pub track_id: String,
-    /// Verdict filter: "all" / "not-a-violation" / "accepted" / "violation"
-    /// (default "all"). Parsed to `VerdictFilter` inside cli-composition (CN-02).
-    pub filter: String,
-    /// Path to the track items directory.
-    pub items_dir: PathBuf,
-}
-
-/// Input DTO for `sotp dry fix-local` (`dry_run_fix_local`).
-///
-/// Maps to the 2 required CLI flags plus the optional model override:
-/// `--track-id` / `--briefing-file` / `--model`.
-/// Carries stdlib-typed fields only — no domain or infrastructure types (CN-02).
-#[derive(Debug, Clone)]
-pub struct RunDryFixLocalInput {
-    /// Track ID. Required (no auto-resolve from branch for write operations).
-    pub track_id: String,
-    /// Path to the briefing file passed to the dry-fix-lead fixer. Required.
-    pub briefing_file: std::path::PathBuf,
-    /// Model for the fixer (Codex) subprocess.
-    /// `None` means "use the model from `agent-profiles.json`".
-    /// An explicit value overrides the profile model.
-    pub model: Option<String>,
-}
-
-/// Input DTO for `sotp dry check-approved`.
-///
-/// D5 / T005: `dry check-approved` is a pure-read staleness + all-resolved gate
-/// (no embedding, no similarity search, no corpus / index / threshold), so the
-/// old `db_path` / `threshold` / `workspace_root` fields are removed.
-#[derive(Debug, Clone)]
-pub struct DryCheckApprovedInput {
-    /// Track ID used to locate the per-track dry-check.json and .commit_hash.
-    pub track_id: String,
-    /// Optional explicit base commit (overrides FsDryCheckCommitHashStore lookup).
-    pub base_commit: Option<String>,
-    /// Path to the track items directory.
-    pub items_dir: PathBuf,
-}
+mod types;
+pub use types::{DryCheckApprovedInput, DryResultsInput, DryWriteInput, RunDryFixLocalInput};
 
 /// Read `base_branch` from `<track_dir>/metadata.json` via the branch_strategy_snapshot.
 ///
@@ -226,7 +161,7 @@ impl DryCompositionRoot {
     ///
     /// Returns `Err` on arg validation, diff acquisition, fragment extraction,
     /// adapter construction, or interactor failures.
-    pub fn dry_write(&self, input: DryWriteInput) -> Result<CommandOutcome, CompositionError> {
+    pub fn dry_write(&self, input: DryWriteInput) -> Result<DryWriteOutcome, CompositionError> {
         use infrastructure::git_cli::{GitRepository, SystemGitRepo};
 
         // Resolve repo root to anchor paths.
@@ -426,7 +361,31 @@ impl DryCompositionRoot {
         let records_appended = records_after.saturating_sub(records_before);
         let pairs_checked = records_appended;
 
-        Ok(dry_write_outcome(&findings, pairs_checked, records_appended, diff_fragments_processed))
+        let findings: Vec<DryWriteFindingSummary> = findings
+            .into_iter()
+            .map(|finding| DryWriteFindingSummary {
+                changed_path: finding.changed_fragment_ref().path().as_str().to_owned(),
+                changed_content_hash: finding
+                    .changed_fragment_ref()
+                    .content_hash()
+                    .as_str()
+                    .to_owned(),
+                candidate_path: finding.candidate_fragment_ref().path().as_str().to_owned(),
+                candidate_content_hash: finding
+                    .candidate_fragment_ref()
+                    .content_hash()
+                    .as_str()
+                    .to_owned(),
+                refactor_proposal: finding.refactor_proposal().as_str().to_owned(),
+            })
+            .collect();
+
+        Ok(DryWriteOutcome::Success {
+            pairs_checked,
+            records_appended,
+            diff_fragments_processed,
+            findings,
+        })
     }
 
     /// Run `sotp dry results`: read and display the historical dry-check results.
@@ -514,7 +473,7 @@ impl DryCompositionRoot {
     pub fn dry_check_approved(
         &self,
         input: DryCheckApprovedInput,
-    ) -> Result<CommandOutcome, CompositionError> {
+    ) -> Result<DryCheckApprovedOutcome, CompositionError> {
         use std::collections::BTreeSet;
 
         use infrastructure::git_cli::{GitRepository, SystemGitRepo};
@@ -554,7 +513,7 @@ impl DryCompositionRoot {
             // computing corpus fingerprints, building fragment refs, or constructing
             // coverage/store adapters (operational fast path for enabled=false).
             let verdict = domain::dry_check::DryCheckApprovalVerdict::Approved;
-            return Ok(dry_check_approved_outcome(verdict));
+            return Ok(to_dry_check_approved_outcome(verdict));
         }
         let track_dir = items_dir_abs.join(track_id.as_ref());
 
@@ -644,7 +603,7 @@ impl DryCompositionRoot {
             );
         }
 
-        Ok(dry_check_approved_outcome(verdict))
+        Ok(to_dry_check_approved_outcome(verdict))
     }
 
     /// Construct a wired [`cli_driver::dry::DryDriver`] for injection into the CLI.
@@ -660,6 +619,19 @@ impl DryCompositionRoot {
         let port = Arc::new(DryDriverAdapter::new());
         let service = Arc::new(DryDriverInteractor::new(port));
         cli_driver::dry::DryDriver::new(service)
+    }
+}
+
+/// Convert a `domain::dry_check::DryCheckApprovalVerdict` into the usecase-level
+/// [`DryCheckApprovedOutcome`] DTO (IN-13/AC-18).
+fn to_dry_check_approved_outcome(
+    verdict: domain::dry_check::DryCheckApprovalVerdict,
+) -> DryCheckApprovedOutcome {
+    match verdict {
+        domain::dry_check::DryCheckApprovalVerdict::Approved => DryCheckApprovedOutcome::Approved,
+        domain::dry_check::DryCheckApprovalVerdict::Blocked { unresolved_pair_count } => {
+            DryCheckApprovedOutcome::Blocked { unresolved_pair_count }
+        }
     }
 }
 
@@ -2608,44 +2580,6 @@ exit 0
         assert!(!temp_index_path.exists(), "ephemeral index dir must be removed on drop");
     }
 
-    // ── Approved/Blocked exit-code semantics ─────────────────────────────────
-
-    #[test]
-    fn test_approved_verdict_maps_to_exit_0() {
-        let outcome = dry_check_approved_outcome(DryCheckApprovalVerdict::Approved);
-        assert_eq!(outcome.exit_code, 0, "Approved must produce exit code 0");
-        assert!(outcome.stdout.is_some(), "Approved must report on stdout");
-        assert_eq!(outcome.stderr, None);
-    }
-
-    #[test]
-    fn test_blocked_verdict_maps_to_exit_1() {
-        let outcome = dry_check_approved_outcome(DryCheckApprovalVerdict::Blocked {
-            unresolved_pair_count: 2,
-        });
-        assert_eq!(outcome.exit_code, 1, "Blocked must produce exit code 1");
-        assert_eq!(outcome.stdout, None);
-        assert!(
-            outcome.stderr.as_deref().is_some_and(|msg| msg.contains("2 unresolved pair(s)")),
-            "Blocked stderr must include unresolved count"
-        );
-    }
-
-    #[test]
-    fn test_dry_write_outcome_reports_checked_and_appended_counts() {
-        let outcome = dry_write_outcome(&[], 3, 2, 1);
-        let stdout = outcome.stdout.as_deref().unwrap_or("");
-
-        assert_eq!(outcome.exit_code, 0);
-        assert!(stdout.contains("3 pair(s) checked"), "stdout must include pairs checked");
-        assert!(stdout.contains("2 record(s) appended"), "stdout must include records appended");
-        assert!(stdout.contains("0 violation(s) found"), "stdout must include finding count");
-        assert!(
-            stdout.contains("1 diff fragment(s) processed"),
-            "stdout must include processed diff fragments"
-        );
-    }
-
     // ── results: informational exit-0 regardless of verdicts ─────────────────
 
     #[test]
@@ -3514,11 +3448,11 @@ exit 0
             items_dir: items_dir.clone(),
         });
 
-        // The call must succeed with exit_code 0 (Approved).
+        // The call must succeed with Approved.
         let outcome = result.unwrap();
-        assert_eq!(
-            outcome.exit_code, 0,
-            "Approved verdict must produce exit_code 0; got: {outcome:?}"
+        assert!(
+            matches!(outcome, DryCheckApprovedOutcome::Approved),
+            "Approved verdict must produce DryCheckApprovedOutcome::Approved; got: {outcome:?}"
         );
 
         // The GateEval event must be present in telemetry.jsonl.
@@ -3648,9 +3582,10 @@ exit 0
             })
             .unwrap();
 
-        assert_eq!(
-            outcome.exit_code, 0,
-            "scoped approval must ignore changed fragments outside the recorded workspace root"
+        assert!(
+            matches!(outcome, DryCheckApprovedOutcome::Approved),
+            "scoped approval must ignore changed fragments outside the recorded workspace root; \
+             got: {outcome:?}"
         );
     }
 
@@ -3756,11 +3691,11 @@ exit 0
             items_dir: items_dir.clone(),
         });
 
-        // The call must succeed (Ok) with exit_code 1 (Blocked — exits non-zero).
+        // The call must succeed (Ok) with Blocked (exits non-zero once rendered).
         let outcome = result.unwrap();
-        assert_eq!(
-            outcome.exit_code, 1,
-            "Blocked verdict must produce exit_code 1; got: {outcome:?}"
+        assert!(
+            matches!(outcome, DryCheckApprovedOutcome::Blocked { .. }),
+            "Blocked verdict must produce DryCheckApprovedOutcome::Blocked; got: {outcome:?}"
         );
 
         // The GateEval event must be present in telemetry.jsonl.

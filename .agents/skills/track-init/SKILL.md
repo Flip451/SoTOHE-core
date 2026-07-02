@@ -1,6 +1,6 @@
 ---
 name: track-init
-description: Use when Codex is asked to initialize a new track directory and its branch (Phase 0). Creates metadata.json and its rendered views, and materializes the branch from main.
+description: Use when Codex is asked to initialize a new track directory and its branch (Phase 0). Creates metadata.json and its rendered views, and materializes the branch from the configured base branch.
 ---
 
 # Track-Init (Codex skill)

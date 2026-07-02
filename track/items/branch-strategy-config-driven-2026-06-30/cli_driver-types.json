@@ -19,6 +19,94 @@
       ],
       "informal_grounds": []
     },
+    "PrInput": {
+      "action": "modify",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Push",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "track_id", "ty": "Option<String>" }
+              ]
+            }
+          },
+          {
+            "name": "Ensure",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "track_id", "ty": "Option<String>" },
+                { "name": "base", "ty": "Option<String>" }
+              ]
+            }
+          },
+          {
+            "name": "Status",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "pr", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "WaitAndMerge",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "pr", "ty": "String" },
+                { "name": "interval", "ty": "u64" },
+                { "name": "timeout", "ty": "u64" },
+                { "name": "method", "ty": "Option<String>" }
+              ]
+            }
+          },
+          {
+            "name": "TriggerReview",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "pr", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "PollReview",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "pr", "ty": "String" },
+                { "name": "trigger_timestamp", "ty": "String" },
+                { "name": "interval", "ty": "u64" },
+                { "name": "timeout", "ty": "u64" }
+              ]
+            }
+          },
+          {
+            "name": "ReviewCycle",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "track_id", "ty": "Option<String>" },
+                { "name": "resume", "ty": "bool" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "pr",
+      "docs": "Typed input for the `pr` command family. Pre-existing type (baseline: Ensure.base and WaitAndMerge.method were plain String); this track (IN-03/AC-09) changes Ensure.base and WaitAndMerge.method to Option<String> so PrDriver forwards the caller's none-means-default intent through to the composition root, which resolves merge_target / merge_method from the active track's branch_strategy_snapshot when the CLI flag is omitted -- mirroring the cli-layer EnsurePrArgs/WaitAndMergeArgs precedent already declared in cli-types.json. Role is Dto (not PrimaryAdapter): this enum is a plain input DTO consumed by PrDriver::handle, not itself the driving adapter (see R1: cli/cli_driver clap args and input DTOs use the Dto role; same role correction already applied to TrackInput in this catalogue). R9 primitive justification: base/method stay raw Option<String> because cli_driver may_depend_on=[usecase] only -- Option<domain::branch_strategy::MergeMethod> (and an equivalent branch-name value object) are architecturally impossible to name in this layer; both concepts are already modelled at the domain layer (BranchStrategySnapshot.merge_target as NonEmptyString, .merge_method as MergeMethod, both validated) and the raw-string-to-domain-type conversion happens downstream in cli_composition, which does depend on domain. The remaining fields (track_id, pr, interval, timeout, trigger_timestamp, resume) are unchanged by this track: track_id carries the same cli_driver-cannot-depend-on-domain rationale as TrackInput.track_id in this catalogue; pr/interval/timeout/trigger_timestamp/resume are opaque technical values (external PR identifier, poll timing knobs, an ISO-8601 timestamp echo, and a boolean resume flag) with no finite-value domain concept to model.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-03" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-09" }
+      ],
+      "informal_grounds": []
+    },
     "TrackInput": {
       "action": "modify",
       "role": { "Dto": {} },

@@ -129,11 +129,11 @@ Convention から関連 ADR にリンクするには `## Decision Reference` セ
 
 ## Lifecycle: pre-merge draft vs post-merge record
 
-ADR が `main` にマージされているかで扱いが変わる:
+ADR が effective strategy の merge target にマージされているかで扱いが変わる:
 
 - **Pre-merge (current working branch / open PR)**: ADR はまだ draft。 レビューや実装で欠陥・矛盾・見落としが判明したら **同じファイルを直接編集** して構わない。新 ADR で supersede する必要はない。pre-merge の段階で design を整える目的に沿う。
-  - 判定: `git log main -- <adr-file>` が empty (当該 ADR が main に存在しない) なら pre-merge 扱い
-- **Post-merge (merged to `main`)**: ADR は永続 record として不変。semantic content の変更は新 ADR で supersede または refinement する。既存 ADR に許容される編集は (1) typo 修正、(2) broken cross-reference 修正、(3) newer ADR への back-reference 追加 のみ。
+  - 判定: `git log <merge_target> -- <adr-file>` が empty (当該 ADR が merge target に存在しない) なら pre-merge 扱い。`<merge_target>` は effective strategy の `merge_target()`（`BranchStrategyPort` 経由。track 内なら `metadata.json#branch_strategy_snapshot`、track 外なら `.harness/config/branch-strategy.json`）で解決する。
+- **Post-merge (merged to the merge target branch)**: ADR は永続 record として不変。semantic content の変更は新 ADR で supersede または refinement する。既存 ADR に許容される編集は (1) typo 修正、(2) broken cross-reference 修正、(3) newer ADR への back-reference 追加 のみ。
   - 新 ADR は `## Related` で旧 ADR を参照。旧 ADR は当時の decision の歴史 record として残す。
 
 この使い分けは `.claude/agents/adr-editor.md` の editing rules にも反映されている。

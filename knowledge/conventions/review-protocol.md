@@ -44,7 +44,7 @@ reviewer は外部プロバイダー（既定: Codex CLI）であり、self-revi
 ### やるべきこと
 
 - finding は原則として修正する
-- テスト失敗を「既存の問題」として無視しない → `git stash` + main でベースライン確認
+- テスト失敗を「既存の問題」として無視しない → `git stash` + base branch（設定済み `base_branch`）でベースライン確認
 - P1 deviation の受け入れはユーザー承認が必要
 
 ## レビュー対象サイズ

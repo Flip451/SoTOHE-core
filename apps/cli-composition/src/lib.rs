@@ -64,7 +64,6 @@ pub use semantic_dup::{
 };
 pub use signal::SignalGateName;
 pub use telemetry::TelemetryReportInput;
-pub use track::fixpoint_resolve::FixpointResolveInput;
 
 // ---------------------------------------------------------------------------
 // Per-context composition root re-exports (AC-04 / D2)

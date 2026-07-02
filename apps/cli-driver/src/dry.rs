@@ -7,8 +7,8 @@ use std::path::PathBuf;
 use std::sync::Arc;
 
 use usecase::dry_driver::{
-    DryCheckApprovedDriverInput, DryDriverOutcome, DryDriverService, DryFixLocalDriverInput,
-    DryResultsDriverInput, DryWriteDriverInput,
+    DryCheckApprovedDriverInput, DryCheckApprovedOutcome, DryDriverOutcome, DryDriverService,
+    DryFixLocalDriverInput, DryResultsDriverInput, DryWriteDriverInput, DryWriteOutcome,
 };
 
 use crate::render::CommandOutcome;
@@ -145,7 +145,7 @@ impl DryDriver {
             model,
             capability_name,
         });
-        into_command_outcome(outcome)
+        render_dry_write_outcome(outcome)
     }
 
     fn dry_results(&self, track_id: String, filter: String, items_dir: PathBuf) -> CommandOutcome {
@@ -165,7 +165,7 @@ impl DryDriver {
             base_commit,
             items_dir,
         });
-        into_command_outcome(outcome)
+        render_dry_check_approved_outcome(outcome)
     }
 
     fn dry_fix_local(
@@ -187,4 +187,116 @@ impl DryDriver {
 /// Convert a `DryDriverOutcome` (usecase boundary type) into a `CommandOutcome`.
 fn into_command_outcome(outcome: DryDriverOutcome) -> CommandOutcome {
     CommandOutcome { stdout: outcome.stdout, stderr: outcome.stderr, exit_code: outcome.exit_code }
+}
+
+/// Render a `DryWriteOutcome` (usecase boundary type) into a `CommandOutcome`.
+///
+/// Reproduces byte-for-byte the text previously produced by cli_composition's
+/// `dry_write_outcome` helper (IN-13/AC-18, CN-07/AC-19).
+fn render_dry_write_outcome(outcome: DryWriteOutcome) -> CommandOutcome {
+    match outcome {
+        DryWriteOutcome::Success {
+            pairs_checked,
+            records_appended,
+            diff_fragments_processed,
+            findings,
+        } => {
+            let mut output_lines: Vec<String> = Vec::new();
+            output_lines.push(format!(
+                "dry write: {pairs_checked} pair(s) checked; {records_appended} record(s) appended; \
+                 {} violation(s) found; {diff_fragments_processed} diff fragment(s) processed",
+                findings.len()
+            ));
+            for finding in &findings {
+                output_lines.push(format!(
+                    "  changed: {} (hash: {})",
+                    finding.changed_path, finding.changed_content_hash,
+                ));
+                output_lines.push(format!(
+                    "  candidate: {} (hash: {})",
+                    finding.candidate_path, finding.candidate_content_hash,
+                ));
+                output_lines.push(format!("  proposal: {}", finding.refactor_proposal));
+            }
+
+            CommandOutcome::success(Some(output_lines.join("\n")))
+        }
+        DryWriteOutcome::Failure { message } => CommandOutcome::failure(Some(message)),
+    }
+}
+
+/// Render a `DryCheckApprovedOutcome` (usecase boundary type) into a `CommandOutcome`.
+///
+/// Reproduces byte-for-byte the text previously produced by cli_composition's
+/// `dry_check_approved_outcome` helper (IN-13/AC-18, CN-07/AC-19).
+fn render_dry_check_approved_outcome(outcome: DryCheckApprovedOutcome) -> CommandOutcome {
+    match outcome {
+        DryCheckApprovedOutcome::Approved => CommandOutcome {
+            stdout: Some("dry check-approved: APPROVED — all pairs verified".to_owned()),
+            stderr: None,
+            exit_code: 0,
+        },
+        DryCheckApprovedOutcome::Blocked { unresolved_pair_count } => CommandOutcome {
+            stdout: None,
+            stderr: Some(format!(
+                "dry check-approved: BLOCKED — {unresolved_pair_count} unresolved pair(s); \
+                 run `sotp dry write` to record verdicts"
+            )),
+            exit_code: 1,
+        },
+        DryCheckApprovedOutcome::Failure { message } => CommandOutcome::failure(Some(message)),
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Tests
+// ---------------------------------------------------------------------------
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_dry_write_outcome_reports_checked_and_appended_counts() {
+        let outcome = render_dry_write_outcome(DryWriteOutcome::Success {
+            pairs_checked: 3,
+            records_appended: 2,
+            diff_fragments_processed: 1,
+            findings: vec![],
+        });
+        let stdout = outcome.stdout.as_deref().unwrap_or("");
+
+        assert_eq!(outcome.exit_code, 0);
+        assert!(stdout.contains("3 pair(s) checked"), "stdout must include pairs checked");
+        assert!(stdout.contains("2 record(s) appended"), "stdout must include records appended");
+        assert!(stdout.contains("0 violation(s) found"), "stdout must include finding count");
+        assert!(
+            stdout.contains("1 diff fragment(s) processed"),
+            "stdout must include processed diff fragments"
+        );
+    }
+
+    // ── Approved/Blocked exit-code semantics ─────────────────────────────────
+
+    #[test]
+    fn test_approved_verdict_maps_to_exit_0() {
+        let outcome = render_dry_check_approved_outcome(DryCheckApprovedOutcome::Approved);
+        assert_eq!(outcome.exit_code, 0, "Approved must produce exit code 0");
+        assert!(outcome.stdout.is_some(), "Approved must report on stdout");
+        assert_eq!(outcome.stderr, None);
+    }
+
+    #[test]
+    fn test_blocked_verdict_maps_to_exit_1() {
+        let outcome = render_dry_check_approved_outcome(DryCheckApprovedOutcome::Blocked {
+            unresolved_pair_count: 2,
+        });
+        assert_eq!(outcome.exit_code, 1, "Blocked must produce exit code 1");
+        assert_eq!(outcome.stdout, None);
+        assert!(
+            outcome.stderr.as_deref().is_some_and(|msg| msg.contains("2 unresolved pair(s)")),
+            "Blocked stderr must include unresolved count"
+        );
+    }
 }

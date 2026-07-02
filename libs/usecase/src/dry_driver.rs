@@ -75,6 +75,54 @@ impl DryDriverOutcome {
     }
 }
 
+/// One rendered-finding row carried by `DryWriteOutcome::Success` (IN-13).
+///
+/// Fields mirror `domain::dry_check::DryCheckFinding`'s `changed_fragment_ref` /
+/// `candidate_fragment_ref` / `refactor_proposal`, flattened to `String` because
+/// `cli_driver` may only depend on `usecase` (architecture-rules.json) and these
+/// values are opaque display text at this boundary, already validated upstream
+/// in the domain layer.
+#[derive(Debug, Clone)]
+pub struct DryWriteFindingSummary {
+    pub changed_path: String,
+    pub changed_content_hash: String,
+    pub candidate_path: String,
+    pub candidate_content_hash: String,
+    pub refactor_proposal: String,
+}
+
+/// Structured (pre-render) output for `sotp dry write` at the `cli_driver`
+/// boundary (IN-13/AC-18).
+///
+/// Replaces the previous `DryDriverOutcome`-based pre-formatted stdout: the CLI
+/// text rendering (the former `dry_write_outcome` helper) moves to `cli_driver`.
+#[derive(Debug, Clone)]
+pub enum DryWriteOutcome {
+    Success {
+        pairs_checked: usize,
+        records_appended: usize,
+        diff_fragments_processed: usize,
+        findings: Vec<DryWriteFindingSummary>,
+    },
+    Failure {
+        message: String,
+    },
+}
+
+/// Structured (pre-render) output for `sotp dry check-approved` at the
+/// `cli_driver` boundary (IN-13/AC-18).
+///
+/// Mirrors `domain::dry_check::DryCheckApprovalVerdict`'s Approved/Blocked shape
+/// as a usecase-level DTO (`cli_driver` may only depend on `usecase`, so the
+/// domain enum itself cannot cross this boundary) plus a `Failure` variant for
+/// adapter-level errors.
+#[derive(Debug, Clone)]
+pub enum DryCheckApprovedOutcome {
+    Approved,
+    Blocked { unresolved_pair_count: usize },
+    Failure { message: String },
+}
+
 // ── Port ──────────────────────────────────────────────────────────────────────
 
 /// Secondary port for the `dry` command family.
@@ -83,13 +131,13 @@ impl DryDriverOutcome {
 /// `DryCompositionRoot` / `DryFixRunnerCompositionRoot` methods.
 pub trait DryDriverPort: Send + Sync {
     /// Run `sotp dry write`.
-    fn dry_write(&self, input: DryWriteDriverInput) -> DryDriverOutcome;
+    fn dry_write(&self, input: DryWriteDriverInput) -> DryWriteOutcome;
 
     /// Run `sotp dry results`.
     fn dry_results(&self, input: DryResultsDriverInput) -> DryDriverOutcome;
 
     /// Run `sotp dry check-approved`.
-    fn dry_check_approved(&self, input: DryCheckApprovedDriverInput) -> DryDriverOutcome;
+    fn dry_check_approved(&self, input: DryCheckApprovedDriverInput) -> DryCheckApprovedOutcome;
 
     /// Run `sotp dry fix-local`.
     fn dry_fix_local(&self, input: DryFixLocalDriverInput) -> DryDriverOutcome;
@@ -100,13 +148,13 @@ pub trait DryDriverPort: Send + Sync {
 /// Application service trait for the `dry` command family.
 pub trait DryDriverService: Send + Sync {
     /// Run `sotp dry write`.
-    fn dry_write(&self, input: DryWriteDriverInput) -> DryDriverOutcome;
+    fn dry_write(&self, input: DryWriteDriverInput) -> DryWriteOutcome;
 
     /// Run `sotp dry results`.
     fn dry_results(&self, input: DryResultsDriverInput) -> DryDriverOutcome;
 
     /// Run `sotp dry check-approved`.
-    fn dry_check_approved(&self, input: DryCheckApprovedDriverInput) -> DryDriverOutcome;
+    fn dry_check_approved(&self, input: DryCheckApprovedDriverInput) -> DryCheckApprovedOutcome;
 
     /// Run `sotp dry fix-local`.
     fn dry_fix_local(&self, input: DryFixLocalDriverInput) -> DryDriverOutcome;
@@ -128,7 +176,7 @@ impl DryDriverInteractor {
 }
 
 impl DryDriverService for DryDriverInteractor {
-    fn dry_write(&self, input: DryWriteDriverInput) -> DryDriverOutcome {
+    fn dry_write(&self, input: DryWriteDriverInput) -> DryWriteOutcome {
         self.port.dry_write(input)
     }
 
@@ -136,7 +184,7 @@ impl DryDriverService for DryDriverInteractor {
         self.port.dry_results(input)
     }
 
-    fn dry_check_approved(&self, input: DryCheckApprovedDriverInput) -> DryDriverOutcome {
+    fn dry_check_approved(&self, input: DryCheckApprovedDriverInput) -> DryCheckApprovedOutcome {
         self.port.dry_check_approved(input)
     }
 

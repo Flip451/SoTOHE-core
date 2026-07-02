@@ -310,6 +310,20 @@ subgraph cli_driver["cli_driver"]
     T31_cli_driver_cli_driver_DryDriver_handle([handle])
   end
   end
+  subgraph cli_driver_cli_driver_module_pr["cli_driver::pr"]
+    direction TB
+  subgraph T29_cli_driver_cli_driver_PrInput["pr::PrInput"]
+    direction TB
+    T29_cli_driver_cli_driver_PrInput__self[PrInput]
+    T29_cli_driver_cli_driver_PrInput_Push[Push]
+    T29_cli_driver_cli_driver_PrInput_Ensure[Ensure]
+    T29_cli_driver_cli_driver_PrInput_Status[Status]
+    T29_cli_driver_cli_driver_PrInput_WaitAndMerge[WaitAndMerge]
+    T29_cli_driver_cli_driver_PrInput_TriggerReview[TriggerReview]
+    T29_cli_driver_cli_driver_PrInput_PollReview[PollReview]
+    T29_cli_driver_cli_driver_PrInput_ReviewCycle[ReviewCycle]
+  end
+  end
   subgraph cli_driver_cli_driver_module_track["cli_driver::track"]
     direction TB
   subgraph T33_cli_driver_cli_driver_TrackDriver["track::TrackDriver"]
@@ -431,6 +445,7 @@ subgraph cli["cli"]
     T20_cli_cli_TrackCommand_FixpointResolve[FixpointResolve]
     T20_cli_cli_TrackCommand_SetCommitHash[SetCommitHash]
     T20_cli_cli_TrackCommand_SwitchBase[SwitchBase]
+    T20_cli_cli_TrackCommand_items_dir([items_dir])
   end
   subgraph T24_cli_cli_WaitAndMergeArgs["commands::pr::WaitAndMergeArgs"]
     direction TB
@@ -605,6 +620,14 @@ class T49_infrastructure_infrastructure_MergeMethodDocument__self dto
 class T45_infrastructure_infrastructure_TrackDocumentV2__self dto
 class T31_cli_driver_cli_driver_DryDriver_new method_node
 class T31_cli_driver_cli_driver_DryDriver_handle method_node
+class T29_cli_driver_cli_driver_PrInput_Push variant_node
+class T29_cli_driver_cli_driver_PrInput_Ensure variant_node
+class T29_cli_driver_cli_driver_PrInput_Status variant_node
+class T29_cli_driver_cli_driver_PrInput_WaitAndMerge variant_node
+class T29_cli_driver_cli_driver_PrInput_TriggerReview variant_node
+class T29_cli_driver_cli_driver_PrInput_PollReview variant_node
+class T29_cli_driver_cli_driver_PrInput_ReviewCycle variant_node
+class T29_cli_driver_cli_driver_PrInput__self dto
 class T33_cli_driver_cli_driver_TrackDriver_new method_node
 class T33_cli_driver_cli_driver_TrackDriver_handle method_node
 class T32_cli_driver_cli_driver_TrackInput_Init variant_node
@@ -688,6 +711,7 @@ class T20_cli_cli_TrackCommand_CatalogueImplSignals variant_node
 class T20_cli_cli_TrackCommand_FixpointResolve variant_node
 class T20_cli_cli_TrackCommand_SetCommitHash variant_node
 class T20_cli_cli_TrackCommand_SwitchBase variant_node
+class T20_cli_cli_TrackCommand_items_dir method_node
 class T20_cli_cli_TrackCommand__self dto
 class T24_cli_cli_WaitAndMergeArgs__self dto
 ```

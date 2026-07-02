@@ -28,6 +28,7 @@ pub mod dry_driver;
 pub mod export_schema;
 pub mod file;
 pub mod fixpoint_resolve;
+pub mod fixpoint_resolve_driver;
 pub mod git_workflow;
 pub mod guard;
 pub mod hook;

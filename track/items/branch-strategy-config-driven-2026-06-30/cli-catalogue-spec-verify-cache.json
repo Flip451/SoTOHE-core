@@ -27,7 +27,7 @@
       }
     },
     {
-      "claim_hash": "52c5b09269d9de21bca4fb8b523e7c55b604e7587b2040e9d382e7101f5754dc",
+      "claim_hash": "4c2590e3259e21727fd8528fdd29acd49ee5d53aad36a9273fdfd45108487322",
       "evidence_hash": "6addf5a32c6222d234d96a82bd2402003c9dbe10f9a31b6d5817bdf32583fb7f",
       "verdict": {
         "kind": "pass",

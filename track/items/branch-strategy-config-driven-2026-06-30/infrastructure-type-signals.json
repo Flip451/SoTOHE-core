@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-01T23:18:40Z",
+  "generated_at": "2026-07-02T05:52:09Z",
   "declaration_hash": "e03a09ce996de453d85dd4945b95f97dc2af82b8eed5185ea752b7e5cc270754",
   "signals": [
     {
@@ -39,45 +39,45 @@
     {
       "type_name": "FsDryApprovalFactoryAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "DryApprovalFactoryPort"
       ]
     },
     {
       "type_name": "FsDryCheckConfigLoaderAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "DryCheckConfigLoaderPort"
       ]
     },
     {
       "type_name": "FsFixpointDryGateFactoryAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "FixpointDryGateFactoryPort"
       ]
     },
     {
       "type_name": "FsFixpointGateStateFactoryAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "FixpointGateStateFactoryPort"
       ]
     },
     {
       "type_name": "FsFixpointWorkspaceContextAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "FixpointWorkspaceContextPort"
       ]
     },

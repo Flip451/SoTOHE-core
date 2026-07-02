@@ -6,6 +6,9 @@
 use std::path::PathBuf;
 use std::sync::Arc;
 
+use usecase::fixpoint_resolve_driver::{
+    FixpointResolveDriverInput, FixpointResolveDriverOutcome, FixpointResolveDriverService,
+};
 use usecase::track_service::{TrackCommandOutput, TrackService};
 
 use crate::render::CommandOutcome;
@@ -45,7 +48,7 @@ pub enum TrackInput {
         /// Track ID string (resolved from git branch if `None`).
         track_id: Option<String>,
     },
-    /// Create a new track branch from `main`.
+    /// Create a new track branch from the configured base branch.
     BranchCreate {
         /// Items directory (`track/items`).
         items_dir: PathBuf,
@@ -128,6 +131,21 @@ pub enum TrackInput {
         /// Project root directory.
         project_root: PathBuf,
     },
+    /// Resolve the next fixpoint step for the active track.
+    FixpointResolve {
+        /// Active track ID (directory name under `items_dir/<id>`).
+        track_id: String,
+        /// Current git branch label (e.g. `"track/my-feature-2026"`).
+        current_branch: String,
+        /// Path to the `track/items` directory.
+        items_dir: PathBuf,
+    },
+    /// Switch to the configured base branch from the active track's
+    /// `branch_strategy_snapshot`.
+    SwitchBase {
+        /// Project root directory.
+        project_root: PathBuf,
+    },
 }
 
 // ---------------------------------------------------------------------------
@@ -136,6 +154,30 @@ pub enum TrackInput {
 
 fn service_output_to_outcome(output: TrackCommandOutput) -> CommandOutcome {
     CommandOutcome { stdout: output.stdout, stderr: output.stderr, exit_code: output.exit_code }
+}
+
+/// Render a [`FixpointResolveDriverOutcome`] into a [`CommandOutcome`].
+///
+/// Reproduces the exact text contract previously produced by
+/// `cli_composition::track::fixpoint_resolve::format_fixpoint_step`:
+/// - `RunDfp` → `"run-dfp"`
+/// - `RunRfp { scopes }` → `"run-rfp scopes=<s1>,<s2>..."` (scopes already
+///   sorted by the usecase layer)
+/// - `RunRefVerify` → `"run-ref-verify"`
+/// - `Commit` → `"commit"`
+/// - `Failure { message }` → failure outcome carrying `message`
+fn render_fixpoint_resolve_outcome(outcome: FixpointResolveDriverOutcome) -> CommandOutcome {
+    match outcome {
+        FixpointResolveDriverOutcome::RunDfp => CommandOutcome::success(Some("run-dfp".to_owned())),
+        FixpointResolveDriverOutcome::RunRfp { scopes } => {
+            CommandOutcome::success(Some(format!("run-rfp scopes={}", scopes.join(","))))
+        }
+        FixpointResolveDriverOutcome::RunRefVerify => {
+            CommandOutcome::success(Some("run-ref-verify".to_owned()))
+        }
+        FixpointResolveDriverOutcome::Commit => CommandOutcome::success(Some("commit".to_owned())),
+        FixpointResolveDriverOutcome::Failure { message } => CommandOutcome::failure(Some(message)),
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -147,12 +189,16 @@ fn service_output_to_outcome(output: TrackCommandOutput) -> CommandOutcome {
 /// Holds an injected [`TrackService`]; exposes `handle(input) -> CommandOutcome`.
 pub struct TrackDriver {
     service: Arc<dyn TrackService>,
+    fixpoint_resolve_service: Arc<dyn FixpointResolveDriverService>,
 }
 
 impl TrackDriver {
-    /// Create a new `TrackDriver` with the given service.
-    pub fn new(service: Arc<dyn TrackService>) -> Self {
-        Self { service }
+    /// Create a new `TrackDriver` with the given services.
+    pub fn new(
+        service: Arc<dyn TrackService>,
+        fixpoint_resolve_service: Arc<dyn FixpointResolveDriverService>,
+    ) -> Self {
+        Self { service, fixpoint_resolve_service }
     }
 
     /// Handle a track command.
@@ -214,6 +260,18 @@ impl TrackDriver {
             TrackInput::DetectActive { project_root } => {
                 service_output_to_outcome(self.service.detect_active(project_root))
             }
+            TrackInput::FixpointResolve { track_id, current_branch, items_dir } => {
+                let outcome =
+                    self.fixpoint_resolve_service.fixpoint_resolve(FixpointResolveDriverInput {
+                        track_id,
+                        current_branch,
+                        items_dir,
+                    });
+                render_fixpoint_resolve_outcome(outcome)
+            }
+            TrackInput::SwitchBase { project_root } => {
+                service_output_to_outcome(self.service.switch_base(project_root))
+            }
         }
     }
 }
@@ -251,3 +309,64 @@ const _: fn() = || {
     let _ = sync_views_to_stdout;
     let _ = format_task_counts_json;
 };
+
+// ---------------------------------------------------------------------------
+// Tests
+// ---------------------------------------------------------------------------
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── render_fixpoint_resolve_outcome ─────────────────────────────────────
+    //
+    // Relocated from `apps/cli-composition/src/track/fixpoint_resolve.rs`'s
+    // `format_fixpoint_step` tests, adapted to exercise the render logic
+    // directly with `FixpointResolveDriverOutcome` inputs instead of a domain
+    // `FixpointStep` (cli_driver may only depend on usecase, not domain).
+
+    #[test]
+    fn test_render_fixpoint_resolve_outcome_run_dfp() {
+        let outcome = render_fixpoint_resolve_outcome(FixpointResolveDriverOutcome::RunDfp);
+        assert_eq!(outcome.stdout.as_deref(), Some("run-dfp"));
+        assert_eq!(outcome.exit_code, 0);
+    }
+
+    #[test]
+    fn test_render_fixpoint_resolve_outcome_run_rfp_single_scope() {
+        let outcome = render_fixpoint_resolve_outcome(FixpointResolveDriverOutcome::RunRfp {
+            scopes: vec!["plan-artifacts".to_owned()],
+        });
+        assert_eq!(outcome.stdout.as_deref(), Some("run-rfp scopes=plan-artifacts"));
+    }
+
+    #[test]
+    fn test_render_fixpoint_resolve_outcome_run_rfp_multiple_scopes_in_btreeset_order() {
+        // "code" < "plan-artifacts" in BTreeSet order.
+        let outcome = render_fixpoint_resolve_outcome(FixpointResolveDriverOutcome::RunRfp {
+            scopes: vec!["code".to_owned(), "plan-artifacts".to_owned()],
+        });
+        assert_eq!(outcome.stdout.as_deref(), Some("run-rfp scopes=code,plan-artifacts"));
+    }
+
+    #[test]
+    fn test_render_fixpoint_resolve_outcome_run_ref_verify() {
+        let outcome = render_fixpoint_resolve_outcome(FixpointResolveDriverOutcome::RunRefVerify);
+        assert_eq!(outcome.stdout.as_deref(), Some("run-ref-verify"));
+    }
+
+    #[test]
+    fn test_render_fixpoint_resolve_outcome_commit() {
+        let outcome = render_fixpoint_resolve_outcome(FixpointResolveDriverOutcome::Commit);
+        assert_eq!(outcome.stdout.as_deref(), Some("commit"));
+    }
+
+    #[test]
+    fn test_render_fixpoint_resolve_outcome_failure() {
+        let outcome = render_fixpoint_resolve_outcome(FixpointResolveDriverOutcome::Failure {
+            message: "boom".to_owned(),
+        });
+        assert_eq!(outcome.stderr.as_deref(), Some("boom"));
+        assert_eq!(outcome.exit_code, 1);
+    }
+}

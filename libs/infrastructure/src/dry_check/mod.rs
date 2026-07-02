@@ -18,6 +18,7 @@
 //! - [`FsDryCorpusMetaAdapter`]: implements `DryCorpusMetaPort` via the
 //!   `dry-check-corpus-root.json` sidecar.
 
+pub mod approval_factory;
 mod codec;
 mod codex_dry_checker;
 mod commit_hash_store;
@@ -31,6 +32,7 @@ pub mod noop_approval;
 pub mod recording_agent;
 mod store;
 
+pub use approval_factory::FsDryApprovalFactoryAdapter;
 pub use codex_dry_checker::CodexDryChecker;
 pub use commit_hash_store::{DryCheckCommitHashError, FsDryCheckCommitHashStore};
 pub use config::{DryCheckConfig, DryCheckConfigError};

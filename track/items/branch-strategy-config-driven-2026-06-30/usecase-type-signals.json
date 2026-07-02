@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-01T23:18:35Z",
+  "generated_at": "2026-07-02T05:52:04Z",
   "declaration_hash": "acd6e65a833ba07556ac03a5ec7ef2774986583958a5868613b44787626fa6df",
   "signals": [
     {
@@ -12,9 +12,9 @@
     {
       "type_name": "DryCheckApprovedOutcome",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::fmt::Debug"
       ]
@@ -22,9 +22,9 @@
     {
       "type_name": "DryCheckConfigLoaderError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::error::Error",
         "core::fmt::Debug",
@@ -34,27 +34,27 @@
     {
       "type_name": "DryCheckConfigLoaderPort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "DryDriverPort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
       "type_name": "DryDriverService",
       "kind_tag": "application_service",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
       "type_name": "DryWriteFindingSummary",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::fmt::Debug"
       ]
@@ -62,9 +62,9 @@
     {
       "type_name": "DryWriteOutcome",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::fmt::Debug"
       ]
@@ -72,21 +72,21 @@
     {
       "type_name": "FixpointDryGateFactoryPort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "FixpointGateStateFactoryPort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "FixpointResolveDriverInput",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::fmt::Debug"
       ]
@@ -94,18 +94,18 @@
     {
       "type_name": "FixpointResolveDriverInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "FixpointResolveDriverService"
       ]
     },
     {
       "type_name": "FixpointResolveDriverOutcome",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::fmt::Debug"
       ]
@@ -113,15 +113,15 @@
     {
       "type_name": "FixpointResolveDriverService",
       "kind_tag": "application_service",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "FixpointWorkspaceContext",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::fmt::Debug"
       ]
@@ -129,9 +129,9 @@
     {
       "type_name": "FixpointWorkspaceContextError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::error::Error",
         "core::fmt::Debug",
@@ -141,8 +141,8 @@
     {
       "type_name": "FixpointWorkspaceContextPort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "TrackService",

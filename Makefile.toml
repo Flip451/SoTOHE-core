@@ -325,7 +325,7 @@ args = ["run", "--quiet", "-p", "cli", "--", "signal", "check-adr-user", "--gate
 
 [tasks.verify-spec-states-current-local]
 private = true
-description = "[internal] Chain ① spec→ADR signal gate. Active track auto-resolved from current branch; graceful skip when spec.json is absent (Phase 0 / pre-Phase-1 tracks — see ADR knowledge/adr/2026-06-03-1241-spec-states-gate-tolerate-missing-spec-artifact.md). Track-aware task: only invoked via ci-track-container / ci-track-local (PR CI, never push/main); the parent already fails-closed on non-track branches so the inner shell skips only on absent spec.json, not on branch shape."
+description = "[internal] Chain ① spec→ADR signal gate. Active track auto-resolved from current branch; graceful skip when spec.json is absent (Phase 0 / pre-Phase-1 tracks — see ADR knowledge/adr/2026-06-03-1241-spec-states-gate-tolerate-missing-spec-artifact.md). Track-aware task: only invoked via ci-track-container / ci-track-local (PR CI, never push/base branch); the parent already fails-closed on non-track branches so the inner shell skips only on absent spec.json, not on branch shape."
 script_runner = "@shell"
 script = ['''
 BRANCH="$(git symbolic-ref --quiet --short HEAD 2>/dev/null || true)"
@@ -340,7 +340,7 @@ cargo run --quiet -p cli -- signal check-spec-adr --gate commit --spec-json "$SP
 
 [tasks.signal-check-impl-catalog-local]
 private = true
-description = "[internal] Chain ③ impl↔catalog signal gate. Active track + layers auto-resolved inside the CLI from the current git branch. Track-aware task: only invoked via ci-track-container / ci-track-local (PR CI, never push/main)."
+description = "[internal] Chain ③ impl↔catalog signal gate. Active track + layers auto-resolved inside the CLI from the current git branch. Track-aware task: only invoked via ci-track-container / ci-track-local (PR CI, never push/base branch)."
 command = "cargo"
 args = ["run", "--quiet", "-p", "cli", "--", "signal", "check-impl-catalog", "--gate", "commit"]
 
@@ -352,7 +352,7 @@ args = ["run", "--quiet", "-p", "cli", "--", "verify", "catalogue-spec-refs"]
 
 [tasks.check-catalogue-spec-signals-local]
 private = true
-description = "[internal] Chain ② catalog→spec signal gate. Active track + layers auto-resolved inside the CLI from the current git branch. Track-aware task: only invoked via ci-track-container / ci-track-local (PR CI, never push/main)."
+description = "[internal] Chain ② catalog→spec signal gate. Active track + layers auto-resolved inside the CLI from the current git branch. Track-aware task: only invoked via ci-track-container / ci-track-local (PR CI, never push/base branch)."
 command = "cargo"
 args = ["run", "--quiet", "-p", "cli", "--", "signal", "check-catalog-spec", "--gate", "commit"]
 
@@ -368,7 +368,7 @@ dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local
 
 [tasks.ci-track-local]
 private = true
-description = "[internal] Run track-aware CI gates (task-contract coverage + check liveness + signal chains spec/catalogue/impl). Assumes a track/<id> branch context — fails closed on main / non-track branches by design."
+description = "[internal] Run track-aware CI gates (task-contract coverage + check liveness + signal chains spec/catalogue/impl). Assumes a track/<id> branch context — fails closed on base branch / non-track branches by design."
 dependencies = ["task-contract-coverage-local", "task-contract-check-local", "verify-spec-states-current-local", "signal-check-impl-catalog-local", "verify-catalogue-spec-refs-local", "check-catalogue-spec-signals-local"]
 
 [tasks.ci-rust-container]
@@ -380,7 +380,7 @@ description = "[gate] Run repo-wide CI checks inside a pre-existing container (n
 dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-hooks-path-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-adr-signals-local"]
 
 [tasks.ci-track-container]
-description = "[gate] Track-aware CI gates that require a track/<id> branch context (task-contract coverage + check liveness + spec/catalogue/impl signal chains). Skip on main / non-track CI runs."
+description = "[gate] Track-aware CI gates that require a track/<id> branch context (task-contract coverage + check liveness + spec/catalogue/impl signal chains). Skip on base branch / non-track CI runs."
 dependencies = ["task-contract-coverage-local", "task-contract-check-local", "verify-spec-states-current-local", "signal-check-impl-catalog-local", "verify-catalogue-spec-refs-local", "check-catalogue-spec-signals-local"]
 
 # Compose wrappers
@@ -572,7 +572,7 @@ script_runner = "@shell"
 script = ['bin/sotp domain export-schema "$@"']
 
 [tasks.track-branch-create]
-description = "[wrapper] Create a track branch from main and switch to it (branch only; no metadata, no commit). (usage: cargo make track-branch-create '<track-id>')"
+description = "[wrapper] Create a track branch from the configured base branch and switch to it (branch only; no metadata, no commit). (usage: cargo make track-branch-create '<track-id>')"
 command = "bin/sotp"
 args = ["track", "branch", "create", "--items-dir", "track/items", "${@}"]
 
@@ -613,10 +613,10 @@ description = "[wrapper] Write current HEAD SHA to .commit_hash (set v2 diff bas
 command = "bin/sotp"
 args = ["track", "set-commit-hash", "${@}"]
 
-[tasks.track-switch-main]
-description = "[wrapper] Switch to main branch and pull latest"
+[tasks.track-switch-base]
+description = "[wrapper] Switch to the configured base branch and pull latest"
 command = "bin/sotp"
-args = ["git", "switch-and-pull", "main"]
+args = ["track", "switch-base"]
 
 [tasks.task-contract-refresh-impl-catalog]
 private = true

@@ -117,6 +117,14 @@ impl GitCompositionRoot {
             .transpose()?;
 
         // Fail-closed: non-track-branch commits are always rejected.
+        //
+        // The "track/" literal here matches `BranchStrategyPort::track_prefix()`
+        // (CN-04: fixed for every adapter, independent of `base_branch`/
+        // `merge_target`/`merge_method`). It is not routed through a constructed
+        // port because no track identity is known yet at this point — that is
+        // exactly what this check determines — and because the value never
+        // varies by config/snapshot, so no adapter construction (and its
+        // associated I/O / fail-closed surface) is needed to obtain it.
         match repo
             .current_branch()
             .map_err(|e| CompositionError::AdapterInit(e.to_string()))?
@@ -291,6 +299,9 @@ impl GitCompositionRoot {
         match usecase::track_resolution::resolve_track_id_from_branch(Some(&branch)) {
             Ok(id) => Ok(Some(id)),
             Err(usecase::track_resolution::TrackResolutionError::InvalidTrackId(slug, _)) => {
+                // "track/" here reconstructs the display form of the branch this
+                // error is about; matches `BranchStrategyPort::track_prefix()`,
+                // which is fixed at "track/" for every adapter (CN-04).
                 Err(CompositionError::Usecase(format!(
                     "current branch 'track/{slug}' has an invalid track id; \
                      rename the branch or switch to a valid track branch before committing"

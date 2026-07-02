@@ -212,7 +212,19 @@
           }
         ]
       },
-      "methods": [],
+      "methods": [
+        {
+          "name": "items_dir",
+          "receiver": "&self",
+          "params": [],
+          "returns": "std::path::PathBuf",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns the effective items_dir for this command variant as an owned PathBuf, used by telemetry wiring to resolve the track items path. Pre-existing method (commit d1d4d89f), unrelated to this track's spec scope; enumerated here to satisfy modify-action completeness for the TrackCommand entry."
+        }
+      ],
       "module_path": "commands::track",
       "docs": "CLI subcommand enum for track operations. SwitchBase is new in this track (IN-05): sotp track switch-base -- switches to the base branch from the active track's branch_strategy_snapshot.",
       "spec_refs": [

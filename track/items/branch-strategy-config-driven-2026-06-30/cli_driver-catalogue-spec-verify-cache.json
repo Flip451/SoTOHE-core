@@ -51,6 +51,54 @@
       }
     },
     {
+      "claim_hash": "aaee6a817a7518484d954cfbb147d7d24873acc3e5235b05565c82cc45a560f0",
+      "evidence_hash": "3f31f4b64b6c70569f6c85d8f596f063f53aead4801aa022b5e76d5ed8babd2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D1 の置換対象表に列挙された本番コード・delivery 層の全箇所（`apps/cli/src/commands/pr.rs`、`apps/cli/src/commands/track/branch_ops.rs`、`apps/cli-composition/src/track/mod.rs`、`apps/cli-composition/src/git.rs`、`apps/cli-composition/src/pr.rs`、`apps/cli-driver/src/track.rs`、CLI `--help` テキスト 2 箇所、`Makefile.toml` description 5 箇所、`README.md:109`、workflow SSoT 3 ファイル、command / rules / skill 5 箇所）のハードコード `main` を effective strategy の port 呼び出しまたは config 値参照に置き換える。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "PrInput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "D1 の置換対象表に列挙された本番コード・delivery 層の全箇所（`apps/cli/src/commands/pr.rs`、`apps/cli/src/commands/track/branch_ops.rs`、`apps/cli-composition/src/track/mod.rs`、`apps/cli-composition/src/git.rs`、`apps/cli-composition/src/pr.rs`、`apps/cli-driver/src/track.rs`、CLI `--help` テキスト 2 箇所、`Makefile.toml` description 5 箇所、`README.md:109`、workflow SSoT 3 ファイル、command / rules / skill 5 箇所）のハードコード `main` を effective strategy の port 呼び出しまたは config 値参照に置き換える。"
+        }
+      }
+    },
+    {
+      "claim_hash": "aaee6a817a7518484d954cfbb147d7d24873acc3e5235b05565c82cc45a560f0",
+      "evidence_hash": "3edebf3b5a6e965a1f14dbe2972b973396e597ab8520270ced93a10ff0fa076a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp pr wait-and-merge` は明示 `--method` がない場合に `branch_strategy_snapshot.merge_method` を既定メソッドとして使い、明示 `--method merge|squash|rebase` はその値を上書きする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "PrInput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "PR 作成・PR merge default・branch 作成・commit gate の各コードパスが `metadata.json` の `branch_strategy_snapshot` から effective strategy を読むことをテストで確認できる（`.harness/config/branch-strategy.json` を直接参照するコードパスがこれらの post-init 操作に存在しない）。branch 作成・switch・PR 作成・merge の git/gh invocation は branch_strategy_snapshot 由来の base_branch / merge_target / merge_method を個別 argv として渡し、shell command 文字列へ補間しない。`sotp pr wait-and-merge` は明示 `--method` がない場合に `branch_strategy_snapshot.merge_method` を既定メソッドとして使い、明示 `--method merge|squash|rebase` はその値を上書きする。"
+        }
+      }
+    },
+    {
       "claim_hash": "e3353ac57d17eae7bd445f2c75e7e6df8963ed5644ac28c8073a93044d48fa28",
       "evidence_hash": "ed2817eadb35a48a3b798b5382f0e922c160b64efa3c91209e3a995f7a9acf62",
       "verdict": {

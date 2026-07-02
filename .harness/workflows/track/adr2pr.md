@@ -81,7 +81,8 @@ defined in the `plan` workflow SSoT's "Phase 1 loop", "Phase 2 loop", and "Phase
 sections (see `.harness/workflows/track/plan.md`; do not re-state them here).
 
 Do NOT invoke the `plan` workflow: after Step 1, the orchestrator is on a `track/<id>` branch,
-so the `plan` workflow's Phase 0 (`init`, which requires `main`) would fail; and the `plan`
+so the `plan` workflow's Phase 0 (`init`, which requires the configured base branch) would fail;
+and the `plan`
 workflow's Termination section can pause for a user decision when ADR working-tree diffs are
 present (violates Constraint 2). Plan artifacts are staged at Step 6 and committed at Step 7.
 
@@ -114,7 +115,8 @@ full internal state machine.
 **Step 10: pr-review workflow**
 
 Invoke the `pr-review` workflow (`.harness/workflows/track/pr-review.md`) for the final
-PR-based review (whole track branch vs `main`). The workflow stops at reviewed PR. No merge
+PR-based review (whole track branch vs the configured merge target). The workflow stops at
+reviewed PR. No merge
 is performed.
 
 ## Gates

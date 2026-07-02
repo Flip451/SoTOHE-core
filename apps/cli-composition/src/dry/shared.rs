@@ -1,8 +1,6 @@
 use std::path::{Path, PathBuf};
 
-use domain::dry_check::{
-    DryCheckApprovalVerdict, DryCheckFinding, VerdictFilter, fragments_overlapping_hunks,
-};
+use domain::dry_check::{VerdictFilter, fragments_overlapping_hunks};
 use domain::semantic_dup::CodeFragment;
 use domain::{CommitHash, TrackId};
 use infrastructure::dry_check::{
@@ -10,7 +8,7 @@ use infrastructure::dry_check::{
 };
 use infrastructure::semantic_dup::extractor::extract_code_fragments;
 
-use crate::{CommandOutcome, error::CompositionError};
+use crate::error::CompositionError;
 
 /// Resolve the diff base commit using the three-branch fail-closed policy.
 ///
@@ -268,51 +266,4 @@ pub(super) fn parse_verdict_filter(s: &str) -> Result<VerdictFilter, Composition
             "invalid --filter '{other}' (expected: all / not-a-violation / accepted / violation)"
         ))),
     }
-}
-
-pub(super) fn dry_check_approved_outcome(verdict: DryCheckApprovalVerdict) -> CommandOutcome {
-    match verdict {
-        DryCheckApprovalVerdict::Approved => CommandOutcome {
-            stdout: Some("dry check-approved: APPROVED — all pairs verified".to_owned()),
-            stderr: None,
-            exit_code: 0,
-        },
-        DryCheckApprovalVerdict::Blocked { unresolved_pair_count } => CommandOutcome {
-            stdout: None,
-            stderr: Some(format!(
-                "dry check-approved: BLOCKED — {unresolved_pair_count} unresolved pair(s); \
-                 run `sotp dry write` to record verdicts"
-            )),
-            exit_code: 1,
-        },
-    }
-}
-
-pub(super) fn dry_write_outcome(
-    findings: &[DryCheckFinding],
-    pairs_checked: usize,
-    records_appended: usize,
-    diff_fragments_processed: usize,
-) -> CommandOutcome {
-    let mut output_lines: Vec<String> = Vec::new();
-    output_lines.push(format!(
-        "dry write: {pairs_checked} pair(s) checked; {records_appended} record(s) appended; \
-         {} violation(s) found; {diff_fragments_processed} diff fragment(s) processed",
-        findings.len()
-    ));
-    for finding in findings {
-        output_lines.push(format!(
-            "  changed: {} (hash: {})",
-            finding.changed_fragment_ref().path().as_str(),
-            finding.changed_fragment_ref().content_hash().as_str(),
-        ));
-        output_lines.push(format!(
-            "  candidate: {} (hash: {})",
-            finding.candidate_fragment_ref().path().as_str(),
-            finding.candidate_fragment_ref().content_hash().as_str(),
-        ));
-        output_lines.push(format!("  proposal: {}", finding.refactor_proposal().as_str(),));
-    }
-
-    CommandOutcome::success(Some(output_lines.join("\n")))
 }

@@ -4,12 +4,12 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| FixpointResolveInput | dto | delete | — | 🟡 | 🔵 |
+| FixpointResolveInput | dto | delete | — | 🔵 | 🔵 |
 
 ## Composition Roots
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| DryCompositionRoot | composition_root | modify | — | 🟡 | 🔵 |
-| TrackCompositionRoot | composition_root | modify | — | 🟡 | 🔵 |
+| DryCompositionRoot | composition_root | modify | — | 🔵 | 🔵 |
+| TrackCompositionRoot | composition_root | modify | — | 🔵 | 🔵 |
 

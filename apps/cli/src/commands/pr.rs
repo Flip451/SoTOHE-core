@@ -41,9 +41,11 @@ pub struct EnsurePrArgs {
     /// Deprecated compatibility option; PR commands resolve from the current track branch.
     #[arg(long)]
     pub track_id: Option<String>,
-    /// Base branch for the PR.
-    #[arg(long, default_value = "main")]
-    pub base: String,
+    /// Base branch for the PR. When omitted, resolved from the active track's
+    /// `branch_strategy_snapshot.merge_target` (composition root resolves via
+    /// `BranchStrategyPort::merge_target()`).
+    #[arg(long)]
+    pub base: Option<String>,
 }
 
 #[derive(Debug, Args)]
@@ -58,8 +60,12 @@ pub struct WaitAndMergeArgs {
     pub interval: u64,
     #[arg(long, default_value_t = 600)]
     pub timeout: u64,
-    #[arg(long, value_parser = ["merge", "squash", "rebase"], default_value = "merge")]
-    pub method: String,
+    /// Merge method. When omitted, resolved from the PR's track
+    /// `branch_strategy_snapshot.merge_method` (composition root resolves via
+    /// `BranchStrategyPort::merge_method()`). An explicit value here always
+    /// overrides the configured default.
+    #[arg(long, value_parser = ["merge", "squash", "rebase"])]
+    pub method: Option<String>,
 }
 
 #[derive(Debug, Args)]

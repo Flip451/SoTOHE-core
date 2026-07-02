@@ -26,8 +26,9 @@ pub enum PrInput {
     Ensure {
         /// Optional track ID override.
         track_id: Option<String>,
-        /// Base branch for the PR (e.g. `"main"`).
-        base: String,
+        /// Optional base-branch override; `None` means "resolve via
+        /// `BranchStrategyPort::merge_target()`".
+        base: Option<String>,
     },
     /// Show current PR check status.
     Status {
@@ -42,8 +43,9 @@ pub enum PrInput {
         interval: u64,
         /// Maximum wait time in seconds before giving up.
         timeout: u64,
-        /// Merge method: `"merge"`, `"squash"`, or `"rebase"`.
-        method: String,
+        /// Optional merge-method override; `None` means "resolve via
+        /// `BranchStrategyPort::merge_method()`".
+        method: Option<String>,
     },
     /// Post `@codex review` comment on a PR.
     TriggerReview {
@@ -91,11 +93,13 @@ impl PrDriver {
     pub fn handle(&self, input: PrInput) -> CommandOutcome {
         match input {
             PrInput::Push { track_id } => to_outcome(self.service.push(track_id)),
-            PrInput::Ensure { track_id, base } => to_outcome(self.service.ensure(track_id, base)),
-            PrInput::Status { pr } => to_outcome(self.service.status(pr)),
-            PrInput::WaitAndMerge { pr, interval, timeout, method } => {
-                to_outcome(self.service.wait_and_merge(pr, interval, timeout, method))
+            PrInput::Ensure { track_id, base } => {
+                to_outcome(self.service.ensure(track_id, base.unwrap_or_default()))
             }
+            PrInput::Status { pr } => to_outcome(self.service.status(pr)),
+            PrInput::WaitAndMerge { pr, interval, timeout, method } => to_outcome(
+                self.service.wait_and_merge(pr, interval, timeout, method.unwrap_or_default()),
+            ),
             PrInput::TriggerReview { pr } => to_outcome(self.service.trigger_review(pr)),
             PrInput::PollReview { pr, trigger_timestamp, interval, timeout } => {
                 to_outcome(self.service.poll_review(pr, trigger_timestamp, interval, timeout))

@@ -1,325 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a15176685f931a467e456eec499c489039622aa761ab63859c1b04ef0454157f",
-          "at": "2026-06-30T20:45:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a15176685f931a467e456eec499c489039622aa761ab63859c1b04ef0454157f",
-          "at": "2026-06-30T20:49:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c25264bf5ba9291c1339bf568fe0a851c539e5b2abb14e21152a8f84266bb292",
-          "at": "2026-07-01T08:00:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c25264bf5ba9291c1339bf568fe0a851c539e5b2abb14e21152a8f84266bb292",
-          "at": "2026-07-01T08:03:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7612b23c9d1754f949a5a8519ed0dac18c420516ac8c4f74270a1d8753e19ed9",
-          "at": "2026-07-01T11:40:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:80c8126ae8e17bcf59c468544a747c799363f80aab7d8e0edcbd0aa80bd71d5b",
-          "at": "2026-07-01T17:25:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:80c8126ae8e17bcf59c468544a747c799363f80aab7d8e0edcbd0aa80bd71d5b",
-          "at": "2026-07-01T17:28:59Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0c04aa88fc38d0c08b5922cf48806e23cae1ff712475ebd292dde703be6f2370",
-          "at": "2026-06-30T20:44:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0c04aa88fc38d0c08b5922cf48806e23cae1ff712475ebd292dde703be6f2370",
-          "at": "2026-06-30T20:48:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`JsonConfigBranchStrategyAdapter::new` reads the config path directly with `read_to_string` and never rejects symlinks or verifies containment under a trusted root. A symlinked `.harness/config/branch-strategy.json` can therefore redirect this adapter to attacker-controlled content outside the repository, which matches the symlink-boundary issue this layer is supposed to fail closed on.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/branch_strategy.rs",
-              "line": 55,
-              "category": "symlink not rejected at boundary"
-            }
-          ],
-          "hash": "rvw1:sha256:29c2c84dadf1c1a8bc867535c4d2ff80d8b4d37514e937f994e9e1798eb4a15d",
-          "at": "2026-06-30T22:44:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "A symlinked `track/items/<id>` or `track/archive/<id>` directory is accepted here because `entry.path().is_dir()` follows symlinks, and the later `metadata.json` / `impl-plan.json` / `task-coverage.json` reads never re-check that the resolved path stays under `root`. A repo-controlled symlink can therefore escape the trusted root and feed external files into the render pipeline.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render/snapshot.rs",
-              "line": 306,
-              "category": "symlink not rejected at boundary"
-            },
-            {
-              "message": "`all_track_directories()` follows symlinked `track/items/<id>` / `track/archive/<id>` entries with `is_dir()`, and `load_track_metadata()` then reads `metadata.json` and `impl-plan.json` from that symlink target without a containment check. That lets the latest-track verifier select and parse data outside `root` if a track directory is replaced with a symlink.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/latest_track.rs",
-              "line": 103,
-              "category": "symlink not rejected at boundary"
-            }
-          ],
-          "hash": "rvw1:sha256:b8a75d58f32bdb24889d48ded48b260884fc83158f3b2f895cbee079aae2cdce",
-          "at": "2026-06-30T22:56:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Leaf symlinks are still followed when loading track state for latest-track/freshness checks. `latest_track.rs` reads `metadata.json` directly at line 254, `track/render/snapshot.rs` reads `impl-plan.json` directly at line 66, and `verify/view_freshness.rs` reads `metadata.json` directly at line 173. Those paths never do the same `symlink_metadata()` + reject step used elsewhere in the repo, so a symlinked file inside an otherwise real track directory can redirect these checks to content outside `track/items`.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/latest_track.rs",
-              "line": 254,
-              "category": "symlink not rejected at boundary"
-            },
-            {
-              "message": "`sync_rendered_views` still accepts symlinked track inputs. `catalogue_path_exists()` explicitly counts symlinks as present, and the render path then reads `spec.json` at line 180 and `*-types.json` at line 325 with `read_to_string()`. That lets a symlink under `track/items/<id>` feed arbitrary outside JSON into generated views instead of enforcing real-file semantics.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render/sync.rs",
-              "line": 325,
-              "category": "symlink not rejected at boundary"
-            }
-          ],
-          "hash": "rvw1:sha256:aa1c55a0c6df87b84666a3e861406ce125015b08fad2e7a10674436cfdd13ceb",
-          "at": "2026-06-30T23:06:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new `metadata_path.is_file()` pre-check runs before `reject_symlinks_below`, so a dangling symlink or other non-regular-file `metadata.json` is treated as absent and silently skipped instead of being rejected at the boundary. That bypasses the fail-closed guard that follows and can hide corrupted track state.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/view_freshness.rs",
-              "line": 84,
-              "category": "symlink not rejected at boundary"
-            }
-          ],
-          "hash": "rvw1:sha256:e45a22c8fa6308ea3c2f5161102260aeaeb83a02eb254a0317275941b8da216f",
-          "at": "2026-06-30T23:26:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c80cc7a3300a83f8cfb23872448c52782977665287270ddb89db62ca0babd43a",
-          "at": "2026-06-30T23:35:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c80cc7a3300a83f8cfb23872448c52782977665287270ddb89db62ca0babd43a",
-          "at": "2026-06-30T23:41:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:720eb2e859862e8ff252da394b9b064a31733f8a6a1e7026b0e96b0e94e8db53",
-          "at": "2026-07-01T01:22:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:720eb2e859862e8ff252da394b9b064a31733f8a6a1e7026b0e96b0e94e8db53",
-          "at": "2026-07-01T01:25:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7898bd45df8cb7262e279bea8abacdd0bc66ea88e03e4595736f6a067af207a3",
-          "at": "2026-07-01T02:12:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7898bd45df8cb7262e279bea8abacdd0bc66ea88e03e4595736f6a067af207a3",
-          "at": "2026-07-01T02:16:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:644f5371f66f0d2ade074f09ebedf9256e6d52efccbde791e8622d8a568d9ac4",
-          "at": "2026-07-01T08:09:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:644f5371f66f0d2ade074f09ebedf9256e6d52efccbde791e8622d8a568d9ac4",
-          "at": "2026-07-01T08:12:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1bd5947dd17b0e3961707627ebdd810fbc3c19acbe67a295e5ec1d5b30900cff",
-          "at": "2026-07-01T12:08:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1bd5947dd17b0e3961707627ebdd810fbc3c19acbe67a295e5ec1d5b30900cff",
-          "at": "2026-07-01T17:26:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`resolve_diff_base` builds `track_dir.join(\".commit_hash\")` and hands it to `FsDryCheckCommitHashStore` without first proving the resolved path remains under `canonical_root`. The store only rejects symlinks before `read_to_string`; it does not canonicalize and enforce `starts_with(canonical_root)`, so a path-traversing `track_dir` supplied at this adapter boundary can make the dry-gate read a `.commit_hash` outside the trusted repo root. This should fail closed using the existing trusted-root containment pattern (`is_safe_briefing_path`/CN-04 style) before any file read or fallback decision.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/dry_check/diff_base_resolver.rs",
-              "line": 51,
-              "category": "trusted-root violation"
-            }
-          ],
-          "hash": "rvw1:sha256:1bd5947dd17b0e3961707627ebdd810fbc3c19acbe67a295e5ec1d5b30900cff",
-          "at": "2026-07-01T17:33:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ad7955493c1701621abdfdfe8357b01d68d7eff78253a8d0673d23741c24bbcc",
-          "at": "2026-07-01T17:39:44Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f9572fc47d468f9941bb85d47917920024275dde36fb9f11f23632d9efbf2184",
-          "at": "2026-06-30T22:39:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f9572fc47d468f9941bb85d47917920024275dde36fb9f11f23632d9efbf2184",
-          "at": "2026-06-30T22:43:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new happy-path test exercises `TrackCompositionRoot::fixpoint_resolve` directly and only asserts the returned `ExitCode`; it never captures stdout/stderr from `execute_fixpoint_resolve`, so a regression in the CLI wrapper's emit path would still pass. This leaves the only bin-layer behavior in this handler effectively untested.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/fixpoint_resolve.rs",
-              "line": 242,
-              "category": "test coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:cd715242f471a9d720d387eb3f9bbc02536632fb0990b8407fd7180c0f5ea086",
-          "at": "2026-07-01T01:22:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:35b798c758fbd5d2547492157571a7c8d65dfd9df3f82860428f5a6ea97489b3",
-          "at": "2026-07-01T01:40:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:35b798c758fbd5d2547492157571a7c8d65dfd9df3f82860428f5a6ea97489b3",
-          "at": "2026-07-01T01:42:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:13a5bdcfda6e7caca9c4af69252bea224cf9e789ed2c3f177cd6bccf4adb2f64",
-          "at": "2026-07-01T07:48:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:13a5bdcfda6e7caca9c4af69252bea224cf9e789ed2c3f177cd6bccf4adb2f64",
-          "at": "2026-07-01T07:50:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fa376ada81ce7a8669626c209ba57b6ca4b652baf890c299a45a807143cb9612",
-          "at": "2026-07-01T12:03:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fa376ada81ce7a8669626c209ba57b6ca4b652baf890c299a45a807143cb9612",
-          "at": "2026-07-01T17:23:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fa376ada81ce7a8669626c209ba57b6ca4b652baf890c299a45a807143cb9612",
-          "at": "2026-07-01T17:27:05Z"
-        }
-      ]
-    },
     "cli_driver": {
       "rounds": [
         {
@@ -335,6 +16,34 @@
           "findings": [],
           "hash": "rvw1:sha256:498e3310ab0076f4ff8be931588e8d97b2d9251f45ca8d7e51b7dfa4eff79fdc",
           "at": "2026-07-01T07:56:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2553c8d7edcd5795ba42df2fdef672fe1f908865718c5ab72fda1170e6e500d",
+          "at": "2026-07-02T02:50:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2553c8d7edcd5795ba42df2fdef672fe1f908865718c5ab72fda1170e6e500d",
+          "at": "2026-07-02T02:56:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d885d5b36f36cb03c6208a497f81fc9e1cc0ba42e9a23d645b33ee6a51681edd",
+          "at": "2026-07-02T03:14:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d885d5b36f36cb03c6208a497f81fc9e1cc0ba42e9a23d645b33ee6a51681edd",
+          "at": "2026-07-02T03:21:32Z"
         }
       ]
     },
@@ -1077,74 +786,200 @@
           "findings": [],
           "hash": "rvw1:sha256:0b938b4ea41eb87735be54f1f5d26b736bfda9ef53f1ee4ed80835baf40f9491",
           "at": "2026-07-01T23:17:55Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:83cd3a8ed3fb6acf06c363984a9e4d8a415f0cf9a03741e5c74d2a3a0b551982",
-          "at": "2026-07-01T01:18:42Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:83cd3a8ed3fb6acf06c363984a9e4d8a415f0cf9a03741e5c74d2a3a0b551982",
-          "at": "2026-07-01T01:22:55Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:cbd2e6484e6c906f016d7c3b15dbda4bfa37a92089e59e70fecb3954055dc0b0",
-          "at": "2026-07-01T08:50:11Z"
+          "hash": "rvw1:sha256:b506f599777f45d063820a959ed7daf52ac32a5efdf29426b527c80b987700a8",
+          "at": "2026-07-02T02:48:30Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:cbd2e6484e6c906f016d7c3b15dbda4bfa37a92089e59e70fecb3954055dc0b0",
-          "at": "2026-07-01T08:54:00Z"
+          "hash": "rvw1:sha256:b506f599777f45d063820a959ed7daf52ac32a5efdf29426b527c80b987700a8",
+          "at": "2026-07-02T02:52:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cba71a230fcf670d48b6f33150c39810654479c4b8fb09f2894cb018d3733b9c",
+          "at": "2026-07-02T03:38:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Batch D briefing says the plan-artifacts change is limited to T016-T023 status transitions and that earlier Batch C+ artifacts remain unchanged, but this diff also marks T009-T015 as done. That makes the rendered plan claim more work was completed in this batch than the review contract describes, so reviewers cannot distinguish the intended T016-T023 closure from off-scope task completion.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/impl-plan.json",
+              "line": 52,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:cba71a230fcf670d48b6f33150c39810654479c4b8fb09f2894cb018d3733b9c",
+          "at": "2026-07-02T03:43:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:20f25ad89868e706f3fddcf8d67e81aef38c237436462e1649448a16ff17ef7e",
+          "at": "2026-07-02T03:49:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:671caf0a11b7e63e51df7f2f247d1712db242cef855f2cf80e7f62b70d0d4077",
+          "at": "2026-07-02T05:15:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The plan artifacts are not limited to the Batch D status-only update described by the review brief: T010's description is rewritten to add cli-driver PrInput work, and the scoped diff also adds the PrInput catalogue/contract entries. That contradicts the stated plan-artifacts intent that existing task descriptions/catalogue/task-contract content remain unchanged except for T016-T023 completion state, so the batch's SoT is ambiguous unless these T010/PrInput edits are either removed from this batch or explicitly included in the plan intent.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/impl-plan.json",
+              "line": 56,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:671caf0a11b7e63e51df7f2f247d1712db242cef855f2cf80e7f62b70d0d4077",
+          "at": "2026-07-02T05:18:46Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The new carve-out cites stale source locations: `DryDriverAdapter::dry_write` is at `apps/cli-composition/src/dry_driver_adapter.rs:55`, `DryCompositionRoot::dry_write` is at `apps/cli-composition/src/dry.rs:371`, and `DryCompositionRoot::dry_results` is at `apps/cli-composition/src/dry.rs:465`, not `dry_driver_adapter.rs:71`, `dry.rs:310`, and `dry.rs:404`. As written, reviewers will validate the wrong call sites and the exception will not reliably cover the intended request-time invokes.",
+              "message": "T009-T015 are still marked `todo` here even though this integrated batch's plan artifacts already add the corresponding `cli_driver`/`cli`/`cli_composition` catalogue changes and the briefing says these S4/S5 items are part of the commit. `plan.md` mirrors the same stale state as 16/23 resolved, so the rendered plan is out of sync with the change set.",
               "severity": "P1",
-              "file": ".harness/custom/review-prompts/cli_composition.md",
-              "line": 29,
-              "category": "factual error"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/branch-strategy-config-driven-2026-06-30/impl-plan.json",
+              "line": 50,
+              "category": "contradiction"
             }
           ],
-          "hash": "rvw1:sha256:4e41e355d872d6346e573e8d8e3eb7769158df8de42844d8dad718ab0295eda9",
-          "at": "2026-07-01T11:39:21Z"
+          "hash": "rvw1:sha256:2656b7ae4e712ffd89a4c017063f0d63695784dded8d95913ccd52f4277697d3",
+          "at": "2026-07-02T05:36:03Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:83cd3a8ed3fb6acf06c363984a9e4d8a415f0cf9a03741e5c74d2a3a0b551982",
-          "at": "2026-07-01T12:00:41Z"
+          "hash": "rvw1:sha256:722f4d7d019ca7b675eb372c4ee4ceeaecc3e3608affd246b8ec6809607c6bc6",
+          "at": "2026-07-02T05:41:19Z"
         },
         {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cf4375c1ceb9ceb37c5b82a48e44647f754f87a4ea8400bca7b33d05d68416db",
-          "at": "2026-07-01T17:27:31Z"
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`PrInput` documents omitted `Ensure.base` as resolving to `branch_strategy_snapshot.base_branch`, but the related plan artifacts define `EnsurePrArgs.base` as the PR base / `merge_target` and T011 resolves PR ensure through `port.merge_target()`. Since `base_branch` and `merge_target` may intentionally differ, this is an internal contradiction that can steer the implementation/review toward PRs targeting the wrong branch. Update this text to say `merge_target / merge_method`.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/cli_driver-types.json",
+              "line": 103,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:722f4d7d019ca7b675eb372c4ee4ceeaecc3e3608affd246b8ec6809607c6bc6",
+          "at": "2026-07-02T05:46:14Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:cf4375c1ceb9ceb37c5b82a48e44647f754f87a4ea8400bca7b33d05d68416db",
-          "at": "2026-07-01T17:32:18Z"
+          "hash": "rvw1:sha256:cc10f802319507e8920b814d80237161740260fba6bc60df94535dd434d7b7bc",
+          "at": "2026-07-02T05:51:37Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a15176685f931a467e456eec499c489039622aa761ab63859c1b04ef0454157f",
+          "at": "2026-06-30T20:45:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a15176685f931a467e456eec499c489039622aa761ab63859c1b04ef0454157f",
+          "at": "2026-06-30T20:49:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c25264bf5ba9291c1339bf568fe0a851c539e5b2abb14e21152a8f84266bb292",
+          "at": "2026-07-01T08:00:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c25264bf5ba9291c1339bf568fe0a851c539e5b2abb14e21152a8f84266bb292",
+          "at": "2026-07-01T08:03:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7612b23c9d1754f949a5a8519ed0dac18c420516ac8c4f74270a1d8753e19ed9",
+          "at": "2026-07-01T11:40:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:80c8126ae8e17bcf59c468544a747c799363f80aab7d8e0edcbd0aa80bd71d5b",
+          "at": "2026-07-01T17:25:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:80c8126ae8e17bcf59c468544a747c799363f80aab7d8e0edcbd0aa80bd71d5b",
+          "at": "2026-07-01T17:28:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e3d9734911ba4d25fc211396a9e8cb387482466f7636bb1175eb88f77eb12e3a",
+          "at": "2026-07-02T02:51:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e3d9734911ba4d25fc211396a9e8cb387482466f7636bb1175eb88f77eb12e3a",
+          "at": "2026-07-02T03:00:15Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8d1e032150792c0be70de04a1661f3a4605a5daddfc0efd835f89ed6d31f69bd",
+          "at": "2026-07-02T02:47:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8d1e032150792c0be70de04a1661f3a4605a5daddfc0efd835f89ed6d31f69bd",
+          "at": "2026-07-02T02:50:26Z"
         }
       ]
     },
@@ -1452,6 +1287,381 @@
           "findings": [],
           "hash": "rvw1:sha256:1860b1fca0699b37ef10c0d15101db3d9276f654cc2d74e8ba6286efb3e0a631",
           "at": "2026-07-01T17:32:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:059e64eb8ad864ecab92ef685124877818cb14e5b6fff24b8701e83e0697475c",
+          "at": "2026-07-02T02:53:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1 render leak: `track_branch_create` still assembles the user-facing success text inside `cli_composition` via `CommandOutcome::success(Some(format!(...)))`. Under the cli_composition policy and ADR D2/D3, this layer should wire the operation and return a typed outcome for `cli_driver` to render, not template CLI output itself.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/branch_strategy.rs",
+              "line": 80,
+              "category": "render leak"
+            }
+          ],
+          "hash": "rvw1:sha256:059e64eb8ad864ecab92ef685124877818cb14e5b6fff24b8701e83e0697475c",
+          "at": "2026-07-02T03:02:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dbee1009586161c1c4100bd2a892e0c4f18503c7d2785cb1676bed4e3b33c83a",
+          "at": "2026-07-02T03:10:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dbee1009586161c1c4100bd2a892e0c4f18503c7d2785cb1676bed4e3b33c83a",
+          "at": "2026-07-02T03:13:58Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:83cd3a8ed3fb6acf06c363984a9e4d8a415f0cf9a03741e5c74d2a3a0b551982",
+          "at": "2026-07-01T01:18:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:83cd3a8ed3fb6acf06c363984a9e4d8a415f0cf9a03741e5c74d2a3a0b551982",
+          "at": "2026-07-01T01:22:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cbd2e6484e6c906f016d7c3b15dbda4bfa37a92089e59e70fecb3954055dc0b0",
+          "at": "2026-07-01T08:50:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cbd2e6484e6c906f016d7c3b15dbda4bfa37a92089e59e70fecb3954055dc0b0",
+          "at": "2026-07-01T08:54:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new carve-out cites stale source locations: `DryDriverAdapter::dry_write` is at `apps/cli-composition/src/dry_driver_adapter.rs:55`, `DryCompositionRoot::dry_write` is at `apps/cli-composition/src/dry.rs:371`, and `DryCompositionRoot::dry_results` is at `apps/cli-composition/src/dry.rs:465`, not `dry_driver_adapter.rs:71`, `dry.rs:310`, and `dry.rs:404`. As written, reviewers will validate the wrong call sites and the exception will not reliably cover the intended request-time invokes.",
+              "severity": "P1",
+              "file": ".harness/custom/review-prompts/cli_composition.md",
+              "line": 29,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:4e41e355d872d6346e573e8d8e3eb7769158df8de42844d8dad718ab0295eda9",
+          "at": "2026-07-01T11:39:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:83cd3a8ed3fb6acf06c363984a9e4d8a415f0cf9a03741e5c74d2a3a0b551982",
+          "at": "2026-07-01T12:00:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cf4375c1ceb9ceb37c5b82a48e44647f754f87a4ea8400bca7b33d05d68416db",
+          "at": "2026-07-01T17:27:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cf4375c1ceb9ceb37c5b82a48e44647f754f87a4ea8400bca7b33d05d68416db",
+          "at": "2026-07-01T17:32:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Renaming the wrapper to `track-switch-base` breaks the shipped `/track:done` flow: `.claude/commands/track/done.md` still shells out to `cargo make track-switch-main`, so the command now points at a deleted task and will fail before it can switch branches. The README already advertises the new base-branch behavior, so the docs and executable surface are now out of sync.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/Makefile.toml",
+              "line": 616,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:103d3b9df956ec75417b38e4857b37c7f91afe81c89d477474d0f20b596ce53b",
+          "at": "2026-07-02T02:50:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:771fc1d89e9cd2828a18f8cc8d12431b243696f690ad0c100095bc019c53f34d",
+          "at": "2026-07-02T03:00:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The harness-policy adapter-SSoT check requires track command adapters to point at an existing `.harness/workflows/track/...` SSoT and avoid duplicating provider-independent workflow steps inline. This changed adapter still owns the `/track:done` step sequence directly (`Step 1`, `Step 2`, command invocation), and there is no referenced `.harness/workflows/track/done.md`, so the workflow can drift from other provider adapters instead of having a single SSoT.",
+              "severity": "P1",
+              "file": ".claude/commands/track/done.md",
+              "line": 10,
+              "category": "adapter-SSoT sync"
+            },
+            {
+              "message": "`/track:done` now executes `cargo make track-switch-base`, but the command text still says it is returning/switching to `main` (also in the frontmatter and opening sentence). With the new branch strategy config using `develop` as the base branch, this makes the command report and reason about the wrong branch after execution.",
+              "severity": "P1",
+              "file": ".claude/commands/track/done.md",
+              "line": 22,
+              "category": "convention contradiction"
+            },
+            {
+              "message": "These rules now advertise `track-switch-base` and `track-branch-create` as operating on the configured base branch, but the canonical branch strategy convention still defines the workflow around `main` as the base/fail-closed branch. The harness-policy severity policy requires convention changes to propagate consistently across `.claude/rules` and `knowledge/conventions`; otherwise agents reading both surfaces get contradictory branch preconditions for the same commands.",
+              "severity": "P1",
+              "file": ".claude/rules/07-dev-environment.md",
+              "line": 54,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:771fc1d89e9cd2828a18f8cc8d12431b243696f690ad0c100095bc019c53f34d",
+          "at": "2026-07-02T03:12:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Phase 0 is still described as `main (direct)` in the phase invocation table, and the writer-ownership table repeats the same assumption later in the file. That contradicts the updated `init` workflow and branch-strategy convention, which now require the configured base branch, so the authoritative workflow docs are internally inconsistent on repos whose base branch is not `main`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.harness/workflows/track/plan.md",
+              "line": 79,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a37a14ed5cc06163f9b4a61fef532afe0eafaada4d27327dbf4eee346a34840d",
+          "at": "2026-07-02T03:39:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Step 3` still writes `metadata.json` as `schema_version: 5` and only lists the identity fields. That contradicts the branch-strategy conventions, which require every track to freeze `metadata.json#branch_strategy_snapshot` at creation and then read that snapshot for post-init branch ops and ADR pre-merge detection. As written, a freshly initialized track will either never get the snapshot or will lose it if the branch-create step seeded one, so `track-switch-base` / PR merge / `git log <merge_target>` resolution will break or fall back incorrectly.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/init.md",
+              "line": 56,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:09b16f2e09d45534bed6688358d654810bb315868abbfecb2e2bf2842904460c",
+          "at": "2026-07-02T03:49:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The post-merge handoff tells users to `git pull` on the merge target branch, but `/track:done` immediately switches to the configured base branch and the branch-strategy convention defines `track-switch-base` as the post-merge landing branch. If `base_branch` and `merge_target` ever diverge, this sends the user to the wrong local branch after a successful merge.",
+              "severity": "P1",
+              "file": ".claude/commands/track/merge.md",
+              "line": 46,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:8bb8192eefa107ef8e1d8159fa9440dbba7f9ba56c0e73c57772f3eadcf2c9e5",
+          "at": "2026-07-02T04:00:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:32d91b254b26d78b6aba8cae875850e502910e00a7d12e4863933b5643edb6d4",
+          "at": "2026-07-02T04:07:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`.harness/config/branch-strategy.json` is still untracked (`git status --short` reports `??` and there is no cached diff), but this workflow now treats that path as the required source for the configured base branch. Because the harness-policy surface is distributed to template consumers, the PR would ship references to a config file that is not present in a fresh checkout, causing `/track:init` / branch creation to fail as soon as they try to resolve the base branch. Add the config file to the tracked change or avoid making tracked workflow docs depend on it.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/init.md",
+              "line": 12,
+              "category": "template-distribution reference leak"
+            },
+            {
+              "message": "The changed `/track:done` adapter still contains the workflow steps inline and does not name an Operational SSoT workflow file at the top. The harness-policy adapter-SSoT check requires `.claude/commands/track/*.md` adapters to point to an existing `.harness/workflows/...` file and avoid duplicating step/gate/state logic in the adapter, so this command can now drift independently from the workflow layer.",
+              "severity": "P1",
+              "file": ".claude/commands/track/done.md",
+              "line": 10,
+              "category": "adapter-SSoT sync"
+            },
+            {
+              "message": "The changed `/track:merge` adapter also encodes the PR resolution, wait/merge sequence, and post-merge behavior directly, without an Operational SSoT reference to an existing `.harness/workflows/...` file. That violates the harness-policy adapter-SSoT requirement and leaves the merge command's branch-strategy behavior outside the workflow SSoT where future policy changes are supposed to land.",
+              "severity": "P1",
+              "file": ".claude/commands/track/merge.md",
+              "line": 20,
+              "category": "adapter-SSoT sync"
+            }
+          ],
+          "hash": "rvw1:sha256:32d91b254b26d78b6aba8cae875850e502910e00a7d12e4863933b5643edb6d4",
+          "at": "2026-07-02T04:12:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6d2370072890a58750194e75b95c3dd3b0235866132edb1cd9cd73c9614e1ef0",
+          "at": "2026-07-02T04:22:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6d2370072890a58750194e75b95c3dd3b0235866132edb1cd9cd73c9614e1ef0",
+          "at": "2026-07-02T04:27:57Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f9572fc47d468f9941bb85d47917920024275dde36fb9f11f23632d9efbf2184",
+          "at": "2026-06-30T22:39:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f9572fc47d468f9941bb85d47917920024275dde36fb9f11f23632d9efbf2184",
+          "at": "2026-06-30T22:43:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new happy-path test exercises `TrackCompositionRoot::fixpoint_resolve` directly and only asserts the returned `ExitCode`; it never captures stdout/stderr from `execute_fixpoint_resolve`, so a regression in the CLI wrapper's emit path would still pass. This leaves the only bin-layer behavior in this handler effectively untested.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/fixpoint_resolve.rs",
+              "line": 242,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:cd715242f471a9d720d387eb3f9bbc02536632fb0990b8407fd7180c0f5ea086",
+          "at": "2026-07-01T01:22:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:35b798c758fbd5d2547492157571a7c8d65dfd9df3f82860428f5a6ea97489b3",
+          "at": "2026-07-01T01:40:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:35b798c758fbd5d2547492157571a7c8d65dfd9df3f82860428f5a6ea97489b3",
+          "at": "2026-07-01T01:42:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:13a5bdcfda6e7caca9c4af69252bea224cf9e789ed2c3f177cd6bccf4adb2f64",
+          "at": "2026-07-01T07:48:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:13a5bdcfda6e7caca9c4af69252bea224cf9e789ed2c3f177cd6bccf4adb2f64",
+          "at": "2026-07-01T07:50:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fa376ada81ce7a8669626c209ba57b6ca4b652baf890c299a45a807143cb9612",
+          "at": "2026-07-01T12:03:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fa376ada81ce7a8669626c209ba57b6ca4b652baf890c299a45a807143cb9612",
+          "at": "2026-07-01T17:23:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fa376ada81ce7a8669626c209ba57b6ca4b652baf890c299a45a807143cb9612",
+          "at": "2026-07-01T17:27:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:92291026fc2ad7da3993a75f09a8f4dbe7a55e6e55a73f64a110a69f70a146a8",
+          "at": "2026-07-02T02:50:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The PR handler now converts omitted `--base` and `--method` into an empty-string sentinel before calling the driver. That embeds the branch-strategy defaulting contract and the \"empty is not a valid branch/method\" invariant in the bin layer, instead of passing typed absence to `cli_driver` and letting driver/composition resolve it. This violates the CLI thin-bin policy from ADR D5/D8: keep this handler to parse-dispatch-emit and move the omission/default contract behind the driver boundary, e.g. with `Option` fields in `PrInput`.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/pr.rs",
+              "line": 113,
+              "category": "business logic in bin"
+            },
+            {
+              "message": "This surviving comment still points readers to `apps/cli-composition/src/track/fixpoint_resolve.rs`, but this PR deletes that file. The same block later names a stale cli-composition test that no longer exists under that name/location, so the final branch leaves a dead reference in the CLI scope. Update the comment to the new test location or remove the path reference.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/fixpoint_resolve.rs",
+              "line": 100,
+              "category": "dead-reference"
+            }
+          ],
+          "hash": "rvw1:sha256:92291026fc2ad7da3993a75f09a8f4dbe7a55e6e55a73f64a110a69f70a146a8",
+          "at": "2026-07-02T02:56:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:66eb1c545d5271c8d1b69b0902f928497dad55d0299e74a7de55fb5f932b285d",
+          "at": "2026-07-02T03:14:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:66eb1c545d5271c8d1b69b0902f928497dad55d0299e74a7de55fb5f932b285d",
+          "at": "2026-07-02T03:20:59Z"
         }
       ]
     },
@@ -1470,6 +1680,277 @@
           "findings": [],
           "hash": "rvw1:sha256:98b734ed377498cde2c2891058182452184459f591320a771ef203f48077cb39",
           "at": "2026-06-30T20:49:00Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c04aa88fc38d0c08b5922cf48806e23cae1ff712475ebd292dde703be6f2370",
+          "at": "2026-06-30T20:44:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c04aa88fc38d0c08b5922cf48806e23cae1ff712475ebd292dde703be6f2370",
+          "at": "2026-06-30T20:48:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`JsonConfigBranchStrategyAdapter::new` reads the config path directly with `read_to_string` and never rejects symlinks or verifies containment under a trusted root. A symlinked `.harness/config/branch-strategy.json` can therefore redirect this adapter to attacker-controlled content outside the repository, which matches the symlink-boundary issue this layer is supposed to fail closed on.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/branch_strategy.rs",
+              "line": 55,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:29c2c84dadf1c1a8bc867535c4d2ff80d8b4d37514e937f994e9e1798eb4a15d",
+          "at": "2026-06-30T22:44:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "A symlinked `track/items/<id>` or `track/archive/<id>` directory is accepted here because `entry.path().is_dir()` follows symlinks, and the later `metadata.json` / `impl-plan.json` / `task-coverage.json` reads never re-check that the resolved path stays under `root`. A repo-controlled symlink can therefore escape the trusted root and feed external files into the render pipeline.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render/snapshot.rs",
+              "line": 306,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "`all_track_directories()` follows symlinked `track/items/<id>` / `track/archive/<id>` entries with `is_dir()`, and `load_track_metadata()` then reads `metadata.json` and `impl-plan.json` from that symlink target without a containment check. That lets the latest-track verifier select and parse data outside `root` if a track directory is replaced with a symlink.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/latest_track.rs",
+              "line": 103,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:b8a75d58f32bdb24889d48ded48b260884fc83158f3b2f895cbee079aae2cdce",
+          "at": "2026-06-30T22:56:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Leaf symlinks are still followed when loading track state for latest-track/freshness checks. `latest_track.rs` reads `metadata.json` directly at line 254, `track/render/snapshot.rs` reads `impl-plan.json` directly at line 66, and `verify/view_freshness.rs` reads `metadata.json` directly at line 173. Those paths never do the same `symlink_metadata()` + reject step used elsewhere in the repo, so a symlinked file inside an otherwise real track directory can redirect these checks to content outside `track/items`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/latest_track.rs",
+              "line": 254,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "`sync_rendered_views` still accepts symlinked track inputs. `catalogue_path_exists()` explicitly counts symlinks as present, and the render path then reads `spec.json` at line 180 and `*-types.json` at line 325 with `read_to_string()`. That lets a symlink under `track/items/<id>` feed arbitrary outside JSON into generated views instead of enforcing real-file semantics.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render/sync.rs",
+              "line": 325,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:aa1c55a0c6df87b84666a3e861406ce125015b08fad2e7a10674436cfdd13ceb",
+          "at": "2026-06-30T23:06:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `metadata_path.is_file()` pre-check runs before `reject_symlinks_below`, so a dangling symlink or other non-regular-file `metadata.json` is treated as absent and silently skipped instead of being rejected at the boundary. That bypasses the fail-closed guard that follows and can hide corrupted track state.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/view_freshness.rs",
+              "line": 84,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:e45a22c8fa6308ea3c2f5161102260aeaeb83a02eb254a0317275941b8da216f",
+          "at": "2026-06-30T23:26:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c80cc7a3300a83f8cfb23872448c52782977665287270ddb89db62ca0babd43a",
+          "at": "2026-06-30T23:35:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c80cc7a3300a83f8cfb23872448c52782977665287270ddb89db62ca0babd43a",
+          "at": "2026-06-30T23:41:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:720eb2e859862e8ff252da394b9b064a31733f8a6a1e7026b0e96b0e94e8db53",
+          "at": "2026-07-01T01:22:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:720eb2e859862e8ff252da394b9b064a31733f8a6a1e7026b0e96b0e94e8db53",
+          "at": "2026-07-01T01:25:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7898bd45df8cb7262e279bea8abacdd0bc66ea88e03e4595736f6a067af207a3",
+          "at": "2026-07-01T02:12:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7898bd45df8cb7262e279bea8abacdd0bc66ea88e03e4595736f6a067af207a3",
+          "at": "2026-07-01T02:16:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:644f5371f66f0d2ade074f09ebedf9256e6d52efccbde791e8622d8a568d9ac4",
+          "at": "2026-07-01T08:09:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:644f5371f66f0d2ade074f09ebedf9256e6d52efccbde791e8622d8a568d9ac4",
+          "at": "2026-07-01T08:12:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1bd5947dd17b0e3961707627ebdd810fbc3c19acbe67a295e5ec1d5b30900cff",
+          "at": "2026-07-01T12:08:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1bd5947dd17b0e3961707627ebdd810fbc3c19acbe67a295e5ec1d5b30900cff",
+          "at": "2026-07-01T17:26:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_diff_base` builds `track_dir.join(\".commit_hash\")` and hands it to `FsDryCheckCommitHashStore` without first proving the resolved path remains under `canonical_root`. The store only rejects symlinks before `read_to_string`; it does not canonicalize and enforce `starts_with(canonical_root)`, so a path-traversing `track_dir` supplied at this adapter boundary can make the dry-gate read a `.commit_hash` outside the trusted repo root. This should fail closed using the existing trusted-root containment pattern (`is_safe_briefing_path`/CN-04 style) before any file read or fallback decision.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/dry_check/diff_base_resolver.rs",
+              "line": 51,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:1bd5947dd17b0e3961707627ebdd810fbc3c19acbe67a295e5ec1d5b30900cff",
+          "at": "2026-07-01T17:33:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ad7955493c1701621abdfdfe8357b01d68d7eff78253a8d0673d23741c24bbcc",
+          "at": "2026-07-01T17:39:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_context` canonicalizes `--items-dir` but never rejects a symlinked root before the trust check. That lets a symlinked `items_dir` be redirected to a different tree, which is contrary to the existing symlink-rejection pattern used for trust-rooted filesystem inputs. Reject the root symlink before canonicalizing it.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/fixpoint_resolve_driver.rs",
+              "line": 113,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "`read_base_branch` reads `<canonical_items_dir>/<track_id>/metadata.json` with `std::fs::read_to_string` directly, so a symlinked `metadata.json` can redirect the load outside the track directory and feed an arbitrary base branch into fixpoint resolution. Existing infrastructure loaders reject symlinked metadata paths before reading; this one should too.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/fixpoint_resolve_driver.rs",
+              "line": 72,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:4eda8e5fcfd6082712a01b2abb63ab3400531d36866cf1e9cff03949de700154",
+          "at": "2026-07-02T02:51:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a6d608710a7306fe0d208523853460560ad6a54447904febb21781945da29a31",
+          "at": "2026-07-02T03:03:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a6d608710a7306fe0d208523853460560ad6a54447904febb21781945da29a31",
+          "at": "2026-07-02T03:15:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`FsDryCheckConfigLoaderAdapter` builds `.harness/config/dry-check.json` under `repo_root` and immediately delegates to `InfraDryCheckConfig::load`, whose file read follows symlinks. Unlike the existing `scope_config_loader.rs` canonicalize + `reject_symlinks_below` pattern, this boundary does not reject a symlinked config file or parent, so fixpoint-resolve can read dry-check settings from outside the trusted checkout and change or disable the gate instead of failing closed. Add canonical containment and symlink rejection against `repo_root` before loading.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/fixpoint_resolve_driver.rs",
+              "line": 210,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:a6d608710a7306fe0d208523853460560ad6a54447904febb21781945da29a31",
+          "at": "2026-07-02T03:24:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6bd4e1303012a980a9dc5ce71e679a6d682f4209809a1771d8366f06344589c1",
+          "at": "2026-07-02T03:36:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6bd4e1303012a980a9dc5ce71e679a6d682f4209809a1771d8366f06344589c1",
+          "at": "2026-07-02T03:39:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`FsDryApprovalFactoryAdapter` derives `dry-check.json` and `dry-check-coverage.json` with `track_dir.join(...)` and then constructs filesystem stores without first proving the resolved paths remain below `canonical_root`. The downstream symlink guard rejects symlinks but does not reject paths outside the trusted root, so a caller that passes an absolute or `..`-based `track_dir` can bind the approval store to files outside the repository. This should fail closed with the same trusted-root containment discipline used by the `is_safe_briefing_path`/CN-04 path policy and the sibling `trusted_commit_hash_path` helper before constructing the stores.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/approval_factory.rs",
+              "line": 34,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:6bd4e1303012a980a9dc5ce71e679a6d682f4209809a1771d8366f06344589c1",
+          "at": "2026-07-02T03:46:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:45256f82c95e9a37a083b06c7499035919e2508d72a6e3d44993a85f3298da9f",
+          "at": "2026-07-02T03:57:02Z"
         }
       ]
     }

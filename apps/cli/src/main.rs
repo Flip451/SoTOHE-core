@@ -470,6 +470,7 @@ fn track_command_label(cmd: &commands::track::TrackCommand) -> &'static str {
         TrackCommand::Lint { .. } => "track lint",
         TrackCommand::FixpointResolve(_) => "track fixpoint-resolve",
         TrackCommand::SetCommitHash(_) => "track set-commit-hash",
+        TrackCommand::SwitchBase { .. } => "track switch-base",
     }
 }
 

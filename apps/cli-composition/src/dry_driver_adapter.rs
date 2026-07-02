@@ -4,8 +4,8 @@
 //! methods, converting `CompositionError` to `DryDriverOutcome::failure`.
 
 use usecase::dry_driver::{
-    DryCheckApprovedDriverInput, DryDriverOutcome, DryDriverPort, DryFixLocalDriverInput,
-    DryResultsDriverInput, DryWriteDriverInput,
+    DryCheckApprovedDriverInput, DryCheckApprovedOutcome, DryDriverOutcome, DryDriverPort,
+    DryFixLocalDriverInput, DryResultsDriverInput, DryWriteDriverInput, DryWriteOutcome,
 };
 
 use crate::dry::RunDryFixLocalInput;
@@ -41,7 +41,7 @@ impl Default for DryDriverAdapter {
 // ---------------------------------------------------------------------------
 
 impl DryDriverPort for DryDriverAdapter {
-    fn dry_write(&self, input: DryWriteDriverInput) -> DryDriverOutcome {
+    fn dry_write(&self, input: DryWriteDriverInput) -> DryWriteOutcome {
         let composition_input = DryWriteInput {
             track_id: input.track_id,
             base_commit: input.base_commit,
@@ -53,12 +53,8 @@ impl DryDriverPort for DryDriverAdapter {
             capability_name: input.capability_name,
         };
         match self.dry_root.dry_write(composition_input) {
-            Ok(outcome) => DryDriverOutcome {
-                stdout: outcome.stdout,
-                stderr: outcome.stderr,
-                exit_code: outcome.exit_code,
-            },
-            Err(e) => DryDriverOutcome::failure(Some(e.to_string())),
+            Ok(outcome) => outcome,
+            Err(e) => DryWriteOutcome::Failure { message: e.to_string() },
         }
     }
 
@@ -78,19 +74,15 @@ impl DryDriverPort for DryDriverAdapter {
         }
     }
 
-    fn dry_check_approved(&self, input: DryCheckApprovedDriverInput) -> DryDriverOutcome {
+    fn dry_check_approved(&self, input: DryCheckApprovedDriverInput) -> DryCheckApprovedOutcome {
         let composition_input = DryCheckApprovedInput {
             track_id: input.track_id,
             base_commit: input.base_commit,
             items_dir: input.items_dir,
         };
         match self.dry_root.dry_check_approved(composition_input) {
-            Ok(outcome) => DryDriverOutcome {
-                stdout: outcome.stdout,
-                stderr: outcome.stderr,
-                exit_code: outcome.exit_code,
-            },
-            Err(e) => DryDriverOutcome::failure(Some(e.to_string())),
+            Ok(outcome) => outcome,
+            Err(e) => DryCheckApprovedOutcome::Failure { message: e.to_string() },
         }
     }
 
