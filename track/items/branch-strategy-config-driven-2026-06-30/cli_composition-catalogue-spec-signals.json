@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "2a57e19a94a96388df8f8c19e41d94322c6c622626c65bf8267bdee65dd8049b",
+  "catalogue_declaration_hash": "b1dbbb499bcc8dcac773144b1340bbf0a965df328995819023f769133fcc0ea5",
   "signals": [
     {
       "type_name": "DryCompositionRoot",
@@ -11,6 +11,11 @@
       "type_name": "FixpointResolveInput",
       "signal": "blue",
       "entry_hash": "a71e8c71b3df6e9fab4289e1391e1b1826b5924b39b4b2e4b821417d7e1e8377"
+    },
+    {
+      "type_name": "GitCompositionRoot",
+      "signal": "blue",
+      "entry_hash": "90d22b9c3ded9ea2498869921ddf0abbe029755ac4edc8eeb88bd93d7b9c68b6"
     },
     {
       "type_name": "TrackCompositionRoot",

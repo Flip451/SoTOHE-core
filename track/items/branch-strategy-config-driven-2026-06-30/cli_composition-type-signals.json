@@ -1,10 +1,16 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-02T08:03:36Z",
-  "declaration_hash": "2a57e19a94a96388df8f8c19e41d94322c6c622626c65bf8267bdee65dd8049b",
+  "generated_at": "2026-07-02T09:02:36Z",
+  "declaration_hash": "b1dbbb499bcc8dcac773144b1340bbf0a965df328995819023f769133fcc0ea5",
   "signals": [
     {
       "type_name": "DryCompositionRoot",
+      "kind_tag": "composition_root",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "GitCompositionRoot",
       "kind_tag": "composition_root",
       "signal": "blue",
       "found_type": true

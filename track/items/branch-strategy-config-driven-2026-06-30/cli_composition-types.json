@@ -673,6 +673,149 @@
         { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-18" }
       ],
       "informal_grounds": []
+    },
+    "GitCompositionRoot": {
+      "action": "modify",
+      "role": { "CompositionRoot": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "unit" }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Create a new `GitCompositionRoot`."
+        },
+        {
+          "name": "git_add_all",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Result<cli_driver::render::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Stage the whole worktree except transient automation scratch files."
+        },
+        {
+          "name": "git_add_from_file",
+          "receiver": "&self",
+          "params": [
+            { "name": "path", "ty": "std::path::PathBuf" },
+            { "name": "cleanup", "ty": "bool" }
+          ],
+          "returns": "Result<cli_driver::render::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Stage repo-relative paths listed in a file."
+        },
+        {
+          "name": "git_commit_from_file",
+          "receiver": "&self",
+          "params": [
+            { "name": "path", "ty": "std::path::PathBuf" },
+            { "name": "cleanup", "ty": "bool" },
+            { "name": "track_dir", "ty": "Option<std::path::PathBuf>" }
+          ],
+          "returns": "Result<cli_driver::render::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Create a commit using the message stored in a file."
+        },
+        {
+          "name": "git_note_from_file",
+          "receiver": "&self",
+          "params": [
+            { "name": "path", "ty": "std::path::PathBuf" },
+            { "name": "cleanup", "ty": "bool" }
+          ],
+          "returns": "Result<cli_driver::render::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Attach a git note using the contents of a file."
+        },
+        {
+          "name": "git_switch_and_pull",
+          "receiver": "&self",
+          "params": [
+            { "name": "branch", "ty": "String" }
+          ],
+          "returns": "Result<cli_driver::render::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Switch to a branch and pull latest changes."
+        },
+        {
+          "name": "git_switch_and_pull_in",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "&std::path::Path" },
+            { "name": "branch", "ty": "String" }
+          ],
+          "returns": "Result<cli_driver::render::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Anchor `git switch` + `git pull` to a specific project checkout instead of the CWD. Callers that resolve the requested checkout via `--project-root` (e.g. `sotp track switch-base --project-root /path/to/checkout`) must reach git via this entry point so the underlying git commands run against the requested worktree, not the process CWD."
+        },
+        {
+          "name": "git_unstage",
+          "receiver": "&self",
+          "params": [
+            { "name": "paths", "ty": "Vec<std::path::PathBuf>" }
+          ],
+          "returns": "Result<cli_driver::render::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Unstage paths (remove from git index without discarding worktree changes)."
+        },
+        {
+          "name": "current_branch_track_id_strict",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Result<Option<String>, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Resolve the track ID from the current git branch (strict mode). Returns `Ok(Some(id))` only when the branch matches `track/<id>` and the id is valid. Non-track branches (e.g. `main`) return `Ok(None)`. Returns `Err` when the branch matches `track/<id>` but the `<id>` fails validation."
+        },
+        {
+          "name": "git_driver",
+          "receiver": "&self",
+          "params": [],
+          "returns": "cli_driver::git::GitDriver",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Build a wired `cli_driver::git::GitDriver` for the git family."
+        }
+      ],
+      "module_path": "git",
+      "docs": "Composition root for the `git` command family. Unit struct: no adapter dependencies are injected at construction time. IN-05: `git_switch_and_pull_in` (added in this track) anchors `git switch` + `git pull` to an explicit `project_root` instead of the process CWD, so `TrackCompositionRoot::track_switch_base` can operate correctly when invoked with `--project-root`. The pre-existing `git_switch_and_pull` now delegates to a private `git_switch_and_pull_impl` helper shared with the new method; the helper is not part of the public API surface and is not catalogued.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-05" }
+      ],
+      "informal_grounds": []
     }
   },
   "traits": {},
@@ -688,6 +831,11 @@
       "action": "reference",
       "trait_ref": "core::default::Default",
       "for_type": "DryCompositionRoot"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::default::Default",
+      "for_type": "GitCompositionRoot"
     }
   ]
 }

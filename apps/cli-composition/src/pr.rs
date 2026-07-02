@@ -266,19 +266,18 @@ impl PrCompositionRoot {
         let branch = client
             .pr_head_branch(&pr)
             .map_err(|e| CompositionError::Infrastructure(e.to_string()))?;
-        let method = if method.is_empty() {
-            let track_id = branch.strip_prefix("track/").unwrap_or(&branch);
-            let port = branch_strategy_port_for_track(track_id)?;
-            merge_method_to_arg(port.merge_method()).to_owned()
-        } else {
-            method
-        };
         let repo =
             SystemGitRepo::discover().map_err(|e| CompositionError::AdapterInit(e.to_string()))?;
         // Use an explicit refspec (+refs/heads/<branch>:refs/remotes/origin/<branch>) so that
         // refs/remotes/origin/<branch> is reliably updated. A bare `git fetch origin <branch>`
         // only refreshes FETCH_HEAD and does not guarantee that `origin/<branch>` is updated,
         // which would cause subsequent `git show origin/<branch>:…` reads to see a stale ref.
+        //
+        // Fetch runs BEFORE the merge-method resolution so that an omitted `--method` can be
+        // resolved from the PR head's `branch_strategy_snapshot.merge_method` via
+        // `git show origin/<branch>:track/items/<track_id>/metadata.json`, not from the local
+        // worktree (which may not contain the PR's track metadata when invoked from a fresh
+        // checkout or the configured base branch).
         let refspec = format!("+refs/heads/{branch}:refs/remotes/origin/{branch}");
         match repo.output(&["fetch", "origin", &refspec]) {
             Ok(o) if !o.status.success() => {
@@ -294,6 +293,13 @@ impl PrCompositionRoot {
             }
             Ok(_) => {}
         }
+        let method = if method.is_empty() {
+            let track_id = branch.strip_prefix("track/").unwrap_or(&branch);
+            let port = branch_strategy_port_for_pr_ref(&repo, &branch, track_id)?;
+            merge_method_to_arg(port.merge_method()).to_owned()
+        } else {
+            method
+        };
 
         let reader = infrastructure::verify::merge_gate_adapter::GitShowTrackBlobReader::new(
             repo.root().to_path_buf(),
@@ -628,6 +634,49 @@ fn branch_strategy_port_for_track(
             CompositionError::Infrastructure(format!("failed to read track metadata: {e}"))
         })?
         .ok_or_else(|| CompositionError::WiringFailed(format!("track '{track_id}' not found")))?;
+    Ok(infrastructure::branch_strategy::SnapshotBranchStrategyAdapter::new(
+        metadata.branch_strategy_snapshot().clone(),
+    ))
+}
+
+/// Resolve a [`infrastructure::branch_strategy::SnapshotBranchStrategyAdapter`] from
+/// `track_id`'s `metadata.json#branch_strategy_snapshot` on the fetched PR ref
+/// (`origin/<branch>`), rather than the local worktree.
+///
+/// Callers that dispatch on a PR head (e.g. `pr wait-and-merge`) must resolve the merge
+/// method from the PR's own committed metadata, not from whatever happens to be checked
+/// out locally — a fresh checkout or the configured base branch would otherwise `track
+/// not found` (or use stale metadata) for a PR whose track was created after the last
+/// pull.
+fn branch_strategy_port_for_pr_ref(
+    repo: &infrastructure::git_cli::SystemGitRepo,
+    branch: &str,
+    track_id: &str,
+) -> Result<infrastructure::branch_strategy::SnapshotBranchStrategyAdapter, CompositionError> {
+    use infrastructure::git_cli::GitRepository as _;
+
+    let path = format!("track/items/{track_id}/metadata.json");
+    let output = repo.output(&["show", &format!("origin/{branch}:{path}")]).map_err(|e| {
+        CompositionError::Infrastructure(format!(
+            "failed to run git show origin/{branch}:{path}: {e}"
+        ))
+    })?;
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        return Err(CompositionError::WiringFailed(format!(
+            "track '{track_id}' metadata not found on origin/{branch}: {stderr}"
+        )));
+    }
+    let json = String::from_utf8(output.stdout).map_err(|e| {
+        CompositionError::Infrastructure(format!(
+            "metadata.json on origin/{branch} is not UTF-8: {e}"
+        ))
+    })?;
+    let (metadata, _) = infrastructure::track::codec::decode(&json).map_err(|e| {
+        CompositionError::Infrastructure(format!(
+            "failed to decode metadata.json on origin/{branch}: {e}"
+        ))
+    })?;
     Ok(infrastructure::branch_strategy::SnapshotBranchStrategyAdapter::new(
         metadata.branch_strategy_snapshot().clone(),
     ))

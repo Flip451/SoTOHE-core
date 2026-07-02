@@ -118,6 +118,7 @@ impl TrackCompositionRoot {
             })?;
         let adapter =
             SnapshotBranchStrategyAdapter::new(metadata.branch_strategy_snapshot().clone());
-        crate::GitCompositionRoot::new().git_switch_and_pull(adapter.base_branch().to_owned())
+        crate::GitCompositionRoot::new()
+            .git_switch_and_pull_in(&project_root, adapter.base_branch().to_owned())
     }
 }

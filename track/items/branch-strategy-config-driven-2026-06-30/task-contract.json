@@ -45,7 +45,8 @@
       { "layer": "cli_driver", "entry_key": "PrInput" }
     ],
     "T011": [
-      { "layer": "cli_composition", "entry_key": "TrackCompositionRoot" }
+      { "layer": "cli_composition", "entry_key": "TrackCompositionRoot" },
+      { "layer": "cli_composition", "entry_key": "GitCompositionRoot" }
     ],
     "T012": [],
     "T013": [],

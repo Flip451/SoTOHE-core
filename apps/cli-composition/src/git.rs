@@ -222,6 +222,35 @@ impl GitCompositionRoot {
 
         let repo =
             SystemGitRepo::discover().map_err(|e| CompositionError::AdapterInit(e.to_string()))?;
+        self.git_switch_and_pull_impl(repo, branch)
+    }
+
+    /// Anchor `git switch` + `git pull` to a specific project checkout instead of the CWD.
+    ///
+    /// Callers that resolve the requested checkout via `--project-root` (e.g.
+    /// `sotp track switch-base --project-root /path/to/checkout`) must reach git via this
+    /// entry point so the underlying git commands run against the requested worktree,
+    /// not the process CWD.
+    ///
+    /// # Errors
+    /// Returns `Err` when git discovery or checkout fails.
+    pub fn git_switch_and_pull_in(
+        &self,
+        project_root: &Path,
+        branch: String,
+    ) -> Result<CommandOutcome, CompositionError> {
+        use infrastructure::git_cli::SystemGitRepo;
+
+        let repo = SystemGitRepo::discover_from(project_root)
+            .map_err(|e| CompositionError::AdapterInit(e.to_string()))?;
+        self.git_switch_and_pull_impl(repo, branch)
+    }
+
+    fn git_switch_and_pull_impl(
+        &self,
+        repo: infrastructure::git_cli::SystemGitRepo,
+        branch: String,
+    ) -> Result<CommandOutcome, CompositionError> {
         let mut stdout_lines = Vec::<String>::new();
 
         stdout_lines.push(format!("Switching to {branch}..."));
