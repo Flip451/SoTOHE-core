@@ -335,18 +335,18 @@ mod tests {
     #[test]
     fn test_render_fixpoint_resolve_outcome_run_rfp_single_scope() {
         let outcome = render_fixpoint_resolve_outcome(FixpointResolveDriverOutcome::RunRfp {
-            scopes: vec!["plan-artifacts".to_owned()],
+            scopes: vec!["impl-plan".to_owned()],
         });
-        assert_eq!(outcome.stdout.as_deref(), Some("run-rfp scopes=plan-artifacts"));
+        assert_eq!(outcome.stdout.as_deref(), Some("run-rfp scopes=impl-plan"));
     }
 
     #[test]
     fn test_render_fixpoint_resolve_outcome_run_rfp_multiple_scopes_in_btreeset_order() {
-        // "code" < "plan-artifacts" in BTreeSet order.
+        // "code" < "impl-plan" in BTreeSet order.
         let outcome = render_fixpoint_resolve_outcome(FixpointResolveDriverOutcome::RunRfp {
-            scopes: vec!["code".to_owned(), "plan-artifacts".to_owned()],
+            scopes: vec!["code".to_owned(), "impl-plan".to_owned()],
         });
-        assert_eq!(outcome.stdout.as_deref(), Some("run-rfp scopes=code,plan-artifacts"));
+        assert_eq!(outcome.stdout.as_deref(), Some("run-rfp scopes=code,impl-plan"));
     }
 
     #[test]

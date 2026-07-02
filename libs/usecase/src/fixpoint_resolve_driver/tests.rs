@@ -224,7 +224,7 @@ fn fixpoint_resolve_dry_blocked_returns_run_dfp() {
 #[test]
 fn fixpoint_resolve_review_needs_review_returns_run_rfp_with_sorted_scopes() {
     let mut set = BTreeSet::new();
-    set.insert("plan-artifacts".to_owned());
+    set.insert("impl-plan".to_owned());
     set.insert("code".to_owned());
     let scopes = ReviewScopeSet::try_new(set).unwrap();
     let interactor = make_driver_interactor(
@@ -235,7 +235,7 @@ fn fixpoint_resolve_review_needs_review_returns_run_rfp_with_sorted_scopes() {
     let outcome = interactor.fixpoint_resolve(make_input());
     match outcome {
         FixpointResolveDriverOutcome::RunRfp { scopes } => {
-            assert_eq!(scopes, vec!["code".to_owned(), "plan-artifacts".to_owned()]);
+            assert_eq!(scopes, vec!["code".to_owned(), "impl-plan".to_owned()]);
         }
         other => panic!("expected RunRfp, got {other:?}"),
     }

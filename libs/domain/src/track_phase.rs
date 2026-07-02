@@ -461,7 +461,7 @@ mod tests {
     #[test]
     fn review_scope_set_try_new_with_single_scope_preserves_it() {
         let mut scopes = BTreeSet::new();
-        scopes.insert("plan-artifacts".to_owned());
+        scopes.insert("impl-plan".to_owned());
         let result = ReviewScopeSet::try_new(scopes.clone());
         assert!(result.is_ok());
         assert_eq!(result.unwrap().as_set(), &scopes);
@@ -471,12 +471,12 @@ mod tests {
     fn review_scope_set_try_new_with_multiple_scopes_preserves_deterministic_order() {
         let mut scopes = BTreeSet::new();
         scopes.insert("code".to_owned());
-        scopes.insert("plan-artifacts".to_owned());
+        scopes.insert("impl-plan".to_owned());
         let result = ReviewScopeSet::try_new(scopes.clone());
         assert!(result.is_ok());
         let set = result.unwrap();
         // BTreeSet iteration order is deterministic (ascending lexicographic).
         let ordered: Vec<&str> = set.as_set().iter().map(String::as_str).collect();
-        assert_eq!(ordered, vec!["code", "plan-artifacts"]);
+        assert_eq!(ordered, vec!["code", "impl-plan"]);
     }
 }

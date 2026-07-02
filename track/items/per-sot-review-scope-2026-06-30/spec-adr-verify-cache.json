@@ -1,0 +1,879 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "4e2278bda83f43bd20fd374619865d1f9baf3789ef90bbd191581a0454944df9",
+      "evidence_hash": "af09e818504920ecd070ec6d9b3d4532ac02f8c2980196679e00e6ae22f8ccc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`review-scope.json` の `plan-artifacts` 単一スコープを廃止し、上流 SoT を `adr` / `spec` / `types` / `impl-plan` の 4 スコープに分割する。目的は、各スコープが当該 SoT 固有の評価観点（severity policy / briefing）を持てるようにすることであり、signal・ref-verify・task-contract・rollback-diagnoser が既に持つ SoT 境界認識に内容レビュー軸を揃える。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "`review-scope.json` の `plan-artifacts` 単一スコープを廃止し、SoT chain の phase 境界に対応した `adr` / `spec` / `types` / `impl-plan` の 4 スコープへ分割することで、内容レビュー軸を signal / ref-verify / task-contract / rollback-diagnoser が共有する SoT 境界認識に揃える。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-1549-per-sot-review-scope.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "d0659d8aee5b8df32c73065a07f08f96f6b493598ec395a6577eb5b3b8668c9a",
+      "evidence_hash": "af09e818504920ecd070ec6d9b3d4532ac02f8c2980196679e00e6ae22f8ccc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/custom/review-prompts/` に `adr.md` / `spec.md` / `types.md` / `impl-plan.md` を新設し、既存 `plan-artifacts.md` の severity policy を各 SoT の評価観点に分解・特化させる。各 briefing は当該 SoT 固有の観点を持つ。特に `types.md`（型カタログ）は、SOLID / CQRS / DRY などの一般コーディング原則に照らして型設計をレビューする旨を含める。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-02",
+          "text_label": "各 SoT スコープに専用の briefing ファイルを持たせることで、振る舞い契約（spec）・型設計（types）・タスク分解（impl-plan）・意思決定（adr）という固有の評価観点を有効にする。特に `types` スコープでは SOLID / CQRS / DRY などの一般コーディング原則に照らした型設計レビューを可能にする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-1549-per-sot-review-scope.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "97af2b0c0052ffba77d059dde4dc73fb27ecec1ae00b284450a5e10f51a9f67a",
+      "evidence_hash": "af09e818504920ecd070ec6d9b3d4532ac02f8c2980196679e00e6ae22f8ccc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`plan-artifacts` を前提とする箇所 ── full-cycle の lifecycle tail commit（`--scope plan-artifacts`）、rollback-diagnoser のトリガー記述、`fixpoint_resolve.rs` / `track_phase.rs` のテストフィクスチャ等 ── を新スコープ構成へ同時更新する"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-03",
+          "text_label": "`plan-artifacts` をスコープ名として参照する既存箇所（`review-scope.json`・full-cycle lifecycle tail commit・rollback-diagnoser・ソーステストフィクスチャ）を新スコープ構成へ同時に移行し、`plan-artifacts` 参照を本 track で根絶する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-1549-per-sot-review-scope.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "0174de72b4382f27abc9853cba36ab87945b857ee0584bd64773b6c524fcebda",
+      "evidence_hash": "af09e818504920ecd070ec6d9b3d4532ac02f8c2980196679e00e6ae22f8ccc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`review-scope.json` の `plan-artifacts` 単一スコープを廃止し、上流 SoT を `adr` / `spec` / `types` / `impl-plan` の 4 スコープに分割する。目的は、各スコープが当該 SoT 固有の評価観点（severity policy / briefing）を持てるようにすること"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "`review-scope.json` の `plan-artifacts` グループを削除し、`adr` / `spec` / `types` / `impl-plan` の 4 グループを新設する。各グループは当該 SoT の評価観点に特化した dedicated briefing ファイル（`.harness/custom/review-prompts/<scope>.md`）を参照する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-1549-per-sot-review-scope.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "0174de72b4382f27abc9853cba36ab87945b857ee0584bd64773b6c524fcebda",
+      "evidence_hash": "af09e818504920ecd070ec6d9b3d4532ac02f8c2980196679e00e6ae22f8ccc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/custom/review-prompts/` に `adr.md` / `spec.md` / `types.md` / `impl-plan.md` を新設し、既存 `plan-artifacts.md` の severity policy を各 SoT の評価観点に分解・特化させる。各 briefing は当該 SoT 固有の観点を持つ。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "`review-scope.json` の `plan-artifacts` グループを削除し、`adr` / `spec` / `types` / `impl-plan` の 4 グループを新設する。各グループは当該 SoT の評価観点に特化した dedicated briefing ファイル（`.harness/custom/review-prompts/<scope>.md`）を参照する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-1549-per-sot-review-scope.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "9956adf2357cea9c2c6d0092aac5589fa92dc1b8c2f7cab943ae92f4517aa3b8",
+      "evidence_hash": "af09e818504920ecd070ec6d9b3d4532ac02f8c2980196679e00e6ae22f8ccc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "| `adr` | `knowledge/adr/**`, `knowledge/research/**` |\n| `spec` | `track/items/<track-id>/spec.json`, `spec.md` |\n| `types` | `track/items/<track-id>/*-types.json`（全 layer 一括）, `contract-map.md` |\n| `impl-plan` | `track/items/<track-id>/impl-plan.json`, `task-coverage.json`, `task-contract.json`, `plan.md`, `observations.md` |\n\n`metadata.json`（identity-only）と `<layer>-types.md`（型カタログの Markdown 化ビュー）は、レビュー価値が薄い / SSoT と重複するため `review_operational` に退避しレビュー対象外とする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "D2 のファイル割当表に従い、4 スコープのパターンと `review_operational` 追加項目を設定する。`adr` スコープ: `knowledge/adr/**`・`knowledge/research/**`。`spec` スコープ: `track/items/<track-id>/spec.json`・`track/items/<track-id>/spec.md`。`types` スコープ: `track/items/<track-id>/*-types.json`（全 layer 一括）・`track/items/<track-id>/contract-map.md`。`impl-plan` スコープ: `track/items/<track-id>/impl-plan.json`・`task-coverage.json`・`task-contract.json`・`plan.md`・`observations.md`。`metadata.json` と `<layer>-types.md` は `review_operational` へ追加してレビュー対象外とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-1549-per-sot-review-scope.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "9956adf2357cea9c2c6d0092aac5589fa92dc1b8c2f7cab943ae92f4517aa3b8",
+      "evidence_hash": "af09e818504920ecd070ec6d9b3d4532ac02f8c2980196679e00e6ae22f8ccc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`spec.md` を `spec` スコープに、`plan.md` を `impl-plan` スコープに、`contract-map.md` ... を `types` スコープに含める。... `<layer>-types.md` は ... `review_operational` に退避する（D2）。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "D2 のファイル割当表に従い、4 スコープのパターンと `review_operational` 追加項目を設定する。`adr` スコープ: `knowledge/adr/**`・`knowledge/research/**`。`spec` スコープ: `track/items/<track-id>/spec.json`・`track/items/<track-id>/spec.md`。`types` スコープ: `track/items/<track-id>/*-types.json`（全 layer 一括）・`track/items/<track-id>/contract-map.md`。`impl-plan` スコープ: `track/items/<track-id>/impl-plan.json`・`task-coverage.json`・`task-contract.json`・`plan.md`・`observations.md`。`metadata.json` と `<layer>-types.md` は `review_operational` へ追加してレビュー対象外とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-1549-per-sot-review-scope.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "bb7e8340f7e3fa75072b3b08a4a1f63a666fd04085250f519a5b20e35ebf061b",
+      "evidence_hash": "af09e818504920ecd070ec6d9b3d4532ac02f8c2980196679e00e6ae22f8ccc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`domain-types.json` / `usecase-types.json` / … を `types` 単一スコープに束ねる。layer 別分割（ソースの layer 分割や signal chain② / task-contract の layer 別構造と対応させる案）は、必要性が実証されるまで行わず Reassess に回す。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "`types` スコープはすべての layer の `*-types.json` ファイルを layer 別分割なく 1 スコープに束ねる（layer-unified）。`contract-map.md` も `types` スコープに同梱する。`<layer>-types.md` は SSoT の機械的 Markdown 化ビューで付加情報が乏しいため `review_operational` に退避し、`types` スコープには含めない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-1549-per-sot-review-scope.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "bb7e8340f7e3fa75072b3b08a4a1f63a666fd04085250f519a5b20e35ebf061b",
+      "evidence_hash": "af09e818504920ecd070ec6d9b3d4532ac02f8c2980196679e00e6ae22f8ccc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`types` | `track/items/<track-id>/*-types.json`（全 layer 一括）, `contract-map.md`\n`metadata.json`（identity-only）と `<layer>-types.md`（型カタログの Markdown 化ビュー）は、レビュー価値が薄い / SSoT と重複するため `review_operational` に退避しレビュー対象外とする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "`types` スコープはすべての layer の `*-types.json` ファイルを layer 別分割なく 1 スコープに束ねる（layer-unified）。`contract-map.md` も `types` スコープに同梱する。`<layer>-types.md` は SSoT の機械的 Markdown 化ビューで付加情報が乏しいため `review_operational` に退避し、`types` スコープには含めない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-1549-per-sot-review-scope.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "63ae35eba633bc71d6a85b3b26af6d4cca7b26646c7ef1c564e99343720c65d5",
+      "evidence_hash": "af09e818504920ecd070ec6d9b3d4532ac02f8c2980196679e00e6ae22f8ccc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/custom/review-prompts/` に `adr.md` / `spec.md` / `types.md` / `impl-plan.md` を新設し、既存 `plan-artifacts.md` の severity policy を各 SoT の評価観点に分解・特化させる。各 briefing は当該 SoT 固有の観点を持つ。特に `types.md`（型カタログ）は、SOLID / CQRS / DRY などの一般コーディング原則に照らして型設計をレビューする旨を含める。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "`.harness/custom/review-prompts/` に `adr.md` / `spec.md` / `types.md` / `impl-plan.md` の 4 briefing ファイルを新設する。各ファイルは当該 SoT 固有の評価観点を持つ severity policy を記述する。`types.md` には SOLID / CQRS / DRY などの一般コーディング原則に照らした型設計レビュー指針を明示的に含める。既存 `plan-artifacts.md` の severity policy を各 briefing へ分解・移行する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-1549-per-sot-review-scope.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "5e4a1d149b44ce678a8b58931dd5b95f39d9fb7b31c866abc581c951157f3fed",
+      "evidence_hash": "af09e818504920ecd070ec6d9b3d4532ac02f8c2980196679e00e6ae22f8ccc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「plan-artifacts を前提とする箇所」, 「を新スコープ構成へ同時更新する」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "`plan-artifacts` スコープ名を参照する既存箇所をすべて新スコープ名へ移行する。対象: (a) `review-scope.json` の `plan-artifacts` グループ定義、(b) `.harness/workflows/track/full-cycle.md` の lifecycle tail commit ステップ（`--scope plan-artifacts` → `--scope impl-plan`）、(c) rollback-diagnoser / track-diagnose 関連ドキュメントのトリガー記述（旧 `plan-artifacts findings` を `adr` / `spec` / `types` / `impl-plan` の各 SoT review finding を診断対象にする記述へ更新）、(d) `knowledge/conventions/enforce-by-mechanism.md` の ADR review scope / semantic review 記述（`plan-artifacts` → `adr`）、(e) ソーステストフィクスチャ（`fixpoint_resolve.rs`・`track_phase.rs`・`review_v2` 関連の domain / usecase / infrastructure / cli-composition / cli 各 crate）。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-1549-per-sot-review-scope.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "3afcfb721180a50b8cabacfc2ea59ef54fe5c964aa937570808f8daced6bd879",
+      "evidence_hash": "af09e818504920ecd070ec6d9b3d4532ac02f8c2980196679e00e6ae22f8ccc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`domain-types.json` / `usecase-types.json` / … を `types` 単一スコープに束ねる。layer 別分割（ソースの layer 分割や signal chain② / task-contract の layer 別構造と対応させる案）は、必要性が実証されるまで行わず Reassess に回す。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-01",
+          "text_label": "`types` スコープの layer 別分割（`domain-types` / `usecase-types` / … を個別スコープにする案）は本 track の対象外とする。finding 傾向が layer 別評価観点の必要性を実証するまで判断を保留する（D4 Reassess）。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-1549-per-sot-review-scope.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "2f593151d5657b59b80d1b5c0832146ec4486869f52429db668ae90cc49d595e",
+      "evidence_hash": "af09e818504920ecd070ec6d9b3d4532ac02f8c2980196679e00e6ae22f8ccc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`review-scope.json` の `plan-artifacts` 単一スコープを廃止し、上流 SoT を `adr` / `spec` / `types` / `impl-plan` の 4 スコープに分割する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-02",
+          "text_label": "`plan-artifacts` スコープ名の後方互換エイリアスや移行シムの提供は行わない。D1 の廃止決定は互換レイヤーなしの全面削除であり、参照箇所は D6 の同時移行で全て更新する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-1549-per-sot-review-scope.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "2f593151d5657b59b80d1b5c0832146ec4486869f52429db668ae90cc49d595e",
+      "evidence_hash": "af09e818504920ecd070ec6d9b3d4532ac02f8c2980196679e00e6ae22f8ccc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`plan-artifacts` を前提とする箇所 ── ... ── を新スコープ構成へ同時更新する"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-02",
+          "text_label": "`plan-artifacts` スコープ名の後方互換エイリアスや移行シムの提供は行わない。D1 の廃止決定は互換レイヤーなしの全面削除であり、参照箇所は D6 の同時移行で全て更新する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-1549-per-sot-review-scope.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "92b8332510acd4a955ac7acd46ba042507ec1c7fff1e2afb148a6f0afcb2986b",
+      "evidence_hash": "af09e818504920ecd070ec6d9b3d4532ac02f8c2980196679e00e6ae22f8ccc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`plan-artifacts` を前提とする箇所 ── full-cycle の lifecycle tail commit（`--scope plan-artifacts`）、rollback-diagnoser のトリガー記述、`fixpoint_resolve.rs` / `track_phase.rs` のテストフィクスチャ等 ── を新スコープ構成へ同時更新する（maintainer-checklist 整合）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-03",
+          "text_label": "`bin/sotp` サブコマンドや CI architecture check への「4 スコープ構成の網羅性検証」機能の一般機構としての追加は行わない。スコープ構成の enforcement は `review-scope.json` の定義と reviewer briefing に限定し、CI 一般機構としての追加は本 ADR の決定範囲外とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-1549-per-sot-review-scope.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "a5b27092c660f90a0451fe7de9fc36ff320acc84feb0bf5d41a21d1ea972b337",
+      "evidence_hash": "af09e818504920ecd070ec6d9b3d4532ac02f8c2980196679e00e6ae22f8ccc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/custom/review-prompts/` に `adr.md` / `spec.md` / `types.md` / `impl-plan.md` を新設し、既存 `plan-artifacts.md` の severity policy を各 SoT の評価観点に分解・特化させる。各 briefing は当該 SoT 固有の観点を持つ。特に `types.md`（型カタログ）は、SOLID / CQRS / DRY などの一般コーディング原則に照らして型設計をレビューする旨を含める。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "`types.md` briefing には型設計を SOLID / CQRS / DRY などの一般コーディング原則に照らしてレビューする旨を明示的に含めなければならない。D5 に記録されたユーザーの明示的な要求であり、省略または曖昧な言及は不可。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-1549-per-sot-review-scope.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "d90d4486dcbcb32d313375e0ffe71e07ef959945f61b7c6d7e2390718a400370",
+      "evidence_hash": "af09e818504920ecd070ec6d9b3d4532ac02f8c2980196679e00e6ae22f8ccc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`metadata.json`（identity-only）と `<layer>-types.md`（型カタログの Markdown 化ビュー）は、レビュー価値が薄い / SSoT と重複するため `review_operational` に退避しレビュー対象外とする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "`metadata.json`（identity-only）と `<layer>-types.md`（型カタログの Markdown 化ビュー）は `review_operational` に列挙し、4 つの新スコープのいずれのパターンにも含めない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-1549-per-sot-review-scope.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "b002a81ae99918354d82c2f46f8e928b6216aa8d8b3a379689a150b30a73f44c",
+      "evidence_hash": "af09e818504920ecd070ec6d9b3d4532ac02f8c2980196679e00e6ae22f8ccc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`review-scope.json` の `plan-artifacts` 単一スコープを廃止し、上流 SoT を `adr` / `spec` / `types` / `impl-plan` の 4 スコープに分割する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "`plan-artifacts` スコープは廃止であり、4 つの新スコープとの並存は認めない。`plan-artifacts.md` は severity policy を 4 briefing へ分解移行後に削除または空にし、`review-scope.json` の `groups` から `plan-artifacts` エントリを除去する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-1549-per-sot-review-scope.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "b002a81ae99918354d82c2f46f8e928b6216aa8d8b3a379689a150b30a73f44c",
+      "evidence_hash": "af09e818504920ecd070ec6d9b3d4532ac02f8c2980196679e00e6ae22f8ccc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「.harness/custom/review-prompts/ に `adr.md` / `spec.md` / `types.md` / `impl-plan.md` を新設し、既存 `plan-artifacts.md` の severity policy を各 SoT の評価観点に分解・特化させる。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "`plan-artifacts` スコープは廃止であり、4 つの新スコープとの並存は認めない。`plan-artifacts.md` は severity policy を 4 briefing へ分解移行後に削除または空にし、`review-scope.json` の `groups` から `plan-artifacts` エントリを除去する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-1549-per-sot-review-scope.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "510bdd1d39728827a8993cac703c4c5e37cbc0125ab4ef9c427ae0093a3a3b55",
+      "evidence_hash": "af09e818504920ecd070ec6d9b3d4532ac02f8c2980196679e00e6ae22f8ccc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`plan-artifacts` を前提とする箇所 ── full-cycle の lifecycle tail commit（`--scope plan-artifacts`）、rollback-diagnoser のトリガー記述、`fixpoint_resolve.rs` / `track_phase.rs` のテストフィクスチャ等 ── を新スコープ構成へ同時更新する（maintainer-checklist 整合）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "D6 移行は網羅的であること。IN-05 で列挙したすべての参照箇所を本 track で更新し、`plan-artifacts` をスコープ名として使用する参照が残存しない状態を実装完了の必要条件とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-1549-per-sot-review-scope.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "67bc373a299d423d58f7fab6ae87ac4a8f23ed381e13b86bae8d14e0fc0661e7",
+      "evidence_hash": "af09e818504920ecd070ec6d9b3d4532ac02f8c2980196679e00e6ae22f8ccc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`review-scope.json` の `plan-artifacts` 単一スコープを廃止し、上流 SoT を `adr` / `spec` / `types` / `impl-plan` の 4 スコープに分割する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`.harness/config/review-scope.json` の `groups` に `adr`・`spec`・`types`・`impl-plan` の 4 エントリが存在し、`plan-artifacts` エントリが存在しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-1549-per-sot-review-scope.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "9d5a0c447b2f76b55b0fc44f6b31a4fc4c7c2ce71f43d5e21f1dbb0488e679b8",
+      "evidence_hash": "af09e818504920ecd070ec6d9b3d4532ac02f8c2980196679e00e6ae22f8ccc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "| `adr` | `knowledge/adr/**`, `knowledge/research/**` |"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "`review-scope.json` の `adr` スコープ patterns が `knowledge/adr/**` と `knowledge/research/**` を含む。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-1549-per-sot-review-scope.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "6e3b81fa210ad3fe1857eb544bcf766e624038d5409298c138b0cc2eb6a3cfb9",
+      "evidence_hash": "af09e818504920ecd070ec6d9b3d4532ac02f8c2980196679e00e6ae22f8ccc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "| `spec` | `track/items/<track-id>/spec.json`, `spec.md` |"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "`review-scope.json` の `spec` スコープ patterns が `track/items/<track-id>/spec.json` と `track/items/<track-id>/spec.md` を含む。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-1549-per-sot-review-scope.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "6e3b81fa210ad3fe1857eb544bcf766e624038d5409298c138b0cc2eb6a3cfb9",
+      "evidence_hash": "af09e818504920ecd070ec6d9b3d4532ac02f8c2980196679e00e6ae22f8ccc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`spec.md` を `spec` スコープに、`plan.md` を `impl-plan` スコープに、`contract-map.md`（全層カタログを統合した型間関係の mermaid ビュー）を `types` スコープに含める。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "`review-scope.json` の `spec` スコープ patterns が `track/items/<track-id>/spec.json` と `track/items/<track-id>/spec.md` を含む。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-1549-per-sot-review-scope.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "a0045049b292eca12af1fc9c40e80fc149131c7e9dd19f780472895e134dab58",
+      "evidence_hash": "af09e818504920ecd070ec6d9b3d4532ac02f8c2980196679e00e6ae22f8ccc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`types` | `track/items/<track-id>/*-types.json`（全 layer 一括）, `contract-map.md` ... `<layer>-types.md`（型カタログの Markdown 化ビュー）は、レビュー価値が薄い / SSoT と重複するため `review_operational` に退避しレビュー対象外とする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "`review-scope.json` の `types` スコープ patterns が `track/items/<track-id>/*-types.json`（全 layer 一括）と `track/items/<track-id>/contract-map.md` を含み、layer 別分割エントリが存在しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-1549-per-sot-review-scope.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "a0045049b292eca12af1fc9c40e80fc149131c7e9dd19f780472895e134dab58",
+      "evidence_hash": "af09e818504920ecd070ec6d9b3d4532ac02f8c2980196679e00e6ae22f8ccc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`contract-map.md`（全層カタログを統合した型間関係の mermaid ビュー）を `types` スコープに含める。 / `<layer>-types.md` は対応する `<layer>-types.json` の機械的な Markdown 化で付加情報が乏しいため同梱せず、`review_operational` に退避する（D2）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "`review-scope.json` の `types` スコープ patterns が `track/items/<track-id>/*-types.json`（全 layer 一括）と `track/items/<track-id>/contract-map.md` を含み、layer 別分割エントリが存在しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-1549-per-sot-review-scope.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "a0045049b292eca12af1fc9c40e80fc149131c7e9dd19f780472895e134dab58",
+      "evidence_hash": "af09e818504920ecd070ec6d9b3d4532ac02f8c2980196679e00e6ae22f8ccc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`domain-types.json` / `usecase-types.json` / … を `types` 単一スコープに束ねる。layer 別分割（ソースの layer 分割や signal chain② / task-contract の layer 別構造と対応させる案）は、必要性が実証されるまで行わず Reassess に回す。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "`review-scope.json` の `types` スコープ patterns が `track/items/<track-id>/*-types.json`（全 layer 一括）と `track/items/<track-id>/contract-map.md` を含み、layer 別分割エントリが存在しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-1549-per-sot-review-scope.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "40db4bf4baef85bab421cc998b00fb8cece7555d3a39c4bac69684721f4b5be2",
+      "evidence_hash": "af09e818504920ecd070ec6d9b3d4532ac02f8c2980196679e00e6ae22f8ccc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`impl-plan` | `track/items/<track-id>/impl-plan.json`, `task-coverage.json`, `task-contract.json`, `plan.md`, `observations.md`"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "`review-scope.json` の `impl-plan` スコープ patterns が `track/items/<track-id>/impl-plan.json`・`task-coverage.json`・`task-contract.json`・`plan.md`・`observations.md` を含む。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-1549-per-sot-review-scope.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "40db4bf4baef85bab421cc998b00fb8cece7555d3a39c4bac69684721f4b5be2",
+      "evidence_hash": "af09e818504920ecd070ec6d9b3d4532ac02f8c2980196679e00e6ae22f8ccc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`plan.md` を `impl-plan` スコープに"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "`review-scope.json` の `impl-plan` スコープ patterns が `track/items/<track-id>/impl-plan.json`・`task-coverage.json`・`task-contract.json`・`plan.md`・`observations.md` を含む。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-1549-per-sot-review-scope.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "34d60bbf492d1ad5f903003cf5792fac67e7b91b1600b5ed845c64f6f1616d73",
+      "evidence_hash": "af09e818504920ecd070ec6d9b3d4532ac02f8c2980196679e00e6ae22f8ccc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`metadata.json`（identity-only）と `<layer>-types.md`（型カタログの Markdown 化ビュー）は、レビュー価値が薄い / SSoT と重複するため `review_operational` に退避しレビュー対象外とする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "`review-scope.json` の `review_operational` に `track/items/<track-id>/metadata.json` および `track/items/<track-id>/*-types.md` に対応するパターンが含まれる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-1549-per-sot-review-scope.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "fe72d1a347820ec094a50fe4f43f468000e42dc007378a5b97a30ea9bacbf12e",
+      "evidence_hash": "af09e818504920ecd070ec6d9b3d4532ac02f8c2980196679e00e6ae22f8ccc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/custom/review-prompts/` に `adr.md` / `spec.md` / `types.md` / `impl-plan.md` を新設し、既存 `plan-artifacts.md` の severity policy を各 SoT の評価観点に分解・特化させる。各 briefing は当該 SoT 固有の観点を持つ。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "`.harness/custom/review-prompts/adr.md`・`spec.md`・`types.md`・`impl-plan.md` の 4 ファイルが存在し、各ファイルが当該 SoT 固有の評価観点を含む severity policy を持つ。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-1549-per-sot-review-scope.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "3adc542591edf335822382c43c089a80bd5d3c300ceb6b446f8c98ca1ddebaa8",
+      "evidence_hash": "af09e818504920ecd070ec6d9b3d4532ac02f8c2980196679e00e6ae22f8ccc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "特に `types.md`（型カタログ）は、SOLID / CQRS / DRY などの一般コーディング原則に照らして型設計をレビューする旨を含める。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "`types.md` briefing に SOLID・CQRS・DRY の各原則への明示的な言及が含まれる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-1549-per-sot-review-scope.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "196770800091f6744c1fd8652f509bab35cfea6f7b77375b380d7d6fba597de3",
+      "evidence_hash": "af09e818504920ecd070ec6d9b3d4532ac02f8c2980196679e00e6ae22f8ccc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`plan-artifacts` を前提とする箇所 ── full-cycle の lifecycle tail commit（`--scope plan-artifacts`）、rollback-diagnoser のトリガー記述、`fixpoint_resolve.rs` / `track_phase.rs` のテストフィクスチャ等 ── を新スコープ構成へ同時更新する"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "`.harness/workflows/track/full-cycle.md` の lifecycle tail commit ステップが `plan-artifacts` スコープを参照せず、`impl-plan` スコープを参照する（`bin/sotp review results --scope impl-plan` 等として使用）。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-1549-per-sot-review-scope.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "c4761f9c95cc7a04dac17c8c1a181837427c05f00b982a0e56b3b6007cae4643",
+      "evidence_hash": "af09e818504920ecd070ec6d9b3d4532ac02f8c2980196679e00e6ae22f8ccc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`plan-artifacts` を前提とする箇所 ── full-cycle の lifecycle tail commit（`--scope plan-artifacts`）、rollback-diagnoser のトリガー記述、`fixpoint_resolve.rs` / `track_phase.rs` のテストフィクスチャ等 ── を新スコープ構成へ同時更新する（maintainer-checklist 整合）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-10",
+          "text_label": "rollback-diagnoser / track-diagnose 関連ドキュメント（`.harness/capabilities/rollback-diagnoser.md`・`.claude/commands/track/diagnose.md`・`.claude/skills/diagnose/SKILL.md`・`.claude/agents/rollback-diagnoser.md`・`.agents/skills/rollback-diagnoser/SKILL.md`・`.codex/agents/rollback-diagnoser.toml`・`.codex/instructions.md`）のトリガー記述が `plan-artifacts` スコープ名を使用せず、`adr` / `spec` / `types` / `impl-plan` の各 SoT review finding を診断対象として明示する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-1549-per-sot-review-scope.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "93956f1c4ee50cf571b4e9ab7df82bbd2b0e275aa949a4a44e5fc9b6c80d4f5c",
+      "evidence_hash": "af09e818504920ecd070ec6d9b3d4532ac02f8c2980196679e00e6ae22f8ccc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`plan-artifacts` を前提とする箇所 ── full-cycle の lifecycle tail commit（`--scope plan-artifacts`）、rollback-diagnoser のトリガー記述、`fixpoint_resolve.rs` / `track_phase.rs` のテストフィクスチャ等 ── を新スコープ構成へ同時更新する"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-11",
+          "text_label": "`fixpoint_resolve.rs`（usecase / cli-composition crate）および `track_phase.rs`（domain crate）のテストフィクスチャ内で `plan-artifacts` 文字列がスコープ名として使用されない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-1549-per-sot-review-scope.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "4f25685cb841d6242f0f1cb6dd990e24073b37ada3e5bf0765b91a5086d6294b",
+      "evidence_hash": "af09e818504920ecd070ec6d9b3d4532ac02f8c2980196679e00e6ae22f8ccc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`plan-artifacts` を前提とする箇所 ── full-cycle の lifecycle tail commit（`--scope plan-artifacts`）、rollback-diagnoser のトリガー記述、`fixpoint_resolve.rs` / `track_phase.rs` のテストフィクスチャ等 ── を新スコープ構成へ同時更新する"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-12",
+          "text_label": "`review_v2` 関連テスト（domain・infrastructure・cli 各 crate の `review_v2/tests.rs`・`scope_config_loader.rs`・`review/tests.rs` 等）が `plan-artifacts` 文字列をスコープ名として使用しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-1549-per-sot-review-scope.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "5e3c0d5bf2073aee39ce337c2505d5a7a4e6b43b517d1da75584d2e58568fd15",
+      "evidence_hash": "af09e818504920ecd070ec6d9b3d4532ac02f8c2980196679e00e6ae22f8ccc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`track/items/<track-id>/` 配下のうち上記スコープにも `review_operational` にも該当しないファイルは暗黙の `other` スコープに落ちるため、移行時に網羅性を検証する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-13",
+          "text_label": "移行後に `track/items/<track-id>/` 配下のファイルを分類した結果、4 つの新スコープまたは `review_operational` に帰属しないファイルが存在しないことが確認されている（暗黙の `other` スコープへの意図せぬ落下がない）。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-1549-per-sot-review-scope.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "5e3c0d5bf2073aee39ce337c2505d5a7a4e6b43b517d1da75584d2e58568fd15",
+      "evidence_hash": "af09e818504920ecd070ec6d9b3d4532ac02f8c2980196679e00e6ae22f8ccc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`plan-artifacts` を前提とする箇所 ── full-cycle の lifecycle tail commit（`--scope plan-artifacts`）、rollback-diagnoser のトリガー記述、`fixpoint_resolve.rs` / `track_phase.rs` のテストフィクスチャ等 ── を新スコープ構成へ同時更新する"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-13",
+          "text_label": "移行後に `track/items/<track-id>/` 配下のファイルを分類した結果、4 つの新スコープまたは `review_operational` に帰属しないファイルが存在しないことが確認されている（暗黙の `other` スコープへの意図せぬ落下がない）。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-1549-per-sot-review-scope.md",
+          "decision_id": "D6"
+        }
+      }
+    }
+  ]
+}

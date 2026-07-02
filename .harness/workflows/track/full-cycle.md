@@ -56,7 +56,11 @@ accumulation:
 2. For the next task in order, estimate its per-scope diff contribution by classifying the
    task description's listed files through `.harness/config/review-scope.json` patterns.
    Do not infer scope from file extension alone: markdown under `.claude/**` / `.harness/**`
-   is `harness-policy`; `knowledge/adr/**` and `track/items/<track-id>/**` are `plan-artifacts`.
+   is `harness-policy`; `knowledge/adr/**` and `knowledge/research/**` are `adr`;
+   `track/items/<track-id>/spec.json` / `spec.md` are `spec`;
+   `track/items/<track-id>/*-types.json` / `contract-map.md` are `types`;
+   `track/items/<track-id>/impl-plan.json` / `task-coverage.json` / `task-contract.json` /
+   `plan.md` / `observations.md` are `impl-plan`.
    For DonePending tasks, use the already-accumulated working-tree diff.
 3. If this task's own contribution would exceed a configured ceiling for a layer whose current
    batch cumulative diff is still **zero**, and the current batch is non-empty, close the current
@@ -169,14 +173,15 @@ Procedure (after Step 3 of the **last** batch):
 1. Inspect the working tree with `git status --short`. Expect modifications limited to
    `track/items/<track-id>/impl-plan.json` and `track/items/<track-id>/plan.md` only.
 2. If those (and only those) files are modified, run a tail review refresh before committing:
-   - Invoke the `review` workflow. Expected required scope: `plan-artifacts` (the tail diff is
-     only the D4 backfill in the current track's plan artifacts).
+   - Invoke the `review` workflow. Expected required scope: `impl-plan` (the tail diff is
+     only the D4 backfill in `impl-plan.json` and the rendered `plan.md`, both of which
+     belong to the `impl-plan` scope).
    - Continue only after `bin/sotp review check-approved` succeeds and:
-     `bin/sotp review results --track-id <track-id> --scope plan-artifacts --round-type final --limit 1`
+     `bin/sotp review results --track-id <track-id> --scope impl-plan --round-type final --limit 1`
      shows a recorded final `zero_findings` round for the tail diff.
    - This review refresh is mandatory: `cargo make track-commit-message` runs
      `bin/sotp review check-approved` before committing, and after Step 3 mutates
-     `impl-plan.json` / `plan.md`, the previous `plan-artifacts` review hash is stale.
+     `impl-plan.json` / `plan.md`, the previous `impl-plan` review hash is stale.
 3. After the tail review refresh succeeds, stage and commit the lifecycle diff:
    1. Run `cargo make add-all` to stage the D4 backfill (plus any review-operational artifacts produced by Step 2's review refresh, e.g. `review.json` / `<layer>-type-signals.json`).
    2. Write the lifecycle tail commit message to `tmp/track-commit/commit-message.txt`. The wrapper in the next step reads this exact path (`bin/sotp git commit-from-file tmp/track-commit/commit-message.txt --cleanup`), so the file must exist before invoking it. A typical message is:

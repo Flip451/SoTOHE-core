@@ -1,0 +1,334 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3141e0542ad0a16ccae6c4cccb67ba1a3d856786ca01c549332fed2f5d88392d",
+          "at": "2026-06-30T18:28:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3141e0542ad0a16ccae6c4cccb67ba1a3d856786ca01c549332fed2f5d88392d",
+          "at": "2026-06-30T18:33:47Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2a6fac96faab96dff8e759f63a3dae9384d762fadec98160604a2a894911a6c9",
+          "at": "2026-06-30T18:28:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2a6fac96faab96dff8e759f63a3dae9384d762fadec98160604a2a894911a6c9",
+          "at": "2026-06-30T18:33:03Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c10edad35d7451700d0f28c66ae41ee3e955220c8c6d6e434f6d945137e10856",
+          "at": "2026-06-30T18:28:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c10edad35d7451700d0f28c66ae41ee3e955220c8c6d6e434f6d945137e10856",
+          "at": "2026-06-30T18:34:04Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 only budgets the `.harness/config/review-scope.json` rewrite plus `review_operational` additions, but `observations.md:38` says the batch also had to add `.claude/skills/**` to the `harness-policy` patterns so T003's `.claude/skills/diagnose/SKILL.md` edit is inside scope. That prerequisite boundary update is not described anywhere in the plan, so T003 is not fully executable from this impl-plan as written.",
+              "severity": "P1",
+              "file": "track/items/per-sot-review-scope-2026-06-30/impl-plan.json",
+              "line": 6,
+              "category": "task description non-executable"
+            }
+          ],
+          "hash": "rvw1:sha256:99a5cc79536a0f3ac44bd5b73f7d25d9af10556e68c386b273a6e10158d74c22",
+          "at": "2026-06-30T18:31:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:742f47eaf8889e09c6cb325d9c5c40abc3b9e31c9a7fb9f1db1356e7ffaec3b4",
+          "at": "2026-06-30T18:45:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`observations.md` records AC-13 as passed from `grep -rn 'plan-artifacts\\|plan_artifacts' . ...`, but that command scans the whole worktree rather than the T005-scoped surface and is not reproducible with the listed residuals. In the current tree it also matches generated/worktree paths outside the three exclusions documented here, so the recorded “残存ヒットは以下のみ” / AC-13 pass evidence is incomplete. Since T005’s acceptance depends on recording the verification command and result, this observations step has not carried the AC-13 recording mandate through to completion.",
+              "severity": "P1",
+              "file": "track/items/per-sot-review-scope-2026-06-30/observations.md",
+              "line": 44,
+              "category": "observations.md mandate without trigger"
+            }
+          ],
+          "hash": "rvw1:sha256:742f47eaf8889e09c6cb325d9c5c40abc3b9e31c9a7fb9f1db1356e7ffaec3b4",
+          "at": "2026-06-30T18:48:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`observations.md` records AC-13 as already verified and passing after “T001-T004” were applied, but the executable plan still has only T001 marked `in_progress` and leaves T002-T005 as `todo`; T005 itself says its prerequisite is that T001-T004 are complete. This makes the current impl-plan state incoherent: a future executor following the plan sees T005 evidence already written before the task can legally run, so the AC-13 observation is not tied to the declared task ordering.",
+              "severity": "P1",
+              "file": "track/items/per-sot-review-scope-2026-06-30/observations.md",
+              "line": 5,
+              "category": "dependency/order"
+            }
+          ],
+          "hash": "rvw1:sha256:afb7ca4a717cdc0702148d4c2f98ce55ff49ab7819b697ebec48a8711958c080",
+          "at": "2026-06-30T18:54:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:661609214761d6c6d2df61fdbafe4ba7e12f4837e5405c52034f95a6bd8ae1d2",
+          "at": "2026-06-30T18:58:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:931b494a1810ddd22b47e5f3202e3939f47744124fb23efc7c82c2564763854c",
+          "at": "2026-06-30T19:04:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:931b494a1810ddd22b47e5f3202e3939f47744124fb23efc7c82c2564763854c",
+          "at": "2026-06-30T19:06:42Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f46c3ffd17927b242e3e479ef0b090c1d78f6cb77b3fb1f4b8a2aaf45a7c0ce3",
+          "at": "2026-06-30T18:28:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f46c3ffd17927b242e3e479ef0b090c1d78f6cb77b3fb1f4b8a2aaf45a7c0ce3",
+          "at": "2026-06-30T18:34:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cfd0e74e43beb8a849406b42c5fffbb004562c01ebbb5727e0936b8f173fb99e",
+          "at": "2026-06-30T18:44:57Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:71c9a65ef8c0f82f95c184e2856275ecd6b3f34a3a06a086101894bb4efc3324",
+          "at": "2026-06-30T18:28:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:71c9a65ef8c0f82f95c184e2856275ecd6b3f34a3a06a086101894bb4efc3324",
+          "at": "2026-06-30T18:33:40Z"
+        }
+      ]
+    },
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e73bafee0c1eb87a122ec2734f118e946424b7b4fb457b3b55cbe11f2f7027ed",
+          "at": "2026-06-30T16:34:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2's `impl-plan` scope preserves `impl-plan.json` and `task-coverage.json` but omits `task-contract.json`. In this repository `task-contract.json` is an accepted Phase 3 artifact authored by `impl-planner` and consumed by the pre-review `task-contract` gate; the current `plan-artifacts` glob covers it via `track/items/<track-id>/**`. With the proposed split it falls into implicit `other`, leaving a Phase 3 SoT/pre-review contract artifact without a semantic review scope. Add it to `impl-plan` or explicitly classify it as operational if it is intentionally excluded.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-30-1549-per-sot-review-scope.md",
+              "line": 52,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e73bafee0c1eb87a122ec2734f118e946424b7b4fb457b3b55cbe11f2f7027ed",
+          "at": "2026-06-30T16:37:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:56a4f06f09b3140d59d2f92eeeeb2572a1211512832de8a9a00013b6b2d22418",
+          "at": "2026-06-30T16:41:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`grep -r 'plan-artifacts' .` will also match this track's own plan artifacts (`plan.md`, `impl-plan.json`, `spec.json`, etc.), which still contain many planned uses of the term and are not scheduled for rewrite. As written, T005 cannot ever satisfy AC-13 unless the search scope excludes the track artifact directory or these files are rewritten too.",
+              "severity": "P1",
+              "file": "track/items/per-sot-review-scope-2026-06-30/plan.md",
+              "line": 39,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:057b7036272adcb6a67c166bce62a7801be9aad231c0a8faec5f7df419557170",
+          "at": "2026-06-30T17:24:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`task-coverage.json` only maps `IN-*` / `OS-*` / `CN-*` / `AC-*` entries to tasks; the three `GO-*` spec elements in `spec.md` are never assigned anywhere. That leaves 3 of the 28 stated spec elements without task coverage, so the plan's full-coverage claim is not actually represented by the artifact set.",
+              "severity": "P1",
+              "file": "track/items/per-sot-review-scope-2026-06-30/task-coverage.json",
+              "line": 3,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:2d1967044049a092e3afc27997708605c91562008c7e3567f353381d0680f711",
+          "at": "2026-06-30T17:31:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AC-10` requires removing `plan-artifacts` from both the `Mission` and `Trigger inputs` sections of `.harness/capabilities/rollback-diagnoser.md`, but `T003` only schedules edits for `Trigger inputs` plus the other trigger-description mirrors. If the `Mission` section still contains the old scope name, this plan leaves a required acceptance criterion unmet.",
+              "severity": "P1",
+              "file": "track/items/per-sot-review-scope-2026-06-30/impl-plan.json",
+              "line": 17,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:1c6d2b4c747a3036ea21092e5768afa7d6110d282d6184e6805d3666d0db88b9",
+          "at": "2026-06-30T17:39:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:896a7798ae83c52209a26609a1d7847f337bd89eaf894d80df51156644c330fa",
+          "at": "2026-06-30T17:45:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 narrows the rollback-diagnoser migration to `impl-plan scope` everywhere, but the spec’s stated goal is to replace the old `plan-artifacts` review surface with four SoT scopes (`adr` / `spec` / `types` / `impl-plan`) while keeping rollback-diagnoser aligned with those boundaries. Since the old `plan-artifacts findings` trigger covered findings from all upstream plan artifacts, changing it only to `impl-plan` drops `adr`, `spec`, and `types` review findings from the documented diagnoser trigger path. Update the task/AC wording to cover the relevant SoT review scopes, or explicitly justify why only impl-plan findings should be diagnosable.",
+              "severity": "P1",
+              "file": "track/items/per-sot-review-scope-2026-06-30/impl-plan.json",
+              "line": 18,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:896a7798ae83c52209a26609a1d7847f337bd89eaf894d80df51156644c330fa",
+          "at": "2026-06-30T17:51:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T005's verification is scoped too narrowly to satisfy CN-04's requirement that no live `plan-artifacts` scope-name references remain. The plan only greps T001-T004's listed change surface, but current non-historical docs outside that list still use the old scope name, for example `.claude/skills/diagnose/SKILL.md` refers to `/track:review plan-artifacts findings` and `knowledge/conventions/enforce-by-mechanism.md` says ADR changes are reviewed by the `plan-artifacts` scope. Since those files are not included in T003/T005, the implementation can complete while leaving stale operational guidance that points reviewers at the deleted scope.",
+              "severity": "P1",
+              "file": "track/items/per-sot-review-scope-2026-06-30/impl-plan.json",
+              "line": 30,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:fd7ff2c57a91e696cffe7c2378531338989c9ee1937f70cb2ac57fdce4df60ca",
+          "at": "2026-06-30T17:57:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:45a4cde78dcd6a0f3323486f96ed4f76ef7c0682c3ce62d7d30486ac43268dd3",
+          "at": "2026-06-30T18:06:43Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new continuation line is dedented out of the `description: |` block, so this frontmatter is no longer valid YAML and the `rollback-diagnoser` skill wrapper can fail to load. Keep `external PR-reviewer comments need` indented with the rest of the block.",
+              "severity": "P1",
+              "file": ".claude/skills/diagnose/SKILL.md",
+              "line": 9,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:0de706c7acdb1ac61c3049d2815a4ab80599434e92fabdb72098f441d827c400",
+          "at": "2026-06-30T18:34:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:975c53ef881d66e3acdf4888b41e94cc33b223cb40c19f4196dc593b6d06f15b",
+          "at": "2026-06-30T18:48:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:975c53ef881d66e3acdf4888b41e94cc33b223cb40c19f4196dc593b6d06f15b",
+          "at": "2026-06-30T18:54:07Z"
+        }
+      ]
+    }
+  }
+}

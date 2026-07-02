@@ -64,6 +64,14 @@ struct GroupEntry {
     diff_ceiling_lines: Option<u32>,
 }
 
+fn has_windows_drive_prefix(path: &str) -> bool {
+    let bytes = path.as_bytes();
+    matches!(
+        (bytes.first(), bytes.get(1)),
+        (Some(first), Some(b':')) if first.is_ascii_alphabetic()
+    )
+}
+
 /// Loads `review-scope.json` into a v2 `ReviewScopeConfig`.
 ///
 /// Extracts `groups`, `review_operational`, and `other_track` fields.
@@ -155,7 +163,24 @@ pub fn load_v2_scope_config(
                     ),
                 }
             })?;
+            if has_windows_drive_prefix(briefing) {
+                return Err(ScopeConfigLoadError::InvalidField {
+                    path: path_display.clone(),
+                    detail: format!(
+                        "invalid briefing_file for group '{name}': '{briefing}' \
+                         (Windows drive prefixes are not repo-relative)"
+                    ),
+                });
+            }
             let briefing_path = trusted_root.join(briefing);
+            if !briefing_path.starts_with(trusted_root) {
+                return Err(ScopeConfigLoadError::InvalidField {
+                    path: path_display.clone(),
+                    detail: format!(
+                        "briefing_file for group '{name}' escapes trusted root: '{briefing}'"
+                    ),
+                });
+            }
             reject_symlinks_below(&briefing_path, trusted_root).map_err(|source| {
                 if source.kind() == std::io::ErrorKind::InvalidInput {
                     ScopeConfigLoadError::InvalidField {
@@ -411,9 +436,9 @@ mod tests {
             r#"{
                 "version": 2,
                 "groups": {
-                    "plan-artifacts": {
+                    "impl-plan": {
                         "patterns": ["track/items/**"],
-                        "briefing_file": ".harness/custom/review-prompts/plan-artifacts.md"
+                        "briefing_file": ".harness/custom/review-prompts/impl-plan.md"
                     }
                 }
             }"#,
@@ -422,11 +447,11 @@ mod tests {
         let config = load_v2_scope_config(&path, &track_id, dir.path()).unwrap();
 
         let scope = domain::review_v2::ScopeName::Main(
-            domain::review_v2::MainScopeName::new("plan-artifacts").unwrap(),
+            domain::review_v2::MainScopeName::new("impl-plan").unwrap(),
         );
         assert_eq!(
             config.briefing_file_for_scope(&scope),
-            Some(".harness/custom/review-prompts/plan-artifacts.md")
+            Some(".harness/custom/review-prompts/impl-plan.md")
         );
     }
 
@@ -464,9 +489,9 @@ mod tests {
             r#"{
                 "version": 2,
                 "groups": {
-                    "plan-artifacts": {
+                    "impl-plan": {
                         "patterns": ["track/items/**"],
-                        "briefng_file": ".harness/custom/review-prompts/plan-artifacts.md"
+                        "briefng_file": ".harness/custom/review-prompts/impl-plan.md"
                     }
                 }
             }"#,
@@ -487,7 +512,7 @@ mod tests {
             r#"{
                 "version": 2,
                 "groups": {
-                    "plan-artifacts": {
+                    "impl-plan": {
                         "patterns": ["track/items/**"],
                         "briefing_file": "/etc/passwd"
                     }
@@ -507,6 +532,33 @@ mod tests {
     }
 
     #[test]
+    fn test_load_rejects_windows_drive_relative_briefing_file() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = write_scope_json(
+            dir.path(),
+            r#"{
+                "version": 2,
+                "groups": {
+                    "impl-plan": {
+                        "patterns": ["track/items/**"],
+                        "briefing_file": "C:review.md"
+                    }
+                }
+            }"#,
+        );
+        let track_id = TrackId::try_new("test-track").unwrap();
+        let err = load_v2_scope_config(&path, &track_id, dir.path()).unwrap_err();
+        assert!(
+            matches!(
+                &err,
+                ScopeConfigLoadError::InvalidField { detail, .. }
+                    if detail.contains("briefing_file") && detail.contains("Windows drive")
+            ),
+            "expected InvalidField for drive-relative briefing_file, got: {err}"
+        );
+    }
+
+    #[test]
     fn test_load_rejects_traversal_briefing_file() {
         let dir = tempfile::tempdir().unwrap();
         let path = write_scope_json(
@@ -514,7 +566,7 @@ mod tests {
             r#"{
                 "version": 2,
                 "groups": {
-                    "plan-artifacts": {
+                    "impl-plan": {
                         "patterns": ["track/items/**"],
                         "briefing_file": "../outside.md"
                     }
@@ -556,7 +608,7 @@ mod tests {
             r#"{
                 "version": 2,
                 "groups": {
-                    "plan-artifacts": {
+                    "impl-plan": {
                         "patterns": ["track/items/**"],
                         "briefing_file": ".harness/custom/review-prompts/policy.md"
                     }

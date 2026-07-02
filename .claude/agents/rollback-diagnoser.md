@@ -9,7 +9,7 @@ tools:
   - Bash
   - WebFetch
 description: |
-  Diagnostic-only specialist invoked by /track:diagnose when an impl-phase or later finding (PreReviewGate Blocked / plan-artifacts review findings / external PR-reviewer comment) needs phase-rollback routing. Reads the SoT chain (ADR → spec → catalogue → impl-plan → source) top-down, identifies the most upstream phase where the root cause originates, and returns a structured `{routing_target, reason, recommended_next_action}` decision the calling orchestrator dispatches. Never edits any SoT artifact, never invokes writer subagents. Mirrors the `rollback-diagnoser` capability in `.harness/config/agent-profiles.json` and enforces Opus via frontmatter.
+  Diagnostic-only specialist invoked by /track:diagnose when an impl-phase or later finding (PreReviewGate Blocked / SoT-scope review finding on adr/spec/types/impl-plan / external PR-reviewer comment) needs phase-rollback routing. Reads the SoT chain (ADR → spec → catalogue → impl-plan → source) top-down, identifies the most upstream phase where the root cause originates, and returns a structured `{routing_target, reason, recommended_next_action}` decision the calling orchestrator dispatches. Never edits any SoT artifact, never invokes writer subagents. Mirrors the `rollback-diagnoser` capability in `.harness/config/agent-profiles.json` and enforces Opus via frontmatter.
 ---
 
 # Rollback-Diagnoser Agent

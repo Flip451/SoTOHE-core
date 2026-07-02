@@ -626,16 +626,16 @@ fn test_scope_config_empty_files() {
 #[test]
 fn test_briefing_file_for_scope_returns_some_when_configured() {
     let entries = vec![(
-        "plan-artifacts".to_owned(),
+        "impl-plan".to_owned(),
         vec!["track/items/**".to_owned()],
-        Some(".harness/custom/review-prompts/plan-artifacts.md".to_owned()),
+        Some(".harness/custom/review-prompts/impl-plan.md".to_owned()),
         None,
     )];
     let config = ReviewScopeConfig::new(&track_id(), entries, vec![], vec![], None).unwrap();
-    let scope = ScopeName::Main(MainScopeName::new("plan-artifacts").unwrap());
+    let scope = ScopeName::Main(MainScopeName::new("impl-plan").unwrap());
     assert_eq!(
         config.briefing_file_for_scope(&scope),
-        Some(".harness/custom/review-prompts/plan-artifacts.md")
+        Some(".harness/custom/review-prompts/impl-plan.md")
     );
 }
 
@@ -774,19 +774,15 @@ fn test_scope_config_group_pattern_expands_track_id_placeholder() {
     // Before T001, groups patterns were compiled verbatim and <track-id> would
     // match only the literal string, catching nothing. After T001, the placeholder
     // must be expanded just like operational/other_track patterns.
-    let entries = vec![(
-        "plan-artifacts".to_owned(),
-        vec!["track/items/<track-id>/**".to_owned()],
-        None,
-        None,
-    )];
+    let entries =
+        vec![("impl-plan".to_owned(), vec!["track/items/<track-id>/**".to_owned()], None, None)];
     let config = ReviewScopeConfig::new(&track_id(), entries, vec![], vec![], None).unwrap();
     let files =
         vec![fp("track/items/my-track-2026-04-05/spec.md"), fp("track/items/other-track/spec.md")];
     let classified = config.classify(&files);
 
-    let plan_artifacts = ScopeName::Main(MainScopeName::new("plan-artifacts").unwrap());
-    let matched = classified.get(&plan_artifacts).unwrap();
+    let impl_plan = ScopeName::Main(MainScopeName::new("impl-plan").unwrap());
+    let matched = classified.get(&impl_plan).unwrap();
     assert_eq!(matched.len(), 1);
     assert_eq!(matched[0].as_str(), "track/items/my-track-2026-04-05/spec.md");
 
