@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "986af3da9163a4a33f1f995413548c79596f674b00beb497a956287937cc3c23",
+  "signals": [
+    {
+      "type_name": "LintRuleKind",
+      "signal": "blue",
+      "entry_hash": "2e8aa2a1fa56f1c4128715ff21e4e053dc450f38c534fc40332603227caab334"
+    },
+    {
+      "type_name": "RunCatalogueLintInteractor",
+      "signal": "blue",
+      "entry_hash": "786cd1562dd1533719194776a04ac82be801b7a254aa4ff03aba35c24831c8c7"
+    },
+    {
+      "type_name": "LintConfigLoader",
+      "signal": "blue",
+      "entry_hash": "ec7f40b14c96d5c480e85912f5575894d2c7c1cfcb5aeb47f321ada7ca5b76c5"
+    },
+    {
+      "type_name": "RunCatalogueLint",
+      "signal": "blue",
+      "entry_hash": "ca358f7a451448e631f3654453f4e8295e07cfac845ab853931baf9b97059682"
+    },
+    {
+      "type_name": "TrackService",
+      "signal": "blue",
+      "entry_hash": "208b3cc01b41eb490fba90d9e5a20fd03f49c5da41ea4aeb143fd91426bc9495"
+    }
+  ]
+}

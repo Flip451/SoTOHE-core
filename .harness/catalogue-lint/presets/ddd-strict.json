@@ -118,6 +118,48 @@
     {
       "target_roles": ["ErrorType"],
       "kind": { "KindLayerConstraint": { "permitted_layers": ["domain", "usecase", "infrastructure", "cli", "cli_composition"] } }
+    },
+    {
+      "target_roles": [],
+      "kind": {
+        "ForbidPrimitiveInTypes": {
+          "primitives": ["String"],
+          "layers": ["domain", "usecase", "infrastructure", "cli_driver", "cli", "cli_composition"],
+          "positions": ["result_err"]
+        }
+      }
+    },
+    {
+      "target_roles": [
+        "ValueObject",
+        "Entity",
+        "AggregateRoot",
+        "DomainService",
+        "Specification",
+        "Factory",
+        "UseCase",
+        "Interactor",
+        "Query",
+        "ErrorType",
+        "SecondaryAdapter",
+        "EventPolicy",
+        "DomainEvent",
+        "CompositionRoot",
+        "PrimaryAdapter",
+        "SpecificationPort",
+        "ApplicationService",
+        "SecondaryPort",
+        "Repository",
+        "FreeFunction",
+        "UseCaseFunction"
+      ],
+      "kind": {
+        "ForbidPrimitiveInTypes": {
+          "primitives": ["String"],
+          "layers": ["domain", "usecase", "infrastructure", "cli_driver", "cli", "cli_composition"],
+          "positions": ["named_field", "variant_field"]
+        }
+      }
     }
   ]
 }

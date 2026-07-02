@@ -90,7 +90,7 @@ pub use tddd::catalogue::{
 };
 pub use tddd::catalogue_linter::{
     CatalogueLintViolation, CatalogueLinterError, CatalogueLinterRule, CatalogueLinterRuleError,
-    CatalogueLinterRuleKind, RoleKind, RuleTarget, evaluate_catalogue_lint,
+    CatalogueLinterRuleKind, FreeText, RoleKind, RuleTarget, evaluate_catalogue_lint,
 };
 pub use tddd::catalogue_spec_signal::{
     CATALOGUE_SPEC_SIGNALS_SCHEMA_VERSION, CatalogueSpecSignal, CatalogueSpecSignalsDocument,

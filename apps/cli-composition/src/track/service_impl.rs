@@ -170,4 +170,17 @@ impl TrackService for TrackServiceImpl {
             None => TrackCommandOutput { stdout: Some(String::new()), stderr: None, exit_code: 0 },
         }
     }
+
+    fn catalogue_lint_check_active_track(
+        &self,
+        track_id: Option<String>,
+        workspace_root: PathBuf,
+        rules_file: Option<PathBuf>,
+    ) -> TrackCommandOutput {
+        composition_to_output(TrackCompositionRoot::new().catalogue_lint_check_active_track(
+            track_id,
+            workspace_root,
+            rules_file,
+        ))
+    }
 }

@@ -1,0 +1,150 @@
+{
+  "schema_version": 1,
+  "layer": "infrastructure",
+  "entries": [
+    {
+      "claim_hash": "8c2d8913744a44f271d12cc1dcb5a6b27076f66a22e86e0c2d19e882852516eb",
+      "evidence_hash": "a5f31728425c70e94ccdab72299a7408a7655f0022abfaf4d1ebed1e3a3c5a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "検出エンジン（infrastructure 層、既存 `type_ref_parser` の syn 経路を再利用）が `syn::visit::Visit` による全再帰走査を実施し、named struct field・enum variant field・メソッド/関数の param・return・bound、および透過コンテナ（`Option` / `Vec` / `Box` / `Arc` / `BTreeMap` 等）や関数型シグネチャ（`Fn` / `FnMut` / `FnOnce`）内部にネストした型引数を含む全位置で、設定されたプリミティブ ident の出現を報告できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalogue-primitive-obsession-guard-2026-07-01/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "SynPrimitiveOccurrenceScanner"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "検出エンジン（infrastructure 層、既存 `type_ref_parser` の syn 経路を再利用）が `syn::visit::Visit` による全再帰走査を実施し、named struct field・enum variant field・メソッド/関数の param・return・bound、および透過コンテナ（`Option` / `Vec` / `Box` / `Arc` / `BTreeMap` 等）や関数型シグネチャ（`Fn` / `FnMut` / `FnOnce`）内部にネストした型引数を含む全位置で、設定されたプリミティブ ident の出現を報告できる。エンジン側に位置の特例（関数型シグネチャ内の除外等）は一切存在しない。ident 判定は完全一致であり、`NonEmptyString` / `OsString` のような紛らわしい型名は誤検出されない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8c2d8913744a44f271d12cc1dcb5a6b27076f66a22e86e0c2d19e882852516eb",
+      "evidence_hash": "d6e6a6982a964e74804cb1fedb2af3115f816296fc4cfb74a80da7a60b4cdf47",
+      "verdict": {
+        "kind": "pass",
+        "citation": "走査が型引数2つの `Result` path segment を検出した場合、第1型引数（Ok スロット）は通常位置として、第2型引数（Err スロット）は専用の `result_err` 位置として区別して報告される。この区別は `Vec<Result<T, String>>` のようにネストした位置でも成立する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalogue-primitive-obsession-guard-2026-07-01/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "SynPrimitiveOccurrenceScanner"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "走査が型引数2つの `Result` path segment を検出した場合、第1型引数（Ok スロット）は通常位置として、第2型引数（Err スロット）は専用の `result_err` 位置として区別して報告される。この区別は `Vec<Result<T, String>>` のようにネストした位置でも成立する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8c2d8913744a44f271d12cc1dcb5a6b27076f66a22e86e0c2d19e882852516eb",
+      "evidence_hash": "65d7237ca041e23422a673d95856ebff152645544444b3024b3dbac3ebe9a8bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "『この TypeRef の型木の指定位置に指定プリミティブが含まれるか』を判定する port が domain 層に定義されており、infrastructure 層の adapter がこれを syn ベースの走査で実装している。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalogue-primitive-obsession-guard-2026-07-01/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "SynPrimitiveOccurrenceScanner"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "『この TypeRef の型木の指定位置に指定プリミティブが含まれるか』を判定する port が domain 層に定義されており、infrastructure 層の adapter がこれを syn ベースの走査で実装している。domain crate が syn に依存していないことは `cargo make check-layers` および `cargo make deny` で検証できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8c2d8913744a44f271d12cc1dcb5a6b27076f66a22e86e0c2d19e882852516eb",
+      "evidence_hash": "8d7a648c183dd61cfa1055d5591b21c687300839782e9172f4e2cabe798761a6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "検出位置はフィールドに限定せず、次を含む: named struct field（plain struct の `shape.fields[].ty`）、enum variant のフィールド（`variants[].payload.fields[].ty`）、メソッド/関数の param・return・bound、type alias target、および TypeRef が現れる位置一般。透過コンテナ（`Option` / `Vec` / `Box` / `Arc` / `BTreeMap` 等）の型引数に現れるプリミティブも対象に含める。位置の語彙は将来拡張の余地を残す（現時点で列挙した位置に限定されるわけではない）。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalogue-primitive-obsession-guard-2026-07-01/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "SynPrimitiveOccurrenceScanner"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "検出位置はフィールドに限定せず、次を含む: named struct field（plain struct の `shape.fields[].ty`）、enum variant のフィールド（`variants[].payload.fields[].ty`）、メソッド/関数の param・return・bound、type alias target、および TypeRef が現れる位置一般。透過コンテナ（`Option` / `Vec` / `Box` / `Arc` / `BTreeMap` 等）の型引数に現れるプリミティブも対象に含める。位置の語彙は将来拡張の余地を残す（現時点で列挙した位置に限定されるわけではない）。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8c2d8913744a44f271d12cc1dcb5a6b27076f66a22e86e0c2d19e882852516eb",
+      "evidence_hash": "2cdef070b68aa327504efdf96ecfd77361c0925102a15406cc6ad7c92d4fc619",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`Result<T, E>`（型引数が2つの `Result` path segment）を走査中に検出した場合、第1型引数（Ok スロット）を通常の位置として扱い、第2型引数（Err スロット）を専用の `result_err` 位置として区別して記録する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalogue-primitive-obsession-guard-2026-07-01/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "SynPrimitiveOccurrenceScanner"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "`Result<T, E>`（型引数が2つの `Result` path segment）を走査中に検出した場合、第1型引数（Ok スロット）を通常の位置として扱い、第2型引数（Err スロット）を専用の `result_err` 位置として区別して記録する。これにより `Result<T, String>` の Err の `String` だけを、`Result<String, E>` の Ok の `String`（レンダラ/シリアライザの戻り値など）を巻き込まずに狙い撃てる。`Result<_, String>` を明示的に対象外にする条項は設けない — むしろ `result_err` 位置として対象に含める。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8c2d8913744a44f271d12cc1dcb5a6b27076f66a22e86e0c2d19e882852516eb",
+      "evidence_hash": "4d88e1ab7ab767c9d452fd9560232cae9986ec9e43e1c0d0290cb22fa3e002ba",
+      "verdict": {
+        "kind": "pass",
+        "citation": "『型木の指定位置に指定プリミティブが含まれるか』の判定は domain 層に port として定義し、infrastructure 層が既存の `type_ref_parser`（syn ベース）で実装する。domain は判定の意味論のみを持ち、syn への依存は infrastructure に閉じる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalogue-primitive-obsession-guard-2026-07-01/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "SynPrimitiveOccurrenceScanner"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "『型木の指定位置に指定プリミティブが含まれるか』の判定は domain 層に port として定義し、infrastructure 層が既存の `type_ref_parser`（syn ベース）で実装する。domain は判定の意味論のみを持ち、syn への依存は infrastructure に閉じる。"
+        }
+      }
+    }
+  ]
+}

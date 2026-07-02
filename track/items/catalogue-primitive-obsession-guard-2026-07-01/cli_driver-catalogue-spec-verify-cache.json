@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "layer": "cli_driver",
+  "entries": [
+    {
+      "claim_hash": "88f735d2edd279a063685b5a6f441e634c28d85f7c966f08fa38a323c2aead8d",
+      "evidence_hash": "aa690529053862a64534cbe5bf388fea7a6e1391a5337c0e0d651844d625ac88",
+      "verdict": {
+        "kind": "pass",
+        "citation": "lint は active track のカタログのみを検査する既存の active-track-scoped ツール群の一部として適用され、過去の完了トラックのカタログは遡及検査の対象にしない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalogue-primitive-obsession-guard-2026-07-01/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "TrackInput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-12",
+          "text_label": "gate は最初から blocking とし、warn → block の段階導入は行わない。lint は active track のカタログのみを検査する既存の active-track-scoped ツール群の一部として適用され、過去の完了トラックのカタログは遡及検査の対象にしない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "88f735d2edd279a063685b5a6f441e634c28d85f7c966f08fa38a323c2aead8d",
+      "evidence_hash": "a6fd34b8bd3755de570100e8b34dcf248221c0af890a211be7c76b2a33b69005",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本ルールの適用範囲は、既存の active-track-scoped ツール群と同様に現在アクティブなトラックのカタログに限定される。過去の完了トラックのカタログは、本ルールの導入によって遡及的に検査対象にはならない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalogue-primitive-obsession-guard-2026-07-01/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "TrackInput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-07",
+          "text_label": "本ルールの適用範囲は、既存の active-track-scoped ツール群と同様に現在アクティブなトラックのカタログに限定される。過去の完了トラックのカタログは、本ルールの導入によって遡及的に検査対象にはならない。"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,518 @@
+{
+  "schema_version": 5,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {
+    "LintRuleKind": {
+      "action": "modify",
+      "role": {
+        "Dto": {}
+      },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "FieldEmpty",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "target_field", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "FieldNonEmpty",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "target_field", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "KindLayerConstraint",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "permitted_layers", "ty": "Vec<String>" }
+              ]
+            }
+          },
+          {
+            "name": "ReferencedRoleConstraint",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "target_field", "ty": "String" },
+                { "name": "expected_role", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "TraitImplRequired",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "required_traits", "ty": "Vec<String>" }
+              ]
+            }
+          },
+          {
+            "name": "NoRoleInMethodSignature",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "forbidden_roles", "ty": "Vec<String>" }
+              ]
+            }
+          },
+          {
+            "name": "MethodReferenceSignature",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "target_field", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "AccessorSignatureRequired",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "target_field", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "FieldElementUniqueAcrossEntries",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "target_field", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "NoExternalReferenceInMethods",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "target_field", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "NoPublicField",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "ForbiddenMethodReceiver",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "forbidden_receiver", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "ForbidPrimitiveInTypes",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "primitives", "ty": "Vec<String>" },
+                { "name": "layers", "ty": "Vec<String>" },
+                { "name": "positions", "ty": "Vec<String>" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "catalogue_lint_workflow",
+      "docs": "Usecase-layer mirror of domain CatalogueLinterRuleKind. Restates all 12 pre-existing variants unchanged from baseline, and adds a 13th variant, ForbidPrimitiveInTypes, in parallel with the domain type's 13th variant (ADR 2026-07-01-0004 D6; spec AC-01, IN-06). Uses String / Vec<String> fields for target_field / forbidden_receiver / required_traits / primitives / layers / positions throughout (rather than the domain-side RolePayloadField / SelfReceiver / NonEmptyVec<TypeRef> / NonEmptyVec<PrimitiveName> / NonEmptyVec<LayerId> / NonEmptyVec<PrimitiveOccurrencePosition> this same track introduces or reuses at the domain layer): the usecase boundary accepts external, not-yet-validated input from CLI/config, and RunCatalogueLintInteractor converts each field and the enum variant itself into the corresponding CatalogueLinterRuleKind variant during rule construction, performing all format / vocabulary / non-emptiness / layer-existence validation at that conversion step -- this type enforces none of it itself. Role: Dto, re-roled from ValueObject during this track's Phase 2 pass (both ValueObject and Dto require recorded grounds for usecase placement per R1). Rationale for the re-role: R3 defines ValueObject as 'a validated value only, no behavior' -- but this type's own baseline docs already admitted that validation is deferred entirely to the interactor's conversion step, meaning the 'validated' half of R3's litmus test never held for this type; it is, and always was, a raw wire-shape carrying externally-supplied data pending conversion to the validated domain representation, which is precisely the Dto pattern rather than ValueObject. This re-roling is consistent with, not a workaround of, ADR 2026-07-01-0004 D7 / spec CN-09 / AC-05's default lint config, which already excludes the Dto role (all layers) from the named_field / variant_field x String check by design, specifically for this externally-sourced-input-pending-conversion pattern; LintRuleKind's raw String / Vec<String> fields remaining exempt from the primitive-obsession lint under the default config is therefore a direct, intended consequence of the (corrected) Dto role, not a special-case carve-out invented to dodge this track's own lint. It additionally derives Serialize/Deserialize to parse its variants out of --rules-file / .harness/catalogue-lint/config.json, consistent with Dto's usual wire-format responsibilities rather than a secondary capability bolted onto a ValueObject.",
+      "spec_refs": [
+        {
+          "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json",
+          "anchor": "AC-01"
+        },
+        {
+          "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json",
+          "anchor": "IN-06"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RunCatalogueLintInteractor": {
+      "action": "modify",
+      "role": {
+        "Interactor": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "catalogue_lint_workflow",
+      "docs": "Concrete implementation of RunCatalogueLint. Modify from baseline: adds a third port dependency, a generic S: PrimitiveOccurrenceScanner (ADR 2026-07-01-0004 D3; spec AC-04, IN-05), threaded through to domain::evaluate_catalogue_lint as its new scanner parameter during execute(). The CatalogueLoader port (L) and LintConfigLoader port (C) are retained unchanged from baseline. Generic over L, C, and S to avoid Arc<dyn Trait> boxing at this boundary.",
+      "spec_refs": [
+        {
+          "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json",
+          "anchor": "AC-04"
+        },
+        {
+          "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json",
+          "anchor": "IN-05"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {
+    "RunCatalogueLint": {
+      "action": "reference",
+      "role": {
+        "ApplicationService": {}
+      },
+      "methods": [
+        {
+          "name": "execute",
+          "receiver": "&self",
+          "params": [
+            { "name": "command", "ty": "RunCatalogueLintCommand" }
+          ],
+          "returns": "Result<Vec<CatalogueLintViolation>, RunCatalogueLintError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Executes the catalogue lint workflow with the given command."
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "catalogue_lint_workflow",
+      "docs": "Application service interface for running catalogue lint. Referenced unchanged from baseline — the interface contract is stable even though the underlying interactor implementation changes to add a third port (ADR 2026-07-01-0004 D3). The Send + Sync supertrait bounds were already present in the baseline and are not introduced by this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "LintConfigLoader": {
+      "action": "reference",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "methods": [
+        {
+          "name": "load",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Result<LintConfig, LintConfigLoaderError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Loads and parses a LintConfig from the path baked into the adapter at construction time. Returns LintConfigLoaderError::MissingFile if the file does not exist (fail-closed — no silent fallback). Returns ParseError on JSON/structure failures. Returns SchemaVersionMismatch on version field mismatch. The path is not passed at call time — the adapter implementation (FsLintConfigLoader) receives the fully-resolved path in its constructor (new()), allowing CLI composition to decide whether to use the workspace default path or a --rules-file override path before constructing the adapter."
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "catalogue_lint_workflow",
+      "docs": "Secondary port for loading lint configuration from a file. Abstracts the external I/O of reading .harness/catalogue-lint/config.json or a --rules-file path. Implementations live in the infrastructure layer (FsLintConfigLoader). Referenced unchanged from baseline — this track does not modify the LintConfigLoader interface; it is cited here because RunCatalogueLintInteractor's impl_generics restate the C: LintConfigLoader bound alongside the newly added S: PrimitiveOccurrenceScanner bound.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "TrackService": {
+      "action": "modify",
+      "role": {
+        "ApplicationService": {}
+      },
+      "methods": [
+        {
+          "name": "init",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id", "ty": "String" },
+            { "name": "description", "ty": "String" }
+          ],
+          "returns": "TrackCommandOutput",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "transition",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id", "ty": "Option<String>" },
+            { "name": "task_id", "ty": "String" },
+            { "name": "target_status", "ty": "String" },
+            { "name": "commit_hash", "ty": "Option<String>" }
+          ],
+          "returns": "TrackCommandOutput",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "resolve",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id", "ty": "Option<String>" }
+          ],
+          "returns": "TrackCommandOutput",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "views_sync",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "std::path::PathBuf" },
+            { "name": "track_id", "ty": "Option<String>" }
+          ],
+          "returns": "TrackCommandOutput",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "branch_create",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id", "ty": "String" }
+          ],
+          "returns": "TrackCommandOutput",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "branch_switch",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id", "ty": "String" }
+          ],
+          "returns": "TrackCommandOutput",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "views_validate",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "TrackCommandOutput",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "add_task",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id", "ty": "Option<String>" },
+            { "name": "description", "ty": "String" },
+            { "name": "section", "ty": "Option<String>" },
+            { "name": "after", "ty": "Option<String>" }
+          ],
+          "returns": "TrackCommandOutput",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "set_override",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id", "ty": "Option<String>" },
+            { "name": "status", "ty": "String" },
+            { "name": "reason", "ty": "String" }
+          ],
+          "returns": "TrackCommandOutput",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "clear_override",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id", "ty": "Option<String>" }
+          ],
+          "returns": "TrackCommandOutput",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "next_task",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id", "ty": "Option<String>" }
+          ],
+          "returns": "TrackCommandOutput",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "task_counts",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id", "ty": "Option<String>" }
+          ],
+          "returns": "TrackCommandOutput",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "archive",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id", "ty": "String" }
+          ],
+          "returns": "TrackCommandOutput",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "detect_active",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "TrackCommandOutput",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "catalogue_lint_check_active_track",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id", "ty": "Option<String>" },
+            { "name": "workspace_root", "ty": "std::path::PathBuf" },
+            { "name": "rules_file", "ty": "Option<std::path::PathBuf>" }
+          ],
+          "returns": "TrackCommandOutput",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "track_service",
+      "docs": "Primary port for the track command family. Each method corresponds to one sotp track <subcommand> invocation. The first 14 methods (init through detect_active) are unchanged from the pre-existing declaration authored in track/items/cli-composition-split-presentation-layer-2026-06-21/usecase-types.json and are reproduced verbatim here since action=modify requires a complete post-modification declaration, not a partial diff. This track adds a 15th method, catalogue_lint_check_active_track, wiring `sotp catalogue-lint check-active-track` through this same TrackService/TrackDriver primary-adapter boundary as every other track subcommand, rather than calling TrackCompositionRoot directly from the cli (bin) layer — correcting a CLI-boundary violation flagged during review (CN-01/CN-02: cli must not call cli_composition workflow methods directly). workspace_root and rules_file are spelled with the full std::path::PathBuf path, matching this trait's own pre-existing items_dir/project_root params, which already spell PathBuf in full. R9 note: track_id / workspace_root / rules_file remain raw Option<String> / std::path::PathBuf / Option<std::path::PathBuf> rather than dedicated value objects — this mirrors the exact primitive types already used by all 14 pre-existing methods on this trait (track_id: Option<String>/String throughout; PathBuf-typed items_dir/project_root throughout) and by the already-written, catalogue-only-task-out-of-scope Rust trait method this entry documents; introducing e.g. a TrackId/WorkspaceRoot newtype here would diverge from the compiled trait signature (Phase 2 mismatch) and would require a Rust source change outside this task's authorized scope. Flagged for a possible future R9 follow-up pass across the whole TrackService surface, not resolved by this track.",
+      "spec_refs": [
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "IN-12" },
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "CN-07" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "functions": {},
+  "inherent_impls": [
+    {
+      "type_name": "RunCatalogueLintInteractor",
+      "impl_generics": [
+        { "name": "L", "bounds": ["domain::tddd::catalogue_ports::CatalogueLoader"] },
+        { "name": "C", "bounds": ["LintConfigLoader"] },
+        { "name": "S", "bounds": ["domain::tddd::primitive_occurrence_scanner::PrimitiveOccurrenceScanner"] }
+      ],
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "loader", "ty": "L" },
+            { "name": "config_loader", "ty": "C" },
+            { "name": "scanner", "ty": "S" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Creates a new RunCatalogueLintInteractor with the catalogue loader, lint config loader, and primitive occurrence scanner. Modify from baseline: adds the scanner parameter (ADR 2026-07-01-0004 D3) alongside the pre-existing loader and config_loader parameters."
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    {
+      "action": "modify",
+      "trait_ref": "RunCatalogueLint",
+      "for_type": "RunCatalogueLintInteractor",
+      "impl_generics": [
+        { "name": "L", "bounds": ["domain::tddd::catalogue_ports::CatalogueLoader", "Send", "Sync"] },
+        { "name": "C", "bounds": ["LintConfigLoader", "Send", "Sync"] },
+        { "name": "S", "bounds": ["domain::tddd::primitive_occurrence_scanner::PrimitiveOccurrenceScanner", "Send", "Sync"] }
+      ]
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "LintRuleKind"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "LintRuleKind"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "LintRuleKind"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "LintRuleKind"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "serde_core::ser::Serialize",
+      "for_type": "LintRuleKind"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "serde_core::de::Deserialize<'de>",
+      "for_type": "LintRuleKind"
+    }
+  ]
+}

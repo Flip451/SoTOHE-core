@@ -128,6 +128,18 @@ pub enum TrackInput {
         /// Project root directory.
         project_root: PathBuf,
     },
+    /// Run the catalogue lint ruleset across every `tddd.enabled` layer of
+    /// the active track and aggregate violations.
+    CatalogueLintCheckActiveTrack {
+        /// Track ID string (resolved from git branch if `None`).
+        track_id: Option<String>,
+        /// Workspace root directory (contains `architecture-rules.json` and
+        /// `track/items/`).
+        workspace_root: PathBuf,
+        /// Optional override for the lint config file path (defaults to
+        /// `.harness/catalogue-lint/config.json` under `workspace_root`).
+        rules_file: Option<PathBuf>,
+    },
 }
 
 // ---------------------------------------------------------------------------
@@ -213,6 +225,13 @@ impl TrackDriver {
             }
             TrackInput::DetectActive { project_root } => {
                 service_output_to_outcome(self.service.detect_active(project_root))
+            }
+            TrackInput::CatalogueLintCheckActiveTrack { track_id, workspace_root, rules_file } => {
+                service_output_to_outcome(self.service.catalogue_lint_check_active_track(
+                    track_id,
+                    workspace_root,
+                    rules_file,
+                ))
             }
         }
     }
