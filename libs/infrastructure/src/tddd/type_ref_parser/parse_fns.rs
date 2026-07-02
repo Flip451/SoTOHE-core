@@ -102,6 +102,26 @@ pub(crate) fn parse_syn_type(type_ref_str: &str) -> syn::Result<syn::Type> {
     syn::parse_str(type_ref_str)
 }
 
+/// Parses a `TypeRef` string into a raw `syn::TypeParamBound` AST, without
+/// resolving paths to `rustdoc_types::GenericBound`.
+///
+/// Unlike [`parse_syn_type`], which parses a bare `syn::Type` and rejects
+/// bound-only forms (`?Sized`, a lifetime such as `'static`, a `for<'a>
+/// Trait<'a>` HRTB form), this function parses the `syn::TypeParamBound`
+/// grammar directly -- the same parser [`parse_generic_bound`] uses for the
+/// `rustdoc_types::GenericBound` codec path. Intended for adapters that only
+/// need the `syn` AST for structural traversal at a `Bound` call site (e.g.
+/// `SynPrimitiveOccurrenceScanner`, ADR `2026-07-01-0004` D2/CN-01; PR #179
+/// round 2 P1) and have no need for catalogue/local-crate path resolution.
+///
+/// # Errors
+///
+/// Returns `syn::Error` if `type_ref_str` cannot be parsed as a
+/// `syn::TypeParamBound`.
+pub(crate) fn parse_syn_type_param_bound(type_ref_str: &str) -> syn::Result<syn::TypeParamBound> {
+    syn::parse_str(type_ref_str)
+}
+
 /// Parses a bound string (e.g. `"'static"`, `"Send"`, `"?Sized"`,
 /// `"for<'a> Fn(&'a str)"`) into a `rustdoc_types::GenericBound`.
 ///

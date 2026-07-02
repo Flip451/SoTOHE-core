@@ -4651,4 +4651,93 @@ mod tests {
             violations[0].message()
         );
     }
+
+    // ------------------------------------------------------------------
+    // PR #179 round 2 P1 regression: impl-block-level generic bounds
+    // (`impl<T: Into<Result<(), String>>> Foo<T>`) are carried on
+    // `InherentImplDeclV2.impl_generics` / `impl_where_predicates`, which
+    // `collect_type_entry_slots` previously never inspected -- only the
+    // *methods* of a matching `inherent_impls` block were merged in (via
+    // `collect_methods_for_type`), so a primitive occurrence appearing only
+    // in an impl-block-level bound was silently missed.
+    // ------------------------------------------------------------------
+
+    #[test]
+    fn test_forbid_primitive_in_types_scans_result_err_inside_inherent_impl_generic_bound() {
+        let mut doc = make_doc("domain");
+        doc.types
+            .insert(TypeName::new("Money").unwrap(), make_type_entry(DataRole::value_object()));
+        doc.inherent_impls.push(InherentImplDeclV2 {
+            type_name: TypeName::new("Money").unwrap(),
+            impl_generics: vec![MethodGenericParam {
+                name: ParamName::new("T").unwrap(),
+                bounds: vec![TypeRef::new("Into<Result<(), String>>").unwrap()],
+            }],
+            impl_where_predicates: vec![],
+            methods: vec![],
+        });
+
+        let all = all_catalogues_single(&doc);
+        let target_layer = doc.layer.clone();
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::all_roles(),
+            CatalogueLinterRuleKind::ForbidPrimitiveInTypes {
+                primitives: NonEmptyVec::new(PrimitiveName::new("String").unwrap(), vec![]),
+                layers: NonEmptyVec::new(layer("domain"), vec![]),
+                positions: NonEmptyVec::new(PrimitiveOccurrencePosition::ResultErr, vec![]),
+            },
+        )
+        .unwrap();
+
+        let violations =
+            evaluate_catalogue_lint(&[rule], &all, &target_layer, &BoundResultErrScanner).unwrap();
+
+        assert_eq!(
+            violations.len(),
+            1,
+            "expected exactly 1 ResultErr violation from the impl-block-level generic bound, \
+             got: {violations:?}"
+        );
+        assert_eq!(violations[0].entry_name(), "Money");
+    }
+
+    #[test]
+    fn test_forbid_primitive_in_types_scans_result_err_inside_inherent_impl_where_predicate() {
+        let mut doc = make_doc("domain");
+        doc.types
+            .insert(TypeName::new("Money").unwrap(), make_type_entry(DataRole::value_object()));
+        doc.inherent_impls.push(InherentImplDeclV2 {
+            type_name: TypeName::new("Money").unwrap(),
+            impl_generics: vec![],
+            impl_where_predicates: vec![WherePredicateDecl {
+                lhs: TypeRef::new("T").unwrap(),
+                rhs: vec![TypeRef::new("Into<Result<(), String>>").unwrap()],
+                operator: BoundOp::Bound,
+            }],
+            methods: vec![],
+        });
+
+        let all = all_catalogues_single(&doc);
+        let target_layer = doc.layer.clone();
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::all_roles(),
+            CatalogueLinterRuleKind::ForbidPrimitiveInTypes {
+                primitives: NonEmptyVec::new(PrimitiveName::new("String").unwrap(), vec![]),
+                layers: NonEmptyVec::new(layer("domain"), vec![]),
+                positions: NonEmptyVec::new(PrimitiveOccurrencePosition::ResultErr, vec![]),
+            },
+        )
+        .unwrap();
+
+        let violations =
+            evaluate_catalogue_lint(&[rule], &all, &target_layer, &BoundResultErrScanner).unwrap();
+
+        assert_eq!(
+            violations.len(),
+            1,
+            "expected exactly 1 ResultErr violation from the impl-block-level where-predicate \
+             bound, got: {violations:?}"
+        );
+        assert_eq!(violations[0].entry_name(), "Money");
+    }
 }

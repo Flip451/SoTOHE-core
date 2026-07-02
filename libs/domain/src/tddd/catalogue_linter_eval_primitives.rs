@@ -171,9 +171,13 @@ pub(super) fn evaluate_forbid_primitive_in_types<S: PrimitiveOccurrenceScanner>(
 }
 
 /// Collects `NamedField` / `VariantField` / `TypeAliasTarget` slots from a
-/// type entry's own shape, plus `Param` / `Return` / `Bound` slots from its
+/// type entry's own shape, `Param` / `Return` / `Bound` slots from its
 /// methods (`TypeEntry.methods` merged with matching `inherent_impls`, via
-/// `collect_methods_for_type`). `Bound` slots are collected according to
+/// `collect_methods_for_type`), and `Bound` slots from any matching
+/// `inherent_impls` block's own `impl_generics` / `impl_where_predicates` --
+/// impl-block-level bounds (e.g. `impl<T: Into<Result<(), String>>> Foo<T>`)
+/// are distinct from a method's own generics and would otherwise never be
+/// scanned (PR #179 round 2 P1). `Bound` slots are collected according to
 /// `bound_filter`.
 fn collect_type_entry_slots(
     catalogue: &CatalogueDocument,
@@ -241,6 +245,25 @@ fn collect_type_entry_slots(
                 &method.returns,
                 &method.generics,
                 &method.where_predicates,
+                bound_filter,
+                slots,
+            );
+        }
+
+        // Impl-block-level bounds (`impl<T: Into<Result<(), String>>> Foo<T>`)
+        // are carried on `InherentImplDeclV2.impl_generics` /
+        // `impl_where_predicates`, not on any method -- `collect_methods_for_type`
+        // above only merges each impl block's *methods*, so these must be
+        // collected separately here (PR #179 round 2 P1).
+        for impl_decl in catalogue
+            .inherent_impls
+            .iter()
+            .filter(|decl| decl.type_name.as_str() == entry_name.as_str())
+        {
+            push_generic_and_where_slots(
+                &entry_name,
+                &impl_decl.impl_generics,
+                &impl_decl.impl_where_predicates,
                 bound_filter,
                 slots,
             );

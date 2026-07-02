@@ -1,183 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`catalogue_lint_check_active_track` directly invokes `RunCatalogueLintInteractor::execute(...)` from the composition root. In this scope, `cli_composition` is supposed to wire adapters and hand off a driver, not execute use cases itself, so this is an invoke leak.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/apps/cli-composition/src/track/tddd.rs",
-              "line": 621,
-              "category": "invoke leak"
-            }
-          ],
-          "hash": "rvw1:sha256:2b010f1c3c0decb76a6b34dfcb30a926cd43b9d4c8a1b2e9beab4d2103cbe356",
-          "at": "2026-07-02T01:29:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2b010f1c3c0decb76a6b34dfcb30a926cd43b9d4c8a1b2e9beab4d2103cbe356",
-          "at": "2026-07-02T01:38:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`catalogue_lint_check_active_track` formats CLI-facing output in the composition layer: it builds per-violation display lines, config-missing guidance, skip/status text, and the final summary before returning `CommandOutcome`. Under the cli_composition policy, rendering belongs in `cli_driver`; this function should return or hand off structured lint results/status for the driver to render instead of assembling user-facing strings here. This is separate from the accepted `.execute()` precedent in the briefing.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/tddd.rs",
-              "line": 631,
-              "category": "render leak"
-            }
-          ],
-          "hash": "rvw1:sha256:6514e62069bd6526be74f8bacc2cdd81c47feb148b39df20fcb1e6f7e3816d01",
-          "at": "2026-07-02T02:02:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6514e62069bd6526be74f8bacc2cdd81c47feb148b39df20fcb1e6f7e3816d01",
-          "at": "2026-07-02T02:07:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b8c32e43525cd238be58efa4b4fa25be0fe644c93c26c9c3ff0d673efed41488",
-          "at": "2026-07-02T03:12:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b8c32e43525cd238be58efa4b4fa25be0fe644c93c26c9c3ff0d673efed41488",
-          "at": "2026-07-02T03:16:19Z"
-        }
-      ]
-    },
-    "types": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:088ae98d41128d86e4f8d79fad3f11a444b66aeb23849bf3845f8b55b1885775",
-          "at": "2026-07-01T12:15:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`PrimitiveOccurrencePosition` cannot represent type-alias targets even though the spec includes `type_alias.target`/TypeRef positions as scan targets. Since `CatalogueLinterRuleKind::ForbidPrimitiveInTypes.positions` is typed as `NonEmptyVec<PrimitiveOccurrencePosition>`, a catalogue entry such as a `type_alias` whose target is `String` cannot be configured or reported by the new rule, leaving an in-scope TypeRef position outside the contract. Add a type-alias-target position to this enum and have the evaluator classify that slot explicitly.",
-              "severity": "P1",
-              "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/domain-types.json",
-              "line": 12,
-              "category": "SoT integrity"
-            }
-          ],
-          "hash": "rvw1:sha256:088ae98d41128d86e4f8d79fad3f11a444b66aeb23849bf3845f8b55b1885775",
-          "at": "2026-07-01T12:22:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:473c6a8a644b0d8af373d56216071cec128f3c14e5a4db5ed50ca21f00db4903",
-          "at": "2026-07-01T13:33:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:473c6a8a644b0d8af373d56216071cec128f3c14e5a4db5ed50ca21f00db4903",
-          "at": "2026-07-01T13:38:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a54ae49134b5150744d16096ddc8533bd27858d9692adfeb1a16e2ebe3eba342",
-          "at": "2026-07-02T01:31:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a54ae49134b5150744d16096ddc8533bd27858d9692adfeb1a16e2ebe3eba342",
-          "at": "2026-07-02T01:40:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:987f7cedef6790f0e5a6d3c93a424ae6b4fbd2684fa2872cc57e84ae7f59a0c3",
-          "at": "2026-07-02T02:35:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:987f7cedef6790f0e5a6d3c93a424ae6b4fbd2684fa2872cc57e84ae7f59a0c3",
-          "at": "2026-07-02T02:41:59Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3532bf0532568e83db7f1259bb2c0509fdcad04bcf9bfba8e861bf892387a0d8",
-          "at": "2026-07-01T07:38:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3532bf0532568e83db7f1259bb2c0509fdcad04bcf9bfba8e861bf892387a0d8",
-          "at": "2026-07-01T07:41:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1, convention contradiction: both [`.harness/catalogue-lint/config.json`](./home/flip451/individual/t-rust/templates/SoTOHE-core-003/.harness/catalogue-lint/config.json#L123) and [`.harness/catalogue-lint/presets/ddd-strict.json`](./home/flip451/individual/t-rust/templates/SoTOHE-core-003/.harness/catalogue-lint/presets/ddd-strict.json#L123) hardcode the six layer names in `ForbidPrimitiveInTypes.layers`. ADR `2026-07-01-0004` D6/D7 says the default config must be generated from `architecture-rules.json` and not hardcoded, so this will drift from the layer SSoT and can miss future `tddd.enabled` layers unless both files are manually kept in sync.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.harness/catalogue-lint/config.json",
-              "line": 123,
-              "category": "convention contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:cd14fcabe5d1416c06f684e3b04f756c9aed7fb61383bc219dd8ddee0d0e1d55",
-          "at": "2026-07-02T01:28:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cd14fcabe5d1416c06f684e3b04f756c9aed7fb61383bc219dd8ddee0d0e1d55",
-          "at": "2026-07-02T01:37:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cd14fcabe5d1416c06f684e3b04f756c9aed7fb61383bc219dd8ddee0d0e1d55",
-          "at": "2026-07-02T02:04:42Z"
-        }
-      ]
-    },
     "impl-plan": {
       "rounds": [
         {
@@ -334,68 +157,21 @@
         }
       ]
     },
-    "adr": {
+    "cli_driver": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:f365b57fe0712fd9cf66e3b474f480dd7db21e0486eabae30092a2010367eb58",
-          "at": "2026-07-01T07:41:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D2 decides that the syn walker recursively visits every generic argument without container special cases, so a type like `MyContainer<String>` should already be detected the same way as `Vec<String>`. The Reassess trigger here says custom generic containers are outside the current detectable set and may need future support, which contradicts D1/D2 and leaves downstream spec/type work unsure whether to implement a whitelist of known transparent containers or a true full recursive TypeRef walk.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
-              "line": 266,
-              "category": "inconsistent decisions within the same ADR"
-            }
-          ],
-          "hash": "rvw1:sha256:f365b57fe0712fd9cf66e3b474f480dd7db21e0486eabae30092a2010367eb58",
-          "at": "2026-07-01T07:43:57Z"
+          "hash": "rvw1:sha256:2e521f1c9d6de36ba8f6c63d32fffa81807c57627d36f556b7b0d4991cb65f0f",
+          "at": "2026-07-02T02:27:55Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:393004989ed1523fb3ccd000a5ae5a54a6ebcc2f351c8f19d7eff2eb0baeecef",
-          "at": "2026-07-01T07:47:34Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:98e17f7845290de2bc22fade65201e36b226cb5d0bc3b8ae7b0616b50f8015bb",
-          "at": "2026-07-02T01:29:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:98e17f7845290de2bc22fade65201e36b226cb5d0bc3b8ae7b0616b50f8015bb",
-          "at": "2026-07-02T01:33:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:43a8983110d930d911d4a0f0cb0e0f226f1e10e52924559bb99bb7bcc35da710",
-          "at": "2026-07-02T02:31:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:43a8983110d930d911d4a0f0cb0e0f226f1e10e52924559bb99bb7bcc35da710",
-          "at": "2026-07-02T02:36:04Z"
+          "hash": "rvw1:sha256:2e521f1c9d6de36ba8f6c63d32fffa81807c57627d36f556b7b0d4991cb65f0f",
+          "at": "2026-07-02T02:32:11Z"
         }
       ]
     },
@@ -439,21 +215,103 @@
         }
       ]
     },
-    "cli_driver": {
+    "infrastructure": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:2e521f1c9d6de36ba8f6c63d32fffa81807c57627d36f556b7b0d4991cb65f0f",
-          "at": "2026-07-02T02:27:55Z"
+          "hash": "rvw1:sha256:ce4145f55250ade74a179747fc54f02717497eca679b1e05a3d518caf755a7ff",
+          "at": "2026-07-02T01:28:26Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:2e521f1c9d6de36ba8f6c63d32fffa81807c57627d36f556b7b0d4991cb65f0f",
-          "at": "2026-07-02T02:32:11Z"
+          "hash": "rvw1:sha256:ce4145f55250ade74a179747fc54f02717497eca679b1e05a3d518caf755a7ff",
+          "at": "2026-07-02T01:33:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:91fb12dd2794d1a21cf8a5fe893f1c751a1b3ea5bde935008ecc94023e7ff13d",
+          "at": "2026-07-02T05:00:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:91fb12dd2794d1a21cf8a5fe893f1c751a1b3ea5bde935008ecc94023e7ff13d",
+          "at": "2026-07-02T05:04:53Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:088ae98d41128d86e4f8d79fad3f11a444b66aeb23849bf3845f8b55b1885775",
+          "at": "2026-07-01T12:15:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`PrimitiveOccurrencePosition` cannot represent type-alias targets even though the spec includes `type_alias.target`/TypeRef positions as scan targets. Since `CatalogueLinterRuleKind::ForbidPrimitiveInTypes.positions` is typed as `NonEmptyVec<PrimitiveOccurrencePosition>`, a catalogue entry such as a `type_alias` whose target is `String` cannot be configured or reported by the new rule, leaving an in-scope TypeRef position outside the contract. Add a type-alias-target position to this enum and have the evaluator classify that slot explicitly.",
+              "severity": "P1",
+              "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/domain-types.json",
+              "line": 12,
+              "category": "SoT integrity"
+            }
+          ],
+          "hash": "rvw1:sha256:088ae98d41128d86e4f8d79fad3f11a444b66aeb23849bf3845f8b55b1885775",
+          "at": "2026-07-01T12:22:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:473c6a8a644b0d8af373d56216071cec128f3c14e5a4db5ed50ca21f00db4903",
+          "at": "2026-07-01T13:33:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:473c6a8a644b0d8af373d56216071cec128f3c14e5a4db5ed50ca21f00db4903",
+          "at": "2026-07-01T13:38:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a54ae49134b5150744d16096ddc8533bd27858d9692adfeb1a16e2ebe3eba342",
+          "at": "2026-07-02T01:31:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a54ae49134b5150744d16096ddc8533bd27858d9692adfeb1a16e2ebe3eba342",
+          "at": "2026-07-02T01:40:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:987f7cedef6790f0e5a6d3c93a424ae6b4fbd2684fa2872cc57e84ae7f59a0c3",
+          "at": "2026-07-02T02:35:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:987f7cedef6790f0e5a6d3c93a424ae6b4fbd2684fa2872cc57e84ae7f59a0c3",
+          "at": "2026-07-02T02:41:59Z"
         }
       ]
     },
@@ -545,24 +403,20 @@
           "findings": [],
           "hash": "rvw1:sha256:41b31150093c88ca0cbfca152134de89f181d138804d7f261a24dabdd440e5ed",
           "at": "2026-07-02T04:29:52Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ce4145f55250ade74a179747fc54f02717497eca679b1e05a3d518caf755a7ff",
-          "at": "2026-07-02T01:28:26Z"
+          "hash": "rvw1:sha256:299bec76b2dee355a25a9598980c226b7131c7a0a7760bc4cdaeee0c81a88e74",
+          "at": "2026-07-02T05:02:02Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ce4145f55250ade74a179747fc54f02717497eca679b1e05a3d518caf755a7ff",
-          "at": "2026-07-02T01:33:44Z"
+          "hash": "rvw1:sha256:299bec76b2dee355a25a9598980c226b7131c7a0a7760bc4cdaeee0c81a88e74",
+          "at": "2026-07-02T05:06:31Z"
         }
       ]
     },
@@ -595,6 +449,180 @@
           "findings": [],
           "hash": "rvw1:sha256:c6ae9a87061c95b8b501328b801303febabdc76b38d7604391684e201e0b9b1b",
           "at": "2026-07-01T13:54:06Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`catalogue_lint_check_active_track` directly invokes `RunCatalogueLintInteractor::execute(...)` from the composition root. In this scope, `cli_composition` is supposed to wire adapters and hand off a driver, not execute use cases itself, so this is an invoke leak.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/apps/cli-composition/src/track/tddd.rs",
+              "line": 621,
+              "category": "invoke leak"
+            }
+          ],
+          "hash": "rvw1:sha256:2b010f1c3c0decb76a6b34dfcb30a926cd43b9d4c8a1b2e9beab4d2103cbe356",
+          "at": "2026-07-02T01:29:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2b010f1c3c0decb76a6b34dfcb30a926cd43b9d4c8a1b2e9beab4d2103cbe356",
+          "at": "2026-07-02T01:38:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`catalogue_lint_check_active_track` formats CLI-facing output in the composition layer: it builds per-violation display lines, config-missing guidance, skip/status text, and the final summary before returning `CommandOutcome`. Under the cli_composition policy, rendering belongs in `cli_driver`; this function should return or hand off structured lint results/status for the driver to render instead of assembling user-facing strings here. This is separate from the accepted `.execute()` precedent in the briefing.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/tddd.rs",
+              "line": 631,
+              "category": "render leak"
+            }
+          ],
+          "hash": "rvw1:sha256:6514e62069bd6526be74f8bacc2cdd81c47feb148b39df20fcb1e6f7e3816d01",
+          "at": "2026-07-02T02:02:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6514e62069bd6526be74f8bacc2cdd81c47feb148b39df20fcb1e6f7e3816d01",
+          "at": "2026-07-02T02:07:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b8c32e43525cd238be58efa4b4fa25be0fe644c93c26c9c3ff0d673efed41488",
+          "at": "2026-07-02T03:12:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b8c32e43525cd238be58efa4b4fa25be0fe644c93c26c9c3ff0d673efed41488",
+          "at": "2026-07-02T03:16:19Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:98e17f7845290de2bc22fade65201e36b226cb5d0bc3b8ae7b0616b50f8015bb",
+          "at": "2026-07-02T01:29:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:98e17f7845290de2bc22fade65201e36b226cb5d0bc3b8ae7b0616b50f8015bb",
+          "at": "2026-07-02T01:33:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:43a8983110d930d911d4a0f0cb0e0f226f1e10e52924559bb99bb7bcc35da710",
+          "at": "2026-07-02T02:31:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:43a8983110d930d911d4a0f0cb0e0f226f1e10e52924559bb99bb7bcc35da710",
+          "at": "2026-07-02T02:36:04Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f365b57fe0712fd9cf66e3b474f480dd7db21e0486eabae30092a2010367eb58",
+          "at": "2026-07-01T07:41:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2 decides that the syn walker recursively visits every generic argument without container special cases, so a type like `MyContainer<String>` should already be detected the same way as `Vec<String>`. The Reassess trigger here says custom generic containers are outside the current detectable set and may need future support, which contradicts D1/D2 and leaves downstream spec/type work unsure whether to implement a whitelist of known transparent containers or a true full recursive TypeRef walk.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+              "line": 266,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:f365b57fe0712fd9cf66e3b474f480dd7db21e0486eabae30092a2010367eb58",
+          "at": "2026-07-01T07:43:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:393004989ed1523fb3ccd000a5ae5a54a6ebcc2f351c8f19d7eff2eb0baeecef",
+          "at": "2026-07-01T07:47:34Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3532bf0532568e83db7f1259bb2c0509fdcad04bcf9bfba8e861bf892387a0d8",
+          "at": "2026-07-01T07:38:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3532bf0532568e83db7f1259bb2c0509fdcad04bcf9bfba8e861bf892387a0d8",
+          "at": "2026-07-01T07:41:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1, convention contradiction: both [`.harness/catalogue-lint/config.json`](./home/flip451/individual/t-rust/templates/SoTOHE-core-003/.harness/catalogue-lint/config.json#L123) and [`.harness/catalogue-lint/presets/ddd-strict.json`](./home/flip451/individual/t-rust/templates/SoTOHE-core-003/.harness/catalogue-lint/presets/ddd-strict.json#L123) hardcode the six layer names in `ForbidPrimitiveInTypes.layers`. ADR `2026-07-01-0004` D6/D7 says the default config must be generated from `architecture-rules.json` and not hardcoded, so this will drift from the layer SSoT and can miss future `tddd.enabled` layers unless both files are manually kept in sync.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.harness/catalogue-lint/config.json",
+              "line": 123,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:cd14fcabe5d1416c06f684e3b04f756c9aed7fb61383bc219dd8ddee0d0e1d55",
+          "at": "2026-07-02T01:28:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cd14fcabe5d1416c06f684e3b04f756c9aed7fb61383bc219dd8ddee0d0e1d55",
+          "at": "2026-07-02T01:37:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cd14fcabe5d1416c06f684e3b04f756c9aed7fb61383bc219dd8ddee0d0e1d55",
+          "at": "2026-07-02T02:04:42Z"
         }
       ]
     }

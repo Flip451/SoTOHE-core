@@ -12,6 +12,13 @@
 //! custom generics, tuples, references, arrays, slices) and function-type
 //! signatures (`Fn` / `FnMut` / `FnOnce`).
 //!
+//! [`PrimitiveOccurrencePosition::Bound`] is the one exception to the
+//! bare-`syn::Type` parse: a catalogue bound slot's text may be a legal
+//! `syn::TypeParamBound` only (`?Sized`, a lifetime such as `'static`, or a
+//! `for<'a> Trait<'a>` HRTB form) that `syn::parse_str::<syn::Type>` rejects,
+//! so a `Bound`-position scan parses `type_ref` as a `syn::TypeParamBound`
+//! instead (see the internal `scan_bound` helper; PR #179 round 2 P1).
+//!
 //! ident matching is exact (no substring matches) -- `NonEmptyString` /
 //! `OsString` never false-positive against a requested `String` primitive.
 
@@ -24,7 +31,7 @@ use domain::tddd::primitive_occurrence_scanner::{
 };
 use syn::visit::Visit;
 
-use super::type_ref_parser::parse_syn_type;
+use super::type_ref_parser::{parse_syn_type, parse_syn_type_param_bound};
 
 // ---------------------------------------------------------------------------
 // SynPrimitiveOccurrenceScanner — secondary adapter
@@ -42,6 +49,12 @@ impl PrimitiveOccurrenceScanner for SynPrimitiveOccurrenceScanner {
     /// requested primitive name with the [`PrimitiveOccurrencePosition`] it
     /// was found at.
     ///
+    /// When `position` is [`PrimitiveOccurrencePosition::Bound`], `type_ref`
+    /// is instead parsed as a `syn::TypeParamBound` (via the internal
+    /// `scan_bound` helper) since a catalogue bound slot's text may be a legal bound (`?Sized`,
+    /// `'static`, `for<'a> Fn(&'a str)`) that is not parseable as a bare
+    /// `syn::Type`.
+    ///
     /// # Errors
     ///
     /// Returns [`PrimitiveOccurrenceScanError::InvalidSitePosition`] if
@@ -49,7 +62,8 @@ impl PrimitiveOccurrenceScanner for SynPrimitiveOccurrenceScanner {
     /// only, never a valid caller-supplied call site).
     ///
     /// Returns [`PrimitiveOccurrenceScanError::ParseFailure`] if `type_ref`
-    /// cannot be parsed as a `syn::Type`.
+    /// cannot be parsed as a `syn::Type` (or, at `Bound` position, as a
+    /// `syn::TypeParamBound`).
     fn scan(
         &self,
         type_ref: TypeRef,
@@ -58,6 +72,10 @@ impl PrimitiveOccurrenceScanner for SynPrimitiveOccurrenceScanner {
     ) -> Result<PrimitiveOccurrenceReport, PrimitiveOccurrenceScanError> {
         if position == PrimitiveOccurrencePosition::ResultErr {
             return Err(PrimitiveOccurrenceScanError::InvalidSitePosition { position });
+        }
+
+        if position == PrimitiveOccurrencePosition::Bound {
+            return scan_bound(type_ref, primitives, position);
         }
 
         let syn_type = match parse_syn_type(type_ref.as_str()) {
@@ -69,6 +87,54 @@ impl PrimitiveOccurrenceScanner for SynPrimitiveOccurrenceScanner {
         visitor.visit_type(&syn_type);
 
         Ok(visitor.into_report())
+    }
+}
+
+// ---------------------------------------------------------------------------
+// scan_bound — Bound-position scan (syn::TypeParamBound, not syn::Type)
+// ---------------------------------------------------------------------------
+
+/// Scans a `Bound`-position `type_ref` for primitive occurrences.
+///
+/// A catalogue bound slot's text may be a legal `syn::TypeParamBound`
+/// (`?Sized`, `'static`, `for<'a> Fn(&'a str)`) that
+/// `syn::parse_str::<syn::Type>` rejects -- unlike every other position,
+/// which is always scanned as a `syn::Type` (a struct field, param, return,
+/// or type-alias target grammatically can never take bound-only syntax).
+/// `type_ref` is therefore parsed as a `syn::TypeParamBound` first:
+///
+/// - [`syn::TypeParamBound::Lifetime`] (`'static`, `'a`) can never carry a
+///   primitive occurrence -- returns an empty report without attempting a
+///   `syn::Type` parse.
+/// - [`syn::TypeParamBound::Trait`] walks the bound's `path` with the same
+///   recursive [`Visit`] used for every other position (reusing
+///   `OccurrenceVisitor::visit_path`), so nested primitive occurrences (e.g.
+///   the `String` in `Into<Result<(), String>>`, or a `Param` occurrence
+///   inside a `Fn(String) -> ()` callable-trait bound) are still found and
+///   reclassified exactly as they would be from a `syn::Type` walk.
+/// - Any other parsed form (e.g. a `Verbatim` token stream from unsupported
+///   future bound syntax such as Rust 2024 precise-capture `use<..>` bounds)
+///   is a [`PrimitiveOccurrenceScanError::ParseFailure`], matching
+///   `parse_generic_bound`'s treatment of the same forms.
+///
+/// # Errors
+///
+/// Returns [`PrimitiveOccurrenceScanError::ParseFailure`] if `type_ref`
+/// cannot be parsed as a `syn::TypeParamBound`, or parses as a form other
+/// than [`syn::TypeParamBound::Lifetime`] / [`syn::TypeParamBound::Trait`].
+fn scan_bound(
+    type_ref: TypeRef,
+    primitives: NonEmptyVec<PrimitiveName>,
+    position: PrimitiveOccurrencePosition,
+) -> Result<PrimitiveOccurrenceReport, PrimitiveOccurrenceScanError> {
+    match parse_syn_type_param_bound(type_ref.as_str()) {
+        Ok(syn::TypeParamBound::Lifetime(_)) => Ok(PrimitiveOccurrenceReport::new(BTreeMap::new())),
+        Ok(syn::TypeParamBound::Trait(trait_bound)) => {
+            let mut visitor = OccurrenceVisitor::new(primitives.as_slice(), position);
+            visitor.visit_path(&trait_bound.path);
+            Ok(visitor.into_report())
+        }
+        _ => Err(PrimitiveOccurrenceScanError::ParseFailure { type_ref }),
     }
 }
 
@@ -424,6 +490,53 @@ mod tests {
     fn caller_supplied_bound_position_passthrough() {
         let result = scan("String", one("String"), PrimitiveOccurrencePosition::Bound).unwrap();
         assert_eq!(result, expect(vec![(PrimitiveOccurrencePosition::Bound, vec!["String"])]));
+    }
+
+    // -- PR #179 round 2 P1: Bound-position scan of non-`syn::Type` bounds --
+
+    #[test]
+    fn bound_position_maybe_sized_is_ok_with_empty_report() {
+        // `?Sized` is a legal catalogue bound (a `syn::TypeParamBound`) but
+        // not a legal `syn::Type`; a Bound-position scan must not fail.
+        let result = scan("?Sized", one("String"), PrimitiveOccurrencePosition::Bound).unwrap();
+        assert_eq!(result, BTreeMap::new());
+    }
+
+    #[test]
+    fn bound_position_lifetime_is_ok_with_empty_report() {
+        // `'static` is a legal catalogue bound (a `syn::TypeParamBound`) but
+        // not a legal `syn::Type`; a Bound-position scan must not fail, and a
+        // bare lifetime can never carry a primitive-name occurrence.
+        let result = scan("'static", one("String"), PrimitiveOccurrencePosition::Bound).unwrap();
+        assert_eq!(result, BTreeMap::new());
+    }
+
+    #[test]
+    fn bound_position_trait_bound_with_no_primitive_match_yields_empty_report() {
+        let result = scan("MyTrait", one("String"), PrimitiveOccurrencePosition::Bound).unwrap();
+        assert_eq!(result, BTreeMap::new());
+    }
+
+    #[test]
+    fn bound_position_callable_trait_bound_reclassifies_param_to_param() {
+        // `Fn(String) -> ()` is a legal trait bound (callable-type sugar);
+        // the nested `String` param must still be reclassified to `Param`,
+        // exactly as it would be from a `syn::Type` walk.
+        let result =
+            scan("Fn(String) -> ()", one("String"), PrimitiveOccurrencePosition::Bound).unwrap();
+        assert_eq!(result, expect(vec![(PrimitiveOccurrencePosition::Param, vec!["String"])]));
+    }
+
+    #[test]
+    fn bound_position_unparseable_bound_is_parse_failure() {
+        let scanner = SynPrimitiveOccurrenceScanner;
+        let err = scanner
+            .scan(type_ref("Vec<String"), one("String"), PrimitiveOccurrencePosition::Bound)
+            .unwrap_err();
+        assert_eq!(
+            err,
+            PrimitiveOccurrenceScanError::ParseFailure { type_ref: type_ref("Vec<String") }
+        );
     }
 
     #[test]
