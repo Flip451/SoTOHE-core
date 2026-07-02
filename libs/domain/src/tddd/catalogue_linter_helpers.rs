@@ -54,15 +54,22 @@ pub(super) fn type_entries_for_target<'a>(
 /// Iterates over `(trait_name, entry)` pairs in `catalogue.traits` where the
 /// entry's `ContractRole` matches the rule's `RuleTarget`.
 ///
-/// Entries with `action: Delete` are excluded so that fail-closed semantics
-/// are preserved: a delete-marked entry is treated as absent and no lint rule
-/// is applied against it.
+/// Entries with `action: Delete` or `action: Reference` are excluded so that
+/// fail-closed semantics are preserved (mirrors `type_entries_for_target`):
+/// - A delete-marked entry is treated as absent and no lint rule is applied
+///   against it.
+/// - A reference-marked entry cites a pre-existing trait without restating
+///   its full structure — it is opaque to this catalogue's rule evaluations,
+///   so no lint rule is applied against it either. Otherwise the shipped
+///   `result_err` default rule would falsely flag a track that only cites an
+///   unchanged upstream trait carrying a legacy `Result<_, String>`.
 pub(super) fn trait_entries_for_target<'a>(
     catalogue: &'a CatalogueDocument,
     target: &RuleTarget,
 ) -> impl Iterator<Item = (&'a TraitName, &'a TraitEntry)> {
     catalogue.traits.iter().filter(move |(_name, entry)| {
         entry.action != ItemAction::Delete
+            && entry.action != ItemAction::Reference
             && target_matches(target, RoleKind::from_contract_role(&entry.role))
     })
 }
@@ -70,15 +77,20 @@ pub(super) fn trait_entries_for_target<'a>(
 /// Iterates over `(function_path, entry)` pairs in `catalogue.functions` where
 /// the entry's `FunctionRole` matches the rule's `RuleTarget`.
 ///
-/// Entries with `action: Delete` are excluded so that fail-closed semantics
-/// are preserved: a delete-marked entry is treated as absent and no lint rule
-/// is applied against it.
+/// Entries with `action: Delete` or `action: Reference` are excluded so that
+/// fail-closed semantics are preserved (mirrors `type_entries_for_target`):
+/// - A delete-marked entry is treated as absent and no lint rule is applied
+///   against it.
+/// - A reference-marked entry cites a pre-existing function without restating
+///   its full structure — it is opaque to this catalogue's rule evaluations,
+///   so no lint rule is applied against it either.
 pub(super) fn function_entries_for_target<'a>(
     catalogue: &'a CatalogueDocument,
     target: &RuleTarget,
 ) -> impl Iterator<Item = (&'a FunctionPath, &'a FunctionEntry)> {
     catalogue.functions.iter().filter(move |(_path, entry)| {
         entry.action != ItemAction::Delete
+            && entry.action != ItemAction::Reference
             && target_matches(target, RoleKind::from_function_role(&entry.role))
     })
 }
