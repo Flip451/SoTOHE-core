@@ -171,6 +171,10 @@ impl TrackService for TrackServiceImpl {
         }
     }
 
+    fn switch_base(&self, project_root: PathBuf) -> TrackCommandOutput {
+        composition_to_output(TrackCompositionRoot::new().track_switch_base(project_root))
+    }
+
     fn catalogue_lint_check_active_track(
         &self,
         track_id: Option<String>,

@@ -51,9 +51,9 @@ bin/sotp pr ensure-pr             # PR 作成（既存なら再利用）
 bin/sotp pr wait-and-merge <pr> --method <merge|squash|rebase>  # CI 待ち → マージ
 bin/sotp pr status <pr>           # PR チェック状況表示
 cargo make track-pr-review        # PR レビューサイクル（push + PR作成 + @codex review）
-cargo make track-switch-main      # main に切替 + pull
+cargo make track-switch-base      # configured base branch に切替 + pull
 bin/sotp track resolve            # 現在の track phase / next command / blocker を表示
-cargo make track-branch-create    # main からトラックブランチを作成して切替
+cargo make track-branch-create    # configured base branch からトラックブランチを作成して切替
 cargo make track-branch-switch    # 既存トラックブランチに切替
 cargo make help                   # カテゴリ付きタスク一覧表示
 cargo make export-schema -- --crate domain --pretty  # domain crate の pub API を JSON 出力（要 nightly）

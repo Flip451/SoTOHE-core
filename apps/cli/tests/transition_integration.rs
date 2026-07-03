@@ -68,7 +68,7 @@ fn init_git_repo_on_track_branch(root: &Path, track_id: &str) {
     assert!(status.success(), "git branch -m must succeed");
 }
 
-/// Writes a minimal v5 metadata.json fixture (identity-only, branchless).
+/// Writes a minimal v6 metadata.json fixture (identity-only, branchless).
 ///
 /// Uses `"branch": null` so the in-usecase branch guard is a no-op: the guard
 /// only fires for tracks that carry an expected branch name.  This lets the
@@ -88,15 +88,20 @@ fn write_fixture_metadata(items_dir: &Path, track_id: &str) -> PathBuf {
     let track_dir = items_dir.join(track_id);
     std::fs::create_dir_all(&track_dir).unwrap();
 
-    // schema_version 5: branchless (branch: null) so the branch guard is no-op.
+    // schema_version 6: branchless (branch: null) so the branch guard is no-op.
     let metadata = format!(
         r#"{{
-  "schema_version": 5,
+  "schema_version": 6,
   "id": "{track_id}",
   "branch": null,
   "title": "Integration Track",
   "created_at": "2026-03-13T00:00:00Z",
-  "updated_at": "2026-03-13T00:00:00Z"
+  "updated_at": "2026-03-13T00:00:00Z",
+  "branch_strategy_snapshot": {{
+    "base_branch": "main",
+    "merge_target": "main",
+    "merge_method": "squash"
+  }}
 }}
 "#
     );

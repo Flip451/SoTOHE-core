@@ -73,8 +73,9 @@ rule ほど mechanism 化の優先度を上げる。
     (`.harness/config/agent-profiles.json::capabilities.reviewer`) が本 convention への違反を指摘する。
     この review は自動ではなく、track ごとの review 実行時に有効になる
   - ADR 変更 (`knowledge/adr/**`) は `adr` scope の review 対象であり、semantic-review
-    (contradiction / factual error / infeasibility の検出) を通じて本 convention と矛盾する ADR を
-    間接的に検出できる (tier 5 の範囲内の保証)
+    (decision underspecification / inconsistent decisions / rejected-alternative regression /
+    research grounding mismatch / scope leakage 等の ADR decision-soundness 検出) を通じて
+    本 convention と矛盾する ADR を間接的に検出できる (tier 5 の範囲内の保証)
   - **Reassess trigger (mechanism 昇格の検討条件)**: (a) ADR author が `/adr:add` 実施時に本 convention
     を cite していないことを adr-editor / reviewer が繰り返し観測した場合 (pre-merge の human observation
     — `adr` scope semantic review は citation 不在を自動検出しない)、(b) 本 convention に違反する

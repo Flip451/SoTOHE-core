@@ -566,6 +566,22 @@ mod tests {
         base_sha
     }
 
+    /// Writes a schema-v6 `metadata.json` fixture for `track_id` under `track_dir`.
+    ///
+    /// Fail-closed per IN-06/IN-07: `build_v2_shared` reads `base_branch` from
+    /// metadata.json's `branch_strategy_snapshot` with no
+    /// `.harness/config/branch-strategy.json` fallback, so every test track
+    /// needs this fixture.
+    fn write_metadata_json(track_dir: &std::path::Path, track_id: &str) {
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            format!(
+                r#"{{"schema_version":6,"id":"{track_id}","title":"Test Track","created_at":"2026-01-01T00:00:00Z","updated_at":"2026-01-01T00:00:00Z","branch_strategy_snapshot":{{"base_branch":"main","merge_target":"main","merge_method":"squash"}}}}"#
+            ),
+        )
+        .unwrap();
+    }
+
     fn make_claude_reviewer() -> ClaudeReviewer {
         ClaudeReviewer::new("claude-opus-4-7", Duration::from_secs(10), "Review.")
     }
@@ -600,6 +616,7 @@ mod tests {
         std::fs::create_dir_all(&track_dir).unwrap();
         // Write diff base so the composition builds successfully.
         std::fs::write(track_dir.join(".commit_hash"), &base_sha).unwrap();
+        write_metadata_json(&track_dir, track_id);
 
         let result = run_claude_review_str(
             track_id,
@@ -657,6 +674,7 @@ mod tests {
         let track_dir = items_dir.join(track_id);
         std::fs::create_dir_all(&track_dir).unwrap();
         std::fs::write(track_dir.join(".commit_hash"), &base_sha).unwrap();
+        write_metadata_json(&track_dir, track_id);
 
         let reviewer = make_reviewer_with_bin(&script);
         let outcome = run_claude_review_str(track_id, &items_dir, "infra", round_type, reviewer)
@@ -690,6 +708,7 @@ mod tests {
         let track_dir = items_dir.join(track_id);
         std::fs::create_dir_all(&track_dir).unwrap();
         std::fs::write(track_dir.join(".commit_hash"), &base_sha).unwrap();
+        write_metadata_json(&track_dir, track_id);
 
         let reviewer = make_reviewer_with_bin(&script);
         let result = run_claude_review_str(track_id, &items_dir, "infra", "fast", reviewer);

@@ -6,6 +6,10 @@
 use std::path::PathBuf;
 use std::process::ExitCode;
 
+use cli_composition::TrackCompositionRoot;
+use cli_driver::track::TrackInput;
+
+use super::state_ops::track_driver_outcome_to_result;
 use super::{
     TrackCommand, archive, branch_ops, fixpoint_resolve, resolve, set_commit_hash, state_ops, tddd,
     transition, views,
@@ -171,6 +175,12 @@ fn dispatch_track_cmd(cmd: TrackCommand) -> Result<ExitCode, crate::CliError> {
             resolve_track_id_from_root_for_write(args.track_id, &PathBuf::from("."))
                 .map_err(|e| CliError::Message(e.to_string()))
                 .and_then(set_commit_hash::execute_set_commit_hash)
+        }
+        TrackCommand::SwitchBase { project_root } => {
+            let outcome = TrackCompositionRoot::new()
+                .track_driver()
+                .handle(TrackInput::SwitchBase { project_root });
+            track_driver_outcome_to_result(outcome)
         }
     }
 }

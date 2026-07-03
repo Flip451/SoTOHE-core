@@ -79,12 +79,19 @@ fn setup_check_approved_repo(root: &Path) -> (PathBuf, PathBuf) {
     write_domain_scope_config(root);
     fs::create_dir_all(root.join("track/items")).unwrap();
 
-    Command::new("git").args(["add", "."]).current_dir(root).output().unwrap();
-    Command::new("git").args(["commit", "-m", "init"]).current_dir(root).output().unwrap();
-
     let items_dir = root.join("items");
     let track_dir = items_dir.join("test-track");
     fs::create_dir_all(&track_dir).unwrap();
+
+    // Commit metadata.json so the empty-diff approval test has no untracked fixture noise.
+    fs::write(
+        track_dir.join("metadata.json"),
+        r#"{"schema_version":6,"id":"test-track","title":"Test Track","created_at":"2026-01-01T00:00:00Z","updated_at":"2026-01-01T00:00:00Z","branch_strategy_snapshot":{"base_branch":"main","merge_target":"main","merge_method":"squash"}}"#,
+    )
+    .unwrap();
+
+    Command::new("git").args(["add", "."]).current_dir(root).output().unwrap();
+    Command::new("git").args(["commit", "-m", "init"]).current_dir(root).output().unwrap();
 
     (items_dir, track_dir)
 }

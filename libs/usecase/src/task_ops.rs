@@ -720,8 +720,22 @@ mod tests {
         }
     }
 
+    fn test_snapshot() -> domain::branch_strategy::BranchStrategySnapshot {
+        domain::branch_strategy::BranchStrategySnapshot::new(
+            domain::NonEmptyString::try_new("main").unwrap(),
+            domain::NonEmptyString::try_new("main").unwrap(),
+            domain::branch_strategy::MergeMethod::Squash,
+        )
+    }
+
     fn sample_track() -> TrackMetadata {
-        TrackMetadata::new(TrackId::try_new("my-track-2026").unwrap(), "My Track", None).unwrap()
+        TrackMetadata::new(
+            TrackId::try_new("my-track-2026").unwrap(),
+            "My Track",
+            None,
+            test_snapshot(),
+        )
+        .unwrap()
     }
 
     fn sample_plan() -> ImplPlanDocument {
@@ -815,6 +829,7 @@ mod tests {
             Some(TrackBranch::try_new("track/my-track-2026").unwrap()),
             "My Track",
             None,
+            test_snapshot(),
         )
         .unwrap();
         let plan = sample_plan();
@@ -849,6 +864,7 @@ mod tests {
             Some(TrackBranch::try_new("track/my-track-2026").unwrap()),
             "My Track",
             None,
+            test_snapshot(),
         )
         .unwrap();
         store.tracks.lock().unwrap().insert(track.id().clone(), track.clone());
@@ -882,6 +898,7 @@ mod tests {
             Some(TrackBranch::try_new("track/my-track-2026").unwrap()),
             "My Track",
             None,
+            test_snapshot(),
         )
         .unwrap();
         store.tracks.lock().unwrap().insert(track.id().clone(), track.clone());
@@ -931,6 +948,7 @@ mod tests {
             Some(TrackBranch::try_new("track/my-track-2026").unwrap()),
             "My Track",
             None,
+            test_snapshot(),
         )
         .unwrap();
         let plan = sample_plan();
@@ -986,6 +1004,7 @@ mod tests {
             Some(TrackBranch::try_new("track/my-track-2026").unwrap()),
             "My Track",
             None,
+            test_snapshot(),
         )
         .unwrap();
         store.tracks.lock().unwrap().insert(track.id().clone(), track.clone());
@@ -1019,6 +1038,7 @@ mod tests {
             Some(TrackBranch::try_new("track/my-track-2026").unwrap()),
             "My Track",
             None,
+            test_snapshot(),
         )
         .unwrap();
         store.tracks.lock().unwrap().insert(track.id().clone(), track.clone());

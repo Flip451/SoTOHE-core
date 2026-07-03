@@ -7,6 +7,8 @@ use std::path::Path;
 
 use domain::verify::{VerifyFinding, VerifyOutcome};
 
+use crate::track::symlink_guard::reject_symlinks_below;
+
 const TRACK_ITEMS_DIR: &str = "track/items";
 
 /// Check that all active track plan.md files match their metadata.json renderings.
@@ -16,11 +18,23 @@ const TRACK_ITEMS_DIR: &str = "track/items";
 /// Returns findings when plan.md content differs from the expected rendering.
 pub fn verify(root: &Path) -> VerifyOutcome {
     let items_dir = root.join(TRACK_ITEMS_DIR);
-    if !items_dir.is_dir() {
+    let items_meta = match items_dir.symlink_metadata() {
+        Ok(meta) => meta,
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => return VerifyOutcome::pass(),
+        Err(e) => {
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+                "Cannot stat {TRACK_ITEMS_DIR}: {e}"
+            ))]);
+        }
+    };
+    if items_meta.file_type().is_symlink() {
+        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+            "{TRACK_ITEMS_DIR}: symlinked track root is unsafe"
+        ))]);
+    }
+    if !items_meta.is_dir() {
         return VerifyOutcome::pass();
     }
-
-    let mut findings = Vec::new();
 
     let entries = match std::fs::read_dir(&items_dir) {
         Ok(e) => e,
@@ -30,6 +44,8 @@ pub fn verify(root: &Path) -> VerifyOutcome {
             ))]);
         }
     };
+
+    let mut findings = Vec::new();
 
     for entry in entries {
         let entry = match entry {
@@ -42,37 +58,61 @@ pub fn verify(root: &Path) -> VerifyOutcome {
             }
         };
         let track_dir = entry.path();
-        if !track_dir.is_dir() {
+        let file_type = match entry.file_type() {
+            Ok(file_type) => file_type,
+            Err(e) => {
+                findings.push(VerifyFinding::error(format!(
+                    "{TRACK_ITEMS_DIR}: cannot inspect entry: {e}"
+                )));
+                continue;
+            }
+        };
+        if file_type.is_symlink() {
+            findings.push(VerifyFinding::error(format!(
+                "{}: symlinked track directory is unsafe",
+                track_dir.file_name().map(|n| n.to_string_lossy()).unwrap_or_default()
+            )));
+            continue;
+        }
+        if !file_type.is_dir() {
             continue;
         }
 
         let metadata_path = track_dir.join("metadata.json");
         let plan_path = track_dir.join("plan.md");
 
-        if !metadata_path.is_file() {
-            continue;
-        }
-
         let track_name =
             track_dir.file_name().map(|n| n.to_string_lossy().into_owned()).unwrap_or_default();
 
-        // Skip v2/v3 legacy tracks: they predate the current renderer and
+        let metadata_present =
+            match guarded_file_present(&metadata_path, &track_dir, &track_name, "metadata.json") {
+                Ok(present) => present,
+                Err(finding) => {
+                    findings.push(finding);
+                    continue;
+                }
+            };
+        if !metadata_present {
+            continue;
+        }
+
+        // Skip v2/v3/v4/v5 legacy tracks: they predate the current renderer and
         // their committed plan.md reflects the renderer that shipped at
-        // their commit time. We only validate v5 (identity-only, current
-        // schema) metadata so that sibling tracks stay untouched by the
-        // active track's work.
+        // their commit time. We only validate v6 (identity-only with
+        // branch_strategy_snapshot, current schema) metadata so that sibling
+        // tracks stay untouched by the active track's work.
         //
-        // Only skip when schema_version is an explicit integer < 5.
+        // Only skip when schema_version is an explicit integer < 6.
         // When the field is missing, non-numeric, or the file cannot be read
         // or parsed, fall through so that the subsequent render attempt
         // surfaces the real error (fail-closed: do not silently bypass
-        // freshness verification for a corrupted v5 file).
+        // freshness verification for a corrupted v6 file).
         if let Ok(content) = std::fs::read_to_string(&metadata_path) {
             if let Ok(raw) = serde_json::from_str::<serde_json::Value>(&content) {
                 if let Some(schema_version) =
                     raw.get("schema_version").and_then(serde_json::Value::as_u64)
                 {
-                    if schema_version < 5 {
+                    if schema_version < 6 {
                         continue;
                     }
                 }
@@ -82,52 +122,17 @@ pub fn verify(root: &Path) -> VerifyOutcome {
         }
 
         // plan.md absent: silent SKIP (file existence = phase status).
-        // Phase 0/1/2 tracks (pre-implementation) may not yet have plan.md
-        // rendered; treat the absence as "not yet rendered" rather than as a
-        // freshness failure. This matches `validate_track_snapshots` in
-        // `libs/infrastructure/src/track/render.rs:621-624`.
-        //
-        // Use symlink_metadata to distinguish genuine absence (NotFound →
-        // silent skip) from other filesystem states (permission error, etc.
-        // → surface as a finding), mirroring the absent-vs-corrupted split
-        // in render.rs:621-624. Symlinks are followed via `metadata` to
-        // detect dangling symlinks and non-file symlink targets (treated as
-        // corrupted track state).
-        let sym_meta = match std::fs::symlink_metadata(&plan_path) {
-            Ok(m) => m,
-            Err(e) if e.kind() == std::io::ErrorKind::NotFound => continue, // Genuine absence.
-            Err(e) => {
-                findings
-                    .push(VerifyFinding::error(format!("{track_name}/plan.md: cannot stat: {e}")));
-                continue;
-            }
-        };
-        if sym_meta.file_type().is_symlink() {
-            match std::fs::metadata(&plan_path) {
-                Ok(target) if target.is_file() => {} // Valid symlink to a regular file — proceed.
-                Ok(_) => {
-                    findings.push(VerifyFinding::error(format!(
-                        "{track_name}/plan.md: symlink target is not a regular file (corrupted track state)"
-                    )));
+        // Phase 0/1/2 tracks may not yet have plan.md rendered; treat absence
+        // as "not yet rendered", but reject symlinks and non-file entries.
+        let plan_present =
+            match guarded_file_present(&plan_path, &track_dir, &track_name, "plan.md") {
+                Ok(present) => present,
+                Err(finding) => {
+                    findings.push(finding);
                     continue;
                 }
-                Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
-                    findings.push(VerifyFinding::error(format!(
-                        "{track_name}/plan.md: dangling symlink (target missing)"
-                    )));
-                    continue;
-                }
-                Err(e) => {
-                    findings.push(VerifyFinding::error(format!(
-                        "{track_name}/plan.md: cannot follow symlink: {e}"
-                    )));
-                    continue;
-                }
-            }
-        } else if !sym_meta.is_file() {
-            findings.push(VerifyFinding::error(format!(
-                "{track_name}/plan.md: not a regular file (corrupted track state)"
-            )));
+            };
+        if !plan_present {
             continue;
         }
 
@@ -170,28 +175,63 @@ pub fn verify(root: &Path) -> VerifyOutcome {
 /// pre-filter by schema_version; v2/v3 metadata is not supported and will
 /// return a decode error.
 fn render_plan_from_metadata(metadata_path: &Path) -> Result<String, String> {
+    let parent = metadata_path.parent().ok_or_else(|| "metadata.json has no parent".to_owned())?;
+    match reject_symlinks_below(metadata_path, parent) {
+        Ok(true) => {}
+        Ok(false) => return Err("metadata.json is missing".to_owned()),
+        Err(e) => return Err(format!("metadata.json symlink guard: {e}")),
+    }
+    if !metadata_path.is_file() {
+        return Err("metadata.json exists but is not a regular file".to_owned());
+    }
     let content = std::fs::read_to_string(metadata_path).map_err(|e| format!("read error: {e}"))?;
 
     let (track, _meta) =
         crate::track::codec::decode(&content).map_err(|e| format!("decode error: {e}"))?;
 
     // Load sibling impl-plan.json when present.
-    let impl_plan = if let Some(parent) = metadata_path.parent() {
+    let impl_plan = {
         let impl_plan_path = parent.join("impl-plan.json");
-        if impl_plan_path.is_file() {
-            let json = std::fs::read_to_string(&impl_plan_path)
-                .map_err(|e| format!("impl-plan.json read error: {e}"))?;
-            let doc = crate::impl_plan_codec::decode(&json)
-                .map_err(|e| format!("impl-plan.json decode error: {e}"))?;
-            Some(doc)
-        } else {
-            None
+        match reject_symlinks_below(&impl_plan_path, parent) {
+            Ok(false) => None,
+            Ok(true) => {
+                if !impl_plan_path.is_file() {
+                    return Err("impl-plan.json exists but is not a regular file".to_owned());
+                }
+                let json = std::fs::read_to_string(&impl_plan_path)
+                    .map_err(|e| format!("impl-plan.json read error: {e}"))?;
+                let doc = crate::impl_plan_codec::decode(&json)
+                    .map_err(|e| format!("impl-plan.json decode error: {e}"))?;
+                Some(doc)
+            }
+            Err(e) => return Err(format!("impl-plan.json symlink guard: {e}")),
         }
-    } else {
-        None
     };
 
     Ok(crate::track::render::render_plan(&track, impl_plan.as_ref()))
+}
+
+fn guarded_file_present(
+    path: &Path,
+    trusted_root: &Path,
+    track_name: &str,
+    filename: &str,
+) -> Result<bool, VerifyFinding> {
+    match reject_symlinks_below(path, trusted_root) {
+        Ok(false) => Ok(false),
+        Ok(true) => {
+            if path.is_file() {
+                Ok(true)
+            } else {
+                Err(VerifyFinding::error(format!(
+                    "{track_name}/{filename}: not a regular file (corrupted track state)"
+                )))
+            }
+        }
+        Err(e) => Err(VerifyFinding::error(format!(
+            "{track_name}/{filename}: symlink guard rejected path: {e}"
+        ))),
+    }
 }
 
 #[cfg(test)]
@@ -205,15 +245,20 @@ mod tests {
         let track_dir = root.join(TRACK_ITEMS_DIR).join(name);
         std::fs::create_dir_all(&track_dir).unwrap();
 
-        // v5 identity-only metadata — legacy v2/v3/v4 tracks are skipped by the
+        // v6 identity-only metadata — legacy v2/v3/v4/v5 tracks are skipped by the
         // freshness validator on purpose.
         let metadata = serde_json::json!({
-            "schema_version": 5,
+            "schema_version": 6,
             "id": name,
             "branch": format!("track/{name}"),
             "title": "Test Track",
             "created_at": "2026-01-01T00:00:00Z",
             "updated_at": "2026-01-01T00:00:00Z",
+            "branch_strategy_snapshot": {
+                "base_branch": "main",
+                "merge_target": "main",
+                "merge_method": "squash"
+            }
         });
         std::fs::write(track_dir.join("metadata.json"), metadata.to_string()).unwrap();
         std::fs::write(track_dir.join("plan.md"), plan_content).unwrap();
@@ -226,12 +271,17 @@ mod tests {
         std::fs::create_dir_all(&track_dir).unwrap();
 
         let metadata = serde_json::json!({
-            "schema_version": 5,
+            "schema_version": 6,
             "id": "test-track",
             "branch": "track/test-track",
             "title": "Test Track",
             "created_at": "2026-01-01T00:00:00Z",
             "updated_at": "2026-01-01T00:00:00Z",
+            "branch_strategy_snapshot": {
+                "base_branch": "main",
+                "merge_target": "main",
+                "merge_method": "squash"
+            }
         });
         std::fs::write(track_dir.join("metadata.json"), metadata.to_string()).unwrap();
 
@@ -268,12 +318,17 @@ mod tests {
         let track_dir = tmp.path().join(TRACK_ITEMS_DIR).join("no-plan");
         std::fs::create_dir_all(&track_dir).unwrap();
         let metadata = serde_json::json!({
-            "schema_version": 5,
+            "schema_version": 6,
             "id": "no-plan",
             "branch": "track/no-plan",
             "title": "No Plan",
             "created_at": "2026-01-01T00:00:00Z",
             "updated_at": "2026-01-01T00:00:00Z",
+            "branch_strategy_snapshot": {
+                "base_branch": "main",
+                "merge_target": "main",
+                "merge_method": "squash"
+            }
         });
         std::fs::write(track_dir.join("metadata.json"), metadata.to_string()).unwrap();
         // No plan.md — should be SKIPPED silently (not a freshness failure).
@@ -290,12 +345,17 @@ mod tests {
         let track_dir = tmp.path().join(TRACK_ITEMS_DIR).join("phase0-bare");
         std::fs::create_dir_all(&track_dir).unwrap();
         let metadata = serde_json::json!({
-            "schema_version": 5,
+            "schema_version": 6,
             "id": "phase0-bare",
             "branch": "track/phase0-bare",
             "title": "Phase 0 Bare",
             "created_at": "2026-04-27T00:00:00Z",
             "updated_at": "2026-04-27T00:00:00Z",
+            "branch_strategy_snapshot": {
+                "base_branch": "main",
+                "merge_target": "main",
+                "merge_method": "squash"
+            }
         });
         std::fs::write(track_dir.join("metadata.json"), metadata.to_string()).unwrap();
 
@@ -358,6 +418,95 @@ mod tests {
             outcome.has_errors(),
             "track with missing schema_version must not be silently skipped: {:#?}",
             outcome.findings()
+        );
+    }
+
+    #[test]
+    #[cfg(unix)]
+    fn test_view_freshness_rejects_symlinked_metadata_file() {
+        let tmp = TempDir::new().unwrap();
+        let track_dir = tmp.path().join(TRACK_ITEMS_DIR).join("metadata-link");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        let outside = TempDir::new().unwrap();
+        let target = outside.path().join("metadata.json");
+        std::fs::write(
+            &target,
+            serde_json::json!({
+                "schema_version": 6,
+                "id": "metadata-link",
+                "branch": "track/metadata-link",
+                "title": "Metadata Link",
+                "created_at": "2026-01-01T00:00:00Z",
+                "updated_at": "2026-01-01T00:00:00Z",
+                "branch_strategy_snapshot": {
+                    "base_branch": "main",
+                    "merge_target": "main",
+                    "merge_method": "squash"
+                }
+            })
+            .to_string(),
+        )
+        .unwrap();
+        std::os::unix::fs::symlink(&target, track_dir.join("metadata.json")).unwrap();
+
+        let outcome = verify(tmp.path());
+        assert!(outcome.has_errors(), "symlinked metadata.json must fail closed");
+        assert!(
+            outcome.findings().iter().any(|f| f.message().contains("symlink")),
+            "finding must mention symlink: {outcome:?}"
+        );
+    }
+
+    #[test]
+    #[cfg(unix)]
+    fn test_view_freshness_rejects_dangling_symlinked_metadata_file() {
+        let tmp = TempDir::new().unwrap();
+        let track_dir = tmp.path().join(TRACK_ITEMS_DIR).join("dangling-metadata-link");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::os::unix::fs::symlink(
+            track_dir.join("missing-metadata.json"),
+            track_dir.join("metadata.json"),
+        )
+        .unwrap();
+
+        let outcome = verify(tmp.path());
+        assert!(outcome.has_errors(), "dangling metadata.json symlink must fail closed");
+        assert!(
+            outcome.findings().iter().any(|f| f.message().contains("symlink")),
+            "finding must mention symlink: {outcome:?}"
+        );
+    }
+
+    #[test]
+    #[cfg(unix)]
+    fn test_view_freshness_rejects_symlinked_plan_file() {
+        let tmp = TempDir::new().unwrap();
+        let track_dir = tmp.path().join(TRACK_ITEMS_DIR).join("plan-link");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        let metadata = serde_json::json!({
+            "schema_version": 6,
+            "id": "plan-link",
+            "branch": "track/plan-link",
+            "title": "Plan Link",
+            "created_at": "2026-01-01T00:00:00Z",
+            "updated_at": "2026-01-01T00:00:00Z",
+            "branch_strategy_snapshot": {
+                "base_branch": "main",
+                "merge_target": "main",
+                "merge_method": "squash"
+            }
+        });
+        std::fs::write(track_dir.join("metadata.json"), metadata.to_string()).unwrap();
+        let outside = TempDir::new().unwrap();
+        let target = outside.path().join("plan.md");
+        std::fs::write(&target, "# Plan\n").unwrap();
+        std::os::unix::fs::symlink(&target, track_dir.join("plan.md")).unwrap();
+
+        let outcome = verify(tmp.path());
+        assert!(outcome.has_errors(), "symlinked plan.md must fail closed");
+        assert!(
+            outcome.findings().iter().any(|f| f.message().contains("symlink")),
+            "finding must mention symlink: {outcome:?}"
         );
     }
 }

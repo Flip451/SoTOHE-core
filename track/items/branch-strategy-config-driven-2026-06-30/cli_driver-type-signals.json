@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-03T15:07:26Z",
+  "declaration_hash": "63068d6bf15f50407234dd0f437b5162def2f6986ccf0395330c749a3c8869b8",
+  "signals": [
+    {
+      "type_name": "DryDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "PrInput",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TrackDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TrackInput",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

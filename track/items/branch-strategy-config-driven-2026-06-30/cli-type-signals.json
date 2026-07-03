@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-03T15:07:30Z",
+  "declaration_hash": "1f9a431f90a96db24bf5a80808e9b2cc391c015fc83281d86cf0e68943e4a151",
+  "signals": [
+    {
+      "type_name": "EnsurePrArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TrackCommand",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "WaitAndMergeArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::dry::execute_dry_check_approved",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

@@ -95,36 +95,46 @@ mod tests {
     use super::*;
     use std::fs;
 
-    /// Write a minimal valid v5 (identity-only, no `status` field) metadata.json.
-    fn write_metadata_v5(track_dir: &std::path::Path, track_id: &str) {
+    /// Write a minimal valid v6 (identity-only, no `status` field) metadata.json.
+    fn write_metadata_v6(track_dir: &std::path::Path, track_id: &str) {
         let metadata = format!(
             r#"{{
-  "schema_version": 5,
+  "schema_version": 6,
   "id": "{track_id}",
   "branch": "track/{track_id}",
   "title": "Test Track",
   "created_at": "2026-01-01T00:00:00Z",
-  "updated_at": "2026-01-01T00:00:00Z"
+  "updated_at": "2026-01-01T00:00:00Z",
+  "branch_strategy_snapshot": {{
+    "base_branch": "main",
+    "merge_target": "main",
+    "merge_method": "squash"
+  }}
 }}"#
         );
         fs::write(track_dir.join("metadata.json"), &metadata).unwrap();
     }
 
-    /// Write a minimal valid v5 branchless metadata.json (`branch: null`).
+    /// Write a minimal valid v6 branchless metadata.json (`branch: null`).
     ///
     /// Branchless tracks skip the in-usecase branch guard unconditionally
     /// (`enforce_branch_guard` returns `Ok(())` when `track.branch()` is `None`),
     /// so these fixtures let CLI-layer tests exercise the full mutation logic
     /// without requiring a real git repository in the temp directory.
-    fn write_metadata_v5_branchless(track_dir: &std::path::Path, track_id: &str) {
+    fn write_metadata_v6_branchless(track_dir: &std::path::Path, track_id: &str) {
         let metadata = format!(
             r#"{{
-  "schema_version": 5,
+  "schema_version": 6,
   "id": "{track_id}",
   "branch": null,
   "title": "Test Track",
   "created_at": "2026-01-01T00:00:00Z",
-  "updated_at": "2026-01-01T00:00:00Z"
+  "updated_at": "2026-01-01T00:00:00Z",
+  "branch_strategy_snapshot": {{
+    "base_branch": "main",
+    "merge_target": "main",
+    "merge_method": "squash"
+  }}
 }}"#
         );
         fs::write(track_dir.join("metadata.json"), &metadata).unwrap();
@@ -140,7 +150,7 @@ mod tests {
     ) -> (PathBuf, PathBuf, PathBuf) {
         let track_dir = tmp.join("track").join("items").join(track_id);
         fs::create_dir_all(&track_dir).unwrap();
-        write_metadata_v5_branchless(&track_dir, track_id);
+        write_metadata_v6_branchless(&track_dir, track_id);
         let items_dir = tmp.join("track").join("items");
         (tmp.to_path_buf(), items_dir, track_dir)
     }
@@ -176,7 +186,7 @@ mod tests {
     fn setup_test_track(tmp: &std::path::Path, track_id: &str) -> (PathBuf, PathBuf, PathBuf) {
         let track_dir = tmp.join("track").join("items").join(track_id);
         fs::create_dir_all(&track_dir).unwrap();
-        write_metadata_v5(&track_dir, track_id);
+        write_metadata_v6(&track_dir, track_id);
         let items_dir = tmp.join("track").join("items");
         (tmp.to_path_buf(), items_dir, track_dir)
     }
@@ -252,15 +262,20 @@ mod tests {
         let track_id = "planning-only";
         let track_dir = tmp.path().join("track").join("items").join(track_id);
         fs::create_dir_all(&track_dir).unwrap();
-        // v5 metadata without branch (branchless planning-only track)
+        // v6 metadata without branch (branchless planning-only track)
         let metadata = format!(
             r#"{{
-  "schema_version": 5,
+  "schema_version": 6,
   "id": "{track_id}",
   "branch": null,
   "title": "Planning Only",
   "created_at": "2026-01-01T00:00:00Z",
-  "updated_at": "2026-01-01T00:00:00Z"
+  "updated_at": "2026-01-01T00:00:00Z",
+  "branch_strategy_snapshot": {{
+    "base_branch": "main",
+    "merge_target": "main",
+    "merge_method": "squash"
+  }}
 }}"#
         );
         fs::write(track_dir.join("metadata.json"), &metadata).unwrap();

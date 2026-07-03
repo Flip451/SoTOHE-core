@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "17096df724cebaca4ec57e10245c38f5e78c3cb0ad244f3753085ceb590c392a",
+  "signals": [
+    {
+      "type_name": "BranchStrategyConfigError",
+      "signal": "blue",
+      "entry_hash": "f3327a7df406099b1ce2c1b63029e16def5c30be4b2385cda3e9782e3b83b88b"
+    },
+    {
+      "type_name": "BranchStrategySnapshotDocument",
+      "signal": "blue",
+      "entry_hash": "360429f6aba400755c16fdb21a158661076386b27eb8ec1920039e6a5cff1569"
+    },
+    {
+      "type_name": "CodexDryFixLocalRunner",
+      "signal": "blue",
+      "entry_hash": "3f2a19c88ac7b261f5d4c670960ff7b40b26f5216816e585ef2a0b8c9c98f851"
+    },
+    {
+      "type_name": "DryCheckServiceFactoryAdapter",
+      "signal": "blue",
+      "entry_hash": "bc9234e65475f5c592e5003ee6ae59414fd979af210110971cad9c2b5901526a"
+    },
+    {
+      "type_name": "DryDriverAdapter",
+      "signal": "blue",
+      "entry_hash": "844eb42b17cd05d3c014753aa88db06d392b77eb7775f97cde49352f41bf3767"
+    },
+    {
+      "type_name": "FsDiffBaseResolverAdapter",
+      "signal": "blue",
+      "entry_hash": "2f133cbc69e59996c9194d891ec14292c96c874c88c6f2a23e4dc0ab9356c6b8"
+    },
+    {
+      "type_name": "FsDryApprovalFactoryAdapter",
+      "signal": "blue",
+      "entry_hash": "f54e0341d6b8535a5dddecc7e773a335dda59238c5593e908558beaf72f1fcd5"
+    },
+    {
+      "type_name": "FsDryBaseBranchAdapter",
+      "signal": "blue",
+      "entry_hash": "d57d2e23a03bbc6bcbde0b8ee22c310ba574a3c00ddc5a525ad105daeb587379"
+    },
+    {
+      "type_name": "FsDryCheckConfigLoaderAdapter",
+      "signal": "blue",
+      "entry_hash": "721ac61e2f611c3f61a0591be3bce0974d50b4e3b50f43b3a5c0c3725020ae3b"
+    },
+    {
+      "type_name": "FsDryCheckStorageFactoryAdapter",
+      "signal": "blue",
+      "entry_hash": "f761b517e690624b38b9cb05a3cbc89555ae1566be9cf4b641a989393eb9dbd3"
+    },
+    {
+      "type_name": "FsDryCorpusFragmentsAdapter",
+      "signal": "blue",
+      "entry_hash": "18eec6c3ec43037c0651706943f79eae8a00f2b98655e6b9d343f9c8de6c7dde"
+    },
+    {
+      "type_name": "FsDryCorpusRootManifestAdapter",
+      "signal": "blue",
+      "entry_hash": "42c4254bee0441c778eef9d4234e05d7e5f8c08ead86f10ec5059532b17a14b7"
+    },
+    {
+      "type_name": "FsDryDiffBaseFactoryAdapter",
+      "signal": "blue",
+      "entry_hash": "aab415143c24cba4b76b952a35eb98d3c86f97b8aaba08b9ff5e475092284c92"
+    },
+    {
+      "type_name": "FsDryRepoRootAdapter",
+      "signal": "blue",
+      "entry_hash": "887261fab5e952dc2a8dd235536946dd1769f937a99eb8d4feaff72d3a6e122c"
+    },
+    {
+      "type_name": "FsDryWriteConfigLoaderAdapter",
+      "signal": "blue",
+      "entry_hash": "f81234eed754422a66fc872537989c467c48443f7b8e932185ad22c9b84e3d94"
+    },
+    {
+      "type_name": "FsFixpointDryGateFactoryAdapter",
+      "signal": "blue",
+      "entry_hash": "5cb5f04a4647c88becc7a7056dc711d0aeb8615aeac67e195da25b646ece960d"
+    },
+    {
+      "type_name": "FsFixpointGateStateFactoryAdapter",
+      "signal": "blue",
+      "entry_hash": "72da6c0489f9a0fdb296cbd2160b2660382b371c4d2860b8415326752f7fc890"
+    },
+    {
+      "type_name": "FsFixpointWorkspaceContextAdapter",
+      "signal": "blue",
+      "entry_hash": "058b3bdba36b5766002f51c5fd1a143982accaa8be202d8a4138b7d77f548edd"
+    },
+    {
+      "type_name": "FsReviewGateStateAdapter",
+      "signal": "blue",
+      "entry_hash": "bc02597c4076bfec410944fab7aab80c3fb5661773734a5c0f7d5f3bd4d4124a"
+    },
+    {
+      "type_name": "JsonConfigBranchStrategyAdapter",
+      "signal": "blue",
+      "entry_hash": "e6ac07a4edae016e5f47c533aebe91442c62921aa37dfa891141d22f98decaeb"
+    },
+    {
+      "type_name": "MergeMethodDocument",
+      "signal": "blue",
+      "entry_hash": "39b1b3bc636c19231f76720d85eba0ef764874c4b3396ae11949bb0aa042d3ac"
+    },
+    {
+      "type_name": "RecordingDryTierTelemetryAdapter",
+      "signal": "blue",
+      "entry_hash": "69ed7e96f075e2554cdc98accd50a0e873262f62893def79646b95626a30815d"
+    },
+    {
+      "type_name": "SnapshotBranchStrategyAdapter",
+      "signal": "blue",
+      "entry_hash": "c81aaced9415fb3b35425bffcc58508626479b85e1e512e8d60ca77c17d98949"
+    },
+    {
+      "type_name": "TrackDocumentV2",
+      "signal": "blue",
+      "entry_hash": "b06cc1517788a997e0ed4c72327eb1c79bbbccee5c0fb7c89ddbebbe801be21b"
+    }
+  ]
+}

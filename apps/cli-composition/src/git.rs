@@ -117,6 +117,14 @@ impl GitCompositionRoot {
             .transpose()?;
 
         // Fail-closed: non-track-branch commits are always rejected.
+        //
+        // The "track/" literal here matches `BranchStrategyPort::track_prefix()`
+        // (CN-04: fixed for every adapter, independent of `base_branch`/
+        // `merge_target`/`merge_method`). It is not routed through a constructed
+        // port because no track identity is known yet at this point — that is
+        // exactly what this check determines — and because the value never
+        // varies by config/snapshot, so no adapter construction (and its
+        // associated I/O / fail-closed surface) is needed to obtain it.
         match repo
             .current_branch()
             .map_err(|e| CompositionError::AdapterInit(e.to_string()))?
@@ -214,6 +222,35 @@ impl GitCompositionRoot {
 
         let repo =
             SystemGitRepo::discover().map_err(|e| CompositionError::AdapterInit(e.to_string()))?;
+        self.git_switch_and_pull_impl(repo, branch)
+    }
+
+    /// Anchor `git switch` + `git pull` to a specific project checkout instead of the CWD.
+    ///
+    /// Callers that resolve the requested checkout via `--project-root` (e.g.
+    /// `sotp track switch-base --project-root /path/to/checkout`) must reach git via this
+    /// entry point so the underlying git commands run against the requested worktree,
+    /// not the process CWD.
+    ///
+    /// # Errors
+    /// Returns `Err` when git discovery or checkout fails.
+    pub fn git_switch_and_pull_in(
+        &self,
+        project_root: &Path,
+        branch: String,
+    ) -> Result<CommandOutcome, CompositionError> {
+        use infrastructure::git_cli::SystemGitRepo;
+
+        let repo = SystemGitRepo::discover_from(project_root)
+            .map_err(|e| CompositionError::AdapterInit(e.to_string()))?;
+        self.git_switch_and_pull_impl(repo, branch)
+    }
+
+    fn git_switch_and_pull_impl(
+        &self,
+        repo: infrastructure::git_cli::SystemGitRepo,
+        branch: String,
+    ) -> Result<CommandOutcome, CompositionError> {
         let mut stdout_lines = Vec::<String>::new();
 
         stdout_lines.push(format!("Switching to {branch}..."));
@@ -291,6 +328,9 @@ impl GitCompositionRoot {
         match usecase::track_resolution::resolve_track_id_from_branch(Some(&branch)) {
             Ok(id) => Ok(Some(id)),
             Err(usecase::track_resolution::TrackResolutionError::InvalidTrackId(slug, _)) => {
+                // "track/" here reconstructs the display form of the branch this
+                // error is about; matches `BranchStrategyPort::track_prefix()`,
+                // which is fixed at "track/" for every adapter (CN-04).
                 Err(CompositionError::Usecase(format!(
                     "current branch 'track/{slug}' has an invalid track id; \
                      rename the branch or switch to a valid track branch before committing"

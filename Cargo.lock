@@ -868,6 +868,7 @@ dependencies = [
  "rustdoc-types",
  "serde",
  "serde_json",
+ "temp-env",
  "tempfile",
  "thiserror",
  "usecase",

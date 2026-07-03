@@ -1,0 +1,174 @@
+{
+  "schema_version": 1,
+  "layer": "cli",
+  "entries": [
+    {
+      "claim_hash": "2a255cc58c4da6dd73332b7241aa240fec9ef34cd1c01d6227e34d63a962faf5",
+      "evidence_hash": "3f31f4b64b6c70569f6c85d8f596f063f53aead4801aa022b5e76d5ed8babd2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`main` を effective strategy の port 呼び出しまたは config 値参照に置き換える。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/cli-types.json",
+          "section_key": "types",
+          "entry_key": "EnsurePrArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "D1 の置換対象表に列挙された本番コード・delivery 層の全箇所（`apps/cli/src/commands/pr.rs`、`apps/cli/src/commands/track/branch_ops.rs`、`apps/cli-composition/src/track/mod.rs`、`apps/cli-composition/src/git.rs`、`apps/cli-composition/src/pr.rs`、`apps/cli-driver/src/track.rs`、CLI `--help` テキスト 2 箇所、`Makefile.toml` description 5 箇所、`README.md:109`、workflow SSoT 3 ファイル、command / rules / skill 5 箇所）のハードコード `main` を effective strategy の port 呼び出しまたは config 値参照に置き換える。"
+        }
+      }
+    },
+    {
+      "claim_hash": "4c2590e3259e21727fd8528fdd29acd49ee5d53aad36a9273fdfd45108487322",
+      "evidence_hash": "6addf5a32c6222d234d96a82bd2402003c9dbe10f9a31b6d5817bdf32583fb7f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cargo make track-switch-main` タスクを `cargo make track-switch-base` にリネームし、本体を `bin/sotp track switch-base`（新規 native subcommand）に委譲する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/cli-types.json",
+          "section_key": "types",
+          "entry_key": "TrackCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "`cargo make track-switch-main` タスクを `cargo make track-switch-base` にリネームし、本体を `bin/sotp track switch-base`（新規 native subcommand）に委譲する。`.claude/settings.json:159` の allowlist エントリ、`.claude/commands/track/done.md`、`.claude/rules/07-dev-environment.md:54,56` の参照を連動更新する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0f94a77606a3c7e9e30257098eb5c9d068dd559db8770335c5d0cc11a34cee16",
+      "evidence_hash": "3f31f4b64b6c70569f6c85d8f596f063f53aead4801aa022b5e76d5ed8babd2f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ハードコード `main` を effective strategy の port 呼び出しまたは config 値参照に置き換える。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/cli-types.json",
+          "section_key": "types",
+          "entry_key": "WaitAndMergeArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "D1 の置換対象表に列挙された本番コード・delivery 層の全箇所（`apps/cli/src/commands/pr.rs`、`apps/cli/src/commands/track/branch_ops.rs`、`apps/cli-composition/src/track/mod.rs`、`apps/cli-composition/src/git.rs`、`apps/cli-composition/src/pr.rs`、`apps/cli-driver/src/track.rs`、CLI `--help` テキスト 2 箇所、`Makefile.toml` description 5 箇所、`README.md:109`、workflow SSoT 3 ファイル、command / rules / skill 5 箇所）のハードコード `main` を effective strategy の port 呼び出しまたは config 値参照に置き換える。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0f94a77606a3c7e9e30257098eb5c9d068dd559db8770335c5d0cc11a34cee16",
+      "evidence_hash": "3edebf3b5a6e965a1f14dbe2972b973396e597ab8520270ced93a10ff0fa076a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp pr wait-and-merge` は明示 `--method` がない場合に `branch_strategy_snapshot.merge_method` を既定メソッドとして使い、明示 `--method merge|squash|rebase` はその値を上書きする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/cli-types.json",
+          "section_key": "types",
+          "entry_key": "WaitAndMergeArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "PR 作成・PR merge default・branch 作成・commit gate の各コードパスが `metadata.json` の `branch_strategy_snapshot` から effective strategy を読むことをテストで確認できる（`.harness/config/branch-strategy.json` を直接参照するコードパスがこれらの post-init 操作に存在しない）。branch 作成・switch・PR 作成・merge の git/gh invocation は branch_strategy_snapshot 由来の base_branch / merge_target / merge_method を個別 argv として渡し、shell command 文字列へ補間しない。`sotp pr wait-and-merge` は明示 `--method` がない場合に `branch_strategy_snapshot.merge_method` を既定メソッドとして使い、明示 `--method merge|squash|rebase` はその値を上書きする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8fe9dc98c856a1df519d808f58abb51a35fb6040b6cd92e9b53f7e80c49d495c",
+      "evidence_hash": "4636a3fba57cadb3e0ad885062184961f8c77117320837502a740144f3601ce2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`GateEval.duration_ms` の計測と telemetry 発行は bin-level telemetry パターン（ADR `2026-07-03-0446-cli-bin-gate-telemetry-instrumentation-exception.md` D1/D2）に従い、`apps/cli/src/commands/dry.rs::execute_dry_check_approved` が bin 層で直接行う（`apps/cli/src/main.rs::execute_verify_with_telemetry` と同じパターン）。`apps/cli/src/commands/dry.rs::execute_dry_check_approved` は `std::time::Instant` で `DryDriver::handle` 呼び出しの経過時間を計測し、`cli_composition::telemetry_wiring::resolve_telemetry_writer` / `emit_gate_eval` を直接呼び出して `GateEval` telemetry を emit する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::dry::execute_dry_check_approved"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-14",
+          "text_label": "`dry write` / `dry results` / `dry check-approved` コマンドについて、`apps/cli-composition/src/dry.rs` の `DryCompositionRoot::dry_write` が担っている use case interactor（`usecase::dry_check::DryCheckInteractor::run_dry_check`）の呼び出し（invoke）、`DryCompositionRoot::dry_results` が担っている use case interactor（`usecase::dry_check::DryCheckResultsInteractor::get_results`）の呼び出し（invoke）および結果を CLI 出力文字列へ整形する処理（render。現状 `lines.push(format!(...))` で行を積み上げ、改行区切りで結合して `CommandOutcome` を組み立てている箇所）、および `DryCompositionRoot::dry_check_approved` が担っている use case interactor（`usecase::dry_check::DryCheckApprovalInteractor::check_approved`）の呼び出し（invoke）を、`apps/cli-composition` から除去する。IN-13 は `dry write` / `dry check-approved` の render のみを `apps/cli-driver` へ移設し、`dry write` の内部 invoke、`dry results` 全体（invoke・render とも）、`dry check-approved` の内部 invoke は範囲外としていた。本 IN はその残りを対象とし、IN-12（`fixpoint-resolve`）で確立済みの構成（composition root は wire のみを行い、use case interactor の invoke は `libs/usecase` 側の application service が担い、`apps/cli-driver` の driver がその service を保持して invoke 結果を render する）に、`dry write` の invoke、`dry results` の invoke・render、`dry check-approved` の invoke を合わせる。移設後、`DryCompositionRoot::dry_write` / `dry_results` / `dry_check_approved`（またはその後継箇所）は `DryCheckInteractor` / `DryCheckResultsInteractor` / `DryCheckApprovalInteractor` を直接構築・呼び出ししない。`dry results` の invoke・render 移設に伴い、driver 境界を流れる `dry results` の戻り値は、現状の事前整形済み `DryDriverOutcome`（stdout/stderr 文字列を保持するだけの pass-through 型）ではなく、IN-13 が `dry write` / `dry check-approved` に対して行ったのと同様に、整形前の構造化データへ変更する。`dry check-approved` は IN-13 により戻り値（`DryCheckApprovedOutcome`）と render（`apps/cli-driver` 側の変換処理）の移設を既に終えており、本 IN が `dry check-approved` に対して追加するのは invoke の除去のみである。この移設に伴う Port 注入型の driver interactor 構成も本 IN の対象とする。usecase 側には shared ports `DryRepoRootPort` / `DryBaseBranchPort` / `DryCheckStorageFactoryPort` / `DryDiffBaseFactoryPort` と、`dry write` 用の追加 ports（`DryCheckServiceFactoryPort` / `DryWriteConfigLoaderPort` / `DryCorpusRootManifestWriterPort` 等）および対応する error / output DTO を置き、実装 adapter は `libs/infrastructure` に置く。`DryBaseBranchPort` は解決済み track の `<track_dir>/metadata.json#branch_strategy_snapshot.base_branch` を読み取り、`metadata.json` が不在の場合、または `branch_strategy_snapshot` が欠落している場合に `DryBaseBranchError` を返す（IN-06/IN-07 が定める fail-closed 不変条件に従う）。`dry check-approved` の中核処理は `DryCheckApprovedDriverInteractor` が `repo_root` / `base_branch` / `diff_base_resolver_factory` / `config_loader` / `corpus_meta` / `fragment_pipeline` / `storage_factory` の 7 個の secondary port だけで担う純粋な interactor とし、この中核 interactor 自体は clock port・telemetry port を保持せず、usecase から `std::time` へ直接依存しない。`GateEval.duration_ms` の計測と telemetry 発行は bin-level telemetry パターン（ADR `2026-07-03-0446-cli-bin-gate-telemetry-instrumentation-exception.md` D1/D2）に従い、`apps/cli/src/commands/dry.rs::execute_dry_check_approved` が bin 層で直接行う（`apps/cli/src/main.rs::execute_verify_with_telemetry` と同じパターン）。`DryCheckApprovedClockPort` / `DryCheckApprovedTelemetryPort` のような secondary port も、`DryCheckApprovedDriverService` を実装する telemetry-aware decorator も usecase には置かない。`apps/cli-driver/src/dry.rs` の `DryDriver::dry_check_approved` は、注入された `DryCheckApprovedDriverService` を invoke し、その結果を render するだけで、直接の計測・telemetry 永続化は行わない。`apps/cli/src/commands/dry.rs::execute_dry_check_approved` は `std::time::Instant` で `DryDriver::handle` 呼び出しの経過時間を計測し、`cli_composition::telemetry_wiring::resolve_telemetry_writer` / `emit_gate_eval` を直接呼び出して `GateEval` telemetry を emit する。infrastructure が usecase の primary ApplicationService を実装することはレイヤー境界違反であり、ADR 1328 D7 が許容するのは SecondaryPort を実装する adapter の infrastructure 移設である。`dry write` の service factory は `DryCheckServiceFactoryOutput { service, tier_telemetry }` を返し、config 解決は `DryWriteConfigResolution { dry_config, effective_threshold, config_fingerprint }` として、corpus-root sidecar の atomic write + symlink guard は `DryCorpusRootManifestWriterPort` として、それぞれ driver interactor に注入する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8fe9dc98c856a1df519d808f58abb51a35fb6040b6cd92e9b53f7e80c49d495c",
+      "evidence_hash": "a8a361094e8e130fe1804c31c7420b74bf4af934b1c296367dd5592a4d5bc02b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli/src/commands/dry.rs::execute_dry_check_approved` は `DryCompositionRoot::new().dry_driver().handle(DryInput::CheckApproved { .. })` の呼び出しを `std::time::Instant` で計測し、`cli_composition::telemetry_wiring::resolve_telemetry_writer` / `emit_gate_eval` を直接呼び出して `GateEval` telemetry を emit したうえで `CommandOutcome` を emit する（`apps/cli/src/main.rs::execute_verify_with_telemetry` と同じ bin-level パターン）。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::dry::execute_dry_check_approved"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-20",
+          "text_label": "`apps/cli-composition`（現行の `apps/cli-composition/src/dry.rs` の `DryCompositionRoot::dry_write` / `dry_results` / `dry_check_approved`、またはその後継箇所）は `usecase::dry_check::DryCheckInteractor::run_dry_check`、`DryCheckResultsInteractor::get_results`、および `DryCheckApprovalInteractor::check_approved` を直接構築・呼び出ししない。これらの invoke は `libs/usecase` 側の application service が担い、`apps/cli-driver` の driver がその service を保持して呼び出す。`dry results` の結果を CLI 出力文字列へ整形する処理（現状の、行を積み上げて改行区切りで結合する render）は `apps/cli-composition` に存在せず、`apps/cli-driver` に実装されている。`dry results` の driver 境界の戻り値は整形前の構造化データであり、事前整形済みの stdout/stderr 文字列をそのまま保持する型ではない。IN-14 の Port 注入型構成も機械的に検証できる。`libs/usecase` に `DryRepoRootPort` / `DryBaseBranchPort` / `DryCheckStorageFactoryPort` / `DryDiffBaseFactoryPort` / `DryCheckServiceFactoryPort` / `DryWriteConfigLoaderPort` / `DryCorpusRootManifestWriterPort` と、対応する error / output DTO が定義されている。対応 adapter は `libs/infrastructure` 配下に定義され、`apps/cli-composition` 配下に port 実装型として残っていない。`DryBaseBranchPort` のテストは、解決済み track の `metadata.json` または `branch_strategy_snapshot` 欠落時に `.harness/config/branch-strategy.json` へフォールバックせず `DryBaseBranchError` で fail-closed することを確認する。`DryCheckApprovedDriverInteractor` は clock port・telemetry port を保持しない 7 個の secondary port（`repo_root` / `base_branch` / `diff_base_resolver_factory` / `config_loader` / `corpus_meta` / `fragment_pipeline` / `storage_factory`）のみで構成される純粋な usecase interactor であり、usecase 側に `std::time` 直接依存がないことを grep またはユニットテストで確認できる。`libs/usecase` に `DryCheckApprovedClockPort` / `DryCheckApprovedTelemetryPort`、または `DryCheckApprovedDriverService` を実装する telemetry-aware application service/decorator は定義されていない。`libs/infrastructure` にもこれらの clock/telemetry port を実装する adapter は存在しない。`DryCheckApprovedDriverInteractor` はこれらを注入されず、`GateEval` の計測・telemetry 発行を担わない。`apps/cli/src/commands/dry.rs::execute_dry_check_approved` は `DryCompositionRoot::new().dry_driver().handle(DryInput::CheckApproved { .. })` の呼び出しを `std::time::Instant` で計測し、`cli_composition::telemetry_wiring::resolve_telemetry_writer` / `emit_gate_eval` を直接呼び出して `GateEval` telemetry を emit したうえで `CommandOutcome` を emit する（`apps/cli/src/main.rs::execute_verify_with_telemetry` と同じ bin-level パターン）。`dry check-approved` の CLI 統合テストは、コマンド実行後に `track/items/<id>/logs/telemetry.jsonl` へ `event_type: GateEval` / `gate_name: dry` / `duration_ms` を含むレコードが append されることを確認する。`apps/cli-driver/src/dry.rs` の `DryDriver::dry_check_approved` は `DryCheckApprovedDriverService` を invoke して結果を render するだけで、直接の計測・telemetry 永続化を行わないことを型シグネチャまたはコードで確認できる。`libs/infrastructure` は `DryCheckApprovedDriverService` を実装せず、usecase の secondary port adapter だけを実装する。`DryWriteConfigLoaderPort` の戻り値が `dry_config` / `effective_threshold` / `config_fingerprint` を保持し、`DryCorpusRootManifestWriterPort` の adapter が atomic write と symlink guard を担うことをユニットテストで確認できる。IN-15 が構造的対応として定める adapter 配置は、`apps/cli-composition/src/dry_driver_adapter.rs` と `apps/cli-composition/src/dry_fix_runner.rs`（または同等の後継箇所）に残存実装がなく、対応する実装が `libs/infrastructure/src/dry_check/dry_fix_local/`（または同等の infrastructure 配下）に存在することで検証できる。この配置確認は構造上の移設のみを対象とし、OS-08 が対象外とする subprocess 起動方式・プロンプト構築・環境変数サニタイズ・sentinel 解析・redaction・smoke test の挙動是正を要求しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8fe9dc98c856a1df519d808f58abb51a35fb6040b6cd92e9b53f7e80c49d495c",
+      "evidence_hash": "0f62611fb3adb17f4fbbaf5f7c88b00d6247ec1e6c8138423252a49098a38203",
+      "verdict": {
+        "kind": "pass",
+        "citation": "IN-11〜IN-15 の移設は既存ユーザー向け CLI 出力の内容（stdout/stderr 文言・exit code）を変更しない。移設対象コマンドが記録する telemetry イベント（`dry check-approved` の `GateEval`、`dry write` の `ReviewRound` / `ExternalSubprocess`）の `duration_ms` も、移設前後で実測の経過時間を反映し続け、固定値・省略・近似に置き換えない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/branch-strategy-config-driven-2026-06-30/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::dry::execute_dry_check_approved"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-07",
+          "text_label": "IN-11〜IN-15 の移設は既存ユーザー向け CLI 出力の内容（stdout/stderr 文言・exit code）を変更しない。移設対象コマンドが記録する telemetry イベント（`dry check-approved` の `GateEval`、`dry write` の `ReviewRound` / `ExternalSubprocess`）の `duration_ms` も、移設前後で実測の経過時間を反映し続け、固定値・省略・近似に置き換えない。移設は re-export shim や段階的 commit を用いて呼び出し互換性を保ちながら行う。"
+        }
+      }
+    }
+  ]
+}

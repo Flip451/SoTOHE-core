@@ -8,6 +8,7 @@ use domain::{TrackMetadata, derive_track_status};
 use super::super::codec::{self, DocumentMeta};
 use super::{TRACK_ARCHIVE_DIR, TRACK_ITEMS_DIR, VALID_TRACK_STATUSES};
 use crate::impl_plan_codec;
+use crate::track::symlink_guard::reject_symlinks_below;
 
 use super::RenderError;
 
@@ -60,8 +61,14 @@ pub(super) fn load_impl_plan_opt(
     track_dir: &Path,
 ) -> Result<Option<domain::ImplPlanDocument>, RenderError> {
     let path = track_dir.join("impl-plan.json");
-    if !path.is_file() {
+    if !reject_symlinks_below(&path, track_dir)? {
         return Ok(None);
+    }
+    if !path.is_file() {
+        return Err(RenderError::InvalidTrackMetadata {
+            path,
+            reason: "impl-plan.json exists but is not a regular file".to_owned(),
+        });
     }
     let json = std::fs::read_to_string(&path)?;
     impl_plan_codec::decode(&json).map(Some).map_err(|e| {
@@ -78,8 +85,14 @@ pub(super) fn load_task_coverage_opt(
     track_dir: &Path,
 ) -> Result<Option<domain::TaskCoverageDocument>, RenderError> {
     let path = track_dir.join("task-coverage.json");
-    if !path.is_file() {
+    if !reject_symlinks_below(&path, track_dir)? {
         return Ok(None);
+    }
+    if !path.is_file() {
+        return Err(RenderError::InvalidTrackMetadata {
+            path,
+            reason: "task-coverage.json exists but is not a regular file".to_owned(),
+        });
     }
     let json = std::fs::read_to_string(&path)?;
     crate::task_coverage_codec::decode(&json).map(Some).map_err(|e| {
@@ -177,7 +190,16 @@ pub(crate) fn decode_legacy_metadata(
         None
     };
 
-    let track = TrackMetadata::with_branch(id, branch, title_str, status_override)
+    // Legacy v2/v3/v4 tracks have no branch_strategy_snapshot; use main defaults
+    // for rendering purposes (OS-03: no migration mechanism provided).
+    let main_branch = domain::NonEmptyString::try_new("main")
+        .map_err(|e| codec::CodecError::Domain(domain::DomainError::Validation(e)))?;
+    let legacy_snapshot = domain::branch_strategy::BranchStrategySnapshot::new(
+        main_branch.clone(),
+        main_branch,
+        domain::branch_strategy::MergeMethod::Squash,
+    );
+    let track = TrackMetadata::with_branch(id, branch, title_str, status_override, legacy_snapshot)
         .map_err(codec::CodecError::Domain)?;
     let meta = DocumentMeta { schema_version, created_at, updated_at };
 
@@ -220,6 +242,19 @@ pub(crate) fn validate_track_document(
         }
     }
 
+    let trusted_root = metadata_path.parent().unwrap_or_else(|| Path::new("."));
+    if !reject_symlinks_below(metadata_path, trusted_root)? {
+        return Err(RenderError::InvalidTrackMetadata {
+            path: metadata_path.to_path_buf(),
+            reason: "metadata.json is missing".to_owned(),
+        });
+    }
+    if !metadata_path.is_file() {
+        return Err(RenderError::InvalidTrackMetadata {
+            path: metadata_path.to_path_buf(),
+            reason: "metadata.json exists but is not a regular file".to_owned(),
+        });
+    }
     let raw_json = std::fs::read_to_string(metadata_path).map_err(RenderError::Io)?;
     let raw_doc: serde_json::Value = serde_json::from_str(&raw_json).map_err(|source| {
         RenderError::InvalidMetadata { path: metadata_path.to_path_buf(), source: source.into() }
@@ -257,9 +292,9 @@ pub(crate) fn validate_track_document(
         }
     }
 
-    // For v5 tracks: decode via the authoritative codec and verify fields round-trip.
-    // `status` field absent in v5 — no drift check needed.
-    if doc.schema_version == 5 {
+    // For v6 tracks: decode via the authoritative codec and verify fields round-trip.
+    // `status` field absent in v6 — no drift check needed.
+    if doc.schema_version == 6 {
         let (_track, _meta) = codec::decode(&raw_json).map_err(|source| {
             RenderError::InvalidMetadata { path: metadata_path.to_path_buf(), source }
         })?;
@@ -280,13 +315,31 @@ pub fn collect_track_snapshots(root: &Path) -> Result<Vec<TrackSnapshot>, Render
     let mut track_dirs: Vec<(PathBuf, bool)> = Vec::new();
     for (rel, is_archive) in [(TRACK_ITEMS_DIR, false), (TRACK_ARCHIVE_DIR, true)] {
         let base = root.join(rel);
-        if !base.is_dir() {
+        let base_meta = match base.symlink_metadata() {
+            Ok(meta) => meta,
+            Err(err) if err.kind() == std::io::ErrorKind::NotFound => continue,
+            Err(err) => return Err(RenderError::Io(err)),
+        };
+        if base_meta.file_type().is_symlink() {
+            return Err(RenderError::InvalidTrackMetadata {
+                path: base,
+                reason: "track directory root is a symlink".to_owned(),
+            });
+        }
+        if !base_meta.is_dir() {
             continue;
         }
         for entry in std::fs::read_dir(base)? {
             let entry = entry?;
             let path = entry.path();
-            if path.is_dir() {
+            let file_type = entry.file_type()?;
+            if file_type.is_symlink() {
+                return Err(RenderError::InvalidTrackMetadata {
+                    path,
+                    reason: "track directory is a symlink".to_owned(),
+                });
+            }
+            if file_type.is_dir() {
                 track_dirs.push((path, is_archive));
             }
         }
@@ -296,8 +349,14 @@ pub fn collect_track_snapshots(root: &Path) -> Result<Vec<TrackSnapshot>, Render
     let mut snapshots = Vec::new();
     for (track_dir, is_archive) in track_dirs {
         let metadata_path = track_dir.join("metadata.json");
-        if !metadata_path.is_file() {
+        if !reject_symlinks_below(&metadata_path, &track_dir)? {
             continue;
+        }
+        if !metadata_path.is_file() {
+            return Err(RenderError::InvalidTrackMetadata {
+                path: metadata_path,
+                reason: "metadata.json exists but is not a regular file".to_owned(),
+            });
         }
 
         let json = std::fs::read_to_string(&metadata_path)?;
@@ -315,7 +374,7 @@ pub fn collect_track_snapshots(root: &Path) -> Result<Vec<TrackSnapshot>, Render
         // Legacy v2/v3 tracks that still carry a `status` field are accepted for
         // rendering purposes (registry.md, plan.md) but are not validated for
         // plan.md freshness — that guard only runs for v4+ (see `validate_track_snapshots`).
-        if !matches!(parsed.schema_version, 2..=5) {
+        if !matches!(parsed.schema_version, 2..=6) {
             return Err(RenderError::UnsupportedSchemaVersion {
                 path: metadata_path,
                 schema_version: parsed.schema_version,
@@ -323,19 +382,40 @@ pub fn collect_track_snapshots(root: &Path) -> Result<Vec<TrackSnapshot>, Render
         }
         validate_track_document(&metadata_path, track_dir.file_name(), &parsed)?;
 
-        // For v5 tracks: use `codec::decode` (schema v5 required).
-        // For legacy v2/v3: parse raw JSON for the `status` field and construct
-        // `TrackMetadata` directly without calling `codec::decode`, which would
-        // reject the old schema.
-        let (track, meta, derived_status) = if parsed.schema_version == 5 {
+        // For v6 tracks: use `codec::decode` (schema v6 required).
+        // For v5 tracks: identity-only (no `status` field, no `branch_strategy_snapshot`);
+        //   decode identity via legacy path, derive status from impl-plan.json.
+        // For legacy v2/v3/v4: parse raw JSON for the `status` field and construct
+        //   `TrackMetadata` directly without calling `codec::decode`, which would
+        //   reject the old schema.
+        let (track, meta, derived_status) = if parsed.schema_version == 6 {
             let (t, m) = codec::decode(&json).map_err(|source| RenderError::InvalidMetadata {
                 path: metadata_path.clone(),
                 source,
             })?;
             // Tracks under `track/archive/` are archived regardless of impl-plan
             // state. `derive_track_status` cannot return `archived` (that state is
-            // encoded by directory location in the v5 schema, not by a status field),
+            // encoded by directory location in the v6 schema, not by a status field),
             // so we set `derived_status` explicitly before calling the derive function.
+            let status = if is_archive {
+                "archived".to_owned()
+            } else {
+                let impl_plan = load_impl_plan_opt(&track_dir)?;
+                derive_track_status(impl_plan.as_ref(), t.status_override()).to_string()
+            };
+            (t, m, status)
+        } else if parsed.schema_version == 5 {
+            // v5: identity-only (like v6) but without `branch_strategy_snapshot`.
+            // Decode via the legacy path which supplies a main-branch default snapshot,
+            // then derive status from impl-plan.json (no `status` field in v5).
+            let raw: serde_json::Value =
+                serde_json::from_str(&json).map_err(|source| RenderError::InvalidMetadata {
+                    path: metadata_path.clone(),
+                    source: codec::CodecError::Json(source),
+                })?;
+            let (t, m) = decode_legacy_metadata(&raw, &metadata_path).map_err(|source| {
+                RenderError::InvalidMetadata { path: metadata_path.clone(), source }
+            })?;
             let status = if is_archive {
                 "archived".to_owned()
             } else {

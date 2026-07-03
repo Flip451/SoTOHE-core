@@ -1,0 +1,394 @@
+{
+  "schema_version": 5,
+  "crate_name": "cli_driver",
+  "layer": "cli_driver",
+  "types": {
+    "DryDriver": {
+      "action": "modify",
+      "role": { "PrimaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "dry",
+      "docs": "Primary adapter driver for the `dry` command family. IN-14/AC-20 (superseding this track's own prior IN-13 `reference` declaration): DryDriver's public `new` constructor holds four injected services (four params total): `service` backs only dry_fix_local (OS-08, unchanged); `write_service` / `results_service` / `check_approved_service` back the three IN-14-migrated commands, each invoked directly by the corresponding `handle` arm. `dry_check_approved` performs a pure invoke+render: it calls `check_approved_service.dry_check_approved` and renders the resulting `DryCheckApprovedOutcome` into a `CommandOutcome`, with no side-effecting I/O of its own -- wall-clock timing measurement and `GateEval` telemetry emission for this call live in the bin layer (`apps/cli/src/commands/dry.rs::execute_dry_check_approved`), mirroring `execute_verify_with_telemetry`'s bin-level pattern (Port abstraction was tried and retracted across two earlier IN-14 drafts: first a `check_approved_telemetry: Arc<dyn DryCheckApprovedTelemetryPort>` field on this struct, and before that an infrastructure-hosted `TimedGateEvalDryCheckApprovedService` decorator implementing the primary port -- both added a layer-boundary violation or unwarranted port indirection at this boundary; neither exists anymore). `handle` gains a new private render helper for the Results variant (DryResultsOutcome -> CommandOutcome, reproducing the former per-record `lines.push(format!(...))` text byte-for-byte per CN-07/AC-19); the Write / CheckApproved render helpers (render_dry_write_outcome / render_dry_check_approved_outcome) are unchanged from IN-13. `handle`'s own public signature (`&self, input: DryInput) -> CommandOutcome`) is unchanged.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-20" }
+      ],
+      "informal_grounds": []
+    },
+    "PrInput": {
+      "action": "modify",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Push",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "track_id", "ty": "Option<String>" }
+              ]
+            }
+          },
+          {
+            "name": "Ensure",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "track_id", "ty": "Option<String>" },
+                { "name": "base", "ty": "Option<String>" }
+              ]
+            }
+          },
+          {
+            "name": "Status",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "pr", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "WaitAndMerge",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "pr", "ty": "String" },
+                { "name": "interval", "ty": "u64" },
+                { "name": "timeout", "ty": "u64" },
+                { "name": "method", "ty": "Option<String>" }
+              ]
+            }
+          },
+          {
+            "name": "TriggerReview",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "pr", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "PollReview",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "pr", "ty": "String" },
+                { "name": "trigger_timestamp", "ty": "String" },
+                { "name": "interval", "ty": "u64" },
+                { "name": "timeout", "ty": "u64" }
+              ]
+            }
+          },
+          {
+            "name": "ReviewCycle",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "track_id", "ty": "Option<String>" },
+                { "name": "resume", "ty": "bool" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "pr",
+      "docs": "Typed input for the `pr` command family. Pre-existing type (baseline: Ensure.base and WaitAndMerge.method were plain String); this track (IN-03/AC-09) changes Ensure.base and WaitAndMerge.method to Option<String> so PrDriver forwards the caller's none-means-default intent through to the composition root, which resolves merge_target / merge_method from the active track's branch_strategy_snapshot when the CLI flag is omitted -- mirroring the cli-layer EnsurePrArgs/WaitAndMergeArgs precedent already declared in cli-types.json. Role is Dto (not PrimaryAdapter): this enum is a plain input DTO consumed by PrDriver::handle, not itself the driving adapter (see R1: cli/cli_driver clap args and input DTOs use the Dto role; same role correction already applied to TrackInput in this catalogue). R9 primitive justification: base/method stay raw Option<String> because cli_driver may_depend_on=[usecase] only -- Option<domain::branch_strategy::MergeMethod> (and an equivalent branch-name value object) are architecturally impossible to name in this layer; both concepts are already modelled at the domain layer (BranchStrategySnapshot.merge_target as NonEmptyString, .merge_method as MergeMethod, both validated) and the raw-string-to-domain-type conversion happens downstream in cli_composition, which does depend on domain. The remaining fields (track_id, pr, interval, timeout, trigger_timestamp, resume) are unchanged by this track: track_id carries the same cli_driver-cannot-depend-on-domain rationale as TrackInput.track_id in this catalogue; pr/interval/timeout/trigger_timestamp/resume are opaque technical values (external PR identifier, poll timing knobs, an ISO-8601 timestamp echo, and a boolean resume flag) with no finite-value domain concept to model.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-03" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-09" }
+      ],
+      "informal_grounds": []
+    },
+    "TrackInput": {
+      "action": "modify",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Init",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "items_dir",   "ty": "std::path::PathBuf" },
+                { "name": "track_id",   "ty": "String" },
+                { "name": "description","ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "Transition",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "items_dir",     "ty": "std::path::PathBuf" },
+                { "name": "track_id",      "ty": "Option<String>" },
+                { "name": "task_id",       "ty": "String" },
+                { "name": "target_status", "ty": "String" },
+                { "name": "commit_hash",   "ty": "Option<String>" }
+              ]
+            }
+          },
+          {
+            "name": "Resolve",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "items_dir", "ty": "std::path::PathBuf" },
+                { "name": "track_id",  "ty": "Option<String>" }
+              ]
+            }
+          },
+          {
+            "name": "BranchCreate",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "items_dir", "ty": "std::path::PathBuf" },
+                { "name": "track_id",  "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "BranchSwitch",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "items_dir", "ty": "std::path::PathBuf" },
+                { "name": "track_id",  "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "ViewsValidate",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "project_root", "ty": "std::path::PathBuf" }
+              ]
+            }
+          },
+          {
+            "name": "ViewsSync",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "project_root", "ty": "std::path::PathBuf" },
+                { "name": "track_id",     "ty": "Option<String>" }
+              ]
+            }
+          },
+          {
+            "name": "AddTask",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "items_dir",   "ty": "std::path::PathBuf" },
+                { "name": "track_id",    "ty": "Option<String>" },
+                { "name": "description", "ty": "String" },
+                { "name": "section",     "ty": "Option<String>" },
+                { "name": "after",       "ty": "Option<String>" }
+              ]
+            }
+          },
+          {
+            "name": "SetOverride",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "items_dir", "ty": "std::path::PathBuf" },
+                { "name": "track_id",  "ty": "Option<String>" },
+                { "name": "status",    "ty": "String" },
+                { "name": "reason",    "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "ClearOverride",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "items_dir", "ty": "std::path::PathBuf" },
+                { "name": "track_id",  "ty": "Option<String>" }
+              ]
+            }
+          },
+          {
+            "name": "NextTask",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "items_dir", "ty": "std::path::PathBuf" },
+                { "name": "track_id",  "ty": "Option<String>" }
+              ]
+            }
+          },
+          {
+            "name": "TaskCounts",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "items_dir", "ty": "std::path::PathBuf" },
+                { "name": "track_id",  "ty": "Option<String>" }
+              ]
+            }
+          },
+          {
+            "name": "Archive",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "items_dir", "ty": "std::path::PathBuf" },
+                { "name": "track_id",  "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "DetectActive",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "project_root", "ty": "std::path::PathBuf" }
+              ]
+            }
+          },
+          {
+            "name": "SwitchBase",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "project_root", "ty": "std::path::PathBuf" }
+              ]
+            }
+          },
+          {
+            "name": "FixpointResolve",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "track_id", "ty": "String" },
+                { "name": "current_branch", "ty": "String" },
+                { "name": "items_dir", "ty": "std::path::PathBuf" }
+              ]
+            }
+          },
+          {
+            "name": "CatalogueLintCheckActiveTrack",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "track_id", "ty": "Option<String>" },
+                { "name": "workspace_root", "ty": "std::path::PathBuf" },
+                { "name": "rules_file", "ty": "Option<std::path::PathBuf>" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "track",
+      "docs": "Typed input for the track command family. SwitchBase is new in this track (IN-05): switches to the base branch read from the active track's branch_strategy_snapshot. FixpointResolve is new in this track (IN-12): fields mirror usecase::fixpoint_resolve_driver::FixpointResolveDriverInput field-for-field. Role corrected from PrimaryAdapter to Dto: this enum is a plain input DTO consumed by TrackDriver::handle, not itself the driving adapter (see R1: cli/cli_driver clap args and input DTOs use the Dto role). CatalogueLintCheckActiveTrack is merge-inherited from base branch (catalogue-primitive-obsession-guard track); not this track's design work -- grounding stays with this entry's existing spec_refs (IN-05).",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-05" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-12" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-17" }
+      ],
+      "informal_grounds": []
+    },
+    "TrackDriver": {
+      "action": "modify",
+      "role": { "PrimaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "track",
+      "docs": "Primary adapter driver for the `track` command family. Holds injected TrackService (for the existing wide-facade subcommands) and, new in this track (IN-12/AC-17), an injected FixpointResolveDriverService used only by the FixpointResolve variant: `handle` invokes it and renders FixpointResolveDriverOutcome into CommandOutcome directly in this layer, instead of TrackCompositionRoot invoking FixpointResolveService and formatting the result itself.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-12" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-17" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [
+    {
+      "type_name": "DryDriver",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "service", "ty": "std::sync::Arc<dyn usecase::dry_driver::DryDriverService>" },
+            { "name": "write_service", "ty": "std::sync::Arc<dyn usecase::dry_write_driver::DryWriteDriverService>" },
+            { "name": "results_service", "ty": "std::sync::Arc<dyn usecase::dry_results_driver::DryResultsDriverService>" },
+            { "name": "check_approved_service", "ty": "std::sync::Arc<dyn usecase::dry_check_approved_driver::DryCheckApprovedDriverService>" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Create a new `DryDriver` with the four given services: `service` backs only dry_fix_local (OS-08, unchanged); write_service / results_service / check_approved_service back the three IN-14-migrated commands, each invoked directly by the corresponding `handle` arm. No telemetry port is held here -- `dry_check_approved`'s wall-clock timing measurement and `GateEval` telemetry emission live in the bin layer (apps/cli/src/commands/dry.rs::execute_dry_check_approved), mirroring execute_verify_with_telemetry; this driver stays a pure invoke+render controller."
+        },
+        {
+          "name": "handle",
+          "receiver": "&self",
+          "params": [
+            { "name": "input", "ty": "DryInput" }
+          ],
+          "returns": "CommandOutcome",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Handle a dry command."
+        }
+      ]
+    },
+    {
+      "type_name": "TrackDriver",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "service", "ty": "std::sync::Arc<dyn usecase::track_service::TrackService>" },
+            { "name": "fixpoint_resolve_service", "ty": "std::sync::Arc<dyn usecase::fixpoint_resolve_driver::FixpointResolveDriverService>" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Create a new `TrackDriver` with the given services."
+        },
+        {
+          "name": "handle",
+          "receiver": "&self",
+          "params": [
+            { "name": "input", "ty": "TrackInput" }
+          ],
+          "returns": "CommandOutcome",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Handle a track command."
+        }
+      ]
+    }
+  ],
+  "trait_impls": []
+}

@@ -9,15 +9,17 @@
 
 Initialize a new track directory and its branch (Phase 0). Creates the minimal identity
 artifacts — `track/items/<track-id>/metadata.json` and its rendered views — and materializes
-the branch from `main`. Phase 0 is the precondition for every subsequent phase; no planning
-or implementation may proceed until this workflow completes with OK.
+the branch from the configured base branch (`.harness/config/branch-strategy.json#base_branch`).
+Phase 0 is the precondition for every subsequent phase; no planning or implementation may
+proceed until this workflow completes with OK.
 
 ## Inputs
 
 - **Feature name** — a slug-ready phrase or descriptive string; the caller supplies this as the
   primary argument. If absent, the caller must ask the user for a feature name and stop.
-- **Current branch = `main`** — the workflow requires the working tree to be on `main` before
-  branch creation. Any other starting branch is a hard prerequisite failure.
+- **Current branch = configured base branch** — the workflow requires the working tree to be on
+  the branch named by `.harness/config/branch-strategy.json#base_branch` before branch creation.
+  Any other starting branch is a hard prerequisite failure.
 - **Git status** — expected clean, or containing only ADR / convention files that belong to
   this new track and will be committed inside it. Any unrelated in-progress changes must be
   resolved by the user before the workflow proceeds.
@@ -28,15 +30,17 @@ or implementation may proceed until this workflow completes with OK.
 
 **Step 1: Pre-flight check**
 
-Verify the current git branch is `main`. If not, stop and present the situation to the
-user — do not auto-switch. Check `git status --short`:
+Verify the current git branch matches the configured base branch
+(`.harness/config/branch-strategy.json#base_branch`). If not, stop and present the situation to
+the user — do not auto-switch. Check `git status --short`:
 
 - ADR / convention / other `knowledge/` baseline files staged for the new track: already
   resolved — they will be committed inside the new track. No user action required.
 - Other unrelated in-progress changes: present the list and ask the user whether to commit,
   stash, discard, or split into a separate track. Do not auto-act.
 
-Proceed to Step 2 once the branch is `main` and any unrelated changes are resolved.
+Proceed to Step 2 once the branch matches the configured base branch and any unrelated changes
+are resolved.
 
 **Step 2: Create track branch**
 
@@ -51,11 +55,14 @@ cargo make track-branch-create '<track-id>'
 
 Write `track/items/<track-id>/metadata.json` with the following fields:
 
-- `schema_version`: 5
+- `schema_version`: 6
 - `id`: `<track-id>`
 - `title`: human-readable title derived from the feature name
 - `branch`: `track/<track-id>`
 - `created_at` / `updated_at`: `date -u +"%Y-%m-%dT%H:%M:%SZ"` (no manual input)
+- `branch_strategy_snapshot`: copy `base_branch`, `merge_target`, and `merge_method` from
+  `.harness/config/branch-strategy.json` at creation time. This snapshot is immutable for the
+  track lifetime and is the source for post-init branch operations.
 
 **Step 4: Render views**
 
@@ -89,17 +96,17 @@ Phase 1 and is not required for this first commit.
 
 | Step | Gate | Verdict |
 |------|------|---------|
-| 1 | Current branch is `main`; no unrelated dirty state | ERROR → stop |
+| 1 | Current branch is the configured base branch; no unrelated dirty state | ERROR → stop |
 | 5 | `cargo make verify-track-metadata` exits 0 | OK / ERROR |
 
 The workflow completes with **OK** when `verify-track-metadata` passes.
-It completes with **ERROR** on any hard failure (non-main branch, branch creation failure,
+It completes with **ERROR** on any hard failure (base branch mismatch, branch creation failure,
 metadata write failure, or gate failure). On ERROR, stop and report to the caller.
 
 ## Failure / recovery
 
-- **Non-main branch**: report the current branch and available options (switch to main manually,
-  or abort). Do not auto-switch.
+- **Base branch mismatch**: report the current branch and available options (switch to the
+  configured base branch manually, or abort). Do not auto-switch.
 - **Unrelated dirty state**: list the modified files, classify them, and ask the user for a
   resolution action.
 - **Branch creation failure** (`cargo make track-branch-create` non-zero): report the error.
@@ -111,7 +118,8 @@ metadata write failure, or gate failure). On ERROR, stop and report to the calle
 ## Outputs
 
 - `track/items/<track-id>/` directory (created)
-- `track/items/<track-id>/metadata.json` (written, schema_version 5)
+- `track/items/<track-id>/metadata.json` (written, schema_version 6 with
+  `branch_strategy_snapshot`)
 - `track/items/<track-id>/plan.md` (rendered view; do not edit directly)
 - `track/registry.md` (regenerated; gitignored, not committed)
 - Branch `track/<track-id>` (created and checked out)

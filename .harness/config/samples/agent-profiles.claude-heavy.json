@@ -39,7 +39,7 @@
     "reviewer": {
       "provider": "claude",
       "model": "claude-opus-4-7",
-      "fast_model": "claude-sonnet-4-6"
+      "fast_model": "claude-sonnet-5"
     },
     "researcher": {
       "provider": "gemini"

@@ -100,11 +100,20 @@ mod tests {
 
     /// Returns the git command list for a branch-create invocation.
     ///
-    /// The create path intentionally emits only `git switch -c track/<id> main`; it must never
-    /// stage or commit metadata so that `main` stays untouched while the new track branch is being
-    /// bootstrapped.
-    pub(super) fn branch_create_git_commands(branch_name: &str) -> Vec<Vec<String>> {
-        vec![vec!["switch".to_owned(), "-c".to_owned(), branch_name.to_owned(), "main".to_owned()]]
+    /// The create path intentionally emits only `git switch -c track/<id> <base_branch>`; it must
+    /// never stage or commit metadata so that `base_branch` stays untouched while the new track
+    /// branch is being bootstrapped. `base_branch` is resolved by the caller from
+    /// `BranchStrategyPort::base_branch()` / the active track's `branch_strategy_snapshot.base_branch`.
+    pub(super) fn branch_create_git_commands(
+        branch_name: &str,
+        base_branch: &str,
+    ) -> Vec<Vec<String>> {
+        vec![vec![
+            "switch".to_owned(),
+            "-c".to_owned(),
+            branch_name.to_owned(),
+            base_branch.to_owned(),
+        ]]
     }
 
     pub(super) fn branch_exists(
@@ -177,7 +186,9 @@ mod tests {
     /// Executes the branch-create git commands against `repo` after validating preconditions.
     ///
     /// Preconditions:
-    /// - current branch must be `main` (branch create must fork from main)
+    /// - current branch must be `base_branch` (branch create must fork from the configured base
+    ///   branch — resolved by the caller from `BranchStrategyPort::base_branch()` / the active
+    ///   track's `branch_strategy_snapshot.base_branch`)
     /// - target branch `branch_name` must not yet exist
     ///
     /// The function guarantees it never runs `git add` / `git commit` — only the commands produced
@@ -185,11 +196,12 @@ mod tests {
     pub(super) fn branch_create_execute(
         repo: &impl GitRepository,
         branch_name: &str,
+        base_branch: &str,
     ) -> Result<(), BranchTestError> {
         let current = repo.current_branch().map_err(|err| BranchTestError(err.to_string()))?;
-        if current.as_deref() != Some("main") {
+        if current.as_deref() != Some(base_branch) {
             return Err(BranchTestError(format!(
-                "branch create must start from 'main'; current branch is {}",
+                "branch create must start from '{base_branch}'; current branch is {}",
                 current.as_deref().unwrap_or("<detached>")
             )));
         }
@@ -198,7 +210,7 @@ mod tests {
             return Err(BranchTestError(format!("branch '{branch_name}' already exists")));
         }
 
-        for command in branch_create_git_commands(branch_name) {
+        for command in branch_create_git_commands(branch_name, base_branch) {
             let args: Vec<&str> = command.iter().map(String::as_str).collect();
             match repo.status(&args) {
                 Ok(0) => {}
@@ -323,9 +335,9 @@ mod tests {
     #[test]
     fn branch_create_git_commands_returns_switch_c_main_only() {
         // Regression guard (ADR 2026-04-22-1432 §D3): branch create must only emit
-        // `git switch -c track/<id> main`. No commit, no add, no branch -f — any
-        // additional command would risk generating a commit on main.
-        let commands = branch_create_git_commands("track/demo");
+        // `git switch -c track/<id> <base_branch>`. No commit, no add, no branch -f —
+        // any additional command would risk generating a commit on the base branch.
+        let commands = branch_create_git_commands("track/demo", "main");
 
         assert_eq!(
             commands,
@@ -334,6 +346,23 @@ mod tests {
                 "-c".to_owned(),
                 "track/demo".to_owned(),
                 "main".to_owned(),
+            ]]
+        );
+    }
+
+    #[test]
+    fn branch_create_git_commands_uses_configured_base_branch() {
+        // ADR 2026-06-30-1441 §D1: the base branch is config-driven, not hardcoded
+        // to "main" — a non-"main" base_branch must flow through unchanged.
+        let commands = branch_create_git_commands("track/demo", "develop");
+
+        assert_eq!(
+            commands,
+            vec![vec![
+                "switch".to_owned(),
+                "-c".to_owned(),
+                "track/demo".to_owned(),
+                "develop".to_owned(),
             ]]
         );
     }
@@ -357,7 +386,7 @@ mod tests {
             status_calls: Mutex::new(Vec::new()),
         };
 
-        branch_create_execute(&repo, "track/demo").unwrap();
+        branch_create_execute(&repo, "track/demo", "main").unwrap();
 
         let calls = repo.status_calls.lock().unwrap().clone();
         assert_eq!(
@@ -388,8 +417,27 @@ mod tests {
             status_calls: Mutex::new(Vec::new()),
         };
 
-        let err = branch_create_execute(&repo, "track/demo").unwrap_err().to_string();
+        let err = branch_create_execute(&repo, "track/demo", "main").unwrap_err().to_string();
         assert!(err.contains("must start from 'main'"));
+        assert!(
+            repo.status_calls.lock().unwrap().is_empty(),
+            "no git side-effects must happen when preflight fails"
+        );
+    }
+
+    #[test]
+    fn branch_create_execute_rejects_source_branch_other_than_configured_base() {
+        // ADR 2026-06-30-1441 §D1: the guard compares against the configured
+        // base_branch, not a hardcoded "main" — a "develop"-configured track must
+        // reject a "main" source branch just as the default rejects "feature".
+        let repo = RecordingRepo {
+            current_branch: Some("main".to_owned()),
+            outputs: HashMap::new(),
+            status_calls: Mutex::new(Vec::new()),
+        };
+
+        let err = branch_create_execute(&repo, "track/demo", "develop").unwrap_err().to_string();
+        assert!(err.contains("must start from 'develop'"));
         assert!(
             repo.status_calls.lock().unwrap().is_empty(),
             "no git side-effects must happen when preflight fails"
@@ -412,7 +460,7 @@ mod tests {
             status_calls: Mutex::new(Vec::new()),
         };
 
-        let err = branch_create_execute(&repo, "track/demo").unwrap_err().to_string();
+        let err = branch_create_execute(&repo, "track/demo", "main").unwrap_err().to_string();
         assert!(err.contains("already exists"));
         assert!(
             repo.status_calls.lock().unwrap().is_empty(),

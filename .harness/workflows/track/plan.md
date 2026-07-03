@@ -30,8 +30,9 @@ Sub-workflows used:
 - **ADR existence** — at least one relevant ADR must exist under `knowledge/adr/`. If none
   exists, stop and ask the user to author one (the `adr:add` command provides this path).
 - **`track/tech-stack.md`** — must be free of blocking `TODO:` markers before implementation.
-- **Current branch** — must be compatible with the operation: `main` for a new track,
-  `track/<id>` for a track already initialized.
+- **Current branch** — must be compatible with the operation: the configured base branch
+  (`.harness/config/branch-strategy.json#base_branch`) for a new track, `track/<id>` for a
+  track already initialized.
 - **`.harness/config/agent-profiles.json`** — must be readable for capability routing.
 
 ## Sequence
@@ -75,7 +76,7 @@ Reverse references and layer skipping are forbidden: `spec → type catalogue`,
 
 | Phase | Workflow | Writer capability | Gate |
 |-------|----------|-------------------|------|
-| 0 | `init` | main (direct) | metadata identity schema (OK / ERROR) |
+| 0 | `init` | orchestrator (direct) | metadata identity schema (OK / ERROR) |
 | 1 | `spec-design` | spec-designer | spec → ADR signal (🔵🟡🔴) |
 | 2 | `type-design` | type-designer | type → spec signal, per layer (🔵🟡🔴) |
 | 3 | `impl-plan` | impl-planner | task-coverage binary gate (OK / ERROR) |
@@ -97,9 +98,12 @@ On ERROR, stop and report. On OK, mark Phase 0 `completed` and proceed to Phase 
    - **🟡**: log warning and proceed to Phase 2. Yellow must be resolved before merge.
    - **🔴**: escalate per ADR auto-edit criteria:
      a. Identify the target ADR path from the 🔴 element.
-     b. If the ADR has commit history: invoke the `adr-editor` capability. Briefing must
-        include the 🔴 element(s), ADR path, and the constraint "edit working tree only; do not
-        commit inside the loop".
+     b. If the ADR has commit history: resolve `merge_target` from the effective branch
+        strategy — read `metadata.json#branch_strategy_snapshot.merge_target` when a track
+        context exists, or `.harness/config/branch-strategy.json#merge_target` when no track
+        has been initialized yet — then invoke the `adr-editor` capability. Briefing must
+        include the 🔴 element(s), ADR path, the resolved `merge_target` value, and the
+        constraint "edit working tree only; do not commit inside the loop".
      c. If no commit history: pause for user — instruct them to commit the ADR first.
      d. After ADR edit, re-invoke `spec-design`. Count against `max_retry`; on overflow, stop.
 
@@ -146,7 +150,7 @@ After Phase 3 OK (or `max_retry` overflow anywhere):
 |-------|----------|--------|
 | Pre-track | `knowledge/adr/*.md` (initial) | user + `adr:add` |
 | Pre-track | `knowledge/adr/*.md` (back-and-forth) | `adr-editor` capability (auto-invoked) |
-| 0 | `track/items/<id>/metadata.json` | main (direct via `init` workflow) |
+| 0 | `track/items/<id>/metadata.json` | orchestrator (direct via `init` workflow) |
 | 1 | `track/items/<id>/spec.json` + `spec.md` | `spec-designer` capability |
 | 2 | `track/items/<id>/<layer>-types.json` + baselines + views | `type-designer` capability |
 | 3 | `track/items/<id>/impl-plan.json` + `task-coverage.json` | `impl-planner` capability |

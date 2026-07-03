@@ -1,0 +1,5 @@
+{
+  "base_branch": "develop",
+  "merge_target": "develop",
+  "merge_method": "squash"
+}

@@ -293,6 +293,14 @@ mod tests {
     use super::*;
     use crate::{StatusOverride, TrackBranch, TrackId};
 
+    fn test_snapshot() -> crate::branch_strategy::BranchStrategySnapshot {
+        crate::branch_strategy::BranchStrategySnapshot::new(
+            crate::NonEmptyString::try_new("main").unwrap(),
+            crate::NonEmptyString::try_new("main").unwrap(),
+            crate::branch_strategy::MergeMethod::Squash,
+        )
+    }
+
     fn planned_track(id: &str, branch: Option<&str>) -> TrackMetadata {
         // Identity-only TrackMetadata; status is derived on demand.
         TrackMetadata::with_branch(
@@ -300,6 +308,7 @@ mod tests {
             branch.map(|b| TrackBranch::try_new(b).unwrap()),
             "Test Track",
             None,
+            test_snapshot(),
         )
         .unwrap()
     }
@@ -366,6 +375,7 @@ mod tests {
             Some(TrackBranch::try_new("track/demo").unwrap()),
             "Test",
             Some(StatusOverride::blocked("waiting on review").unwrap()),
+            test_snapshot(),
         )
         .unwrap();
         let info = resolve_phase(&track, None);
@@ -385,6 +395,7 @@ mod tests {
             Some(TrackBranch::try_new("track/demo").unwrap()),
             "Test",
             Some(StatusOverride::cancelled("scope changed").unwrap()),
+            test_snapshot(),
         )
         .unwrap();
         let info = resolve_phase(&track, None);

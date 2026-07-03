@@ -646,7 +646,11 @@ pub(super) fn trigger_new_review(
     repo.push_branch(&ctx.branch).map_err(|e| CompositionError::Infrastructure(e.to_string()))?;
     println!("[OK] Pushed {}", ctx.branch);
 
-    let pr_number = match ensure_pr_for_cycle(&ctx, "main", client)? {
+    let base = super::branch_strategy_port_for_track(&ctx.track_id).map(|port| {
+        use usecase::branch_strategy::BranchStrategyPort as _;
+        port.merge_target().to_owned()
+    })?;
+    let pr_number = match ensure_pr_for_cycle(&ctx, &base, client)? {
         Some(pr) => pr,
         None => return Ok(None),
     };

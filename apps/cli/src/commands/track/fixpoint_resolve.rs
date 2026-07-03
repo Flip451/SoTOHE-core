@@ -4,9 +4,12 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 use clap::Args;
-use cli_composition::{FixpointResolveInput, TrackCompositionRoot};
+use cli_composition::TrackCompositionRoot;
+use cli_driver::track::TrackInput;
 
 use crate::CliError;
+
+use super::state_ops::track_driver_outcome_to_result;
 
 /// Arguments for `sotp track fixpoint-resolve`.
 #[derive(Debug, Args, Clone)]
@@ -28,23 +31,14 @@ pub struct FixpointResolveArgs {
 ///
 /// # Errors
 ///
-/// Returns [`CliError`] when `CliApp::fixpoint_resolve` fails.
+/// Returns [`CliError`] when the fixpoint-resolve driver reports a failure.
 pub fn execute_fixpoint_resolve(args: FixpointResolveArgs) -> Result<ExitCode, CliError> {
-    let outcome = TrackCompositionRoot::new()
-        .fixpoint_resolve(FixpointResolveInput {
-            track_id: args.track_id,
-            current_branch: args.current_branch,
-            items_dir: args.items_dir,
-        })
-        .map_err(|e| CliError::Message(e.to_string()))?;
-
-    if let Some(msg) = outcome.stdout {
-        println!("{msg}");
-    }
-    if let Some(msg) = outcome.stderr {
-        eprintln!("{msg}");
-    }
-    Ok(ExitCode::from(outcome.exit_code))
+    let outcome = TrackCompositionRoot::new().track_driver().handle(TrackInput::FixpointResolve {
+        track_id: args.track_id,
+        current_branch: args.current_branch,
+        items_dir: args.items_dir,
+    });
+    track_driver_outcome_to_result(outcome)
 }
 
 #[cfg(test)]
@@ -101,15 +95,13 @@ mod tests {
         assert_eq!(args.items_dir.as_os_str(), "track/items");
     }
 
-    // Domain-level validation tests for `FixpointCurrentBranch::try_new` and
-    // output-shape tests for `format_fixpoint_step` live in
-    // `apps/cli-composition/src/track/fixpoint_resolve.rs` so the
-    // `cli_composition` public surface does not have to re-export `domain` /
-    // `usecase` types across the CN-02 boundary.
+    // Dispatch-level assertions only in this CLI module. Domain validation and
+    // render tests live with their respective owners in the usecase and
+    // cli-driver crates.
 
     // ── execute_fixpoint_resolve dispatch tests ───────────────────────────────
 
-    /// `execute_fixpoint_resolve` propagates `CliApp::fixpoint_resolve` errors
+    /// `execute_fixpoint_resolve` propagates fixpoint-resolve driver errors
     /// as `CliError::Message` (exit code 1).
     ///
     /// A `--track-id` of `""` is rejected by the composition layer before any
@@ -129,15 +121,16 @@ mod tests {
         );
     }
 
-    /// `execute_fixpoint_resolve` returns `ExitCode::SUCCESS` when
-    /// `CliApp::fixpoint_resolve` returns `CommandOutcome::success`.
+    /// `execute_fixpoint_resolve` returns `ExitCode::SUCCESS` when the
+    /// fixpoint-resolve driver returns `CommandOutcome::success`.
     ///
     /// We use a wrong-branch scenario to exercise the stdout-emission path:
     /// the composition layer returns `Err(...)` for a wrong branch, so we
     /// cannot test the success exit code without a full fixture.  Instead, we
-    /// document that the stdout is written by verifying the integration via
-    /// `cli_composition` tests (`test_fixpoint_resolve_missing_coverage_record_returns_run_dfp`)
-    /// and this unit confirms the error-path exit code only.
+    /// document that the stdout is written by verifying the real-wiring
+    /// integration in
+    /// `libs/infrastructure/src/track/fixpoint_resolve_driver.rs::test_fixpoint_resolve_missing_coverage_record_with_enabled_true_returns_run_dfp`,
+    /// while this unit confirms the error-path exit code only.
     #[test]
     fn test_execute_fixpoint_resolve_wrong_branch_returns_cli_error() {
         use crate::CliError;
@@ -153,12 +146,12 @@ mod tests {
         );
     }
 
-    /// Happy-path: `execute_fixpoint_resolve` returns `ExitCode::SUCCESS` and
-    /// writes the step to stdout when `CliApp::fixpoint_resolve` succeeds.
+    /// Happy-path: `execute_fixpoint_resolve` returns `ExitCode::SUCCESS` when
+    /// the fixpoint-resolve driver reports `RunDfp`.
     ///
     /// Uses an isolated temp git repository (not the workspace) with
     /// `enabled: true` in `.harness/config/dry-check.json` and no
-    /// `dry-check-coverage.json`, so the dry gate returns Blocked → step = `RunDfp`.
+    /// `dry-check-coverage.json`, so the dry gate returns Blocked → outcome = `RunDfp`.
     ///
     /// CWD is temporarily changed to the temp repo root (via `run_in_dir`) so that
     /// `SystemGitRepo::discover()` picks up the isolated repo and reads the fixture
@@ -211,6 +204,15 @@ mod tests {
         let head_sha = String::from_utf8_lossy(&head_sha_output.stdout).trim().to_owned();
         std::fs::write(track_dir.join(".commit_hash"), &head_sha).unwrap();
 
+        // Write metadata.json with branch_strategy_snapshot so fixpoint_resolve can read base_branch.
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            format!(
+                r#"{{"schema_version":6,"id":"{track_id_str}","title":"Test Track","created_at":"2026-01-01T00:00:00Z","updated_at":"2026-01-01T00:00:00Z","branch_strategy_snapshot":{{"base_branch":"main","merge_target":"main","merge_method":"squash"}}}}"#
+            ),
+        )
+        .unwrap();
+
         // Write `.harness/config/dry-check.json` with `enabled: true` so the dry gate
         // runs (rather than bypassing via the enabled=false short-circuit).
         let harness_config_dir = root.join(".harness").join("config");
@@ -229,15 +231,15 @@ mod tests {
         .unwrap();
 
         // Switch CWD to the temp repo so `SystemGitRepo::discover()` finds this repo.
-        // No dry-check-coverage.json → dry gate Blocked → step = "run-dfp".
+        // No dry-check-coverage.json → dry gate Blocked → outcome = "run-dfp".
         let (outcome, exit) = run_in_dir(root, || {
-            let outcome = cli_composition::TrackCompositionRoot::new()
-                .fixpoint_resolve(cli_composition::FixpointResolveInput {
+            let outcome = cli_composition::TrackCompositionRoot::new().track_driver().handle(
+                cli_driver::track::TrackInput::FixpointResolve {
                     track_id: track_id_str.to_owned(),
                     current_branch: format!("track/{track_id_str}"),
                     items_dir: items_dir.clone(),
-                })
-                .expect("fixpoint-resolve with enabled=true + missing coverage must succeed");
+                },
+            );
 
             let exit = super::execute_fixpoint_resolve(super::FixpointResolveArgs {
                 track_id: track_id_str.to_owned(),

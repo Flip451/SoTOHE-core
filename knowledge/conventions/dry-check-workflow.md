@@ -140,7 +140,7 @@ DFP 完了の判定基準。RFP に移る前に必ずこのコマンドが exit 
 | `FsDryCheckCommitHashStore::read()` の結果 | 動作 |
 |---|---|
 | `Ok(Some(hash))` — 有効かつ HEAD の祖先 | そのまま base として使用 |
-| `Ok(None)` — ファイル不在または非祖先 | `git rev-parse main` にフォールバック |
+| `Ok(None)` — ファイル不在または非祖先 | `git rev-parse <base_branch>` にフォールバック（effective strategy の `base_branch()`） |
 | `Err(Format)` — 不正なハッシュ | `eprintln!` 警告を出してフォールバック（CLI エラーにはしない） |
 | `Err(Io)` / `Err(SymlinkDetected)` — その他のストア読み取り失敗 | `eprintln!` 警告を出してフォールバック（CLI エラーにはしない） |
 

@@ -52,13 +52,13 @@ fn detach_git_head(dir: &std::path::Path) {
     assert!(status.success(), "git checkout --detach failed with {status}");
 }
 
-/// Generates a v5 metadata.json string (no `status` field).
+/// Generates a v6 metadata.json string (no `status` field, has `branch_strategy_snapshot`).
 /// The `status` parameter is accepted for API compatibility but is ignored
-/// since v5 derives status from impl-plan.json at runtime.
+/// since v6 derives status from impl-plan.json at runtime.
 /// The `tasks_json` parameter is also ignored (tasks live in impl-plan.json).
 fn sample_metadata_json(id: &str, _status: &str, updated_at: &str, _tasks_json: &str) -> String {
     sample_metadata_json_with_schema_and_branch(
-        5,
+        6,
         id,
         _status,
         updated_at,
@@ -74,12 +74,13 @@ fn sample_metadata_json_with_branch(
     _tasks_json: &str,
     branch: Option<&str>,
 ) -> String {
-    sample_metadata_json_with_schema_and_branch(5, id, _status, updated_at, _tasks_json, branch)
+    sample_metadata_json_with_schema_and_branch(6, id, _status, updated_at, _tasks_json, branch)
 }
 
 /// Generates a metadata.json string.
 ///
-/// For `schema_version == 5`: emits v5 format (no `status`, no `tasks`/`plan`).
+/// For `schema_version >= 6`: emits v6 format (no `status`, no `tasks`/`plan`; has `branch_strategy_snapshot`).
+/// For `schema_version == 5`: emits v5 legacy format (no `status`, no `tasks`/`plan`, no snapshot).
 /// For `schema_version < 5`: emits legacy format with `status`, `tasks`, and `plan`.
 fn sample_metadata_json_with_schema_and_branch(
     schema_version: u32,
@@ -93,8 +94,23 @@ fn sample_metadata_json_with_schema_and_branch(
         Some(branch) => format!(r#""branch": "{branch}","#),
         None => r#""branch": null,"#.to_owned(),
     };
-    if schema_version >= 5 {
-        // v5: no `status`, no `tasks`, no `plan`
+    if schema_version >= 6 {
+        // v6: no `status`, no `tasks`, no `plan`; has `branch_strategy_snapshot`
+        format!(
+            r#"{{
+  "schema_version": {schema_version},
+  "id": "{id}",
+  {branch_field}
+  "title": "Title {id}",
+  "created_at": "2026-03-13T00:00:00Z",
+  "updated_at": "{updated_at}",
+  "branch_strategy_snapshot": {{"base_branch": "main", "merge_target": "main", "merge_method": "squash"}}
+}}
+"#
+        )
+    } else if schema_version == 5 {
+        // v5 legacy: identity-only, no branch_strategy_snapshot (no longer writable,
+        // but kept here so existing render tests can still exercise the legacy-v5 path)
         format!(
             r#"{{
   "schema_version": {schema_version},
@@ -328,14 +344,15 @@ fn render_plan_marks_skipped_task_with_dash() {
 #[test]
 fn render_plan_preserves_multi_section_order() {
     // Sections rendered in order (S1 before S2).
-    // Uses v5 metadata JSON (no `status`/`tasks`/`plan` fields).
+    // Uses v6 metadata JSON (no `status`/`tasks`/`plan` fields; has `branch_strategy_snapshot`).
     let json = r#"{
-  "schema_version": 5,
+  "schema_version": 6,
   "id": "track-a",
   "branch": "track/track-a",
   "title": "Title track-a",
   "created_at": "2026-03-13T00:00:00Z",
-  "updated_at": "2026-03-13T01:00:00Z"
+  "updated_at": "2026-03-13T01:00:00Z",
+  "branch_strategy_snapshot": {"base_branch": "main", "merge_target": "main", "merge_method": "squash"}
 }"#;
     let (track, _) = codec::decode(json).unwrap();
     let impl_plan = make_impl_plan_with_tasks(
@@ -352,14 +369,15 @@ fn render_plan_preserves_multi_section_order() {
 #[test]
 fn render_plan_places_summary_after_generated_header() {
     // Summary lines appear after the header and before task sections.
-    // Uses v5 metadata JSON.
+    // Uses v6 metadata JSON.
     let json = r#"{
-  "schema_version": 5,
+  "schema_version": 6,
   "id": "track-a",
   "branch": "track/track-a",
   "title": "Title track-a",
   "created_at": "2026-03-13T00:00:00Z",
-  "updated_at": "2026-03-13T01:00:00Z"
+  "updated_at": "2026-03-13T01:00:00Z",
+  "branch_strategy_snapshot": {"base_branch": "main", "merge_target": "main", "merge_method": "squash"}
 }"#;
     let (track, _) = codec::decode(json).unwrap();
     let impl_plan = make_impl_plan_with_summary_and_tasks(
@@ -380,14 +398,15 @@ fn render_plan_places_summary_after_generated_header() {
 #[test]
 fn render_plan_renders_section_description_lines() {
     // Section description lines appear as blockquotes under the section heading.
-    // Uses v5 metadata JSON.
+    // Uses v6 metadata JSON.
     let json = r#"{
-  "schema_version": 5,
+  "schema_version": 6,
   "id": "track-a",
   "branch": "track/track-a",
   "title": "Title track-a",
   "created_at": "2026-03-13T00:00:00Z",
-  "updated_at": "2026-03-13T01:00:00Z"
+  "updated_at": "2026-03-13T01:00:00Z",
+  "branch_strategy_snapshot": {"base_branch": "main", "merge_target": "main", "merge_method": "squash"}
 }"#;
     let (track, _) = codec::decode(json).unwrap();
     let impl_plan = make_impl_plan_with_desc_and_tasks(
@@ -747,7 +766,7 @@ fn validate_track_snapshots_rejects_unsupported_schema_version() {
 #[test]
 fn validate_track_snapshots_tolerates_phase_zero_missing_plan_md() {
     // Phase 0 compat (ADR 2026-04-19-1242 §D0.0 / §D1.4): a freshly-created
-    // v5 track directory containing only `metadata.json` (no `plan.md` yet,
+    // v6 track directory containing only `metadata.json` (no `plan.md` yet,
     // because the view is rendered in later phases) must pass validation.
     // The previous behaviour failed with an I/O error on the missing file.
     let dir = tempfile::tempdir().unwrap();
@@ -756,7 +775,7 @@ fn validate_track_snapshots_tolerates_phase_zero_missing_plan_md() {
     std::fs::write(
         track_dir.join("metadata.json"),
         sample_metadata_json_with_schema_and_branch(
-            5,
+            6,
             "track-a",
             "planned",
             "2026-03-13T02:00:00Z",
@@ -785,7 +804,7 @@ fn validate_track_snapshots_rejects_dangling_plan_md_symlink() {
     std::fs::write(
         track_dir.join("metadata.json"),
         sample_metadata_json_with_schema_and_branch(
-            5,
+            6,
             "track-a",
             "planned",
             "2026-03-13T02:00:00Z",
@@ -799,9 +818,90 @@ fn validate_track_snapshots_rejects_dangling_plan_md_symlink() {
     std::os::unix::fs::symlink(track_dir.join("missing-target.md"), &link).unwrap();
 
     let err = validate_track_snapshots(dir.path()).unwrap_err();
+    assert!(err.to_string().contains("symlink"), "expected symlink rejection, got: {err}");
+}
+
+#[test]
+#[cfg(unix)]
+fn collect_track_snapshots_rejects_symlinked_track_directory() {
+    let dir = tempfile::tempdir().unwrap();
+    let items_dir = dir.path().join("track/items");
+    std::fs::create_dir_all(&items_dir).unwrap();
+    let outside = tempfile::tempdir().unwrap();
+    std::fs::write(
+        outside.path().join("metadata.json"),
+        sample_metadata_json_with_schema_and_branch(
+            6,
+            "track-a",
+            "planned",
+            "2026-03-13T02:00:00Z",
+            "[]",
+            Some("track/track-a"),
+        ),
+    )
+    .unwrap();
+    std::os::unix::fs::symlink(outside.path(), items_dir.join("track-a")).unwrap();
+
+    let err = collect_track_snapshots(dir.path()).unwrap_err();
     assert!(
-        err.to_string().contains("dangling symlink"),
-        "expected dangling-symlink rejection, got: {err}"
+        err.to_string().contains("track directory is a symlink"),
+        "expected symlinked-track-dir rejection, got: {err}"
+    );
+}
+
+#[test]
+#[cfg(unix)]
+fn collect_track_snapshots_rejects_symlinked_metadata_file() {
+    let dir = tempfile::tempdir().unwrap();
+    let track_dir = dir.path().join("track/items/track-a");
+    std::fs::create_dir_all(&track_dir).unwrap();
+    let outside = tempfile::tempdir().unwrap();
+    let target = outside.path().join("metadata.json");
+    std::fs::write(
+        &target,
+        sample_metadata_json_with_schema_and_branch(
+            6,
+            "track-a",
+            "planned",
+            "2026-03-13T02:00:00Z",
+            "[]",
+            Some("track/track-a"),
+        ),
+    )
+    .unwrap();
+    std::os::unix::fs::symlink(&target, track_dir.join("metadata.json")).unwrap();
+
+    let err = collect_track_snapshots(dir.path()).unwrap_err();
+    assert!(err.to_string().contains("symlink"), "expected metadata symlink rejection, got: {err}");
+}
+
+#[test]
+#[cfg(unix)]
+fn collect_track_snapshots_rejects_symlinked_impl_plan_file() {
+    let dir = tempfile::tempdir().unwrap();
+    let track_dir = dir.path().join("track/items/track-a");
+    std::fs::create_dir_all(&track_dir).unwrap();
+    std::fs::write(
+        track_dir.join("metadata.json"),
+        sample_metadata_json_with_schema_and_branch(
+            6,
+            "track-a",
+            "planned",
+            "2026-03-13T02:00:00Z",
+            "[]",
+            Some("track/track-a"),
+        ),
+    )
+    .unwrap();
+    let outside = tempfile::tempdir().unwrap();
+    let target = outside.path().join("impl-plan.json");
+    std::fs::write(&target, r#"{"schema_version":1,"plan":{"summary":[],"sections":[]}}"#).unwrap();
+    std::os::unix::fs::symlink(&target, track_dir.join("impl-plan.json")).unwrap();
+
+    let err = collect_track_snapshots(dir.path()).unwrap_err();
+    assert!(
+        err.to_string().contains("symlink"),
+        "expected impl-plan symlink rejection, got: {err}"
     );
 }
 
@@ -810,12 +910,12 @@ fn validate_track_snapshots_rejects_out_of_sync_plan() {
     let dir = tempfile::tempdir().unwrap();
     let track_dir = dir.path().join("track/items/track-a");
     std::fs::create_dir_all(&track_dir).unwrap();
-    // v5 identity-only metadata — v2/v3/v4 legacy tracks are intentionally
-    // skipped by `validate_track_snapshots` so only v5 mismatches surface.
+    // v6 identity-only metadata — v2/v3/v4 legacy tracks are intentionally
+    // skipped by `validate_track_snapshots` so only v6 mismatches surface.
     std::fs::write(
         track_dir.join("metadata.json"),
         sample_metadata_json_with_schema_and_branch(
-            5,
+            6,
             "track-a",
             "planned",
             "2026-03-13T02:00:00Z",
@@ -869,12 +969,12 @@ fn validate_track_snapshots_rejects_out_of_sync_registry() {
     let track_dir = dir.path().join("track/items/track-a");
     std::fs::create_dir_all(&track_dir).unwrap();
     let metadata_path = track_dir.join("metadata.json");
-    // v5 identity-only metadata so the plan.md freshness check runs and
+    // v6 identity-only metadata so the plan.md freshness check runs and
     // passes before we reach the registry.md check.
     std::fs::write(
         &metadata_path,
         sample_metadata_json_with_schema_and_branch(
-            5,
+            6,
             "track-a",
             "planned",
             "2026-03-13T02:00:00Z",
@@ -2583,22 +2683,75 @@ fn adapter_render_rejects_symlinked_style_config() {
 
 // ── Branch-based guard tests for sync_rendered_views (T004 / IN-04 / CN-01) ──
 
-/// Helper: write a minimal v5 metadata.json to `track_dir/<track_id>/metadata.json`.
+/// Helper: write a minimal v6 metadata.json to `track_dir/<track_id>/metadata.json`.
 fn write_minimal_v5_metadata(items_dir: &std::path::Path, track_id: &str) {
     let track_dir = items_dir.join(track_id);
     std::fs::create_dir_all(&track_dir).unwrap();
     let content = format!(
         r#"{{
-  "schema_version": 5,
+  "schema_version": 6,
   "id": "{track_id}",
   "branch": "track/{track_id}",
   "title": "Test Track",
   "created_at": "2026-01-01T00:00:00Z",
-  "updated_at": "2026-01-01T00:00:00Z"
+  "updated_at": "2026-01-01T00:00:00Z",
+  "branch_strategy_snapshot": {{"base_branch": "main", "merge_target": "main", "merge_method": "squash"}}
 }}
 "#
     );
     std::fs::write(track_dir.join("metadata.json"), content).unwrap();
+}
+
+#[test]
+#[cfg(unix)]
+fn sync_rendered_views_rejects_symlinked_spec_json() {
+    let dir = tempfile::tempdir().unwrap();
+    let track_id = "test-spec-link-guard";
+    init_git_repo_on_track_branch(dir.path(), track_id);
+    let items_dir = dir.path().join("track/items");
+    write_minimal_v5_metadata(&items_dir, track_id);
+    let track_dir = items_dir.join(track_id);
+    let outside = tempfile::tempdir().unwrap();
+    let target = outside.path().join("spec.json");
+    std::fs::write(
+        &target,
+        r#"{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "Linked Spec",
+  "scope": { "in_scope": [], "out_of_scope": [] }
+}"#,
+    )
+    .unwrap();
+    std::os::unix::fs::symlink(&target, track_dir.join("spec.json")).unwrap();
+
+    let err = sync_rendered_views(dir.path(), Some(track_id)).unwrap_err();
+    assert!(
+        err.to_string().contains("symlink"),
+        "expected spec.json symlink rejection, got: {err}"
+    );
+}
+
+#[test]
+#[cfg(unix)]
+fn sync_rendered_views_rejects_symlinked_type_catalogue() {
+    let dir = tempfile::tempdir().unwrap();
+    let track_id = "test-types-link-guard";
+    init_git_repo_on_track_branch(dir.path(), track_id);
+    let items_dir = dir.path().join("track/items");
+    write_minimal_v5_metadata(&items_dir, track_id);
+    let track_dir = items_dir.join(track_id);
+    std::fs::write(dir.path().join("architecture-rules.json"), DOMAIN_ARCH_RULES).unwrap();
+    let outside = tempfile::tempdir().unwrap();
+    let target = outside.path().join("domain-types.json");
+    std::fs::write(&target, DOMAIN_TYPES_JSON_MINIMAL).unwrap();
+    std::os::unix::fs::symlink(&target, track_dir.join("domain-types.json")).unwrap();
+
+    let err = sync_rendered_views(dir.path(), Some(track_id)).unwrap_err();
+    assert!(
+        err.to_string().contains("symlink"),
+        "expected domain-types.json symlink rejection, got: {err}"
+    );
 }
 
 /// Branch-based guard: `sync_rendered_views` must NOT render spec.md /

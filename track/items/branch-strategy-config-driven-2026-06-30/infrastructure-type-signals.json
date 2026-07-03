@@ -1,0 +1,231 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-03T15:07:25Z",
+  "declaration_hash": "17096df724cebaca4ec57e10245c38f5e78c3cb0ad244f3753085ceb590c392a",
+  "signals": [
+    {
+      "type_name": "BranchStrategyConfigError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::convert::From<Error>",
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "BranchStrategySnapshotDocument",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug",
+        "serde_core::de::Deserialize<'de>",
+        "serde_core::ser::Serialize"
+      ]
+    },
+    {
+      "type_name": "CodexDryFixLocalRunner",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::default::Default"
+      ]
+    },
+    {
+      "type_name": "DryCheckServiceFactoryAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "DryCheckServiceFactoryPort"
+      ]
+    },
+    {
+      "type_name": "DryDriverAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "DryDriverPort",
+        "core::default::Default"
+      ]
+    },
+    {
+      "type_name": "FsDiffBaseResolverAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "DiffBaseResolverPort"
+      ]
+    },
+    {
+      "type_name": "FsDryApprovalFactoryAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "DryApprovalFactoryPort"
+      ]
+    },
+    {
+      "type_name": "FsDryBaseBranchAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "DryBaseBranchPort"
+      ]
+    },
+    {
+      "type_name": "FsDryCheckConfigLoaderAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "DryCheckConfigLoaderPort"
+      ]
+    },
+    {
+      "type_name": "FsDryCheckStorageFactoryAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "DryCheckStorageFactoryPort"
+      ]
+    },
+    {
+      "type_name": "FsDryCorpusFragmentsAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "DryCorpusFragmentsPort"
+      ]
+    },
+    {
+      "type_name": "FsDryCorpusRootManifestAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "DryCorpusRootManifestWriterPort"
+      ]
+    },
+    {
+      "type_name": "FsDryDiffBaseFactoryAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "DryDiffBaseFactoryPort"
+      ]
+    },
+    {
+      "type_name": "FsDryRepoRootAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "DryRepoRootPort"
+      ]
+    },
+    {
+      "type_name": "FsDryWriteConfigLoaderAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "DryWriteConfigLoaderPort"
+      ]
+    },
+    {
+      "type_name": "FsFixpointDryGateFactoryAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "FixpointDryGateFactoryPort"
+      ]
+    },
+    {
+      "type_name": "FsFixpointGateStateFactoryAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "FixpointGateStateFactoryPort"
+      ]
+    },
+    {
+      "type_name": "FsFixpointWorkspaceContextAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "FixpointWorkspaceContextPort"
+      ]
+    },
+    {
+      "type_name": "FsReviewGateStateAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "JsonConfigBranchStrategyAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "BranchStrategyPort"
+      ]
+    },
+    {
+      "type_name": "MergeMethodDocument",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::clone::TrivialClone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::marker::Copy",
+        "serde_core::de::Deserialize<'de>",
+        "serde_core::ser::Serialize"
+      ]
+    },
+    {
+      "type_name": "RecordingDryTierTelemetryAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "DryTierTelemetryPort"
+      ]
+    },
+    {
+      "type_name": "SnapshotBranchStrategyAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "BranchStrategyPort"
+      ]
+    },
+    {
+      "type_name": "TrackDocumentV2",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

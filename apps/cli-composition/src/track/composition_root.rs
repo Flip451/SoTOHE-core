@@ -31,12 +31,23 @@ impl Default for TrackCompositionRoot {
 
 impl TrackCompositionRoot {
     /// Build a wired [`cli_driver::track::TrackDriver`] for the track family.
+    ///
+    /// Only constructs and injects the fixpoint-resolve adapter chain — never
+    /// calls `FixpointResolveDriverService::fixpoint_resolve` itself (ADR
+    /// 2026-06-21-1328 D2: composition root is wire-only).
     pub fn track_driver(&self) -> cli_driver::track::TrackDriver {
         use std::sync::Arc;
 
         use super::service_impl::TrackServiceImpl;
 
         let service = Arc::new(TrackServiceImpl);
-        cli_driver::track::TrackDriver::new(service)
+        let fixpoint_resolve_service =
+            Arc::new(usecase::fixpoint_resolve_driver::FixpointResolveDriverInteractor::new(
+                Arc::new(infrastructure::track::fixpoint_resolve_driver::FsFixpointWorkspaceContextAdapter),
+                Arc::new(infrastructure::track::fixpoint_resolve_driver::FsDryCheckConfigLoaderAdapter),
+                Arc::new(infrastructure::track::fixpoint_resolve_driver::FsFixpointDryGateFactoryAdapter),
+                Arc::new(infrastructure::track::fixpoint_resolve_driver::FsFixpointGateStateFactoryAdapter),
+            ));
+        cli_driver::track::TrackDriver::new(service, fixpoint_resolve_service)
     }
 }
