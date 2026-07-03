@@ -7,6 +7,19 @@
 //!
 //! v6 adds `branch_strategy_snapshot` (a required non-optional field).
 //! All previous schema versions are rejected on decode — no backward-compat.
+//!
+//! Legacy v3/v5 metadata handling: existing tracks committed under earlier
+//! schemas are historical records (completed / merged tracks). The rendering
+//! path (`render::snapshot`) dispatches by `schema_version` and reads legacy
+//! metadata via a per-version code path, so `verify-track-metadata` succeeds.
+//! The operational path (`FsTrackStore::read_track`) uses this strict decoder
+//! and rejects legacy schemas — commands like `transition` / `resolve` /
+//! `switch-base` only touch the active (branch-derived) track, which is always
+//! v6 for tracks initialized under IN-06/IN-07. Legacy tracks are unreachable
+//! via normal branch checkout since their branches were merged and deleted at
+//! completion time. A v5 decode fallback path here would be a fail-open
+//! workaround for the historical-tracks case rather than a real operational
+//! requirement (see PR #180 Accepted Deviations for the rationale).
 
 use domain::{DomainError, StatusOverride, TrackBranch, TrackId, TrackMetadata};
 
