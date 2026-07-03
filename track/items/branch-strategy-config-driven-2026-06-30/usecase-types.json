@@ -173,7 +173,7 @@
       },
       "methods": [],
       "module_path": "dry_driver",
-      "docs": "Structured (pre-render) output for `sotp dry write` at the cli_driver boundary (IN-13/AC-18). Replaces the previous DryDriverOutcome-based pre-formatted stdout: DryDriverPort::dry_write / DryDriverService::dry_write now return this type so the CLI text rendering (the former dry_write_outcome helper) moves to cli_driver. `Success` carries plain counts and per-finding summaries; `Failure` carries an adapter-level error message, mirroring the existing DryDriverOutcome::failure convention -- DryCompositionRoot::dry_write itself always produces `Success` inside its own `Result::Ok`, `Failure` is constructed only by the DryDriverPort adapter when the composition call returns `Err`.",
+      "docs": "Structured (pre-render) output for `sotp dry write` at the cli_driver boundary (IN-13/AC-18, retained by the IN-14 split). Replaces the previous DryDriverOutcome-based pre-formatted stdout; in the final IN-14 shape, DryWriteDriverService::dry_write returns this type so cli_driver renders the text itself. `Success` carries plain counts and per-finding summaries; `Failure` carries validation, workspace, or port-call errors surfaced by DryWriteDriverInteractor.",
       "spec_refs": [
         { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-13" },
         { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-18" },
@@ -236,11 +236,111 @@
       },
       "methods": [],
       "module_path": "dry_driver",
-      "docs": "Structured (pre-render) output for `sotp dry check-approved` at the cli_driver boundary (IN-13/AC-18). Mirrors domain::dry_check::DryCheckApprovalVerdict's Approved/Blocked shape as a usecase-level DTO (cli_driver may only depend on usecase, so the domain enum itself cannot cross this boundary) plus a Failure variant for adapter-level errors, matching the DryDriverOutcome::failure convention. DryCompositionRoot::dry_check_approved itself only ever produces Approved/Blocked; Failure is constructed only by the DryDriverPort adapter.",
+      "docs": "Structured (pre-render) output for `sotp dry check-approved` at the cli_driver boundary (IN-13/AC-18, retained by the IN-14 split). Mirrors domain::dry_check::DryCheckApprovalVerdict's Approved/Blocked shape as a usecase-level DTO (cli_driver may only depend on usecase, so the domain enum itself cannot cross this boundary) plus a Failure variant for validation, workspace, or port-call errors surfaced by DryCheckApprovedDriverInteractor.",
       "spec_refs": [
         { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-13" },
         { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-18" },
         { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "CN-07" }
+      ],
+      "informal_grounds": []
+    },
+    "DryWriteDriverInput": {
+      "action": "reference",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "track_id", "ty": "String" },
+            { "name": "base_commit", "ty": "Option<String>" },
+            { "name": "db_path", "ty": "std::path::PathBuf" },
+            { "name": "threshold", "ty": "Option<f32>" },
+            { "name": "workspace_root", "ty": "std::path::PathBuf" },
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "model", "ty": "Option<String>" },
+            { "name": "capability_name", "ty": "String" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "dry_driver",
+      "docs": "Input for `sotp dry write` at the cli_driver boundary (IN-14/AC-20). Pre-existing in usecase-types-baseline.json (baseline span libs/usecase/src/dry_driver.rs:18-27) with identical fields, so this track leaves it unmodified; declared `action: reference` (not `add`) so the DryWriteDriverService::dry_write(input: DryWriteDriverInput) param edge -- introduced by this track's IN-14 driver split -- is visible in the contract-map. Carries stdlib-typed fields only, mirroring the driver-boundary DTO convention already used by FixpointResolveDriverInput in this same catalogue: track_id / base_commit / threshold are re-validated into domain::TrackId / domain::CommitHash / domain::semantic_dup::SimilarityThreshold inside DryWriteDriverInteractor, not at this DTO boundary. (role R1 note: usecase Dto placement needs justification) justified because this DTO crosses the cli_driver/usecase boundary -- cli_driver may only depend on usecase per architecture-rules.json, so the raw CLI-arg values must be carried by a usecase-hosted DTO until validated.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-20" }
+      ],
+      "informal_grounds": []
+    },
+    "DryResultsDriverInput": {
+      "action": "reference",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "track_id", "ty": "String" },
+            { "name": "filter", "ty": "String" },
+            { "name": "items_dir", "ty": "std::path::PathBuf" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "dry_driver",
+      "docs": "Input for `sotp dry results` at the cli_driver boundary (IN-14/AC-20). Pre-existing in usecase-types-baseline.json (baseline span libs/usecase/src/dry_driver.rs:31-35) with identical fields, so this track leaves it unmodified; declared `action: reference` so the DryResultsDriverService::dry_results(input: DryResultsDriverInput) param edge -- introduced by this track's IN-14 driver split -- is visible in the contract-map. Carries stdlib-typed fields only, mirroring the driver-boundary DTO convention already used by FixpointResolveDriverInput / DryWriteDriverInput: track_id is re-validated into domain::TrackId and filter is parsed into domain::dry_check::VerdictFilter inside DryResultsDriverInteractor, not at this DTO boundary. (role R1 note: usecase Dto placement needs justification) justified because this DTO crosses the cli_driver/usecase boundary -- cli_driver may only depend on usecase per architecture-rules.json, so the raw CLI-arg values must be carried by a usecase-hosted DTO until validated.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-20" }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckApprovedDriverInput": {
+      "action": "reference",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "track_id", "ty": "String" },
+            { "name": "base_commit", "ty": "Option<String>" },
+            { "name": "items_dir", "ty": "std::path::PathBuf" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "dry_driver",
+      "docs": "Input for `sotp dry check-approved` at the cli_driver boundary (IN-14/AC-20). Pre-existing in usecase-types-baseline.json (baseline span libs/usecase/src/dry_driver.rs:39-43) with identical fields, so this track leaves it unmodified; declared `action: reference` so the DryCheckApprovedDriverService::dry_check_approved(input: DryCheckApprovedDriverInput) param edge -- introduced by this track's IN-14 driver split -- is visible in the contract-map. Carries stdlib-typed fields only, mirroring the driver-boundary DTO convention already used by FixpointResolveDriverInput / DryWriteDriverInput: track_id / base_commit are re-validated into domain::TrackId / domain::CommitHash inside DryCheckApprovedDriverInteractor, not at this DTO boundary. (role R1 note: usecase Dto placement needs justification) justified because this DTO crosses the cli_driver/usecase boundary -- cli_driver may only depend on usecase per architecture-rules.json, so the raw CLI-arg values must be carried by a usecase-hosted DTO until validated.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-20" }
+      ],
+      "informal_grounds": []
+    },
+    "DryFixLocalDriverInput": {
+      "action": "reference",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "track_id", "ty": "String" },
+            { "name": "briefing_file", "ty": "std::path::PathBuf" },
+            { "name": "model", "ty": "Option<String>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "dry_driver",
+      "docs": "Input for `sotp dry fix-local` at the cli_driver boundary (OS-08, out of this track's IN-14 correction scope per DryDriverPort/DryDriverService's own docs). Pre-existing in usecase-types-baseline.json (baseline span libs/usecase/src/dry_driver.rs:47-51) with identical fields, so this track leaves it unmodified; declared `action: reference` so the already-declared DryDriverPort::dry_fix_local / DryDriverService::dry_fix_local (both `action: modify` in this catalogue, since their surrounding trait shrank from four methods to one) param edge is visible in the contract-map. Carries stdlib-typed fields only, mirroring the driver-boundary DTO convention already used by FixpointResolveDriverInput / DryWriteDriverInput: track_id is re-validated into domain::TrackId inside infrastructure::dry_check::dry_fix_local's CodexDryFixLocalRunner (the DryDriverPort adapter), not at this DTO boundary. (role R1 note: usecase Dto placement needs justification) justified because this DTO crosses the cli_driver/usecase boundary -- cli_driver may only depend on usecase per architecture-rules.json, so the raw CLI-arg values must be carried by a usecase-hosted DTO until validated.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "OS-08" }
       ],
       "informal_grounds": []
     },
@@ -253,10 +353,395 @@
       },
       "methods": [],
       "module_path": "dry_driver",
-      "docs": "Baseline pass-through interactor implementing DryDriverService by delegating to an injected DryDriverPort. Referenced (not modified) so that its existing impl of DryDriverService -- whose dry_write / dry_check_approved signatures this track changes (IN-13) -- is accounted for by the catalogue. DryDriverInteractor's own struct shape and constructor are unchanged; only the delegation methods' return types shift to match the modified trait.",
+      "docs": "Baseline pass-through interactor implementing DryDriverService by delegating to an injected DryDriverPort. IN-14 leaves only dry_fix_local on this legacy pass-through pair; dry_write / dry_results / dry_check_approved moved to dedicated DryWriteDriverService / DryResultsDriverService / DryCheckApprovedDriverService interactors. Referenced because current cli_composition wiring (cli_composition::dry::DryCompositionRoot::dry_driver()) constructs this exact type directly, injected with infrastructure::dry_check::dry_fix_local::DryDriverAdapter (ADR 1328 D7 relocated both DryDriverAdapter and its CodexDryFixLocalRunner delegate from apps/cli-composition into libs/infrastructure, so neither remains crate-private).",
       "spec_refs": [
         { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-13" },
         { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-18" }
+      ],
+      "informal_grounds": []
+    },
+    "DryRepoWorkspace": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "repo_root", "ty": "std::path::PathBuf" },
+            { "name": "canonical_root", "ty": "std::path::PathBuf" },
+            { "name": "canonical_items_dir", "ty": "std::path::PathBuf" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "dry_driver_shared",
+      "docs": "Output of DryRepoRootPort::resolve: the CWD-anchored discovered repo root and the canonicalized/containment-checked items_dir plus derived project root, mirroring usecase::fixpoint_resolve_driver::FixpointWorkspaceContext's field shape minus base_branch (IN-14 deliberately keeps base_branch resolution as a separate DryBaseBranchPort call so `dry results`, which needs no base_branch, does not gain a new metadata.json dependency -- CN-07). usecase-hosted Dto (R1 note, same justification as FixpointWorkspaceContext's precedent in this file): this is the internal output shape of a usecase SecondaryPort method and never crosses a serde boundary.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-20" }
+      ],
+      "informal_grounds": []
+    },
+    "DryRepoWorkspaceError": {
+      "action": "add",
+      "role": { "ErrorType": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Unavailable", "payload": { "kind": "tuple", "fields": ["String"] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "dry_driver_shared",
+      "docs": "Error returned by DryRepoRootPort::resolve when repo discovery fails or items_dir cannot be canonicalized, is not a directory, or escapes the repository root. Single opaque-message variant, mirroring the existing FixpointWorkspaceContextError / DiffBaseResolverError shape in this same crate.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" }
+      ],
+      "informal_grounds": []
+    },
+    "DryBaseBranchError": {
+      "action": "add",
+      "role": { "ErrorType": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Unavailable", "payload": { "kind": "tuple", "fields": ["String"] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "dry_driver_shared",
+      "docs": "Error returned by DryBaseBranchPort::resolve_base_branch when metadata.json is absent, unreadable, or exists but fails to decode. Fail-closed per IN-06/IN-07: there is no `.harness/config/branch-strategy.json` fallback. Single opaque-message variant, mirroring the existing FixpointWorkspaceContextError shape in this same crate.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-22" }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckStorageHandle": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "reader", "ty": "std::sync::Arc<dyn domain::dry_check::DryCheckReader>" },
+            { "name": "writer", "ty": "std::sync::Arc<dyn domain::dry_check::DryCheckWriter>" },
+            { "name": "coverage", "ty": "std::sync::Arc<dyn DryCheckCoveragePort>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "dry_driver_shared",
+      "docs": "Output of DryCheckStorageFactoryPort::build: the three dry-check.json / dry-check-coverage.json-backed port implementations bound to one track_dir, all Arc-cloned from the same underlying FsDryCheckStore instance for reader+writer (it implements both domain::dry_check::DryCheckReader and DryCheckWriter) plus a separately-constructed FsDryCheckCoverageAdapter for coverage. usecase-hosted Dto (R1 note): internal output shape of a usecase SecondaryPort method, never crosses a serde boundary, mirroring FixpointWorkspaceContext's established precedent for this kind of factory-output bundle.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-20" }
+      ],
+      "informal_grounds": []
+    },
+    "DryWriteConfigResolution": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "dry_config", "ty": "DryCheckConfig" },
+            { "name": "effective_threshold", "ty": "domain::semantic_dup::SimilarityThreshold" },
+            { "name": "config_fingerprint", "ty": "domain::dry_check::DryCheckConfigFingerprint" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "dry_write_driver",
+      "docs": "Output of DryWriteConfigLoaderPort::load: the usecase dry-check configuration, the resolved effective similarity threshold (CLI override or config-file default), and the config_fingerprint chosen by the safe-approval rule (see DryWriteConfigLoaderPort's docs). usecase-hosted Dto (R1 note): internal output shape of a usecase SecondaryPort method, never crosses a serde boundary.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" }
+      ],
+      "informal_grounds": []
+    },
+    "DryCorpusFragmentsOutput": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "diff_fragments", "ty": "Vec<domain::semantic_dup::CodeFragment>" },
+            { "name": "corpus_fragments", "ty": "Vec<domain::semantic_dup::CodeFragment>" },
+            { "name": "corpus_fingerprint", "ty": "domain::dry_check::DryCheckCorpusFingerprint" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "dry_write_driver",
+      "docs": "Output of DryCorpusFragmentsPort::build: the hunk-scoped diff_fragments to judge, the full whole-workspace corpus_fragments (needed by DryCheckServiceFactoryPort to open the persistent index), and the corpus fingerprint computed over corpus_fragments. usecase-hosted Dto (R1 note): internal output shape of a usecase SecondaryPort method, never crosses a serde boundary.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-20" }
+      ],
+      "informal_grounds": []
+    },
+    "DryCorpusFragmentsError": {
+      "action": "add",
+      "role": { "ErrorType": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Unavailable", "payload": { "kind": "tuple", "fields": ["String"] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "dry_write_driver",
+      "docs": "Error returned by DryCorpusFragmentsPort::build when workspace_root fails containment validation, or hunk listing / fragment extraction / path normalization fails. Single opaque-message variant, mirroring the existing DiffBaseResolverError / DryCorpusMetaError shape in this same crate.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckServiceFactoryCommand": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "reader", "ty": "std::sync::Arc<dyn domain::dry_check::DryCheckReader>" },
+            { "name": "writer", "ty": "std::sync::Arc<dyn domain::dry_check::DryCheckWriter>" },
+            { "name": "coverage", "ty": "std::sync::Arc<dyn DryCheckCoveragePort>" },
+            { "name": "track_id", "ty": "domain::TrackId" },
+            { "name": "repo_root", "ty": "std::path::PathBuf" },
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "db_path", "ty": "std::path::PathBuf" },
+            { "name": "corpus_fragments", "ty": "Vec<domain::semantic_dup::CodeFragment>" },
+            { "name": "model", "ty": "Option<String>" },
+            { "name": "capability_name", "ty": "String" },
+            { "name": "dry_config", "ty": "DryCheckConfig" },
+            { "name": "config_fingerprint", "ty": "domain::dry_check::DryCheckConfigFingerprint" },
+            { "name": "corpus_fingerprint", "ty": "domain::dry_check::DryCheckCorpusFingerprint" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "dry_write_driver",
+      "docs": "Command for DryCheckServiceFactoryPort::build, bundling every already-resolved value the constructed usecase::dry_check::DryCheckInteractor::new (10-parameter constructor) plus its embedding/index/agent adapter construction need. reader/writer/coverage come from DryCheckStorageFactoryPort; track_id/dry_config/config_fingerprint/corpus_fingerprint/corpus_fragments come from earlier orchestration steps; repo_root/items_dir/db_path/model/capability_name are the raw values the factory's infrastructure-side agent-profiles.json + LanceDB wiring needs. items_dir (IN-14 telemetry-preservation microfix) is DryWriteDriverInteractor's own workspace.canonical_items_dir (from DryRepoRootPort), added so the factory can also resolve a branch/kill-switch-gated telemetry writer bound to the correct output path -- distinct from repo_root, since a custom --items-dir invocation can diverge from the git repository root. usecase-hosted Dto (R1 note): internal input shape of a usecase SecondaryPort method, never crosses a serde boundary.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-20" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "CN-07" }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckServiceFactoryError": {
+      "action": "add",
+      "role": { "ErrorType": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Unavailable", "payload": { "kind": "tuple", "fields": ["String"] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "dry_write_driver",
+      "docs": "Error returned by DryCheckServiceFactoryPort::build when the embedding model fails to load, the persistent index fails to open, or agent-profiles.json-driven model/reasoning-effort resolution fails. Single opaque-message variant, mirroring the existing DiffBaseResolverError / DryCorpusMetaError shape in this same crate.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckServiceFactoryOutput": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "service", "ty": "std::sync::Arc<dyn DryCheckService>" },
+            { "name": "tier_telemetry", "ty": "std::sync::Arc<dyn DryTierTelemetryPort>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "dry_write_driver",
+      "docs": "Output of DryCheckServiceFactoryPort::build (IN-14 telemetry-preservation microfix). Bundles the constructed DryCheckService alongside a fresh DryTierTelemetryPort instance bound to the SAME tiered judgment-activity recorder embedded in the RecordingDryAgent wrapping this call's CodexDryChecker. Bundling both in one factory return (rather than a second factory call) is required because the recorder instance is created fresh inside this specific build() call -- there is no other channel through which DryWriteDriverInteractor could obtain a telemetry reader bound to the same recorder that observes the service it is about to invoke, and DryCheckServiceFactoryAdapter is a stateless zero-field unit struct so it cannot correlate a later, separate port call with this invocation's recorder. usecase-hosted Dto (R1 note): internal output shape of a usecase SecondaryPort method, never crosses a serde boundary, mirroring FixpointWorkspaceContext's established precedent for this kind of factory-output bundle.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-20" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "CN-07" }
+      ],
+      "informal_grounds": []
+    },
+    "DryCorpusRootManifestError": {
+      "action": "add",
+      "role": { "ErrorType": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Unavailable", "payload": { "kind": "tuple", "fields": ["String"] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "dry_write_driver",
+      "docs": "Error returned by DryCorpusRootManifestWriterPort::write when the sidecar cannot be serialized or written (including symlink-guard rejection). Single opaque-message variant, mirroring the existing DiffBaseResolverError / DryCorpusMetaError shape in this same crate.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" }
+      ],
+      "informal_grounds": []
+    },
+    "DryWriteDriverInteractor": {
+      "action": "add",
+      "role": { "Interactor": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "dry_write_driver",
+      "docs": "Implements DryWriteDriverService by orchestrating `sotp dry write` directly in usecase (ADR 1328 D4), mirroring FixpointResolveDriverInteractor's multi-fine-grained-port-factory shape rather than the superseded DryDriverInteractor single-port pass-through shape. Orchestration: validate track_id (domain::TrackId::try_new) and, when input.threshold is Some, the CLI --threshold override (domain::semantic_dup::SimilarityThreshold::new) as pure logic; resolve workspace paths via DryRepoRootPort; derive track_dir = canonical_items_dir.join(track_id); resolve base_branch via DryBaseBranchPort; resolve the diff base commit -- input.base_commit when given (parsed directly, no port call), otherwise via diff_base_resolver_factory.build(&base_branch).resolve_diff_base(track_dir, canonical_root, repo_root) (DryDiffBaseFactoryPort constructs a base_branch-bound usecase::fixpoint_resolve::DiffBaseResolverPort at request time, mirroring FixpointDryGateFactoryPort's established construction for the same underlying adapter, because this interactor -- unlike FixpointDryGateInteractor -- is wired once per CLI process before any track_id/base_branch is known) -- reproducing the same override-or-store-fallback policy as the current DryCompositionRoot::dry_write; resolve config + effective threshold + fingerprint via DryWriteConfigLoaderPort; build diff/corpus fragments via DryCorpusFragmentsPort; build the reader/writer/coverage trio via DryCheckStorageFactoryPort and read records_before = reader.read_records()?.len() directly (a domain port call, no new usecase port needed); write the corpus-root sidecar via DryCorpusRootManifestWriterPort (unconditionally, before invoking the write cycle, matching the current call order); construct DryCheckServiceFactoryCommand (including items_dir = workspace.canonical_items_dir, IN-14 telemetry-preservation microfix) and call DryCheckServiceFactoryPort::build to obtain a DryCheckServiceFactoryOutput { service, tier_telemetry }; invoke service.run_dry_check(vec![], diff_fragments, effective_threshold, base) directly -- no infrastructure SecondaryAdapter sits between this interactor and the domain-level run_dry_check call -- then call tier_telemetry.record(&dry_result) unconditionally right after run_dry_check returns, before mapping dry_result into DryWriteOutcome (IN-14 telemetry-preservation microfix: preserves the tier-level ReviewRound/ExternalSubprocess telemetry DryCompositionRoot::dry_write previously emitted, which this orchestration migration would otherwise silently drop); read records_after = reader.read_records()?.len() and derive records_appended = records_after.saturating_sub(records_before) (pairs_checked is the same value, matching the current DryCompositionRoot alias); map findings into DryWriteFindingSummary rows and wrap in DryWriteOutcome::Success, or DryWriteOutcome::Failure{message} on any validation/port/service error.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-20" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "CN-07" }
+      ],
+      "informal_grounds": []
+    },
+    "DryResultsOutcome": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Success",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "records", "ty": "Vec<DryResultsRecordSummary>" }
+              ]
+            }
+          },
+          {
+            "name": "Failure",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "message", "ty": "String" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "dry_results_driver",
+      "docs": "Structured (pre-render) output for `sotp dry results` at the cli_driver boundary (IN-14/AC-20). Replaces the previous behavior where DryCompositionRoot::dry_results itself built and joined the display lines into a pre-formatted CommandOutcome: DryResultsDriverService::dry_results now returns this type so the CLI text rendering (the former per-record `lines.push(format!(...))` loop) moves to cli_driver, matching the DryWriteOutcome / DryCheckApprovedOutcome precedent IN-13 already established for the other two `dry` commands. `Success` carries the filtered latest-per-pair record summaries; `Failure` carries an adapter/port-level error message (DryCheckResultsInteractor::get_results reader errors, or track_id/filter validation failures now performed inside DryResultsDriverInteractor itself).",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-20" }
+      ],
+      "informal_grounds": []
+    },
+    "DryResultsRecordSummary": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "low_path", "ty": "String" },
+            { "name": "low_content_hash", "ty": "String" },
+            { "name": "high_path", "ty": "String" },
+            { "name": "high_content_hash", "ty": "String" },
+            { "name": "changed_path", "ty": "String" },
+            { "name": "verdict", "ty": "DryResultsVerdictSummary" },
+            { "name": "similarity_score", "ty": "f32" },
+            { "name": "threshold", "ty": "f32" },
+            { "name": "base_commit", "ty": "String" },
+            { "name": "rationale", "ty": "String" },
+            { "name": "recorded_at", "ty": "String" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "dry_results_driver",
+      "docs": "One rendered-record row carried by DryResultsOutcome::Success (IN-14). Fields mirror domain::dry_check::DryCheckRecord's pair_key (low/high FragmentRef path + content_hash), changed_path, verdict, similarity_score, threshold, base_commit, rationale, and recorded_at accessors, flattened to String/f32 because cli_driver may only depend on usecase (architecture-rules.json) and these values are opaque display text or already-validated numeric values at this boundary -- the same convention already used by DryWriteFindingSummary at this same driver-family boundary. `verdict` alone is kept as a typed mirror enum (DryResultsVerdictSummary, not a flattened String) rather than flattened, because the render step branches on its 3-way structure (R9: a finite domain concept crossing this boundary is modelled as a usecase mirror enum, exactly as FixpointResolveDriverOutcome mirrors domain::track_phase::FixpointStep, not flattened to a display string).",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-20" }
+      ],
+      "informal_grounds": []
+    },
+    "DryResultsVerdictSummary": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "NotAViolation", "payload": { "kind": "unit" } },
+          { "name": "Accepted", "payload": { "kind": "unit" } },
+          {
+            "name": "Violation",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "refactor_proposal", "ty": "String" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "dry_results_driver",
+      "docs": "usecase-level mirror of domain::dry_check::DryCheckVerdict's three variants (IN-14), carried by DryResultsRecordSummary.verdict. cli_driver may only depend on usecase (architecture-rules.json), so the domain enum itself cannot cross this boundary; mirroring it as a usecase DTO enum (rather than flattening to a display String) preserves the 3-way branch the render step needs, following the same pattern already established by FixpointResolveDriverOutcome mirroring domain::track_phase::FixpointStep.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-20" }
+      ],
+      "informal_grounds": []
+    },
+    "DryResultsDriverInteractor": {
+      "action": "add",
+      "role": { "Interactor": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "dry_results_driver",
+      "docs": "Implements DryResultsDriverService by orchestrating `sotp dry results` directly in usecase (ADR 1328 D4), mirroring FixpointResolveDriverInteractor's shape. Orchestration: validate track_id (domain::TrackId::try_new); parse input.filter into domain::dry_check::VerdictFilter as pure logic (case-insensitive match on \"all\"/\"not-a-violation\"/\"accepted\"/\"violation\", the same values DryCompositionRoot's private parse_verdict_filter already accepted -- an unrecognized value maps to DryResultsOutcome::Failure); resolve workspace paths via DryRepoRootPort; derive track_dir = canonical_items_dir.join(track_id); build the storage trio via DryCheckStorageFactoryPort (using only .reader; .writer / .coverage are unused for this read-only command); construct usecase::dry_check::DryCheckResultsInteractor::new(reader) and invoke get_results(filter) directly -- no infrastructure SecondaryAdapter sits between this interactor and the domain-level call; map each returned domain::dry_check::DryCheckRecord into a DryResultsRecordSummary and wrap the list in DryResultsOutcome::Success, or DryResultsOutcome::Failure{message} on any validation/port/reader error.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-20" }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckApprovedDriverInteractor": {
+      "action": "add",
+      "role": { "Interactor": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "dry_check_approved_driver",
+      "docs": "Implements DryCheckApprovedDriverService by orchestrating `sotp dry check-approved` directly in usecase (ADR 1328 D4), mirroring FixpointResolveDriverInteractor's shape and directly reusing three of its existing sibling ports/services from usecase::fixpoint_resolve rather than re-declaring near-duplicates. Holds the seven secondary ports below as private Arc<dyn Port> fields and carries no clock or telemetry dependency -- usecase-purity forbids sampling std::time::Instant or invoking a telemetry port from inside a usecase entrypoint; wall-clock timing measurement and GateEval telemetry emission for the call to this service live in the bin layer (apps/cli/src/commands/dry.rs::execute_dry_check_approved), mirroring execute_verify_with_telemetry's bin-level pattern, while cli_driver::dry::DryDriver (the primary adapter that invokes this service) stays a pure invoke+render controller with no side-effecting I/O of its own. Orchestration: validate track_id (domain::TrackId::try_new); resolve workspace paths via DryRepoRootPort (items_dir containment is validated before the config short-circuit below, matching the current DryCompositionRoot::dry_check_approved ordering); load config via the EXISTING usecase::fixpoint_resolve_driver::DryCheckConfigLoaderPort (reused unmodified -- dry_check_approved needs exactly (DryCheckConfig, DryCheckConfigFingerprint) with no threshold-override complexity, unlike dry_write's DryWriteConfigLoaderPort); when dry_config.enabled is false, return DryCheckApprovedOutcome::Approved immediately without resolving base_branch, diff base, corpus meta, or storage (D2/IN-05/CN-06 service-boundary safety net, matching the current early-return); otherwise derive track_dir = canonical_items_dir.join(track_id), resolve base_branch via DryBaseBranchPort, resolve the diff base commit (input.base_commit override or diff_base_resolver_factory.build(&base_branch).resolve_diff_base(track_dir, canonical_root, repo_root), same request-time DryDiffBaseFactoryPort construction and override-or-store-fallback policy as DryWriteDriverInteractor), resolve corpus workspace root + fingerprint via the EXISTING usecase::fixpoint_resolve::DryCorpusMetaPort (reused unmodified) -- ABSORBING a DryCorpusMetaError into a local fallback of (canonical_root, DryCheckCorpusFingerprint::fail_closed()) rather than propagating it as DryCheckApprovedOutcome::Failure, exactly matching the current DryCompositionRoot::dry_check_approved warn-and-fall-back behavior (this is the one place this interactor's error handling deliberately diverges from FixpointDryGateInteractor's hard-propagate use of the same port, to preserve CN-07 no-behavior-change); derive current_fragment_refs via the EXISTING usecase::dry_check::fragment_pipeline::DryFragmentPipelineService::derive_current_refs (reused unmodified, injected the same way FixpointDryGateInteractor injects it); build the reader/coverage pair via DryCheckStorageFactoryPort (.writer unused for this read-only command); construct usecase::dry_check::DryCheckApprovalInteractor::new(dry_config, reader, coverage, config_fingerprint, corpus_fingerprint) and invoke check_approved(track_id, current_fragment_refs) directly -- no infrastructure SecondaryAdapter sits between this interactor and the domain-level call; map the resulting domain::dry_check::DryCheckApprovalVerdict into DryCheckApprovedOutcome::Approved/Blocked, or Failure{message} on any validation/port/service error. GateEval telemetry emission (previously performed inline here in an earlier IN-14 draft that injected DryCheckApprovedClockPort/DryCheckApprovedTelemetryPort directly into this interactor, and in a still-earlier draft via a DryDriver-hosted DryCheckApprovedTelemetryPort call after invoke) now happens entirely in the apps/cli bin layer (apps/cli/src/commands/dry.rs::execute_dry_check_approved, using std::time::Instant plus cli_composition::telemetry_wiring::{resolve_telemetry_writer, emit_gate_eval} directly, with no port abstraction) after cli_driver::dry::DryDriver renders this interactor's outcome -- this interactor itself no longer references either port, and neither DryCheckApprovedClockPort nor DryCheckApprovedTelemetryPort exists anywhere in usecase or infrastructure.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-20" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "CN-07" }
       ],
       "informal_grounds": []
     }
@@ -598,7 +1083,7 @@
       ],
       "supertrait_bounds": ["Send", "Sync"],
       "module_path": "fixpoint_resolve",
-      "docs": "Baseline port referenced so that the FsDiffBaseResolverAdapter -.impl.-> DiffBaseResolverPort edge is visible in the contract-map (R7).",
+      "docs": "Baseline port referenced so that the FsDiffBaseResolverAdapter -.impl.-> DiffBaseResolverPort edge, and DryDiffBaseFactoryPort::build's Arc<dyn DiffBaseResolverPort> return-type edge, are visible in the contract-map (R7).",
       "spec_refs": [
         { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-04" },
         { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-04" }
@@ -841,44 +1326,33 @@
       "role": { "SecondaryPort": {} },
       "methods": [
         {
-          "name": "dry_write",
+          "name": "dry_fix_local",
           "receiver": "&self",
           "params": [
-            { "name": "input", "ty": "DryWriteDriverInput" }
-          ],
-          "returns": "DryWriteOutcome",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Run `sotp dry write`."
-        },
-        {
-          "name": "dry_results",
-          "receiver": "&self",
-          "params": [
-            { "name": "input", "ty": "DryResultsDriverInput" }
+            { "name": "input", "ty": "DryFixLocalDriverInput" }
           ],
           "returns": "DryDriverOutcome",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
           "where_predicates": [],
-          "docs": "Run `sotp dry results`."
-        },
-        {
-          "name": "dry_check_approved",
-          "receiver": "&self",
-          "params": [
-            { "name": "input", "ty": "DryCheckApprovedDriverInput" }
-          ],
-          "returns": "DryCheckApprovedOutcome",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Run `sotp dry check-approved`."
-        },
+          "docs": "Run `sotp dry fix-local`."
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "dry_driver",
+      "docs": "Secondary port for the `dry fix-local` command only, retained for DryDriverInteractor's legacy pass-through shape (OS-08 out of this track's correction scope). IN-14: dry_write / dry_results / dry_check_approved are removed from this trait -- they no longer flow through a single coarse pass-through port. That prior single-port shape (one trait bundling four unrelated command methods behind one Arc<dyn DryDriverPort>, with cli_composition performing the DryCheckInteractor / DryCheckResultsInteractor / DryCheckApprovalInteractor invoke) is the anti-pattern documented in usecase::fixpoint_resolve_driver::FixpointResolveDriverInteractor's own docs (\"DryDriverInteractor's single-port pass-through shape\"). The three removed commands now each get a dedicated application service (DryWriteDriverService / DryResultsDriverService / DryCheckApprovedDriverService) backed by a dedicated Interactor that holds multiple fine-grained secondary ports and performs the orchestration itself, mirroring FixpointResolveDriverInteractor's established shape (ADR 1328 D4). Implemented by an adapter in libs/infrastructure (infrastructure::dry_check::dry_fix_local::DryDriverAdapter, relocated from apps/cli-composition/src/dry_driver_adapter.rs per ADR 1328 D7), which delegates to infrastructure::dry_check::dry_fix_local::CodexDryFixLocalRunner (relocated + renamed from apps/cli-composition/src/dry_fix_runner.rs's DryFixRunnerCompositionRoot) to spawn the Codex fixer subprocess. cli_composition::dry::DryCompositionRoot::dry_driver() wires this adapter into the public usecase::dry_driver::DryDriverInteractor -- no crate-private bridge remains for dry_fix_local.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-20" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "OS-08" }
+      ],
+      "informal_grounds": []
+    },
+    "DryDriverService": {
+      "action": "modify",
+      "role": { "ApplicationService": {} },
+      "methods": [
         {
           "name": "dry_fix_local",
           "receiver": "&self",
@@ -895,15 +1369,271 @@
       ],
       "supertrait_bounds": ["Send", "Sync"],
       "module_path": "dry_driver",
-      "docs": "Secondary port for the `dry` command family, implemented by an adapter in cli_composition that delegates to DryCompositionRoot / DryFixRunnerCompositionRoot methods. IN-13: dry_write / dry_check_approved now return structured pre-render DTOs (DryWriteOutcome / DryCheckApprovedOutcome) instead of the pre-formatted DryDriverOutcome, so the CLI text formatting moves to cli_driver; dry_results / dry_fix_local are unchanged.",
+      "docs": "Application service trait for `sotp dry fix-local` only, invoked by cli_driver::dry::DryDriver. IN-14: dry_write / dry_results / dry_check_approved are removed from this trait (see DryDriverPort's docs for the full rationale) and replaced by DryWriteDriverService / DryResultsDriverService / DryCheckApprovedDriverService, each with a dedicated Interactor performing its own orchestration directly (ADR 1328 D4). dry_fix_local (OS-08, out of scope) keeps only this single service method; cli_composition::dry::DryCompositionRoot::dry_driver() wires it via the public usecase::dry_driver::DryDriverInteractor injected with infrastructure::dry_check::dry_fix_local::DryDriverAdapter -- no crate-private bridge remains for dry_fix_local (ADR 1328 D7 relocated both DryDriverAdapter and its CodexDryFixLocalRunner delegate into libs/infrastructure), while the retained DryDriverInteractor/DryDriverPort pair remains legacy public usecase surface.",
       "spec_refs": [
-        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-13" },
-        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-18" }
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-20" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "OS-08" }
       ],
       "informal_grounds": []
     },
-    "DryDriverService": {
-      "action": "modify",
+    "DryRepoRootPort": {
+      "action": "add",
+      "role": { "SecondaryPort": {} },
+      "methods": [
+        {
+          "name": "resolve",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "&std::path::Path" }
+          ],
+          "returns": "Result<DryRepoWorkspace, DryRepoWorkspaceError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "CWD-anchored git repo discovery plus canonicalization/containment validation of items_dir. Does not resolve base_branch (see DryBaseBranchPort) so that `dry results` -- which never reads metadata.json today -- does not pick up a new fail-closed metadata dependency (CN-07)."
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "dry_driver_shared",
+      "docs": "Secondary port shared by DryWriteDriverInteractor / DryResultsDriverInteractor / DryCheckApprovedDriverInteractor (IN-14). Reproduces the CWD-anchored repo discovery and items_dir canonicalization/containment check previously inlined at the top of DryCompositionRoot::dry_write / dry_results / dry_check_approved. Deliberately NOT merged with base_branch resolution into one FixpointWorkspaceContextPort-shaped call: `dry results` needs repo_root/canonical_items_dir only, and forcing a metadata.json read on it would be a new fail-closed dependency it does not have today (CN-07 no-behavior-change). Implemented by infrastructure::dry_check::dry_driver_shared::FsDryRepoRootAdapter.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-20" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "CN-07" }
+      ],
+      "informal_grounds": []
+    },
+    "DryBaseBranchPort": {
+      "action": "add",
+      "role": { "SecondaryPort": {} },
+      "methods": [
+        {
+          "name": "resolve_base_branch",
+          "receiver": "&self",
+          "params": [
+            { "name": "canonical_root", "ty": "&std::path::Path" },
+            { "name": "track_dir", "ty": "&std::path::Path" },
+            { "name": "track_id", "ty": "&domain::TrackId" }
+          ],
+          "returns": "Result<String, DryBaseBranchError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Read the track's configured base_branch from `<track_dir>/metadata.json#branch_strategy_snapshot`. Fail-closed per IN-06/IN-07: returns Err(DryBaseBranchError::Unavailable) -- never a hardcoded branch-name default or a `.harness/config/branch-strategy.json` fallback -- when metadata.json is missing, unreadable, or fails to decode. R9/R10 note (mirrors FixpointWorkspaceContext.base_branch's established justification in this same crate): base_branch already has a proper domain-level home (domain::branch_strategy::BranchStrategySnapshot, wrapping a validated NonEmptyString); the raw String returned here is a resolved, already-domain-validated runtime value threaded through to DiffBaseResolverPort / infrastructure git-invocation and adapter-construction call sites, matching the raw String/&str representation already used at this exact orchestration boundary by every sibling entry (BranchStrategyPort::base_branch, FixpointWorkspaceContext.base_branch, FsDiffBaseResolverAdapter::new(base_branch: String))."
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "dry_driver_shared",
+      "docs": "Secondary port shared by DryWriteDriverInteractor / DryCheckApprovedDriverInteractor (IN-14; `dry results` does not need base_branch and does not inject this port). Reads `<track_dir>/metadata.json#branch_strategy_snapshot.base_branch`; fail-closed per IN-06/IN-07, with no `.harness/config/branch-strategy.json` fallback. Implemented by infrastructure::dry_check::dry_driver_shared::FsDryBaseBranchAdapter.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-20" }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckStorageFactoryPort": {
+      "action": "add",
+      "role": { "SecondaryPort": {} },
+      "methods": [
+        {
+          "name": "build",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_dir", "ty": "&std::path::Path" },
+            { "name": "canonical_root", "ty": "&std::path::Path" }
+          ],
+          "returns": "DryCheckStorageHandle",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Construct the reader/writer/coverage adapter trio bound to the given track_dir. Infallible: pure object construction (FsDryCheckStore::new / FsDryCheckCoverageAdapter::new take no fallible I/O)."
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "dry_driver_shared",
+      "docs": "Secondary port shared by all three IN-14 driver interactors. FsDryCheckStore implements both domain::dry_check::DryCheckReader and DryCheckWriter from one underlying instance (Arc-cloned into two independently-typed trait objects, exactly as DryCompositionRoot::dry_write currently does with `store.clone()` / `store`); FsDryCheckCoverageAdapter implements DryCheckCoveragePort. Bundling all three behind one factory call (rather than three separate factories) mirrors DryApprovalFactoryPort's precedent of returning one cohesive constructed value and avoids three near-duplicate track_dir+canonical_root-keyed factory ports. Implemented by infrastructure::dry_check::dry_driver_shared::FsDryCheckStorageFactoryAdapter.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-20" }
+      ],
+      "informal_grounds": []
+    },
+    "DryDiffBaseFactoryPort": {
+      "action": "add",
+      "role": { "SecondaryPort": {} },
+      "methods": [
+        {
+          "name": "build",
+          "receiver": "&self",
+          "params": [
+            { "name": "base_branch", "ty": "&str" }
+          ],
+          "returns": "std::sync::Arc<dyn DiffBaseResolverPort>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Construct a DiffBaseResolverPort bound to the given base_branch. Infallible: FsDiffBaseResolverAdapter::new performs no fallible I/O at construction time."
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "dry_driver_shared",
+      "docs": "Secondary port shared by DryWriteDriverInteractor / DryCheckApprovedDriverInteractor (IN-14; `dry results` never resolves a diff base and does not inject this port). usecase::fixpoint_resolve::DiffBaseResolverPort's only existing adapter, infrastructure::dry_check::diff_base_resolver::FsDiffBaseResolverAdapter, requires a base_branch: String fixed at ::new() construction time (D1/IN-04), but DryWriteDriverInteractor / DryCheckApprovedDriverInteractor are wired once per CLI process before any track_id is known and resolve base_branch themselves at request time via DryBaseBranchPort, so a permanently-injected Arc<dyn DiffBaseResolverPort> field would bind every request to whichever base_branch happened to be current at wiring time. This is exactly the construction-time-vs-request-time mismatch usecase::fixpoint_resolve_driver::FixpointDryGateFactoryPort already solves for the same underlying adapter -- the IN-12 construction that spec.json's own IN-14 text says dry write / dry check-approved must align to: the interactor holds a factory instead of a pre-bound port instance and calls build(base_branch) once base_branch is resolved at request time, then calls resolve_diff_base on the returned value. Implemented by infrastructure::dry_check::dry_driver_shared::FsDryDiffBaseFactoryAdapter, which reproduces FsFixpointDryGateFactoryAdapter's construction pattern for the same adapter (Arc::new(FsDiffBaseResolverAdapter::new(base_branch.to_owned()))).",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-20" }
+      ],
+      "informal_grounds": []
+    },
+    "DryWriteConfigLoaderPort": {
+      "action": "add",
+      "role": { "SecondaryPort": {} },
+      "methods": [
+        {
+          "name": "load",
+          "receiver": "&self",
+          "params": [
+            { "name": "repo_root", "ty": "&std::path::Path" },
+            { "name": "threshold_override", "ty": "Option<domain::semantic_dup::SimilarityThreshold>" }
+          ],
+          "returns": "Result<DryWriteConfigResolution, DryCheckConfigLoaderError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Load `.harness/config/dry-check.json`, resolve the effective SimilarityThreshold (threshold_override when given, otherwise the config-file default), and compute the config_fingerprint using the safe-approval rule: stricter-or-equal-than-file threshold uses the plain file fingerprint (so `dry check-approved` can match it); a looser (higher) override uses the threshold-qualified fingerprint (so `dry check-approved` sees a mismatch and correctly blocks approval for a manifest built under looser criteria)."
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "dry_write_driver",
+      "docs": "Secondary port for `sotp dry write` (IN-14). Bundles config load + effective-threshold resolution + safe-approval fingerprint selection behind one cohesive method (mirroring DryCorpusMetaPort's precedent of resolving several related values in one port call), because the fingerprint decision needs BOTH the resolved effective threshold AND the infrastructure-side DryCheckConfig's own file threshold -- a value usecase::dry_check::DryCheckConfig does not carry, so the decision cannot be made in the usecase interactor itself without leaking an infrastructure type across the boundary. Reuses the existing DryCheckConfigLoaderError (fixpoint_resolve_driver module) rather than declaring a near-duplicate error type: the failure mode (dry-check.json unreadable/unparseable) is identical to DryCheckConfigLoaderPort's; only the extra threshold_override parameter and the fingerprint-selection rule differ, which does not warrant a second error type per this crate's `Unavailable(String)`-per-port convention. Implemented by infrastructure::dry_check::dry_write_driver::FsDryWriteConfigLoaderAdapter.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-20" }
+      ],
+      "informal_grounds": []
+    },
+    "DryCorpusFragmentsPort": {
+      "action": "add",
+      "role": { "SecondaryPort": {} },
+      "methods": [
+        {
+          "name": "build",
+          "receiver": "&self",
+          "params": [
+            { "name": "base", "ty": "&domain::CommitHash" },
+            { "name": "workspace_root", "ty": "&std::path::Path" },
+            { "name": "repo_root", "ty": "&std::path::Path" },
+            { "name": "canonical_root", "ty": "&std::path::Path" }
+          ],
+          "returns": "Result<DryCorpusFragmentsOutput, DryCorpusFragmentsError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Validate workspace_root is an existing directory under canonical_root, list changed git hunks since base, extract the whole-workspace corpus, normalize fragment paths to repo-relative form, narrow diff_fragments to hunk-overlapping candidates, and compute the corpus fingerprint over the extracted corpus_fragments."
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "dry_write_driver",
+      "docs": "Secondary port for `sotp dry write` (IN-14). Bundles workspace_root validation + the hunk-scope diff/corpus fragment pipeline + corpus fingerprint computation previously done by DryCompositionRoot's private resolve_existing_dir_under_repo / build_diff_and_corpus_fragments / compute_dry_corpus_fingerprint_from_fragments helpers. Distinct from the existing usecase::dry_check::fragment_pipeline::DryFragmentPipelineService (reused as-is by DryCheckApprovedDriverInteractor): that service returns only a FragmentRef set for the pure-read approval gate, whereas `dry write` additionally needs the full corpus_fragments Vec (for persistent-index construction) and the raw diff_fragments Vec (for the run_dry_check judgment call), so this port returns the richer DryCorpusFragmentsOutput rather than sharing DryFragmentPipelineService's narrower output shape. Implemented by infrastructure::dry_check::dry_write_driver::FsDryCorpusFragmentsAdapter.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-20" }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckServiceFactoryPort": {
+      "action": "add",
+      "role": { "SecondaryPort": {} },
+      "methods": [
+        {
+          "name": "build",
+          "receiver": "&self",
+          "params": [
+            { "name": "cmd", "ty": "DryCheckServiceFactoryCommand" }
+          ],
+          "returns": "Result<DryCheckServiceFactoryOutput, DryCheckServiceFactoryError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Construct a fully-wired usecase::dry_check::DryCheckService (a DryCheckInteractor internally): resolves the embedding adapter, opens the persistent LanceDB index over cmd.corpus_fragments (D7/IN-10; makes the interactor's own corpus-index build a no-op since the corpus is already indexed), resolves the fast/final Codex model and reasoning effort from `.harness/config/agent-profiles.json` for cmd.model/cmd.capability_name, wraps the resulting agent in infrastructure::dry_check::recording_agent::RecordingDryAgent (retaining, not discarding, the TieredDryAgentRecorder it returns), and constructs the DryCheckInteractor from these plus cmd's already-resolved reader/writer/coverage/track_id/dry_config/config_fingerprint/corpus_fingerprint. Does NOT invoke run_dry_check itself -- the caller (DryWriteDriverInteractor) holds and invokes the returned service directly (ADR 1328 D4). IN-14 telemetry-preservation microfix: also resolves a branch/kill-switch-gated telemetry writer from cmd.repo_root/cmd.items_dir/cmd.track_id and constructs a DryTierTelemetryPort instance bound to the retained recorder, the resolved fast/final model names, and that writer, returning it alongside the service as DryCheckServiceFactoryOutput so the caller can record tier telemetry after invoking run_dry_check."
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "dry_write_driver",
+      "docs": "Secondary port for `sotp dry write` (IN-14). The sole remaining adapter-construction step DryWriteDriverInteractor needs before it can invoke usecase::dry_check::DryCheckService::run_dry_check directly itself: hides embedding-model load, persistent-index open, and agent-profiles-driven Codex agent construction (all substantial infrastructure-side work) behind one factory call, mirroring DryApprovalFactoryPort's and FixpointDryGateFactoryPort's precedent of returning a request-scoped Arc<dyn Service> built fresh per invocation rather than being a permanently-injected field (the returned DryCheckInteractor closes over per-request db_path / corpus_fragments / model / config values that cannot be fixed at DryWriteDriverInteractor construction time). The factory returning the service (rather than the factory itself calling run_dry_check) is the specific shape that keeps this port from repeating the anti-pattern documented on FixpointResolveDriverInteractor (an infrastructure adapter must never itself invoke the domain-facing interactor's core method -- only construct it). IN-14 telemetry-preservation microfix: the return type is DryCheckServiceFactoryOutput rather than a bare service handle, because the tier-level ReviewRound/ExternalSubprocess telemetry DryCompositionRoot::dry_write previously emitted (via apps/cli-composition/src/telemetry_wiring.rs) depends on the SAME TieredDryAgentRecorder this factory call constructs internally -- bundling a DryTierTelemetryPort bound to that recorder into the return value is the only way DryWriteDriverInteractor can preserve that telemetry once orchestration moves into usecase. Implemented by infrastructure::dry_check::dry_write_driver::DryCheckServiceFactoryAdapter.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-20" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "CN-07" }
+      ],
+      "informal_grounds": []
+    },
+    "DryCorpusRootManifestWriterPort": {
+      "action": "add",
+      "role": { "SecondaryPort": {} },
+      "methods": [
+        {
+          "name": "write",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_dir", "ty": "&std::path::Path" },
+            { "name": "workspace_root", "ty": "&std::path::Path" },
+            { "name": "repo_root", "ty": "&std::path::Path" }
+          ],
+          "returns": "Result<(), DryCorpusRootManifestError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Persist `<track_dir>/dry-check-corpus-root.json` recording the repo-relative workspace_root scanned by this `dry write` run, so a later `dry check-approved` (via the existing DryCorpusMetaPort) can recompute the identical corpus fingerprint."
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "dry_write_driver",
+      "docs": "Secondary port for `sotp dry write` (IN-14). Reproduces DryCompositionRoot's private write_dry_corpus_root_manifest helper, called unconditionally before DryCheckServiceFactoryPort::build/run_dry_check (matching the current call order) so the sidecar records the scanned root even if the write cycle itself later fails. Distinct from usecase::fixpoint_resolve::DryCorpusMetaPort, which only reads this sidecar (via infrastructure::dry_check::FsDryCorpusMetaAdapter); the write side has no existing port. Implemented by infrastructure::dry_check::dry_write_driver::FsDryCorpusRootManifestAdapter.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-20" }
+      ],
+      "informal_grounds": []
+    },
+    "DryTierTelemetryPort": {
+      "action": "add",
+      "role": { "SecondaryPort": {} },
+      "methods": [
+        {
+          "name": "record",
+          "receiver": "&self",
+          "params": [
+            { "name": "dry_result", "ty": "&Result<Vec<domain::dry_check::DryCheckFinding>, DryCheckCycleError>" }
+          ],
+          "returns": "()",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Compute and emit per-tier (fast/final) ReviewRound telemetry, plus ExternalSubprocess telemetry for any tier whose subprocess actually started, derived from dry_result and the tiered judgment-activity recorder bound to this instance at construction time (the same recorder embedded in the RecordingDryAgent wrapping the DryCheckService this port's factory, DryCheckServiceFactoryPort, built alongside this port in the same call). Infallible and fire-and-forget (CN-01: diagnostic telemetry must never affect the primary dry-write result) -- no error is returned; a disabled or non-track-branch writer resolved at construction time makes this call a silent no-op."
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "dry_write_driver",
+      "docs": "Secondary port for per-tier `sotp dry write` telemetry (ReviewRound + ExternalSubprocess), preserving the tier-level telemetry DryCompositionRoot::dry_write previously emitted via apps/cli-composition/src/telemetry_wiring.rs before this track's IN-14 orchestration migration moved dry_write's invocation into usecase (IN-14 telemetry-preservation microfix). A fresh instance is constructed by DryCheckServiceFactoryPort::build alongside the DryCheckService it returns (bundled together as DryCheckServiceFactoryOutput), because the tiered recorder this port reads is the same recorder embedded in the RecordingDryAgent wrapping the CodexDryChecker that same factory call constructs -- the recorder only observes tier activity once DryWriteDriverInteractor invokes run_dry_check on the returned service, so this port's record method must be called by that same interactor afterward, not by the factory itself (mirroring DryCheckServiceFactoryPort's own anti-pattern-avoidance: an infrastructure adapter must never invoke the domain-facing interactor's core method itself, only construct request-scoped collaborators for it). Implemented by infrastructure::dry_check::dry_write_driver::RecordingDryTierTelemetryAdapter.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-20" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "CN-07" }
+      ],
+      "informal_grounds": []
+    },
+    "DryWriteDriverService": {
+      "action": "add",
       "role": { "ApplicationService": {} },
       "methods": [
         {
@@ -917,21 +1647,49 @@
           "generics": [],
           "has_default_impl": false,
           "where_predicates": [],
-          "docs": "Run `sotp dry write`."
-        },
+          "docs": "Run `sotp dry write`: detect DRY violations for the current diff scope and record results to dry-check.json."
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "dry_write_driver",
+      "docs": "Application service (primary port) for `sotp dry write` (IN-14/AC-20), invoked by cli_driver::dry::DryDriver. DryDriver holds this service, calls it (invoke), and renders DryWriteOutcome into CommandOutcome (render logic unchanged from IN-13). Implemented by DryWriteDriverInteractor, which performs the entire dry-write orchestration itself (ADR 1328 D4) instead of DryCompositionRoot directly constructing and calling usecase::dry_check::DryCheckInteractor::run_dry_check.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-20" }
+      ],
+      "informal_grounds": []
+    },
+    "DryResultsDriverService": {
+      "action": "add",
+      "role": { "ApplicationService": {} },
+      "methods": [
         {
           "name": "dry_results",
           "receiver": "&self",
           "params": [
             { "name": "input", "ty": "DryResultsDriverInput" }
           ],
-          "returns": "DryDriverOutcome",
+          "returns": "DryResultsOutcome",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
           "where_predicates": [],
-          "docs": "Run `sotp dry results`."
-        },
+          "docs": "Run `sotp dry results`: read and filter the historical dry-check records."
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "dry_results_driver",
+      "docs": "Application service (primary port) for `sotp dry results` (IN-14/AC-20), invoked by cli_driver::dry::DryDriver. DryDriver holds this service, calls it (invoke), and renders the new DryResultsOutcome into CommandOutcome text (the former per-record `lines.push(format!(...))` loop, byte-for-byte per CN-07/AC-19). Implemented by DryResultsDriverInteractor, which constructs and invokes usecase::dry_check::DryCheckResultsInteractor::get_results directly (ADR 1328 D4) instead of DryCompositionRoot doing so and pre-formatting the result itself.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-20" }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckApprovedDriverService": {
+      "action": "add",
+      "role": { "ApplicationService": {} },
+      "methods": [
         {
           "name": "dry_check_approved",
           "receiver": "&self",
@@ -943,28 +1701,15 @@
           "generics": [],
           "has_default_impl": false,
           "where_predicates": [],
-          "docs": "Run `sotp dry check-approved`."
-        },
-        {
-          "name": "dry_fix_local",
-          "receiver": "&self",
-          "params": [
-            { "name": "input", "ty": "DryFixLocalDriverInput" }
-          ],
-          "returns": "DryDriverOutcome",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Run `sotp dry fix-local`."
+          "docs": "Run `sotp dry check-approved`: gate that reports unresolved pairs."
         }
       ],
       "supertrait_bounds": ["Send", "Sync"],
-      "module_path": "dry_driver",
-      "docs": "Application service trait for the `dry` command family, invoked by cli_driver::dry::DryDriver. IN-13: dry_write / dry_check_approved now return structured pre-render DTOs (DryWriteOutcome / DryCheckApprovedOutcome); DryDriver renders these into CommandOutcome text itself instead of forwarding an already-formatted string.",
+      "module_path": "dry_check_approved_driver",
+      "docs": "Application service (primary port) for `sotp dry check-approved` (IN-14/AC-20), invoked by cli_driver::dry::DryDriver. DryDriver holds this service, calls it (invoke), and renders DryCheckApprovedOutcome into CommandOutcome (render logic unchanged from IN-13). Implemented by DryCheckApprovedDriverInteractor, which performs the entire check-approved orchestration itself (ADR 1328 D4) instead of DryCompositionRoot directly constructing and calling usecase::dry_check::DryCheckApprovalInteractor::check_approved.",
       "spec_refs": [
-        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-13" },
-        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-18" }
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-20" }
       ],
       "informal_grounds": []
     }
@@ -991,10 +1736,116 @@
           "docs": "Create a new interactor bound to the four fine-grained secondary ports it orchestrates directly."
         }
       ]
+    },
+    {
+      "type_name": "DryWriteDriverInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "repo_root", "ty": "std::sync::Arc<dyn DryRepoRootPort>" },
+            { "name": "base_branch", "ty": "std::sync::Arc<dyn DryBaseBranchPort>" },
+            { "name": "diff_base_resolver_factory", "ty": "std::sync::Arc<dyn DryDiffBaseFactoryPort>" },
+            { "name": "config_loader", "ty": "std::sync::Arc<dyn DryWriteConfigLoaderPort>" },
+            { "name": "corpus_fragments", "ty": "std::sync::Arc<dyn DryCorpusFragmentsPort>" },
+            { "name": "storage_factory", "ty": "std::sync::Arc<dyn DryCheckStorageFactoryPort>" },
+            { "name": "service_factory", "ty": "std::sync::Arc<dyn DryCheckServiceFactoryPort>" },
+            { "name": "corpus_root_manifest", "ty": "std::sync::Arc<dyn DryCorpusRootManifestWriterPort>" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Create a new interactor bound to the eight fine-grained secondary ports it orchestrates directly (diff_base_resolver_factory builds a base_branch-bound usecase::fixpoint_resolve::DiffBaseResolverPort at request time via the new DryDiffBaseFactoryPort, since this interactor is wired once per CLI process before any track_id/base_branch is known -- mirroring FixpointDryGateFactoryPort's established construction for the same underlying adapter)."
+        }
+      ]
+    },
+    {
+      "type_name": "DryResultsDriverInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "repo_root", "ty": "std::sync::Arc<dyn DryRepoRootPort>" },
+            { "name": "storage_factory", "ty": "std::sync::Arc<dyn DryCheckStorageFactoryPort>" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Create a new interactor bound to the two fine-grained secondary ports it orchestrates directly."
+        }
+      ]
+    },
+    {
+      "type_name": "DryCheckApprovedDriverInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "repo_root", "ty": "std::sync::Arc<dyn DryRepoRootPort>" },
+            { "name": "base_branch", "ty": "std::sync::Arc<dyn DryBaseBranchPort>" },
+            { "name": "diff_base_resolver_factory", "ty": "std::sync::Arc<dyn DryDiffBaseFactoryPort>" },
+            { "name": "config_loader", "ty": "std::sync::Arc<dyn DryCheckConfigLoaderPort>" },
+            { "name": "corpus_meta", "ty": "std::sync::Arc<dyn DryCorpusMetaPort>" },
+            { "name": "fragment_pipeline", "ty": "std::sync::Arc<dyn DryFragmentPipelineService>" },
+            { "name": "storage_factory", "ty": "std::sync::Arc<dyn DryCheckStorageFactoryPort>" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Create a new interactor bound to the seven fine-grained secondary ports it orchestrates directly (config_loader / corpus_meta / fragment_pipeline reuse the existing usecase::fixpoint_resolve_driver::DryCheckConfigLoaderPort, usecase::fixpoint_resolve::DryCorpusMetaPort, and usecase::dry_check::fragment_pipeline::DryFragmentPipelineService unmodified; diff_base_resolver_factory builds a base_branch-bound usecase::fixpoint_resolve::DiffBaseResolverPort at request time via the new DryDiffBaseFactoryPort, mirroring DryWriteDriverInteractor's identical construction-time-vs-request-time fix). No clock or telemetry port is injected here -- usecase-purity forbids sampling std::time::Instant or invoking a telemetry port from inside a usecase entrypoint; timing measurement and GateEval telemetry emission live in the apps/cli bin layer (apps/cli/src/commands/dry.rs::execute_dry_check_approved) around the call to cli_driver::dry::DryDriver::dry_check_approved, which itself stays a pure invoke+render controller."
+        }
+      ]
     }
   ],
   "trait_impls": [
     { "action": "reference", "trait_ref": "DryDriverService", "for_type": "DryDriverInteractor" },
+    { "action": "add", "trait_ref": "DryWriteDriverService", "for_type": "DryWriteDriverInteractor" },
+    { "action": "add", "trait_ref": "DryResultsDriverService", "for_type": "DryResultsDriverInteractor" },
+    { "action": "add", "trait_ref": "DryCheckApprovedDriverService", "for_type": "DryCheckApprovedDriverInteractor" },
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "DryRepoWorkspace" },
+    { "action": "add", "trait_ref": "core::clone::Clone", "for_type": "DryRepoWorkspace" },
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "DryRepoWorkspaceError" },
+    { "action": "add", "trait_ref": "core::clone::Clone", "for_type": "DryRepoWorkspaceError" },
+    { "action": "add", "trait_ref": "core::fmt::Display", "for_type": "DryRepoWorkspaceError" },
+    { "action": "add", "trait_ref": "core::error::Error", "for_type": "DryRepoWorkspaceError" },
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "DryBaseBranchError" },
+    { "action": "add", "trait_ref": "core::clone::Clone", "for_type": "DryBaseBranchError" },
+    { "action": "add", "trait_ref": "core::fmt::Display", "for_type": "DryBaseBranchError" },
+    { "action": "add", "trait_ref": "core::error::Error", "for_type": "DryBaseBranchError" },
+    { "action": "add", "trait_ref": "core::clone::Clone", "for_type": "DryCheckStorageHandle" },
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "DryWriteConfigResolution" },
+    { "action": "add", "trait_ref": "core::clone::Clone", "for_type": "DryWriteConfigResolution" },
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "DryCorpusFragmentsOutput" },
+    { "action": "add", "trait_ref": "core::clone::Clone", "for_type": "DryCorpusFragmentsOutput" },
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "DryCorpusFragmentsError" },
+    { "action": "add", "trait_ref": "core::clone::Clone", "for_type": "DryCorpusFragmentsError" },
+    { "action": "add", "trait_ref": "core::fmt::Display", "for_type": "DryCorpusFragmentsError" },
+    { "action": "add", "trait_ref": "core::error::Error", "for_type": "DryCorpusFragmentsError" },
+    { "action": "add", "trait_ref": "core::clone::Clone", "for_type": "DryCheckServiceFactoryCommand" },
+    { "action": "add", "trait_ref": "core::clone::Clone", "for_type": "DryCheckServiceFactoryOutput" },
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "DryCheckServiceFactoryError" },
+    { "action": "add", "trait_ref": "core::clone::Clone", "for_type": "DryCheckServiceFactoryError" },
+    { "action": "add", "trait_ref": "core::fmt::Display", "for_type": "DryCheckServiceFactoryError" },
+    { "action": "add", "trait_ref": "core::error::Error", "for_type": "DryCheckServiceFactoryError" },
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "DryCorpusRootManifestError" },
+    { "action": "add", "trait_ref": "core::clone::Clone", "for_type": "DryCorpusRootManifestError" },
+    { "action": "add", "trait_ref": "core::fmt::Display", "for_type": "DryCorpusRootManifestError" },
+    { "action": "add", "trait_ref": "core::error::Error", "for_type": "DryCorpusRootManifestError" },
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "DryResultsOutcome" },
+    { "action": "add", "trait_ref": "core::clone::Clone", "for_type": "DryResultsOutcome" },
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "DryResultsRecordSummary" },
+    { "action": "add", "trait_ref": "core::clone::Clone", "for_type": "DryResultsRecordSummary" },
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "DryResultsVerdictSummary" },
+    { "action": "add", "trait_ref": "core::clone::Clone", "for_type": "DryResultsVerdictSummary" },
     { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "FixpointResolveDriverInput" },
     { "action": "add", "trait_ref": "core::clone::Clone", "for_type": "FixpointResolveDriverInput" },
     { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "FixpointResolveDriverOutcome" },

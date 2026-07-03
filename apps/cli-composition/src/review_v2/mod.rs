@@ -743,11 +743,6 @@ mod tests {
             r#"{"version":2,"groups":{"cli_composition":{"patterns":["src/**"]}}}"#,
         )
         .unwrap();
-        fs::write(
-            config_dir.join("branch-strategy.json"),
-            r#"{"base_branch":"main","merge_target":"main","merge_method":"squash"}"#,
-        )
-        .unwrap();
         fs::write(dir.path().join("README.md"), "init\n").unwrap();
         GitRunner::at(dir.path()).assert_success(&["add", "."]);
         GitRunner::at(dir.path()).assert_success(&["commit", "-m", "base"]);
@@ -763,6 +758,16 @@ mod tests {
         let track_dir = items_dir.join(track_id);
         fs::create_dir_all(&track_dir).unwrap();
         fs::write(track_dir.join(".commit_hash"), base_sha).unwrap();
+        // Fail-closed per IN-06/IN-07: base_branch is read from metadata.json's
+        // branch_strategy_snapshot — there is no `.harness/config/branch-strategy.json`
+        // fallback, so every test track needs its own metadata.json fixture.
+        fs::write(
+            track_dir.join("metadata.json"),
+            format!(
+                r#"{{"schema_version":6,"id":"{track_id}","title":"Test Track","created_at":"2026-01-01T00:00:00Z","updated_at":"2026-01-01T00:00:00Z","branch_strategy_snapshot":{{"base_branch":"main","merge_target":"main","merge_method":"squash"}}}}"#
+            ),
+        )
+        .unwrap();
 
         ReviewEntrypointRepo { _dir: dir, items_dir, track_dir, track_id: track_id.to_owned() }
     }

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "e48f94bf5dd9398046f665de53110f416766c6719f7913cd2e021b96c799b7a9",
+  "catalogue_declaration_hash": "1f9a431f90a96db24bf5a80808e9b2cc391c015fc83281d86cf0e68943e4a151",
   "signals": [
     {
       "type_name": "EnsurePrArgs",
@@ -16,6 +16,11 @@
       "type_name": "WaitAndMergeArgs",
       "signal": "blue",
       "entry_hash": "0f94a77606a3c7e9e30257098eb5c9d068dd559db8770335c5d0cc11a34cee16"
+    },
+    {
+      "type_name": "cli::commands::dry::execute_dry_check_approved",
+      "signal": "blue",
+      "entry_hash": "8fe9dc98c856a1df519d808f58abb51a35fb6040b6cd92e9b53f7e80c49d495c"
     }
   ]
 }

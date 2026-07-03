@@ -3,103 +3,527 @@
   "track_id": "branch-strategy-config-driven-2026-06-30",
   "entries": {
     "T001": [
-      { "layer": "domain", "entry_key": "MergeMethod" },
-      { "layer": "domain", "entry_key": "BranchStrategySnapshot" },
-      { "layer": "domain", "entry_key": "TrackMetadata" }
+      {
+        "layer": "domain",
+        "entry_key": "MergeMethod"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "BranchStrategySnapshot"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "TrackMetadata"
+      }
     ],
     "T002": [
-      { "layer": "usecase", "entry_key": "BranchStrategyPort" },
-      { "layer": "usecase", "entry_key": "TrackService" }
+      {
+        "layer": "usecase",
+        "entry_key": "BranchStrategyPort"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "TrackService"
+      }
     ],
     "T003": [
-      { "layer": "infrastructure", "entry_key": "MergeMethodDocument" },
-      { "layer": "infrastructure", "entry_key": "BranchStrategySnapshotDocument" },
-      { "layer": "infrastructure", "entry_key": "TrackDocumentV2" }
+      {
+        "layer": "infrastructure",
+        "entry_key": "MergeMethodDocument"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "BranchStrategySnapshotDocument"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "TrackDocumentV2"
+      }
     ],
     "T004": [
-      { "layer": "infrastructure", "entry_key": "JsonConfigBranchStrategyAdapter" },
-      { "layer": "infrastructure", "entry_key": "SnapshotBranchStrategyAdapter" },
-      { "layer": "infrastructure", "entry_key": "BranchStrategyConfigError" }
+      {
+        "layer": "infrastructure",
+        "entry_key": "JsonConfigBranchStrategyAdapter"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "SnapshotBranchStrategyAdapter"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "BranchStrategyConfigError"
+      }
     ],
     "T005": [
-      { "layer": "usecase", "entry_key": "BranchStrategyPort" },
-      { "layer": "domain", "entry_key": "BranchStrategySnapshot" },
-      { "layer": "domain", "entry_key": "TrackMetadata" }
+      {
+        "layer": "usecase",
+        "entry_key": "BranchStrategyPort"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "BranchStrategySnapshot"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "TrackMetadata"
+      }
     ],
     "T006": [
-      { "layer": "infrastructure", "entry_key": "FsReviewGateStateAdapter" },
-      { "layer": "usecase", "entry_key": "ReviewGateStatePort" }
+      {
+        "layer": "infrastructure",
+        "entry_key": "FsReviewGateStateAdapter"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "ReviewGateStatePort"
+      }
     ],
     "T007": [],
     "T008": [
-      { "layer": "infrastructure", "entry_key": "FsDiffBaseResolverAdapter" },
-      { "layer": "usecase", "entry_key": "DiffBaseResolverPort" }
+      {
+        "layer": "infrastructure",
+        "entry_key": "FsDiffBaseResolverAdapter"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "DiffBaseResolverPort"
+      }
     ],
     "T009": [
-      { "layer": "cli_driver", "entry_key": "TrackInput" }
+      {
+        "layer": "cli_driver",
+        "entry_key": "TrackInput"
+      }
     ],
     "T010": [
-      { "layer": "cli", "entry_key": "TrackCommand" },
-      { "layer": "cli", "entry_key": "EnsurePrArgs" },
-      { "layer": "cli", "entry_key": "WaitAndMergeArgs" },
-      { "layer": "cli_driver", "entry_key": "PrInput" }
+      {
+        "layer": "cli",
+        "entry_key": "TrackCommand"
+      },
+      {
+        "layer": "cli",
+        "entry_key": "EnsurePrArgs"
+      },
+      {
+        "layer": "cli",
+        "entry_key": "WaitAndMergeArgs"
+      },
+      {
+        "layer": "cli_driver",
+        "entry_key": "PrInput"
+      }
     ],
     "T011": [
-      { "layer": "cli_composition", "entry_key": "TrackCompositionRoot" },
-      { "layer": "cli_composition", "entry_key": "GitCompositionRoot" }
+      {
+        "layer": "cli_composition",
+        "entry_key": "TrackCompositionRoot"
+      },
+      {
+        "layer": "cli_composition",
+        "entry_key": "GitCompositionRoot"
+      }
     ],
     "T012": [],
     "T013": [],
     "T014": [],
     "T015": [],
     "T016": [
-      { "layer": "infrastructure", "entry_key": "FsDryApprovalFactoryAdapter" },
-      { "layer": "usecase", "entry_key": "DryApprovalFactoryPort" }
+      {
+        "layer": "infrastructure",
+        "entry_key": "FsDryApprovalFactoryAdapter"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "DryApprovalFactoryPort"
+      }
     ],
     "T017": [
-      { "layer": "usecase", "entry_key": "FixpointResolveDriverInput" },
-      { "layer": "usecase", "entry_key": "FixpointResolveDriverOutcome" },
-      { "layer": "usecase", "entry_key": "FixpointResolveDriverInteractor" },
-      { "layer": "usecase", "entry_key": "FixpointWorkspaceContext" },
-      { "layer": "usecase", "entry_key": "FixpointWorkspaceContextError" },
-      { "layer": "usecase", "entry_key": "DryCheckConfigLoaderError" },
-      { "layer": "usecase", "entry_key": "FixpointWorkspaceContextPort" },
-      { "layer": "usecase", "entry_key": "DryCheckConfigLoaderPort" },
-      { "layer": "usecase", "entry_key": "FixpointDryGateFactoryPort" },
-      { "layer": "usecase", "entry_key": "FixpointGateStateFactoryPort" },
-      { "layer": "usecase", "entry_key": "FixpointResolveDriverService" }
+      {
+        "layer": "usecase",
+        "entry_key": "FixpointResolveDriverInput"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "FixpointResolveDriverOutcome"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "FixpointResolveDriverInteractor"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "FixpointWorkspaceContext"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "FixpointWorkspaceContextError"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "DryCheckConfigLoaderError"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "FixpointWorkspaceContextPort"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "DryCheckConfigLoaderPort"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "FixpointDryGateFactoryPort"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "FixpointGateStateFactoryPort"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "FixpointResolveDriverService"
+      }
     ],
     "T018": [
-      { "layer": "infrastructure", "entry_key": "FsFixpointWorkspaceContextAdapter" },
-      { "layer": "infrastructure", "entry_key": "FsDryCheckConfigLoaderAdapter" },
-      { "layer": "infrastructure", "entry_key": "FsFixpointDryGateFactoryAdapter" },
-      { "layer": "infrastructure", "entry_key": "FsFixpointGateStateFactoryAdapter" },
-      { "layer": "usecase", "entry_key": "RefVerifyGateStatePort" },
-      { "layer": "usecase", "entry_key": "FixpointDryGateService" }
+      {
+        "layer": "infrastructure",
+        "entry_key": "FsFixpointWorkspaceContextAdapter"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "FsDryCheckConfigLoaderAdapter"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "FsFixpointDryGateFactoryAdapter"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "FsFixpointGateStateFactoryAdapter"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "RefVerifyGateStatePort"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "FixpointDryGateService"
+      }
     ],
     "T019": [
-      { "layer": "cli_driver", "entry_key": "TrackInput" },
-      { "layer": "cli_driver", "entry_key": "TrackDriver" },
-      { "layer": "cli_composition", "entry_key": "TrackCompositionRoot" }
+      {
+        "layer": "cli_driver",
+        "entry_key": "TrackInput"
+      },
+      {
+        "layer": "cli_driver",
+        "entry_key": "TrackDriver"
+      },
+      {
+        "layer": "cli_composition",
+        "entry_key": "TrackCompositionRoot"
+      }
     ],
     "T020": [
-      { "layer": "cli_composition", "entry_key": "FixpointResolveInput" }
+      {
+        "layer": "cli_composition",
+        "entry_key": "FixpointResolveInput"
+      }
     ],
     "T021": [
-      { "layer": "usecase", "entry_key": "DryWriteOutcome" },
-      { "layer": "usecase", "entry_key": "DryWriteFindingSummary" },
-      { "layer": "usecase", "entry_key": "DryCheckApprovedOutcome" },
-      { "layer": "usecase", "entry_key": "DryDriverPort" },
-      { "layer": "usecase", "entry_key": "DryDriverService" },
-      { "layer": "usecase", "entry_key": "DryDriverInteractor" }
+      {
+        "layer": "usecase",
+        "entry_key": "DryWriteOutcome"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "DryWriteFindingSummary"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "DryCheckApprovedOutcome"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "DryDriverPort"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "DryDriverService"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "DryDriverInteractor"
+      }
     ],
     "T022": [
-      { "layer": "cli_composition", "entry_key": "DryCompositionRoot" },
-      { "layer": "cli_driver", "entry_key": "DryDriver" }
+      {
+        "layer": "cli_composition",
+        "entry_key": "DryCompositionRoot"
+      },
+      {
+        "layer": "cli_driver",
+        "entry_key": "DryDriver"
+      }
     ],
     "T023": [
-      { "layer": "cli_composition", "entry_key": "DryCompositionRoot" },
-      { "layer": "cli_driver", "entry_key": "DryDriver" }
+      {
+        "layer": "cli_composition",
+        "entry_key": "DryCompositionRoot"
+      },
+      {
+        "layer": "cli_driver",
+        "entry_key": "DryDriver"
+      }
+    ],
+    "T024": [
+      {
+        "layer": "usecase",
+        "entry_key": "DryRepoWorkspace"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "DryRepoWorkspaceError"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "DryBaseBranchError"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "DryCheckStorageHandle"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "DryRepoRootPort"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "DryBaseBranchPort"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "DryCheckStorageFactoryPort"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "DryDiffBaseFactoryPort"
+      }
+    ],
+    "T025": [
+      {
+        "layer": "infrastructure",
+        "entry_key": "FsDryRepoRootAdapter"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "FsDryBaseBranchAdapter"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "FsDryCheckStorageFactoryAdapter"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "FsDryDiffBaseFactoryAdapter"
+      }
+    ],
+    "T026": [
+      {
+        "layer": "usecase",
+        "entry_key": "DryWriteConfigResolution"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "DryCorpusFragmentsOutput"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "DryCorpusFragmentsError"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "DryCheckServiceFactoryCommand"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "DryCheckServiceFactoryError"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "DryCheckServiceFactoryOutput"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "DryCorpusRootManifestError"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "DryWriteConfigLoaderPort"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "DryCorpusFragmentsPort"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "DryCheckServiceFactoryPort"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "DryCorpusRootManifestWriterPort"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "DryTierTelemetryPort"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "DryWriteDriverService"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "DryWriteDriverInput"
+      }
+    ],
+    "T027": [
+      {
+        "layer": "usecase",
+        "entry_key": "DryWriteDriverInteractor"
+      }
+    ],
+    "T028": [
+      {
+        "layer": "infrastructure",
+        "entry_key": "FsDryWriteConfigLoaderAdapter"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "FsDryCorpusFragmentsAdapter"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "FsDryCorpusRootManifestAdapter"
+      }
+    ],
+    "T029": [
+      {
+        "layer": "usecase",
+        "entry_key": "DryResultsOutcome"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "DryResultsRecordSummary"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "DryResultsVerdictSummary"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "DryResultsDriverService"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "DryResultsDriverInteractor"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "DryResultsDriverInput"
+      }
+    ],
+    "T030": [
+      {
+        "layer": "usecase",
+        "entry_key": "DryCheckApprovedDriverService"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "DryCheckApprovedDriverInteractor"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "DryCheckApprovedDriverInput"
+      }
+    ],
+    "T031": [
+      {
+        "layer": "cli",
+        "entry_key": "cli::commands::dry::execute_dry_check_approved"
+      }
+    ],
+    "T032": [
+      {
+        "layer": "cli_driver",
+        "entry_key": "DryDriver"
+      },
+      {
+        "layer": "cli_composition",
+        "entry_key": "DryCompositionRoot"
+      }
+    ],
+    "T033": [
+      {
+        "layer": "usecase",
+        "entry_key": "DryDriverPort"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "DryDriverService"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "DryDriverInteractor"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "DryFixLocalDriverInput"
+      },
+      {
+        "layer": "cli_composition",
+        "entry_key": "DryFixRunnerCompositionRoot"
+      },
+      {
+        "layer": "cli_composition",
+        "entry_key": "RunDryFixLocalInput"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "CodexDryFixLocalRunner"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "DryDriverAdapter"
+      }
+    ],
+    "T034": [
+      {
+        "layer": "infrastructure",
+        "entry_key": "RecordingDryTierTelemetryAdapter"
+      }
+    ],
+    "T035": [
+      {
+        "layer": "infrastructure",
+        "entry_key": "DryCheckServiceFactoryAdapter"
+      }
+    ],
+    "T037": [
+      {
+        "layer": "cli_composition",
+        "entry_key": "DryWriteInput"
+      },
+      {
+        "layer": "cli_composition",
+        "entry_key": "DryResultsInput"
+      },
+      {
+        "layer": "cli_composition",
+        "entry_key": "DryCheckApprovedInput"
+      },
+      {
+        "layer": "cli_composition",
+        "entry_key": "DryCompositionRoot"
+      }
     ]
   }
 }

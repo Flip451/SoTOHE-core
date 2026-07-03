@@ -1,68 +1,83 @@
-//! Per-tier `ReviewRound` telemetry for `sotp dry write` (T013 / IN-07 / AC-09).
+//! Per-tier `ReviewRound`/`ExternalSubprocess` telemetry helpers for `sotp
+//! dry write`, backing [`super::RecordingDryTierTelemetryAdapter`].
 //!
-//! This module houses the telemetry helpers extracted from `super::dry` to keep
-//! the composition module within the 700-line limit.  The recorder / agent types
-//! were relocated to `infrastructure::dry_check::recording_agent` (D7 / CN-06):
+//! Relocated from `apps/cli-composition/src/dry/tier_telemetry.rs`'s
+//! `dry_tiered_telemetry_for_result` / `emit_dry_tier_review_round` /
+//! `emit_dry_tier_external_subprocess` (T028) — reimplemented directly
+//! against this crate's own [`crate::telemetry`] types (no dependency on
+//! `apps/cli-composition`).
 //!
-//! - [`DryAgentRunRecorder`]: re-exported from `infrastructure`.
-//! - [`TieredDryAgentRecorder`]: re-exported from `infrastructure`.
-//! - [`RecordingDryAgent`]: re-exported from `infrastructure`.
-//! - [`DryRoundTelemetry`]: telemetry payload built from a recorder snapshot.
-//! - [`dry_tiered_telemetry_for_result`]: builds `(fast, final_)` telemetry from
-//!   the cycle result and tiered recorder.
-//! - [`dry_agent_error_is_subprocess_failure`]: classifies agent errors as
-//!   subprocess failures for telemetry attribution.
-//! - [`emit_dry_tier_review_round`]: emits a `ReviewRound` event with
-//!   pre-computed or elapsed duration.
+//! [`super::RecordingDryTierTelemetryAdapter`] itself (the catalogued
+//! `SecondaryAdapter`) is defined directly in the parent `dry_write_driver`
+//! module, matching its catalogued `module_path`; only its private helper
+//! functions live here.
 
+use std::path::Path;
 use std::time::Instant;
 
 use domain::dry_check::DryCheckFinding;
 use usecase::dry_check::{DryCheckAgentError, DryCheckCycleError};
 
-// ── Re-exports from infrastructure ───────────────────────────────────────────
+use crate::dry_check::recording_agent::TieredDryAgentRecorder;
+use crate::telemetry::{TelemetryConfig, TelemetryEvent, TelemetryWriter};
 
-pub(super) use infrastructure::dry_check::recording_agent::{
-    RecordingDryAgent, TieredDryAgentRecorder,
-};
+// ── resolve_dry_write_telemetry_writer ────────────────────────────────────────
+
+/// Resolve a branch/kill-switch-gated [`TelemetryWriter`] for a `dry write` run.
+///
+/// Reproduces the `track/<track_id>` + `SOTP_TELEMETRY=0` gating currently in
+/// `apps/cli-composition/src/telemetry_wiring.rs::resolve_telemetry_writer`
+/// (composed with `dry.rs`'s `resolve_dry_write_telemetry_writer` explicit
+/// `track_id` match filter), reimplemented locally since `infrastructure`
+/// cannot depend on `apps/cli-composition`.
+///
+/// Returns `None` when: the current branch (discovered from `repo_root`)
+/// cannot be resolved, the resolved branch does not decode to a track id, the
+/// resolved track id does not match `track_id`, or `SOTP_TELEMETRY=0`.
+pub(super) fn resolve_dry_write_telemetry_writer(
+    repo_root: &Path,
+    items_dir: &Path,
+    track_id: &str,
+) -> Option<TelemetryWriter> {
+    use crate::git_cli::{GitRepository as _, SystemGitRepo};
+
+    let repo = SystemGitRepo::discover_from(repo_root).ok()?;
+    let branch = repo.current_branch().ok().flatten()?;
+    let branch_track_id =
+        usecase::track_resolution::resolve_track_id_from_branch(Some(&branch)).ok()?;
+    if branch_track_id != track_id {
+        return None;
+    }
+
+    let config = TelemetryConfig::from_env();
+    if !config.is_enabled() {
+        return None;
+    }
+
+    Some(TelemetryWriter::new(config, track_id.to_owned(), items_dir.to_path_buf()))
+}
 
 // ── DryRoundTelemetry ─────────────────────────────────────────────────────────
 
 pub(super) struct DryRoundTelemetry {
     pub(super) findings_count: u32,
     pub(super) verdict_parse_failed: bool,
-    pub(super) subprocess_started_at: Option<std::time::Instant>,
+    pub(super) subprocess_started_at: Option<Instant>,
     /// Pre-computed duration in milliseconds for this tier.
     ///
     /// `Some(ms)` is used when the tier's end time can be determined precisely
-    /// (e.g. fast tier on escalated runs: duration = final_started_at - fast_started_at).
-    /// `None` means the caller should use `round_started_at.elapsed()` at emission time.
+    /// (e.g. fast tier on escalated runs: duration = final_started_at -
+    /// fast_started_at). `None` means the caller should use
+    /// `round_started_at.elapsed()` at emission time.
     pub(super) duration_ms: Option<u64>,
     /// The `Instant` to use for elapsed duration when `duration_ms` is `None`.
-    pub(super) round_started_at: Option<std::time::Instant>,
+    pub(super) round_started_at: Option<Instant>,
 }
 
 // ── dry_tiered_telemetry_for_result ──────────────────────────────────────────
 
-/// Build per-tier telemetry from the interactor result and the tier-split recorder.
-///
-/// Returns `(fast_telemetry, final_telemetry)`.
-/// - `fast_telemetry` is `Some` when the fast tier was invoked for production pairs
-///   (calibration-probe-only runs do not set `started_at`).
-/// - `final_telemetry` is `Some` only when the final recorder shows production
-///   activity (started_at is `Some` after a production final-tier call).
-///
-/// Calibration probes are excluded from recording by `RecordingDryAgent::judge`
-/// (the `is_calibration_probe` guard) so every recorder field reflects only
-/// production judgments.
-///
-/// On escalated runs the fast tier duration is pre-computed as
-/// `(final_started_at - fast_started_at)` so that the fast `ReviewRound` event
-/// does not erroneously include the final tier's processing time.
-///
-/// `findings_count` uses per-tier recorder counts for all paths.  Fast
-/// `findings_count` is the number of `Violation` judgments returned by the fast
-/// tier before any final-tier arbitration.
+/// Build per-tier telemetry from the interactor result and the tier-split
+/// recorder. Returns `(fast_telemetry, final_telemetry)`.
 pub(super) fn dry_tiered_telemetry_for_result(
     dry_result: &Result<Vec<DryCheckFinding>, DryCheckCycleError>,
     tiered: &TieredDryAgentRecorder,
@@ -104,14 +119,6 @@ pub(super) fn dry_tiered_telemetry_for_result(
 
     match dry_result {
         Ok(_findings) => {
-            // Use per-tier recorder counts.  Calibration probes are excluded from
-            // recording by `RecordingDryAgent::judge` (the `is_calibration_probe`
-            // guard), so the recorder counts reflect only production judgments.
-            //
-            // Fast `findings_count` = violations flagged by the fast tier before
-            // final-tier arbitration.  When fast flags a pair and final downgrades
-            // it to `NotAViolation`, the fast `ReviewRound` still records the fast
-            // tier's own count — not the final accepted count.
             let fast = tiered.fast.started_at().map(|started_at| {
                 build_fast(started_at, final_started_at, tiered.fast.findings_count(), false)
             });
@@ -122,10 +129,6 @@ pub(super) fn dry_tiered_telemetry_for_result(
         Err(DryCheckCycleError::Agent(inner)) => {
             if dry_agent_error_is_subprocess_failure(inner) {
                 let is_parse_failure = matches!(inner, DryCheckAgentError::IllegalOutput);
-                // Attribute verdict_parse_failed only to the tier that produced
-                // the error. `has_errored()` is set directly by `RecordingDryAgent`
-                // when `judge()` returns `Err(_)`, so it stays accurate even when
-                // earlier calls on the same tier completed successfully.
                 let final_is_failing = tiered.final_.has_errored();
                 let fast = tiered.fast.started_at().map(|started_at| {
                     build_fast(
@@ -147,7 +150,6 @@ pub(super) fn dry_tiered_telemetry_for_result(
                 (None, None)
             }
         }
-        // Entry and Writer errors occur after the agent ran.
         Err(DryCheckCycleError::Entry(_)) | Err(DryCheckCycleError::Writer(_)) => {
             let fast = tiered.fast.started_at().map(|started_at| {
                 build_fast(started_at, final_started_at, tiered.fast.findings_count(), false)
@@ -156,7 +158,6 @@ pub(super) fn dry_tiered_telemetry_for_result(
                 .map(|started_at| build_final(started_at, tiered.final_.findings_count(), false));
             (fast, final_)
         }
-        // Index error after a successful agent call.
         Err(DryCheckCycleError::Index(_))
             if tiered.fast.has_completed() || tiered.final_.has_completed() =>
         {
@@ -171,13 +172,8 @@ pub(super) fn dry_tiered_telemetry_for_result(
     }
 }
 
-// ── subprocess error classification ──────────────────────────────────────────
-
 /// Returns `true` when the agent error is attributable to a subprocess failure
 /// (the external process was spawned, ran, and returned an error or bad output).
-///
-/// Pre-spawn errors are excluded so that telemetry is not emitted for cases
-/// where the agent process never started.
 pub(super) fn dry_agent_error_is_subprocess_failure(error: &DryCheckAgentError) -> bool {
     match error {
         DryCheckAgentError::UserAbort
@@ -194,17 +190,6 @@ fn dry_agent_unexpected_after_spawn(message: &str) -> bool {
         || message.starts_with("failed to read output-last-message ")
 }
 
-// ── dry_duration_ms ───────────────────────────────────────────────────────────
-
-/// Resolve the duration in milliseconds for a dry-check tier telemetry event.
-///
-/// Uses `duration_ms` when pre-computed (escalated runs where the fast tier's
-/// end time equals the final tier's start time).  Falls back to
-/// `started_at.elapsed()` at emission time, or to `fallback_start.elapsed()`
-/// when `started_at` is also `None`.
-///
-/// `fallback_start` is only used when both `duration_ms` and `started_at` are
-/// `None` — which should not occur in well-formed [`DryRoundTelemetry`] structs.
 fn dry_duration_ms(
     duration_ms: Option<u64>,
     started_at: Option<Instant>,
@@ -219,19 +204,14 @@ fn dry_duration_ms(
     }
 }
 
-// ── emit_dry_tier_review_round ────────────────────────────────────────────────
+/// Returns an ISO-8601 UTC timestamp string for the current moment.
+fn now_timestamp() -> String {
+    chrono::Utc::now().to_rfc3339()
+}
 
-/// Emit a `ReviewRound` telemetry event for a dry-check tier (T013 / IN-07).
-///
-/// Uses the pre-computed `duration_ms` in the telemetry when available (escalated
-/// runs where the fast tier's end time equals the final tier's start time), falling
-/// back to `round_started_at.elapsed()` for tiers whose end time is the current
-/// moment (typically the final tier or a fast-only run).
-///
-/// `fallback_start` is only used when both `duration_ms` and `round_started_at`
-/// are `None` — which should not happen in well-formed telemetry structs.
+/// Emit a `ReviewRound` telemetry event for a dry-check tier.
 pub(super) fn emit_dry_tier_review_round(
-    writer: &infrastructure::telemetry::TelemetryWriter,
+    writer: &TelemetryWriter,
     track_id: &str,
     provider: &str,
     model: &str,
@@ -241,7 +221,6 @@ pub(super) fn emit_dry_tier_review_round(
 ) {
     let duration_ms =
         dry_duration_ms(telemetry.duration_ms, telemetry.round_started_at, fallback_start);
-    use infrastructure::telemetry::TelemetryEvent;
     let event = TelemetryEvent::ReviewRound {
         schema_version: 1,
         track_id: track_id.to_string(),
@@ -250,30 +229,15 @@ pub(super) fn emit_dry_tier_review_round(
         round_type: round_type.to_string(),
         duration_ms,
         findings_count: telemetry.findings_count,
-        timestamp: crate::telemetry_wiring::now_timestamp(),
+        timestamp: now_timestamp(),
     };
     // Fire-and-forget: suppress errors per CN-01.
     let _ = writer.write(event);
 }
 
-// ── emit_dry_tier_external_subprocess ────────────────────────────────────────
-
-/// Emit an `ExternalSubprocess` telemetry event for a dry-check tier (T013 / IN-07).
-///
-/// Uses the same duration logic as [`emit_dry_tier_review_round`] via
-/// [`dry_duration_ms`]: when `telemetry.duration_ms` is `Some(ms)`, the
-/// pre-computed duration is used so that the fast-tier event on escalated runs
-/// does not include final-tier processing time. When `duration_ms` is `None`,
-/// the elapsed time since `telemetry.subprocess_started_at` (or `fallback_start`)
-/// is used.
-///
-/// Emits only when `telemetry.subprocess_started_at` is `Some` (i.e., the
-/// subprocess was actually launched for this tier).
-///
-/// `fallback_start` is used when both `duration_ms` and `subprocess_started_at`
-/// are `None` — which should not occur in well-formed telemetry structs.
+/// Emit an `ExternalSubprocess` telemetry event for a dry-check tier.
 pub(super) fn emit_dry_tier_external_subprocess(
-    writer: &infrastructure::telemetry::TelemetryWriter,
+    writer: &TelemetryWriter,
     track_id: &str,
     command: &str,
     telemetry: &DryRoundTelemetry,
@@ -281,7 +245,6 @@ pub(super) fn emit_dry_tier_external_subprocess(
 ) {
     let duration_ms =
         dry_duration_ms(telemetry.duration_ms, telemetry.subprocess_started_at, fallback_start);
-    use infrastructure::telemetry::TelemetryEvent;
     let event = TelemetryEvent::ExternalSubprocess {
         schema_version: 1,
         track_id: track_id.to_string(),
@@ -289,8 +252,103 @@ pub(super) fn emit_dry_tier_external_subprocess(
         duration_ms,
         retry_count: 0,
         verdict_parse_failed: telemetry.verdict_parse_failed,
-        timestamp: crate::telemetry_wiring::now_timestamp(),
+        timestamp: now_timestamp(),
     };
     // Fire-and-forget: suppress errors per CN-01.
     let _ = writer.write(event);
+}
+
+// ── Tests ─────────────────────────────────────────────────────────────────────
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+mod tests {
+    use crate::dry_check::recording_agent::DryAgentRunRecorder;
+
+    use super::*;
+
+    fn make_tiered_recorder_fast_only(findings: u32) -> TieredDryAgentRecorder {
+        let fast = DryAgentRunRecorder::new();
+        fast.record_started();
+        for _ in 0..findings {
+            fast.record_violation();
+        }
+        fast.record_completed();
+        TieredDryAgentRecorder { fast, final_: DryAgentRunRecorder::new() }
+    }
+
+    #[test]
+    fn test_dry_agent_unexpected_after_spawn_classifies_child_poll_failure() {
+        let error =
+            DryCheckAgentError::Unexpected("failed to poll dry-check agent child: io".to_owned());
+        assert!(dry_agent_error_is_subprocess_failure(&error));
+    }
+
+    #[test]
+    fn test_dry_agent_unexpected_before_spawn_is_not_subprocess_failure() {
+        let error =
+            DryCheckAgentError::Unexpected("failed to write output-schema: disk full".to_owned());
+        assert!(!dry_agent_error_is_subprocess_failure(&error));
+    }
+
+    #[test]
+    fn test_dry_tiered_telemetry_for_result_index_after_fast_agent_success_emits_fast() {
+        let tiered = make_tiered_recorder_fast_only(2);
+        let result: Result<Vec<DryCheckFinding>, DryCheckCycleError> = Err(
+            DryCheckCycleError::Index(usecase::semantic_dup::SemanticIndexError::SearchFailed {
+                source: "changed_path error: invalid path".to_owned(),
+            }),
+        );
+
+        let (fast, final_) = dry_tiered_telemetry_for_result(&result, &tiered);
+        let fast_t = fast.unwrap();
+        assert_eq!(fast_t.findings_count, 2);
+        assert!(!fast_t.verdict_parse_failed);
+        assert!(fast_t.subprocess_started_at.is_some());
+        assert!(final_.is_none());
+    }
+
+    #[test]
+    fn test_dry_tiered_telemetry_for_result_index_before_agent_returns_none() {
+        let tiered = TieredDryAgentRecorder {
+            fast: DryAgentRunRecorder::new(),
+            final_: DryAgentRunRecorder::new(),
+        };
+        let result: Result<Vec<DryCheckFinding>, DryCheckCycleError> = Err(
+            DryCheckCycleError::Index(usecase::semantic_dup::SemanticIndexError::SearchFailed {
+                source: "candidate index failed".to_owned(),
+            }),
+        );
+
+        let (fast, final_) = dry_tiered_telemetry_for_result(&result, &tiered);
+        assert!(fast.is_none());
+        assert!(final_.is_none());
+    }
+
+    #[test]
+    fn test_dry_tiered_telemetry_for_result_success_without_agent_start_skips_subprocess() {
+        let tiered = TieredDryAgentRecorder {
+            fast: DryAgentRunRecorder::new(),
+            final_: DryAgentRunRecorder::new(),
+        };
+        let result: Result<Vec<DryCheckFinding>, DryCheckCycleError> = Ok(vec![]);
+
+        let (fast, final_) = dry_tiered_telemetry_for_result(&result, &tiered);
+        assert!(fast.is_none());
+        assert!(final_.is_none());
+    }
+
+    #[test]
+    fn test_dry_tiered_telemetry_for_result_writer_error_uses_fast_findings_count() {
+        let tiered = make_tiered_recorder_fast_only(3);
+        let result: Result<Vec<DryCheckFinding>, DryCheckCycleError> =
+            Err(DryCheckCycleError::Writer(domain::dry_check::DryCheckWriterError::Codec {
+                detail: "serialize failed".to_owned(),
+            }));
+
+        let (fast, final_) = dry_tiered_telemetry_for_result(&result, &tiered);
+        let fast_t = fast.unwrap();
+        assert_eq!(fast_t.findings_count, 3);
+        assert!(final_.is_none());
+    }
 }

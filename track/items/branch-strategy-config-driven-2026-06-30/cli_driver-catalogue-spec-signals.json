@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "893ebc4e121ef679e51d428ffea4c8bef1ca310b3d70adcedf31ae17b801e69f",
+  "catalogue_declaration_hash": "4d7db489d27c9d94052e96d376b032f7097a46a2d2966036247965411bf451ef",
   "signals": [
     {
       "type_name": "DryDriver",
       "signal": "blue",
-      "entry_hash": "072d0a506b7214380bf07b5a8b09e571e6299c7cb2dd2cffb5961818fd92d33d"
+      "entry_hash": "7109222837f13c2d8beefaa849f37dff8d8264371f0da01e6d4005c77a5f8274"
     },
     {
       "type_name": "PrInput",

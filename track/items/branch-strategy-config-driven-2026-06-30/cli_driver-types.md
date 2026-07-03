@@ -11,5 +11,6 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| DryDriver | primary_adapter | reference | — | 🔵 | 🔵 |
+| DryDriver | primary_adapter | modify | — | 🔵 | 🔵 |
 | TrackDriver | primary_adapter | modify | — | 🔵 | 🔵 |
+

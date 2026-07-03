@@ -4,9 +4,13 @@
 //! invokes, plus a pass-through `DryDriverInteractor` that delegates to
 //! an injected `DryDriverPort`.
 //!
-//! The adapter that implements `DryDriverPort` lives in `cli_composition`
-//! (where `infrastructure` is available) and delegates to the existing
-//! `DryCompositionRoot` / `DryFixRunnerCompositionRoot` methods.
+//! `dry write` / `dry results` / `dry check-approved` are backed by their own
+//! IN-14 driver services ([`crate::dry_write_driver`],
+//! [`crate::dry_results_driver`], [`crate::dry_check_approved_driver`]); this
+//! module's `DryDriverPort` / `DryDriverService` now cover only `dry
+//! fix-local` (OS-08). The adapter that implements `DryDriverPort` lives in
+//! `libs/infrastructure` (`infrastructure::dry_check::dry_fix_local::DryDriverAdapter`)
+//! and spawns the Codex fixer subprocess.
 
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -127,18 +131,16 @@ pub enum DryCheckApprovedOutcome {
 
 /// Secondary port for the `dry` command family.
 ///
-/// Implemented by an adapter in `cli_composition` that delegates to
-/// `DryCompositionRoot` / `DryFixRunnerCompositionRoot` methods.
+/// Implemented by an adapter in `libs/infrastructure`
+/// (`infrastructure::dry_check::dry_fix_local::DryDriverAdapter`) that spawns
+/// the Codex fixer subprocess.
+///
+/// `dry write` / `dry results` / `dry check-approved` are now backed by their
+/// own IN-14 driver services ([`crate::dry_write_driver::DryWriteDriverService`],
+/// [`crate::dry_results_driver::DryResultsDriverService`],
+/// [`crate::dry_check_approved_driver::DryCheckApprovedDriverService`]); this
+/// port's sole remaining responsibility is `dry fix-local` (OS-08).
 pub trait DryDriverPort: Send + Sync {
-    /// Run `sotp dry write`.
-    fn dry_write(&self, input: DryWriteDriverInput) -> DryWriteOutcome;
-
-    /// Run `sotp dry results`.
-    fn dry_results(&self, input: DryResultsDriverInput) -> DryDriverOutcome;
-
-    /// Run `sotp dry check-approved`.
-    fn dry_check_approved(&self, input: DryCheckApprovedDriverInput) -> DryCheckApprovedOutcome;
-
     /// Run `sotp dry fix-local`.
     fn dry_fix_local(&self, input: DryFixLocalDriverInput) -> DryDriverOutcome;
 }
@@ -146,16 +148,11 @@ pub trait DryDriverPort: Send + Sync {
 // ── Service ───────────────────────────────────────────────────────────────────
 
 /// Application service trait for the `dry` command family.
+///
+/// `dry write` / `dry results` / `dry check-approved` are now backed by their
+/// own IN-14 driver services; this service's sole remaining responsibility is
+/// `dry fix-local` (OS-08).
 pub trait DryDriverService: Send + Sync {
-    /// Run `sotp dry write`.
-    fn dry_write(&self, input: DryWriteDriverInput) -> DryWriteOutcome;
-
-    /// Run `sotp dry results`.
-    fn dry_results(&self, input: DryResultsDriverInput) -> DryDriverOutcome;
-
-    /// Run `sotp dry check-approved`.
-    fn dry_check_approved(&self, input: DryCheckApprovedDriverInput) -> DryCheckApprovedOutcome;
-
     /// Run `sotp dry fix-local`.
     fn dry_fix_local(&self, input: DryFixLocalDriverInput) -> DryDriverOutcome;
 }
@@ -176,18 +173,6 @@ impl DryDriverInteractor {
 }
 
 impl DryDriverService for DryDriverInteractor {
-    fn dry_write(&self, input: DryWriteDriverInput) -> DryWriteOutcome {
-        self.port.dry_write(input)
-    }
-
-    fn dry_results(&self, input: DryResultsDriverInput) -> DryDriverOutcome {
-        self.port.dry_results(input)
-    }
-
-    fn dry_check_approved(&self, input: DryCheckApprovedDriverInput) -> DryCheckApprovedOutcome {
-        self.port.dry_check_approved(input)
-    }
-
     fn dry_fix_local(&self, input: DryFixLocalDriverInput) -> DryDriverOutcome {
         self.port.dry_fix_local(input)
     }

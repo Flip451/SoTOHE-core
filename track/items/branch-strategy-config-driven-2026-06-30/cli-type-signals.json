@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-02T10:07:44Z",
-  "declaration_hash": "e48f94bf5dd9398046f665de53110f416766c6719f7913cd2e021b96c799b7a9",
+  "generated_at": "2026-07-03T08:10:48Z",
+  "declaration_hash": "1f9a431f90a96db24bf5a80808e9b2cc391c015fc83281d86cf0e68943e4a151",
   "signals": [
     {
       "type_name": "EnsurePrArgs",
@@ -18,6 +18,12 @@
     {
       "type_name": "WaitAndMergeArgs",
       "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::dry::execute_dry_check_approved",
+      "kind_tag": "free_function",
       "signal": "blue",
       "found_type": true
     }

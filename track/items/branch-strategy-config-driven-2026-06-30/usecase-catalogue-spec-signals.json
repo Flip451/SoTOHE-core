@@ -1,11 +1,26 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "acd6e65a833ba07556ac03a5ec7ef2774986583958a5868613b44787626fa6df",
+  "catalogue_declaration_hash": "9d38ce4cb9b59140e082bc66b02b7efee1fdcbcf03a2a7ecb99e0f25d0b49f2f",
   "signals": [
+    {
+      "type_name": "DryBaseBranchError",
+      "signal": "blue",
+      "entry_hash": "5d17a5a9fd05eace754a15fb8cce17380571b4d61bd57861ed5a95509a608949"
+    },
+    {
+      "type_name": "DryCheckApprovedDriverInput",
+      "signal": "blue",
+      "entry_hash": "56d03c59a93b5e9e86b67ff99005c7dfed4caf17e91b7ccb444dc6543b374c83"
+    },
+    {
+      "type_name": "DryCheckApprovedDriverInteractor",
+      "signal": "blue",
+      "entry_hash": "309051878bdbc766eda55484149b08c5e5f7d1098090dc0b5f2d9565157195f5"
+    },
     {
       "type_name": "DryCheckApprovedOutcome",
       "signal": "blue",
-      "entry_hash": "82585738ecfbfc3be00f5d020d5ac1c7ca8cce6dc5ad079736e2b24b8e05aaf8"
+      "entry_hash": "610bb30fb6040379e179815a00d22c3d17cb3ad5027b3b843c6223e7f59be021"
     },
     {
       "type_name": "DryCheckConfigLoaderError",
@@ -13,9 +28,99 @@
       "entry_hash": "bd5a6821a733c6a8a1f18015a3009c8aa5f8e2abec42f7c5de5d146269cea362"
     },
     {
+      "type_name": "DryCheckServiceFactoryCommand",
+      "signal": "blue",
+      "entry_hash": "9cd58964f2d8cdd890b1a849e082a9973a2d9fae29448a710669cae128a419ab"
+    },
+    {
+      "type_name": "DryCheckServiceFactoryError",
+      "signal": "blue",
+      "entry_hash": "b0e09fbedf6c43cc9fb45f08a64ba8e0ec0d5eeaaee69b4b364dbf99a89195c1"
+    },
+    {
+      "type_name": "DryCheckServiceFactoryOutput",
+      "signal": "blue",
+      "entry_hash": "f32f554b0a428188c3eea2691f9b79623e20ecb1724e49f5b337361076d82d6c"
+    },
+    {
+      "type_name": "DryCheckStorageHandle",
+      "signal": "blue",
+      "entry_hash": "142fcf1b8594e00ecf3dcfc99028196147c421822285ba5d49eb93c12242fa31"
+    },
+    {
+      "type_name": "DryCorpusFragmentsError",
+      "signal": "blue",
+      "entry_hash": "80ce379a7c308dbe5498ae5231bae5298fb13bf87a56d4aa937f3d20bc32682e"
+    },
+    {
+      "type_name": "DryCorpusFragmentsOutput",
+      "signal": "blue",
+      "entry_hash": "c70b2bdf59997ecfc23c26b41a0ffbb61ea7eedb33ada966c42e837a1de8f9cf"
+    },
+    {
+      "type_name": "DryCorpusRootManifestError",
+      "signal": "blue",
+      "entry_hash": "5b78b64ceca1282dc9d5ceed4392a716f9f7cae68be740d4a04cf189cd9c23cb"
+    },
+    {
       "type_name": "DryDriverInteractor",
       "signal": "blue",
-      "entry_hash": "cc0db483390f196cac3ca89eedea9449d40bc966a77f3d0f5ea99a5201381483"
+      "entry_hash": "0541b870119d25dfb1bc9f77d869cbb913aadce83a178ad2f102a88b399ff290"
+    },
+    {
+      "type_name": "DryFixLocalDriverInput",
+      "signal": "blue",
+      "entry_hash": "1bee5b3c986967fc276fb5d906d52c225df4f1659dffb25f301998bd58267a29"
+    },
+    {
+      "type_name": "DryRepoWorkspace",
+      "signal": "blue",
+      "entry_hash": "65f9a1a8aa4aa92b76855b421552de4dadbeaecb70e000e8a8f2eff327f235a9"
+    },
+    {
+      "type_name": "DryRepoWorkspaceError",
+      "signal": "blue",
+      "entry_hash": "f435719433bc02b2eee07299f8c5d31301395b32e43cb6314748a0263fe73b86"
+    },
+    {
+      "type_name": "DryResultsDriverInput",
+      "signal": "blue",
+      "entry_hash": "1aae2a13a020fb1f95ff34a638c6b69d2fa62ba4c33f8f2951748f124814ebe5"
+    },
+    {
+      "type_name": "DryResultsDriverInteractor",
+      "signal": "blue",
+      "entry_hash": "5b75a6facb005de32024ffe2ca6facef781b1c13e8c425938f649a093cd44d28"
+    },
+    {
+      "type_name": "DryResultsOutcome",
+      "signal": "blue",
+      "entry_hash": "7d64330656a8b352e2c1c976c18d4f588b87735879271dba661e52db347bbd69"
+    },
+    {
+      "type_name": "DryResultsRecordSummary",
+      "signal": "blue",
+      "entry_hash": "8d292cd37390efa4aec0905690ced8831a0063d91de6ba52997f292405ed9537"
+    },
+    {
+      "type_name": "DryResultsVerdictSummary",
+      "signal": "blue",
+      "entry_hash": "7eebdc1cc836d26e6f35861f6652f9146373035918ef8f24ed29fa4666d59e13"
+    },
+    {
+      "type_name": "DryWriteConfigResolution",
+      "signal": "blue",
+      "entry_hash": "c4f2c6a31d6401cdd89e69fddf3064d516198c65cf80dbc4728673e51b904217"
+    },
+    {
+      "type_name": "DryWriteDriverInput",
+      "signal": "blue",
+      "entry_hash": "d70d616630d65ef3ac8bebeff4243ec30548e6ff0a360fad473cee2d2bcf8c00"
+    },
+    {
+      "type_name": "DryWriteDriverInteractor",
+      "signal": "blue",
+      "entry_hash": "9b1560526f17f60851d9d2dc9d550740034d1373f54dd5d2bab038054ccb1dcd"
     },
     {
       "type_name": "DryWriteFindingSummary",
@@ -25,7 +130,7 @@
     {
       "type_name": "DryWriteOutcome",
       "signal": "blue",
-      "entry_hash": "b808077e39ecfd68f5a97b01d8a905321f59e609ce7a094a435d7fc1f6c0c5e5"
+      "entry_hash": "eeef217ea2b62eaa22c63729a9adeee47c9e33d66a98154bf414ffe94fefde82"
     },
     {
       "type_name": "FixpointResolveDriverInput",
@@ -60,7 +165,7 @@
     {
       "type_name": "DiffBaseResolverPort",
       "signal": "blue",
-      "entry_hash": "9fe91732206e9813d28e01b88d4ec64b90e79abfbab996deac8da1890b9fcf87"
+      "entry_hash": "ac7ad7ad83b28997e302eeccb1bafa25d1daec0b40e6e4c28e7ccc9e3506680b"
     },
     {
       "type_name": "DryApprovalFactoryPort",
@@ -68,19 +173,79 @@
       "entry_hash": "b7b6d3c3c49d1c41f8acb2cfcb6fdd5432b0d3f2b2a126bb5b6838bc8aa1942f"
     },
     {
+      "type_name": "DryBaseBranchPort",
+      "signal": "blue",
+      "entry_hash": "a7d4944b0c1fdbd162c1bc4d5292f3182c522fe6d04b846efc4baed23b7b096e"
+    },
+    {
+      "type_name": "DryCheckApprovedDriverService",
+      "signal": "blue",
+      "entry_hash": "8cb66b4a4d995c4251b65b785720172a996ed57f82ad6535c8f36a20e1480b09"
+    },
+    {
       "type_name": "DryCheckConfigLoaderPort",
       "signal": "blue",
       "entry_hash": "72e192c6ebce0af6447ffd8bd92ed7ca39eb45a7452a206d0719e057b57ea425"
     },
     {
+      "type_name": "DryCheckServiceFactoryPort",
+      "signal": "blue",
+      "entry_hash": "bf7122895c698387b86c7608603be22eb2a0f8d450dd68866fa15cdc29b14b2a"
+    },
+    {
+      "type_name": "DryCheckStorageFactoryPort",
+      "signal": "blue",
+      "entry_hash": "b8a277ed25971bd748255c9aa8f17011fde0e6031efb8b669aebd73adf8dbb4f"
+    },
+    {
+      "type_name": "DryCorpusFragmentsPort",
+      "signal": "blue",
+      "entry_hash": "e9deced32eaeb8deeb1838aa8f8cda9a3c63926242d000f84eff73598effe201"
+    },
+    {
+      "type_name": "DryCorpusRootManifestWriterPort",
+      "signal": "blue",
+      "entry_hash": "3aef0457dc8e041d1dfcec95e25fd91a9b5e44a20589b41f15b663ebdb7b5607"
+    },
+    {
+      "type_name": "DryDiffBaseFactoryPort",
+      "signal": "blue",
+      "entry_hash": "22b218be40e38e6ceaafe60b5859184d3bd6b248997c0a8169bb45d032cbdaab"
+    },
+    {
       "type_name": "DryDriverPort",
       "signal": "blue",
-      "entry_hash": "d2d73ec97af367c080b4acbf07d29e8443b812cddc10041183bd500ae5c65371"
+      "entry_hash": "ba543e2423a2bde83e317606cb2cd96548f7b4fe5b88db482be13d1edaacb66f"
     },
     {
       "type_name": "DryDriverService",
       "signal": "blue",
-      "entry_hash": "9bfd6a742b218c2415c2ad8a1c4138bbd54a1c1edbe0ada7d5664ac63079699d"
+      "entry_hash": "24d620be77971f98c3c7f30b2b0d99f7481f92c0742d2014c91d4199a2b8e9a7"
+    },
+    {
+      "type_name": "DryRepoRootPort",
+      "signal": "blue",
+      "entry_hash": "27935f9e15099ac2549f7cbb69f703bf293215b2314f3c8719e0f2b6294d8dca"
+    },
+    {
+      "type_name": "DryResultsDriverService",
+      "signal": "blue",
+      "entry_hash": "f934183c0d59599c7a9c9499c3b14b5df279547f387040181a41a9c1e694ba17"
+    },
+    {
+      "type_name": "DryTierTelemetryPort",
+      "signal": "blue",
+      "entry_hash": "674c361f136b7da2500b254c2c1e110400a312e1025fbf339732ab434639fbda"
+    },
+    {
+      "type_name": "DryWriteConfigLoaderPort",
+      "signal": "blue",
+      "entry_hash": "e80561b10102d15b5a2070f0fb30875cb4395fef996218f2417d1eb9f0af503c"
+    },
+    {
+      "type_name": "DryWriteDriverService",
+      "signal": "blue",
+      "entry_hash": "1c81567b137f81173f5856390b91c1daac99e7eba0181d03b239ec2a5e634b69"
     },
     {
       "type_name": "FixpointDryGateFactoryPort",

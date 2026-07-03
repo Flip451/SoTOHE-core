@@ -3,7 +3,7 @@
 use std::path::{Path, PathBuf};
 use std::time::Instant;
 
-use domain::review_v2::{CommitHashReader, FilePath, ReviewScopeConfig};
+use domain::review_v2::{CommitHashReader, ReviewScopeConfig};
 use domain::{CommitHash, TrackId};
 
 use infrastructure::git_cli::{GitRepository, SystemGitRepo};
@@ -12,9 +12,7 @@ use infrastructure::review_v2::{
     SystemReviewHasher, load_v2_scope_config,
 };
 use thiserror::Error;
-use usecase::review_v2::{
-    ReviewCycle, ScopeQueryInteractor, error::DiffGetError, ports::DiffGetter,
-};
+use usecase::review_v2::{ReviewCycle, ScopeQueryInteractor};
 
 use super::null_reviewer::NullReviewer;
 
@@ -40,16 +38,6 @@ pub enum ReviewSharedError {
     /// Invalid input (e.g. bad track-id, invalid commit hash).
     #[error("{0}")]
     InvalidInput(String),
-}
-
-/// Stub `DiffGetter` for pure-logic use cases (e.g. `classify`) that do not
-/// need diff listings. `list_diff_files` always returns an empty list.
-pub(crate) struct NullDiffGetter;
-
-impl DiffGetter for NullDiffGetter {
-    fn list_diff_files(&self, _base: &CommitHash) -> Result<Vec<FilePath>, DiffGetError> {
-        Ok(Vec::new())
-    }
 }
 
 /// All v2 adapters needed for status/check-approved operations (NullReviewer).
@@ -199,16 +187,26 @@ pub(super) fn build_v2_shared(
     }
 
     // Read base_branch from metadata.json (branch_strategy_snapshot).
-    // When metadata.json is absent (new tracks pre-init or ephemeral fixtures),
-    // fall back to `.harness/config/branch-strategy.json` via
-    // `JsonConfigBranchStrategyAdapter` (D5: no hard-coded `main`).
-    // Decode errors propagate as Config; per ADR D5 (no backward compatibility),
-    // schema_version != 6 is not supported and must fail explicitly rather
-    // than silently degrade.
+    // Fail-closed per IN-06/IN-07: a missing, unreadable, or malformed
+    // metadata.json returns ReviewSharedError::Config — there is no
+    // `.harness/config/branch-strategy.json` fallback and no hardcoded default.
+    // Per ADR D5 (no backward compatibility), schema_version != 6 is not
+    // supported and must fail explicitly rather than silently degrade.
     let base_branch = {
-        use usecase::branch_strategy::BranchStrategyPort as _;
-
         let metadata_path = track_dir.join("metadata.json");
+        let trusted_items_dir = track_dir.parent().unwrap_or(&track_dir);
+        match infrastructure::track::symlink_guard::reject_symlinks_below(
+            &metadata_path,
+            trusted_items_dir,
+        ) {
+            Ok(true) => {}
+            Ok(false) => {
+                // metadata.json is not present — fall through to the NotFound branch below.
+            }
+            Err(e) => {
+                return Err(ReviewSharedError::Config(format!("symlink guard metadata.json: {e}")));
+            }
+        }
         match std::fs::read_to_string(&metadata_path) {
             Ok(metadata_json) => {
                 let (track_meta, _) = infrastructure::track::codec::decode(&metadata_json)
@@ -216,17 +214,10 @@ pub(super) fn build_v2_shared(
                 track_meta.branch_strategy_snapshot().base_branch().to_owned()
             }
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
-                let config_path = canonical_root.join(".harness/config/branch-strategy.json");
-                let adapter =
-                    infrastructure::branch_strategy::JsonConfigBranchStrategyAdapter::new(
-                        config_path,
-                    )
-                    .map_err(|e| {
-                        ReviewSharedError::Config(format!(
-                            "load .harness/config/branch-strategy.json (metadata.json absent): {e}"
-                        ))
-                    })?;
-                adapter.base_branch().to_owned()
+                return Err(ReviewSharedError::Config(format!(
+                    "metadata.json for '{}' not found",
+                    track_id.as_ref()
+                )));
             }
             Err(e) => {
                 return Err(ReviewSharedError::Config(format!("read metadata.json: {e}")));
@@ -476,7 +467,7 @@ pub(crate) fn build_scope_query_interactor_str(
 
 /// Builds a `ScopeQueryInteractor` for pure-logic use (no diff I/O).
 ///
-/// Uses [`NullDiffGetter`] and a placeholder `CommitHash`. Suitable for the
+/// Uses [`GitDiffGetter`] and a placeholder `CommitHash`. Suitable for the
 /// `sotp review classify` command which only calls
 /// [`usecase::review_v2::ScopeQueryService::classify_by_strings`].
 ///
@@ -490,7 +481,7 @@ pub(crate) fn build_scope_query_interactor_str(
 pub(crate) fn build_scope_query_interactor_no_diff_str(
     track_id_str: &str,
     items_dir: &Path,
-) -> Result<ScopeQueryInteractor<NullDiffGetter>, ReviewSharedError> {
+) -> Result<ScopeQueryInteractor<GitDiffGetter>, ReviewSharedError> {
     use super::scope::load_scope_config_only;
 
     let track_id = TrackId::try_new(track_id_str)
@@ -502,7 +493,7 @@ pub(crate) fn build_scope_query_interactor_no_diff_str(
             "internal: placeholder commit hash construction failed: {e}"
         ))
     })?;
-    Ok(ScopeQueryInteractor::new(scope_config, NullDiffGetter, placeholder_base))
+    Ok(ScopeQueryInteractor::new(scope_config, GitDiffGetter, placeholder_base))
 }
 
 // ---------------------------------------------------------------------------

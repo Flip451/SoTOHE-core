@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-02T10:07:46Z",
-  "declaration_hash": "b1dbbb499bcc8dcac773144b1340bbf0a965df328995819023f769133fcc0ea5",
+  "generated_at": "2026-07-03T08:10:51Z",
+  "declaration_hash": "cb30e74521ef8caa842733b15de3aa6ef1f19993ac3341f23e78cf7e0e3ceb02",
   "signals": [
     {
       "type_name": "DryCompositionRoot",
@@ -22,7 +22,37 @@
       "found_type": true
     },
     {
+      "type_name": "DryCheckApprovedInput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "DryFixRunnerCompositionRoot",
+      "kind_tag": "composition_root",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "DryResultsInput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "DryWriteInput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
       "type_name": "FixpointResolveInput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "RunDryFixLocalInput",
       "kind_tag": "dto",
       "signal": "blue",
       "found_type": false

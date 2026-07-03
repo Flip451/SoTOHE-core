@@ -13,3 +13,9 @@
 | EnsurePrArgs | dto | modify | — | 🔵 | 🔵 |
 | WaitAndMergeArgs | dto | modify | — | 🔵 | 🔵 |
 
+## Free Functions
+
+| Name | Kind | Action | Details | Signal | Cat-Spec |
+|------|------|--------|---------|--------|----------|
+| cli::commands::dry::execute_dry_check_approved | free_function | modify | fn(args: DryCheckApprovedArgs) -> std::process::ExitCode | 🔵 | 🔵 |
+

@@ -281,7 +281,26 @@
     }
   },
   "traits": {},
-  "functions": {},
+  "functions": {
+    "cli::commands::dry::execute_dry_check_approved": {
+      "action": "modify",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "args", "ty": "DryCheckApprovedArgs" }
+      ],
+      "returns": "std::process::ExitCode",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Execute `sotp dry check-approved` (IN-14/AC-20). Resolves track_id via crate::commands::track::resolve_track_id (explicit --track-id or auto from the current track/<id> branch), then measures the wall-clock duration of `DryCompositionRoot::new().dry_driver().handle(DryInput::CheckApproved { .. })` (which internally invokes usecase::dry_check_approved_driver::DryCheckApprovedDriverService::dry_check_approved and renders via cli_driver::dry::DryDriver::dry_check_approved) with std::time::Instant, and emits a GateEval telemetry event for the \"dry\" gate via cli_composition::telemetry_wiring::{resolve_telemetry_writer, emit_gate_eval} -- a plain function-call pattern with no Port abstraction at this boundary, identical to apps/cli/src/main.rs::execute_verify_with_telemetry's existing bin-level pattern for the verify command family. Telemetry is only emitted when resolve_telemetry_writer resolves a writer (on a track/* branch); the verdict tag is \"ok\" when the driver outcome's exit_code is 0, else \"error\", and reason_summary is the outcome's stderr text (empty string when absent). Exits 0 on Approved; exits non-zero on Blocked or Failure. This bin-layer timing+telemetry wrapper supersedes two earlier IN-14 drafts that instead added a DryCheckApprovedTelemetryPort/DryCheckApprovedClockPort pair (usecase) with a DryGateEvalTelemetryAdapter implementation (infrastructure), and a still-earlier check_approved_telemetry field on cli_driver::dry::DryDriver -- both retracted because they added Port-abstraction machinery or layer-boundary violations at a boundary where a plain function call, mirroring execute_verify_with_telemetry, is sufficient and matches CN-07's no-behavior-change telemetry preservation requirement. args/returns are unchanged pre- and post-track (pre-existing in baseline at apps/cli/src/commands/dry.rs:187-200); only the body gains the Instant+telemetry wrapper, hence action: modify rather than add.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-20" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "CN-07" }
+      ],
+      "informal_grounds": []
+    }
+  },
   "inherent_impls": [],
   "trait_impls": [
     { "action": "reference", "trait_ref": "core::fmt::Debug",                    "for_type": "EnsurePrArgs" },

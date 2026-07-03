@@ -4,7 +4,7 @@
   "layer": "cli_driver",
   "types": {
     "DryDriver": {
-      "action": "reference",
+      "action": "modify",
       "role": { "PrimaryAdapter": {} },
       "kind": {
         "kind": "struct",
@@ -12,10 +12,10 @@
       },
       "methods": [],
       "module_path": "dry",
-      "docs": "Primary adapter driver for the `dry` command family (baseline; public shape unchanged by this track). Referenced (not modified) so that this track's changes (IN-13/AC-18) to its private dry_write / dry_check_approved helper methods -- which now consume usecase::dry_driver::DryWriteOutcome / DryCheckApprovedOutcome (IN-13/AC-18) instead of the pre-formatted DryDriverOutcome, and render them into CommandOutcome text themselves instead of forwarding an already-formatted string -- are accounted for by the catalogue, mirroring the DryDriverInteractor precedent in usecase-types.json (a struct whose own shape is unchanged even though the trait it delegates to changes signature). DryDriver's own struct shape and its public new(service) / handle(input) signatures are unchanged; only the private (rustdoc-invisible) rendering logic inside dry_write / dry_check_approved changes.",
+      "docs": "Primary adapter driver for the `dry` command family. IN-14/AC-20 (superseding this track's own prior IN-13 `reference` declaration): DryDriver's public `new` constructor holds four injected services (four params total): `service` backs only dry_fix_local (OS-08, unchanged); `write_service` / `results_service` / `check_approved_service` back the three IN-14-migrated commands, each invoked directly by the corresponding `handle` arm. `dry_check_approved` performs a pure invoke+render: it calls `check_approved_service.dry_check_approved` and renders the resulting `DryCheckApprovedOutcome` into a `CommandOutcome`, with no side-effecting I/O of its own -- wall-clock timing measurement and `GateEval` telemetry emission for this call live in the bin layer (`apps/cli/src/commands/dry.rs::execute_dry_check_approved`), mirroring `execute_verify_with_telemetry`'s bin-level pattern (Port abstraction was tried and retracted across two earlier IN-14 drafts: first a `check_approved_telemetry: Arc<dyn DryCheckApprovedTelemetryPort>` field on this struct, and before that an infrastructure-hosted `TimedGateEvalDryCheckApprovedService` decorator implementing the primary port -- both added a layer-boundary violation or unwarranted port indirection at this boundary; neither exists anymore). `handle` gains a new private render helper for the Results variant (DryResultsOutcome -> CommandOutcome, reproducing the former per-record `lines.push(format!(...))` text byte-for-byte per CN-07/AC-19); the Write / CheckApproved render helpers (render_dry_write_outcome / render_dry_check_approved_outcome) are unchanged from IN-13. `handle`'s own public signature (`&self, input: DryInput) -> CommandOutcome`) is unchanged.",
       "spec_refs": [
-        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-13" },
-        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-18" }
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-20" }
       ],
       "informal_grounds": []
     },
@@ -319,14 +319,17 @@
           "name": "new",
           "receiver": null,
           "params": [
-            { "name": "service", "ty": "std::sync::Arc<dyn usecase::dry_driver::DryDriverService>" }
+            { "name": "service", "ty": "std::sync::Arc<dyn usecase::dry_driver::DryDriverService>" },
+            { "name": "write_service", "ty": "std::sync::Arc<dyn usecase::dry_write_driver::DryWriteDriverService>" },
+            { "name": "results_service", "ty": "std::sync::Arc<dyn usecase::dry_results_driver::DryResultsDriverService>" },
+            { "name": "check_approved_service", "ty": "std::sync::Arc<dyn usecase::dry_check_approved_driver::DryCheckApprovedDriverService>" }
           ],
           "returns": "Self",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
           "where_predicates": [],
-          "docs": "Create a new `DryDriver` with the given service."
+          "docs": "Create a new `DryDriver` with the four given services: `service` backs only dry_fix_local (OS-08, unchanged); write_service / results_service / check_approved_service back the three IN-14-migrated commands, each invoked directly by the corresponding `handle` arm. No telemetry port is held here -- `dry_check_approved`'s wall-clock timing measurement and `GateEval` telemetry emission live in the bin layer (apps/cli/src/commands/dry.rs::execute_dry_check_approved), mirroring execute_verify_with_telemetry; this driver stays a pure invoke+render controller."
         },
         {
           "name": "handle",

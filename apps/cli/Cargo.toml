@@ -16,6 +16,7 @@ workspace = true
 infrastructure = { path = "../../libs/infrastructure" }
 rstest = { workspace = true }
 rustdoc-types = "0.57"
+temp-env = "0.3"
 tempfile = "3.27.0"
 usecase = { path = "../../libs/usecase" }
 

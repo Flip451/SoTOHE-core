@@ -1,12 +1,23 @@
-//! Helpers for building usecase `DryCheckConfig` from infra config and
-//! resolving `CodexDryChecker` construction parameters (model + reasoning effort)
-//! from `AgentProfiles`.
+//! Helpers for lifting infra `DryCheckConfig` into the usecase newtypes and
+//! resolving `CodexDryChecker` construction parameters (model + reasoning
+//! effort) from `AgentProfiles`.
+//!
+//! Relocated from `apps/cli-composition/src/dry/dry_checker_config.rs` (T028)
+//! — the logic is fully owned by [`super::DryCheckServiceFactoryAdapter`] /
+//! [`super::FsDryWriteConfigLoaderAdapter`] now, so it no longer needs to
+//! live in `cli_composition`.
 
-/// Lift infra `DryCheckConfig` fields (enabled + max_parallelism + known-bad percents) into the
-/// validated usecase newtypes (D2 / D3 / D4 / T004 / T011). All values come from
-/// `.harness/config/dry-check.json` v4.
+use std::path::Path;
+
+use crate::agent_profiles::{AGENT_PROFILES_PATH, AgentProfiles};
+use crate::dry_check::DryCheckConfig as InfraDryCheckConfig;
+use crate::track::symlink_guard::reject_symlinks_below;
+
+/// Lift infra [`InfraDryCheckConfig`] fields (enabled + max_parallelism +
+/// known-bad percents) into the validated usecase newtypes. All values come
+/// from `.harness/config/dry-check.json` v4.
 pub(super) fn build_usecase_dry_check_config(
-    infra_config: &infrastructure::dry_check::DryCheckConfig,
+    infra_config: &InfraDryCheckConfig,
 ) -> Result<usecase::dry_check::DryCheckConfig, String> {
     use usecase::dry_check::{DryCheckConfig, DryCheckParallelism, DryCheckPercent};
     let percent =
@@ -41,18 +52,18 @@ pub(super) fn resolve_dry_checker_reasoning_effort(
     }
 }
 
-/// Resolve `(fast_model, final_model, fast_reasoning_effort, final_reasoning_effort)` for the
-/// `dry-checker` capability (D4 / T012 / T013). Explicit `--model` overrides both model fields.
-/// Reasoning effort comes from `CapabilityConfigDto` accessors, is validated against the Codex
-/// allowed values, and absent fields fall back to `"medium"` (fast) / `"high"` (final).
+/// Resolve `(fast_model, final_model, fast_reasoning_effort,
+/// final_reasoning_effort)` for the `dry-checker` capability. Explicit
+/// `--model` overrides both model fields. Reasoning effort comes from
+/// `CapabilityConfigDto` accessors, is validated against the Codex allowed
+/// values, and absent fields fall back to `"medium"` (fast) / `"high"` (final).
 pub(super) fn resolve_dry_checker_config(
-    root: &std::path::Path,
+    root: &Path,
     capability_name: &str,
     explicit_model: Option<String>,
 ) -> Result<(String, String, String, String), String> {
-    use infrastructure::agent_profiles::{AGENT_PROFILES_PATH, AgentProfiles, RoundType};
-    let profiles = AgentProfiles::load(&root.join(AGENT_PROFILES_PATH))
-        .map_err(|e| format!("[ERROR] failed to load agent-profiles.json: {e}"))?;
+    use crate::agent_profiles::RoundType;
+    let profiles = load_agent_profiles_under_root(root)?;
     let (fast_model, final_model) = if let Some(m) = explicit_model {
         (m.clone(), m)
     } else {
@@ -82,30 +93,34 @@ pub(super) fn resolve_dry_checker_config(
     Ok((fast_model, final_model, fast_reasoning_effort, final_reasoning_effort))
 }
 
+fn load_agent_profiles_under_root(root: &Path) -> Result<AgentProfiles, String> {
+    let canonical_root = root.canonicalize().map_err(|e| {
+        format!("[ERROR] failed to canonicalize repo root '{}': {e}", root.display())
+    })?;
+    let profiles_path = canonical_root.join(AGENT_PROFILES_PATH);
+    reject_symlinks_below(&profiles_path, &canonical_root).map_err(|e| {
+        format!("symlink guard agent-profiles.json '{}': {e}", profiles_path.display())
+    })?;
+    AgentProfiles::load(&profiles_path)
+        .map_err(|e| format!("[ERROR] failed to load agent-profiles.json: {e}"))
+}
+
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::indexing_slicing)]
+#[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
     use super::*;
 
-    // ── T016 smoke tests: build_usecase_dry_check_config + resolve_dry_checker_config ──
-
-    /// Builds an infra `DryCheckConfig` from JSON content and a temp file.
-    fn load_infra_dry_check_config_from_json(
-        json: &str,
-    ) -> infrastructure::dry_check::DryCheckConfig {
+    fn load_infra_dry_check_config_from_json(json: &str) -> InfraDryCheckConfig {
         let dir = tempfile::tempdir().unwrap();
         let path = dir.path().join("dry-check.json");
         std::fs::write(&path, json).unwrap();
-        let config = infrastructure::dry_check::DryCheckConfig::load(&path).unwrap();
-        // Keep dir alive through the function — config has no reference to the file.
+        let config = InfraDryCheckConfig::load(&path).unwrap();
         drop(dir);
         config
     }
 
-    /// Verify that `build_usecase_dry_check_config` propagates `max_parallelism`
-    /// from the infra config to the usecase config newtype.
     #[test]
     fn test_dry_write_passes_max_parallelism_to_usecase_config() {
         let infra_config = load_infra_dry_check_config_from_json(
@@ -117,18 +132,10 @@ mod tests {
                 "known_bad_detection_threshold_percent": 90
             }"#,
         );
-        assert_eq!(infra_config.max_parallelism(), 7, "infra config must expose max_parallelism=7");
-
         let usecase_config = build_usecase_dry_check_config(&infra_config).unwrap();
-        assert_eq!(
-            usecase_config.max_parallelism.as_usize(),
-            7,
-            "build_usecase_dry_check_config must propagate max_parallelism to the usecase newtype"
-        );
+        assert_eq!(usecase_config.max_parallelism.as_usize(), 7);
     }
 
-    /// Verify that `build_usecase_dry_check_config` propagates the known-bad calibration
-    /// percent fields from the infra config to the usecase config newtypes.
     #[test]
     fn test_dry_write_passes_known_bad_calibration_to_usecase_config() {
         let infra_config = load_infra_dry_check_config_from_json(
@@ -140,30 +147,14 @@ mod tests {
                 "known_bad_detection_threshold_percent": 80
             }"#,
         );
-        assert_eq!(infra_config.known_bad_injection_rate_percent(), 20);
-        assert_eq!(infra_config.known_bad_detection_threshold_percent(), 80);
-
         let usecase_config = build_usecase_dry_check_config(&infra_config).unwrap();
-        assert_eq!(
-            usecase_config.known_bad_injection_rate_percent.as_u8(),
-            20,
-            "build_usecase_dry_check_config must propagate known_bad_injection_rate_percent"
-        );
-        assert_eq!(
-            usecase_config.known_bad_detection_threshold_percent.as_u8(),
-            80,
-            "build_usecase_dry_check_config must propagate known_bad_detection_threshold_percent"
-        );
+        assert_eq!(usecase_config.known_bad_injection_rate_percent.as_u8(), 20);
+        assert_eq!(usecase_config.known_bad_detection_threshold_percent.as_u8(), 80);
     }
 
-    /// Verify that `resolve_dry_checker_config` returns fast and final models from a
-    /// test `agent-profiles.json` with both `fast_model` and `model` defined.
     #[test]
     fn test_resolve_dry_checker_config_returns_fast_and_final_from_agent_profiles() {
         let dir = tempfile::tempdir().unwrap();
-
-        // Write a minimal agent-profiles.json with separate fast_model / model and
-        // reasoning_effort fields for dry-checker.
         std::fs::create_dir_all(dir.path().join(".harness/config")).unwrap();
         std::fs::write(
             dir.path().join(".harness/config/agent-profiles.json"),
@@ -186,25 +177,12 @@ mod tests {
         let (fast_model, final_model, fast_effort, final_effort) =
             resolve_dry_checker_config(dir.path(), "dry-checker", None).unwrap();
 
-        assert_eq!(
-            fast_model, "fast-model-v1",
-            "fast_model must come from the fast_model field in agent-profiles.json"
-        );
-        assert_eq!(
-            final_model, "final-model-v1",
-            "final_model must come from the model field in agent-profiles.json"
-        );
-        assert_eq!(
-            fast_effort, "low",
-            "fast_reasoning_effort must come from agent-profiles.json dry-checker capability"
-        );
-        assert_eq!(
-            final_effort, "high",
-            "final_reasoning_effort must come from agent-profiles.json dry-checker capability"
-        );
+        assert_eq!(fast_model, "fast-model-v1");
+        assert_eq!(final_model, "final-model-v1");
+        assert_eq!(fast_effort, "low");
+        assert_eq!(final_effort, "high");
     }
 
-    /// Verify that an explicit model override still uses reasoning effort from agent-profiles.json.
     #[test]
     fn test_resolve_dry_checker_config_explicit_model_uses_agent_profile_reasoning_effort() {
         let dir = tempfile::tempdir().unwrap();
@@ -240,13 +218,9 @@ mod tests {
         assert_eq!(final_effort, "minimal");
     }
 
-    /// Verify that `resolve_dry_checker_config` falls back fast_model → final_model
-    /// when no separate `fast_model` field is configured, and uses built-in defaults
-    /// for reasoning effort when the fields are absent.
     #[test]
     fn test_resolve_dry_checker_config_fast_falls_back_to_final_when_not_set() {
         let dir = tempfile::tempdir().unwrap();
-
         std::fs::create_dir_all(dir.path().join(".harness/config")).unwrap();
         std::fs::write(
             dir.path().join(".harness/config/agent-profiles.json"),
@@ -266,23 +240,41 @@ mod tests {
         let (fast_model, final_model, fast_effort, final_effort) =
             resolve_dry_checker_config(dir.path(), "dry-checker", None).unwrap();
 
-        assert_eq!(
-            fast_model, "only-final-model-v1",
-            "fast_model must fall back to final_model when fast_model is not configured"
-        );
-        assert_eq!(final_model, "only-final-model-v1", "final_model must be the model field");
-        assert_eq!(
-            fast_effort, "medium",
-            "fast_reasoning_effort must use built-in default 'medium' when absent from profiles"
-        );
-        assert_eq!(
-            final_effort, "high",
-            "final_reasoning_effort must use built-in default 'high' when absent from profiles"
-        );
+        assert_eq!(fast_model, "only-final-model-v1");
+        assert_eq!(final_model, "only-final-model-v1");
+        assert_eq!(fast_effort, "medium");
+        assert_eq!(final_effort, "high");
     }
 
-    /// Verify that `resolve_dry_checker_config` remains the allowed-values guard
-    /// for reasoning effort values loaded from agent-profiles.json.
+    #[cfg(unix)]
+    #[test]
+    fn test_resolve_dry_checker_config_symlinked_agent_profiles_returns_error() {
+        let dir = tempfile::tempdir().unwrap();
+        let config_dir = dir.path().join(".harness/config");
+        std::fs::create_dir_all(&config_dir).unwrap();
+        let real_profiles = config_dir.join("real-agent-profiles.json");
+        std::fs::write(
+            &real_profiles,
+            r#"{
+  "schema_version": 1,
+  "providers": { "codex": { "label": "Codex" } },
+  "capabilities": {
+    "dry-checker": {
+      "provider": "codex",
+      "model": "final-model-v1"
+    }
+  }
+}"#,
+        )
+        .unwrap();
+        std::os::unix::fs::symlink(&real_profiles, config_dir.join("agent-profiles.json")).unwrap();
+
+        let err = resolve_dry_checker_config(dir.path(), "dry-checker", None).unwrap_err();
+
+        assert!(err.contains("symlink guard agent-profiles.json"), "got: {err}");
+        assert!(err.contains("symlink"), "got: {err}");
+    }
+
     #[test]
     fn test_resolve_dry_checker_config_invalid_reasoning_effort_returns_error() {
         let cases = [
@@ -313,18 +305,8 @@ mod tests {
             .unwrap();
 
             let err = resolve_dry_checker_config(dir.path(), "dry-checker", None).unwrap_err();
-            assert!(
-                err.contains(expected_field),
-                "error must name invalid field {expected_field}; got: {err}"
-            );
-            assert!(
-                err.contains(expected_value),
-                "error must include invalid value {expected_value}; got: {err}"
-            );
-            assert!(
-                err.contains("allowed: low, medium, high, minimal"),
-                "error must show allowed values; got: {err}"
-            );
+            assert!(err.contains(expected_field), "got: {err}");
+            assert!(err.contains(expected_value), "got: {err}");
         }
     }
 }

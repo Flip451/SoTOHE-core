@@ -184,7 +184,17 @@ pub struct DryCheckApprovedArgs {
 /// Execute `sotp dry check-approved`.
 ///
 /// Exits 0 on Approved; exits non-zero on Blocked.
+///
+/// Measures the driver call's wall-clock duration and emits a `GateEval`
+/// telemetry event for the `"dry"` gate — mirroring
+/// `main.rs::execute_verify_with_telemetry`. Timing measurement and the
+/// telemetry emit call are a bin-layer (thin-bin I/O) responsibility, not a
+/// `cli_driver` one: `cli_driver::dry::DryDriver` stays a pure invoke+render
+/// controller.
 pub fn execute_dry_check_approved(args: DryCheckApprovedArgs) -> ExitCode {
+    use cli_composition::telemetry_wiring::{emit_gate_eval, resolve_telemetry_writer};
+    use std::time::Instant;
+
     let track_id = match crate::commands::track::resolve_track_id(args.track_id, &args.items_dir) {
         Ok(id) => id,
         Err(msg) => {
@@ -192,11 +202,22 @@ pub fn execute_dry_check_approved(args: DryCheckApprovedArgs) -> ExitCode {
             return ExitCode::FAILURE;
         }
     };
-    driver_outcome_to_exit(DryCompositionRoot::new().dry_driver().handle(DryInput::CheckApproved {
+
+    let telemetry = resolve_telemetry_writer(&args.items_dir);
+    let start = Instant::now();
+    let outcome = DryCompositionRoot::new().dry_driver().handle(DryInput::CheckApproved {
         track_id,
         base_commit: args.base_commit,
         items_dir: args.items_dir,
-    }))
+    });
+
+    if let Some((ref w, ref tid)) = telemetry {
+        let verdict_str = if outcome.exit_code == 0 { "ok" } else { "error" };
+        let reason_summary = outcome.stderr.as_deref().unwrap_or("").to_owned();
+        emit_gate_eval(w, tid, "dry", verdict_str, &reason_summary, start);
+    }
+
+    driver_outcome_to_exit(outcome)
 }
 
 // ── sotp dry fix-local ────────────────────────────────────────────────────────
@@ -438,6 +459,56 @@ mod tests {
             }
             other => panic!("expected CheckApproved, got {other:?}"),
         }
+    }
+
+    // ── sotp dry check-approved: telemetry wiring (bin-level GateEval emit) ──
+    //
+    // Timing measurement and `GateEval` telemetry emission for `dry
+    // check-approved` live in `execute_dry_check_approved` itself (moved
+    // from `cli_driver::dry::DryDriver`, which is now a pure invoke+render
+    // controller). This exercises the real `resolve_telemetry_writer` /
+    // `emit_gate_eval` wiring end-to-end through a temp git repo checked out
+    // on a `track/<id>` branch, mirroring the infra-level GateEval tests
+    // that used to cover `DryGateEvalTelemetryAdapter`.
+
+    #[test]
+    fn test_execute_dry_check_approved_emits_gate_eval_telemetry_on_track_branch() {
+        use crate::commands::track::test_support::{process_env_lock, run_in_dir, seed_repo};
+
+        let _guard = process_env_lock().lock().unwrap();
+        let dir = tempfile::TempDir::new().unwrap();
+        let root = dir.path();
+        let track_id = "dry-telemetry-bin-2026";
+        seed_repo(root, &format!("track/{track_id}"));
+        std::fs::create_dir_all(root.join("track/items").join(track_id)).unwrap();
+
+        // `cargo make test` runs with `SOTP_TELEMETRY=0` (Makefile.toml
+        // `test-local`) to keep the suite from writing telemetry by default;
+        // override it here so this test exercises the enabled path.
+        temp_env::with_vars([("SOTP_TELEMETRY", Some("1")), ("SOTP_TELEMETRY_DIR", None)], || {
+            run_in_dir(root, || {
+                execute_dry_check_approved(DryCheckApprovedArgs {
+                    track_id: None,
+                    base_commit: None,
+                    items_dir: PathBuf::from("track/items"),
+                });
+            });
+        });
+
+        let telemetry_path =
+            root.join("track/items").join(track_id).join("logs").join("telemetry.jsonl");
+        assert!(
+            telemetry_path.exists(),
+            "telemetry.jsonl must exist after execute_dry_check_approved on a track branch"
+        );
+        let content = std::fs::read_to_string(&telemetry_path).unwrap();
+        assert!(
+            content.contains("\"event_type\":\"GateEval\""),
+            "event_type must be GateEval; got: {content}"
+        );
+        assert!(content.contains("\"gate_name\":\"dry\""), "gate_name must be dry; got: {content}");
+        assert!(content.contains(track_id), "track_id must be present; got: {content}");
+        assert!(content.contains("\"duration_ms\""), "duration_ms must be present; got: {content}");
     }
 
     // ── VerdictFilterArg → filter string conversion ───────────────────────────

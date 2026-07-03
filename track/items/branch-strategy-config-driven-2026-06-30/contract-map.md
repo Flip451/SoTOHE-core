@@ -74,8 +74,25 @@ subgraph usecase["usecase"]
     R34_usecase_usecase_BranchStrategyPort_track_prefix([track_prefix])
   end
   end
+  subgraph usecase_usecase_module_dry_check_approved_driver["usecase::dry_check_approved_driver"]
+    direction TB
+  subgraph T48_usecase_usecase_DryCheckApprovedDriverInteractor["dry_check_approved_driver::DryCheckApprovedDriverInteractor"]
+    direction TB
+    T48_usecase_usecase_DryCheckApprovedDriverInteractor__self[DryCheckApprovedDriverInteractor]
+    T48_usecase_usecase_DryCheckApprovedDriverInteractor_new([new])
+  end
+  subgraph R45_usecase_usecase_DryCheckApprovedDriverService["dry_check_approved_driver::DryCheckApprovedDriverService"]
+    direction TB
+    R45_usecase_usecase_DryCheckApprovedDriverService__self[DryCheckApprovedDriverService]
+    R45_usecase_usecase_DryCheckApprovedDriverService_dry_check_approved([dry_check_approved])
+  end
+  end
   subgraph usecase_usecase_module_dry_driver["usecase::dry_driver"]
     direction TB
+  subgraph T43_usecase_usecase_DryCheckApprovedDriverInput["dry_driver::DryCheckApprovedDriverInput"]
+    direction TB
+    T43_usecase_usecase_DryCheckApprovedDriverInput__self[DryCheckApprovedDriverInput]
+  end
   subgraph T39_usecase_usecase_DryCheckApprovedOutcome["dry_driver::DryCheckApprovedOutcome"]
     direction TB
     T39_usecase_usecase_DryCheckApprovedOutcome__self[DryCheckApprovedOutcome]
@@ -86,6 +103,18 @@ subgraph usecase["usecase"]
   subgraph T35_usecase_usecase_DryDriverInteractor["dry_driver::DryDriverInteractor"]
     direction TB
     T35_usecase_usecase_DryDriverInteractor__self[DryDriverInteractor]
+  end
+  subgraph T38_usecase_usecase_DryFixLocalDriverInput["dry_driver::DryFixLocalDriverInput"]
+    direction TB
+    T38_usecase_usecase_DryFixLocalDriverInput__self[DryFixLocalDriverInput]
+  end
+  subgraph T37_usecase_usecase_DryResultsDriverInput["dry_driver::DryResultsDriverInput"]
+    direction TB
+    T37_usecase_usecase_DryResultsDriverInput__self[DryResultsDriverInput]
+  end
+  subgraph T35_usecase_usecase_DryWriteDriverInput["dry_driver::DryWriteDriverInput"]
+    direction TB
+    T35_usecase_usecase_DryWriteDriverInput__self[DryWriteDriverInput]
   end
   subgraph T38_usecase_usecase_DryWriteFindingSummary["dry_driver::DryWriteFindingSummary"]
     direction TB
@@ -100,18 +129,152 @@ subgraph usecase["usecase"]
   subgraph R29_usecase_usecase_DryDriverPort["dry_driver::DryDriverPort"]
     direction TB
     R29_usecase_usecase_DryDriverPort__self[DryDriverPort]
-    R29_usecase_usecase_DryDriverPort_dry_write([dry_write])
-    R29_usecase_usecase_DryDriverPort_dry_results([dry_results])
-    R29_usecase_usecase_DryDriverPort_dry_check_approved([dry_check_approved])
     R29_usecase_usecase_DryDriverPort_dry_fix_local([dry_fix_local])
   end
   subgraph R32_usecase_usecase_DryDriverService["dry_driver::DryDriverService"]
     direction TB
     R32_usecase_usecase_DryDriverService__self[DryDriverService]
-    R32_usecase_usecase_DryDriverService_dry_write([dry_write])
-    R32_usecase_usecase_DryDriverService_dry_results([dry_results])
-    R32_usecase_usecase_DryDriverService_dry_check_approved([dry_check_approved])
     R32_usecase_usecase_DryDriverService_dry_fix_local([dry_fix_local])
+  end
+  end
+  subgraph usecase_usecase_module_dry_driver_shared["usecase::dry_driver_shared"]
+    direction TB
+  subgraph T34_usecase_usecase_DryBaseBranchError["dry_driver_shared::DryBaseBranchError"]
+    direction TB
+    T34_usecase_usecase_DryBaseBranchError__self[DryBaseBranchError]
+    T34_usecase_usecase_DryBaseBranchError_Unavailable[Unavailable]
+  end
+  subgraph T37_usecase_usecase_DryCheckStorageHandle["dry_driver_shared::DryCheckStorageHandle"]
+    direction TB
+    T37_usecase_usecase_DryCheckStorageHandle__self[DryCheckStorageHandle]
+  end
+  subgraph T32_usecase_usecase_DryRepoWorkspace["dry_driver_shared::DryRepoWorkspace"]
+    direction TB
+    T32_usecase_usecase_DryRepoWorkspace__self[DryRepoWorkspace]
+  end
+  subgraph T37_usecase_usecase_DryRepoWorkspaceError["dry_driver_shared::DryRepoWorkspaceError"]
+    direction TB
+    T37_usecase_usecase_DryRepoWorkspaceError__self[DryRepoWorkspaceError]
+    T37_usecase_usecase_DryRepoWorkspaceError_Unavailable[Unavailable]
+  end
+  subgraph R33_usecase_usecase_DryBaseBranchPort["dry_driver_shared::DryBaseBranchPort"]
+    direction TB
+    R33_usecase_usecase_DryBaseBranchPort__self[DryBaseBranchPort]
+    R33_usecase_usecase_DryBaseBranchPort_resolve_base_branch([resolve_base_branch])
+  end
+  subgraph R42_usecase_usecase_DryCheckStorageFactoryPort["dry_driver_shared::DryCheckStorageFactoryPort"]
+    direction TB
+    R42_usecase_usecase_DryCheckStorageFactoryPort__self[DryCheckStorageFactoryPort]
+    R42_usecase_usecase_DryCheckStorageFactoryPort_build([build])
+  end
+  subgraph R38_usecase_usecase_DryDiffBaseFactoryPort["dry_driver_shared::DryDiffBaseFactoryPort"]
+    direction TB
+    R38_usecase_usecase_DryDiffBaseFactoryPort__self[DryDiffBaseFactoryPort]
+    R38_usecase_usecase_DryDiffBaseFactoryPort_build([build])
+  end
+  subgraph R31_usecase_usecase_DryRepoRootPort["dry_driver_shared::DryRepoRootPort"]
+    direction TB
+    R31_usecase_usecase_DryRepoRootPort__self[DryRepoRootPort]
+    R31_usecase_usecase_DryRepoRootPort_resolve([resolve])
+  end
+  end
+  subgraph usecase_usecase_module_dry_results_driver["usecase::dry_results_driver"]
+    direction TB
+  subgraph T42_usecase_usecase_DryResultsDriverInteractor["dry_results_driver::DryResultsDriverInteractor"]
+    direction TB
+    T42_usecase_usecase_DryResultsDriverInteractor__self[DryResultsDriverInteractor]
+    T42_usecase_usecase_DryResultsDriverInteractor_new([new])
+  end
+  subgraph T33_usecase_usecase_DryResultsOutcome["dry_results_driver::DryResultsOutcome"]
+    direction TB
+    T33_usecase_usecase_DryResultsOutcome__self[DryResultsOutcome]
+    T33_usecase_usecase_DryResultsOutcome_Success[Success]
+    T33_usecase_usecase_DryResultsOutcome_Failure[Failure]
+  end
+  subgraph T39_usecase_usecase_DryResultsRecordSummary["dry_results_driver::DryResultsRecordSummary"]
+    direction TB
+    T39_usecase_usecase_DryResultsRecordSummary__self[DryResultsRecordSummary]
+  end
+  subgraph T40_usecase_usecase_DryResultsVerdictSummary["dry_results_driver::DryResultsVerdictSummary"]
+    direction TB
+    T40_usecase_usecase_DryResultsVerdictSummary__self[DryResultsVerdictSummary]
+    T40_usecase_usecase_DryResultsVerdictSummary_NotAViolation[NotAViolation]
+    T40_usecase_usecase_DryResultsVerdictSummary_Accepted[Accepted]
+    T40_usecase_usecase_DryResultsVerdictSummary_Violation[Violation]
+  end
+  subgraph R39_usecase_usecase_DryResultsDriverService["dry_results_driver::DryResultsDriverService"]
+    direction TB
+    R39_usecase_usecase_DryResultsDriverService__self[DryResultsDriverService]
+    R39_usecase_usecase_DryResultsDriverService_dry_results([dry_results])
+  end
+  end
+  subgraph usecase_usecase_module_dry_write_driver["usecase::dry_write_driver"]
+    direction TB
+  subgraph T45_usecase_usecase_DryCheckServiceFactoryCommand["dry_write_driver::DryCheckServiceFactoryCommand"]
+    direction TB
+    T45_usecase_usecase_DryCheckServiceFactoryCommand__self[DryCheckServiceFactoryCommand]
+  end
+  subgraph T43_usecase_usecase_DryCheckServiceFactoryError["dry_write_driver::DryCheckServiceFactoryError"]
+    direction TB
+    T43_usecase_usecase_DryCheckServiceFactoryError__self[DryCheckServiceFactoryError]
+    T43_usecase_usecase_DryCheckServiceFactoryError_Unavailable[Unavailable]
+  end
+  subgraph T44_usecase_usecase_DryCheckServiceFactoryOutput["dry_write_driver::DryCheckServiceFactoryOutput"]
+    direction TB
+    T44_usecase_usecase_DryCheckServiceFactoryOutput__self[DryCheckServiceFactoryOutput]
+  end
+  subgraph T39_usecase_usecase_DryCorpusFragmentsError["dry_write_driver::DryCorpusFragmentsError"]
+    direction TB
+    T39_usecase_usecase_DryCorpusFragmentsError__self[DryCorpusFragmentsError]
+    T39_usecase_usecase_DryCorpusFragmentsError_Unavailable[Unavailable]
+  end
+  subgraph T40_usecase_usecase_DryCorpusFragmentsOutput["dry_write_driver::DryCorpusFragmentsOutput"]
+    direction TB
+    T40_usecase_usecase_DryCorpusFragmentsOutput__self[DryCorpusFragmentsOutput]
+  end
+  subgraph T42_usecase_usecase_DryCorpusRootManifestError["dry_write_driver::DryCorpusRootManifestError"]
+    direction TB
+    T42_usecase_usecase_DryCorpusRootManifestError__self[DryCorpusRootManifestError]
+    T42_usecase_usecase_DryCorpusRootManifestError_Unavailable[Unavailable]
+  end
+  subgraph T40_usecase_usecase_DryWriteConfigResolution["dry_write_driver::DryWriteConfigResolution"]
+    direction TB
+    T40_usecase_usecase_DryWriteConfigResolution__self[DryWriteConfigResolution]
+  end
+  subgraph T40_usecase_usecase_DryWriteDriverInteractor["dry_write_driver::DryWriteDriverInteractor"]
+    direction TB
+    T40_usecase_usecase_DryWriteDriverInteractor__self[DryWriteDriverInteractor]
+    T40_usecase_usecase_DryWriteDriverInteractor_new([new])
+  end
+  subgraph R42_usecase_usecase_DryCheckServiceFactoryPort["dry_write_driver::DryCheckServiceFactoryPort"]
+    direction TB
+    R42_usecase_usecase_DryCheckServiceFactoryPort__self[DryCheckServiceFactoryPort]
+    R42_usecase_usecase_DryCheckServiceFactoryPort_build([build])
+  end
+  subgraph R38_usecase_usecase_DryCorpusFragmentsPort["dry_write_driver::DryCorpusFragmentsPort"]
+    direction TB
+    R38_usecase_usecase_DryCorpusFragmentsPort__self[DryCorpusFragmentsPort]
+    R38_usecase_usecase_DryCorpusFragmentsPort_build([build])
+  end
+  subgraph R47_usecase_usecase_DryCorpusRootManifestWriterPort["dry_write_driver::DryCorpusRootManifestWriterPort"]
+    direction TB
+    R47_usecase_usecase_DryCorpusRootManifestWriterPort__self[DryCorpusRootManifestWriterPort]
+    R47_usecase_usecase_DryCorpusRootManifestWriterPort_write([write])
+  end
+  subgraph R36_usecase_usecase_DryTierTelemetryPort["dry_write_driver::DryTierTelemetryPort"]
+    direction TB
+    R36_usecase_usecase_DryTierTelemetryPort__self[DryTierTelemetryPort]
+    R36_usecase_usecase_DryTierTelemetryPort_record([record])
+  end
+  subgraph R40_usecase_usecase_DryWriteConfigLoaderPort["dry_write_driver::DryWriteConfigLoaderPort"]
+    direction TB
+    R40_usecase_usecase_DryWriteConfigLoaderPort__self[DryWriteConfigLoaderPort]
+    R40_usecase_usecase_DryWriteConfigLoaderPort_load([load])
+  end
+  subgraph R37_usecase_usecase_DryWriteDriverService["dry_write_driver::DryWriteDriverService"]
+    direction TB
+    R37_usecase_usecase_DryWriteDriverService__self[DryWriteDriverService]
+    R37_usecase_usecase_DryWriteDriverService_dry_write([dry_write])
   end
   end
   subgraph usecase_usecase_module_fixpoint_resolve["usecase::fixpoint_resolve"]
@@ -249,6 +412,21 @@ subgraph infrastructure["infrastructure"]
   end
   subgraph infrastructure_infrastructure_module_dry_check["infrastructure::dry_check"]
     direction TB
+  subgraph T52_infrastructure_infrastructure_CodexDryFixLocalRunner["dry_check::dry_fix_local::CodexDryFixLocalRunner"]
+    direction TB
+    T52_infrastructure_infrastructure_CodexDryFixLocalRunner__self[CodexDryFixLocalRunner]
+    T52_infrastructure_infrastructure_CodexDryFixLocalRunner_new([new])
+    T52_infrastructure_infrastructure_CodexDryFixLocalRunner_dry_run_fix_local([dry_run_fix_local])
+  end
+  subgraph T59_infrastructure_infrastructure_DryCheckServiceFactoryAdapter["dry_check::dry_write_driver::DryCheckServiceFactoryAdapter"]
+    direction TB
+    T59_infrastructure_infrastructure_DryCheckServiceFactoryAdapter__self[DryCheckServiceFactoryAdapter]
+  end
+  subgraph T46_infrastructure_infrastructure_DryDriverAdapter["dry_check::dry_fix_local::DryDriverAdapter"]
+    direction TB
+    T46_infrastructure_infrastructure_DryDriverAdapter__self[DryDriverAdapter]
+    T46_infrastructure_infrastructure_DryDriverAdapter_new([new])
+  end
   subgraph T55_infrastructure_infrastructure_FsDiffBaseResolverAdapter["dry_check::diff_base_resolver::FsDiffBaseResolverAdapter"]
     direction TB
     T55_infrastructure_infrastructure_FsDiffBaseResolverAdapter__self[FsDiffBaseResolverAdapter]
@@ -257,6 +435,39 @@ subgraph infrastructure["infrastructure"]
   subgraph T57_infrastructure_infrastructure_FsDryApprovalFactoryAdapter["dry_check::approval_factory::FsDryApprovalFactoryAdapter"]
     direction TB
     T57_infrastructure_infrastructure_FsDryApprovalFactoryAdapter__self[FsDryApprovalFactoryAdapter]
+  end
+  subgraph T52_infrastructure_infrastructure_FsDryBaseBranchAdapter["dry_check::dry_driver_shared::FsDryBaseBranchAdapter"]
+    direction TB
+    T52_infrastructure_infrastructure_FsDryBaseBranchAdapter__self[FsDryBaseBranchAdapter]
+  end
+  subgraph T61_infrastructure_infrastructure_FsDryCheckStorageFactoryAdapter["dry_check::dry_driver_shared::FsDryCheckStorageFactoryAdapter"]
+    direction TB
+    T61_infrastructure_infrastructure_FsDryCheckStorageFactoryAdapter__self[FsDryCheckStorageFactoryAdapter]
+  end
+  subgraph T57_infrastructure_infrastructure_FsDryCorpusFragmentsAdapter["dry_check::dry_write_driver::FsDryCorpusFragmentsAdapter"]
+    direction TB
+    T57_infrastructure_infrastructure_FsDryCorpusFragmentsAdapter__self[FsDryCorpusFragmentsAdapter]
+  end
+  subgraph T60_infrastructure_infrastructure_FsDryCorpusRootManifestAdapter["dry_check::dry_write_driver::FsDryCorpusRootManifestAdapter"]
+    direction TB
+    T60_infrastructure_infrastructure_FsDryCorpusRootManifestAdapter__self[FsDryCorpusRootManifestAdapter]
+  end
+  subgraph T57_infrastructure_infrastructure_FsDryDiffBaseFactoryAdapter["dry_check::dry_driver_shared::FsDryDiffBaseFactoryAdapter"]
+    direction TB
+    T57_infrastructure_infrastructure_FsDryDiffBaseFactoryAdapter__self[FsDryDiffBaseFactoryAdapter]
+  end
+  subgraph T50_infrastructure_infrastructure_FsDryRepoRootAdapter["dry_check::dry_driver_shared::FsDryRepoRootAdapter"]
+    direction TB
+    T50_infrastructure_infrastructure_FsDryRepoRootAdapter__self[FsDryRepoRootAdapter]
+  end
+  subgraph T59_infrastructure_infrastructure_FsDryWriteConfigLoaderAdapter["dry_check::dry_write_driver::FsDryWriteConfigLoaderAdapter"]
+    direction TB
+    T59_infrastructure_infrastructure_FsDryWriteConfigLoaderAdapter__self[FsDryWriteConfigLoaderAdapter]
+  end
+  subgraph T62_infrastructure_infrastructure_RecordingDryTierTelemetryAdapter["dry_check::dry_write_driver::RecordingDryTierTelemetryAdapter"]
+    direction TB
+    T62_infrastructure_infrastructure_RecordingDryTierTelemetryAdapter__self[RecordingDryTierTelemetryAdapter]
+    T62_infrastructure_infrastructure_RecordingDryTierTelemetryAdapter_new([new])
   end
   end
   subgraph infrastructure_infrastructure_module_track["infrastructure::track"]
@@ -362,9 +573,6 @@ subgraph cli_composition["cli_composition"]
     direction TB
     T50_cli_composition_cli_composition_DryCompositionRoot__self[DryCompositionRoot]
     T50_cli_composition_cli_composition_DryCompositionRoot_new([new])
-    T50_cli_composition_cli_composition_DryCompositionRoot_dry_write([dry_write])
-    T50_cli_composition_cli_composition_DryCompositionRoot_dry_results([dry_results])
-    T50_cli_composition_cli_composition_DryCompositionRoot_dry_check_approved([dry_check_approved])
     T50_cli_composition_cli_composition_DryCompositionRoot_dry_driver([dry_driver])
   end
   end
@@ -468,6 +676,7 @@ subgraph cli["cli"]
     direction TB
     T24_cli_cli_WaitAndMergeArgs__self[WaitAndMergeArgs]
   end
+  F54_cli_cli_cli__commands__dry__execute_dry_check_approved[[execute_dry_check_approved]]
   end
 end
 T36_domain_domain_BranchStrategySnapshot_new --o T25_domain_domain_MergeMethod__self
@@ -479,11 +688,32 @@ T27_domain_domain_TrackMetadata_with_branch --o T36_domain_domain_BranchStrategy
 T27_domain_domain_TrackMetadata_with_branch --> T27_domain_domain_TrackMetadata__self
 T27_domain_domain_TrackMetadata_branch_strategy_snapshot --> T36_domain_domain_BranchStrategySnapshot__self
 R34_usecase_usecase_BranchStrategyPort_merge_method --> T25_domain_domain_MergeMethod__self
+T48_usecase_usecase_DryCheckApprovedDriverInteractor_new --> T48_usecase_usecase_DryCheckApprovedDriverInteractor__self
+R45_usecase_usecase_DryCheckApprovedDriverService_dry_check_approved --o T43_usecase_usecase_DryCheckApprovedDriverInput__self
+R45_usecase_usecase_DryCheckApprovedDriverService_dry_check_approved --> T39_usecase_usecase_DryCheckApprovedOutcome__self
 T31_usecase_usecase_DryWriteOutcome_Success --o|findings| T38_usecase_usecase_DryWriteFindingSummary__self
-R29_usecase_usecase_DryDriverPort_dry_write --> T31_usecase_usecase_DryWriteOutcome__self
-R29_usecase_usecase_DryDriverPort_dry_check_approved --> T39_usecase_usecase_DryCheckApprovedOutcome__self
-R32_usecase_usecase_DryDriverService_dry_write --> T31_usecase_usecase_DryWriteOutcome__self
-R32_usecase_usecase_DryDriverService_dry_check_approved --> T39_usecase_usecase_DryCheckApprovedOutcome__self
+R29_usecase_usecase_DryDriverPort_dry_fix_local --o T38_usecase_usecase_DryFixLocalDriverInput__self
+R32_usecase_usecase_DryDriverService_dry_fix_local --o T38_usecase_usecase_DryFixLocalDriverInput__self
+R33_usecase_usecase_DryBaseBranchPort_resolve_base_branch --> T34_usecase_usecase_DryBaseBranchError__self
+R42_usecase_usecase_DryCheckStorageFactoryPort_build --> T37_usecase_usecase_DryCheckStorageHandle__self
+R31_usecase_usecase_DryRepoRootPort_resolve --> T32_usecase_usecase_DryRepoWorkspace__self
+R31_usecase_usecase_DryRepoRootPort_resolve --> T37_usecase_usecase_DryRepoWorkspaceError__self
+T42_usecase_usecase_DryResultsDriverInteractor_new --> T42_usecase_usecase_DryResultsDriverInteractor__self
+T33_usecase_usecase_DryResultsOutcome_Success --o|records| T39_usecase_usecase_DryResultsRecordSummary__self
+T39_usecase_usecase_DryResultsRecordSummary__self --o|verdict| T40_usecase_usecase_DryResultsVerdictSummary__self
+R39_usecase_usecase_DryResultsDriverService_dry_results --o T37_usecase_usecase_DryResultsDriverInput__self
+R39_usecase_usecase_DryResultsDriverService_dry_results --> T33_usecase_usecase_DryResultsOutcome__self
+T40_usecase_usecase_DryWriteDriverInteractor_new --> T40_usecase_usecase_DryWriteDriverInteractor__self
+R42_usecase_usecase_DryCheckServiceFactoryPort_build --o T45_usecase_usecase_DryCheckServiceFactoryCommand__self
+R42_usecase_usecase_DryCheckServiceFactoryPort_build --> T43_usecase_usecase_DryCheckServiceFactoryError__self
+R42_usecase_usecase_DryCheckServiceFactoryPort_build --> T44_usecase_usecase_DryCheckServiceFactoryOutput__self
+R38_usecase_usecase_DryCorpusFragmentsPort_build --> T39_usecase_usecase_DryCorpusFragmentsError__self
+R38_usecase_usecase_DryCorpusFragmentsPort_build --> T40_usecase_usecase_DryCorpusFragmentsOutput__self
+R47_usecase_usecase_DryCorpusRootManifestWriterPort_write --> T42_usecase_usecase_DryCorpusRootManifestError__self
+R40_usecase_usecase_DryWriteConfigLoaderPort_load --> T41_usecase_usecase_DryCheckConfigLoaderError__self
+R40_usecase_usecase_DryWriteConfigLoaderPort_load --> T40_usecase_usecase_DryWriteConfigResolution__self
+R37_usecase_usecase_DryWriteDriverService_dry_write --o T35_usecase_usecase_DryWriteDriverInput__self
+R37_usecase_usecase_DryWriteDriverService_dry_write --> T31_usecase_usecase_DryWriteOutcome__self
 T47_usecase_usecase_FixpointResolveDriverInteractor_new --> T47_usecase_usecase_FixpointResolveDriverInteractor__self
 R40_usecase_usecase_DryCheckConfigLoaderPort_load --> T41_usecase_usecase_DryCheckConfigLoaderError__self
 R44_usecase_usecase_FixpointResolveDriverService_fixpoint_resolve --o T42_usecase_usecase_FixpointResolveDriverInput__self
@@ -491,12 +721,19 @@ R44_usecase_usecase_FixpointResolveDriverService_fixpoint_resolve --> T44_usecas
 R44_usecase_usecase_FixpointWorkspaceContextPort_resolve_context --> T40_usecase_usecase_FixpointWorkspaceContext__self
 R44_usecase_usecase_FixpointWorkspaceContextPort_resolve_context --> T45_usecase_usecase_FixpointWorkspaceContextError__self
 T35_usecase_usecase_DryDriverInteractor__self -.impl.-> R32_usecase_usecase_DryDriverService__self
+T40_usecase_usecase_DryWriteDriverInteractor__self -.impl.-> R37_usecase_usecase_DryWriteDriverService__self
+T42_usecase_usecase_DryResultsDriverInteractor__self -.impl.-> R39_usecase_usecase_DryResultsDriverService__self
+T48_usecase_usecase_DryCheckApprovedDriverInteractor__self -.impl.-> R45_usecase_usecase_DryCheckApprovedDriverService__self
 T47_usecase_usecase_FixpointResolveDriverInteractor__self -.impl.-> R44_usecase_usecase_FixpointResolveDriverService__self
 T61_infrastructure_infrastructure_JsonConfigBranchStrategyAdapter_new --> T55_infrastructure_infrastructure_BranchStrategyConfigError__self
 T61_infrastructure_infrastructure_JsonConfigBranchStrategyAdapter_new --> T61_infrastructure_infrastructure_JsonConfigBranchStrategyAdapter__self
 T59_infrastructure_infrastructure_SnapshotBranchStrategyAdapter_new --o T36_domain_domain_BranchStrategySnapshot__self
 T59_infrastructure_infrastructure_SnapshotBranchStrategyAdapter_new --> T59_infrastructure_infrastructure_SnapshotBranchStrategyAdapter__self
+T52_infrastructure_infrastructure_CodexDryFixLocalRunner_new --> T52_infrastructure_infrastructure_CodexDryFixLocalRunner__self
+T52_infrastructure_infrastructure_CodexDryFixLocalRunner_dry_run_fix_local --o T38_usecase_usecase_DryFixLocalDriverInput__self
+T46_infrastructure_infrastructure_DryDriverAdapter_new --> T46_infrastructure_infrastructure_DryDriverAdapter__self
 T55_infrastructure_infrastructure_FsDiffBaseResolverAdapter_new --> T55_infrastructure_infrastructure_FsDiffBaseResolverAdapter__self
+T62_infrastructure_infrastructure_RecordingDryTierTelemetryAdapter_new --> T62_infrastructure_infrastructure_RecordingDryTierTelemetryAdapter__self
 T60_infrastructure_infrastructure_BranchStrategySnapshotDocument__self --o|merge_method| T49_infrastructure_infrastructure_MergeMethodDocument__self
 T54_infrastructure_infrastructure_FsReviewGateStateAdapter_new --> T54_infrastructure_infrastructure_FsReviewGateStateAdapter__self
 T45_infrastructure_infrastructure_TrackDocumentV2__self --o|branch_strategy_snapshot| T60_infrastructure_infrastructure_BranchStrategySnapshotDocument__self
@@ -509,12 +746,20 @@ T63_infrastructure_infrastructure_FsFixpointWorkspaceContextAdapter__self -.impl
 T59_infrastructure_infrastructure_FsDryCheckConfigLoaderAdapter__self -.impl.-> R40_usecase_usecase_DryCheckConfigLoaderPort__self
 T61_infrastructure_infrastructure_FsFixpointDryGateFactoryAdapter__self -.impl.-> R42_usecase_usecase_FixpointDryGateFactoryPort__self
 T63_infrastructure_infrastructure_FsFixpointGateStateFactoryAdapter__self -.impl.-> R44_usecase_usecase_FixpointGateStateFactoryPort__self
+T50_infrastructure_infrastructure_FsDryRepoRootAdapter__self -.impl.-> R31_usecase_usecase_DryRepoRootPort__self
+T52_infrastructure_infrastructure_FsDryBaseBranchAdapter__self -.impl.-> R33_usecase_usecase_DryBaseBranchPort__self
+T61_infrastructure_infrastructure_FsDryCheckStorageFactoryAdapter__self -.impl.-> R42_usecase_usecase_DryCheckStorageFactoryPort__self
+T57_infrastructure_infrastructure_FsDryDiffBaseFactoryAdapter__self -.impl.-> R38_usecase_usecase_DryDiffBaseFactoryPort__self
+T59_infrastructure_infrastructure_FsDryWriteConfigLoaderAdapter__self -.impl.-> R40_usecase_usecase_DryWriteConfigLoaderPort__self
+T57_infrastructure_infrastructure_FsDryCorpusFragmentsAdapter__self -.impl.-> R38_usecase_usecase_DryCorpusFragmentsPort__self
+T59_infrastructure_infrastructure_DryCheckServiceFactoryAdapter__self -.impl.-> R42_usecase_usecase_DryCheckServiceFactoryPort__self
+T60_infrastructure_infrastructure_FsDryCorpusRootManifestAdapter__self -.impl.-> R47_usecase_usecase_DryCorpusRootManifestWriterPort__self
+T62_infrastructure_infrastructure_RecordingDryTierTelemetryAdapter__self -.impl.-> R36_usecase_usecase_DryTierTelemetryPort__self
+T46_infrastructure_infrastructure_DryDriverAdapter__self -.impl.-> R29_usecase_usecase_DryDriverPort__self
 T31_cli_driver_cli_driver_DryDriver_new --> T31_cli_driver_cli_driver_DryDriver__self
 T33_cli_driver_cli_driver_TrackDriver_new --> T33_cli_driver_cli_driver_TrackDriver__self
 T33_cli_driver_cli_driver_TrackDriver_handle --o T32_cli_driver_cli_driver_TrackInput__self
 T50_cli_composition_cli_composition_DryCompositionRoot_new --> T50_cli_composition_cli_composition_DryCompositionRoot__self
-T50_cli_composition_cli_composition_DryCompositionRoot_dry_write --> T31_usecase_usecase_DryWriteOutcome__self
-T50_cli_composition_cli_composition_DryCompositionRoot_dry_check_approved --> T39_usecase_usecase_DryCheckApprovedOutcome__self
 T50_cli_composition_cli_composition_DryCompositionRoot_dry_driver --> T31_cli_driver_cli_driver_DryDriver__self
 T50_cli_composition_cli_composition_GitCompositionRoot_new --> T50_cli_composition_cli_composition_GitCompositionRoot__self
 T52_cli_composition_cli_composition_TrackCompositionRoot_new --> T52_cli_composition_cli_composition_TrackCompositionRoot__self
@@ -544,25 +789,77 @@ class R34_usecase_usecase_BranchStrategyPort_merge_target method_node
 class R34_usecase_usecase_BranchStrategyPort_merge_method method_node
 class R34_usecase_usecase_BranchStrategyPort_track_prefix method_node
 class R34_usecase_usecase_BranchStrategyPort__self secondary_port
+class T48_usecase_usecase_DryCheckApprovedDriverInteractor_new method_node
+class T48_usecase_usecase_DryCheckApprovedDriverInteractor__self interactor
+class R45_usecase_usecase_DryCheckApprovedDriverService_dry_check_approved method_node
+class R45_usecase_usecase_DryCheckApprovedDriverService__self app_service
+class T43_usecase_usecase_DryCheckApprovedDriverInput__self dto
 class T39_usecase_usecase_DryCheckApprovedOutcome_Approved variant_node
 class T39_usecase_usecase_DryCheckApprovedOutcome_Blocked variant_node
 class T39_usecase_usecase_DryCheckApprovedOutcome_Failure variant_node
 class T39_usecase_usecase_DryCheckApprovedOutcome__self dto
 class T35_usecase_usecase_DryDriverInteractor__self interactor
+class T38_usecase_usecase_DryFixLocalDriverInput__self dto
+class T37_usecase_usecase_DryResultsDriverInput__self dto
+class T35_usecase_usecase_DryWriteDriverInput__self dto
 class T38_usecase_usecase_DryWriteFindingSummary__self dto
 class T31_usecase_usecase_DryWriteOutcome_Success variant_node
 class T31_usecase_usecase_DryWriteOutcome_Failure variant_node
 class T31_usecase_usecase_DryWriteOutcome__self dto
-class R29_usecase_usecase_DryDriverPort_dry_write method_node
-class R29_usecase_usecase_DryDriverPort_dry_results method_node
-class R29_usecase_usecase_DryDriverPort_dry_check_approved method_node
 class R29_usecase_usecase_DryDriverPort_dry_fix_local method_node
 class R29_usecase_usecase_DryDriverPort__self secondary_port
-class R32_usecase_usecase_DryDriverService_dry_write method_node
-class R32_usecase_usecase_DryDriverService_dry_results method_node
-class R32_usecase_usecase_DryDriverService_dry_check_approved method_node
 class R32_usecase_usecase_DryDriverService_dry_fix_local method_node
 class R32_usecase_usecase_DryDriverService__self app_service
+class T34_usecase_usecase_DryBaseBranchError_Unavailable variant_node
+class T34_usecase_usecase_DryBaseBranchError__self error_type
+class T37_usecase_usecase_DryCheckStorageHandle__self dto
+class T32_usecase_usecase_DryRepoWorkspace__self dto
+class T37_usecase_usecase_DryRepoWorkspaceError_Unavailable variant_node
+class T37_usecase_usecase_DryRepoWorkspaceError__self error_type
+class R33_usecase_usecase_DryBaseBranchPort_resolve_base_branch method_node
+class R33_usecase_usecase_DryBaseBranchPort__self secondary_port
+class R42_usecase_usecase_DryCheckStorageFactoryPort_build method_node
+class R42_usecase_usecase_DryCheckStorageFactoryPort__self secondary_port
+class R38_usecase_usecase_DryDiffBaseFactoryPort_build method_node
+class R38_usecase_usecase_DryDiffBaseFactoryPort__self secondary_port
+class R31_usecase_usecase_DryRepoRootPort_resolve method_node
+class R31_usecase_usecase_DryRepoRootPort__self secondary_port
+class T42_usecase_usecase_DryResultsDriverInteractor_new method_node
+class T42_usecase_usecase_DryResultsDriverInteractor__self interactor
+class T33_usecase_usecase_DryResultsOutcome_Success variant_node
+class T33_usecase_usecase_DryResultsOutcome_Failure variant_node
+class T33_usecase_usecase_DryResultsOutcome__self dto
+class T39_usecase_usecase_DryResultsRecordSummary__self dto
+class T40_usecase_usecase_DryResultsVerdictSummary_NotAViolation variant_node
+class T40_usecase_usecase_DryResultsVerdictSummary_Accepted variant_node
+class T40_usecase_usecase_DryResultsVerdictSummary_Violation variant_node
+class T40_usecase_usecase_DryResultsVerdictSummary__self dto
+class R39_usecase_usecase_DryResultsDriverService_dry_results method_node
+class R39_usecase_usecase_DryResultsDriverService__self app_service
+class T45_usecase_usecase_DryCheckServiceFactoryCommand__self dto
+class T43_usecase_usecase_DryCheckServiceFactoryError_Unavailable variant_node
+class T43_usecase_usecase_DryCheckServiceFactoryError__self error_type
+class T44_usecase_usecase_DryCheckServiceFactoryOutput__self dto
+class T39_usecase_usecase_DryCorpusFragmentsError_Unavailable variant_node
+class T39_usecase_usecase_DryCorpusFragmentsError__self error_type
+class T40_usecase_usecase_DryCorpusFragmentsOutput__self dto
+class T42_usecase_usecase_DryCorpusRootManifestError_Unavailable variant_node
+class T42_usecase_usecase_DryCorpusRootManifestError__self error_type
+class T40_usecase_usecase_DryWriteConfigResolution__self dto
+class T40_usecase_usecase_DryWriteDriverInteractor_new method_node
+class T40_usecase_usecase_DryWriteDriverInteractor__self interactor
+class R42_usecase_usecase_DryCheckServiceFactoryPort_build method_node
+class R42_usecase_usecase_DryCheckServiceFactoryPort__self secondary_port
+class R38_usecase_usecase_DryCorpusFragmentsPort_build method_node
+class R38_usecase_usecase_DryCorpusFragmentsPort__self secondary_port
+class R47_usecase_usecase_DryCorpusRootManifestWriterPort_write method_node
+class R47_usecase_usecase_DryCorpusRootManifestWriterPort__self secondary_port
+class R36_usecase_usecase_DryTierTelemetryPort_record method_node
+class R36_usecase_usecase_DryTierTelemetryPort__self secondary_port
+class R40_usecase_usecase_DryWriteConfigLoaderPort_load method_node
+class R40_usecase_usecase_DryWriteConfigLoaderPort__self secondary_port
+class R37_usecase_usecase_DryWriteDriverService_dry_write method_node
+class R37_usecase_usecase_DryWriteDriverService__self app_service
 class R36_usecase_usecase_DiffBaseResolverPort_resolve_diff_base method_node
 class R36_usecase_usecase_DiffBaseResolverPort__self secondary_port
 class R38_usecase_usecase_DryApprovalFactoryPort_build_approval method_node
@@ -621,9 +918,24 @@ class T61_infrastructure_infrastructure_JsonConfigBranchStrategyAdapter_new meth
 class T61_infrastructure_infrastructure_JsonConfigBranchStrategyAdapter__self secondary_adapter
 class T59_infrastructure_infrastructure_SnapshotBranchStrategyAdapter_new method_node
 class T59_infrastructure_infrastructure_SnapshotBranchStrategyAdapter__self secondary_adapter
+class T52_infrastructure_infrastructure_CodexDryFixLocalRunner_new method_node
+class T52_infrastructure_infrastructure_CodexDryFixLocalRunner_dry_run_fix_local method_node
+class T52_infrastructure_infrastructure_CodexDryFixLocalRunner__self secondary_adapter
+class T59_infrastructure_infrastructure_DryCheckServiceFactoryAdapter__self secondary_adapter
+class T46_infrastructure_infrastructure_DryDriverAdapter_new method_node
+class T46_infrastructure_infrastructure_DryDriverAdapter__self secondary_adapter
 class T55_infrastructure_infrastructure_FsDiffBaseResolverAdapter_new method_node
 class T55_infrastructure_infrastructure_FsDiffBaseResolverAdapter__self secondary_adapter
 class T57_infrastructure_infrastructure_FsDryApprovalFactoryAdapter__self secondary_adapter
+class T52_infrastructure_infrastructure_FsDryBaseBranchAdapter__self secondary_adapter
+class T61_infrastructure_infrastructure_FsDryCheckStorageFactoryAdapter__self secondary_adapter
+class T57_infrastructure_infrastructure_FsDryCorpusFragmentsAdapter__self secondary_adapter
+class T60_infrastructure_infrastructure_FsDryCorpusRootManifestAdapter__self secondary_adapter
+class T57_infrastructure_infrastructure_FsDryDiffBaseFactoryAdapter__self secondary_adapter
+class T50_infrastructure_infrastructure_FsDryRepoRootAdapter__self secondary_adapter
+class T59_infrastructure_infrastructure_FsDryWriteConfigLoaderAdapter__self secondary_adapter
+class T62_infrastructure_infrastructure_RecordingDryTierTelemetryAdapter_new method_node
+class T62_infrastructure_infrastructure_RecordingDryTierTelemetryAdapter__self secondary_adapter
 class T60_infrastructure_infrastructure_BranchStrategySnapshotDocument__self dto
 class T59_infrastructure_infrastructure_FsDryCheckConfigLoaderAdapter__self secondary_adapter
 class T61_infrastructure_infrastructure_FsFixpointDryGateFactoryAdapter__self secondary_adapter
@@ -666,9 +978,6 @@ class T32_cli_driver_cli_driver_TrackInput_SwitchBase variant_node
 class T32_cli_driver_cli_driver_TrackInput_FixpointResolve variant_node
 class T32_cli_driver_cli_driver_TrackInput__self dto
 class T50_cli_composition_cli_composition_DryCompositionRoot_new method_node
-class T50_cli_composition_cli_composition_DryCompositionRoot_dry_write method_node
-class T50_cli_composition_cli_composition_DryCompositionRoot_dry_results method_node
-class T50_cli_composition_cli_composition_DryCompositionRoot_dry_check_approved method_node
 class T50_cli_composition_cli_composition_DryCompositionRoot_dry_driver method_node
 class T50_cli_composition_cli_composition_GitCompositionRoot_new method_node
 class T50_cli_composition_cli_composition_GitCompositionRoot_git_add_all method_node
@@ -742,4 +1051,6 @@ class T20_cli_cli_TrackCommand_SwitchBase variant_node
 class T20_cli_cli_TrackCommand_items_dir method_node
 class T20_cli_cli_TrackCommand__self dto
 class T24_cli_cli_WaitAndMergeArgs__self dto
+class F54_cli_cli_cli__commands__dry__execute_dry_check_approved free_function
+class F54_cli_cli_cli__commands__dry__execute_dry_check_approved function_node
 ```

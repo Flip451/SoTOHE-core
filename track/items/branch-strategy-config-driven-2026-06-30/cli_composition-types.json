@@ -589,7 +589,7 @@
       },
       "methods": [],
       "module_path": "track::fixpoint_resolve",
-      "docs": "Superseded by usecase::fixpoint_resolve_driver::FixpointResolveDriverInput (IN-12): `apps/cli` now routes `sotp track fixpoint-resolve` through TrackCompositionRoot::track_driver().handle(TrackInput::FixpointResolve) instead of calling TrackCompositionRoot::fixpoint_resolve(FixpointResolveInput) directly, per no-backward-compat.md (no permanent parallel entrypoint retained). Role note: this entry's role (Dto) is not R1-legal for cli_composition (R1: Dto is forbidden in cli_composition) -- that placement was itself part of the layer violation IN-12 corrects; recorded here for audit-trail accuracy of the removed item, not as an endorsed placement. The former method's wiring, invoke, and render responsibilities are now split across three layers per ADR 1328 D2/D3/D4: the four fine-grained infrastructure::track::fixpoint_resolve_driver adapters (FsFixpointWorkspaceContextAdapter / FsDryCheckConfigLoaderAdapter / FsFixpointDryGateFactoryAdapter / FsFixpointGateStateFactoryAdapter, each implementing one usecase secondary port; R1: SecondaryAdapter is infrastructure-only) perform only narrow I/O concerns and do not invoke FixpointResolveService; the actual orchestration and FixpointResolveService::resolve invocation live in usecase::fixpoint_resolve_driver::FixpointResolveDriverInteractor (ADR 1328 D4: application orchestration belongs in usecase, not composition or an infrastructure SecondaryAdapter -- an earlier draft that pushed this invocation into a single infrastructure adapter was flagged as a D4 violation, 2026-07-02 plan-artifacts final-review P1 finding, and corrected here); TrackCompositionRoot::track_driver() only constructs and injects the four adapters plus the interactor built from them (wire-only, ADR 1328 D2) and never invokes FixpointResolveDriverService itself. This differs from the pre-existing DryDriverAdapter / TrackServiceImpl (both genuinely pub, both out of this track's IN/AC scope, both structurally coupled to their respective CompositionRoot -- DryDriverAdapter holds DryCompositionRoot + DryFixRunnerCompositionRoot fields and delegates to their methods, TrackServiceImpl calls TrackCompositionRoot::new().track_*() per method -- so neither is relocatable to infrastructure without further restructuring; left as an out-of-scope pre-existing gap, not a pattern to replicate here). The four fixpoint-resolve adapters have no such composition-root dependency (their wiring logic uses only domain / usecase / infrastructure types), so they follow the D7 default placement.",
+      "docs": "Superseded by usecase::fixpoint_resolve_driver::FixpointResolveDriverInput (IN-12): `apps/cli` now routes `sotp track fixpoint-resolve` through TrackCompositionRoot::track_driver().handle(TrackInput::FixpointResolve) instead of calling TrackCompositionRoot::fixpoint_resolve(FixpointResolveInput) directly, per no-backward-compat.md (no permanent parallel entrypoint retained). Role note: this entry's role (Dto) is not R1-legal for cli_composition (R1: Dto is forbidden in cli_composition) -- that placement was itself part of the layer violation IN-12 corrects; recorded here for audit-trail accuracy of the removed item, not as an endorsed placement. The former method's wiring, invoke, and render responsibilities are now split across three layers per ADR 1328 D2/D3/D4: the four fine-grained infrastructure::track::fixpoint_resolve_driver adapters (FsFixpointWorkspaceContextAdapter / FsDryCheckConfigLoaderAdapter / FsFixpointDryGateFactoryAdapter / FsFixpointGateStateFactoryAdapter, each implementing one usecase secondary port; R1: SecondaryAdapter is infrastructure-only) perform only narrow I/O concerns and do not invoke FixpointResolveService; the actual orchestration and FixpointResolveService::resolve invocation live in usecase::fixpoint_resolve_driver::FixpointResolveDriverInteractor (ADR 1328 D4: application orchestration belongs in usecase, not composition or an infrastructure SecondaryAdapter -- an earlier draft that pushed this invocation into a single infrastructure adapter was flagged as a D4 violation, 2026-07-02 plan-artifacts final-review P1 finding, and corrected here); TrackCompositionRoot::track_driver() only constructs and injects the four adapters plus the interactor built from them (wire-only, ADR 1328 D2) and never invokes FixpointResolveDriverService itself. This differs from the pre-existing TrackServiceImpl (genuinely pub, out of this track's IN/AC scope, and structurally coupled to TrackCompositionRoot because each method calls TrackCompositionRoot::new().track_*()), so it is not relocatable to infrastructure without further restructuring and is left as an out-of-scope pre-existing gap, not a pattern to replicate here. DryDriverAdapter (like DryFixRunnerCompositionRoot, renamed CodexDryFixLocalRunner) has since relocated to libs/infrastructure (infrastructure::dry_check::dry_fix_local::{DryDriverAdapter, CodexDryFixLocalRunner}, ADR 1328 D7), so neither is a cli_composition type any more; DryDriverAdapter is no longer crate-private -- it is a public infrastructure SecondaryAdapter declared in infrastructure-types.json. The four fixpoint-resolve adapters have no such composition-root dependency (their wiring logic uses only domain / usecase / infrastructure types), so they follow the D7 default placement.",
       "spec_refs": [
         { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-12" },
         { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-17" }
@@ -616,45 +616,6 @@
           "docs": "Create a new `DryCompositionRoot`."
         },
         {
-          "name": "dry_write",
-          "receiver": "&self",
-          "params": [
-            { "name": "input", "ty": "DryWriteInput" }
-          ],
-          "returns": "Result<usecase::dry_driver::DryWriteOutcome, CompositionError>",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Run `sotp dry write`: detect DRY violations for the current diff scope and record results to dry-check.json. IN-13/AC-18: returns the structured DryWriteOutcome instead of a pre-formatted CommandOutcome; the former dry_write_outcome text formatting moves to cli_driver."
-        },
-        {
-          "name": "dry_results",
-          "receiver": "&self",
-          "params": [
-            { "name": "input", "ty": "DryResultsInput" }
-          ],
-          "returns": "Result<cli_driver::render::CommandOutcome, CompositionError>",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Run `sotp dry results`: read and display the historical dry-check results. Unchanged by IN-13 (only dry_write / dry_check_approved are in scope)."
-        },
-        {
-          "name": "dry_check_approved",
-          "receiver": "&self",
-          "params": [
-            { "name": "input", "ty": "DryCheckApprovedInput" }
-          ],
-          "returns": "Result<usecase::dry_driver::DryCheckApprovedOutcome, CompositionError>",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Run `sotp dry check-approved`: gate that reports unresolved pairs. IN-13/AC-18: returns the structured DryCheckApprovedOutcome instead of a pre-formatted CommandOutcome; the former dry_check_approved_outcome text formatting moves to cli_driver."
-        },
-        {
           "name": "dry_driver",
           "receiver": "&self",
           "params": [],
@@ -663,14 +624,115 @@
           "generics": [],
           "has_default_impl": false,
           "where_predicates": [],
-          "docs": "Construct a wired `cli_driver::dry::DryDriver` for injection into the CLI. Unchanged by IN-13."
+          "docs": "Construct a wired `cli_driver::dry::DryDriver` for injection into the CLI. IN-14/AC-20: dry_write / dry_results / dry_check_approved are removed from this type (see below) -- this method is the ONLY remaining public surface for the whole `dry` family, and its own wiring grows to also construct the infrastructure::dry_check::dry_driver_shared / dry_write_driver adapters (infrastructure::dry_check::dry_driver_shared::FsDryRepoRootAdapter / FsDryBaseBranchAdapter / FsDryCheckStorageFactoryAdapter / FsDryDiffBaseFactoryAdapter shared across all three new interactors; infrastructure::dry_check::dry_write_driver::FsDryWriteConfigLoaderAdapter / FsDryCorpusFragmentsAdapter / DryCheckServiceFactoryAdapter / FsDryCorpusRootManifestAdapter for write_service only -- infrastructure::dry_check::dry_write_driver::RecordingDryTierTelemetryAdapter is NOT constructed here -- it is constructed internally by DryCheckServiceFactoryAdapter::build, not by this composition root) plus the three new usecase::dry_write_driver::DryWriteDriverInteractor / usecase::dry_results_driver::DryResultsDriverInteractor / usecase::dry_check_approved_driver::DryCheckApprovedDriverInteractor instances (injecting infrastructure::dry_check::dry_driver_shared::FsDryDiffBaseFactoryAdapter for DryCheckApprovedDriverInteractor's diff-base factory dependency, which constructs infrastructure::dry_check::diff_base_resolver::FsDiffBaseResolverAdapter per request after the base branch is resolved; reusing the existing infrastructure::dry_check::FsDryCorpusMetaAdapter and the existing usecase::dry_check::fragment_pipeline::DryFragmentPipelineInteractor + infrastructure::dry_check::GitDryCheckDiffGetter / infrastructure::semantic_dup::CodeFragmentExtractorAdapter for DryCheckApprovedDriverInteractor's fragment_pipeline dependency; and injecting the existing infrastructure::track::fixpoint_resolve_driver::FsDryCheckConfigLoaderAdapter-equivalent usecase::fixpoint_resolve_driver::DryCheckConfigLoaderPort adapter for DryCheckApprovedDriverInteractor's config_loader dependency -- constructed inline here the same way, not re-exported). usecase::dry_check_approved_driver::DryCheckApprovedDriverInteractor::new takes only the seven fine-grained secondary ports above (no clock or telemetry port -- usecase-purity forbids sampling std::time::Instant or invoking a telemetry port from inside a usecase entrypoint); the resulting interactor is passed unwrapped as `check_approved_service` with no telemetry adapter constructed or injected alongside it: `cli_driver::dry::DryDriver::new` takes only the four services (`service`, `write_service`, `results_service`, `check_approved_service`), dropping the `check_approved_telemetry` parameter and the infrastructure::dry_check::dry_check_approved_driver::DryGateEvalTelemetryAdapter it used to wire (both existed briefly in an earlier IN-14 draft and were retracted). Wall-clock timing measurement and `GateEval` telemetry emission for `dry check-approved` now live entirely in the bin layer (`apps/cli/src/commands/dry.rs::execute_dry_check_approved`), calling `cli_composition::telemetry_wiring::{resolve_telemetry_writer, emit_gate_eval}` directly with no Port abstraction at this boundary, mirroring `execute_verify_with_telemetry` -- superseding a still-earlier design where an infrastructure-hosted TimedGateEvalDryCheckApprovedService decorator implemented the primary DryCheckApprovedDriverService port to bolt timing onto it, which was a layer-boundary violation. This method continues to only wire and inject (ADR 1328 D2); it never invokes any of the four services itself."
         }
       ],
       "module_path": "dry::shim",
-      "docs": "Composition root for the `dry` command family. Unit struct: no adapter dependencies are injected at construction time.",
+      "docs": "Composition root for the `dry` command family. Unit struct: no adapter dependencies are injected at construction time. IN-14/AC-20: dry_write / dry_results / dry_check_approved are removed as public methods of this type -- DryCompositionRoot no longer directly constructs or calls usecase::dry_check::DryCheckInteractor::run_dry_check / DryCheckResultsInteractor::get_results / DryCheckApprovalInteractor::check_approved (the invoke leak this track corrects); those three commands are now reached exclusively through dry_driver()'s wired cli_driver::dry::DryDriver, mirroring how TrackCompositionRoot exposes fixpoint-resolve exclusively through track_driver() (IN-12 precedent) with no parallel direct-call entrypoint retained (no-backward-compat.md).",
       "spec_refs": [
-        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-13" },
-        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-18" }
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-20" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "CN-07" }
+      ],
+      "informal_grounds": []
+    },
+    "DryWriteInput": {
+      "action": "delete",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "track_id", "ty": "String" },
+            { "name": "base_commit", "ty": "Option<String>" },
+            { "name": "db_path", "ty": "std::path::PathBuf" },
+            { "name": "threshold", "ty": "Option<f32>" },
+            { "name": "workspace_root", "ty": "std::path::PathBuf" },
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "model", "ty": "Option<String>" },
+            { "name": "capability_name", "ty": "String" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "dry::types",
+      "docs": "Input DTO for the removed DryCompositionRoot::dry_write (IN-14/AC-20). Dead after the invoke moves to usecase::dry_write_driver::DryWriteDriverInteractor, which is constructed from the pre-existing usecase::dry_write_driver::DryWriteDriverInput (an already-catalogued sibling in usecase-types.json) instead of this cli_composition-local mirror. Role note: this entry's role (Dto) is not R1-legal for cli_composition (R1: Dto is forbidden in cli_composition) -- that placement was itself part of the invoke-leak layer violation this track corrects; recorded here for audit-trail accuracy of the removed item (Pattern 7: kind must match the deleted type's actual baseline kind), not as an endorsed placement, mirroring this same track's own prior FixpointResolveInput removal entry's identical role note.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-20" }
+      ],
+      "informal_grounds": []
+    },
+    "DryResultsInput": {
+      "action": "delete",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "track_id", "ty": "String" },
+            { "name": "filter", "ty": "String" },
+            { "name": "items_dir", "ty": "std::path::PathBuf" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "dry::types",
+      "docs": "Input DTO for the removed DryCompositionRoot::dry_results (IN-14/AC-20). Dead after the invoke moves to usecase::dry_results_driver::DryResultsDriverInteractor, which is constructed from the pre-existing usecase::dry_driver::DryResultsDriverInput (an already-catalogued sibling in usecase-types.json) instead of this cli_composition-local mirror. Role note: this entry's role (Dto) is not R1-legal for cli_composition (R1: Dto is forbidden in cli_composition) -- that placement was itself part of the invoke-leak layer violation this track corrects; recorded here for audit-trail accuracy of the removed item (Pattern 7: kind must match the deleted type's actual baseline kind), not as an endorsed placement, mirroring this same track's own prior FixpointResolveInput removal entry's identical role note.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-20" }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckApprovedInput": {
+      "action": "delete",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "track_id", "ty": "String" },
+            { "name": "base_commit", "ty": "Option<String>" },
+            { "name": "items_dir", "ty": "std::path::PathBuf" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "dry::types",
+      "docs": "Input DTO for the removed DryCompositionRoot::dry_check_approved (IN-14/AC-20). Dead after the invoke moves to usecase::dry_check_approved_driver::DryCheckApprovedDriverInteractor, which is constructed from the pre-existing usecase::dry_driver::DryCheckApprovedDriverInput (an already-catalogued sibling in usecase-types.json) instead of this cli_composition-local mirror. Role note: this entry's role (Dto) is not R1-legal for cli_composition (R1: Dto is forbidden in cli_composition) -- that placement was itself part of the invoke-leak layer violation this track corrects; recorded here for audit-trail accuracy of the removed item (Pattern 7: kind must match the deleted type's actual baseline kind), not as an endorsed placement, mirroring this same track's own prior FixpointResolveInput removal entry's identical role note.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-20" }
+      ],
+      "informal_grounds": []
+    },
+    "RunDryFixLocalInput": {
+      "action": "delete",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "track_id", "ty": "String" },
+            { "name": "briefing_file", "ty": "std::path::PathBuf" },
+            { "name": "model", "ty": "Option<String>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "dry",
+      "docs": "Input DTO for `sotp dry fix-local` (`dry_run_fix_local`), as it existed in cli_composition at the start of this track (baseline span apps/cli-composition/src/dry.rs:136-145). This deleted DTO remains the parameter type of the deleted DryFixRunnerCompositionRoot::dry_run_fix_local method recorded below, preserving the removed cli_composition API edge for audit-trail accuracy. It is superseded by usecase::dry_driver::DryFixLocalDriverInput, which the relocated apps/cli-composition/src/dry_fix_runner.rs -> libs/infrastructure/src/dry_check/dry_fix_local/mod.rs CodexDryFixLocalRunner::dry_run_fix_local now takes directly (OS-08). This entry was previously absent from every layer catalogue despite being a baseline item removed earlier in this track -- added here to close that gap. Role note: this entry's role (Dto) is not R1-legal for cli_composition (R1: Dto is forbidden in cli_composition) -- that placement was itself part of the layer violation this track corrects; recorded here for audit-trail accuracy of the removed item, not as an endorsed placement, mirroring this same track's DryWriteInput/DryResultsInput/DryCheckApprovedInput/FixpointResolveInput sibling entries' identical role note.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "OS-08" }
       ],
       "informal_grounds": []
     },
@@ -816,6 +878,48 @@
         { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-05" }
       ],
       "informal_grounds": []
+    },
+    "DryFixRunnerCompositionRoot": {
+      "action": "delete",
+      "role": { "CompositionRoot": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "unit" }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Create a new `DryFixRunnerCompositionRoot`."
+        },
+        {
+          "name": "dry_run_fix_local",
+          "receiver": "&self",
+          "params": [
+            { "name": "input", "ty": "RunDryFixLocalInput" }
+          ],
+          "returns": "Result<cli_driver::render::CommandOutcome, CompositionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": null
+        }
+      ],
+      "module_path": "dry_fix_runner",
+      "docs": "Composition root for the `dry_fix_runner` command family (`sotp dry fix-local`), as it existed earlier in this track (previously declared here as `action: reference`, since `dry_fix_runner.rs` was byte-identical to `main` at that point). Superseded by relocation: `apps/cli-composition/src/dry_fix_runner.rs` and its sibling `apps/cli-composition/src/dry_driver_adapter.rs` are both deleted; the struct is renamed to `CodexDryFixLocalRunner` and, together with `DryDriverAdapter`, relocated to `libs/infrastructure/src/dry_check/dry_fix_local/` (ADR 1328 D7: port-impl adapters belong in libs/infrastructure). Role note: this entry's `CompositionRoot` role was fully R1-legal while the type lived in cli_composition (`CompositionRoot` is cli_composition ONLY); the relocated `CodexDryFixLocalRunner` carries `role: SecondaryAdapter` instead, per infrastructure's R1 role set (recorded here for audit-trail accuracy of the removed item, not as an endorsed placement for a hypothetical CompositionRoot-in-infrastructure). See infrastructure-types.json's `CodexDryFixLocalRunner` / `DryDriverAdapter` entries for the new declarations.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-20" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "OS-08" }
+      ],
+      "informal_grounds": []
     }
   },
   "traits": {},
@@ -836,6 +940,11 @@
       "action": "reference",
       "trait_ref": "core::default::Default",
       "for_type": "GitCompositionRoot"
+    },
+    {
+      "action": "delete",
+      "trait_ref": "core::default::Default",
+      "for_type": "DryFixRunnerCompositionRoot"
     }
   ]
 }

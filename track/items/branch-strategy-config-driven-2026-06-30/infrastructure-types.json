@@ -148,7 +148,7 @@
       },
       "methods": [],
       "module_path": "dry_check::diff_base_resolver",
-      "docs": "Filesystem adapter implementing usecase::fixpoint_resolve::DiffBaseResolverPort. Owns the configured base_branch (read from the active track's branch_strategy_snapshot) and falls back to `git rev-parse <base_branch>` (argv-style, AC-04 command-boundary safety) when .commit_hash is absent, non-ancestor, or unreadable (D1/IN-04).",
+      "docs": "Filesystem adapter implementing usecase::fixpoint_resolve::DiffBaseResolverPort. Owns the configured base_branch (read from the active track's branch_strategy_snapshot) and falls back to `git rev-parse <base_branch>` (argv-style, AC-04 command-boundary safety) when .commit_hash is absent, non-ancestor, or unreadable (D1/IN-04). Constructed fresh per request (never permanently injected) by infrastructure::track::fixpoint_resolve_driver::FsFixpointDryGateFactoryAdapter and infrastructure::dry_check::dry_driver_shared::FsDryDiffBaseFactoryAdapter, since base_branch is only known once a track_id is resolved at request time (IN-14).",
       "spec_refs": [
         { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-04" },
         { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-04" }
@@ -236,6 +236,210 @@
         { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-17" }
       ],
       "informal_grounds": []
+    },
+    "FsDryRepoRootAdapter": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "unit" }
+      },
+      "methods": [],
+      "module_path": "dry_check::dry_driver_shared",
+      "docs": "Implements usecase::dry_driver_shared::DryRepoRootPort (IN-14/AC-20). Reproduces the CWD-anchored SystemGitRepo::discover() repo-root resolution plus items_dir absolutize/canonicalize/containment/symlink-guard checks previously inlined at the top of DryCompositionRoot::dry_write / dry_results / dry_check_approved (the private resolve_existing_dir_under_repo helper). Zero-field unit struct, constructed by name (no constructor function), matching FsFixpointWorkspaceContextAdapter's sibling pattern.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-20" }
+      ],
+      "informal_grounds": []
+    },
+    "FsDryBaseBranchAdapter": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "unit" }
+      },
+      "methods": [],
+      "module_path": "dry_check::dry_driver_shared",
+      "docs": "Implements usecase::dry_driver_shared::DryBaseBranchPort (IN-14/AC-20). Reads `<track_dir>/metadata.json#branch_strategy_snapshot.base_branch` via infrastructure::track::codec::decode. Fail-closed per IN-06/IN-07: maps a missing metadata.json (and any other read/decode error) to DryBaseBranchError::Unavailable, with no `.harness/config/branch-strategy.json` fallback. Zero-field unit struct, constructed by name (no constructor function), matching FsFixpointWorkspaceContextAdapter's sibling pattern.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-20" }
+      ],
+      "informal_grounds": []
+    },
+    "FsDryCheckStorageFactoryAdapter": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "unit" }
+      },
+      "methods": [],
+      "module_path": "dry_check::dry_driver_shared",
+      "docs": "Implements usecase::dry_driver_shared::DryCheckStorageFactoryPort (IN-14/AC-20). Constructs one `Arc<infrastructure::dry_check::FsDryCheckStore>` (Arc-cloned into the reader and writer fields of the returned DryCheckStorageHandle -- FsDryCheckStore implements both domain::dry_check::DryCheckReader and DryCheckWriter) plus one `infrastructure::dry_check::FsDryCheckCoverageAdapter` for the coverage field, both bound to `<track_dir>/dry-check.json` / `<track_dir>/dry-check-coverage.json`. Zero-field unit struct, constructed by name (no constructor function), matching FsFixpointWorkspaceContextAdapter's sibling pattern.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-20" }
+      ],
+      "informal_grounds": []
+    },
+    "FsDryDiffBaseFactoryAdapter": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "unit" }
+      },
+      "methods": [],
+      "module_path": "dry_check::dry_driver_shared",
+      "docs": "Implements usecase::dry_driver_shared::DryDiffBaseFactoryPort (IN-14/AC-20). Reproduces FsFixpointDryGateFactoryAdapter's construction pattern for the same underlying adapter: build(base_branch) constructs `infrastructure::dry_check::diff_base_resolver::FsDiffBaseResolverAdapter::new(base_branch.to_owned())` and returns it as `Arc<dyn usecase::fixpoint_resolve::DiffBaseResolverPort>`. Zero-field unit struct, constructed by name (no constructor function), matching FsFixpointWorkspaceContextAdapter's sibling pattern.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-20" }
+      ],
+      "informal_grounds": []
+    },
+    "FsDryWriteConfigLoaderAdapter": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "unit" }
+      },
+      "methods": [],
+      "module_path": "dry_check::dry_write_driver",
+      "docs": "Implements usecase::dry_write_driver::DryWriteConfigLoaderPort (IN-14/AC-20). Loads `.harness/config/dry-check.json` via infrastructure::dry_check::DryCheckConfig::load, converts it to the usecase DryCheckConfig newtype (same field-by-field conversion as FsDryCheckConfigLoaderAdapter), resolves the effective SimilarityThreshold (threshold_override or the file's own threshold), and selects the config_fingerprint via the safe-approval rule: `infra_config.fingerprint()` when the effective threshold is stricter-or-equal to the file threshold, otherwise `infra_config.fingerprint_with_threshold(effective_threshold)` -- reproducing DryCompositionRoot's private resolve_write_config_fingerprint helper exactly. Zero-field unit struct, constructed by name (no constructor function), matching FsFixpointWorkspaceContextAdapter's sibling pattern.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-20" }
+      ],
+      "informal_grounds": []
+    },
+    "FsDryCorpusFragmentsAdapter": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "unit" }
+      },
+      "methods": [],
+      "module_path": "dry_check::dry_write_driver",
+      "docs": "Implements usecase::dry_write_driver::DryCorpusFragmentsPort (IN-14/AC-20). Validates workspace_root is an existing directory under canonical_root, then reproduces DryCompositionRoot's private build_diff_and_corpus_fragments pipeline: lists changed hunks via infrastructure::dry_check::GitDryCheckDiffGetter, extracts the whole-workspace corpus via infrastructure::semantic_dup::extractor::extract_code_fragments, normalizes fragment paths to repo-relative form, narrows to hunk-overlapping diff_fragments, and computes the corpus fingerprint over the extracted corpus_fragments (the same sha256-based fingerprint DryCompositionRoot's private compute_dry_corpus_fingerprint_from_fragments computes). Zero-field unit struct, constructed by name (no constructor function), matching FsFixpointWorkspaceContextAdapter's sibling pattern.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-20" }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckServiceFactoryAdapter": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "unit" }
+      },
+      "methods": [],
+      "module_path": "dry_check::dry_write_driver",
+      "docs": "Implements usecase::dry_write_driver::DryCheckServiceFactoryPort (IN-14/AC-20). Constructs infrastructure::semantic_dup::embedding::FastEmbedAdapter (embedding), opens the persistent LanceDB index over cmd.db_path + cmd.corpus_fragments via the current infrastructure::dry_check::dry_write_driver::{persistent_index, manifest} helpers that own the relocated persistent-index-open + manifest-diff logic (D7/IN-10: NullInsertIndexProxy makes the interactor's own corpus-index build a no-op), resolves the fast/final Codex model + reasoning effort from `.harness/config/agent-profiles.json` (cmd.repo_root joined) for cmd.model/cmd.capability_name via infrastructure::agent_profiles::AgentProfiles (the same resolution DryCompositionRoot's private resolve_dry_checker_config performs), wraps the resulting infrastructure::dry_check::CodexDryChecker in infrastructure::dry_check::recording_agent::RecordingDryAgent, retaining (not discarding) the TieredDryAgentRecorder that construction call returns, and constructs usecase::dry_check::DryCheckInteractor::new from cmd's reader/writer/coverage/track_id/dry_config/config_fingerprint/corpus_fingerprint plus these adapters. Zero-field unit struct, constructed by name (no constructor function), matching FsFixpointWorkspaceContextAdapter's sibling pattern. Naming note: no `Fs`/`Git` prefix (unlike its siblings) because no single I/O technology dominates -- it wires an embedding model, a vector index, and a subprocess-backed agent, matching DryCheckInteractor's own \"composition-layer value object bundling all secondary ports\" self-description. IN-14 telemetry-preservation microfix: also resolves a branch/kill-switch-gated infrastructure::telemetry::TelemetryWriter from cmd.repo_root (current-branch discovery via infrastructure::git_cli::SystemGitRepo, matching the track/<track_id> + SOTP_TELEMETRY=0 gating apps/cli-composition/src/telemetry_wiring.rs::resolve_telemetry_writer previously performed) and cmd.items_dir/cmd.track_id, constructs a RecordingDryTierTelemetryAdapter from the retained recorder, the resolved fast_model/final_model names, cmd.track_id, and that writer (None when gating excludes this invocation), and returns usecase::dry_write_driver::DryCheckServiceFactoryOutput { service, tier_telemetry } instead of a bare service handle.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-20" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "CN-07" }
+      ],
+      "informal_grounds": []
+    },
+    "RecordingDryTierTelemetryAdapter": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "dry_check::dry_write_driver",
+      "docs": "Implements usecase::dry_write_driver::DryTierTelemetryPort (IN-14 telemetry-preservation microfix). Constructed fresh by DryCheckServiceFactoryAdapter::build alongside the DryCheckService it returns, sharing the SAME TieredDryAgentRecorder instance embedded in the RecordingDryAgent wrapping that call's CodexDryChecker (the recorder now lives in infrastructure::dry_check::recording_agent after the earlier relocation, D7/CN-06). record(dry_result) reproduces the former dry_tiered_telemetry_for_result computation plus the emit_dry_tier_review_round / emit_dry_tier_external_subprocess emission logic now represented by infrastructure::dry_check::dry_write_driver::telemetry plus the existing apps/cli-composition/src/telemetry_wiring.rs writer semantics directly against this crate's own infrastructure::telemetry::{TelemetryWriter, TelemetryEvent} -- no dependency on apps/cli-composition is introduced, since TelemetryWriter/TelemetryEvent already live in this crate. The private writer field is None (record() becomes a silent no-op) when construction-time branch/kill-switch gating excluded telemetry for this invocation (current branch is not track/<track_id>, or SOTP_TELEMETRY=0), reproducing resolve_telemetry_writer's AC-11 gating.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-20" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "CN-07" }
+      ],
+      "informal_grounds": []
+    },
+    "FsDryCorpusRootManifestAdapter": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "unit" }
+      },
+      "methods": [],
+      "module_path": "dry_check::dry_write_driver",
+      "docs": "Implements usecase::dry_write_driver::DryCorpusRootManifestWriterPort (IN-14/AC-20). Reproduces DryCompositionRoot's private write_dry_corpus_root_manifest helper: serializes and atomically writes `<track_dir>/dry-check-corpus-root.json` (schema_version 1, repo-relative workspace_root) with the same symlink-guard checks. The read side of this sidecar remains served by the existing infrastructure::dry_check::FsDryCorpusMetaAdapter (usecase::fixpoint_resolve::DryCorpusMetaPort), reused unmodified by DryCheckApprovedDriverInteractor. Zero-field unit struct, constructed by name (no constructor function), matching FsFixpointWorkspaceContextAdapter's sibling pattern.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-20" }
+      ],
+      "informal_grounds": []
+    },
+    "CodexDryFixLocalRunner": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "unit" }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Create a new CodexDryFixLocalRunner."
+        },
+        {
+          "name": "dry_run_fix_local",
+          "receiver": "&self",
+          "params": [
+            { "name": "input", "ty": "usecase::dry_driver::DryFixLocalDriverInput" }
+          ],
+          "returns": "usecase::dry_driver::DryDriverOutcome",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Run `sotp dry fix-local`: resolve the git root, load agent profiles, resolve the `dry-fix-lead` capability, and dispatch to the configured provider (currently only `codex`). Never returns an `Err`: failures at any stage are folded into a DryDriverOutcome::failure so this method satisfies DryDriverPort::dry_fix_local's infallible signature."
+        }
+      ],
+      "module_path": "dry_check::dry_fix_local",
+      "docs": "Implements the IN-15/AC-21 relocation of the OS-08 codex subprocess spawn path for `sotp dry fix-local`. Reproduces the former DryFixRunnerCompositionRoot::dry_run_fix_local logic (relocated from apps/cli-composition/src/dry_fix_runner.rs per ADR 1328 D7: port-impl adapters belong in libs/infrastructure), renamed to reflect its infrastructure-layer role -- the `CompositionRoot` role it carried in cli_composition is R1-illegal here; `SecondaryAdapter` is the correct infrastructure role for a struct that owns an external-process I/O boundary (subprocess spawn, env redaction, DRY_FIX_STATUS sentinel parsing), coordinating this module's private env / prompt / sentinel / session_log / smoke_test / spawn submodules. Unit struct: no adapter dependencies are injected at construction time. Wrapped by DryDriverAdapter, which implements usecase::dry_driver::DryDriverPort by delegating dry_fix_local to this runner's dry_run_fix_local.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-15" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-21" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "OS-08" }
+      ],
+      "informal_grounds": []
+    },
+    "DryDriverAdapter": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "dry_check::dry_fix_local",
+      "docs": "Implements usecase::dry_driver::DryDriverPort by delegating to CodexDryFixLocalRunner. Relocated from apps/cli-composition/src/dry_driver_adapter.rs per ADR 1328 D7 (port implementations belong in libs/infrastructure), alongside CodexDryFixLocalRunner's identical relocation from apps/cli-composition/src/dry_fix_runner.rs. Single private field holding the runner it delegates dry_fix_local to; constructed via new() (no I/O at construction time). cli_composition::dry::DryCompositionRoot::dry_driver() wires this adapter (as Arc<dyn DryDriverPort>) into usecase::dry_driver::DryDriverInteractor -- no crate-private bridge remains for dry_fix_local.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-15" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-21" }
+      ],
+      "informal_grounds": []
     }
   },
   "traits": {},
@@ -313,6 +517,44 @@
           "docs": "Construct with the configured base branch."
         }
       ]
+    },
+    {
+      "type_name": "RecordingDryTierTelemetryAdapter",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "recorder", "ty": "TieredDryAgentRecorder" },
+            { "name": "fast_model", "ty": "String" },
+            { "name": "final_model", "ty": "String" },
+            { "name": "track_id", "ty": "String" },
+            { "name": "writer", "ty": "Option<TelemetryWriter>" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Construct an adapter bound to the given tiered recorder, resolved fast/final model names, track_id, and an already branch/kill-switch-gated writer (None when this invocation's telemetry is gated off). Called only by DryCheckServiceFactoryAdapter::build (IN-14 telemetry-preservation microfix); no I/O is performed at construction time. `track_id: String` (R9 note, not `domain::TrackId`) mirrors usecase::telemetry::ArchivedTrackTelemetryPort::emit(track_id: String, ...): this value is used only to populate TelemetryEvent::ReviewRound.track_id: String (a pre-existing serde-DTO field, itself String for the same DTO-boundary reason), never for file-path construction or other business logic, so no validated-invariant loss occurs by carrying it as an opaque String here."
+        }
+      ]
+    },
+    {
+      "type_name": "DryDriverAdapter",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Create a new dry driver port adapter, constructing its private CodexDryFixLocalRunner. No I/O is performed at construction time."
+        }
+      ]
     }
   ],
   "trait_impls": [
@@ -345,6 +587,18 @@
     { "action": "add",       "trait_ref": "usecase::fixpoint_resolve_driver::FixpointWorkspaceContextPort", "for_type": "FsFixpointWorkspaceContextAdapter" },
     { "action": "add",       "trait_ref": "usecase::fixpoint_resolve_driver::DryCheckConfigLoaderPort",     "for_type": "FsDryCheckConfigLoaderAdapter" },
     { "action": "add",       "trait_ref": "usecase::fixpoint_resolve_driver::FixpointDryGateFactoryPort",   "for_type": "FsFixpointDryGateFactoryAdapter" },
-    { "action": "add",       "trait_ref": "usecase::fixpoint_resolve_driver::FixpointGateStateFactoryPort", "for_type": "FsFixpointGateStateFactoryAdapter" }
+    { "action": "add",       "trait_ref": "usecase::fixpoint_resolve_driver::FixpointGateStateFactoryPort", "for_type": "FsFixpointGateStateFactoryAdapter" },
+    { "action": "add",       "trait_ref": "usecase::dry_driver_shared::DryRepoRootPort",              "for_type": "FsDryRepoRootAdapter" },
+    { "action": "add",       "trait_ref": "usecase::dry_driver_shared::DryBaseBranchPort",            "for_type": "FsDryBaseBranchAdapter" },
+    { "action": "add",       "trait_ref": "usecase::dry_driver_shared::DryCheckStorageFactoryPort",   "for_type": "FsDryCheckStorageFactoryAdapter" },
+    { "action": "add",       "trait_ref": "usecase::dry_driver_shared::DryDiffBaseFactoryPort",       "for_type": "FsDryDiffBaseFactoryAdapter" },
+    { "action": "add",       "trait_ref": "usecase::dry_write_driver::DryWriteConfigLoaderPort",      "for_type": "FsDryWriteConfigLoaderAdapter" },
+    { "action": "add",       "trait_ref": "usecase::dry_write_driver::DryCorpusFragmentsPort",        "for_type": "FsDryCorpusFragmentsAdapter" },
+    { "action": "add",       "trait_ref": "usecase::dry_write_driver::DryCheckServiceFactoryPort",    "for_type": "DryCheckServiceFactoryAdapter" },
+    { "action": "add",       "trait_ref": "usecase::dry_write_driver::DryCorpusRootManifestWriterPort", "for_type": "FsDryCorpusRootManifestAdapter" },
+    { "action": "add",       "trait_ref": "usecase::dry_write_driver::DryTierTelemetryPort",          "for_type": "RecordingDryTierTelemetryAdapter" },
+    { "action": "add",       "trait_ref": "core::default::Default",                                    "for_type": "CodexDryFixLocalRunner" },
+    { "action": "add",       "trait_ref": "core::default::Default",                                    "for_type": "DryDriverAdapter" },
+    { "action": "add",       "trait_ref": "usecase::dry_driver::DryDriverPort",                         "for_type": "DryDriverAdapter" }
   ]
 }

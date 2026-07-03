@@ -32,8 +32,6 @@ mod telemetry;
 pub mod track;
 pub mod verify;
 
-pub(crate) mod dry_driver_adapter;
-mod dry_fix_runner;
 pub(crate) mod semantic_dup_driver_adapter;
 
 /// Telemetry wiring for the composition root.
@@ -49,7 +47,6 @@ pub mod telemetry_wiring;
 // ---------------------------------------------------------------------------
 
 pub use domain::ExportSchemaInput;
-pub use dry::{DryCheckApprovedInput, DryResultsInput, DryWriteInput, RunDryFixLocalInput};
 pub use error::CompositionError;
 pub use ref_verify::{
     RefVerifyChainFilter, RefVerifyCheckApprovedInput, RefVerifyResultsInput, RefVerifyRunInput,
@@ -74,7 +71,6 @@ pub use conventions::ConventionsCompositionRoot;
 pub use demo::DemoCompositionRoot;
 pub use domain::DomainCompositionRoot;
 pub use dry::DryCompositionRoot;
-pub use dry_fix_runner::DryFixRunnerCompositionRoot;
 pub use file::FileCompositionRoot;
 pub use git::GitCompositionRoot;
 pub use guard::GuardCompositionRoot;

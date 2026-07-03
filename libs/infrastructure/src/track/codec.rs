@@ -52,7 +52,7 @@ impl serde::Serialize for MergeMethodDocument {
 
 impl<'de> serde::Deserialize<'de> for MergeMethodDocument {
     fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
-        let s = String::deserialize(deserializer)?;
+        let s = <String as serde::Deserialize<'de>>::deserialize(deserializer)?;
         match s.as_str() {
             "squash" => Ok(MergeMethodDocument::Squash),
             "merge" => Ok(MergeMethodDocument::Merge),

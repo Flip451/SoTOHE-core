@@ -1,21 +1,46 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "b1dbbb499bcc8dcac773144b1340bbf0a965df328995819023f769133fcc0ea5",
+  "catalogue_declaration_hash": "cb30e74521ef8caa842733b15de3aa6ef1f19993ac3341f23e78cf7e0e3ceb02",
   "signals": [
+    {
+      "type_name": "DryCheckApprovedInput",
+      "signal": "blue",
+      "entry_hash": "d860932c4f3d74b768685cacd3454912bdc54cafd7c03b422305c1f58cc90652"
+    },
     {
       "type_name": "DryCompositionRoot",
       "signal": "blue",
-      "entry_hash": "6fc1458beea57ab4d0ca1c69ca7c60cabd9a1151344eb98a50384d32ca203add"
+      "entry_hash": "f40ecf191273792bfd805e9c8d911669b47d10465e9acd0b6cd51f92ecdd5a5e"
+    },
+    {
+      "type_name": "DryFixRunnerCompositionRoot",
+      "signal": "blue",
+      "entry_hash": "2a7d938346f2f0c4de1b1662bb0b2ce419adfe9ee7eeefb41570f5a801869164"
+    },
+    {
+      "type_name": "DryResultsInput",
+      "signal": "blue",
+      "entry_hash": "8867f56736e480e310daab74e48942a2fe54d3c7e2aefd55f66611f3f1193b73"
+    },
+    {
+      "type_name": "DryWriteInput",
+      "signal": "blue",
+      "entry_hash": "97df839ae7b1f17742e2a1002d76985b2d9fce1b96af15337263244c41e3ccc7"
     },
     {
       "type_name": "FixpointResolveInput",
       "signal": "blue",
-      "entry_hash": "a71e8c71b3df6e9fab4289e1391e1b1826b5924b39b4b2e4b821417d7e1e8377"
+      "entry_hash": "9ff4788f6652016d510369d22f077cc9cff822dadfef5407da85f3a9d6d0490f"
     },
     {
       "type_name": "GitCompositionRoot",
       "signal": "blue",
       "entry_hash": "90d22b9c3ded9ea2498869921ddf0abbe029755ac4edc8eeb88bd93d7b9c68b6"
+    },
+    {
+      "type_name": "RunDryFixLocalInput",
+      "signal": "blue",
+      "entry_hash": "2b9b5592a5c1e3c8ef84773c500bc49391b09dbf38113df80ce4e13c7ab87765"
     },
     {
       "type_name": "TrackCompositionRoot",
