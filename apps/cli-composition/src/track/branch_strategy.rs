@@ -54,9 +54,13 @@ impl TrackCompositionRoot {
         // branch is resolved from the global config (mirrors track_init).
         let snap = resolve_branch_strategy_snapshot(&project_root)?;
         let base_branch = snap.base_branch();
-        let repo = infrastructure::git_cli::SystemGitRepo::discover().map_err(|e| {
-            CompositionError::AdapterInit(format!("failed to discover git repository: {e}"))
-        })?;
+        let repo =
+            infrastructure::git_cli::SystemGitRepo::discover_from(&project_root).map_err(|e| {
+                CompositionError::AdapterInit(format!(
+                    "failed to discover git repository from '{}': {e}",
+                    project_root.display()
+                ))
+            })?;
         let current = GitRepository::current_branch(&repo)
             .map_err(|e| CompositionError::Infrastructure(e.to_string()))?;
         if current.as_deref() != Some(base_branch) {
