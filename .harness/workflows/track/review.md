@@ -68,6 +68,11 @@ For each scope reporting `required`, write `tmp/reviewer-runtime/briefing-{scope
 {scope-specific notes for findings that should be dismissed}
 ```
 
+Every briefing must include one sentence requiring that findings matching the severity policy
+be enumerated in full for the round — all matches reported, not truncated after the first
+finding — with the same sentence stating that the severity constraints themselves remain
+unchanged.
+
 The CLI auto-injects the scope file list and severity policy. Do NOT hand-author the
 `## Scope-specific severity policy` section: scopes with `briefing_file` configured in
 `.harness/config/review-scope.json` receive the policy reference automatically via

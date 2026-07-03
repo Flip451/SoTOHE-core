@@ -5,7 +5,7 @@
   "goal": [
     {
       "id": "GO-01",
-      "text": "reviewer の findings 全件報告規律（1 round で severity policy に該当する findings を全件列挙して報告する）と、下流 artifact（impl-plan の task text / plan sections、型カタログの docs / intent）が上流（ADR / spec）の設計理由・挙動契約を散文で再記述しないことを求める convention の新設、およびその convention を reviewer severity policy 更新（実行可能性の再定義 + 再記述の finding 化）とセットで review gate に載せることにより、findings 1 件ずつの直列往復と artifact 間矛盾 findings の発生源を減らし、レビュー負荷を軽減する。",
+      "text": "レビュー負荷の軽減のため 3 つの対策を導入する。(1) reviewer の findings 全件報告規律（1 round で severity policy に該当する findings を全件列挙して報告する。severity 基準自体は変更しない）を review workflow の briefing 構成規則（framework-owned surface）に配置する。(2) 下流 artifact（impl-plan の task text / plan sections、型カタログの docs / intent）が上流（ADR / spec）の設計理由・挙動契約を散文で再記述しないことを求める convention を新設する。(3) reviewer severity policy を更新し、実行可能性の判定基準を再定義して再記述を finding 化することで、(2) の規範を review gate に載せる。これにより findings 1 件ずつの直列往復と artifact 間矛盾 findings の発生源を減らす。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-02-1600-review-load-batch-findings-no-restatement.md",
@@ -26,7 +26,7 @@
     "in_scope": [
       {
         "id": "IN-01",
-        "text": "`.harness/config/review-scope.json` の `groups[].briefing_file` が参照する `.harness/custom/review-prompts/` 配下の review prompt ファイルすべて（`spec.md` / `types.md` / `impl-plan.md` / `domain.md` / `usecase.md` / `infrastructure.md` / `cli.md` / `cli_composition.md` / `cli_driver.md` / `harness-policy.md` / `adr.md`）に、「severity policy に該当する findings は、その round で発見した全件を列挙して報告する」規律を明記する。既存の severity 基準（事実誤り・矛盾・実行不能・broken reference のみを報告する既存の基準）の文言そのものは変更しない。",
+        "text": "`.harness/workflows/track/review.md` の Step 3（briefing 構成規則）に、全 scope の briefing（`tmp/reviewer-runtime/briefing-{scope}.md`）へ「severity policy に該当する findings は、その round で発見した全件を列挙して報告する」旨の 1 文を含めることを義務化する記述を追加する。全件報告の規律は framework-owned surface にのみ配置し、`.harness/custom/review-prompts/*.md`（利用者所有の severity policy）には挿入しない。既存の severity 基準（事実誤り・矛盾・実行不能・broken reference のみを報告する既存の基準）の文言そのものは変更しない。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-07-02-1600-review-load-batch-findings-no-restatement.md",
@@ -36,7 +36,7 @@
       },
       {
         "id": "IN-02",
-        "text": "`knowledge/conventions/` 配下に新規 convention ファイルを追加し、impl-plan の task text / plan sections と型カタログ（`<layer>-types.json`）の docs / intent は「変更対象（file / symbol）+ 操作 + spec anchor の cite」で記述し、上流（ADR / spec）の設計理由・挙動契約を散文で再説明しないと定める。挙動は `AC-NN` / `IN-NN` / `CN-NN` の cite で参照し内容を言い直さないこと、数値状態（`schema_version` 等）は literal ではなく相対参照（「現行値 + 1」等）で書くことをルールに含める。追加後は `knowledge/conventions/README.md` の Current Files 一覧にも登録する。",
+        "text": "`knowledge/conventions/` 配下に新規 convention ファイルを追加し、impl-plan の task text / plan sections と型カタログ（`<layer>-types.json`）の docs / intent は「変更対象（file / symbol）+ 操作 + spec anchor の cite」で記述し、上流（ADR / spec）の設計理由・挙動契約を散文で再説明しないと定める。挙動は `AC-NN` / `IN-NN` / `CN-NN` の cite で参照し内容を言い直さないことをルールに含める。追加後は `knowledge/conventions/README.md` の Current Files 一覧にも登録する。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-07-02-1600-review-load-batch-findings-no-restatement.md",
@@ -128,7 +128,7 @@
       },
       {
         "id": "OS-07",
-        "text": "sotp（Rust CLI）本体のコード変更は本 track の対象外とする。実装は `.harness/custom/review-prompts/*.md` と `knowledge/conventions/` への文書変更のみで完結する（D1 / D2 / D3 のいずれも prompt / convention の文書変更のみで実現する）。",
+        "text": "sotp（Rust CLI）本体のコード変更は本 track の対象外とする。実装は `.harness/workflows/track/review.md`・`.harness/custom/review-prompts/*.md`・`knowledge/conventions/` への文書変更のみで完結する（D1 は workflow、D2 は convention、D3 は prompt の文書変更でそれぞれ実現する）。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-07-02-1600-review-load-batch-findings-no-restatement.md",
@@ -171,7 +171,7 @@
   "acceptance_criteria": [
     {
       "id": "AC-01",
-      "text": "`.harness/config/review-scope.json` の `groups[].briefing_file` が参照する review prompt ファイルそれぞれに、severity policy に該当する findings をその round で発見した全件列挙して報告する旨の指示が明記されている。既存の severity 基準（事実誤り・矛盾・実行不能・broken reference）の記述内容が変更前と同一であることを diff で確認できる。",
+      "text": "`.harness/workflows/track/review.md` の Step 3（briefing 構成規則）に、全 scope の briefing へ「severity policy に該当する findings は、その round で発見した全件を列挙して報告する」旨の 1 文を含めることを義務化する記述が存在し、その記述が severity 制約（事実誤り・矛盾・実行不能・broken reference のみを報告する基準）を維持する旨を同じ文で明示している。`.harness/custom/review-prompts/` 配下のファイルに全件報告規律の文が挿入されていないことを diff で確認できる。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-02-1600-review-load-batch-findings-no-restatement.md",
@@ -181,7 +181,7 @@
     },
     {
       "id": "AC-02",
-      "text": "`knowledge/conventions/` 配下に、下流 artifact（impl-plan の task text / plan sections、型カタログの docs / intent）の再記述禁止ルールを定めた convention ファイルが存在する。本文に、挙動を `AC-NN` / `IN-NN` / `CN-NN` の cite で参照し内容を言い直さないこと、数値状態を相対参照で書くこと、spec.json は対象外であること、既存 track artifact への遡及適用を行わないことが明記されている。`knowledge/conventions/README.md` の Current Files 一覧に新規ファイルが登録されている。",
+      "text": "`knowledge/conventions/` 配下に、下流 artifact（impl-plan の task text / plan sections、型カタログの docs / intent）の再記述禁止ルールを定めた convention ファイルが存在する。本文に、挙動を `AC-NN` / `IN-NN` / `CN-NN` の cite で参照し内容を言い直さないこと、spec.json は対象外であること、既存 track artifact への遡及適用を行わないことが明記されている。`knowledge/conventions/README.md` の Current Files 一覧に新規ファイルが登録されている。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-02-1600-review-load-batch-findings-no-restatement.md",

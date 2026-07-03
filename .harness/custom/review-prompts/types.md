@@ -42,6 +42,10 @@ spec_refs/role/action mismatch.
   (Chain2 would flag this 🔴) — call it out if it's load-bearing, OR an entry
   whose `spec_refs[].anchor` cites a spec element whose intent is plainly
   unrelated to the type's purpose at the narrative level.
+- **upstream restatement**: an entry whose `docs` / `intent` field restates
+  an upstream ADR's or spec.json's design rationale or behaviour contract in
+  prose instead of citing it by anchor (`AC-NN` / `IN-NN` / `CN-NN` / spec
+  element id). Cite `knowledge/conventions/no-upstream-restatement.md`.
 
 ### SOLID findings
 

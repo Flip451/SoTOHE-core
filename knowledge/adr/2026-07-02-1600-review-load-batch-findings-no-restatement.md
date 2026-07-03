@@ -2,10 +2,10 @@
 adr_id: 2026-07-02-1600-review-load-batch-findings-no-restatement
 decisions:
   - id: D1
-    user_decision_ref: "chat:session-e823e003:2026-07-03 裁定「プロンプトの修正だけで十分な価値を発揮できそう。4b(findings 全件報告)と再記述禁止の convention + reviewer policy 更新を、レビュー負荷軽減を目的とした一つの ADR にまとめる」"
+    user_decision_ref: "chat:session-e823e003:2026-07-03 裁定「プロンプトの修正だけで十分な価値を発揮できそう。4b(findings 全件報告)と再記述禁止の convention + reviewer policy 更新を、レビュー負荷軽減を目的とした一つの ADR にまとめる」; chat:session-6459b365:2026-07-04 裁定「D1 配置を framework-owned (review workflow briefing 規則) へ変更」"
     status: proposed
   - id: D2
-    user_decision_ref: "chat:session-e823e003:2026-07-03 同裁定（再記述禁止 convention の新設）"
+    user_decision_ref: "chat:session-e823e003:2026-07-03 同裁定（再記述禁止 convention の新設）; chat:session-6459b365:2026-07-04 裁定「数値状態の相対参照 bullet を決定から削除」"
     status: proposed
   - id: D3
     user_decision_ref: "chat:session-e823e003:2026-07-03 同裁定（reviewer severity policy の更新）+ 機械 lint は「False Positive の扱いが難しいのですぐには採用しない」"
@@ -28,7 +28,7 @@ findings の内容面では、最大クラスは artifact 間矛盾であり、�
 
 ### D1: findings の全件報告 — 1 ラウンドで該当 findings を全件列挙する
 
-すべての scope の review prompt に「severity policy に該当する findings は、その round で発見した全件を列挙して報告する」規律を明記する。severity 制約（事実誤り・矛盾・実行不能・broken reference のみを報告する既存の基準）は変更しない — 報告の基準を緩めるのではなく、基準に該当する findings の報告漏れ（最初の 1 件で打ち切る挙動）を禁止する。fix 側は報告された全件を 1 バッチで修正し、次の round で一括検証する。
+全件報告の規律は framework-owned surface に配置する: `.harness/workflows/track/review.md` の Step 3（briefing 構成規則）で、全 scope の briefing に「severity policy に該当する findings は、その round で発見した全件を列挙して報告する」旨の 1 文を含めることを義務化する。`.harness/custom/review-prompts/*.md`（利用者所有の severity policy）には挿入しない — 報告密度の規律は framework の review-process 挙動であり、利用者が独立に書き換えられる surface には置かない。severity 制約（事実誤り・矛盾・実行不能・broken reference のみを報告する既存の基準）は変更しない — 報告の基準を緩めるのではなく、基準に該当する findings の報告漏れ（最初の 1 件で打ち切る挙動）を禁止する。fix 側は報告された全件を 1 バッチで修正し、次の round で一括検証する。
 
 狙いは 1 finding ずつの直列往復の削減である。全件化が低確度 findings の水増しに転じないよう、severity 制約の維持を同じ文で明示する。
 
@@ -37,7 +37,6 @@ findings の内容面では、最大クラスは artifact 間矛盾であり、�
 impl-plan の task text / plan sections と型カタログの docs / intent は「変更対象（file / symbol）+ 操作 + spec anchor の cite」で記述し、上流（ADR / spec）の設計理由・挙動契約の再説明を書かない。この規範を `knowledge/conventions/` に convention として新設する。
 
 - 挙動は `AC-NN` / `IN-NN` / `CN-NN` の cite で参照し、内容を言い直さない
-- 数値状態（schema_version 等）は literal でなく相対参照（「現行値 + 1」等）で書く
 - spec.json は対象外とする — ADR を細粒度化するのが spec の仕事であり、再記述はその本務である
 - workflow ドキュメントは既存の adapter-SSoT 規則（provider 非依存 logic の重複禁止）が同族としてカバー済みであり、対象に含めない
 - 既存 track artifact への遡及適用はしない（完了 track の artifact は歴史的記録）
@@ -76,7 +75,7 @@ D2 の規範を文書として置くだけの案。gate 強制のない文書ル
 - findings の直列往復が減る（現行実測: findings ラウンドあたり平均約 1.5 件。全件報告で複数 findings が 1 往復に束なる）
 - 矛盾 findings の発生源（言い換え散文）が縮み、artifact 間矛盾クラスの発生自体が減る
 - reviewer の 1 finding あたりの調査コストが下がる（意味調停 → 再記述の存在検出）
-- 実装は prompt / convention の文書変更のみで sotp のコード変更ゼロ。即日適用でき、効果がなければ即時に戻せる
+- 実装は workflow / prompt / convention の文書変更のみで sotp のコード変更ゼロ。即日適用でき、効果がなければ即時に戻せる
 
 ### Negative
 
@@ -98,7 +97,9 @@ D2 の規範を文書として置くだけの案。gate 強制のない文書ル
 
 ## Related
 
-- `.harness/custom/review-prompts/` — D1 / D3 の変更対象 policy 群
+- `.harness/workflows/track/review.md` — D1 の変更対象（Step 3 の briefing 構成規則）
+- `.harness/custom/review-prompts/` — D3 の変更対象 policy 群
+- `knowledge/conventions/type-designer-kind-selection.md` — `.harness/custom/review-prompts/*` を framework methodology の enforcement source にしないという既存の境界言明（D1 の配置判断と同じ基準）
 - `knowledge/conventions/enforce-by-mechanism.md` — 文書ルール単独の形骸化と gate 強制の原則（D2 + D3 セット採用の根拠）
 - `knowledge/conventions/workflow-ceremony-minimization.md` — エラーを実質的に防がない ceremony の廃止原則（B / C の却下と同じ判断基準）
 - `tmp/adr/2026-07-02-1345-catalogue-generation-annotation.md`（未昇格 draft。`tmp/` は `.gitignore` 対象のため本リポジトリの版管理外） — 型カタログの生成 + 注釈化 draft（カタログ散文を intent 一行に絞る方向で D2 と整合）

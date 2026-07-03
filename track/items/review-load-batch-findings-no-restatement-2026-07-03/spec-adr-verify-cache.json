@@ -2,18 +2,18 @@
   "schema_version": 1,
   "entries": [
     {
-      "claim_hash": "e80b0a0ac3251004802c550d5b3aca559494d8e0d1518f6d0a6de53a55eae214",
-      "evidence_hash": "d60e3a3f0586cb8982d9729f5f5c234bd378bcbbd7aa90c94a26ee4696158339",
+      "claim_hash": "f4d6bbca4569048fb9c7ad340695aaa992c9addcaaaf0d05c09ef00579dd845c",
+      "evidence_hash": "f53b911b899752b031187ad9be99991ee41d1f6a5549c9d7428b351c04603ae3",
       "verdict": {
         "kind": "pass",
-        "citation": "「4b(findings 全件報告)と再記述禁止の convention + reviewer policy 更新を、レビュー負荷軽減を目的とした一つの ADR にまとめる」 / 「severity 制約 ... は変更しない」"
+        "citation": "user_decision_ref: chat:session-e823e003:2026-07-03 裁定「プロンプトの修正だけで十分な価値を発揮できそう。4b(findings 全件報告)と再記述禁止の convention + reviewer policy 更新を、レビュー負荷軽減を目的とした一つの ADR にまとめる」; chat:session-6459b365:2026-07-04 裁定「D1 配置を framework-owned (review workflow briefing 規則) へ変更」"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "goal",
           "element_id": "GO-01",
-          "text_label": "reviewer の findings 全件報告規律（1 round で severity policy に該当する findings を全件列挙して報告する）と、下流 artifact（impl-plan の task text / plan sections、型カタログの docs / intent）が上流（ADR / spec）の設計理由・挙動契約を散文で再記述しないことを求める convention の新設、およびその convention を reviewer severity policy 更新（実行可能性の再定義 + 再記述の finding 化）とセットで review gate に載せることにより、findings 1 件ずつの直列往復と artifact 間矛盾 findings の発生源を減らし、レビュー負荷を軽減する。"
+          "text_label": "レビュー負荷の軽減のため 3 つの対策を導入する。(1) reviewer の findings 全件報告規律（1 round で severity policy に該当する findings を全件列挙して報告する。severity 基準自体は変更しない）を review workflow の briefing 構成規則（framework-owned surface）に配置する。(2) 下流 artifact（impl-plan の task text / plan sections、型カタログの docs / intent）が上流（ADR / spec）の設計理由・挙動契約を散文で再記述しないことを求める convention を新設する。(3) reviewer severity policy を更新し、実行可能性の判定基準を再定義して再記述を finding 化することで、(2) の規範を review gate に載せる。これにより findings 1 件ずつの直列往復と artifact 間矛盾 findings の発生源を減らす。"
         }
       },
       "evidence_origin": {
@@ -25,8 +25,8 @@
       }
     },
     {
-      "claim_hash": "e80b0a0ac3251004802c550d5b3aca559494d8e0d1518f6d0a6de53a55eae214",
-      "evidence_hash": "d60e3a3f0586cb8982d9729f5f5c234bd378bcbbd7aa90c94a26ee4696158339",
+      "claim_hash": "f4d6bbca4569048fb9c7ad340695aaa992c9addcaaaf0d05c09ef00579dd845c",
+      "evidence_hash": "f53b911b899752b031187ad9be99991ee41d1f6a5549c9d7428b351c04603ae3",
       "verdict": {
         "kind": "pass",
         "citation": "impl-plan の task text / plan sections と型カタログの docs / intent は「変更対象（file / symbol）+ 操作 + spec anchor の cite」で記述し、上流（ADR / spec）の設計理由・挙動契約の再説明を書かない。この規範を `knowledge/conventions/` に convention として新設する。"
@@ -36,7 +36,7 @@
         "data": {
           "section": "goal",
           "element_id": "GO-01",
-          "text_label": "reviewer の findings 全件報告規律（1 round で severity policy に該当する findings を全件列挙して報告する）と、下流 artifact（impl-plan の task text / plan sections、型カタログの docs / intent）が上流（ADR / spec）の設計理由・挙動契約を散文で再記述しないことを求める convention の新設、およびその convention を reviewer severity policy 更新（実行可能性の再定義 + 再記述の finding 化）とセットで review gate に載せることにより、findings 1 件ずつの直列往復と artifact 間矛盾 findings の発生源を減らし、レビュー負荷を軽減する。"
+          "text_label": "レビュー負荷の軽減のため 3 つの対策を導入する。(1) reviewer の findings 全件報告規律（1 round で severity policy に該当する findings を全件列挙して報告する。severity 基準自体は変更しない）を review workflow の briefing 構成規則（framework-owned surface）に配置する。(2) 下流 artifact（impl-plan の task text / plan sections、型カタログの docs / intent）が上流（ADR / spec）の設計理由・挙動契約を散文で再記述しないことを求める convention を新設する。(3) reviewer severity policy を更新し、実行可能性の判定基準を再定義して再記述を finding 化することで、(2) の規範を review gate に載せる。これにより findings 1 件ずつの直列往復と artifact 間矛盾 findings の発生源を減らす。"
         }
       },
       "evidence_origin": {
@@ -48,18 +48,18 @@
       }
     },
     {
-      "claim_hash": "e80b0a0ac3251004802c550d5b3aca559494d8e0d1518f6d0a6de53a55eae214",
-      "evidence_hash": "d60e3a3f0586cb8982d9729f5f5c234bd378bcbbd7aa90c94a26ee4696158339",
+      "claim_hash": "f4d6bbca4569048fb9c7ad340695aaa992c9addcaaaf0d05c09ef00579dd845c",
+      "evidence_hash": "f53b911b899752b031187ad9be99991ee41d1f6a5549c9d7428b351c04603ae3",
       "verdict": {
         "kind": "pass",
-        "citation": "「『上流（ADR / spec）の挙動・設計理由を散文で再説明している』こと自体を finding クラスとして追加する。」"
+        "citation": "「『上流（ADR / spec）の挙動・設計理由を散文で再説明している』こと自体を finding クラスとして追加する】【。This enforcement is毎ラウンドの review gate で効く」"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "goal",
           "element_id": "GO-01",
-          "text_label": "reviewer の findings 全件報告規律（1 round で severity policy に該当する findings を全件列挙して報告する）と、下流 artifact（impl-plan の task text / plan sections、型カタログの docs / intent）が上流（ADR / spec）の設計理由・挙動契約を散文で再記述しないことを求める convention の新設、およびその convention を reviewer severity policy 更新（実行可能性の再定義 + 再記述の finding 化）とセットで review gate に載せることにより、findings 1 件ずつの直列往復と artifact 間矛盾 findings の発生源を減らし、レビュー負荷を軽減する。"
+          "text_label": "レビュー負荷の軽減のため 3 つの対策を導入する。(1) reviewer の findings 全件報告規律（1 round で severity policy に該当する findings を全件列挙して報告する。severity 基準自体は変更しない）を review workflow の briefing 構成規則（framework-owned surface）に配置する。(2) 下流 artifact（impl-plan の task text / plan sections、型カタログの docs / intent）が上流（ADR / spec）の設計理由・挙動契約を散文で再記述しないことを求める convention を新設する。(3) reviewer severity policy を更新し、実行可能性の判定基準を再定義して再記述を finding 化することで、(2) の規範を review gate に載せる。これにより findings 1 件ずつの直列往復と artifact 間矛盾 findings の発生源を減らす。"
         }
       },
       "evidence_origin": {
@@ -71,18 +71,18 @@
       }
     },
     {
-      "claim_hash": "b80ffa2587045c5375c885c7e310dbbe8f85b7cb5d96b7840ec00926b233cca5",
-      "evidence_hash": "d60e3a3f0586cb8982d9729f5f5c234bd378bcbbd7aa90c94a26ee4696158339",
+      "claim_hash": "53cccae65cc1aed863454a3cb45e5fda809ab1a6e2162c7617783df28f41cda5",
+      "evidence_hash": "f53b911b899752b031187ad9be99991ee41d1f6a5549c9d7428b351c04603ae3",
       "verdict": {
         "kind": "pass",
-        "citation": "すべての scope の review prompt に「severity policy に該当する findings は、その round で発見した全件を列挙して報告する」規律を明記する。severity 制約（事実誤り・矛盾・実行不能・broken reference のみを報告する既存の基準）は変更しない — 報告の基準を緩めるのではなく、基準に該当する findings の報告漏れ（最初の 1 件で打ち切る挙動）を禁止する。"
+        "citation": "「全件報告の規律は framework-owned surface に配置する: `.harness/workflows/track/review.md` の Step 3（briefing 構成規則）で、全 scope の briefing に『severity policy に該当する findings は、その round で発見した全件を列挙して報告する』旨の 1 文を含めることを義務化する。`.harness/custom/review-prompts/*.md`（利用者所有の severity policy）には挿入しない — … severity 制約（事実誤り・矛盾・実行不能・broken reference のみを報告する既存の基準）は変更しない」"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "in_scope",
           "element_id": "IN-01",
-          "text_label": "`.harness/config/review-scope.json` の `groups[].briefing_file` が参照する `.harness/custom/review-prompts/` 配下の review prompt ファイルすべて（`spec.md` / `types.md` / `impl-plan.md` / `domain.md` / `usecase.md` / `infrastructure.md` / `cli.md` / `cli_composition.md` / `cli_driver.md` / `harness-policy.md` / `adr.md`）に、「severity policy に該当する findings は、その round で発見した全件を列挙して報告する」規律を明記する。既存の severity 基準（事実誤り・矛盾・実行不能・broken reference のみを報告する既存の基準）の文言そのものは変更しない。"
+          "text_label": "`.harness/workflows/track/review.md` の Step 3（briefing 構成規則）に、全 scope の briefing（`tmp/reviewer-runtime/briefing-{scope}.md`）へ「severity policy に該当する findings は、その round で発見した全件を列挙して報告する」旨の 1 文を含めることを義務化する記述を追加する。全件報告の規律は framework-owned surface にのみ配置し、`.harness/custom/review-prompts/*.md`（利用者所有の severity policy）には挿入しない。既存の severity 基準（事実誤り・矛盾・実行不能・broken reference のみを報告する既存の基準）の文言そのものは変更しない。"
         }
       },
       "evidence_origin": {
@@ -94,18 +94,18 @@
       }
     },
     {
-      "claim_hash": "4cc9e7258221767487ad58f007681e403a517504175da5b4eadc5c2d8d3b2a0f",
-      "evidence_hash": "d60e3a3f0586cb8982d9729f5f5c234bd378bcbbd7aa90c94a26ee4696158339",
+      "claim_hash": "b27fbc0012f706ab2e6d327ee52d959f5b4e3037bde1fff8abc52869690255a5",
+      "evidence_hash": "f53b911b899752b031187ad9be99991ee41d1f6a5549c9d7428b351c04603ae3",
       "verdict": {
         "kind": "pass",
-        "citation": "impl-plan の task text / plan sections と型カタログの docs / intent は「変更対象（file / symbol）+ 操作 + spec anchor の cite」で記述し、上流（ADR / spec）の設計理由・挙動契約の再説明を書かない。この規範を `knowledge/conventions/` に convention として新設する。\n\n- 挙動は `AC-NN` / `IN-NN` / `CN-NN` の cite で参照し、内容を言い直さない\n- 数値状態（schema_version 等）は literal でなく相対参照（「現行値 + 1」等）で書く"
+        "citation": "impl-plan の task text / plan sections と型カタログの docs / intent は「変更対象（file / symbol）+ 操作 + spec anchor の cite」で記述し、上流（ADR / spec）の設計理由・挙動契約の再説明を書かない。この規範を `knowledge/conventions/` に convention として新設する。\n\n- 挙動は `AC-NN` / `IN-NN` / `CN-NN` の cite で参照し、内容を言い直さない"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "in_scope",
           "element_id": "IN-02",
-          "text_label": "`knowledge/conventions/` 配下に新規 convention ファイルを追加し、impl-plan の task text / plan sections と型カタログ（`<layer>-types.json`）の docs / intent は「変更対象（file / symbol）+ 操作 + spec anchor の cite」で記述し、上流（ADR / spec）の設計理由・挙動契約を散文で再説明しないと定める。挙動は `AC-NN` / `IN-NN` / `CN-NN` の cite で参照し内容を言い直さないこと、数値状態（`schema_version` 等）は literal ではなく相対参照（「現行値 + 1」等）で書くことをルールに含める。追加後は `knowledge/conventions/README.md` の Current Files 一覧にも登録する。"
+          "text_label": "`knowledge/conventions/` 配下に新規 convention ファイルを追加し、impl-plan の task text / plan sections と型カタログ（`<layer>-types.json`）の docs / intent は「変更対象（file / symbol）+ 操作 + spec anchor の cite」で記述し、上流（ADR / spec）の設計理由・挙動契約を散文で再説明しないと定める。挙動は `AC-NN` / `IN-NN` / `CN-NN` の cite で参照し内容を言い直さないことをルールに含める。追加後は `knowledge/conventions/README.md` の Current Files 一覧にも登録する。"
         }
       },
       "evidence_origin": {
@@ -118,10 +118,10 @@
     },
     {
       "claim_hash": "f61dcc4661ddbc990dabb0c60e28453e38e7d88108786a89a25f32212d54cf45",
-      "evidence_hash": "d60e3a3f0586cb8982d9729f5f5c234bd378bcbbd7aa90c94a26ee4696158339",
+      "evidence_hash": "f53b911b899752b031187ad9be99991ee41d1f6a5549c9d7428b351c04603ae3",
       "verdict": {
         "kind": "pass",
-        "citation": "「変更対象 file / symbol + 操作 + anchor cite が揃っていれば実行可能」に書き換える。挙動の再説明を実行可能性の要件から外し、要求しない。"
+        "citation": "「task description non-executable」の判定基準を「変更対象 file / symbol + 操作 + anchor cite が揃っていれば実行可能」に書き換える。挙動の再説明を実行可能性の要件から外し、要求しない。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -141,7 +141,7 @@
     },
     {
       "claim_hash": "03b1c3d0f60bd2daf8b136c5c699b5ce28e480860959f321f00bd99ec957b4c6",
-      "evidence_hash": "d60e3a3f0586cb8982d9729f5f5c234bd378bcbbd7aa90c94a26ee4696158339",
+      "evidence_hash": "f53b911b899752b031187ad9be99991ee41d1f6a5549c9d7428b351c04603ae3",
       "verdict": {
         "kind": "pass",
         "citation": "「再記述の finding 化（impl-plan / types）: 『上流（ADR / spec）の挙動・設計理由を散文で再説明している』こと自体を finding クラスとして追加する。reviewer の仕事は散文同士の意味調停（どちらが正しいかの調査）から、再記述の存在検出 + citation の妥当性確認へ寄る。」"
@@ -164,7 +164,7 @@
     },
     {
       "claim_hash": "42c18103790d987a43ce89e5adabd9dbe2828c0cf26016bb2386fb9a79bf06b2",
-      "evidence_hash": "d60e3a3f0586cb8982d9729f5f5c234bd378bcbbd7aa90c94a26ee4696158339",
+      "evidence_hash": "f53b911b899752b031187ad9be99991ee41d1f6a5549c9d7428b351c04603ae3",
       "verdict": {
         "kind": "pass",
         "citation": "spec.json は対象外とする — ADR を細粒度化するのが spec の仕事であり、再記述はその本務である"
@@ -187,7 +187,7 @@
     },
     {
       "claim_hash": "20a2fc17185e25c7a0d0494caf62bb0639df30fc56e5d8d5d1ee9a01ae5c65f2",
-      "evidence_hash": "d60e3a3f0586cb8982d9729f5f5c234bd378bcbbd7aa90c94a26ee4696158339",
+      "evidence_hash": "f53b911b899752b031187ad9be99991ee41d1f6a5549c9d7428b351c04603ae3",
       "verdict": {
         "kind": "pass",
         "citation": "既存 track artifact への遡及適用はしない（完了 track の artifact は歴史的記録）"
@@ -210,7 +210,7 @@
     },
     {
       "claim_hash": "a5e0e3e2840fa3346c7010484f1003ade41cd0f82866bdaadddf057db138e299",
-      "evidence_hash": "d60e3a3f0586cb8982d9729f5f5c234bd378bcbbd7aa90c94a26ee4696158339",
+      "evidence_hash": "f53b911b899752b031187ad9be99991ee41d1f6a5549c9d7428b351c04603ae3",
       "verdict": {
         "kind": "pass",
         "citation": "workflow ドキュメントは既存の adapter-SSoT 規則（provider 非依存 logic の重複禁止）が同族としてカバー済みであり、対象に含めない"
@@ -233,10 +233,10 @@
     },
     {
       "claim_hash": "8cd48176472df51f001b43cb1d4aba476098e9d6a6e413c143a26de785f10848",
-      "evidence_hash": "d60e3a3f0586cb8982d9729f5f5c234bd378bcbbd7aa90c94a26ee4696158339",
+      "evidence_hash": "f53b911b899752b031187ad9be99991ee41d1f6a5549c9d7428b351c04603ae3",
       "verdict": {
         "kind": "pass",
-        "citation": "すべての scope の review prompt に「severity policy に該当する findings は、その round で発見した全件を列挙して報告する」規律を明記する。... fix 側は報告された全件を 1 バッチで修正し、次の round で一括検証する。"
+        "citation": "「fix 側は報告された全件を 1 バッチで修正し、次の round で一括検証する。」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -256,10 +256,10 @@
     },
     {
       "claim_hash": "646609e27c584de0e42a73b40c6227bc8ab144246412f3473bfd8b75e2b22959",
-      "evidence_hash": "d60e3a3f0586cb8982d9729f5f5c234bd378bcbbd7aa90c94a26ee4696158339",
+      "evidence_hash": "f53b911b899752b031187ad9be99991ee41d1f6a5549c9d7428b351c04603ae3",
       "verdict": {
         "kind": "pass",
-        "citation": "プロンプトの修正だけで十分な価値を発揮できそう。4b(findings 全件報告)と再記述禁止の convention + reviewer policy 更新を、レビュー負荷軽減を目的とした一つの ADR にまとめる"
+        "citation": "全件報告の規律は framework-owned surface に配置する: `.harness/workflows/track/review.md` の Step 3（briefing 構成規則）で、全 scope の briefing に「severity policy に該当する findings は、その round で発見した全件を列挙して報告する」旨の 1 文を含めることを義務化する。`.harness/custom/review-prompts/*.md`（利用者所有の severity policy）には挿入しない — 報告密度の規律は framework の review-process 挙動であり、利用者が独立に書き換えられる surface には置かない。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -279,10 +279,10 @@
     },
     {
       "claim_hash": "5ceb838e1761e6d6f80177ecedf095b13d4910ee220121739d49789339c18aac",
-      "evidence_hash": "d60e3a3f0586cb8982d9729f5f5c234bd378bcbbd7aa90c94a26ee4696158339",
+      "evidence_hash": "f53b911b899752b031187ad9be99991ee41d1f6a5549c9d7428b351c04603ae3",
       "verdict": {
         "kind": "pass",
-        "citation": "「機械 lint は『False Positive の扱いが難しいのですぐには採用しない』」「reviewer の仕事は…再記述の存在検出 + citation の妥当性確認へ寄る。」"
+        "citation": "機械 lint は「False Positive の扱いが難しいのですぐには採用しない」\n\nreviewer の仕事は散文同士の意味調停（どちらが正しいかの調査）から、再記述の存在検出 + citation の妥当性確認へ寄る。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -301,18 +301,18 @@
       }
     },
     {
-      "claim_hash": "3248dbecd117d8ba1f7b67c269ceb970387f5c35a41c1a5b328c33b9b9de99a7",
-      "evidence_hash": "d60e3a3f0586cb8982d9729f5f5c234bd378bcbbd7aa90c94a26ee4696158339",
+      "claim_hash": "eb559844a8ebd1a72ac511956c0c6d5e95b3a5b7ba4b5b3e9c565de8ea550bab",
+      "evidence_hash": "f53b911b899752b031187ad9be99991ee41d1f6a5549c9d7428b351c04603ae3",
       "verdict": {
         "kind": "pass",
-        "citation": "「すべての scope の review prompt に『severity policy に該当する findings は、その round で発見した全件を列挙して報告する』規律を明記する。」"
+        "citation": "framework-owned surface に配置する: `.harness/workflows/track/review.md` の Step 3（briefing 構成規則）で、全 scope の briefing に「severity policy に該当する findings は、その round で発見した全件を列挙して報告する」旨の 1 文を含めることを義務化する。`.harness/custom/review-prompts/*.md`（利用者所有の severity policy）には挿入しない"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "out_of_scope",
           "element_id": "OS-07",
-          "text_label": "sotp（Rust CLI）本体のコード変更は本 track の対象外とする。実装は `.harness/custom/review-prompts/*.md` と `knowledge/conventions/` への文書変更のみで完結する（D1 / D2 / D3 のいずれも prompt / convention の文書変更のみで実現する）。"
+          "text_label": "sotp（Rust CLI）本体のコード変更は本 track の対象外とする。実装は `.harness/workflows/track/review.md`・`.harness/custom/review-prompts/*.md`・`knowledge/conventions/` への文書変更のみで完結する（D1 は workflow、D2 は convention、D3 は prompt の文書変更でそれぞれ実現する）。"
         }
       },
       "evidence_origin": {
@@ -324,18 +324,18 @@
       }
     },
     {
-      "claim_hash": "3248dbecd117d8ba1f7b67c269ceb970387f5c35a41c1a5b328c33b9b9de99a7",
-      "evidence_hash": "d60e3a3f0586cb8982d9729f5f5c234bd378bcbbd7aa90c94a26ee4696158339",
+      "claim_hash": "eb559844a8ebd1a72ac511956c0c6d5e95b3a5b7ba4b5b3e9c565de8ea550bab",
+      "evidence_hash": "f53b911b899752b031187ad9be99991ee41d1f6a5549c9d7428b351c04603ae3",
       "verdict": {
         "kind": "pass",
-        "citation": "この規範を `knowledge/conventions/` に convention として新設する。"
+        "citation": "- spec.json は対象外とする — ADR を細粒度化するのが spec の仕事であり、再記述はその本務である\n- workflow ドキュメントは既存の adapter-SSoT 規則（provider 非依存 logic の重複禁止）が同族としてカバー済みであり、対象に含めない\n- この規範を `knowledge/conventions/` に convention として新設する"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "out_of_scope",
           "element_id": "OS-07",
-          "text_label": "sotp（Rust CLI）本体のコード変更は本 track の対象外とする。実装は `.harness/custom/review-prompts/*.md` と `knowledge/conventions/` への文書変更のみで完結する（D1 / D2 / D3 のいずれも prompt / convention の文書変更のみで実現する）。"
+          "text_label": "sotp（Rust CLI）本体のコード変更は本 track の対象外とする。実装は `.harness/workflows/track/review.md`・`.harness/custom/review-prompts/*.md`・`knowledge/conventions/` への文書変更のみで完結する（D1 は workflow、D2 は convention、D3 は prompt の文書変更でそれぞれ実現する）。"
         }
       },
       "evidence_origin": {
@@ -347,18 +347,18 @@
       }
     },
     {
-      "claim_hash": "3248dbecd117d8ba1f7b67c269ceb970387f5c35a41c1a5b328c33b9b9de99a7",
-      "evidence_hash": "d60e3a3f0586cb8982d9729f5f5c234bd378bcbbd7aa90c94a26ee4696158339",
+      "claim_hash": "eb559844a8ebd1a72ac511956c0c6d5e95b3a5b7ba4b5b3e9c565de8ea550bab",
+      "evidence_hash": "f53b911b899752b031187ad9be99991ee41d1f6a5549c9d7428b351c04603ae3",
       "verdict": {
         "kind": "pass",
-        "citation": "`.harness/custom/review-prompts/` の severity policy を 2 点更新する。 ... convention 文書（D2）単独では形骸化することが全コード調査（gate 強制なしの文書ルール = 25 違反、強制あり = 0 違反）で実測されており、D2 と D3 は不可分のセットである。"
+        "citation": "`.harness/custom/review-prompts/` の severity policy を 2 点更新する。"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "out_of_scope",
           "element_id": "OS-07",
-          "text_label": "sotp（Rust CLI）本体のコード変更は本 track の対象外とする。実装は `.harness/custom/review-prompts/*.md` と `knowledge/conventions/` への文書変更のみで完結する（D1 / D2 / D3 のいずれも prompt / convention の文書変更のみで実現する）。"
+          "text_label": "sotp（Rust CLI）本体のコード変更は本 track の対象外とする。実装は `.harness/workflows/track/review.md`・`.harness/custom/review-prompts/*.md`・`knowledge/conventions/` への文書変更のみで完結する（D1 は workflow、D2 は convention、D3 は prompt の文書変更でそれぞれ実現する）。"
         }
       },
       "evidence_origin": {
@@ -371,10 +371,10 @@
     },
     {
       "claim_hash": "504df732e2fb8d73507bfd97ef263d5b928a13e7198e09406bf67413bd47b1d6",
-      "evidence_hash": "d60e3a3f0586cb8982d9729f5f5c234bd378bcbbd7aa90c94a26ee4696158339",
+      "evidence_hash": "f53b911b899752b031187ad9be99991ee41d1f6a5549c9d7428b351c04603ae3",
       "verdict": {
         "kind": "pass",
-        "citation": "severity 制約（事実誤り・矛盾・実行不能・broken reference のみを報告する既存の基準）は変更しない — 報告の基準を緩めるのではなく"
+        "citation": "severity 制約（事実誤り・矛盾・実行不能・broken reference のみを報告する既存の基準）は変更しない — 報告の基準を緩めるのではなく、基準に該当する findings の報告漏れ（最初の 1 件で打ち切る挙動）を禁止する。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -394,10 +394,10 @@
     },
     {
       "claim_hash": "ab296d1f8128449585039797805d2bdc7c9f30fdb194561871e046fee4cb7356",
-      "evidence_hash": "d60e3a3f0586cb8982d9729f5f5c234bd378bcbbd7aa90c94a26ee4696158339",
+      "evidence_hash": "f53b911b899752b031187ad9be99991ee41d1f6a5549c9d7428b351c04603ae3",
       "verdict": {
         "kind": "pass",
-        "citation": "convention 文書（D2）単独では形骸化することが全コード調査（gate 強制なしの文書ルール = 25 違反、強制あり = 0 違反）で実測されており、D2 と D3 は不可分のセットである。"
+        "citation": "この enforcement は毎ラウンドの review gate で効くため、書き手（planner / type-designer / orchestrator）の遵守意思に依存しない。convention 文書（D2）単独では形骸化することが全コード調査（gate 強制なしの文書ルール = 25 違反、強制あり = 0 違反）で実測されており、D2 と D3 は不可分のセットである。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -416,18 +416,18 @@
       }
     },
     {
-      "claim_hash": "6d40b8652d90c65997ccd1e3a99dd70999936c8766f6d4228f0f3821088daa68",
-      "evidence_hash": "d60e3a3f0586cb8982d9729f5f5c234bd378bcbbd7aa90c94a26ee4696158339",
+      "claim_hash": "2036301338d10a186f7dfe02aba22f047d8086899aa5fad6ffe61530cafed0e9",
+      "evidence_hash": "f53b911b899752b031187ad9be99991ee41d1f6a5549c9d7428b351c04603ae3",
       "verdict": {
         "kind": "pass",
-        "citation": "「すべての scope の review prompt に『severity policy に該当する findings は、その round で発見した全件を列挙して報告する』規律を明記する。severity 制約（事実誤り・矛盾・実行不能・broken reference のみを報告する既存の基準）は変更しない」"
+        "citation": "全件報告の規律は framework-owned surface に配置する: `.harness/workflows/track/review.md` の Step 3（briefing 構成規則）で、全 scope の briefing に「severity policy に該当する findings は、その round で発見した全件を列挙して報告する」旨の 1 文を含めることを義務化する。`.harness/custom/review-prompts/*.md`（利用者所有の severity policy）には挿入しない — 報告密度の規律は framework の review-process 挙動であり、利用者が独立に書き換えられる surface には置かない。severity 制約（事実誤り・矛盾・実行不能・broken reference のみを報告する既存の基準）は変更しない"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-01",
-          "text_label": "`.harness/config/review-scope.json` の `groups[].briefing_file` が参照する review prompt ファイルそれぞれに、severity policy に該当する findings をその round で発見した全件列挙して報告する旨の指示が明記されている。既存の severity 基準（事実誤り・矛盾・実行不能・broken reference）の記述内容が変更前と同一であることを diff で確認できる。"
+          "text_label": "`.harness/workflows/track/review.md` の Step 3（briefing 構成規則）に、全 scope の briefing へ「severity policy に該当する findings は、その round で発見した全件を列挙して報告する」旨の 1 文を含めることを義務化する記述が存在し、その記述が severity 制約（事実誤り・矛盾・実行不能・broken reference のみを報告する基準）を維持する旨を同じ文で明示している。`.harness/custom/review-prompts/` 配下のファイルに全件報告規律の文が挿入されていないことを diff で確認できる。"
         }
       },
       "evidence_origin": {
@@ -439,18 +439,18 @@
       }
     },
     {
-      "claim_hash": "0c9fbef93dbcb889ee7c959068873b257eff4409352da766aac057b047881ea1",
-      "evidence_hash": "d60e3a3f0586cb8982d9729f5f5c234bd378bcbbd7aa90c94a26ee4696158339",
+      "claim_hash": "5fd432e17a812b1c98bb769fc12950841fd0ddcd47ab007255c6fc68b26d76b3",
+      "evidence_hash": "f53b911b899752b031187ad9be99991ee41d1f6a5549c9d7428b351c04603ae3",
       "verdict": {
         "kind": "pass",
-        "citation": "impl-plan の task text / plan sections と型カタログの docs / intent は「変更対象（file / symbol）+ 操作 + spec anchor の cite」で記述し、上流（ADR / spec）の設計理由・挙動契約の再説明を書かない。この規範を `knowledge/conventions/` に convention として新設する。\n- 挙動は `AC-NN` / `IN-NN` / `CN-NN` の cite で参照し、内容を言い直さない\n- 数値状態（schema_version 等）は literal でなく相対参照（「現行値 + 1」等）で書く\n- spec.json は対象外とする — ADR を細粒度化するのが spec の仕事であり、再記述はその本務である\n- 既存 track artifact への遡及適用はしない（完了 track の artifact は歴史的記録）"
+        "citation": "impl-plan の task text / plan sections と型カタログの docs / intent は「変更対象（file / symbol）+ 操作 + spec anchor の cite」で記述し、上流（ADR / spec）の設計理由・挙動契約の再説明を書かない。この規範を `knowledge/conventions/` に convention として新設する。\n\n- 挙動は `AC-NN` / `IN-NN` / `CN-NN` の cite で参照し、内容を言い直さない\n- spec.json は対象外とする\n- 既存 track artifact への遡及適用はしない（完了 track の artifact は歴史的記録）"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-02",
-          "text_label": "`knowledge/conventions/` 配下に、下流 artifact（impl-plan の task text / plan sections、型カタログの docs / intent）の再記述禁止ルールを定めた convention ファイルが存在する。本文に、挙動を `AC-NN` / `IN-NN` / `CN-NN` の cite で参照し内容を言い直さないこと、数値状態を相対参照で書くこと、spec.json は対象外であること、既存 track artifact への遡及適用を行わないことが明記されている。`knowledge/conventions/README.md` の Current Files 一覧に新規ファイルが登録されている。"
+          "text_label": "`knowledge/conventions/` 配下に、下流 artifact（impl-plan の task text / plan sections、型カタログの docs / intent）の再記述禁止ルールを定めた convention ファイルが存在する。本文に、挙動を `AC-NN` / `IN-NN` / `CN-NN` の cite で参照し内容を言い直さないこと、spec.json は対象外であること、既存 track artifact への遡及適用を行わないことが明記されている。`knowledge/conventions/README.md` の Current Files 一覧に新規ファイルが登録されている。"
         }
       },
       "evidence_origin": {
@@ -463,7 +463,7 @@
     },
     {
       "claim_hash": "3f89c9f8f4c574220d80f6409c3ea0094fa11aa1150f6aba9dabe8585952b730",
-      "evidence_hash": "d60e3a3f0586cb8982d9729f5f5c234bd378bcbbd7aa90c94a26ee4696158339",
+      "evidence_hash": "f53b911b899752b031187ad9be99991ee41d1f6a5549c9d7428b351c04603ae3",
       "verdict": {
         "kind": "pass",
         "citation": "「task description non-executable」の判定基準を「変更対象 file / symbol + 操作 + anchor cite が揃っていれば実行可能」に書き換える。挙動の再説明を実行可能性の要件から外し、要求しない。"
@@ -486,10 +486,10 @@
     },
     {
       "claim_hash": "3a94e3ed50e49115a866074299acf38da9dccdb053cda65d668149cd7a17a474",
-      "evidence_hash": "d60e3a3f0586cb8982d9729f5f5c234bd378bcbbd7aa90c94a26ee4696158339",
+      "evidence_hash": "f53b911b899752b031187ad9be99991ee41d1f6a5549c9d7428b351c04603ae3",
       "verdict": {
         "kind": "pass",
-        "citation": "「上流（ADR / spec）の挙動・設計理由を散文で再説明している」こと自体を finding クラスとして追加する。"
+        "citation": "2. **再記述の finding 化**（impl-plan / types）: 「上流（ADR / spec）の挙動・設計理由を散文で再説明している」こと自体を finding クラスとして追加する。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -509,10 +509,10 @@
     },
     {
       "claim_hash": "22b0888b4765681b42d7ec47ff83683bd224eb91df4a14cd8513bfa523ac891b",
-      "evidence_hash": "d60e3a3f0586cb8982d9729f5f5c234bd378bcbbd7aa90c94a26ee4696158339",
+      "evidence_hash": "f53b911b899752b031187ad9be99991ee41d1f6a5549c9d7428b351c04603ae3",
       "verdict": {
         "kind": "pass",
-        "citation": "### D3: reviewer severity policy の更新 — 実行可能性の再定義と再記述の finding 化\n\n`convention 文書（D2）単独では形骸化することが全コード調査（gate 強制なしの文書ルール = 25 違反、強制あり = 0 違反）で実測されており、D2 と D3 は不可分のセットである。`"
+        "citation": "D2 と D3 は不可分のセットである。"
       },
       "claim_origin": {
         "kind": "spec_element",
