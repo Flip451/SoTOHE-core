@@ -1,4 +1,23 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # レビュー負荷軽減 — findings 全件報告と下流 artifact の再記述禁止
 
-> **Note**: `impl-plan.json` not yet generated. Run `/track:impl-plan` to generate the implementation plan.
+## Tasks (0/4 resolved)
+
+### S1 — D1 — findings 全件報告規律の追記
+
+> 全 11 review-prompt ファイルの `## What to report` に、該当 round で発見した findings を全件報告する旨の一文を追加する。既存の severity 基準文言は変更しない。
+
+- [ ] **T001**: harness-policy — In each of the 11 `.harness/custom/review-prompts/` files referenced by `.harness/config/review-scope.json` `groups[].briefing_file` (domain.md, usecase.md, infrastructure.md, cli.md, cli_composition.md, cli_driver.md, adr.md, spec.md, types.md, impl-plan.md, harness-policy.md), insert one sentence directly below the file's `## What to report` heading, before the existing severity-category bullet list, stating that findings matching this file's severity policy must be reported in full for the round (not truncated after the first match found). Do not edit any existing severity-category bullet text in any of the 11 files — this task changes reporting density only. IN-01/CN-01/AC-01.
+
+### S2 — D2 — 再記述禁止 convention の新設
+
+> `knowledge/conventions/no-upstream-restatement.md` を新設し README index に登録する。impl-plan task text / plan sections と型カタログの docs / intent が上流の設計理由・挙動契約を散文で再説明せず、anchor cite で参照する規範を定める。
+
+- [ ] **T002**: harness-policy — Run `bin/sotp conventions add no-upstream-restatement --slug no-upstream-restatement --title "No Upstream Restatement Convention" --summary "impl-plan task text / plan.sections and <layer>-types.json docs/intent must reference upstream ADR/spec via anchor, not restate it in prose."` to scaffold `knowledge/conventions/no-upstream-restatement.md` and register it into `knowledge/conventions/README.md` Current Files in one step. Fill the scaffold's `## Scope` section: applies to `impl-plan.json` task text / `plan.sections[].description` and `<layer>-types.json` entry `docs` / `intent` fields; does not apply to `spec.json` (OS-01), to track artifacts already committed before this track started (OS-02, no retroactive rewrite), or to workflow docs under `.claude/commands/` / `.claude/skills/` (OS-03). Fill `## Rules`: (1) reference behaviour via an `AC-NN` / `IN-NN` / `CN-NN` anchor instead of restating the ADR's or spec's design rationale or behaviour contract in prose; (2) write numeric state fields (e.g. `schema_version`) as a relative reference such as "current value + 1" instead of a literal number. IN-02/AC-02.
+
+### S3 — D3 — reviewer severity policy の更新
+
+> S1 完了後に着手する。impl-plan.md の実行可能性基準を anchor cite ベースに書き換え、impl-plan.md / types.md の両方に再記述 finding class を追加する。D2 と同一 track 内で完結させる（CN-02）。
+
+- [ ] **T003**: harness-policy — Ordered after T001 (T001 already added the report-density sentence to this file; this task edits the severity-category bullets themselves) — In `.harness/custom/review-prompts/impl-plan.md`'s `## What to report` list: (1) rewrite the `task description non-executable` bullet's criterion so a task description is executable when it names the target file/symbol, the operation, and an anchor cite (`AC-NN` / `IN-NN` / `CN-NN` / spec element id), dropping the current requirement that the description state "what the expected behaviour is" (IN-03/AC-03). (2) Add a new finding-class bullet to the same list: a task or plan section that restates an upstream ADR's or spec.json's design rationale or behaviour contract in prose instead of citing it by anchor (IN-04, impl-plan.md half of AC-04). CN-02/AC-05.
+- [ ] **T004**: harness-policy — Ordered after T001 (T001 already added the report-density sentence to this file) — In `.harness/custom/review-prompts/types.md`'s `## What to report` list, add a new finding-class bullet (parallel to the one T003 adds to impl-plan.md): a catalogue entry's `docs` / `intent` field that restates an upstream ADR's or spec.json's design rationale or behaviour contract in prose instead of citing it by anchor. IN-04, types.md half of AC-04. CN-02/AC-05.
