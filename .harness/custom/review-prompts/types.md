@@ -44,8 +44,10 @@ spec_refs/role/action mismatch.
   unrelated to the type's purpose at the narrative level.
 - **upstream restatement**: an entry whose `docs` / `intent` field restates
   an upstream ADR's or spec.json's design rationale or behaviour contract in
-  prose instead of citing it by anchor (`AC-NN` / `IN-NN` / `CN-NN` / spec
-  element id). Cite `knowledge/conventions/no-upstream-restatement.md`.
+  prose. Flag the restatement itself regardless of whether an anchor cite
+  (`AC-NN` / `IN-NN` / `CN-NN` / spec element id) accompanies it — the field
+  must reference upstream behaviour by anchor cite, not reproduce it. Cite
+  `knowledge/conventions/no-upstream-restatement.md`.
 
 ### SOLID findings
 
