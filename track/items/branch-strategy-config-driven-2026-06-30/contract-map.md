@@ -486,6 +486,7 @@ subgraph usecase["usecase"]
     R28_usecase_usecase_TrackService_archive([archive])
     R28_usecase_usecase_TrackService_detect_active([detect_active])
     R28_usecase_usecase_TrackService_switch_base([switch_base])
+    R28_usecase_usecase_TrackService_catalogue_lint_check_active_track([catalogue_lint_check_active_track])
   end
   end
 end
@@ -662,6 +663,7 @@ subgraph cli_driver["cli_driver"]
     T32_cli_driver_cli_driver_TrackInput_DetectActive[DetectActive]
     T32_cli_driver_cli_driver_TrackInput_SwitchBase[SwitchBase]
     T32_cli_driver_cli_driver_TrackInput_FixpointResolve[FixpointResolve]
+    T32_cli_driver_cli_driver_TrackInput_CatalogueLintCheckActiveTrack[CatalogueLintCheckActiveTrack]
   end
   end
 end
@@ -736,6 +738,7 @@ subgraph cli_composition["cli_composition"]
     T52_cli_composition_cli_composition_TrackCompositionRoot_track_task_counts([track_task_counts])
     T52_cli_composition_cli_composition_TrackCompositionRoot_track_archive([track_archive])
     T52_cli_composition_cli_composition_TrackCompositionRoot_track_switch_base([track_switch_base])
+    T52_cli_composition_cli_composition_TrackCompositionRoot_catalogue_lint_check_active_track([catalogue_lint_check_active_track])
   end
   end
 end
@@ -1118,6 +1121,7 @@ class R28_usecase_usecase_TrackService_task_counts method_node
 class R28_usecase_usecase_TrackService_archive method_node
 class R28_usecase_usecase_TrackService_detect_active method_node
 class R28_usecase_usecase_TrackService_switch_base method_node
+class R28_usecase_usecase_TrackService_catalogue_lint_check_active_track method_node
 class R28_usecase_usecase_TrackService__self app_service
 class T55_infrastructure_infrastructure_BranchStrategyConfigError_Io variant_node
 class T55_infrastructure_infrastructure_BranchStrategyConfigError_Parse variant_node
@@ -1184,6 +1188,7 @@ class T32_cli_driver_cli_driver_TrackInput_Archive variant_node
 class T32_cli_driver_cli_driver_TrackInput_DetectActive variant_node
 class T32_cli_driver_cli_driver_TrackInput_SwitchBase variant_node
 class T32_cli_driver_cli_driver_TrackInput_FixpointResolve variant_node
+class T32_cli_driver_cli_driver_TrackInput_CatalogueLintCheckActiveTrack variant_node
 class T32_cli_driver_cli_driver_TrackInput__self dto
 class T50_cli_composition_cli_composition_DryCompositionRoot_new method_node
 class T50_cli_composition_cli_composition_DryCompositionRoot_dry_driver method_node
@@ -1235,6 +1240,7 @@ class T52_cli_composition_cli_composition_TrackCompositionRoot_track_next_task m
 class T52_cli_composition_cli_composition_TrackCompositionRoot_track_task_counts method_node
 class T52_cli_composition_cli_composition_TrackCompositionRoot_track_archive method_node
 class T52_cli_composition_cli_composition_TrackCompositionRoot_track_switch_base method_node
+class T52_cli_composition_cli_composition_TrackCompositionRoot_catalogue_lint_check_active_track method_node
 class T20_cli_cli_EnsurePrArgs__self dto
 class T20_cli_cli_TrackCommand_Archive variant_node
 class T20_cli_cli_TrackCommand_Transition variant_node

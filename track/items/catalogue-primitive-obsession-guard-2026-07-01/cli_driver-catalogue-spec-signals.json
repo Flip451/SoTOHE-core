@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "07656b7f01d74dddbe9f2af317b2ab6f0fde94a822d0e94dd37d04fc2e6195c3",
+  "signals": [
+    {
+      "type_name": "TrackInput",
+      "signal": "blue",
+      "entry_hash": "88f735d2edd279a063685b5a6f441e634c28d85f7c966f08fa38a323c2aead8d"
+    }
+  ]
+}

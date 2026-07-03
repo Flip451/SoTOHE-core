@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-03T13:57:15Z",
-  "declaration_hash": "cb30e74521ef8caa842733b15de3aa6ef1f19993ac3341f23e78cf7e0e3ceb02",
+  "generated_at": "2026-07-03T15:07:32Z",
+  "declaration_hash": "779d4c182c7ab16ff7abe06a47f37b21519f45201a6e8af2c4a9afc97b39a3ff",
   "signals": [
     {
       "type_name": "DryCompositionRoot",

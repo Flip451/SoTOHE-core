@@ -134,4 +134,14 @@ pub trait TrackService: Send + Sync {
             "switch_base is not yet implemented in this composition root".to_string(),
         ))
     }
+
+    /// `catalogue-lint check-active-track` — run the catalogue lint ruleset
+    /// across every `tddd.enabled` layer of the active track and aggregate
+    /// violations.
+    fn catalogue_lint_check_active_track(
+        &self,
+        track_id: Option<String>,
+        workspace_root: PathBuf,
+        rules_file: Option<PathBuf>,
+    ) -> TrackCommandOutput;
 }

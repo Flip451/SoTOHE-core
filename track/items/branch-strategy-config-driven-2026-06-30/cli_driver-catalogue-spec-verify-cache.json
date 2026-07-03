@@ -147,7 +147,7 @@
       }
     },
     {
-      "claim_hash": "7b128b719123c4280c267b8a7620f8d410d88f6a304534dd9e446e05029d381d",
+      "claim_hash": "c969be3bb02d17e85e62c042e1fba0168e308c396d2b24f015178156b15abdab",
       "evidence_hash": "6addf5a32c6222d234d96a82bd2402003c9dbe10f9a31b6d5817bdf32583fb7f",
       "verdict": {
         "kind": "pass",
@@ -171,11 +171,11 @@
       }
     },
     {
-      "claim_hash": "7b128b719123c4280c267b8a7620f8d410d88f6a304534dd9e446e05029d381d",
+      "claim_hash": "c969be3bb02d17e85e62c042e1fba0168e308c396d2b24f015178156b15abdab",
       "evidence_hash": "ed2817eadb35a48a3b798b5382f0e922c160b64efa3c91209e3a995f7a9acf62",
       "verdict": {
         "kind": "pass",
-        "citation": "`fixpoint-resolve` 用の入出力型を追加する。移設後、`TrackCompositionRoot` に `fixpoint-resolve` 専用のメソッドは存在しない。他の track サブコマンドに対して既に使われている汎用の wire メソッド `TrackCompositionRoot::track_driver()` が `fixpoint-resolve` 用アダプタの構築と注入も担って `TrackDriver` を返し、`apps/cli` はその `TrackDriver` の `handle()` に `TrackInput::FixpointResolve` variant を渡して dispatch する。"
+        "citation": "`apps/cli-driver/src/track.rs` の `TrackDriver` が他の track サブコマンドに対して既に行っている invoke + render の構成に合わせ、`fixpoint-resolve` 用の入出力型を追加する。移設後、`TrackCompositionRoot` に `fixpoint-resolve` 専用のメソッドは存在しない。他の track サブコマンドに対して既に使われている汎用の wire メソッド `TrackCompositionRoot::track_driver()` が `fixpoint-resolve` 用アダプタの構築と注入も担って `TrackDriver` を返し、`apps/cli` はその `TrackDriver` の `handle()` に `TrackInput::FixpointResolve` variant を渡して dispatch する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -195,7 +195,7 @@
       }
     },
     {
-      "claim_hash": "7b128b719123c4280c267b8a7620f8d410d88f6a304534dd9e446e05029d381d",
+      "claim_hash": "c969be3bb02d17e85e62c042e1fba0168e308c396d2b24f015178156b15abdab",
       "evidence_hash": "6d6d40b1fb2bc6d371f918d1f329ffa701c971d89a8d26738a7a890986591593",
       "verdict": {
         "kind": "pass",

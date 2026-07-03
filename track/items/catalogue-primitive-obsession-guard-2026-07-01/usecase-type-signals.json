@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-02T06:35:15Z",
+  "declaration_hash": "986af3da9163a4a33f1f995413548c79596f674b00beb497a956287937cc3c23",
+  "signals": [
+    {
+      "type_name": "LintRuleKind",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "serde_core::de::Deserialize<'de>",
+        "serde_core::ser::Serialize"
+      ]
+    },
+    {
+      "type_name": "RunCatalogueLintInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "RunCatalogueLint"
+      ]
+    },
+    {
+      "type_name": "TrackService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "LintConfigLoader",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "RunCatalogueLint",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

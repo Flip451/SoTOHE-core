@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "cb30e74521ef8caa842733b15de3aa6ef1f19993ac3341f23e78cf7e0e3ceb02",
+  "catalogue_declaration_hash": "779d4c182c7ab16ff7abe06a47f37b21519f45201a6e8af2c4a9afc97b39a3ff",
   "signals": [
     {
       "type_name": "DryCheckApprovedInput",
@@ -45,7 +45,7 @@
     {
       "type_name": "TrackCompositionRoot",
       "signal": "blue",
-      "entry_hash": "c4f994fb34a765533c5791ca0d523c85b1b50bdcc238388835cc790f4ae3638a"
+      "entry_hash": "a4dd412f3f7275dce271f6e0ed754a9cf5fc221a64266a72f78cdf5f85934f72"
     }
   ]
 }

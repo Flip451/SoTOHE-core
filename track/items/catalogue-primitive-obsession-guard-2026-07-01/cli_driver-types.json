@@ -1,0 +1,188 @@
+{
+  "schema_version": 5,
+  "crate_name": "cli_driver",
+  "layer": "cli_driver",
+  "types": {
+    "TrackInput": {
+      "action": "modify",
+      "role": {
+        "Dto": {}
+      },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Init",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "items_dir", "ty": "std::path::PathBuf" },
+                { "name": "track_id", "ty": "String" },
+                { "name": "description", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "Transition",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "items_dir", "ty": "std::path::PathBuf" },
+                { "name": "track_id", "ty": "Option<String>" },
+                { "name": "task_id", "ty": "String" },
+                { "name": "target_status", "ty": "String" },
+                { "name": "commit_hash", "ty": "Option<String>" }
+              ]
+            }
+          },
+          {
+            "name": "Resolve",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "items_dir", "ty": "std::path::PathBuf" },
+                { "name": "track_id", "ty": "Option<String>" }
+              ]
+            }
+          },
+          {
+            "name": "BranchCreate",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "items_dir", "ty": "std::path::PathBuf" },
+                { "name": "track_id", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "BranchSwitch",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "items_dir", "ty": "std::path::PathBuf" },
+                { "name": "track_id", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "ViewsValidate",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "project_root", "ty": "std::path::PathBuf" }
+              ]
+            }
+          },
+          {
+            "name": "ViewsSync",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "project_root", "ty": "std::path::PathBuf" },
+                { "name": "track_id", "ty": "Option<String>" }
+              ]
+            }
+          },
+          {
+            "name": "AddTask",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "items_dir", "ty": "std::path::PathBuf" },
+                { "name": "track_id", "ty": "Option<String>" },
+                { "name": "description", "ty": "String" },
+                { "name": "section", "ty": "Option<String>" },
+                { "name": "after", "ty": "Option<String>" }
+              ]
+            }
+          },
+          {
+            "name": "SetOverride",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "items_dir", "ty": "std::path::PathBuf" },
+                { "name": "track_id", "ty": "Option<String>" },
+                { "name": "status", "ty": "String" },
+                { "name": "reason", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "ClearOverride",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "items_dir", "ty": "std::path::PathBuf" },
+                { "name": "track_id", "ty": "Option<String>" }
+              ]
+            }
+          },
+          {
+            "name": "NextTask",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "items_dir", "ty": "std::path::PathBuf" },
+                { "name": "track_id", "ty": "Option<String>" }
+              ]
+            }
+          },
+          {
+            "name": "TaskCounts",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "items_dir", "ty": "std::path::PathBuf" },
+                { "name": "track_id", "ty": "Option<String>" }
+              ]
+            }
+          },
+          {
+            "name": "Archive",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "items_dir", "ty": "std::path::PathBuf" },
+                { "name": "track_id", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "DetectActive",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "project_root", "ty": "std::path::PathBuf" }
+              ]
+            }
+          },
+          {
+            "name": "CatalogueLintCheckActiveTrack",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "track_id", "ty": "Option<String>" },
+                { "name": "workspace_root", "ty": "std::path::PathBuf" },
+                { "name": "rules_file", "ty": "Option<std::path::PathBuf>" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "track",
+      "docs": "Typed input for the track command family. The first 14 variants (Init through DetectActive) are unchanged from the pre-existing declaration authored in track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/cli_driver-types.json and are reproduced verbatim here since action=modify requires a complete post-modification declaration, not a partial diff — except that every PathBuf-typed field (items_dir / project_root, one per pre-existing variant) is spelled out as the full std::path::PathBuf path rather than the source entry's bare PathBuf: that source entry carried action=reference, under which Phase 2 does not structurally compare field content, so the bare spelling was harmless there, but this entry's action=modify does undergo structural comparison against current rustdoc, and PathBuf is absent from the A-codec's auto-resolve set (libs/infrastructure/src/tddd/type_ref_parser/constants.rs: PRIMITIVE_TYPES / STD_PRELUDE_TYPES), so a bare PathBuf would misresolve as an in-crate type and mismatch. This track adds a 15th variant, CatalogueLintCheckActiveTrack, carrying the `sotp catalogue-lint check-active-track` request through TrackDriver::handle to TrackService::catalogue_lint_check_active_track — correcting a CLI-boundary violation where cli called TrackCompositionRoot::catalogue_lint_check_active_track directly, bypassing this driver (CN-01/CN-02: cli must not call cli_composition workflow methods directly). TrackDriver itself needs no catalogue change: its handle(&self, input: TrackInput) -> CommandOutcome signature is unchanged; only its match-arm body gained a case for the new variant. R9 note: track_id / workspace_root / rules_file remain raw Option<String> / std::path::PathBuf / Option<std::path::PathBuf> rather than dedicated value objects — this mirrors the exact primitive types already used by all 14 pre-existing variants on this enum (track_id: Option<String>/String throughout; PathBuf-typed items_dir/project_root throughout) and by the already-written, catalogue-only-task-out-of-scope Rust enum variant this entry documents; introducing e.g. a TrackId/WorkspaceRoot newtype here would diverge from the compiled enum signature (Phase 2 mismatch) and would require a Rust source change outside this task's authorized scope. Flagged for a possible future R9 follow-up pass across the whole TrackInput surface, not resolved by this track.",
+      "spec_refs": [
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "IN-12" },
+        { "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json", "anchor": "CN-07" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [],
+  "trait_impls": []
+}

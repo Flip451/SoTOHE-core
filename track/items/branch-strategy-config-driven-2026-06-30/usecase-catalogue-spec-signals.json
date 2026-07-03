@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "8fd7d84c4549ad6a55043ff3c2d8fd35f35eb37440a1f4d36cd3456accfa7f62",
+  "catalogue_declaration_hash": "ed8cdde6b4f201a13a95563c97e640fed14accf0ca84229ac528cb7d8bd2b8da",
   "signals": [
     {
       "type_name": "AgentConfigResolutionFailureDetail",
@@ -340,7 +340,7 @@
     {
       "type_name": "TrackService",
       "signal": "blue",
-      "entry_hash": "c8261e2aea547c1109aec7fa37713144a342d2e477a96e7b3eafb388a4f4db12"
+      "entry_hash": "25ef2080b15ba7813b61c7a8e777493313d2677640a2258f371ef7e0063d420a"
     }
   ]
 }

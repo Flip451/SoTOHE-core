@@ -387,7 +387,7 @@
       }
     },
     {
-      "claim_hash": "c4f994fb34a765533c5791ca0d523c85b1b50bdcc238388835cc790f4ae3638a",
+      "claim_hash": "a4dd412f3f7275dce271f6e0ed754a9cf5fc221a64266a72f78cdf5f85934f72",
       "evidence_hash": "6addf5a32c6222d234d96a82bd2402003c9dbe10f9a31b6d5817bdf32583fb7f",
       "verdict": {
         "kind": "pass",
@@ -411,11 +411,11 @@
       }
     },
     {
-      "claim_hash": "c4f994fb34a765533c5791ca0d523c85b1b50bdcc238388835cc790f4ae3638a",
+      "claim_hash": "a4dd412f3f7275dce271f6e0ed754a9cf5fc221a64266a72f78cdf5f85934f72",
       "evidence_hash": "ed2817eadb35a48a3b798b5382f0e922c160b64efa3c91209e3a995f7a9acf62",
       "verdict": {
         "kind": "pass",
-        "citation": "`TrackCompositionRoot::fixpoint_resolve` が担っている use case interactor の呼び出し（invoke）と、結果を CLI 出力文字列へ整形する処理（`format_fixpoint_step` を含む render）を `apps/cli-driver` へ移す。... 移設後、`TrackCompositionRoot` に `fixpoint-resolve` 専用のメソッドは存在しない。... `TrackCompositionRoot::track_driver()` が `fixpoint-resolve` 用アダプタの構築と注入も担って `TrackDriver` を返し、`apps/cli` はその `TrackDriver` の `handle()` に `TrackInput::FixpointResolve` variant を渡して dispatch する。"
+        "citation": "`TrackCompositionRoot::fixpoint_resolve` が担っている use case interactor の呼び出し（invoke）と、結果を CLI 出力文字列へ整形する処理（`format_fixpoint_step` を含む render）を `apps/cli-driver` へ移す。 ... 移設後、`TrackCompositionRoot` に `fixpoint-resolve` 専用のメソッドは存在しない。他の track サブコマンドに対して既に使われている汎用の wire メソッド `TrackCompositionRoot::track_driver()` が `fixpoint-resolve` 用アダプタの構築と注入も担って `TrackDriver` を返し、`apps/cli` はその `TrackDriver` の `handle()` に `TrackInput::FixpointResolve` variant を渡して dispatch する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -435,7 +435,7 @@
       }
     },
     {
-      "claim_hash": "c4f994fb34a765533c5791ca0d523c85b1b50bdcc238388835cc790f4ae3638a",
+      "claim_hash": "a4dd412f3f7275dce271f6e0ed754a9cf5fc221a64266a72f78cdf5f85934f72",
       "evidence_hash": "6d6d40b1fb2bc6d371f918d1f329ffa701c971d89a8d26738a7a890986591593",
       "verdict": {
         "kind": "pass",

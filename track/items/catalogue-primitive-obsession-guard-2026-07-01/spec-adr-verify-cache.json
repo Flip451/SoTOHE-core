@@ -1,0 +1,1454 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "a5e5b6bd17246cc5f7349c9b9159dff058b5f7a4da1e2becf5d6aa681b200125",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "検出対象の**プリミティブ型**は config で指定する集合とする（既定 `String` ...）。検出**位置**はフィールドに限定しない。全出現位置を検出可能とする: ... **`result_err`**: 任意位置の TypeRef の型木に現れる `Result<_, E>` の **Err スロット**"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "型カタログ（`<layer>-types.json`）に、config で指定したプリミティブ（既定 `String`）が config で指定した出現位置（named field / variant field / param / return / bound、および `Result` の Err スロットである `result_err` を含む）に現れることを機械的に検出・禁止する catalogue-lint ルールを追加する。本ルールは `prefer-type-safe-abstractions.md` の Decision Flow ステップ3（最後の手段としての lint）ではなく、コンパイラでは強制できない『意味を持つ値を裸のプリミティブで持たず newtype 化する』という型設計判断（ステップ2）を機械的に強制するメタ lint として位置づける。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "721df4c66c1168bd44fd34f47ef90033532fd50fd9818fa70e8dd13e872e391a",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "正規表現による文字列マッチではなく、infrastructure の `type_ref_parser` がカタログの TypeRef を `syn::Type` にパースする経路を再利用し、`syn::visit::Visit` で型木を**全再帰走査**して"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-02",
+          "text_label": "検出手段は正規表現による文字列マッチではなく、既存の syn ベース TypeRef パーサ（`libs/infrastructure/src/tddd/type_ref_parser/`）が生成する AST を `syn::visit::Visit` で全再帰走査する。走査エンジンは位置や深さの特例（関数型シグネチャ内の除外など）を一切持たず、『この TypeRef の型木のどの位置に指定プリミティブが現れるか』だけを答え、実際にどの位置を違反とするかは config 側の判断に委ねる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "75079413b56459c679453e86f290cb1458b2f5c8e43f1c658d5a00172e6b52b3",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "domain に「型木のどの位置に指定プリミティブが含まれるか」を判定する port を定義し、infrastructure が既存 `type_ref_parser` の syn 走査でこれを実装する。`catalogue_linter`（domain）は port 経由で判定を呼ぶ。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-03",
+          "text_label": "『型木の指定位置に指定プリミティブが含まれるか』を判定する契約を domain 層の port として定義し、infrastructure 層が既存の syn 走査でこれを実装することで、domain の syn 非依存とヘキサゴナル純粋性を維持する。実装は既存の `CatalogueLinterRuleKind` に新しい variant を追加する形で行い、role 軸の絞り込みは新規フィールドを設けず既存の `RuleTarget`（`target_roles`）を再利用する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "75079413b56459c679453e86f290cb1458b2f5c8e43f1c658d5a00172e6b52b3",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "したがって本 lint は新しい rule variant を追加して実装する。 ... role 軸による絞り込みは新 variant に持たせず、既存の `RuleTarget`（`target_roles`）を再利用する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-03",
+          "text_label": "『型木の指定位置に指定プリミティブが含まれるか』を判定する契約を domain 層の port として定義し、infrastructure 層が既存の syn 走査でこれを実装することで、domain の syn 非依存とヘキサゴナル純粋性を維持する。実装は既存の `CatalogueLinterRuleKind` に新しい variant を追加する形で行い、role 軸の絞り込みは新規フィールドを設けず既存の `RuleTarget`（`target_roles`）を再利用する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "f89bcdc1c4d3f6af2593a14106feb013e43416d29ad23b2ea34b9b751875ecd8",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「個別フィールドに付ける例外マーク（per-instance の opt-out 注釈）は導入しない」; 「D7 の粒度 config で提供する（例: Dto / Command の除外）」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-04",
+          "text_label": "適用範囲を (layer × role × 出現位置 × プリミティブ) の4軸粒度で宣言的に設定可能にし、既存の `.harness/catalogue-lint/` config 面にそのまま乗せる。layer 軸は `architecture-rules.json` から列挙生成し（`\"all\"` 特殊値は設けない）、既定では `Dto` / `Command`（usecase）のみをフィールド位置の対象から除外し、それ以外は per-instance の escape hatch を一切設けずに最初から blocking gate として導入する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "f89bcdc1c4d3f6af2593a14106feb013e43416d29ad23b2ea34b9b751875ecd8",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「warn → block の段階導入は行わない。…したがって後方互換性・既存違反の段階移行を考える必要はなく、最初から blocking gate として導入できる。新規トラックの type-designer が書くカタログにのみ適用される。既定の適用範囲は D7 の通り（フィールド位置は Dto / Command のみ除外、それ以外の全 role と `result_err` は ON）。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-04",
+          "text_label": "適用範囲を (layer × role × 出現位置 × プリミティブ) の4軸粒度で宣言的に設定可能にし、既存の `.harness/catalogue-lint/` config 面にそのまま乗せる。layer 軸は `architecture-rules.json` から列挙生成し（`\"all\"` 特殊値は設けない）、既定では `Dto` / `Command`（usecase）のみをフィールド位置の対象から除外し、それ以外は per-instance の escape hatch を一切設けずに最初から blocking gate として導入する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "f89bcdc1c4d3f6af2593a14106feb013e43416d29ad23b2ea34b9b751875ecd8",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "新 variant の payload は次を持つ:\n\n- **禁止プリミティブ集合**（例: [\"String\"]）\n- **適用対象 layer 集合**（層名のリスト。`architecture-rules.json` に定義された名前のみ受け付け、存在検証も同 SSoT 基準。`\"all\"` のような特殊値は設けない — 全層を対象にするなら層名を列挙する。既定 config を生成する際に同 SSoT から列挙する）\n- **検出位置集合**（named field / variant field / param / return / bound / result_err …）\n\n**role 軸**による絞り込みは新 variant に持たせず、既存の `RuleTarget`（`target_roles`）を再利用する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-04",
+          "text_label": "適用範囲を (layer × role × 出現位置 × プリミティブ) の4軸粒度で宣言的に設定可能にし、既存の `.harness/catalogue-lint/` config 面にそのまま乗せる。layer 軸は `architecture-rules.json` から列挙生成し（`\"all\"` 特殊値は設けない）、既定では `Dto` / `Command`（usecase）のみをフィールド位置の対象から除外し、それ以外は per-instance の escape hatch を一切設けずに最初から blocking gate として導入する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "f89bcdc1c4d3f6af2593a14106feb013e43416d29ad23b2ea34b9b751875ecd8",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「4軸の粒度で ON/OFF を宣言的に切り替えられるものとする。既存 framework にそのまま乗せる」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-04",
+          "text_label": "適用範囲を (layer × role × 出現位置 × プリミティブ) の4軸粒度で宣言的に設定可能にし、既存の `.harness/catalogue-lint/` config 面にそのまま乗せる。layer 軸は `architecture-rules.json` から列挙生成し（`\"all\"` 特殊値は設けない）、既定では `Dto` / `Command`（usecase）のみをフィールド位置の対象から除外し、それ以外は per-instance の escape hatch を一切設けずに最初から blocking gate として導入する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "fd00e57a3e0da41d8f24202b226b658f4b71977a0f7f1575b95d1d13de8dd133",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "検出対象の**プリミティブ型**は config で指定する集合とする（既定 `String`、`i32` / `u32` / `bool` / `f64` / `usize` 等を追加できる）。`String` は primitive obsession の一例にすぎず、裸プリミティブ全般を同じ機構でパラメータ化して扱う。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "検出対象プリミティブは config で指定する集合とする。既定は `String` のみだが、`i32` / `u32` / `bool` / `f64` / `usize` 等を config に追加することで同一の検出機構をそのまま適用できるようパラメータ化する。プリミティブごとに専用ルールを増やす設計は採らない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "8d7a648c183dd61cfa1055d5591b21c687300839782e9172f4e2cabe798761a6",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "検出位置はフィールドに限定しない。全出現位置を検出可能とする:\n\n- named struct field（plain struct の `shape.fields[].ty`）\n- enum variant のフィールド（`variants[].payload.fields[].ty`）\n- メソッド / 関数の param / return / bound\n- **`result_err`**: 任意位置の TypeRef の型木に現れる `Result<_, E>` の **Err スロット**（`Result<T, String>` の `String`）。\n- type alias target など、TypeRef が現れる位置一般\n\n透過コンテナの型引数に現れるプリミティブも対象とする（`Option<String>` / `Vec<String>` / `BTreeMap<String, _>` → `Option<NewType>` / `Vec<NewType>` へ矯正）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "検出位置はフィールドに限定せず、次を含む: named struct field（plain struct の `shape.fields[].ty`）、enum variant のフィールド（`variants[].payload.fields[].ty`）、メソッド/関数の param・return・bound、type alias target、および TypeRef が現れる位置一般。透過コンテナ（`Option` / `Vec` / `Box` / `Arc` / `BTreeMap` 等）の型引数に現れるプリミティブも対象に含める。位置の語彙は将来拡張の余地を残す（現時点で列挙した位置に限定されるわけではない）。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "8d7a648c183dd61cfa1055d5591b21c687300839782e9172f4e2cabe798761a6",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "syn::visit::Visit で型木を**全再帰走査**して、指定プリミティブの ident を検出する。透過コンテナ（`Option` / `Vec` / `Box` / `Arc` / `BTreeMap` 等）の型引数も、関数型（`Fn` / `FnMut` / `FnOnce`）シグネチャ内（例: `Box<dyn Fn(String) -> _>`）も**区別せず全て走査する（特例を設けない）**。エンジンは「この TypeRef の型木のどの位置に指定プリミティブが現れるか」を答え"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "検出位置はフィールドに限定せず、次を含む: named struct field（plain struct の `shape.fields[].ty`）、enum variant のフィールド（`variants[].payload.fields[].ty`）、メソッド/関数の param・return・bound、type alias target、および TypeRef が現れる位置一般。透過コンテナ（`Option` / `Vec` / `Box` / `Arc` / `BTreeMap` 等）の型引数に現れるプリミティブも対象に含める。位置の語彙は将来拡張の余地を残す（現時点で列挙した位置に限定されるわけではない）。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "2cdef070b68aa327504efdf96ecfd77361c0925102a15406cc6ad7c92d4fc619",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- **`result_err`**: 任意位置の TypeRef の型木に現れる `Result<_, E>` の **Err スロット**（`Result<T, String>` の `String`）。エラーを生 String で返すことを、Ok スロット（`Result<String, E>` のレンダラ戻り値）を巻き込まずに狙い撃つための専用位置。\n\n明示的な対象外は設けない（`Result<_, String>` はむしろ `result_err` 位置で対象に含める）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "`Result<T, E>`（型引数が2つの `Result` path segment）を走査中に検出した場合、第1型引数（Ok スロット）を通常の位置として扱い、第2型引数（Err スロット）を専用の `result_err` 位置として区別して記録する。これにより `Result<T, String>` の Err の `String` だけを、`Result<String, E>` の Ok の `String`（レンダラ/シリアライザの戻り値など）を巻き込まずに狙い撃てる。`Result<_, String>` を明示的に対象外にする条項は設けない — むしろ `result_err` 位置として対象に含める。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "2cdef070b68aa327504efdf96ecfd77361c0925102a15406cc6ad7c92d4fc619",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "第 2 型引数（E スロット）を result_err 位置として記録する。第 1 型引数（Ok スロット）は通常の走査位置として扱い、result_err とは区別する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "`Result<T, E>`（型引数が2つの `Result` path segment）を走査中に検出した場合、第1型引数（Ok スロット）を通常の位置として扱い、第2型引数（Err スロット）を専用の `result_err` 位置として区別して記録する。これにより `Result<T, String>` の Err の `String` だけを、`Result<String, E>` の Ok の `String`（レンダラ/シリアライザの戻り値など）を巻き込まずに狙い撃てる。`Result<_, String>` を明示的に対象外にする条項は設けない — むしろ `result_err` 位置として対象に含める。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "749a3bb4437e337c398cf7b03681bbd90bdbb5abd97c9a3a510bb673305523bc",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ident 完全一致で判定するため、`NonEmptyString` / `OsString` のような「プリミティブ名を部分文字列に含むが別物の型」は自動的に除外される。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "検出は ident の完全一致で判定し、部分文字列マッチは行わない。`NonEmptyString` / `OsString` のようにプリミティブ名を部分文字列として含むが別物の型は、この完全一致判定により構造的に誤検出対象から除外される。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "4d88e1ab7ab767c9d452fd9560232cae9986ec9e43e1c0d0290cb22fa3e002ba",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "domain に「型木のどの位置に指定プリミティブが含まれるか」を判定する port を定義し、infrastructure が既存 `type_ref_parser` の syn 走査でこれを実装する。`catalogue_linter`（domain）は port 経由で判定を呼ぶ。これにより domain の syn 非依存と hexagonal 純粋性を維持する（domain は判定の意味論だけを持ち、syn への依存は infrastructure に閉じる）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "『型木の指定位置に指定プリミティブが含まれるか』の判定は domain 層に port として定義し、infrastructure 層が既存の `type_ref_parser`（syn ベース）で実装する。domain は判定の意味論のみを持ち、syn への依存は infrastructure に閉じる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "93fe9aae2f2036b2557bb12722d42905e344fe577ae101245da70b142bec7427",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "新 variant の payload は次を持つ:\n\n- **禁止プリミティブ集合**（例: `[\"String\"]`）\n- **適用対象 layer 集合**（層名のリスト。`architecture-rules.json` に定義された名前のみ受け付け、存在検証も同 SSoT 基準。`\"all\"` のような特殊値は設けない — 全層を対象にするなら層名を列挙する。既定 config を生成する際に同 SSoT から列挙する）\n- **検出位置集合**（named field / variant field / param / return / bound / result_err …）\n\n**role 軸**による絞り込みは新 variant に持たせず、既存の `RuleTarget`（`target_roles`）を再利用する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "既存の `CatalogueLinterRuleKind` に新しい variant を追加して実装する。新 variant の payload は (a) 禁止プリミティブ集合、(b) 適用対象 layer 集合、(c) 検出位置集合の3つを持つ。role 軸は新 variant にフィールドを持たせず、既存の `RuleTarget`（`target_roles`）をそのまま再利用する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "63b4ac9a86fb83972ba64afbec6347bbf5bed0d51b020a4f5724c69de58bbc40",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- **適用対象 layer 集合**（層名のリスト。`architecture-rules.json` に定義された名前のみ受け付け、存在検証も同 SSoT 基準。`\"all\"` のような特殊値は設けない — 全層を対象にするなら層名を列挙する。既定 config を生成する際に同 SSoT から列挙する）"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "新 variant の layer 集合、および既定 config が列挙する layer 名は、`architecture-rules.json` に定義された名前のみを受け付け、そこに存在検証の基準を置く。`\"all\"` のような特殊値は設けず、全層を対象にする場合は層名を列挙する。既定 config の層名列挙も同じ SSoT から生成する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "63b4ac9a86fb83972ba64afbec6347bbf5bed0d51b020a4f5724c69de58bbc40",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- **layer 軸**: 層名のリスト（`architecture-rules.json` 定義済みの名前のみ）。`\"all\"` 特殊値は設けず、全層対象なら層名を列挙する。\n\n既定 config（テンプレート同梱）は **`architecture-rules.json` の層名を列挙して生成**"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "新 variant の layer 集合、および既定 config が列挙する layer 名は、`architecture-rules.json` に定義された名前のみを受け付け、そこに存在検証の基準を置く。`\"all\"` のような特殊値は設けず、全層を対象にする場合は層名を列挙する。既定 config の層名列挙も同じ SSoT から生成する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "f4c8fae72561e132763384d04e62dfbc43a92320247559f399f4bb97411b2b8f",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "1. **`result_err` × `String`**: 全層 × **全 role** で ON（`Result<_, String>` を型付きエラーに矯正。role 除外なし）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "既定 config は `result_err` × `String` を全層 × 全 role で ON にする。この除外なしの適用は role を問わない — `Dto` / `Command` を含むいかなる role の `result_err` 位置の `String` も違反対象である。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "5b0cc066043f307143c6c14fad53e00b5c54ae06c7adab18b385d3c17a7eae82",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「named field + variant field × `String`」…「除外はこの 2 role のみ」…「`ErrorType` を含む他の全 role … は対象である」「エラー型を特別扱いしない」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-09",
+          "text_label": "既定 config は named field + variant field × `String` を全層 × 全 role で ON にしたうえで、`Dto`（全層）と `Command`（usecase のみ）の2 role だけを除外する。`ErrorType` を含むそれ以外の全 role（`ValueObject` / `Entity` / `AggregateRoot` 等）はフィールド位置でも一般対象のままであり、`ErrorType` を特別扱いする条項は設けない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "0efbd3196ce38d1aa1746efd840565c3b475172c44a84a43608345dc3ad781dd",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`String` 以外のプリミティブ、および一般の param / return（Err スロットを除く）は既定 OFF とし、利用者が config に追加して opt-in する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-10",
+          "text_label": "`String` 以外のプリミティブ、および `result_err` を除く一般の param / return 位置（Ok スロットを含む）は既定 OFF とする。有効化したい場合は config への明示的な追加によって opt-in する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "1114c995af6787af57b3dd40e9c70a2bbbf1e835430dc500fd2415bbf18fecc9",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "個別フィールドに付ける例外マーク（per-instance の opt-out 注釈）は導入しない。... 真に自由文が本質のフィールド（自由記述メッセージ・生ログ等）には、per-instance 例外ではなく **意味を与えた汎用 newtype**（`FreeText` / `LogLine` 等）を使う。... `(layer × role × 出現位置 × プリミティブ)` というカテゴリ単位での ON/OFF は D7 の粒度 config で提供する"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-11",
+          "text_label": "個別フィールド単位の escape hatch 注釈は一切設けない。唯一サポートする除外の粒度は (layer × role × 出現位置 × プリミティブ) というカテゴリ単位の宣言的 config である。真に自由文が本質のフィールドは、per-instance 例外ではなく意味を与えた汎用 newtype（`FreeText` / `LogLine` 等）で型付けする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "aa690529053862a64534cbe5bf388fea7a6e1391a5337c0e0d651844d625ac88",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「warn → block の段階導入は行わない。lint は active track のカタログのみを検査する既存の `track-active-gate` に乗る」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-12",
+          "text_label": "gate は最初から blocking とし、warn → block の段階導入は行わない。lint は active track のカタログのみを検査する既存の active-track-scoped ツール群の一部として適用され、過去の完了トラックのカタログは遡及検査の対象にしない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "33c83b2080bfb16b5ecafe05fcf9be249ed2e498e290e23ddb1ceb83408bb4b1",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "正規表現による文字列マッチではなく、... `syn::visit::Visit` で型木を**全再帰走査**して、指定プリミティブの ident を検出する。透過コンテナ（`Option` / `Vec` / `Box` / `Arc` / `BTreeMap` 等）の型引数も、関数型（`Fn` / `FnMut` / `FnOnce`）シグネチャ内も**区別せず全て走査する**（特例を設けない）。... `Result<T, E>` ... その**第 2 型引数（E スロット）**を `result_err` 位置として記録"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-01",
+          "text_label": "正規表現（例: `\\bString\\b`）による文字列マッチでプリミティブを検出する方式は採らない。型を構造として扱えないため、透過コンテナの再帰走査も `Result` の Ok/Err スロットの区別もできない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "dc9f1267899f48f5d02c38b582a6fe3bfa9ae1add983ed01efe5684faae39b57",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "infrastructure の `type_ref_parser` がカタログの TypeRef を `syn::Type` にパースする経路を再利用し、`syn::visit::Visit` で型木を**全再帰走査**して、指定プリミティブの ident を検出する。... どの位置を実際に違反とするかは D7 の粒度 config が決めるため、走査エンジン側で位置や深さの特例（Fn 内除外など）を持たせる必要はない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-02",
+          "text_label": "型カタログではなく実ソース（`.rs`）の struct / enum フィールド型を dylint / clippy 等で直接 lint する方式は対象外。本課題の主眼は型契約（カタログ）段階の primitive obsession であり、TDDD signal chain を通じて実装側にも間接的に波及させる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "cb0cd776095918e0196e7a44b0d902e1da35b1be43579e1aaa0c92d6e83ad76c",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「String 以外のプリミティブ、および一般の param / return（Err スロットを除く）は既定 OFF とし、利用者が config に追加して opt-in する。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-03",
+          "text_label": "引数・戻り値位置（`Result` の Ok スロットを含む一般の param / return）を既定 ON にする方式は対象外。実態集計で `impl Into<String>`（境界入力）・`&str`（借用）・`Arc<dyn Fn(String, ...) -> ...>`（クロージャシグネチャ）・`Result<String, ConcreteError>`（レンダラの Ok 値）が支配的で誤検出が過大であるため、これらは既定 OFF とし config での opt-in に委ねる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "a22a9c928a06a966668b897b3dc09e2af965800ceb9ffc6f33b233edeff3e838",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「個別フィールドに付ける例外マーク（per-instance の opt-out 注釈）は導入しない。」および「真に自由文が本質のフィールド（自由記述メッセージ・生ログ等）には、per-instance 例外ではなく **意味を与えた汎用 newtype**（`FreeText` / `LogLine` 等）を使う。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-04",
+          "text_label": "個別フィールド単位の escape hatch 注釈機構を設ける方式は対象外。個別例外は形骸化しやすく、gate を無条件 blocking に保てなくなる。自由文が本質のフィールドは汎用 newtype で型付けする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "693ec18361f10e2db54466b9c9cb8d4f7cc8d24911b09fde7002b2fdeff03c0b",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "infrastructure の `type_ref_parser` がカタログの TypeRef を `syn::Type` にパースする経路を再利用し、`syn::visit::Visit` で型木を**全再帰走査**して、指定プリミティブの ident を検出する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-05",
+          "text_label": "カタログの `ty` フィールドを文字列から構造化オブジェクトへ変える schema 移行（v6 化）は対象外。TypeRef を文字列のまま保持し infrastructure で syn パースする既存方針を維持し、既存パーサの走査を再利用するだけで足りる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "eb7b3910f2c1dded2954c7d47543517ca260a5ff4c9df062532a7257e1dc0fe3",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「warn → block の段階導入は行わない。lint は active track のカタログのみを検査する既存の `track-active-gate` に乗るため、過去の完了トラックのカタログは遡及検査されない。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-06",
+          "text_label": "既存違反を warn で可視化してから blocking へ段階的に移行する方式は対象外。lint は active track のカタログのみを検査し過去の完了トラックを遡及しないため、移行や後方互換性を考慮する必要がなく、最初から blocking gate として導入する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "1ec2832b3b2b1181b8a2f26c608011d30b5da28ab08b8d7af7fef7ddd0f3bbb8",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「個別フィールドに付ける例外マーク（per-instance の opt-out 注釈）は導入しない。」／「`(layer × role × 出現位置 × プリミティブ)` というカテゴリ単位での ON/OFF は D7 の粒度 config で提供する（例: Dto / Command の除外）」。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-07",
+          "text_label": "適用範囲の粒度制御を持たせず全カタログに一律で lint を効かせる方式は対象外。プリミティブが設計上正当なカテゴリ（`Dto` の外部形式、`Command` の外部入力）を構造的に除外できなくなり、per-instance escape hatch に頼らざるを得なくなる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "1ec2832b3b2b1181b8a2f26c608011d30b5da28ab08b8d7af7fef7ddd0f3bbb8",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「lint は一律ではなく、**4 軸の粒度**で ON/OFF を宣言的に切り替えられるものとする。」また「この粒度制御は D4 が否定した per-instance escape hatch とは**別次元**である。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-07",
+          "text_label": "適用範囲の粒度制御を持たせず全カタログに一律で lint を効かせる方式は対象外。プリミティブが設計上正当なカテゴリ（`Dto` の外部形式、`Command` の外部入力）を構造的に除外できなくなり、per-instance escape hatch に頼らざるを得なくなる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "0f8d674eedd1f2f6f0c0956f9303139776c123f323c034d4771416164daf721c",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「検出対象の**プリミティブ型**は config で指定する集合とする」「`String` は primitive obsession の一例にすぎず、裸プリミティブ全般を同じ機構でパラメータ化して扱う。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-08",
+          "text_label": "検出対象を `String` のみに固定し、プリミティブをパラメータ化しない実装は対象外。primitive obsession は `String` に限らず `i32` / `bool` 等でも同型の問題であり、検出機構をプリミティブ集合で config パラメータ化することで、プリミティブごとに専用ルールを増やさずに一貫適用する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "f60678e72bf6cb5088067dc654f90d13ae51766fbd7ee9a9a04cb6a9b3edbe9e",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "透過コンテナ（`Option` / `Vec` / `Box` / `Arc` / `BTreeMap` 等）の型引数も、関数型（`Fn` / `FnMut` / `FnOnce`）シグネチャ内（例: `Box<dyn Fn(String) -> _>`）も**区別せず全て走査する**（特例を設けない）。…どの位置を実際に違反とするかは D7 の粒度 config が決めるため、走査エンジン側で位置や深さの特例（Fn 内除外など）を持たせる必要はない。エンジンは「この TypeRef の型木のどの位置に指定プリミティブが現れるか」を答え、適用可否は config が判断する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-09",
+          "text_label": "関数型シグネチャ内（`Box<dyn Fn(String) -> _>` の内部等）をエンジン側で走査対象外にする、すなわちエンジンに位置特例を持たせる実装は対象外。どの位置を実際に効かせるかは config の判断に委ね、エンジンは全再帰走査で位置情報を答えるだけの単純な役割に留める。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "cc2a40ca3f4cb50f1510d1a1fa5a6b4dc12c0a8e8658647b6d540d59bbb4b629",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「architecture-rules.json に定義された名前のみ受け付け、存在検証も同 SSoT 基準。`\"all\"` のような特殊値は設けない — 全層を対象にするなら層名を列挙する。既定 config を生成する際に同 SSoT から列挙する」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-10",
+          "text_label": "layer 軸を `\"all\"` という特殊値で表現する、または新 variant や既定 config に層名の固定リストを直書きする実装は対象外。層名・層構成は `architecture-rules.json` を SSoT とし、既定 config はそこから層名を列挙生成する。config は同 SSoT に定義済みの層名だけを受け付け、未定義の層名は検証で弾く。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "cc2a40ca3f4cb50f1510d1a1fa5a6b4dc12c0a8e8658647b6d540d59bbb4b629",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "layer 軸: 層名のリスト（`architecture-rules.json` 定義済みの名前のみ）。`\"all\"` 特殊値は設けず"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-10",
+          "text_label": "layer 軸を `\"all\"` という特殊値で表現する、または新 variant や既定 config に層名の固定リストを直書きする実装は対象外。層名・層構成は `architecture-rules.json` を SSoT とし、既定 config はそこから層名を列挙生成する。config は同 SSoT に定義済みの層名だけを受け付け、未定義の層名は検証で弾く。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "d99a0eecf63417976d5cc3ee29457069bd052cd6c8283148b9132f2aa8f6ffe6",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`result_err`: 任意位置の TypeRef の型木に現れる `Result<_, E>` の **Err スロット**（`Result<T, String>` の `String`）。エラーを生 String で返すことを、Ok スロット（`Result<String, E>` のレンダラ戻り値）を巻き込まずに狙い撃つための専用位置。\n\n明示的な対象外は設けない（`Result<_, String>` はむしろ `result_err` 位置で対象に含める）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-11",
+          "text_label": "`Result<_, String>`（エラー型としての String）を lint 対象外にする方式は対象外。エラーを生 `String` で持つことは primitive obsession の典型であり、むしろ狙って禁止する。Ok スロット（`Result<String, E>` のレンダラ戻り値）との区別は `result_err` 位置で解決する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "d99a0eecf63417976d5cc3ee29457069bd052cd6c8283148b9132f2aa8f6ffe6",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`result_err` 位置は、走査中に `Result<T, E>`（path segment が `Result` で型引数が 2 つ）を見つけたとき、その**第 2 型引数（E スロット）**を `result_err` 位置として記録することで識別する。第 1 型引数（Ok スロット）は通常の走査位置として扱い、`result_err` とは区別する。これにより `Result<T, String>` の Err の String だけを `result_err` 位置に、`Result<String, E>` の Ok の String は Ok 側位置に振り分けられる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-11",
+          "text_label": "`Result<_, String>`（エラー型としての String）を lint 対象外にする方式は対象外。エラーを生 `String` で持つことは primitive obsession の典型であり、むしろ狙って禁止する。Ok スロット（`Result<String, E>` のレンダラ戻り値）との区別は `result_err` 位置で解決する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "f03b8fdfa3ed674bf909a59529a2e7df8750a99f6a8fe6ec5b33e3a1ecdc688f",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "infrastructure の `type_ref_parser` がカタログの TypeRef を `syn::Type` にパースする経路を再利用し"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "syn によるパースは既存の infrastructure `type_ref_parser`（`libs/infrastructure/src/tddd/type_ref_parser/`）が提供する経路を再利用する。新規の TypeRef パーサを重複実装しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "7c1a3e6d52c8663eb615324c94a939d4e2265fec652827cda6cb8fca7a8bd4e8",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "domain に「型木のどの位置に指定プリミティブが含まれるか」を判定する port を定義し、infrastructure が既存 `type_ref_parser` の syn 走査でこれを実装する。... これにより domain の syn 非依存と hexagonal 純粋性を維持する（domain は判定の意味論だけを持ち、syn への依存は infrastructure に閉じる）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "domain crate は syn への依存を持たない。『型木の指定位置に指定プリミティブが含まれるか』の判定は domain 層の port として表現し、syn を用いた実装は infrastructure 層の adapter に閉じる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "c20d6d62adc617f759f6b55dc0f686496c337fb2a024d2fcd1649bae8acfe128",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "role 軸による絞り込みは新 variant に持たせず、既存の `RuleTarget`（`target_roles`）を再利用する。\n\n新 variant の payload は次を持つ:\n\n- **禁止プリミティブ集合**\n- **適用対象 layer 集合**\n- **検出位置集合**"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "role 軸による絞り込みは新 variant に持たせず、既存の `RuleTarget`（`target_roles`）を再利用する。新 variant の payload は禁止プリミティブ集合・適用対象 layer 集合・検出位置集合の3つに限定する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "b9200402966a951fd2f279b1e00c56e9e5dd82d423b95ea10212f704367153a9",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「architecture-rules.json に定義された名前のみ受け付け、存在検証も同 SSoT 基準。`\"all\"` のような特殊値は設けない」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "新 variant の payload、および既定 config が列挙する layer 名は、`architecture-rules.json` に定義済みの名前のみを受け付ける。未定義の layer 名は検証で拒否し、`\"all\"` のような特殊値は設けない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "b9200402966a951fd2f279b1e00c56e9e5dd82d423b95ea10212f704367153a9",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「layer 軸: 層名のリスト（`architecture-rules.json` 定義済みの名前のみ）。`\"all\"` 特殊値は設けず、全層対象なら層名を列挙する。」「既定 config（テンプレート同梱）は **`architecture-rules.json` の層名を列挙して生成**」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "新 variant の payload、および既定 config が列挙する layer 名は、`architecture-rules.json` に定義済みの名前のみを受け付ける。未定義の layer 名は検証で拒否し、`\"all\"` のような特殊値は設けない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "eed0555beedf09b6fa1122d38678361eab80a689bf93c46eb2aefe409c857d3a",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「個別フィールドに付ける例外マーク（per-instance の opt-out 注釈）は導入しない。」 「`(layer × role × 出現位置 × プリミティブ)` というカテゴリ単位での ON/OFF は D7 の粒度 config で提供する」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-05",
+          "text_label": "個別フィールド・個別カタログエントリ単位で本ルールを免除する注釈・属性・config キーは、schema にも評価経路にも一切存在しない。唯一サポートする除外の粒度は (layer × role × 出現位置 × プリミティブ) というカテゴリ単位の宣言的 config である。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "50be52afe1a971dfa3304f996227280be0957437506df4c1c3ac3e4b671d02fe",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "lint は active track のカタログのみを検査する既存の `track-active-gate` に乗るため、過去の完了トラックのカタログは遡及検査されない。したがって後方互換性・既存違反の段階移行を考える必要はなく、最初から blocking gate として導入できる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-06",
+          "text_label": "本ルールは既存の `.harness/catalogue-lint/` の opt-in ルール宣言機構にそのまま乗せて宣言する。このルール専用の新しい gate 機構・config ファイル形式を新設しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "50be52afe1a971dfa3304f996227280be0957437506df4c1c3ac3e4b671d02fe",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存の `CatalogueLinterRuleKind`（現行の rule 種別群）に「型木に現れるプリミティブの禁止」に相当するものはない ... したがって本 lint は新しい rule variant を追加して実装する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-06",
+          "text_label": "本ルールは既存の `.harness/catalogue-lint/` の opt-in ルール宣言機構にそのまま乗せて宣言する。このルール専用の新しい gate 機構・config ファイル形式を新設しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "a6fd34b8bd3755de570100e8b34dcf248221c0af890a211be7c76b2a33b69005",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "lint は active track のカタログのみを検査する既存の `track-active-gate` に乗るため、過去の完了トラックのカタログは遡及検査されない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-07",
+          "text_label": "本ルールの適用範囲は、既存の active-track-scoped ツール群と同様に現在アクティブなトラックのカタログに限定される。過去の完了トラックのカタログは、本ルールの導入によって遡及的に検査対象にはならない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "7104ff6c54aac2796c2bb6ff056f2cf933aeeda6b1a95fcf76acdd483d87dff1",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`result_err` × `String`: 全層 × 全 role で ON; `named field + variant field × String`: 全層 × 全 role で ON、ただし次の role のみ除外: `Dto` ... `Command`"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-08",
+          "text_label": "`result_err` 位置の適用（全 role で ON、role 除外なし）と、named field / variant field 位置の適用（`Dto` / `Command` のみ除外）は独立に評価される。`Dto` または `Command` role のカタログエントリであっても、フィールド型が `Result<T, String>` であれば、その `String` の Err スロットは `result_err` 位置として引き続き違反になる — フィールド位置の role 除外は `result_err` 位置には及ばない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "91146b821d4ee92c80ac397cd0b702512782aa164727cd5c08895c8962457c15",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「result_err × String」: 全層 × 全 role で ON（role 除外なし） / 「ErrorType を含む他の全 role」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-09",
+          "text_label": "`ErrorType` role は本ルールのいかなる位置・いかなる評価経路においても特別扱い（専用の除外・専用の緩和ルール）を受けない。そのフィールド位置および `result_err` 位置の `String` 出現は、`Dto` / `Command` 以外の他の role と同一の一般ルールに従って判定される。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "8e2f1e88cd41c5ee66e642f7f64b4455857190f9d77bfa827324c4621b7655d6",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "\"architecture-rules.json に定義された名前のみ受け付け、存在検証も同 SSoT 基準。`\\\"all\\\"` のような特殊値は設けない\" / \"既存の `RuleTarget`（`target_roles`）を再利用する。\""
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "新しい `CatalogueLinterRuleKind` variant が実装されており、その payload は (a) 設定可能な禁止プリミティブ集合、(b) `architecture-rules.json` を基準に存在検証される適用対象 layer 集合（未定義の layer 名は拒否、`\"all\"` 特殊値は存在しない）、(c) 検出位置集合、の3要素を持つ。role による絞り込みは新 variant に専用フィールドを持たず、既存の `RuleTarget`（`target_roles`）が引き続き使われる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "8e2f1e88cd41c5ee66e642f7f64b4455857190f9d77bfa827324c4621b7655d6",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- **role 軸**: 既存の `RuleTarget`（`target_roles`）。\n- **layer 軸**: 層名のリスト（`architecture-rules.json` 定義済みの名前のみ）。`\"all\"` 特殊値は設けず、全層対象なら層名を列挙する。\n- **出現位置軸**: named field / variant field / param / return / bound / result_err …（将来位置を足す余地）。\n- **プリミティブ軸**: `String` / `i32` / `bool` / …（D1 のパラメータ）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "新しい `CatalogueLinterRuleKind` variant が実装されており、その payload は (a) 設定可能な禁止プリミティブ集合、(b) `architecture-rules.json` を基準に存在検証される適用対象 layer 集合（未定義の layer 名は拒否、`\"all\"` 特殊値は存在しない）、(c) 検出位置集合、の3要素を持つ。role による絞り込みは新 variant に専用フィールドを持たず、既存の `RuleTarget`（`target_roles`）が引き続き使われる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "a5f31728425c70e94ccdab72299a7408a7655f0022abfaf4d1ebed1e3a3c5a29",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「全出現位置を検出可能とする」「透過コンテナの型引数に現れるプリミティブも対象とする」「明示的な対象外は設けない」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "検出エンジン（infrastructure 層、既存 `type_ref_parser` の syn 経路を再利用）が `syn::visit::Visit` による全再帰走査を実施し、named struct field・enum variant field・メソッド/関数の param・return・bound、および透過コンテナ（`Option` / `Vec` / `Box` / `Arc` / `BTreeMap` 等）や関数型シグネチャ（`Fn` / `FnMut` / `FnOnce`）内部にネストした型引数を含む全位置で、設定されたプリミティブ ident の出現を報告できる。エンジン側に位置の特例（関数型シグネチャ内の除外等）は一切存在しない。ident 判定は完全一致であり、`NonEmptyString` / `OsString` のような紛らわしい型名は誤検出されない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "a5f31728425c70e94ccdab72299a7408a7655f0022abfaf4d1ebed1e3a3c5a29",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "infrastructure の `type_ref_parser` がカタログの TypeRef を `syn::Type` にパースする経路を再利用し、`syn::visit::Visit` で型木を**全再帰走査**して、指定プリミティブの ident を検出する。透過コンテナ（`Option` / `Vec` / `Box` / `Arc` / `BTreeMap` 等）の型引数も、関数型（`Fn` / `FnMut` / `FnOnce`）シグネチャ内（例: `Box<dyn Fn(String) -> _>`）も**区別せず全て走査する**（特例を設けない）。ident 完全一致で判定するため、`NonEmptyString` / `OsString` のような「プリミティブ名を部分文字列に含むが別物の型」は自動的に除外される。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "検出エンジン（infrastructure 層、既存 `type_ref_parser` の syn 経路を再利用）が `syn::visit::Visit` による全再帰走査を実施し、named struct field・enum variant field・メソッド/関数の param・return・bound、および透過コンテナ（`Option` / `Vec` / `Box` / `Arc` / `BTreeMap` 等）や関数型シグネチャ（`Fn` / `FnMut` / `FnOnce`）内部にネストした型引数を含む全位置で、設定されたプリミティブ ident の出現を報告できる。エンジン側に位置の特例（関数型シグネチャ内の除外等）は一切存在しない。ident 判定は完全一致であり、`NonEmptyString` / `OsString` のような紛らわしい型名は誤検出されない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "d6e6a6982a964e74804cb1fedb2af3115f816296fc4cfb74a80da7a60b4cdf47",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "検出位置はフィールドに限定しない。全出現位置を検出可能とする: - **`result_err`**: 任意位置の TypeRef の型木に現れる `Result<_, E>` の **Err スロット**"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "走査が型引数2つの `Result` path segment を検出した場合、第1型引数（Ok スロット）は通常位置として、第2型引数（Err スロット）は専用の `result_err` 位置として区別して報告される。この区別は `Vec<Result<T, String>>` のようにネストした位置でも成立する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "d6e6a6982a964e74804cb1fedb2af3115f816296fc4cfb74a80da7a60b4cdf47",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`Result<T, E>`（path segment が `Result` で型引数が 2 つ）を見つけたとき、その**第 2 型引数（E スロット）**を `result_err` 位置として記録することで識別する。第 1 型引数（Ok スロット）は通常の走査位置として扱い、`result_err` とは区別する。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "走査が型引数2つの `Result` path segment を検出した場合、第1型引数（Ok スロット）は通常位置として、第2型引数（Err スロット）は専用の `result_err` 位置として区別して報告される。この区別は `Vec<Result<T, String>>` のようにネストした位置でも成立する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "65d7237ca041e23422a673d95856ebff152645544444b3024b3dbac3ebe9a8bb",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "domain に「型木のどの位置に指定プリミティブが含まれるか」を判定する port を定義し、infrastructure が既存 `type_ref_parser` の syn 走査でこれを実装する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "『この TypeRef の型木の指定位置に指定プリミティブが含まれるか』を判定する port が domain 層に定義されており、infrastructure 層の adapter がこれを syn ベースの走査で実装している。domain crate が syn に依存していないことは `cargo make check-layers` および `cargo make deny` で検証できる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "8c16536effee911434e9d7a161f4e994fffc38538ca974de286aaf3a556537ab",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- **layer 軸**: 層名のリスト（`architecture-rules.json` 定義済みの名前のみ）。`\"all\"` 特殊値は設けず、全層対象なら層名を列挙する。\n- 1. **`result_err` × `String`**: 全層 × **全 role** で ON（`Result<_, String>` を型付きエラーに矯正。role 除外なし）。\n- 2. **named field + variant field × `String`**: 全層 × 全 role で ON、ただし次の role のみ**除外**する:\n   - `Dto`（全層）\n   - `Command`（usecase）\n\n   除外はこの 2 role のみで、`ErrorType` を含む他の全 role（`ValueObject` / `Entity` / `AggregateRoot` 等）は対象である。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "既定 config（`.harness/catalogue-lint/` 配下）は、`architecture-rules.json` から列挙される全層について、(a) `result_err` × `String` を全 role で ON にし role による除外を一切持たず、(b) named field / variant field × `String` を全 role で ON にしたうえで `Dto`（全層）と `Command`（usecase のみ）だけを除外している。`ErrorType` を含むそれ以外の全 role は (b) の対象のまま特別扱いされていない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "f1fc65e3d67b3eb4611b0e5f620bbaf0d94980ea79d8318e1b4fe53627ea4dab",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`result_err` × `String`: 全層 × **全 role** で ON（`Result<_, String>` を型付きエラーに矯正。role 除外なし）。\n\n`named field + variant field × `String`: 全層 × 全 role で ON、ただし次の role のみ**除外**する:\n- `Dto`（全層）\n- `Command`（usecase）\n\n除外はこの 2 role のみ"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "`Dto` role または `Command` role（usecase 層）のカタログエントリが、named field / variant field 位置に裸の `String` を持つ場合、既定 config では違反を生じない。同じエントリが `Result<T, String>` 型のフィールドを持つ場合は、その `String` の Err スロットが `result_err` 位置の違反として報告される（フィールド位置の role 除外は `result_err` 位置には及ばない）。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "c8f83092e6fca42ae382e6304441dd81cb46baafc328cac452915ab9053e7cf1",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`String` 以外のプリミティブ、および一般の param / return（Err スロットを除く）は既定 OFF とし、利用者が config に追加して opt-in する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "`String` 以外のプリミティブ、および `result_err` を除く一般の param / return 位置（`Result` の Ok スロットを含む）は既定 OFF であり、これらを有効化するには config への明示的な追加が必要である。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "a87ac90dbd2fada30cb193ec92b9a16a0af653f172c933696ba187261f6f02ad",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「個別フィールドに付ける例外マーク（per-instance の opt-out 注釈）は導入しない。」／「カテゴリ単位での ON/OFF は D7 の粒度 config で提供する」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "個別のカタログエントリ・個別フィールドを本ルールから除外する注釈・属性・per-field config キーは schema にも評価経路にも存在しない。除外の唯一の手段は (layer × role × 出現位置 × プリミティブ) のカテゴリ単位の宣言的 config である。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "403595b89ac7969fb16163fe6b20e7b94f0b5aee0073fbf17c8d2487bc62fec1",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "newtype 内部（tuple struct の private フィールド）は rustdoc-stripped でそもそもカタログに出現しないため、除外条項を要しない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "tuple struct newtype の private フィールド（rustdoc によって `has_stripped_fields: true` として strip される）だけに `String` が現れるカタログエントリは違反を生じない。これはルール側の特別扱いによってではなく、そのフィールドの型情報がそもそもカタログに出現しない（構造的に走査対象が存在しない）ことによる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "bfc3d5fdee68e5bd12d959eda9f94d479648c3a5818de43c5535dc276b552834",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「warn → block の段階導入は行わない。lint は active track のカタログのみを検査する既存の `track-active-gate` に乗るため、過去の完了トラックのカタログは遡及検査されない。したがって後方互換性・既存違反の段階移行を考える必要はなく、最初から blocking gate として導入できる。新規トラックの type-designer が書くカタログにのみ適用される。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-10",
+          "text_label": "本ルールとその既定 config が導入された時点で、対象となるカタログエントリを最初に検査した際に得られる違反は、warn のような中間段階を経ない blocking な結果として得られる。段階的移行や既存違反への後方互換的な救済措置は存在しない。本ルールの適用範囲は、他の active-track-scoped ツール群と同様、現在アクティブなトラックのカタログに限定される。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "cc158dbfa6578b4e809ea6978accceb688e696a5bcf8f89d75adaa0b83c58053",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「architecture-rules.json に定義された名前のみ受け付け、存在検証も同 SSoT 基準。`\"all\"` のような特殊値は設けない — 全層を対象にするなら層名を列挙する。既定 config を生成する際に同 SSoT から列挙する」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-11",
+          "text_label": "`architecture-rules.json` が、本ルールのいかなる layer 参照（新 variant の payload・既定 config の層名列挙のいずれも）にとっても唯一の SSoT であり続ける。同ファイルに定義のない layer 名は拒否され、列挙の代替となる `\"all\"` 特殊値は存在しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "cc158dbfa6578b4e809ea6978accceb688e696a5bcf8f89d75adaa0b83c58053",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`architecture-rules.json` 定義済みの名前のみ）。`\"all\"` 特殊値は設けず、全層対象なら層名を列挙する。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-11",
+          "text_label": "`architecture-rules.json` が、本ルールのいかなる layer 参照（新 variant の payload・既定 config の層名列挙のいずれも）にとっても唯一の SSoT であり続ける。同ファイルに定義のない layer 名は拒否され、列挙の代替となる `\"all\"` 特殊値は存在しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D7"
+        }
+      }
+    }
+  ]
+}

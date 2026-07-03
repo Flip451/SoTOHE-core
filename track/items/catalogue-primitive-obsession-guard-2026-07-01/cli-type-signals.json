@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-02T06:35:24Z",
+  "declaration_hash": "56b5e73610c70ae44de82e796aedd7748e41828aa2d7f3e1471bab51b38ff218",
+  "signals": [
+    {
+      "type_name": "CatalogueLintCheckActiveTrackArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "clap_builder::derive::Args",
+        "clap_builder::derive::FromArgMatches",
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "CatalogueLintCommand",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "clap_builder::derive::FromArgMatches",
+        "clap_builder::derive::Subcommand",
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "CliCommand",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::catalogue_lint::execute",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::catalogue_lint::execute_check_active_track",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

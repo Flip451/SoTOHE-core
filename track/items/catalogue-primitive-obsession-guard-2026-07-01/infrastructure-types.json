@@ -1,0 +1,69 @@
+{
+  "schema_version": 5,
+  "crate_name": "infrastructure",
+  "layer": "infrastructure",
+  "types": {
+    "SynPrimitiveOccurrenceScanner": {
+      "action": "add",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "tddd::syn_primitive_occurrence_scanner",
+      "docs": "Syn-based implementation of domain::tddd::primitive_occurrence_scanner::PrimitiveOccurrenceScanner (ADR 2026-07-01-0004 D2/D3; spec AC-02/AC-03/AC-04, IN-02/IN-03/IN-05). Reuses the existing type_ref_parser syn-parsing machinery (CN-01) to parse a TypeRef's string into a syn type, then performs a full recursive syn::visit::Visit walk with no per-position special-casing to find every ident matching a name in the requested primitive set at every position (named struct field, enum variant field, method/function param, return, bound, type_alias target, and nested inside transparent containers such as Option / Vec / Box / Arc / BTreeMap and function-type signatures Fn / FnMut / FnOnce). ident matching is exact (no substring matches). Each occurrence is labelled with the PrimitiveOccurrencePosition it was found at and returned in a position-keyed PrimitiveOccurrenceReport: occurrences found as the second (Err) type argument of a two-argument Result path segment are labelled ResultErr regardless of nesting depth (e.g. Vec<Result<T, String>>); occurrences found while descending into a nested function-type signature's own parameter / return slots, or a nested generic-bound clause, are labelled Param / Return / Bound respectively regardless of the caller-supplied `position` argument; all other (top-level, not otherwise reclassified) occurrences are labelled with whatever `position` the caller passed to scan (NamedField / VariantField / Param / Return / Bound / TypeAliasTarget) -- so a nested Param occurrence (e.g. inside a Box<dyn Fn(String) -> _> field) is distinguishable in the resulting report from the field's own outer NamedField label instead of collapsing together. If `position` is PrimitiveOccurrencePosition::ResultErr, returns PrimitiveOccurrenceScanError::InvalidSitePosition instead of scanning, since ResultErr is exclusively scan-intrinsic. Stateless: holds no fields, so no constructor beyond Default is needed.",
+      "spec_refs": [
+        {
+          "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json",
+          "anchor": "AC-02"
+        },
+        {
+          "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json",
+          "anchor": "AC-03"
+        },
+        {
+          "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json",
+          "anchor": "AC-04"
+        },
+        {
+          "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json",
+          "anchor": "IN-02"
+        },
+        {
+          "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json",
+          "anchor": "IN-03"
+        },
+        {
+          "file": "track/items/catalogue-primitive-obsession-guard-2026-07-01/spec.json",
+          "anchor": "IN-05"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [],
+  "trait_impls": [
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "SynPrimitiveOccurrenceScanner"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::default::Default",
+      "for_type": "SynPrimitiveOccurrenceScanner"
+    },
+    {
+      "action": "add",
+      "trait_ref": "domain::tddd::primitive_occurrence_scanner::PrimitiveOccurrenceScanner",
+      "for_type": "SynPrimitiveOccurrenceScanner"
+    }
+  ]
+}

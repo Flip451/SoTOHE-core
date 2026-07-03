@@ -32,6 +32,7 @@ pub mod rustdoc_crate_adapter;
 pub mod semantic_verify_codec;
 pub mod signal_evaluator_v2;
 pub mod spec_ground_codec;
+pub mod syn_primitive_occurrence_scanner;
 pub mod tddd_catalogue_document_loader;
 pub mod tddd_layer_bindings_adapter;
 pub mod type_graph_cluster;

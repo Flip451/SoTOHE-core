@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "4d7db489d27c9d94052e96d376b032f7097a46a2d2966036247965411bf451ef",
+  "catalogue_declaration_hash": "63068d6bf15f50407234dd0f437b5162def2f6986ccf0395330c749a3c8869b8",
   "signals": [
     {
       "type_name": "DryDriver",
@@ -20,7 +20,7 @@
     {
       "type_name": "TrackInput",
       "signal": "blue",
-      "entry_hash": "7b128b719123c4280c267b8a7620f8d410d88f6a304534dd9e446e05029d381d"
+      "entry_hash": "c969be3bb02d17e85e62c042e1fba0168e308c396d2b24f015178156b15abdab"
     }
   ]
 }

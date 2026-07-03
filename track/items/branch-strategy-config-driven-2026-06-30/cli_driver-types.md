@@ -5,7 +5,7 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | PrInput | enum | modify | Push, Ensure, Status, WaitAndMerge, TriggerReview, PollReview, ReviewCycle | 🔵 | 🔵 |
-| TrackInput | enum | modify | Init, Transition, Resolve, BranchCreate, BranchSwitch, ViewsValidate, ViewsSync, AddTask, SetOverride, ClearOverride, NextTask, TaskCounts, Archive, DetectActive, SwitchBase, FixpointResolve | 🔵 | 🔵 |
+| TrackInput | enum | modify | Init, Transition, Resolve, BranchCreate, BranchSwitch, ViewsValidate, ViewsSync, AddTask, SetOverride, ClearOverride, NextTask, TaskCounts, Archive, DetectActive, SwitchBase, FixpointResolve, CatalogueLintCheckActiveTrack | 🔵 | 🔵 |
 
 ## Primary Adapters
 

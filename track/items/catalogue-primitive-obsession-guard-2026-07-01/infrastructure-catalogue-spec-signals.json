@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "30cc8e50a16bf19249d922997be838777116cc9d7284cd6da2d50ceabda3d694",
+  "signals": [
+    {
+      "type_name": "SynPrimitiveOccurrenceScanner",
+      "signal": "blue",
+      "entry_hash": "8c2d8913744a44f271d12cc1dcb5a6b27076f66a22e86e0c2d19e882852516eb"
+    }
+  ]
+}

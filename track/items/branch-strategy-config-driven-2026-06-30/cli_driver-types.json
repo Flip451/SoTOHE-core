@@ -279,12 +279,23 @@
                 { "name": "items_dir", "ty": "std::path::PathBuf" }
               ]
             }
+          },
+          {
+            "name": "CatalogueLintCheckActiveTrack",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "track_id", "ty": "Option<String>" },
+                { "name": "workspace_root", "ty": "std::path::PathBuf" },
+                { "name": "rules_file", "ty": "Option<std::path::PathBuf>" }
+              ]
+            }
           }
         ]
       },
       "methods": [],
       "module_path": "track",
-      "docs": "Typed input for the track command family. SwitchBase is new in this track (IN-05): switches to the base branch read from the active track's branch_strategy_snapshot. FixpointResolve is new in this track (IN-12): fields mirror usecase::fixpoint_resolve_driver::FixpointResolveDriverInput field-for-field. Role corrected from PrimaryAdapter to Dto: this enum is a plain input DTO consumed by TrackDriver::handle, not itself the driving adapter (see R1: cli/cli_driver clap args and input DTOs use the Dto role).",
+      "docs": "Typed input for the track command family. SwitchBase is new in this track (IN-05): switches to the base branch read from the active track's branch_strategy_snapshot. FixpointResolve is new in this track (IN-12): fields mirror usecase::fixpoint_resolve_driver::FixpointResolveDriverInput field-for-field. Role corrected from PrimaryAdapter to Dto: this enum is a plain input DTO consumed by TrackDriver::handle, not itself the driving adapter (see R1: cli/cli_driver clap args and input DTOs use the Dto role). CatalogueLintCheckActiveTrack is merge-inherited from base branch (catalogue-primitive-obsession-guard track); not this track's design work -- grounding stays with this entry's existing spec_refs (IN-05).",
       "spec_refs": [
         { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-05" },
         { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-12" },

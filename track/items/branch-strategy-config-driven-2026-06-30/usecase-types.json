@@ -1566,11 +1566,26 @@
           "has_default_impl": true,
           "where_predicates": [],
           "docs": "Switch to the base branch read from the active track's branch_strategy_snapshot. The default implementation returns a failure placeholder until composition-root wiring overrides it."
+        },
+        {
+          "name": "catalogue_lint_check_active_track",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id", "ty": "Option<String>" },
+            { "name": "workspace_root", "ty": "std::path::PathBuf" },
+            { "name": "rules_file", "ty": "Option<std::path::PathBuf>" }
+          ],
+          "returns": "TrackCommandOutput",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "`catalogue-lint check-active-track` -- run the catalogue lint ruleset across every tddd.enabled layer of the active track and aggregate violations."
         }
       ],
       "supertrait_bounds": ["Send", "Sync"],
       "module_path": "track_service",
-      "docs": null,
+      "docs": "catalogue_lint_check_active_track is merge-inherited from base branch (catalogue-primitive-obsession-guard track); not this track's design work -- grounding stays with this entry's existing spec_refs (IN-05).",
       "spec_refs": [
         { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-05" }
       ],

@@ -1,0 +1,246 @@
+{
+  "schema_version": 1,
+  "layer": "cli",
+  "entries": [
+    {
+      "claim_hash": "c4c68088625786e6ec8859e3182bece92cbd8deb78ee49fdb43539129345d6e4",
+      "evidence_hash": "aa690529053862a64534cbe5bf388fea7a6e1391a5337c0e0d651844d625ac88",
+      "verdict": {
+        "kind": "pass",
+        "citation": "lint は active track のカタログのみを検査する既存の active-track-scoped ツール群の一部として適用され、過去の完了トラックのカタログは遡及検査の対象にしない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalogue-primitive-obsession-guard-2026-07-01/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogueLintCheckActiveTrackArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-12",
+          "text_label": "gate は最初から blocking とし、warn → block の段階導入は行わない。lint は active track のカタログのみを検査する既存の active-track-scoped ツール群の一部として適用され、過去の完了トラックのカタログは遡及検査の対象にしない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c4c68088625786e6ec8859e3182bece92cbd8deb78ee49fdb43539129345d6e4",
+      "evidence_hash": "a6fd34b8bd3755de570100e8b34dcf248221c0af890a211be7c76b2a33b69005",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本ルールの適用範囲は、既存の active-track-scoped ツール群と同様に現在アクティブなトラックのカタログに限定される。過去の完了トラックのカタログは、本ルールの導入によって遡及的に検査対象にはならない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalogue-primitive-obsession-guard-2026-07-01/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogueLintCheckActiveTrackArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-07",
+          "text_label": "本ルールの適用範囲は、既存の active-track-scoped ツール群と同様に現在アクティブなトラックのカタログに限定される。過去の完了トラックのカタログは、本ルールの導入によって遡及的に検査対象にはならない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ceb404e4ac2edb31b4bb18564818e9659282a0cfce3852ea261681b70a0e1623",
+      "evidence_hash": "aa690529053862a64534cbe5bf388fea7a6e1391a5337c0e0d651844d625ac88",
+      "verdict": {
+        "kind": "pass",
+        "citation": "gate は最初から blocking とし、warn → block の段階導入は行わない。lint は active track のカタログのみを検査する既存の active-track-scoped ツール群の一部として適用され、過去の完了トラックのカタログは遡及検査の対象にしない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalogue-primitive-obsession-guard-2026-07-01/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogueLintCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-12",
+          "text_label": "gate は最初から blocking とし、warn → block の段階導入は行わない。lint は active track のカタログのみを検査する既存の active-track-scoped ツール群の一部として適用され、過去の完了トラックのカタログは遡及検査の対象にしない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ceb404e4ac2edb31b4bb18564818e9659282a0cfce3852ea261681b70a0e1623",
+      "evidence_hash": "a6fd34b8bd3755de570100e8b34dcf248221c0af890a211be7c76b2a33b69005",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本ルールの適用範囲は、既存の active-track-scoped ツール群と同様に現在アクティブなトラックのカタログに限定される。過去の完了トラックのカタログは、本ルールの導入によって遡及的に検査対象にはならない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalogue-primitive-obsession-guard-2026-07-01/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogueLintCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-07",
+          "text_label": "本ルールの適用範囲は、既存の active-track-scoped ツール群と同様に現在アクティブなトラックのカタログに限定される。過去の完了トラックのカタログは、本ルールの導入によって遡及的に検査対象にはならない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "3f648500d30899a0ae2e07a589fe17a22ee2659f0cdcf86bd14d7db88b4d2a03",
+      "evidence_hash": "aa690529053862a64534cbe5bf388fea7a6e1391a5337c0e0d651844d625ac88",
+      "verdict": {
+        "kind": "pass",
+        "citation": "lint は active track のカタログのみを検査する既存の active-track-scoped ツール群の一部として適用され、過去の完了トラックのカタログは遡及検査の対象にしない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalogue-primitive-obsession-guard-2026-07-01/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CliCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-12",
+          "text_label": "gate は最初から blocking とし、warn → block の段階導入は行わない。lint は active track のカタログのみを検査する既存の active-track-scoped ツール群の一部として適用され、過去の完了トラックのカタログは遡及検査の対象にしない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "3f648500d30899a0ae2e07a589fe17a22ee2659f0cdcf86bd14d7db88b4d2a03",
+      "evidence_hash": "a6fd34b8bd3755de570100e8b34dcf248221c0af890a211be7c76b2a33b69005",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本ルールの適用範囲は、既存の active-track-scoped ツール群と同様に現在アクティブなトラックのカタログに限定される。過去の完了トラックのカタログは、本ルールの導入によって遡及的に検査対象にはならない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalogue-primitive-obsession-guard-2026-07-01/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CliCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-07",
+          "text_label": "本ルールの適用範囲は、既存の active-track-scoped ツール群と同様に現在アクティブなトラックのカタログに限定される。過去の完了トラックのカタログは、本ルールの導入によって遡及的に検査対象にはならない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8945edeb17005d5e2b55274ca01a86cf1e23442eafc5df8884d672068e35b828",
+      "evidence_hash": "aa690529053862a64534cbe5bf388fea7a6e1391a5337c0e0d651844d625ac88",
+      "verdict": {
+        "kind": "pass",
+        "citation": "lint は active track のカタログのみを検査する既存の active-track-scoped ツール群の一部として適用され、過去の完了トラックのカタログは遡及検査の対象にしない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalogue-primitive-obsession-guard-2026-07-01/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::catalogue_lint::execute"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-12",
+          "text_label": "gate は最初から blocking とし、warn → block の段階導入は行わない。lint は active track のカタログのみを検査する既存の active-track-scoped ツール群の一部として適用され、過去の完了トラックのカタログは遡及検査の対象にしない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8945edeb17005d5e2b55274ca01a86cf1e23442eafc5df8884d672068e35b828",
+      "evidence_hash": "a6fd34b8bd3755de570100e8b34dcf248221c0af890a211be7c76b2a33b69005",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本ルールの適用範囲は、既存の active-track-scoped ツール群と同様に現在アクティブなトラックのカタログに限定される。過去の完了トラックのカタログは、本ルールの導入によって遡及的に検査対象にはならない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalogue-primitive-obsession-guard-2026-07-01/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::catalogue_lint::execute"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-07",
+          "text_label": "本ルールの適用範囲は、既存の active-track-scoped ツール群と同様に現在アクティブなトラックのカタログに限定される。過去の完了トラックのカタログは、本ルールの導入によって遡及的に検査対象にはならない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8b0f5d0ba9b86201a06fadf776ecba1f3e83de5a7402c8d158de8e13eacd50d9",
+      "evidence_hash": "aa690529053862a64534cbe5bf388fea7a6e1391a5337c0e0d651844d625ac88",
+      "verdict": {
+        "kind": "pass",
+        "citation": "lint は active track のカタログのみを検査する既存の active-track-scoped ツール群の一部として適用され、過去の完了トラックのカタログは遡及検査の対象にしない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalogue-primitive-obsession-guard-2026-07-01/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::catalogue_lint::execute_check_active_track"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-12",
+          "text_label": "gate は最初から blocking とし、warn → block の段階導入は行わない。lint は active track のカタログのみを検査する既存の active-track-scoped ツール群の一部として適用され、過去の完了トラックのカタログは遡及検査の対象にしない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8b0f5d0ba9b86201a06fadf776ecba1f3e83de5a7402c8d158de8e13eacd50d9",
+      "evidence_hash": "a6fd34b8bd3755de570100e8b34dcf248221c0af890a211be7c76b2a33b69005",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本ルールの適用範囲は、既存の active-track-scoped ツール群と同様に現在アクティブなトラックのカタログに限定される。過去の完了トラックのカタログは、本ルールの導入によって遡及的に検査対象にはならない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalogue-primitive-obsession-guard-2026-07-01/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::catalogue_lint::execute_check_active_track"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-07",
+          "text_label": "本ルールの適用範囲は、既存の active-track-scoped ツール群と同様に現在アクティブなトラックのカタログに限定される。過去の完了トラックのカタログは、本ルールの導入によって遡及的に検査対象にはならない。"
+        }
+      }
+    }
+  ]
+}

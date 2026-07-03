@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "track_id": "catalogue-primitive-obsession-guard-2026-07-01",
+  "entries": {
+    "T001": [
+      { "layer": "domain", "entry_key": "PrimitiveOccurrencePosition" },
+      { "layer": "domain", "entry_key": "PrimitiveOccurrenceReport" },
+      { "layer": "domain", "entry_key": "PrimitiveOccurrenceScanError" },
+      { "layer": "domain", "entry_key": "PrimitiveName" },
+      { "layer": "domain", "entry_key": "PrimitiveOccurrenceScanner" },
+      { "layer": "domain", "entry_key": "TypeRef" },
+      { "layer": "domain", "entry_key": "NonEmptyVec" }
+    ],
+    "T002": [
+      { "layer": "domain", "entry_key": "RolePayloadField" },
+      { "layer": "domain", "entry_key": "CatalogueLinterRuleKind" },
+      { "layer": "domain", "entry_key": "CatalogueLinterRuleError" },
+      { "layer": "domain", "entry_key": "CatalogueLinterError" },
+      { "layer": "domain", "entry_key": "FreeText" }
+    ],
+    "T003": [
+      { "layer": "domain", "entry_key": "CatalogueLinterRuleKind" },
+      { "layer": "domain", "entry_key": "SelfReceiver" }
+    ],
+    "T004": [
+      { "layer": "infrastructure", "entry_key": "SynPrimitiveOccurrenceScanner" }
+    ],
+    "T005": [
+      { "layer": "domain", "entry_key": "CatalogueLinterRuleKind" },
+      { "layer": "domain", "entry_key": "CatalogueLinterError" },
+      { "layer": "domain", "entry_key": "domain::tddd::catalogue_linter::eval::evaluate_catalogue_lint" },
+      { "layer": "domain", "entry_key": "LayerId" },
+      { "layer": "usecase", "entry_key": "RunCatalogueLintInteractor" },
+      { "layer": "usecase", "entry_key": "RunCatalogueLint" },
+      { "layer": "usecase", "entry_key": "LintConfigLoader" },
+      { "layer": "cli_composition", "entry_key": "TrackCompositionRoot" }
+    ],
+    "T006": [
+      { "layer": "usecase", "entry_key": "LintRuleKind" }
+    ],
+    "T007": [],
+    "T008": [
+      { "layer": "cli", "entry_key": "CatalogueLintCommand" },
+      { "layer": "cli", "entry_key": "CliCommand" },
+      { "layer": "cli", "entry_key": "cli::commands::catalogue_lint::execute" },
+      { "layer": "cli", "entry_key": "CatalogueLintCheckActiveTrackArgs" },
+      { "layer": "cli", "entry_key": "cli::commands::catalogue_lint::execute_check_active_track" },
+      { "layer": "cli_composition", "entry_key": "TrackCompositionRoot" },
+      { "layer": "usecase", "entry_key": "TrackService" },
+      { "layer": "cli_driver", "entry_key": "TrackInput" }
+    ]
+  }
+}

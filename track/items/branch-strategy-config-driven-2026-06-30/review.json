@@ -1,28 +1,474 @@
 {
   "schema_version": 2,
   "scopes": {
-    "other": {
+    "impl-plan": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8d1e032150792c0be70de04a1661f3a4605a5daddfc0efd835f89ed6d31f69bd",
-          "at": "2026-07-02T02:47:16Z"
+          "hash": "rvw1:sha256:ba0e9b6d288465fb2689610904477bf95e23eee8fbe7b96bb80d8e9a56dd38b2",
+          "at": "2026-07-02T08:54:37Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8d1e032150792c0be70de04a1661f3a4605a5daddfc0efd835f89ed6d31f69bd",
-          "at": "2026-07-02T02:50:26Z"
+          "hash": "rvw1:sha256:ba0e9b6d288465fb2689610904477bf95e23eee8fbe7b96bb80d8e9a56dd38b2",
+          "at": "2026-07-02T08:58:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:10151bc1558e9d85249a62076886740e1664f3598aea9b0a70509e89cb06779a",
+          "at": "2026-07-02T15:59:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AC-19` is only mapped to `T016`-`T023` here, but the new S8 work explicitly claims AC-19-preserving behavior in `T029` and `T032` (both mention byte-for-byte preservation / relocated render tests under `AC-19`). As written, the task coverage understates which tasks close that criterion.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/task-coverage.json",
+              "line": 57,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:bc17585277b987d218d69c1a6b1e78b3e9467dd66c3e44ec83286532606de5ba",
+          "at": "2026-07-02T16:50:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:38c2caa19039af5f87e350de0e561f3ac46cbc672a2c3ebe64a3428adcc7b5c4",
+          "at": "2026-07-02T16:57:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T030/T031 are contract-mismatched: `task-contract.json` adds `DryCheckApprovedClockPort` here and `SystemMonotonicClockAdapter` at line 160, but neither task description mentions a clock port or adapter. T030 explicitly captures elapsed time with `Instant::now()` instead, so T032 has no described source for this dependency if it is intentional. Either add the clock-port work to the task text or remove these entries.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/task-contract.json",
+              "line": 155,
+              "category": "task-contract attribution mismatch"
+            },
+            {
+              "message": "T033 over-attributes `CodexDryFixLocalRunner`: the cutover/cleanup description never mentions touching that adapter, yet the contract lists it. This claims work that the task text does not require, so the entry should be removed or the description should explicitly cover it.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/task-contract.json",
+              "line": 176,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:39d8bfc63284d1b186ab62f9e4249cf18122306e4b59bc9479bf22f7c769a655",
+          "at": "2026-07-02T18:11:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:03e10fbe756ddafcd6ac9c9ae0e3a2ebc4a56440209c6d3ae1aae784ec872074",
+          "at": "2026-07-02T18:20:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e955d40457d1eafa70ff0f9e4c269b978d6ffb2f32d9fa651d564a779525da5e",
+          "at": "2026-07-02T18:50:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T033 leaks into OS-08: the task relocates the `dry_fix_local` bridge and renames/moves `DryFixRunnerCompositionRoot`, but OS-08 explicitly excludes correcting or deciding on the `dry_fix_runner`/`dry_run_fix_local` path in this track. This makes the task implement out-of-scope behavior rather than only preserving the existing dry-fix-local path while completing IN-14.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/impl-plan.json",
+              "line": 171,
+              "category": "out_of_scope leak into a task"
+            },
+            {
+              "message": "AC-19 omits T033 even though T033 is the final cutover/deletion task and explicitly carries the post-deletion `cargo make test` verification. Mapping AC-19 only through earlier S8 tasks leaves the final branch state's no-output-regression/test-pass acceptance criterion uncovered after the old dry paths are deleted.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/task-coverage.json",
+              "line": 57,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:e955d40457d1eafa70ff0f9e4c269b978d6ffb2f32d9fa651d564a779525da5e",
+          "at": "2026-07-02T19:02:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`task-contract.json` attributes T026 to `DryWriteDriverInput`, but the T026 task text explicitly says the service should reuse the pre-existing `usecase::dry_driver::DryWriteDriverInput` / `DryWriteOutcome` DTOs and not redeclare them. This makes a referenced-only existing DTO look owned by T026; the same mismatch appears for T029 `DryResultsDriverInput` and T030 `DryCheckApprovedDriverInput`.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/task-contract.json",
+              "line": 134,
+              "category": "task-contract attribution mismatch"
+            },
+            {
+              "message": "T033 is attributed to `DryFixLocalDriverInput` and `RunDryFixLocalInput`, but the T033 task description only preserves those DTOs as the unaffected `dry_fix_local` path while deleting/shrinking surrounding APIs. Since the plan does not specify adding, modifying, or deleting either DTO entry, these should not be attributed to T033.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/task-contract.json",
+              "line": 173,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:90b3c99ea5ab6fa95dc03a102604eb3ba58f33448d5e2a5409ea7c808d3ddd14",
+          "at": "2026-07-02T19:20:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T032 instructs implementers to wire \"the five T028 adapters\" into `DryWriteDriverInteractor::new`, but T027's constructor only accepts four T028-provided direct ports: config loader, corpus fragments, service factory, and corpus-root manifest writer. T028 says `RecordingDryTierTelemetryAdapter` is constructed internally by `DryCheckServiceFactoryAdapter::build`, so T032 as written is not executable and can lead to an invented constructor parameter or duplicated telemetry wiring.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/impl-plan.json",
+              "line": 166,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T028 is a single infrastructure task that defines five adapters, relocates persistent-index, manifest, config, fragment, and telemetry logic, and adds/relocates test coverage. That scope is far beyond the 500-line default review ceiling by a multiple, so it should be split into smaller independently reviewable tasks, for example config/fragments/manifest, service-factory/persistent-index, and telemetry.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/impl-plan.json",
+              "line": 145,
+              "category": "batch-size infeasibility"
+            },
+            {
+              "message": "T033 combines deletion of old composition methods and modules, DTO/re-export cleanup, relocation of the dry-fix-local runner and adapter into infrastructure, and shrinking the legacy usecase port/service. This spans multiple review scopes and is well beyond the per-scope diff ceiling by a multiple; split the relocation, composition cleanup, and usecase trait shrink into separate tasks so each can be implemented and reviewed coherently.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/impl-plan.json",
+              "line": 170,
+              "category": "batch-size infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:ffcd2741ca2da378d3d914ce3e7bc3efda2cd72c6e8671f29bc117b218c3bf50",
+          "at": "2026-07-02T19:30:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T033 shrinks `usecase::dry_driver::DryDriverPort` / `DryDriverService` to only `dry_fix_local`, but the plan explicitly leaves the old `apps/cli-composition/src/dry_driver_adapter.rs` bridge in place until T036 and T032 says that bridge still has the three now-superseded `dry_write` / `dry_results` / `dry_check_approved` delegate methods. Since Rust trait impls cannot contain methods removed from the trait, T033 is not an individually committable task and will break the sequence before T036 deletes the adapter. Move the old adapter cleanup into T033 or reorder/merge the cleanup so no commit contains the shrunk trait with the stale impl still present.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/impl-plan.json",
+              "line": 181,
+              "category": "dependency cycle or wrong ordering"
+            }
+          ],
+          "hash": "rvw1:sha256:cd03859e2af25c8a99b6338bc28ae04e7694ec93194e6489372e6e0d2e42cbfc",
+          "at": "2026-07-02T19:37:27Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d6cd46a7b6cca302d96196e00157d300ac7b27d2029d163e90347cccda90ed53",
-          "at": "2026-07-03T07:53:24Z"
+          "hash": "rvw1:sha256:c1aaa252056055a964ad87d3bcf5494a1fd54d5b8271a5e6e3a33a34310b30c2",
+          "at": "2026-07-02T19:42:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-19 requires the IN-14 migration to keep the existing `dry write`/`dry results`/`dry check-approved` tests passing without output changes, but the coverage list omits T027 even though T027 is the task that moves `dry write` invocation into `DryWriteDriverInteractor` and claims CN-07 behavior preservation. T027 only asks for new stub-port tests, while T037 later refers to “relocated tests from T027,” so the plan has no executable task that carries the existing dry-write orchestration tests through this behavior-preservation AC. Add T027 to AC-19 and make T027 explicitly relocate/preserve the existing `DryCompositionRoot::dry_write` behavior tests, or remove the later T037 dependency on those nonexistent relocated tests.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/task-coverage.json",
+              "line": 210,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:6308c5dff0834df02477c99028c6e71c4bd07293c59c8f7a9ff51aa6bea34fb5",
+          "at": "2026-07-02T20:04:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a0b5593b387d4ac325c384b0c9d728d26dd7dd44e7b15e9a993e1c98cfee7362",
+          "at": "2026-07-02T20:10:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T024/T025 define `DryBaseBranchPort` to fall back to `.harness/config/branch-strategy.json` when `<track_dir>/metadata.json` is absent, and T025 even requires an `absent-with-fallback` test. This contradicts the S8/IN-14 fail-closed contract for the dry driver path, where resolved tracks must use `metadata.json#branch_strategy_snapshot.base_branch` and missing metadata/snapshot must return `DryBaseBranchError` rather than reread global config. As written, the plan maps these tasks to AC-20 but instructs the opposite behavior, so implementation would preserve a forbidden global-config fallback for in-flight tracks.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/impl-plan.json",
+              "line": 126,
+              "category": "out_of_scope leak into a task"
+            }
+          ],
+          "hash": "rvw1:sha256:61367bf74d388a046e4f1807e4b8df42e26c660712e3beb6e896807b3f4fd724",
+          "at": "2026-07-02T22:20:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:41419f5742afe3b0f39a0ee171f048547846d5b98d0e05436789f78e2d59b1cc",
+          "at": "2026-07-02T22:28:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T030/T031/T032 still describe the obsolete clock-port design: T030 adds `DryCheckApprovedClockPort` and injects both telemetry and clock into `DryCheckApprovedDriverInteractor`, T031 implements `SystemMonotonicClockAdapter`, and T032 wires that clock into the interactor. That cannot plausibly close AC-20/AC-22, which require the interactor to take only the seven secondary ports and require `GateEval.duration_ms` to be measured by the infrastructure `TimedGateEvalDryCheckApprovedService` decorator. An implementer following this plan will build the wrong layer boundary and fail the mapped ACs.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/impl-plan.json",
+              "line": 166,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:3d55bc3b498559593fce61f3192a286f9b06338ebe651bbdee3e3e4f56a9c628",
+          "at": "2026-07-03T00:01:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cef9a725062cf22f6f9d45e60be3942e96d7fe6d96e88f801c3856877ab9aeae",
+          "at": "2026-07-03T00:15:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-22 coverage is implausible for T031: the mapped task adds `TimedGateEvalDryCheckApprovedService` in `libs/infrastructure` implementing `DryCheckApprovedDriverService`, and T032 wires that decorator while `DryDriver::new` still takes only four services. AC-22/AC-20 require the opposite shape: no infrastructure `DryCheckApprovedDriverService` decorator, and `apps/cli-driver` `DryDriver` must take `check_approved_telemetry: Arc<dyn DryCheckApprovedTelemetryPort>` and measure/call telemetry there. As written, the mapped tasks cannot satisfy AC-22 and would implement a layer-boundary-violating plan.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/task-coverage.json",
+              "line": 248,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:a907e55f858f085d2395ef0bd3730a578d027e67ec11e68aaa0aaaa169603c19",
+          "at": "2026-07-03T02:05:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T030's description still instructs the implementer to add `DryCheckApprovedTelemetryPort` and says T032's DryDriver reports GateEval through that port, but `task-contract.json` attributes T030 only to the service/interactor/input and T031/T032 describe bin-layer telemetry instead. This is a task-contract attribution mismatch and leaves two contradictory execution paths for AC-22.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/impl-plan.json",
+              "line": 166,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:5af3b32c3619893175376ed70ce388589bc1e4bb4ef547fc725dcfacdf406f83",
+          "at": "2026-07-03T03:40:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-22 is mapped as covered here, but the mapped tasks no longer implement the AC's required GateEval architecture. The current plan has T030 explicitly omit `DryCheckApprovedClockPort` / `DryCheckApprovedTelemetryPort` and has T031 put `Instant`/`resolve_telemetry_writer`/`emit_gate_eval` directly in `apps/cli/src/commands/dry.rs`, while AC-22 requires usecase clock/telemetry ports plus a telemetry-aware service/decorator, infrastructure adapters, and no direct bin-layer telemetry calls. This makes the AC-22 coverage implausible as written.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/task-coverage.json",
+              "line": 248,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:1a71125ddb43577f554345330f550f91429a9e53e09f2d3c555d834f6c009885",
+          "at": "2026-07-03T03:50:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a71125ddb43577f554345330f550f91429a9e53e09f2d3c555d834f6c009885",
+          "at": "2026-07-03T07:54:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T031 now attributes `cli_composition::telemetry_wiring::resolve_telemetry_writer_for_track`, but the T031 plan text says this task calls the pre-existing `resolve_telemetry_writer` / `emit_gate_eval` helpers and adds only a new call site, not a new or changed cli_composition function. That makes the task-contract attribution inconsistent with the executable task boundary; either the task description needs to own the visibility/public-surface change to `resolve_telemetry_writer_for_track`, or this attribution belongs to the task that actually introduces that catalogue entry.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/task-contract.json",
+              "line": 454,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:f725731cf020ab843c5fad9198a35a3c79a747805b70875f5f2083b6c39ab88d",
+          "at": "2026-07-03T09:48:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8c2f95e4866027f21f77e00eb881c8b0782816b1e2ef1f5f1b53d44276c5db3a",
+          "at": "2026-07-03T13:18:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T038's plan text says it will modify seven existing usecase ErrorType catalogue entries (`DryRepoWorkspaceError`, `DryBaseBranchError`, `DryCheckConfigLoaderError`, `DryCorpusFragmentsError`, `DryCheckServiceFactoryError`, `DryCorpusRootManifestError`, and `FixpointWorkspaceContextError`) from `Unavailable(String)` to typed variants, but `task-contract.json` attributes T038 only to the 11 supporting ValueObject entries. Under the impl-plan policy this is a task-contract attribution mismatch: entries the task explicitly claims to modify are omitted, so the executable task contract no longer reflects the actual catalogue surface T038 owns.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/task-contract.json",
+              "line": 528,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:8c2f95e4866027f21f77e00eb881c8b0782816b1e2ef1f5f1b53d44276c5db3a",
+          "at": "2026-07-03T13:23:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2e283f76d2b06c6168c0164e8e1bda5c79ed22b5ab094fb472059daeeb3fa535",
+          "at": "2026-07-03T13:28:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:efd0ce939ccdc7d8318b3d2f3ec55676b64e06f93b904784066fb5272b8f0382",
+          "at": "2026-07-03T15:02:38Z"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:498e3310ab0076f4ff8be931588e8d97b2d9251f45ca8d7e51b7dfa4eff79fdc",
+          "at": "2026-07-01T07:53:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:498e3310ab0076f4ff8be931588e8d97b2d9251f45ca8d7e51b7dfa4eff79fdc",
+          "at": "2026-07-01T07:56:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2553c8d7edcd5795ba42df2fdef672fe1f908865718c5ab72fda1170e6e500d",
+          "at": "2026-07-02T02:50:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2553c8d7edcd5795ba42df2fdef672fe1f908865718c5ab72fda1170e6e500d",
+          "at": "2026-07-02T02:56:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d885d5b36f36cb03c6208a497f81fc9e1cc0ba42e9a23d645b33ee6a51681edd",
+          "at": "2026-07-02T03:14:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d885d5b36f36cb03c6208a497f81fc9e1cc0ba42e9a23d645b33ee6a51681edd",
+          "at": "2026-07-02T03:21:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3a5a31477da8acf53bea9ac386f4f1d1b047d342029f67a40803965d683ac61e",
+          "at": "2026-07-02T07:33:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3a5a31477da8acf53bea9ac386f4f1d1b047d342029f67a40803965d683ac61e",
+          "at": "2026-07-02T07:38:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bc0606125b00a937447e7a0bef40008f99cfab0fbeab0a366d6f02207e969d71",
+          "at": "2026-07-02T15:58:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bc0606125b00a937447e7a0bef40008f99cfab0fbeab0a366d6f02207e969d71",
+          "at": "2026-07-02T16:48:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bc0606125b00a937447e7a0bef40008f99cfab0fbeab0a366d6f02207e969d71",
+          "at": "2026-07-02T18:08:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bc0606125b00a937447e7a0bef40008f99cfab0fbeab0a366d6f02207e969d71",
+          "at": "2026-07-02T18:47:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bc0606125b00a937447e7a0bef40008f99cfab0fbeab0a366d6f02207e969d71",
+          "at": "2026-07-02T19:02:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `dry_check_approved` now does more than the allowed cli_driver controller flow: it starts a timer, invokes the check-approved interactor, computes elapsed duration, and then calls a telemetry port before rendering. The scope policy says a Driver should stay at `input -> invoke exactly one interactor -> render`; this adds multi-step orchestration and an extra side-effect in the primary adapter instead of keeping timing/telemetry behind the application service/composition boundary.",
+              "severity": "P1",
+              "file": "apps/cli-driver/src/dry.rs",
+              "line": 209,
+              "category": "business_logic_in_adapter"
+            }
+          ],
+          "hash": "rvw1:sha256:0e2196305405ce2690a5f7727d569f917bfdf9472ee3a8ca449d0e0eea553fdc",
+          "at": "2026-07-03T02:04:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4191787b2f3ee78590cf0184d025f0ea549c931b61eaf166c2c7b96b79cca4d8",
+          "at": "2026-07-03T03:39:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c4955aef93b6b9b4ee21dacf7f13a300665ce5b14abda357b18032efc5281ca9",
+          "at": "2026-07-03T14:53:33Z"
         }
       ]
     },
@@ -877,6 +1323,563 @@
         }
       ]
     },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c04aa88fc38d0c08b5922cf48806e23cae1ff712475ebd292dde703be6f2370",
+          "at": "2026-06-30T20:44:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c04aa88fc38d0c08b5922cf48806e23cae1ff712475ebd292dde703be6f2370",
+          "at": "2026-06-30T20:48:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`JsonConfigBranchStrategyAdapter::new` reads the config path directly with `read_to_string` and never rejects symlinks or verifies containment under a trusted root. A symlinked `.harness/config/branch-strategy.json` can therefore redirect this adapter to attacker-controlled content outside the repository, which matches the symlink-boundary issue this layer is supposed to fail closed on.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/branch_strategy.rs",
+              "line": 55,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:29c2c84dadf1c1a8bc867535c4d2ff80d8b4d37514e937f994e9e1798eb4a15d",
+          "at": "2026-06-30T22:44:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "A symlinked `track/items/<id>` or `track/archive/<id>` directory is accepted here because `entry.path().is_dir()` follows symlinks, and the later `metadata.json` / `impl-plan.json` / `task-coverage.json` reads never re-check that the resolved path stays under `root`. A repo-controlled symlink can therefore escape the trusted root and feed external files into the render pipeline.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render/snapshot.rs",
+              "line": 306,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "`all_track_directories()` follows symlinked `track/items/<id>` / `track/archive/<id>` entries with `is_dir()`, and `load_track_metadata()` then reads `metadata.json` and `impl-plan.json` from that symlink target without a containment check. That lets the latest-track verifier select and parse data outside `root` if a track directory is replaced with a symlink.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/latest_track.rs",
+              "line": 103,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:b8a75d58f32bdb24889d48ded48b260884fc83158f3b2f895cbee079aae2cdce",
+          "at": "2026-06-30T22:56:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Leaf symlinks are still followed when loading track state for latest-track/freshness checks. `latest_track.rs` reads `metadata.json` directly at line 254, `track/render/snapshot.rs` reads `impl-plan.json` directly at line 66, and `verify/view_freshness.rs` reads `metadata.json` directly at line 173. Those paths never do the same `symlink_metadata()` + reject step used elsewhere in the repo, so a symlinked file inside an otherwise real track directory can redirect these checks to content outside `track/items`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/latest_track.rs",
+              "line": 254,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "`sync_rendered_views` still accepts symlinked track inputs. `catalogue_path_exists()` explicitly counts symlinks as present, and the render path then reads `spec.json` at line 180 and `*-types.json` at line 325 with `read_to_string()`. That lets a symlink under `track/items/<id>` feed arbitrary outside JSON into generated views instead of enforcing real-file semantics.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render/sync.rs",
+              "line": 325,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:aa1c55a0c6df87b84666a3e861406ce125015b08fad2e7a10674436cfdd13ceb",
+          "at": "2026-06-30T23:06:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `metadata_path.is_file()` pre-check runs before `reject_symlinks_below`, so a dangling symlink or other non-regular-file `metadata.json` is treated as absent and silently skipped instead of being rejected at the boundary. That bypasses the fail-closed guard that follows and can hide corrupted track state.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/view_freshness.rs",
+              "line": 84,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:e45a22c8fa6308ea3c2f5161102260aeaeb83a02eb254a0317275941b8da216f",
+          "at": "2026-06-30T23:26:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c80cc7a3300a83f8cfb23872448c52782977665287270ddb89db62ca0babd43a",
+          "at": "2026-06-30T23:35:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c80cc7a3300a83f8cfb23872448c52782977665287270ddb89db62ca0babd43a",
+          "at": "2026-06-30T23:41:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:720eb2e859862e8ff252da394b9b064a31733f8a6a1e7026b0e96b0e94e8db53",
+          "at": "2026-07-01T01:22:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:720eb2e859862e8ff252da394b9b064a31733f8a6a1e7026b0e96b0e94e8db53",
+          "at": "2026-07-01T01:25:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7898bd45df8cb7262e279bea8abacdd0bc66ea88e03e4595736f6a067af207a3",
+          "at": "2026-07-01T02:12:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7898bd45df8cb7262e279bea8abacdd0bc66ea88e03e4595736f6a067af207a3",
+          "at": "2026-07-01T02:16:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:644f5371f66f0d2ade074f09ebedf9256e6d52efccbde791e8622d8a568d9ac4",
+          "at": "2026-07-01T08:09:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:644f5371f66f0d2ade074f09ebedf9256e6d52efccbde791e8622d8a568d9ac4",
+          "at": "2026-07-01T08:12:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1bd5947dd17b0e3961707627ebdd810fbc3c19acbe67a295e5ec1d5b30900cff",
+          "at": "2026-07-01T12:08:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1bd5947dd17b0e3961707627ebdd810fbc3c19acbe67a295e5ec1d5b30900cff",
+          "at": "2026-07-01T17:26:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_diff_base` builds `track_dir.join(\".commit_hash\")` and hands it to `FsDryCheckCommitHashStore` without first proving the resolved path remains under `canonical_root`. The store only rejects symlinks before `read_to_string`; it does not canonicalize and enforce `starts_with(canonical_root)`, so a path-traversing `track_dir` supplied at this adapter boundary can make the dry-gate read a `.commit_hash` outside the trusted repo root. This should fail closed using the existing trusted-root containment pattern (`is_safe_briefing_path`/CN-04 style) before any file read or fallback decision.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/dry_check/diff_base_resolver.rs",
+              "line": 51,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:1bd5947dd17b0e3961707627ebdd810fbc3c19acbe67a295e5ec1d5b30900cff",
+          "at": "2026-07-01T17:33:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ad7955493c1701621abdfdfe8357b01d68d7eff78253a8d0673d23741c24bbcc",
+          "at": "2026-07-01T17:39:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_context` canonicalizes `--items-dir` but never rejects a symlinked root before the trust check. That lets a symlinked `items_dir` be redirected to a different tree, which is contrary to the existing symlink-rejection pattern used for trust-rooted filesystem inputs. Reject the root symlink before canonicalizing it.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/fixpoint_resolve_driver.rs",
+              "line": 113,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "`read_base_branch` reads `<canonical_items_dir>/<track_id>/metadata.json` with `std::fs::read_to_string` directly, so a symlinked `metadata.json` can redirect the load outside the track directory and feed an arbitrary base branch into fixpoint resolution. Existing infrastructure loaders reject symlinked metadata paths before reading; this one should too.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/fixpoint_resolve_driver.rs",
+              "line": 72,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:4eda8e5fcfd6082712a01b2abb63ab3400531d36866cf1e9cff03949de700154",
+          "at": "2026-07-02T02:51:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a6d608710a7306fe0d208523853460560ad6a54447904febb21781945da29a31",
+          "at": "2026-07-02T03:03:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a6d608710a7306fe0d208523853460560ad6a54447904febb21781945da29a31",
+          "at": "2026-07-02T03:15:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`FsDryCheckConfigLoaderAdapter` builds `.harness/config/dry-check.json` under `repo_root` and immediately delegates to `InfraDryCheckConfig::load`, whose file read follows symlinks. Unlike the existing `scope_config_loader.rs` canonicalize + `reject_symlinks_below` pattern, this boundary does not reject a symlinked config file or parent, so fixpoint-resolve can read dry-check settings from outside the trusted checkout and change or disable the gate instead of failing closed. Add canonical containment and symlink rejection against `repo_root` before loading.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/fixpoint_resolve_driver.rs",
+              "line": 210,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:a6d608710a7306fe0d208523853460560ad6a54447904febb21781945da29a31",
+          "at": "2026-07-02T03:24:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6bd4e1303012a980a9dc5ce71e679a6d682f4209809a1771d8366f06344589c1",
+          "at": "2026-07-02T03:36:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6bd4e1303012a980a9dc5ce71e679a6d682f4209809a1771d8366f06344589c1",
+          "at": "2026-07-02T03:39:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`FsDryApprovalFactoryAdapter` derives `dry-check.json` and `dry-check-coverage.json` with `track_dir.join(...)` and then constructs filesystem stores without first proving the resolved paths remain below `canonical_root`. The downstream symlink guard rejects symlinks but does not reject paths outside the trusted root, so a caller that passes an absolute or `..`-based `track_dir` can bind the approval store to files outside the repository. This should fail closed with the same trusted-root containment discipline used by the `is_safe_briefing_path`/CN-04 path policy and the sibling `trusted_commit_hash_path` helper before constructing the stores.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/approval_factory.rs",
+              "line": 34,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:6bd4e1303012a980a9dc5ce71e679a6d682f4209809a1771d8366f06344589c1",
+          "at": "2026-07-02T03:46:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:45256f82c95e9a37a083b06c7499035919e2508d72a6e3d44993a85f3298da9f",
+          "at": "2026-07-02T03:57:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`briefing_file` validation here still accepts Windows drive-relative paths such as `C:review.md`. `FilePath::new()` only rejects absolute and `..` traversal, so `trusted_root.join(briefing)` can discard `trusted_root` on Windows and resolve the briefing outside the workspace. Add a post-join `starts_with(trusted_root)` check or tighten the domain validator to reject drive-relative prefixes.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/scope_config_loader.rs",
+              "line": 150,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:2a6fac96faab96dff8e759f63a3dae9384d762fadec98160604a2a894911a6c9",
+          "at": "2026-07-02T07:44:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6e8c1400b57ec4d0f49f28e52dab8d0c3ccbf39afd7b1fe7ae03c3afffb999e3",
+          "at": "2026-07-02T07:50:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6e8c1400b57ec4d0f49f28e52dab8d0c3ccbf39afd7b1fe7ae03c3afffb999e3",
+          "at": "2026-07-02T07:54:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0ddb78fc8816dbd079f2aba2817f044d243291c3e6a7ea167532e9bb7b0770c8",
+          "at": "2026-07-02T10:28:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0ddb78fc8816dbd079f2aba2817f044d243291c3e6a7ea167532e9bb7b0770c8",
+          "at": "2026-07-02T10:31:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:71b0b94e5f34e2856dbce73210411526f3a7e5b9e02edb469ba7b9dcc367b91c",
+          "at": "2026-07-02T15:58:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_existing_dir_under_repo` canonicalizes the candidate path and checks containment, but it never rejects a symlinked leaf or ancestor before trusting the result. That means `FsDryRepoRootAdapter` and `FsDryCorpusFragmentsAdapter` can accept a symlinked `items_dir`/`workspace_root` root, unlike the existing fail-closed `--items-dir` validation pattern that rejects symlinks before canonicalization.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/dry_check/dry_driver_shared.rs",
+              "line": 35,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "`FsDryWriteConfigLoaderAdapter` reads `.harness/config/dry-check.json` via `InfraDryCheckConfig::load` without the canonicalize + `reject_symlinks_below` guard used by the existing dry-check config loader. A symlinked config file will be followed and treated as trusted instead of being rejected at the boundary.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/dry_check/dry_write_driver.rs",
+              "line": 94,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "`read_manifest` uses `std::fs::read_to_string` on the persistent-index sidecar with no symlink check. `open_persistent_index_with_corpus` consults this file before deciding whether to rebuild or reuse the cache, so a symlinked `.manifest` can inject cache state and steer the index path.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/dry_check/dry_write_driver/manifest.rs",
+              "line": 71,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:71b0b94e5f34e2856dbce73210411526f3a7e5b9e02edb469ba7b9dcc367b91c",
+          "at": "2026-07-02T16:56:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`build_dry_fix_prompt` validates only prompt-breaking characters before calling `read_to_string` on the user-supplied `--briefing-file`. Absolute paths, `..` components, and symlinked briefing files are still accepted, so `sotp dry fix-local --briefing-file /etc/passwd` or a repo symlink can inject workspace-external file contents into the Codex subprocess prompt. This bypasses the existing `is_safe_briefing_path` / CN-04 fail-closed pattern; resolve the briefing under the repo trusted root and reject absolute/traversal/symlink paths before reading.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/dry_fix_local/prompt.rs",
+              "line": 18,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:20c964532f14608af628605e89723f77075420c2303f5c98aacf89715795d709",
+          "at": "2026-07-02T18:11:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:56349b73dfab93b7cc5f56a2204b5f09c2d1f5febca9d80a88b67a1d694c5dce",
+          "at": "2026-07-02T18:20:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cff4295949763c83dc400702fc87f1ec5c8421c69115ae5fe27bfa2356166562",
+          "at": "2026-07-02T22:23:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`dry_fix_spawn_and_collect` drains the Codex subprocess pipes but appends every stdout/stderr line into an unbounded `String` before writing the session log. Because this is an external process boundary, a bad or misconfigured `codex` binary can emit unlimited output and exhaust memory before the adapter can return a typed failure; the infrastructure policy treats unbounded I/O as a correctness issue. Add a bounded capture/truncation strategy while still draining the pipes.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/dry_fix_local/spawn.rs",
+              "line": 108,
+              "category": "unbounded I/O"
+            }
+          ],
+          "hash": "rvw1:sha256:57b3bc2e58cff7f8257ddde0c68c08f4e22c0f2e7990d7b299e234756b82742e",
+          "at": "2026-07-03T00:03:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`existing_directory_state` only calls `symlink_metadata` on the leaf path, so symlinks in parent components of the user-supplied `db_path` are not rejected. `clear_persistent_index_dir` later calls `remove_dir_all(db_path)`, which will follow a symlinked parent such as `repo/link/index` where `link -> /outside`, allowing the persistent-index cleanup to operate outside the intended tree. This should use the same fail-closed ancestor check pattern as `reject_symlinks_below` before reading, writing, or deleting index paths.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/dry_write_driver/persistent_index.rs",
+              "line": 208,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:98c3e1949bdda99dffe834f4bab796e18c404d4171f3c905fe11ed2ae6f04947",
+          "at": "2026-07-03T00:30:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`dry write` loads `.harness/config/agent-profiles.json` by passing `root.join(AGENT_PROFILES_PATH)` directly to `AgentProfiles::load`, whose loader uses `std::fs::read_to_string` without rejecting symlinks. This bypasses the infrastructure config-boundary pattern used by `scope_config_loader.rs` and should fail closed with `reject_symlinks_below` before loading.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/dry_write_driver/checker_config.rs",
+              "line": 62,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "`dry fix-local` has the same unguarded agent-profiles config read: it builds `<repo>/.harness/config/agent-profiles.json` and calls `AgentProfiles::load` without a `symlink_metadata`/`reject_symlinks_below` check. A symlinked config can be followed before provider/model resolution, contrary to the infrastructure symlink-rejection policy and existing `scope_config_loader.rs` guard pattern.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/dry_fix_local/mod.rs",
+              "line": 93,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:50e9a37355a410a3dfe6af521d45ccf5bf49b767a28a1ebdc743383b4d6201f0",
+          "at": "2026-07-03T02:07:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_base_branch` ignores the `canonical_root` trust anchor and instead builds `metadata_path` from the caller-supplied `track_dir`, then anchors symlink rejection at `track_dir.parent()`. If this adapter is ever called with an out-of-repo `track_dir`, a plain non-symlink path outside the repo is accepted and `std::fs::read_to_string` reads that external `metadata.json`. Infrastructure path loads should follow the existing safe-briefing pattern/CN-04 fail-closed policy: canonicalize the target and verify it remains under the trusted repo root before reading.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/dry_driver_shared.rs",
+              "line": 107,
+              "category": "trusted-root violation"
+            },
+            {
+              "message": "`FsDryCorpusRootManifestAdapter::write` writes to `track_dir.join(\"dry-check-corpus-root.json\")` without proving that `track_dir` resolves under `repo_root`. `reject_symlinks_below(..., repo_root)` rejects symlinks but does not enforce containment, so an absolute or otherwise out-of-repo `track_dir` can create directories and atomically write the manifest outside the trusted root. Add a canonical containment check against `repo_root`, matching the safe-briefing/CN-04 fail-closed pattern, before `create_dir_all` or `atomic_write_file`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/dry_write_driver.rs",
+              "line": 384,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:1f003abce9bf7aefc81d152f406d0c1051de81950d5ac52a41fda445a3e22f64",
+          "at": "2026-07-03T03:43:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`write_manifest` writes to `{db_path}.manifest.tmp` with `std::fs::write` without first rejecting symlinks for the temp path. The read path has an explicit sidecar symlink guard, but this write boundary does not guard the `.tmp` leaf, so a pre-existing symlink at that path is followed and can overwrite a target outside the intended index sidecar location. Use the existing `reject_symlinks_below`/atomic-write pattern for both the temp path and final sidecar before writing.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/dry_check/dry_write_driver/manifest.rs",
+              "line": 100,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "The manifest hash for a file's `CodeFragment`s includes `start_line` and content, but omits `end_line`. `CodeFragment`'s line span is part of the stored semantic-index payload, so two fragments with the same path/content/start line but different end line produce the same manifest hash and the persistent index is incorrectly treated as fresh, leaving stale range metadata. Include every semantics-affecting fragment field in the canonical hash, matching the existing fingerprint convention.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/dry_write_driver/manifest.rs",
+              "line": 122,
+              "category": "fingerprint or hash drift"
+            }
+          ],
+          "hash": "rvw1:sha256:80f2c3ce2d3318c513c9f2b73c82407ea2d353753aab428bbdc77d6e1f999481",
+          "at": "2026-07-03T03:53:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e1a37b65c0690af3799063dd9add77065a02753b167db47a94fec6af12f4ddad",
+          "at": "2026-07-03T04:04:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2fd6a2fdd3ee38436469120d6bc44ee2edd9fffc67bb327f939219eecf97b91e",
+          "at": "2026-07-03T08:09:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a9a9ac4be82db5ae704c9b29f22d3e8ae3ff101901f7c7ab7197aef81257a2d",
+          "at": "2026-07-03T11:14:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `items_dir_abs.symlink_metadata()` runs before `canonicalize()`, so a missing `--items-dir` now returns `ItemsDirSymlinkCheckFailed` (`ENOENT` from `symlink_metadata`) instead of the contractually expected `ItemsDirInvalid`. That regresses a common invalid-input case and misroutes callers that rely on the invalid-directory branch.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/fixpoint_resolve_driver.rs",
+              "line": 145,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:261b900898e5019305695494c93a24b23d81d8fe6da39054e2828ba8aa79b3d3",
+          "at": "2026-07-03T13:23:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8430a45da8c4c3b0912121120f72474efb0f8432230a8a8bfdc16b5798ed011c",
+          "at": "2026-07-03T13:35:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8430a45da8c4c3b0912121120f72474efb0f8432230a8a8bfdc16b5798ed011c",
+          "at": "2026-07-03T13:41:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:788713a94851a1e80533424a1629373b9eee1c48e44509d3672ed2c186c75e0e",
+          "at": "2026-07-03T14:59:29Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8d1e032150792c0be70de04a1661f3a4605a5daddfc0efd835f89ed6d31f69bd",
+          "at": "2026-07-02T02:47:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8d1e032150792c0be70de04a1661f3a4605a5daddfc0efd835f89ed6d31f69bd",
+          "at": "2026-07-02T02:50:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d6cd46a7b6cca302d96196e00157d300ac7b27d2029d163e90347cccda90ed53",
+          "at": "2026-07-03T07:53:24Z"
+        }
+      ]
+    },
     "spec": {
       "rounds": [
         {
@@ -1055,782 +2058,275 @@
         }
       ]
     },
-    "cli": {
+    "harness-policy": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:f9572fc47d468f9941bb85d47917920024275dde36fb9f11f23632d9efbf2184",
-          "at": "2026-06-30T22:39:41Z"
+          "hash": "rvw1:sha256:83cd3a8ed3fb6acf06c363984a9e4d8a415f0cf9a03741e5c74d2a3a0b551982",
+          "at": "2026-07-01T01:18:42Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:f9572fc47d468f9941bb85d47917920024275dde36fb9f11f23632d9efbf2184",
-          "at": "2026-06-30T22:43:23Z"
+          "hash": "rvw1:sha256:83cd3a8ed3fb6acf06c363984a9e4d8a415f0cf9a03741e5c74d2a3a0b551982",
+          "at": "2026-07-01T01:22:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cbd2e6484e6c906f016d7c3b15dbda4bfa37a92089e59e70fecb3954055dc0b0",
+          "at": "2026-07-01T08:50:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cbd2e6484e6c906f016d7c3b15dbda4bfa37a92089e59e70fecb3954055dc0b0",
+          "at": "2026-07-01T08:54:00Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The new happy-path test exercises `TrackCompositionRoot::fixpoint_resolve` directly and only asserts the returned `ExitCode`; it never captures stdout/stderr from `execute_fixpoint_resolve`, so a regression in the CLI wrapper's emit path would still pass. This leaves the only bin-layer behavior in this handler effectively untested.",
+              "message": "The new carve-out cites stale source locations: `DryDriverAdapter::dry_write` is at `apps/cli-composition/src/dry_driver_adapter.rs:55`, `DryCompositionRoot::dry_write` is at `apps/cli-composition/src/dry.rs:371`, and `DryCompositionRoot::dry_results` is at `apps/cli-composition/src/dry.rs:465`, not `dry_driver_adapter.rs:71`, `dry.rs:310`, and `dry.rs:404`. As written, reviewers will validate the wrong call sites and the exception will not reliably cover the intended request-time invokes.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/fixpoint_resolve.rs",
-              "line": 242,
-              "category": "test coverage"
+              "file": ".harness/custom/review-prompts/cli_composition.md",
+              "line": 29,
+              "category": "factual error"
             }
           ],
-          "hash": "rvw1:sha256:cd715242f471a9d720d387eb3f9bbc02536632fb0990b8407fd7180c0f5ea086",
-          "at": "2026-07-01T01:22:52Z"
+          "hash": "rvw1:sha256:4e41e355d872d6346e573e8d8e3eb7769158df8de42844d8dad718ab0295eda9",
+          "at": "2026-07-01T11:39:21Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:35b798c758fbd5d2547492157571a7c8d65dfd9df3f82860428f5a6ea97489b3",
-          "at": "2026-07-01T01:40:46Z"
+          "hash": "rvw1:sha256:83cd3a8ed3fb6acf06c363984a9e4d8a415f0cf9a03741e5c74d2a3a0b551982",
+          "at": "2026-07-01T12:00:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cf4375c1ceb9ceb37c5b82a48e44647f754f87a4ea8400bca7b33d05d68416db",
+          "at": "2026-07-01T17:27:31Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:35b798c758fbd5d2547492157571a7c8d65dfd9df3f82860428f5a6ea97489b3",
-          "at": "2026-07-01T01:42:56Z"
+          "hash": "rvw1:sha256:cf4375c1ceb9ceb37c5b82a48e44647f754f87a4ea8400bca7b33d05d68416db",
+          "at": "2026-07-01T17:32:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Renaming the wrapper to `track-switch-base` breaks the shipped `/track:done` flow: `.claude/commands/track/done.md` still shells out to `cargo make track-switch-main`, so the command now points at a deleted task and will fail before it can switch branches. The README already advertises the new base-branch behavior, so the docs and executable surface are now out of sync.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/Makefile.toml",
+              "line": 616,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:103d3b9df956ec75417b38e4857b37c7f91afe81c89d477474d0f20b596ce53b",
+          "at": "2026-07-02T02:50:14Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:13a5bdcfda6e7caca9c4af69252bea224cf9e789ed2c3f177cd6bccf4adb2f64",
-          "at": "2026-07-01T07:48:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:13a5bdcfda6e7caca9c4af69252bea224cf9e789ed2c3f177cd6bccf4adb2f64",
-          "at": "2026-07-01T07:50:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fa376ada81ce7a8669626c209ba57b6ca4b652baf890c299a45a807143cb9612",
-          "at": "2026-07-01T12:03:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fa376ada81ce7a8669626c209ba57b6ca4b652baf890c299a45a807143cb9612",
-          "at": "2026-07-01T17:23:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fa376ada81ce7a8669626c209ba57b6ca4b652baf890c299a45a807143cb9612",
-          "at": "2026-07-01T17:27:05Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:92291026fc2ad7da3993a75f09a8f4dbe7a55e6e55a73f64a110a69f70a146a8",
-          "at": "2026-07-02T02:50:38Z"
+          "hash": "rvw1:sha256:771fc1d89e9cd2828a18f8cc8d12431b243696f690ad0c100095bc019c53f34d",
+          "at": "2026-07-02T03:00:35Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The PR handler now converts omitted `--base` and `--method` into an empty-string sentinel before calling the driver. That embeds the branch-strategy defaulting contract and the \"empty is not a valid branch/method\" invariant in the bin layer, instead of passing typed absence to `cli_driver` and letting driver/composition resolve it. This violates the CLI thin-bin policy from ADR D5/D8: keep this handler to parse-dispatch-emit and move the omission/default contract behind the driver boundary, e.g. with `Option` fields in `PrInput`.",
+              "message": "The harness-policy adapter-SSoT check requires track command adapters to point at an existing `.harness/workflows/track/...` SSoT and avoid duplicating provider-independent workflow steps inline. This changed adapter still owns the `/track:done` step sequence directly (`Step 1`, `Step 2`, command invocation), and there is no referenced `.harness/workflows/track/done.md`, so the workflow can drift from other provider adapters instead of having a single SSoT.",
               "severity": "P1",
-              "file": "apps/cli/src/commands/pr.rs",
-              "line": 113,
-              "category": "business logic in bin"
+              "file": ".claude/commands/track/done.md",
+              "line": 10,
+              "category": "adapter-SSoT sync"
             },
             {
-              "message": "This surviving comment still points readers to `apps/cli-composition/src/track/fixpoint_resolve.rs`, but this PR deletes that file. The same block later names a stale cli-composition test that no longer exists under that name/location, so the final branch leaves a dead reference in the CLI scope. Update the comment to the new test location or remove the path reference.",
+              "message": "`/track:done` now executes `cargo make track-switch-base`, but the command text still says it is returning/switching to `main` (also in the frontmatter and opening sentence). With the new branch strategy config using `develop` as the base branch, this makes the command report and reason about the wrong branch after execution.",
               "severity": "P1",
-              "file": "apps/cli/src/commands/track/fixpoint_resolve.rs",
-              "line": 100,
-              "category": "dead-reference"
-            }
-          ],
-          "hash": "rvw1:sha256:92291026fc2ad7da3993a75f09a8f4dbe7a55e6e55a73f64a110a69f70a146a8",
-          "at": "2026-07-02T02:56:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:66eb1c545d5271c8d1b69b0902f928497dad55d0299e74a7de55fb5f932b285d",
-          "at": "2026-07-02T03:14:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:66eb1c545d5271c8d1b69b0902f928497dad55d0299e74a7de55fb5f932b285d",
-          "at": "2026-07-02T03:20:59Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Adding `metadata.json` here makes the supposed empty-diff approval test stop exercising the Approved path. `GitDiffGetter` includes untracked files, and this helper does not exclude `items/test-track/metadata.json`, so the new file becomes a diff in the implicit `Other` scope. The `check_approved_approved_path_exits_success_with_ok_message` case now covers the bypass/success path instead of the intended empty-diff Approved case.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/tests.rs",
-              "line": 89,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:ac9f377c491fb6bfe19621fa2cd9cc535f9b16f8814aef255637e734c3645e90",
-          "at": "2026-07-02T07:36:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2c4dba10810c5ef4aec4f4222d70953b198a340dba8cf3d16de57944e57be8ac",
-          "at": "2026-07-02T07:40:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2c4dba10810c5ef4aec4f4222d70953b198a340dba8cf3d16de57944e57be8ac",
-          "at": "2026-07-02T07:44:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`execute_dry_check_approved` now resolves a telemetry writer, measures time, maps the driver outcome into a telemetry verdict, and calls `emit_gate_eval` from the bin handler. The CLI scope policy says `apps/cli` handlers must stay thin parse-dispatch-emit wrappers, with application-level I/O flowing through the driver; direct telemetry persistence from the bin is explicitly reportable under ADR D5/D8. Move this GateEval emission behind the `cli_driver`/composition boundary instead of doing it in `apps/cli`.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/dry.rs",
-              "line": 206,
-              "category": "direct I/O in bin"
-            }
-          ],
-          "hash": "rvw1:sha256:7cdba52821244696a926f4d34caacc5c7db6e15e7b93c5aef43fc03cd7919d5d",
-          "at": "2026-07-03T07:53:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7cdba52821244696a926f4d34caacc5c7db6e15e7b93c5aef43fc03cd7919d5d",
-          "at": "2026-07-03T07:59:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`resolve_track_id` accepts an explicit `--track-id` without reading or validating the current branch, and this line now passes that id into `resolve_telemetry_writer_for_track`, which constructs a writer without the branch-bound `track/*` check that `execute_verify_with_telemetry` gets from `resolve_telemetry_writer`. As a result, `sotp dry check-approved --track-id T` can emit GateEval telemetry from `main` or another non-track branch, exceeding the ADR-0446 D1/D2 narrow bin-level telemetry exception and the established verify-gate pattern. Keep the branch-bound resolver or explicitly validate the current branch before emitting.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/dry.rs",
-              "line": 209,
-              "category": "direct I/O in bin"
-            }
-          ],
-          "hash": "rvw1:sha256:0d91332b286e19dc9aa3776f557059c95f632db5174d9d5b05a337fa44feaca0",
-          "at": "2026-07-03T09:49:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9f6ae8593697d19cc7cd37bcf36602c2fa1f22c963ed5ac435d88cf16b03620c",
-          "at": "2026-07-03T10:06:47Z"
-        }
-      ]
-    },
-    "impl-plan": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ba0e9b6d288465fb2689610904477bf95e23eee8fbe7b96bb80d8e9a56dd38b2",
-          "at": "2026-07-02T08:54:37Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ba0e9b6d288465fb2689610904477bf95e23eee8fbe7b96bb80d8e9a56dd38b2",
-          "at": "2026-07-02T08:58:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:10151bc1558e9d85249a62076886740e1664f3598aea9b0a70509e89cb06779a",
-          "at": "2026-07-02T15:59:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`AC-19` is only mapped to `T016`-`T023` here, but the new S8 work explicitly claims AC-19-preserving behavior in `T029` and `T032` (both mention byte-for-byte preservation / relocated render tests under `AC-19`). As written, the task coverage understates which tasks close that criterion.",
-              "severity": "P1",
-              "file": "track/items/branch-strategy-config-driven-2026-06-30/task-coverage.json",
-              "line": 57,
-              "category": "task-coverage gap"
-            }
-          ],
-          "hash": "rvw1:sha256:bc17585277b987d218d69c1a6b1e78b3e9467dd66c3e44ec83286532606de5ba",
-          "at": "2026-07-02T16:50:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:38c2caa19039af5f87e350de0e561f3ac46cbc672a2c3ebe64a3428adcc7b5c4",
-          "at": "2026-07-02T16:57:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T030/T031 are contract-mismatched: `task-contract.json` adds `DryCheckApprovedClockPort` here and `SystemMonotonicClockAdapter` at line 160, but neither task description mentions a clock port or adapter. T030 explicitly captures elapsed time with `Instant::now()` instead, so T032 has no described source for this dependency if it is intentional. Either add the clock-port work to the task text or remove these entries.",
-              "severity": "P1",
-              "file": "track/items/branch-strategy-config-driven-2026-06-30/task-contract.json",
-              "line": 155,
-              "category": "task-contract attribution mismatch"
+              "file": ".claude/commands/track/done.md",
+              "line": 22,
+              "category": "convention contradiction"
             },
             {
-              "message": "T033 over-attributes `CodexDryFixLocalRunner`: the cutover/cleanup description never mentions touching that adapter, yet the contract lists it. This claims work that the task text does not require, so the entry should be removed or the description should explicitly cover it.",
+              "message": "These rules now advertise `track-switch-base` and `track-branch-create` as operating on the configured base branch, but the canonical branch strategy convention still defines the workflow around `main` as the base/fail-closed branch. The harness-policy severity policy requires convention changes to propagate consistently across `.claude/rules` and `knowledge/conventions`; otherwise agents reading both surfaces get contradictory branch preconditions for the same commands.",
               "severity": "P1",
-              "file": "track/items/branch-strategy-config-driven-2026-06-30/task-contract.json",
-              "line": 176,
-              "category": "task-contract attribution mismatch"
+              "file": ".claude/rules/07-dev-environment.md",
+              "line": 54,
+              "category": "convention contradiction"
             }
           ],
-          "hash": "rvw1:sha256:39d8bfc63284d1b186ab62f9e4249cf18122306e4b59bc9479bf22f7c769a655",
-          "at": "2026-07-02T18:11:19Z"
+          "hash": "rvw1:sha256:771fc1d89e9cd2828a18f8cc8d12431b243696f690ad0c100095bc019c53f34d",
+          "at": "2026-07-02T03:12:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Phase 0 is still described as `main (direct)` in the phase invocation table, and the writer-ownership table repeats the same assumption later in the file. That contradicts the updated `init` workflow and branch-strategy convention, which now require the configured base branch, so the authoritative workflow docs are internally inconsistent on repos whose base branch is not `main`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.harness/workflows/track/plan.md",
+              "line": 79,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a37a14ed5cc06163f9b4a61fef532afe0eafaada4d27327dbf4eee346a34840d",
+          "at": "2026-07-02T03:39:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Step 3` still writes `metadata.json` as `schema_version: 5` and only lists the identity fields. That contradicts the branch-strategy conventions, which require every track to freeze `metadata.json#branch_strategy_snapshot` at creation and then read that snapshot for post-init branch ops and ADR pre-merge detection. As written, a freshly initialized track will either never get the snapshot or will lose it if the branch-create step seeded one, so `track-switch-base` / PR merge / `git log <merge_target>` resolution will break or fall back incorrectly.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/init.md",
+              "line": 56,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:09b16f2e09d45534bed6688358d654810bb315868abbfecb2e2bf2842904460c",
+          "at": "2026-07-02T03:49:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The post-merge handoff tells users to `git pull` on the merge target branch, but `/track:done` immediately switches to the configured base branch and the branch-strategy convention defines `track-switch-base` as the post-merge landing branch. If `base_branch` and `merge_target` ever diverge, this sends the user to the wrong local branch after a successful merge.",
+              "severity": "P1",
+              "file": ".claude/commands/track/merge.md",
+              "line": 46,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:8bb8192eefa107ef8e1d8159fa9440dbba7f9ba56c0e73c57772f3eadcf2c9e5",
+          "at": "2026-07-02T04:00:56Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:03e10fbe756ddafcd6ac9c9ae0e3a2ebc4a56440209c6d3ae1aae784ec872074",
-          "at": "2026-07-02T18:20:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e955d40457d1eafa70ff0f9e4c269b978d6ffb2f32d9fa651d564a779525da5e",
-          "at": "2026-07-02T18:50:52Z"
+          "hash": "rvw1:sha256:32d91b254b26d78b6aba8cae875850e502910e00a7d12e4863933b5643edb6d4",
+          "at": "2026-07-02T04:07:49Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "T033 leaks into OS-08: the task relocates the `dry_fix_local` bridge and renames/moves `DryFixRunnerCompositionRoot`, but OS-08 explicitly excludes correcting or deciding on the `dry_fix_runner`/`dry_run_fix_local` path in this track. This makes the task implement out-of-scope behavior rather than only preserving the existing dry-fix-local path while completing IN-14.",
+              "message": "`.harness/config/branch-strategy.json` is still untracked (`git status --short` reports `??` and there is no cached diff), but this workflow now treats that path as the required source for the configured base branch. Because the harness-policy surface is distributed to template consumers, the PR would ship references to a config file that is not present in a fresh checkout, causing `/track:init` / branch creation to fail as soon as they try to resolve the base branch. Add the config file to the tracked change or avoid making tracked workflow docs depend on it.",
               "severity": "P1",
-              "file": "track/items/branch-strategy-config-driven-2026-06-30/impl-plan.json",
-              "line": 171,
-              "category": "out_of_scope leak into a task"
+              "file": ".harness/workflows/track/init.md",
+              "line": 12,
+              "category": "template-distribution reference leak"
             },
             {
-              "message": "AC-19 omits T033 even though T033 is the final cutover/deletion task and explicitly carries the post-deletion `cargo make test` verification. Mapping AC-19 only through earlier S8 tasks leaves the final branch state's no-output-regression/test-pass acceptance criterion uncovered after the old dry paths are deleted.",
+              "message": "The changed `/track:done` adapter still contains the workflow steps inline and does not name an Operational SSoT workflow file at the top. The harness-policy adapter-SSoT check requires `.claude/commands/track/*.md` adapters to point to an existing `.harness/workflows/...` file and avoid duplicating step/gate/state logic in the adapter, so this command can now drift independently from the workflow layer.",
               "severity": "P1",
-              "file": "track/items/branch-strategy-config-driven-2026-06-30/task-coverage.json",
-              "line": 57,
-              "category": "task-coverage gap"
-            }
-          ],
-          "hash": "rvw1:sha256:e955d40457d1eafa70ff0f9e4c269b978d6ffb2f32d9fa651d564a779525da5e",
-          "at": "2026-07-02T19:02:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`task-contract.json` attributes T026 to `DryWriteDriverInput`, but the T026 task text explicitly says the service should reuse the pre-existing `usecase::dry_driver::DryWriteDriverInput` / `DryWriteOutcome` DTOs and not redeclare them. This makes a referenced-only existing DTO look owned by T026; the same mismatch appears for T029 `DryResultsDriverInput` and T030 `DryCheckApprovedDriverInput`.",
-              "severity": "P1",
-              "file": "track/items/branch-strategy-config-driven-2026-06-30/task-contract.json",
-              "line": 134,
-              "category": "task-contract attribution mismatch"
+              "file": ".claude/commands/track/done.md",
+              "line": 10,
+              "category": "adapter-SSoT sync"
             },
             {
-              "message": "T033 is attributed to `DryFixLocalDriverInput` and `RunDryFixLocalInput`, but the T033 task description only preserves those DTOs as the unaffected `dry_fix_local` path while deleting/shrinking surrounding APIs. Since the plan does not specify adding, modifying, or deleting either DTO entry, these should not be attributed to T033.",
+              "message": "The changed `/track:merge` adapter also encodes the PR resolution, wait/merge sequence, and post-merge behavior directly, without an Operational SSoT reference to an existing `.harness/workflows/...` file. That violates the harness-policy adapter-SSoT requirement and leaves the merge command's branch-strategy behavior outside the workflow SSoT where future policy changes are supposed to land.",
               "severity": "P1",
-              "file": "track/items/branch-strategy-config-driven-2026-06-30/task-contract.json",
-              "line": 173,
-              "category": "task-contract attribution mismatch"
+              "file": ".claude/commands/track/merge.md",
+              "line": 20,
+              "category": "adapter-SSoT sync"
             }
           ],
-          "hash": "rvw1:sha256:90b3c99ea5ab6fa95dc03a102604eb3ba58f33448d5e2a5409ea7c808d3ddd14",
-          "at": "2026-07-02T19:20:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T032 instructs implementers to wire \"the five T028 adapters\" into `DryWriteDriverInteractor::new`, but T027's constructor only accepts four T028-provided direct ports: config loader, corpus fragments, service factory, and corpus-root manifest writer. T028 says `RecordingDryTierTelemetryAdapter` is constructed internally by `DryCheckServiceFactoryAdapter::build`, so T032 as written is not executable and can lead to an invented constructor parameter or duplicated telemetry wiring.",
-              "severity": "P1",
-              "file": "track/items/branch-strategy-config-driven-2026-06-30/impl-plan.json",
-              "line": 166,
-              "category": "task description non-executable"
-            },
-            {
-              "message": "T028 is a single infrastructure task that defines five adapters, relocates persistent-index, manifest, config, fragment, and telemetry logic, and adds/relocates test coverage. That scope is far beyond the 500-line default review ceiling by a multiple, so it should be split into smaller independently reviewable tasks, for example config/fragments/manifest, service-factory/persistent-index, and telemetry.",
-              "severity": "P1",
-              "file": "track/items/branch-strategy-config-driven-2026-06-30/impl-plan.json",
-              "line": 145,
-              "category": "batch-size infeasibility"
-            },
-            {
-              "message": "T033 combines deletion of old composition methods and modules, DTO/re-export cleanup, relocation of the dry-fix-local runner and adapter into infrastructure, and shrinking the legacy usecase port/service. This spans multiple review scopes and is well beyond the per-scope diff ceiling by a multiple; split the relocation, composition cleanup, and usecase trait shrink into separate tasks so each can be implemented and reviewed coherently.",
-              "severity": "P1",
-              "file": "track/items/branch-strategy-config-driven-2026-06-30/impl-plan.json",
-              "line": 170,
-              "category": "batch-size infeasibility"
-            }
-          ],
-          "hash": "rvw1:sha256:ffcd2741ca2da378d3d914ce3e7bc3efda2cd72c6e8671f29bc117b218c3bf50",
-          "at": "2026-07-02T19:30:37Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T033 shrinks `usecase::dry_driver::DryDriverPort` / `DryDriverService` to only `dry_fix_local`, but the plan explicitly leaves the old `apps/cli-composition/src/dry_driver_adapter.rs` bridge in place until T036 and T032 says that bridge still has the three now-superseded `dry_write` / `dry_results` / `dry_check_approved` delegate methods. Since Rust trait impls cannot contain methods removed from the trait, T033 is not an individually committable task and will break the sequence before T036 deletes the adapter. Move the old adapter cleanup into T033 or reorder/merge the cleanup so no commit contains the shrunk trait with the stale impl still present.",
-              "severity": "P1",
-              "file": "track/items/branch-strategy-config-driven-2026-06-30/impl-plan.json",
-              "line": 181,
-              "category": "dependency cycle or wrong ordering"
-            }
-          ],
-          "hash": "rvw1:sha256:cd03859e2af25c8a99b6338bc28ae04e7694ec93194e6489372e6e0d2e42cbfc",
-          "at": "2026-07-02T19:37:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c1aaa252056055a964ad87d3bcf5494a1fd54d5b8271a5e6e3a33a34310b30c2",
-          "at": "2026-07-02T19:42:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-19 requires the IN-14 migration to keep the existing `dry write`/`dry results`/`dry check-approved` tests passing without output changes, but the coverage list omits T027 even though T027 is the task that moves `dry write` invocation into `DryWriteDriverInteractor` and claims CN-07 behavior preservation. T027 only asks for new stub-port tests, while T037 later refers to “relocated tests from T027,” so the plan has no executable task that carries the existing dry-write orchestration tests through this behavior-preservation AC. Add T027 to AC-19 and make T027 explicitly relocate/preserve the existing `DryCompositionRoot::dry_write` behavior tests, or remove the later T037 dependency on those nonexistent relocated tests.",
-              "severity": "P1",
-              "file": "track/items/branch-strategy-config-driven-2026-06-30/task-coverage.json",
-              "line": 210,
-              "category": "task-coverage gap"
-            }
-          ],
-          "hash": "rvw1:sha256:6308c5dff0834df02477c99028c6e71c4bd07293c59c8f7a9ff51aa6bea34fb5",
-          "at": "2026-07-02T20:04:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a0b5593b387d4ac325c384b0c9d728d26dd7dd44e7b15e9a993e1c98cfee7362",
-          "at": "2026-07-02T20:10:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T024/T025 define `DryBaseBranchPort` to fall back to `.harness/config/branch-strategy.json` when `<track_dir>/metadata.json` is absent, and T025 even requires an `absent-with-fallback` test. This contradicts the S8/IN-14 fail-closed contract for the dry driver path, where resolved tracks must use `metadata.json#branch_strategy_snapshot.base_branch` and missing metadata/snapshot must return `DryBaseBranchError` rather than reread global config. As written, the plan maps these tasks to AC-20 but instructs the opposite behavior, so implementation would preserve a forbidden global-config fallback for in-flight tracks.",
-              "severity": "P1",
-              "file": "track/items/branch-strategy-config-driven-2026-06-30/impl-plan.json",
-              "line": 126,
-              "category": "out_of_scope leak into a task"
-            }
-          ],
-          "hash": "rvw1:sha256:61367bf74d388a046e4f1807e4b8df42e26c660712e3beb6e896807b3f4fd724",
-          "at": "2026-07-02T22:20:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:41419f5742afe3b0f39a0ee171f048547846d5b98d0e05436789f78e2d59b1cc",
-          "at": "2026-07-02T22:28:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T030/T031/T032 still describe the obsolete clock-port design: T030 adds `DryCheckApprovedClockPort` and injects both telemetry and clock into `DryCheckApprovedDriverInteractor`, T031 implements `SystemMonotonicClockAdapter`, and T032 wires that clock into the interactor. That cannot plausibly close AC-20/AC-22, which require the interactor to take only the seven secondary ports and require `GateEval.duration_ms` to be measured by the infrastructure `TimedGateEvalDryCheckApprovedService` decorator. An implementer following this plan will build the wrong layer boundary and fail the mapped ACs.",
-              "severity": "P1",
-              "file": "track/items/branch-strategy-config-driven-2026-06-30/impl-plan.json",
-              "line": 166,
-              "category": "task-coverage gap"
-            }
-          ],
-          "hash": "rvw1:sha256:3d55bc3b498559593fce61f3192a286f9b06338ebe651bbdee3e3e4f56a9c628",
-          "at": "2026-07-03T00:01:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cef9a725062cf22f6f9d45e60be3942e96d7fe6d96e88f801c3856877ab9aeae",
-          "at": "2026-07-03T00:15:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-22 coverage is implausible for T031: the mapped task adds `TimedGateEvalDryCheckApprovedService` in `libs/infrastructure` implementing `DryCheckApprovedDriverService`, and T032 wires that decorator while `DryDriver::new` still takes only four services. AC-22/AC-20 require the opposite shape: no infrastructure `DryCheckApprovedDriverService` decorator, and `apps/cli-driver` `DryDriver` must take `check_approved_telemetry: Arc<dyn DryCheckApprovedTelemetryPort>` and measure/call telemetry there. As written, the mapped tasks cannot satisfy AC-22 and would implement a layer-boundary-violating plan.",
-              "severity": "P1",
-              "file": "track/items/branch-strategy-config-driven-2026-06-30/task-coverage.json",
-              "line": 248,
-              "category": "task-coverage gap"
-            }
-          ],
-          "hash": "rvw1:sha256:a907e55f858f085d2395ef0bd3730a578d027e67ec11e68aaa0aaaa169603c19",
-          "at": "2026-07-03T02:05:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T030's description still instructs the implementer to add `DryCheckApprovedTelemetryPort` and says T032's DryDriver reports GateEval through that port, but `task-contract.json` attributes T030 only to the service/interactor/input and T031/T032 describe bin-layer telemetry instead. This is a task-contract attribution mismatch and leaves two contradictory execution paths for AC-22.",
-              "severity": "P1",
-              "file": "track/items/branch-strategy-config-driven-2026-06-30/impl-plan.json",
-              "line": 166,
-              "category": "task-contract attribution mismatch"
-            }
-          ],
-          "hash": "rvw1:sha256:5af3b32c3619893175376ed70ce388589bc1e4bb4ef547fc725dcfacdf406f83",
-          "at": "2026-07-03T03:40:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-22 is mapped as covered here, but the mapped tasks no longer implement the AC's required GateEval architecture. The current plan has T030 explicitly omit `DryCheckApprovedClockPort` / `DryCheckApprovedTelemetryPort` and has T031 put `Instant`/`resolve_telemetry_writer`/`emit_gate_eval` directly in `apps/cli/src/commands/dry.rs`, while AC-22 requires usecase clock/telemetry ports plus a telemetry-aware service/decorator, infrastructure adapters, and no direct bin-layer telemetry calls. This makes the AC-22 coverage implausible as written.",
-              "severity": "P1",
-              "file": "track/items/branch-strategy-config-driven-2026-06-30/task-coverage.json",
-              "line": 248,
-              "category": "task-coverage gap"
-            }
-          ],
-          "hash": "rvw1:sha256:1a71125ddb43577f554345330f550f91429a9e53e09f2d3c555d834f6c009885",
-          "at": "2026-07-03T03:50:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1a71125ddb43577f554345330f550f91429a9e53e09f2d3c555d834f6c009885",
-          "at": "2026-07-03T07:54:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T031 now attributes `cli_composition::telemetry_wiring::resolve_telemetry_writer_for_track`, but the T031 plan text says this task calls the pre-existing `resolve_telemetry_writer` / `emit_gate_eval` helpers and adds only a new call site, not a new or changed cli_composition function. That makes the task-contract attribution inconsistent with the executable task boundary; either the task description needs to own the visibility/public-surface change to `resolve_telemetry_writer_for_track`, or this attribution belongs to the task that actually introduces that catalogue entry.",
-              "severity": "P1",
-              "file": "track/items/branch-strategy-config-driven-2026-06-30/task-contract.json",
-              "line": 454,
-              "category": "task-contract attribution mismatch"
-            }
-          ],
-          "hash": "rvw1:sha256:f725731cf020ab843c5fad9198a35a3c79a747805b70875f5f2083b6c39ab88d",
-          "at": "2026-07-03T09:48:33Z"
+          "hash": "rvw1:sha256:32d91b254b26d78b6aba8cae875850e502910e00a7d12e4863933b5643edb6d4",
+          "at": "2026-07-02T04:12:54Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8c2f95e4866027f21f77e00eb881c8b0782816b1e2ef1f5f1b53d44276c5db3a",
-          "at": "2026-07-03T13:18:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T038's plan text says it will modify seven existing usecase ErrorType catalogue entries (`DryRepoWorkspaceError`, `DryBaseBranchError`, `DryCheckConfigLoaderError`, `DryCorpusFragmentsError`, `DryCheckServiceFactoryError`, `DryCorpusRootManifestError`, and `FixpointWorkspaceContextError`) from `Unavailable(String)` to typed variants, but `task-contract.json` attributes T038 only to the 11 supporting ValueObject entries. Under the impl-plan policy this is a task-contract attribution mismatch: entries the task explicitly claims to modify are omitted, so the executable task contract no longer reflects the actual catalogue surface T038 owns.",
-              "severity": "P1",
-              "file": "track/items/branch-strategy-config-driven-2026-06-30/task-contract.json",
-              "line": 528,
-              "category": "task-contract attribution mismatch"
-            }
-          ],
-          "hash": "rvw1:sha256:8c2f95e4866027f21f77e00eb881c8b0782816b1e2ef1f5f1b53d44276c5db3a",
-          "at": "2026-07-03T13:23:35Z"
+          "hash": "rvw1:sha256:6d2370072890a58750194e75b95c3dd3b0235866132edb1cd9cd73c9614e1ef0",
+          "at": "2026-07-02T04:22:42Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:2e283f76d2b06c6168c0164e8e1bda5c79ed22b5ab094fb472059daeeb3fa535",
-          "at": "2026-07-03T13:28:49Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:98b734ed377498cde2c2891058182452184459f591320a771ef203f48077cb39",
-          "at": "2026-06-30T20:44:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:98b734ed377498cde2c2891058182452184459f591320a771ef203f48077cb39",
-          "at": "2026-06-30T20:49:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c9c9639697e2daf17e427aa1fc80d00c7f84bc17a6dfc09dcbe841c0b0d42ebc",
-          "at": "2026-07-02T07:34:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c9c9639697e2daf17e427aa1fc80d00c7f84bc17a6dfc09dcbe841c0b0d42ebc",
-          "at": "2026-07-02T07:39:48Z"
-        }
-      ]
-    },
-    "types": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bac82630858af0d55b78ef571a0bd5fc4cce2397fb5401074b5f100e6ec29832",
-          "at": "2026-07-02T08:56:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bac82630858af0d55b78ef571a0bd5fc4cce2397fb5401074b5f100e6ec29832",
-          "at": "2026-07-02T09:01:23Z"
+          "hash": "rvw1:sha256:6d2370072890a58750194e75b95c3dd3b0235866132edb1cd9cd73c9614e1ef0",
+          "at": "2026-07-02T04:27:57Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`DryCheckServiceFactoryAdapter`'s docs still cite deleted paths under `apps/cli-composition/src/dry/` (`persistent_index.rs` and `manifest.rs`), and the nearby `RecordingDryTierTelemetryAdapter` entry repeats the same problem with `tier_telemetry.rs`. Those files were removed in this branch, so the catalogue now contains stale path references instead of current locations.",
+              "message": "`.harness/custom/review-prompts/types.md` has inconsistent hexagonal-architecture citations: line 36 uses `§Port Placement` instead of the project's `§Port Placement Rules`, and line 69 cites `§Dependency Direction`, but `knowledge/conventions/hexagonal-architecture.md` only has `## Layer Dependencies`. That makes the reviewer guidance point at the wrong convention sections.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/branch-strategy-config-driven-2026-06-30/infrastructure-types.json",
-              "line": 345,
-              "category": "dead-reference"
+              "file": ".harness/custom/review-prompts/types.md",
+              "line": 69,
+              "category": "broken narrative reference"
             }
           ],
-          "hash": "rvw1:sha256:58f60bfc83c32e4b3278fbde99bb25088ee9c573b4d72304e7fda8d163132105",
-          "at": "2026-07-02T16:00:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`DryFixRunnerCompositionRoot` is a new load-bearing catalogue entry, but its `spec_refs` array is empty. That breaks the traceability requirement for the contract map: the entry cannot be tied back to any spec anchor, so Chain2 will not be able to verify why this type is present. Add a concrete spec reference or remove the entry from the catalogued surface.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/branch-strategy-config-driven-2026-06-30/cli_composition-types.json",
-              "line": 894,
-              "category": "SoT integrity"
-            }
-          ],
-          "hash": "rvw1:sha256:f855f12515369aa985427281286f42d8d9d86bb826f671a47a1714b646b8bed5",
-          "at": "2026-07-02T16:49:08Z"
+          "hash": "rvw1:sha256:975c53ef881d66e3acdf4888b41e94cc33b223cb40c19f4196dc593b6d06f15b",
+          "at": "2026-07-02T07:40:30Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:45a4d9c83b5c501a9b598a3948435d1aa171146055d48d4cb9a3962783708bde",
-          "at": "2026-07-02T17:02:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`usecase-types.json` now declares `DryWriteDriverService`, `DryResultsDriverService`, and `DryCheckApprovedDriverService`, but their method signatures reference `DryWriteDriverInput`, `DryResultsDriverInput`, and `DryCheckApprovedDriverInput`; the retained `DryDriverPort`/`DryDriverService` still reference `DryFixLocalDriverInput`. None of those four input DTOs are declared anywhere in this catalogue, so the type SSoT is incomplete and the new interfaces are left with unresolved contract types. `libs/usecase/src/dry_driver.rs` defines these structs, so this file needs matching catalogue entries here.",
-              "severity": "P1",
-              "file": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
-              "line": 1543,
-              "category": "SoT integrity"
-            }
-          ],
-          "hash": "rvw1:sha256:f659137cdbf5f9f888870d83c1951c94452e60787963194c58794e9c744b2652",
-          "at": "2026-07-02T18:18:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f3fa4f2e587375903e724e9c43abe1cf879ff910898baee0d4b249ec67cd62e0",
-          "at": "2026-07-02T18:57:18Z"
+          "hash": "rvw1:sha256:a2f0f1dc3e8cd7f9908e77c237af2186e06fed16feb50bde3d2d94b47a36fdc5",
+          "at": "2026-07-02T07:49:38Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`DryCompositionRoot.dry_driver` documents the check-approved wiring as reusing `infrastructure::dry_check::FsDiffBaseResolverAdapter`, but the actual composition code injects `dry_driver_shared::FsDryDiffBaseFactoryAdapter` into `DryCheckApprovedDriverInteractor::new` and only that factory constructs `FsDiffBaseResolverAdapter` later per request. This makes the type catalogue's wiring contract factually inconsistent with the implementation for the diff-base dependency.",
+              "message": "The convention still claims ADR changes are protected by `adr` semantic review for `contradiction / factual error / infeasibility`, but the new `adr` briefing no longer reports general factual-error or infeasibility categories. Since `plan-artifacts` was removed, this line now overstates the actual review mechanism and can let convention-violating ADRs pass despite the convention promising reviewer coverage. Update the convention to match `.harness/custom/review-prompts/adr.md` or add the missing categories there.",
               "severity": "P1",
-              "file": "track/items/branch-strategy-config-driven-2026-06-30/cli_composition-types.json",
-              "line": 627,
-              "category": "SoT integrity"
+              "file": "knowledge/conventions/enforce-by-mechanism.md",
+              "line": 75,
+              "category": "convention contradiction"
             }
           ],
-          "hash": "rvw1:sha256:f3fa4f2e587375903e724e9c43abe1cf879ff910898baee0d4b249ec67cd62e0",
-          "at": "2026-07-02T19:08:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`DryFixRunnerCompositionRoot` is a delete-action entry for the cli_composition type being removed, but its `dry_run_fix_local` signature is declared with the replacement `usecase::dry_driver::DryFixLocalDriverInput`. The deleted source method took the cli_composition-local `RunDryFixLocalInput`, which is separately catalogued as a deleted DTO, so this delete contract is action-incoherent and loses the actual edge to the removed input type.",
-              "severity": "P1",
-              "file": "track/items/branch-strategy-config-driven-2026-06-30/cli_composition-types.json",
-              "line": 905,
-              "category": "SoT integrity"
-            }
-          ],
-          "hash": "rvw1:sha256:24ba08d8f8fc57f4cbcc7ddb297d2ce898b9898a029c0a6e5896f32bc0cc657b",
-          "at": "2026-07-02T19:14:35Z"
+          "hash": "rvw1:sha256:a2f0f1dc3e8cd7f9908e77c237af2186e06fed16feb50bde3d2d94b47a36fdc5",
+          "at": "2026-07-02T07:57:36Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8180a5eb3ba617f3af828683eb636cf8a6a34408902656c69aa2a5229fb32ff7",
-          "at": "2026-07-02T19:20:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`CodexDryFixLocalRunner` and `DryDriverAdapter` are the load-bearing infrastructure declarations for the dry-fix-local relocation, but both entries trace only to `OS-08`. `OS-08` explicitly says the subprocess behavior remains out of scope and points the placement correction at `IN-15`; `AC-21` then validates these exact types and their delegation relationship. As written, the catalogue records the new adapter/runner against the out-of-scope rationale instead of the requirement they implement, so the type contract's SoT trace is misleading. Add `IN-15`/`AC-21` (or replace `OS-08` where appropriate) on both entries.",
-              "severity": "P1",
-              "file": "track/items/branch-strategy-config-driven-2026-06-30/infrastructure-types.json",
-              "line": 454,
-              "category": "SoT integrity"
-            }
-          ],
-          "hash": "rvw1:sha256:fad4d701adbc0565d6a7f14408878709dc0be5057a80d99a5e40a2b69b83e5da",
-          "at": "2026-07-02T21:26:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`DryBaseBranchPort` still declares that missing `metadata.json` falls back to `.harness/config/branch-strategy.json`, and `FsDryBaseBranchAdapter` repeats the same fallback contract. That contradicts the referenced spec contract in IN-14/AC-20 (and IN-16/AC-22), which requires reading only `<track_dir>/metadata.json#branch_strategy_snapshot.base_branch` and returning `DryBaseBranchError` when metadata or the snapshot is missing, with no global-config fallback. As written, the type catalogue locks in the opposite behavior for dry write/check-approved base-branch resolution.",
-              "severity": "P1",
-              "file": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
-              "line": 1424,
-              "category": "SoT integrity"
-            }
-          ],
-          "hash": "rvw1:sha256:32269c01a9e0e17bdefde43affbe05f3106d9c9114774605943a1a3662e90a16",
-          "at": "2026-07-02T21:33:43Z"
+          "hash": "rvw1:sha256:872a8960f964da1154ad0885856387beebf4608643bdf88af91b51dd7c18042b",
+          "at": "2026-07-02T08:02:55Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:155bcfb31315ae55c47f291285b41f441654083f2f365e2eb04cb50cbb60e966",
-          "at": "2026-07-02T22:23:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TimedGateEvalDryCheckApprovedService` is declared as `role: SecondaryAdapter`, but its own docs and `trait_impls` show it implements `usecase::dry_check_approved_driver::DryCheckApprovedDriverService`, an `ApplicationService`, rather than a secondary port. The type-design rules define `SecondaryAdapter` as an infrastructure struct implementing a `SecondaryPort`; an application-service implementation is not that contract. This force-fits an infrastructure-hosted primary-service decorator into the wrong role, so the catalogue and contract map misclassify the type-level boundary. Formalize a decorator role/pattern or split the design so infrastructure only implements a secondary port.",
-              "severity": "P1",
-              "file": "track/items/branch-strategy-config-driven-2026-06-30/infrastructure-types.json",
-              "line": 405,
-              "category": "role/kind mismatch"
-            }
-          ],
-          "hash": "rvw1:sha256:f398aa7b7b592e1ba6b1339c1a26d8ac8cbc921023f5bd223ba56a8fada83a87",
-          "at": "2026-07-03T00:02:58Z"
+          "hash": "rvw1:sha256:eeda0256377b616587c6bc8ef94c3b2c5570604419e5bc2d655a22f3aa3fbf49",
+          "at": "2026-07-03T10:27:51Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:07c85774e03649a93d3eae21589515cfbb7fbb8dab23a84998e160d2ee9698fd",
-          "at": "2026-07-03T02:09:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:72437f13b1f086b73792ce43a34b2e6b4cb71acdf71f2683643126a4459a893c",
-          "at": "2026-07-03T03:46:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`cli_composition::telemetry_wiring::resolve_telemetry_writer_for_track` is declared as a `FreeFunction` in the `cli_composition` catalogue even though `knowledge/conventions/type-designer-kind-selection.md` R1 marks `FreeFunction` as forbidden for `cli_composition`; the entry itself acknowledges this. ADR-0446 authorizes bin-level GateEval helper calls, but it does not update or override the catalogue role/layer matrix, so this leaves a forbidden role in the type SSoT instead of modelling the public helper through an allowed cli_composition contract or formalizing the exception in the governing convention.",
-              "severity": "P1",
-              "file": "track/items/branch-strategy-config-driven-2026-06-30/cli_composition-types.json",
-              "line": 929,
-              "category": "role_kind_mismatch"
-            }
-          ],
-          "hash": "rvw1:sha256:e7d6502a5bfcefa9bb4a2cc18936fcc8aaa4ffd5236e0cb3cedfed1a15d74aae",
-          "at": "2026-07-03T09:49:59Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0b40cfe403f837a1d894b71d347f2f1874aee3f278a7518165dee8ca29617e16",
-          "at": "2026-07-03T13:21:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0b40cfe403f837a1d894b71d347f2f1874aee3f278a7518165dee8ca29617e16",
-          "at": "2026-07-03T13:26:56Z"
+          "hash": "rvw1:sha256:cbd9185609199f35f4e6b03d8d6d12bed0af06b32f851a4765fe3de47130e3c6",
+          "at": "2026-07-03T14:54:04Z"
         }
       ]
     },
@@ -2049,6 +2545,434 @@
           "findings": [],
           "hash": "rvw1:sha256:0f51c364e3bc67144eafdffd79deff33e41df71fa3e8ea90309dac1ef2f65352",
           "at": "2026-07-03T13:55:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b52b406a7909de8596f967e7ec40853c592d6a57ce0a52b582f5b7a9068c2d6a",
+          "at": "2026-07-03T14:59:22Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f9572fc47d468f9941bb85d47917920024275dde36fb9f11f23632d9efbf2184",
+          "at": "2026-06-30T22:39:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f9572fc47d468f9941bb85d47917920024275dde36fb9f11f23632d9efbf2184",
+          "at": "2026-06-30T22:43:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new happy-path test exercises `TrackCompositionRoot::fixpoint_resolve` directly and only asserts the returned `ExitCode`; it never captures stdout/stderr from `execute_fixpoint_resolve`, so a regression in the CLI wrapper's emit path would still pass. This leaves the only bin-layer behavior in this handler effectively untested.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/fixpoint_resolve.rs",
+              "line": 242,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:cd715242f471a9d720d387eb3f9bbc02536632fb0990b8407fd7180c0f5ea086",
+          "at": "2026-07-01T01:22:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:35b798c758fbd5d2547492157571a7c8d65dfd9df3f82860428f5a6ea97489b3",
+          "at": "2026-07-01T01:40:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:35b798c758fbd5d2547492157571a7c8d65dfd9df3f82860428f5a6ea97489b3",
+          "at": "2026-07-01T01:42:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:13a5bdcfda6e7caca9c4af69252bea224cf9e789ed2c3f177cd6bccf4adb2f64",
+          "at": "2026-07-01T07:48:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:13a5bdcfda6e7caca9c4af69252bea224cf9e789ed2c3f177cd6bccf4adb2f64",
+          "at": "2026-07-01T07:50:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fa376ada81ce7a8669626c209ba57b6ca4b652baf890c299a45a807143cb9612",
+          "at": "2026-07-01T12:03:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fa376ada81ce7a8669626c209ba57b6ca4b652baf890c299a45a807143cb9612",
+          "at": "2026-07-01T17:23:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fa376ada81ce7a8669626c209ba57b6ca4b652baf890c299a45a807143cb9612",
+          "at": "2026-07-01T17:27:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:92291026fc2ad7da3993a75f09a8f4dbe7a55e6e55a73f64a110a69f70a146a8",
+          "at": "2026-07-02T02:50:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The PR handler now converts omitted `--base` and `--method` into an empty-string sentinel before calling the driver. That embeds the branch-strategy defaulting contract and the \"empty is not a valid branch/method\" invariant in the bin layer, instead of passing typed absence to `cli_driver` and letting driver/composition resolve it. This violates the CLI thin-bin policy from ADR D5/D8: keep this handler to parse-dispatch-emit and move the omission/default contract behind the driver boundary, e.g. with `Option` fields in `PrInput`.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/pr.rs",
+              "line": 113,
+              "category": "business logic in bin"
+            },
+            {
+              "message": "This surviving comment still points readers to `apps/cli-composition/src/track/fixpoint_resolve.rs`, but this PR deletes that file. The same block later names a stale cli-composition test that no longer exists under that name/location, so the final branch leaves a dead reference in the CLI scope. Update the comment to the new test location or remove the path reference.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/fixpoint_resolve.rs",
+              "line": 100,
+              "category": "dead-reference"
+            }
+          ],
+          "hash": "rvw1:sha256:92291026fc2ad7da3993a75f09a8f4dbe7a55e6e55a73f64a110a69f70a146a8",
+          "at": "2026-07-02T02:56:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:66eb1c545d5271c8d1b69b0902f928497dad55d0299e74a7de55fb5f932b285d",
+          "at": "2026-07-02T03:14:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:66eb1c545d5271c8d1b69b0902f928497dad55d0299e74a7de55fb5f932b285d",
+          "at": "2026-07-02T03:20:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Adding `metadata.json` here makes the supposed empty-diff approval test stop exercising the Approved path. `GitDiffGetter` includes untracked files, and this helper does not exclude `items/test-track/metadata.json`, so the new file becomes a diff in the implicit `Other` scope. The `check_approved_approved_path_exits_success_with_ok_message` case now covers the bypass/success path instead of the intended empty-diff Approved case.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/tests.rs",
+              "line": 89,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:ac9f377c491fb6bfe19621fa2cd9cc535f9b16f8814aef255637e734c3645e90",
+          "at": "2026-07-02T07:36:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c4dba10810c5ef4aec4f4222d70953b198a340dba8cf3d16de57944e57be8ac",
+          "at": "2026-07-02T07:40:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c4dba10810c5ef4aec4f4222d70953b198a340dba8cf3d16de57944e57be8ac",
+          "at": "2026-07-02T07:44:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_dry_check_approved` now resolves a telemetry writer, measures time, maps the driver outcome into a telemetry verdict, and calls `emit_gate_eval` from the bin handler. The CLI scope policy says `apps/cli` handlers must stay thin parse-dispatch-emit wrappers, with application-level I/O flowing through the driver; direct telemetry persistence from the bin is explicitly reportable under ADR D5/D8. Move this GateEval emission behind the `cli_driver`/composition boundary instead of doing it in `apps/cli`.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/dry.rs",
+              "line": 206,
+              "category": "direct I/O in bin"
+            }
+          ],
+          "hash": "rvw1:sha256:7cdba52821244696a926f4d34caacc5c7db6e15e7b93c5aef43fc03cd7919d5d",
+          "at": "2026-07-03T07:53:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7cdba52821244696a926f4d34caacc5c7db6e15e7b93c5aef43fc03cd7919d5d",
+          "at": "2026-07-03T07:59:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_track_id` accepts an explicit `--track-id` without reading or validating the current branch, and this line now passes that id into `resolve_telemetry_writer_for_track`, which constructs a writer without the branch-bound `track/*` check that `execute_verify_with_telemetry` gets from `resolve_telemetry_writer`. As a result, `sotp dry check-approved --track-id T` can emit GateEval telemetry from `main` or another non-track branch, exceeding the ADR-0446 D1/D2 narrow bin-level telemetry exception and the established verify-gate pattern. Keep the branch-bound resolver or explicitly validate the current branch before emitting.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/dry.rs",
+              "line": 209,
+              "category": "direct I/O in bin"
+            }
+          ],
+          "hash": "rvw1:sha256:0d91332b286e19dc9aa3776f557059c95f632db5174d9d5b05a337fa44feaca0",
+          "at": "2026-07-03T09:49:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9f6ae8593697d19cc7cd37bcf36602c2fa1f22c963ed5ac435d88cf16b03620c",
+          "at": "2026-07-03T10:06:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0812dac1d467d990491f2d5988b3e1268070efacc60e6cbde40284ae4b0d12d9",
+          "at": "2026-07-03T14:54:25Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bac82630858af0d55b78ef571a0bd5fc4cce2397fb5401074b5f100e6ec29832",
+          "at": "2026-07-02T08:56:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bac82630858af0d55b78ef571a0bd5fc4cce2397fb5401074b5f100e6ec29832",
+          "at": "2026-07-02T09:01:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`DryCheckServiceFactoryAdapter`'s docs still cite deleted paths under `apps/cli-composition/src/dry/` (`persistent_index.rs` and `manifest.rs`), and the nearby `RecordingDryTierTelemetryAdapter` entry repeats the same problem with `tier_telemetry.rs`. Those files were removed in this branch, so the catalogue now contains stale path references instead of current locations.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/branch-strategy-config-driven-2026-06-30/infrastructure-types.json",
+              "line": 345,
+              "category": "dead-reference"
+            }
+          ],
+          "hash": "rvw1:sha256:58f60bfc83c32e4b3278fbde99bb25088ee9c573b4d72304e7fda8d163132105",
+          "at": "2026-07-02T16:00:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`DryFixRunnerCompositionRoot` is a new load-bearing catalogue entry, but its `spec_refs` array is empty. That breaks the traceability requirement for the contract map: the entry cannot be tied back to any spec anchor, so Chain2 will not be able to verify why this type is present. Add a concrete spec reference or remove the entry from the catalogued surface.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/branch-strategy-config-driven-2026-06-30/cli_composition-types.json",
+              "line": 894,
+              "category": "SoT integrity"
+            }
+          ],
+          "hash": "rvw1:sha256:f855f12515369aa985427281286f42d8d9d86bb826f671a47a1714b646b8bed5",
+          "at": "2026-07-02T16:49:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:45a4d9c83b5c501a9b598a3948435d1aa171146055d48d4cb9a3962783708bde",
+          "at": "2026-07-02T17:02:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase-types.json` now declares `DryWriteDriverService`, `DryResultsDriverService`, and `DryCheckApprovedDriverService`, but their method signatures reference `DryWriteDriverInput`, `DryResultsDriverInput`, and `DryCheckApprovedDriverInput`; the retained `DryDriverPort`/`DryDriverService` still reference `DryFixLocalDriverInput`. None of those four input DTOs are declared anywhere in this catalogue, so the type SSoT is incomplete and the new interfaces are left with unresolved contract types. `libs/usecase/src/dry_driver.rs` defines these structs, so this file needs matching catalogue entries here.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+              "line": 1543,
+              "category": "SoT integrity"
+            }
+          ],
+          "hash": "rvw1:sha256:f659137cdbf5f9f888870d83c1951c94452e60787963194c58794e9c744b2652",
+          "at": "2026-07-02T18:18:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f3fa4f2e587375903e724e9c43abe1cf879ff910898baee0d4b249ec67cd62e0",
+          "at": "2026-07-02T18:57:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`DryCompositionRoot.dry_driver` documents the check-approved wiring as reusing `infrastructure::dry_check::FsDiffBaseResolverAdapter`, but the actual composition code injects `dry_driver_shared::FsDryDiffBaseFactoryAdapter` into `DryCheckApprovedDriverInteractor::new` and only that factory constructs `FsDiffBaseResolverAdapter` later per request. This makes the type catalogue's wiring contract factually inconsistent with the implementation for the diff-base dependency.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/cli_composition-types.json",
+              "line": 627,
+              "category": "SoT integrity"
+            }
+          ],
+          "hash": "rvw1:sha256:f3fa4f2e587375903e724e9c43abe1cf879ff910898baee0d4b249ec67cd62e0",
+          "at": "2026-07-02T19:08:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`DryFixRunnerCompositionRoot` is a delete-action entry for the cli_composition type being removed, but its `dry_run_fix_local` signature is declared with the replacement `usecase::dry_driver::DryFixLocalDriverInput`. The deleted source method took the cli_composition-local `RunDryFixLocalInput`, which is separately catalogued as a deleted DTO, so this delete contract is action-incoherent and loses the actual edge to the removed input type.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/cli_composition-types.json",
+              "line": 905,
+              "category": "SoT integrity"
+            }
+          ],
+          "hash": "rvw1:sha256:24ba08d8f8fc57f4cbcc7ddb297d2ce898b9898a029c0a6e5896f32bc0cc657b",
+          "at": "2026-07-02T19:14:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8180a5eb3ba617f3af828683eb636cf8a6a34408902656c69aa2a5229fb32ff7",
+          "at": "2026-07-02T19:20:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CodexDryFixLocalRunner` and `DryDriverAdapter` are the load-bearing infrastructure declarations for the dry-fix-local relocation, but both entries trace only to `OS-08`. `OS-08` explicitly says the subprocess behavior remains out of scope and points the placement correction at `IN-15`; `AC-21` then validates these exact types and their delegation relationship. As written, the catalogue records the new adapter/runner against the out-of-scope rationale instead of the requirement they implement, so the type contract's SoT trace is misleading. Add `IN-15`/`AC-21` (or replace `OS-08` where appropriate) on both entries.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/infrastructure-types.json",
+              "line": 454,
+              "category": "SoT integrity"
+            }
+          ],
+          "hash": "rvw1:sha256:fad4d701adbc0565d6a7f14408878709dc0be5057a80d99a5e40a2b69b83e5da",
+          "at": "2026-07-02T21:26:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`DryBaseBranchPort` still declares that missing `metadata.json` falls back to `.harness/config/branch-strategy.json`, and `FsDryBaseBranchAdapter` repeats the same fallback contract. That contradicts the referenced spec contract in IN-14/AC-20 (and IN-16/AC-22), which requires reading only `<track_dir>/metadata.json#branch_strategy_snapshot.base_branch` and returning `DryBaseBranchError` when metadata or the snapshot is missing, with no global-config fallback. As written, the type catalogue locks in the opposite behavior for dry write/check-approved base-branch resolution.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+              "line": 1424,
+              "category": "SoT integrity"
+            }
+          ],
+          "hash": "rvw1:sha256:32269c01a9e0e17bdefde43affbe05f3106d9c9114774605943a1a3662e90a16",
+          "at": "2026-07-02T21:33:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:155bcfb31315ae55c47f291285b41f441654083f2f365e2eb04cb50cbb60e966",
+          "at": "2026-07-02T22:23:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TimedGateEvalDryCheckApprovedService` is declared as `role: SecondaryAdapter`, but its own docs and `trait_impls` show it implements `usecase::dry_check_approved_driver::DryCheckApprovedDriverService`, an `ApplicationService`, rather than a secondary port. The type-design rules define `SecondaryAdapter` as an infrastructure struct implementing a `SecondaryPort`; an application-service implementation is not that contract. This force-fits an infrastructure-hosted primary-service decorator into the wrong role, so the catalogue and contract map misclassify the type-level boundary. Formalize a decorator role/pattern or split the design so infrastructure only implements a secondary port.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/infrastructure-types.json",
+              "line": 405,
+              "category": "role/kind mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:f398aa7b7b592e1ba6b1339c1a26d8ac8cbc921023f5bd223ba56a8fada83a87",
+          "at": "2026-07-03T00:02:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:07c85774e03649a93d3eae21589515cfbb7fbb8dab23a84998e160d2ee9698fd",
+          "at": "2026-07-03T02:09:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:72437f13b1f086b73792ce43a34b2e6b4cb71acdf71f2683643126a4459a893c",
+          "at": "2026-07-03T03:46:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cli_composition::telemetry_wiring::resolve_telemetry_writer_for_track` is declared as a `FreeFunction` in the `cli_composition` catalogue even though `knowledge/conventions/type-designer-kind-selection.md` R1 marks `FreeFunction` as forbidden for `cli_composition`; the entry itself acknowledges this. ADR-0446 authorizes bin-level GateEval helper calls, but it does not update or override the catalogue role/layer matrix, so this leaves a forbidden role in the type SSoT instead of modelling the public helper through an allowed cli_composition contract or formalizing the exception in the governing convention.",
+              "severity": "P1",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/cli_composition-types.json",
+              "line": 929,
+              "category": "role_kind_mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:e7d6502a5bfcefa9bb4a2cc18936fcc8aaa4ffd5236e0cb3cedfed1a15d74aae",
+          "at": "2026-07-03T09:49:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0b40cfe403f837a1d894b71d347f2f1874aee3f278a7518165dee8ca29617e16",
+          "at": "2026-07-03T13:21:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0b40cfe403f837a1d894b71d347f2f1874aee3f278a7518165dee8ca29617e16",
+          "at": "2026-07-03T13:26:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4e56fd51d3ea948e29cd40c7816f7c4b2e40b6ac6e6a41968f42048a01a5655a",
+          "at": "2026-07-03T15:06:42Z"
         }
       ]
     },
@@ -2074,6 +2998,13 @@
           "findings": [],
           "hash": "rvw1:sha256:ae2c230d20aef72e2c9dd8fae0e82dad97f5391b5180f7122b6f07d27aa3acde",
           "at": "2026-07-03T07:51:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:393004989ed1523fb3ccd000a5ae5a54a6ebcc2f351c8f19d7eff2eb0baeecef",
+          "at": "2026-07-03T14:53:10Z"
         }
       ]
     },
@@ -2632,913 +3563,52 @@
           "findings": [],
           "hash": "rvw1:sha256:72ffaed10b4534576a221069513c4b6d31c2b7f8aef685cc79fb62bf88930927",
           "at": "2026-07-03T09:48:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:79bd3ad273f8079a9f8ac2cce68937fc606e14ab7a460e82d238c2351c0d77fb",
+          "at": "2026-07-03T14:59:03Z"
         }
       ]
     },
-    "cli_driver": {
+    "domain": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:498e3310ab0076f4ff8be931588e8d97b2d9251f45ca8d7e51b7dfa4eff79fdc",
-          "at": "2026-07-01T07:53:45Z"
+          "hash": "rvw1:sha256:98b734ed377498cde2c2891058182452184459f591320a771ef203f48077cb39",
+          "at": "2026-06-30T20:44:11Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:498e3310ab0076f4ff8be931588e8d97b2d9251f45ca8d7e51b7dfa4eff79fdc",
-          "at": "2026-07-01T07:56:45Z"
+          "hash": "rvw1:sha256:98b734ed377498cde2c2891058182452184459f591320a771ef203f48077cb39",
+          "at": "2026-06-30T20:49:00Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:f2553c8d7edcd5795ba42df2fdef672fe1f908865718c5ab72fda1170e6e500d",
-          "at": "2026-07-02T02:50:43Z"
+          "hash": "rvw1:sha256:c9c9639697e2daf17e427aa1fc80d00c7f84bc17a6dfc09dcbe841c0b0d42ebc",
+          "at": "2026-07-02T07:34:20Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:f2553c8d7edcd5795ba42df2fdef672fe1f908865718c5ab72fda1170e6e500d",
-          "at": "2026-07-02T02:56:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d885d5b36f36cb03c6208a497f81fc9e1cc0ba42e9a23d645b33ee6a51681edd",
-          "at": "2026-07-02T03:14:16Z"
+          "hash": "rvw1:sha256:c9c9639697e2daf17e427aa1fc80d00c7f84bc17a6dfc09dcbe841c0b0d42ebc",
+          "at": "2026-07-02T07:39:48Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d885d5b36f36cb03c6208a497f81fc9e1cc0ba42e9a23d645b33ee6a51681edd",
-          "at": "2026-07-02T03:21:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3a5a31477da8acf53bea9ac386f4f1d1b047d342029f67a40803965d683ac61e",
-          "at": "2026-07-02T07:33:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3a5a31477da8acf53bea9ac386f4f1d1b047d342029f67a40803965d683ac61e",
-          "at": "2026-07-02T07:38:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bc0606125b00a937447e7a0bef40008f99cfab0fbeab0a366d6f02207e969d71",
-          "at": "2026-07-02T15:58:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bc0606125b00a937447e7a0bef40008f99cfab0fbeab0a366d6f02207e969d71",
-          "at": "2026-07-02T16:48:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bc0606125b00a937447e7a0bef40008f99cfab0fbeab0a366d6f02207e969d71",
-          "at": "2026-07-02T18:08:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bc0606125b00a937447e7a0bef40008f99cfab0fbeab0a366d6f02207e969d71",
-          "at": "2026-07-02T18:47:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bc0606125b00a937447e7a0bef40008f99cfab0fbeab0a366d6f02207e969d71",
-          "at": "2026-07-02T19:02:50Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: `dry_check_approved` now does more than the allowed cli_driver controller flow: it starts a timer, invokes the check-approved interactor, computes elapsed duration, and then calls a telemetry port before rendering. The scope policy says a Driver should stay at `input -> invoke exactly one interactor -> render`; this adds multi-step orchestration and an extra side-effect in the primary adapter instead of keeping timing/telemetry behind the application service/composition boundary.",
-              "severity": "P1",
-              "file": "apps/cli-driver/src/dry.rs",
-              "line": 209,
-              "category": "business_logic_in_adapter"
-            }
-          ],
-          "hash": "rvw1:sha256:0e2196305405ce2690a5f7727d569f917bfdf9472ee3a8ca449d0e0eea553fdc",
-          "at": "2026-07-03T02:04:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4191787b2f3ee78590cf0184d025f0ea549c931b61eaf166c2c7b96b79cca4d8",
-          "at": "2026-07-03T03:39:55Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:83cd3a8ed3fb6acf06c363984a9e4d8a415f0cf9a03741e5c74d2a3a0b551982",
-          "at": "2026-07-01T01:18:42Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:83cd3a8ed3fb6acf06c363984a9e4d8a415f0cf9a03741e5c74d2a3a0b551982",
-          "at": "2026-07-01T01:22:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cbd2e6484e6c906f016d7c3b15dbda4bfa37a92089e59e70fecb3954055dc0b0",
-          "at": "2026-07-01T08:50:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cbd2e6484e6c906f016d7c3b15dbda4bfa37a92089e59e70fecb3954055dc0b0",
-          "at": "2026-07-01T08:54:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new carve-out cites stale source locations: `DryDriverAdapter::dry_write` is at `apps/cli-composition/src/dry_driver_adapter.rs:55`, `DryCompositionRoot::dry_write` is at `apps/cli-composition/src/dry.rs:371`, and `DryCompositionRoot::dry_results` is at `apps/cli-composition/src/dry.rs:465`, not `dry_driver_adapter.rs:71`, `dry.rs:310`, and `dry.rs:404`. As written, reviewers will validate the wrong call sites and the exception will not reliably cover the intended request-time invokes.",
-              "severity": "P1",
-              "file": ".harness/custom/review-prompts/cli_composition.md",
-              "line": 29,
-              "category": "factual error"
-            }
-          ],
-          "hash": "rvw1:sha256:4e41e355d872d6346e573e8d8e3eb7769158df8de42844d8dad718ab0295eda9",
-          "at": "2026-07-01T11:39:21Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:83cd3a8ed3fb6acf06c363984a9e4d8a415f0cf9a03741e5c74d2a3a0b551982",
-          "at": "2026-07-01T12:00:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cf4375c1ceb9ceb37c5b82a48e44647f754f87a4ea8400bca7b33d05d68416db",
-          "at": "2026-07-01T17:27:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cf4375c1ceb9ceb37c5b82a48e44647f754f87a4ea8400bca7b33d05d68416db",
-          "at": "2026-07-01T17:32:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Renaming the wrapper to `track-switch-base` breaks the shipped `/track:done` flow: `.claude/commands/track/done.md` still shells out to `cargo make track-switch-main`, so the command now points at a deleted task and will fail before it can switch branches. The README already advertises the new base-branch behavior, so the docs and executable surface are now out of sync.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/Makefile.toml",
-              "line": 616,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:103d3b9df956ec75417b38e4857b37c7f91afe81c89d477474d0f20b596ce53b",
-          "at": "2026-07-02T02:50:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:771fc1d89e9cd2828a18f8cc8d12431b243696f690ad0c100095bc019c53f34d",
-          "at": "2026-07-02T03:00:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The harness-policy adapter-SSoT check requires track command adapters to point at an existing `.harness/workflows/track/...` SSoT and avoid duplicating provider-independent workflow steps inline. This changed adapter still owns the `/track:done` step sequence directly (`Step 1`, `Step 2`, command invocation), and there is no referenced `.harness/workflows/track/done.md`, so the workflow can drift from other provider adapters instead of having a single SSoT.",
-              "severity": "P1",
-              "file": ".claude/commands/track/done.md",
-              "line": 10,
-              "category": "adapter-SSoT sync"
-            },
-            {
-              "message": "`/track:done` now executes `cargo make track-switch-base`, but the command text still says it is returning/switching to `main` (also in the frontmatter and opening sentence). With the new branch strategy config using `develop` as the base branch, this makes the command report and reason about the wrong branch after execution.",
-              "severity": "P1",
-              "file": ".claude/commands/track/done.md",
-              "line": 22,
-              "category": "convention contradiction"
-            },
-            {
-              "message": "These rules now advertise `track-switch-base` and `track-branch-create` as operating on the configured base branch, but the canonical branch strategy convention still defines the workflow around `main` as the base/fail-closed branch. The harness-policy severity policy requires convention changes to propagate consistently across `.claude/rules` and `knowledge/conventions`; otherwise agents reading both surfaces get contradictory branch preconditions for the same commands.",
-              "severity": "P1",
-              "file": ".claude/rules/07-dev-environment.md",
-              "line": 54,
-              "category": "convention contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:771fc1d89e9cd2828a18f8cc8d12431b243696f690ad0c100095bc019c53f34d",
-          "at": "2026-07-02T03:12:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Phase 0 is still described as `main (direct)` in the phase invocation table, and the writer-ownership table repeats the same assumption later in the file. That contradicts the updated `init` workflow and branch-strategy convention, which now require the configured base branch, so the authoritative workflow docs are internally inconsistent on repos whose base branch is not `main`.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.harness/workflows/track/plan.md",
-              "line": 79,
-              "category": "convention contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:a37a14ed5cc06163f9b4a61fef532afe0eafaada4d27327dbf4eee346a34840d",
-          "at": "2026-07-02T03:39:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`Step 3` still writes `metadata.json` as `schema_version: 5` and only lists the identity fields. That contradicts the branch-strategy conventions, which require every track to freeze `metadata.json#branch_strategy_snapshot` at creation and then read that snapshot for post-init branch ops and ADR pre-merge detection. As written, a freshly initialized track will either never get the snapshot or will lose it if the branch-create step seeded one, so `track-switch-base` / PR merge / `git log <merge_target>` resolution will break or fall back incorrectly.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/init.md",
-              "line": 56,
-              "category": "convention contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:09b16f2e09d45534bed6688358d654810bb315868abbfecb2e2bf2842904460c",
-          "at": "2026-07-02T03:49:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The post-merge handoff tells users to `git pull` on the merge target branch, but `/track:done` immediately switches to the configured base branch and the branch-strategy convention defines `track-switch-base` as the post-merge landing branch. If `base_branch` and `merge_target` ever diverge, this sends the user to the wrong local branch after a successful merge.",
-              "severity": "P1",
-              "file": ".claude/commands/track/merge.md",
-              "line": 46,
-              "category": "convention contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:8bb8192eefa107ef8e1d8159fa9440dbba7f9ba56c0e73c57772f3eadcf2c9e5",
-          "at": "2026-07-02T04:00:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:32d91b254b26d78b6aba8cae875850e502910e00a7d12e4863933b5643edb6d4",
-          "at": "2026-07-02T04:07:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`.harness/config/branch-strategy.json` is still untracked (`git status --short` reports `??` and there is no cached diff), but this workflow now treats that path as the required source for the configured base branch. Because the harness-policy surface is distributed to template consumers, the PR would ship references to a config file that is not present in a fresh checkout, causing `/track:init` / branch creation to fail as soon as they try to resolve the base branch. Add the config file to the tracked change or avoid making tracked workflow docs depend on it.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/init.md",
-              "line": 12,
-              "category": "template-distribution reference leak"
-            },
-            {
-              "message": "The changed `/track:done` adapter still contains the workflow steps inline and does not name an Operational SSoT workflow file at the top. The harness-policy adapter-SSoT check requires `.claude/commands/track/*.md` adapters to point to an existing `.harness/workflows/...` file and avoid duplicating step/gate/state logic in the adapter, so this command can now drift independently from the workflow layer.",
-              "severity": "P1",
-              "file": ".claude/commands/track/done.md",
-              "line": 10,
-              "category": "adapter-SSoT sync"
-            },
-            {
-              "message": "The changed `/track:merge` adapter also encodes the PR resolution, wait/merge sequence, and post-merge behavior directly, without an Operational SSoT reference to an existing `.harness/workflows/...` file. That violates the harness-policy adapter-SSoT requirement and leaves the merge command's branch-strategy behavior outside the workflow SSoT where future policy changes are supposed to land.",
-              "severity": "P1",
-              "file": ".claude/commands/track/merge.md",
-              "line": 20,
-              "category": "adapter-SSoT sync"
-            }
-          ],
-          "hash": "rvw1:sha256:32d91b254b26d78b6aba8cae875850e502910e00a7d12e4863933b5643edb6d4",
-          "at": "2026-07-02T04:12:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6d2370072890a58750194e75b95c3dd3b0235866132edb1cd9cd73c9614e1ef0",
-          "at": "2026-07-02T04:22:42Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6d2370072890a58750194e75b95c3dd3b0235866132edb1cd9cd73c9614e1ef0",
-          "at": "2026-07-02T04:27:57Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`.harness/custom/review-prompts/types.md` has inconsistent hexagonal-architecture citations: line 36 uses `§Port Placement` instead of the project's `§Port Placement Rules`, and line 69 cites `§Dependency Direction`, but `knowledge/conventions/hexagonal-architecture.md` only has `## Layer Dependencies`. That makes the reviewer guidance point at the wrong convention sections.",
-              "severity": "P1",
-              "file": ".harness/custom/review-prompts/types.md",
-              "line": 69,
-              "category": "broken narrative reference"
-            }
-          ],
-          "hash": "rvw1:sha256:975c53ef881d66e3acdf4888b41e94cc33b223cb40c19f4196dc593b6d06f15b",
-          "at": "2026-07-02T07:40:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a2f0f1dc3e8cd7f9908e77c237af2186e06fed16feb50bde3d2d94b47a36fdc5",
-          "at": "2026-07-02T07:49:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The convention still claims ADR changes are protected by `adr` semantic review for `contradiction / factual error / infeasibility`, but the new `adr` briefing no longer reports general factual-error or infeasibility categories. Since `plan-artifacts` was removed, this line now overstates the actual review mechanism and can let convention-violating ADRs pass despite the convention promising reviewer coverage. Update the convention to match `.harness/custom/review-prompts/adr.md` or add the missing categories there.",
-              "severity": "P1",
-              "file": "knowledge/conventions/enforce-by-mechanism.md",
-              "line": 75,
-              "category": "convention contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:a2f0f1dc3e8cd7f9908e77c237af2186e06fed16feb50bde3d2d94b47a36fdc5",
-          "at": "2026-07-02T07:57:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:872a8960f964da1154ad0885856387beebf4608643bdf88af91b51dd7c18042b",
-          "at": "2026-07-02T08:02:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:eeda0256377b616587c6bc8ef94c3b2c5570604419e5bc2d655a22f3aa3fbf49",
-          "at": "2026-07-03T10:27:51Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0c04aa88fc38d0c08b5922cf48806e23cae1ff712475ebd292dde703be6f2370",
-          "at": "2026-06-30T20:44:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0c04aa88fc38d0c08b5922cf48806e23cae1ff712475ebd292dde703be6f2370",
-          "at": "2026-06-30T20:48:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`JsonConfigBranchStrategyAdapter::new` reads the config path directly with `read_to_string` and never rejects symlinks or verifies containment under a trusted root. A symlinked `.harness/config/branch-strategy.json` can therefore redirect this adapter to attacker-controlled content outside the repository, which matches the symlink-boundary issue this layer is supposed to fail closed on.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/branch_strategy.rs",
-              "line": 55,
-              "category": "symlink not rejected at boundary"
-            }
-          ],
-          "hash": "rvw1:sha256:29c2c84dadf1c1a8bc867535c4d2ff80d8b4d37514e937f994e9e1798eb4a15d",
-          "at": "2026-06-30T22:44:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "A symlinked `track/items/<id>` or `track/archive/<id>` directory is accepted here because `entry.path().is_dir()` follows symlinks, and the later `metadata.json` / `impl-plan.json` / `task-coverage.json` reads never re-check that the resolved path stays under `root`. A repo-controlled symlink can therefore escape the trusted root and feed external files into the render pipeline.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render/snapshot.rs",
-              "line": 306,
-              "category": "symlink not rejected at boundary"
-            },
-            {
-              "message": "`all_track_directories()` follows symlinked `track/items/<id>` / `track/archive/<id>` entries with `is_dir()`, and `load_track_metadata()` then reads `metadata.json` and `impl-plan.json` from that symlink target without a containment check. That lets the latest-track verifier select and parse data outside `root` if a track directory is replaced with a symlink.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/latest_track.rs",
-              "line": 103,
-              "category": "symlink not rejected at boundary"
-            }
-          ],
-          "hash": "rvw1:sha256:b8a75d58f32bdb24889d48ded48b260884fc83158f3b2f895cbee079aae2cdce",
-          "at": "2026-06-30T22:56:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Leaf symlinks are still followed when loading track state for latest-track/freshness checks. `latest_track.rs` reads `metadata.json` directly at line 254, `track/render/snapshot.rs` reads `impl-plan.json` directly at line 66, and `verify/view_freshness.rs` reads `metadata.json` directly at line 173. Those paths never do the same `symlink_metadata()` + reject step used elsewhere in the repo, so a symlinked file inside an otherwise real track directory can redirect these checks to content outside `track/items`.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/latest_track.rs",
-              "line": 254,
-              "category": "symlink not rejected at boundary"
-            },
-            {
-              "message": "`sync_rendered_views` still accepts symlinked track inputs. `catalogue_path_exists()` explicitly counts symlinks as present, and the render path then reads `spec.json` at line 180 and `*-types.json` at line 325 with `read_to_string()`. That lets a symlink under `track/items/<id>` feed arbitrary outside JSON into generated views instead of enforcing real-file semantics.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render/sync.rs",
-              "line": 325,
-              "category": "symlink not rejected at boundary"
-            }
-          ],
-          "hash": "rvw1:sha256:aa1c55a0c6df87b84666a3e861406ce125015b08fad2e7a10674436cfdd13ceb",
-          "at": "2026-06-30T23:06:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new `metadata_path.is_file()` pre-check runs before `reject_symlinks_below`, so a dangling symlink or other non-regular-file `metadata.json` is treated as absent and silently skipped instead of being rejected at the boundary. That bypasses the fail-closed guard that follows and can hide corrupted track state.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/view_freshness.rs",
-              "line": 84,
-              "category": "symlink not rejected at boundary"
-            }
-          ],
-          "hash": "rvw1:sha256:e45a22c8fa6308ea3c2f5161102260aeaeb83a02eb254a0317275941b8da216f",
-          "at": "2026-06-30T23:26:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c80cc7a3300a83f8cfb23872448c52782977665287270ddb89db62ca0babd43a",
-          "at": "2026-06-30T23:35:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c80cc7a3300a83f8cfb23872448c52782977665287270ddb89db62ca0babd43a",
-          "at": "2026-06-30T23:41:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:720eb2e859862e8ff252da394b9b064a31733f8a6a1e7026b0e96b0e94e8db53",
-          "at": "2026-07-01T01:22:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:720eb2e859862e8ff252da394b9b064a31733f8a6a1e7026b0e96b0e94e8db53",
-          "at": "2026-07-01T01:25:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7898bd45df8cb7262e279bea8abacdd0bc66ea88e03e4595736f6a067af207a3",
-          "at": "2026-07-01T02:12:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7898bd45df8cb7262e279bea8abacdd0bc66ea88e03e4595736f6a067af207a3",
-          "at": "2026-07-01T02:16:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:644f5371f66f0d2ade074f09ebedf9256e6d52efccbde791e8622d8a568d9ac4",
-          "at": "2026-07-01T08:09:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:644f5371f66f0d2ade074f09ebedf9256e6d52efccbde791e8622d8a568d9ac4",
-          "at": "2026-07-01T08:12:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1bd5947dd17b0e3961707627ebdd810fbc3c19acbe67a295e5ec1d5b30900cff",
-          "at": "2026-07-01T12:08:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1bd5947dd17b0e3961707627ebdd810fbc3c19acbe67a295e5ec1d5b30900cff",
-          "at": "2026-07-01T17:26:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`resolve_diff_base` builds `track_dir.join(\".commit_hash\")` and hands it to `FsDryCheckCommitHashStore` without first proving the resolved path remains under `canonical_root`. The store only rejects symlinks before `read_to_string`; it does not canonicalize and enforce `starts_with(canonical_root)`, so a path-traversing `track_dir` supplied at this adapter boundary can make the dry-gate read a `.commit_hash` outside the trusted repo root. This should fail closed using the existing trusted-root containment pattern (`is_safe_briefing_path`/CN-04 style) before any file read or fallback decision.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/dry_check/diff_base_resolver.rs",
-              "line": 51,
-              "category": "trusted-root violation"
-            }
-          ],
-          "hash": "rvw1:sha256:1bd5947dd17b0e3961707627ebdd810fbc3c19acbe67a295e5ec1d5b30900cff",
-          "at": "2026-07-01T17:33:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ad7955493c1701621abdfdfe8357b01d68d7eff78253a8d0673d23741c24bbcc",
-          "at": "2026-07-01T17:39:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`resolve_context` canonicalizes `--items-dir` but never rejects a symlinked root before the trust check. That lets a symlinked `items_dir` be redirected to a different tree, which is contrary to the existing symlink-rejection pattern used for trust-rooted filesystem inputs. Reject the root symlink before canonicalizing it.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/fixpoint_resolve_driver.rs",
-              "line": 113,
-              "category": "symlink not rejected at boundary"
-            },
-            {
-              "message": "`read_base_branch` reads `<canonical_items_dir>/<track_id>/metadata.json` with `std::fs::read_to_string` directly, so a symlinked `metadata.json` can redirect the load outside the track directory and feed an arbitrary base branch into fixpoint resolution. Existing infrastructure loaders reject symlinked metadata paths before reading; this one should too.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/fixpoint_resolve_driver.rs",
-              "line": 72,
-              "category": "symlink not rejected at boundary"
-            }
-          ],
-          "hash": "rvw1:sha256:4eda8e5fcfd6082712a01b2abb63ab3400531d36866cf1e9cff03949de700154",
-          "at": "2026-07-02T02:51:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a6d608710a7306fe0d208523853460560ad6a54447904febb21781945da29a31",
-          "at": "2026-07-02T03:03:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a6d608710a7306fe0d208523853460560ad6a54447904febb21781945da29a31",
-          "at": "2026-07-02T03:15:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`FsDryCheckConfigLoaderAdapter` builds `.harness/config/dry-check.json` under `repo_root` and immediately delegates to `InfraDryCheckConfig::load`, whose file read follows symlinks. Unlike the existing `scope_config_loader.rs` canonicalize + `reject_symlinks_below` pattern, this boundary does not reject a symlinked config file or parent, so fixpoint-resolve can read dry-check settings from outside the trusted checkout and change or disable the gate instead of failing closed. Add canonical containment and symlink rejection against `repo_root` before loading.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/track/fixpoint_resolve_driver.rs",
-              "line": 210,
-              "category": "symlink not rejected at boundary"
-            }
-          ],
-          "hash": "rvw1:sha256:a6d608710a7306fe0d208523853460560ad6a54447904febb21781945da29a31",
-          "at": "2026-07-02T03:24:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6bd4e1303012a980a9dc5ce71e679a6d682f4209809a1771d8366f06344589c1",
-          "at": "2026-07-02T03:36:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6bd4e1303012a980a9dc5ce71e679a6d682f4209809a1771d8366f06344589c1",
-          "at": "2026-07-02T03:39:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`FsDryApprovalFactoryAdapter` derives `dry-check.json` and `dry-check-coverage.json` with `track_dir.join(...)` and then constructs filesystem stores without first proving the resolved paths remain below `canonical_root`. The downstream symlink guard rejects symlinks but does not reject paths outside the trusted root, so a caller that passes an absolute or `..`-based `track_dir` can bind the approval store to files outside the repository. This should fail closed with the same trusted-root containment discipline used by the `is_safe_briefing_path`/CN-04 path policy and the sibling `trusted_commit_hash_path` helper before constructing the stores.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/dry_check/approval_factory.rs",
-              "line": 34,
-              "category": "trusted-root violation"
-            }
-          ],
-          "hash": "rvw1:sha256:6bd4e1303012a980a9dc5ce71e679a6d682f4209809a1771d8366f06344589c1",
-          "at": "2026-07-02T03:46:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:45256f82c95e9a37a083b06c7499035919e2508d72a6e3d44993a85f3298da9f",
-          "at": "2026-07-02T03:57:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`briefing_file` validation here still accepts Windows drive-relative paths such as `C:review.md`. `FilePath::new()` only rejects absolute and `..` traversal, so `trusted_root.join(briefing)` can discard `trusted_root` on Windows and resolve the briefing outside the workspace. Add a post-join `starts_with(trusted_root)` check or tighten the domain validator to reject drive-relative prefixes.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/review_v2/scope_config_loader.rs",
-              "line": 150,
-              "category": "trusted-root violation"
-            }
-          ],
-          "hash": "rvw1:sha256:2a6fac96faab96dff8e759f63a3dae9384d762fadec98160604a2a894911a6c9",
-          "at": "2026-07-02T07:44:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6e8c1400b57ec4d0f49f28e52dab8d0c3ccbf39afd7b1fe7ae03c3afffb999e3",
-          "at": "2026-07-02T07:50:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6e8c1400b57ec4d0f49f28e52dab8d0c3ccbf39afd7b1fe7ae03c3afffb999e3",
-          "at": "2026-07-02T07:54:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0ddb78fc8816dbd079f2aba2817f044d243291c3e6a7ea167532e9bb7b0770c8",
-          "at": "2026-07-02T10:28:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0ddb78fc8816dbd079f2aba2817f044d243291c3e6a7ea167532e9bb7b0770c8",
-          "at": "2026-07-02T10:31:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:71b0b94e5f34e2856dbce73210411526f3a7e5b9e02edb469ba7b9dcc367b91c",
-          "at": "2026-07-02T15:58:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`resolve_existing_dir_under_repo` canonicalizes the candidate path and checks containment, but it never rejects a symlinked leaf or ancestor before trusting the result. That means `FsDryRepoRootAdapter` and `FsDryCorpusFragmentsAdapter` can accept a symlinked `items_dir`/`workspace_root` root, unlike the existing fail-closed `--items-dir` validation pattern that rejects symlinks before canonicalization.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/dry_check/dry_driver_shared.rs",
-              "line": 35,
-              "category": "symlink not rejected at boundary"
-            },
-            {
-              "message": "`FsDryWriteConfigLoaderAdapter` reads `.harness/config/dry-check.json` via `InfraDryCheckConfig::load` without the canonicalize + `reject_symlinks_below` guard used by the existing dry-check config loader. A symlinked config file will be followed and treated as trusted instead of being rejected at the boundary.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/dry_check/dry_write_driver.rs",
-              "line": 94,
-              "category": "symlink not rejected at boundary"
-            },
-            {
-              "message": "`read_manifest` uses `std::fs::read_to_string` on the persistent-index sidecar with no symlink check. `open_persistent_index_with_corpus` consults this file before deciding whether to rebuild or reuse the cache, so a symlinked `.manifest` can inject cache state and steer the index path.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/dry_check/dry_write_driver/manifest.rs",
-              "line": 71,
-              "category": "symlink not rejected at boundary"
-            }
-          ],
-          "hash": "rvw1:sha256:71b0b94e5f34e2856dbce73210411526f3a7e5b9e02edb469ba7b9dcc367b91c",
-          "at": "2026-07-02T16:56:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`build_dry_fix_prompt` validates only prompt-breaking characters before calling `read_to_string` on the user-supplied `--briefing-file`. Absolute paths, `..` components, and symlinked briefing files are still accepted, so `sotp dry fix-local --briefing-file /etc/passwd` or a repo symlink can inject workspace-external file contents into the Codex subprocess prompt. This bypasses the existing `is_safe_briefing_path` / CN-04 fail-closed pattern; resolve the briefing under the repo trusted root and reject absolute/traversal/symlink paths before reading.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/dry_check/dry_fix_local/prompt.rs",
-              "line": 18,
-              "category": "trusted-root violation"
-            }
-          ],
-          "hash": "rvw1:sha256:20c964532f14608af628605e89723f77075420c2303f5c98aacf89715795d709",
-          "at": "2026-07-02T18:11:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:56349b73dfab93b7cc5f56a2204b5f09c2d1f5febca9d80a88b67a1d694c5dce",
-          "at": "2026-07-02T18:20:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cff4295949763c83dc400702fc87f1ec5c8421c69115ae5fe27bfa2356166562",
-          "at": "2026-07-02T22:23:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`dry_fix_spawn_and_collect` drains the Codex subprocess pipes but appends every stdout/stderr line into an unbounded `String` before writing the session log. Because this is an external process boundary, a bad or misconfigured `codex` binary can emit unlimited output and exhaust memory before the adapter can return a typed failure; the infrastructure policy treats unbounded I/O as a correctness issue. Add a bounded capture/truncation strategy while still draining the pipes.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/dry_check/dry_fix_local/spawn.rs",
-              "line": 108,
-              "category": "unbounded I/O"
-            }
-          ],
-          "hash": "rvw1:sha256:57b3bc2e58cff7f8257ddde0c68c08f4e22c0f2e7990d7b299e234756b82742e",
-          "at": "2026-07-03T00:03:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`existing_directory_state` only calls `symlink_metadata` on the leaf path, so symlinks in parent components of the user-supplied `db_path` are not rejected. `clear_persistent_index_dir` later calls `remove_dir_all(db_path)`, which will follow a symlinked parent such as `repo/link/index` where `link -> /outside`, allowing the persistent-index cleanup to operate outside the intended tree. This should use the same fail-closed ancestor check pattern as `reject_symlinks_below` before reading, writing, or deleting index paths.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/dry_check/dry_write_driver/persistent_index.rs",
-              "line": 208,
-              "category": "symlink not rejected at boundary"
-            }
-          ],
-          "hash": "rvw1:sha256:98c3e1949bdda99dffe834f4bab796e18c404d4171f3c905fe11ed2ae6f04947",
-          "at": "2026-07-03T00:30:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`dry write` loads `.harness/config/agent-profiles.json` by passing `root.join(AGENT_PROFILES_PATH)` directly to `AgentProfiles::load`, whose loader uses `std::fs::read_to_string` without rejecting symlinks. This bypasses the infrastructure config-boundary pattern used by `scope_config_loader.rs` and should fail closed with `reject_symlinks_below` before loading.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/dry_check/dry_write_driver/checker_config.rs",
-              "line": 62,
-              "category": "symlink not rejected at boundary"
-            },
-            {
-              "message": "`dry fix-local` has the same unguarded agent-profiles config read: it builds `<repo>/.harness/config/agent-profiles.json` and calls `AgentProfiles::load` without a `symlink_metadata`/`reject_symlinks_below` check. A symlinked config can be followed before provider/model resolution, contrary to the infrastructure symlink-rejection policy and existing `scope_config_loader.rs` guard pattern.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/dry_check/dry_fix_local/mod.rs",
-              "line": 93,
-              "category": "symlink not rejected at boundary"
-            }
-          ],
-          "hash": "rvw1:sha256:50e9a37355a410a3dfe6af521d45ccf5bf49b767a28a1ebdc743383b4d6201f0",
-          "at": "2026-07-03T02:07:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`resolve_base_branch` ignores the `canonical_root` trust anchor and instead builds `metadata_path` from the caller-supplied `track_dir`, then anchors symlink rejection at `track_dir.parent()`. If this adapter is ever called with an out-of-repo `track_dir`, a plain non-symlink path outside the repo is accepted and `std::fs::read_to_string` reads that external `metadata.json`. Infrastructure path loads should follow the existing safe-briefing pattern/CN-04 fail-closed policy: canonicalize the target and verify it remains under the trusted repo root before reading.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/dry_check/dry_driver_shared.rs",
-              "line": 107,
-              "category": "trusted-root violation"
-            },
-            {
-              "message": "`FsDryCorpusRootManifestAdapter::write` writes to `track_dir.join(\"dry-check-corpus-root.json\")` without proving that `track_dir` resolves under `repo_root`. `reject_symlinks_below(..., repo_root)` rejects symlinks but does not enforce containment, so an absolute or otherwise out-of-repo `track_dir` can create directories and atomically write the manifest outside the trusted root. Add a canonical containment check against `repo_root`, matching the safe-briefing/CN-04 fail-closed pattern, before `create_dir_all` or `atomic_write_file`.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/dry_check/dry_write_driver.rs",
-              "line": 384,
-              "category": "trusted-root violation"
-            }
-          ],
-          "hash": "rvw1:sha256:1f003abce9bf7aefc81d152f406d0c1051de81950d5ac52a41fda445a3e22f64",
-          "at": "2026-07-03T03:43:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`write_manifest` writes to `{db_path}.manifest.tmp` with `std::fs::write` without first rejecting symlinks for the temp path. The read path has an explicit sidecar symlink guard, but this write boundary does not guard the `.tmp` leaf, so a pre-existing symlink at that path is followed and can overwrite a target outside the intended index sidecar location. Use the existing `reject_symlinks_below`/atomic-write pattern for both the temp path and final sidecar before writing.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/dry_check/dry_write_driver/manifest.rs",
-              "line": 100,
-              "category": "symlink not rejected at boundary"
-            },
-            {
-              "message": "The manifest hash for a file's `CodeFragment`s includes `start_line` and content, but omits `end_line`. `CodeFragment`'s line span is part of the stored semantic-index payload, so two fragments with the same path/content/start line but different end line produce the same manifest hash and the persistent index is incorrectly treated as fresh, leaving stale range metadata. Include every semantics-affecting fragment field in the canonical hash, matching the existing fingerprint convention.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/dry_check/dry_write_driver/manifest.rs",
-              "line": 122,
-              "category": "fingerprint or hash drift"
-            }
-          ],
-          "hash": "rvw1:sha256:80f2c3ce2d3318c513c9f2b73c82407ea2d353753aab428bbdc77d6e1f999481",
-          "at": "2026-07-03T03:53:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e1a37b65c0690af3799063dd9add77065a02753b167db47a94fec6af12f4ddad",
-          "at": "2026-07-03T04:04:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2fd6a2fdd3ee38436469120d6bc44ee2edd9fffc67bb327f939219eecf97b91e",
-          "at": "2026-07-03T08:09:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1a9a9ac4be82db5ae704c9b29f22d3e8ae3ff101901f7c7ab7197aef81257a2d",
-          "at": "2026-07-03T11:14:05Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: `items_dir_abs.symlink_metadata()` runs before `canonicalize()`, so a missing `--items-dir` now returns `ItemsDirSymlinkCheckFailed` (`ENOENT` from `symlink_metadata`) instead of the contractually expected `ItemsDirInvalid`. That regresses a common invalid-input case and misroutes callers that rely on the invalid-directory branch.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/fixpoint_resolve_driver.rs",
-              "line": 145,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:261b900898e5019305695494c93a24b23d81d8fe6da39054e2828ba8aa79b3d3",
-          "at": "2026-07-03T13:23:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8430a45da8c4c3b0912121120f72474efb0f8432230a8a8bfdc16b5798ed011c",
-          "at": "2026-07-03T13:35:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8430a45da8c4c3b0912121120f72474efb0f8432230a8a8bfdc16b5798ed011c",
-          "at": "2026-07-03T13:41:27Z"
+          "hash": "rvw1:sha256:73e04a19403cfc6dfb529b8bdc1d26e2e0bd92409714dab6e4f545df7bb482f6",
+          "at": "2026-07-03T15:00:32Z"
         }
       ]
     }

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-03T13:57:09Z",
-  "declaration_hash": "4d7db489d27c9d94052e96d376b032f7097a46a2d2966036247965411bf451ef",
+  "generated_at": "2026-07-03T15:07:26Z",
+  "declaration_hash": "63068d6bf15f50407234dd0f437b5162def2f6986ccf0395330c749a3c8869b8",
   "signals": [
     {
       "type_name": "DryDriver",

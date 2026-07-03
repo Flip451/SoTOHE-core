@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "56b5e73610c70ae44de82e796aedd7748e41828aa2d7f3e1471bab51b38ff218",
+  "signals": [
+    {
+      "type_name": "CatalogueLintCheckActiveTrackArgs",
+      "signal": "blue",
+      "entry_hash": "c4c68088625786e6ec8859e3182bece92cbd8deb78ee49fdb43539129345d6e4"
+    },
+    {
+      "type_name": "CatalogueLintCommand",
+      "signal": "blue",
+      "entry_hash": "ceb404e4ac2edb31b4bb18564818e9659282a0cfce3852ea261681b70a0e1623"
+    },
+    {
+      "type_name": "CliCommand",
+      "signal": "blue",
+      "entry_hash": "3f648500d30899a0ae2e07a589fe17a22ee2659f0cdcf86bd14d7db88b4d2a03"
+    },
+    {
+      "type_name": "cli::commands::catalogue_lint::execute",
+      "signal": "blue",
+      "entry_hash": "8945edeb17005d5e2b55274ca01a86cf1e23442eafc5df8884d672068e35b828"
+    },
+    {
+      "type_name": "cli::commands::catalogue_lint::execute_check_active_track",
+      "signal": "blue",
+      "entry_hash": "8b0f5d0ba9b86201a06fadf776ecba1f3e83de5a7402c8d158de8e13eacd50d9"
+    }
+  ]
+}

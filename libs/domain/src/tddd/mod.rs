@@ -28,6 +28,7 @@ pub mod contract_map_renderer;
 pub mod extended_crate;
 pub mod layer_id;
 pub mod new_typegraph_codec_error;
+pub mod primitive_occurrence_scanner;
 pub mod semantic_verify;
 pub mod signal_evaluator;
 pub mod type_signals_doc;

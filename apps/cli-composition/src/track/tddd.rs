@@ -449,6 +449,7 @@ impl TrackCompositionRoot {
     ) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::tddd::contract_map_adapter::FsCatalogueLoader;
         use infrastructure::tddd::fs_lint_config_loader::FsLintConfigLoader;
+        use infrastructure::tddd::syn_primitive_occurrence_scanner::SynPrimitiveOccurrenceScanner;
         use usecase::catalogue_lint_workflow::{
             RunCatalogueLint, RunCatalogueLintCommand, RunCatalogueLintError,
             RunCatalogueLintInteractor,
@@ -464,7 +465,8 @@ impl TrackCompositionRoot {
         let rules_path = workspace_root.join("architecture-rules.json");
         let loader = FsCatalogueLoader::new(items_dir, rules_path, workspace_root.clone());
         let config_loader = FsLintConfigLoader::new(config_path);
-        let interactor = RunCatalogueLintInteractor::new(loader, config_loader);
+        let scanner = SynPrimitiveOccurrenceScanner;
+        let interactor = RunCatalogueLintInteractor::new(loader, config_loader, scanner);
 
         let runner: &dyn RunCatalogueLint = &interactor;
         let result = runner.execute(RunCatalogueLintCommand {
@@ -555,6 +557,14 @@ impl TrackCompositionRoot {
         Ok(CommandOutcome { stdout: Some(report.text), stderr: None, exit_code })
     }
 }
+
+// ---------------------------------------------------------------------------
+// Extracted submodules (split for module_limits.max_lines; see
+// libs/domain/src/tddd/catalogue_linter.rs for the same #[path] pattern)
+// ---------------------------------------------------------------------------
+
+#[path = "tddd_catalogue_lint.rs"]
+mod tddd_catalogue_lint;
 
 // ---------------------------------------------------------------------------
 // Shared helpers
