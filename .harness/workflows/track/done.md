@@ -25,8 +25,10 @@ cargo make track-switch-base
 
 Checks out the configured base branch and pulls the latest changes from origin. The wrapper
 delegates to `bin/sotp track switch-base`, which resolves `base_branch` from the active track's
-`metadata.json#branch_strategy_snapshot` when available and falls back to
-`.harness/config/branch-strategy.json` (via `JsonConfigBranchStrategyAdapter`) otherwise.
+`metadata.json#branch_strategy_snapshot`. The current branch must be `track/<id>` for the
+active track to resolve; if the caller is already on the base branch or on any other
+non-`track/<id>` branch, the command fails-closed. In that case, switch back to the track
+branch manually before invoking `/track:done`.
 
 **Step 2: Completion summary**
 
