@@ -100,7 +100,7 @@
       },
       "methods": [],
       "module_path": "fixpoint_resolve_driver",
-      "docs": "Output of FixpointWorkspaceContextPort::resolve_context: the validated workspace paths (CWD-anchored discovered repo root, canonicalized/containment-checked items_dir, derived project root) and the active track's configured base_branch (read from metadata.json's branch_strategy_snapshot.base_branch; resolve_context returns Err(FixpointWorkspaceContextError::Unavailable) instead of a hardcoded branch-name default when metadata.json is missing or fails to decode -- fail-closed per CN-03/CN-06, no branch-name fallback), bundled together because base_branch resolution is structurally dependent on the validated canonical_items_dir (mirrors DryCorpusMetaPort::resolve_corpus_meta's precedent of returning multiple related resolved values from one cohesive port method). usecase-hosted Dto (role R1 note: usecase Dto placement needs justification) justified because this is the internal output shape of a usecase SecondaryPort method, directly analogous to the existing FixpointResolveDriverInput/FixpointResolveDriverOutcome usecase-hosted plain data carriers in this same module -- it never crosses a serde boundary. `base_branch: String` (R9/R10 note): the base-branch concept already has a proper domain-level home (domain::branch_strategy::BranchStrategySnapshot, wrapping a validated domain::NonEmptyString, introduced by this same track's T001/T002), so R10's \"model the concept somewhere in domain\" requirement is satisfied elsewhere; this field is a resolved, already-domain-validated runtime value threaded through to FixpointDryGateFactoryPort / FixpointGateStateFactoryPort for `git rev-parse <base_branch>` / adapter-construction use, matching the raw String/&str representation already used at this exact orchestration boundary by every sibling entry introduced by IN-02/IN-04/IN-11 (BranchStrategyPort::base_branch, FsDiffBaseResolverAdapter::new(base_branch: String), FsReviewGateStateAdapter::new(items_dir, base_branch: String)) -- re-wrapping it in a second, usecase-local newtype here would diverge from that established convention without adding a new invariant.",
+      "docs": "Output of FixpointWorkspaceContextPort::resolve_context: the validated workspace paths (CWD-anchored discovered repo root, canonicalized/containment-checked items_dir, derived project root) and the active track's configured base_branch (read from metadata.json's branch_strategy_snapshot.base_branch; resolve_context returns an appropriate Err(FixpointWorkspaceContextError) variant (e.g. MetadataNotFound / MetadataDecodeFailed) instead of a hardcoded branch-name default when metadata.json is missing or fails to decode -- fail-closed per CN-03/CN-06, no branch-name fallback), bundled together because base_branch resolution is structurally dependent on the validated canonical_items_dir (mirrors DryCorpusMetaPort::resolve_corpus_meta's precedent of returning multiple related resolved values from one cohesive port method). usecase-hosted Dto (role R1 note: usecase Dto placement needs justification) justified because this is the internal output shape of a usecase SecondaryPort method, directly analogous to the existing FixpointResolveDriverInput/FixpointResolveDriverOutcome usecase-hosted plain data carriers in this same module -- it never crosses a serde boundary. `base_branch: String` (R9/R10 note): the base-branch concept already has a proper domain-level home (domain::branch_strategy::BranchStrategySnapshot, wrapping a validated domain::NonEmptyString, introduced by this same track's T001/T002), so R10's \"model the concept somewhere in domain\" requirement is satisfied elsewhere; this field is a resolved, already-domain-validated runtime value threaded through to FixpointDryGateFactoryPort / FixpointGateStateFactoryPort for `git rev-parse <base_branch>` / adapter-construction use, matching the raw String/&str representation already used at this exact orchestration boundary by every sibling entry introduced by IN-02/IN-04/IN-11 (BranchStrategyPort::base_branch, FsDiffBaseResolverAdapter::new(base_branch: String), FsReviewGateStateAdapter::new(items_dir, base_branch: String)) -- re-wrapping it in a second, usecase-local newtype here would diverge from that established convention without adding a new invariant.",
       "spec_refs": [
         { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-12" },
         { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "CN-03" },
@@ -114,12 +114,50 @@
       "kind": {
         "kind": "enum",
         "variants": [
-          { "name": "Unavailable", "payload": { "kind": "tuple", "fields": ["String"] } }
+          { "name": "GitDiscoveryFailed", "payload": { "kind": "struct", "fields": [
+            { "name": "detail", "ty": "GitDiscoveryFailureDetail" }
+          ] } },
+          { "name": "RepoRootCanonicalizeFailed", "payload": { "kind": "struct", "fields": [
+            { "name": "repo_root", "ty": "std::path::PathBuf" },
+            { "name": "detail", "ty": "IoFailureDetail" }
+          ] } },
+          { "name": "ItemsDirSymlinkCheckFailed", "payload": { "kind": "struct", "fields": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "detail", "ty": "IoFailureDetail" }
+          ] } },
+          { "name": "ItemsDirIsSymlink", "payload": { "kind": "struct", "fields": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" }
+          ] } },
+          { "name": "ItemsDirInvalid", "payload": { "kind": "struct", "fields": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" }
+          ] } },
+          { "name": "ProjectRootPatternInvalid", "payload": { "kind": "struct", "fields": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" }
+          ] } },
+          { "name": "ProjectRootCanonicalizeFailed", "payload": { "kind": "struct", "fields": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "detail", "ty": "IoFailureDetail" }
+          ] } },
+          { "name": "MetadataNotFound", "payload": { "kind": "struct", "fields": [
+            { "name": "track_id", "ty": "domain::TrackId" }
+          ] } },
+          { "name": "MetadataSymlinkRejected", "payload": { "kind": "struct", "fields": [
+            { "name": "track_id", "ty": "domain::TrackId" },
+            { "name": "detail", "ty": "IoFailureDetail" }
+          ] } },
+          { "name": "MetadataReadFailed", "payload": { "kind": "struct", "fields": [
+            { "name": "track_id", "ty": "domain::TrackId" },
+            { "name": "detail", "ty": "IoFailureDetail" }
+          ] } },
+          { "name": "MetadataDecodeFailed", "payload": { "kind": "struct", "fields": [
+            { "name": "track_id", "ty": "domain::TrackId" },
+            { "name": "detail", "ty": "MetadataDecodeFailureDetail" }
+          ] } }
         ]
       },
       "methods": [],
       "module_path": "fixpoint_resolve_driver",
-      "docs": "Error returned by FixpointWorkspaceContextPort::resolve_context when repo discovery fails, items_dir cannot be canonicalized or escapes the repository root, items_dir is not a directory, or the track's metadata.json cannot be read/decoded. Single opaque-message variant, mirroring the existing DiffBaseResolverError / DryCorpusMetaError shape in this same crate.",
+      "docs": "Error returned by FixpointWorkspaceContextPort::resolve_context (IN-12/AC-22). Decomposed per enumerable failure mode (2026-07 catalogue lint ForbidPrimitiveInTypes redesign; supersedes the single Unavailable(String) variant): GitDiscoveryFailed (SystemGitRepo::discover() failed -- git binary missing, not inside a working tree, etc.); RepoRootCanonicalizeFailed (the discovered repo root could not be canonicalized); ItemsDirSymlinkCheckFailed (the symlink-guard inspection of --items-dir itself failed with an io error, as opposed to definitively finding a symlink); ItemsDirIsSymlink (the symlink guard definitively found --items-dir is a symlink); ItemsDirInvalid (--items-dir does not exist, is not a directory, or resolves outside the repository root -- folds the canonicalize-not-found and containment/is_dir sub-cases, which the pre-redesign source already reported with identical text); ProjectRootPatternInvalid (canonical_items_dir does not match the required '<project-root>/track/items' shape); ProjectRootCanonicalizeFailed (the derived project root could not be canonicalized); MetadataNotFound / MetadataSymlinkRejected / MetadataReadFailed / MetadataDecodeFailed (the same four metadata.json failure modes as DryBaseBranchError, reproduced here because this port additionally resolves base_branch inline -- see DryBaseBranchError's docs for the fail-closed rationale, IN-06/IN-07). IoFailureDetail / GitDiscoveryFailureDetail / MetadataDecodeFailureDetail carry the underlying io::Error / git_cli::GitError / track::codec::CodecError's rendered text -- none of those infrastructure-only error types can cross into this usecase crate (layer direction) or are Clone, so a usecase-local opaque-text ValueObject bridges the diagnostic message.",
       "spec_refs": [
         { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-12" }
       ],
@@ -131,14 +169,188 @@
       "kind": {
         "kind": "enum",
         "variants": [
-          { "name": "Unavailable", "payload": { "kind": "tuple", "fields": ["String"] } }
+          { "name": "RepoRootCanonicalizeFailed", "payload": { "kind": "struct", "fields": [
+            { "name": "repo_root", "ty": "std::path::PathBuf" },
+            { "name": "detail", "ty": "IoFailureDetail" }
+          ] } },
+          { "name": "ConfigPathCanonicalizeFailed", "payload": { "kind": "struct", "fields": [
+            { "name": "config_path", "ty": "std::path::PathBuf" },
+            { "name": "detail", "ty": "IoFailureDetail" }
+          ] } },
+          { "name": "ConfigPathOutsideRepo", "payload": { "kind": "struct", "fields": [
+            { "name": "config_path", "ty": "std::path::PathBuf" },
+            { "name": "canonical_root", "ty": "std::path::PathBuf" }
+          ] } },
+          { "name": "ConfigSymlinkRejected", "payload": { "kind": "struct", "fields": [
+            { "name": "config_path", "ty": "std::path::PathBuf" },
+            { "name": "detail", "ty": "IoFailureDetail" }
+          ] } },
+          { "name": "ConfigLoadFailed", "payload": { "kind": "struct", "fields": [
+            { "name": "config_path", "ty": "std::path::PathBuf" },
+            { "name": "detail", "ty": "DryCheckConfigLoadFailureDetail" }
+          ] } },
+          { "name": "InvalidKnownBadPercent", "payload": { "kind": "struct", "fields": [
+            { "name": "value", "ty": "u8" }
+          ] } },
+          { "name": "InvalidMaxParallelism", "payload": { "kind": "struct", "fields": [
+            { "name": "configured_value", "ty": "usize" }
+          ] } }
         ]
       },
       "methods": [],
       "module_path": "fixpoint_resolve_driver",
-      "docs": "Error returned by DryCheckConfigLoaderPort::load when `.harness/config/dry-check.json` cannot be read or parsed. Single opaque-message variant, mirroring the existing DiffBaseResolverError / DryCorpusMetaError shape in this same crate.",
+      "docs": "Error returned by DryCheckConfigLoaderPort::load and reused by DryWriteConfigLoaderPort::load (IN-12/IN-14) when `.harness/config/dry-check.json` cannot be resolved or lifted into the usecase DryCheckConfig newtypes. Decomposed per enumerable failure mode (2026-07 catalogue lint ForbidPrimitiveInTypes redesign; supersedes the single Unavailable(String) variant): RepoRootCanonicalizeFailed / ConfigPathCanonicalizeFailed / ConfigSymlinkRejected / ConfigLoadFailed cover the canonicalize/symlink-guard/parse preamble shared by both FsDryCheckConfigLoaderAdapter::load and FsDryWriteConfigLoaderAdapter::load; ConfigPathOutsideRepo is fully structured (no external cause text) since the message is derivable from the two paths alone; InvalidKnownBadPercent / InvalidMaxParallelism cover the known-bad-percent / max_parallelism validation failure surfaced when lifting the raw config values into DryCheckPercent::try_new / DryCheckParallelism::try_new (usecase::dry_check::config) -- value is the raw rejected input, not the validated newtype, since the whole point of these variants is that validation failed. ConfigLoadFailed's detail carries infrastructure::dry_check::DryCheckConfigError's rendered text (not Clone, cannot cross the infrastructure->usecase boundary directly).",
       "spec_refs": [
         { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-12" }
+      ],
+      "informal_grounds": []
+    },
+    "IoFailureDetail": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "tuple", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [ { "name": "detail", "ty": "impl Into<String>" } ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "as_str",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "dry_driver_shared",
+      "docs": "Opaque diagnostic-text carrier for a std::io::Error encountered during a filesystem operation (canonicalize / read / write / create_dir / symlink inspection) at a DryRepoWorkspaceError / DryBaseBranchError / FixpointWorkspaceContextError / DryCheckConfigLoaderError / DryCorpusRootManifestError construction site. std::io::Error itself is not Clone and infrastructure adapters cannot pass their own error types across the infrastructure->usecase boundary (layer direction), so the adapter renders the io::Error via Display and wraps the resulting text in this usecase-local newtype. R1 note (ValueObject usecase placement needs justification): this is a purely technical diagnostic-text carrier introduced to give the underlying io::Error's rendered message a precise catalogue identity (satisfying the ForbidPrimitiveInTypes lint at the ErrorType variant positions that reference it) -- it is not a domain business concept (no domain expert discusses \"IoFailureDetail\" as ubiquitous language), so it is co-located with the usecase driver modules that construct it rather than promoted to domain. Infallible constructor: every call site supplies format!(...) output that is never empty in practice (a static prefix plus the io::Error's own non-empty Display text), so a fallible try_new + dedicated validation-error type would add ceremony without protecting against any reachable invalid state.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-12" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" }
+      ],
+      "informal_grounds": []
+    },
+    "GitDiscoveryFailureDetail": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "tuple", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [ { "name": "detail", "ty": "impl Into<String>" } ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "as_str",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "dry_driver_shared",
+      "docs": "Opaque diagnostic-text carrier for infrastructure::git_cli::GitError produced by a failed SystemGitRepo::discover() call, at a DryRepoWorkspaceError::GitDiscoveryFailed / FixpointWorkspaceContextError::GitDiscoveryFailed construction site. GitError (CurrentDir(io::Error) / Spawn{..} / CommandFailed{stderr,..} / EmptyRepoRoot) is infrastructure-only and not Clone, so it cannot cross the infrastructure->usecase boundary directly; the adapter renders it via Display and wraps the resulting text here. R1 note (ValueObject usecase placement needs justification): purely technical diagnostic carrier, not a domain concept -- co-located with the usecase driver modules that construct it, mirroring IoFailureDetail's identical justification in this same module. Infallible constructor for the same reason as IoFailureDetail (format!(...) output is never empty in practice).",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-12" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" }
+      ],
+      "informal_grounds": []
+    },
+    "MetadataDecodeFailureDetail": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "tuple", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [ { "name": "detail", "ty": "impl Into<String>" } ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "as_str",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "dry_driver_shared",
+      "docs": "Opaque diagnostic-text carrier for infrastructure::track::codec::CodecError produced when metadata.json fails to decode into TrackMetadata (JSON parse error, domain validation error, invalid field, or pre-v6 schema mismatch -- IN-07 fail-closed), at a DryBaseBranchError::MetadataDecodeFailed / FixpointWorkspaceContextError::MetadataDecodeFailed construction site. CodecError is infrastructure-only and not Clone (it wraps serde_json::Error), so it cannot cross the infrastructure->usecase boundary directly; the adapter renders it via Display and wraps the resulting text here. R1 note (ValueObject usecase placement needs justification): purely technical diagnostic carrier, not a domain concept -- co-located with the usecase driver modules that construct it, mirroring IoFailureDetail's identical justification in this same module. Infallible constructor for the same reason as IoFailureDetail.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-12" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-22" }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckConfigLoadFailureDetail": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "tuple", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [ { "name": "detail", "ty": "impl Into<String>" } ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "as_str",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "fixpoint_resolve_driver",
+      "docs": "Opaque diagnostic-text carrier for infrastructure::dry_check::DryCheckConfigError produced when `.harness/config/dry-check.json` fails to load or parse (Io / Parse / UnsupportedSchemaVersion / InvalidThreshold), at a DryCheckConfigLoaderError::ConfigLoadFailed construction site. DryCheckConfigError is infrastructure-only and not Clone (it wraps std::io::Error and serde_json::Error), so it cannot cross the infrastructure->usecase boundary directly; the adapter renders it via Display and wraps the resulting text here. R1 note (ValueObject usecase placement needs justification): purely technical diagnostic carrier, not a domain concept -- co-located with the usecase driver module that constructs it. Infallible constructor for the same reason as IoFailureDetail (usecase::dry_driver_shared).",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-12" },
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" }
       ],
       "informal_grounds": []
     },
@@ -390,12 +602,25 @@
       "kind": {
         "kind": "enum",
         "variants": [
-          { "name": "Unavailable", "payload": { "kind": "tuple", "fields": ["String"] } }
+          { "name": "GitDiscoveryFailed", "payload": { "kind": "struct", "fields": [
+            { "name": "detail", "ty": "GitDiscoveryFailureDetail" }
+          ] } },
+          { "name": "RepoRootCanonicalizeFailed", "payload": { "kind": "struct", "fields": [
+            { "name": "repo_root", "ty": "std::path::PathBuf" },
+            { "name": "detail", "ty": "IoFailureDetail" }
+          ] } },
+          { "name": "ItemsDirSymlinkRejected", "payload": { "kind": "struct", "fields": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "detail", "ty": "IoFailureDetail" }
+          ] } },
+          { "name": "ItemsDirInvalid", "payload": { "kind": "struct", "fields": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" }
+          ] } }
         ]
       },
       "methods": [],
       "module_path": "dry_driver_shared",
-      "docs": "Error returned by DryRepoRootPort::resolve when repo discovery fails or items_dir cannot be canonicalized, is not a directory, or escapes the repository root. Single opaque-message variant, mirroring the existing FixpointWorkspaceContextError / DiffBaseResolverError shape in this same crate.",
+      "docs": "Error returned by DryRepoRootPort::resolve (IN-14/AC-22). Decomposed per enumerable failure mode (2026-07 catalogue lint ForbidPrimitiveInTypes redesign; supersedes the single Unavailable(String) variant), mirroring FixpointWorkspaceContextError's git-discovery/items_dir variants (this port omits the base_branch/metadata.json step, which is DryBaseBranchPort's sole responsibility per CN-07): GitDiscoveryFailed (SystemGitRepo::discover() failed); RepoRootCanonicalizeFailed (the discovered repo root could not be canonicalized); ItemsDirSymlinkRejected (the symlink guard rejected items_dir, whether from an io error inspecting it or from definitively finding a symlink -- FsDryRepoRootAdapter's shared resolve_existing_dir_under_repo helper does not itself distinguish the two at the call site, unlike FsFixpointWorkspaceContextAdapter's inline checks); ItemsDirInvalid (items_dir does not exist, is not a directory, or resolves outside the repository root -- fully structured, no external cause text, since the message is derivable from items_dir alone). GitDiscoveryFailureDetail / IoFailureDetail (usecase::dry_driver_shared) carry the underlying git_cli::GitError / io::Error's rendered text -- neither infrastructure-only type can cross into this usecase crate or is Clone.",
       "spec_refs": [
         { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" }
       ],
@@ -407,12 +632,30 @@
       "kind": {
         "kind": "enum",
         "variants": [
-          { "name": "Unavailable", "payload": { "kind": "tuple", "fields": ["String"] } }
+          { "name": "MetadataPathOutsideRepo", "payload": { "kind": "struct", "fields": [
+            { "name": "metadata_path", "ty": "std::path::PathBuf" },
+            { "name": "canonical_root", "ty": "std::path::PathBuf" }
+          ] } },
+          { "name": "MetadataSymlinkRejected", "payload": { "kind": "struct", "fields": [
+            { "name": "track_id", "ty": "domain::TrackId" },
+            { "name": "detail", "ty": "IoFailureDetail" }
+          ] } },
+          { "name": "MetadataNotFound", "payload": { "kind": "struct", "fields": [
+            { "name": "track_id", "ty": "domain::TrackId" }
+          ] } },
+          { "name": "MetadataReadFailed", "payload": { "kind": "struct", "fields": [
+            { "name": "track_id", "ty": "domain::TrackId" },
+            { "name": "detail", "ty": "IoFailureDetail" }
+          ] } },
+          { "name": "MetadataDecodeFailed", "payload": { "kind": "struct", "fields": [
+            { "name": "track_id", "ty": "domain::TrackId" },
+            { "name": "detail", "ty": "MetadataDecodeFailureDetail" }
+          ] } }
         ]
       },
       "methods": [],
       "module_path": "dry_driver_shared",
-      "docs": "Error returned by DryBaseBranchPort::resolve_base_branch when metadata.json is absent, unreadable, or exists but fails to decode. Fail-closed per IN-06/IN-07: there is no `.harness/config/branch-strategy.json` fallback. Single opaque-message variant, mirroring the existing FixpointWorkspaceContextError shape in this same crate.",
+      "docs": "Error returned by DryBaseBranchPort::resolve_base_branch when metadata.json is absent, unreadable, or exists but fails to decode. Fail-closed per IN-06/IN-07: there is no `.harness/config/branch-strategy.json` fallback. Decomposed per enumerable failure mode (2026-07 catalogue lint ForbidPrimitiveInTypes redesign; supersedes the single Unavailable(String) variant): MetadataPathOutsideRepo (the resolved metadata.json path escapes canonical_root -- fully structured, checked before any read); MetadataSymlinkRejected (the symlink guard rejected metadata.json); MetadataNotFound (metadata.json does not exist -- fully structured); MetadataReadFailed (metadata.json exists but could not be read); MetadataDecodeFailed (metadata.json was read but failed to decode into TrackMetadata -- JSON parse error, domain validation error, or pre-v6 schema, all surfaced via infrastructure::track::codec::CodecError). IoFailureDetail / MetadataDecodeFailureDetail (usecase::dry_driver_shared) carry the underlying io::Error / CodecError's rendered text -- neither infrastructure-only type can cross into this usecase crate or is Clone.",
       "spec_refs": [
         { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" },
         { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-22" }
@@ -496,12 +739,99 @@
       "kind": {
         "kind": "enum",
         "variants": [
-          { "name": "Unavailable", "payload": { "kind": "tuple", "fields": ["String"] } }
+          { "name": "WorkspaceRootSymlinkRejected", "payload": { "kind": "struct", "fields": [
+            { "name": "workspace_root", "ty": "std::path::PathBuf" },
+            { "name": "detail", "ty": "IoFailureDetail" }
+          ] } },
+          { "name": "WorkspaceRootInvalid", "payload": { "kind": "struct", "fields": [
+            { "name": "workspace_root", "ty": "std::path::PathBuf" }
+          ] } },
+          { "name": "DiffHunkListingFailed", "payload": { "kind": "struct", "fields": [
+            { "name": "detail", "ty": "DiffHunkListingFailureDetail" }
+          ] } },
+          { "name": "FragmentExtractionFailed", "payload": { "kind": "struct", "fields": [
+            { "name": "detail", "ty": "FragmentPipelineFailureDetail" }
+          ] } },
+          { "name": "FragmentPathNormalizationFailed", "payload": { "kind": "struct", "fields": [
+            { "name": "detail", "ty": "FragmentPipelineFailureDetail" }
+          ] } }
         ]
       },
       "methods": [],
       "module_path": "dry_write_driver",
-      "docs": "Error returned by DryCorpusFragmentsPort::build when workspace_root fails containment validation, or hunk listing / fragment extraction / path normalization fails. Single opaque-message variant, mirroring the existing DiffBaseResolverError / DryCorpusMetaError shape in this same crate.",
+      "docs": "Error returned by DryCorpusFragmentsPort::build (IN-14). Decomposed per enumerable failure mode (2026-07 catalogue lint ForbidPrimitiveInTypes redesign; supersedes the single Unavailable(String) variant), mirroring DryRepoWorkspaceError's items_dir-invalid split for the analogous workspace_root check performed by the same resolve_existing_dir_under_repo helper: WorkspaceRootSymlinkRejected / WorkspaceRootInvalid cover workspace_root validation; DiffHunkListingFailed covers GitDryCheckDiffGetter::list_changed_hunks failing; FragmentExtractionFailed covers extract_code_fragments failing over workspace_root; FragmentPathNormalizationFailed covers the subsequent CodeFragment path-rebuild step failing (normalize_fragment_paths -- an internal-invariant case the source's own doc comment notes should not occur in practice, kept as a distinct variant because the source still defends against it explicitly). FragmentExtractionFailed and FragmentPathNormalizationFailed share one FragmentPipelineFailureDetail carrier type since both are diagnostic text from the same fragment-processing pipeline stage, distinguished by the enum variant rather than by a second carrier type.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" }
+      ],
+      "informal_grounds": []
+    },
+    "DiffHunkListingFailureDetail": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "tuple", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [ { "name": "detail", "ty": "impl Into<String>" } ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "as_str",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "dry_write_driver",
+      "docs": "Opaque diagnostic-text carrier for a failed GitDryCheckDiffGetter::list_changed_hunks call, at a DryCorpusFragmentsError::DiffHunkListingFailed construction site. R1 note (ValueObject usecase placement needs justification): purely technical diagnostic carrier, not a domain concept -- co-located with the usecase driver module that constructs it. Infallible constructor for the same reason as IoFailureDetail (usecase::dry_driver_shared).",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" }
+      ],
+      "informal_grounds": []
+    },
+    "FragmentPipelineFailureDetail": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "tuple", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [ { "name": "detail", "ty": "impl Into<String>" } ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "as_str",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "dry_write_driver",
+      "docs": "Opaque diagnostic-text carrier shared by DryCorpusFragmentsError::FragmentExtractionFailed (extract_code_fragments over workspace_root) and FragmentPathNormalizationFailed (the subsequent CodeFragment path-rebuild step) -- both are diagnostic text from the same fragment-processing pipeline stage, distinguished by the enum variant rather than by a second carrier type. R1 note (ValueObject usecase placement needs justification): purely technical diagnostic carrier, not a domain concept -- co-located with the usecase driver module that constructs it. Infallible constructor for the same reason as IoFailureDetail (usecase::dry_driver_shared).",
       "spec_refs": [
         { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" }
       ],
@@ -548,12 +878,165 @@
       "kind": {
         "kind": "enum",
         "variants": [
-          { "name": "Unavailable", "payload": { "kind": "tuple", "fields": ["String"] } }
+          { "name": "EmbeddingModelLoadFailed", "payload": { "kind": "struct", "fields": [
+            { "name": "detail", "ty": "EmbeddingModelLoadFailureDetail" }
+          ] } },
+          { "name": "SemanticIndexOpenFailed", "payload": { "kind": "struct", "fields": [
+            { "name": "detail", "ty": "SemanticIndexOpenFailureDetail" }
+          ] } },
+          { "name": "AgentConfigResolutionFailed", "payload": { "kind": "struct", "fields": [
+            { "name": "capability_name", "ty": "CapabilityName" },
+            { "name": "detail", "ty": "AgentConfigResolutionFailureDetail" }
+          ] } }
         ]
       },
       "methods": [],
       "module_path": "dry_write_driver",
-      "docs": "Error returned by DryCheckServiceFactoryPort::build when the embedding model fails to load, the persistent index fails to open, or agent-profiles.json-driven model/reasoning-effort resolution fails. Single opaque-message variant, mirroring the existing DiffBaseResolverError / DryCorpusMetaError shape in this same crate.",
+      "docs": "Error returned by DryCheckServiceFactoryPort::build (IN-14). Decomposed per enumerable failure mode (2026-07 catalogue lint ForbidPrimitiveInTypes redesign; supersedes the single Unavailable(String) variant) at the three distinct construction-site failures in DryCheckServiceFactoryAdapter::build: EmbeddingModelLoadFailed (FastEmbedAdapter::new() failed -- offline-cache preflight or model init); SemanticIndexOpenFailed (persistent_index::open_persistent_index_with_corpus failed -- LanceDB open/create, index cache marker I/O, or symlink guard); AgentConfigResolutionFailed (checker_config::resolve_dry_checker_config failed -- agent-profiles.json symlink guard, load/parse failure, no model configured for capability_name, or an invalid reasoning_effort value; not decomposed further than this shared construction-site boundary because these four sub-causes are already folded into one text by the private helper today and none of them recur at any other DryCheckServiceFactoryError construction site). Each *FailureDetail carries opaque diagnostic text from a third-party dependency (fastembed-rs / LanceDB / agent-profiles.json resolution) with no Clone-able, layer-crossable typed representation -- mirrors the pre-existing usecase::semantic_dup::EmbeddingError / SemanticIndexError precedent of an 'opaque error string, no domain concept' carrier, but as a dedicated named ValueObject per source instead of a raw String field so each carries its own precise identity.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" }
+      ],
+      "informal_grounds": []
+    },
+    "EmbeddingModelLoadFailureDetail": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "tuple", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [ { "name": "detail", "ty": "impl Into<String>" } ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "as_str",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "dry_write_driver",
+      "docs": "Opaque diagnostic-text carrier for a failed FastEmbedAdapter::new() call (offline-cache preflight or fastembed-rs model init failure), at a DryCheckServiceFactoryError::EmbeddingModelLoadFailed construction site. Mirrors the pre-existing usecase::semantic_dup::EmbeddingError::ModelLoadFailed{source: String}'s 'opaque error string from fastembed-rs, no domain concept' rationale, but as a dedicated named ValueObject rather than a raw String field so the identity is precise under the ForbidPrimitiveInTypes lint. R1 note (ValueObject usecase placement needs justification): purely technical diagnostic carrier, not a domain concept -- co-located with the usecase driver module that constructs it. Infallible constructor for the same reason as IoFailureDetail (usecase::dry_driver_shared).",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" }
+      ],
+      "informal_grounds": []
+    },
+    "SemanticIndexOpenFailureDetail": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "tuple", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [ { "name": "detail", "ty": "impl Into<String>" } ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "as_str",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "dry_write_driver",
+      "docs": "Opaque diagnostic-text carrier for a failed persistent_index::open_persistent_index_with_corpus call (LanceDB open/create failure, index cache marker read/write failure, or symlink guard rejection of the index cache path), at a DryCheckServiceFactoryError::SemanticIndexOpenFailed construction site. Mirrors the pre-existing usecase::semantic_dup::SemanticIndexError::OpenFailed{source: String}'s 'opaque error string from LanceDB, no domain concept' rationale, but as a dedicated named ValueObject rather than a raw String field so the identity is precise under the ForbidPrimitiveInTypes lint. R1 note (ValueObject usecase placement needs justification): purely technical diagnostic carrier, not a domain concept -- co-located with the usecase driver module that constructs it. Infallible constructor for the same reason as IoFailureDetail (usecase::dry_driver_shared).",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" }
+      ],
+      "informal_grounds": []
+    },
+    "AgentConfigResolutionFailureDetail": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "tuple", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [ { "name": "detail", "ty": "impl Into<String>" } ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "as_str",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "dry_write_driver",
+      "docs": "Opaque diagnostic-text carrier for a failed checker_config::resolve_dry_checker_config call (agent-profiles.json symlink guard rejection, load/parse failure, no model configured for the capability, or an invalid reasoning_effort value), at a DryCheckServiceFactoryError::AgentConfigResolutionFailed construction site. R1 note (ValueObject usecase placement needs justification): purely technical diagnostic carrier, not a domain concept -- co-located with the usecase driver module that constructs it. Infallible constructor for the same reason as IoFailureDetail (usecase::dry_driver_shared).",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" }
+      ],
+      "informal_grounds": []
+    },
+    "CapabilityName": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "tuple", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [
+        {
+          "name": "try_new",
+          "receiver": null,
+          "params": [ { "name": "value", "ty": "impl Into<String>" } ],
+          "returns": "Result<Self, domain::ValidationError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "as_str",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "dry_write_driver",
+      "docs": "Validated non-empty capability lookup key used to query `.harness/config/agent-profiles.json` (e.g. \"dry-checker\"), carried by DryCheckServiceFactoryError::AgentConfigResolutionFailed so the failed lookup names which capability was being resolved. Genuine identifier concept (R9/R10), unlike the *FailureDetail carriers in this same file -- validated via domain::NonEmptyString::try_new internally (non-empty, trimmed), reusing domain's existing validation rule rather than duplicating it. R1 note (ValueObject usecase placement needs justification): the raw capability_name value already crosses the cli_driver/usecase boundary as an unvalidated String field on DryCheckServiceFactoryCommand (a Dto, exempt from this justification); this ValueObject exists specifically to type the SAME concept at the ErrorType variant position, where DryCheckServiceFactoryCommand's Dto exemption does not apply.",
       "spec_refs": [
         { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" }
       ],
@@ -589,12 +1072,71 @@
       "kind": {
         "kind": "enum",
         "variants": [
-          { "name": "Unavailable", "payload": { "kind": "tuple", "fields": ["String"] } }
+          { "name": "RepoRootCanonicalizeFailed", "payload": { "kind": "struct", "fields": [
+            { "name": "repo_root", "ty": "std::path::PathBuf" },
+            { "name": "detail", "ty": "IoFailureDetail" }
+          ] } },
+          { "name": "ManifestPathOutsideRepo", "payload": { "kind": "struct", "fields": [
+            { "name": "manifest_path", "ty": "std::path::PathBuf" },
+            { "name": "canonical_root", "ty": "std::path::PathBuf" }
+          ] } },
+          { "name": "ManifestSerializeFailed", "payload": { "kind": "struct", "fields": [
+            { "name": "manifest_path", "ty": "std::path::PathBuf" },
+            { "name": "detail", "ty": "SerializationFailureDetail" }
+          ] } },
+          { "name": "ManifestSymlinkRejected", "payload": { "kind": "struct", "fields": [
+            { "name": "path", "ty": "std::path::PathBuf" },
+            { "name": "detail", "ty": "IoFailureDetail" }
+          ] } },
+          { "name": "ManifestParentCreateFailed", "payload": { "kind": "struct", "fields": [
+            { "name": "parent", "ty": "std::path::PathBuf" },
+            { "name": "detail", "ty": "IoFailureDetail" }
+          ] } },
+          { "name": "ManifestWriteFailed", "payload": { "kind": "struct", "fields": [
+            { "name": "manifest_path", "ty": "std::path::PathBuf" },
+            { "name": "detail", "ty": "IoFailureDetail" }
+          ] } }
         ]
       },
       "methods": [],
       "module_path": "dry_write_driver",
-      "docs": "Error returned by DryCorpusRootManifestWriterPort::write when the sidecar cannot be serialized or written (including symlink-guard rejection). Single opaque-message variant, mirroring the existing DiffBaseResolverError / DryCorpusMetaError shape in this same crate.",
+      "docs": "Error returned by DryCorpusRootManifestWriterPort::write (IN-14). Decomposed per enumerable failure mode (2026-07 catalogue lint ForbidPrimitiveInTypes redesign; supersedes the single Unavailable(String) variant): RepoRootCanonicalizeFailed / ManifestPathOutsideRepo cover resolve_manifest_path_under_repo's two sub-cases (the second fully structured, no external cause text); ManifestSerializeFailed covers serde_json::to_vec_pretty failing on the manifest DTO; ManifestSymlinkRejected covers the symlink guard rejecting EITHER the manifest's parent directory OR the manifest path itself -- FsDryCorpusRootManifestAdapter::write calls the same reject_symlinks_below check at both points, so one variant with a `path` field (which of the two paths failed) replaces what the source already treats as the same kind of rejection at two call sites; ManifestParentCreateFailed covers std::fs::create_dir_all failing for the manifest's parent directory; ManifestWriteFailed covers atomic_write_file failing for the manifest itself. IoFailureDetail / SerializationFailureDetail carry the underlying io::Error / serde_json::Error's rendered text -- neither is Clone.",
+      "spec_refs": [
+        { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" }
+      ],
+      "informal_grounds": []
+    },
+    "SerializationFailureDetail": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "tuple", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [ { "name": "detail", "ty": "impl Into<String>" } ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "as_str",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "dry_write_driver",
+      "docs": "Opaque diagnostic-text carrier for a serde_json::Error produced when the dry-check-corpus-root.json manifest DTO fails to serialize, at a DryCorpusRootManifestError::ManifestSerializeFailed construction site. serde_json::Error is not Clone, so the adapter renders it via Display and wraps the resulting text here. R1 note (ValueObject usecase placement needs justification): purely technical diagnostic carrier, not a domain concept -- co-located with the usecase driver module that constructs it. Infallible constructor for the same reason as IoFailureDetail (usecase::dry_driver_shared).",
       "spec_refs": [
         { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" }
       ],
@@ -1142,7 +1684,7 @@
       ],
       "supertrait_bounds": ["Send", "Sync"],
       "module_path": "fixpoint_resolve_driver",
-      "docs": "Secondary port for the fixpoint-resolve orchestration (IN-12). Bundles CWD-anchored git repo discovery, items_dir canonicalization/containment validation, project-root derivation, and base_branch resolution from the track's metadata.json branch_strategy_snapshot behind one cohesive port method, mirroring DryCorpusMetaPort's precedent of resolving several related filesystem-dependent values in one method. Fail-closed per CN-03/CN-06: resolve_context returns Err(FixpointWorkspaceContextError::Unavailable) -- never a hardcoded branch-name default -- when metadata.json is missing, unreadable, or fails to decode; no branch-name fallback. Implemented by infrastructure::track::fixpoint_resolve_driver::FsFixpointWorkspaceContextAdapter (ADR 1328 D7: port-impl adapters belong in libs/infrastructure). Injected directly into FixpointResolveDriverInteractor, which invokes it as part of its own orchestration (ADR 1328 D4) -- unlike the superseded FixpointResolveDriverPort design, this port performs only a single narrow I/O concern and does not itself invoke FixpointResolveService.",
+      "docs": "Secondary port for the fixpoint-resolve orchestration (IN-12). Bundles CWD-anchored git repo discovery, items_dir canonicalization/containment validation, project-root derivation, and base_branch resolution from the track's metadata.json branch_strategy_snapshot behind one cohesive port method, mirroring DryCorpusMetaPort's precedent of resolving several related filesystem-dependent values in one method. Fail-closed per CN-03/CN-06: resolve_context returns an appropriate Err(FixpointWorkspaceContextError) variant (e.g. MetadataNotFound / MetadataReadFailed / MetadataDecodeFailed) -- never a hardcoded branch-name default -- when metadata.json is missing, unreadable, or fails to decode; no branch-name fallback. Implemented by infrastructure::track::fixpoint_resolve_driver::FsFixpointWorkspaceContextAdapter (ADR 1328 D7: port-impl adapters belong in libs/infrastructure). Injected directly into FixpointResolveDriverInteractor, which invokes it as part of its own orchestration (ADR 1328 D4) -- unlike the superseded FixpointResolveDriverPort design, this port performs only a single narrow I/O concern and does not itself invoke FixpointResolveService.",
       "spec_refs": [
         { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-12" },
         { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "CN-03" },
@@ -1422,7 +1964,7 @@
           "generics": [],
           "has_default_impl": false,
           "where_predicates": [],
-          "docs": "Read the track's configured base_branch from `<track_dir>/metadata.json#branch_strategy_snapshot`. Fail-closed per IN-06/IN-07: returns Err(DryBaseBranchError::Unavailable) -- never a hardcoded branch-name default or a `.harness/config/branch-strategy.json` fallback -- when metadata.json is missing, unreadable, or fails to decode. R9/R10 note (mirrors FixpointWorkspaceContext.base_branch's established justification in this same crate): base_branch already has a proper domain-level home (domain::branch_strategy::BranchStrategySnapshot, wrapping a validated NonEmptyString); the raw String returned here is a resolved, already-domain-validated runtime value threaded through to DiffBaseResolverPort / infrastructure git-invocation and adapter-construction call sites, matching the raw String/&str representation already used at this exact orchestration boundary by every sibling entry (BranchStrategyPort::base_branch, FixpointWorkspaceContext.base_branch, FsDiffBaseResolverAdapter::new(base_branch: String))."
+          "docs": "Read the track's configured base_branch from `<track_dir>/metadata.json#branch_strategy_snapshot`. Fail-closed per IN-06/IN-07: returns an appropriate Err(DryBaseBranchError) variant (e.g. MetadataNotFound / MetadataReadFailed / MetadataDecodeFailed) -- never a hardcoded branch-name default or a `.harness/config/branch-strategy.json` fallback -- when metadata.json is missing, unreadable, or fails to decode. R9/R10 note (mirrors FixpointWorkspaceContext.base_branch's established justification in this same crate): base_branch already has a proper domain-level home (domain::branch_strategy::BranchStrategySnapshot, wrapping a validated NonEmptyString); the raw String returned here is a resolved, already-domain-validated runtime value threaded through to DiffBaseResolverPort / infrastructure git-invocation and adapter-construction call sites, matching the raw String/&str representation already used at this exact orchestration boundary by every sibling entry (BranchStrategyPort::base_branch, FixpointWorkspaceContext.base_branch, FsDiffBaseResolverAdapter::new(base_branch: String))."
         }
       ],
       "supertrait_bounds": ["Send", "Sync"],
@@ -1510,7 +2052,7 @@
       ],
       "supertrait_bounds": ["Send", "Sync"],
       "module_path": "dry_write_driver",
-      "docs": "Secondary port for `sotp dry write` (IN-14). Bundles config load + effective-threshold resolution + safe-approval fingerprint selection behind one cohesive method (mirroring DryCorpusMetaPort's precedent of resolving several related values in one port call), because the fingerprint decision needs BOTH the resolved effective threshold AND the infrastructure-side DryCheckConfig's own file threshold -- a value usecase::dry_check::DryCheckConfig does not carry, so the decision cannot be made in the usecase interactor itself without leaking an infrastructure type across the boundary. Reuses the existing DryCheckConfigLoaderError (fixpoint_resolve_driver module) rather than declaring a near-duplicate error type: the failure mode (dry-check.json unreadable/unparseable) is identical to DryCheckConfigLoaderPort's; only the extra threshold_override parameter and the fingerprint-selection rule differ, which does not warrant a second error type per this crate's `Unavailable(String)`-per-port convention. Implemented by infrastructure::dry_check::dry_write_driver::FsDryWriteConfigLoaderAdapter.",
+      "docs": "Secondary port for `sotp dry write` (IN-14). Bundles config load + effective-threshold resolution + safe-approval fingerprint selection behind one cohesive method (mirroring DryCorpusMetaPort's precedent of resolving several related values in one port call), because the fingerprint decision needs BOTH the resolved effective threshold AND the infrastructure-side DryCheckConfig's own file threshold -- a value usecase::dry_check::DryCheckConfig does not carry, so the decision cannot be made in the usecase interactor itself without leaking an infrastructure type across the boundary. Reuses the existing DryCheckConfigLoaderError (fixpoint_resolve_driver module, redesigned 2026-07 into per-failure-mode variants including RepoRootCanonicalizeFailed / ConfigLoadFailed / InvalidKnownBadPercent / InvalidMaxParallelism) rather than declaring a near-duplicate error type: the failure modes (dry-check.json unreadable/unparseable, invalid known-bad-percent/max_parallelism) are identical to DryCheckConfigLoaderPort's; only the extra threshold_override parameter and the fingerprint-selection rule differ, which does not warrant a second error type. Implemented by infrastructure::dry_check::dry_write_driver::FsDryWriteConfigLoaderAdapter.",
       "spec_refs": [
         { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "IN-14" },
         { "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json", "anchor": "AC-20" }
@@ -1866,6 +2408,61 @@
     { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "DryWriteFindingSummary" },
     { "action": "add", "trait_ref": "core::clone::Clone", "for_type": "DryWriteFindingSummary" },
     { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "DryCheckApprovedOutcome" },
-    { "action": "add", "trait_ref": "core::clone::Clone", "for_type": "DryCheckApprovedOutcome" }
+    { "action": "add", "trait_ref": "core::clone::Clone", "for_type": "DryCheckApprovedOutcome" },
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "IoFailureDetail" },
+    { "action": "add", "trait_ref": "core::clone::Clone", "for_type": "IoFailureDetail" },
+    { "action": "add", "trait_ref": "core::cmp::PartialEq", "for_type": "IoFailureDetail" },
+    { "action": "add", "trait_ref": "core::cmp::Eq", "for_type": "IoFailureDetail" },
+    { "action": "add", "trait_ref": "core::fmt::Display", "for_type": "IoFailureDetail" },
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "GitDiscoveryFailureDetail" },
+    { "action": "add", "trait_ref": "core::clone::Clone", "for_type": "GitDiscoveryFailureDetail" },
+    { "action": "add", "trait_ref": "core::cmp::PartialEq", "for_type": "GitDiscoveryFailureDetail" },
+    { "action": "add", "trait_ref": "core::cmp::Eq", "for_type": "GitDiscoveryFailureDetail" },
+    { "action": "add", "trait_ref": "core::fmt::Display", "for_type": "GitDiscoveryFailureDetail" },
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "MetadataDecodeFailureDetail" },
+    { "action": "add", "trait_ref": "core::clone::Clone", "for_type": "MetadataDecodeFailureDetail" },
+    { "action": "add", "trait_ref": "core::cmp::PartialEq", "for_type": "MetadataDecodeFailureDetail" },
+    { "action": "add", "trait_ref": "core::cmp::Eq", "for_type": "MetadataDecodeFailureDetail" },
+    { "action": "add", "trait_ref": "core::fmt::Display", "for_type": "MetadataDecodeFailureDetail" },
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "DryCheckConfigLoadFailureDetail" },
+    { "action": "add", "trait_ref": "core::clone::Clone", "for_type": "DryCheckConfigLoadFailureDetail" },
+    { "action": "add", "trait_ref": "core::cmp::PartialEq", "for_type": "DryCheckConfigLoadFailureDetail" },
+    { "action": "add", "trait_ref": "core::cmp::Eq", "for_type": "DryCheckConfigLoadFailureDetail" },
+    { "action": "add", "trait_ref": "core::fmt::Display", "for_type": "DryCheckConfigLoadFailureDetail" },
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "SerializationFailureDetail" },
+    { "action": "add", "trait_ref": "core::clone::Clone", "for_type": "SerializationFailureDetail" },
+    { "action": "add", "trait_ref": "core::cmp::PartialEq", "for_type": "SerializationFailureDetail" },
+    { "action": "add", "trait_ref": "core::cmp::Eq", "for_type": "SerializationFailureDetail" },
+    { "action": "add", "trait_ref": "core::fmt::Display", "for_type": "SerializationFailureDetail" },
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "EmbeddingModelLoadFailureDetail" },
+    { "action": "add", "trait_ref": "core::clone::Clone", "for_type": "EmbeddingModelLoadFailureDetail" },
+    { "action": "add", "trait_ref": "core::cmp::PartialEq", "for_type": "EmbeddingModelLoadFailureDetail" },
+    { "action": "add", "trait_ref": "core::cmp::Eq", "for_type": "EmbeddingModelLoadFailureDetail" },
+    { "action": "add", "trait_ref": "core::fmt::Display", "for_type": "EmbeddingModelLoadFailureDetail" },
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "SemanticIndexOpenFailureDetail" },
+    { "action": "add", "trait_ref": "core::clone::Clone", "for_type": "SemanticIndexOpenFailureDetail" },
+    { "action": "add", "trait_ref": "core::cmp::PartialEq", "for_type": "SemanticIndexOpenFailureDetail" },
+    { "action": "add", "trait_ref": "core::cmp::Eq", "for_type": "SemanticIndexOpenFailureDetail" },
+    { "action": "add", "trait_ref": "core::fmt::Display", "for_type": "SemanticIndexOpenFailureDetail" },
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "AgentConfigResolutionFailureDetail" },
+    { "action": "add", "trait_ref": "core::clone::Clone", "for_type": "AgentConfigResolutionFailureDetail" },
+    { "action": "add", "trait_ref": "core::cmp::PartialEq", "for_type": "AgentConfigResolutionFailureDetail" },
+    { "action": "add", "trait_ref": "core::cmp::Eq", "for_type": "AgentConfigResolutionFailureDetail" },
+    { "action": "add", "trait_ref": "core::fmt::Display", "for_type": "AgentConfigResolutionFailureDetail" },
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "DiffHunkListingFailureDetail" },
+    { "action": "add", "trait_ref": "core::clone::Clone", "for_type": "DiffHunkListingFailureDetail" },
+    { "action": "add", "trait_ref": "core::cmp::PartialEq", "for_type": "DiffHunkListingFailureDetail" },
+    { "action": "add", "trait_ref": "core::cmp::Eq", "for_type": "DiffHunkListingFailureDetail" },
+    { "action": "add", "trait_ref": "core::fmt::Display", "for_type": "DiffHunkListingFailureDetail" },
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "FragmentPipelineFailureDetail" },
+    { "action": "add", "trait_ref": "core::clone::Clone", "for_type": "FragmentPipelineFailureDetail" },
+    { "action": "add", "trait_ref": "core::cmp::PartialEq", "for_type": "FragmentPipelineFailureDetail" },
+    { "action": "add", "trait_ref": "core::cmp::Eq", "for_type": "FragmentPipelineFailureDetail" },
+    { "action": "add", "trait_ref": "core::fmt::Display", "for_type": "FragmentPipelineFailureDetail" },
+    { "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "CapabilityName" },
+    { "action": "add", "trait_ref": "core::clone::Clone", "for_type": "CapabilityName" },
+    { "action": "add", "trait_ref": "core::cmp::PartialEq", "for_type": "CapabilityName" },
+    { "action": "add", "trait_ref": "core::cmp::Eq", "for_type": "CapabilityName" },
+    { "action": "add", "trait_ref": "core::fmt::Display", "for_type": "CapabilityName" }
   ]
 }

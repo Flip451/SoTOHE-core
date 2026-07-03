@@ -13,20 +13,36 @@ use crate::agent_profiles::{AGENT_PROFILES_PATH, AgentProfiles};
 use crate::dry_check::DryCheckConfig as InfraDryCheckConfig;
 use crate::track::symlink_guard::reject_symlinks_below;
 
+/// Distinguishes which validation step failed inside
+/// [`build_usecase_dry_check_config`], so the caller
+/// ([`super::FsDryWriteConfigLoaderAdapter::load`]) can map each failure to
+/// its own `usecase::fixpoint_resolve_driver::DryCheckConfigLoaderError`
+/// variant, carrying the raw rejected input value (not the validation
+/// error's rendered text).
+#[derive(Debug)]
+pub(super) enum BuildDryCheckConfigError {
+    /// A `known_bad_*_percent` value failed `DryCheckPercent::try_new`.
+    InvalidKnownBadPercent(u8),
+    /// `max_parallelism` failed `DryCheckParallelism::try_new`.
+    InvalidMaxParallelism(usize),
+}
+
 /// Lift infra [`InfraDryCheckConfig`] fields (enabled + max_parallelism +
 /// known-bad percents) into the validated usecase newtypes. All values come
 /// from `.harness/config/dry-check.json` v4.
 pub(super) fn build_usecase_dry_check_config(
     infra_config: &InfraDryCheckConfig,
-) -> Result<usecase::dry_check::DryCheckConfig, String> {
+) -> Result<usecase::dry_check::DryCheckConfig, BuildDryCheckConfigError> {
     use usecase::dry_check::{DryCheckConfig, DryCheckParallelism, DryCheckPercent};
-    let percent =
-        |v: u8| DryCheckPercent::try_new(v).map_err(|e| format!("invalid known-bad percent: {e}"));
+    let percent = |v: u8| {
+        DryCheckPercent::try_new(v).map_err(|_| BuildDryCheckConfigError::InvalidKnownBadPercent(v))
+    };
     Ok(DryCheckConfig::new(
         percent(infra_config.known_bad_injection_rate_percent())?,
         percent(infra_config.known_bad_detection_threshold_percent())?,
-        DryCheckParallelism::try_new(infra_config.max_parallelism())
-            .map_err(|e| format!("invalid max_parallelism: {e}"))?,
+        DryCheckParallelism::try_new(infra_config.max_parallelism()).map_err(|_| {
+            BuildDryCheckConfigError::InvalidMaxParallelism(infra_config.max_parallelism())
+        })?,
         infra_config.enabled(),
     ))
 }

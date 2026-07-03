@@ -222,11 +222,14 @@ mod tests {
     };
     use crate::dry_driver_shared::{
         DryBaseBranchError, DryCheckStorageHandle, DryRepoWorkspace, DryRepoWorkspaceError,
+        GitDiscoveryFailureDetail, IoFailureDetail,
     };
     use crate::fixpoint_resolve::{
         DiffBaseResolverError, DiffBaseResolverPort, DryCorpusMetaError,
     };
-    use crate::fixpoint_resolve_driver::DryCheckConfigLoaderError;
+    use crate::fixpoint_resolve_driver::{
+        DryCheckConfigLoadFailureDetail, DryCheckConfigLoaderError,
+    };
 
     // ── Test doubles ─────────────────────────────────────────────────────────
 
@@ -407,6 +410,10 @@ mod tests {
         CommitHash::try_new("a".repeat(40)).unwrap()
     }
 
+    fn make_test_track_id() -> TrackId {
+        TrackId::try_new("test-track-2026").unwrap()
+    }
+
     fn make_input() -> DryCheckApprovedDriverInput {
         DryCheckApprovedDriverInput {
             track_id: "test-track-2026".to_owned(),
@@ -454,7 +461,7 @@ mod tests {
         let interactor = make_interactor(
             Ok(make_workspace()),
             Ok((test_dry_config(false), make_config_fingerprint())),
-            Err(DryBaseBranchError::Unavailable("must not be called".to_owned())),
+            Err(DryBaseBranchError::MetadataNotFound { track_id: make_test_track_id() }),
             Err(DiffBaseResolverError::Unavailable("must not be called".to_owned())),
             Err(DryCorpusMetaError::Unavailable("must not be called".to_owned())),
             Err(D4OrchestrationError::DiffFragment("must not be called".to_owned())),
@@ -533,7 +540,9 @@ mod tests {
         let interactor = DryCheckApprovedDriverInteractor::new(
             Arc::new(StubRepoRoot { result: Ok(make_workspace()) }),
             Arc::new(StubBaseBranch {
-                result: Err(DryBaseBranchError::Unavailable("must not be called".to_owned())),
+                result: Err(DryBaseBranchError::MetadataNotFound {
+                    track_id: make_test_track_id(),
+                }),
             }),
             Arc::new(PanicIfCalledDiffBaseFactory),
             Arc::new(StubConfigLoader {
@@ -584,7 +593,9 @@ mod tests {
     #[test]
     fn dry_check_approved_repo_root_failure_returns_failure() {
         let interactor = make_interactor(
-            Err(DryRepoWorkspaceError::Unavailable("repo boom".to_owned())),
+            Err(DryRepoWorkspaceError::GitDiscoveryFailed {
+                detail: GitDiscoveryFailureDetail::new("repo boom"),
+            }),
             Ok((test_dry_config(true), make_config_fingerprint())),
             Ok("main".to_owned()),
             Ok(make_commit_hash()),
@@ -606,7 +617,10 @@ mod tests {
     fn dry_check_approved_config_loader_failure_returns_failure() {
         let interactor = make_interactor(
             Ok(make_workspace()),
-            Err(DryCheckConfigLoaderError::Unavailable("config boom".to_owned())),
+            Err(DryCheckConfigLoaderError::ConfigLoadFailed {
+                config_path: PathBuf::from(".harness/config/dry-check.json"),
+                detail: DryCheckConfigLoadFailureDetail::new("config boom"),
+            }),
             Ok("main".to_owned()),
             Ok(make_commit_hash()),
             Ok((
@@ -630,7 +644,10 @@ mod tests {
         let interactor = make_interactor(
             Ok(make_workspace()),
             Ok((test_dry_config(true), make_config_fingerprint())),
-            Err(DryBaseBranchError::Unavailable("base branch boom".to_owned())),
+            Err(DryBaseBranchError::MetadataReadFailed {
+                track_id: make_test_track_id(),
+                detail: IoFailureDetail::new("base branch boom"),
+            }),
             Ok(make_commit_hash()),
             Ok((
                 PathBuf::from("/repo"),

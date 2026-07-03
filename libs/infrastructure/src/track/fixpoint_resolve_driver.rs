@@ -18,11 +18,14 @@ use usecase::dry_check::{
     DryCheckApprovalService, DryCheckConfig, DryCheckParallelism, DryCheckPercent,
     DryFragmentPipelineInteractor,
 };
+use usecase::dry_driver_shared::{
+    GitDiscoveryFailureDetail, IoFailureDetail, MetadataDecodeFailureDetail,
+};
 use usecase::fixpoint_resolve::{FixpointDryGateInteractor, FixpointDryGateService};
 use usecase::fixpoint_resolve_driver::{
-    DryCheckConfigLoaderError, DryCheckConfigLoaderPort, FixpointDryGateFactoryPort,
-    FixpointGateStateFactoryPort, FixpointWorkspaceContext, FixpointWorkspaceContextError,
-    FixpointWorkspaceContextPort,
+    DryCheckConfigLoadFailureDetail, DryCheckConfigLoaderError, DryCheckConfigLoaderPort,
+    FixpointDryGateFactoryPort, FixpointGateStateFactoryPort, FixpointWorkspaceContext,
+    FixpointWorkspaceContextError, FixpointWorkspaceContextPort,
 };
 
 use crate::dry_check::approval_factory::FsDryApprovalFactoryAdapter;
@@ -63,8 +66,8 @@ fn resolve_project_root(items_dir: &Path) -> Result<PathBuf, String> {
 
 /// Read `base_branch` from `<canonical_items_dir>/<track_id>/metadata.json`.
 ///
-/// Fail-closed: a missing `metadata.json` or any decode error maps to
-/// [`FixpointWorkspaceContextError::Unavailable`] — there is no branch-name
+/// Fail-closed: a missing `metadata.json` or any decode error maps to a
+/// [`FixpointWorkspaceContextError`] variant — there is no branch-name
 /// fallback (IN-06/IN-07/CN-03/CN-06).
 fn read_base_branch(
     canonical_items_dir: &Path,
@@ -74,29 +77,28 @@ fn read_base_branch(
     match reject_symlinks_below(&metadata_path, canonical_items_dir) {
         Ok(true) => {}
         Ok(false) => {
-            return Err(FixpointWorkspaceContextError::Unavailable(format!(
-                "read metadata.json for '{}': metadata.json is missing",
-                track_id.as_ref()
-            )));
+            return Err(FixpointWorkspaceContextError::MetadataNotFound {
+                track_id: track_id.clone(),
+            });
         }
         Err(e) => {
-            return Err(FixpointWorkspaceContextError::Unavailable(format!(
-                "symlink guard metadata.json for '{}': {e}",
-                track_id.as_ref()
-            )));
+            return Err(FixpointWorkspaceContextError::MetadataSymlinkRejected {
+                track_id: track_id.clone(),
+                detail: IoFailureDetail::new(e.to_string()),
+            });
         }
     }
     let metadata_json = std::fs::read_to_string(&metadata_path).map_err(|e| {
-        FixpointWorkspaceContextError::Unavailable(format!(
-            "read metadata.json for '{}': {e}",
-            track_id.as_ref()
-        ))
+        FixpointWorkspaceContextError::MetadataReadFailed {
+            track_id: track_id.clone(),
+            detail: IoFailureDetail::new(e.to_string()),
+        }
     })?;
     let (track_meta, _) = crate::track::codec::decode(&metadata_json).map_err(|e| {
-        FixpointWorkspaceContextError::Unavailable(format!(
-            "decode metadata.json for '{}': {e}",
-            track_id.as_ref()
-        ))
+        FixpointWorkspaceContextError::MetadataDecodeFailed {
+            track_id: track_id.clone(),
+            detail: MetadataDecodeFailureDetail::new(e.to_string()),
+        }
     })?;
     Ok(track_meta.branch_strategy_snapshot().base_branch().to_owned())
 }
@@ -118,12 +120,15 @@ impl FixpointWorkspaceContextPort for FsFixpointWorkspaceContextAdapter {
         track_id: &TrackId,
     ) -> Result<FixpointWorkspaceContext, FixpointWorkspaceContextError> {
         let cwd_repo = SystemGitRepo::discover().map_err(|e| {
-            FixpointWorkspaceContextError::Unavailable(format!("cannot discover git repo: {e}"))
+            FixpointWorkspaceContextError::GitDiscoveryFailed {
+                detail: GitDiscoveryFailureDetail::new(e.to_string()),
+            }
         })?;
         let repo_root = cwd_repo.root().canonicalize().map_err(|e| {
-            FixpointWorkspaceContextError::Unavailable(format!(
-                "cannot canonicalize repo root: {e}"
-            ))
+            FixpointWorkspaceContextError::RepoRootCanonicalizeFailed {
+                repo_root: cwd_repo.root().to_path_buf(),
+                detail: IoFailureDetail::new(e.to_string()),
+            }
         })?;
 
         let items_dir_abs = if items_dir.is_absolute() {
@@ -131,57 +136,57 @@ impl FixpointWorkspaceContextPort for FsFixpointWorkspaceContextAdapter {
         } else {
             repo_root.join(items_dir)
         };
-        reject_symlinks_below(&items_dir_abs, &repo_root).map_err(|e| {
-            FixpointWorkspaceContextError::Unavailable(format!(
-                "symlink guard: refusing to use --items-dir '{}': {e}",
-                items_dir.display()
-            ))
-        })?;
-        match items_dir_abs.symlink_metadata() {
-            Ok(meta) if meta.file_type().is_symlink() => {
-                return Err(FixpointWorkspaceContextError::Unavailable(format!(
-                    "symlink guard: refusing to use symlinked --items-dir '{}'",
-                    items_dir.display()
-                )));
+        match reject_symlinks_below(&items_dir_abs, &repo_root) {
+            Ok(true) => {}
+            Ok(false) => {
+                return Err(FixpointWorkspaceContextError::ItemsDirInvalid {
+                    items_dir: items_dir.to_path_buf(),
+                });
             }
-            Ok(_) => {}
             Err(e) => {
-                return Err(FixpointWorkspaceContextError::Unavailable(format!(
-                    "symlink guard: cannot stat --items-dir '{}': {e}",
-                    items_dir.display()
-                )));
+                if matches!(
+                    items_dir_abs.symlink_metadata(),
+                    Ok(meta) if meta.file_type().is_symlink()
+                ) {
+                    return Err(FixpointWorkspaceContextError::ItemsDirIsSymlink {
+                        items_dir: items_dir.to_path_buf(),
+                    });
+                }
+                return Err(FixpointWorkspaceContextError::ItemsDirSymlinkCheckFailed {
+                    items_dir: items_dir.to_path_buf(),
+                    detail: IoFailureDetail::new(e.to_string()),
+                });
             }
         }
 
         let canonical_items_dir = items_dir_abs.canonicalize().map_err(|_| {
-            FixpointWorkspaceContextError::Unavailable(format!(
-                "--items-dir '{}' must be an existing directory under the repository root",
-                items_dir.display()
-            ))
+            FixpointWorkspaceContextError::ItemsDirInvalid { items_dir: items_dir.to_path_buf() }
         })?;
 
         if !canonical_items_dir.starts_with(&repo_root) {
-            return Err(FixpointWorkspaceContextError::Unavailable(format!(
-                "--items-dir '{}' must be an existing directory under the repository root",
-                items_dir.display()
-            )));
+            return Err(FixpointWorkspaceContextError::ItemsDirInvalid {
+                items_dir: items_dir.to_path_buf(),
+            });
         }
 
-        let canonical_root = resolve_project_root(&canonical_items_dir)
-            .and_then(|p| {
-                p.canonicalize().map_err(|e| format!("cannot canonicalize project root: {e}"))
-            })
-            .map_err(|e| {
-                FixpointWorkspaceContextError::Unavailable(format!(
-                    "cannot derive project root from items_dir: {e}"
-                ))
-            })?;
+        let canonical_root = match resolve_project_root(&canonical_items_dir) {
+            Ok(project_root) => project_root.canonicalize().map_err(|e| {
+                FixpointWorkspaceContextError::ProjectRootCanonicalizeFailed {
+                    items_dir: canonical_items_dir.clone(),
+                    detail: IoFailureDetail::new(e.to_string()),
+                }
+            })?,
+            Err(_) => {
+                return Err(FixpointWorkspaceContextError::ProjectRootPatternInvalid {
+                    items_dir: canonical_items_dir.clone(),
+                });
+            }
+        };
 
         if !canonical_items_dir.is_dir() {
-            return Err(FixpointWorkspaceContextError::Unavailable(format!(
-                "--items-dir '{}' must be an existing directory under the repository root",
-                items_dir.display()
-            )));
+            return Err(FixpointWorkspaceContextError::ItemsDirInvalid {
+                items_dir: items_dir.to_path_buf(),
+            });
         }
 
         let base_branch = read_base_branch(&canonical_items_dir, track_id)?;
@@ -207,45 +212,48 @@ impl DryCheckConfigLoaderPort for FsDryCheckConfigLoaderAdapter {
         repo_root: &Path,
     ) -> Result<(DryCheckConfig, DryCheckConfigFingerprint), DryCheckConfigLoaderError> {
         let canonical_root = repo_root.canonicalize().map_err(|e| {
-            DryCheckConfigLoaderError::Unavailable(format!(
-                "failed to canonicalize repo root '{}': {e}",
-                repo_root.display()
-            ))
+            DryCheckConfigLoaderError::RepoRootCanonicalizeFailed {
+                repo_root: repo_root.to_path_buf(),
+                detail: IoFailureDetail::new(e.to_string()),
+            }
         })?;
         let dry_config_path = canonical_root.join(".harness/config/dry-check.json");
         let canonical_dry_config_path = dry_config_path.canonicalize().map_err(|e| {
-            DryCheckConfigLoaderError::Unavailable(format!(
-                "failed to canonicalize dry-check config '{}': {e}",
-                dry_config_path.display()
-            ))
+            DryCheckConfigLoaderError::ConfigPathCanonicalizeFailed {
+                config_path: dry_config_path.clone(),
+                detail: IoFailureDetail::new(e.to_string()),
+            }
         })?;
         if !canonical_dry_config_path.starts_with(&canonical_root) {
-            return Err(DryCheckConfigLoaderError::Unavailable(format!(
-                "dry-check config '{}' resolves outside repo root '{}'",
-                dry_config_path.display(),
-                canonical_root.display()
-            )));
+            return Err(DryCheckConfigLoaderError::ConfigPathOutsideRepo {
+                config_path: dry_config_path,
+                canonical_root,
+            });
         }
         reject_symlinks_below(&dry_config_path, &canonical_root).map_err(|e| {
-            DryCheckConfigLoaderError::Unavailable(format!(
-                "symlink guard dry-check config '{}': {e}",
-                dry_config_path.display()
-            ))
+            DryCheckConfigLoaderError::ConfigSymlinkRejected {
+                config_path: dry_config_path.clone(),
+                detail: IoFailureDetail::new(e.to_string()),
+            }
         })?;
         let infra_config = InfraDryCheckConfig::load(&canonical_dry_config_path).map_err(|e| {
-            DryCheckConfigLoaderError::Unavailable(format!("failed to load dry-check config: {e}"))
+            DryCheckConfigLoaderError::ConfigLoadFailed {
+                config_path: dry_config_path.clone(),
+                detail: DryCheckConfigLoadFailureDetail::new(e.to_string()),
+            }
         })?;
 
         let percent = |v: u8| {
-            DryCheckPercent::try_new(v).map_err(|e| {
-                DryCheckConfigLoaderError::Unavailable(format!("invalid known-bad percent: {e}"))
-            })
+            DryCheckPercent::try_new(v)
+                .map_err(|_| DryCheckConfigLoaderError::InvalidKnownBadPercent { value: v })
         };
         let usecase_config = DryCheckConfig::new(
             percent(infra_config.known_bad_injection_rate_percent())?,
             percent(infra_config.known_bad_detection_threshold_percent())?,
-            DryCheckParallelism::try_new(infra_config.max_parallelism()).map_err(|e| {
-                DryCheckConfigLoaderError::Unavailable(format!("invalid max_parallelism: {e}"))
+            DryCheckParallelism::try_new(infra_config.max_parallelism()).map_err(|_| {
+                DryCheckConfigLoaderError::InvalidMaxParallelism {
+                    configured_value: infra_config.max_parallelism(),
+                }
             })?,
             infra_config.enabled(),
         );
@@ -434,6 +442,33 @@ mod tests {
             }
             other => panic!("expected Failure, got {other:?}"),
         }
+    }
+
+    /// A missing `--items-dir` is an invalid directory input, not a symlink-guard
+    /// inspection failure.
+    #[test]
+    fn test_fixpoint_workspace_context_missing_items_dir_returns_invalid_error() {
+        let _lock = CWD_LOCK.lock().unwrap();
+        let (dir, _items_dir) = seed_track_repo("my-track-2026");
+        let root = dir.path();
+        let original_cwd = std::env::current_dir().expect("current_dir must succeed");
+        std::env::set_current_dir(root).expect("set_current_dir to temp repo must succeed");
+
+        let result = FsFixpointWorkspaceContextAdapter.resolve_context(
+            &PathBuf::from("track/missing-items"),
+            &TrackId::try_new("my-track-2026").unwrap(),
+        );
+
+        std::env::set_current_dir(&original_cwd).expect("restore CWD must succeed");
+        drop(dir);
+        assert!(
+            matches!(
+                result,
+                Err(FixpointWorkspaceContextError::ItemsDirInvalid { ref items_dir })
+                    if items_dir.as_path() == Path::new("track/missing-items")
+            ),
+            "missing items_dir must be classified as invalid, got: {result:?}"
+        );
     }
 
     /// A symlinked `--items-dir` must be rejected before canonicalization can

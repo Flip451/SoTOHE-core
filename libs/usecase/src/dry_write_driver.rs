@@ -22,8 +22,16 @@ use crate::dry_check::{DryCheckConfig, DryCheckCoveragePort, DryCheckCycleError,
 use crate::dry_driver::{DryWriteDriverInput, DryWriteFindingSummary, DryWriteOutcome};
 use crate::dry_driver_shared::{
     DryBaseBranchPort, DryCheckStorageFactoryPort, DryDiffBaseFactoryPort, DryRepoRootPort,
+    IoFailureDetail,
 };
 use crate::fixpoint_resolve_driver::DryCheckConfigLoaderError;
+
+mod failure_details;
+pub use failure_details::{
+    AgentConfigResolutionFailureDetail, CapabilityName, DiffHunkListingFailureDetail,
+    EmbeddingModelLoadFailureDetail, FragmentPipelineFailureDetail, SemanticIndexOpenFailureDetail,
+    SerializationFailureDetail,
+};
 
 // ── DryWriteConfigResolution ──────────────────────────────────────────────────
 
@@ -57,9 +65,43 @@ pub struct DryCorpusFragmentsOutput {
 /// Error returned by [`DryCorpusFragmentsPort::build`].
 #[derive(Debug, Clone, thiserror::Error)]
 pub enum DryCorpusFragmentsError {
-    /// Workspace-root validation, diff listing, or fragment extraction failed.
-    #[error("{0}")]
-    Unavailable(String),
+    /// The symlink guard rejected `workspace_root`.
+    #[error("symlink guard workspace_root '{}': {detail}", workspace_root.display())]
+    WorkspaceRootSymlinkRejected {
+        /// The rejected `workspace_root` path.
+        workspace_root: PathBuf,
+        /// Rendered `io::Error` diagnostic text.
+        detail: IoFailureDetail,
+    },
+    /// `workspace_root` does not exist, is not a directory, or resolves
+    /// outside the repository root.
+    #[error(
+        "workspace_root '{}' must be an existing directory under the repository root",
+        workspace_root.display()
+    )]
+    WorkspaceRootInvalid {
+        /// The invalid `workspace_root` path.
+        workspace_root: PathBuf,
+    },
+    /// `GitDryCheckDiffGetter::list_changed_hunks` failed.
+    #[error("list_changed_hunks failed: {detail}")]
+    DiffHunkListingFailed {
+        /// Rendered diagnostic text.
+        detail: DiffHunkListingFailureDetail,
+    },
+    /// `extract_code_fragments` failed over `workspace_root`.
+    #[error("fragment extraction failed: {detail}")]
+    FragmentExtractionFailed {
+        /// Rendered diagnostic text.
+        detail: FragmentPipelineFailureDetail,
+    },
+    /// The subsequent `CodeFragment` path-rebuild step
+    /// (`normalize_fragment_paths`) failed.
+    #[error("fragment path normalization failed: {detail}")]
+    FragmentPathNormalizationFailed {
+        /// Rendered diagnostic text.
+        detail: FragmentPipelineFailureDetail,
+    },
 }
 
 // ── DryCheckServiceFactoryCommand ─────────────────────────────────────────────
@@ -100,9 +142,29 @@ pub struct DryCheckServiceFactoryCommand {
 /// Error returned by [`DryCheckServiceFactoryPort::build`].
 #[derive(Debug, Clone, thiserror::Error)]
 pub enum DryCheckServiceFactoryError {
-    /// Embedding-model load, index-open, or agent-profile resolution failed.
-    #[error("{0}")]
-    Unavailable(String),
+    /// `FastEmbedAdapter::new()` failed (offline-cache preflight or model init).
+    #[error("failed to load embedding model: {detail}")]
+    EmbeddingModelLoadFailed {
+        /// Rendered diagnostic text.
+        detail: EmbeddingModelLoadFailureDetail,
+    },
+    /// `persistent_index::open_persistent_index_with_corpus` failed (LanceDB
+    /// open/create, index cache marker I/O, or symlink guard).
+    #[error("{detail}")]
+    SemanticIndexOpenFailed {
+        /// Rendered diagnostic text.
+        detail: SemanticIndexOpenFailureDetail,
+    },
+    /// `checker_config::resolve_dry_checker_config` failed (agent-profiles.json
+    /// symlink guard rejection, load/parse failure, no model configured for
+    /// `capability_name`, or an invalid `reasoning_effort` value).
+    #[error("{detail}")]
+    AgentConfigResolutionFailed {
+        /// The capability name that was being resolved.
+        capability_name: CapabilityName,
+        /// Rendered diagnostic text.
+        detail: AgentConfigResolutionFailureDetail,
+    },
 }
 
 // ── DryCheckServiceFactoryOutput ──────────────────────────────────────────────
@@ -121,9 +183,65 @@ pub struct DryCheckServiceFactoryOutput {
 /// Error returned by [`DryCorpusRootManifestWriterPort::write`].
 #[derive(Debug, Clone, thiserror::Error)]
 pub enum DryCorpusRootManifestError {
-    /// Serialization or filesystem write failed.
-    #[error("{0}")]
-    Unavailable(String),
+    /// `repo_root` could not be canonicalized.
+    #[error("failed to canonicalize repo root '{}': {detail}", repo_root.display())]
+    RepoRootCanonicalizeFailed {
+        /// The repo root that failed to canonicalize.
+        repo_root: PathBuf,
+        /// Rendered `io::Error` diagnostic text.
+        detail: IoFailureDetail,
+    },
+    /// The resolved manifest path escapes `canonical_root`.
+    #[error(
+        "dry corpus root manifest path '{}' resolves outside repo root '{}'",
+        manifest_path.display(),
+        canonical_root.display()
+    )]
+    ManifestPathOutsideRepo {
+        /// The out-of-bounds manifest path.
+        manifest_path: PathBuf,
+        /// The canonicalized repo root the path escaped.
+        canonical_root: PathBuf,
+    },
+    /// `serde_json::to_vec_pretty` failed on the manifest DTO.
+    #[error(
+        "failed to serialize dry corpus root manifest '{}': {detail}",
+        manifest_path.display()
+    )]
+    ManifestSerializeFailed {
+        /// The manifest path being serialized for.
+        manifest_path: PathBuf,
+        /// Rendered `serde_json::Error` diagnostic text.
+        detail: SerializationFailureDetail,
+    },
+    /// The symlink guard rejected either the manifest's parent directory or
+    /// the manifest path itself.
+    #[error("symlink guard dry corpus root manifest {}: {detail}", path.display())]
+    ManifestSymlinkRejected {
+        /// The rejected path (parent directory or manifest file).
+        path: PathBuf,
+        /// Rendered `io::Error` diagnostic text.
+        detail: IoFailureDetail,
+    },
+    /// `std::fs::create_dir_all` failed for the manifest's parent directory.
+    #[error(
+        "failed to create dry corpus root manifest parent '{}': {detail}",
+        parent.display()
+    )]
+    ManifestParentCreateFailed {
+        /// The parent directory that failed to be created.
+        parent: PathBuf,
+        /// Rendered `io::Error` diagnostic text.
+        detail: IoFailureDetail,
+    },
+    /// `atomic_write_file` failed for the manifest itself.
+    #[error("failed to write dry corpus root manifest '{}': {detail}", manifest_path.display())]
+    ManifestWriteFailed {
+        /// The manifest path that failed to write.
+        manifest_path: PathBuf,
+        /// Rendered `io::Error` diagnostic text.
+        detail: IoFailureDetail,
+    },
 }
 
 // ── DryWriteConfigLoaderPort ──────────────────────────────────────────────────
@@ -141,7 +259,7 @@ pub trait DryWriteConfigLoaderPort: Send + Sync {
     ///
     /// # Errors
     ///
-    /// Returns [`DryCheckConfigLoaderError::Unavailable`] on load or
+    /// Returns a [`DryCheckConfigLoaderError`] variant on load or
     /// validation failure.
     fn load(
         &self,
@@ -162,7 +280,7 @@ pub trait DryCorpusFragmentsPort: Send + Sync {
     ///
     /// # Errors
     ///
-    /// Returns [`DryCorpusFragmentsError::Unavailable`] on workspace-root
+    /// Returns a [`DryCorpusFragmentsError`] variant on workspace-root
     /// validation, diff listing, or fragment extraction failure.
     fn build(
         &self,
@@ -191,7 +309,7 @@ pub trait DryCheckServiceFactoryPort: Send + Sync {
     ///
     /// # Errors
     ///
-    /// Returns [`DryCheckServiceFactoryError::Unavailable`] on
+    /// Returns a [`DryCheckServiceFactoryError`] variant on
     /// embedding-load, index-open, or agent-profile resolution failure.
     fn build(
         &self,
@@ -207,7 +325,7 @@ pub trait DryCorpusRootManifestWriterPort: Send + Sync {
     ///
     /// # Errors
     ///
-    /// Returns [`DryCorpusRootManifestError::Unavailable`] on serialization
+    /// Returns a [`DryCorpusRootManifestError`] variant on serialization
     /// or filesystem write failure.
     fn write(
         &self,
@@ -471,8 +589,10 @@ mod tests {
     use crate::dry_check::{DryCheckParallelism, DryCheckPercent};
     use crate::dry_driver_shared::{
         DryBaseBranchError, DryCheckStorageHandle, DryRepoWorkspace, DryRepoWorkspaceError,
+        GitDiscoveryFailureDetail,
     };
     use crate::fixpoint_resolve::{DiffBaseResolverError, DiffBaseResolverPort};
+    use crate::fixpoint_resolve_driver::DryCheckConfigLoadFailureDetail;
 
     // ── Test doubles ─────────────────────────────────────────────────────────
 
@@ -680,7 +800,9 @@ mod tests {
             &self,
             _cmd: DryCheckServiceFactoryCommand,
         ) -> Result<DryCheckServiceFactoryOutput, DryCheckServiceFactoryError> {
-            Err(DryCheckServiceFactoryError::Unavailable("service factory boom".to_owned()))
+            Err(DryCheckServiceFactoryError::EmbeddingModelLoadFailed {
+                detail: EmbeddingModelLoadFailureDetail::new("service factory boom"),
+            })
         }
     }
 
@@ -696,7 +818,10 @@ mod tests {
             _repo_root: &Path,
         ) -> Result<(), DryCorpusRootManifestError> {
             if self.fail {
-                Err(DryCorpusRootManifestError::Unavailable("manifest boom".to_owned()))
+                Err(DryCorpusRootManifestError::ManifestWriteFailed {
+                    manifest_path: PathBuf::from("dry-check-corpus-root.json"),
+                    detail: IoFailureDetail::new("manifest boom"),
+                })
             } else {
                 Ok(())
             }
@@ -743,6 +868,10 @@ mod tests {
 
     fn make_commit_hash() -> CommitHash {
         CommitHash::try_new("a".repeat(40)).unwrap()
+    }
+
+    fn make_test_track_id() -> TrackId {
+        TrackId::try_new("test-track-2026").unwrap()
     }
 
     fn make_config_fingerprint() -> DryCheckConfigFingerprint {
@@ -892,7 +1021,9 @@ mod tests {
         let interactor = DryWriteDriverInteractor::new(
             Arc::new(StubRepoRoot { result: Ok(make_workspace()) }),
             Arc::new(StubBaseBranch {
-                result: Err(DryBaseBranchError::Unavailable("must not be called".to_owned())),
+                result: Err(DryBaseBranchError::MetadataNotFound {
+                    track_id: make_test_track_id(),
+                }),
             }),
             Arc::new(PanicIfCalledDiffBaseFactory),
             Arc::new(StubConfigLoader {
@@ -945,7 +1076,9 @@ mod tests {
     #[test]
     fn dry_write_invalid_threshold_returns_failure_before_any_port_call() {
         let interactor = make_interactor(
-            Err(DryRepoWorkspaceError::Unavailable("must not be called".to_owned())),
+            Err(DryRepoWorkspaceError::ItemsDirInvalid {
+                items_dir: PathBuf::from("must not be called"),
+            }),
             Ok("main".to_owned()),
             Ok(make_commit_hash()),
             Ok(DryWriteConfigResolution {
@@ -992,7 +1125,9 @@ mod tests {
     #[test]
     fn dry_write_repo_root_failure_returns_failure() {
         let interactor = make_interactor(
-            Err(DryRepoWorkspaceError::Unavailable("repo boom".to_owned())),
+            Err(DryRepoWorkspaceError::GitDiscoveryFailed {
+                detail: GitDiscoveryFailureDetail::new("repo boom"),
+            }),
             Ok("main".to_owned()),
             Ok(make_commit_hash()),
             Ok(DryWriteConfigResolution {
@@ -1021,7 +1156,10 @@ mod tests {
     fn dry_write_base_branch_failure_returns_failure() {
         let interactor = make_interactor(
             Ok(make_workspace()),
-            Err(DryBaseBranchError::Unavailable("base branch boom".to_owned())),
+            Err(DryBaseBranchError::MetadataReadFailed {
+                track_id: make_test_track_id(),
+                detail: IoFailureDetail::new("base branch boom"),
+            }),
             Ok(make_commit_hash()),
             Ok(DryWriteConfigResolution {
                 dry_config: test_dry_config(),
@@ -1079,7 +1217,10 @@ mod tests {
             Ok(make_workspace()),
             Ok("main".to_owned()),
             Ok(make_commit_hash()),
-            Err(DryCheckConfigLoaderError::Unavailable("config boom".to_owned())),
+            Err(DryCheckConfigLoaderError::ConfigLoadFailed {
+                config_path: PathBuf::from(".harness/config/dry-check.json"),
+                detail: DryCheckConfigLoadFailureDetail::new("config boom"),
+            }),
             Ok(DryCorpusFragmentsOutput {
                 diff_fragments: vec![],
                 corpus_fragments: vec![],
@@ -1108,7 +1249,9 @@ mod tests {
                 effective_threshold: SimilarityThreshold::new(0.85).unwrap(),
                 config_fingerprint: make_config_fingerprint(),
             }),
-            Err(DryCorpusFragmentsError::Unavailable("fragments boom".to_owned())),
+            Err(DryCorpusFragmentsError::DiffHunkListingFailed {
+                detail: DiffHunkListingFailureDetail::new("fragments boom"),
+            }),
             0,
             false,
             Arc::new(StubServiceFactory { findings: vec![] }),

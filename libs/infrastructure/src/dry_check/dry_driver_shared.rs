@@ -16,6 +16,7 @@ use domain::TrackId;
 use usecase::dry_driver_shared::{
     DryBaseBranchError, DryBaseBranchPort, DryCheckStorageFactoryPort, DryCheckStorageHandle,
     DryDiffBaseFactoryPort, DryRepoRootPort, DryRepoWorkspace, DryRepoWorkspaceError,
+    GitDiscoveryFailureDetail, IoFailureDetail, MetadataDecodeFailureDetail,
 };
 
 use crate::dry_check::diff_base_resolver::FsDiffBaseResolverAdapter;
@@ -24,43 +25,6 @@ use crate::git_cli::{GitRepository as _, SystemGitRepo};
 use crate::track::symlink_guard::reject_symlinks_below;
 
 // ── Local helpers (reimplemented — see per-fn docs) ───────────────────────────
-
-/// Resolve an input directory and require it to stay inside the repository root.
-///
-/// Reimplemented locally: `libs/infrastructure` cannot depend on the
-/// `cli_composition`-private
-/// `apps/cli-composition/src/dry/shared.rs::resolve_existing_dir_under_repo`
-/// helper. Same validation semantics: existing directory, must resolve under
-/// the canonicalized repo root.
-fn resolve_existing_dir_under_repo(
-    input_path: &Path,
-    repo_root: &Path,
-    canonical_root: &Path,
-    label: &str,
-) -> Result<PathBuf, String> {
-    let absolute_path = if input_path.is_absolute() {
-        input_path.to_path_buf()
-    } else {
-        repo_root.join(input_path)
-    };
-    reject_symlinks_below(&absolute_path, canonical_root)
-        .map_err(|e| format!("symlink guard {label} '{}': {e}", input_path.display()))?;
-    let canonical_path = absolute_path.canonicalize().map_err(|_| {
-        format!(
-            "{label} '{}' must be an existing directory under the repository root",
-            input_path.display()
-        )
-    })?;
-
-    if !canonical_path.is_dir() || !canonical_path.starts_with(canonical_root) {
-        return Err(format!(
-            "{label} '{}' must be an existing directory under the repository root",
-            input_path.display()
-        ));
-    }
-
-    Ok(canonical_path)
-}
 
 fn resolve_metadata_path_under_repo(
     track_dir: &Path,
@@ -78,11 +42,10 @@ fn resolve_metadata_path_under_repo(
         .any(|component| matches!(component, std::path::Component::ParentDir))
         || !absolute_path.starts_with(canonical_root)
     {
-        return Err(DryBaseBranchError::Unavailable(format!(
-            "metadata.json path '{}' resolves outside repo root '{}'",
-            absolute_path.display(),
-            canonical_root.display()
-        )));
+        return Err(DryBaseBranchError::MetadataPathOutsideRepo {
+            metadata_path: absolute_path,
+            canonical_root: canonical_root.to_path_buf(),
+        });
     }
 
     Ok(absolute_path)
@@ -99,15 +62,37 @@ pub struct FsDryRepoRootAdapter;
 
 impl DryRepoRootPort for FsDryRepoRootAdapter {
     fn resolve(&self, items_dir: &Path) -> Result<DryRepoWorkspace, DryRepoWorkspaceError> {
-        let git = SystemGitRepo::discover()
-            .map_err(|e| DryRepoWorkspaceError::Unavailable(format!("git discover: {e}")))?;
+        let git =
+            SystemGitRepo::discover().map_err(|e| DryRepoWorkspaceError::GitDiscoveryFailed {
+                detail: GitDiscoveryFailureDetail::new(e.to_string()),
+            })?;
         let repo_root = git.root().to_path_buf();
         let canonical_root = repo_root.canonicalize().map_err(|e| {
-            DryRepoWorkspaceError::Unavailable(format!("failed to canonicalize repo root: {e}"))
+            DryRepoWorkspaceError::RepoRootCanonicalizeFailed {
+                repo_root: repo_root.clone(),
+                detail: IoFailureDetail::new(e.to_string()),
+            }
         })?;
-        let canonical_items_dir =
-            resolve_existing_dir_under_repo(items_dir, &repo_root, &canonical_root, "items_dir")
-                .map_err(DryRepoWorkspaceError::Unavailable)?;
+
+        let absolute_items_dir = if items_dir.is_absolute() {
+            items_dir.to_path_buf()
+        } else {
+            repo_root.join(items_dir)
+        };
+        reject_symlinks_below(&absolute_items_dir, &canonical_root).map_err(|e| {
+            DryRepoWorkspaceError::ItemsDirSymlinkRejected {
+                items_dir: items_dir.to_path_buf(),
+                detail: IoFailureDetail::new(e.to_string()),
+            }
+        })?;
+        let canonical_items_dir = absolute_items_dir.canonicalize().map_err(|_| {
+            DryRepoWorkspaceError::ItemsDirInvalid { items_dir: items_dir.to_path_buf() }
+        })?;
+        if !canonical_items_dir.is_dir() || !canonical_items_dir.starts_with(&canonical_root) {
+            return Err(DryRepoWorkspaceError::ItemsDirInvalid {
+                items_dir: items_dir.to_path_buf(),
+            });
+        }
 
         Ok(DryRepoWorkspace { repo_root, canonical_root, canonical_items_dir })
     }
@@ -119,7 +104,7 @@ impl DryRepoRootPort for FsDryRepoRootAdapter {
 ///
 /// Reads `<track_dir>/metadata.json#branch_strategy_snapshot.base_branch`.
 /// Fail-closed per IN-06/IN-07: a missing, unreadable, or malformed
-/// `metadata.json` returns `DryBaseBranchError::Unavailable` — there is no
+/// `metadata.json` returns a `DryBaseBranchError` variant — there is no
 /// `.harness/config/branch-strategy.json` fallback and no hardcoded default.
 pub struct FsDryBaseBranchAdapter;
 
@@ -137,32 +122,29 @@ impl DryBaseBranchPort for FsDryBaseBranchAdapter {
                 // metadata.json is not present — fall through to the NotFound branch below.
             }
             Err(e) => {
-                return Err(DryBaseBranchError::Unavailable(format!(
-                    "symlink guard metadata.json for '{}': {e}",
-                    track_id.as_ref()
-                )));
+                return Err(DryBaseBranchError::MetadataSymlinkRejected {
+                    track_id: track_id.clone(),
+                    detail: IoFailureDetail::new(e.to_string()),
+                });
             }
         }
         match std::fs::read_to_string(&metadata_path) {
             Ok(metadata_json) => {
                 let (track_meta, _) = crate::track::codec::decode(&metadata_json).map_err(|e| {
-                    DryBaseBranchError::Unavailable(format!(
-                        "decode metadata.json for '{}': {e} (track metadata schema v6 required)",
-                        track_id.as_ref()
-                    ))
+                    DryBaseBranchError::MetadataDecodeFailed {
+                        track_id: track_id.clone(),
+                        detail: MetadataDecodeFailureDetail::new(e.to_string()),
+                    }
                 })?;
                 Ok(track_meta.branch_strategy_snapshot().base_branch().to_owned())
             }
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
-                Err(DryBaseBranchError::Unavailable(format!(
-                    "metadata.json for '{}' not found",
-                    track_id.as_ref()
-                )))
+                Err(DryBaseBranchError::MetadataNotFound { track_id: track_id.clone() })
             }
-            Err(e) => Err(DryBaseBranchError::Unavailable(format!(
-                "read metadata.json for '{}': {e}",
-                track_id.as_ref()
-            ))),
+            Err(e) => Err(DryBaseBranchError::MetadataReadFailed {
+                track_id: track_id.clone(),
+                detail: IoFailureDetail::new(e.to_string()),
+            }),
         }
     }
 }

@@ -23,13 +23,19 @@ use std::time::Instant;
 use domain::CommitHash;
 use domain::dry_check::DryCheckFinding;
 use usecase::dry_check::{DryCheckCycleError, DryCheckInteractor, DryCheckService};
+use usecase::dry_driver_shared::IoFailureDetail;
 use usecase::dry_write_driver::{
+    AgentConfigResolutionFailureDetail, CapabilityName, DiffHunkListingFailureDetail,
     DryCheckServiceFactoryCommand, DryCheckServiceFactoryError, DryCheckServiceFactoryOutput,
     DryCheckServiceFactoryPort, DryCorpusFragmentsError, DryCorpusFragmentsOutput,
     DryCorpusFragmentsPort, DryCorpusRootManifestError, DryCorpusRootManifestWriterPort,
     DryTierTelemetryPort, DryWriteConfigLoaderPort, DryWriteConfigResolution,
+    EmbeddingModelLoadFailureDetail, FragmentPipelineFailureDetail, SemanticIndexOpenFailureDetail,
+    SerializationFailureDetail,
 };
-use usecase::fixpoint_resolve_driver::DryCheckConfigLoaderError;
+use usecase::fixpoint_resolve_driver::{
+    DryCheckConfigLoadFailureDetail, DryCheckConfigLoaderError,
+};
 
 use crate::dry_check::CodexDryChecker;
 use crate::dry_check::DryCheckConfig as InfraDryCheckConfig;
@@ -38,43 +44,6 @@ use crate::semantic_dup::embedding::FastEmbedAdapter;
 use crate::telemetry::TelemetryWriter;
 use crate::track::atomic_write::atomic_write_file;
 use crate::track::symlink_guard::reject_symlinks_below;
-
-// ── Local helpers (reimplemented — see per-fn docs) ───────────────────────────
-
-/// Resolve an input directory and require it to stay inside the repository root.
-///
-/// Reimplemented locally (mirrors `dry_driver_shared`'s equivalent private
-/// helper — `libs/infrastructure` cannot depend on the `cli_composition`-private
-/// `apps/cli-composition/src/dry/shared.rs::resolve_existing_dir_under_repo`).
-fn resolve_existing_dir_under_repo(
-    input_path: &Path,
-    repo_root: &Path,
-    canonical_root: &Path,
-    label: &str,
-) -> Result<PathBuf, String> {
-    let absolute_path = if input_path.is_absolute() {
-        input_path.to_path_buf()
-    } else {
-        repo_root.join(input_path)
-    };
-    reject_symlinks_below(&absolute_path, canonical_root)
-        .map_err(|e| format!("symlink guard {label} '{}': {e}", input_path.display()))?;
-    let canonical_path = absolute_path.canonicalize().map_err(|_| {
-        format!(
-            "{label} '{}' must be an existing directory under the repository root",
-            input_path.display()
-        )
-    })?;
-
-    if !canonical_path.is_dir() || !canonical_path.starts_with(canonical_root) {
-        return Err(format!(
-            "{label} '{}' must be an existing directory under the repository root",
-            input_path.display()
-        ));
-    }
-
-    Ok(canonical_path)
-}
 
 // ── FsDryWriteConfigLoaderAdapter ─────────────────────────────────────────────
 
@@ -94,39 +63,48 @@ impl DryWriteConfigLoaderPort for FsDryWriteConfigLoaderAdapter {
         threshold_override: Option<domain::semantic_dup::SimilarityThreshold>,
     ) -> Result<DryWriteConfigResolution, DryCheckConfigLoaderError> {
         let canonical_root = repo_root.canonicalize().map_err(|e| {
-            DryCheckConfigLoaderError::Unavailable(format!(
-                "failed to canonicalize repo root '{}': {e}",
-                repo_root.display()
-            ))
+            DryCheckConfigLoaderError::RepoRootCanonicalizeFailed {
+                repo_root: repo_root.to_path_buf(),
+                detail: IoFailureDetail::new(e.to_string()),
+            }
         })?;
         let config_path = canonical_root.join(".harness/config/dry-check.json");
         let canonical_config_path = config_path.canonicalize().map_err(|e| {
-            DryCheckConfigLoaderError::Unavailable(format!(
-                "failed to canonicalize dry-check config '{}': {e}",
-                config_path.display()
-            ))
+            DryCheckConfigLoaderError::ConfigPathCanonicalizeFailed {
+                config_path: config_path.clone(),
+                detail: IoFailureDetail::new(e.to_string()),
+            }
         })?;
         if !canonical_config_path.starts_with(&canonical_root) {
-            return Err(DryCheckConfigLoaderError::Unavailable(format!(
-                "dry-check config '{}' resolves outside repo root '{}'",
-                config_path.display(),
-                canonical_root.display()
-            )));
+            return Err(DryCheckConfigLoaderError::ConfigPathOutsideRepo {
+                config_path,
+                canonical_root,
+            });
         }
         reject_symlinks_below(&config_path, &canonical_root).map_err(|e| {
-            DryCheckConfigLoaderError::Unavailable(format!(
-                "symlink guard dry-check config '{}': {e}",
-                config_path.display()
-            ))
+            DryCheckConfigLoaderError::ConfigSymlinkRejected {
+                config_path: config_path.clone(),
+                detail: IoFailureDetail::new(e.to_string()),
+            }
         })?;
         let infra_config = InfraDryCheckConfig::load(&canonical_config_path).map_err(|e| {
-            DryCheckConfigLoaderError::Unavailable(format!("failed to load dry-check config: {e}"))
+            DryCheckConfigLoaderError::ConfigLoadFailed {
+                config_path: config_path.clone(),
+                detail: DryCheckConfigLoadFailureDetail::new(e.to_string()),
+            }
         })?;
 
         let effective_threshold = threshold_override.unwrap_or_else(|| infra_config.threshold());
 
-        let dry_config = checker_config::build_usecase_dry_check_config(&infra_config)
-            .map_err(DryCheckConfigLoaderError::Unavailable)?;
+        let dry_config =
+            checker_config::build_usecase_dry_check_config(&infra_config).map_err(|e| match e {
+                checker_config::BuildDryCheckConfigError::InvalidKnownBadPercent(value) => {
+                    DryCheckConfigLoaderError::InvalidKnownBadPercent { value }
+                }
+                checker_config::BuildDryCheckConfigError::InvalidMaxParallelism(
+                    configured_value,
+                ) => DryCheckConfigLoaderError::InvalidMaxParallelism { configured_value },
+            })?;
 
         // Safe-approval rule: a stricter-or-equal override uses the plain file
         // fingerprint (so `dry check-approved` can match); a looser override
@@ -159,25 +137,76 @@ impl DryCorpusFragmentsPort for FsDryCorpusFragmentsAdapter {
         repo_root: &Path,
         canonical_root: &Path,
     ) -> Result<DryCorpusFragmentsOutput, DryCorpusFragmentsError> {
-        let canonical_workspace_root = resolve_existing_dir_under_repo(
-            workspace_root,
-            repo_root,
-            canonical_root,
-            "workspace_root",
-        )
-        .map_err(DryCorpusFragmentsError::Unavailable)?;
+        let absolute_workspace_root = if workspace_root.is_absolute() {
+            workspace_root.to_path_buf()
+        } else {
+            repo_root.join(workspace_root)
+        };
+        reject_symlinks_below(&absolute_workspace_root, canonical_root).map_err(|e| {
+            DryCorpusFragmentsError::WorkspaceRootSymlinkRejected {
+                workspace_root: workspace_root.to_path_buf(),
+                detail: IoFailureDetail::new(e.to_string()),
+            }
+        })?;
+        let canonical_workspace_root = absolute_workspace_root.canonicalize().map_err(|_| {
+            DryCorpusFragmentsError::WorkspaceRootInvalid {
+                workspace_root: workspace_root.to_path_buf(),
+            }
+        })?;
+        if !canonical_workspace_root.is_dir()
+            || !canonical_workspace_root.starts_with(canonical_root)
+        {
+            return Err(DryCorpusFragmentsError::WorkspaceRootInvalid {
+                workspace_root: workspace_root.to_path_buf(),
+            });
+        }
 
         let (diff_fragments, corpus_fragments) = fragments::build_diff_and_corpus_fragments(
             base,
             &canonical_workspace_root,
             canonical_root,
         )
-        .map_err(DryCorpusFragmentsError::Unavailable)?;
+        .map_err(|e| match e {
+            fragments::FragmentsBuildError::DiffHunkListing(detail) => {
+                DryCorpusFragmentsError::DiffHunkListingFailed {
+                    detail: DiffHunkListingFailureDetail::new(detail),
+                }
+            }
+            fragments::FragmentsBuildError::FragmentExtraction(detail) => {
+                DryCorpusFragmentsError::FragmentExtractionFailed {
+                    detail: FragmentPipelineFailureDetail::new(detail),
+                }
+            }
+            fragments::FragmentsBuildError::FragmentPathNormalization(detail) => {
+                DryCorpusFragmentsError::FragmentPathNormalizationFailed {
+                    detail: FragmentPipelineFailureDetail::new(detail),
+                }
+            }
+        })?;
 
         let corpus_fingerprint =
             fragments::compute_dry_corpus_fingerprint_from_fragments(&corpus_fragments);
 
         Ok(DryCorpusFragmentsOutput { diff_fragments, corpus_fragments, corpus_fingerprint })
+    }
+}
+
+/// Construct a [`CapabilityName`] from `raw`, falling back to the literal
+/// `"dry-checker"` if `raw` is empty or whitespace-only.
+///
+/// `capability_name` reaches this construction site as an unvalidated
+/// `String` (`DryCheckServiceFactoryCommand::capability_name`); every known
+/// call site passes a non-empty CLI-resolved capability like `"dry-checker"`,
+/// so the fallback branch is unreachable in practice. Written without
+/// `unwrap`/`expect`/`panic` (denied workspace-wide) so it stays total even
+/// if that assumption is ever violated.
+fn capability_name_or_fallback(raw: String) -> CapabilityName {
+    match CapabilityName::try_new(raw) {
+        Ok(name) => name,
+        Err(_) => match CapabilityName::try_new("dry-checker") {
+            Ok(name) => name,
+            Err(_) => capability_name_or_fallback("dry-checker".to_owned()),
+        },
     }
 }
 
@@ -196,7 +225,9 @@ impl DryCheckServiceFactoryPort for DryCheckServiceFactoryAdapter {
         cmd: DryCheckServiceFactoryCommand,
     ) -> Result<DryCheckServiceFactoryOutput, DryCheckServiceFactoryError> {
         let embedding_port = Arc::new(FastEmbedAdapter::new().map_err(|e| {
-            DryCheckServiceFactoryError::Unavailable(format!("failed to load embedding model: {e}"))
+            DryCheckServiceFactoryError::EmbeddingModelLoadFailed {
+                detail: EmbeddingModelLoadFailureDetail::new(e.to_string()),
+            }
         })?);
 
         // D7/IN-10: persistent index keyed by file-level content hash;
@@ -207,15 +238,21 @@ impl DryCheckServiceFactoryPort for DryCheckServiceFactoryAdapter {
             cmd.corpus_fragments,
             embedding_port.as_ref(),
         )
-        .map_err(DryCheckServiceFactoryError::Unavailable)?;
+        .map_err(|e| DryCheckServiceFactoryError::SemanticIndexOpenFailed {
+            detail: SemanticIndexOpenFailureDetail::new(e),
+        })?;
 
+        let capability_name = cmd.capability_name.clone();
         let (fast_model, final_model, fast_reasoning_effort, final_reasoning_effort) =
             checker_config::resolve_dry_checker_config(
                 &cmd.repo_root,
                 &cmd.capability_name,
                 cmd.model,
             )
-            .map_err(DryCheckServiceFactoryError::Unavailable)?;
+            .map_err(|e| DryCheckServiceFactoryError::AgentConfigResolutionFailed {
+                capability_name: capability_name_or_fallback(capability_name),
+                detail: AgentConfigResolutionFailureDetail::new(e),
+            })?;
 
         let (agent, tiered_recorder) = RecordingDryAgent::new(CodexDryChecker::new(
             fast_model.clone(),
@@ -367,10 +404,10 @@ fn resolve_manifest_path_under_repo(
     repo_root: &Path,
 ) -> Result<PathBuf, DryCorpusRootManifestError> {
     let canonical_root = repo_root.canonicalize().map_err(|e| {
-        DryCorpusRootManifestError::Unavailable(format!(
-            "failed to canonicalize repo root '{}': {e}",
-            repo_root.display()
-        ))
+        DryCorpusRootManifestError::RepoRootCanonicalizeFailed {
+            repo_root: repo_root.to_path_buf(),
+            detail: IoFailureDetail::new(e.to_string()),
+        }
     })?;
     let manifest_path = track_dir.join(DRY_CORPUS_ROOT_MANIFEST_FILE);
     let absolute_path = if manifest_path.is_absolute() {
@@ -384,11 +421,10 @@ fn resolve_manifest_path_under_repo(
         .any(|component| matches!(component, std::path::Component::ParentDir))
         || !absolute_path.starts_with(&canonical_root)
     {
-        return Err(DryCorpusRootManifestError::Unavailable(format!(
-            "dry corpus root manifest path '{}' resolves outside repo root '{}'",
-            absolute_path.display(),
-            canonical_root.display()
-        )));
+        return Err(DryCorpusRootManifestError::ManifestPathOutsideRepo {
+            manifest_path: absolute_path,
+            canonical_root,
+        });
     }
 
     Ok(absolute_path)
@@ -415,38 +451,38 @@ impl DryCorpusRootManifestWriterPort for FsDryCorpusRootManifestAdapter {
         };
         let manifest_path = resolve_manifest_path_under_repo(track_dir, repo_root)?;
         let content = serde_json::to_vec_pretty(&manifest).map_err(|e| {
-            DryCorpusRootManifestError::Unavailable(format!(
-                "failed to serialize dry corpus root manifest '{}': {e}",
-                manifest_path.display()
-            ))
+            DryCorpusRootManifestError::ManifestSerializeFailed {
+                manifest_path: manifest_path.clone(),
+                detail: SerializationFailureDetail::new(e.to_string()),
+            }
         })?;
         if let Some(parent) = manifest_path.parent() {
             if !parent.as_os_str().is_empty() {
                 reject_symlinks_below(parent, repo_root).map_err(|e| {
-                    DryCorpusRootManifestError::Unavailable(format!(
-                        "symlink guard dry corpus root manifest parent '{}': {e}",
-                        parent.display()
-                    ))
+                    DryCorpusRootManifestError::ManifestSymlinkRejected {
+                        path: parent.to_path_buf(),
+                        detail: IoFailureDetail::new(e.to_string()),
+                    }
                 })?;
                 std::fs::create_dir_all(parent).map_err(|e| {
-                    DryCorpusRootManifestError::Unavailable(format!(
-                        "failed to create dry corpus root manifest parent '{}': {e}",
-                        parent.display()
-                    ))
+                    DryCorpusRootManifestError::ManifestParentCreateFailed {
+                        parent: parent.to_path_buf(),
+                        detail: IoFailureDetail::new(e.to_string()),
+                    }
                 })?;
             }
         }
         reject_symlinks_below(&manifest_path, repo_root).map_err(|e| {
-            DryCorpusRootManifestError::Unavailable(format!(
-                "symlink guard dry corpus root manifest '{}': {e}",
-                manifest_path.display()
-            ))
+            DryCorpusRootManifestError::ManifestSymlinkRejected {
+                path: manifest_path.clone(),
+                detail: IoFailureDetail::new(e.to_string()),
+            }
         })?;
         atomic_write_file(&manifest_path, &content).map_err(|e| {
-            DryCorpusRootManifestError::Unavailable(format!(
-                "failed to write dry corpus root manifest '{}': {e}",
-                manifest_path.display()
-            ))
+            DryCorpusRootManifestError::ManifestWriteFailed {
+                manifest_path: manifest_path.clone(),
+                detail: IoFailureDetail::new(e.to_string()),
+            }
         })
     }
 }
@@ -574,7 +610,7 @@ mod tests {
 
     #[cfg(unix)]
     #[test]
-    fn test_resolve_existing_dir_under_repo_symlinked_workspace_root_returns_error() {
+    fn test_fs_dry_corpus_fragments_adapter_symlinked_workspace_root_returns_error() {
         let repo = tempfile::tempdir().unwrap();
         let repo_root = repo.path().canonicalize().unwrap();
         let workspace = repo_root.join("workspace");
@@ -582,11 +618,12 @@ mod tests {
         std::fs::create_dir_all(&workspace).unwrap();
         std::os::unix::fs::symlink(&workspace, &link).unwrap();
 
-        let err = resolve_existing_dir_under_repo(&link, &repo_root, &repo_root, "workspace_root")
-            .unwrap_err();
+        let commit = CommitHash::try_new("a".repeat(40)).unwrap();
+        let err =
+            FsDryCorpusFragmentsAdapter.build(&commit, &link, &repo_root, &repo_root).unwrap_err();
 
         assert!(
-            err.contains("symlink guard"),
+            err.to_string().contains("symlink guard"),
             "symlinked workspace_root must fail closed, got: {err}"
         );
     }

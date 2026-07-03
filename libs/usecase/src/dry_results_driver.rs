@@ -225,7 +225,7 @@ mod tests {
     use crate::dry_check::DryCheckCycleError;
     use crate::dry_driver_shared::{
         DryBaseBranchError, DryBaseBranchPort, DryCheckStorageHandle, DryRepoWorkspace,
-        DryRepoWorkspaceError,
+        DryRepoWorkspaceError, GitDiscoveryFailureDetail,
     };
 
     // ── Test doubles ─────────────────────────────────────────────────────────
@@ -478,7 +478,9 @@ mod tests {
     fn dry_results_repo_root_failure_returns_failure() {
         let interactor = DryResultsDriverInteractor::new(
             Arc::new(StubRepoRoot {
-                result: Err(DryRepoWorkspaceError::Unavailable("repo boom".to_owned())),
+                result: Err(DryRepoWorkspaceError::GitDiscoveryFailed {
+                    detail: GitDiscoveryFailureDetail::new("repo boom"),
+                }),
             }),
             Arc::new(StubStorageFactory { records: vec![], fail_reader: false }),
         );

@@ -17,6 +17,101 @@ use std::sync::Arc;
 
 use domain::TrackId;
 
+// ── IoFailureDetail ────────────────────────────────────────────────────────────
+
+/// Opaque diagnostic-text carrier for a [`std::io::Error`] encountered during a
+/// filesystem operation (canonicalize / read / write / create_dir / symlink
+/// inspection) at a driver-error construction site.
+///
+/// `std::io::Error` itself is not `Clone` and infrastructure adapters cannot
+/// pass their own error types across the infrastructure→usecase boundary, so
+/// the adapter renders the `io::Error` via `Display` and wraps the resulting
+/// text in this usecase-local newtype.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct IoFailureDetail(String);
+
+impl IoFailureDetail {
+    /// Wrap the rendered `Display` text of an infrastructure I/O error.
+    pub fn new(detail: impl Into<String>) -> Self {
+        Self(detail.into())
+    }
+
+    /// Borrow the wrapped diagnostic text.
+    #[must_use]
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
+}
+
+impl std::fmt::Display for IoFailureDetail {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&self.0)
+    }
+}
+
+// ── GitDiscoveryFailureDetail ─────────────────────────────────────────────────
+
+/// Opaque diagnostic-text carrier for `infrastructure::git_cli::GitError`
+/// produced by a failed `SystemGitRepo::discover()` call.
+///
+/// `GitError` is infrastructure-only and not `Clone`, so it cannot cross the
+/// infrastructure→usecase boundary directly; the adapter renders it via
+/// `Display` and wraps the resulting text here.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct GitDiscoveryFailureDetail(String);
+
+impl GitDiscoveryFailureDetail {
+    /// Wrap the rendered `Display` text of a failed git-discovery call.
+    pub fn new(detail: impl Into<String>) -> Self {
+        Self(detail.into())
+    }
+
+    /// Borrow the wrapped diagnostic text.
+    #[must_use]
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
+}
+
+impl std::fmt::Display for GitDiscoveryFailureDetail {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&self.0)
+    }
+}
+
+// ── MetadataDecodeFailureDetail ───────────────────────────────────────────────
+
+/// Opaque diagnostic-text carrier for `infrastructure::track::codec::CodecError`
+/// produced when `metadata.json` fails to decode into `TrackMetadata` (JSON
+/// parse error, domain validation error, invalid field, or pre-v6 schema
+/// mismatch — IN-07 fail-closed).
+///
+/// `CodecError` is infrastructure-only and not `Clone` (it wraps
+/// `serde_json::Error`), so it cannot cross the infrastructure→usecase
+/// boundary directly; the adapter renders it via `Display` and wraps the
+/// resulting text here.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MetadataDecodeFailureDetail(String);
+
+impl MetadataDecodeFailureDetail {
+    /// Wrap the rendered `Display` text of a failed `metadata.json` decode.
+    pub fn new(detail: impl Into<String>) -> Self {
+        Self(detail.into())
+    }
+
+    /// Borrow the wrapped diagnostic text.
+    #[must_use]
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
+}
+
+impl std::fmt::Display for MetadataDecodeFailureDetail {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&self.0)
+    }
+}
+
 // ── DryRepoWorkspace ──────────────────────────────────────────────────────────
 
 /// Resolved repository/workspace paths for a `dry` driver run.
@@ -38,21 +133,94 @@ pub struct DryRepoWorkspace {
 /// Error returned by [`DryRepoRootPort::resolve`].
 #[derive(Debug, Clone, thiserror::Error)]
 pub enum DryRepoWorkspaceError {
-    /// Repo discovery, canonicalization, or `items_dir` containment failed.
-    #[error("{0}")]
-    Unavailable(String),
+    /// `SystemGitRepo::discover()` failed.
+    #[error("git discover: {detail}")]
+    GitDiscoveryFailed {
+        /// Rendered `GitError` diagnostic text.
+        detail: GitDiscoveryFailureDetail,
+    },
+    /// The discovered repo root could not be canonicalized.
+    #[error("failed to canonicalize repo root '{}': {detail}", repo_root.display())]
+    RepoRootCanonicalizeFailed {
+        /// The repo root that failed to canonicalize.
+        repo_root: PathBuf,
+        /// Rendered `io::Error` diagnostic text.
+        detail: IoFailureDetail,
+    },
+    /// The symlink guard rejected `items_dir` — either an I/O error
+    /// inspecting it, or a definitively-found symlink.
+    #[error("symlink guard items_dir '{}': {detail}", items_dir.display())]
+    ItemsDirSymlinkRejected {
+        /// The rejected `items_dir` path.
+        items_dir: PathBuf,
+        /// Rendered `io::Error` diagnostic text.
+        detail: IoFailureDetail,
+    },
+    /// `items_dir` does not exist, is not a directory, or resolves outside
+    /// the repository root.
+    #[error(
+        "items_dir '{}' must be an existing directory under the repository root",
+        items_dir.display()
+    )]
+    ItemsDirInvalid {
+        /// The invalid `items_dir` path.
+        items_dir: PathBuf,
+    },
 }
 
 // ── DryBaseBranchError ────────────────────────────────────────────────────────
 
 /// Error returned by [`DryBaseBranchPort::resolve_base_branch`].
+///
+/// Fail-closed per IN-06/IN-07: there is no `.harness/config/branch-strategy.json`
+/// fallback.
 #[derive(Debug, Clone, thiserror::Error)]
 pub enum DryBaseBranchError {
-    /// `metadata.json` is missing, unreadable, or its `branch_strategy_snapshot`
-    /// could not be decoded. Fail-closed per IN-06/IN-07: there is no
-    /// global branch-strategy config fallback.
-    #[error("{0}")]
-    Unavailable(String),
+    /// The resolved `metadata.json` path escapes `canonical_root`.
+    #[error(
+        "metadata.json path '{}' resolves outside repo root '{}'",
+        metadata_path.display(),
+        canonical_root.display()
+    )]
+    MetadataPathOutsideRepo {
+        /// The out-of-bounds `metadata.json` path.
+        metadata_path: PathBuf,
+        /// The canonicalized repo root the path escaped.
+        canonical_root: PathBuf,
+    },
+    /// The symlink guard rejected `metadata.json`.
+    #[error("symlink guard metadata.json for '{}': {detail}", track_id.as_ref())]
+    MetadataSymlinkRejected {
+        /// The active track.
+        track_id: TrackId,
+        /// Rendered `io::Error` diagnostic text.
+        detail: IoFailureDetail,
+    },
+    /// `metadata.json` does not exist.
+    #[error("metadata.json for '{}' not found", track_id.as_ref())]
+    MetadataNotFound {
+        /// The active track.
+        track_id: TrackId,
+    },
+    /// `metadata.json` exists but could not be read.
+    #[error("read metadata.json for '{}': {detail}", track_id.as_ref())]
+    MetadataReadFailed {
+        /// The active track.
+        track_id: TrackId,
+        /// Rendered `io::Error` diagnostic text.
+        detail: IoFailureDetail,
+    },
+    /// `metadata.json` was read but failed to decode into `TrackMetadata`.
+    #[error(
+        "decode metadata.json for '{}': {detail} (track metadata schema v6 required)",
+        track_id.as_ref()
+    )]
+    MetadataDecodeFailed {
+        /// The active track.
+        track_id: TrackId,
+        /// Rendered `CodecError` diagnostic text.
+        detail: MetadataDecodeFailureDetail,
+    },
 }
 
 // ── DryCheckStorageHandle ─────────────────────────────────────────────────────
@@ -81,7 +249,7 @@ pub trait DryRepoRootPort: Send + Sync {
     ///
     /// # Errors
     ///
-    /// Returns [`DryRepoWorkspaceError::Unavailable`] on git discovery,
+    /// Returns a [`DryRepoWorkspaceError`] variant on git discovery,
     /// canonicalization, or `items_dir` containment failure.
     fn resolve(&self, items_dir: &Path) -> Result<DryRepoWorkspace, DryRepoWorkspaceError>;
 }
@@ -92,7 +260,7 @@ pub trait DryRepoRootPort: Send + Sync {
 ///
 /// Reads `<track_dir>/metadata.json#branch_strategy_snapshot.base_branch`.
 /// Fail-closed per IN-06/IN-07: a missing `metadata.json` or any decode error
-/// propagates as [`DryBaseBranchError::Unavailable`] — there is no
+/// propagates as a [`DryBaseBranchError`] variant — there is no
 /// `.harness/config/branch-strategy.json` fallback and no hardcoded
 /// branch-name default.
 pub trait DryBaseBranchPort: Send + Sync {
@@ -100,7 +268,7 @@ pub trait DryBaseBranchPort: Send + Sync {
     ///
     /// # Errors
     ///
-    /// Returns [`DryBaseBranchError::Unavailable`] when `metadata.json` is
+    /// Returns a [`DryBaseBranchError`] variant when `metadata.json` is
     /// missing, unreadable, or cannot be decoded.
     fn resolve_base_branch(
         &self,

@@ -24,11 +24,46 @@ use domain::TrackId;
 use domain::dry_check::DryCheckConfigFingerprint;
 
 use crate::dry_check::DryCheckConfig;
+use crate::dry_driver_shared::{
+    GitDiscoveryFailureDetail, IoFailureDetail, MetadataDecodeFailureDetail,
+};
 use crate::fixpoint_resolve::{
     FixpointCurrentBranch, FixpointDryGateCommand, FixpointDryGateService, FixpointResolveCommand,
     FixpointResolveError, FixpointResolveInteractor, FixpointResolveService as _,
     RefVerifyGateStatePort, ReviewGateStatePort,
 };
+
+// ── DryCheckConfigLoadFailureDetail ───────────────────────────────────────────
+
+/// Opaque diagnostic-text carrier for `infrastructure::dry_check::DryCheckConfigError`
+/// produced when `.harness/config/dry-check.json` fails to load or parse
+/// (`Io` / `Parse` / `UnsupportedSchemaVersion` / `InvalidThreshold`).
+///
+/// `DryCheckConfigError` is infrastructure-only and not `Clone` (it wraps
+/// `std::io::Error` and `serde_json::Error`), so it cannot cross the
+/// infrastructure→usecase boundary directly; the adapter renders it via
+/// `Display` and wraps the resulting text here.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DryCheckConfigLoadFailureDetail(String);
+
+impl DryCheckConfigLoadFailureDetail {
+    /// Wrap the rendered `Display` text of a failed dry-check config load.
+    pub fn new(detail: impl Into<String>) -> Self {
+        Self(detail.into())
+    }
+
+    /// Borrow the wrapped diagnostic text.
+    #[must_use]
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
+}
+
+impl std::fmt::Display for DryCheckConfigLoadFailureDetail {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&self.0)
+    }
+}
 
 // ── FixpointResolveDriverInput ────────────────────────────────────────────────
 
@@ -95,19 +130,156 @@ pub struct FixpointWorkspaceContext {
 /// Error returned by [`FixpointWorkspaceContextPort::resolve_context`].
 #[derive(Debug, Clone, thiserror::Error)]
 pub enum FixpointWorkspaceContextError {
-    /// Workspace resolution failed (git discovery, path containment, or metadata read/decode).
-    #[error("{0}")]
-    Unavailable(String),
+    /// `SystemGitRepo::discover()` failed.
+    #[error("cannot discover git repo: {detail}")]
+    GitDiscoveryFailed {
+        /// Rendered `GitError` diagnostic text.
+        detail: GitDiscoveryFailureDetail,
+    },
+    /// The discovered repo root could not be canonicalized.
+    #[error("cannot canonicalize repo root: {detail}")]
+    RepoRootCanonicalizeFailed {
+        /// The repo root that failed to canonicalize.
+        repo_root: PathBuf,
+        /// Rendered `io::Error` diagnostic text.
+        detail: IoFailureDetail,
+    },
+    /// The symlink-guard inspection of `--items-dir` itself failed with an
+    /// I/O error (as opposed to definitively finding a symlink).
+    #[error("symlink guard: cannot stat --items-dir '{}': {detail}", items_dir.display())]
+    ItemsDirSymlinkCheckFailed {
+        /// The `--items-dir` value being inspected.
+        items_dir: PathBuf,
+        /// Rendered `io::Error` diagnostic text.
+        detail: IoFailureDetail,
+    },
+    /// The symlink guard definitively found `--items-dir` is a symlink.
+    #[error("symlink guard: refusing to use symlinked --items-dir '{}'", items_dir.display())]
+    ItemsDirIsSymlink {
+        /// The rejected `--items-dir` value.
+        items_dir: PathBuf,
+    },
+    /// `--items-dir` does not exist, is not a directory, or resolves outside
+    /// the repository root.
+    #[error(
+        "--items-dir '{}' must be an existing directory under the repository root",
+        items_dir.display()
+    )]
+    ItemsDirInvalid {
+        /// The invalid `--items-dir` value.
+        items_dir: PathBuf,
+    },
+    /// `canonical_items_dir` does not match the required
+    /// `<project-root>/track/items` shape.
+    #[error("items_dir must point to '<project-root>/track/items'; got {}", items_dir.display())]
+    ProjectRootPatternInvalid {
+        /// The `canonical_items_dir` that failed the shape check.
+        items_dir: PathBuf,
+    },
+    /// The derived project root could not be canonicalized.
+    #[error("cannot derive project root from items_dir: {detail}")]
+    ProjectRootCanonicalizeFailed {
+        /// The `items_dir` the project root was derived from.
+        items_dir: PathBuf,
+        /// Rendered `io::Error` diagnostic text.
+        detail: IoFailureDetail,
+    },
+    /// `metadata.json` does not exist.
+    #[error("read metadata.json for '{}': metadata.json is missing", track_id.as_ref())]
+    MetadataNotFound {
+        /// The active track.
+        track_id: TrackId,
+    },
+    /// The symlink guard rejected `metadata.json`.
+    #[error("symlink guard metadata.json for '{}': {detail}", track_id.as_ref())]
+    MetadataSymlinkRejected {
+        /// The active track.
+        track_id: TrackId,
+        /// Rendered `io::Error` diagnostic text.
+        detail: IoFailureDetail,
+    },
+    /// `metadata.json` exists but could not be read.
+    #[error("read metadata.json for '{}': {detail}", track_id.as_ref())]
+    MetadataReadFailed {
+        /// The active track.
+        track_id: TrackId,
+        /// Rendered `io::Error` diagnostic text.
+        detail: IoFailureDetail,
+    },
+    /// `metadata.json` was read but failed to decode into `TrackMetadata`.
+    #[error("decode metadata.json for '{}': {detail}", track_id.as_ref())]
+    MetadataDecodeFailed {
+        /// The active track.
+        track_id: TrackId,
+        /// Rendered `CodecError` diagnostic text.
+        detail: MetadataDecodeFailureDetail,
+    },
 }
 
 // ── DryCheckConfigLoaderError ─────────────────────────────────────────────────
 
-/// Error returned by [`DryCheckConfigLoaderPort::load`].
+/// Error returned by [`DryCheckConfigLoaderPort::load`], also reused by
+/// `DryWriteConfigLoaderPort::load` (IN-14).
 #[derive(Debug, Clone, thiserror::Error)]
 pub enum DryCheckConfigLoaderError {
-    /// The dry-check config could not be loaded or lifted into the usecase newtypes.
-    #[error("{0}")]
-    Unavailable(String),
+    /// `repo_root` could not be canonicalized.
+    #[error("failed to canonicalize repo root '{}': {detail}", repo_root.display())]
+    RepoRootCanonicalizeFailed {
+        /// The repo root that failed to canonicalize.
+        repo_root: PathBuf,
+        /// Rendered `io::Error` diagnostic text.
+        detail: IoFailureDetail,
+    },
+    /// `.harness/config/dry-check.json` could not be canonicalized.
+    #[error("failed to canonicalize dry-check config '{}': {detail}", config_path.display())]
+    ConfigPathCanonicalizeFailed {
+        /// The config path that failed to canonicalize.
+        config_path: PathBuf,
+        /// Rendered `io::Error` diagnostic text.
+        detail: IoFailureDetail,
+    },
+    /// The config path resolves outside `canonical_root`.
+    #[error(
+        "dry-check config '{}' resolves outside repo root '{}'",
+        config_path.display(),
+        canonical_root.display()
+    )]
+    ConfigPathOutsideRepo {
+        /// The out-of-bounds config path.
+        config_path: PathBuf,
+        /// The canonicalized repo root the path escaped.
+        canonical_root: PathBuf,
+    },
+    /// The symlink guard rejected `.harness/config/dry-check.json`.
+    #[error("symlink guard dry-check config '{}': {detail}", config_path.display())]
+    ConfigSymlinkRejected {
+        /// The rejected config path.
+        config_path: PathBuf,
+        /// Rendered `io::Error` diagnostic text.
+        detail: IoFailureDetail,
+    },
+    /// `.harness/config/dry-check.json` failed to load or parse.
+    #[error("failed to load dry-check config: {detail}")]
+    ConfigLoadFailed {
+        /// The config path that failed to load.
+        config_path: PathBuf,
+        /// Rendered `DryCheckConfigError` diagnostic text.
+        detail: DryCheckConfigLoadFailureDetail,
+    },
+    /// The configured `known_bad_*_percent` value failed
+    /// `DryCheckPercent::try_new` validation.
+    #[error("invalid known-bad percent: {value}")]
+    InvalidKnownBadPercent {
+        /// The raw rejected input value.
+        value: u8,
+    },
+    /// The configured `max_parallelism` value failed
+    /// `DryCheckParallelism::try_new` validation.
+    #[error("invalid max_parallelism: {configured_value}")]
+    InvalidMaxParallelism {
+        /// The raw rejected input value.
+        configured_value: usize,
+    },
 }
 
 // ── FixpointWorkspaceContextPort ──────────────────────────────────────────────
@@ -123,7 +295,7 @@ pub trait FixpointWorkspaceContextPort: Send + Sync {
     ///
     /// # Errors
     ///
-    /// Returns [`FixpointWorkspaceContextError::Unavailable`] on git discovery,
+    /// Returns a [`FixpointWorkspaceContextError`] variant on git discovery,
     /// path containment, or metadata read/decode failure.
     fn resolve_context(
         &self,
@@ -142,7 +314,7 @@ pub trait DryCheckConfigLoaderPort: Send + Sync {
     ///
     /// # Errors
     ///
-    /// Returns [`DryCheckConfigLoaderError::Unavailable`] on load or validation failure.
+    /// Returns a [`DryCheckConfigLoaderError`] variant on load or validation failure.
     fn load(
         &self,
         repo_root: &Path,

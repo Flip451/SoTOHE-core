@@ -1,13 +1,52 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-03T11:14:34Z",
-  "declaration_hash": "9d38ce4cb9b59140e082bc66b02b7efee1fdcbcf03a2a7ecb99e0f25d0b49f2f",
+  "generated_at": "2026-07-03T13:57:03Z",
+  "declaration_hash": "8fd7d84c4549ad6a55043ff3c2d8fd35f35eb37440a1f4d36cd3456accfa7f62",
   "signals": [
+    {
+      "type_name": "AgentConfigResolutionFailureDetail",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
     {
       "type_name": "BranchStrategyPort",
       "kind_tag": "secondary_port",
       "signal": "blue",
       "found_type": true
+    },
+    {
+      "type_name": "CapabilityName",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "DiffHunkListingFailureDetail",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
     },
     {
       "type_name": "DryBaseBranchError",
@@ -50,6 +89,19 @@
       "found_items": [
         "core::clone::Clone",
         "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "DryCheckConfigLoadFailureDetail",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::fmt::Display"
       ]
     },
     {
@@ -316,6 +368,19 @@
       ]
     },
     {
+      "type_name": "EmbeddingModelLoadFailureDetail",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
       "type_name": "FixpointDryGateFactoryPort",
       "kind_tag": "secondary_port",
       "signal": "blue",
@@ -389,6 +454,84 @@
       "kind_tag": "secondary_port",
       "signal": "blue",
       "found_type": true
+    },
+    {
+      "type_name": "FragmentPipelineFailureDetail",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "GitDiscoveryFailureDetail",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "IoFailureDetail",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "MetadataDecodeFailureDetail",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "SemanticIndexOpenFailureDetail",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "SerializationFailureDetail",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
     },
     {
       "type_name": "TrackService",

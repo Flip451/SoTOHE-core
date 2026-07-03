@@ -1,11 +1,26 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "9d38ce4cb9b59140e082bc66b02b7efee1fdcbcf03a2a7ecb99e0f25d0b49f2f",
+  "catalogue_declaration_hash": "8fd7d84c4549ad6a55043ff3c2d8fd35f35eb37440a1f4d36cd3456accfa7f62",
   "signals": [
+    {
+      "type_name": "AgentConfigResolutionFailureDetail",
+      "signal": "blue",
+      "entry_hash": "6d48ec8a77168eb2f2a700b998d500dcee28532984e330c0b136914c3f47a5e5"
+    },
+    {
+      "type_name": "CapabilityName",
+      "signal": "blue",
+      "entry_hash": "26e8b2388eba2c2fa288595fde1cbd30b0cc36a585a4c87e3dbc99bdbc794923"
+    },
+    {
+      "type_name": "DiffHunkListingFailureDetail",
+      "signal": "blue",
+      "entry_hash": "667cbecd72bd78b02144079275df824cf9b7b47c7d3badf5ff96dbb007a22087"
+    },
     {
       "type_name": "DryBaseBranchError",
       "signal": "blue",
-      "entry_hash": "5d17a5a9fd05eace754a15fb8cce17380571b4d61bd57861ed5a95509a608949"
+      "entry_hash": "e09ba4ec2cfc2375c513ecdddfcf7a7d5e6c8dcb7acba23da9dc1306d181fad8"
     },
     {
       "type_name": "DryCheckApprovedDriverInput",
@@ -23,9 +38,14 @@
       "entry_hash": "610bb30fb6040379e179815a00d22c3d17cb3ad5027b3b843c6223e7f59be021"
     },
     {
+      "type_name": "DryCheckConfigLoadFailureDetail",
+      "signal": "blue",
+      "entry_hash": "b72ab355c88665f89d96824550cd02c5dabb65defb85083586c73040933f9fab"
+    },
+    {
       "type_name": "DryCheckConfigLoaderError",
       "signal": "blue",
-      "entry_hash": "bd5a6821a733c6a8a1f18015a3009c8aa5f8e2abec42f7c5de5d146269cea362"
+      "entry_hash": "c5e255c4857ca7ca8838c3849eebcf9eab20c1af567d5f75b3b9df628d3d8609"
     },
     {
       "type_name": "DryCheckServiceFactoryCommand",
@@ -35,7 +55,7 @@
     {
       "type_name": "DryCheckServiceFactoryError",
       "signal": "blue",
-      "entry_hash": "b0e09fbedf6c43cc9fb45f08a64ba8e0ec0d5eeaaee69b4b364dbf99a89195c1"
+      "entry_hash": "9763ec5f812bdd1a9a8668784fa3dcad3fce64f06f61f41672bf79466b0dd402"
     },
     {
       "type_name": "DryCheckServiceFactoryOutput",
@@ -50,7 +70,7 @@
     {
       "type_name": "DryCorpusFragmentsError",
       "signal": "blue",
-      "entry_hash": "80ce379a7c308dbe5498ae5231bae5298fb13bf87a56d4aa937f3d20bc32682e"
+      "entry_hash": "67af5cd39da36dc8cae78ce44e51777fd412344d6d999edca936145c2cd1ddb2"
     },
     {
       "type_name": "DryCorpusFragmentsOutput",
@@ -60,7 +80,7 @@
     {
       "type_name": "DryCorpusRootManifestError",
       "signal": "blue",
-      "entry_hash": "5b78b64ceca1282dc9d5ceed4392a716f9f7cae68be740d4a04cf189cd9c23cb"
+      "entry_hash": "cddd0303de25a44db8bfa9c5a0c4cc132f92826fd92a2e7170d29e6d4cb6f742"
     },
     {
       "type_name": "DryDriverInteractor",
@@ -80,7 +100,7 @@
     {
       "type_name": "DryRepoWorkspaceError",
       "signal": "blue",
-      "entry_hash": "f435719433bc02b2eee07299f8c5d31301395b32e43cb6314748a0263fe73b86"
+      "entry_hash": "59b03676cc01ed01b4dca0b8e400d0113f05b4966fedecf38eab4b9a62877f5d"
     },
     {
       "type_name": "DryResultsDriverInput",
@@ -133,6 +153,11 @@
       "entry_hash": "eeef217ea2b62eaa22c63729a9adeee47c9e33d66a98154bf414ffe94fefde82"
     },
     {
+      "type_name": "EmbeddingModelLoadFailureDetail",
+      "signal": "blue",
+      "entry_hash": "058a3a54d1726bd45b67afd72b80e50978db0dd8dd9a30222441804a21b29d6c"
+    },
+    {
       "type_name": "FixpointResolveDriverInput",
       "signal": "blue",
       "entry_hash": "ea081a519daf4366c8572707ddd3f95408db3f96366244bd2c6cb715bb8e7d79"
@@ -150,12 +175,42 @@
     {
       "type_name": "FixpointWorkspaceContext",
       "signal": "blue",
-      "entry_hash": "23e5c2111a5e64fd950981a4c8da4022804dd775d184aa9b5ea90fa5399c0299"
+      "entry_hash": "f15e16b323e56249a77d3c690286e27421ff143093c7fd1c9b28bcb12893cd09"
     },
     {
       "type_name": "FixpointWorkspaceContextError",
       "signal": "blue",
-      "entry_hash": "1f67d33ede5809c35b4f437f119e4324b248bcc15cd86d7f2abc7efb63a2fc23"
+      "entry_hash": "654e28684ff7f8ab171285746d28cb0681805d7fed070810f0d1ac61f58bf6b2"
+    },
+    {
+      "type_name": "FragmentPipelineFailureDetail",
+      "signal": "blue",
+      "entry_hash": "171c6c96a5f078fe6722f8b88cb3a9decf324d054162587a0342db957fe11ef7"
+    },
+    {
+      "type_name": "GitDiscoveryFailureDetail",
+      "signal": "blue",
+      "entry_hash": "7920c29c34401819db36b2ef3786859475a363e68c850d51b3549d68ca430bd2"
+    },
+    {
+      "type_name": "IoFailureDetail",
+      "signal": "blue",
+      "entry_hash": "7a5d1872ee356abcc4291707674f35673611739ab367b54a042c90087d9ce422"
+    },
+    {
+      "type_name": "MetadataDecodeFailureDetail",
+      "signal": "blue",
+      "entry_hash": "00de2f75f29cae612faacdbdb436d663bdb87c5f49e78729aed16e2d15649acd"
+    },
+    {
+      "type_name": "SemanticIndexOpenFailureDetail",
+      "signal": "blue",
+      "entry_hash": "74c71c165a24dc56608a6307f9fbb3f64399a9b76b2827a79c66b0371e80cc7f"
+    },
+    {
+      "type_name": "SerializationFailureDetail",
+      "signal": "blue",
+      "entry_hash": "c54480331116bfd698b24379f6885bfc7559441ea0d5b9701ab1bac57f058fef"
     },
     {
       "type_name": "BranchStrategyPort",
@@ -175,7 +230,7 @@
     {
       "type_name": "DryBaseBranchPort",
       "signal": "blue",
-      "entry_hash": "a7d4944b0c1fdbd162c1bc4d5292f3182c522fe6d04b846efc4baed23b7b096e"
+      "entry_hash": "c6edf2a75359fa99d21cd3e236d53c73febf10996ea91ca8abfa299fd581167a"
     },
     {
       "type_name": "DryCheckApprovedDriverService",
@@ -240,7 +295,7 @@
     {
       "type_name": "DryWriteConfigLoaderPort",
       "signal": "blue",
-      "entry_hash": "e80561b10102d15b5a2070f0fb30875cb4395fef996218f2417d1eb9f0af503c"
+      "entry_hash": "93e9c7df60641ef7273209bb8fa07c43565a0061ec656ed393a28740e8fdc058"
     },
     {
       "type_name": "DryWriteDriverService",
@@ -270,7 +325,7 @@
     {
       "type_name": "FixpointWorkspaceContextPort",
       "signal": "blue",
-      "entry_hash": "57e5de550807a7412922eb371b58add3b08997ec26f121651d6a0da17fc7486c"
+      "entry_hash": "1707bbe3ffa6744edb97f6a037a76175d6364c2535606cc0036533bb010e7db4"
     },
     {
       "type_name": "RefVerifyGateStatePort",

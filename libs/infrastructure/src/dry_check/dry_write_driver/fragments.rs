@@ -56,6 +56,19 @@ pub(super) fn normalize_fragment_paths(
     Ok(result)
 }
 
+/// Distinguishes which pipeline stage failed inside
+/// [`build_diff_and_corpus_fragments`], so the caller
+/// ([`super::FsDryCorpusFragmentsAdapter::build`]) can map each stage to its
+/// own `usecase::dry_write_driver::DryCorpusFragmentsError` variant.
+pub(super) enum FragmentsBuildError {
+    /// `GitDryCheckDiffGetter::list_changed_hunks` failed.
+    DiffHunkListing(String),
+    /// `extract_code_fragments` failed over `workspace_root`.
+    FragmentExtraction(String),
+    /// The subsequent `CodeFragment` path-rebuild step failed.
+    FragmentPathNormalization(String),
+}
+
 /// Build `diff_fragments` and `corpus_fragments` using the hunk-scope pipeline.
 ///
 /// Returns `(diff_fragments, corpus_fragments)` where:
@@ -64,22 +77,23 @@ pub(super) fn normalize_fragment_paths(
 ///
 /// # Errors
 ///
-/// Returns `Err` when diff listing or fragment extraction fails.
+/// Returns `Err` when diff listing, fragment extraction, or fragment path
+/// normalization fails.
 pub(super) fn build_diff_and_corpus_fragments(
     base: &CommitHash,
     workspace_root: &Path,
     repo_root: &Path,
-) -> Result<(Vec<CodeFragment>, Vec<CodeFragment>), String> {
+) -> Result<(Vec<CodeFragment>, Vec<CodeFragment>), FragmentsBuildError> {
     let getter = GitDryCheckDiffGetter;
     let changed_hunks = getter
         .list_changed_hunks(base, repo_root)
-        .map_err(|e| format!("list_changed_hunks failed: {e}"))?;
+        .map_err(|e| FragmentsBuildError::DiffHunkListing(e.to_string()))?;
 
     let raw_fragments = extract_code_fragments(workspace_root)
-        .map_err(|e| format!("fragment extraction failed: {e}"))?;
+        .map_err(|e| FragmentsBuildError::FragmentExtraction(e.to_string()))?;
 
     let normalized_fragments = normalize_fragment_paths(raw_fragments, repo_root)
-        .map_err(|e| format!("fragment path normalization failed: {e}"))?;
+        .map_err(FragmentsBuildError::FragmentPathNormalization)?;
 
     let changed_paths: std::collections::HashSet<String> =
         changed_hunks.iter().map(|h| h.path().as_str().to_owned()).collect();

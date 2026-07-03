@@ -165,6 +165,10 @@ fn make_input() -> FixpointResolveDriverInput {
     }
 }
 
+fn make_test_track_id() -> TrackId {
+    TrackId::try_new("test-track-2026").unwrap()
+}
+
 fn make_driver_interactor(
     dry_verdict: DryCheckApprovalVerdict,
     review_status: ReviewGateStatus,
@@ -187,12 +191,15 @@ fn make_driver_interactor(
 fn make_short_circuit_interactor() -> FixpointResolveDriverInteractor {
     FixpointResolveDriverInteractor::new(
         Arc::new(StubWorkspaceContext {
-            result: Err(FixpointWorkspaceContextError::Unavailable(
-                "must not be called".to_owned(),
-            )),
+            result: Err(FixpointWorkspaceContextError::MetadataNotFound {
+                track_id: make_test_track_id(),
+            }),
         }),
         Arc::new(StubDryConfigLoader {
-            result: Err(DryCheckConfigLoaderError::Unavailable("must not be called".to_owned())),
+            result: Err(DryCheckConfigLoaderError::ConfigLoadFailed {
+                config_path: PathBuf::from(".harness/config/dry-check.json"),
+                detail: DryCheckConfigLoadFailureDetail::new("must not be called"),
+            }),
         }),
         Arc::new(StubDryGateFactory {
             fail: Some(D4OrchestrationError::DryGate("must not be called".to_owned())),
@@ -275,7 +282,9 @@ fn fixpoint_resolve_all_gates_green_returns_commit() {
 fn fixpoint_resolve_workspace_context_failure_returns_failure_outcome() {
     let interactor = FixpointResolveDriverInteractor::new(
         Arc::new(StubWorkspaceContext {
-            result: Err(FixpointWorkspaceContextError::Unavailable("boom".to_owned())),
+            result: Err(FixpointWorkspaceContextError::GitDiscoveryFailed {
+                detail: GitDiscoveryFailureDetail::new("boom"),
+            }),
         }),
         Arc::new(StubDryConfigLoader {
             result: Ok((test_dry_check_config(true), make_config_fingerprint())),
@@ -300,7 +309,10 @@ fn fixpoint_resolve_dry_config_loader_failure_returns_failure_outcome() {
     let interactor = FixpointResolveDriverInteractor::new(
         Arc::new(StubWorkspaceContext { result: Ok(make_context()) }),
         Arc::new(StubDryConfigLoader {
-            result: Err(DryCheckConfigLoaderError::Unavailable("bad config".to_owned())),
+            result: Err(DryCheckConfigLoaderError::ConfigLoadFailed {
+                config_path: PathBuf::from(".harness/config/dry-check.json"),
+                detail: DryCheckConfigLoadFailureDetail::new("bad config"),
+            }),
         }),
         Arc::new(StubDryGateFactory { fail: None, verdict: DryCheckApprovalVerdict::Approved }),
         Arc::new(StubGateStateFactory {

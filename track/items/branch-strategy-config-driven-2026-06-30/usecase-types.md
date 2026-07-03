@@ -10,17 +10,33 @@
 | DryWriteOutcome | enum | add | Success, Failure | 🔵 | 🔵 |
 | FixpointResolveDriverOutcome | enum | add | RunDfp, RunRfp, RunRefVerify, Commit, Failure | 🔵 | 🔵 |
 
+## Value Objects
+
+| Name | Kind | Action | Details | Signal | Cat-Spec |
+|------|------|--------|---------|--------|----------|
+| AgentConfigResolutionFailureDetail | value_object | add | — | 🔵 | 🔵 |
+| CapabilityName | value_object | add | — | 🔵 | 🔵 |
+| DiffHunkListingFailureDetail | value_object | add | — | 🔵 | 🔵 |
+| DryCheckConfigLoadFailureDetail | value_object | add | — | 🔵 | 🔵 |
+| EmbeddingModelLoadFailureDetail | value_object | add | — | 🔵 | 🔵 |
+| FragmentPipelineFailureDetail | value_object | add | — | 🔵 | 🔵 |
+| GitDiscoveryFailureDetail | value_object | add | — | 🔵 | 🔵 |
+| IoFailureDetail | value_object | add | — | 🔵 | 🔵 |
+| MetadataDecodeFailureDetail | value_object | add | — | 🔵 | 🔵 |
+| SemanticIndexOpenFailureDetail | value_object | add | — | 🔵 | 🔵 |
+| SerializationFailureDetail | value_object | add | — | 🔵 | 🔵 |
+
 ## Error Types
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| DryBaseBranchError | error_type | add | Unavailable | 🔵 | 🔵 |
-| DryCheckConfigLoaderError | error_type | add | Unavailable | 🔵 | 🔵 |
-| DryCheckServiceFactoryError | error_type | add | Unavailable | 🔵 | 🔵 |
-| DryCorpusFragmentsError | error_type | add | Unavailable | 🔵 | 🔵 |
-| DryCorpusRootManifestError | error_type | add | Unavailable | 🔵 | 🔵 |
-| DryRepoWorkspaceError | error_type | add | Unavailable | 🔵 | 🔵 |
-| FixpointWorkspaceContextError | error_type | add | Unavailable | 🔵 | 🔵 |
+| DryBaseBranchError | error_type | add | MetadataPathOutsideRepo, MetadataSymlinkRejected, MetadataNotFound, MetadataReadFailed, MetadataDecodeFailed | 🔵 | 🔵 |
+| DryCheckConfigLoaderError | error_type | add | RepoRootCanonicalizeFailed, ConfigPathCanonicalizeFailed, ConfigPathOutsideRepo, ConfigSymlinkRejected, ConfigLoadFailed, InvalidKnownBadPercent, InvalidMaxParallelism | 🔵 | 🔵 |
+| DryCheckServiceFactoryError | error_type | add | EmbeddingModelLoadFailed, SemanticIndexOpenFailed, AgentConfigResolutionFailed | 🔵 | 🔵 |
+| DryCorpusFragmentsError | error_type | add | WorkspaceRootSymlinkRejected, WorkspaceRootInvalid, DiffHunkListingFailed, FragmentExtractionFailed, FragmentPathNormalizationFailed | 🔵 | 🔵 |
+| DryCorpusRootManifestError | error_type | add | RepoRootCanonicalizeFailed, ManifestPathOutsideRepo, ManifestSerializeFailed, ManifestSymlinkRejected, ManifestParentCreateFailed, ManifestWriteFailed | 🔵 | 🔵 |
+| DryRepoWorkspaceError | error_type | add | GitDiscoveryFailed, RepoRootCanonicalizeFailed, ItemsDirSymlinkRejected, ItemsDirInvalid | 🔵 | 🔵 |
+| FixpointWorkspaceContextError | error_type | add | GitDiscoveryFailed, RepoRootCanonicalizeFailed, ItemsDirSymlinkCheckFailed, ItemsDirIsSymlink, ItemsDirInvalid, ProjectRootPatternInvalid, ProjectRootCanonicalizeFailed, MetadataNotFound, MetadataSymlinkRejected, MetadataReadFailed, MetadataDecodeFailed | 🔵 | 🔵 |
 
 ## Secondary Ports
 

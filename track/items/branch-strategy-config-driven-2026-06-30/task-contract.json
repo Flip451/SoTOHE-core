@@ -524,6 +524,80 @@
         "layer": "cli_composition",
         "entry_key": "DryCompositionRoot"
       }
+    ],
+    "T038": [
+      {
+        "layer": "usecase",
+        "entry_key": "DryRepoWorkspaceError"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "DryBaseBranchError"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "DryCheckConfigLoaderError"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "FixpointWorkspaceContextError"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "DryCorpusFragmentsError"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "DryCheckServiceFactoryError"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "DryCorpusRootManifestError"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "IoFailureDetail"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "GitDiscoveryFailureDetail"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "MetadataDecodeFailureDetail"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "DryCheckConfigLoadFailureDetail"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "SerializationFailureDetail"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "EmbeddingModelLoadFailureDetail"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "SemanticIndexOpenFailureDetail"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "AgentConfigResolutionFailureDetail"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "DiffHunkListingFailureDetail"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "FragmentPipelineFailureDetail"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "CapabilityName"
+      }
     ]
   }
 }
