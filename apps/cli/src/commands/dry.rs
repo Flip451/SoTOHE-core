@@ -195,13 +195,18 @@ pub fn execute_dry_check_approved(args: DryCheckApprovedArgs) -> ExitCode {
     use cli_composition::telemetry_wiring::{emit_gate_eval, resolve_telemetry_writer};
     use std::time::Instant;
 
-    let track_id = match crate::commands::track::resolve_track_id(args.track_id, &args.items_dir) {
-        Ok(id) => id,
-        Err(msg) => {
-            eprintln!("{msg}");
-            return ExitCode::FAILURE;
-        }
-    };
+    // WRITE semantics: `--track-id A` on `track/B` fails BranchMismatch before
+    // any work (mirrors `resolve_track_id_for_write` usage in transition /
+    // views-sync / etc.). This guarantees telemetry is written under the same
+    // track the gate evaluates.
+    let track_id =
+        match crate::commands::track::resolve_track_id_for_write(args.track_id, &args.items_dir) {
+            Ok(id) => id,
+            Err(msg) => {
+                eprintln!("{msg}");
+                return ExitCode::FAILURE;
+            }
+        };
 
     let telemetry = resolve_telemetry_writer(&args.items_dir);
     let start = Instant::now();
