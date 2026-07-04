@@ -1,652 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`switch_to_base` downgrades `SyncNonFastForward` and `SyncWorktreeUnresolved` to a warning and then returns `Ok(...)`, so `git sync` can report success even though `git pull --ff-only` failed. The surrounding docs say only `SyncUpstreamNotSet` is the non-fatal case; the other sync failures should propagate so callers do not continue on a stale branch.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/git_workflow.rs",
-              "line": 658,
-              "category": "error handling"
-            },
-            {
-              "message": "`commit_from_file` wraps pure branch-guard failures from `verify_explicit_track_branch` / `verify_auto_detected_branch` in `GitWorkflowError::Unavailable`, which turns a user-context or validation failure into an infrastructure outage. Callers can no longer distinguish a branch mismatch or missing claim from a real git/process failure, so the abstraction boundary is lost.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/git_workflow.rs",
-              "line": 514,
-              "category": "error type confusion"
-            }
-          ],
-          "hash": "rvw1:sha256:c54ac6880583bdaddd4291786326c133d849443e3ad371bf5428f7a23954d267",
-          "at": "2026-07-04T10:50:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3f6724e323e2ce6aeaeba3a3c9fb4d035fda4b57a0c5a3f5f800c1aabf02d2d2",
-          "at": "2026-07-04T11:01:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3f6724e323e2ce6aeaeba3a3c9fb4d035fda4b57a0c5a3f5f800c1aabf02d2d2",
-          "at": "2026-07-04T11:06:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`switch_to_base` now folds `SyncNonFastForward` into the warning/`Ok(String)` path, but this test still calls `unwrap_err()` and expects that variant to propagate. As written, the usecase test suite fails before it can validate the new orchestration contract; update this case to assert the warning output or restore propagation in the implementation.",
-              "severity": "P1",
-              "file": "libs/usecase/src/git_workflow.rs",
-              "line": 1311,
-              "category": "test"
-            }
-          ],
-          "hash": "rvw1:sha256:719a6e57e690d979a48b924b046b069ed3fb8b06128088c44de9bee4e5a3ce5b",
-          "at": "2026-07-04T11:25:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9948bd334c20c751a2c5de7aa781d58f38652d7bfcbbea046b72ecf67e5e3f22",
-          "at": "2026-07-04T11:34:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`current_branch_track_id` collapses every parse error except `InvalidTrackId` into `Ok(None)`, so `DetachedHead` and `NoBranch` are treated as \"no track\" instead of a failure. In the `CurrentBranchTrackIdStrict` CLI path that becomes a successful exit, which silently hides detached-HEAD / branch-detection problems.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/git_workflow.rs",
-              "line": 556,
-              "category": "correctness"
-            },
-            {
-              "message": "If the `logs/` rename fails, the attempted rollback `self.git.move_path(Some(project_root), &dst_dir, &src_dir)` discards its result. A second failure can leave the track half-archived while the API only reports the original rename error, so the caller cannot tell the rollback also failed.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/git_workflow.rs",
-              "line": 726,
-              "category": "error handling"
-            }
-          ],
-          "hash": "rvw1:sha256:0cdc2350ae695d52ada1e01a3391863c3c1200788aa0045a3ad15997739fc39d",
-          "at": "2026-07-04T14:06:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TelemetryAggregateInteractor::emit_archived` builds `telemetry_dir` from a raw `track_id` string without validating it as a `domain::TrackId`. A malformed id such as `../evil` would escape `track/archive` and let the archived telemetry writer write outside the intended tree if a caller bypasses the CLI-level prevalidation.",
-              "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/telemetry.rs",
-              "line": 392,
-              "category": "security"
-            },
-            {
-              "message": "The new public `GitWorkflowInteractor` APIs are missing direct coverage for their success/forwarding paths: `current_branch_track_id` only has detached-head/no-branch tests, and `sync_current_branch` is only exercised indirectly through `switch_to_base`. A regression in branch parsing or sync delegation could ship without a failing test.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/git_workflow.rs",
-              "line": 537,
-              "category": "testing"
-            },
-            {
-              "message": "`TelemetryAggregateInteractor::emit_archived` has no test that `ArchivedTrackTelemetryPort::emit` failures are propagated as `EmitUnavailable`; the current tests only cover the happy path, repo-root failure, and malformed `items_dir`.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/telemetry.rs",
-              "line": 394,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:eecbaba114b9d4aec49d5c4ee32f4d1fb86a8145e43af20c40d25ddd0f3a1080",
-          "at": "2026-07-04T14:22:49Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ce755ebcba4ce8165ce5bf5144e91c4a465f718922a5f18ccdaba726ecda4290",
-          "at": "2026-07-04T14:47:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ce755ebcba4ce8165ce5bf5144e91c4a465f718922a5f18ccdaba726ecda4290",
-          "at": "2026-07-04T14:49:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ce755ebcba4ce8165ce5bf5144e91c4a465f718922a5f18ccdaba726ecda4290",
-          "at": "2026-07-04T14:52:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5e53c70df6340fddc9bc789e4ce8da066503dd19aadc0d71ea124357ffb9879e",
-          "at": "2026-07-04T16:01:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5e53c70df6340fddc9bc789e4ce8da066503dd19aadc0d71ea124357ffb9879e",
-          "at": "2026-07-04T16:06:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:acd20b69c83a1cc936aaa226438a1bfc9d7815427d359fde85ae15cb3353c857",
-          "at": "2026-07-04T17:10:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`archive_track` records that `logs/` existed before the `git mv`, but this branch only handles the case where `dst_logs` is absent and `src_logs` is still present. If the git move or adapter behavior leaves neither path present, the function falls through to `Ok(...)`, reporting a successful archive after losing the archived telemetry logs. This should fail closed and roll back when `logs_was_dir` is true and `dst_logs` is not present.",
-              "severity": "P0",
-              "file": "libs/usecase/src/git_workflow/flow_interactors.rs",
-              "line": 162,
-              "category": "orchestration_correctness"
-            },
-            {
-              "message": "On a filesystem rename failure, the rollback attempts `git mv dst_dir src_dir` while `src_dir` still exists because it contains the untracked `logs/` directory. The real git adapter will reject moving the archive directory over an existing source directory, so the rollback path leaves tracked files under `track/archive/...` and logs under `track/items/...`. The previous composition logic moved archive children back into the existing source directory before removing the empty archive dir; this interactor should preserve that behavior through the existing fs port methods.",
-              "severity": "P0",
-              "file": "libs/usecase/src/git_workflow/flow_interactors.rs",
-              "line": 167,
-              "category": "orchestration_correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:acd20b69c83a1cc936aaa226438a1bfc9d7815427d359fde85ae15cb3353c857",
-          "at": "2026-07-04T17:16:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:674f839e8fb79c1d597084604f8f31d1030c8471b02669cf94ba421918a3fa31",
-          "at": "2026-07-04T17:24:31Z"
-        }
-      ]
-    },
-    "types": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Several `docs` fields in the new/modified catalog entries restate ADR/spec rationale instead of staying anchor-only, which violates `knowledge/conventions/no-upstream-restatement.md`. The clearest instance is `usecase::git_workflow::DiagnosticText` at line 38, and the same pattern recurs in `GitWorkflowError`, `GitWorkflowInteractor`, `GitPrimitivePort`, `TrackArchiveFsPort`, `GitWorkflowService`, and the corresponding CLI/infrastructure entries: they explain why the design exists rather than just naming the changed surface and citing the anchors.",
-              "severity": "P1",
-              "file": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
-              "line": 38,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:bc1e8e5ac4fc3775d7e76a8229e5e01c55eec89d201b6421d137147ae421e836",
-          "at": "2026-07-04T06:53:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:216d56c11305758a81e9d8c9d99f0e9edef356a6a42ad0655b9e2fb5d7fc5f05",
-          "at": "2026-07-04T07:16:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`contract-map.md` still renders `FsGitWorkflowAdapter` as implementing `GitWorkflowService`, but the catalogue declares that trait impl as `action: delete` and the replacement `GitPrimitivePort` impl as `action: add`. Because deleted `SwitchAndPullArgs` / `GitRepository` nodes are omitted from the map, this stale live edge makes the rendered type contract contradict the target-state catalogue and preserves the old adapter-to-application-service relationship in the PR-level view.",
-              "severity": "P1",
-              "file": "track/items/remote-sync-dedicated-command-2026-07-04/contract-map.md",
-              "line": 354,
-              "category": "SoT integrity"
-            }
-          ],
-          "hash": "rvw1:sha256:216d56c11305758a81e9d8c9d99f0e9edef356a6a42ad0655b9e2fb5d7fc5f05",
-          "at": "2026-07-04T07:22:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The `docs` field for `usecase::git_workflow::GitPrimitivePort` is restating the upstream contract in prose (per-method git semantics, explicit implementation target, and branch-root behavior) instead of staying at the required \"change + operation + anchor cite\" level. This violates `knowledge/conventions/no-upstream-restatement.md`; the same pattern also appears in `cli::commands::git::GitCommand`, `cli_driver::git::GitInput`, and `cli_composition::git::GitCompositionRoot`.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
-              "line": 206,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:e7e9ebe0ec6441dbf2ce39122f80c514b2bd0d3b2f1c37f384ea99658e4d4576",
-          "at": "2026-07-04T07:42:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`GitWorkflowService::current_branch_track_id` still returns `Result<Option<String>, GitWorkflowError>` here, so the service boundary exports a branch-derived track identifier as a raw string instead of a validated domain type. That keeps the track-id contract stringly typed and pushes re-validation onto every caller.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
-              "line": 520,
-              "category": "SoT integrity"
-            },
-            {
-              "message": "`domain-types.json` is missing the reference nodes needed by this track's usecase surface: `BranchReadError` (`usecase-types.json:555`), `domain::TrackId` (`:644`, `:656`, `:678`, `:702`, `:732`) and `domain::CommitHash` (`:302`, `:712`, `:733`, `:741`). Without those declarations, the contract map leaves the new cross-layer type edges unresolved.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/domain-types.json",
-              "line": 5,
-              "category": "SoT integrity"
-            }
-          ],
-          "hash": "rvw1:sha256:43bde4ed7f99ce2b7670425ef8bb7d6dbb2342058b480a155de7550f91982ea1",
-          "at": "2026-07-04T07:56:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:05b465a025cebd0d13db70186acb189b1e519657d6a0e2d3c1014403e8b2159c",
-          "at": "2026-07-04T08:20:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TrackGitInteractor` method docs restate upstream behavior contracts instead of only citing anchors: the catalogue spells out the branch-create sequence, switch-base sequence, archive rollback sequence, and stdout behavior. `knowledge/conventions/no-upstream-restatement.md` applies to `<layer>-types.json` docs/intent fields, so this creates a second behavioral source of truth that can drift from IN-05/IN-10/CN-03/AC-04. Replace the prose with target/operation plus anchor cites.",
-              "severity": "P1",
-              "file": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
-              "line": 664,
-              "category": "upstream_restatement"
-            },
-            {
-              "message": "The PR/review interactor method docs also encode behavior flow details (`fetch_branch -> show_file_at_ref(...) -> raw JSON` and current-branch verification before resolving HEAD) rather than deferring to the cited spec anchors. This violates the same no-upstream-restatement rule for type catalogues and makes these usecase entries independent behavioral documentation instead of type contracts tied to IN-10/CN-03/AC-09.",
-              "severity": "P1",
-              "file": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
-              "line": 721,
-              "category": "upstream_restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:05b465a025cebd0d13db70186acb189b1e519657d6a0e2d3c1014403e8b2159c",
-          "at": "2026-07-04T08:31:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dbca4c15e5a193b329784a41f78147b424b37ae5b88965dab68d77a999233346",
-          "at": "2026-07-04T08:50:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dbca4c15e5a193b329784a41f78147b424b37ae5b88965dab68d77a999233346",
-          "at": "2026-07-04T08:55:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The catalogue adds `ArchivedTelemetryFactoryPort::build` returning `std::sync::Arc<dyn ArchivedTrackTelemetryPort>` in `usecase-types.json`, but the rendered `contract-map.md` never draws that dependency edge. The telemetry subgraph therefore no longer matches the type catalogue and hides the new factory return type.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/contract-map.md",
-              "line": 170,
-              "category": "SoT integrity"
-            }
-          ],
-          "hash": "rvw1:sha256:b100f9b34a012b276c91daed072af458674b372726ffce186603e64346f0cd55",
-          "at": "2026-07-04T14:00:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b100f9b34a012b276c91daed072af458674b372726ffce186603e64346f0cd55",
-          "at": "2026-07-04T14:16:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`GitWorkflowError` docs cite `CN-05` and `AC-04`, but the structured `spec_refs` omit both. Catalogue traceability is driven by `spec_refs`, not prose, so the switch-base / bit-equivalence grounding for the new `SwitchFailed` contract is invisible to catalogue-spec verification and can drift. Add those anchors to `spec_refs`, or remove them from the docs if they are not actually part of this entry's contract.",
-              "severity": "P1",
-              "file": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
-              "line": 79,
-              "category": "SoT integrity"
-            },
-            {
-              "message": "`TelemetryAggregateInteractor` is declared as one interactor holding `GitPrimitivePort`, `TelemetryReportPort`, and `ArchivedTelemetryFactoryPort`, which bundles report aggregation with archived telemetry emit/repo-root orchestration. Those query and command concerns change for different reasons, and the report path now depends on git plus archive-emitter factory wiring it does not need. Split report and emit into separate interactors/services, or explicitly catalogue a thin facade over separate usecase ports if a single driver-facing facade is required.",
-              "severity": "P1",
-              "file": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
-              "line": 232,
-              "category": "SOLID: Single Responsibility"
-            }
-          ],
-          "hash": "rvw1:sha256:b100f9b34a012b276c91daed072af458674b372726ffce186603e64346f0cd55",
-          "at": "2026-07-04T14:23:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:996454d13b08030721978fec78f78efd398fdc5dab95469a767ee8943a0c812f",
-          "at": "2026-07-04T15:02:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TelemetryReportInteractor`'s `docs` field restates the design rationale for the SRP split and dependency shape (`report path only`, split so it carries no git/factory dependency) instead of limiting the catalogue entry to target + operation + anchor cites. `knowledge/conventions/no-upstream-restatement.md` requires type-catalogue docs to reference upstream behavior by anchor, not reproduce the rationale in prose.",
-              "severity": "P1",
-              "file": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
-              "line": 234,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "`TelemetryEmitInteractor`'s `docs` field restates the archived telemetry emit orchestration sequence (`repo-root resolution via GitPrimitivePort::resolve_repo_root`, then factory-built `ArchivedTrackTelemetryPort`). That is IN-10/CN-03 behavior prose in the downstream type catalogue; per `knowledge/conventions/no-upstream-restatement.md`, keep this as changed type + operation + anchors.",
-              "severity": "P1",
-              "file": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
-              "line": 251,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "`TelemetryAggregateInteractor`'s `docs` field restates the facade/delegation design and relocation rationale for the telemetry service (`delegating report -> ...`, `emit_archived -> ...`, SRP split, relocated from cli_composition). This reproduces upstream design rationale in the catalogue instead of citing IN-10/CN-03/AC-09 only, violating `knowledge/conventions/no-upstream-restatement.md`.",
-              "severity": "P1",
-              "file": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
-              "line": 268,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:996454d13b08030721978fec78f78efd398fdc5dab95469a767ee8943a0c812f",
-          "at": "2026-07-04T15:09:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`SyncError`'s `docs` field restates the upstream sync failure contract and mapping behavior (`3 fail-closed sync modes`, `Sync modes map 1:1...`, `Spawn maps...`) instead of limiting the catalogue entry to the changed type surface plus anchor cites. Per `knowledge/conventions/no-upstream-restatement.md`, downstream type catalogue docs must not reproduce IN-06/CN-02/AC-08 behavior in prose because that creates a second source of truth.",
-              "severity": "P1",
-              "file": "track/items/remote-sync-dedicated-command-2026-07-04/infrastructure-types.json",
-              "line": 26,
-              "category": "upstream_restatement"
-            },
-            {
-              "message": "`TelemetryEmitInteractor::emit_archived`'s method `docs` restate the orchestration behavior (`Emits an archived-track telemetry event; resolves the repo root via GitPrimitivePort::resolve_repo_root`) while also citing IN-10/CN-03/AC-09. The type catalogue should identify the method and cite the anchors, not duplicate the upstream behavior contract in prose.",
-              "severity": "P1",
-              "file": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
-              "line": 968,
-              "category": "upstream_restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:e61ded56df0c85e77d947f98f8d022b85d17c8446e1442d0117741681302e209",
-          "at": "2026-07-04T15:17:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TelemetryReportInteractor::report` and `TelemetryEmitInteractor::emit_archived` are added usecase-facing contracts but both accept `track_id` as raw `&str`. Other added git interactors in this same catalogue use `&domain::TrackId` for track identifiers, and the briefing explicitly calls out using `domain::TrackId` instead of raw strings where appropriate. Keeping these telemetry contracts stringly makes invalid track IDs representable at the usecase boundary; the methods should take a validated `domain::TrackId` or validate before exposing the downstream port contract.",
-              "severity": "P1",
-              "file": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
-              "line": 930,
-              "category": "type-safety"
-            }
-          ],
-          "hash": "rvw1:sha256:6feedeb5db217b0be1a4983a39ef20360b12cb9edab83630900768197d72eb22",
-          "at": "2026-07-04T15:22:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Several updated `docs` fields restate downstream behavior/contract instead of staying at `change target + operation + anchor cite`, which violates `knowledge/conventions/no-upstream-restatement.md`: `TelemetryAggregateInteractor` here, plus the same pattern in `/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/infrastructure-types.json:70` (`SystemGitRepo`), `.../infrastructure-types.json:127` (`FsArchivedTelemetryFactoryAdapter`), and `.../cli_composition-types.json:63` (`persist_commit_hash_for_track`).",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
-              "line": 268,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:f3cb6e2bf34604d7ac421f567f0e4334cd39dee5ef5751a3c32802fdb30053dd",
-          "at": "2026-07-04T15:38:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Several updated `docs` fields restate the contract/wiring instead of pointing at the upstream anchors, which violates the no-upstream-restatement rule and creates a second source of truth for the type contract: `/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json` (`TelemetryAggregateInteractor` at line 259 and `ArchivedTelemetryFactoryPort` at line 316), `/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/infrastructure-types.json` (`SystemGitRepo` at line 61 and `FsArchivedTelemetryFactoryAdapter` at line 118), and `/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/cli_composition-types.json` (`persist_commit_hash_for_track` at line 55). These fields should be reduced to a terse type summary plus anchor cites.",
-              "severity": "P1",
-              "file": null,
-              "line": null,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:9bf1c395fb646b783b58d66f86566d7d63382e62dfc6ed35a3bf7c2cb194ea78",
-          "at": "2026-07-04T16:00:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5e546630679156e117f0f8c282fe11608519bf6fc2d2d31fa7fe188a04d4d804",
-          "at": "2026-07-04T16:12:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5e546630679156e117f0f8c282fe11608519bf6fc2d2d31fa7fe188a04d4d804",
-          "at": "2026-07-04T16:39:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5ebef8ea5492c435b07c485ce4932739ddf836557280f759b72f9aacdc1e77b1",
-          "at": "2026-07-04T18:47:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5ebef8ea5492c435b07c485ce4932739ddf836557280f759b72f9aacdc1e77b1",
-          "at": "2026-07-04T18:54:22Z"
-        }
-      ]
-    },
-    "cli_driver": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:824b7d835297a2c4b8d6520679d13de337c33bfa6b56606f1cce7d1ec49b99b6",
-          "at": "2026-07-04T10:44:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:824b7d835297a2c4b8d6520679d13de337c33bfa6b56606f1cce7d1ec49b99b6",
-          "at": "2026-07-04T10:48:21Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:807f3a207c376596a1c399db60bfe51f6a2e914177598c13d14d12e38922b78c",
-          "at": "2026-07-04T07:33:42Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:807f3a207c376596a1c399db60bfe51f6a2e914177598c13d14d12e38922b78c",
-          "at": "2026-07-04T07:37:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`fs::read_dir(path)` will follow a symlinked `path` and enumerate the target directory, but this port method never performs the explicit `symlink_metadata()`/reject check used elsewhere in the infrastructure boundary. That lets an untrusted caller hand in a symlink and read entries outside the intended workspace tree.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/git_cli/workflow_adapter.rs",
-              "line": 535,
-              "category": "symlink not rejected at boundary"
-            }
-          ],
-          "hash": "rvw1:sha256:a44733d8201974988f49a235a57aa54e0a4bc87096e3f36ed6f5f979a70f05de",
-          "at": "2026-07-04T10:52:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new `TrackArchiveFsPort` implementation uses raw `std::fs::create_dir_all` / `fs::rename` after only checking the queried path itself, so a symlinked ancestor under `track/` or `archive/` can redirect archive operations outside the trusted repo root. `path_is_dir` / `path_exists` also only inspect the leaf via `symlink_metadata`, so they do not close that boundary.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/git_cli/workflow_adapter.rs",
-              "line": 513,
-              "category": "trusted-root violation"
-            },
-            {
-              "message": "This classifier folds `Command::output()` spawn failures into `SyncError::WorktreeUnresolved`, so a missing/broken git binary or permission failure is reported as a dirty-worktree sync problem instead of an infrastructure failure. The new stderr matcher is also brittle and has no regression coverage for the non-fast-forward / worktree branches.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/git_cli/mod.rs",
-              "line": 274,
-              "category": "error handling"
-            }
-          ],
-          "hash": "rvw1:sha256:5888bcaea7ac57a0b58102a03ff09bd0b6ab93801c0d19599a534295f4f91b10",
-          "at": "2026-07-04T11:12:16Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6eedfdc7fa83422da12e3e2c4846ccc98772e67df8dcfb4ca427b18e67df4971",
-          "at": "2026-07-04T11:47:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4a76d4ba86b8df820341f571ee1b237ea675fb055b50800336145374e6827d24",
-          "at": "2026-07-04T14:02:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a015ccfba282792c035e74b3b42c7d341e5f7bc5de236e1b90bba671720b4675",
-          "at": "2026-07-04T14:10:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4a76d4ba86b8df820341f571ee1b237ea675fb055b50800336145374e6827d24",
-          "at": "2026-07-04T16:42:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4a76d4ba86b8df820341f571ee1b237ea675fb055b50800336145374e6827d24",
-          "at": "2026-07-04T16:51:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`move_path` accepts any path that does not strip the repo prefix by falling back to the original `src`/`dst` values. That means absolute paths outside the repo, and `..`-based paths that fail prefix stripping, are forwarded to `git mv` instead of being rejected, which bypasses the trusted-root boundary for this filesystem-mutating adapter.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/git_cli/workflow_adapter.rs",
-              "line": 256,
-              "category": "trusted-root violation"
-            }
-          ],
-          "hash": "rvw1:sha256:b218ec6311b491110e766769190a30676543d03837ba0f66757a66e7a79badff",
-          "at": "2026-07-04T17:41:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`classify_sync_failure` falls through to `SyncError::WorktreeUnresolved` for every `git pull --ff-only` failure that does not match the two string checks. That downgrades unrelated git errors such as auth/network/remote corruption, and future wording changes in git, into the same non-fatal path as a dirty worktree, so callers can report success after a real sync failure. Unknown stderr should not be swallowed into the warning path.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/git_cli/mod.rs",
-              "line": 53,
-              "category": "missing error handling"
-            }
-          ],
-          "hash": "rvw1:sha256:8c019a40cb29780dd2e7f8bb598519826a0b6946f8a12dbd1448f89ec5221fd6",
-          "at": "2026-07-04T17:58:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2a005fccc74ebd6d6a13931e0de4fdee34eb715644263c88f23c6b4ceaf69bb0",
-          "at": "2026-07-04T18:10:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2a005fccc74ebd6d6a13931e0de4fdee34eb715644263c88f23c6b4ceaf69bb0",
-          "at": "2026-07-04T18:17:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c19a11693d715a626c5c2e8885eb6eda476f65a90f6ecb36bb060afbc5249e44",
-          "at": "2026-07-04T18:31:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c19a11693d715a626c5c2e8885eb6eda476f65a90f6ecb36bb060afbc5249e44",
-          "at": "2026-07-04T18:38:44Z"
-        }
-      ]
-    },
     "impl-plan": {
       "rounds": [
         {
@@ -1065,113 +419,6 @@
         }
       ]
     },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8bd1f474595b5327597aa70992136690318b7a48db43bb4b8e83f84fabd4225a",
-          "at": "2026-07-04T06:44:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8bd1f474595b5327597aa70992136690318b7a48db43bb4b8e83f84fabd4225a",
-          "at": "2026-07-04T06:47:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`.harness/workflows/track/done.md:26-33` makes the sync step warning-only for `UpstreamNotSet` / `NonFastForward` / `WorktreeUnresolved`, but the same workflow still says the output should confirm the tree is 'updated from origin' and `.claude/commands/track/done.md:19-21` asks for it to be 'up to date with origin'. That lets `/track:done` report a successful completion even when the ff-only pull failed, so the completion contract is false in the warning path. Reword the summary/output to say the sync was attempted unless the pull actually succeeded.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/done.md",
-              "line": 61,
-              "category": "convention contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:c96483be97b7a80bbd86dcfe121587315883f223c9dab1ea0784c2f9fc8b06a3",
-          "at": "2026-07-04T10:48:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: The new `done` workflow docs overstate the sync failure contract. In [`/.harness/workflows/track/done.md:12`](/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.harness/workflows/track/done.md#L12) and [`knowledge/conventions/branch-strategy.md:40`](/home/flip451/individual/t-rust/templates/SoTOHE-core-003/knowledge/conventions/branch-strategy.md#L40), the text says `UpstreamNotSet` / `NonFastForward` / `WorktreeUnresolved` are all downgraded to `[WARN]` and that `cargo make sync` is a generic pull/rebase path. The implementation only downgrades `SyncUpstreamNotSet`; `SyncNonFastForward` and `SyncWorktreeUnresolved` still bubble out as errors in [`libs/usecase/src/git_workflow.rs:650`](/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/git_workflow.rs#L650) and [`libs/usecase/src/git_workflow.rs:653`](/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/git_workflow.rs#L653). As written, `/track:done` will be documented as more failure-tolerant than it really is.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.harness/workflows/track/done.md",
-              "line": 12,
-              "category": "convention contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:485eaed280284c9fe4b103978fa3c6f92df4cf9602b54fcb7bfe9dbcc891477d",
-          "at": "2026-07-04T11:00:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e4ca71699234ed4f201d8e0c9173d5e8669e428ef8112963a8757923b28ef035",
-          "at": "2026-07-04T11:06:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new direct `bin/sotp git sync` entry contradicts this section's own boundary that git-write operations stay behind `cargo make` wrappers for hook coverage. `sync` runs `git pull --ff-only` and can update the current branch/worktree, while the change also adds the intended `cargo make sync` wrapper and permission. Advertising the native command in the \"Direct bin/sotp\" list creates a bypass/miswiring of the documented hook boundary; keep the runnable guidance on `cargo make sync` and mention `bin/sotp git sync` only as the wrapper implementation if needed.",
-              "severity": "P1",
-              "file": ".claude/rules/07-dev-environment.md",
-              "line": 95,
-              "category": "hook coverage gap"
-            }
-          ],
-          "hash": "rvw1:sha256:e4ca71699234ed4f201d8e0c9173d5e8669e428ef8112963a8757923b28ef035",
-          "at": "2026-07-04T11:12:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`.claude/commands/**/*.md` must not cite a specific ADR by date slug; the pre-track ADR authoring convention requires command docs to be self-contained and to express the workflow behavior directly instead. This adapter now embeds `ADR 2026-07-04-0155 D6`, so the harness command surface is drifting against that convention. Drop the ADR citation and keep only the operational description.",
-              "severity": "P1",
-              "file": ".claude/commands/track/done.md",
-              "line": 14,
-              "category": "convention contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:48c5b1876ce9e4dc50af54eb36394524c6924d82ff3a2d128f363ef60b776294",
-          "at": "2026-07-04T11:16:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`track-switch-base` is documented here as downgrading only missing-upstream to `[WARN] Pull failed` while letting non-fast-forward and unresolved-worktree sync failures fail as typed errors. That contradicts the workflow SSoT and implementation contract for `/track:done`, where `TrackGitInteractor::switch_to_base` downgrades all known sync refusal modes, including non-fast-forward and unresolved worktree, to the non-fatal warning so the branch switch can still complete. This drift changes the operator-facing failure semantics for the base-return path; align the convention text with the SSoT or clearly separate standalone `cargo make sync` failure behavior from `track-switch-base`'s downgraded sync behavior.",
-              "severity": "P1",
-              "file": "knowledge/conventions/branch-strategy.md",
-              "line": 40,
-              "category": "convention contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:94eac3216de6fe9244c10afa60472c28230b1e29af9a2da2db554c292def338b",
-          "at": "2026-07-04T11:31:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:479d45cd7c5ee5a4e68435c90ef0569c7e5611f18727dacbce23440f841c41b4",
-          "at": "2026-07-04T11:38:02Z"
-        }
-      ]
-    },
     "spec": {
       "rounds": [
         {
@@ -1244,6 +491,392 @@
           "findings": [],
           "hash": "rvw1:sha256:6e46e9c19b096751c758c5d38cf6099b047795576ebfc649a72a1f6b9be019fa",
           "at": "2026-07-04T14:00:59Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:807f3a207c376596a1c399db60bfe51f6a2e914177598c13d14d12e38922b78c",
+          "at": "2026-07-04T07:33:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:807f3a207c376596a1c399db60bfe51f6a2e914177598c13d14d12e38922b78c",
+          "at": "2026-07-04T07:37:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`fs::read_dir(path)` will follow a symlinked `path` and enumerate the target directory, but this port method never performs the explicit `symlink_metadata()`/reject check used elsewhere in the infrastructure boundary. That lets an untrusted caller hand in a symlink and read entries outside the intended workspace tree.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/git_cli/workflow_adapter.rs",
+              "line": 535,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:a44733d8201974988f49a235a57aa54e0a4bc87096e3f36ed6f5f979a70f05de",
+          "at": "2026-07-04T10:52:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `TrackArchiveFsPort` implementation uses raw `std::fs::create_dir_all` / `fs::rename` after only checking the queried path itself, so a symlinked ancestor under `track/` or `archive/` can redirect archive operations outside the trusted repo root. `path_is_dir` / `path_exists` also only inspect the leaf via `symlink_metadata`, so they do not close that boundary.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/git_cli/workflow_adapter.rs",
+              "line": 513,
+              "category": "trusted-root violation"
+            },
+            {
+              "message": "This classifier folds `Command::output()` spawn failures into `SyncError::WorktreeUnresolved`, so a missing/broken git binary or permission failure is reported as a dirty-worktree sync problem instead of an infrastructure failure. The new stderr matcher is also brittle and has no regression coverage for the non-fast-forward / worktree branches.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/git_cli/mod.rs",
+              "line": 274,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:5888bcaea7ac57a0b58102a03ff09bd0b6ab93801c0d19599a534295f4f91b10",
+          "at": "2026-07-04T11:12:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6eedfdc7fa83422da12e3e2c4846ccc98772e67df8dcfb4ca427b18e67df4971",
+          "at": "2026-07-04T11:47:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4a76d4ba86b8df820341f571ee1b237ea675fb055b50800336145374e6827d24",
+          "at": "2026-07-04T14:02:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a015ccfba282792c035e74b3b42c7d341e5f7bc5de236e1b90bba671720b4675",
+          "at": "2026-07-04T14:10:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4a76d4ba86b8df820341f571ee1b237ea675fb055b50800336145374e6827d24",
+          "at": "2026-07-04T16:42:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4a76d4ba86b8df820341f571ee1b237ea675fb055b50800336145374e6827d24",
+          "at": "2026-07-04T16:51:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`move_path` accepts any path that does not strip the repo prefix by falling back to the original `src`/`dst` values. That means absolute paths outside the repo, and `..`-based paths that fail prefix stripping, are forwarded to `git mv` instead of being rejected, which bypasses the trusted-root boundary for this filesystem-mutating adapter.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/git_cli/workflow_adapter.rs",
+              "line": 256,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:b218ec6311b491110e766769190a30676543d03837ba0f66757a66e7a79badff",
+          "at": "2026-07-04T17:41:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`classify_sync_failure` falls through to `SyncError::WorktreeUnresolved` for every `git pull --ff-only` failure that does not match the two string checks. That downgrades unrelated git errors such as auth/network/remote corruption, and future wording changes in git, into the same non-fatal path as a dirty worktree, so callers can report success after a real sync failure. Unknown stderr should not be swallowed into the warning path.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/git_cli/mod.rs",
+              "line": 53,
+              "category": "missing error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:8c019a40cb29780dd2e7f8bb598519826a0b6946f8a12dbd1448f89ec5221fd6",
+          "at": "2026-07-04T17:58:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2a005fccc74ebd6d6a13931e0de4fdee34eb715644263c88f23c6b4ceaf69bb0",
+          "at": "2026-07-04T18:10:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2a005fccc74ebd6d6a13931e0de4fdee34eb715644263c88f23c6b4ceaf69bb0",
+          "at": "2026-07-04T18:17:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c19a11693d715a626c5c2e8885eb6eda476f65a90f6ecb36bb060afbc5249e44",
+          "at": "2026-07-04T18:31:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c19a11693d715a626c5c2e8885eb6eda476f65a90f6ecb36bb060afbc5249e44",
+          "at": "2026-07-04T18:38:44Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`switch_to_base` downgrades `SyncNonFastForward` and `SyncWorktreeUnresolved` to a warning and then returns `Ok(...)`, so `git sync` can report success even though `git pull --ff-only` failed. The surrounding docs say only `SyncUpstreamNotSet` is the non-fatal case; the other sync failures should propagate so callers do not continue on a stale branch.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/git_workflow.rs",
+              "line": 658,
+              "category": "error handling"
+            },
+            {
+              "message": "`commit_from_file` wraps pure branch-guard failures from `verify_explicit_track_branch` / `verify_auto_detected_branch` in `GitWorkflowError::Unavailable`, which turns a user-context or validation failure into an infrastructure outage. Callers can no longer distinguish a branch mismatch or missing claim from a real git/process failure, so the abstraction boundary is lost.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/git_workflow.rs",
+              "line": 514,
+              "category": "error type confusion"
+            }
+          ],
+          "hash": "rvw1:sha256:c54ac6880583bdaddd4291786326c133d849443e3ad371bf5428f7a23954d267",
+          "at": "2026-07-04T10:50:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3f6724e323e2ce6aeaeba3a3c9fb4d035fda4b57a0c5a3f5f800c1aabf02d2d2",
+          "at": "2026-07-04T11:01:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3f6724e323e2ce6aeaeba3a3c9fb4d035fda4b57a0c5a3f5f800c1aabf02d2d2",
+          "at": "2026-07-04T11:06:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`switch_to_base` now folds `SyncNonFastForward` into the warning/`Ok(String)` path, but this test still calls `unwrap_err()` and expects that variant to propagate. As written, the usecase test suite fails before it can validate the new orchestration contract; update this case to assert the warning output or restore propagation in the implementation.",
+              "severity": "P1",
+              "file": "libs/usecase/src/git_workflow.rs",
+              "line": 1311,
+              "category": "test"
+            }
+          ],
+          "hash": "rvw1:sha256:719a6e57e690d979a48b924b046b069ed3fb8b06128088c44de9bee4e5a3ce5b",
+          "at": "2026-07-04T11:25:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9948bd334c20c751a2c5de7aa781d58f38652d7bfcbbea046b72ecf67e5e3f22",
+          "at": "2026-07-04T11:34:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`current_branch_track_id` collapses every parse error except `InvalidTrackId` into `Ok(None)`, so `DetachedHead` and `NoBranch` are treated as \"no track\" instead of a failure. In the `CurrentBranchTrackIdStrict` CLI path that becomes a successful exit, which silently hides detached-HEAD / branch-detection problems.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/git_workflow.rs",
+              "line": 556,
+              "category": "correctness"
+            },
+            {
+              "message": "If the `logs/` rename fails, the attempted rollback `self.git.move_path(Some(project_root), &dst_dir, &src_dir)` discards its result. A second failure can leave the track half-archived while the API only reports the original rename error, so the caller cannot tell the rollback also failed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/git_workflow.rs",
+              "line": 726,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:0cdc2350ae695d52ada1e01a3391863c3c1200788aa0045a3ad15997739fc39d",
+          "at": "2026-07-04T14:06:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TelemetryAggregateInteractor::emit_archived` builds `telemetry_dir` from a raw `track_id` string without validating it as a `domain::TrackId`. A malformed id such as `../evil` would escape `track/archive` and let the archived telemetry writer write outside the intended tree if a caller bypasses the CLI-level prevalidation.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/telemetry.rs",
+              "line": 392,
+              "category": "security"
+            },
+            {
+              "message": "The new public `GitWorkflowInteractor` APIs are missing direct coverage for their success/forwarding paths: `current_branch_track_id` only has detached-head/no-branch tests, and `sync_current_branch` is only exercised indirectly through `switch_to_base`. A regression in branch parsing or sync delegation could ship without a failing test.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/git_workflow.rs",
+              "line": 537,
+              "category": "testing"
+            },
+            {
+              "message": "`TelemetryAggregateInteractor::emit_archived` has no test that `ArchivedTrackTelemetryPort::emit` failures are propagated as `EmitUnavailable`; the current tests only cover the happy path, repo-root failure, and malformed `items_dir`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/telemetry.rs",
+              "line": 394,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:eecbaba114b9d4aec49d5c4ee32f4d1fb86a8145e43af20c40d25ddd0f3a1080",
+          "at": "2026-07-04T14:22:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce755ebcba4ce8165ce5bf5144e91c4a465f718922a5f18ccdaba726ecda4290",
+          "at": "2026-07-04T14:47:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce755ebcba4ce8165ce5bf5144e91c4a465f718922a5f18ccdaba726ecda4290",
+          "at": "2026-07-04T14:49:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce755ebcba4ce8165ce5bf5144e91c4a465f718922a5f18ccdaba726ecda4290",
+          "at": "2026-07-04T14:52:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e53c70df6340fddc9bc789e4ce8da066503dd19aadc0d71ea124357ffb9879e",
+          "at": "2026-07-04T16:01:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e53c70df6340fddc9bc789e4ce8da066503dd19aadc0d71ea124357ffb9879e",
+          "at": "2026-07-04T16:06:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:acd20b69c83a1cc936aaa226438a1bfc9d7815427d359fde85ae15cb3353c857",
+          "at": "2026-07-04T17:10:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`archive_track` records that `logs/` existed before the `git mv`, but this branch only handles the case where `dst_logs` is absent and `src_logs` is still present. If the git move or adapter behavior leaves neither path present, the function falls through to `Ok(...)`, reporting a successful archive after losing the archived telemetry logs. This should fail closed and roll back when `logs_was_dir` is true and `dst_logs` is not present.",
+              "severity": "P0",
+              "file": "libs/usecase/src/git_workflow/flow_interactors.rs",
+              "line": 162,
+              "category": "orchestration_correctness"
+            },
+            {
+              "message": "On a filesystem rename failure, the rollback attempts `git mv dst_dir src_dir` while `src_dir` still exists because it contains the untracked `logs/` directory. The real git adapter will reject moving the archive directory over an existing source directory, so the rollback path leaves tracked files under `track/archive/...` and logs under `track/items/...`. The previous composition logic moved archive children back into the existing source directory before removing the empty archive dir; this interactor should preserve that behavior through the existing fs port methods.",
+              "severity": "P0",
+              "file": "libs/usecase/src/git_workflow/flow_interactors.rs",
+              "line": 167,
+              "category": "orchestration_correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:acd20b69c83a1cc936aaa226438a1bfc9d7815427d359fde85ae15cb3353c857",
+          "at": "2026-07-04T17:16:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:674f839e8fb79c1d597084604f8f31d1030c8471b02669cf94ba421918a3fa31",
+          "at": "2026-07-04T17:24:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:19104d083c09282a8ef0df5182b7ba049c31c700179079fb9301581d8809969f",
+          "at": "2026-07-04T19:25:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:19104d083c09282a8ef0df5182b7ba049c31c700179079fb9301581d8809969f",
+          "at": "2026-07-04T19:28:18Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a88b2a56f27f4f8d99bde691fced18d75aa5a74c280a5868cb4abf6cd35237b6",
+          "at": "2026-07-04T10:49:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `execute_branch_create`/`execute_branch_switch` still perform domain validation and branch-name derivation in the CLI layer before dispatching to `TrackDriver` (`validate_track_id_str`, `format!(\"track/{track_id}\")`, `validate_track_branch_str`, and `resolve_project_root`). Under the cli thin-bin policy, ADR D5/D8 require these handlers to only parse args, build `TrackInput`, call `TrackCompositionRoot::new().track_driver().handle(...)`, and emit the `CommandOutcome`; this pre-dispatch business logic should move behind the driver/usecase boundary. The same pattern is repeated in the switch path around line 64.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/branch_ops.rs",
+              "line": 38,
+              "category": "business logic in bin"
+            }
+          ],
+          "hash": "rvw1:sha256:a88b2a56f27f4f8d99bde691fced18d75aa5a74c280a5868cb4abf6cd35237b6",
+          "at": "2026-07-04T10:53:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c5200054ddf34d27cf6d85e614d1c2c652e441b8f372913ca5721ece3211a65",
+          "at": "2026-07-04T11:07:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c5200054ddf34d27cf6d85e614d1c2c652e441b8f372913ca5721ece3211a65",
+          "at": "2026-07-04T11:11:41Z"
         }
       ]
     },
@@ -1322,43 +955,299 @@
         }
       ]
     },
-    "cli": {
+    "types": {
       "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Several `docs` fields in the new/modified catalog entries restate ADR/spec rationale instead of staying anchor-only, which violates `knowledge/conventions/no-upstream-restatement.md`. The clearest instance is `usecase::git_workflow::DiagnosticText` at line 38, and the same pattern recurs in `GitWorkflowError`, `GitWorkflowInteractor`, `GitPrimitivePort`, `TrackArchiveFsPort`, `GitWorkflowService`, and the corresponding CLI/infrastructure entries: they explain why the design exists rather than just naming the changed surface and citing the anchors.",
+              "severity": "P1",
+              "file": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+              "line": 38,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:bc1e8e5ac4fc3775d7e76a8229e5e01c55eec89d201b6421d137147ae421e836",
+          "at": "2026-07-04T06:53:46Z"
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a88b2a56f27f4f8d99bde691fced18d75aa5a74c280a5868cb4abf6cd35237b6",
-          "at": "2026-07-04T10:49:01Z"
+          "hash": "rvw1:sha256:216d56c11305758a81e9d8c9d99f0e9edef356a6a42ad0655b9e2fb5d7fc5f05",
+          "at": "2026-07-04T07:16:05Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "P1: `execute_branch_create`/`execute_branch_switch` still perform domain validation and branch-name derivation in the CLI layer before dispatching to `TrackDriver` (`validate_track_id_str`, `format!(\"track/{track_id}\")`, `validate_track_branch_str`, and `resolve_project_root`). Under the cli thin-bin policy, ADR D5/D8 require these handlers to only parse args, build `TrackInput`, call `TrackCompositionRoot::new().track_driver().handle(...)`, and emit the `CommandOutcome`; this pre-dispatch business logic should move behind the driver/usecase boundary. The same pattern is repeated in the switch path around line 64.",
+              "message": "`contract-map.md` still renders `FsGitWorkflowAdapter` as implementing `GitWorkflowService`, but the catalogue declares that trait impl as `action: delete` and the replacement `GitPrimitivePort` impl as `action: add`. Because deleted `SwitchAndPullArgs` / `GitRepository` nodes are omitted from the map, this stale live edge makes the rendered type contract contradict the target-state catalogue and preserves the old adapter-to-application-service relationship in the PR-level view.",
               "severity": "P1",
-              "file": "apps/cli/src/commands/track/branch_ops.rs",
-              "line": 38,
-              "category": "business logic in bin"
+              "file": "track/items/remote-sync-dedicated-command-2026-07-04/contract-map.md",
+              "line": 354,
+              "category": "SoT integrity"
             }
           ],
-          "hash": "rvw1:sha256:a88b2a56f27f4f8d99bde691fced18d75aa5a74c280a5868cb4abf6cd35237b6",
-          "at": "2026-07-04T10:53:19Z"
+          "hash": "rvw1:sha256:216d56c11305758a81e9d8c9d99f0e9edef356a6a42ad0655b9e2fb5d7fc5f05",
+          "at": "2026-07-04T07:22:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `docs` field for `usecase::git_workflow::GitPrimitivePort` is restating the upstream contract in prose (per-method git semantics, explicit implementation target, and branch-root behavior) instead of staying at the required \"change + operation + anchor cite\" level. This violates `knowledge/conventions/no-upstream-restatement.md`; the same pattern also appears in `cli::commands::git::GitCommand`, `cli_driver::git::GitInput`, and `cli_composition::git::GitCompositionRoot`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+              "line": 206,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:e7e9ebe0ec6441dbf2ce39122f80c514b2bd0d3b2f1c37f384ea99658e4d4576",
+          "at": "2026-07-04T07:42:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`GitWorkflowService::current_branch_track_id` still returns `Result<Option<String>, GitWorkflowError>` here, so the service boundary exports a branch-derived track identifier as a raw string instead of a validated domain type. That keeps the track-id contract stringly typed and pushes re-validation onto every caller.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+              "line": 520,
+              "category": "SoT integrity"
+            },
+            {
+              "message": "`domain-types.json` is missing the reference nodes needed by this track's usecase surface: `BranchReadError` (`usecase-types.json:555`), `domain::TrackId` (`:644`, `:656`, `:678`, `:702`, `:732`) and `domain::CommitHash` (`:302`, `:712`, `:733`, `:741`). Without those declarations, the contract map leaves the new cross-layer type edges unresolved.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/domain-types.json",
+              "line": 5,
+              "category": "SoT integrity"
+            }
+          ],
+          "hash": "rvw1:sha256:43bde4ed7f99ce2b7670425ef8bb7d6dbb2342058b480a155de7550f91982ea1",
+          "at": "2026-07-04T07:56:38Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:3c5200054ddf34d27cf6d85e614d1c2c652e441b8f372913ca5721ece3211a65",
-          "at": "2026-07-04T11:07:44Z"
+          "hash": "rvw1:sha256:05b465a025cebd0d13db70186acb189b1e519657d6a0e2d3c1014403e8b2159c",
+          "at": "2026-07-04T08:20:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TrackGitInteractor` method docs restate upstream behavior contracts instead of only citing anchors: the catalogue spells out the branch-create sequence, switch-base sequence, archive rollback sequence, and stdout behavior. `knowledge/conventions/no-upstream-restatement.md` applies to `<layer>-types.json` docs/intent fields, so this creates a second behavioral source of truth that can drift from IN-05/IN-10/CN-03/AC-04. Replace the prose with target/operation plus anchor cites.",
+              "severity": "P1",
+              "file": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+              "line": 664,
+              "category": "upstream_restatement"
+            },
+            {
+              "message": "The PR/review interactor method docs also encode behavior flow details (`fetch_branch -> show_file_at_ref(...) -> raw JSON` and current-branch verification before resolving HEAD) rather than deferring to the cited spec anchors. This violates the same no-upstream-restatement rule for type catalogues and makes these usecase entries independent behavioral documentation instead of type contracts tied to IN-10/CN-03/AC-09.",
+              "severity": "P1",
+              "file": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+              "line": 721,
+              "category": "upstream_restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:05b465a025cebd0d13db70186acb189b1e519657d6a0e2d3c1014403e8b2159c",
+          "at": "2026-07-04T08:31:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dbca4c15e5a193b329784a41f78147b424b37ae5b88965dab68d77a999233346",
+          "at": "2026-07-04T08:50:14Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:3c5200054ddf34d27cf6d85e614d1c2c652e441b8f372913ca5721ece3211a65",
-          "at": "2026-07-04T11:11:41Z"
+          "hash": "rvw1:sha256:dbca4c15e5a193b329784a41f78147b424b37ae5b88965dab68d77a999233346",
+          "at": "2026-07-04T08:55:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The catalogue adds `ArchivedTelemetryFactoryPort::build` returning `std::sync::Arc<dyn ArchivedTrackTelemetryPort>` in `usecase-types.json`, but the rendered `contract-map.md` never draws that dependency edge. The telemetry subgraph therefore no longer matches the type catalogue and hides the new factory return type.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/contract-map.md",
+              "line": 170,
+              "category": "SoT integrity"
+            }
+          ],
+          "hash": "rvw1:sha256:b100f9b34a012b276c91daed072af458674b372726ffce186603e64346f0cd55",
+          "at": "2026-07-04T14:00:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b100f9b34a012b276c91daed072af458674b372726ffce186603e64346f0cd55",
+          "at": "2026-07-04T14:16:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`GitWorkflowError` docs cite `CN-05` and `AC-04`, but the structured `spec_refs` omit both. Catalogue traceability is driven by `spec_refs`, not prose, so the switch-base / bit-equivalence grounding for the new `SwitchFailed` contract is invisible to catalogue-spec verification and can drift. Add those anchors to `spec_refs`, or remove them from the docs if they are not actually part of this entry's contract.",
+              "severity": "P1",
+              "file": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+              "line": 79,
+              "category": "SoT integrity"
+            },
+            {
+              "message": "`TelemetryAggregateInteractor` is declared as one interactor holding `GitPrimitivePort`, `TelemetryReportPort`, and `ArchivedTelemetryFactoryPort`, which bundles report aggregation with archived telemetry emit/repo-root orchestration. Those query and command concerns change for different reasons, and the report path now depends on git plus archive-emitter factory wiring it does not need. Split report and emit into separate interactors/services, or explicitly catalogue a thin facade over separate usecase ports if a single driver-facing facade is required.",
+              "severity": "P1",
+              "file": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+              "line": 232,
+              "category": "SOLID: Single Responsibility"
+            }
+          ],
+          "hash": "rvw1:sha256:b100f9b34a012b276c91daed072af458674b372726ffce186603e64346f0cd55",
+          "at": "2026-07-04T14:23:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:996454d13b08030721978fec78f78efd398fdc5dab95469a767ee8943a0c812f",
+          "at": "2026-07-04T15:02:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TelemetryReportInteractor`'s `docs` field restates the design rationale for the SRP split and dependency shape (`report path only`, split so it carries no git/factory dependency) instead of limiting the catalogue entry to target + operation + anchor cites. `knowledge/conventions/no-upstream-restatement.md` requires type-catalogue docs to reference upstream behavior by anchor, not reproduce the rationale in prose.",
+              "severity": "P1",
+              "file": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+              "line": 234,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`TelemetryEmitInteractor`'s `docs` field restates the archived telemetry emit orchestration sequence (`repo-root resolution via GitPrimitivePort::resolve_repo_root`, then factory-built `ArchivedTrackTelemetryPort`). That is IN-10/CN-03 behavior prose in the downstream type catalogue; per `knowledge/conventions/no-upstream-restatement.md`, keep this as changed type + operation + anchors.",
+              "severity": "P1",
+              "file": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+              "line": 251,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`TelemetryAggregateInteractor`'s `docs` field restates the facade/delegation design and relocation rationale for the telemetry service (`delegating report -> ...`, `emit_archived -> ...`, SRP split, relocated from cli_composition). This reproduces upstream design rationale in the catalogue instead of citing IN-10/CN-03/AC-09 only, violating `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+              "line": 268,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:996454d13b08030721978fec78f78efd398fdc5dab95469a767ee8943a0c812f",
+          "at": "2026-07-04T15:09:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SyncError`'s `docs` field restates the upstream sync failure contract and mapping behavior (`3 fail-closed sync modes`, `Sync modes map 1:1...`, `Spawn maps...`) instead of limiting the catalogue entry to the changed type surface plus anchor cites. Per `knowledge/conventions/no-upstream-restatement.md`, downstream type catalogue docs must not reproduce IN-06/CN-02/AC-08 behavior in prose because that creates a second source of truth.",
+              "severity": "P1",
+              "file": "track/items/remote-sync-dedicated-command-2026-07-04/infrastructure-types.json",
+              "line": 26,
+              "category": "upstream_restatement"
+            },
+            {
+              "message": "`TelemetryEmitInteractor::emit_archived`'s method `docs` restate the orchestration behavior (`Emits an archived-track telemetry event; resolves the repo root via GitPrimitivePort::resolve_repo_root`) while also citing IN-10/CN-03/AC-09. The type catalogue should identify the method and cite the anchors, not duplicate the upstream behavior contract in prose.",
+              "severity": "P1",
+              "file": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+              "line": 968,
+              "category": "upstream_restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:e61ded56df0c85e77d947f98f8d022b85d17c8446e1442d0117741681302e209",
+          "at": "2026-07-04T15:17:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TelemetryReportInteractor::report` and `TelemetryEmitInteractor::emit_archived` are added usecase-facing contracts but both accept `track_id` as raw `&str`. Other added git interactors in this same catalogue use `&domain::TrackId` for track identifiers, and the briefing explicitly calls out using `domain::TrackId` instead of raw strings where appropriate. Keeping these telemetry contracts stringly makes invalid track IDs representable at the usecase boundary; the methods should take a validated `domain::TrackId` or validate before exposing the downstream port contract.",
+              "severity": "P1",
+              "file": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+              "line": 930,
+              "category": "type-safety"
+            }
+          ],
+          "hash": "rvw1:sha256:6feedeb5db217b0be1a4983a39ef20360b12cb9edab83630900768197d72eb22",
+          "at": "2026-07-04T15:22:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Several updated `docs` fields restate downstream behavior/contract instead of staying at `change target + operation + anchor cite`, which violates `knowledge/conventions/no-upstream-restatement.md`: `TelemetryAggregateInteractor` here, plus the same pattern in `/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/infrastructure-types.json:70` (`SystemGitRepo`), `.../infrastructure-types.json:127` (`FsArchivedTelemetryFactoryAdapter`), and `.../cli_composition-types.json:63` (`persist_commit_hash_for_track`).",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+              "line": 268,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:f3cb6e2bf34604d7ac421f567f0e4334cd39dee5ef5751a3c32802fdb30053dd",
+          "at": "2026-07-04T15:38:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Several updated `docs` fields restate the contract/wiring instead of pointing at the upstream anchors, which violates the no-upstream-restatement rule and creates a second source of truth for the type contract: `/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json` (`TelemetryAggregateInteractor` at line 259 and `ArchivedTelemetryFactoryPort` at line 316), `/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/infrastructure-types.json` (`SystemGitRepo` at line 61 and `FsArchivedTelemetryFactoryAdapter` at line 118), and `/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/cli_composition-types.json` (`persist_commit_hash_for_track` at line 55). These fields should be reduced to a terse type summary plus anchor cites.",
+              "severity": "P1",
+              "file": null,
+              "line": null,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:9bf1c395fb646b783b58d66f86566d7d63382e62dfc6ed35a3bf7c2cb194ea78",
+          "at": "2026-07-04T16:00:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e546630679156e117f0f8c282fe11608519bf6fc2d2d31fa7fe188a04d4d804",
+          "at": "2026-07-04T16:12:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e546630679156e117f0f8c282fe11608519bf6fc2d2d31fa7fe188a04d4d804",
+          "at": "2026-07-04T16:39:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5ebef8ea5492c435b07c485ce4932739ddf836557280f759b72f9aacdc1e77b1",
+          "at": "2026-07-04T18:47:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5ebef8ea5492c435b07c485ce4932739ddf836557280f759b72f9aacdc1e77b1",
+          "at": "2026-07-04T18:54:22Z"
         }
       ]
     },
@@ -1530,6 +1419,131 @@
           "findings": [],
           "hash": "rvw1:sha256:69e86a55a757c70e3d93f0f42eefba317cff39afb2cd63a8d0c74413360fb64f",
           "at": "2026-07-04T17:26:29Z"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:824b7d835297a2c4b8d6520679d13de337c33bfa6b56606f1cce7d1ec49b99b6",
+          "at": "2026-07-04T10:44:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:824b7d835297a2c4b8d6520679d13de337c33bfa6b56606f1cce7d1ec49b99b6",
+          "at": "2026-07-04T10:48:21Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8bd1f474595b5327597aa70992136690318b7a48db43bb4b8e83f84fabd4225a",
+          "at": "2026-07-04T06:44:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8bd1f474595b5327597aa70992136690318b7a48db43bb4b8e83f84fabd4225a",
+          "at": "2026-07-04T06:47:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`.harness/workflows/track/done.md:26-33` makes the sync step warning-only for `UpstreamNotSet` / `NonFastForward` / `WorktreeUnresolved`, but the same workflow still says the output should confirm the tree is 'updated from origin' and `.claude/commands/track/done.md:19-21` asks for it to be 'up to date with origin'. That lets `/track:done` report a successful completion even when the ff-only pull failed, so the completion contract is false in the warning path. Reword the summary/output to say the sync was attempted unless the pull actually succeeded.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/done.md",
+              "line": 61,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c96483be97b7a80bbd86dcfe121587315883f223c9dab1ea0784c2f9fc8b06a3",
+          "at": "2026-07-04T10:48:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: The new `done` workflow docs overstate the sync failure contract. In [`/.harness/workflows/track/done.md:12`](/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.harness/workflows/track/done.md#L12) and [`knowledge/conventions/branch-strategy.md:40`](/home/flip451/individual/t-rust/templates/SoTOHE-core-003/knowledge/conventions/branch-strategy.md#L40), the text says `UpstreamNotSet` / `NonFastForward` / `WorktreeUnresolved` are all downgraded to `[WARN]` and that `cargo make sync` is a generic pull/rebase path. The implementation only downgrades `SyncUpstreamNotSet`; `SyncNonFastForward` and `SyncWorktreeUnresolved` still bubble out as errors in [`libs/usecase/src/git_workflow.rs:650`](/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/git_workflow.rs#L650) and [`libs/usecase/src/git_workflow.rs:653`](/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/git_workflow.rs#L653). As written, `/track:done` will be documented as more failure-tolerant than it really is.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.harness/workflows/track/done.md",
+              "line": 12,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:485eaed280284c9fe4b103978fa3c6f92df4cf9602b54fcb7bfe9dbcc891477d",
+          "at": "2026-07-04T11:00:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e4ca71699234ed4f201d8e0c9173d5e8669e428ef8112963a8757923b28ef035",
+          "at": "2026-07-04T11:06:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new direct `bin/sotp git sync` entry contradicts this section's own boundary that git-write operations stay behind `cargo make` wrappers for hook coverage. `sync` runs `git pull --ff-only` and can update the current branch/worktree, while the change also adds the intended `cargo make sync` wrapper and permission. Advertising the native command in the \"Direct bin/sotp\" list creates a bypass/miswiring of the documented hook boundary; keep the runnable guidance on `cargo make sync` and mention `bin/sotp git sync` only as the wrapper implementation if needed.",
+              "severity": "P1",
+              "file": ".claude/rules/07-dev-environment.md",
+              "line": 95,
+              "category": "hook coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:e4ca71699234ed4f201d8e0c9173d5e8669e428ef8112963a8757923b28ef035",
+          "at": "2026-07-04T11:12:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`.claude/commands/**/*.md` must not cite a specific ADR by date slug; the pre-track ADR authoring convention requires command docs to be self-contained and to express the workflow behavior directly instead. This adapter now embeds `ADR 2026-07-04-0155 D6`, so the harness command surface is drifting against that convention. Drop the ADR citation and keep only the operational description.",
+              "severity": "P1",
+              "file": ".claude/commands/track/done.md",
+              "line": 14,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:48c5b1876ce9e4dc50af54eb36394524c6924d82ff3a2d128f363ef60b776294",
+          "at": "2026-07-04T11:16:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track-switch-base` is documented here as downgrading only missing-upstream to `[WARN] Pull failed` while letting non-fast-forward and unresolved-worktree sync failures fail as typed errors. That contradicts the workflow SSoT and implementation contract for `/track:done`, where `TrackGitInteractor::switch_to_base` downgrades all known sync refusal modes, including non-fast-forward and unresolved worktree, to the non-fatal warning so the branch switch can still complete. This drift changes the operator-facing failure semantics for the base-return path; align the convention text with the SSoT or clearly separate standalone `cargo make sync` failure behavior from `track-switch-base`'s downgraded sync behavior.",
+              "severity": "P1",
+              "file": "knowledge/conventions/branch-strategy.md",
+              "line": 40,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:94eac3216de6fe9244c10afa60472c28230b1e29af9a2da2db554c292def338b",
+          "at": "2026-07-04T11:31:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:479d45cd7c5ee5a4e68435c90ef0569c7e5611f18727dacbce23440f841c41b4",
+          "at": "2026-07-04T11:38:02Z"
         }
       ]
     }

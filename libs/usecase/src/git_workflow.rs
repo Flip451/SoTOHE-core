@@ -1189,6 +1189,26 @@ mod tests {
     }
 
     #[test]
+    fn track_git_switch_to_base_downgrades_spawn_unavailable_to_warning() {
+        // CN-05 regression guard: `SyncError::Spawn` (auth / network / process
+        // spawn failure) surfaces as `GitWorkflowError::Unavailable` from the
+        // adapter. The base checkout has already succeeded, so the previous
+        // inline `git_switch_and_pull_impl` folded every pull failure into
+        // `[WARN] Pull failed` and returned exit 0. `switch_to_base` must
+        // preserve that contract or the `/track:done` flow gets stranded on a
+        // transient pull failure.
+        let git = Arc::new(MockGitPrimitive::default());
+        let fs = Arc::new(MockFsPort::default());
+        *git.sync_result.lock().unwrap() =
+            Some(GitWorkflowError::Unavailable(DiagnosticText::new("git process spawn failed")));
+        let interactor = TrackGitInteractor::new(git, fs);
+
+        let msg = interactor.switch_to_base(Path::new("/root"), "main").unwrap();
+
+        assert!(msg.contains("[WARN] Pull failed"), "expected WARN fold, got: {msg}");
+    }
+
+    #[test]
     fn track_git_archive_track_happy_moves_track_directory() {
         let git = Arc::new(MockGitPrimitive::default());
         let fs = Arc::new(MockFsPort::default());

@@ -106,14 +106,20 @@ impl TrackGitInteractor {
             Err(
                 GitWorkflowError::SyncUpstreamNotSet
                 | GitWorkflowError::SyncNonFastForward { .. }
-                | GitWorkflowError::SyncWorktreeUnresolved { .. },
+                | GitWorkflowError::SyncWorktreeUnresolved { .. }
+                | GitWorkflowError::Unavailable(_),
             ) => {
                 // CN-05 bit-equivalence: the previous inline
                 // `git_switch_and_pull_impl` in cli_composition treated every
                 // non-zero `git pull --ff-only` result as `[WARN] Pull failed`
                 // and returned exit 0 with the switch success. Preserve that
-                // observable stdout / exit contract by folding all three
-                // fail-closed sync modes into the same WARN line.
+                // observable stdout / exit contract by folding **all** sync
+                // failures — the three classified fail-closed modes plus
+                // Unavailable (from `SyncError::Spawn`: auth / network / process
+                // spawn errors) — into the same WARN line. The base checkout
+                // has already succeeded and the `/track:done` contract
+                // ("sync attempted, not guaranteed") requires callers not to be
+                // stranded by a transient pull failure.
                 lines.push("[WARN] Pull failed (may not have remote tracking branch)".to_owned());
             }
             Err(e) => return Err(e),
