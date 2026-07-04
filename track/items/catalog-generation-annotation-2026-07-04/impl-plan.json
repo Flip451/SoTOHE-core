@@ -4,7 +4,8 @@
     {
       "id": "T001",
       "description": "Target libs/domain tddd::catalog_gen. Add TodoInstruction, DraftHolePath, DraftHole, CatalogEntryName, CatalogImportAction, and CatalogEntryKind with constructors/accessors/derives from domain-types.json (IN-03/IN-04/IN-07/AC-03/AC-04/AC-05/AC-08). Add unit tests for TodoInstruction::try_new, DraftHolePath::try_new, DraftHole::new, CatalogEntryName::try_new, and enum construction.",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "f9b46e78"
     },
     {
       "id": "T002",
@@ -15,12 +16,14 @@
     {
       "id": "T003",
       "description": "Target libs/usecase catalog_gen. Add CatalogGateContext, CatalogCheckVerdict, CatalogAddCommand, CatalogImportCommand, CatalogCiteCommand, CatalogCheckQuery, CatalogInitReport, CatalogWriteReport, CatalogCheckReport, and CatalogError with shapes/variants from usecase-types.json; CatalogError variants are FileExists/FileMissing/DuplicateEntry/AnchorNotFound/InvalidRole/ParseFragment/SchemaInvalid/DraftIncomplete/Port only (IN-02/IN-03/IN-04/IN-05/IN-06/IN-10/IN-12/AC-02/AC-03/AC-04/AC-06/AC-10/AC-11). Add unit tests for CatalogError Display/Error over all variants and command/query/report construction.",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "f9b46e78"
     },
     {
       "id": "T004",
       "description": "Target libs/usecase catalog_gen. Add CatalogService trait, CatalogPort trait, and CatalogInteractor with signatures from usecase-types.json; implement CatalogService by delegating to injected CatalogPort (IN-01/AC-01). Add unit tests with a CatalogPort double for all five methods.",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "f9b46e78"
     },
     {
       "id": "T005",

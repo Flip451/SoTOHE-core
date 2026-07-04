@@ -17,7 +17,7 @@ Batching: land T002+T012+T013 in one commit; review T006+T007 in one batch (CN-1
 
 > Targets T001/T002 domain catalog_gen and catalogue_v2 entry changes (IN-07/IN-09/IN-13/AC-05/AC-07/AC-14/AC-15/AC-16).
 
-- [x] **T001**: Target libs/domain tddd::catalog_gen. Add TodoInstruction, DraftHolePath, DraftHole, CatalogEntryName, CatalogImportAction, and CatalogEntryKind with constructors/accessors/derives from domain-types.json (IN-03/IN-04/IN-07/AC-03/AC-04/AC-05/AC-08). Add unit tests for TodoInstruction::try_new, DraftHolePath::try_new, DraftHole::new, CatalogEntryName::try_new, and enum construction.
+- [x] **T001**: Target libs/domain tddd::catalog_gen. Add TodoInstruction, DraftHolePath, DraftHole, CatalogEntryName, CatalogImportAction, and CatalogEntryKind with constructors/accessors/derives from domain-types.json (IN-03/IN-04/IN-07/AC-03/AC-04/AC-05/AC-08). Add unit tests for TodoInstruction::try_new, DraftHolePath::try_new, DraftHole::new, CatalogEntryName::try_new, and enum construction. (`f9b46e78`)
 - [x] **T002**: Target libs/domain catalogue_v2::identifiers, catalogue_v2::entries, catalogue_linter.rs, catalogue_linter_helpers.rs, catalogue_linter_eval_primitives.rs, catalogue_v2/document.rs, and entries.rs tests. Add DocString; make TypeEntry/TraitEntry/FunctionEntry fields private; add all-fields new constructors and read accessors; retype docs to Option<DocString>; add TypeEntry generics and where_predicates; migrate domain consumers (IN-09/IN-13/CN-09/CN-10/CN-11/AC-07/AC-14/AC-15/AC-16). Batch: T002+T012+T013 same commit. Add unit tests for DocString, constructors/accessors, TypeEntry generics/where, and docs. (`82aff0c7`)
 
 ### S6 — Entry-type refactor: cross-crate consumer migration
@@ -31,8 +31,8 @@ Batching: land T002+T012+T013 in one commit; review T006+T007 in one batch (CN-1
 
 > Targets T003/T004 usecase catalog_gen data, ports, and interactor (IN-01/IN-02/IN-03/IN-04/IN-05/IN-06/IN-10/IN-12/AC-01/AC-02/AC-03/AC-04/AC-06/AC-10/AC-11).
 
-- [x] **T003**: Target libs/usecase catalog_gen. Add CatalogGateContext, CatalogCheckVerdict, CatalogAddCommand, CatalogImportCommand, CatalogCiteCommand, CatalogCheckQuery, CatalogInitReport, CatalogWriteReport, CatalogCheckReport, and CatalogError with shapes/variants from usecase-types.json; CatalogError variants are FileExists/FileMissing/DuplicateEntry/AnchorNotFound/InvalidRole/ParseFragment/SchemaInvalid/DraftIncomplete/Port only (IN-02/IN-03/IN-04/IN-05/IN-06/IN-10/IN-12/AC-02/AC-03/AC-04/AC-06/AC-10/AC-11). Add unit tests for CatalogError Display/Error over all variants and command/query/report construction.
-- [x] **T004**: Target libs/usecase catalog_gen. Add CatalogService trait, CatalogPort trait, and CatalogInteractor with signatures from usecase-types.json; implement CatalogService by delegating to injected CatalogPort (IN-01/AC-01). Add unit tests with a CatalogPort double for all five methods.
+- [x] **T003**: Target libs/usecase catalog_gen. Add CatalogGateContext, CatalogCheckVerdict, CatalogAddCommand, CatalogImportCommand, CatalogCiteCommand, CatalogCheckQuery, CatalogInitReport, CatalogWriteReport, CatalogCheckReport, and CatalogError with shapes/variants from usecase-types.json; CatalogError variants are FileExists/FileMissing/DuplicateEntry/AnchorNotFound/InvalidRole/ParseFragment/SchemaInvalid/DraftIncomplete/Port only (IN-02/IN-03/IN-04/IN-05/IN-06/IN-10/IN-12/AC-02/AC-03/AC-04/AC-06/AC-10/AC-11). Add unit tests for CatalogError Display/Error over all variants and command/query/report construction. (`f9b46e78`)
+- [x] **T004**: Target libs/usecase catalog_gen. Add CatalogService trait, CatalogPort trait, and CatalogInteractor with signatures from usecase-types.json; implement CatalogService by delegating to injected CatalogPort (IN-01/AC-01). Add unit tests with a CatalogPort double for all five methods. (`f9b46e78`)
 
 ### S3 — Infrastructure: draft layer and filesystem adapter
 
