@@ -1,185 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "types": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bd9d875871090c255653a6fd83458934021dcce67dcd2cd51cc0353d83f37ab1",
-          "at": "2026-07-04T06:29:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1 upstream restatement: `domain::DocString`, `domain::TypeEntry`, `domain::TraitEntry`, and `domain::FunctionEntry` docs restate the lint-conformance ADR/spec behavior in prose, including why fields are private, why `docs` becomes `Option<DocString>`, and the constructor/accessor strategy. Per `knowledge/conventions/no-upstream-restatement.md`, these catalogue docs should cite IN-13/IN-14/AC-14..AC-16 rather than restating the upstream contract.",
-              "severity": "P1",
-              "file": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
-              "line": 143,
-              "category": "upstream_restatement"
-            },
-            {
-              "message": "P1 upstream restatement: multiple usecase entries restate spec behavior instead of only anchoring it. Examples include `usecase::CatalogGateContext` spelling out phase2/merge/commit strictness, `usecase::CatalogCheckVerdict` restating exit semantics, and `usecase::CatalogError` restating per-variant AC/D decision behavior. This duplicates the upstream spec/ADR contract in the type catalogue docs.",
-              "severity": "P1",
-              "file": "track/items/catalog-generation-annotation-2026-07-04/usecase-types.json",
-              "line": 19,
-              "category": "upstream_restatement"
-            },
-            {
-              "message": "P1 upstream restatement: infrastructure catalogue docs restate upstream D4/CN-02 behavior. `infrastructure::FsCatalogAdapter`, `infrastructure::CatalogDraftError`, `scan_todo_holes`, and `try_complete` describe schema authority, `$todo` traversal, completion-boundary behavior, and consumer impact in prose instead of leaving those behaviors to the cited anchors.",
-              "severity": "P1",
-              "file": "track/items/catalog-generation-annotation-2026-07-04/infrastructure-types.json",
-              "line": 15,
-              "category": "upstream_restatement"
-            },
-            {
-              "message": "P1 upstream restatement: CLI catalogue docs restate command behavior from the spec/ADR, especially the D8/IN-11 track-id guard and read/write resolution rules in `cli::CatalogInitArgs` and `cli::commands::catalog::execute`. These docs should identify the surface and cite IN-11/AC-09 rather than reproducing the fail-closed contract.",
-              "severity": "P1",
-              "file": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
-              "line": 84,
-              "category": "upstream_restatement"
-            },
-            {
-              "message": "P1 upstream restatement: cli_driver DTO docs restate upstream validation and guard behavior, such as `CatalogInitInput` describing the D8 write guard and `CatalogAddInput`/`CatalogCiteInput` describing downstream validation semantics. The type catalogue should cite the relevant anchors instead of duplicating the behavior contract.",
-              "severity": "P1",
-              "file": "track/items/catalog-generation-annotation-2026-07-04/cli_driver-types.json",
-              "line": 84,
-              "category": "upstream_restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:bd9d875871090c255653a6fd83458934021dcce67dcd2cd51cc0353d83f37ab1",
-          "at": "2026-07-04T06:37:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`CatalogService::init` / `CatalogPort::init` reuse the full `CatalogError`, but the `init` verb can only plausibly emit file-creation and I/O failures. Callers still have to handle dead branches such as `DuplicateEntry`, `AnchorNotFound`, `InvalidRole`, `ParseFragment`, `SchemaInvalid`, and `DraftIncomplete`, and the method docs do not narrow that subset or justify the broad enum.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/usecase-types.json",
-              "line": 280,
-              "category": "per-method error imprecision"
-            }
-          ],
-          "hash": "rvw1:sha256:644fbababe296a28603ed439fa9df1fb0f4224ca17000efac38c9c3df453897a",
-          "at": "2026-07-04T07:07:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8b69765cf49970ddcb26d2fa94874a065f19e4828adec3ab1daf4a52bcf0505b",
-          "at": "2026-07-04T07:20:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The `docs` fields for domain catalogue entries such as `domain::TodoInstruction`, `domain::DraftHole`, `domain::CatalogImportAction`, `domain::TypeEntry`, `domain::TraitEntry`, and `domain::FunctionEntry` restate upstream ADR/spec behavior in prose instead of only citing the upstream anchors. For example, `TodoInstruction` re-describes how `$todo` nodes are generated and consumed. `knowledge/conventions/no-upstream-restatement.md` applies to `<layer>-types.json` docs, so these downstream restatements should be replaced with concise entry identification plus anchor cites.",
-              "severity": "P1",
-              "file": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
-              "line": 21,
-              "category": "SoT integrity / upstream restatement"
-            },
-            {
-              "message": "The usecase catalogue has the same upstream-restatement problem across keys including `usecase::CatalogGateContext`, `usecase::CatalogAddCommand`, `usecase::CatalogError`, `usecase::CatalogInteractor`, `usecase::CatalogService`, and `usecase::CatalogPort`. These docs repeat gate semantics, validation ownership, error semantics, track guard behavior, and port wiring rationale that already live in ADR/spec anchors. Per `knowledge/conventions/no-upstream-restatement.md`, the docs must cite anchors rather than re-explain the behavioral contract.",
-              "severity": "P1",
-              "file": "track/items/catalog-generation-annotation-2026-07-04/usecase-types.json",
-              "line": 19,
-              "category": "SoT integrity / upstream restatement"
-            },
-            {
-              "message": "CLI catalogue docs for keys such as `cli::CatalogKindArg`, `cli::CatalogAddArgs`, `cli::CatalogCheckArgs`, `cli::CatalogCommand`, and `cli::commands::catalog::execute` restate clap spelling, argument mapping, track-id guard behavior, dispatch, and exit-code behavior in prose. Those are upstream behavior contracts already covered by spec refs; keeping the narrative here violates `knowledge/conventions/no-upstream-restatement.md` and creates another drift source.",
-              "severity": "P1",
-              "file": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
-              "line": 21,
-              "category": "SoT integrity / upstream restatement"
-            },
-            {
-              "message": "The cli_driver catalogue docs for `cli_driver::CatalogKindSelect`, `cli_driver::CatalogAddInput`, `cli_driver::CatalogCheckInput`, `cli_driver::CatalogInput`, and `cli_driver::CatalogDriver` restate boundary conversion, dynamic layer handling, trusted track-id handling, and dispatch behavior. These should be anchor-backed type declarations, not prose copies of the upstream contract, under `knowledge/conventions/no-upstream-restatement.md`.",
-              "severity": "P1",
-              "file": "track/items/catalog-generation-annotation-2026-07-04/cli_driver-types.json",
-              "line": 21,
-              "category": "SoT integrity / upstream restatement"
-            },
-            {
-              "message": "`cli_composition::CatalogCompositionRoot` docs restate DI wiring, full-stack handling, and test-entry behavior instead of limiting the catalogue entry to the declared type surface plus upstream anchor refs. That is downstream prose duplication of the composition behavior and violates `knowledge/conventions/no-upstream-restatement.md`.",
-              "severity": "P1",
-              "file": "track/items/catalog-generation-annotation-2026-07-04/cli_composition-types.json",
-              "line": 15,
-              "category": "SoT integrity / upstream restatement"
-            },
-            {
-              "message": "Infrastructure catalogue docs for `infrastructure::FsCatalogAdapter`, `infrastructure::CatalogDraftError`, `infrastructure::tddd::catalog_gen::scan_todo_holes`, and `infrastructure::tddd::catalog_gen::try_complete` restate adapter parsing choices, schema authority, `$todo` traversal semantics, and completion/error behavior. Those are ADR/spec contracts already cited in `spec_refs`; the type catalogue docs should not reproduce them under `knowledge/conventions/no-upstream-restatement.md`.",
-              "severity": "P1",
-              "file": "track/items/catalog-generation-annotation-2026-07-04/infrastructure-types.json",
-              "line": 15,
-              "category": "SoT integrity / upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:8b69765cf49970ddcb26d2fa94874a065f19e4828adec3ab1daf4a52bcf0505b",
-          "at": "2026-07-04T07:28:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8751b88bff03f7056b67887b713e805f89576c86023da1c279ac0f6b2f7e4cd6",
-          "at": "2026-07-04T07:49:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:80b9df95ed8cea6e949b96e1e08e94f327311e38a4d9d961fd76665c8d93294c",
-          "at": "2026-07-04T12:02:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:80b9df95ed8cea6e949b96e1e08e94f327311e38a4d9d961fd76665c8d93294c",
-          "at": "2026-07-04T12:07:16Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:403f04a41a3244051d0b8b18c382d94d8194bb6c170739e6fe4b75abb4163209",
-          "at": "2026-07-04T15:59:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:403f04a41a3244051d0b8b18c382d94d8194bb6c170739e6fe4b75abb4163209",
-          "at": "2026-07-04T16:09:19Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6e5c3f80132da943d5ec5e02c5ba28741c43dc4eb386a1392f719e560402f51a",
-          "at": "2026-07-04T15:51:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6e5c3f80132da943d5ec5e02c5ba28741c43dc4eb386a1392f719e560402f51a",
-          "at": "2026-07-04T16:06:52Z"
-        }
-      ]
-    },
     "adr": {
       "rounds": [
         {
@@ -264,92 +85,35 @@
         }
       ]
     },
-    "harness-policy": {
+    "cli_driver": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:9150414d3e8894f6249036886ba388cf82b91f476739693dacc632e4b2cc24bd",
-          "at": "2026-07-04T06:13:04Z"
+          "hash": "rvw1:sha256:1d19f89bf21b4b347c0a461faf6aeb568154c01f04ffb9142f968afca0ce9bff",
+          "at": "2026-07-04T12:15:13Z"
         },
         {
           "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The description still says this adapter \"enforces Opus via frontmatter\", but the briefing documents that `CLAUDE_CODE_SUBAGENT_MODEL` takes precedence over agent frontmatter. Leaving this wording in the distributed agent policy preserves the incorrect routing contract that caused the incident, so it should be updated to describe the explicit Opus frontmatter as the selected/default model rather than an enforcement mechanism.",
-              "severity": "P1",
-              "file": ".claude/agents/adr-editor.md",
-              "line": 6,
-              "category": "harness-policy factual routing drift"
-            },
-            {
-              "message": "The description still says this adapter \"enforces Opus via frontmatter\", but the briefing documents that `CLAUDE_CODE_SUBAGENT_MODEL` takes precedence over agent frontmatter. This keeps an incorrect routing guarantee in the harness policy surface and can mislead future fixes into relying on frontmatter as an override-proof control.",
-              "severity": "P1",
-              "file": ".claude/agents/spec-designer.md",
-              "line": 15,
-              "category": "harness-policy factual routing drift"
-            },
-            {
-              "message": "The description still says this adapter \"enforces Opus via frontmatter\", but the briefing documents that `CLAUDE_CODE_SUBAGENT_MODEL` takes precedence over agent frontmatter. This keeps an incorrect routing guarantee in the harness policy surface and should be revised with the model-setting change.",
-              "severity": "P1",
-              "file": ".claude/agents/impl-planner.md",
-              "line": 15,
-              "category": "harness-policy factual routing drift"
-            },
-            {
-              "message": "The description still says this adapter \"enforces Opus via frontmatter\", but the briefing documents that `CLAUDE_CODE_SUBAGENT_MODEL` takes precedence over agent frontmatter. This preserves the same false routing contract in the distributed adapter docs and should be corrected alongside the explicit model ID.",
-              "severity": "P1",
-              "file": ".claude/agents/rollback-diagnoser.md",
-              "line": 12,
-              "category": "harness-policy factual routing drift"
-            }
-          ],
-          "hash": "rvw1:sha256:9150414d3e8894f6249036886ba388cf82b91f476739693dacc632e4b2cc24bd",
-          "at": "2026-07-04T06:17:41Z"
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1d19f89bf21b4b347c0a461faf6aeb568154c01f04ffb9142f968afca0ce9bff",
+          "at": "2026-07-04T12:18:04Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:202334dcbff77abf61de3f2acf2b47a73098d9c3f93f8db3ebe49cf18de68e65",
-          "at": "2026-07-04T06:35:24Z"
+          "hash": "rvw1:sha256:a4d61360311e3983915bd4252491587731b729a50af6e53c5abe9029f3916190",
+          "at": "2026-07-04T15:51:36Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:202334dcbff77abf61de3f2acf2b47a73098d9c3f93f8db3ebe49cf18de68e65",
-          "at": "2026-07-04T06:41:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5ef11e60ce5b13fd88ff600bcb978c17f3a4687d6f7ae87abb3ef02eab3645c2",
-          "at": "2026-07-04T08:43:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5ef11e60ce5b13fd88ff600bcb978c17f3a4687d6f7ae87abb3ef02eab3645c2",
-          "at": "2026-07-04T08:47:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:78043345b7bd572f0dfd37f298678a81ac22ad5355d0281f9e47407c5f076eaf",
-          "at": "2026-07-04T15:52:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:78043345b7bd572f0dfd37f298678a81ac22ad5355d0281f9e47407c5f076eaf",
-          "at": "2026-07-04T16:07:24Z"
+          "hash": "rvw1:sha256:a4d61360311e3983915bd4252491587731b729a50af6e53c5abe9029f3916190",
+          "at": "2026-07-04T16:08:08Z"
         }
       ]
     },
@@ -577,35 +341,182 @@
         }
       ]
     },
-    "cli_driver": {
+    "types": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1d19f89bf21b4b347c0a461faf6aeb568154c01f04ffb9142f968afca0ce9bff",
-          "at": "2026-07-04T12:15:13Z"
+          "hash": "rvw1:sha256:bd9d875871090c255653a6fd83458934021dcce67dcd2cd51cc0353d83f37ab1",
+          "at": "2026-07-04T06:29:19Z"
         },
         {
           "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1d19f89bf21b4b347c0a461faf6aeb568154c01f04ffb9142f968afca0ce9bff",
-          "at": "2026-07-04T12:18:04Z"
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1 upstream restatement: `domain::DocString`, `domain::TypeEntry`, `domain::TraitEntry`, and `domain::FunctionEntry` docs restate the lint-conformance ADR/spec behavior in prose, including why fields are private, why `docs` becomes `Option<DocString>`, and the constructor/accessor strategy. Per `knowledge/conventions/no-upstream-restatement.md`, these catalogue docs should cite IN-13/IN-14/AC-14..AC-16 rather than restating the upstream contract.",
+              "severity": "P1",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+              "line": 143,
+              "category": "upstream_restatement"
+            },
+            {
+              "message": "P1 upstream restatement: multiple usecase entries restate spec behavior instead of only anchoring it. Examples include `usecase::CatalogGateContext` spelling out phase2/merge/commit strictness, `usecase::CatalogCheckVerdict` restating exit semantics, and `usecase::CatalogError` restating per-variant AC/D decision behavior. This duplicates the upstream spec/ADR contract in the type catalogue docs.",
+              "severity": "P1",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/usecase-types.json",
+              "line": 19,
+              "category": "upstream_restatement"
+            },
+            {
+              "message": "P1 upstream restatement: infrastructure catalogue docs restate upstream D4/CN-02 behavior. `infrastructure::FsCatalogAdapter`, `infrastructure::CatalogDraftError`, `scan_todo_holes`, and `try_complete` describe schema authority, `$todo` traversal, completion-boundary behavior, and consumer impact in prose instead of leaving those behaviors to the cited anchors.",
+              "severity": "P1",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/infrastructure-types.json",
+              "line": 15,
+              "category": "upstream_restatement"
+            },
+            {
+              "message": "P1 upstream restatement: CLI catalogue docs restate command behavior from the spec/ADR, especially the D8/IN-11 track-id guard and read/write resolution rules in `cli::CatalogInitArgs` and `cli::commands::catalog::execute`. These docs should identify the surface and cite IN-11/AC-09 rather than reproducing the fail-closed contract.",
+              "severity": "P1",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+              "line": 84,
+              "category": "upstream_restatement"
+            },
+            {
+              "message": "P1 upstream restatement: cli_driver DTO docs restate upstream validation and guard behavior, such as `CatalogInitInput` describing the D8 write guard and `CatalogAddInput`/`CatalogCiteInput` describing downstream validation semantics. The type catalogue should cite the relevant anchors instead of duplicating the behavior contract.",
+              "severity": "P1",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/cli_driver-types.json",
+              "line": 84,
+              "category": "upstream_restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:bd9d875871090c255653a6fd83458934021dcce67dcd2cd51cc0353d83f37ab1",
+          "at": "2026-07-04T06:37:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CatalogService::init` / `CatalogPort::init` reuse the full `CatalogError`, but the `init` verb can only plausibly emit file-creation and I/O failures. Callers still have to handle dead branches such as `DuplicateEntry`, `AnchorNotFound`, `InvalidRole`, `ParseFragment`, `SchemaInvalid`, and `DraftIncomplete`, and the method docs do not narrow that subset or justify the broad enum.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/usecase-types.json",
+              "line": 280,
+              "category": "per-method error imprecision"
+            }
+          ],
+          "hash": "rvw1:sha256:644fbababe296a28603ed439fa9df1fb0f4224ca17000efac38c9c3df453897a",
+          "at": "2026-07-04T07:07:58Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a4d61360311e3983915bd4252491587731b729a50af6e53c5abe9029f3916190",
-          "at": "2026-07-04T15:51:36Z"
+          "hash": "rvw1:sha256:8b69765cf49970ddcb26d2fa94874a065f19e4828adec3ab1daf4a52bcf0505b",
+          "at": "2026-07-04T07:20:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `docs` fields for domain catalogue entries such as `domain::TodoInstruction`, `domain::DraftHole`, `domain::CatalogImportAction`, `domain::TypeEntry`, `domain::TraitEntry`, and `domain::FunctionEntry` restate upstream ADR/spec behavior in prose instead of only citing the upstream anchors. For example, `TodoInstruction` re-describes how `$todo` nodes are generated and consumed. `knowledge/conventions/no-upstream-restatement.md` applies to `<layer>-types.json` docs, so these downstream restatements should be replaced with concise entry identification plus anchor cites.",
+              "severity": "P1",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+              "line": 21,
+              "category": "SoT integrity / upstream restatement"
+            },
+            {
+              "message": "The usecase catalogue has the same upstream-restatement problem across keys including `usecase::CatalogGateContext`, `usecase::CatalogAddCommand`, `usecase::CatalogError`, `usecase::CatalogInteractor`, `usecase::CatalogService`, and `usecase::CatalogPort`. These docs repeat gate semantics, validation ownership, error semantics, track guard behavior, and port wiring rationale that already live in ADR/spec anchors. Per `knowledge/conventions/no-upstream-restatement.md`, the docs must cite anchors rather than re-explain the behavioral contract.",
+              "severity": "P1",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/usecase-types.json",
+              "line": 19,
+              "category": "SoT integrity / upstream restatement"
+            },
+            {
+              "message": "CLI catalogue docs for keys such as `cli::CatalogKindArg`, `cli::CatalogAddArgs`, `cli::CatalogCheckArgs`, `cli::CatalogCommand`, and `cli::commands::catalog::execute` restate clap spelling, argument mapping, track-id guard behavior, dispatch, and exit-code behavior in prose. Those are upstream behavior contracts already covered by spec refs; keeping the narrative here violates `knowledge/conventions/no-upstream-restatement.md` and creates another drift source.",
+              "severity": "P1",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+              "line": 21,
+              "category": "SoT integrity / upstream restatement"
+            },
+            {
+              "message": "The cli_driver catalogue docs for `cli_driver::CatalogKindSelect`, `cli_driver::CatalogAddInput`, `cli_driver::CatalogCheckInput`, `cli_driver::CatalogInput`, and `cli_driver::CatalogDriver` restate boundary conversion, dynamic layer handling, trusted track-id handling, and dispatch behavior. These should be anchor-backed type declarations, not prose copies of the upstream contract, under `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/cli_driver-types.json",
+              "line": 21,
+              "category": "SoT integrity / upstream restatement"
+            },
+            {
+              "message": "`cli_composition::CatalogCompositionRoot` docs restate DI wiring, full-stack handling, and test-entry behavior instead of limiting the catalogue entry to the declared type surface plus upstream anchor refs. That is downstream prose duplication of the composition behavior and violates `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/cli_composition-types.json",
+              "line": 15,
+              "category": "SoT integrity / upstream restatement"
+            },
+            {
+              "message": "Infrastructure catalogue docs for `infrastructure::FsCatalogAdapter`, `infrastructure::CatalogDraftError`, `infrastructure::tddd::catalog_gen::scan_todo_holes`, and `infrastructure::tddd::catalog_gen::try_complete` restate adapter parsing choices, schema authority, `$todo` traversal semantics, and completion/error behavior. Those are ADR/spec contracts already cited in `spec_refs`; the type catalogue docs should not reproduce them under `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/infrastructure-types.json",
+              "line": 15,
+              "category": "SoT integrity / upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:8b69765cf49970ddcb26d2fa94874a065f19e4828adec3ab1daf4a52bcf0505b",
+          "at": "2026-07-04T07:28:00Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a4d61360311e3983915bd4252491587731b729a50af6e53c5abe9029f3916190",
-          "at": "2026-07-04T16:08:08Z"
+          "hash": "rvw1:sha256:8751b88bff03f7056b67887b713e805f89576c86023da1c279ac0f6b2f7e4cd6",
+          "at": "2026-07-04T07:49:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:80b9df95ed8cea6e949b96e1e08e94f327311e38a4d9d961fd76665c8d93294c",
+          "at": "2026-07-04T12:02:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:80b9df95ed8cea6e949b96e1e08e94f327311e38a4d9d961fd76665c8d93294c",
+          "at": "2026-07-04T12:07:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:403f04a41a3244051d0b8b18c382d94d8194bb6c170739e6fe4b75abb4163209",
+          "at": "2026-07-04T15:59:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:403f04a41a3244051d0b8b18c382d94d8194bb6c170739e6fe4b75abb4163209",
+          "at": "2026-07-04T16:09:19Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7ffd3fbf84f51de9c36b19d7d9a5784fa471c96f0c13fa5e3a46fbb5ddd58585",
+          "at": "2026-07-04T15:53:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7ffd3fbf84f51de9c36b19d7d9a5784fa471c96f0c13fa5e3a46fbb5ddd58585",
+          "at": "2026-07-04T16:07:47Z"
         }
       ]
     },
@@ -689,24 +600,20 @@
           "findings": [],
           "hash": "rvw1:sha256:f9dac1c301be637bb7a7b989efe6658224ac11c3098d3ea860ad4177bdade225",
           "at": "2026-07-04T14:25:35Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7ffd3fbf84f51de9c36b19d7d9a5784fa471c96f0c13fa5e3a46fbb5ddd58585",
-          "at": "2026-07-04T15:53:30Z"
+          "hash": "rvw1:sha256:3067326ce699e2cf6318be66813d7d28cb752dc5d71cfcf03e9dd0d601944204",
+          "at": "2026-07-04T16:53:44Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7ffd3fbf84f51de9c36b19d7d9a5784fa471c96f0c13fa5e3a46fbb5ddd58585",
-          "at": "2026-07-04T16:07:47Z"
+          "hash": "rvw1:sha256:3067326ce699e2cf6318be66813d7d28cb752dc5d71cfcf03e9dd0d601944204",
+          "at": "2026-07-04T16:57:30Z"
         }
       ]
     },
@@ -754,6 +661,159 @@
           "findings": [],
           "hash": "rvw1:sha256:05c07f4001ac2346daa04c618daa0e65ac86156a7fc530c4a401727845310166",
           "at": "2026-07-04T11:58:02Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6e5c3f80132da943d5ec5e02c5ba28741c43dc4eb386a1392f719e560402f51a",
+          "at": "2026-07-04T15:51:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6e5c3f80132da943d5ec5e02c5ba28741c43dc4eb386a1392f719e560402f51a",
+          "at": "2026-07-04T16:06:52Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9150414d3e8894f6249036886ba388cf82b91f476739693dacc632e4b2cc24bd",
+          "at": "2026-07-04T06:13:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The description still says this adapter \"enforces Opus via frontmatter\", but the briefing documents that `CLAUDE_CODE_SUBAGENT_MODEL` takes precedence over agent frontmatter. Leaving this wording in the distributed agent policy preserves the incorrect routing contract that caused the incident, so it should be updated to describe the explicit Opus frontmatter as the selected/default model rather than an enforcement mechanism.",
+              "severity": "P1",
+              "file": ".claude/agents/adr-editor.md",
+              "line": 6,
+              "category": "harness-policy factual routing drift"
+            },
+            {
+              "message": "The description still says this adapter \"enforces Opus via frontmatter\", but the briefing documents that `CLAUDE_CODE_SUBAGENT_MODEL` takes precedence over agent frontmatter. This keeps an incorrect routing guarantee in the harness policy surface and can mislead future fixes into relying on frontmatter as an override-proof control.",
+              "severity": "P1",
+              "file": ".claude/agents/spec-designer.md",
+              "line": 15,
+              "category": "harness-policy factual routing drift"
+            },
+            {
+              "message": "The description still says this adapter \"enforces Opus via frontmatter\", but the briefing documents that `CLAUDE_CODE_SUBAGENT_MODEL` takes precedence over agent frontmatter. This keeps an incorrect routing guarantee in the harness policy surface and should be revised with the model-setting change.",
+              "severity": "P1",
+              "file": ".claude/agents/impl-planner.md",
+              "line": 15,
+              "category": "harness-policy factual routing drift"
+            },
+            {
+              "message": "The description still says this adapter \"enforces Opus via frontmatter\", but the briefing documents that `CLAUDE_CODE_SUBAGENT_MODEL` takes precedence over agent frontmatter. This preserves the same false routing contract in the distributed adapter docs and should be corrected alongside the explicit model ID.",
+              "severity": "P1",
+              "file": ".claude/agents/rollback-diagnoser.md",
+              "line": 12,
+              "category": "harness-policy factual routing drift"
+            }
+          ],
+          "hash": "rvw1:sha256:9150414d3e8894f6249036886ba388cf82b91f476739693dacc632e4b2cc24bd",
+          "at": "2026-07-04T06:17:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:202334dcbff77abf61de3f2acf2b47a73098d9c3f93f8db3ebe49cf18de68e65",
+          "at": "2026-07-04T06:35:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:202334dcbff77abf61de3f2acf2b47a73098d9c3f93f8db3ebe49cf18de68e65",
+          "at": "2026-07-04T06:41:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5ef11e60ce5b13fd88ff600bcb978c17f3a4687d6f7ae87abb3ef02eab3645c2",
+          "at": "2026-07-04T08:43:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5ef11e60ce5b13fd88ff600bcb978c17f3a4687d6f7ae87abb3ef02eab3645c2",
+          "at": "2026-07-04T08:47:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:78043345b7bd572f0dfd37f298678a81ac22ad5355d0281f9e47407c5f076eaf",
+          "at": "2026-07-04T15:52:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:78043345b7bd572f0dfd37f298678a81ac22ad5355d0281f9e47407c5f076eaf",
+          "at": "2026-07-04T16:07:24Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0ccbad4c1757bc4097f43ceb2a125cb72e8a435debf4d4c59a82a7e0b071e577",
+          "at": "2026-07-04T10:42:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0ccbad4c1757bc4097f43ceb2a125cb72e8a435debf4d4c59a82a7e0b071e577",
+          "at": "2026-07-04T10:47:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:af2e2991490a22ba94f8ae532554ab458d52d8b8520f87b51904a2929cdd1eff",
+          "at": "2026-07-04T11:55:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:af2e2991490a22ba94f8ae532554ab458d52d8b8520f87b51904a2929cdd1eff",
+          "at": "2026-07-04T11:58:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d9b4ba20d36761f1e3991cb043c1132df0a4bc51d7e3cc90bf4cada6a3869f6f",
+          "at": "2026-07-04T15:50:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d9b4ba20d36761f1e3991cb043c1132df0a4bc51d7e3cc90bf4cada6a3869f6f",
+          "at": "2026-07-04T16:06:41Z"
         }
       ]
     },
@@ -817,52 +877,6 @@
           "findings": [],
           "hash": "rvw1:sha256:f57b6e2224123abfd98f0d04c0e07bc98e7a5d52c25f4726a081daa6d7a01fa7",
           "at": "2026-07-04T06:37:27Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0ccbad4c1757bc4097f43ceb2a125cb72e8a435debf4d4c59a82a7e0b071e577",
-          "at": "2026-07-04T10:42:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0ccbad4c1757bc4097f43ceb2a125cb72e8a435debf4d4c59a82a7e0b071e577",
-          "at": "2026-07-04T10:47:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:af2e2991490a22ba94f8ae532554ab458d52d8b8520f87b51904a2929cdd1eff",
-          "at": "2026-07-04T11:55:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:af2e2991490a22ba94f8ae532554ab458d52d8b8520f87b51904a2929cdd1eff",
-          "at": "2026-07-04T11:58:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d9b4ba20d36761f1e3991cb043c1132df0a4bc51d7e3cc90bf4cada6a3869f6f",
-          "at": "2026-07-04T15:50:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d9b4ba20d36761f1e3991cb043c1132df0a4bc51d7e3cc90bf4cada6a3869f6f",
-          "at": "2026-07-04T16:06:41Z"
         }
       ]
     }

@@ -51,8 +51,10 @@ pub(super) fn resolve_shape(
     let schema = exporter.export(&crate_name).map_err(|err| {
         port_error(format!("rustdoc extraction for crate `{crate_name}` failed: {err}"))
     })?;
-    let type_info = select_type(&schema, &module, &name).ok_or_else(|| {
-        schema_error(format!("type `{type_path}` not found in crate `{crate_name}`"))
+    let type_info = select_type(&schema, &crate_name, &module, &name).ok_or_else(|| {
+        schema_error(format!(
+            "type `{type_path}` not found in crate `{crate_name}` at that exact module path"
+        ))
     })?;
     let kind = kind_value(type_info);
     let methods = collect_methods(&schema, &name);
@@ -113,19 +115,43 @@ fn parse_type_path(type_path: &str) -> Result<(String, String, String), CatalogE
     Ok((crate_name, module, name))
 }
 
-/// Select the [`TypeInfo`] matching `name`, preferring a module match.
-fn select_type<'a>(schema: &'a SchemaExport, module: &str, name: &str) -> Option<&'a TypeInfo> {
-    let mut fallback = None;
-    for type_info in schema.types() {
-        if type_info.name() != name {
-            continue;
-        }
-        match type_info.module_path() {
-            Some(path) if module.is_empty() || path.ends_with(module) => return Some(type_info),
-            _ => fallback = fallback.or(Some(type_info)),
-        }
-    }
-    fallback
+/// Select the [`TypeInfo`] whose short name is `name` and whose crate-qualified
+/// module path matches `crate_name` + `module` exactly, segment for segment.
+///
+/// Rustdoc module paths are crate-qualified (e.g. `domain::tddd`), so the
+/// requested crate and module are compared as one segment list against the
+/// type's module path. There is no short-name fallback and no `ends_with`
+/// suffix matching: a request that does not name the exact module resolves to
+/// `None` rather than an arbitrary same-named type elsewhere in the crate
+/// (which would otherwise let `foo::Order` collide with `bar_foo::Order`).
+fn select_type<'a>(
+    schema: &'a SchemaExport,
+    crate_name: &str,
+    module: &str,
+    name: &str,
+) -> Option<&'a TypeInfo> {
+    let expected = expected_module_segments(crate_name, module);
+    schema.types().iter().find(|type_info| {
+        type_info.name() == name && module_segments(type_info.module_path()) == expected
+    })
+}
+
+/// The crate-qualified module segments a requested `crate_name` + `module`
+/// denotes (the crate is always the leading segment).
+fn expected_module_segments<'a>(crate_name: &'a str, module: &'a str) -> Vec<&'a str> {
+    let mut segments = vec![crate_name];
+    segments.extend(path_segments(module));
+    segments
+}
+
+/// The segments of a rustdoc module path, or empty when the path is unknown.
+fn module_segments(module_path: Option<&str>) -> Vec<&str> {
+    module_path.map(path_segments).unwrap_or_default()
+}
+
+/// Split a `::`-separated path into its non-empty segments.
+fn path_segments(path: &str) -> Vec<&str> {
+    path.split("::").filter(|segment| !segment.is_empty()).collect()
 }
 
 /// Build the `kind` node from a [`TypeInfo`].
@@ -284,5 +310,46 @@ mod tests {
         )
         .unwrap();
         assert_eq!(entry["action"], json!("delete"));
+    }
+
+    // Finding 3: exact segment-wise module match — `foo` must not resolve the
+    // same-named type living in `bar_foo` via an `ends_with` suffix collision.
+    #[test]
+    fn test_select_type_exact_module_avoids_suffix_collision() {
+        let in_foo = TypeInfo::with_module_path(
+            "Order".to_owned(),
+            TypeKind::Struct,
+            None,
+            vec![],
+            "shop::foo".to_owned(),
+        );
+        let in_bar_foo = TypeInfo::with_module_path(
+            "Order".to_owned(),
+            TypeKind::Struct,
+            None,
+            vec![],
+            "shop::bar_foo".to_owned(),
+        );
+        let schema =
+            SchemaExport::new("shop".to_owned(), vec![in_bar_foo, in_foo], vec![], vec![], vec![]);
+        let selected = select_type(&schema, "shop", "foo", "Order").unwrap();
+        assert_eq!(selected.module_path(), Some("shop::foo"));
+    }
+
+    // Finding 3: an inexact request must not fall back to the sole same-named
+    // type in another module.
+    #[test]
+    fn test_select_type_no_short_name_fallback() {
+        let ti = TypeInfo::with_module_path(
+            "LayerId".to_owned(),
+            TypeKind::Struct,
+            None,
+            vec![],
+            "domain::tddd".to_owned(),
+        );
+        let schema = SchemaExport::new("domain".to_owned(), vec![ti], vec![], vec![], vec![]);
+        assert!(select_type(&schema, "domain", "review", "LayerId").is_none());
+        assert!(select_type(&schema, "domain", "", "LayerId").is_none());
+        assert!(select_type(&schema, "domain", "tddd", "LayerId").is_some());
     }
 }

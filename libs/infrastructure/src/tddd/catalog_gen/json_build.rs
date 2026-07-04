@@ -89,10 +89,15 @@ pub(super) fn build_add_entry(
                 .insert("module_path".to_owned(), todo("module path where this trait is declared"));
         }
         CatalogEntryKind::Function => {
-            let (params, returns, is_async) = function_signature(command)?;
-            entry.insert("params".to_owned(), params);
-            entry.insert("returns".to_owned(), returns);
-            entry.insert("is_async".to_owned(), json!(is_async));
+            let signature = function_signature(command)?;
+            entry.insert("params".to_owned(), signature.params);
+            entry.insert("returns".to_owned(), signature.returns);
+            entry.insert("is_async".to_owned(), json!(signature.is_async));
+            // D6 (no silent drop): keep the generics / where predicates parsed
+            // from the `--method` signature, appending any distinct `--generic` /
+            // `--where` flags after them.
+            let generics = union_values(signature.generics, generics);
+            let where_predicates = union_values(signature.where_predicates, where_predicates);
             insert_if_non_empty(&mut entry, "generics", generics);
             insert_if_non_empty(&mut entry, "where_predicates", where_predicates);
         }
@@ -157,32 +162,84 @@ fn methods_value(command: &CatalogAddCommand) -> Result<Value, CatalogError> {
     }
 }
 
-/// Derive `(params, returns, is_async)` for a function entry from the first
-/// `--method` signature, or hole them when none is supplied.
-fn function_signature(command: &CatalogAddCommand) -> Result<(Value, Value, bool), CatalogError> {
+/// The pieces of a function entry derived from its `--method` signature.
+struct FunctionSignatureParts {
+    params: Value,
+    returns: Value,
+    is_async: bool,
+    generics: Vec<Value>,
+    where_predicates: Vec<Value>,
+}
+
+/// Derive a function entry's signature parts from the first `--method`
+/// signature, or hole `params` / `returns` when none is supplied.
+fn function_signature(command: &CatalogAddCommand) -> Result<FunctionSignatureParts, CatalogError> {
     match command.methods.first() {
         Some(signature) => {
             let parsed = parse_method(signature)?;
             let params = parsed.get("params").cloned().unwrap_or_else(|| json!([]));
             let returns = parsed.get("returns").cloned().unwrap_or_else(|| json!("()"));
             let is_async = parsed.get("is_async").and_then(Value::as_bool).unwrap_or(false);
-            Ok((params, returns, is_async))
+            Ok(FunctionSignatureParts {
+                params,
+                returns,
+                is_async,
+                generics: array_field(&parsed, "generics"),
+                where_predicates: array_field(&parsed, "where_predicates"),
+            })
         }
-        None => Ok((
-            todo("parameter list — supply the signature via `--method`"),
-            todo("return type — supply the signature via `--method`"),
-            false,
-        )),
+        None => Ok(FunctionSignatureParts {
+            params: todo("parameter list — supply the signature via `--method`"),
+            returns: todo("return type — supply the signature via `--method`"),
+            is_async: false,
+            generics: Vec::new(),
+            where_predicates: Vec::new(),
+        }),
     }
 }
 
-/// Build the document-level trait-impl declarations for the entry.
+/// Clone the array stored at `key` in `value`, or an empty vec when absent.
+fn array_field(value: &Value, key: &str) -> Vec<Value> {
+    value.get(key).and_then(Value::as_array).cloned().unwrap_or_default()
+}
+
+/// Concatenate `primary` with the entries of `secondary` that are not already
+/// present (value equality), preserving `primary`-first order.
+fn union_values(mut primary: Vec<Value>, secondary: Vec<Value>) -> Vec<Value> {
+    for value in secondary {
+        if !primary.contains(&value) {
+            primary.push(value);
+        }
+    }
+    primary
+}
+
+/// Build the document-level trait-impl declarations for the entry, carrying the
+/// impl-block generics / where predicates onto each declaration.
 fn build_trait_impls(command: &CatalogAddCommand) -> Result<Vec<Value>, CatalogError> {
+    let impl_generics = parse_list(&command.impl_generics, parse_generic)?;
+    let impl_where_predicates = parse_list(&command.impl_where_predicates, parse_where)?;
     let mut impls = Vec::new();
     for fragment in &command.trait_impls {
-        impls.push(parse_trait_impl(fragment, &command.name)?);
+        let mut value = parse_trait_impl(fragment, &command.name)?;
+        attach_impl_bounds(&mut value, &impl_generics, &impl_where_predicates);
+        impls.push(value);
     }
     Ok(impls)
+}
+
+/// Attach `impl_generics` / `impl_where_predicates` to a trait-impl value when
+/// non-empty, matching the codec's `TraitImplDto` wire shape.
+fn attach_impl_bounds(value: &mut Value, generics: &[Value], where_predicates: &[Value]) {
+    let Some(object) = value.as_object_mut() else {
+        return;
+    };
+    if !generics.is_empty() {
+        object.insert("impl_generics".to_owned(), Value::Array(generics.to_vec()));
+    }
+    if !where_predicates.is_empty() {
+        object.insert("impl_where_predicates".to_owned(), Value::Array(where_predicates.to_vec()));
+    }
 }
 
 /// Map each fragment through `parser`, collecting into a vec.
@@ -312,5 +369,57 @@ mod tests {
             build_add_entry(&command, "track/items/t/spec.json", &anchor_set()).unwrap();
         assert_eq!(trait_impls.len(), 1);
         assert_eq!(trait_impls[0]["for_type"], json!("Foo"));
+    }
+
+    // Finding 1: generics / where parsed from the `--method` signature must be
+    // wired into the function entry, not silently dropped.
+    #[test]
+    fn test_build_add_entry_function_wires_signature_generics_and_where() {
+        let mut command = base_command(CatalogEntryKind::Function, "FreeFunction");
+        command.methods = vec!["fn parse<T: Clone>(input: T) -> T where T: Send".to_owned()];
+        let (entry, _) =
+            build_add_entry(&command, "track/items/t/spec.json", &anchor_set()).unwrap();
+        assert_eq!(entry["generics"], json!([{ "name": "T", "bounds": ["Clone"] }]));
+        assert_eq!(
+            entry["where_predicates"],
+            json!([{ "lhs": "T", "rhs": ["Send"], "operator": "Bound" }])
+        );
+    }
+
+    // Finding 1: signature-parsed generics come first; distinct `--generic`
+    // flags are appended, and an identical flag is not duplicated.
+    #[test]
+    fn test_build_add_entry_function_unions_flag_generics_without_duplicates() {
+        let mut command = base_command(CatalogEntryKind::Function, "FreeFunction");
+        command.methods = vec!["fn parse<T: Clone>(input: T) -> T".to_owned()];
+        command.generics = vec!["T: Clone".to_owned(), "U: Send".to_owned()];
+        let (entry, _) =
+            build_add_entry(&command, "track/items/t/spec.json", &anchor_set()).unwrap();
+        assert_eq!(
+            entry["generics"],
+            json!([
+                { "name": "T", "bounds": ["Clone"] },
+                { "name": "U", "bounds": ["Send"] }
+            ])
+        );
+    }
+
+    // Finding 2: `--impl-generic` / `--impl-where` must ride along on each
+    // emitted trait-impl row (codec `TraitImplDto` shape).
+    #[test]
+    fn test_build_add_entry_trait_impl_carries_impl_generics_and_where() {
+        let mut command = base_command(CatalogEntryKind::Struct, "ErrorType");
+        command.fields = vec!["message: String".to_owned()];
+        command.trait_impls = vec!["From<T>".to_owned()];
+        command.impl_generics = vec!["T: Clone".to_owned()];
+        command.impl_where_predicates = vec!["T: Send".to_owned()];
+        let (_, trait_impls) =
+            build_add_entry(&command, "track/items/t/spec.json", &anchor_set()).unwrap();
+        assert_eq!(trait_impls.len(), 1);
+        assert_eq!(trait_impls[0]["impl_generics"], json!([{ "name": "T", "bounds": ["Clone"] }]));
+        assert_eq!(
+            trait_impls[0]["impl_where_predicates"],
+            json!([{ "lhs": "T", "rhs": ["Send"], "operator": "Bound" }])
+        );
     }
 }
