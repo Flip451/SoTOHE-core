@@ -1,0 +1,13 @@
+{
+  "schema_version": 6,
+  "id": "remote-sync-dedicated-command-2026-07-04",
+  "title": "remote sync 専用コマンドの新設 — switch と pull の分離",
+  "branch": "track/remote-sync-dedicated-command-2026-07-04",
+  "created_at": "2026-07-04T02:04:51Z",
+  "updated_at": "2026-07-04T02:04:51Z",
+  "branch_strategy_snapshot": {
+    "base_branch": "develop",
+    "merge_target": "develop",
+    "merge_method": "squash"
+  }
+}
