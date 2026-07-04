@@ -149,6 +149,15 @@ pub(super) fn ensure_rustdoc_json_path_safe(
     Ok(())
 }
 
+/// The `Id` of an impl's `for_` type when it resolves to a named path, used to
+/// look up the target type's module path via `extract_module_path`.
+fn impl_target_id(ty: &rustdoc_types::Type) -> Option<&rustdoc_types::Id> {
+    match ty {
+        rustdoc_types::Type::ResolvedPath(path) => Some(&path.id),
+        _ => None,
+    }
+}
+
 fn build_schema_export(
     crate_name: &str,
     krate: &rustdoc_types::Crate,
@@ -185,6 +194,8 @@ fn build_schema_export(
                 continue;
             }
             let target = format_helpers::format_type(&i.for_);
+            let target_module_path =
+                impl_target_id(&i.for_).and_then(|id| extract_module_path(id, krate));
             let (trait_name, trait_def_path) = match &i.trait_ {
                 Some(p) => {
                     let short = p.path.rsplit("::").next().unwrap_or(&p.path).to_string();
@@ -201,11 +212,12 @@ fn build_schema_export(
             };
             let methods = extract_methods(&i.items, krate)?;
             if !methods.is_empty() || trait_name.is_some() {
-                impls.push(ImplInfo::with_trait_def_path(
+                impls.push(ImplInfo::with_target_details(
                     target,
                     trait_name,
                     methods,
                     trait_def_path,
+                    target_module_path,
                 ));
             }
             continue;

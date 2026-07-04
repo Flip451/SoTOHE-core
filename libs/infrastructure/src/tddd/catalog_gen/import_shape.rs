@@ -57,7 +57,7 @@ pub(super) fn resolve_shape(
         ))
     })?;
     let kind = kind_value(type_info);
-    let methods = collect_methods(&schema, &name);
+    let methods = collect_methods(&schema, &name, type_info.module_path());
     Ok(ImportedShape { module_path: module, name, kind, methods })
 }
 
@@ -192,11 +192,23 @@ fn variant_value(member: &MemberDeclaration) -> Value {
     }
 }
 
-/// Collect inherent (non-trait) methods for `name` from the schema's impls.
-fn collect_methods(schema: &SchemaExport, name: &str) -> Vec<Value> {
+/// Collect inherent (non-trait) methods for the type named `name` living in
+/// `module_path` from the schema's impls.
+///
+/// Impls are matched on both the target's short name and its crate-qualified
+/// module path (segment for segment), so a same-short-named type in another
+/// module (e.g. `shop::bar_foo::Order` vs `shop::foo::Order`) does not
+/// contribute its methods. The impl's target module path is `None` when
+/// extraction could not resolve it, in which case only a request whose module
+/// is likewise unresolved matches.
+fn collect_methods(schema: &SchemaExport, name: &str, module_path: Option<&str>) -> Vec<Value> {
+    let expected = module_segments(module_path);
     let mut methods = Vec::new();
     for impl_info in schema.impls() {
-        if impl_info.target_type() == name && impl_info.trait_name().is_none() {
+        if impl_info.target_type() == name
+            && impl_info.trait_name().is_none()
+            && module_segments(impl_info.target_module_path()) == expected
+        {
             for func in impl_info.methods() {
                 methods.push(method_value(func));
             }
@@ -351,5 +363,43 @@ mod tests {
         assert!(select_type(&schema, "domain", "review", "LayerId").is_none());
         assert!(select_type(&schema, "domain", "", "LayerId").is_none());
         assert!(select_type(&schema, "domain", "tddd", "LayerId").is_some());
+    }
+
+    // Finding 2: inherent methods must be attributed by the target type's exact
+    // module path, not its short name — `shop::foo::Order` must not absorb the
+    // methods of the same-short-named `shop::bar_foo::Order`.
+    #[test]
+    fn test_collect_methods_disambiguates_by_target_module_path() {
+        use domain::schema::ImplInfo;
+
+        let inherent = |method_name: &str, module: &str| {
+            ImplInfo::with_target_details(
+                "Order".to_owned(),
+                None,
+                vec![FunctionInfo::new(
+                    method_name.to_owned(),
+                    None,
+                    vec![],
+                    false,
+                    vec![],
+                    "()".to_owned(),
+                    None,
+                    false,
+                )],
+                None,
+                Some(module.to_owned()),
+            )
+        };
+        let schema = SchemaExport::new(
+            "shop".to_owned(),
+            vec![],
+            vec![],
+            vec![],
+            vec![inherent("in_foo", "shop::foo"), inherent("in_bar", "shop::bar_foo")],
+        );
+
+        let methods = collect_methods(&schema, "Order", Some("shop::foo"));
+        assert_eq!(methods.len(), 1);
+        assert_eq!(methods[0]["name"], json!("in_foo"));
     }
 }

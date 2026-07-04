@@ -40,7 +40,9 @@
     ],
     "T006": [],
     "T007": [
-      { "layer": "infrastructure", "entry_key": "FsCatalogAdapter" }
+      { "layer": "infrastructure", "entry_key": "FsCatalogAdapter" },
+      { "layer": "domain", "entry_key": "ImplInfo" },
+      { "layer": "domain", "entry_key": "FunctionInfo" }
     ],
     "T008": [
       { "layer": "cli_driver", "entry_key": "CatalogKindSelect" },

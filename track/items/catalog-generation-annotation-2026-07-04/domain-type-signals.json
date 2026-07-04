@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-04T16:58:11Z",
-  "declaration_hash": "8125794768ceae3d548a4799f27e02454df0f6f53dd0a5f37f3305b053317ac5",
+  "generated_at": "2026-07-04T18:48:29Z",
+  "declaration_hash": "b5dd1a4b1cc7fbb3fea8ce0b91bb6a0da23a8c9715686de866eadbf990615251",
   "signals": [
     {
       "type_name": "CatalogEntryKind",
@@ -84,6 +84,26 @@
       "kind_tag": "value_object",
       "signal": "blue",
       "found_type": true
+    },
+    {
+      "type_name": "FunctionInfo",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::cmp::Eq",
+        "core::cmp::PartialEq"
+      ]
+    },
+    {
+      "type_name": "ImplInfo",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::cmp::Eq",
+        "core::cmp::PartialEq"
+      ]
     },
     {
       "type_name": "TodoInstruction",

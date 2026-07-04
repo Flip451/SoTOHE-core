@@ -16,6 +16,8 @@
 | DraftHole | value_object | add | — | 🔵 | 🔵 |
 | DraftHolePath | value_object | add | — | 🔵 | 🔵 |
 | FunctionEntry | value_object | modify | — | 🔵 | 🔵 |
+| FunctionInfo | value_object | modify | — | 🔵 | 🔵 |
+| ImplInfo | value_object | modify | — | 🔵 | 🔵 |
 | TodoInstruction | value_object | add | — | 🔵 | 🔵 |
 | TraitEntry | value_object | modify | — | 🔵 | 🔵 |
 | TypeEntry | value_object | modify | — | 🔵 | 🔵 |

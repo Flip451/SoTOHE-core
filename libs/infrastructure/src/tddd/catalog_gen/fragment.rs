@@ -12,7 +12,7 @@ use serde_json::{Value, json};
 use usecase::catalog_gen::CatalogError;
 
 /// Build a [`CatalogError::ParseFragment`].
-fn parse_error(message: impl Into<String>) -> CatalogError {
+pub(super) fn parse_error(message: impl Into<String>) -> CatalogError {
     CatalogError::ParseFragment { message: FreeText::new(message) }
 }
 
@@ -131,7 +131,8 @@ pub(super) fn parse_method(fragment: &str) -> Result<Value, CatalogError> {
     }
 
     let after_params = tail_after_delimited(fragment, '(', ')').unwrap_or_default();
-    let (returns, where_body) = split_return_and_where(&after_params);
+    let has_where = signature.generics.where_clause.is_some();
+    let (returns, where_body) = split_return_and_where(&after_params, has_where);
     let generics = extract_method_generics(fragment)?;
     let mut where_predicates = Vec::new();
     if let Some(body) = where_body {
@@ -333,10 +334,58 @@ fn find_top_level(haystack: &str, needle: &str) -> Option<usize> {
     None
 }
 
+/// Locate a standalone `needle` keyword at bracket depth ≤ 0. Unlike a raw
+/// substring search the match must be a whole token — the flanking characters,
+/// if any, must not be identifier characters — so a return type such as
+/// `somewhere::Thing` does not trip the `where`-clause detector.
+fn find_top_level_keyword(haystack: &str, needle: &str) -> Option<usize> {
+    let mut depth: i32 = 0;
+    for (idx, ch) in haystack.char_indices() {
+        match ch {
+            '<' | '(' | '[' | '{' => depth += 1,
+            '>' | ')' | ']' | '}' => depth -= 1,
+            _ => {}
+        }
+        if depth <= 0 {
+            if let Some(rest) = haystack.get(idx..) {
+                if rest.starts_with(needle) && is_token_boundary(haystack, idx, needle.len()) {
+                    return Some(idx);
+                }
+            }
+        }
+    }
+    None
+}
+
+/// Whether the `[start, start + len)` slice of `text` sits on identifier word
+/// boundaries (the characters flanking it, if present, are not identifier
+/// characters).
+fn is_token_boundary(text: &str, start: usize, len: usize) -> bool {
+    let before_ok = text
+        .get(..start)
+        .and_then(|before| before.chars().next_back())
+        .is_none_or(|ch| !is_ident_char(ch));
+    let after_ok = text
+        .get(start + len..)
+        .and_then(|after| after.chars().next())
+        .is_none_or(|ch| !is_ident_char(ch));
+    before_ok && after_ok
+}
+
+/// Whether `ch` can appear inside a Rust identifier (and so must not be treated
+/// as a token boundary).
+fn is_ident_char(ch: char) -> bool {
+    ch.is_alphanumeric() || ch == '_'
+}
+
 /// Split a post-parameter tail into a return-type string and optional
-/// where-clause body.
-fn split_return_and_where(after: &str) -> (String, Option<String>) {
-    let (head, where_body) = match find_top_level(after, "where") {
+/// where-clause body. `has_where` is the syn-derived signal for whether the
+/// signature actually carries a where clause, so a return type that merely
+/// contains the substring `where` (e.g. `somewhere::T`) is never mistaken for
+/// one.
+fn split_return_and_where(after: &str, has_where: bool) -> (String, Option<String>) {
+    let where_start = if has_where { find_top_level_keyword(after, "where") } else { None };
+    let (head, where_body) = match where_start {
         Some(idx) => {
             let before = after.get(..idx).unwrap_or("").to_owned();
             let body = after.get(idx + "where".len()..).unwrap_or("").trim().to_owned();
@@ -471,6 +520,27 @@ mod tests {
     #[test]
     fn test_parse_method_rejects_non_signature() {
         assert!(matches!(parse_method("not a function"), Err(CatalogError::ParseFragment { .. })));
+    }
+
+    // Finding 3: a return type whose path contains the substring `where`
+    // (e.g. `somewhere::Thing`) must not be mistaken for a where clause.
+    #[test]
+    fn test_parse_method_return_type_containing_where_substring() {
+        let value = parse_method("fn locate() -> somewhere::Thing").unwrap();
+        assert_eq!(value["returns"], json!("somewhere::Thing"));
+        assert_eq!(value.get("where_predicates"), None);
+    }
+
+    // Finding 3: a genuine where clause is still split off even when the return
+    // type also contains the substring `where`.
+    #[test]
+    fn test_parse_method_where_substring_return_with_real_where_clause() {
+        let value = parse_method("fn locate<T>() -> somewhere::Thing where T: Send").unwrap();
+        assert_eq!(value["returns"], json!("somewhere::Thing"));
+        assert_eq!(
+            value["where_predicates"],
+            json!([{ "lhs": "T", "rhs": ["Send"], "operator": "Bound" }])
+        );
     }
 
     #[test]

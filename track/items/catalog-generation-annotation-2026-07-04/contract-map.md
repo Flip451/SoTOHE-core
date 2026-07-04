@@ -25,6 +25,36 @@ classDef value_object fill:#d1fae5,stroke:#065f46,stroke-width:1px
 classDef variant_node fill:#fafaf9,stroke:#d6d3d1,stroke-width:1px
 subgraph domain["domain"]
   direction TB
+  subgraph domain_domain_module_schema["domain::schema"]
+    direction TB
+  subgraph T26_domain_domain_FunctionInfo["schema::FunctionInfo"]
+    direction TB
+    T26_domain_domain_FunctionInfo__self[FunctionInfo]
+    T26_domain_domain_FunctionInfo_new([new])
+    T26_domain_domain_FunctionInfo_with_module_path([with_module_path])
+    T26_domain_domain_FunctionInfo_name([name])
+    T26_domain_domain_FunctionInfo_docs([docs])
+    T26_domain_domain_FunctionInfo_return_type_names([return_type_names])
+    T26_domain_domain_FunctionInfo_has_self_receiver([has_self_receiver])
+    T26_domain_domain_FunctionInfo_params([params])
+    T26_domain_domain_FunctionInfo_returns([returns])
+    T26_domain_domain_FunctionInfo_receiver([receiver])
+    T26_domain_domain_FunctionInfo_is_async([is_async])
+    T26_domain_domain_FunctionInfo_module_path([module_path])
+  end
+  subgraph T22_domain_domain_ImplInfo["schema::ImplInfo"]
+    direction TB
+    T22_domain_domain_ImplInfo__self[ImplInfo]
+    T22_domain_domain_ImplInfo_new([new])
+    T22_domain_domain_ImplInfo_with_trait_def_path([with_trait_def_path])
+    T22_domain_domain_ImplInfo_with_target_details([with_target_details])
+    T22_domain_domain_ImplInfo_target_type([target_type])
+    T22_domain_domain_ImplInfo_trait_name([trait_name])
+    T22_domain_domain_ImplInfo_methods([methods])
+    T22_domain_domain_ImplInfo_trait_def_path([trait_def_path])
+    T22_domain_domain_ImplInfo_target_module_path([target_module_path])
+  end
+  end
   subgraph domain_domain_module_tddd["domain::tddd"]
     direction TB
   subgraph T30_domain_domain_CatalogEntryKind["tddd::catalog_gen::CatalogEntryKind"]
@@ -404,6 +434,15 @@ subgraph cli["cli"]
   F49_cli_cli_cli__commands__catalog__resolve_for_write[[resolve_for_write]]
   end
 end
+T26_domain_domain_FunctionInfo_new --> T26_domain_domain_FunctionInfo__self
+T26_domain_domain_FunctionInfo_with_module_path --> T26_domain_domain_FunctionInfo__self
+T22_domain_domain_ImplInfo_new --o T26_domain_domain_FunctionInfo__self
+T22_domain_domain_ImplInfo_new --> T22_domain_domain_ImplInfo__self
+T22_domain_domain_ImplInfo_with_trait_def_path --o T26_domain_domain_FunctionInfo__self
+T22_domain_domain_ImplInfo_with_trait_def_path --> T22_domain_domain_ImplInfo__self
+T22_domain_domain_ImplInfo_with_target_details --o T26_domain_domain_FunctionInfo__self
+T22_domain_domain_ImplInfo_with_target_details --> T22_domain_domain_ImplInfo__self
+T22_domain_domain_ImplInfo_methods --> T26_domain_domain_FunctionInfo__self
 T30_domain_domain_CatalogEntryName_try_new --> T30_domain_domain_CatalogEntryName__self
 T23_domain_domain_DocString_new --> T23_domain_domain_DocString__self
 T23_domain_domain_DraftHole_new --o T27_domain_domain_DraftHolePath__self
@@ -500,6 +539,27 @@ F46_cli_cli_cli__commands__catalog__gate_to_select --o T22_cli_cli_CatalogGateAr
 F46_cli_cli_cli__commands__catalog__gate_to_select --> T39_cli_driver_cli_driver_CatalogGateSelect__self
 F46_cli_cli_cli__commands__catalog__kind_to_select --o T22_cli_cli_CatalogKindArg__self
 F46_cli_cli_cli__commands__catalog__kind_to_select --> T39_cli_driver_cli_driver_CatalogKindSelect__self
+class T26_domain_domain_FunctionInfo_new method_node
+class T26_domain_domain_FunctionInfo_with_module_path method_node
+class T26_domain_domain_FunctionInfo_name method_node
+class T26_domain_domain_FunctionInfo_docs method_node
+class T26_domain_domain_FunctionInfo_return_type_names method_node
+class T26_domain_domain_FunctionInfo_has_self_receiver method_node
+class T26_domain_domain_FunctionInfo_params method_node
+class T26_domain_domain_FunctionInfo_returns method_node
+class T26_domain_domain_FunctionInfo_receiver method_node
+class T26_domain_domain_FunctionInfo_is_async method_node
+class T26_domain_domain_FunctionInfo_module_path method_node
+class T26_domain_domain_FunctionInfo__self value_object
+class T22_domain_domain_ImplInfo_new method_node
+class T22_domain_domain_ImplInfo_with_trait_def_path method_node
+class T22_domain_domain_ImplInfo_with_target_details method_node
+class T22_domain_domain_ImplInfo_target_type method_node
+class T22_domain_domain_ImplInfo_trait_name method_node
+class T22_domain_domain_ImplInfo_methods method_node
+class T22_domain_domain_ImplInfo_trait_def_path method_node
+class T22_domain_domain_ImplInfo_target_module_path method_node
+class T22_domain_domain_ImplInfo__self value_object
 class T30_domain_domain_CatalogEntryKind_Struct variant_node
 class T30_domain_domain_CatalogEntryKind_Enum variant_node
 class T30_domain_domain_CatalogEntryKind_TypeAlias variant_node

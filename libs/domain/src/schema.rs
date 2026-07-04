@@ -165,7 +165,7 @@ impl TypeInfo {
 ///
 /// T004: the historical `signature: String` field has been replaced by
 /// structured fields (`params` / `returns` / `receiver` / `is_async`).
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FunctionInfo {
     name: String,
     docs: Option<String>,
@@ -317,7 +317,7 @@ impl TraitInfo {
 }
 
 /// Information about an impl block.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ImplInfo {
     /// The type being implemented for (e.g., `TrackStatus`).
     target_type: String,
@@ -327,16 +327,21 @@ pub struct ImplInfo {
     methods: Vec<FunctionInfo>,
     /// Stable fully-qualified definition path of the trait from rustdoc `paths`.
     trait_def_path: Option<String>,
+    /// Crate-qualified module path of the target type (e.g., `shop::foo`).
+    /// Disambiguates impls of same-short-named types across modules. `None`
+    /// when the target type's module could not be resolved.
+    target_module_path: Option<String>,
 }
 
 impl ImplInfo {
-    /// Creates a new impl info (backward-compatible: `trait_def_path` defaults to `None`).
+    /// Creates a new impl info (backward-compatible: `trait_def_path` and
+    /// `target_module_path` default to `None`).
     pub fn new(
         target_type: String,
         trait_name: Option<String>,
         methods: Vec<FunctionInfo>,
     ) -> Self {
-        Self { target_type, trait_name, methods, trait_def_path: None }
+        Self::with_target_details(target_type, trait_name, methods, None, None)
     }
 
     /// Creates a new impl info with an explicit `trait_def_path`.
@@ -346,7 +351,19 @@ impl ImplInfo {
         methods: Vec<FunctionInfo>,
         trait_def_path: Option<String>,
     ) -> Self {
-        Self { target_type, trait_name, methods, trait_def_path }
+        Self::with_target_details(target_type, trait_name, methods, trait_def_path, None)
+    }
+
+    /// Creates a new impl info with an explicit `trait_def_path` and target-type
+    /// `target_module_path`.
+    pub fn with_target_details(
+        target_type: String,
+        trait_name: Option<String>,
+        methods: Vec<FunctionInfo>,
+        trait_def_path: Option<String>,
+        target_module_path: Option<String>,
+    ) -> Self {
+        Self { target_type, trait_name, methods, trait_def_path, target_module_path }
     }
 
     /// Returns the target type name.
@@ -367,6 +384,11 @@ impl ImplInfo {
     /// Returns the stable fully-qualified definition path of the trait, if known.
     pub fn trait_def_path(&self) -> Option<&str> {
         self.trait_def_path.as_deref()
+    }
+
+    /// Returns the crate-qualified module path of the target type, if resolved.
+    pub fn target_module_path(&self) -> Option<&str> {
+        self.target_module_path.as_deref()
     }
 }
 

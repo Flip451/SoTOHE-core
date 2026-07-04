@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "8125794768ceae3d548a4799f27e02454df0f6f53dd0a5f37f3305b053317ac5",
+  "catalogue_declaration_hash": "b5dd1a4b1cc7fbb3fea8ce0b91bb6a0da23a8c9715686de866eadbf990615251",
   "signals": [
     {
       "type_name": "CatalogEntryKind",
@@ -36,6 +36,16 @@
       "type_name": "FunctionEntry",
       "signal": "blue",
       "entry_hash": "f2a4fd023e3e86dfa24d72ec787c9af5d86621d1f3e81c5a50c4c07d66f10e03"
+    },
+    {
+      "type_name": "FunctionInfo",
+      "signal": "blue",
+      "entry_hash": "af638ba0fc4dc96d3c418391b0c94b0976790a97813bcec071fce77e1f9b290e"
+    },
+    {
+      "type_name": "ImplInfo",
+      "signal": "blue",
+      "entry_hash": "a9b64da880d7eff84c5c6d4c4b2d048a6d194fabde47863011a08236e4752723"
     },
     {
       "type_name": "TodoInstruction",

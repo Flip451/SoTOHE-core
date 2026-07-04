@@ -14,7 +14,8 @@ use serde_json::{Map, Value, json};
 use usecase::catalog_gen::{CatalogAddCommand, CatalogError};
 
 use super::fragment::{
-    parse_field, parse_generic, parse_method, parse_trait_impl, parse_variant, parse_where,
+    parse_error, parse_field, parse_generic, parse_method, parse_trait_impl, parse_variant,
+    parse_where,
 };
 use super::fs_access::schema_error;
 use super::validate::{spec_refs_value, validate_role};
@@ -171,9 +172,18 @@ struct FunctionSignatureParts {
     where_predicates: Vec<Value>,
 }
 
-/// Derive a function entry's signature parts from the first `--method`
+/// Derive a function entry's signature parts from its single `--method`
 /// signature, or hole `params` / `returns` when none is supplied.
+///
+/// A function entry maps to exactly one signature, so more than one `--method`
+/// fragment is rejected rather than silently truncated to the first.
 fn function_signature(command: &CatalogAddCommand) -> Result<FunctionSignatureParts, CatalogError> {
+    if command.methods.len() > 1 {
+        return Err(parse_error(format!(
+            "function entry accepts at most one --method fragment, got {}",
+            command.methods.len()
+        )));
+    }
     match command.methods.first() {
         Some(signature) => {
             let parsed = parse_method(signature)?;
@@ -343,6 +353,27 @@ mod tests {
         assert_eq!(entry["role"], json!("FreeFunction"));
         assert_eq!(entry["returns"], json!("bool"));
         assert_eq!(entry["params"], json!([{ "name": "input", "ty": "u32" }]));
+    }
+
+    // Finding 1: a function entry maps to exactly one signature; supplying more
+    // than one `--method` is rejected rather than silently dropping the rest.
+    #[test]
+    fn test_build_add_entry_function_rejects_multiple_methods() {
+        let mut command = base_command(CatalogEntryKind::Function, "FreeFunction");
+        command.methods =
+            vec!["fn run(input: u32) -> bool".to_owned(), "fn other() -> u8".to_owned()];
+        let err = build_add_entry(&command, "track/items/t/spec.json", &anchor_set()).unwrap_err();
+        assert!(matches!(err, CatalogError::ParseFragment { .. }));
+    }
+
+    // Finding 1: non-function kinds still accept multiple `--method` fragments.
+    #[test]
+    fn test_build_add_entry_trait_accepts_multiple_methods() {
+        let mut command = base_command(CatalogEntryKind::Trait, "SecondaryPort");
+        command.methods = vec!["fn a()".to_owned(), "fn b() -> u32".to_owned()];
+        let (entry, _) =
+            build_add_entry(&command, "track/items/t/spec.json", &anchor_set()).unwrap();
+        assert_eq!(entry["methods"].as_array().map(Vec::len), Some(2));
     }
 
     #[test]
