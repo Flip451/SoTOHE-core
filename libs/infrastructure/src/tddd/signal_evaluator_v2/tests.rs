@@ -3533,39 +3533,41 @@ fn test_impl_block_generics_symmetric_compare_blue() {
 
     doc.types.insert(
         TypeName::new("Foo").unwrap(),
-        TypeEntry {
-            action: domain::tddd::catalogue_v2::ItemAction::Add,
-            role: DataRole::value_object(),
-            kind: TypeKindV2::Struct(StructKind::new(
+        TypeEntry::new(
+            domain::tddd::catalogue_v2::ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: vec![], has_stripped_fields: false },
                 None,
             )),
-            methods: vec![],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        },
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
     );
     doc.trait_impls.push(trait_impl);
     // Also register the local trait "MyTrait" (needed for local trait id resolution).
     use domain::tddd::catalogue_v2::entries::TraitEntry;
     doc.traits.insert(
         TraitName::new("MyTrait").unwrap(),
-        TraitEntry {
-            action: domain::tddd::catalogue_v2::ItemAction::Add,
-            role: ContractRole::SpecificationPort,
-            methods: vec![],
-            assoc_types: vec![],
-            assoc_consts: vec![],
-            supertrait_bounds: vec![],
-            generics: vec![],
-            where_predicates: vec![],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        },
+        TraitEntry::new(
+            domain::tddd::catalogue_v2::ItemAction::Add,
+            ContractRole::SpecificationPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
     );
 
     let a = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
@@ -3773,37 +3775,39 @@ fn test_existing_catalogue_no_change_in_signal_for_trait_impl_no_generics() {
 
     doc.types.insert(
         TypeName::new("Foo").unwrap(),
-        TypeEntry {
-            action: domain::tddd::catalogue_v2::ItemAction::Add,
-            role: DataRole::value_object(),
-            kind: TypeKindV2::Struct(StructKind::new(
+        TypeEntry::new(
+            domain::tddd::catalogue_v2::ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: vec![], has_stripped_fields: false },
                 None,
             )),
-            methods: vec![],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        },
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
     );
     doc.trait_impls.push(trait_impl);
     doc.traits.insert(
         TraitName::new("MyTrait").unwrap(),
-        TraitEntry {
-            action: domain::tddd::catalogue_v2::ItemAction::Add,
-            role: ContractRole::SpecificationPort,
-            methods: vec![],
-            assoc_types: vec![],
-            assoc_consts: vec![],
-            supertrait_bounds: vec![],
-            generics: vec![],
-            where_predicates: vec![],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        },
+        TraitEntry::new(
+            domain::tddd::catalogue_v2::ItemAction::Add,
+            ContractRole::SpecificationPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
     );
 
     let a = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
@@ -4366,38 +4370,40 @@ fn test_adr0048_cross_crate_impl_add_evaluates_blue() {
     // Declare `MyTrait` (self-crate trait, Add).
     doc.traits.insert(
         TraitName::new("MyTrait").unwrap(),
-        TraitEntry {
-            action: domain::tddd::catalogue_v2::ItemAction::Add,
-            role: ContractRole::SpecificationPort,
-            methods: vec![],
-            assoc_types: vec![],
-            assoc_consts: vec![],
-            supertrait_bounds: vec![],
-            generics: vec![],
-            where_predicates: vec![],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        },
+        TraitEntry::new(
+            domain::tddd::catalogue_v2::ItemAction::Add,
+            ContractRole::SpecificationPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
     );
 
     // Declare `SelfType` (self-crate type, Add).
     doc.types.insert(
         TypeName::new("SelfType").unwrap(),
-        TypeEntry {
-            action: domain::tddd::catalogue_v2::ItemAction::Add,
-            role: DataRole::value_object(),
-            kind: TypeKindV2::Struct(StructKind::new(
+        TypeEntry::new(
+            domain::tddd::catalogue_v2::ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: vec![], has_stripped_fields: false },
                 None,
             )),
-            methods: vec![],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        },
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
     );
 
     // Case B: `impl MyTrait for std::vec::Vec<i32>` — external self type.

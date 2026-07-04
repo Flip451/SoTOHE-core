@@ -9,7 +9,7 @@ use rustdoc_types::{Id, ItemEnum, ItemKind, Struct, StructKind, TypeAlias, Varia
 use crate::tddd::catalogue_to_extended_crate_codec_error::CatalogueToExtendedCrateCodecError;
 
 use super::encoder::EncoderState;
-use super::helpers::{empty_generics, make_impl, make_item, resolved_path_type};
+use super::helpers::{make_impl, make_item, resolved_path_type};
 
 impl EncoderState {
     /// Shared finalization for struct-like type entries.
@@ -25,12 +25,29 @@ impl EncoderState {
         entry: &TypeEntry,
         struct_kind: StructKind,
     ) -> Result<(), CatalogueToExtendedCrateCodecError> {
-        let module_path = entry.module_path.clone();
-        let docs = entry.docs.clone();
+        let module_path = entry.module_path().clone();
+        let docs = entry.docs().map(|d| d.as_str().to_owned());
 
-        let methods: Vec<MethodDeclaration> = entry.methods.clone();
-        let method_ids =
-            self.encode_method_items(&methods, true, type_name.as_str(), &module_path, &[])?;
+        // Type-declaration-level generics / where predicates are encoded into the
+        // struct's `Generics` (ADR `2026-07-02-1345` D6): declared values must be
+        // observable by the signal comparator, never silently dropped. Empty decls
+        // yield empty `Generics`, preserving backward compatibility with catalogues
+        // that predate these fields. Symmetric with trait / function encoding.
+        let generic_names: Vec<&str> = entry.generics().iter().map(|g| g.name.as_str()).collect();
+        let generics = self.build_where_form_generics(
+            entry.generics(),
+            entry.where_predicates(),
+            &generic_names,
+        )?;
+
+        let methods: Vec<MethodDeclaration> = entry.methods().to_vec();
+        let method_ids = self.encode_method_items(
+            &methods,
+            true,
+            type_name.as_str(),
+            &module_path,
+            &generic_names,
+        )?;
 
         let impl_id = self.alloc_id();
         let for_type = resolved_path_type(type_id, type_name.as_str());
@@ -43,11 +60,7 @@ impl EncoderState {
             type_id,
             Some(type_name.as_str().to_string()),
             docs,
-            ItemEnum::Struct(Struct {
-                kind: struct_kind,
-                generics: empty_generics(),
-                impls: vec![impl_id],
-            }),
+            ItemEnum::Struct(Struct { kind: struct_kind, generics, impls: vec![impl_id] }),
         );
         self.index.insert(type_id, struct_item);
         self.register_path(type_id, ItemKind::Struct, type_name.as_str(), &module_path);
@@ -73,8 +86,16 @@ impl EncoderState {
         fields: Vec<domain::tddd::catalogue_v2::identifiers::TypeRef>,
         has_stripped_fields: bool,
     ) -> Result<(), CatalogueToExtendedCrateCodecError> {
-        let module_path = entry.module_path.clone();
-        let docs = entry.docs.clone();
+        let module_path = entry.module_path().clone();
+        let docs = entry.docs().map(|d| d.as_str().to_owned());
+
+        // Type-declaration-level generics / where predicates (ADR `2026-07-02-1345` D6).
+        let generic_names: Vec<&str> = entry.generics().iter().map(|g| g.name.as_str()).collect();
+        let generics = self.build_where_form_generics(
+            entry.generics(),
+            entry.where_predicates(),
+            &generic_names,
+        )?;
 
         // Encode positional fields as StructField items with None names (tuple style).
         // Positional field names (.0, .1, ...) are synthesized by the rustdoc format;
@@ -104,9 +125,14 @@ impl EncoderState {
         let struct_kind = StructKind::Tuple(field_ids);
 
         // Encode inherent method items.
-        let methods: Vec<MethodDeclaration> = entry.methods.clone();
-        let method_ids =
-            self.encode_method_items(&methods, true, type_name.as_str(), &module_path, &[])?;
+        let methods: Vec<MethodDeclaration> = entry.methods().to_vec();
+        let method_ids = self.encode_method_items(
+            &methods,
+            true,
+            type_name.as_str(),
+            &module_path,
+            &generic_names,
+        )?;
 
         let impl_id = self.alloc_id();
         let for_type = resolved_path_type(type_id, type_name.as_str());
@@ -119,11 +145,7 @@ impl EncoderState {
             type_id,
             Some(type_name.as_str().to_string()),
             docs,
-            ItemEnum::Struct(Struct {
-                kind: struct_kind,
-                generics: empty_generics(),
-                impls: vec![impl_id],
-            }),
+            ItemEnum::Struct(Struct { kind: struct_kind, generics, impls: vec![impl_id] }),
         );
         self.index.insert(type_id, struct_item);
         self.register_path(type_id, ItemKind::Struct, type_name.as_str(), &module_path);
@@ -172,8 +194,16 @@ impl EncoderState {
         entry: &TypeEntry,
         variants: Vec<VariantDecl>,
     ) -> Result<(), CatalogueToExtendedCrateCodecError> {
-        let module_path = entry.module_path.clone();
-        let docs = entry.docs.clone();
+        let module_path = entry.module_path().clone();
+        let docs = entry.docs().map(|d| d.as_str().to_owned());
+
+        // Type-declaration-level generics / where predicates (ADR `2026-07-02-1345` D6).
+        let generic_names: Vec<&str> = entry.generics().iter().map(|g| g.name.as_str()).collect();
+        let generics = self.build_where_form_generics(
+            entry.generics(),
+            entry.where_predicates(),
+            &generic_names,
+        )?;
 
         // Encode variant items.
         let mut variant_ids: Vec<Id> = vec![];
@@ -195,9 +225,14 @@ impl EncoderState {
         }
 
         // Inherent methods (concrete implementations → has_body: true).
-        let methods: Vec<MethodDeclaration> = entry.methods.clone();
-        let method_ids =
-            self.encode_method_items(&methods, true, type_name.as_str(), &module_path, &[])?;
+        let methods: Vec<MethodDeclaration> = entry.methods().to_vec();
+        let method_ids = self.encode_method_items(
+            &methods,
+            true,
+            type_name.as_str(),
+            &module_path,
+            &generic_names,
+        )?;
 
         // Inherent Impl block.
         let impl_id = self.alloc_id();
@@ -213,7 +248,7 @@ impl EncoderState {
             Some(type_name.as_str().to_string()),
             docs,
             ItemEnum::Enum(rustdoc_types::Enum {
-                generics: empty_generics(),
+                generics,
                 variants: variant_ids,
                 impls: vec![impl_id],
                 has_stripped_variants: false,
@@ -232,15 +267,28 @@ impl EncoderState {
         entry: &TypeEntry,
         target: domain::tddd::catalogue_v2::TypeRef,
     ) -> Result<(), CatalogueToExtendedCrateCodecError> {
-        let module_path = entry.module_path.clone();
-        let docs = entry.docs.clone();
+        let module_path = entry.module_path().clone();
+        let docs = entry.docs().map(|d| d.as_str().to_owned());
+
+        // Type-declaration-level generics / where predicates (ADR `2026-07-02-1345` D6).
+        let generic_names: Vec<&str> = entry.generics().iter().map(|g| g.name.as_str()).collect();
+        let generics = self.build_where_form_generics(
+            entry.generics(),
+            entry.where_predicates(),
+            &generic_names,
+        )?;
 
         let target_ty = self.parse_type_ref_str(target.as_str())?;
 
         // Encode inherent methods (rare for type aliases; concrete implementations → has_body: true).
-        let methods: Vec<MethodDeclaration> = entry.methods.clone();
-        let method_ids =
-            self.encode_method_items(&methods, true, type_name.as_str(), &module_path, &[])?;
+        let methods: Vec<MethodDeclaration> = entry.methods().to_vec();
+        let method_ids = self.encode_method_items(
+            &methods,
+            true,
+            type_name.as_str(),
+            &module_path,
+            &generic_names,
+        )?;
         let impl_id = self.alloc_id();
         let for_type = resolved_path_type(type_id, type_name.as_str());
         self.index.insert(
@@ -252,7 +300,7 @@ impl EncoderState {
             type_id,
             Some(type_name.as_str().to_string()),
             docs,
-            ItemEnum::TypeAlias(TypeAlias { type_: target_ty, generics: empty_generics() }),
+            ItemEnum::TypeAlias(TypeAlias { type_: target_ty, generics }),
         );
         self.index.insert(type_id, alias_item);
         self.register_path(type_id, ItemKind::TypeAlias, type_name.as_str(), &module_path);

@@ -118,7 +118,7 @@ pub(super) fn check_chain2_for_layer<R: TrackBlobReader>(
         check_spec_refs_for_entry(
             layer_id,
             type_name.as_str(),
-            &entry.spec_refs,
+            entry.spec_refs(),
             spec_element_hashes,
             &mut integrity_errors,
         );
@@ -127,7 +127,7 @@ pub(super) fn check_chain2_for_layer<R: TrackBlobReader>(
         check_spec_refs_for_entry(
             layer_id,
             trait_name.as_str(),
-            &entry.spec_refs,
+            entry.spec_refs(),
             spec_element_hashes,
             &mut integrity_errors,
         );
@@ -136,7 +136,7 @@ pub(super) fn check_chain2_for_layer<R: TrackBlobReader>(
         check_spec_refs_for_entry(
             layer_id,
             &fn_path.to_string(),
-            &entry.spec_refs,
+            entry.spec_refs(),
             spec_element_hashes,
             &mut integrity_errors,
         );

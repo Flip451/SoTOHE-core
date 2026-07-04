@@ -205,34 +205,36 @@ mod tests {
     }
 
     fn make_simple_type_entry() -> TypeEntry {
-        TypeEntry {
-            action: ItemAction::Add,
-            role: DataRole::value_object(),
-            kind: TypeKindV2::Struct(StructKind::new(
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: vec![], has_stripped_fields: false },
                 None,
             )),
-            methods: vec![],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        }
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        )
     }
 
     fn make_simple_function_entry() -> FunctionEntry {
-        FunctionEntry {
-            action: ItemAction::Add,
-            role: FunctionRole::FreeFunction,
-            params: vec![],
-            returns: TypeRef::new("()").unwrap(),
-            is_async: false,
-            generics: vec![],
-            where_predicates: vec![],
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        }
+        FunctionEntry::new(
+            ItemAction::Add,
+            FunctionRole::FreeFunction,
+            vec![],
+            TypeRef::new("()").unwrap(),
+            false,
+            vec![],
+            vec![],
+            None,
+            vec![],
+            vec![],
+        )
     }
 
     // -----------------------------------------------------------------------

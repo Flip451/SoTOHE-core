@@ -206,8 +206,8 @@ impl Encoder {
                         reason: "pre-pass id not found (internal error)".to_string(),
                     }
                 })?;
-            let action = entry.action;
-            match entry.kind.clone() {
+            let action = entry.action();
+            match entry.kind().clone() {
                 TypeKindV2::Struct(struct_kind) => {
                     let domain::tddd::catalogue_v2::StructKind { shape, typestate } = struct_kind;
                     match shape {
@@ -254,7 +254,7 @@ impl Encoder {
                         reason: "pre-pass id not found (internal error)".to_string(),
                     }
                 })?;
-            let action = entry.action;
+            let action = entry.action();
             state.encode_trait(trait_id, trait_name, entry)?;
             item_actions.insert(trait_id, action);
         }
@@ -268,7 +268,7 @@ impl Encoder {
                         reason: "pre-pass id not found (internal error)".to_string(),
                     }
                 })?;
-            let action = entry.action;
+            let action = entry.action();
             state.encode_function(fn_id, fn_path, entry)?;
             item_actions.insert(fn_id, action);
         }

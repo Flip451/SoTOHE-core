@@ -155,7 +155,7 @@ pub fn evaluate_catalogue_lint<S: PrimitiveOccurrenceScanner>(
                     *target_field,
                 )?;
                 for (name, entry) in type_entries_for_target(catalogue, rule.target()) {
-                    if !field_vec_is_empty(&entry.role, *target_field) {
+                    if !field_vec_is_empty(entry.role(), *target_field) {
                         violations.push(CatalogueLintViolation::new(
                             rule.kind().discriminant_name(),
                             name.as_str(),
@@ -173,7 +173,7 @@ pub fn evaluate_catalogue_lint<S: PrimitiveOccurrenceScanner>(
                     *target_field,
                 )?;
                 for (name, entry) in type_entries_for_target(catalogue, rule.target()) {
-                    if field_vec_is_empty(&entry.role, *target_field) {
+                    if field_vec_is_empty(entry.role(), *target_field) {
                         violations.push(CatalogueLintViolation::new(
                             rule.kind().discriminant_name(),
                             name.as_str(),
@@ -247,7 +247,7 @@ pub fn evaluate_catalogue_lint<S: PrimitiveOccurrenceScanner>(
                     field,
                 )?;
                 for (name, entry) in type_entries_for_target(catalogue, rule.target()) {
-                    for type_ref in field_type_refs(&entry.role, field) {
+                    for type_ref in field_type_refs(entry.role(), field) {
                         let ref_str = type_ref.as_str();
                         if resolve_type_role(ref_str, all_catalogues, target_layer_id)
                             != Some(*expected_role)
@@ -267,7 +267,7 @@ pub fn evaluate_catalogue_lint<S: PrimitiveOccurrenceScanner>(
                 }
 
                 for (name, entry) in trait_entries_for_target(catalogue, rule.target()) {
-                    if let Some(type_ref) = contract_role_type_ref(&entry.role, field) {
+                    if let Some(type_ref) = contract_role_type_ref(entry.role(), field) {
                         let ref_str = type_ref.as_str();
                         if resolve_type_role(ref_str, all_catalogues, target_layer_id)
                             != Some(*expected_role)
@@ -321,8 +321,10 @@ pub fn evaluate_catalogue_lint<S: PrimitiveOccurrenceScanner>(
                         'sig_slot: for type_ref_str in sig_types {
                             for (cat_layer_id, cat) in all_catalogues {
                                 // Check type entries, excluding delete-action entries.
-                                for (tn, e) in
-                                    cat.types.iter().filter(|(_, e)| e.action != ItemAction::Delete)
+                                for (tn, e) in cat
+                                    .types
+                                    .iter()
+                                    .filter(|(_, e)| e.action() != ItemAction::Delete)
                                 {
                                     let role = entry_role_kind(e);
                                     if forbidden_roles.as_slice().contains(&role)
@@ -352,9 +354,9 @@ pub fn evaluate_catalogue_lint<S: PrimitiveOccurrenceScanner>(
                                 for (tn, e) in cat
                                     .traits
                                     .iter()
-                                    .filter(|(_, e)| e.action != ItemAction::Delete)
+                                    .filter(|(_, e)| e.action() != ItemAction::Delete)
                                 {
-                                    let role = RoleKind::from_contract_role(&e.role);
+                                    let role = RoleKind::from_contract_role(e.role());
                                     if forbidden_roles.as_slice().contains(&role)
                                         && sig_type_contains_entry(
                                             type_ref_str,
@@ -392,7 +394,7 @@ pub fn evaluate_catalogue_lint<S: PrimitiveOccurrenceScanner>(
                 }
                 for (name, entry) in type_entries_for_target(catalogue, rule.target()) {
                     let all_methods = collect_methods_for_type(catalogue, entry, name.as_str())?;
-                    for inv in invariants_for_role(&entry.role) {
+                    for inv in invariants_for_role(entry.role()) {
                         let InvariantPredicate::SelfMethod(method_name) = &inv.predicate;
                         let mname = method_name.as_str();
                         match all_methods.iter().find(|m| m.name.as_str() == mname) {
@@ -434,7 +436,7 @@ pub fn evaluate_catalogue_lint<S: PrimitiveOccurrenceScanner>(
                     ))));
                 }
                 for (name, entry) in type_entries_for_target(catalogue, rule.target()) {
-                    let getter_name = match identity_accessor_name(&entry.role) {
+                    let getter_name = match identity_accessor_name(entry.role()) {
                         Some(g) => g,
                         None => continue,
                     };
@@ -492,7 +494,7 @@ pub fn evaluate_catalogue_lint<S: PrimitiveOccurrenceScanner>(
                 let mut seen: std::collections::HashMap<String, String> =
                     std::collections::HashMap::new();
                 for (name, entry) in type_entries_for_target(catalogue, rule.target()) {
-                    for type_ref in field_type_refs(&entry.role, *target_field) {
+                    for type_ref in field_type_refs(entry.role(), *target_field) {
                         let ref_str = type_ref.as_str();
                         let canonical = ref_str.split("::").last().unwrap_or(ref_str).to_owned();
                         if let Some(prev_entry) = seen.get(&canonical) {
@@ -531,7 +533,7 @@ pub fn evaluate_catalogue_lint<S: PrimitiveOccurrenceScanner>(
                 )?;
                 let mut agg_exclusive: Vec<(String, Vec<String>)> = Vec::new();
                 for (name, entry) in type_entries_for_target(catalogue, rule.target()) {
-                    let refs = field_type_refs(&entry.role, *target_field)
+                    let refs = field_type_refs(entry.role(), *target_field)
                         .iter()
                         .map(|r| r.as_str().to_owned())
                         .collect();
@@ -557,11 +559,11 @@ pub fn evaluate_catalogue_lint<S: PrimitiveOccurrenceScanner>(
                         // Exclude delete-action aggregates: a deleted aggregate's
                         // shared_value_objects no longer define the boundary set.
                         if let Some((_name, entry)) = catalogue.types.iter().find(|(n, e)| {
-                            n.as_str() == agg_name.as_str() && e.action != ItemAction::Delete
+                            n.as_str() == agg_name.as_str() && e.action() != ItemAction::Delete
                         }) {
                             // "shared_value_objects" is a recognised field name — always succeeds.
                             for r in
-                                field_type_refs(&entry.role, RolePayloadField::SharedValueObjects)
+                                field_type_refs(entry.role(), RolePayloadField::SharedValueObjects)
                             {
                                 let tail =
                                     r.as_str().split("::").last().unwrap_or(r.as_str()).to_owned();
@@ -573,7 +575,7 @@ pub fn evaluate_catalogue_lint<S: PrimitiveOccurrenceScanner>(
                     // Exclude delete-action entries: a deleted type cannot have methods
                     // that violate the exclusivity boundary.
                     for (other_name, other_entry) in
-                        catalogue.types.iter().filter(|(_, e)| e.action != ItemAction::Delete)
+                        catalogue.types.iter().filter(|(_, e)| e.action() != ItemAction::Delete)
                     {
                         let other_bare =
                             other_name.as_str().split("::").last().unwrap_or(other_name.as_str());
@@ -612,7 +614,7 @@ pub fn evaluate_catalogue_lint<S: PrimitiveOccurrenceScanner>(
 
             CatalogueLinterRuleKind::NoPublicField => {
                 for (name, entry) in type_entries_for_target(catalogue, rule.target()) {
-                    if let TypeKindV2::Struct(struct_kind) = &entry.kind {
+                    if let TypeKindV2::Struct(struct_kind) = entry.kind() {
                         if struct_has_public_fields(struct_kind) {
                             violations.push(CatalogueLintViolation::new(
                                 rule.kind().discriminant_name(),

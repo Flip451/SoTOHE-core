@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-04T08:48:20Z",
+  "generated_at": "2026-07-04T11:04:32Z",
   "declaration_hash": "a5a01c8a8f6f7a98a992013ca12571cad7e13a5811f2fa0bbc562600e5559992",
   "signals": [
     {
@@ -44,9 +44,9 @@
     {
       "type_name": "DocString",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -80,7 +80,7 @@
     {
       "type_name": "FunctionEntry",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
@@ -98,13 +98,13 @@
     {
       "type_name": "TraitEntry",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
       "type_name": "TypeEntry",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     }
   ]

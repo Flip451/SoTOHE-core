@@ -335,20 +335,21 @@ mod tests {
         let mut domain_doc = empty_v3_doc("domain");
         domain_doc.types.insert(
             TypeName::new("User").unwrap(),
-            TypeEntry {
-                action: ItemAction::Add,
-                role: DataRole::entity().unwrap(),
-                kind: TypeKindV2::Struct(StructKind::new(
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::entity().unwrap(),
+                TypeKindV2::Struct(StructKind::new(
                     StructShape::Plain { fields: vec![], has_stripped_fields: false },
                     None,
                 )),
-                methods: vec![],
-
-                module_path: ModulePath::root(),
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            },
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
         );
         catalogues.insert(domain_layer, domain_doc);
 
@@ -357,10 +358,10 @@ mod tests {
         for trait_name in ["RegisterUser", "RegisterUserCommand"] {
             usecase_doc.traits.insert(
                 TraitName::new(trait_name).unwrap(),
-                TraitEntry {
-                    action: ItemAction::Add,
-                    role: ContractRole::ApplicationService,
-                    methods: vec![MethodDeclaration::new(
+                TraitEntry::new(
+                    ItemAction::Add,
+                    ContractRole::ApplicationService,
+                    vec![MethodDeclaration::new(
                         domain::tddd::catalogue_v2::identifiers::MethodName::new("execute")
                             .unwrap(),
                         None,
@@ -369,16 +370,16 @@ mod tests {
                         false,
                         None,
                     )],
-                    assoc_types: vec![],
-                    assoc_consts: vec![],
-                    supertrait_bounds: vec![],
-                    generics: vec![],
-                    where_predicates: vec![],
-                    module_path: ModulePath::root(),
-                    docs: None,
-                    spec_refs: vec![],
-                    informal_grounds: vec![],
-                },
+                    vec![],
+                    vec![],
+                    vec![],
+                    vec![],
+                    vec![],
+                    ModulePath::root(),
+                    None,
+                    vec![],
+                    vec![],
+                ),
             );
         }
         catalogues.insert(usecase_layer, usecase_doc);
@@ -390,21 +391,19 @@ mod tests {
             FunctionPath::at_root(fn_crate, FunctionName::new("render_contract_map").unwrap());
         infra_doc.functions.insert(
             fn_path,
-            FunctionEntry {
-                action: ItemAction::Add,
-                role: FunctionRole::FreeFunction,
-                params: vec![],
-                returns: domain::tddd::catalogue_v2::identifiers::TypeRef::new(
-                    "ContractMapContent",
-                )
-                .unwrap(),
-                is_async: false,
-                generics: vec![],
-                where_predicates: vec![],
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            },
+            FunctionEntry::new(
+                ItemAction::Add,
+                FunctionRole::FreeFunction,
+                vec![],
+                domain::tddd::catalogue_v2::identifiers::TypeRef::new("ContractMapContent")
+                    .unwrap(),
+                false,
+                vec![],
+                vec![],
+                None,
+                vec![],
+                vec![],
+            ),
         );
         catalogues.insert(infra_layer, infra_doc);
 

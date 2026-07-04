@@ -50,9 +50,9 @@ pub use entries::{
 };
 
 pub use identifiers::{
-    AssocConstName, CrateName, FieldName, FunctionName, FunctionPath, Identifier, IdentifierError,
-    InvariantName, MethodName, ModulePath, ParamName, RustExpression, RustExpressionError,
-    TraitName, TypeName, TypeRef, VariantName,
+    AssocConstName, CrateName, DocString, FieldName, FunctionName, FunctionPath, Identifier,
+    IdentifierError, InvariantName, MethodName, ModulePath, ParamName, RustExpression,
+    RustExpressionError, TraitName, TypeName, TypeRef, VariantName,
 };
 
 pub use methods::{

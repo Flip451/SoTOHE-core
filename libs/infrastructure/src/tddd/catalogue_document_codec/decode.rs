@@ -9,7 +9,7 @@ use domain::tddd::catalogue_v2::composite::{
     StructKind, StructShape, TypeKindV2, TypestateMarker, TypestateTransitions,
 };
 use domain::tddd::catalogue_v2::entries::{TraitEntry, TypeEntry};
-use domain::tddd::catalogue_v2::identifiers::{FieldName, VariantName};
+use domain::tddd::catalogue_v2::identifiers::{DocString, FieldName, VariantName};
 use domain::tddd::catalogue_v2::variants::{FieldDecl, VariantDecl, VariantPayload};
 use domain::tddd::catalogue_v2::{
     BoundOp, CatalogueDocument, CrateName, FunctionPath, ItemAction, MethodDeclaration,
@@ -126,6 +126,9 @@ pub(super) fn type_entry_from_dto(
         .map(|m| method_decl_from_dto(name, m))
         .collect::<Result<Vec<_>, _>>()?;
 
+    let generics = method_generics_from_dtos(name, dto.generics)?;
+    let where_predicates = where_predicates_from_dtos(name, dto.where_predicates)?;
+
     let module_path = if dto.module_path.is_empty() {
         ModulePath::root()
     } else {
@@ -146,16 +149,18 @@ pub(super) fn type_entry_from_dto(
         }
     })?;
 
-    Ok(TypeEntry {
+    Ok(TypeEntry::new(
         action,
         role,
         kind,
         methods,
+        generics,
+        where_predicates,
         module_path,
-        docs: dto.docs,
+        dto.docs.map(DocString::new),
         spec_refs,
         informal_grounds,
-    })
+    ))
 }
 
 fn type_kind_from_dto(
@@ -603,7 +608,7 @@ pub(super) fn trait_entry_from_dto(
         }
     })?;
 
-    Ok(TraitEntry {
+    Ok(TraitEntry::new(
         action,
         role,
         methods,
@@ -613,10 +618,10 @@ pub(super) fn trait_entry_from_dto(
         generics,
         where_predicates,
         module_path,
-        docs: dto.docs,
+        dto.docs.map(DocString::new),
         spec_refs,
         informal_grounds,
-    })
+    ))
 }
 
 // validate_trait_item_names, inherent_impl_from_dto, and function_entry_from_dto are in

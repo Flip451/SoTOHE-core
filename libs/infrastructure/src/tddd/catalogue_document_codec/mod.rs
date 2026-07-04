@@ -452,18 +452,18 @@ mod tests {
         function_name: &str,
         predicate: WherePredicateDecl,
     ) -> CatalogueDocument {
-        let entry = FunctionEntry {
-            action: ItemAction::Add,
-            role: FunctionRole::FreeFunction,
-            params: vec![],
-            returns: TypeRef::new("()".to_string()).unwrap(),
-            is_async: false,
-            generics: vec![],
-            where_predicates: vec![predicate],
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        };
+        let entry = FunctionEntry::new(
+            ItemAction::Add,
+            FunctionRole::FreeFunction,
+            vec![],
+            TypeRef::new("()".to_string()).unwrap(),
+            false,
+            vec![],
+            vec![predicate],
+            None,
+            vec![],
+            vec![],
+        );
         let crate_name = CrateName::new("usecase".to_string()).unwrap();
         let layer = LayerId::try_new("usecase").unwrap();
         let mut doc = CatalogueDocument::new(4, crate_name.clone(), layer);
@@ -593,10 +593,10 @@ mod tests {
         let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
         assert_eq!(doc.types.len(), 1);
         let entry = doc.types.values().next().unwrap();
-        assert_eq!(entry.action, ItemAction::Add);
-        assert_eq!(entry.role, DataRole::value_object());
+        assert_eq!(entry.action(), ItemAction::Add);
+        assert_eq!(entry.role(), &DataRole::value_object());
         assert!(
-            matches!(&entry.kind, TypeKindV2::Struct(sk) if matches!(sk.shape, StructShape::Plain { .. }))
+            matches!(entry.kind(), TypeKindV2::Struct(sk) if matches!(sk.shape, StructShape::Plain { .. }))
         );
     }
 
@@ -620,7 +620,7 @@ mod tests {
         assert_eq!(doc.types.len(), 1);
         let entry = doc.types.values().next().unwrap();
         assert!(
-            matches!(&entry.kind, TypeKindV2::Struct(sk) if matches!(sk.shape, StructShape::Unit))
+            matches!(entry.kind(), TypeKindV2::Struct(sk) if matches!(sk.shape, StructShape::Unit))
         );
     }
 
@@ -642,7 +642,7 @@ mod tests {
 }"#;
         let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
         let entry = doc.types.values().next().unwrap();
-        match &entry.kind {
+        match entry.kind() {
             TypeKindV2::Struct(sk) => match &sk.shape {
                 StructShape::Tuple { fields, has_stripped_fields } => {
                     assert_eq!(fields.len(), 1);
@@ -677,7 +677,7 @@ mod tests {
 }"#;
         let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
         let entry = doc.types.values().next().unwrap();
-        match &entry.kind {
+        match entry.kind() {
             TypeKindV2::Struct(sk) => {
                 assert!(sk.typestate.is_some(), "expected typestate to be Some");
                 let ts = sk.typestate.as_ref().unwrap();
@@ -707,7 +707,7 @@ mod tests {
         let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
         assert_eq!(doc.traits.len(), 1);
         let entry = doc.traits.values().next().unwrap();
-        assert_eq!(entry.role, ContractRole::SecondaryPort);
+        assert_eq!(entry.role(), &ContractRole::SecondaryPort);
     }
 
     // -----------------------------------------------------------------------
@@ -734,11 +734,11 @@ mod tests {
 }"#;
         let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
         let entry = doc.traits.values().next().unwrap();
-        assert_eq!(entry.generics.len(), 1);
-        assert_eq!(entry.generics[0].name.as_str(), "T");
-        assert_eq!(entry.where_predicates.len(), 1);
-        assert_eq!(entry.where_predicates[0].lhs.as_str(), "T");
-        assert_eq!(entry.where_predicates[0].rhs[0].as_str(), "Clone");
+        assert_eq!(entry.generics().len(), 1);
+        assert_eq!(entry.generics()[0].name.as_str(), "T");
+        assert_eq!(entry.where_predicates().len(), 1);
+        assert_eq!(entry.where_predicates()[0].lhs.as_str(), "T");
+        assert_eq!(entry.where_predicates()[0].rhs[0].as_str(), "Clone");
     }
 
     #[test]
@@ -760,8 +760,8 @@ mod tests {
 }"#;
         let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
         let entry = doc.traits.values().next().unwrap();
-        assert!(entry.generics.is_empty(), "generics must default to empty Vec");
-        assert!(entry.where_predicates.is_empty(), "where_predicates must default to empty Vec");
+        assert!(entry.generics().is_empty(), "generics must default to empty Vec");
+        assert!(entry.where_predicates().is_empty(), "where_predicates must default to empty Vec");
     }
 
     #[test]
@@ -787,10 +787,10 @@ mod tests {
         let doc2 = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
         assert_eq!(doc, doc2);
         let entry = doc2.traits.values().next().unwrap();
-        assert_eq!(entry.generics[0].name.as_str(), "T");
-        assert_eq!(entry.generics[0].bounds[0].as_str(), "Clone");
-        assert_eq!(entry.where_predicates[0].lhs.as_str(), "T");
-        assert_eq!(entry.where_predicates[0].rhs[0].as_str(), "Send");
+        assert_eq!(entry.generics()[0].name.as_str(), "T");
+        assert_eq!(entry.generics()[0].bounds[0].as_str(), "Clone");
+        assert_eq!(entry.where_predicates()[0].lhs.as_str(), "T");
+        assert_eq!(entry.where_predicates()[0].rhs[0].as_str(), "Send");
     }
 
     #[test]
@@ -1094,7 +1094,7 @@ mod tests {
         let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
         let entry = doc.types.values().next().unwrap();
         // A-side retains typestate marker.
-        let sk = match &entry.kind {
+        let sk = match entry.kind() {
             domain::tddd::catalogue_v2::TypeKindV2::Struct(sk) => sk,
             _ => panic!("expected Struct"),
         };
@@ -1140,7 +1140,7 @@ mod tests {
         let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
         let entry = doc.types.values().next().unwrap();
         // A-side retains typestate marker.
-        let sk = match &entry.kind {
+        let sk = match entry.kind() {
             domain::tddd::catalogue_v2::TypeKindV2::Struct(sk) => sk,
             _ => panic!("expected Struct"),
         };
@@ -1234,9 +1234,9 @@ mod tests {
 }"#;
         let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
         let entry = doc.types.values().next().unwrap();
-        assert_eq!(entry.spec_refs.len(), 1);
-        assert_eq!(entry.spec_refs[0].anchor.as_ref(), "IN-01");
-        assert_eq!(entry.informal_grounds.len(), 1);
+        assert_eq!(entry.spec_refs().len(), 1);
+        assert_eq!(entry.spec_refs()[0].anchor.as_ref(), "IN-01");
+        assert_eq!(entry.informal_grounds().len(), 1);
 
         let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
         let doc2 = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
@@ -1267,9 +1267,9 @@ mod tests {
 }"#;
         let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
         let entry = doc.traits.values().next().unwrap();
-        assert_eq!(entry.spec_refs.len(), 1);
-        assert_eq!(entry.spec_refs[0].anchor.as_ref(), "AC-02");
-        assert_eq!(entry.informal_grounds.len(), 1);
+        assert_eq!(entry.spec_refs().len(), 1);
+        assert_eq!(entry.spec_refs()[0].anchor.as_ref(), "AC-02");
+        assert_eq!(entry.informal_grounds().len(), 1);
 
         let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
         let doc2 = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
@@ -1295,8 +1295,8 @@ mod tests {
         let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
         let entry = doc.traits.values().next().unwrap();
 
-        assert!(entry.assoc_types.is_empty(), "omitted assoc_types must default to empty");
-        assert!(entry.assoc_consts.is_empty(), "omitted assoc_consts must default to empty");
+        assert!(entry.assoc_types().is_empty(), "omitted assoc_types must default to empty");
+        assert!(entry.assoc_consts().is_empty(), "omitted assoc_consts must default to empty");
     }
 
     #[test]
@@ -1324,14 +1324,14 @@ mod tests {
         let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
         let entry = doc.traits.values().next().unwrap();
 
-        assert_eq!(entry.assoc_types.len(), 1);
-        assert_eq!(entry.assoc_types[0].name.as_str(), "Output");
-        assert_eq!(entry.assoc_types[0].bounds[0].as_str(), "Send");
-        assert_eq!(entry.assoc_types[0].default.as_ref().unwrap().as_str(), "Vec<u8>");
-        assert_eq!(entry.assoc_consts.len(), 1);
-        assert_eq!(entry.assoc_consts[0].name.as_str(), "ID");
-        assert_eq!(entry.assoc_consts[0].ty.as_str(), "usize");
-        assert_eq!(entry.assoc_consts[0].default_value.as_ref().map(|e| e.as_str()), Some("42"));
+        assert_eq!(entry.assoc_types().len(), 1);
+        assert_eq!(entry.assoc_types()[0].name.as_str(), "Output");
+        assert_eq!(entry.assoc_types()[0].bounds[0].as_str(), "Send");
+        assert_eq!(entry.assoc_types()[0].default.as_ref().unwrap().as_str(), "Vec<u8>");
+        assert_eq!(entry.assoc_consts().len(), 1);
+        assert_eq!(entry.assoc_consts()[0].name.as_str(), "ID");
+        assert_eq!(entry.assoc_consts()[0].ty.as_str(), "usize");
+        assert_eq!(entry.assoc_consts()[0].default_value.as_ref().map(|e| e.as_str()), Some("42"));
 
         let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
         assert!(encoded.contains("\"assoc_types\""), "assoc_types must encode: {encoded}");
@@ -1449,9 +1449,9 @@ mod tests {
 }"#;
         let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
         let entry = doc.functions.values().next().unwrap();
-        assert_eq!(entry.spec_refs.len(), 1);
-        assert_eq!(entry.spec_refs[0].anchor.as_ref(), "UC-01");
-        assert_eq!(entry.informal_grounds.len(), 1);
+        assert_eq!(entry.spec_refs().len(), 1);
+        assert_eq!(entry.spec_refs()[0].anchor.as_ref(), "UC-01");
+        assert_eq!(entry.informal_grounds().len(), 1);
 
         let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
         let doc2 = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
@@ -1476,8 +1476,8 @@ mod tests {
 }"#;
         let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
         let entry = doc.types.values().next().unwrap();
-        assert!(entry.spec_refs.is_empty());
-        assert!(entry.informal_grounds.is_empty());
+        assert!(entry.spec_refs().is_empty());
+        assert!(entry.informal_grounds().is_empty());
 
         let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
         // Encoded output must contain the grounding fields (always emitted).
@@ -1596,9 +1596,9 @@ mod tests {
 }"#;
         let doc = CatalogueDocumentCodec::decode(json, "usecase").unwrap();
         let trait_entry = doc.traits.values().next().unwrap();
-        assert_eq!(trait_entry.methods.len(), 1);
+        assert_eq!(trait_entry.methods().len(), 1);
         assert!(
-            trait_entry.methods[0].has_default_impl,
+            trait_entry.methods()[0].has_default_impl,
             "has_default_impl=true must round-trip through decode"
         );
     }
@@ -1608,15 +1608,18 @@ mod tests {
         let doc = CatalogueDocumentCodec::decode(mixed_trait_with_default_impl_json(), "usecase")
             .unwrap();
         let trait_entry = doc.traits.values().next().unwrap();
-        let required = trait_entry.methods.iter().find(|m| m.name.as_str() == "required").unwrap();
+        let required =
+            trait_entry.methods().iter().find(|m| m.name.as_str() == "required").unwrap();
         assert!(!required.has_default_impl, "omitted has_default_impl must default to false");
 
         let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
         let doc2 = CatalogueDocumentCodec::decode(&encoded, "usecase").unwrap();
         assert_eq!(doc, doc2);
         let trait_entry = doc2.traits.values().next().unwrap();
-        let required = trait_entry.methods.iter().find(|m| m.name.as_str() == "required").unwrap();
-        let provided = trait_entry.methods.iter().find(|m| m.name.as_str() == "provided").unwrap();
+        let required =
+            trait_entry.methods().iter().find(|m| m.name.as_str() == "required").unwrap();
+        let provided =
+            trait_entry.methods().iter().find(|m| m.name.as_str() == "provided").unwrap();
         assert!(!required.has_default_impl);
         assert!(provided.has_default_impl);
     }
@@ -1682,11 +1685,11 @@ mod tests {
 }"#;
         let doc = CatalogueDocumentCodec::decode(json, "usecase").unwrap();
         let entry = doc.functions.values().next().unwrap();
-        assert_eq!(entry.generics.len(), 2);
-        assert_eq!(entry.generics[0].name.as_str(), "R");
-        assert_eq!(entry.generics[0].bounds[0].as_str(), "TrackBlobReader<Error = E>");
-        assert_eq!(entry.generics[1].name.as_str(), "E");
-        assert_eq!(entry.generics[1].bounds[0].as_str(), "std::error::Error");
+        assert_eq!(entry.generics().len(), 2);
+        assert_eq!(entry.generics()[0].name.as_str(), "R");
+        assert_eq!(entry.generics()[0].bounds[0].as_str(), "TrackBlobReader<Error = E>");
+        assert_eq!(entry.generics()[1].name.as_str(), "E");
+        assert_eq!(entry.generics()[1].bounds[0].as_str(), "std::error::Error");
     }
 
     #[test]
@@ -1709,7 +1712,7 @@ mod tests {
         let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
         let entry = doc.functions.values().next().unwrap();
         assert!(
-            entry.generics.is_empty(),
+            entry.generics().is_empty(),
             "omitted generics must default to empty Vec for backward compatibility"
         );
     }
@@ -1740,8 +1743,8 @@ mod tests {
         let doc2 = CatalogueDocumentCodec::decode(&encoded, "usecase").unwrap();
         assert_eq!(doc, doc2);
         let entry = doc2.functions.values().next().unwrap();
-        assert_eq!(entry.generics.len(), 1);
-        assert_eq!(entry.generics[0].name.as_str(), "T");
+        assert_eq!(entry.generics().len(), 1);
+        assert_eq!(entry.generics()[0].name.as_str(), "T");
     }
 
     #[test]
@@ -1832,7 +1835,7 @@ mod tests {
 }"#;
         let doc = CatalogueDocumentCodec::decode(json, "usecase").unwrap();
         let entry = doc.traits.values().next().unwrap();
-        let method = &entry.methods[0];
+        let method = &entry.methods()[0];
         assert_eq!(method.where_predicates.len(), 1);
         assert_eq!(method.where_predicates[0].lhs.as_str(), "T");
         assert_eq!(method.where_predicates[0].rhs.len(), 2);
@@ -1867,9 +1870,9 @@ mod tests {
 }"#;
         let doc = CatalogueDocumentCodec::decode(json, "usecase").unwrap();
         let entry = doc.functions.values().next().unwrap();
-        assert_eq!(entry.where_predicates.len(), 1);
-        assert_eq!(entry.where_predicates[0].lhs.as_str(), "T");
-        assert_eq!(entry.where_predicates[0].rhs[0].as_str(), "Clone");
+        assert_eq!(entry.where_predicates().len(), 1);
+        assert_eq!(entry.where_predicates()[0].lhs.as_str(), "T");
+        assert_eq!(entry.where_predicates()[0].rhs[0].as_str(), "Clone");
 
         let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
         let doc2 = CatalogueDocumentCodec::decode(&encoded, "usecase").unwrap();
@@ -1912,7 +1915,7 @@ mod tests {
 }"#;
         use domain::tddd::catalogue_v2::methods::BoundOp;
         let doc = CatalogueDocumentCodec::decode(json, "usecase").unwrap();
-        let method = &doc.traits.values().next().unwrap().methods[0];
+        let method = &doc.traits.values().next().unwrap().methods()[0];
         assert_eq!(method.where_predicates.len(), 1, "expected 1 where predicate");
         let pred = &method.where_predicates[0];
         assert_eq!(pred.lhs.as_str(), "T", "legacy `type` field maps to `lhs`");
@@ -1987,7 +1990,7 @@ mod tests {
   "functions": {}
 }"#;
         let doc = CatalogueDocumentCodec::decode(json, "usecase").unwrap();
-        let method = &doc.traits.values().next().unwrap().methods[0];
+        let method = &doc.traits.values().next().unwrap().methods()[0];
         assert!(
             method.where_predicates.is_empty(),
             "omitted where_predicates must default to empty Vec"
@@ -2146,8 +2149,8 @@ mod tests {
         );
         let doc = CatalogueDocumentCodec::decode(&json, "usecase").unwrap();
         let fn_entry = doc.functions.values().next().expect("expected one function entry");
-        assert_eq!(fn_entry.where_predicates.len(), 1);
-        let pred = &fn_entry.where_predicates[0];
+        assert_eq!(fn_entry.where_predicates().len(), 1);
+        let pred = &fn_entry.where_predicates()[0];
         assert_eq!(pred.lhs.as_str(), "T::Assoc");
         assert_eq!(pred.rhs.len(), 1);
         assert_eq!(pred.rhs[0].as_str(), "u32");
@@ -2201,9 +2204,9 @@ mod tests {
         );
         let doc = result.unwrap();
         let fn_entry = doc.functions.values().next().expect("expected one function entry");
-        assert_eq!(fn_entry.where_predicates.len(), 1);
-        assert_eq!(fn_entry.where_predicates[0].lhs.as_str(), "T");
-        assert_eq!(fn_entry.where_predicates[0].operator, BoundOp::Equal);
+        assert_eq!(fn_entry.where_predicates().len(), 1);
+        assert_eq!(fn_entry.where_predicates()[0].lhs.as_str(), "T");
+        assert_eq!(fn_entry.where_predicates()[0].operator, BoundOp::Equal);
     }
 
     // -----------------------------------------------------------------------
@@ -2587,7 +2590,7 @@ mod tests {
 }"#;
         let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
         let entry = doc.types.values().next().unwrap();
-        match &entry.role {
+        match entry.role() {
             domain::tddd::catalogue_v2::roles::DataRole::EventPolicy { reacts_to } => {
                 let slice = reacts_to.as_slice();
                 assert_eq!(slice.len(), 2);
@@ -2681,7 +2684,7 @@ mod tests {
 }"#;
         let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
         let entry = doc.traits.values().next().unwrap();
-        match &entry.role {
+        match entry.role() {
             domain::tddd::catalogue_v2::roles::ContractRole::Repository { aggregate } => {
                 assert_eq!(aggregate.as_str(), "Order");
             }
@@ -2770,7 +2773,7 @@ mod tests {
 }"#;
         let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
         let entry = doc.types.values().next().unwrap();
-        assert_eq!(entry.role, DataRole::value_object());
+        assert_eq!(entry.role(), &DataRole::value_object());
         let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
         let doc2 = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
         assert_eq!(doc, doc2);
@@ -2802,7 +2805,7 @@ mod tests {
 }"#;
         let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
         let entry = doc.types.values().next().unwrap();
-        match &entry.role {
+        match entry.role() {
             DataRole::ValueObject { invariants } => {
                 assert_eq!(invariants.len(), 1);
                 assert_eq!(invariants[0].name.as_str(), "email_is_valid");
@@ -2841,7 +2844,7 @@ mod tests {
 }"#;
         let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
         let entry = doc.types.values().next().unwrap();
-        match &entry.role {
+        match entry.role() {
             DataRole::Entity { identity, invariants } => {
                 assert_eq!(identity.method_name().as_str(), "id");
                 assert_eq!(invariants.len(), 1);
@@ -2884,7 +2887,7 @@ mod tests {
 }"#;
         let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
         let entry = doc.types.values().next().unwrap();
-        match &entry.role {
+        match entry.role() {
             DataRole::AggregateRoot {
                 identity,
                 invariants,
@@ -2928,7 +2931,7 @@ mod tests {
 }"#;
         let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
         let entry = doc.types.values().next().unwrap();
-        match &entry.role {
+        match entry.role() {
             DataRole::DomainService { emits } => {
                 assert_eq!(emits.len(), 1);
                 assert_eq!(emits[0].as_str(), "PriceCalculated");
@@ -2960,7 +2963,7 @@ mod tests {
 }"#;
         let doc = CatalogueDocumentCodec::decode(json, "usecase").unwrap();
         let entry = doc.types.values().next().unwrap();
-        match &entry.role {
+        match entry.role() {
             DataRole::UseCase { handles } => {
                 assert_eq!(handles.len(), 1);
                 assert_eq!(handles[0].as_str(), "RegisterUserCommand");
@@ -2994,8 +2997,8 @@ mod tests {
         let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
         let entry = doc.types.values().next().unwrap();
         assert_eq!(
-            entry.role,
-            domain::tddd::catalogue_v2::roles::DataRole::DomainEvent,
+            entry.role(),
+            &domain::tddd::catalogue_v2::roles::DataRole::DomainEvent,
             "decoded role must be DomainEvent"
         );
         let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();

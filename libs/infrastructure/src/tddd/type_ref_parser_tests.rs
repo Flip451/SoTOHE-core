@@ -431,20 +431,20 @@ fn test_trait_impl_decl_for_type_generic_param_encodes_type_generic() {
     );
     doc.traits.insert(
         TraitName::new("MyTrait").unwrap(),
-        TraitEntry {
-            action: ItemAction::Add,
-            role: ContractRole::SpecificationPort,
-            methods: vec![],
-            assoc_types: vec![],
-            assoc_consts: vec![],
-            supertrait_bounds: vec![],
-            generics: vec![],
-            where_predicates: vec![],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        },
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SpecificationPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
     );
 
     let mut trait_impl =

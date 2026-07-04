@@ -70,16 +70,23 @@ pub(super) fn domain_to_dto(
 pub(super) fn type_entry_to_dto(
     entry: &TypeEntry,
 ) -> Result<TypeEntryDto, CatalogueDocumentCodecError> {
-    let methods = entry.methods.iter().map(method_decl_to_dto).collect::<Result<_, _>>()?;
+    let methods = entry.methods().iter().map(method_decl_to_dto).collect::<Result<_, _>>()?;
+    let where_predicates = entry
+        .where_predicates()
+        .iter()
+        .map(where_predicate_decl_to_dto)
+        .collect::<Result<_, _>>()?;
     Ok(TypeEntryDto {
-        action: entry.action.to_string(),
-        role: data_role_to_dto(&entry.role),
-        kind: type_kind_to_dto(&entry.kind),
+        action: entry.action().to_string(),
+        role: data_role_to_dto(entry.role()),
+        kind: type_kind_to_dto(entry.kind()),
         methods,
-        module_path: entry.module_path.to_string(),
-        docs: entry.docs.clone(),
-        spec_refs: spec_refs_to_dtos(&entry.spec_refs),
-        informal_grounds: informal_grounds_to_dtos(&entry.informal_grounds),
+        generics: method_generic_params_to_dtos(entry.generics()),
+        where_predicates,
+        module_path: entry.module_path().to_string(),
+        docs: entry.docs().map(|d| d.as_str().to_owned()),
+        spec_refs: spec_refs_to_dtos(entry.spec_refs()),
+        informal_grounds: informal_grounds_to_dtos(entry.informal_grounds()),
     })
 }
 
@@ -328,24 +335,31 @@ fn trait_impl_to_dto(t: &TraitImplDeclV2) -> Result<TraitImplDto, CatalogueDocum
 pub(super) fn trait_entry_to_dto(
     entry: &TraitEntry,
 ) -> Result<TraitEntryDto, CatalogueDocumentCodecError> {
-    let methods = entry.methods.iter().map(method_decl_to_dto).collect::<Result<_, _>>()?;
-    let where_predicates =
-        entry.where_predicates.iter().map(where_predicate_decl_to_dto).collect::<Result<_, _>>()?;
-    let assoc_types = entry.assoc_types.iter().map(assoc_type_decl_to_dto).collect();
-    let assoc_consts = entry.assoc_consts.iter().map(assoc_const_decl_to_dto).collect();
+    let methods = entry.methods().iter().map(method_decl_to_dto).collect::<Result<_, _>>()?;
+    let where_predicates = entry
+        .where_predicates()
+        .iter()
+        .map(where_predicate_decl_to_dto)
+        .collect::<Result<_, _>>()?;
+    let assoc_types = entry.assoc_types().iter().map(assoc_type_decl_to_dto).collect();
+    let assoc_consts = entry.assoc_consts().iter().map(assoc_const_decl_to_dto).collect();
     Ok(TraitEntryDto {
-        action: entry.action.to_string(),
-        role: contract_role_to_dto(&entry.role),
+        action: entry.action().to_string(),
+        role: contract_role_to_dto(entry.role()),
         methods,
         assoc_types,
         assoc_consts,
-        supertrait_bounds: entry.supertrait_bounds.iter().map(|b| b.as_str().to_owned()).collect(),
-        generics: method_generic_params_to_dtos(&entry.generics),
+        supertrait_bounds: entry
+            .supertrait_bounds()
+            .iter()
+            .map(|b| b.as_str().to_owned())
+            .collect(),
+        generics: method_generic_params_to_dtos(entry.generics()),
         where_predicates,
-        module_path: entry.module_path.to_string(),
-        docs: entry.docs.clone(),
-        spec_refs: spec_refs_to_dtos(&entry.spec_refs),
-        informal_grounds: informal_grounds_to_dtos(&entry.informal_grounds),
+        module_path: entry.module_path().to_string(),
+        docs: entry.docs().map(|d| d.as_str().to_owned()),
+        spec_refs: spec_refs_to_dtos(entry.spec_refs()),
+        informal_grounds: informal_grounds_to_dtos(entry.informal_grounds()),
     })
 }
 
@@ -396,18 +410,21 @@ pub(super) fn inherent_impl_to_dto(
 pub(super) fn function_entry_to_dto(
     entry: &FunctionEntry,
 ) -> Result<FunctionEntryDto, CatalogueDocumentCodecError> {
-    let where_predicates =
-        entry.where_predicates.iter().map(where_predicate_decl_to_dto).collect::<Result<_, _>>()?;
+    let where_predicates = entry
+        .where_predicates()
+        .iter()
+        .map(where_predicate_decl_to_dto)
+        .collect::<Result<_, _>>()?;
     Ok(FunctionEntryDto {
-        action: entry.action.to_string(),
-        role: entry.role.to_string(),
-        params: entry.params.iter().map(param_decl_to_dto).collect(),
-        returns: entry.returns.as_str().to_owned(),
-        is_async: entry.is_async,
-        generics: method_generic_params_to_dtos(&entry.generics),
+        action: entry.action().to_string(),
+        role: entry.role().to_string(),
+        params: entry.params().iter().map(param_decl_to_dto).collect(),
+        returns: entry.returns().as_str().to_owned(),
+        is_async: entry.is_async(),
+        generics: method_generic_params_to_dtos(entry.generics()),
         where_predicates,
-        docs: entry.docs.clone(),
-        spec_refs: spec_refs_to_dtos(&entry.spec_refs),
-        informal_grounds: informal_grounds_to_dtos(&entry.informal_grounds),
+        docs: entry.docs().map(|d| d.as_str().to_owned()),
+        spec_refs: spec_refs_to_dtos(entry.spec_refs()),
+        informal_grounds: informal_grounds_to_dtos(entry.informal_grounds()),
     })
 }

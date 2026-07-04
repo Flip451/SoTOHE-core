@@ -504,20 +504,21 @@ mod tests {
         let crate_name = CrateName::new("domain").unwrap();
         let layer = domain::tddd::LayerId::try_new("domain").unwrap();
         let mut doc = CatalogueDocument::new(3, crate_name, layer);
-        let entry = TypeEntry {
+        let entry = TypeEntry::new(
             action,
-            role: DataRole::value_object(),
-            kind: TypeKindV2::Struct(StructKind::new(
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: vec![], has_stripped_fields: false },
                 None,
             )),
-            methods: vec![],
-
-            module_path: ModulePath::root(),
-            docs: None,
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
             spec_refs,
             informal_grounds,
-        };
+        );
         doc.types.insert(TypeName::new(name).unwrap(), entry);
         doc
     }
@@ -541,20 +542,21 @@ mod tests {
         let layer = domain::tddd::LayerId::try_new("domain").unwrap();
         let mut doc = CatalogueDocument::new(3, crate_name, layer);
         for (name, action, spec_refs, informal_grounds) in entries {
-            let entry = TypeEntry {
+            let entry = TypeEntry::new(
                 action,
-                role: DataRole::value_object(),
-                kind: TypeKindV2::Struct(StructKind::new(
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(
                     StructShape::Plain { fields: vec![], has_stripped_fields: false },
                     None,
                 )),
-                methods: vec![],
-
-                module_path: ModulePath::root(),
-                docs: None,
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
                 spec_refs,
                 informal_grounds,
-            };
+            );
             doc.types.insert(TypeName::new(name).unwrap(), entry);
         }
         doc

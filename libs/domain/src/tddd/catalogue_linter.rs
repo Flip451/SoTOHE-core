@@ -1267,61 +1267,65 @@ mod tests {
     }
 
     fn make_type_entry_with_kind(role: DataRole, kind: TypeKindV2) -> TypeEntry {
-        TypeEntry {
-            action: ItemAction::Add,
+        TypeEntry::new(
+            ItemAction::Add,
             role,
             kind,
-            methods: vec![],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        }
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        )
     }
 
     fn make_type_entry_with_methods(role: DataRole, methods: Vec<MethodDeclaration>) -> TypeEntry {
-        TypeEntry {
-            action: ItemAction::Add,
+        TypeEntry::new(
+            ItemAction::Add,
             role,
-            kind: unit_struct_kind(),
+            unit_struct_kind(),
             methods,
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        }
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        )
     }
 
     fn make_trait_entry(role: ContractRole) -> TraitEntry {
-        TraitEntry {
-            action: ItemAction::Add,
+        TraitEntry::new(
+            ItemAction::Add,
             role,
-            methods: vec![],
-            assoc_types: vec![],
-            assoc_consts: vec![],
-            supertrait_bounds: vec![],
-            generics: vec![],
-            where_predicates: vec![],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        }
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        )
     }
 
     fn make_function_entry(role: FunctionRole) -> FunctionEntry {
-        FunctionEntry {
-            action: ItemAction::Add,
+        FunctionEntry::new(
+            ItemAction::Add,
             role,
-            params: vec![],
-            returns: TypeRef::new("()").unwrap(),
-            is_async: false,
-            generics: vec![],
-            where_predicates: vec![],
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        }
+            vec![],
+            TypeRef::new("()").unwrap(),
+            false,
+            vec![],
+            vec![],
+            None,
+            vec![],
+            vec![],
+        )
     }
 
     fn method_ref_no_params(
@@ -1892,19 +1896,21 @@ mod tests {
     fn test_method_reference_signature_ac13_pass_when_invariant_method_valid() {
         // Entity with invariant "is_valid" → method &self, no params, bool return → pass
         let mut doc = make_doc("domain");
-        let entity = TypeEntry {
-            action: ItemAction::Add,
-            role: DataRole::Entity {
+        let entity = TypeEntry::new(
+            ItemAction::Add,
+            DataRole::Entity {
                 identity: identity_accessor("id"),
                 invariants: vec![invariant_decl("is_valid")],
             },
-            kind: unit_struct_kind(),
-            methods: vec![method_shared_ref_no_params("is_valid", "bool")],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        };
+            unit_struct_kind(),
+            vec![method_shared_ref_no_params("is_valid", "bool")],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        );
         doc.types.insert(TypeName::new("Order").unwrap(), entity);
         let violations = run_rule(
             &doc,
@@ -1920,19 +1926,21 @@ mod tests {
     fn test_method_reference_signature_ac13_violation_when_method_missing() {
         // Entity with invariant "is_valid" → method not in public methods → 1 violation
         let mut doc = make_doc("domain");
-        let entity = TypeEntry {
-            action: ItemAction::Add,
-            role: DataRole::Entity {
+        let entity = TypeEntry::new(
+            ItemAction::Add,
+            DataRole::Entity {
                 identity: identity_accessor("id"),
                 invariants: vec![invariant_decl("is_valid")],
             },
-            kind: unit_struct_kind(),
-            methods: vec![], // method missing
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        };
+            unit_struct_kind(),
+            vec![], // method missing
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        );
         doc.types.insert(TypeName::new("Order").unwrap(), entity);
         let violations = run_rule(
             &doc,
@@ -1951,19 +1959,21 @@ mod tests {
     fn test_method_reference_signature_ac13_violation_when_wrong_receiver() {
         // Entity with invariant "is_valid" → method has &mut self → 1 violation
         let mut doc = make_doc("domain");
-        let entity = TypeEntry {
-            action: ItemAction::Add,
-            role: DataRole::Entity {
+        let entity = TypeEntry::new(
+            ItemAction::Add,
+            DataRole::Entity {
                 identity: identity_accessor("id"),
                 invariants: vec![invariant_decl("is_valid")],
             },
-            kind: unit_struct_kind(),
-            methods: vec![method_exclusive_ref_no_params("is_valid", "bool")],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        };
+            unit_struct_kind(),
+            vec![method_exclusive_ref_no_params("is_valid", "bool")],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        );
         doc.types.insert(TypeName::new("Order").unwrap(), entity);
         let violations = run_rule(
             &doc,
@@ -1985,24 +1995,26 @@ mod tests {
     fn test_method_reference_signature_ac13_violation_when_has_params() {
         // Entity with invariant "is_valid" → method has a param → 1 violation
         let mut doc = make_doc("domain");
-        let entity = TypeEntry {
-            action: ItemAction::Add,
-            role: DataRole::Entity {
+        let entity = TypeEntry::new(
+            ItemAction::Add,
+            DataRole::Entity {
                 identity: identity_accessor("id"),
                 invariants: vec![invariant_decl("is_valid")],
             },
-            kind: unit_struct_kind(),
-            methods: vec![method_with_params(
+            unit_struct_kind(),
+            vec![method_with_params(
                 "is_valid",
                 Some(SelfReceiver::SharedRef),
                 vec![("x", "i32")],
                 "bool",
             )],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        };
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        );
         doc.types.insert(TypeName::new("Order").unwrap(), entity);
         let violations = run_rule(
             &doc,
@@ -2024,16 +2036,18 @@ mod tests {
     fn test_accessor_signature_required_ac14_pass_when_valid_getter() {
         // Entity with identity "id" → method &self, no params, non-unit return → pass
         let mut doc = make_doc("domain");
-        let entity = TypeEntry {
-            action: ItemAction::Add,
-            role: DataRole::Entity { identity: identity_accessor("id"), invariants: vec![] },
-            kind: unit_struct_kind(),
-            methods: vec![method_shared_ref_no_params("id", "OrderId")],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        };
+        let entity = TypeEntry::new(
+            ItemAction::Add,
+            DataRole::Entity { identity: identity_accessor("id"), invariants: vec![] },
+            unit_struct_kind(),
+            vec![method_shared_ref_no_params("id", "OrderId")],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        );
         doc.types.insert(TypeName::new("Order").unwrap(), entity);
         let violations = run_rule(
             &doc,
@@ -2049,16 +2063,18 @@ mod tests {
     fn test_accessor_signature_required_ac14_violation_when_getter_missing() {
         // Entity with identity "id" → method not present → 1 violation
         let mut doc = make_doc("domain");
-        let entity = TypeEntry {
-            action: ItemAction::Add,
-            role: DataRole::Entity { identity: identity_accessor("id"), invariants: vec![] },
-            kind: unit_struct_kind(),
-            methods: vec![],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        };
+        let entity = TypeEntry::new(
+            ItemAction::Add,
+            DataRole::Entity { identity: identity_accessor("id"), invariants: vec![] },
+            unit_struct_kind(),
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        );
         doc.types.insert(TypeName::new("Order").unwrap(), entity);
         let violations = run_rule(
             &doc,
@@ -2077,16 +2093,18 @@ mod tests {
     fn test_accessor_signature_required_ac14_violation_when_unit_return() {
         // Entity identity getter returns "()" → 1 violation
         let mut doc = make_doc("domain");
-        let entity = TypeEntry {
-            action: ItemAction::Add,
-            role: DataRole::Entity { identity: identity_accessor("id"), invariants: vec![] },
-            kind: unit_struct_kind(),
-            methods: vec![method_shared_ref_no_params("id", "()")],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        };
+        let entity = TypeEntry::new(
+            ItemAction::Add,
+            DataRole::Entity { identity: identity_accessor("id"), invariants: vec![] },
+            unit_struct_kind(),
+            vec![method_shared_ref_no_params("id", "()")],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        );
         doc.types.insert(TypeName::new("Order").unwrap(), entity);
         let violations = run_rule(
             &doc,
@@ -3345,8 +3363,18 @@ mod tests {
 
         // domain layer: OrderPlaced is Delete-marked — must be invisible to lookups
         let mut domain_doc = make_doc("domain");
-        let mut deleted_entry = make_type_entry(DataRole::DomainEvent);
-        deleted_entry.action = ItemAction::Delete;
+        let deleted_entry = TypeEntry::new(
+            ItemAction::Delete,
+            DataRole::DomainEvent,
+            unit_struct_kind(),
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        );
         domain_doc.types.insert(TypeName::new("OrderPlaced").unwrap(), deleted_entry);
 
         // usecase layer: PlaceOrder.handles references "domain::OrderPlaced"
@@ -3402,10 +3430,20 @@ mod tests {
         // domain layer: OrderRepo is Delete-marked — must not be iterated by the
         // NoRoleInMethodSignature trait loop.
         let mut domain_doc = make_doc("domain");
-        let mut deleted_trait = make_trait_entry(ContractRole::Repository {
-            aggregate: TypeRef::new("Order").unwrap(),
-        });
-        deleted_trait.action = ItemAction::Delete;
+        let deleted_trait = TraitEntry::new(
+            ItemAction::Delete,
+            ContractRole::Repository { aggregate: TypeRef::new("Order").unwrap() },
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        );
         domain_doc.traits.insert(TraitName::new("OrderRepo").unwrap(), deleted_trait);
 
         // usecase layer: MyDto method param uses the qualified form "domain::OrderRepo"
@@ -3467,8 +3505,18 @@ mod tests {
         // domain layer: OrderPlaced is Delete-marked — must not be iterated by the
         // NoRoleInMethodSignature TYPE loop.
         let mut domain_doc = make_doc("domain");
-        let mut deleted_type = make_type_entry(DataRole::DomainEvent);
-        deleted_type.action = ItemAction::Delete;
+        let deleted_type = TypeEntry::new(
+            ItemAction::Delete,
+            DataRole::DomainEvent,
+            unit_struct_kind(),
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        );
         domain_doc.types.insert(TypeName::new("OrderPlaced").unwrap(), deleted_type);
 
         // usecase layer: MyUseCase method return type uses the qualified form
@@ -3560,16 +3608,18 @@ mod tests {
         // place, no violation fires.
         {
             let mut doc = make_doc("domain");
-            let deleted_entry = TypeEntry {
-                action: ItemAction::Delete,
-                role: DataRole::ValueObject { invariants: vec![] }, // empty — would violate
-                kind: unit_struct_kind(),
-                methods: vec![],
-                module_path: ModulePath::root(),
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            };
+            let deleted_entry = TypeEntry::new(
+                ItemAction::Delete,
+                DataRole::ValueObject { invariants: vec![] }, // empty — would violate
+                unit_struct_kind(),
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            );
             doc.types.insert(TypeName::new("DeletedValue").unwrap(), deleted_entry);
 
             let violations = run_rule(
@@ -3592,16 +3642,18 @@ mod tests {
         // violation fires.
         {
             let mut doc = make_doc("domain");
-            let deleted_entry = TypeEntry {
-                action: ItemAction::Delete,
-                role: DataRole::value_object(),
-                kind: plain_struct_kind(vec![field_decl("pub_field", "String")]), // public — would violate
-                methods: vec![],
-                module_path: ModulePath::root(),
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            };
+            let deleted_entry = TypeEntry::new(
+                ItemAction::Delete,
+                DataRole::value_object(),
+                plain_struct_kind(vec![field_decl("pub_field", "String")]), // public — would violate
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            );
             doc.types.insert(TypeName::new("DeletedValue").unwrap(), deleted_entry);
 
             let violations = run_rule(
@@ -3628,16 +3680,18 @@ mod tests {
         // not be flagged as missing PartialEq, because a Reference entry is
         // opaque to this catalogue's rule evaluations.
         let mut doc = make_doc("domain");
-        let reference_entry = TypeEntry {
-            action: ItemAction::Reference,
-            role: DataRole::value_object(),
-            kind: unit_struct_kind(),
-            methods: vec![],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        };
+        let reference_entry = TypeEntry::new(
+            ItemAction::Reference,
+            DataRole::value_object(),
+            unit_struct_kind(),
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        );
         doc.types.insert(TypeName::new("ReferencedValue").unwrap(), reference_entry);
         // Deliberately no TraitImplDeclV2 pushed to doc.trait_impls: a
         // Reference entry's trait impls are not restated in this catalogue.
@@ -3960,24 +4014,26 @@ mod tests {
         // Must not be scanned as either an aggregate source or an external entry.
         // Without the `action != Delete` filter in the other_entry.methods scan,
         // this method would cause a second violation to fire for OrderAgg/DeletedAgg.
-        let deleted_agg = TypeEntry {
-            action: ItemAction::Delete,
-            role: DataRole::AggregateRoot {
+        let deleted_agg = TypeEntry::new(
+            ItemAction::Delete,
+            DataRole::AggregateRoot {
                 identity: IdentityAccessor::new(MethodName::new("id").unwrap()),
                 invariants: vec![],
                 exclusive_members: vec![TypeRef::new("OrderLine").unwrap()],
                 shared_value_objects: vec![TypeRef::new("Money").unwrap()],
                 emits: vec![],
             },
-            kind: unit_struct_kind(),
+            unit_struct_kind(),
             // Method references OrderLine — would trigger a second violation if
             // the other_entry.methods scan were not guarded by action != Delete.
-            methods: vec![method_shared_ref_no_params("get_line", "OrderLine")],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        };
+            vec![method_shared_ref_no_params("get_line", "OrderLine")],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        );
         doc.types.insert(TypeName::new("DeletedAgg").unwrap(), deleted_agg);
 
         // ExternalEntry: references OrderLine (exclusive member) — should be a violation.
@@ -4188,13 +4244,25 @@ mod tests {
     #[test]
     fn test_forbid_primitive_in_types_detects_param_and_return_on_trait_method() {
         let mut doc = make_doc("domain");
-        let mut trait_entry = make_trait_entry(ContractRole::SpecificationPort);
-        trait_entry.methods.push(method_with_params(
-            "check",
-            Some(SelfReceiver::SharedRef),
-            vec![("input", "String")],
-            "String",
-        ));
+        let trait_entry = TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SpecificationPort,
+            vec![method_with_params(
+                "check",
+                Some(SelfReceiver::SharedRef),
+                vec![("input", "String")],
+                "String",
+            )],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        );
         doc.traits.insert(TraitName::new("Checker").unwrap(), trait_entry);
 
         let violations = run_rule(
@@ -4220,14 +4288,21 @@ mod tests {
     #[test]
     fn test_forbid_primitive_in_types_detects_param_and_return_on_free_function() {
         let mut doc = make_doc("domain");
-        let entry = FunctionEntry {
-            params: vec![ParamDeclaration::new(
+        let entry = FunctionEntry::new(
+            ItemAction::Add,
+            FunctionRole::FreeFunction,
+            vec![ParamDeclaration::new(
                 ParamName::new("value").unwrap(),
                 TypeRef::new("String").unwrap(),
             )],
-            returns: TypeRef::new("String").unwrap(),
-            ..make_function_entry(FunctionRole::FreeFunction)
-        };
+            TypeRef::new("String").unwrap(),
+            false,
+            vec![],
+            vec![],
+            None,
+            vec![],
+            vec![],
+        );
         doc.functions.insert(
             FunctionPath::at_root(
                 CrateName::new("domain").unwrap(),
@@ -4714,10 +4789,20 @@ mod tests {
         // `push_generic_and_where_slots` -- a distinct code path that must
         // also skip Bound slots when Bound is not requested.
         let mut doc = make_doc("domain");
-        let trait_entry = TraitEntry {
-            supertrait_bounds: vec![TypeRef::new("?Sized").unwrap()],
-            ..make_trait_entry(ContractRole::SpecificationPort)
-        };
+        let trait_entry = TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SpecificationPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![TypeRef::new("?Sized").unwrap()],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        );
         doc.traits.insert(TraitName::new("Checker").unwrap(), trait_entry);
 
         let all = all_catalogues_single(&doc);
@@ -4797,6 +4882,99 @@ mod tests {
             "expected the violation to be attributed to ResultErr, got: {}",
             violations[0].message()
         );
+    }
+
+    #[test]
+    fn test_forbid_primitive_in_types_scans_result_err_inside_type_entry_generic_bound() {
+        let mut doc = make_doc("domain");
+        doc.types.insert(
+            TypeName::new("Money").unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                unit_struct_kind(),
+                vec![],
+                vec![MethodGenericParam {
+                    name: ParamName::new("T").unwrap(),
+                    bounds: vec![TypeRef::new("Into<Result<(), String>>").unwrap()],
+                }],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        let all = all_catalogues_single(&doc);
+        let target_layer = doc.layer.clone();
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::all_roles(),
+            CatalogueLinterRuleKind::ForbidPrimitiveInTypes {
+                primitives: NonEmptyVec::new(PrimitiveName::new("String").unwrap(), vec![]),
+                layers: NonEmptyVec::new(layer("domain"), vec![]),
+                positions: NonEmptyVec::new(PrimitiveOccurrencePosition::ResultErr, vec![]),
+            },
+        )
+        .unwrap();
+
+        let violations =
+            evaluate_catalogue_lint(&[rule], &all, &target_layer, &BoundResultErrScanner).unwrap();
+
+        assert_eq!(
+            violations.len(),
+            1,
+            "expected exactly 1 ResultErr violation from the type-entry generic bound, \
+             got: {violations:?}"
+        );
+        assert_eq!(violations[0].entry_name(), "Money");
+    }
+
+    #[test]
+    fn test_forbid_primitive_in_types_scans_result_err_inside_type_entry_where_predicate() {
+        let mut doc = make_doc("domain");
+        doc.types.insert(
+            TypeName::new("Money").unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                unit_struct_kind(),
+                vec![],
+                vec![],
+                vec![WherePredicateDecl {
+                    lhs: TypeRef::new("T").unwrap(),
+                    rhs: vec![TypeRef::new("Into<Result<(), String>>").unwrap()],
+                    operator: BoundOp::Bound,
+                }],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        let all = all_catalogues_single(&doc);
+        let target_layer = doc.layer.clone();
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::all_roles(),
+            CatalogueLinterRuleKind::ForbidPrimitiveInTypes {
+                primitives: NonEmptyVec::new(PrimitiveName::new("String").unwrap(), vec![]),
+                layers: NonEmptyVec::new(layer("domain"), vec![]),
+                positions: NonEmptyVec::new(PrimitiveOccurrencePosition::ResultErr, vec![]),
+            },
+        )
+        .unwrap();
+
+        let violations =
+            evaluate_catalogue_lint(&[rule], &all, &target_layer, &BoundResultErrScanner).unwrap();
+
+        assert_eq!(
+            violations.len(),
+            1,
+            "expected exactly 1 ResultErr violation from the type-entry where-predicate \
+             bound, got: {violations:?}"
+        );
+        assert_eq!(violations[0].entry_name(), "Money");
     }
 
     // ------------------------------------------------------------------

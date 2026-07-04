@@ -492,7 +492,7 @@ pub(super) fn find_in_catalogue(
     if let Some((_, entry)) = catalogue
         .types
         .iter()
-        .find(|(tn, entry)| tn.as_str() == bare_name && entry.action != ItemAction::Delete)
+        .find(|(tn, entry)| tn.as_str() == bare_name && entry.action() != ItemAction::Delete)
     {
         return Some(entry_role_kind(entry));
     }
@@ -500,6 +500,6 @@ pub(super) fn find_in_catalogue(
     catalogue
         .traits
         .iter()
-        .find(|(tn, entry)| tn.as_str() == bare_name && entry.action != ItemAction::Delete)
-        .map(|(_, e)| RoleKind::from_contract_role(&e.role))
+        .find(|(tn, entry)| tn.as_str() == bare_name && entry.action() != ItemAction::Delete)
+        .map(|(_, e)| RoleKind::from_contract_role(e.role()))
 }

@@ -8,7 +8,7 @@ use domain::tddd::catalogue_v2::entries::{
     AssocConstDecl, AssocTypeDecl, FunctionEntry, InherentImplDeclV2,
 };
 use domain::tddd::catalogue_v2::roles::{FunctionRole, ItemAction};
-use domain::tddd::catalogue_v2::{MethodDeclaration, TypeName, TypeRef};
+use domain::tddd::catalogue_v2::{DocString, MethodDeclaration, TypeName, TypeRef};
 
 use std::str::FromStr;
 
@@ -127,18 +127,18 @@ pub(super) fn function_entry_from_dto(
         }
     })?;
 
-    Ok(FunctionEntry {
+    Ok(FunctionEntry::new(
         action,
         role,
         params,
         returns,
-        is_async: dto.is_async,
+        dto.is_async,
         generics,
         where_predicates,
-        docs: dto.docs,
+        dto.docs.map(DocString::new),
         spec_refs,
         informal_grounds,
-    })
+    ))
 }
 
 #[cfg(test)]

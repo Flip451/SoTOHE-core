@@ -252,19 +252,21 @@ include_function_roles = []
         // This is necessary for the edge-config lookup to be triggered (CN-02).
         doc.types.insert(
             TypeName::new("PayloadType").unwrap(),
-            TypeEntry {
-                action: ItemAction::Add,
-                role: DataRole::value_object(),
-                kind: TypeKindV2::Struct(StructKind::new(
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(
                     StructShape::Plain { fields: vec![], has_stripped_fields: false },
                     None,
                 )),
-                methods: vec![],
-                module_path: ModulePath::root(),
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            },
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
         );
 
         let tuple_variant = VariantDecl::tuple(
@@ -273,16 +275,18 @@ include_function_roles = []
         );
         doc.types.insert(
             TypeName::new("MyEnum").unwrap(),
-            TypeEntry {
-                action: ItemAction::Add,
-                role: DataRole::value_object(),
-                kind: TypeKindV2::Enum { variants: vec![tuple_variant] },
-                methods: vec![],
-                module_path: ModulePath::root(),
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            },
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Enum { variants: vec![tuple_variant] },
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
         );
 
         let result = adapter.render(&[doc], &[layer], &opts);
@@ -363,38 +367,40 @@ include_function_roles = []
         // Module-level type (creates layer → module → entry nesting).
         doc.types.insert(
             TypeName::new("ModuleType").unwrap(),
-            TypeEntry {
-                action: ItemAction::Add,
-                role: DataRole::value_object(),
-                kind: TypeKindV2::Struct(StructKind::new(
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(
                     StructShape::Plain { fields: vec![], has_stripped_fields: false },
                     None,
                 )),
-                methods: vec![],
-                module_path: ModulePath::from_segments(vec!["submod".to_string()]).unwrap(),
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            },
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::from_segments(vec!["submod".to_string()]).unwrap(),
+                None,
+                vec![],
+                vec![],
+            ),
         );
 
         // Root-level trait (creates layer → entry nesting without module subgraph).
         doc.traits.insert(
             TraitName::new("RootTrait").unwrap(),
-            TraitEntry {
-                action: ItemAction::Add,
-                role: ContractRole::SecondaryPort,
-                methods: vec![],
-                assoc_types: vec![],
-                assoc_consts: vec![],
-                supertrait_bounds: vec![],
-                generics: vec![],
-                where_predicates: vec![],
-                module_path: ModulePath::root(),
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            },
+            TraitEntry::new(
+                ItemAction::Add,
+                ContractRole::SecondaryPort,
+                vec![],
+                vec![],
+                vec![],
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
         );
 
         let content = adapter.render(&[doc], &[layer], &opts).unwrap();
@@ -496,37 +502,41 @@ include_function_roles = []
         // Root entry (module_path = [])
         doc.types.insert(
             TypeName::new("RootType").unwrap(),
-            TypeEntry {
-                action: ItemAction::Add,
-                role: DataRole::value_object(),
-                kind: TypeKindV2::Struct(StructKind::new(
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(
                     StructShape::Plain { fields: vec![], has_stripped_fields: false },
                     None,
                 )),
-                methods: vec![],
-                module_path: ModulePath::root(),
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            },
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
         );
 
         // Non-root entry
         doc.types.insert(
             TypeName::new("ModuleType").unwrap(),
-            TypeEntry {
-                action: ItemAction::Add,
-                role: DataRole::entity().unwrap(),
-                kind: TypeKindV2::Struct(StructKind::new(
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::entity().unwrap(),
+                TypeKindV2::Struct(StructKind::new(
                     StructShape::Plain { fields: vec![], has_stripped_fields: false },
                     None,
                 )),
-                methods: vec![],
-                module_path: ModulePath::from_segments(vec!["user".to_string()]).unwrap(),
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            },
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::from_segments(vec!["user".to_string()]).unwrap(),
+                None,
+                vec![],
+                vec![],
+            ),
         );
 
         let result = adapter.render(&[doc], &[layer], &opts).unwrap();
@@ -571,37 +581,41 @@ include_function_roles = []
 
         doc.types.insert(
             TypeName::new("Pending").unwrap(),
-            TypeEntry {
-                action: ItemAction::Add,
-                role: DataRole::value_object(),
-                kind: TypeKindV2::Struct(StructKind::new(
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(
                     StructShape::Plain { fields: vec![], has_stripped_fields: false },
                     Some(marker),
                 )),
-                methods: vec![approve_method],
-                module_path: ModulePath::root(),
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            },
+                vec![approve_method],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
         );
 
         // Declare `Approved` as a catalogue type so the transition edge target resolves.
         doc.types.insert(
             TypeName::new("Approved").unwrap(),
-            TypeEntry {
-                action: ItemAction::Add,
-                role: DataRole::value_object(),
-                kind: TypeKindV2::Struct(StructKind::new(
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(
                     StructShape::Plain { fields: vec![], has_stripped_fields: false },
                     None,
                 )),
-                methods: vec![],
-                module_path: ModulePath::root(),
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            },
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
         );
 
         let result = adapter.render(&[doc], &[layer], &opts).unwrap();
@@ -628,19 +642,21 @@ include_function_roles = []
 
         doc.types.insert(
             TypeName::new("Email").unwrap(),
-            TypeEntry {
-                action: ItemAction::Add,
-                role: DataRole::value_object(),
-                kind: TypeKindV2::Struct(StructKind::new(
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(
                     StructShape::Plain { fields: vec![], has_stripped_fields: false },
                     None,
                 )),
-                methods: vec![],
-                module_path: ModulePath::root(),
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            },
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
         );
 
         // Two InherentImplDeclV2 for the same type (AC-04).
@@ -703,16 +719,18 @@ include_function_roles = []
 
         doc.types.insert(
             TypeName::new("Option").unwrap(),
-            TypeEntry {
-                action: ItemAction::Add,
-                role: DataRole::value_object(),
-                kind: TypeKindV2::Enum { variants: vec![tuple_variant, unit_variant] },
-                methods: vec![],
-                module_path: ModulePath::root(),
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            },
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Enum { variants: vec![tuple_variant, unit_variant] },
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
         );
 
         let result = adapter.render(&[doc], &[layer], &opts).unwrap();
@@ -740,19 +758,21 @@ include_function_roles = []
         // Declare `ErrorMessage` as a catalogue type so the variant payload edge resolves.
         doc.types.insert(
             TypeName::new("ErrorMessage").unwrap(),
-            TypeEntry {
-                action: ItemAction::Add,
-                role: DataRole::value_object(),
-                kind: TypeKindV2::Struct(StructKind::new(
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(
                     StructShape::Plain { fields: vec![], has_stripped_fields: false },
                     None,
                 )),
-                methods: vec![],
-                module_path: ModulePath::root(),
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            },
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
         );
 
         let field = FieldDecl::new(
@@ -764,16 +784,18 @@ include_function_roles = []
 
         doc.types.insert(
             TypeName::new("AppError").unwrap(),
-            TypeEntry {
-                action: ItemAction::Add,
-                role: DataRole::ErrorType,
-                kind: TypeKindV2::Enum { variants: vec![struct_variant] },
-                methods: vec![],
-                module_path: ModulePath::root(),
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            },
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::ErrorType,
+                TypeKindV2::Enum { variants: vec![struct_variant] },
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
         );
 
         let result = adapter.render(&[doc], &[layer], &opts).unwrap();
@@ -803,38 +825,42 @@ include_function_roles = []
         // Declare `Email` as a catalogue type so the field edge target resolves.
         doc.types.insert(
             TypeName::new("Email").unwrap(),
-            TypeEntry {
-                action: ItemAction::Add,
-                role: DataRole::value_object(),
-                kind: TypeKindV2::Struct(StructKind::new(
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(
                     StructShape::Plain { fields: vec![], has_stripped_fields: false },
                     None,
                 )),
-                methods: vec![],
-                module_path: ModulePath::root(),
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            },
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
         );
 
         let field =
             FieldDecl::new(FieldName::new("email").unwrap(), TypeRef::new("Email").unwrap());
         doc.types.insert(
             TypeName::new("User").unwrap(),
-            TypeEntry {
-                action: ItemAction::Add,
-                role: DataRole::entity().unwrap(),
-                kind: TypeKindV2::Struct(StructKind::new(
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::entity().unwrap(),
+                TypeKindV2::Struct(StructKind::new(
                     StructShape::Plain { fields: vec![field], has_stripped_fields: false },
                     None,
                 )),
-                methods: vec![],
-                module_path: ModulePath::root(),
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            },
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
         );
 
         let result = adapter.render(&[doc], &[layer], &opts).unwrap();
@@ -857,22 +883,24 @@ include_function_roles = []
             FieldDecl::new(FieldName::new("secret").unwrap(), TypeRef::new("SecretKey").unwrap());
         doc.types.insert(
             TypeName::new("Config").unwrap(),
-            TypeEntry {
-                action: ItemAction::Add,
-                role: DataRole::Dto,
-                kind: TypeKindV2::Struct(StructKind::new(
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::Dto,
+                TypeKindV2::Struct(StructKind::new(
                     StructShape::Plain {
                         fields: vec![field],
                         has_stripped_fields: true, // stripped — no field edge
                     },
                     None,
                 )),
-                methods: vec![],
-                module_path: ModulePath::root(),
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            },
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
         );
 
         let result = adapter.render(&[doc], &[layer], &opts).unwrap();
@@ -903,28 +931,30 @@ include_function_roles = []
         for type_name in ["UserId", "GroupId"] {
             doc.types.insert(
                 TypeName::new(type_name).unwrap(),
-                TypeEntry {
-                    action: ItemAction::Add,
-                    role: DataRole::value_object(),
-                    kind: TypeKindV2::Struct(StructKind::new(
+                TypeEntry::new(
+                    ItemAction::Add,
+                    DataRole::value_object(),
+                    TypeKindV2::Struct(StructKind::new(
                         StructShape::Plain { fields: vec![], has_stripped_fields: false },
                         None,
                     )),
-                    methods: vec![],
-                    module_path: ModulePath::root(),
-                    docs: None,
-                    spec_refs: vec![],
-                    informal_grounds: vec![],
-                },
+                    vec![],
+                    vec![],
+                    vec![],
+                    ModulePath::root(),
+                    None,
+                    vec![],
+                    vec![],
+                ),
             );
         }
 
         doc.types.insert(
             TypeName::new("Pair").unwrap(),
-            TypeEntry {
-                action: ItemAction::Add,
-                role: DataRole::value_object(),
-                kind: TypeKindV2::Struct(StructKind::new(
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(
                     StructShape::Tuple {
                         // Use two declared types so both positional edges (.0, .1) are emitted.
                         fields: vec![
@@ -935,12 +965,14 @@ include_function_roles = []
                     },
                     None,
                 )),
-                methods: vec![],
-                module_path: ModulePath::root(),
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            },
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
         );
 
         let result = adapter.render(&[doc], &[layer], &opts).unwrap();
@@ -975,33 +1007,37 @@ include_function_roles = []
         // Declare the alias target so the alias_of edge resolves.
         doc.types.insert(
             TypeName::new("RawId").unwrap(),
-            TypeEntry {
-                action: ItemAction::Add,
-                role: DataRole::value_object(),
-                kind: TypeKindV2::Struct(StructKind::new(
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(
                     StructShape::Plain { fields: vec![], has_stripped_fields: false },
                     None,
                 )),
-                methods: vec![],
-                module_path: ModulePath::root(),
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            },
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
         );
 
         doc.types.insert(
             TypeName::new("UserId").unwrap(),
-            TypeEntry {
-                action: ItemAction::Add,
-                role: DataRole::value_object(),
-                kind: TypeKindV2::TypeAlias { target: TypeRef::new("RawId").unwrap() },
-                methods: vec![],
-                module_path: ModulePath::root(),
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            },
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::TypeAlias { target: TypeRef::new("RawId").unwrap() },
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
         );
 
         let result = adapter.render(&[doc], &[layer], &opts).unwrap();
@@ -1030,19 +1066,21 @@ include_function_roles = []
         // Add a type.
         doc.types.insert(
             TypeName::new("MyAdapter").unwrap(),
-            TypeEntry {
-                action: ItemAction::Add,
-                role: DataRole::SecondaryAdapter,
-                kind: TypeKindV2::Struct(StructKind::new(
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::SecondaryAdapter,
+                TypeKindV2::Struct(StructKind::new(
                     StructShape::Plain { fields: vec![], has_stripped_fields: false },
                     None,
                 )),
-                methods: vec![],
-                module_path: ModulePath::root(),
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            },
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
         );
 
         // Trait impl: MyAdapter implements MyPort.
@@ -1149,19 +1187,21 @@ include_function_roles = []
         );
         infra_doc.types.insert(
             TypeName::new("MyAdapter").unwrap(),
-            TypeEntry {
-                action: ItemAction::Add,
-                role: DataRole::SecondaryAdapter,
-                kind: TypeKindV2::Struct(StructKind::new(
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::SecondaryAdapter,
+                TypeKindV2::Struct(StructKind::new(
                     StructShape::Plain { fields: vec![], has_stripped_fields: false },
                     None,
                 )),
-                methods: vec![],
-                module_path: ModulePath::root(),
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            },
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
         );
         // Qualified cross-crate trait_ref (as used in real catalogues).
         infra_doc.trait_impls.push(TraitImplDeclV2::new(
@@ -1193,19 +1233,21 @@ include_function_roles = []
                 CatalogueDocument::new(3, CrateName::new("domain").unwrap(), layer.clone());
             doc.types.insert(
                 TypeName::new("MyType").unwrap(),
-                TypeEntry {
-                    action: ItemAction::Add,
-                    role: DataRole::value_object(),
-                    kind: TypeKindV2::Struct(StructKind::new(
+                TypeEntry::new(
+                    ItemAction::Add,
+                    DataRole::value_object(),
+                    TypeKindV2::Struct(StructKind::new(
                         StructShape::Plain { fields: vec![], has_stripped_fields: false },
                         None,
                     )),
-                    methods: vec![],
-                    module_path: ModulePath::root(),
-                    docs: None,
-                    spec_refs: vec![],
-                    informal_grounds: vec![],
-                },
+                    vec![],
+                    vec![],
+                    vec![],
+                    ModulePath::root(),
+                    None,
+                    vec![],
+                    vec![],
+                ),
             );
             doc.trait_impls.push(TraitImplDeclV2::new(
                 TypeRef::new(trait_ref).unwrap(),
@@ -1237,39 +1279,41 @@ include_function_roles = []
         // Deleted trait — must be absent from output and trait index.
         doc.traits.insert(
             TraitName::new("RemovedTrait").unwrap(),
-            TraitEntry {
-                action: ItemAction::Delete,
-                role: ContractRole::SecondaryPort,
-                methods: vec![],
-                assoc_types: vec![],
-                assoc_consts: vec![],
-                supertrait_bounds: vec![],
-                generics: vec![],
-                where_predicates: vec![],
-                module_path: ModulePath::root(),
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            },
+            TraitEntry::new(
+                ItemAction::Delete,
+                ContractRole::SecondaryPort,
+                vec![],
+                vec![],
+                vec![],
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
         );
 
         // A type that tries to impl the deleted trait — the trait_impl edge must be skipped
         // (deleted trait is absent from the trait index).
         doc.types.insert(
             TypeName::new("MyAdapter").unwrap(),
-            TypeEntry {
-                action: ItemAction::Add,
-                role: DataRole::SecondaryAdapter,
-                kind: TypeKindV2::Struct(StructKind::new(
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::SecondaryAdapter,
+                TypeKindV2::Struct(StructKind::new(
                     StructShape::Plain { fields: vec![], has_stripped_fields: false },
                     None,
                 )),
-                methods: vec![],
-                module_path: ModulePath::root(),
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            },
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
         );
         doc.trait_impls.push(TraitImplDeclV2::new(
             TypeRef::new("RemovedTrait").unwrap(),
@@ -1309,18 +1353,18 @@ include_function_roles = []
             FunctionPath::at_root(crate_name.clone(), FunctionName::new("removed_fn").unwrap());
         doc.functions.insert(
             fn_path,
-            FunctionEntry {
-                action: ItemAction::Delete,
-                role: FunctionRole::FreeFunction,
-                params: vec![],
-                returns: TypeRef::new("()").unwrap(),
-                is_async: false,
-                generics: vec![],
-                where_predicates: vec![],
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            },
+            FunctionEntry::new(
+                ItemAction::Delete,
+                FunctionRole::FreeFunction,
+                vec![],
+                TypeRef::new("()").unwrap(),
+                false,
+                vec![],
+                vec![],
+                None,
+                vec![],
+                vec![],
+            ),
         );
 
         let result = adapter.render(&[doc], &[layer], &opts).unwrap();
@@ -1353,19 +1397,21 @@ include_function_roles = []
             FieldDecl::new(FieldName::new("name").unwrap(), TypeRef::new("String").unwrap());
         doc.types.insert(
             TypeName::new("Product").unwrap(),
-            TypeEntry {
-                action: ItemAction::Add,
-                role: DataRole::entity().unwrap(),
-                kind: TypeKindV2::Struct(StructKind::new(
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::entity().unwrap(),
+                TypeKindV2::Struct(StructKind::new(
                     StructShape::Plain { fields: vec![field], has_stripped_fields: false },
                     None,
                 )),
-                methods: vec![],
-                module_path: ModulePath::root(),
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            },
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
         );
 
         let result = adapter.render(&[doc], &[layer], &opts).unwrap();
@@ -1407,19 +1453,21 @@ include_function_roles = []
         );
         doc.types.insert(
             TypeName::new("Converter").unwrap(),
-            TypeEntry {
-                action: ItemAction::Add,
-                role: DataRole::domain_service(),
-                kind: TypeKindV2::Struct(StructKind::new(
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::domain_service(),
+                TypeKindV2::Struct(StructKind::new(
                     StructShape::Plain { fields: vec![], has_stripped_fields: false },
                     None,
                 )),
-                methods: vec![method_with_generic_params],
-                module_path: ModulePath::root(),
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            },
+                vec![method_with_generic_params],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
         );
 
         let result = adapter.render(&[doc], &[layer], &opts).unwrap();
@@ -1454,19 +1502,21 @@ include_function_roles = []
         // Type that is being deleted.
         doc.types.insert(
             TypeName::new("OldToken").unwrap(),
-            TypeEntry {
-                action: ItemAction::Delete,
-                role: DataRole::value_object(),
-                kind: TypeKindV2::Struct(StructKind::new(
+            TypeEntry::new(
+                ItemAction::Delete,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(
                     StructShape::Plain { fields: vec![], has_stripped_fields: false },
                     None,
                 )),
-                methods: vec![],
-                module_path: ModulePath::root(),
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            },
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
         );
 
         // Type with a field pointing at the deleted type — edge must be silently skipped.
@@ -1474,19 +1524,21 @@ include_function_roles = []
             FieldDecl::new(FieldName::new("token").unwrap(), TypeRef::new("OldToken").unwrap());
         doc.types.insert(
             TypeName::new("Session").unwrap(),
-            TypeEntry {
-                action: ItemAction::Add,
-                role: DataRole::entity().unwrap(),
-                kind: TypeKindV2::Struct(StructKind::new(
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::entity().unwrap(),
+                TypeKindV2::Struct(StructKind::new(
                     StructShape::Plain { fields: vec![field], has_stripped_fields: false },
                     None,
                 )),
-                methods: vec![],
-                module_path: ModulePath::root(),
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            },
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
         );
 
         let result = adapter.render(&[doc], &[layer], &opts).unwrap();
@@ -1523,19 +1575,21 @@ include_function_roles = []
         for type_name in ["ContractMapContent", "ContractMapRendererError"] {
             doc.types.insert(
                 TypeName::new(type_name).unwrap(),
-                TypeEntry {
-                    action: ItemAction::Add,
-                    role: DataRole::value_object(),
-                    kind: TypeKindV2::Struct(StructKind::new(
+                TypeEntry::new(
+                    ItemAction::Add,
+                    DataRole::value_object(),
+                    TypeKindV2::Struct(StructKind::new(
                         StructShape::Plain { fields: vec![], has_stripped_fields: false },
                         None,
                     )),
-                    methods: vec![],
-                    module_path: ModulePath::root(),
-                    docs: None,
-                    spec_refs: vec![],
-                    informal_grounds: vec![],
-                },
+                    vec![],
+                    vec![],
+                    vec![],
+                    ModulePath::root(),
+                    None,
+                    vec![],
+                    vec![],
+                ),
             );
         }
 
@@ -1550,19 +1604,21 @@ include_function_roles = []
         );
         doc.types.insert(
             TypeName::new("ContractMapRenderer").unwrap(),
-            TypeEntry {
-                action: ItemAction::Add,
-                role: DataRole::domain_service(),
-                kind: TypeKindV2::Struct(StructKind::new(
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::domain_service(),
+                TypeKindV2::Struct(StructKind::new(
                     StructShape::Plain { fields: vec![], has_stripped_fields: false },
                     None,
                 )),
-                methods: vec![render_method],
-                module_path: ModulePath::root(),
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            },
+                vec![render_method],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
         );
 
         let result = adapter.render(&[doc], &[layer], &opts).unwrap();
@@ -1607,19 +1663,21 @@ include_function_roles = []
 
             doc.types.insert(
                 TypeName::new(target_type).unwrap(),
-                TypeEntry {
-                    action: ItemAction::Add,
-                    role: DataRole::entity().unwrap(),
-                    kind: TypeKindV2::Struct(StructKind::new(
+                TypeEntry::new(
+                    ItemAction::Add,
+                    DataRole::entity().unwrap(),
+                    TypeKindV2::Struct(StructKind::new(
                         StructShape::Plain { fields: vec![], has_stripped_fields: false },
                         None,
                     )),
-                    methods: vec![],
-                    module_path: ModulePath::root(),
-                    docs: None,
-                    spec_refs: vec![],
-                    informal_grounds: vec![],
-                },
+                    vec![],
+                    vec![],
+                    vec![],
+                    ModulePath::root(),
+                    None,
+                    vec![],
+                    vec![],
+                ),
             );
 
             let method = MethodDeclaration::new(
@@ -1635,19 +1693,21 @@ include_function_roles = []
             );
             doc.types.insert(
                 TypeName::new(owner_type).unwrap(),
-                TypeEntry {
-                    action: ItemAction::Add,
-                    role: DataRole::domain_service(),
-                    kind: TypeKindV2::Struct(StructKind::new(
+                TypeEntry::new(
+                    ItemAction::Add,
+                    DataRole::domain_service(),
+                    TypeKindV2::Struct(StructKind::new(
                         StructShape::Plain { fields: vec![], has_stripped_fields: false },
                         None,
                     )),
-                    methods: vec![method],
-                    module_path: ModulePath::root(),
-                    docs: None,
-                    spec_refs: vec![],
-                    informal_grounds: vec![],
-                },
+                    vec![method],
+                    vec![],
+                    vec![],
+                    ModulePath::root(),
+                    None,
+                    vec![],
+                    vec![],
+                ),
             );
 
             let result = adapter.render(&[doc], &[layer], &opts).unwrap();
@@ -1699,19 +1759,21 @@ include_function_roles = []
         );
         doc.types.insert(
             TypeName::new("Store").unwrap(),
-            TypeEntry {
-                action: ItemAction::Add,
-                role: DataRole::domain_service(),
-                kind: TypeKindV2::Struct(StructKind::new(
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::domain_service(),
+                TypeKindV2::Struct(StructKind::new(
                     StructShape::Plain { fields: vec![], has_stripped_fields: false },
                     None,
                 )),
-                methods: vec![method],
-                module_path: ModulePath::root(),
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            },
+                vec![method],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
         );
 
         let result = adapter.render(&[doc], &[layer], &opts).unwrap();
@@ -1765,19 +1827,21 @@ include_function_roles = []
         );
         doc.types.insert(
             TypeName::new("ContractMapRendererAdapter").unwrap(),
-            TypeEntry {
-                action: ItemAction::Add,
-                role: DataRole::SecondaryAdapter,
-                kind: TypeKindV2::Struct(StructKind::new(
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::SecondaryAdapter,
+                TypeKindV2::Struct(StructKind::new(
                     StructShape::Plain { fields: vec![], has_stripped_fields: false },
                     None,
                 )),
-                methods: vec![new_method],
-                module_path: ModulePath::root(),
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            },
+                vec![new_method],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
         );
 
         // Trait impl: ContractMapRendererAdapter implements ContractMapRenderer.
@@ -1862,19 +1926,21 @@ include_function_roles = []
 
         doc.types.insert(
             TypeName::new("MyType").unwrap(),
-            TypeEntry {
-                action: ItemAction::Add,
-                role: DataRole::value_object(),
-                kind: TypeKindV2::Struct(StructKind::new(
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(
                     StructShape::Plain { fields: vec![], has_stripped_fields: false },
                     None,
                 )),
-                methods: vec![],
-                module_path: ModulePath::root(),
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            },
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
         );
         doc.traits.insert(TraitName::new("MyTrait").unwrap(), make_empty_trait_entry());
 
@@ -1929,19 +1995,19 @@ include_function_roles = []
     // -----------------------------------------------------------------------
 
     fn make_empty_trait_entry() -> TraitEntry {
-        TraitEntry {
-            action: ItemAction::Add,
-            role: ContractRole::SecondaryPort,
-            methods: vec![],
-            assoc_types: vec![],
-            assoc_consts: vec![],
-            supertrait_bounds: vec![],
-            generics: vec![],
-            where_predicates: vec![],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        }
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SecondaryPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        )
     }
 }

@@ -18,7 +18,7 @@ use crate::tddd::catalogue_v2::roles::{ContractRole, DataRole, ItemAction};
 
 /// Returns the `RoleKind` for a `TypeEntry`'s `DataRole`.
 pub(super) fn entry_role_kind(entry: &TypeEntry) -> RoleKind {
-    RoleKind::from_data_role(&entry.role)
+    RoleKind::from_data_role(entry.role())
 }
 
 /// Returns `true` when the `target` selector matches the given `RoleKind`.
@@ -45,8 +45,8 @@ pub(super) fn type_entries_for_target<'a>(
     target: &RuleTarget,
 ) -> impl Iterator<Item = (&'a TypeName, &'a TypeEntry)> {
     catalogue.types.iter().filter(move |(_name, entry)| {
-        entry.action != ItemAction::Delete
-            && entry.action != ItemAction::Reference
+        entry.action() != ItemAction::Delete
+            && entry.action() != ItemAction::Reference
             && target_matches(target, entry_role_kind(entry))
     })
 }
@@ -68,9 +68,9 @@ pub(super) fn trait_entries_for_target<'a>(
     target: &RuleTarget,
 ) -> impl Iterator<Item = (&'a TraitName, &'a TraitEntry)> {
     catalogue.traits.iter().filter(move |(_name, entry)| {
-        entry.action != ItemAction::Delete
-            && entry.action != ItemAction::Reference
-            && target_matches(target, RoleKind::from_contract_role(&entry.role))
+        entry.action() != ItemAction::Delete
+            && entry.action() != ItemAction::Reference
+            && target_matches(target, RoleKind::from_contract_role(entry.role()))
     })
 }
 
@@ -89,9 +89,9 @@ pub(super) fn function_entries_for_target<'a>(
     target: &RuleTarget,
 ) -> impl Iterator<Item = (&'a FunctionPath, &'a FunctionEntry)> {
     catalogue.functions.iter().filter(move |(_path, entry)| {
-        entry.action != ItemAction::Delete
-            && entry.action != ItemAction::Reference
-            && target_matches(target, RoleKind::from_function_role(&entry.role))
+        entry.action() != ItemAction::Delete
+            && entry.action() != ItemAction::Reference
+            && target_matches(target, RoleKind::from_function_role(&entry.role()))
     })
 }
 
@@ -120,7 +120,7 @@ pub(super) fn collect_methods_for_type<'a>(
     let mut methods = Vec::new();
     let mut seen_names = std::collections::BTreeMap::new();
 
-    for method in entry.methods.iter().chain(
+    for method in entry.methods().iter().chain(
         catalogue
             .inherent_impls
             .iter()

@@ -164,9 +164,9 @@ pub fn refresh_one_layer(
     let mut signals: Vec<CatalogueSpecSignal> = Vec::new();
     for (type_name, entry) in &v3_doc.types {
         let signal = evaluate_catalogue_entry_signal(
-            entry.action,
-            &entry.spec_refs,
-            &entry.informal_grounds,
+            entry.action(),
+            entry.spec_refs(),
+            entry.informal_grounds(),
         );
         let entry_hash = catalogue_entry_hash(&raw_json, "types", type_name.as_str())
             .map_err(|e| format!("entry_hash for type '{type_name}': {e}"))?;
@@ -174,9 +174,9 @@ pub fn refresh_one_layer(
     }
     for (trait_name, entry) in &v3_doc.traits {
         let signal = evaluate_catalogue_entry_signal(
-            entry.action,
-            &entry.spec_refs,
-            &entry.informal_grounds,
+            entry.action(),
+            entry.spec_refs(),
+            entry.informal_grounds(),
         );
         let entry_hash = catalogue_entry_hash(&raw_json, "traits", trait_name.as_str())
             .map_err(|e| format!("entry_hash for trait '{trait_name}': {e}"))?;
@@ -184,9 +184,9 @@ pub fn refresh_one_layer(
     }
     for (fn_path, entry) in &v3_doc.functions {
         let signal = evaluate_catalogue_entry_signal(
-            entry.action,
-            &entry.spec_refs,
-            &entry.informal_grounds,
+            entry.action(),
+            entry.spec_refs(),
+            entry.informal_grounds(),
         );
         let fn_key = fn_path.to_string();
         let entry_hash = catalogue_entry_hash(&raw_json, "functions", &fn_key)
@@ -321,18 +321,18 @@ mod tests {
         let mut signals: Vec<CatalogueSpecSignal> = Vec::new();
         for (type_name, entry) in &v3_doc.types {
             let signal = evaluate_catalogue_entry_signal(
-                entry.action,
-                &entry.spec_refs,
-                &entry.informal_grounds,
+                entry.action(),
+                entry.spec_refs(),
+                entry.informal_grounds(),
             );
             let entry_hash = catalogue_entry_hash(&raw_json, "types", type_name.as_str()).unwrap();
             signals.push(CatalogueSpecSignal::new(type_name.as_str(), signal, entry_hash));
         }
         for (trait_name, entry) in &v3_doc.traits {
             let signal = evaluate_catalogue_entry_signal(
-                entry.action,
-                &entry.spec_refs,
-                &entry.informal_grounds,
+                entry.action(),
+                entry.spec_refs(),
+                entry.informal_grounds(),
             );
             let entry_hash =
                 catalogue_entry_hash(&raw_json, "traits", trait_name.as_str()).unwrap();
@@ -340,9 +340,9 @@ mod tests {
         }
         for (fn_path, entry) in &v3_doc.functions {
             let signal = evaluate_catalogue_entry_signal(
-                entry.action,
-                &entry.spec_refs,
-                &entry.informal_grounds,
+                entry.action(),
+                entry.spec_refs(),
+                entry.informal_grounds(),
             );
             let fn_key = fn_path.to_string();
             let entry_hash = catalogue_entry_hash(&raw_json, "functions", &fn_key).unwrap();

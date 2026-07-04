@@ -183,14 +183,14 @@ pub(super) fn render_mermaid(
 
             // Types
             for (type_name, type_entry) in &doc.types {
-                if type_entry.action == ItemAction::Delete {
+                if type_entry.action() == ItemAction::Delete {
                     continue; // deleted types must not appear in the rendered map
                 }
-                if type_entry.module_path.is_root() {
+                if type_entry.module_path().is_root() {
                     root_entries.push(EntryKind::Type(type_name.as_str(), type_entry));
                 } else {
                     let first_seg = type_entry
-                        .module_path
+                        .module_path()
                         .segments()
                         .first()
                         .map(|s| s.as_str())
@@ -205,14 +205,14 @@ pub(super) fn render_mermaid(
 
             // Traits
             for (trait_name, trait_entry) in &doc.traits {
-                if trait_entry.action == ItemAction::Delete {
+                if trait_entry.action() == ItemAction::Delete {
                     continue; // deleted traits must not appear in the rendered map
                 }
-                if trait_entry.module_path.is_root() {
+                if trait_entry.module_path().is_root() {
                     root_entries.push(EntryKind::Trait(trait_name.as_str(), trait_entry));
                 } else {
                     let first_seg = trait_entry
-                        .module_path
+                        .module_path()
                         .segments()
                         .first()
                         .map(|s| s.as_str())
@@ -227,7 +227,7 @@ pub(super) fn render_mermaid(
 
             // Functions
             for (fn_path, fn_entry) in &doc.functions {
-                if fn_entry.action == ItemAction::Delete {
+                if fn_entry.action() == ItemAction::Delete {
                     continue; // deleted functions must not appear in the rendered map
                 }
                 if fn_path.module_path.is_root() {

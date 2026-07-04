@@ -255,13 +255,13 @@ fn verify_one_layer(
     };
 
     for (type_name, entry) in &catalogue.types {
-        check_entry_refs(type_name.as_str().to_owned(), &entry.spec_refs);
+        check_entry_refs(type_name.as_str().to_owned(), entry.spec_refs());
     }
     for (trait_name, entry) in &catalogue.traits {
-        check_entry_refs(trait_name.as_str().to_owned(), &entry.spec_refs);
+        check_entry_refs(trait_name.as_str().to_owned(), entry.spec_refs());
     }
     for (fn_path, entry) in &catalogue.functions {
-        check_entry_refs(fn_path.to_string(), &entry.spec_refs);
+        check_entry_refs(fn_path.to_string(), entry.spec_refs());
     }
 
     // StaleSignals: compare signals_opt.catalogue_declaration_hash to current hash.

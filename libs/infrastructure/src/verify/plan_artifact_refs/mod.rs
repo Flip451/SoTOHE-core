@@ -348,13 +348,13 @@ pub fn verify(track_dir: &Path) -> VerifyOutcome {
         };
 
         for (type_name, entry) in &catalogue_doc.types {
-            process_entry_refs(type_name.as_str(), &entry.spec_refs);
+            process_entry_refs(type_name.as_str(), entry.spec_refs());
         }
         for (trait_name, entry) in &catalogue_doc.traits {
-            process_entry_refs(trait_name.as_str(), &entry.spec_refs);
+            process_entry_refs(trait_name.as_str(), entry.spec_refs());
         }
         for (fn_path, entry) in &catalogue_doc.functions {
-            process_entry_refs(&fn_path.to_string(), &entry.spec_refs);
+            process_entry_refs(&fn_path.to_string(), entry.spec_refs());
         }
     }
 

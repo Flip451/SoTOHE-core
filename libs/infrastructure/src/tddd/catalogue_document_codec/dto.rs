@@ -214,6 +214,15 @@ pub(super) struct TypeEntryDto {
     pub(super) kind: TypeKindDto,
     #[serde(default)]
     pub(super) methods: Vec<MethodDeclarationDto>,
+    /// Type-declaration-level generic type parameters (e.g. `[{ name: "T", bounds: ["Clone"] }]`
+    /// for `struct Foo<T: Clone>`). Default empty for backward compatibility
+    /// (ADR `2026-07-02-1345` D6 / IN-13).
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub(super) generics: Vec<MethodGenericParamDto>,
+    /// Type-declaration-level `where`-clause bound predicates. Default empty for
+    /// backward compatibility (ADR `2026-07-02-1345` D6 / IN-13).
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub(super) where_predicates: Vec<WherePredicateDeclDto>,
     #[serde(default)]
     pub(super) module_path: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
