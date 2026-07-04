@@ -1,0 +1,10 @@
+{
+  "schema_version": 5,
+  "crate_name": "cli_driver",
+  "layer": "cli_driver",
+  "types": {},
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [],
+  "trait_impls": []
+}

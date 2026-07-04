@@ -17,12 +17,19 @@ uniqueness, status transitions) are handled by `cargo make verify-*` /
 Report findings ONLY for the following categories. Each finding must name a
 specific `task_id` or `section.id`, or quote the offending text.
 
-- **task description non-executable**: a `task` whose description does not
-  give an implementer enough information to execute it without re-reading the
-  ADR / spec from scratch. Concretely missing: which files must change, what
-  the expected behaviour is, or what AC-NN the task closes. Distinguish from
-  "the description could be shorter" — flag only when an executor would have
-  to invent the boundary.
+- **task description non-executable**: a `task` whose description lacks one
+  of the three elements that make it executable: the target file / symbol,
+  the operation to perform, or an anchor cite (`AC-NN` / `IN-NN` / `CN-NN` /
+  spec element id). A description that names all three is executable — do
+  not require it to also restate the expected behaviour in prose. Distinguish
+  from "the description could be shorter" — flag only when an executor would
+  have to invent the boundary.
+- **upstream restatement**: a task description or plan section that restates
+  an upstream ADR's or spec.json's design rationale or behaviour contract in
+  prose. Flag the restatement itself regardless of whether an anchor cite
+  (`AC-NN` / `IN-NN` / `CN-NN` / spec element id) accompanies it — the
+  permitted form is target + operation + anchor cite only. Cite
+  `knowledge/conventions/no-upstream-restatement.md`.
 - **dependency cycle or wrong ordering**: a task list whose declared
   dependencies form a cycle, or whose declared order would force later tasks
   to refer to artifacts not yet created (e.g., T003 modifies a briefing file

@@ -1,0 +1,252 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:96fdd725acf876c680a0873d6f83c889db137983bccd736c7f7a8856d902bd33",
+          "at": "2026-07-03T17:39:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`no-upstream-restatement.md` is registered here and also cited by the updated impl-plan/types review prompts, but the file is not part of the tracked diff (`git ls-files` returns nothing; `git diff --stat` shows only the 12 modified files). A fresh checkout of this branch will therefore have distribution-target references to a missing convention file. Add `knowledge/conventions/no-upstream-restatement.md` to the tracked change set.",
+              "severity": "P1",
+              "file": "knowledge/conventions/README.md",
+              "line": 72,
+              "category": "template-distribution reference leak"
+            }
+          ],
+          "hash": "rvw1:sha256:96fdd725acf876c680a0873d6f83c889db137983bccd736c7f7a8856d902bd33",
+          "at": "2026-07-03T17:44:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The report-density rule is framework review-process behavior, but it is being added inside every `.harness/custom/review-prompts/*` consumer-customizable severity policy. That crosses the harness-policy responsibility boundary: framework methodology should live in the framework-owned briefing/workflow surface, not under `.harness/custom`, where consumers can override or drift it independently.",
+              "severity": "P1",
+              "file": ".harness/custom/review-prompts/adr.md",
+              "line": 13,
+              "category": "responsibility-boundary cross"
+            },
+            {
+              "message": "This adds a numeric-state rule to the new convention, but the paired reviewer-policy changes only add an `upstream restatement` finding class for prose restatement in impl-plan/types. Since the convention later claims enforcement through those severity-policy finding classes, the numeric rule is left as document-only guidance, contradicting the enforce-by-mechanism convention's requirement that new rules ship with an enforcement mechanism or reassess trigger.",
+              "severity": "P1",
+              "file": "knowledge/conventions/no-upstream-restatement.md",
+              "line": 30,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:96fdd725acf876c680a0873d6f83c889db137983bccd736c7f7a8856d902bd33",
+          "at": "2026-07-03T17:54:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bd9fd7081d706e9b9c1d09e3211c1bbdee0345a07b622528d0002378ee7032ef",
+          "at": "2026-07-03T18:31:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bd9fd7081d706e9b9c1d09e3211c1bbdee0345a07b622528d0002378ee7032ef",
+          "at": "2026-07-03T18:36:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:27ec1d74cdfba1ec906049cce0a67092d74cf4a4092381b8c7851c866484a952",
+          "at": "2026-07-03T19:08:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:27ec1d74cdfba1ec906049cce0a67092d74cf4a4092381b8c7851c866484a952",
+          "at": "2026-07-03T19:12:04Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:85a32ecb9da13d34fac74bdc1437b2bf987203952a4395db3da3a1ee02d90af8",
+          "at": "2026-07-03T16:30:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:85a32ecb9da13d34fac74bdc1437b2bf987203952a4395db3da3a1ee02d90af8",
+          "at": "2026-07-03T16:33:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ca772a5fdcf4ba60b8c4632bcd3955983bfb26c1151ca3a8474ce8ba3549e729",
+          "at": "2026-07-03T18:30:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ca772a5fdcf4ba60b8c4632bcd3955983bfb26c1151ca3a8474ce8ba3549e729",
+          "at": "2026-07-03T18:34:15Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4f4e2ec079f6093aa05ea2df66f1d30cfed79fe3a6b4944775c24d97c5b36582",
+          "at": "2026-07-03T16:30:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4f4e2ec079f6093aa05ea2df66f1d30cfed79fe3a6b4944775c24d97c5b36582",
+          "at": "2026-07-03T16:32:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fa136a0e76c3f44d28933310eaecc2b9caea6f44ebee31e6b3764ad0ea2f8304",
+          "at": "2026-07-03T17:11:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fa136a0e76c3f44d28933310eaecc2b9caea6f44ebee31e6b3764ad0ea2f8304",
+          "at": "2026-07-03T17:16:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:772dd63bf21492619ccefde0be4ae9b48168e878c13ed950973c79faa3f776b8",
+          "at": "2026-07-03T18:30:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 says to remove the paragraph beginning \"When multiple findings match this severity policy\" because it is \"currently present\" in all 11 `.harness/custom/review-prompts/` files, but that text is absent from those prompt files in both HEAD and the current worktree. The removal half of the task therefore has no concrete target and is not executable as written; either drop that step or point to the actual artifact that still contains the paragraph.",
+              "severity": "P1",
+              "file": "track/items/review-load-batch-findings-no-restatement-2026-07-03/impl-plan.json",
+              "line": 6,
+              "category": "task description non-executable"
+            }
+          ],
+          "hash": "rvw1:sha256:772dd63bf21492619ccefde0be4ae9b48168e878c13ed950973c79faa3f776b8",
+          "at": "2026-07-03T18:35:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3b6822844902ffc5d41e913e7202a724d85f30a187bf9c5405306cc9db4193cf",
+          "at": "2026-07-03T18:39:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:889a4853a0ddd504ce472c77e5649c0db201698ad836fcd22ed93ab8b3c6570b",
+          "at": "2026-07-03T18:46:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:889a4853a0ddd504ce472c77e5649c0db201698ad836fcd22ed93ab8b3c6570b",
+          "at": "2026-07-03T18:49:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:76c4fc68f90b7a2a7963ec965f6f0f0fdc54c664e87f93dbe1445ef2f87bde1f",
+          "at": "2026-07-03T18:53:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:76c4fc68f90b7a2a7963ec965f6f0f0fdc54c664e87f93dbe1445ef2f87bde1f",
+          "at": "2026-07-03T18:56:19Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4cf5683b6430311b6ded6b9fedd86a0de7218b2c88326d3bc38698edc5c62af1",
+          "at": "2026-07-03T17:10:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4cf5683b6430311b6ded6b9fedd86a0de7218b2c88326d3bc38698edc5c62af1",
+          "at": "2026-07-03T17:15:02Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:18766bf058bdffb0d4e817679e0f6acb797b7f98cd75e875fc9b8894dd51dbb5",
+          "at": "2026-07-03T17:11:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:18766bf058bdffb0d4e817679e0f6acb797b7f98cd75e875fc9b8894dd51dbb5",
+          "at": "2026-07-03T17:15:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2459a37c2cb63e742da426a5e7b996717bfea60d4ec7d8d7d61d42bcdd7d6b69",
+          "at": "2026-07-03T18:29:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2459a37c2cb63e742da426a5e7b996717bfea60d4ec7d8d7d61d42bcdd7d6b69",
+          "at": "2026-07-03T18:33:28Z"
+        }
+      ]
+    }
+  }
+}
