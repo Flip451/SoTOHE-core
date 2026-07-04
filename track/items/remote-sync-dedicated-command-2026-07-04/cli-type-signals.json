@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-04T09:07:14Z",
+  "declaration_hash": "9f276f1c4c4552d51267611775434aab1c0fc07fb9f7df60729496e65157b7c1",
+  "signals": [
+    {
+      "type_name": "GitCommand",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "SwitchAndPullArgs",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "clap_builder::derive::Args",
+        "clap_builder::derive::FromArgMatches",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "CommitFromFileArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "FileArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "UnstageArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

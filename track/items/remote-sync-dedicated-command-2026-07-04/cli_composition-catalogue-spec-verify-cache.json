@@ -1,0 +1,222 @@
+{
+  "schema_version": 1,
+  "layer": "cli_composition",
+  "entries": [
+    {
+      "claim_hash": "2465a61b41a12a39c22a24e03d63e830202a35a048c01440de1eb07492586b01",
+      "evidence_hash": "2901e6ccf173e2a5a7a37c5f296251b0ce6dba55c77df66b8b4c35feaabe8627",
+      "verdict": {
+        "kind": "pass",
+        "citation": "generic な switch+pull 合成 subcommand `bin/sotp git switch-and-pull` を廃止する。`apps/cli/src/commands/git.rs` の `SwitchAndPull` variant / `SwitchAndPullArgs` 型と、`apps/cli-composition/src/git.rs` の `git_switch_and_pull` / `git_switch_and_pull_in` / `git_switch_and_pull_impl` を削除する。deprecation shim / alias は残さず、呼び出し元は `track switch-base`（track 文脈）または `git sync`（現在ブランチ同期）へ置き換える。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/cli_composition-types.json",
+          "section_key": "types",
+          "entry_key": "GitCompositionRoot"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "generic な switch+pull 合成 subcommand `bin/sotp git switch-and-pull` を廃止する。`apps/cli/src/commands/git.rs` の `SwitchAndPull` variant / `SwitchAndPullArgs` 型と、`apps/cli-composition/src/git.rs` の `git_switch_and_pull` / `git_switch_and_pull_in` / `git_switch_and_pull_impl` を削除する。deprecation shim / alias は残さず、呼び出し元は `track switch-base`（track 文脈）または `git sync`（現在ブランチ同期）へ置き換える。"
+        }
+      }
+    },
+    {
+      "claim_hash": "2465a61b41a12a39c22a24e03d63e830202a35a048c01440de1eb07492586b01",
+      "evidence_hash": "a439f4f58c3b373f04182f0f3cde5a4bad1373eeed77820c221934383321a573",
+      "verdict": {
+        "kind": "pass",
+        "citation": "cli 系レイヤー（cli / cli_composition / cli_driver）に埋め込まれた git コマンド文字列と判定ロジックを、infrastructure の意味論 method 群へ全面移管する。write 系（stage / commit / note / branch create / branch switch / mv / fetch）と read 系（rev-parse 系 / show / fetch）の両方を対象とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/cli_composition-types.json",
+          "section_key": "types",
+          "entry_key": "GitCompositionRoot"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "cli 系レイヤー（cli / cli_composition / cli_driver）に埋め込まれた git コマンド文字列と判定ロジックを、infrastructure の意味論 method 群へ全面移管する。write 系（stage / commit / note / branch create / branch switch / mv / fetch）と read 系（rev-parse 系 / show / fetch）の両方を対象とする。sync path 限定ではなく、census で特定した cli_composition の git / track / pr / review_v2 系と delivery 層の直埋めを対象範囲に含める。上位層は自層 error 型への変換のみを行い、失敗判別ロジックを持たない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "2465a61b41a12a39c22a24e03d63e830202a35a048c01440de1eb07492586b01",
+      "evidence_hash": "6274d959b92c2852882a76b64c6664a3f180a24e676d6a256220162f40e1956d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`GitCompositionRoot` の inline git method 群（Chain B）を削除し、`apps/cli` の git subcommand dispatch を配線済み `GitDriver` 経由にする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/cli_composition-types.json",
+          "section_key": "types",
+          "entry_key": "GitCompositionRoot"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "git workflow 操作の二重実装を解消する。usecase port `GitWorkflowService` → infrastructure adapter `FsGitWorkflowAdapter` → delivery `GitDriver` の既存 chain を正とし、production caller ゼロの dead code から唯一の live chain へ統合する。`GitCompositionRoot` の inline git method 群（Chain B）を削除し、`apps/cli` の git subcommand dispatch を配線済み `GitDriver` 経由にする。両系統に逐語重複している commit の fail-closed track-branch guard を単一箇所へ集約する。port method を再編し、`switch_and_pull` を trait から削除して sync（現在ブランチ pull 専用）と branch switch を分離した method として整備する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "2465a61b41a12a39c22a24e03d63e830202a35a048c01440de1eb07492586b01",
+      "evidence_hash": "641f7c05989d880357cd9a20647b64c43dbcdea5bf9c16603491106039cce8ba",
+      "verdict": {
+        "kind": "pass",
+        "citation": "composition root は adapter の構築と注入（wiring / DI）だけを行う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/cli_composition-types.json",
+          "section_key": "types",
+          "entry_key": "GitCompositionRoot"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-10",
+          "text_label": "git 関与フローの orchestration（意味論 method を呼ぶ側の手順）を usecase 層の interactor へ移管する。track branch create の fail-closed 検証シーケンス、track archive の git mv + logs 移動の合成、pr 系の fetch → 解決 → 参照フロー、review_v2 の hash 解決フローを、既存 `GitWorkflowInteractor` と同型の port + interactor 構造として usecase に置く。composition root は adapter の構築と注入（wiring / DI）だけを行う。適用範囲は本 track census で特定した git 関与フローに限定する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "2465a61b41a12a39c22a24e03d63e830202a35a048c01440de1eb07492586b01",
+      "evidence_hash": "60e90498a7a6e413e1c0cc3508694d1e8e5ae1d7d448971d07a7df31afafb19b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "git 関与フローについて composition root は adapter の構築と注入（wiring / DI）だけを行い、orchestration（呼ぶ側の手順・判定シーケンス）を持たない。意味論 method を呼ぶ手順は usecase interactor に置く。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/cli_composition-types.json",
+          "section_key": "types",
+          "entry_key": "GitCompositionRoot"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "git 関与フローについて composition root は adapter の構築と注入（wiring / DI）だけを行い、orchestration（呼ぶ側の手順・判定シーケンス）を持たない。意味論 method を呼ぶ手順は usecase interactor に置く。"
+        }
+      }
+    },
+    {
+      "claim_hash": "2465a61b41a12a39c22a24e03d63e830202a35a048c01440de1eb07492586b01",
+      "evidence_hash": "5030593340a9f3e7ff568e811bff0eee80645c6442cf73415d3198da94e19207",
+      "verdict": {
+        "kind": "pass",
+        "citation": "内部 refactor / chain 統合が行われても、外部から観測可能な挙動を bit-equivalent に保つ。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/cli_composition-types.json",
+          "section_key": "types",
+          "entry_key": "GitCompositionRoot"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-05",
+          "text_label": "`track switch-base` および削除対象を除く既存 git subcommand の CLI 面（受け取る引数、stdout/stderr の内容と順序、exit code、fail-closed 挙動）を本 track で変更しない。内部 refactor / chain 統合が行われても、外部から観測可能な挙動を bit-equivalent に保つ。"
+        }
+      }
+    },
+    {
+      "claim_hash": "2465a61b41a12a39c22a24e03d63e830202a35a048c01440de1eb07492586b01",
+      "evidence_hash": "ec435e084353ed1e885fe4517e935454788643ca6a29cec5a8fee1824fc7a6f4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cargo make ci` が pass し、削除に伴う dead reference が残らない"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/cli_composition-types.json",
+          "section_key": "types",
+          "entry_key": "GitCompositionRoot"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "`apps/cli/src/commands/git.rs` に `SwitchAndPull` variant / `SwitchAndPullArgs` 型が存在せず、`apps/cli-composition/src/git.rs` に `git_switch_and_pull` / `git_switch_and_pull_in` / `git_switch_and_pull_impl` が存在しない。`cargo make ci` が pass し、削除に伴う dead reference が残らない（compile 通過が呼び出し元全消えの機械的検証を担う）。"
+        }
+      }
+    },
+    {
+      "claim_hash": "2465a61b41a12a39c22a24e03d63e830202a35a048c01440de1eb07492586b01",
+      "evidence_hash": "b16fad6584e647e98cd34264b82e897b4d9f2cf35478bb46b15d69f3ee06f659",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`GitCompositionRoot` に inline git 実装（git コマンド文字列を直接叩く method 群）が存在せず、wiring（adapter 構築 + 注入）に限定される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/cli_composition-types.json",
+          "section_key": "types",
+          "entry_key": "GitCompositionRoot"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "`GitCompositionRoot` に inline git 実装（git コマンド文字列を直接叩く method 群）が存在せず、wiring（adapter 構築 + 注入）に限定される。`apps/cli` の git subcommand dispatch が配線済み `GitDriver` を実 dispatch し、`GitWorkflowService` → `FsGitWorkflowAdapter` → `GitDriver` chain が唯一の live chain になる。commit の fail-closed track-branch guard が単一箇所に集約され、逐語重複が解消されていることをテストで確認できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "2465a61b41a12a39c22a24e03d63e830202a35a048c01440de1eb07492586b01",
+      "evidence_hash": "1b4629278e929edde6354e27477d0587fc845c9aa1d778c6bf60c1e6c8dedae6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "git 関与フロー（track branch ops / archive / pr / review_v2 系）の orchestration が usecase 層の interactor に存在し、composition root は wiring（adapter 構築 + 注入）のみになっていることを確認できる。移管された手順が usecase 単体テストで検証可能である。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/cli_composition-types.json",
+          "section_key": "types",
+          "entry_key": "GitCompositionRoot"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "git 関与フロー（track branch ops / archive / pr / review_v2 系）の orchestration が usecase 層の interactor に存在し、composition root は wiring（adapter 構築 + 注入）のみになっていることを確認できる。移管された手順が usecase 単体テストで検証可能である。"
+        }
+      }
+    }
+  ]
+}

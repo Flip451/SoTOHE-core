@@ -1,0 +1,1040 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "deedd7d5fdeb36a8253fdf065d6e1712a86e25c76b3f0a281aa039eeea89fa73",
+      "evidence_hash": "eae963e001bd4eef873d6c728f4509713ce7e19a4c9519eced0c6f3a6e805328",
+      "verdict": {
+        "kind": "pass",
+        "citation": "現在ブランチを upstream から pull するだけの subcommand を新設する。switch は行わず、ブランチ引数も取らない。sync 対象は常に「現在ブランチ」なので branch 解決も config 読み取りも不要になり、CN-02（snapshot 優先、global config 再読禁止）と構造的に衝突しない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "「現在ブランチを remote と同期する」だけの単純操作を、branch 解決や config 読み取りに依存しないプリミティブ `bin/sotp git sync` として切り出し、base branch（develop 等）上で remote の最新を取り込む正規動線を回復する。`track switch-base` の branch 解決が base branch 上で失敗し sync 経路自体が失われている現状の欠落を、track 文脈を必要としない引数なしの fast-forward only sync コマンドで解消する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "deedd7d5fdeb36a8253fdf065d6e1712a86e25c76b3f0a281aa039eeea89fa73",
+      "evidence_hash": "eae963e001bd4eef873d6c728f4509713ce7e19a4c9519eced0c6f3a6e805328",
+      "verdict": {
+        "kind": "pass",
+        "citation": "pull は fast-forward only とする。divergence（ff 不可）時は明確なエラーで停止し、手動 merge はユーザー責務とする（merge / rebase を AI ハードブロックとする既存の enforcement 方針と整合）。upstream 未設定時も明確なエラーとし、graceful skip にしない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "「現在ブランチを remote と同期する」だけの単純操作を、branch 解決や config 読み取りに依存しないプリミティブ `bin/sotp git sync` として切り出し、base branch（develop 等）上で remote の最新を取り込む正規動線を回復する。`track switch-base` の branch 解決が base branch 上で失敗し sync 経路自体が失われている現状の欠落を、track 文脈を必要としない引数なしの fast-forward only sync コマンドで解消する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "fb83f1c753695937f04662f10a36fad5a48d8860ed01385545869f1463196bef",
+      "evidence_hash": "eae963e001bd4eef873d6c728f4509713ce7e19a4c9519eced0c6f3a6e805328",
+      "verdict": {
+        "kind": "pass",
+        "citation": "git コマンド文字列と判定ロジックを ... infrastructure の意味論的 method 群へ全面移管する / 失敗も同様に infrastructure 側で意味論 error として分類し"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-02",
+          "text_label": "git を触るフロー（stage / commit / note / sync / branch 操作 / archive / pr / review 系）について、git コマンド文字列と失敗判定を cli 系レイヤー（cli / cli_composition / cli_driver）から排除し infrastructure の意味論 port + typed error に移管する。さらに意味論 method を呼ぶ側の手順（orchestration）を usecase 層の interactor へ移し、composition root を wiring（DI）に、cli 層を parse + dispatch に限定する。結果として git 関与フローの層責務を「cli = parse + dispatch / composition = wiring / usecase = orchestration / infrastructure = git 意味論」に整流する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "fb83f1c753695937f04662f10a36fad5a48d8860ed01385545869f1463196bef",
+      "evidence_hash": "eae963e001bd4eef873d6c728f4509713ce7e19a4c9519eced0c6f3a6e805328",
+      "verdict": {
+        "kind": "pass",
+        "citation": "git を触るフローについては、この手順部分を usecase 層の interactor（既存 `GitWorkflowInteractor` と同型の port + interactor 構造）へ移管し、composition root は adapter の構築と注入（wiring / DI）だけを行う。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-02",
+          "text_label": "git を触るフロー（stage / commit / note / sync / branch 操作 / archive / pr / review 系）について、git コマンド文字列と失敗判定を cli 系レイヤー（cli / cli_composition / cli_driver）から排除し infrastructure の意味論 port + typed error に移管する。さらに意味論 method を呼ぶ側の手順（orchestration）を usecase 層の interactor へ移し、composition root を wiring（DI）に、cli 層を parse + dispatch に限定する。結果として git 関与フローの層責務を「cli = parse + dispatch / composition = wiring / usecase = orchestration / infrastructure = git 意味論」に整流する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
+          "decision_id": "D8"
+        }
+      }
+    },
+    {
+      "claim_hash": "fb83f1c753695937f04662f10a36fad5a48d8860ed01385545869f1463196bef",
+      "evidence_hash": "eae963e001bd4eef873d6c728f4509713ce7e19a4c9519eced0c6f3a6e805328",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli` の command module は引数 parse と dispatch のみを持つ thin bin とし、infrastructure の型・関数を直接参照しない。既存の cli → usecase 一本化方針を git 系にも徹底し、`apps/cli/src/commands/track/branch_ops.rs` の `rev-parse` 直埋めのような cli 層での git 判定は、usecase 経由（cli_driver の driver または usecase interactor の呼び出し）に置き換える。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-02",
+          "text_label": "git を触るフロー（stage / commit / note / sync / branch 操作 / archive / pr / review 系）について、git コマンド文字列と失敗判定を cli 系レイヤー（cli / cli_composition / cli_driver）から排除し infrastructure の意味論 port + typed error に移管する。さらに意味論 method を呼ぶ側の手順（orchestration）を usecase 層の interactor へ移し、composition root を wiring（DI）に、cli 層を parse + dispatch に限定する。結果として git 関与フローの層責務を「cli = parse + dispatch / composition = wiring / usecase = orchestration / infrastructure = git 意味論」に整流する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
+          "decision_id": "D9"
+        }
+      }
+    },
+    {
+      "claim_hash": "0300bc9074068710b9c70164c31e56ac6e025371ced452feabb9f533c1688418",
+      "evidence_hash": "eae963e001bd4eef873d6c728f4509713ce7e19a4c9519eced0c6f3a6e805328",
+      "verdict": {
+        "kind": "pass",
+        "citation": "現在ブランチを upstream から pull するだけの subcommand を新設する。switch は行わず、ブランチ引数も取らない。sync 対象は常に「現在ブランチ」なので branch 解決も config 読み取りも不要になり、CN-02（snapshot 優先、global config 再読禁止）と構造的に衝突しない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "現在ブランチを upstream から pull するだけの native subcommand `bin/sotp git sync` を新設する。switch は行わず branch 引数も取らない。sync 対象は常に「現在の git ブランチ」に固定し、`.harness/config/branch-strategy.json` や `metadata.json#branch_strategy_snapshot` を読まない。branch 解決も config 読み取りも不要なプリミティブとすることで、snapshot 優先・global config 再読禁止の原則と構造的に衝突しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "da0fd3885c77b45d8a33ba5650a1eced990a8c9e53ff60a7e4aa0108d5dd0988",
+      "evidence_hash": "eae963e001bd4eef873d6c728f4509713ce7e19a4c9519eced0c6f3a6e805328",
+      "verdict": {
+        "kind": "pass",
+        "citation": "pull は fast-forward only とする。divergence（ff 不可）時は明確なエラーで停止し、手動 merge はユーザー責務とする（merge / rebase を AI ハードブロックとする既存の enforcement 方針と整合）。upstream 未設定時も明確なエラーとし、graceful skip にしない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "`bin/sotp git sync` の pull を fast-forward only とする。divergence（ff 不可）/ upstream 未設定 / worktree 未解決 のいずれの失敗も、明確な説明的エラーと非ゼロ終了ステータスで停止させる。graceful skip や warning-only 継続（成功扱い）を行わない。手動 merge / rebase による解消はユーザー責務とし、既存の merge / rebase AI ハードブロック方針と整合させる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "fd85136daa75e36fea638c6557d7b4f728c570fbf47b691c9830890e4240b341",
+      "evidence_hash": "eae963e001bd4eef873d6c728f4509713ce7e19a4c9519eced0c6f3a6e805328",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ロジックは CLI 側（`bin/sotp git sync`）に実装し、Makefile 側は薄い wrapper task のみとする。ブランチ名・条件分岐などのロジックを Makefile に書かない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "`bin/sotp git sync` のロジックは Rust 側（cli + infrastructure）に実装し、`Makefile.toml` 側は `command = \"bin/sotp\"` + `args = [\"git\", \"sync\"]` 形式の薄い wrapper task のみとする。ブランチ名リテラル・条件分岐・shell script 化を Makefile に持ち込まない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "2901e6ccf173e2a5a7a37c5f296251b0ce6dba55c77df66b8b4c35feaabe8627",
+      "evidence_hash": "eae963e001bd4eef873d6c728f4509713ce7e19a4c9519eced0c6f3a6e805328",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`track-switch-base` は「track ブランチから base branch に戻る」動線として存続させ、内部を branch switch + sync の合成に refactor する（外部挙動は不変）。generic な `git switch-and-pull` subcommand は廃止する（sync と既存の branch switch 系コマンドで代替可能になるため）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "generic な switch+pull 合成 subcommand `bin/sotp git switch-and-pull` を廃止する。`apps/cli/src/commands/git.rs` の `SwitchAndPull` variant / `SwitchAndPullArgs` 型と、`apps/cli-composition/src/git.rs` の `git_switch_and_pull` / `git_switch_and_pull_in` / `git_switch_and_pull_impl` を削除する。deprecation shim / alias は残さず、呼び出し元は `track switch-base`（track 文脈）または `git sync`（現在ブランチ同期）へ置き換える。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "afeaf6330026e65f2bc14ddec66dff224707ce7819a5a002bf2dbad117230137",
+      "evidence_hash": "eae963e001bd4eef873d6c728f4509713ce7e19a4c9519eced0c6f3a6e805328",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`track-switch-base` は「track ブランチから base branch に戻る」動線として存続させ、内部を branch switch + sync の合成に refactor する（外部挙動は不変）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "`bin/sotp track switch-base` を存続させ、内部実装を branch switch + sync の合成に refactor する。base branch は active track の `branch_strategy_snapshot` から解決する既存ロジック（`apps/cli-composition/src/track/branch_strategy.rs::track_switch_base`、snapshot 優先）を保持し、sync step は `git sync` と同じ infrastructure 側の意味論 method を経由する。cli_composition 側に git コマンド文字列や ff-only 意味論を残さない。外部挙動（引数・stdout/stderr・exit code・非 track ブランチでの fail-closed）は不変とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "41681684a81e798f3a6a1a1bcfee24f1552ab284a94409c82cf8e6c167f2b2c8",
+      "evidence_hash": "eae963e001bd4eef873d6c728f4509713ce7e19a4c9519eced0c6f3a6e805328",
+      "verdict": {
+        "kind": "pass",
+        "citation": "sync path はその旗艦事例とする。現在ブランチを upstream から fast-forward only で pull する infrastructure adapter primitive（例: `SystemGitRepo::sync_current_branch(&self) -> Result<(), SyncError>`）を新設し、CN-02 の 3 種 fail-closed failure modes（upstream 未設定 / non-fast-forward / worktree unresolved）を `SyncError` enum の variant として infrastructure boundary で型化する。この method は git process I/O と失敗分類を所有する下位 primitive であり、command-facing の公開契約ではない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "sync path を D5 の旗艦事例として、`libs/infrastructure/src/git_cli/` に「現在ブランチを upstream から fast-forward only で pull する」意味論 method（ADR 例示 `sync_current_branch`）を新設する。git コマンド文字列（`pull --ff-only`）と ff-only 意味論を infrastructure 内側に閉じ込め、generic passthrough には委ねない。3 種 fail-closed failure modes（upstream 未設定 / non-fast-forward / worktree unresolved）を typed error（ADR 例示 `SyncError`）の variant として infrastructure boundary で分類する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "a439f4f58c3b373f04182f0f3cde5a4bad1373eeed77820c221934383321a573",
+      "evidence_hash": "eae963e001bd4eef873d6c728f4509713ce7e19a4c9519eced0c6f3a6e805328",
+      "verdict": {
+        "kind": "pass",
+        "citation": "cli 系レイヤー（cli / cli_composition / cli_driver）に埋め込まれた git コマンド文字列と判定ロジックを、infrastructure（`libs/infrastructure/src/git_cli/`）の意味論的 method 群へ全面移管する。write 系（stage / commit / note / branch create / branch switch / mv / fetch）と read 系（`rev-parse` 系 / `show`）の両方を対象とする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "cli 系レイヤー（cli / cli_composition / cli_driver）に埋め込まれた git コマンド文字列と判定ロジックを、infrastructure の意味論 method 群へ全面移管する。write 系（stage / commit / note / branch create / branch switch / mv / fetch）と read 系（rev-parse 系 / show / fetch）の両方を対象とする。sync path 限定ではなく、census で特定した cli_composition の git / track / pr / review_v2 系と delivery 層の直埋めを対象範囲に含める。上位層は自層 error 型への変換のみを行い、失敗判別ロジックを持たない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "6274d959b92c2852882a76b64c6664a3f180a24e676d6a256220162f40e1956d",
+      "evidence_hash": "eae963e001bd4eef873d6c728f4509713ce7e19a4c9519eced0c6f3a6e805328",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「git workflow 操作の二重実装を解消する。」「Chain B）は削除する。」「switch_and_pull を port trait から削除し、sync...と branch switch ...を分離する」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "git workflow 操作の二重実装を解消する。usecase port `GitWorkflowService` → infrastructure adapter `FsGitWorkflowAdapter` → delivery `GitDriver` の既存 chain を正とし、production caller ゼロの dead code から唯一の live chain へ統合する。`GitCompositionRoot` の inline git method 群（Chain B）を削除し、`apps/cli` の git subcommand dispatch を配線済み `GitDriver` 経由にする。両系統に逐語重複している commit の fail-closed track-branch guard を単一箇所へ集約する。port method を再編し、`switch_and_pull` を trait から削除して sync（現在ブランチ pull 専用）と branch switch を分離した method として整備する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "88d0a756b820ba4037650bc0f9de864d0fd42c0f160b0fa284f874d5324ab19b",
+      "evidence_hash": "eae963e001bd4eef873d6c728f4509713ce7e19a4c9519eced0c6f3a6e805328",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`GitRepository` trait 自体を削除し、`status` / `output` の generic passthrough を `SystemGitRepo` の `pub(crate)` inherent method に移す（`pub trait` の method は言語仕様上 method 単位で可視性を落とせないため、trait 経由の公開を撤去することで達成する）。既存の意味論 method（`current_branch` / `push_branch` / `index_tree_hash` / `stage_all_excluding` + 新設 `sync_current_branch` 等）は `SystemGitRepo` の `pub` inherent method として残す。crate 外から観測できる意味論 method の集合は変えないが、任意の git コマンド文字列を注入する generic passthrough は crate 内側だけの実装用ハッチとなり、上位層に露出しない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-09",
+          "text_label": "`GitRepository::status` / `output` の generic passthrough を infrastructure crate 内 `pub(crate)` に降格し、上位層が git コマンド文字列を注入する経路を可視性レベルで塞ぐ（再発を compile-time で防止）。read 系の直埋め call site（rev-parse 系 / show / fetch。cli_composition の pr / review_v2 / track 系、および delivery 層 `apps/cli/src/commands/track/branch_ops.rs`）を意味論 method（branch 存在確認 / HEAD 解決 / ref 上のファイル読み出し等）へ置き換える。意味論 method（`current_branch` / `push_branch` / `index_tree_hash` / `stage_all_excluding` の既存前例に連なるもの）だけを公開 API とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "641f7c05989d880357cd9a20647b64c43dbcdea5bf9c16603491106039cce8ba",
+      "evidence_hash": "eae963e001bd4eef873d6c728f4509713ce7e19a4c9519eced0c6f3a6e805328",
+      "verdict": {
+        "kind": "pass",
+        "citation": "git 関与フローの orchestration を usecase interactor へ移管し、composition root は adapter の構築と注入（wiring / DI）だけを行う。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-10",
+          "text_label": "git 関与フローの orchestration（意味論 method を呼ぶ側の手順）を usecase 層の interactor へ移管する。track branch create の fail-closed 検証シーケンス、track archive の git mv + logs 移動の合成、pr 系の fetch → 解決 → 参照フロー、review_v2 の hash 解決フローを、既存 `GitWorkflowInteractor` と同型の port + interactor 構造として usecase に置く。composition root は adapter の構築と注入（wiring / DI）だけを行う。適用範囲は本 track census で特定した git 関与フローに限定する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
+          "decision_id": "D8"
+        }
+      }
+    },
+    {
+      "claim_hash": "cc548b4804ccc29d208eadafdca995b2e0d1c01c69166ada1d43352242ec1411",
+      "evidence_hash": "eae963e001bd4eef873d6c728f4509713ce7e19a4c9519eced0c6f3a6e805328",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli` の command module は引数 parse と dispatch のみを持つ thin bin とし、infrastructure の型・関数を直接参照しない。既存の cli → usecase 一本化方針を git 系にも徹底し、`apps/cli/src/commands/track/branch_ops.rs` の `rev-parse` 直埋めのような cli 層での git 判定は、usecase 経由（cli_driver の driver または usecase interactor の呼び出し）に置き換える。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-11",
+          "text_label": "`apps/cli` の command module を引数 parse と dispatch のみを持つ thin bin とし、infrastructure の型・関数を直接参照しない。`apps/cli/src/commands/track/branch_ops.rs` の `rev-parse` 直埋めのような cli 層での git 判定を、usecase 経由（cli_driver の driver または usecase interactor の呼び出し）へ置き換え、cli → usecase 一本化を git 系にも徹底する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
+          "decision_id": "D9"
+        }
+      }
+    },
+    {
+      "claim_hash": "d71d340b2de97fc8100773900db7fe4434a0d6b4cecb9a30a29066404cbeb542",
+      "evidence_hash": "eae963e001bd4eef873d6c728f4509713ce7e19a4c9519eced0c6f3a6e805328",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`track-switch-base` は「track ブランチから base branch に戻る」動線として存続させ、内部を branch switch + sync の合成に refactor する（外部挙動は不変）。generic な `git switch-and-pull` subcommand は廃止する（sync と既存の branch switch 系コマンドで代替可能になるため）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-12",
+          "text_label": "本 track の同一 PR 内で、`git sync` 新設と `switch-and-pull` 廃止に伴う運用文書・config を同時更新する（maintainer checklist の影響レイヤー同時更新原則）。対象 6 面: (a) `knowledge/conventions/branch-strategy.md`（sync 動線追記・`track-switch-base` 記述更新）、(b) `.claude/rules/07-dev-environment.md`（cargo make タスク一覧と `bin/sotp` native subcommand 一覧への `git sync` 追加、`switch-and-pull` 参照除去）、(c) `.claude/commands/track/done.md` / `.harness/workflows/track/done.md`（base 復帰手順）、(d) `.codex/rules/default.rules`（新 wrapper task の prefix_rule 追加、旧 `track-switch-main` stale 参照除去）、(e) `.claude/settings.json` の `permissions.allow`（新 wrapper task エントリ）、(f) `Makefile.toml`（wrapper task の追加・整理）。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "d71d340b2de97fc8100773900db7fe4434a0d6b4cecb9a30a29066404cbeb542",
+      "evidence_hash": "eae963e001bd4eef873d6c728f4509713ce7e19a4c9519eced0c6f3a6e805328",
+      "verdict": {
+        "kind": "pass",
+        "citation": "現在ブランチ pull 専用の `bin/sotp git sync` を新設する。現在ブランチを upstream から pull するだけの subcommand を新設する。switch は行わず、ブランチ引数も取らない。sync 対象は常に「現在ブランチ」なので branch 解決も config 読み取りも不要になり、CN-02（snapshot 優先、global config 再読禁止）と構造的に衝突しない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-12",
+          "text_label": "本 track の同一 PR 内で、`git sync` 新設と `switch-and-pull` 廃止に伴う運用文書・config を同時更新する（maintainer checklist の影響レイヤー同時更新原則）。対象 6 面: (a) `knowledge/conventions/branch-strategy.md`（sync 動線追記・`track-switch-base` 記述更新）、(b) `.claude/rules/07-dev-environment.md`（cargo make タスク一覧と `bin/sotp` native subcommand 一覧への `git sync` 追加、`switch-and-pull` 参照除去）、(c) `.claude/commands/track/done.md` / `.harness/workflows/track/done.md`（base 復帰手順）、(d) `.codex/rules/default.rules`（新 wrapper task の prefix_rule 追加、旧 `track-switch-main` stale 参照除去）、(e) `.claude/settings.json` の `permissions.allow`（新 wrapper task エントリ）、(f) `Makefile.toml`（wrapper task の追加・整理）。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "d1910eecfaf938b6b51fcfd5cd4ef51b197b2427ad94189609ebebf1265608d4",
+      "evidence_hash": "eae963e001bd4eef873d6c728f4509713ce7e19a4c9519eced0c6f3a6e805328",
+      "verdict": {
+        "kind": "pass",
+        "citation": "現在ブランチを upstream から pull するだけの subcommand を新設する。switch は行わず、ブランチ引数も取らない。sync 対象は常に「現在ブランチ」なので branch 解決も config 読み取りも不要になり、CN-02（snapshot 優先、global config 再読禁止）と構造的に衝突しない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-01",
+          "text_label": "`.githooks/reference-transaction` フックおよび guard policy の enforcement 仕様変更は対象外とする。素の terminal 経由 `git pull` を hook で例外扱いする案（ADR Rejected Alternative C）は採らず、hook モデルを変更しない。ref 更新は sotp 経由（`git_cli` 層が `SOTP_GUARDED_GIT` env token を注入する経路）のみを許容する現行不変条件を維持する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "1e47de6b003d1c294e03d097bfd81bcc185b5fd5b056bb312731fd514d1ba600",
+      "evidence_hash": "eae963e001bd4eef873d6c728f4509713ce7e19a4c9519eced0c6f3a6e805328",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「現在ブランチを upstream から pull するだけの subcommand を新設する。switch は行わず、ブランチ引数も取らない。sync 対象は常に『現在ブランチ』なので branch 解決も config 読み取りも不要になり…」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-02",
+          "text_label": "multi-remote 対応 / `origin` 以外の remote 名解決 / remote-tracking branch 名の設定駆動化は対象外とする。upstream 解決は `git pull --ff-only` が現在ブランチの tracking 設定から自動解決する挙動に委ね、SoTOHE 側の追加 config を導入しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "8a5e7ebf736b4e4ad4c2da3ee16041260a4ff43ef7be32352a8e66ad0b0d4ff8",
+      "evidence_hash": "eae963e001bd4eef873d6c728f4509713ce7e19a4c9519eced0c6f3a6e805328",
+      "verdict": {
+        "kind": "pass",
+        "citation": "pull は fast-forward only とする。divergence（ff 不可）時は明確なエラーで停止し、手動 merge はユーザー責務とする"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-03",
+          "text_label": "divergence 発生時の対話的 merge / rebase 支援や自動 fallback は対象外とする。ff 不可時は非ゼロ終了で停止し、以降の解消（手動 merge / PR ベース同期）はユーザー責務に留める。既存の `git merge` / `git rebase` AI ハードブロック方針と整合する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "b9848e776f1966883a18606a6c2511af1977ee70a3118eb9b74bcb3a89d45509",
+      "evidence_hash": "eae963e001bd4eef873d6c728f4509713ce7e19a4c9519eced0c6f3a6e805328",
+      "verdict": {
+        "kind": "pass",
+        "citation": "現在ブランチを upstream から pull するだけの subcommand を新設する。switch は行わず、ブランチ引数も取らない。sync 対象は常に「現在ブランチ」なので branch 解決も config 読み取りも不要になり"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-04",
+          "text_label": "`git sync` への branch 引数追加や current branch 以外を同期するオプションは対象外とする。branch 引数を持たせない設計は D1 の構造的コアであり、後付けの引数追加は switch/pull 密結合の再導入に相当する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "8dc80640fd966d20cfade036f034e00421a041e175197fc793a0cff9ae02a9ec",
+      "evidence_hash": "eae963e001bd4eef873d6c728f4509713ce7e19a4c9519eced0c6f3a6e805328",
+      "verdict": {
+        "kind": "pass",
+        "citation": "generic な `git switch-and-pull` subcommand は廃止する（sync と既存の branch switch 系コマンドで代替可能になるため）."
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-05",
+          "text_label": "`git switch-and-pull` 廃止に伴う deprecation shim / alias / migration ガイドの提供は対象外とする。廃止は削除のみで行い、no-backward-compat 方針に従う。呼び出し元は本 track 内で `track switch-base` / `git sync` に置き換える。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "1c94b99e0363f5d696c0789a14a70aa18d66269f102f63abd2d82a820e6e162a",
+      "evidence_hash": "eae963e001bd4eef873d6c728f4509713ce7e19a4c9519eced0c6f3a6e805328",
+      "verdict": {
+        "kind": "pass",
+        "citation": "適用範囲は git 関与フローに限定する（本 track の census で特定した cli_composition の track branch ops / archive / pr / review_v2 系）。git を触らないフローの composition root 純化は本 ADR の対象外。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-06",
+          "text_label": "git を触らないフローの composition root 純化は対象外とする。D8 の orchestration → usecase interactor 移管は本 track census で特定した git 関与フロー（track branch ops / archive / pr / review_v2 系）に限定し、git 非関与フローの composition = wiring only 化は将来トリガ（別 ADR）に送る。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
+          "decision_id": "D8"
+        }
+      }
+    },
+    {
+      "claim_hash": "895a287b30987a9fefa47b8df8127ec43d325d9acbf41a8d4bb4f68f746d1b1a",
+      "evidence_hash": "eae963e001bd4eef873d6c728f4509713ce7e19a4c9519eced0c6f3a6e805328",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「composition root は adapter の構築と注入（wiring / DI）だけを行う。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-07",
+          "text_label": "composition root の wiring 限定を機械検証する enforcement gate（composition-root purity 検証）の導入は対象外とする。ADR Reassess When に従い、違反の再流入が観測された時点で別 ADR で検討する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
+          "decision_id": "D8"
+        }
+      }
+    },
+    {
+      "claim_hash": "9ba972495323d97cebccc0ad3be932fe1e7be095aa0cc8143b6ad65ff43b0c01",
+      "evidence_hash": "eae963e001bd4eef873d6c728f4509713ce7e19a4c9519eced0c6f3a6e805328",
+      "verdict": {
+        "kind": "pass",
+        "citation": "cli 系レイヤー（cli / cli_composition / cli_driver）に埋め込まれた git コマンド文字列と判定ロジックを、infrastructure（`libs/infrastructure/src/git_cli/`）の意味論的 method 群へ全面移管する。write 系（stage / commit / note / branch create / branch switch / mv / fetch）と read 系（`rev-parse` 系 / `show`）の両方を対象とする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-08",
+          "text_label": "ADR が明示しない外部 subprocess（`gh` 等 git 以外のプロセス）の意味論 port 化は対象外とする。本 track の意味論移管は git（`git_cli`）操作に限定し、他の subprocess 抽象化は扱わない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "6dcb05ab98039e40275f2df635b0b5fd902259b633015952e37c66e2ba35e147",
+      "evidence_hash": "eae963e001bd4eef873d6c728f4509713ce7e19a4c9519eced0c6f3a6e805328",
+      "verdict": {
+        "kind": "pass",
+        "citation": "pull は fast-forward only とする。divergence（ff 不可）時は明確なエラーで停止し、手動 merge はユーザー責務とする（merge / rebase を AI ハードブロックとする既存の enforcement 方針と整合）。upstream 未設定時も明確なエラーとし、graceful skip にしない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "`git sync` の pull は fast-forward only 固定とし、`--ff` / `--rebase` / `--no-ff` 等のフラグを追加しない。upstream 未設定 / divergence / worktree 未解決 のいずれも fail-closed とし、graceful skip / warning-only 継続を許容しない。`switch-and-pull` が採っていた「pull 失敗を WARN で通過させ exit 0」挙動（`apps/cli-composition/src/git.rs::git_switch_and_pull_impl` の警告フォールバック）を新経路に持ち込まない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "200ea0af2e0afe029c771a274e7e798d03168a40fc3ef82f0576e2b677d2fe2b",
+      "evidence_hash": "eae963e001bd4eef873d6c728f4509713ce7e19a4c9519eced0c6f3a6e805328",
+      "verdict": {
+        "kind": "pass",
+        "citation": "sync path はその旗艦事例とする。現在ブランチを upstream から fast-forward only で pull する infrastructure adapter primitive（例: `SystemGitRepo::sync_current_branch(&self) -> Result<(), SyncError>`）を新設し、CN-02 の 3 種 fail-closed failure modes（upstream 未設定 / non-fast-forward / worktree unresolved）を `SyncError` enum の variant として infrastructure boundary で型化する。... 上位層は自層の error 型への変換のみを行い、error 判別ロジックを持たない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "sync path の failure modes は `libs/infrastructure/src/git_cli/` 境界で typed error（例 `SyncError`）の variant として分類する。上位層（`apps/cli-composition` / `track switch-base` 内部合成）は自層 error 型への薄い変換に留め、失敗種別の判別・message 組み立て・string 化を持たない。error 判別ロジックを infrastructure 側に一元化する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "60e90498a7a6e413e1c0cc3508694d1e8e5ae1d7d448971d07a7df31afafb19b",
+      "evidence_hash": "eae963e001bd4eef873d6c728f4509713ce7e19a4c9519eced0c6f3a6e805328",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「git を触るフローについては、この手順部分を usecase 層の interactor … へ移管し、composition root は adapter の構築と注入（wiring / DI）だけを行う。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "git 関与フローについて composition root は adapter の構築と注入（wiring / DI）だけを行い、orchestration（呼ぶ側の手順・判定シーケンス）を持たない。意味論 method を呼ぶ手順は usecase interactor に置く。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
+          "decision_id": "D8"
+        }
+      }
+    },
+    {
+      "claim_hash": "68ef8bfee4963f79c6351f7f72b03473d9f60ad50cf93ca0bb8410d6026b699f",
+      "evidence_hash": "eae963e001bd4eef873d6c728f4509713ce7e19a4c9519eced0c6f3a6e805328",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli` の command module は引数 parse と dispatch のみを持つ thin bin とし、infrastructure の型・関数を直接参照しない。 / `rev-parse` 直埋めのような cli 層での git 判定は、usecase 経由（cli_driver の driver または usecase interactor の呼び出し）に置き換える。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "`apps/cli` の command module は parse + dispatch に限定し、infrastructure の型・関数を直接参照しない。git 判定ロジックを cli 層に置かず、usecase / cli_driver 経由で呼ぶ。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
+          "decision_id": "D9"
+        }
+      }
+    },
+    {
+      "claim_hash": "5030593340a9f3e7ff568e811bff0eee80645c6442cf73415d3198da94e19207",
+      "evidence_hash": "eae963e001bd4eef873d6c728f4509713ce7e19a4c9519eced0c6f3a6e805328",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`track-switch-base` は「track ブランチから base branch に戻る」動線として存続させ、内部を branch switch + sync の合成に refactor する（外部挙動は不変）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-05",
+          "text_label": "`track switch-base` および削除対象を除く既存 git subcommand の CLI 面（受け取る引数、stdout/stderr の内容と順序、exit code、fail-closed 挙動）を本 track で変更しない。内部 refactor / chain 統合が行われても、外部から観測可能な挙動を bit-equivalent に保つ。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "50ff281bea585f7063624f4524102d8ad4fb5c4292c29d906dbd943575c81e5b",
+      "evidence_hash": "eae963e001bd4eef873d6c728f4509713ce7e19a4c9519eced0c6f3a6e805328",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Makefile 側は薄い wrapper task のみとする。ブランチ名・条件分岐などのロジックを Makefile に書かない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-06",
+          "text_label": "追加する `git sync` 用 wrapper task は `command` + `args` の薄い passthrough に限定する。`script_runner = \"@shell\"` / `script = [...]` を使わず、ブランチ名リテラル・条件分岐・引数の shell 文字列補間を書かない。ロジックは Rust 側 CLI にのみ存在する不変条件を機械的に保つ。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "14b45f5f3978cd12826282402f9d098971e2a1cb44f0e7b64143570ae2264357",
+      "evidence_hash": "eae963e001bd4eef873d6c728f4509713ce7e19a4c9519eced0c6f3a6e805328",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`status` / `output` の generic passthrough を `SystemGitRepo` の `pub(crate)` inherent method に移す"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-07",
+          "text_label": "cli 系レイヤーは git を意味論 method 経由でのみ操作する。generic passthrough（`GitRepository::status` / `output`）は infrastructure crate 内 `pub(crate)` とし、crate 外から git コマンド文字列を注入できない。新しい git 操作は意味論 port method として追加する（generic passthrough の再公開は ADR supersede を要する）。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "509fd1473af0dbd46648aabb43bb3c81f6c72665e0006d082c426a130c8af930",
+      "evidence_hash": "eae963e001bd4eef873d6c728f4509713ce7e19a4c9519eced0c6f3a6e805328",
+      "verdict": {
+        "kind": "pass",
+        "citation": "現在ブランチを upstream から pull するだけの subcommand を新設する。switch は行わず、ブランチ引数も取らない。sync 対象は常に「現在ブランチ」なので branch 解決も config 読み取りも不要になり、CN-02（snapshot 優先、global config 再読禁止）と構造的に衝突しない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`bin/sotp git sync` subcommand が存在し、引数なしで呼ぶと現在ブランチを upstream から fast-forward pull する。happy path（upstream 設定済み + ff-clean）のユニット / 統合テストが `cargo make test` で pass する。CLI `--help` の `git` サブコマンド一覧に `sync` が表示され、branch 引数を取らないことがヘルプに明示される。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "2f326898df865471dff01918bf0af9bd2338fdaece52b0d51c90359f1f6cfad8",
+      "evidence_hash": "eae963e001bd4eef873d6c728f4509713ce7e19a4c9519eced0c6f3a6e805328",
+      "verdict": {
+        "kind": "pass",
+        "citation": "pull は fast-forward only とする。divergence（ff 不可）時は明確なエラーで停止し、手動 merge はユーザー責務とする（merge / rebase を AI ハードブロックとする既存の enforcement 方針と整合）。upstream 未設定時も明確なエラーとし、graceful skip にしない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "`bin/sotp git sync` が 3 ケース（(a) upstream 未設定、(b) fast-forward 不可 = divergence、(c) worktree 未解決）で非ゼロ終了し、それぞれ原因を説明的に伝えるエラーを出力することをテストで確認できる。いずれのケースでも「warning を出して exit 0 で終了する」挙動が存在しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "ec435e084353ed1e885fe4517e935454788643ca6a29cec5a8fee1824fc7a6f4",
+      "evidence_hash": "eae963e001bd4eef873d6c728f4509713ce7e19a4c9519eced0c6f3a6e805328",
+      "verdict": {
+        "kind": "pass",
+        "citation": "generic な `git switch-and-pull` subcommand は廃止する"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "`apps/cli/src/commands/git.rs` に `SwitchAndPull` variant / `SwitchAndPullArgs` 型が存在せず、`apps/cli-composition/src/git.rs` に `git_switch_and_pull` / `git_switch_and_pull_in` / `git_switch_and_pull_impl` が存在しない。`cargo make ci` が pass し、削除に伴う dead reference が残らない（compile 通過が呼び出し元全消えの機械的検証を担う）。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "bc034cba8d68f862fa032cc3320bb3d8287998b1f6f2cef866b2983a8a469f38",
+      "evidence_hash": "eae963e001bd4eef873d6c728f4509713ce7e19a4c9519eced0c6f3a6e805328",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`track-switch-base` は「track ブランチから base branch に戻る」動線として存続させ、内部を branch switch + sync の合成に refactor する（外部挙動は不変）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "`bin/sotp track switch-base` が本 track 前と同じ input / output / exit code を維持することを、既存の switch-base 挙動テスト（`apps/cli-composition/src/track/branch_strategy.rs` 周辺）が bit-equivalent に pass することで確認できる。track ブランチから base branch に戻り upstream から pull する end-to-end 挙動を、fresh temp git repo の統合テストで確認できる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "721b7682dde42119a4b366b6ae39d4fccc7bcefe34c022a9eca1fd3326bcd9b6",
+      "evidence_hash": "eae963e001bd4eef873d6c728f4509713ce7e19a4c9519eced0c6f3a6e805328",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ロジックは CLI 側（`bin/sotp git sync`）に実装し、Makefile 側は薄い wrapper task のみとする。ブランチ名・条件分岐などのロジックを Makefile に書かない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "`Makefile.toml` の `git sync` wrapper task が `command = \"bin/sotp\"` + `args = [\"git\", \"sync\"]`（加えて description）のみで構成される。`script_runner = \"@shell\"` / `script = [...]` の指定がなく、ブランチ名リテラル（例 `\"main\"` / `\"develop\"`）や `case` / `if` / 変数展開が task 本体に含まれない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "b16fad6584e647e98cd34264b82e897b4d9f2cf35478bb46b15d69f3ee06f659",
+      "evidence_hash": "eae963e001bd4eef873d6c728f4509713ce7e19a4c9519eced0c6f3a6e805328",
+      "verdict": {
+        "kind": "pass",
+        "citation": "GitCompositionRoot の inline git method 群（Chain B）は削除する。`apps/cli` の git subcommand dispatch は配線済み `GitDriver` を経由する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "`GitCompositionRoot` に inline git 実装（git コマンド文字列を直接叩く method 群）が存在せず、wiring（adapter 構築 + 注入）に限定される。`apps/cli` の git subcommand dispatch が配線済み `GitDriver` を実 dispatch し、`GitWorkflowService` → `FsGitWorkflowAdapter` → `GitDriver` chain が唯一の live chain になる。commit の fail-closed track-branch guard が単一箇所に集約され、逐語重複が解消されていることをテストで確認できる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "f9a2225d618ed961d0c0410280be4bc353a18b888f024613fb8504eede01efd8",
+      "evidence_hash": "eae963e001bd4eef873d6c728f4509713ce7e19a4c9519eced0c6f3a6e805328",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`status` / `output` の generic passthrough を `SystemGitRepo` の `pub(crate)` inherent method に移す（`pub trait` の method は言語仕様上 method 単位で可視性を落とせないため、trait 経由の公開を撤去することで達成する）。 ... read 系の直埋め call site（`rev-parse` 系 / `show` / `fetch`。cli_composition の pr / review_v2 / track 系、および delivery 層 `apps/cli` の branch_ops）は意味論 method ... への置き換えで解消する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "`GitRepository::status` / `output` が infrastructure crate 外から不可視（`pub(crate)`）であり、`apps/cli` / `apps/cli-composition` / `apps/cli-driver` の非テストコード（テスト除く）に git コマンド文字列リテラルまたは git command の失敗種別判別ロジックが残存しないことを確認できる。read 系（rev-parse / show / fetch）が意味論 method 経由に置き換わっていることをテストで確認できる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "fbfc8d30a7fc96c2508fe11f5b12089f46fbe9864b2bc96381a96b5b6b9430c1",
+      "evidence_hash": "eae963e001bd4eef873d6c728f4509713ce7e19a4c9519eced0c6f3a6e805328",
+      "verdict": {
+        "kind": "pass",
+        "citation": "sync path はその旗艦事例とする。現在ブランチを upstream から fast-forward only で pull する infrastructure adapter primitive（例: `SystemGitRepo::sync_current_branch(&self) -> Result<(), SyncError>`）を新設し、CN-02 の 3 種 fail-closed failure modes（upstream 未設定 / non-fast-forward / worktree unresolved）を `SyncError` enum の variant として infrastructure boundary で型化する。... 上位層は自層の error 型への変換のみを行い、error 判別ロジックを持たない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "`libs/infrastructure/src/git_cli/` に current-branch sync 用意味論 method（例 `sync_current_branch`）と typed error（例 `SyncError`）が declare され、3 fail-closed modes（upstream 未設定 / non-fast-forward / worktree unresolved）が distinguishable な variant として区別できる。infrastructure layer が対応 variant を返し pattern match で識別可能であること、`apps/cli-composition` 側が変換のみで失敗種別を再判定していないことをユニットテストで確認できる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "1b4629278e929edde6354e27477d0587fc845c9aa1d778c6bf60c1e6c8dedae6",
+      "evidence_hash": "eae963e001bd4eef873d6c728f4509713ce7e19a4c9519eced0c6f3a6e805328",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「usecase 層の interactor へ移管し、composition root は adapter の構築と注入（wiring / DI）だけを行う」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "git 関与フロー（track branch ops / archive / pr / review_v2 系）の orchestration が usecase 層の interactor に存在し、composition root は wiring（adapter 構築 + 注入）のみになっていることを確認できる。移管された手順が usecase 単体テストで検証可能である。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
+          "decision_id": "D8"
+        }
+      }
+    },
+    {
+      "claim_hash": "55f3236e8de7c375963cdce3900a89842ca8e577c633a23c68d463a2df2e9b14",
+      "evidence_hash": "eae963e001bd4eef873d6c728f4509713ce7e19a4c9519eced0c6f3a6e805328",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli` の command module は引数 parse と dispatch のみを持つ thin bin とし、infrastructure の型・関数を直接参照しない。既存の cli → usecase 一本化方針を git 系にも徹底し、`apps/cli/src/commands/track/branch_ops.rs` の `rev-parse` 直埋めのような cli 層での git 判定は、usecase 経由（cli_driver の driver または usecase interactor の呼び出し）に置き換える。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-10",
+          "text_label": "`apps/cli` の非テストコードに infrastructure crate（`infrastructure::`）への直接参照が残存しないことを確認できる。`apps/cli/src/commands/track/branch_ops.rs` の git 判定（`rev-parse` 直埋め等）が usecase / cli_driver 経由に置き換わっている。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
+          "decision_id": "D9"
+        }
+      }
+    },
+    {
+      "claim_hash": "bcb258cfe6f6c3184962997b060ef4ad5872ec13f51ffa8b4e0c45a85f1e34a3",
+      "evidence_hash": "eae963e001bd4eef873d6c728f4509713ce7e19a4c9519eced0c6f3a6e805328",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`track-switch-base` は「track ブランチから base branch に戻る」動線として存続させ、内部を branch switch + sync の合成に refactor する（外部挙動は不変）。generic な `git switch-and-pull` subcommand は廃止する（sync と既存の branch switch 系コマンドで代替可能になるため）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-11",
+          "text_label": "6 surface が本 track の PR 内で更新されていることを確認できる: (a) `knowledge/conventions/branch-strategy.md` に sync 動線と更新後の `track-switch-base` 説明、(b) `.claude/rules/07-dev-environment.md` の cargo make タスク / `bin/sotp` subcommand 一覧に `git sync` 追加かつ `switch-and-pull` 参照なし、(c) `.claude/commands/track/done.md` / `.harness/workflows/track/done.md` の base 復帰手順整合、(d) `.codex/rules/default.rules` に新 wrapper task prefix_rule 追加かつ旧 `track-switch-main` stale 参照除去、(e) `.claude/settings.json` `permissions.allow` に新 wrapper task、(f) `Makefile.toml` に AC-05 の wrapper task。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "bcb258cfe6f6c3184962997b060ef4ad5872ec13f51ffa8b4e0c45a85f1e34a3",
+      "evidence_hash": "eae963e001bd4eef873d6c728f4509713ce7e19a4c9519eced0c6f3a6e805328",
+      "verdict": {
+        "kind": "pass",
+        "citation": "現在ブランチを upstream から pull するだけの subcommand を新設する。switch は行わず、ブランチ引数も取らない。sync 対象は常に「現在ブランチ」なので branch 解決も config 読み取りも不要になり、CN-02（snapshot 優先、global config 再読禁止）と構造的に衝突しない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-11",
+          "text_label": "6 surface が本 track の PR 内で更新されていることを確認できる: (a) `knowledge/conventions/branch-strategy.md` に sync 動線と更新後の `track-switch-base` 説明、(b) `.claude/rules/07-dev-environment.md` の cargo make タスク / `bin/sotp` subcommand 一覧に `git sync` 追加かつ `switch-and-pull` 参照なし、(c) `.claude/commands/track/done.md` / `.harness/workflows/track/done.md` の base 復帰手順整合、(d) `.codex/rules/default.rules` に新 wrapper task prefix_rule 追加かつ旧 `track-switch-main` stale 参照除去、(e) `.claude/settings.json` `permissions.allow` に新 wrapper task、(f) `Makefile.toml` に AC-05 の wrapper task。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
+          "decision_id": "D1"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,419 @@
+{
+  "schema_version": 5,
+  "crate_name": "infrastructure",
+  "layer": "infrastructure",
+  "types": {
+    "SyncError": {
+      "action": "add",
+      "role": { "ErrorType": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "UpstreamNotSet",     "payload": { "kind": "unit" } },
+          { "name": "NonFastForward",     "payload": { "kind": "struct", "fields": [
+            { "name": "stderr", "ty": "usecase::git_workflow::DiagnosticText" }
+          ] } },
+          { "name": "WorktreeUnresolved", "payload": { "kind": "struct", "fields": [
+            { "name": "stderr", "ty": "usecase::git_workflow::DiagnosticText" }
+          ] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "git_cli",
+      "docs": "Typed error for SystemGitRepo::sync_current_branch: UpstreamNotSet / NonFastForward{stderr} / WorktreeUnresolved{stderr}; stderr: usecase::git_workflow::DiagnosticText. Mapped 1:1 to GitWorkflowError::Sync* by the adapter. IN-06 / CN-02 / AC-08.",
+      "spec_refs": [
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-06" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "CN-02" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "AC-08" }
+      ],
+      "informal_grounds": []
+    },
+    "GitError": {
+      "action": "reference",
+      "role": { "ErrorType": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "CurrentDir",    "payload": { "kind": "tuple", "fields": ["std::io::Error"] } },
+          { "name": "Spawn",         "payload": { "kind": "struct", "fields": [
+            { "name": "command", "ty": "String" },
+            { "name": "source",  "ty": "std::io::Error" }
+          ] } },
+          { "name": "CommandFailed", "payload": { "kind": "struct", "fields": [
+            { "name": "command", "ty": "String" },
+            { "name": "code",    "ty": "i32" },
+            { "name": "stderr",  "ty": "String" }
+          ] } },
+          { "name": "EmptyRepoRoot", "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "git_cli",
+      "docs": "Pre-existing structured error for the crate-internal git helpers; unchanged by this track. Declared reference so Result<_, GitError> edges on SystemGitRepo's inherent methods resolve.",
+      "spec_refs": [
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-07" }
+      ],
+      "informal_grounds": []
+    },
+    "SystemGitRepo": {
+      "action": "modify",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "git_cli",
+      "docs": "System git runner (single private root: PathBuf field). Public surface reshaped: the GitRepository trait is demoted to pub(crate); status/output demoted to pub(crate) inherent; root / resolve_path / current_branch / push_branch / index_tree_hash / stage_all_excluding migrate to pub inherent (same signatures); adds sync_current_branch -> Result<(), SyncError>. Post-modify pub inherent set: discover / discover_from / root / resolve_path / current_branch / push_branch / index_tree_hash / stage_all_excluding / sync_current_branch (status/output excluded — pub(crate)). WorktreeReader + BranchReaderPort impls preserved. Role SecondaryAdapter. IN-06 / IN-07 / IN-09 / CN-02 / CN-07 / AC-07 / AC-08.",
+      "spec_refs": [
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-06" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-07" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-09" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "CN-02" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "CN-07" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "AC-07" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "AC-08" }
+      ],
+      "informal_grounds": []
+    },
+    "FsGitWorkflowAdapter": {
+      "action": "modify",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "unit" }
+      },
+      "methods": [],
+      "module_path": "git_cli::workflow_adapter",
+      "docs": "Adapter for guarded git primitives (unit struct). Trait-impl swap: usecase::git_workflow::GitWorkflowService -> usecase::git_workflow::GitPrimitivePort. IN-06 / IN-08 / CN-02 / AC-06 / AC-08.",
+      "spec_refs": [
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-06" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-08" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "CN-02" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "AC-06" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "AC-08" }
+      ],
+      "informal_grounds": []
+    },
+    "FsWorkspaceAdapter": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "unit" }
+      },
+      "methods": [],
+      "module_path": "git_cli::workflow_adapter",
+      "docs": "Adapter implementing usecase::git_workflow::TrackArchiveFsPort over std::fs; failures map to GitWorkflowError::Fs. Unit struct. IN-08 / IN-10 / AC-09.",
+      "spec_refs": [
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-08" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-10" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "AC-09" }
+      ],
+      "informal_grounds": []
+    },
+    "TrackBranchError": {
+      "action": "reference",
+      "role": { "ErrorType": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "LoadFailed", "payload": { "kind": "tuple", "fields": ["String"] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "git_cli",
+      "docs": "Pre-existing error for track-branch metadata loading; unchanged by this track. Declared reference.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "TrackBranchRecord": {
+      "action": "reference",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "display_path", "ty": "String" },
+            { "name": "track_name",   "ty": "String" },
+            { "name": "branch",       "ty": "Option<String>" },
+            { "name": "status",       "ty": "Option<String>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "git_cli",
+      "docs": "Pre-existing record returned by load_explicit_track_branch / collect_track_branch_claims; unchanged by this track. Role Dto. Declared reference for edge visibility.",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "traits": {
+    "GitRepository": {
+      "action": "delete",
+      "role": { "SecondaryPort": {} },
+      "methods": [
+        {
+          "name": "root",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&std::path::Path",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "(baseline shape for the delete diff; -> pub inherent on SystemGitRepo)"
+        },
+        {
+          "name": "status",
+          "receiver": "&self",
+          "params": [{ "name": "args", "ty": "&[&str]" }],
+          "returns": "Result<i32, GitError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "(baseline; -> pub(crate) inherent, IN-09)"
+        },
+        {
+          "name": "output",
+          "receiver": "&self",
+          "params": [{ "name": "args", "ty": "&[&str]" }],
+          "returns": "Result<std::process::Output, GitError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "(baseline; -> pub(crate) inherent, IN-09)"
+        },
+        {
+          "name": "resolve_path",
+          "receiver": "&self",
+          "params": [{ "name": "path", "ty": "&std::path::Path" }],
+          "returns": "std::path::PathBuf",
+          "is_async": false, "generics": [], "has_default_impl": true, "where_predicates": [],
+          "docs": "(baseline; -> pub inherent on SystemGitRepo)"
+        },
+        {
+          "name": "current_branch",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Result<Option<String>, GitError>",
+          "is_async": false, "generics": [], "has_default_impl": true, "where_predicates": [],
+          "docs": "(baseline; -> pub inherent on SystemGitRepo)"
+        },
+        {
+          "name": "push_branch",
+          "receiver": "&self",
+          "params": [{ "name": "branch", "ty": "&str" }],
+          "returns": "Result<(), GitError>",
+          "is_async": false, "generics": [], "has_default_impl": true, "where_predicates": [],
+          "docs": "(baseline; -> pub inherent on SystemGitRepo)"
+        },
+        {
+          "name": "index_tree_hash",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Result<String, GitError>",
+          "is_async": false, "generics": [], "has_default_impl": true, "where_predicates": [],
+          "docs": "(baseline; -> pub inherent on SystemGitRepo)"
+        },
+        {
+          "name": "stage_all_excluding",
+          "receiver": "&self",
+          "params": [
+            { "name": "exclude_files", "ty": "&[&str]" },
+            { "name": "exclude_dirs",  "ty": "&[&str]" }
+          ],
+          "returns": "Result<(), GitError>",
+          "is_async": false, "generics": [], "has_default_impl": true, "where_predicates": [],
+          "docs": "(baseline; -> pub inherent on SystemGitRepo)"
+        }
+      ],
+      "supertrait_bounds": [],
+      "module_path": "git_cli",
+      "docs": "Pre-existing pub trait GitRepository removed from the public surface (demoted pub(crate)); status/output become pub(crate) inherent; the other seven methods migrate to pub inherent on SystemGitRepo. Baseline method shapes recorded for the delete diff. IN-08 / IN-09 / CN-07 / AC-07.",
+      "spec_refs": [
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-08" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-09" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "CN-07" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "AC-07" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "functions": {
+    "infrastructure::git_cli::resolve_repo_path": {
+      "action": "reference",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "root", "ty": "&std::path::Path" },
+        { "name": "path", "ty": "&std::path::Path" }
+      ],
+      "returns": "std::path::PathBuf",
+      "is_async": false, "generics": [], "where_predicates": [],
+      "docs": "Pre-existing pub free helper; unchanged.",
+      "spec_refs": [], "informal_grounds": []
+    },
+    "infrastructure::git_cli::load_explicit_track_branch": {
+      "action": "reference",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "root",      "ty": "&std::path::Path" },
+        { "name": "track_dir", "ty": "&std::path::Path" }
+      ],
+      "returns": "Result<TrackBranchRecord, TrackBranchError>",
+      "is_async": false, "generics": [], "where_predicates": [],
+      "docs": "Pre-existing pub free helper; unchanged. Delegated to by FsGitWorkflowAdapter::read_explicit_track_branch.",
+      "spec_refs": [], "informal_grounds": []
+    },
+    "infrastructure::git_cli::load_explicit_track_branch_from_items_dir": {
+      "action": "reference",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "root",      "ty": "&std::path::Path" },
+        { "name": "items_dir", "ty": "&std::path::Path" },
+        { "name": "track_dir", "ty": "&std::path::Path" }
+      ],
+      "returns": "Result<TrackBranchRecord, TrackBranchError>",
+      "is_async": false, "generics": [], "where_predicates": [],
+      "docs": "Pre-existing pub free helper; unchanged.",
+      "spec_refs": [], "informal_grounds": []
+    },
+    "infrastructure::git_cli::collect_track_branch_claims": {
+      "action": "reference",
+      "role": "FreeFunction",
+      "params": [{ "name": "root", "ty": "&std::path::Path" }],
+      "returns": "Result<Vec<TrackBranchRecord>, TrackBranchError>",
+      "is_async": false, "generics": [], "where_predicates": [],
+      "docs": "Pre-existing pub free helper; unchanged. Delegated to by FsGitWorkflowAdapter::collect_track_branch_claims.",
+      "spec_refs": [], "informal_grounds": []
+    }
+  },
+  "inherent_impls": [
+    {
+      "type_name": "SystemGitRepo",
+      "methods": [
+        {
+          "name": "discover",
+          "receiver": null,
+          "params": [],
+          "returns": "Result<Self, GitError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "Discover the git repository root from the process CWD. Unchanged."
+        },
+        {
+          "name": "discover_from",
+          "receiver": null,
+          "params": [{ "name": "start_dir", "ty": "&std::path::Path" }],
+          "returns": "Result<Self, GitError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "Discover the git repository root from start_dir. Unchanged."
+        },
+        {
+          "name": "root",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&std::path::Path",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "Repo root accessor (migrated from the GitRepository trait, IN-09)."
+        },
+        {
+          "name": "resolve_path",
+          "receiver": "&self",
+          "params": [{ "name": "path", "ty": "&std::path::Path" }],
+          "returns": "std::path::PathBuf",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "Anchor a repo-relative path at the repo root (migrated from the GitRepository trait, IN-09)."
+        },
+        {
+          "name": "current_branch",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Result<Option<String>, GitError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "Current branch name (migrated from the GitRepository trait, IN-09)."
+        },
+        {
+          "name": "push_branch",
+          "receiver": "&self",
+          "params": [{ "name": "branch", "ty": "&str" }],
+          "returns": "Result<(), GitError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "git push -u origin <branch> (migrated from the GitRepository trait, IN-09)."
+        },
+        {
+          "name": "index_tree_hash",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Result<String, GitError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "git write-tree -> tree hash of the current index (migrated from the GitRepository trait, IN-09)."
+        },
+        {
+          "name": "stage_all_excluding",
+          "receiver": "&self",
+          "params": [
+            { "name": "exclude_files", "ty": "&[&str]" },
+            { "name": "exclude_dirs",  "ty": "&[&str]" }
+          ],
+          "returns": "Result<(), GitError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "git add -A excluding pathspecs (migrated from the GitRepository trait, IN-09)."
+        },
+        {
+          "name": "sync_current_branch",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Result<(), SyncError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "git pull --ff-only on the current branch, typed via SyncError. IN-06 / CN-02 / AC-08."
+        }
+      ]
+    },
+    {
+      "type_name": "FsGitWorkflowAdapter",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [],
+          "returns": "Self",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "Unit-struct constructor. Unchanged."
+        }
+      ]
+    },
+    {
+      "type_name": "FsWorkspaceAdapter",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [],
+          "returns": "Self",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "Unit-struct constructor."
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    { "action": "add",       "trait_ref": "core::fmt::Debug",                              "for_type": "SyncError" },
+    { "action": "add",       "trait_ref": "core::fmt::Display",                            "for_type": "SyncError" },
+    { "action": "add",       "trait_ref": "core::error::Error",                            "for_type": "SyncError" },
+    { "action": "reference", "trait_ref": "core::fmt::Debug",                              "for_type": "GitError" },
+    { "action": "reference", "trait_ref": "core::fmt::Display",                            "for_type": "GitError" },
+    { "action": "reference", "trait_ref": "core::error::Error",                            "for_type": "GitError" },
+    { "action": "reference", "trait_ref": "core::fmt::Debug",                              "for_type": "SystemGitRepo" },
+    { "action": "reference", "trait_ref": "core::clone::Clone",                            "for_type": "SystemGitRepo" },
+    { "action": "delete",    "trait_ref": "GitRepository",                                 "for_type": "SystemGitRepo" },
+    { "action": "reference", "trait_ref": "domain::WorktreeReader",                        "for_type": "SystemGitRepo" },
+    { "action": "reference", "trait_ref": "usecase::track_resolution::BranchReaderPort",   "for_type": "SystemGitRepo" },
+    { "action": "reference", "trait_ref": "core::default::Default",                        "for_type": "FsGitWorkflowAdapter" },
+    { "action": "delete",    "trait_ref": "usecase::git_workflow::GitWorkflowService",     "for_type": "FsGitWorkflowAdapter" },
+    { "action": "add",       "trait_ref": "usecase::git_workflow::GitPrimitivePort",       "for_type": "FsGitWorkflowAdapter" },
+    { "action": "add",       "trait_ref": "core::default::Default",                        "for_type": "FsWorkspaceAdapter" },
+    { "action": "add",       "trait_ref": "usecase::git_workflow::TrackArchiveFsPort",     "for_type": "FsWorkspaceAdapter" },
+    { "action": "reference", "trait_ref": "core::fmt::Debug",                              "for_type": "TrackBranchError" },
+    { "action": "reference", "trait_ref": "core::fmt::Display",                            "for_type": "TrackBranchError" },
+    { "action": "reference", "trait_ref": "core::error::Error",                            "for_type": "TrackBranchError" },
+    { "action": "reference", "trait_ref": "core::fmt::Debug",                              "for_type": "TrackBranchRecord" },
+    { "action": "reference", "trait_ref": "core::clone::Clone",                            "for_type": "TrackBranchRecord" },
+    { "action": "reference", "trait_ref": "core::cmp::PartialEq",                          "for_type": "TrackBranchRecord" },
+    { "action": "reference", "trait_ref": "core::cmp::Eq",                                 "for_type": "TrackBranchRecord" }
+  ]
+}

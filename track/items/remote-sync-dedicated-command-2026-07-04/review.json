@@ -1,6 +1,85 @@
 {
   "schema_version": 2,
   "scopes": {
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bfc96c4b192ced3802b308995fdf02cbe5c0d3744ee6fa1b8b20a671ca01adef",
+          "at": "2026-07-04T06:44:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-02/IN-07 explicitly include `cli_driver` in the layers whose git command strings and failure-detection logic must be moved behind infrastructure semantics, but the acceptance checks here only grep `apps/cli` and `apps/cli-composition`. AC-06 proves `apps/cli` dispatches through `GitDriver`, but it does not deterministically assert that `apps/cli-driver` itself contains no direct git command literals or failure classification, so the `cli_driver` portion of the stated goal can pass unverified.",
+              "severity": "P1",
+              "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json",
+              "line": 383,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:bfc96c4b192ced3802b308995fdf02cbe5c0d3744ee6fa1b8b20a671ca01adef",
+          "at": "2026-07-04T06:50:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:82b02dbb7378ba7531ebc63cdc46fa0722e18f4841ed9222c27465ee85aa9d1b",
+          "at": "2026-07-04T06:53:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:af65e7f6ae8c23b7c9e15cb65ef29100372202cd0962c51c5fbcdd3bf5765363",
+          "at": "2026-07-04T07:35:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:af65e7f6ae8c23b7c9e15cb65ef29100372202cd0962c51c5fbcdd3bf5765363",
+          "at": "2026-07-04T07:40:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5f98d85c5552d66c07ad5abbe213fa6881fbeda82d687225f57f030cb1da084b",
+          "at": "2026-07-04T09:00:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5f98d85c5552d66c07ad5abbe213fa6881fbeda82d687225f57f030cb1da084b",
+          "at": "2026-07-04T09:04:35Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:807f3a207c376596a1c399db60bfe51f6a2e914177598c13d14d12e38922b78c",
+          "at": "2026-07-04T07:33:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:807f3a207c376596a1c399db60bfe51f6a2e914177598c13d14d12e38922b78c",
+          "at": "2026-07-04T07:37:10Z"
+        }
+      ]
+    },
     "adr": {
       "rounds": [
         {
@@ -16,6 +95,35 @@
           "findings": [],
           "hash": "rvw1:sha256:9b5ed29fc07cf08fa4a949a035eabb9b4ad7a64050d11870e05a0f5d8207b3dc",
           "at": "2026-07-04T02:13:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D5-D9 split the new sync refactor across three ownership layers without choosing one coherent public contract. D5 introduces `sync_current_branch`/`SyncError` at the infrastructure boundary, D6 rehomes sync/pull separation into the `GitWorkflowService` port chain, and D8/D9 then move orchestration out of composition root and cli. As written, `spec.json` and the later type catalogue cannot derive a single API surface or error-mapping boundary for `git sync`, so implementers can satisfy the prose while wiring incompatible layers.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
+              "line": 67,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:56e923e1c54de0d5def86d8488a5e37828728fff61b8e9229c23a8bc91893f76",
+          "at": "2026-07-04T06:46:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c7beefbba50efd196b349718a91ffca4acde61f7546d8393e726426b77b5c42",
+          "at": "2026-07-04T06:52:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c7beefbba50efd196b349718a91ffca4acde61f7546d8393e726426b77b5c42",
+          "at": "2026-07-04T06:56:50Z"
         }
       ]
     },
@@ -34,6 +142,298 @@
           "findings": [],
           "hash": "rvw1:sha256:4ce22c8b4888ed4555515e6a4328e115d89dc4b51e2f5c13aed6ebcff0e4ff65",
           "at": "2026-07-04T02:11:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 is attributed to `ExplicitTrackBranch`, `TrackBranchClaim`, and `BranchReaderPort`, but the task text explicitly says those reference-only entries are unchanged. Remove those attributions or the contract no longer matches the described edit scope.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/task-contract.json",
+              "line": 5,
+              "category": "task-contract attribution mismatch"
+            },
+            {
+              "message": "T005 is attributed to `FileArgs`, `CommitFromFileArgs`, and `UnstageArgs`, but the task text says the `AddAll` / `AddFromFile` / `CommitFromFile` / `NoteFromFile` / `Unstage` variants keep their existing shape and tests. Those symbol attributions look inflated for the described change.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/task-contract.json",
+              "line": 37,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:4ba623040dc121e649129960ce56aa1abd4f5c078d03886728ad23da5e49f63c",
+          "at": "2026-07-04T06:48:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `plan.summary` block is prose-heavy restatement of the upstream ADR/spec behavior (`bin/sotp git sync` semantics, hexagonal layering, D7/D8 rationale) instead of an executable plan. The impl-plan review policy only permits target + operation + anchor cite here, so this section should be collapsed into taskable edits rather than restating the design contract.",
+              "severity": "P1",
+              "file": "track/items/remote-sync-dedicated-command-2026-07-04/impl-plan.json",
+              "line": 60,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`T005` is attributed to `FileArgs`, `CommitFromFileArgs`, and `UnstageArgs`, but the task text only removes `SwitchAndPull`, adds `Sync`, and rewires the git-family dispatch path; it explicitly says the `AddAll` / `AddFromFile` / `CommitFromFile` / `NoteFromFile` / `Unstage` variants keep their existing shape. Those three catalog entries are therefore over-attributed and make the task-contract imply a broader edit than the plan actually describes.",
+              "severity": "P1",
+              "file": "track/items/remote-sync-dedicated-command-2026-07-04/task-contract.json",
+              "line": 43,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:02c3b5f549c894e4e86b14ec8a4c411fe788517bf4344f4e170a1dcce0cf7e2e",
+          "at": "2026-07-04T06:58:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "S1-S7 (and the task bullets beneath them) restate upstream ADR/spec behavior in prose instead of staying in the executable-plan format. Examples include 'exact stdout/stderr/exit contracts', 'git pull --ff-only classified into 3 typed SyncError variants', and 'graceful skip forbidden'. The impl-plan prompt only allows target + operation + anchor cite, so this text needs to be collapsed into action items.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/plan.md",
+              "line": 15,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T002 over-attributes `BranchReaderPort` even though the task text explicitly says 'Reference-only entries (ExplicitTrackBranch, TrackBranchClaim, BranchReaderPort) are unchanged'. That catalogue entry is not part of the work and should be removed from the task-contract map.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/task-contract.json",
+              "line": 12,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:b265fbd72c48100048bf6b490712bf9b9c4ebd59e8c50f505aec6b421e65fb8b",
+          "at": "2026-07-04T07:05:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:63df473a1bf3f03d3c7ab1a9904e74863897a92f5535727bf995c980dfff098d",
+          "at": "2026-07-04T07:13:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-03 is mapped only to T005, but T006 explicitly owns deletion of `apps/cli-composition/src/git.rs` helpers `git_switch_and_pull_in` / `git_switch_and_pull_impl` in `impl-plan.json` line 36. AC-03 requires those symbols to be absent, so the load-bearing coverage is split incorrectly: T005 could be treated as covering AC-03 while the helper deletion is deferred to an unmapped task. Add T006 to AC-03 coverage or move that deletion fully into T005.",
+              "severity": "P1",
+              "file": "track/items/remote-sync-dedicated-command-2026-07-04/task-coverage.json",
+              "line": 39,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "T009 includes `Add switch-and-pull grep assertion` without naming the target file, script, task, or symbol where that assertion should be added. The rest of T009 names files, but this persistent verification step lacks a target boundary, so an executor has to invent where it belongs.",
+              "severity": "P1",
+              "file": "track/items/remote-sync-dedicated-command-2026-07-04/impl-plan.json",
+              "line": 54,
+              "category": "task description non-executable"
+            }
+          ],
+          "hash": "rvw1:sha256:63df473a1bf3f03d3c7ab1a9904e74863897a92f5535727bf995c980dfff098d",
+          "at": "2026-07-04T07:24:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f4ef035b759971cf91ea19b57c9975236041a40f0dd395892cd28c4864c46429",
+          "at": "2026-07-04T07:37:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-10/IN-11 require replacing the non-test `apps/cli/src/commands/track/branch_ops.rs` git判定/direct infrastructure path, but the plan never assigns that production edit. `task-coverage.json` maps AC-10 to T005/T006/T008, while T005 only covers `apps/cli/src/commands/git.rs`, T006 covers `apps/cli-composition`, and T008 mentions only `branch_ops.rs tests` cleanup. An implementer can follow all tasks and still leave the production `branch_ops.rs` rev-parse/GitRepository path outside the plan.",
+              "severity": "P1",
+              "file": "track/items/remote-sync-dedicated-command-2026-07-04/impl-plan.json",
+              "line": 48,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:f4ef035b759971cf91ea19b57c9975236041a40f0dd395892cd28c4864c46429",
+          "at": "2026-07-04T07:43:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1b62ddb8ec5b43e6a7c1df8d6aa438b032e469e6ebaef3711beb03a1d21f2a38",
+          "at": "2026-07-04T07:49:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5cb64f58ad0ca173afc1707322cd8decb265c14e7718547431ead4db302ea5de",
+          "at": "2026-07-04T08:45:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-09 is only mapped to T003, but T003 just adds the interactor types and mock-port tests; it does not migrate the live track/pr/review_v2 composition flows that AC-09 requires to be orchestrated through those interactors. The executable tasks that perform that migration are T006/T007, and T007 even cites AC-09 in impl-plan.json, so leaving AC-09 covered solely by T003 makes the coverage map report the acceptance criterion complete before the actual caller migration is covered.",
+              "severity": "P1",
+              "file": "track/items/remote-sync-dedicated-command-2026-07-04/task-coverage.json",
+              "line": 45,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:5cb64f58ad0ca173afc1707322cd8decb265c14e7718547431ead4db302ea5de",
+          "at": "2026-07-04T08:50:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69c9906a9ba93f9af91ede586591e8ceb2ca2289e1529da12cdc60be0ee0bf87",
+          "at": "2026-07-04T08:55:01Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Several `docs` fields in the new/modified catalog entries restate ADR/spec rationale instead of staying anchor-only, which violates `knowledge/conventions/no-upstream-restatement.md`. The clearest instance is `usecase::git_workflow::DiagnosticText` at line 38, and the same pattern recurs in `GitWorkflowError`, `GitWorkflowInteractor`, `GitPrimitivePort`, `TrackArchiveFsPort`, `GitWorkflowService`, and the corresponding CLI/infrastructure entries: they explain why the design exists rather than just naming the changed surface and citing the anchors.",
+              "severity": "P1",
+              "file": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+              "line": 38,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:bc1e8e5ac4fc3775d7e76a8229e5e01c55eec89d201b6421d137147ae421e836",
+          "at": "2026-07-04T06:53:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:216d56c11305758a81e9d8c9d99f0e9edef356a6a42ad0655b9e2fb5d7fc5f05",
+          "at": "2026-07-04T07:16:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`contract-map.md` still renders `FsGitWorkflowAdapter` as implementing `GitWorkflowService`, but the catalogue declares that trait impl as `action: delete` and the replacement `GitPrimitivePort` impl as `action: add`. Because deleted `SwitchAndPullArgs` / `GitRepository` nodes are omitted from the map, this stale live edge makes the rendered type contract contradict the target-state catalogue and preserves the old adapter-to-application-service relationship in the PR-level view.",
+              "severity": "P1",
+              "file": "track/items/remote-sync-dedicated-command-2026-07-04/contract-map.md",
+              "line": 354,
+              "category": "SoT integrity"
+            }
+          ],
+          "hash": "rvw1:sha256:216d56c11305758a81e9d8c9d99f0e9edef356a6a42ad0655b9e2fb5d7fc5f05",
+          "at": "2026-07-04T07:22:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `docs` field for `usecase::git_workflow::GitPrimitivePort` is restating the upstream contract in prose (per-method git semantics, explicit implementation target, and branch-root behavior) instead of staying at the required \"change + operation + anchor cite\" level. This violates `knowledge/conventions/no-upstream-restatement.md`; the same pattern also appears in `cli::commands::git::GitCommand`, `cli_driver::git::GitInput`, and `cli_composition::git::GitCompositionRoot`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+              "line": 206,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:e7e9ebe0ec6441dbf2ce39122f80c514b2bd0d3b2f1c37f384ea99658e4d4576",
+          "at": "2026-07-04T07:42:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`GitWorkflowService::current_branch_track_id` still returns `Result<Option<String>, GitWorkflowError>` here, so the service boundary exports a branch-derived track identifier as a raw string instead of a validated domain type. That keeps the track-id contract stringly typed and pushes re-validation onto every caller.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+              "line": 520,
+              "category": "SoT integrity"
+            },
+            {
+              "message": "`domain-types.json` is missing the reference nodes needed by this track's usecase surface: `BranchReadError` (`usecase-types.json:555`), `domain::TrackId` (`:644`, `:656`, `:678`, `:702`, `:732`) and `domain::CommitHash` (`:302`, `:712`, `:733`, `:741`). Without those declarations, the contract map leaves the new cross-layer type edges unresolved.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/domain-types.json",
+              "line": 5,
+              "category": "SoT integrity"
+            }
+          ],
+          "hash": "rvw1:sha256:43bde4ed7f99ce2b7670425ef8bb7d6dbb2342058b480a155de7550f91982ea1",
+          "at": "2026-07-04T07:56:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:05b465a025cebd0d13db70186acb189b1e519657d6a0e2d3c1014403e8b2159c",
+          "at": "2026-07-04T08:20:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TrackGitInteractor` method docs restate upstream behavior contracts instead of only citing anchors: the catalogue spells out the branch-create sequence, switch-base sequence, archive rollback sequence, and stdout behavior. `knowledge/conventions/no-upstream-restatement.md` applies to `<layer>-types.json` docs/intent fields, so this creates a second behavioral source of truth that can drift from IN-05/IN-10/CN-03/AC-04. Replace the prose with target/operation plus anchor cites.",
+              "severity": "P1",
+              "file": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+              "line": 664,
+              "category": "upstream_restatement"
+            },
+            {
+              "message": "The PR/review interactor method docs also encode behavior flow details (`fetch_branch -> show_file_at_ref(...) -> raw JSON` and current-branch verification before resolving HEAD) rather than deferring to the cited spec anchors. This violates the same no-upstream-restatement rule for type catalogues and makes these usecase entries independent behavioral documentation instead of type contracts tied to IN-10/CN-03/AC-09.",
+              "severity": "P1",
+              "file": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+              "line": 721,
+              "category": "upstream_restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:05b465a025cebd0d13db70186acb189b1e519657d6a0e2d3c1014403e8b2159c",
+          "at": "2026-07-04T08:31:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dbca4c15e5a193b329784a41f78147b424b37ae5b88965dab68d77a999233346",
+          "at": "2026-07-04T08:50:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dbca4c15e5a193b329784a41f78147b424b37ae5b88965dab68d77a999233346",
+          "at": "2026-07-04T08:55:53Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8bd1f474595b5327597aa70992136690318b7a48db43bb4b8e83f84fabd4225a",
+          "at": "2026-07-04T06:44:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8bd1f474595b5327597aa70992136690318b7a48db43bb4b8e83f84fabd4225a",
+          "at": "2026-07-04T06:47:46Z"
         }
       ]
     }

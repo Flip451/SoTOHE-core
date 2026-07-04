@@ -1,0 +1,141 @@
+{
+  "schema_version": 5,
+  "crate_name": "cli",
+  "layer": "cli",
+  "types": {
+    "GitCommand": {
+      "action": "modify",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "AddAll",         "payload": { "kind": "unit" } },
+          { "name": "AddFromFile",    "payload": { "kind": "tuple", "fields": ["FileArgs"] } },
+          { "name": "CommitFromFile", "payload": { "kind": "tuple", "fields": ["CommitFromFileArgs"] } },
+          { "name": "NoteFromFile",   "payload": { "kind": "tuple", "fields": ["FileArgs"] } },
+          { "name": "Sync",           "payload": { "kind": "unit" } },
+          { "name": "Unstage",        "payload": { "kind": "tuple", "fields": ["UnstageArgs"] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "commands::git",
+      "docs": "Modify GitCommand: delete SwitchAndPull(SwitchAndPullArgs), add unit Sync, and record the post-modify variant set. IN-01 / IN-04 / IN-11 / CN-01 / CN-04 / CN-05 / CN-06 / AC-01 / AC-03 / AC-10.",
+      "spec_refs": [
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-01" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-11" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "CN-01" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "CN-04" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "CN-05" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "CN-06" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "AC-01" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "AC-03" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "AC-10" }
+      ],
+      "informal_grounds": []
+    },
+    "SwitchAndPullArgs": {
+      "action": "delete",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "branch", "ty": "String" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "commands::git",
+      "docs": "clap args struct for the removed bin/sotp git switch-and-pull <branch> subcommand. Deleted (baseline shape recorded for the delete diff: plain struct, pub branch: String). Role Dto. IN-04 / CN-05 / AC-03.",
+      "spec_refs": [
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "CN-05" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "AC-03" }
+      ],
+      "informal_grounds": []
+    },
+    "FileArgs": {
+      "action": "reference",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "path",    "ty": "std::path::PathBuf" },
+            { "name": "cleanup", "ty": "bool" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "commands::git",
+      "docs": "Pre-existing clap args struct shared by `GitCommand::AddFromFile` and `GitCommand::NoteFromFile`. Unchanged by this track — declared as `reference` so `GitCommand`'s variant edges resolve in the contract-map graph.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "CommitFromFileArgs": {
+      "action": "reference",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "path",      "ty": "std::path::PathBuf" },
+            { "name": "cleanup",   "ty": "bool" },
+            { "name": "track_dir", "ty": "Option<std::path::PathBuf>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "commands::git",
+      "docs": "Pre-existing clap args struct for `GitCommand::CommitFromFile`. Unchanged by this track — declared as `reference` so `GitCommand`'s variant edge resolves in the contract-map graph.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "UnstageArgs": {
+      "action": "reference",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "paths", "ty": "Vec<std::path::PathBuf>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "commands::git",
+      "docs": "Pre-existing clap args struct for `GitCommand::Unstage`. Unchanged by this track — declared as `reference` so `GitCommand`'s variant edge resolves in the contract-map graph.",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [],
+  "trait_impls": [
+    { "action": "reference", "trait_ref": "core::fmt::Debug",                     "for_type": "GitCommand" },
+    { "action": "reference", "trait_ref": "clap_builder::derive::Subcommand",     "for_type": "GitCommand" },
+    { "action": "reference", "trait_ref": "clap_builder::derive::FromArgMatches", "for_type": "GitCommand" },
+    { "action": "delete",    "trait_ref": "core::fmt::Debug",                     "for_type": "SwitchAndPullArgs" },
+    { "action": "delete",    "trait_ref": "clap_builder::derive::Args",           "for_type": "SwitchAndPullArgs" },
+    { "action": "delete",    "trait_ref": "clap_builder::derive::FromArgMatches", "for_type": "SwitchAndPullArgs" },
+    { "action": "reference", "trait_ref": "core::fmt::Debug",                     "for_type": "FileArgs" },
+    { "action": "reference", "trait_ref": "clap_builder::derive::Args",           "for_type": "FileArgs" },
+    { "action": "reference", "trait_ref": "clap_builder::derive::FromArgMatches", "for_type": "FileArgs" },
+    { "action": "reference", "trait_ref": "core::fmt::Debug",                     "for_type": "CommitFromFileArgs" },
+    { "action": "reference", "trait_ref": "clap_builder::derive::Args",           "for_type": "CommitFromFileArgs" },
+    { "action": "reference", "trait_ref": "clap_builder::derive::FromArgMatches", "for_type": "CommitFromFileArgs" },
+    { "action": "reference", "trait_ref": "core::fmt::Debug",                     "for_type": "UnstageArgs" },
+    { "action": "reference", "trait_ref": "clap_builder::derive::Args",           "for_type": "UnstageArgs" },
+    { "action": "reference", "trait_ref": "clap_builder::derive::FromArgMatches", "for_type": "UnstageArgs" }
+  ]
+}

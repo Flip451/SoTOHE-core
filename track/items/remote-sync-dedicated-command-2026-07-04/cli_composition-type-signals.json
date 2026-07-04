@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-04T09:07:16Z",
+  "declaration_hash": "8deddf07b8917d339913676840b7ab02deef26464a7728a9c1f81f9b91297fbb",
+  "signals": [
+    {
+      "type_name": "GitCompositionRoot",
+      "kind_tag": "composition_root",
+      "signal": "yellow",
+      "found_type": true
+    }
+  ]
+}

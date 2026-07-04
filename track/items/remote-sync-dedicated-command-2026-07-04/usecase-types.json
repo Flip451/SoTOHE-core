@@ -1,0 +1,785 @@
+{
+  "schema_version": 5,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {
+    "DiagnosticText": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "tuple", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [{ "name": "s", "ty": "impl Into<String>" }],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Infallible constructor from any string-like input."
+        },
+        {
+          "name": "as_str",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Returns the underlying string slice."
+        }
+      ],
+      "module_path": "git_workflow",
+      "docs": "General-purpose newtype wrapping an unstructured diagnostic string; private String field (rustdoc-stripped). Shared by GitWorkflowError and infrastructure::git_cli::SyncError variant fields. Role ValueObject (usecase-hosted, co-located with consumers). IN-06 / IN-08 / CN-02.",
+      "spec_refs": [
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-06" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-08" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "CN-02" }
+      ],
+      "informal_grounds": []
+    },
+    "GitWorkflowError": {
+      "action": "modify",
+      "role": { "ErrorType": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Validation",     "payload": { "kind": "tuple", "fields": ["DiagnosticText"] } },
+          { "name": "NoBranch",       "payload": { "kind": "unit" } },
+          { "name": "DetachedHead",   "payload": { "kind": "tuple", "fields": ["DiagnosticText"] } },
+          { "name": "BranchMismatch", "payload": { "kind": "struct", "fields": [
+            { "name": "current",  "ty": "DiagnosticText" },
+            { "name": "expected", "ty": "DiagnosticText" }
+          ] } },
+          { "name": "Message",     "payload": { "kind": "tuple", "fields": ["DiagnosticText"] } },
+          { "name": "Unavailable", "payload": { "kind": "tuple", "fields": ["DiagnosticText"] } },
+          { "name": "SyncUpstreamNotSet",     "payload": { "kind": "unit" } },
+          { "name": "SyncNonFastForward",     "payload": { "kind": "struct", "fields": [
+            { "name": "stderr", "ty": "DiagnosticText" }
+          ] } },
+          { "name": "SyncWorktreeUnresolved", "payload": { "kind": "struct", "fields": [
+            { "name": "stderr", "ty": "DiagnosticText" }
+          ] } },
+          { "name": "Fs", "payload": { "kind": "struct", "fields": [
+            { "name": "detail", "ty": "DiagnosticText" }
+          ] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "git_workflow",
+      "docs": "ErrorType for the git-workflow surface. Adds Sync variants (SyncUpstreamNotSet / SyncNonFastForward{stderr} / SyncWorktreeUnresolved{stderr}) and Fs{detail}; every free-text String variant field retyped to DiagnosticText. Full post-modify variant set enumerated. IN-06 / IN-08 / IN-10 / CN-02 / AC-08.",
+      "spec_refs": [
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-06" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-08" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-10" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "CN-02" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "AC-08" }
+      ],
+      "informal_grounds": []
+    },
+    "GitWorkflowInteractor": {
+      "action": "modify",
+      "role": { "Interactor": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "git_workflow",
+      "docs": "Interactor implementing GitWorkflowService (git family). new() param Arc<dyn GitWorkflowService> -> Arc<dyn GitPrimitivePort>; impl reshaped (drop switch_and_pull, add sync_current_branch, commit_from_file hosts the track-branch guard). Single private field (has_stripped_fields: true / fields: []). IN-08 / AC-06.",
+      "spec_refs": [
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-08" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "AC-06" }
+      ],
+      "informal_grounds": []
+    },
+    "TrackGitInteractor": {
+      "action": "add",
+      "role": { "UseCase": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "git_workflow",
+      "docs": "UseCase holding Arc<dyn GitPrimitivePort> + Arc<dyn TrackArchiveFsPort>. Orchestrates the git-involved track subcommands (create_track_branch / switch_to_track_branch / switch_to_base / archive_track), relocated from apps/cli-composition/src/track/branch_strategy.rs + track/mod.rs. Two private fields (has_stripped_fields: true / fields: []). IN-05 / IN-08 / IN-10 / CN-03 / CN-05 / AC-04 / AC-09.",
+      "spec_refs": [
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-05" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-08" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-10" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "CN-03" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "CN-05" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "AC-04" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "AC-09" }
+      ],
+      "informal_grounds": []
+    },
+    "PrGitInteractor": {
+      "action": "add",
+      "role": { "UseCase": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "git_workflow",
+      "docs": "UseCase holding Arc<dyn GitPrimitivePort>. Orchestrates the pr git reads (fetch_and_read_metadata_at_ref / resolve_head), relocated from apps/cli-composition/src/pr.rs + pr/poll.rs. One private field (has_stripped_fields: true / fields: []). IN-08 / IN-10 / CN-03 / AC-09.",
+      "spec_refs": [
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-08" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-10" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "CN-03" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "AC-09" }
+      ],
+      "informal_grounds": []
+    },
+    "ReviewGitInteractor": {
+      "action": "add",
+      "role": { "UseCase": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "git_workflow",
+      "docs": "UseCase holding Arc<dyn GitPrimitivePort>. Orchestrates the review_v2 git reads (resolve_head_for_track_branch / resolve_diff_base), relocated from apps/cli-composition/src/review_v2/commit_hash.rs + shared.rs. One private field (has_stripped_fields: true / fields: []). IN-08 / IN-10 / CN-03 / AC-09.",
+      "spec_refs": [
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-08" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-10" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "CN-03" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "AC-09" }
+      ],
+      "informal_grounds": []
+    },
+    "ExplicitTrackBranch": {
+      "action": "reference",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "display_path",    "ty": "String" },
+            { "name": "expected_branch", "ty": "Option<String>" },
+            { "name": "status",          "ty": "Option<String>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "git_workflow",
+      "docs": "Pre-existing shared record; unchanged by this track. Role Dto. Declared reference for edge visibility (GitPrimitivePort::read_explicit_track_branch, verify_explicit_track_branch).",
+      "spec_refs": [
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-08" }
+      ],
+      "informal_grounds": []
+    },
+    "TrackBranchClaim": {
+      "action": "reference",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "track_name", "ty": "String" },
+            { "name": "branch",     "ty": "Option<String>" },
+            { "name": "status",     "ty": "Option<String>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "git_workflow",
+      "docs": "Pre-existing shared record; unchanged by this track. Role Dto. Declared reference for edge visibility (GitPrimitivePort::collect_track_branch_claims, verify_auto_detected_branch).",
+      "spec_refs": [
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-08" }
+      ],
+      "informal_grounds": []
+    },
+    "BranchReadError": {
+      "action": "reference",
+      "role": { "ErrorType": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "ReadFailed", "payload": { "kind": "tuple", "fields": ["String"] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "track_resolution",
+      "docs": "Pre-existing usecase error for BranchReaderPort::current_branch; unchanged by this track. Declared reference for edge visibility (BranchReaderPort return type).",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "traits": {
+    "GitPrimitivePort": {
+      "action": "add",
+      "role": { "SecondaryPort": {} },
+      "methods": [
+        {
+          "name": "current_branch",
+          "receiver": "&self",
+          "params": [{ "name": "project_root", "ty": "Option<&std::path::Path>" }],
+          "returns": "Result<Option<String>, GitWorkflowError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "GitPrimitivePort primitive; see entry spec_refs."
+        },
+        {
+          "name": "sync_current_branch",
+          "receiver": "&self",
+          "params": [{ "name": "project_root", "ty": "Option<&std::path::Path>" }],
+          "returns": "Result<(), GitWorkflowError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "GitPrimitivePort primitive; see entry spec_refs."
+        },
+        {
+          "name": "switch_branch",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "Option<&std::path::Path>" },
+            { "name": "branch",       "ty": "&str" }
+          ],
+          "returns": "Result<(), GitWorkflowError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "GitPrimitivePort primitive; see entry spec_refs."
+        },
+        {
+          "name": "create_branch",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "Option<&std::path::Path>" },
+            { "name": "new_branch",   "ty": "&str" },
+            { "name": "base_branch",  "ty": "&str" }
+          ],
+          "returns": "Result<(), GitWorkflowError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "GitPrimitivePort primitive; see entry spec_refs."
+        },
+        {
+          "name": "branch_exists",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "Option<&std::path::Path>" },
+            { "name": "branch",       "ty": "&str" }
+          ],
+          "returns": "Result<bool, GitWorkflowError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "GitPrimitivePort primitive; see entry spec_refs."
+        },
+        {
+          "name": "move_path",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "Option<&std::path::Path>" },
+            { "name": "src",          "ty": "&std::path::Path" },
+            { "name": "dst",          "ty": "&std::path::Path" }
+          ],
+          "returns": "Result<(), GitWorkflowError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "GitPrimitivePort primitive; see entry spec_refs."
+        },
+        {
+          "name": "fetch_branch",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "Option<&std::path::Path>" },
+            { "name": "branch",       "ty": "&str" }
+          ],
+          "returns": "Result<(), GitWorkflowError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "GitPrimitivePort primitive; see entry spec_refs."
+        },
+        {
+          "name": "show_file_at_ref",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "Option<&std::path::Path>" },
+            { "name": "git_ref",      "ty": "&str" },
+            { "name": "path",         "ty": "&std::path::Path" }
+          ],
+          "returns": "Result<String, GitWorkflowError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "GitPrimitivePort primitive; see entry spec_refs."
+        },
+        {
+          "name": "resolve_commit",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "Option<&std::path::Path>" },
+            { "name": "rev",          "ty": "&str" }
+          ],
+          "returns": "Result<Option<domain::CommitHash>, GitWorkflowError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "GitPrimitivePort primitive; see entry spec_refs."
+        },
+        {
+          "name": "stage_all",
+          "receiver": "&self",
+          "params": [{ "name": "project_root", "ty": "Option<&std::path::Path>" }],
+          "returns": "Result<(), GitWorkflowError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "GitPrimitivePort primitive; see entry spec_refs."
+        },
+        {
+          "name": "stage_from_file",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "Option<&std::path::Path>" },
+            { "name": "path",         "ty": "&std::path::Path" },
+            { "name": "cleanup",      "ty": "bool" }
+          ],
+          "returns": "Result<(), GitWorkflowError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "GitPrimitivePort primitive; see entry spec_refs."
+        },
+        {
+          "name": "commit_from_message_file",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "Option<&std::path::Path>" },
+            { "name": "path",         "ty": "&std::path::Path" },
+            { "name": "cleanup",      "ty": "bool" }
+          ],
+          "returns": "Result<(), GitWorkflowError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "GitPrimitivePort primitive; see entry spec_refs."
+        },
+        {
+          "name": "note_from_file",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "Option<&std::path::Path>" },
+            { "name": "path",         "ty": "&std::path::Path" },
+            { "name": "cleanup",      "ty": "bool" }
+          ],
+          "returns": "Result<(), GitWorkflowError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "GitPrimitivePort primitive; see entry spec_refs."
+        },
+        {
+          "name": "unstage",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "Option<&std::path::Path>" },
+            { "name": "paths",        "ty": "&[std::path::PathBuf]" }
+          ],
+          "returns": "Result<(), GitWorkflowError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "GitPrimitivePort primitive; see entry spec_refs."
+        },
+        {
+          "name": "read_explicit_track_branch",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "Option<&std::path::Path>" },
+            { "name": "track_dir",    "ty": "&std::path::Path" }
+          ],
+          "returns": "Result<ExplicitTrackBranch, GitWorkflowError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "GitPrimitivePort primitive; see entry spec_refs."
+        },
+        {
+          "name": "collect_track_branch_claims",
+          "receiver": "&self",
+          "params": [{ "name": "project_root", "ty": "Option<&std::path::Path>" }],
+          "returns": "Result<Vec<TrackBranchClaim>, GitWorkflowError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "GitPrimitivePort primitive; see entry spec_refs."
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "git_workflow",
+      "docs": "Add GitPrimitivePort SecondaryPort; method set records the D8 flow census. IN-06 / IN-07 / IN-08 / IN-09 / CN-02 / CN-07 / AC-08.",
+      "spec_refs": [
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-06" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-07" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-08" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-09" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "CN-02" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "CN-07" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "AC-08" }
+      ],
+      "informal_grounds": []
+    },
+    "TrackArchiveFsPort": {
+      "action": "add",
+      "role": { "SecondaryPort": {} },
+      "methods": [
+        {
+          "name": "path_is_dir",
+          "receiver": "&self",
+          "params": [{ "name": "path", "ty": "&std::path::Path" }],
+          "returns": "Result<bool, GitWorkflowError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "fs: is path a directory?"
+        },
+        {
+          "name": "path_exists",
+          "receiver": "&self",
+          "params": [{ "name": "path", "ty": "&std::path::Path" }],
+          "returns": "Result<bool, GitWorkflowError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "fs: does path exist?"
+        },
+        {
+          "name": "create_dir_all",
+          "receiver": "&self",
+          "params": [{ "name": "path", "ty": "&std::path::Path" }],
+          "returns": "Result<(), GitWorkflowError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "fs: create path and missing parents."
+        },
+        {
+          "name": "rename_path",
+          "receiver": "&self",
+          "params": [
+            { "name": "src", "ty": "&std::path::Path" },
+            { "name": "dst", "ty": "&std::path::Path" }
+          ],
+          "returns": "Result<(), GitWorkflowError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "fs: rename src to dst."
+        },
+        {
+          "name": "list_dir_file_names",
+          "receiver": "&self",
+          "params": [{ "name": "path", "ty": "&std::path::Path" }],
+          "returns": "Result<Vec<std::path::PathBuf>, GitWorkflowError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "fs: list the immediate entries of path."
+        },
+        {
+          "name": "remove_dir",
+          "receiver": "&self",
+          "params": [{ "name": "path", "ty": "&std::path::Path" }],
+          "returns": "Result<(), GitWorkflowError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "fs: remove an empty directory."
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "git_workflow",
+      "docs": "Filesystem SecondaryPort for the track archive orchestration's non-git steps; failures map to GitWorkflowError::Fs. Implemented by infrastructure::git_cli::FsWorkspaceAdapter. IN-08 / IN-10 / CN-03 / AC-09.",
+      "spec_refs": [
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-08" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-10" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "CN-03" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "AC-09" }
+      ],
+      "informal_grounds": []
+    },
+    "GitWorkflowService": {
+      "action": "modify",
+      "role": { "ApplicationService": {} },
+      "methods": [
+        {
+          "name": "stage_all",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Result<(), GitWorkflowError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "git add-all."
+        },
+        {
+          "name": "stage_from_file",
+          "receiver": "&self",
+          "params": [
+            { "name": "path",    "ty": "&std::path::Path" },
+            { "name": "cleanup", "ty": "bool" }
+          ],
+          "returns": "Result<(), GitWorkflowError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "git add-from-file."
+        },
+        {
+          "name": "commit_from_file",
+          "receiver": "&self",
+          "params": [
+            { "name": "path",      "ty": "&std::path::Path" },
+            { "name": "cleanup",   "ty": "bool" },
+            { "name": "track_dir", "ty": "Option<&std::path::Path>" }
+          ],
+          "returns": "Result<(), GitWorkflowError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "git commit-from-file (guard in the interactor). AC-06."
+        },
+        {
+          "name": "note_from_file",
+          "receiver": "&self",
+          "params": [
+            { "name": "path",    "ty": "&std::path::Path" },
+            { "name": "cleanup", "ty": "bool" }
+          ],
+          "returns": "Result<(), GitWorkflowError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "git note-from-file."
+        },
+        {
+          "name": "unstage",
+          "receiver": "&self",
+          "params": [{ "name": "paths", "ty": "&[std::path::PathBuf]" }],
+          "returns": "Result<(), GitWorkflowError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "git unstage."
+        },
+        {
+          "name": "current_branch_track_id",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Result<Option<domain::TrackId>, GitWorkflowError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "Resolve the current branch's track ID into domain::TrackId; invalid slug -> GitWorkflowError::Validation. IN-08 / AC-06."
+        },
+        {
+          "name": "sync_current_branch",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Result<(), GitWorkflowError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "git sync — ff-only pull of the current branch. IN-01 / CN-01."
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "git_workflow",
+      "docs": "ApplicationService (driving port) for the bin/sotp git family; called by cli_driver::git::GitDriver, implemented by GitWorkflowInteractor. Removes switch_and_pull, adds sync_current_branch; full method set enumerated. Send + Sync. IN-01 / IN-04 / IN-06 / IN-08 / CN-01 / AC-01 / AC-06.",
+      "spec_refs": [
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-01" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-06" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-08" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "CN-01" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "AC-01" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "AC-06" }
+      ],
+      "informal_grounds": []
+    },
+    "BranchReaderPort": {
+      "action": "reference",
+      "role": { "SecondaryPort": {} },
+      "methods": [
+        {
+          "name": "current_branch",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Result<Option<String>, BranchReadError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "(baseline) Returns the current branch name."
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "track_resolution",
+      "docs": "Pre-existing driven port; unchanged by this track. Declared reference for edge visibility (SystemGitRepo -.impl.-> BranchReaderPort, R7).",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "functions": {
+    "usecase::git_workflow::validate_stage_path_entries": {
+      "action": "reference",
+      "role": "FreeFunction",
+      "params": [{ "name": "entries", "ty": "I" }],
+      "returns": "Result<Vec<String>, GitWorkflowError>",
+      "is_async": false,
+      "generics": [{ "name": "I", "bounds": ["IntoIterator<Item = &'a str>"] }],
+      "where_predicates": [],
+      "docs": "Pre-existing pure validator; unchanged. Declared reference for edge visibility.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "usecase::git_workflow::verify_explicit_track_branch": {
+      "action": "reference",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "current_branch", "ty": "Option<&str>" },
+        { "name": "explicit_track", "ty": "&ExplicitTrackBranch" }
+      ],
+      "returns": "Result<(), GitWorkflowError>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Pre-existing pure branch-guard rule; unchanged. Composed by GitWorkflowInteractor::commit_from_file. Declared reference for edge visibility.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "usecase::git_workflow::verify_auto_detected_branch": {
+      "action": "reference",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "current_branch", "ty": "Option<&str>" },
+        { "name": "claims",         "ty": "&[TrackBranchClaim]" }
+      ],
+      "returns": "Result<(), GitWorkflowError>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Pre-existing pure branch-guard rule; unchanged. Composed by GitWorkflowInteractor::commit_from_file. Declared reference for edge visibility.",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "inherent_impls": [
+    {
+      "type_name": "GitWorkflowInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [{ "name": "port", "ty": "std::sync::Arc<dyn GitPrimitivePort>" }],
+          "returns": "Self",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "Construct over the git-primitive port. Param Arc<dyn GitWorkflowService> -> Arc<dyn GitPrimitivePort>."
+        }
+      ]
+    },
+    {
+      "type_name": "TrackGitInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "git", "ty": "std::sync::Arc<dyn GitPrimitivePort>" },
+            { "name": "fs",  "ty": "std::sync::Arc<dyn TrackArchiveFsPort>" }
+          ],
+          "returns": "Self",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "Inject the git-primitive and archive-fs ports."
+        },
+        {
+          "name": "create_track_branch",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "&std::path::Path" },
+            { "name": "track_id",     "ty": "&domain::TrackId" },
+            { "name": "base_branch",  "ty": "&str" }
+          ],
+          "returns": "Result<(), GitWorkflowError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "Orchestrates track branch create. IN-10 / CN-03."
+        },
+        {
+          "name": "switch_to_track_branch",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "&std::path::Path" },
+            { "name": "track_id",     "ty": "&domain::TrackId" }
+          ],
+          "returns": "Result<String, GitWorkflowError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "Orchestrates track branch switch. IN-10 / CN-03."
+        },
+        {
+          "name": "switch_to_base",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "&std::path::Path" },
+            { "name": "base_branch",  "ty": "&str" }
+          ],
+          "returns": "Result<String, GitWorkflowError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "Orchestrates the track switch-base compose. IN-05 / CN-05 / AC-04."
+        },
+        {
+          "name": "archive_track",
+          "receiver": "&self",
+          "params": [
+            { "name": "project_root", "ty": "&std::path::Path" },
+            { "name": "track_id",     "ty": "&domain::TrackId" }
+          ],
+          "returns": "Result<String, GitWorkflowError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "Orchestrates track archive (git mv + logs move). IN-10 / CN-03 / AC-09."
+        }
+      ]
+    },
+    {
+      "type_name": "PrGitInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [{ "name": "git", "ty": "std::sync::Arc<dyn GitPrimitivePort>" }],
+          "returns": "Self",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "Inject the git-primitive port."
+        },
+        {
+          "name": "fetch_and_read_metadata_at_ref",
+          "receiver": "&self",
+          "params": [
+            { "name": "branch",   "ty": "&str" },
+            { "name": "track_id", "ty": "&domain::TrackId" }
+          ],
+          "returns": "Result<String, GitWorkflowError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "Reads track metadata JSON at origin/<branch>. IN-10 / CN-03."
+        },
+        {
+          "name": "resolve_head",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Result<Option<domain::CommitHash>, GitWorkflowError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "Resolves HEAD to a CommitHash. IN-10 / CN-03."
+        }
+      ]
+    },
+    {
+      "type_name": "ReviewGitInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [{ "name": "git", "ty": "std::sync::Arc<dyn GitPrimitivePort>" }],
+          "returns": "Self",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "Inject the git-primitive port."
+        },
+        {
+          "name": "resolve_head_for_track_branch",
+          "receiver": "&self",
+          "params": [{ "name": "track_id", "ty": "&domain::TrackId" }],
+          "returns": "Result<domain::CommitHash, GitWorkflowError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "Resolves HEAD to a CommitHash for the track branch. IN-10 / CN-03 / AC-09."
+        },
+        {
+          "name": "resolve_diff_base",
+          "receiver": "&self",
+          "params": [{ "name": "rev", "ty": "&str" }],
+          "returns": "Result<Option<domain::CommitHash>, GitWorkflowError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "Resolves a rev to a CommitHash. IN-10 / CN-03."
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    { "action": "add",       "trait_ref": "core::fmt::Debug",       "for_type": "DiagnosticText" },
+    { "action": "add",       "trait_ref": "core::clone::Clone",     "for_type": "DiagnosticText" },
+    { "action": "add",       "trait_ref": "core::cmp::PartialEq",   "for_type": "DiagnosticText" },
+    { "action": "add",       "trait_ref": "core::cmp::Eq",          "for_type": "DiagnosticText" },
+    { "action": "add",       "trait_ref": "core::fmt::Display",     "for_type": "DiagnosticText" },
+    { "action": "reference", "trait_ref": "core::fmt::Debug",       "for_type": "GitWorkflowError" },
+    { "action": "reference", "trait_ref": "core::fmt::Display",     "for_type": "GitWorkflowError" },
+    { "action": "reference", "trait_ref": "core::error::Error",     "for_type": "GitWorkflowError" },
+    { "action": "reference", "trait_ref": "core::fmt::Debug",       "for_type": "ExplicitTrackBranch" },
+    { "action": "reference", "trait_ref": "core::clone::Clone",     "for_type": "ExplicitTrackBranch" },
+    { "action": "reference", "trait_ref": "core::cmp::PartialEq",   "for_type": "ExplicitTrackBranch" },
+    { "action": "reference", "trait_ref": "core::cmp::Eq",          "for_type": "ExplicitTrackBranch" },
+    { "action": "reference", "trait_ref": "core::fmt::Debug",       "for_type": "TrackBranchClaim" },
+    { "action": "reference", "trait_ref": "core::clone::Clone",     "for_type": "TrackBranchClaim" },
+    { "action": "reference", "trait_ref": "core::cmp::PartialEq",   "for_type": "TrackBranchClaim" },
+    { "action": "reference", "trait_ref": "core::cmp::Eq",          "for_type": "TrackBranchClaim" },
+    { "action": "modify",    "trait_ref": "GitWorkflowService",     "for_type": "GitWorkflowInteractor" },
+    { "action": "reference", "trait_ref": "core::fmt::Debug",       "for_type": "BranchReadError" },
+    { "action": "reference", "trait_ref": "core::fmt::Display",     "for_type": "BranchReadError" },
+    { "action": "reference", "trait_ref": "core::error::Error",     "for_type": "BranchReadError" }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "8deddf07b8917d339913676840b7ab02deef26464a7728a9c1f81f9b91297fbb",
+  "signals": [
+    {
+      "type_name": "GitCompositionRoot",
+      "signal": "blue",
+      "entry_hash": "2465a61b41a12a39c22a24e03d63e830202a35a048c01440de1eb07492586b01"
+    }
+  ]
+}

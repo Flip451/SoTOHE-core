@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-04T09:07:10Z",
+  "declaration_hash": "9f19d95070d3f70d8d6fbdb682f99755409417d0fc4647169309da95d0358f9f",
+  "signals": [
+    {
+      "type_name": "GitInput",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": true
+    }
+  ]
+}

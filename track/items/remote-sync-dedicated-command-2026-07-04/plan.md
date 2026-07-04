@@ -1,4 +1,57 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # remote sync 専用コマンドの新設 — switch と pull の分離
 
-> **Note**: `impl-plan.json` not yet generated. Run `/track:impl-plan` to generate the implementation plan.
+## Summary
+
+T001: libs/usecase/src/git_workflow.rs — add DiagnosticText and retype GitWorkflowError construction sites (IN-06 / CN-02).
+T002-T003: libs/usecase/src/git_workflow.rs — declare GitPrimitivePort / TrackArchiveFsPort and add TrackGitInteractor / PrGitInteractor / ReviewGitInteractor with mock-port tests (IN-08 / AC-09).
+T004: libs/infrastructure/src/git_cli/mod.rs and workflow_adapter.rs — add SyncError, SystemGitRepo::sync_current_branch, GitPrimitivePort impl, and FsWorkspaceAdapter (IN-02 / AC-08).
+T005: libs/usecase/src/git_workflow.rs, apps/cli-driver/src/git.rs, apps/cli/src/commands/git.rs, and apps/cli-composition/src/git.rs — replace SwitchAndPull with Sync and rewire the git-family service path (IN-01 / AC-03 / AC-06).
+T006-T008: apps/cli-composition/src/{track,pr,review_v2,git}.rs, apps/cli/src/commands/track/branch_ops.rs, and libs/infrastructure/src/git_cli/mod.rs — move remaining git flows to usecase interactors and close the GitRepository/public passthrough surface (IN-05 / IN-07 / IN-11 / AC-07 / AC-10).
+T009: Makefile.toml plus .claude/.harness/.codex/knowledge docs — add the cargo make sync wrapper and update operational references (IN-12 / AC-11).
+
+## Tasks (0/9 resolved)
+
+### S1 — Usecase foundation: DiagnosticText, GitWorkflowError, atomic ports
+
+> libs/usecase/src/git_workflow.rs — run T001 then T002 (IN-06 / IN-08 / CN-02).
+
+- [ ] **T001**: libs/usecase/src/git_workflow.rs — add DiagnosticText; retype GitWorkflowError variants and validator construction sites. libs/infrastructure/src/git_cli/workflow_adapter.rs — update GitWorkflowError construction sites. Add DiagnosticText / GitWorkflowError display tests (IN-06 / CN-02).
+- [ ] **T002**: libs/usecase/src/git_workflow.rs — add GitPrimitivePort with current_branch / sync_current_branch / switch_branch / create_branch / branch_exists / move_path / fetch_branch / show_file_at_ref / resolve_commit / stage_all / stage_from_file / commit_from_message_file / note_from_file / unstage / read_explicit_track_branch -> ExplicitTrackBranch / collect_track_branch_claims -> Vec<TrackBranchClaim>; add TrackArchiveFsPort with path_is_dir / path_exists / create_dir_all / rename_path / list_dir_file_names / remove_dir; add dyn-safety compile test (IN-08).
+
+### S2 — Usecase interactors: TrackGit / PrGit / ReviewGit orchestrations
+
+> libs/usecase/src/git_workflow.rs — add interactor types and mock-port tests (IN-05 / IN-07 / AC-09).
+
+- [ ] **T003**: libs/usecase/src/git_workflow.rs — add TrackGitInteractor::new / create_track_branch / switch_to_track_branch / switch_to_base / archive_track, PrGitInteractor::new / fetch_and_read_metadata_at_ref / resolve_head, and ReviewGitInteractor::new / resolve_head_for_track_branch / resolve_diff_base; add mock GitPrimitivePort / TrackArchiveFsPort unit tests for listed methods and error branches (IN-05 / IN-07 / AC-09).
+
+### S3 — Infrastructure primitives: SyncError, sync_current_branch, adapters
+
+> libs/infrastructure/src/git_cli/mod.rs and workflow_adapter.rs — add sync primitive, port impl, fs adapter, and tests (IN-02 / AC-08).
+
+- [ ] **T004**: libs/infrastructure/src/git_cli/mod.rs — add SyncError and SystemGitRepo::sync_current_branch. libs/infrastructure/src/git_cli/workflow_adapter.rs — implement GitPrimitivePort for FsGitWorkflowAdapter; add FsWorkspaceAdapter implementing TrackArchiveFsPort; map SyncError / fs errors to GitWorkflowError. Add sync, adapter, and fs-port tests (IN-02 / CN-02 / AC-08).
+
+### S4 — Git-family CLI cutover (compile-atomic bundle)
+
+> libs/usecase, libs/infrastructure, apps/cli-composition, apps/cli-driver, and apps/cli — perform T005 compile-atomic cutover (IN-01 / AC-03 / AC-06).
+
+- [ ] **T005**: Compile-atomic edit. libs/usecase/src/git_workflow.rs — replace GitWorkflowService::switch_and_pull with sync_current_branch and rewrite GitWorkflowInteractor over GitPrimitivePort. libs/infrastructure/src/git_cli/workflow_adapter.rs — delete FsGitWorkflowAdapter's GitWorkflowService impl. apps/cli-composition/src/git.rs — delete git-family inline methods and rewire git_driver. apps/cli-driver/src/git.rs — replace GitInput::SwitchAndPull with Sync. apps/cli/src/commands/git.rs — replace GitCommand::SwitchAndPull / SwitchAndPullArgs with Sync, keep FileArgs / CommitFromFileArgs / UnstageArgs payload DTOs compiling, and update dispatch/tests (IN-01 / AC-01 / AC-02 / AC-03 / AC-06).
+
+### S5 — Composition-root migrations: track / pr / review flows to usecase interactors
+
+> apps/cli-composition/src/{track,pr,review_v2,git}.rs — run T006 then T007 migrations (IN-05 / IN-07 / CN-05 / AC-09 / AC-10).
+
+- [ ] **T006**: apps/cli-composition/src/track/branch_strategy.rs — route track_switch_base and track_branch_create through TrackGitInteractor. apps/cli-composition/src/track/mod.rs — route track_branch_switch and track_archive through TrackGitInteractor / FsWorkspaceAdapter. apps/cli-composition/src/git.rs — delete git_switch_and_pull_in / git_switch_and_pull_impl and dead helpers. Update track-family tests (IN-05 / IN-10 / CN-05 / AC-04 / AC-10).
+- [ ] **T007**: apps/cli-composition/src/pr.rs and pr/poll.rs — replace inline fetch / metadata / HEAD / branch reads with PrGitInteractor. apps/cli-composition/src/review_v2/commit_hash.rs, shared.rs, and helpers.rs — replace inline git reads with ReviewGitInteractor or semantic SystemGitRepo current_branch where listed. Preserve review_v2/run.rs test-support fixture. Update pr/review_v2 tests (IN-07 / IN-10 / CN-03 / CN-05 / AC-09).
+
+### S6 — Infrastructure closure: GitRepository trait deletion + status/output pub(crate) demote
+
+> libs/infrastructure/src/git_cli/mod.rs plus apps/cli/src/commands/track/branch_ops.rs and cli tests — run T008 closure and audits (IN-09 / IN-11 / CN-04 / CN-07 / AC-07 / AC-10).
+
+- [ ] **T008**: libs/infrastructure/src/git_cli/mod.rs — delete pub GitRepository; move root / resolve_path / current_branch / push_branch / index_tree_hash / stage_all_excluding to pub inherent SystemGitRepo methods; make status / output pub(crate); preserve SystemGitRepo BranchReaderPort and WorktreeReader impls. apps/cli/src/commands/track/branch_ops.rs — replace non-test GitRepository / rev-parse branch checks with usecase or cli_driver routing. apps/cli/src/commands/git.rs tests and apps/cli/src/commands/track/branch_ops.rs tests — remove GitRepository imports/stubs. Run AC-07 / AC-10 grep audit and cargo make ci (IN-09 / IN-11 / CN-04 / CN-07 / AC-07 / AC-10).
+
+### S7 — Wrapper task and operational documentation
+
+> Makefile.toml plus .claude/.harness/.codex/knowledge docs — run T009 wrapper/doc update (IN-12 / CN-06 / AC-05 / AC-11).
+
+- [ ] **T009**: Makefile.toml — add tasks.sync wrapper (command = bin/sotp, args = git sync, no shell logic). .claude/settings.json — add Bash(cargo make sync) to permissions.allow. .codex/rules/default.rules — add prefix_rule for cargo make sync and remove the stale track-switch-main line 12 prefix_rule. .claude/rules/07-dev-environment.md, knowledge/conventions/branch-strategy.md, .claude/commands/track/done.md, and .harness/workflows/track/done.md — add cargo make sync / bin/sotp git sync references and update the track-switch-base description. Verification (final in-task check): Grep each of the 7 files edited above — Makefile.toml, .claude/settings.json, .codex/rules/default.rules, .claude/rules/07-dev-environment.md, knowledge/conventions/branch-strategy.md, .claude/commands/track/done.md, .harness/workflows/track/done.md — and confirm none contains the literal switch-and-pull or the identifier SwitchAndPull; any residual match in these 7 files blocks task completion. Residual matches in this track's spec.md / plan.md / impl-plan.json and in the ADR knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md are expected (SoT records) and out of scope for this check (IN-12 / CN-06 / AC-05 / AC-11).

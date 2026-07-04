@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "9e9e4fe7f35c2f62f9fe0121dbe419703a2d482cb5e443613f1cfdd6a24cc044",
+  "signals": [
+    {
+      "type_name": "BranchReadError",
+      "signal": "blue",
+      "entry_hash": "b07751b64c39dc5235b2db0de7a65f98fd3376fd1e250d6d8f6de2204d4e474d"
+    },
+    {
+      "type_name": "DiagnosticText",
+      "signal": "blue",
+      "entry_hash": "8e89c0572cfb61e4cdf42af26ae11f55096671eaed935438f95fdb815cb70c30"
+    },
+    {
+      "type_name": "ExplicitTrackBranch",
+      "signal": "blue",
+      "entry_hash": "068678f8ed48234d5b2939a3f0e912bff06cc0971e7e1c4d34e30ab46290888d"
+    },
+    {
+      "type_name": "GitWorkflowError",
+      "signal": "blue",
+      "entry_hash": "ece162657f5a93d85794c108332771ed1ffb6a05473c236f745831fa8dd123c3"
+    },
+    {
+      "type_name": "GitWorkflowInteractor",
+      "signal": "blue",
+      "entry_hash": "c90811ac9a82ddc949c9578755e4ef0fd926674cb8f065b378e190e139a5c56e"
+    },
+    {
+      "type_name": "PrGitInteractor",
+      "signal": "blue",
+      "entry_hash": "a4100881c13f7f509df37fbb0d4cb4362e62de1094ab56cc0756a1326ab591ba"
+    },
+    {
+      "type_name": "ReviewGitInteractor",
+      "signal": "blue",
+      "entry_hash": "79a9a2082d8bd94bfa2e5585702e9f2912c6d10d856851cda1a5bbf9e836484e"
+    },
+    {
+      "type_name": "TrackBranchClaim",
+      "signal": "blue",
+      "entry_hash": "f3e9bc73585b6b464b0341256703d2868d1a00b7218e3f0115bc2a3de1a6f1e8"
+    },
+    {
+      "type_name": "TrackGitInteractor",
+      "signal": "blue",
+      "entry_hash": "78ce61d8b36c1b0875da821d8c9ab6108288a217d7db69ac856b25b34d81bed5"
+    },
+    {
+      "type_name": "BranchReaderPort",
+      "signal": "blue",
+      "entry_hash": "e9e497841b8dfa59bb877b87f5e2049f1b087ed1ec24f1a4f5680cc9f5383e0b"
+    },
+    {
+      "type_name": "GitPrimitivePort",
+      "signal": "blue",
+      "entry_hash": "81026be7b83540f3bc134aaae4ba9b6f1832e3de65f8ed285f492d6272fb4974"
+    },
+    {
+      "type_name": "GitWorkflowService",
+      "signal": "blue",
+      "entry_hash": "f66f0c08cf82856b6b16e196e02141c6e9bd0f38b7ae04ed90d7e025b92a19f5"
+    },
+    {
+      "type_name": "TrackArchiveFsPort",
+      "signal": "blue",
+      "entry_hash": "48956d7615760d827e6433255ce751aa23103472993c400a5e0880352acf06b0"
+    },
+    {
+      "type_name": "usecase::git_workflow::validate_stage_path_entries",
+      "signal": "blue",
+      "entry_hash": "0435d49f11281b6ab86f43f215f8041769ff618b5763c3dfda67403536070c06"
+    },
+    {
+      "type_name": "usecase::git_workflow::verify_auto_detected_branch",
+      "signal": "blue",
+      "entry_hash": "dc96fe8e335431122c7cef82d34702c57151fb65b9f428f9d88aa495b68af296"
+    },
+    {
+      "type_name": "usecase::git_workflow::verify_explicit_track_branch",
+      "signal": "blue",
+      "entry_hash": "121561d458eb06043e0b712ac5f850c8884d008c997eb33646669d92d7e25e4f"
+    }
+  ]
+}
