@@ -602,15 +602,31 @@ description = "[gate] Run the default-config catalogue lint (primitive-obsession
 command = "bin/sotp"
 args = ["catalogue-lint", "check-active-track"]
 
+[tasks.catalog-check-commit]
+description = "[gate] Re-validate catalogue completion for the active track at the commit gate (bin/sotp catalog check --gate commit). Active track auto-resolved from current git branch. Absent catalogue files (Phase 0/1) skip; residual $todo holes warn (interim); only schema-broken catalogues block. Never requires .harness/config/signal-gates.json (CN-07)."
+command = "bin/sotp"
+args = ["catalog", "check", "--gate", "commit"]
+
+[tasks.catalog-check-phase2]
+description = "[gate] Re-validate catalogue completion for the active track at the strict phase2 (type-design) gate (bin/sotp catalog check --gate phase2). Active track auto-resolved from current git branch. Residual $todo holes, dangling anchors, out-of-vocabulary roles, schema errors, and missing TDDD catalogue files all block (non-zero). Never requires .harness/config/signal-gates.json (CN-07)."
+command = "bin/sotp"
+args = ["catalog", "check", "--gate", "phase2"]
+
+[tasks.catalog-check-merge]
+description = "[gate] Re-validate catalogue completion for the active track at the strict merge gate (bin/sotp catalog check --gate merge). Active track auto-resolved from current git branch. Same strict semantics as phase2. Never requires .harness/config/signal-gates.json (CN-07)."
+command = "bin/sotp"
+args = ["catalog", "check", "--gate", "merge"]
+
 [tasks.track-active-gate]
 private = true
-description = "[gate] Regen sequence: signal calc-impl-catalog → signal calc-catalog-spec → catalogue-lint check-active-track → views sync. Both track-commit-message and review invocations depend on this shared task. Fail-closed: non-zero exit aborts the chain."
+description = "[gate] Regen sequence: signal calc-impl-catalog → signal calc-catalog-spec → catalogue-lint check-active-track → catalog check --gate commit → views sync. Both track-commit-message and review invocations depend on this shared task. Fail-closed: non-zero exit aborts the chain."
 script_runner = "@shell"
 script = ['''
 set -e
 bin/sotp signal calc-impl-catalog
 bin/sotp signal calc-catalog-spec
 bin/sotp catalogue-lint check-active-track
+bin/sotp catalog check --gate commit
 bin/sotp track views sync
 ''']
 

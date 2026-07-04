@@ -13,7 +13,12 @@ use std::sync::Arc;
 
 use domain::plan_ref::SpecElementId;
 use domain::tddd::LayerId;
-use domain::tddd::catalog_gen::{
+// Re-export the domain catalog types that appear in this module's public
+// command / report / error API so the `cli_driver` primary adapter can name
+// them without depending on `domain` directly (same boundary-re-export pattern
+// as `usecase::LayerId`; architecture-rules.json: cli_driver may_depend_on
+// [usecase]).
+pub use domain::tddd::catalog_gen::{
     CatalogEntryKind, CatalogEntryName, CatalogImportAction, DraftHole,
 };
 use domain::tddd::catalogue_linter::FreeText;

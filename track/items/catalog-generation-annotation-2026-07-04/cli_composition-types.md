@@ -4,5 +4,5 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CatalogCompositionRoot | composition_root | add | — | 🟡 | 🔵 |
+| CatalogCompositionRoot | composition_root | add | — | 🔵 | 🔵 |
 

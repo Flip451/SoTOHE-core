@@ -4,24 +4,24 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CatalogGateSelect | enum | add | Phase2, Commit, Merge | 🟡 | 🔵 |
-| CatalogImportSelect | enum | add | Reference, Modify, Delete | 🟡 | 🔵 |
-| CatalogInput | enum | add | Init, Add, Import, Cite, Check | 🟡 | 🔵 |
-| CatalogKindSelect | enum | add | Struct, Enum, TypeAlias, Trait, Function | 🟡 | 🔵 |
+| CatalogGateSelect | enum | add | Phase2, Commit, Merge | 🔵 | 🔵 |
+| CatalogImportSelect | enum | add | Reference, Modify, Delete | 🔵 | 🔵 |
+| CatalogInput | enum | add | Init, Add, Import, Cite, Check | 🔵 | 🔵 |
+| CatalogKindSelect | enum | add | Struct, Enum, TypeAlias, Trait, Function | 🔵 | 🔵 |
 
 ## DTOs
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CatalogAddInput | dto | add | — | 🟡 | 🔵 |
-| CatalogCheckInput | dto | add | — | 🟡 | 🔵 |
-| CatalogCiteInput | dto | add | — | 🟡 | 🔵 |
-| CatalogImportInput | dto | add | — | 🟡 | 🔵 |
-| CatalogInitInput | dto | add | — | 🟡 | 🔵 |
+| CatalogAddInput | dto | add | — | 🔵 | 🔵 |
+| CatalogCheckInput | dto | add | — | 🔵 | 🔵 |
+| CatalogCiteInput | dto | add | — | 🔵 | 🔵 |
+| CatalogImportInput | dto | add | — | 🔵 | 🔵 |
+| CatalogInitInput | dto | add | — | 🔵 | 🔵 |
 
 ## Primary Adapters
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CatalogDriver | primary_adapter | add | — | 🟡 | 🔵 |
+| CatalogDriver | primary_adapter | add | — | 🔵 | 🔵 |
 

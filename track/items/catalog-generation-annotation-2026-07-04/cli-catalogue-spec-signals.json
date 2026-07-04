@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "33b050fb4741fe2199a40d681d3f2bff580db26b427638155cf5e74a925cb27e",
+  "catalogue_declaration_hash": "41c56e38592d466f2b8681d951650927a36f401e44fd0aaad9fe201623d56ebe",
   "signals": [
     {
       "type_name": "CatalogActionArg",
@@ -48,9 +48,69 @@
       "entry_hash": "d4bf32edb2f9d699fd5cb43d713e78a7576ab779d43c5d189373631fafc6924d"
     },
     {
+      "type_name": "CliCommand",
+      "signal": "blue",
+      "entry_hash": "84deda1cf6988b5ef0edf75a6ec5e3e5a3ff0fd7831b6f21400b2ef1a65afbbf"
+    },
+    {
+      "type_name": "cli::commands::catalog::action_to_select",
+      "signal": "blue",
+      "entry_hash": "85e4833d828efcdcd256d54d915f5145ea4a401e28ebdbff6f4924483e12f1f3"
+    },
+    {
+      "type_name": "cli::commands::catalog::dispatch",
+      "signal": "blue",
+      "entry_hash": "cb71a78f5f51912643afb607b4f153f3ecd2f86bc07140966ead66e877caf74c"
+    },
+    {
       "type_name": "cli::commands::catalog::execute",
       "signal": "blue",
       "entry_hash": "a278c8dc0908019822b4a203993983c5686fa4dcd44e3b0747cff66a203b46e6"
+    },
+    {
+      "type_name": "cli::commands::catalog::execute_add",
+      "signal": "blue",
+      "entry_hash": "346f420b05744d1022ac21b1222cffbb961f7a0533e1954b8deafe46724d5fdc"
+    },
+    {
+      "type_name": "cli::commands::catalog::execute_check",
+      "signal": "blue",
+      "entry_hash": "b1a766aabb026ce1978f3d46b7372def85cc6c3bc318703074879adee1b96b7f"
+    },
+    {
+      "type_name": "cli::commands::catalog::execute_cite",
+      "signal": "blue",
+      "entry_hash": "b9404853a2a328d2e0de42897778c63f26e828808d96849706d277949284959b"
+    },
+    {
+      "type_name": "cli::commands::catalog::execute_import",
+      "signal": "blue",
+      "entry_hash": "42bffa06b365e2e2d67c6cee68788a439769f0778cfb15f39bbd6107e61ab414"
+    },
+    {
+      "type_name": "cli::commands::catalog::execute_init",
+      "signal": "blue",
+      "entry_hash": "73b452d9d1c6102778a08b18b322263a7ad82797bf498364e8ef4aad89950220"
+    },
+    {
+      "type_name": "cli::commands::catalog::gate_to_select",
+      "signal": "blue",
+      "entry_hash": "199d1cbc709e39f79fb8454286b75915c3bd0c8e6a707e432c96f9f950dca81a"
+    },
+    {
+      "type_name": "cli::commands::catalog::kind_to_select",
+      "signal": "blue",
+      "entry_hash": "0d5789866600b01d7c5dffc1bf362658aa16d5e046b222d0a8ae4d0981ef3f57"
+    },
+    {
+      "type_name": "cli::commands::catalog::resolve_for_read",
+      "signal": "blue",
+      "entry_hash": "a36c02a8a0270f9bd539bef574203f617b0c8bedd89fb02c9f49d150da229791"
+    },
+    {
+      "type_name": "cli::commands::catalog::resolve_for_write",
+      "signal": "blue",
+      "entry_hash": "14dc3d418dcf6671c69f9837aab399bcee5d448cd8f7dff9318c7a1948da7590"
     }
   ]
 }

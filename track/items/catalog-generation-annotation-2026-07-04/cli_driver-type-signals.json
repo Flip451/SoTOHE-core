@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-04T14:26:54Z",
-  "declaration_hash": "3fd1ca87e64f4050962f35c3ff5647a8454b19eb57952f9ba151feffd7628fb8",
+  "generated_at": "2026-07-04T16:10:26Z",
+  "declaration_hash": "025aece02ada02f87fb89dea5b35455568c8223d38ed3ffc2b1070a55aa741b2",
   "signals": [
     {
       "type_name": "CatalogAddInput",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::fmt::Debug"
       ]
@@ -16,9 +16,9 @@
     {
       "type_name": "CatalogCheckInput",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::fmt::Debug"
       ]
@@ -26,9 +26,9 @@
     {
       "type_name": "CatalogCiteInput",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::fmt::Debug"
       ]
@@ -36,16 +36,17 @@
     {
       "type_name": "CatalogDriver",
       "kind_tag": "primary_adapter",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "CatalogGateSelect",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
+        "core::clone::TrivialClone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
         "core::fmt::Debug",
@@ -55,9 +56,9 @@
     {
       "type_name": "CatalogImportInput",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::fmt::Debug"
       ]
@@ -65,10 +66,11 @@
     {
       "type_name": "CatalogImportSelect",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
+        "core::clone::TrivialClone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
         "core::fmt::Debug",
@@ -78,9 +80,9 @@
     {
       "type_name": "CatalogInitInput",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::fmt::Debug"
       ]
@@ -88,9 +90,9 @@
     {
       "type_name": "CatalogInput",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::fmt::Debug"
       ]
@@ -98,10 +100,11 @@
     {
       "type_name": "CatalogKindSelect",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
+        "core::clone::TrivialClone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
         "core::fmt::Debug",

@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-04T14:26:58Z",
-  "declaration_hash": "33b050fb4741fe2199a40d681d3f2bff580db26b427638155cf5e74a925cb27e",
+  "generated_at": "2026-07-04T16:10:29Z",
+  "declaration_hash": "41c56e38592d466f2b8681d951650927a36f401e44fd0aaad9fe201623d56ebe",
   "signals": [
     {
       "type_name": "CatalogActionArg",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "clap_builder::derive::ValueEnum",
         "core::clone::Clone",
         "core::cmp::Eq",
@@ -19,9 +19,9 @@
     {
       "type_name": "CatalogAddArgs",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "clap_builder::derive::Args",
         "clap_builder::derive::FromArgMatches",
         "core::fmt::Debug"
@@ -30,9 +30,9 @@
     {
       "type_name": "CatalogCheckArgs",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "clap_builder::derive::Args",
         "clap_builder::derive::FromArgMatches",
         "core::fmt::Debug"
@@ -41,9 +41,9 @@
     {
       "type_name": "CatalogCiteArgs",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "clap_builder::derive::Args",
         "clap_builder::derive::FromArgMatches",
         "core::fmt::Debug"
@@ -52,9 +52,9 @@
     {
       "type_name": "CatalogCommand",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "clap_builder::derive::FromArgMatches",
         "clap_builder::derive::Subcommand",
         "core::fmt::Debug"
@@ -63,9 +63,9 @@
     {
       "type_name": "CatalogGateArg",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "clap_builder::derive::ValueEnum",
         "core::clone::Clone",
         "core::cmp::Eq",
@@ -76,9 +76,9 @@
     {
       "type_name": "CatalogImportArgs",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "clap_builder::derive::Args",
         "clap_builder::derive::FromArgMatches",
         "core::fmt::Debug"
@@ -87,9 +87,9 @@
     {
       "type_name": "CatalogInitArgs",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "clap_builder::derive::Args",
         "clap_builder::derive::FromArgMatches",
         "core::fmt::Debug"
@@ -98,9 +98,9 @@
     {
       "type_name": "CatalogKindArg",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "clap_builder::derive::ValueEnum",
         "core::clone::Clone",
         "core::cmp::Eq",
@@ -109,10 +109,82 @@
       ]
     },
     {
+      "type_name": "CliCommand",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::catalog::action_to_select",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::catalog::dispatch",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
       "type_name": "cli::commands::catalog::execute",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::catalog::execute_add",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::catalog::execute_check",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::catalog::execute_cite",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::catalog::execute_import",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::catalog::execute_init",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::catalog::gate_to_select",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::catalog::kind_to_select",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::catalog::resolve_for_read",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::catalog::resolve_for_write",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
     }
   ]
 }

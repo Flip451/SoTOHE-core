@@ -483,6 +483,126 @@
       }
     },
     {
+      "claim_hash": "84deda1cf6988b5ef0edf75a6ec5e3e5a3ff0fd7831b6f21400b2ef1a65afbbf",
+      "evidence_hash": "491806b658f2c4affa709bb990673cd2262ebb156ded3b4d0b2fc7af13f4db0e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "top-level コマンド群 `sotp catalog` の新設。… UI 表記の綴りは `catalog`（米綴り）で統一する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CliCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "top-level コマンド群 `sotp catalog` の新設。動詞は `init` / `add` / `import` / `cite` / `check` の 5 つ。UI 表記の綴りは `catalog`（米綴り）で統一する。既存機構の名称（`.harness/catalogue-lint/` や catalogue-spec-signals 等）の rename は含まない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "84deda1cf6988b5ef0edf75a6ec5e3e5a3ff0fd7831b6f21400b2ef1a65afbbf",
+      "evidence_hash": "9fa838958978bcb533590e1c1e8ecd5237720811d692f876e2cd82520ff59206",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp catalog {init,add,import,cite,check}` の 5 コマンドが CLI に存在する。UI 表記の綴りは `catalog`。既存機構の Rust 型名・ディレクトリ名（catalogue 綴り）は変更されていない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CliCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`sotp catalog {init,add,import,cite,check}` の 5 コマンドが CLI に存在する。UI 表記の綴りは `catalog`。既存機構の Rust 型名・ディレクトリ名（catalogue 綴り）は変更されていない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "85e4833d828efcdcd256d54d915f5145ea4a401e28ebdbff6f4924483e12f1f3",
+      "evidence_hash": "491806b658f2c4affa709bb990673cd2262ebb156ded3b4d0b2fc7af13f4db0e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "top-level コマンド群 `sotp catalog` の新設。動詞は `init` / `add` / `import` / `cite` / `check` の 5 つ。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::catalog::action_to_select"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "top-level コマンド群 `sotp catalog` の新設。動詞は `init` / `add` / `import` / `cite` / `check` の 5 つ。UI 表記の綴りは `catalog`（米綴り）で統一する。既存機構の名称（`.harness/catalogue-lint/` や catalogue-spec-signals 等）の rename は含まない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cb71a78f5f51912643afb607b4f153f3ecd2f86bc07140966ead66e877caf74c",
+      "evidence_hash": "491806b658f2c4affa709bb990673cd2262ebb156ded3b4d0b2fc7af13f4db0e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "top-level コマンド群 `sotp catalog` の新設。動詞は `init` / `add` / `import` / `cite` / `check` の 5 つ。UI 表記の綴りは `catalog`（米綴り）で統一する。既存機構の名称（`.harness/catalogue-lint/` や catalogue-spec-signals 等）の rename は含まない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::catalog::dispatch"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "top-level コマンド群 `sotp catalog` の新設。動詞は `init` / `add` / `import` / `cite` / `check` の 5 つ。UI 表記の綴りは `catalog`（米綴り）で統一する。既存機構の名称（`.harness/catalogue-lint/` や catalogue-spec-signals 等）の rename は含まない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cb71a78f5f51912643afb607b4f153f3ecd2f86bc07140966ead66e877caf74c",
+      "evidence_hash": "9fa838958978bcb533590e1c1e8ecd5237720811d692f876e2cd82520ff59206",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp catalog {init,add,import,cite,check}` の 5 コマンドが CLI に存在する。UI 表記の綴りは `catalog`。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::catalog::dispatch"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`sotp catalog {init,add,import,cite,check}` の 5 コマンドが CLI に存在する。UI 表記の綴りは `catalog`。既存機構の Rust 型名・ディレクトリ名（catalogue 綴り）は変更されていない。"
+        }
+      }
+    },
+    {
       "claim_hash": "a278c8dc0908019822b4a203993983c5686fa4dcd44e3b0747cff66a203b46e6",
       "evidence_hash": "491806b658f2c4affa709bb990673cd2262ebb156ded3b4d0b2fc7af13f4db0e",
       "verdict": {
@@ -567,6 +687,390 @@
           "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
           "section_key": "functions",
           "entry_key": "cli::commands::catalog::execute"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "WRITE 操作（`init` / `add` / `import` / `cite`）で現在ブランチと一致しない `--track-id`、または非 track ブランチでの実行が fail-closed で停止する。READ 操作（`check`）では `--track-id` が現在ブランチと異なっても READ override として受理される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "346f420b05744d1022ac21b1222cffbb961f7a0533e1954b8deafe46724d5fdc",
+      "evidence_hash": "491806b658f2c4affa709bb990673cd2262ebb156ded3b4d0b2fc7af13f4db0e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "top-level コマンド群 `sotp catalog` の新設。動詞は `init` / `add` / `import` / `cite` / `check` の 5 つ。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::catalog::execute_add"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "top-level コマンド群 `sotp catalog` の新設。動詞は `init` / `add` / `import` / `cite` / `check` の 5 つ。UI 表記の綴りは `catalog`（米綴り）で統一する。既存機構の名称（`.harness/catalogue-lint/` や catalogue-spec-signals 等）の rename は含まない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "346f420b05744d1022ac21b1222cffbb961f7a0533e1954b8deafe46724d5fdc",
+      "evidence_hash": "9fa838958978bcb533590e1c1e8ecd5237720811d692f876e2cd82520ff59206",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp catalog {init,add,import,cite,check}` の 5 コマンドが CLI に存在する。UI 表記の綴りは `catalog`。既存機構の Rust 型名・ディレクトリ名（catalogue 綴り）は変更されていない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::catalog::execute_add"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`sotp catalog {init,add,import,cite,check}` の 5 コマンドが CLI に存在する。UI 表記の綴りは `catalog`。既存機構の Rust 型名・ディレクトリ名（catalogue 綴り）は変更されていない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b1a766aabb026ce1978f3d46b7372def85cc6c3bc318703074879adee1b96b7f",
+      "evidence_hash": "491806b658f2c4affa709bb990673cd2262ebb156ded3b4d0b2fc7af13f4db0e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "top-level コマンド群 `sotp catalog` の新設。動詞は `init` / `add` / `import` / `cite` / `check` の 5 つ。UI 表記の綴りは `catalog`（米綴り）で統一する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::catalog::execute_check"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "top-level コマンド群 `sotp catalog` の新設。動詞は `init` / `add` / `import` / `cite` / `check` の 5 つ。UI 表記の綴りは `catalog`（米綴り）で統一する。既存機構の名称（`.harness/catalogue-lint/` や catalogue-spec-signals 等）の rename は含まない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b1a766aabb026ce1978f3d46b7372def85cc6c3bc318703074879adee1b96b7f",
+      "evidence_hash": "9fa838958978bcb533590e1c1e8ecd5237720811d692f876e2cd82520ff59206",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp catalog {init,add,import,cite,check}` の 5 コマンドが CLI に存在する。UI 表記の綴りは `catalog`。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::catalog::execute_check"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`sotp catalog {init,add,import,cite,check}` の 5 コマンドが CLI に存在する。UI 表記の綴りは `catalog`。既存機構の Rust 型名・ディレクトリ名（catalogue 綴り）は変更されていない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b9404853a2a328d2e0de42897778c63f26e828808d96849706d277949284959b",
+      "evidence_hash": "491806b658f2c4affa709bb990673cd2262ebb156ded3b4d0b2fc7af13f4db0e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "top-level コマンド群 `sotp catalog` の新設。動詞は `init` / `add` / `import` / `cite` / `check` の 5 つ。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::catalog::execute_cite"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "top-level コマンド群 `sotp catalog` の新設。動詞は `init` / `add` / `import` / `cite` / `check` の 5 つ。UI 表記の綴りは `catalog`（米綴り）で統一する。既存機構の名称（`.harness/catalogue-lint/` や catalogue-spec-signals 等）の rename は含まない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b9404853a2a328d2e0de42897778c63f26e828808d96849706d277949284959b",
+      "evidence_hash": "9fa838958978bcb533590e1c1e8ecd5237720811d692f876e2cd82520ff59206",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp catalog {init,add,import,cite,check}` の 5 コマンドが CLI に存在する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::catalog::execute_cite"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`sotp catalog {init,add,import,cite,check}` の 5 コマンドが CLI に存在する。UI 表記の綴りは `catalog`。既存機構の Rust 型名・ディレクトリ名（catalogue 綴り）は変更されていない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "42bffa06b365e2e2d67c6cee68788a439769f0778cfb15f39bbd6107e61ab414",
+      "evidence_hash": "491806b658f2c4affa709bb990673cd2262ebb156ded3b4d0b2fc7af13f4db0e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "top-level コマンド群 `sotp catalog` の新設。動詞は `init` / `add` / `import` / `cite` / `check` の 5 つ。UI 表記の綴りは `catalog`（米綴り）で統一する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::catalog::execute_import"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "top-level コマンド群 `sotp catalog` の新設。動詞は `init` / `add` / `import` / `cite` / `check` の 5 つ。UI 表記の綴りは `catalog`（米綴り）で統一する。既存機構の名称（`.harness/catalogue-lint/` や catalogue-spec-signals 等）の rename は含まない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "42bffa06b365e2e2d67c6cee68788a439769f0778cfb15f39bbd6107e61ab414",
+      "evidence_hash": "9fa838958978bcb533590e1c1e8ecd5237720811d692f876e2cd82520ff59206",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp catalog {init,add,import,cite,check}` の 5 コマンドが CLI に存在する。UI 表記の綴りは `catalog`。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::catalog::execute_import"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`sotp catalog {init,add,import,cite,check}` の 5 コマンドが CLI に存在する。UI 表記の綴りは `catalog`。既存機構の Rust 型名・ディレクトリ名（catalogue 綴り）は変更されていない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "73b452d9d1c6102778a08b18b322263a7ad82797bf498364e8ef4aad89950220",
+      "evidence_hash": "491806b658f2c4affa709bb990673cd2262ebb156ded3b4d0b2fc7af13f4db0e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "top-level コマンド群 `sotp catalog` の新設。動詞は `init` / `add` / `import` / `cite` / `check` の 5 つ。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::catalog::execute_init"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "top-level コマンド群 `sotp catalog` の新設。動詞は `init` / `add` / `import` / `cite` / `check` の 5 つ。UI 表記の綴りは `catalog`（米綴り）で統一する。既存機構の名称（`.harness/catalogue-lint/` や catalogue-spec-signals 等）の rename は含まない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "73b452d9d1c6102778a08b18b322263a7ad82797bf498364e8ef4aad89950220",
+      "evidence_hash": "9fa838958978bcb533590e1c1e8ecd5237720811d692f876e2cd82520ff59206",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp catalog {init,add,import,cite,check}` の 5 コマンドが CLI に存在する。UI 表記の綴りは `catalog`。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::catalog::execute_init"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`sotp catalog {init,add,import,cite,check}` の 5 コマンドが CLI に存在する。UI 表記の綴りは `catalog`。既存機構の Rust 型名・ディレクトリ名（catalogue 綴り）は変更されていない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "199d1cbc709e39f79fb8454286b75915c3bd0c8e6a707e432c96f9f950dca81a",
+      "evidence_hash": "491806b658f2c4affa709bb990673cd2262ebb156ded3b4d0b2fc7af13f4db0e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "top-level コマンド群 `sotp catalog` の新設。動詞は `init` / `add` / `import` / `cite` / `check` の 5 つ。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::catalog::gate_to_select"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "top-level コマンド群 `sotp catalog` の新設。動詞は `init` / `add` / `import` / `cite` / `check` の 5 つ。UI 表記の綴りは `catalog`（米綴り）で統一する。既存機構の名称（`.harness/catalogue-lint/` や catalogue-spec-signals 等）の rename は含まない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0d5789866600b01d7c5dffc1bf362658aa16d5e046b222d0a8ae4d0981ef3f57",
+      "evidence_hash": "491806b658f2c4affa709bb990673cd2262ebb156ded3b4d0b2fc7af13f4db0e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "top-level コマンド群 `sotp catalog` の新設。動詞は `init` / `add` / `import` / `cite` / `check` の 5 つ。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::catalog::kind_to_select"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "top-level コマンド群 `sotp catalog` の新設。動詞は `init` / `add` / `import` / `cite` / `check` の 5 つ。UI 表記の綴りは `catalog`（米綴り）で統一する。既存機構の名称（`.harness/catalogue-lint/` や catalogue-spec-signals 等）の rename は含まない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a36c02a8a0270f9bd539bef574203f617b0c8bedd89fb02c9f49d150da229791",
+      "evidence_hash": "207ca484bc05e6088f6df26ea2b4b0132a47e5415faaa01226c4763184ebb4d8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`check` は読み取り専用のため、明示 `--track-id` を READ override として使える。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::catalog::resolve_for_read"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-11",
+          "text_label": "track の解決と `--track-id` の扱い。track は省略時に現ブランチから自動解決する。`init` / `add` / `import` / `cite` は WRITE 操作なので、明示 `--track-id` は現在ブランチから導出した id と一致する場合だけ受理し、不一致または非 track ブランチでは fail-closed で停止する（cross-track override として扱わない）。`check` は読み取り専用のため、明示 `--track-id` を READ override として使える。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a36c02a8a0270f9bd539bef574203f617b0c8bedd89fb02c9f49d150da229791",
+      "evidence_hash": "7bccbc50f813ec68acd4f618f3c0125ee188873d0f5a02588293d7344bcda8b1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "READ 操作（`check`）では `--track-id` が現在ブランチと異なっても READ override として受理される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::catalog::resolve_for_read"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "WRITE 操作（`init` / `add` / `import` / `cite`）で現在ブランチと一致しない `--track-id`、または非 track ブランチでの実行が fail-closed で停止する。READ 操作（`check`）では `--track-id` が現在ブランチと異なっても READ override として受理される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "14dc3d418dcf6671c69f9837aab399bcee5d448cd8f7dff9318c7a1948da7590",
+      "evidence_hash": "207ca484bc05e6088f6df26ea2b4b0132a47e5415faaa01226c4763184ebb4d8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`init` / `add` / `import` / `cite` は WRITE 操作なので、明示 `--track-id` は現在ブランチから導出した id と一致する場合だけ受理し、不一致または非 track ブランチでは fail-closed で停止する（cross-track override として扱わない）。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::catalog::resolve_for_write"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-11",
+          "text_label": "track の解決と `--track-id` の扱い。track は省略時に現ブランチから自動解決する。`init` / `add` / `import` / `cite` は WRITE 操作なので、明示 `--track-id` は現在ブランチから導出した id と一致する場合だけ受理し、不一致または非 track ブランチでは fail-closed で停止する（cross-track override として扱わない）。`check` は読み取り専用のため、明示 `--track-id` を READ override として使える。"
+        }
+      }
+    },
+    {
+      "claim_hash": "14dc3d418dcf6671c69f9837aab399bcee5d448cd8f7dff9318c7a1948da7590",
+      "evidence_hash": "7bccbc50f813ec68acd4f618f3c0125ee188873d0f5a02588293d7344bcda8b1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "WRITE 操作（`init` / `add` / `import` / `cite`）で現在ブランチと一致しない `--track-id`、または非 track ブランチでの実行が fail-closed で停止する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::catalog::resolve_for_write"
         }
       },
       "evidence_origin": {

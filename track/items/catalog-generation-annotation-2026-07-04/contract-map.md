@@ -309,6 +309,33 @@ subgraph cli_composition["cli_composition"]
 end
 subgraph cli["cli"]
   direction TB
+  subgraph T18_cli_cli_CliCommand["CliCommand"]
+    direction TB
+    T18_cli_cli_CliCommand__self[CliCommand]
+    T18_cli_cli_CliCommand_Arch[Arch]
+    T18_cli_cli_CliCommand_Conventions[Conventions]
+    T18_cli_cli_CliCommand_Domain[Domain]
+    T18_cli_cli_CliCommand_Guard[Guard]
+    T18_cli_cli_CliCommand_Hook[Hook]
+    T18_cli_cli_CliCommand_Track[Track]
+    T18_cli_cli_CliCommand_Git[Git]
+    T18_cli_cli_CliCommand_Pr[Pr]
+    T18_cli_cli_CliCommand_Plan[Plan]
+    T18_cli_cli_CliCommand_Review[Review]
+    T18_cli_cli_CliCommand_File[File]
+    T18_cli_cli_CliCommand_Verify[Verify]
+    T18_cli_cli_CliCommand_FindSimilar[FindSimilar]
+    T18_cli_cli_CliCommand_DupIndex[DupIndex]
+    T18_cli_cli_CliCommand_DupCheck[DupCheck]
+    T18_cli_cli_CliCommand_Telemetry[Telemetry]
+    T18_cli_cli_CliCommand_Dry[Dry]
+    T18_cli_cli_CliCommand_RefVerify[RefVerify]
+    T18_cli_cli_CliCommand_Signal[Signal]
+    T18_cli_cli_CliCommand_TaskContract[TaskContract]
+    T18_cli_cli_CliCommand_Catalog[Catalog]
+    T18_cli_cli_CliCommand_CatalogueLint[CatalogueLint]
+    T18_cli_cli_CliCommand_Demo[Demo]
+  end
   subgraph cli_cli_module_commands["cli::commands"]
     direction TB
   subgraph T24_cli_cli_CatalogActionArg["commands::catalog::CatalogActionArg"]
@@ -363,7 +390,18 @@ subgraph cli["cli"]
     T22_cli_cli_CatalogKindArg_Trait[Trait]
     T22_cli_cli_CatalogKindArg_Function[Function]
   end
+  F48_cli_cli_cli__commands__catalog__action_to_select[[action_to_select]]
+  F40_cli_cli_cli__commands__catalog__dispatch[[dispatch]]
   F39_cli_cli_cli__commands__catalog__execute[[execute]]
+  F43_cli_cli_cli__commands__catalog__execute_add[[execute_add]]
+  F45_cli_cli_cli__commands__catalog__execute_check[[execute_check]]
+  F44_cli_cli_cli__commands__catalog__execute_cite[[execute_cite]]
+  F46_cli_cli_cli__commands__catalog__execute_import[[execute_import]]
+  F44_cli_cli_cli__commands__catalog__execute_init[[execute_init]]
+  F46_cli_cli_cli__commands__catalog__gate_to_select[[gate_to_select]]
+  F46_cli_cli_cli__commands__catalog__kind_to_select[[kind_to_select]]
+  F48_cli_cli_cli__commands__catalog__resolve_for_read[[resolve_for_read]]
+  F49_cli_cli_cli__commands__catalog__resolve_for_write[[resolve_for_write]]
   end
 end
 T30_domain_domain_CatalogEntryName_try_new --> T30_domain_domain_CatalogEntryName__self
@@ -440,6 +478,7 @@ T34_cli_driver_cli_driver_CatalogInput_Check --o T39_cli_driver_cli_driver_Catal
 T54_cli_composition_cli_composition_CatalogCompositionRoot_new --> T54_cli_composition_cli_composition_CatalogCompositionRoot__self
 T54_cli_composition_cli_composition_CatalogCompositionRoot_catalog_driver --> T35_cli_driver_cli_driver_CatalogDriver__self
 T54_cli_composition_cli_composition_CatalogCompositionRoot_handle --o T34_cli_driver_cli_driver_CatalogInput__self
+T18_cli_cli_CliCommand_Catalog --o|cmd| T22_cli_cli_CatalogCommand__self
 T22_cli_cli_CatalogAddArgs__self --o|kind| T22_cli_cli_CatalogKindArg__self
 T24_cli_cli_CatalogCheckArgs__self --o|gate| T22_cli_cli_CatalogGateArg__self
 T22_cli_cli_CatalogCommand_Init --o T23_cli_cli_CatalogInitArgs__self
@@ -448,7 +487,19 @@ T22_cli_cli_CatalogCommand_Import --o T25_cli_cli_CatalogImportArgs__self
 T22_cli_cli_CatalogCommand_Cite --o T23_cli_cli_CatalogCiteArgs__self
 T22_cli_cli_CatalogCommand_Check --o T24_cli_cli_CatalogCheckArgs__self
 T25_cli_cli_CatalogImportArgs__self --o|action| T24_cli_cli_CatalogActionArg__self
+F48_cli_cli_cli__commands__catalog__action_to_select --o T24_cli_cli_CatalogActionArg__self
+F48_cli_cli_cli__commands__catalog__action_to_select --> T41_cli_driver_cli_driver_CatalogImportSelect__self
+F40_cli_cli_cli__commands__catalog__dispatch --o T34_cli_driver_cli_driver_CatalogInput__self
 F39_cli_cli_cli__commands__catalog__execute --o T22_cli_cli_CatalogCommand__self
+F43_cli_cli_cli__commands__catalog__execute_add --o T22_cli_cli_CatalogAddArgs__self
+F45_cli_cli_cli__commands__catalog__execute_check --o T24_cli_cli_CatalogCheckArgs__self
+F44_cli_cli_cli__commands__catalog__execute_cite --o T23_cli_cli_CatalogCiteArgs__self
+F46_cli_cli_cli__commands__catalog__execute_import --o T25_cli_cli_CatalogImportArgs__self
+F44_cli_cli_cli__commands__catalog__execute_init --o T23_cli_cli_CatalogInitArgs__self
+F46_cli_cli_cli__commands__catalog__gate_to_select --o T22_cli_cli_CatalogGateArg__self
+F46_cli_cli_cli__commands__catalog__gate_to_select --> T39_cli_driver_cli_driver_CatalogGateSelect__self
+F46_cli_cli_cli__commands__catalog__kind_to_select --o T22_cli_cli_CatalogKindArg__self
+F46_cli_cli_cli__commands__catalog__kind_to_select --> T39_cli_driver_cli_driver_CatalogKindSelect__self
 class T30_domain_domain_CatalogEntryKind_Struct variant_node
 class T30_domain_domain_CatalogEntryKind_Enum variant_node
 class T30_domain_domain_CatalogEntryKind_TypeAlias variant_node
@@ -595,6 +646,30 @@ class T39_cli_driver_cli_driver_CatalogKindSelect__self dto
 class T54_cli_composition_cli_composition_CatalogCompositionRoot_new method_node
 class T54_cli_composition_cli_composition_CatalogCompositionRoot_catalog_driver method_node
 class T54_cli_composition_cli_composition_CatalogCompositionRoot_handle method_node
+class T18_cli_cli_CliCommand_Arch variant_node
+class T18_cli_cli_CliCommand_Conventions variant_node
+class T18_cli_cli_CliCommand_Domain variant_node
+class T18_cli_cli_CliCommand_Guard variant_node
+class T18_cli_cli_CliCommand_Hook variant_node
+class T18_cli_cli_CliCommand_Track variant_node
+class T18_cli_cli_CliCommand_Git variant_node
+class T18_cli_cli_CliCommand_Pr variant_node
+class T18_cli_cli_CliCommand_Plan variant_node
+class T18_cli_cli_CliCommand_Review variant_node
+class T18_cli_cli_CliCommand_File variant_node
+class T18_cli_cli_CliCommand_Verify variant_node
+class T18_cli_cli_CliCommand_FindSimilar variant_node
+class T18_cli_cli_CliCommand_DupIndex variant_node
+class T18_cli_cli_CliCommand_DupCheck variant_node
+class T18_cli_cli_CliCommand_Telemetry variant_node
+class T18_cli_cli_CliCommand_Dry variant_node
+class T18_cli_cli_CliCommand_RefVerify variant_node
+class T18_cli_cli_CliCommand_Signal variant_node
+class T18_cli_cli_CliCommand_TaskContract variant_node
+class T18_cli_cli_CliCommand_Catalog variant_node
+class T18_cli_cli_CliCommand_CatalogueLint variant_node
+class T18_cli_cli_CliCommand_Demo variant_node
+class T18_cli_cli_CliCommand__self dto
 class T24_cli_cli_CatalogActionArg_Reference variant_node
 class T24_cli_cli_CatalogActionArg_Modify variant_node
 class T24_cli_cli_CatalogActionArg_Delete variant_node
@@ -620,6 +695,28 @@ class T22_cli_cli_CatalogKindArg_TypeAlias variant_node
 class T22_cli_cli_CatalogKindArg_Trait variant_node
 class T22_cli_cli_CatalogKindArg_Function variant_node
 class T22_cli_cli_CatalogKindArg__self dto
+class F48_cli_cli_cli__commands__catalog__action_to_select free_function
+class F48_cli_cli_cli__commands__catalog__action_to_select function_node
+class F40_cli_cli_cli__commands__catalog__dispatch free_function
+class F40_cli_cli_cli__commands__catalog__dispatch function_node
 class F39_cli_cli_cli__commands__catalog__execute free_function
 class F39_cli_cli_cli__commands__catalog__execute function_node
+class F43_cli_cli_cli__commands__catalog__execute_add free_function
+class F43_cli_cli_cli__commands__catalog__execute_add function_node
+class F45_cli_cli_cli__commands__catalog__execute_check free_function
+class F45_cli_cli_cli__commands__catalog__execute_check function_node
+class F44_cli_cli_cli__commands__catalog__execute_cite free_function
+class F44_cli_cli_cli__commands__catalog__execute_cite function_node
+class F46_cli_cli_cli__commands__catalog__execute_import free_function
+class F46_cli_cli_cli__commands__catalog__execute_import function_node
+class F44_cli_cli_cli__commands__catalog__execute_init free_function
+class F44_cli_cli_cli__commands__catalog__execute_init function_node
+class F46_cli_cli_cli__commands__catalog__gate_to_select free_function
+class F46_cli_cli_cli__commands__catalog__gate_to_select function_node
+class F46_cli_cli_cli__commands__catalog__kind_to_select free_function
+class F46_cli_cli_cli__commands__catalog__kind_to_select function_node
+class F48_cli_cli_cli__commands__catalog__resolve_for_read free_function
+class F48_cli_cli_cli__commands__catalog__resolve_for_read function_node
+class F49_cli_cli_cli__commands__catalog__resolve_for_write free_function
+class F49_cli_cli_cli__commands__catalog__resolve_for_write function_node
 ```

@@ -116,6 +116,11 @@ enum CliCommand {
         #[command(subcommand)]
         cmd: commands::task_contract::TaskContractCommand,
     },
+    /// Catalogue generation + annotation: init, add, import, cite, check.
+    Catalog {
+        #[command(subcommand)]
+        cmd: commands::catalog::CatalogCommand,
+    },
     /// Catalogue lint: primitive-obsession guard across TDDD layer catalogues.
     CatalogueLint {
         #[command(subcommand)]
@@ -163,6 +168,7 @@ fn run_cli_with(
         Some(CliCommand::RefVerify { cmd }) => ref_verify_execute(cmd),
         Some(CliCommand::Signal { cmd }) => commands::signal::execute(cmd),
         Some(CliCommand::TaskContract { cmd }) => commands::task_contract::execute(cmd),
+        Some(CliCommand::Catalog { cmd }) => commands::catalog::execute(cmd),
         Some(CliCommand::CatalogueLint { cmd }) => commands::catalogue_lint::execute(cmd),
         Some(CliCommand::Demo) | None => {
             let outcome = DemoCompositionRoot::new().demo_driver().handle(DemoInput::Run);

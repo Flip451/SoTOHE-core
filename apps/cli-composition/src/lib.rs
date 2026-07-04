@@ -10,6 +10,7 @@
 // ---------------------------------------------------------------------------
 
 mod arch;
+mod catalog;
 mod cmd_outcome;
 mod conventions;
 mod demo;
@@ -67,6 +68,7 @@ pub use telemetry::TelemetryReportInput;
 // ---------------------------------------------------------------------------
 
 pub use arch::ArchCompositionRoot;
+pub use catalog::CatalogCompositionRoot;
 pub use conventions::ConventionsCompositionRoot;
 pub use demo::DemoCompositionRoot;
 pub use domain::DomainCompositionRoot;
