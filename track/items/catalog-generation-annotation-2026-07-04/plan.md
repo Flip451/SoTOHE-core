@@ -11,7 +11,7 @@ CLI driver/composition: add CatalogDriver and CatalogCompositionRoot wiring (IN-
 Gates: wire `sotp catalog check` into commit, phase2, and merge paths (IN-06/AC-11/CN-06/CN-07/CN-08).
 Batching: land T002+T012+T013 in one commit; review T006+T007 in one batch (CN-10/AC-17).
 
-## Tasks (6/13 resolved)
+## Tasks (9/13 resolved)
 
 ### S1 — Domain foundation: draft value types, entry-type refactor, schema extension
 
@@ -38,9 +38,9 @@ Batching: land T002+T012+T013 in one commit; review T006+T007 in one batch (CN-1
 
 > Targets T005/T006/T007 infrastructure draft layer and FsCatalogAdapter implementation (IN-02/IN-03/IN-04/IN-05/IN-06/IN-07/IN-08/IN-09/IN-10/IN-12/AC-02/AC-03/AC-04/AC-05/AC-06/AC-07/AC-08/AC-10/AC-11/AC-12).
 
-- [ ] **T005**: Target libs/infrastructure tddd::catalog_gen. Add scan_todo_holes, try_complete, and CatalogDraftError with shape from infrastructure-types.json, including Codec { source: CatalogueDocumentCodecError } and From<CatalogueDocumentCodecError> (IN-07/CN-01/AC-05). Add unit tests for $todo locations, dotted paths, hole-free draft, incomplete draft, typed completion, and codec error.
-- [ ] **T006**: Target libs/infrastructure tddd::catalog_gen::FsCatalogAdapter helper layer. Add FsCatalogAdapter new/Default without CatalogPort impl; add private helpers for skeleton generation, syn fragment parsing, anchor/role validation, and draft scan/completion integration (IN-03/IN-07/IN-08/IN-09/IN-10/CN-01/CN-02/CN-03/CN-05/AC-03/AC-05/AC-06/AC-07). Add unit tests for helper outputs and errors. Batch review with T007.
-- [ ] **T007**: Target libs/infrastructure tddd::catalog_gen::FsCatalogAdapter. Add verb helpers for init/add/import/cite/check and the complete impl usecase::catalog_gen::CatalogPort for FsCatalogAdapter (IN-02/IN-03/IN-04/IN-05/IN-06/IN-12/CN-05/CN-06/CN-07/CN-08/AC-02/AC-03/AC-04/AC-08/AC-10/AC-11/AC-12). Add unit tests for init, add/import/cite, duplicate entry, missing file, and phase2/commit/merge contexts. Batch review with T006.
+- [x] **T005**: Target libs/infrastructure tddd::catalog_gen. Add scan_todo_holes, try_complete, and CatalogDraftError with shape from infrastructure-types.json, including Codec { source: CatalogueDocumentCodecError } and From<CatalogueDocumentCodecError> (IN-07/CN-01/AC-05). Add unit tests for $todo locations, dotted paths, hole-free draft, incomplete draft, typed completion, and codec error.
+- [x] **T006**: Target libs/infrastructure tddd::catalog_gen::FsCatalogAdapter helper layer. Add FsCatalogAdapter new/Default without CatalogPort impl; add private helpers for skeleton generation, syn fragment parsing, anchor/role validation, and draft scan/completion integration (IN-03/IN-07/IN-08/IN-09/IN-10/CN-01/CN-02/CN-03/CN-05/AC-03/AC-05/AC-06/AC-07). Add unit tests for helper outputs and errors. Batch review with T007.
+- [x] **T007**: Target libs/infrastructure tddd::catalog_gen::FsCatalogAdapter. Add verb helpers for init/add/import/cite/check and the complete impl usecase::catalog_gen::CatalogPort for FsCatalogAdapter (IN-02/IN-03/IN-04/IN-05/IN-06/IN-12/CN-05/CN-06/CN-07/CN-08/AC-02/AC-03/AC-04/AC-08/AC-10/AC-11/AC-12). Add unit tests for init, add/import/cite, duplicate entry, missing file, and phase2/commit/merge contexts. Batch review with T006.
 
 ### S4 — Presentation wiring: driver, composition, CLI
 

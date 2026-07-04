@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-04T12:25:23Z",
+  "generated_at": "2026-07-04T14:26:54Z",
   "declaration_hash": "c8b328f8f58a29271c2dd126f5461d55b7a176dd5985ed4e8327ab649008e912",
   "signals": [
     {
       "type_name": "CatalogDraftError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::convert::From<CatalogueDocumentCodecError>",
         "core::error::Error",
         "core::fmt::Debug",
@@ -18,9 +18,9 @@
     {
       "type_name": "FsCatalogAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "CatalogPort",
         "core::default::Default",
         "core::fmt::Debug"
@@ -29,14 +29,14 @@
     {
       "type_name": "infrastructure::tddd::catalog_gen::scan_todo_holes",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "infrastructure::tddd::catalog_gen::try_complete",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     }
   ]
 }
