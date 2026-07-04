@@ -15,7 +15,7 @@ use crate::tddd::catalogue_document_codec::derive_filename_stem;
 
 use super::fs_access::{catalogue_path, load_bindings, read_catalogue, track_dir};
 use super::validate::load_spec_anchors_for_check;
-use super::{scan_todo_holes, try_complete};
+use super::{scan_todo_holes, try_complete, validate_hole_free_schema};
 
 /// Per-layer check outcome, aggregated across all checked layers.
 struct LayerOutcome {
@@ -76,13 +76,22 @@ fn check_layer(
     };
 
     let holes = scan_todo_holes(&value);
+    let expected_stem = derive_filename_stem(path);
     if !holes.is_empty() {
+        // A residual `$todo` hole is tolerated as an interim result at the commit
+        // gate, but it must not mask a schema violation in a *hole-free* entry
+        // (invalid role, unknown field, crate-name mismatch) — those would
+        // otherwise slip through as interim / exit 0. Validate the hole-free
+        // portion first and block on a real schema error; keep the hole interim
+        // when only holes remain.
+        if let Err(err) = validate_hole_free_schema(&value, &expected_stem) {
+            return Ok(blocked(format!("{layer_name}: schema error: {err}")));
+        }
         return Ok(hole_outcome(gate, layer_name, holes));
     }
 
     let mut anchor_strings = Vec::new();
     collect_anchor_strings(&value, &mut anchor_strings);
-    let expected_stem = derive_filename_stem(path);
     if let Err(err) = try_complete(value, &expected_stem) {
         return Ok(blocked(format!("{layer_name}: schema error: {err}")));
     }
@@ -312,6 +321,97 @@ mod tests {
                 .unwrap();
         assert_eq!(outcome.verdict, CatalogCheckVerdict::Blocked);
         assert!(outcome.holes.is_empty());
+    }
+
+    #[test]
+    fn test_schema_error_in_hole_free_entry_blocks_despite_unrelated_hole_at_commit() {
+        // `Foo` carries a legitimate `$todo` hole (still being annotated). `Bar` is
+        // hole-free but has an unknown field that `read_catalogue`'s schema_version
+        // probe does not catch — only a full decode does. At the commit gate the
+        // unrelated hole must not mask `Bar`'s schema violation as an interim result.
+        let body = r#"{"schema_version":5,"crate_name":"domain","layer":"domain","types":{"Foo":{"role":{"$todo":"pick"}},"Bar":{"action":"add","role":{"ValueObject":{}},"kind":{"kind":"struct","shape":{"kind":"unit"}},"bogus_field":true}},"traits":{},"functions":{}}"#;
+        let (temp, path) = write_file("domain-types.json", body);
+        let outcome =
+            check_layer(CatalogGateContext::Commit, "domain", &path, temp.path(), &empty_set())
+                .unwrap();
+        assert_eq!(outcome.verdict, CatalogCheckVerdict::Blocked);
+    }
+
+    #[test]
+    fn test_crate_name_mismatch_with_hole_blocks_at_commit() {
+        // A `crate_name` that disagrees with the filename stem is a decode-time
+        // schema error the schema_version probe never catches. It must be blocked
+        // at the commit gate even when an unrelated `$todo` hole is present.
+        let body = r#"{"schema_version":5,"crate_name":"wrong","layer":"domain","types":{"Foo":{"role":{"$todo":"pick"}}},"traits":{},"functions":{}}"#;
+        let (temp, path) = write_file("domain-types.json", body);
+        let outcome =
+            check_layer(CatalogGateContext::Commit, "domain", &path, temp.path(), &empty_set())
+                .unwrap();
+        assert_eq!(outcome.verdict, CatalogCheckVerdict::Blocked);
+    }
+
+    #[test]
+    fn test_hole_free_valid_entry_alongside_hole_stays_interim_at_commit() {
+        // `Foo` carries a hole; `Bar` is hole-free and schema-valid. The hole-free
+        // schema validation must not block a legitimately-interim catalogue: the
+        // outcome stays interim (and still reports the residual hole).
+        let body = r#"{"schema_version":5,"crate_name":"domain","layer":"domain","types":{"Foo":{"role":{"$todo":"pick"}},"Bar":{"action":"add","role":{"ValueObject":{}},"kind":{"kind":"struct","shape":{"kind":"unit"}}}},"traits":{},"functions":{}}"#;
+        let (temp, path) = write_file("domain-types.json", body);
+        let outcome =
+            check_layer(CatalogGateContext::Commit, "domain", &path, temp.path(), &empty_set())
+                .unwrap();
+        assert_eq!(outcome.verdict, CatalogCheckVerdict::Interim);
+        assert!(!outcome.holes.is_empty());
+    }
+
+    #[test]
+    fn test_top_level_hole_does_not_mask_hole_free_schema_error_at_commit() {
+        // A top-level scalar hole used to survive pruning and make `try_complete`
+        // return `Incomplete` before the strict codec could decode `Bar`. The
+        // hole-free `Bar` schema error must still block instead of becoming Interim.
+        let body = r#"{"schema_version":5,"crate_name":"domain","layer":{"$todo":"pick"},"types":{"Bar":{"action":"add","role":{"ValueObject":{}},"kind":{"kind":"struct","shape":{"kind":"unit"}},"bogus_field":true}},"traits":{},"functions":{}}"#;
+        let (temp, path) = write_file("domain-types.json", body);
+        let outcome =
+            check_layer(CatalogGateContext::Commit, "domain", &path, temp.path(), &empty_set())
+                .unwrap();
+        assert_eq!(outcome.verdict, CatalogCheckVerdict::Blocked);
+    }
+
+    #[test]
+    fn test_top_level_hole_with_valid_remainder_stays_interim_at_commit() {
+        // Top-level scalar holes are still tolerated by the commit gate when the
+        // hole-free remainder decodes cleanly.
+        let body = r#"{"schema_version":5,"crate_name":"domain","layer":{"$todo":"pick"},"types":{},"traits":{},"functions":{}}"#;
+        let (temp, path) = write_file("domain-types.json", body);
+        let outcome =
+            check_layer(CatalogGateContext::Commit, "domain", &path, temp.path(), &empty_set())
+                .unwrap();
+        assert_eq!(outcome.verdict, CatalogCheckVerdict::Interim);
+        assert!(!outcome.holes.is_empty());
+    }
+
+    #[test]
+    fn test_root_hole_does_not_mask_hole_free_schema_error_at_commit() {
+        // A root-level marker is valid draft syntax for "the document is still
+        // incomplete", but when other fields are present the hole-free remainder
+        // must still be decoded so schema errors cannot become Interim.
+        let body = r#"{"$todo":"finish draft","schema_version":5,"crate_name":"domain","layer":"domain","types":{"Bar":{"action":"add","role":{"ValueObject":{}},"kind":{"kind":"struct","shape":{"kind":"unit"}},"bogus_field":true}},"traits":{},"functions":{}}"#;
+        let (temp, path) = write_file("domain-types.json", body);
+        let outcome =
+            check_layer(CatalogGateContext::Commit, "domain", &path, temp.path(), &empty_set())
+                .unwrap();
+        assert_eq!(outcome.verdict, CatalogCheckVerdict::Blocked);
+    }
+
+    #[test]
+    fn test_root_hole_with_valid_remainder_stays_interim_at_commit() {
+        let body = r#"{"$todo":"finish draft","schema_version":5,"crate_name":"domain","layer":"domain","types":{},"traits":{},"functions":{}}"#;
+        let (temp, path) = write_file("domain-types.json", body);
+        let outcome =
+            check_layer(CatalogGateContext::Commit, "domain", &path, temp.path(), &empty_set())
+                .unwrap();
+        assert_eq!(outcome.verdict, CatalogCheckVerdict::Interim);
+        assert!(!outcome.holes.is_empty());
     }
 
     #[test]

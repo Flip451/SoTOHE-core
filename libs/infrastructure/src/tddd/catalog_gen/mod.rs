@@ -20,13 +20,15 @@ use std::path::Path;
 
 use domain::tddd::catalog_gen::{DraftHole, DraftHolePath, TodoInstruction};
 use domain::tddd::catalogue_v2::CatalogueDocument;
-use serde_json::Value;
+use serde_json::{Map, Value};
 use usecase::catalog_gen::{
     CatalogAddCommand, CatalogCheckQuery, CatalogCheckReport, CatalogCiteCommand, CatalogError,
     CatalogImportCommand, CatalogInitReport, CatalogPort, CatalogWriteReport,
 };
 
-use crate::tddd::catalogue_document_codec::{CatalogueDocumentCodec, CatalogueDocumentCodecError};
+use crate::tddd::catalogue_document_codec::{
+    CatalogueDocumentCodec, CatalogueDocumentCodecError, SCHEMA_VERSION,
+};
 
 mod fragment;
 mod fs_access;
@@ -155,6 +157,143 @@ pub fn try_complete(
     let json = serde_json::to_string(&value).map_err(CatalogueDocumentCodecError::from)?;
     let document = CatalogueDocumentCodec::decode(&json, expected_stem)?;
     Ok(document)
+}
+
+/// Validate the schema of a draft's hole-free portion.
+///
+/// Unlike [`try_complete`] — which rejects *any* draft that still contains a
+/// `$todo` hole — this prunes every entry that carries a hole and decodes the
+/// remainder. It lets a gate that tolerates holes (the commit gate maps a
+/// residual hole to an interim result) still surface a real schema violation in a
+/// *hole-free* entry (an invalid role, an unknown field, a `crate_name` mismatch)
+/// that an unrelated hole would otherwise mask as an interim / exit-0 outcome.
+///
+/// A residual hole that cannot be pruned — a `$todo` at a top-level scalar field
+/// rather than inside an entry — is treated as tolerated (`Ok(())`); the hole
+/// itself is still reported by the caller and blocks at the stricter merge /
+/// phase2 gates.
+///
+/// # Errors
+///
+/// Returns [`CatalogDraftError::Codec`] when a hole-free entry violates the
+/// catalogue schema.
+pub(crate) fn validate_hole_free_schema(
+    value: &Value,
+    expected_stem: &str,
+) -> Result<(), CatalogDraftError> {
+    let pruned = prune_hole_bearing_entries(value, expected_stem);
+    match try_complete(pruned, expected_stem) {
+        // Hole-free portion decodes cleanly, or a non-prunable root/top-level
+        // hole remains (tolerated here; still reported and blocked at stricter
+        // gates). Any deeper hole that survives pruning is treated as a missed
+        // validation case and fails closed instead of masking schema errors.
+        Ok(_) => Ok(()),
+        Err(CatalogDraftError::Incomplete { holes })
+            if holes.iter().all(is_root_or_top_level_hole) =>
+        {
+            Ok(())
+        }
+        Err(err @ CatalogDraftError::Incomplete { .. }) => Err(err),
+        Err(err @ CatalogDraftError::Codec { .. }) => Err(err),
+    }
+}
+
+/// Clone `value` and drop every entry (from the `types` / `traits` / `functions`
+/// maps) and every `trait_impls` / `inherent_impls` element whose subtree carries
+/// a `$todo` hole, so the remainder can be schema-decoded without a hole marker
+/// aborting the parse at its position.
+fn prune_hole_bearing_entries(value: &Value, expected_stem: &str) -> Value {
+    const ENTRY_SECTIONS: [&str; 3] = ["types", "traits", "functions"];
+    const IMPL_SECTIONS: [&str; 2] = ["trait_impls", "inherent_impls"];
+
+    let mut pruned = value.clone();
+    if let Value::Object(root) = &mut pruned {
+        remove_root_todo_marker(root);
+        replace_top_level_hole(root, "schema_version", Value::Number(SCHEMA_VERSION.into()));
+        replace_top_level_hole(root, "crate_name", Value::String(expected_stem.to_owned()));
+        replace_top_level_hole(root, "layer", Value::String(expected_stem.to_owned()));
+        for section in ENTRY_SECTIONS {
+            match root.get_mut(section) {
+                Some(Value::Object(entries)) => {
+                    entries.remove(TODO_KEY);
+                    entries.retain(|_, entry| !subtree_contains_todo_key(entry));
+                }
+                Some(value) if subtree_contains_todo_key(value) => {
+                    *value = Value::Object(Map::new());
+                }
+                _ => {}
+            }
+        }
+        for section in IMPL_SECTIONS {
+            match root.get_mut(section) {
+                Some(Value::Array(items)) => {
+                    items.retain(|item| !subtree_contains_todo_key(item));
+                }
+                Some(value) if subtree_contains_todo_key(value) => {
+                    *value = Value::Array(vec![]);
+                }
+                _ => {}
+            }
+        }
+        remove_unknown_top_level_holes(root);
+    }
+    pruned
+}
+
+fn remove_root_todo_marker(root: &mut Map<String, Value>) {
+    if root.len() > 1 {
+        root.remove(TODO_KEY);
+    }
+}
+
+fn replace_top_level_hole(root: &mut Map<String, Value>, key: &str, replacement: Value) {
+    if root.get(key).is_some_and(subtree_contains_todo_key) {
+        root.insert(key.to_owned(), replacement);
+    }
+}
+
+fn remove_unknown_top_level_holes(root: &mut Map<String, Value>) {
+    const KNOWN_TOP_LEVEL_KEYS: [&str; 8] = [
+        "schema_version",
+        "crate_name",
+        "layer",
+        "types",
+        "traits",
+        "functions",
+        "trait_impls",
+        "inherent_impls",
+    ];
+    let keys_to_remove: Vec<String> = root
+        .iter()
+        .filter(|(key, value)| {
+            !KNOWN_TOP_LEVEL_KEYS.contains(&key.as_str()) && subtree_contains_todo_key(value)
+        })
+        .map(|(key, _)| key.clone())
+        .collect();
+    for key in keys_to_remove {
+        root.remove(&key);
+    }
+}
+
+fn is_root_or_top_level_hole(hole: &DraftHole) -> bool {
+    let path = hole.path().as_str();
+    path == "(root)" || (!path.contains('.') && !path.contains('['))
+}
+
+/// Whether `value` carries the reserved `$todo` hole key anywhere in its subtree.
+///
+/// Distinct from [`scan_todo_holes`], which collects hole paths + instructions and
+/// silently skips a hole whose path/instruction is unrepresentable: this is a
+/// plain existence check, so a malformed hole still counts as hole-bearing for
+/// pruning purposes.
+fn subtree_contains_todo_key(value: &Value) -> bool {
+    match value {
+        Value::Object(map) => {
+            map.contains_key(TODO_KEY) || map.values().any(subtree_contains_todo_key)
+        }
+        Value::Array(items) => items.iter().any(subtree_contains_todo_key),
+        _ => false,
+    }
 }
 
 // ---------------------------------------------------------------------------

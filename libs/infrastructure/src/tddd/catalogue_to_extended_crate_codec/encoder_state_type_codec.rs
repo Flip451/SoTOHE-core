@@ -103,7 +103,11 @@ impl EncoderState {
         let mut field_ids: Vec<Option<Id>> = vec![];
         for field_ty_ref in &fields {
             let field_id = self.alloc_id();
-            let field_ty = self.parse_type_ref_str(field_ty_ref.as_str())?;
+            // Field types must resolve type-declaration-level generics so that a
+            // field like `.0: T` in `struct Foo<T>(T)` encodes as `Type::Generic("T")`,
+            // matching rustdoc's C-side, rather than an unresolved local-path marker.
+            let field_ty =
+                self.parse_type_ref_str_with_generics(field_ty_ref.as_str(), &generic_names)?;
             self.index
                 .insert(field_id, make_item(field_id, None, None, ItemEnum::StructField(field_ty)));
             field_ids.push(Some(field_id));
@@ -166,11 +170,17 @@ impl EncoderState {
         has_stripped_fields: bool,
         _typestate: Option<domain::tddd::catalogue_v2::composite::TypestateMarker>,
     ) -> Result<(), CatalogueToExtendedCrateCodecError> {
-        // Encode named fields → StructField items.
+        // Encode named fields → StructField items. Field types must resolve
+        // type-declaration-level generics (ADR `2026-07-02-1345` D6) so that a
+        // field like `value: T` in `struct Foo<T> { value: T }` encodes as
+        // `Type::Generic("T")`, matching rustdoc's C-side, rather than an
+        // unresolved local-path marker (which would surface a false non-Blue signal).
+        let generic_names: Vec<&str> = entry.generics().iter().map(|g| g.name.as_str()).collect();
         let mut field_ids: Vec<Id> = vec![];
         for field in &fields {
             let field_id = self.alloc_id();
-            let field_ty = self.parse_type_ref_str(field.ty.as_str())?;
+            let field_ty =
+                self.parse_type_ref_str_with_generics(field.ty.as_str(), &generic_names)?;
             self.index.insert(
                 field_id,
                 make_item(
@@ -211,7 +221,7 @@ impl EncoderState {
             let variant_id = self.alloc_id();
             let variant_name = variant.name.as_str().to_string();
             let payload = variant.payload.clone();
-            let kind = self.encode_variant_kind(payload)?;
+            let kind = self.encode_variant_kind(payload, &generic_names)?;
             self.index.insert(
                 variant_id,
                 make_item(
@@ -278,7 +288,10 @@ impl EncoderState {
             &generic_names,
         )?;
 
-        let target_ty = self.parse_type_ref_str(target.as_str())?;
+        // The alias target must resolve type-declaration-level generics so that
+        // `type Foo<T> = Vec<T>` encodes the inner `T` as `Type::Generic("T")`,
+        // matching rustdoc's C-side rather than an unresolved local-path marker.
+        let target_ty = self.parse_type_ref_str_with_generics(target.as_str(), &generic_names)?;
 
         // Encode inherent methods (rare for type aliases; concrete implementations → has_body: true).
         let methods: Vec<MethodDeclaration> = entry.methods().to_vec();
@@ -308,9 +321,16 @@ impl EncoderState {
     }
 
     /// Encodes a `VariantPayload` into `rustdoc_types::VariantKind`.
+    ///
+    /// `generic_names` lists the enum's type-declaration-level generic parameter
+    /// names (ADR `2026-07-02-1345` D6) so that a variant payload referencing a
+    /// generic — e.g. `Some(T)` in `enum Opt<T> { Some(T) }` — encodes as
+    /// `Type::Generic("T")`, matching rustdoc's C-side, rather than an unresolved
+    /// local-path marker.
     pub(super) fn encode_variant_kind(
         &mut self,
         payload: VariantPayload,
+        generic_names: &[&str],
     ) -> Result<VariantKind, CatalogueToExtendedCrateCodecError> {
         match payload {
             VariantPayload::Unit => Ok(VariantKind::Plain),
@@ -318,7 +338,8 @@ impl EncoderState {
                 let mut field_ids = vec![];
                 for ty_ref in type_refs {
                     let field_id = self.alloc_id();
-                    let field_ty = self.parse_type_ref_str(ty_ref.as_str())?;
+                    let field_ty =
+                        self.parse_type_ref_str_with_generics(ty_ref.as_str(), generic_names)?;
                     self.index.insert(
                         field_id,
                         make_item(field_id, None, None, ItemEnum::StructField(field_ty)),
@@ -331,7 +352,8 @@ impl EncoderState {
                 let mut field_ids = vec![];
                 for f in fields {
                     let field_id = self.alloc_id();
-                    let field_ty = self.parse_type_ref_str(f.ty.as_str())?;
+                    let field_ty =
+                        self.parse_type_ref_str_with_generics(f.ty.as_str(), generic_names)?;
                     self.index.insert(
                         field_id,
                         make_item(

@@ -844,6 +844,132 @@ fn test_encode_method_generic_param_type_emits_type_generic() {
 }
 
 // -----------------------------------------------------------------------
+// ADR 2026-07-02-1345 D6: type-declaration-level generics on struct fields,
+// enum payloads, and alias targets encode as Type::Generic
+// -----------------------------------------------------------------------
+
+/// A plain-struct field whose type is a type-declaration-level generic
+/// (`value: T` in `struct Foo<T> { value: T }`) must encode as
+/// `Type::Generic("T")`, matching rustdoc's C-side. Without the generic wiring it
+/// falls through to an unresolved local-path marker, which surfaces a false
+/// non-Blue signal for a structurally-correct generic struct.
+#[test]
+fn test_encode_struct_field_generic_type_emits_type_generic() {
+    let mut doc = make_doc("domain");
+    doc.types.insert(
+        TypeName::new("Holder").unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain {
+                    fields: vec![FieldDecl::new(
+                        FieldName::new("value").unwrap(),
+                        TypeRef::new("T").unwrap(),
+                    )],
+                    has_stripped_fields: false,
+                },
+                None,
+            )),
+            vec![],
+            vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let field = ec.krate().index.values().find(|item| {
+        item.name.as_deref() == Some("value") && matches!(item.inner, ItemEnum::StructField(_))
+    });
+    assert!(field.is_some(), "expected StructField item for 'value'");
+    let ItemEnum::StructField(ref ty) = field.unwrap().inner else {
+        panic!("expected StructField")
+    };
+    assert!(
+        matches!(ty, Type::Generic(g) if g == "T"),
+        "expected Type::Generic(\"T\") for generic struct field, got: {ty:?}"
+    );
+}
+
+/// A tuple-variant payload referencing a type-declaration-level generic
+/// (`Some(T)` in `enum Opt<T> { Some(T) }`) must encode as `Type::Generic("T")`.
+#[test]
+fn test_encode_enum_tuple_variant_payload_generic_emits_type_generic() {
+    let mut doc = make_doc("domain");
+    doc.types.insert(
+        TypeName::new("Opt").unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Enum {
+                variants: vec![VariantDecl::tuple(
+                    VariantName::new("Some").unwrap(),
+                    vec![TypeRef::new("T").unwrap()],
+                )],
+            },
+            vec![],
+            vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    // The enum encoding produces exactly one StructField: the variant payload.
+    let field =
+        ec.krate().index.values().find(|item| matches!(item.inner, ItemEnum::StructField(_)));
+    assert!(field.is_some(), "expected a StructField item for the variant payload");
+    let ItemEnum::StructField(ref ty) = field.unwrap().inner else {
+        panic!("expected StructField")
+    };
+    assert!(
+        matches!(ty, Type::Generic(g) if g == "T"),
+        "expected Type::Generic(\"T\") for generic enum payload, got: {ty:?}"
+    );
+}
+
+/// A type-alias target referencing a type-declaration-level generic
+/// (`type Alias<T> = T`) must encode as `Type::Generic("T")`.
+#[test]
+fn test_encode_type_alias_target_generic_emits_type_generic() {
+    let mut doc = make_doc("domain");
+    doc.types.insert(
+        TypeName::new("Alias").unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::TypeAlias { target: TypeRef::new("T").unwrap() },
+            vec![],
+            vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let alias = ec.krate().index.values().find(|item| {
+        item.name.as_deref() == Some("Alias") && matches!(item.inner, ItemEnum::TypeAlias(_))
+    });
+    assert!(alias.is_some(), "expected TypeAlias item for 'Alias'");
+    let ItemEnum::TypeAlias(ref ta) = alias.unwrap().inner else { panic!("expected TypeAlias") };
+    assert!(
+        matches!(&ta.type_, Type::Generic(g) if g == "T"),
+        "expected alias target Type::Generic(\"T\"), got: {:?}",
+        ta.type_
+    );
+}
+
+// -----------------------------------------------------------------------
 // ADR 0248 D13: per-method `has_body` from `has_default_impl` (Gap 1)
 // -----------------------------------------------------------------------
 
