@@ -46,22 +46,26 @@
     {
       "id": "T008",
       "description": "Target apps/cli-driver catalog_gen. Add CatalogKindSelect, CatalogImportSelect, CatalogGateSelect, CatalogInitInput, CatalogAddInput, CatalogImportInput, CatalogCiteInput, CatalogCheckInput, CatalogInput, and CatalogDriver; implement handle(input) -> CommandOutcome mapping to CatalogService commands/queries (IN-01/IN-03/IN-04/IN-05/IN-06/AC-01/AC-03/AC-04/AC-06/AC-11). Add unit tests with a CatalogService double.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "74edb0d8"
     },
     {
       "id": "T009",
       "description": "Target apps/cli-composition catalog module. Add CatalogCompositionRoot new/Default, catalog_driver(), and handle(CatalogInput) wiring FsCatalogAdapter -> CatalogInteractor -> CatalogDriver (IN-01/AC-01). Add integration test for a composition-root catalog operation.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "74edb0d8"
     },
     {
       "id": "T010",
       "description": "Target apps/cli commands::catalog and apps/cli/src/main.rs. Add CatalogKindArg, CatalogActionArg, CatalogGateArg, CatalogInitArgs, CatalogAddArgs, CatalogImportArgs, CatalogCiteArgs, CatalogCheckArgs, CatalogCommand, execute(CatalogCommand) -> ExitCode, and top-level registration (IN-01/IN-03/IN-04/IN-05/IN-06/IN-11/OS-02/AC-01/AC-03/AC-04/AC-06/AC-09/AC-11). Add CLI integration tests for parsing, dispatch, add output, validation errors, check gates, duplicate entry, and track-id cases.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "74edb0d8"
     },
     {
       "id": "T011",
       "description": "Target Makefile.toml and gate wiring. Add a command+args wrapper for `sotp catalog check --gate commit`; insert it into track-active-gate; add phase2/merge invocations alongside the catalogue-lint gate path; keep signal-gates.json out of prerequisites (IN-06/CN-06/CN-07/CN-08/AC-11). Add gate integration tests for commit and phase2/merge contexts.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "74edb0d8"
     },
     {
       "id": "T012",

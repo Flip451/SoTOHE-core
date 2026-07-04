@@ -11,7 +11,7 @@ CLI driver/composition: add CatalogDriver and CatalogCompositionRoot wiring (IN-
 Gates: wire `sotp catalog check` into commit, phase2, and merge paths (IN-06/AC-11/CN-06/CN-07/CN-08).
 Batching: land T002+T012+T013 in one commit; review T006+T007 in one batch (CN-10/AC-17).
 
-## Tasks (9/13 resolved)
+## Tasks (13/13 resolved)
 
 ### S1 — Domain foundation: draft value types, entry-type refactor, schema extension
 
@@ -46,12 +46,12 @@ Batching: land T002+T012+T013 in one commit; review T006+T007 in one batch (CN-1
 
 > Targets T008/T009/T010 cli_driver, cli_composition, and cli catalog command surface (IN-01/IN-03/IN-04/IN-05/IN-06/IN-11/AC-01/AC-03/AC-04/AC-06/AC-09/AC-11).
 
-- [~] **T008**: Target apps/cli-driver catalog_gen. Add CatalogKindSelect, CatalogImportSelect, CatalogGateSelect, CatalogInitInput, CatalogAddInput, CatalogImportInput, CatalogCiteInput, CatalogCheckInput, CatalogInput, and CatalogDriver; implement handle(input) -> CommandOutcome mapping to CatalogService commands/queries (IN-01/IN-03/IN-04/IN-05/IN-06/AC-01/AC-03/AC-04/AC-06/AC-11). Add unit tests with a CatalogService double.
-- [~] **T009**: Target apps/cli-composition catalog module. Add CatalogCompositionRoot new/Default, catalog_driver(), and handle(CatalogInput) wiring FsCatalogAdapter -> CatalogInteractor -> CatalogDriver (IN-01/AC-01). Add integration test for a composition-root catalog operation.
-- [~] **T010**: Target apps/cli commands::catalog and apps/cli/src/main.rs. Add CatalogKindArg, CatalogActionArg, CatalogGateArg, CatalogInitArgs, CatalogAddArgs, CatalogImportArgs, CatalogCiteArgs, CatalogCheckArgs, CatalogCommand, execute(CatalogCommand) -> ExitCode, and top-level registration (IN-01/IN-03/IN-04/IN-05/IN-06/IN-11/OS-02/AC-01/AC-03/AC-04/AC-06/AC-09/AC-11). Add CLI integration tests for parsing, dispatch, add output, validation errors, check gates, duplicate entry, and track-id cases.
+- [x] **T008**: Target apps/cli-driver catalog_gen. Add CatalogKindSelect, CatalogImportSelect, CatalogGateSelect, CatalogInitInput, CatalogAddInput, CatalogImportInput, CatalogCiteInput, CatalogCheckInput, CatalogInput, and CatalogDriver; implement handle(input) -> CommandOutcome mapping to CatalogService commands/queries (IN-01/IN-03/IN-04/IN-05/IN-06/AC-01/AC-03/AC-04/AC-06/AC-11). Add unit tests with a CatalogService double. (`74edb0d8`)
+- [x] **T009**: Target apps/cli-composition catalog module. Add CatalogCompositionRoot new/Default, catalog_driver(), and handle(CatalogInput) wiring FsCatalogAdapter -> CatalogInteractor -> CatalogDriver (IN-01/AC-01). Add integration test for a composition-root catalog operation. (`74edb0d8`)
+- [x] **T010**: Target apps/cli commands::catalog and apps/cli/src/main.rs. Add CatalogKindArg, CatalogActionArg, CatalogGateArg, CatalogInitArgs, CatalogAddArgs, CatalogImportArgs, CatalogCiteArgs, CatalogCheckArgs, CatalogCommand, execute(CatalogCommand) -> ExitCode, and top-level registration (IN-01/IN-03/IN-04/IN-05/IN-06/IN-11/OS-02/AC-01/AC-03/AC-04/AC-06/AC-09/AC-11). Add CLI integration tests for parsing, dispatch, add output, validation errors, check gates, duplicate entry, and track-id cases. (`74edb0d8`)
 
 ### S5 — Gate enforcement
 
 > Targets T011 catalog check gate wiring (IN-06/CN-06/CN-07/CN-08/AC-11).
 
-- [~] **T011**: Target Makefile.toml and gate wiring. Add a command+args wrapper for `sotp catalog check --gate commit`; insert it into track-active-gate; add phase2/merge invocations alongside the catalogue-lint gate path; keep signal-gates.json out of prerequisites (IN-06/CN-06/CN-07/CN-08/AC-11). Add gate integration tests for commit and phase2/merge contexts.
+- [x] **T011**: Target Makefile.toml and gate wiring. Add a command+args wrapper for `sotp catalog check --gate commit`; insert it into track-active-gate; add phase2/merge invocations alongside the catalogue-lint gate path; keep signal-gates.json out of prerequisites (IN-06/CN-06/CN-07/CN-08/AC-11). Add gate integration tests for commit and phase2/merge contexts. (`74edb0d8`)
