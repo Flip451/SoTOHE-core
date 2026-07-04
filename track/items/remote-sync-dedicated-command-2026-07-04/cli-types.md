@@ -4,7 +4,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| GitCommand | enum | modify | AddAll, AddFromFile, CommitFromFile, NoteFromFile, Sync, Unstage | 🟡 | 🔵 |
+| GitCommand | enum | modify | AddAll, AddFromFile, CommitFromFile, NoteFromFile, Sync, Unstage | 🔵 | 🔵 |
 
 ## DTOs
 
@@ -12,6 +12,6 @@
 |------|------|--------|---------|--------|----------|
 | CommitFromFileArgs | dto | reference | — | 🔵 | 🔵 |
 | FileArgs | dto | reference | — | 🔵 | 🔵 |
-| SwitchAndPullArgs | dto | delete | — | 🟡 | 🔵 |
+| SwitchAndPullArgs | dto | delete | — | 🔵 | 🔵 |
 | UnstageArgs | dto | reference | — | 🔵 | 🔵 |
 

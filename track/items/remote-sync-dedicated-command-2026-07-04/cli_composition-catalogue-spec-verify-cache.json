@@ -52,7 +52,7 @@
     },
     {
       "claim_hash": "2465a61b41a12a39c22a24e03d63e830202a35a048c01440de1eb07492586b01",
-      "evidence_hash": "6274d959b92c2852882a76b64c6664a3f180a24e676d6a256220162f40e1956d",
+      "evidence_hash": "eb2130c58bbc83b0b8c30ce003a2ed1bff49d794eed6380666e33424de0cb601",
       "verdict": {
         "kind": "pass",
         "citation": "`GitCompositionRoot` の inline git method 群（Chain B）を削除し、`apps/cli` の git subcommand dispatch を配線済み `GitDriver` 経由にする。"
@@ -70,13 +70,13 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-08",
-          "text_label": "git workflow 操作の二重実装を解消する。usecase port `GitWorkflowService` → infrastructure adapter `FsGitWorkflowAdapter` → delivery `GitDriver` の既存 chain を正とし、production caller ゼロの dead code から唯一の live chain へ統合する。`GitCompositionRoot` の inline git method 群（Chain B）を削除し、`apps/cli` の git subcommand dispatch を配線済み `GitDriver` 経由にする。両系統に逐語重複している commit の fail-closed track-branch guard を単一箇所へ集約する。port method を再編し、`switch_and_pull` を trait から削除して sync（現在ブランチ pull 専用）と branch switch を分離した method として整備する。"
+          "text_label": "git workflow 操作の二重実装を解消する。usecase port `GitWorkflowService` → infrastructure adapter `FsGitWorkflowAdapter` → delivery `GitDriver` の既存 chain を正とし、production caller ゼロの dead code から唯一の live chain へ統合する。`GitCompositionRoot` の inline git method 群（Chain B）を削除し、`apps/cli` の git subcommand dispatch を配線済み `GitDriver` 経由にする。両系統に逐語重複している commit の fail-closed track-branch guard を単一箇所へ集約する。port method を再編し、`switch_and_pull` を trait から削除して sync（現在ブランチ pull 専用）と branch switch を分離した method として整備する。sync の command-facing 公開契約は usecase port（ADR 例示 `GitWorkflowService::sync_current_branch() -> Result<(), GitWorkflowError>`）に置き `bin/sotp git sync` の唯一の service API とする。`FsGitWorkflowAdapter` が D5 の infrastructure primitive（`SystemGitRepo::sync_current_branch` / `SyncError`）を `GitWorkflowError` へ写像し、`apps/cli` = parse + dispatch、`apps/cli-driver` = service 呼び出し + presentation 変換、`apps/cli-composition` = `GitDriver` への wiring のみ、と層責務を分ける。`track switch-base` は usecase 側 orchestration として「snapshot から base branch 解決 → branch switch service → sync service」を合成し、composition root に手順を置かない。"
         }
       }
     },
     {
       "claim_hash": "2465a61b41a12a39c22a24e03d63e830202a35a048c01440de1eb07492586b01",
-      "evidence_hash": "641f7c05989d880357cd9a20647b64c43dbcdea5bf9c16603491106039cce8ba",
+      "evidence_hash": "328d76731e25df874eba80ce74446dd41231ace238ffef454a780e8dcb1c04ec",
       "verdict": {
         "kind": "pass",
         "citation": "composition root は adapter の構築と注入（wiring / DI）だけを行う。"
@@ -94,7 +94,7 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-10",
-          "text_label": "git 関与フローの orchestration（意味論 method を呼ぶ側の手順）を usecase 層の interactor へ移管する。track branch create の fail-closed 検証シーケンス、track archive の git mv + logs 移動の合成、pr 系の fetch → 解決 → 参照フロー、review_v2 の hash 解決フローを、既存 `GitWorkflowInteractor` と同型の port + interactor 構造として usecase に置く。composition root は adapter の構築と注入（wiring / DI）だけを行う。適用範囲は本 track census で特定した git 関与フローに限定する。"
+          "text_label": "git 関与フローの orchestration（意味論 method / service を呼ぶ側の手順）を usecase 層の interactor へ移管する。本 track census で特定した git 関与フロー — track branch ops の fail-closed 検証シーケンス、track archive の git mv + logs 移動の合成、pr 系の fetch → 解決 → 参照フロー、review_v2 の hash 解決フロー、および archived-track telemetry の emit フロー（`TelemetryAggregateServiceImpl::emit_archived`（`apps/cli-composition/src/telemetry.rs`）は git worktree 解決を伴う git 関与フローであり、application service 実装ごと usecase interactor + port 構造へ移設して composition から外す）— を、既存 `GitWorkflowInteractor` と同型の port + interactor 構造として usecase に置く。composition root は adapter の構築と注入（wiring / DI）だけを行う。適用範囲は git 関与フローに限定する。"
         }
       }
     },
@@ -196,10 +196,10 @@
     },
     {
       "claim_hash": "2465a61b41a12a39c22a24e03d63e830202a35a048c01440de1eb07492586b01",
-      "evidence_hash": "1b4629278e929edde6354e27477d0587fc845c9aa1d778c6bf60c1e6c8dedae6",
+      "evidence_hash": "fd04cb65809c583f462f7af6bd2fd3906994f5bdb6562eaa72a938bb835a722c",
       "verdict": {
         "kind": "pass",
-        "citation": "git 関与フロー（track branch ops / archive / pr / review_v2 系）の orchestration が usecase 層の interactor に存在し、composition root は wiring（adapter 構築 + 注入）のみになっていることを確認できる。移管された手順が usecase 単体テストで検証可能である。"
+        "citation": "対応する composition root 側が wiring（adapter 構築 + 注入）のみになっていることを確認できる。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -214,7 +214,31 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-09",
-          "text_label": "git 関与フロー（track branch ops / archive / pr / review_v2 系）の orchestration が usecase 層の interactor に存在し、composition root は wiring（adapter 構築 + 注入）のみになっていることを確認できる。移管された手順が usecase 単体テストで検証可能である。"
+          "text_label": "本 track census で特定した git 関与フロー（archived-track telemetry emit を含む）の orchestration が usecase 層の interactor に存在し、対応する composition root 側が wiring（adapter 構築 + 注入）のみになっていることを確認できる。移管された各手順が mock port を用いた usecase 単体テストで検証可能である。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0046a496890375b411e97568aaed7284b076e4849e2dda4015ac071b3779440f",
+      "evidence_hash": "fd04cb65809c583f462f7af6bd2fd3906994f5bdb6562eaa72a938bb835a722c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本 track census で特定した git 関与フロー（archived-track telemetry emit を含む）の orchestration が usecase 層の interactor に存在し、対応する composition root 側が wiring（adapter 構築 + 注入）のみになっていることを確認できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/cli_composition-types.json",
+          "section_key": "functions",
+          "entry_key": "cli_composition::review_v2::commit_hash::persist_commit_hash_for_track"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "本 track census で特定した git 関与フロー（archived-track telemetry emit を含む）の orchestration が usecase 層の interactor に存在し、対応する composition root 側が wiring（adapter 構築 + 注入）のみになっていることを確認できる。移管された各手順が mock port を用いた usecase 単体テストで検証可能である。"
         }
       }
     }

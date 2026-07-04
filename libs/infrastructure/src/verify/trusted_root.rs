@@ -27,7 +27,7 @@
 
 use std::path::{Path, PathBuf};
 
-use crate::git_cli::{GitRepository, SystemGitRepo};
+use crate::git_cli::SystemGitRepo;
 
 /// Resolves the trusted_root to use for `spec_states::verify` /
 /// `verify_from_spec_json` given a `spec_path`.

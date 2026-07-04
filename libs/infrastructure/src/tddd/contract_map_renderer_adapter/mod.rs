@@ -335,10 +335,14 @@ include_function_roles = []
             .map(|i| fence_start + i + 1) // +1 to include the \n before ```
             .unwrap_or(text.len());
         let mermaid_body = &text[fence_start..fence_end];
+        // ELK layout frontmatter (`---\nconfig:\n  layout: elk\n---\n`) sits
+        // between the fence and `flowchart LR` to sidestep the dagre
+        // cluster-ordering crash on large 3-level subgraphs. Both must be
+        // present at the top of the fence.
         assert!(
-            mermaid_body.starts_with("flowchart LR\n"),
-            "mermaid body inside the fence must start with 'flowchart LR\\n', got: {:?}",
-            &mermaid_body[..mermaid_body.len().min(40)]
+            mermaid_body.starts_with("---\nconfig:\n  layout: elk\n---\nflowchart LR\n"),
+            "mermaid body must begin with ELK frontmatter followed by 'flowchart LR\\n', got: {:?}",
+            &mermaid_body[..mermaid_body.len().min(80)]
         );
     }
 

@@ -1,13 +1,19 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-04T09:07:16Z",
-  "declaration_hash": "8deddf07b8917d339913676840b7ab02deef26464a7728a9c1f81f9b91297fbb",
+  "generated_at": "2026-07-04T18:56:16Z",
+  "declaration_hash": "1eeb38426caf1b76dbbaac27a1e92623682bde476bc484c372ef735bb1bf4d0e",
   "signals": [
     {
       "type_name": "GitCompositionRoot",
       "kind_tag": "composition_root",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
+    },
+    {
+      "type_name": "cli_composition::review_v2::commit_hash::persist_commit_hash_for_track",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
     }
   ]
 }

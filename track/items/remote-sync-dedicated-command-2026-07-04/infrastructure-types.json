@@ -15,12 +15,15 @@
           ] } },
           { "name": "WorktreeUnresolved", "payload": { "kind": "struct", "fields": [
             { "name": "stderr", "ty": "usecase::git_workflow::DiagnosticText" }
+          ] } },
+          { "name": "Spawn", "payload": { "kind": "struct", "fields": [
+            { "name": "detail", "ty": "usecase::git_workflow::DiagnosticText" }
           ] } }
         ]
       },
       "methods": [],
       "module_path": "git_cli",
-      "docs": "Typed error for SystemGitRepo::sync_current_branch: UpstreamNotSet / NonFastForward{stderr} / WorktreeUnresolved{stderr}; stderr: usecase::git_workflow::DiagnosticText. Mapped 1:1 to GitWorkflowError::Sync* by the adapter. IN-06 / CN-02 / AC-08.",
+      "docs": "Add SyncError enum surface for SystemGitRepo::sync_current_branch; variants UpstreamNotSet, NonFastForward{stderr}, WorktreeUnresolved{stderr}, Spawn{detail}. IN-06 / CN-02 / AC-08.",
       "spec_refs": [
         { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-06" },
         { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "CN-02" },
@@ -64,7 +67,7 @@
       },
       "methods": [],
       "module_path": "git_cli",
-      "docs": "System git runner (single private root: PathBuf field). Public surface reshaped: the GitRepository trait is demoted to pub(crate); status/output demoted to pub(crate) inherent; root / resolve_path / current_branch / push_branch / index_tree_hash / stage_all_excluding migrate to pub inherent (same signatures); adds sync_current_branch -> Result<(), SyncError>. Post-modify pub inherent set: discover / discover_from / root / resolve_path / current_branch / push_branch / index_tree_hash / stage_all_excluding / sync_current_branch (status/output excluded — pub(crate)). WorktreeReader + BranchReaderPort impls preserved. Role SecondaryAdapter. IN-06 / IN-07 / IN-09 / CN-02 / CN-07 / AC-07 / AC-08.",
+      "docs": "Modify SystemGitRepo. IN-06 / IN-07 / IN-09 / CN-02 / CN-07 / AC-07 / AC-08.",
       "spec_refs": [
         { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-06" },
         { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-07" },
@@ -108,6 +111,23 @@
       "spec_refs": [
         { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-08" },
         { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-10" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "AC-09" }
+      ],
+      "informal_grounds": []
+    },
+    "FsArchivedTelemetryFactoryAdapter": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "unit" }
+      },
+      "methods": [],
+      "module_path": "telemetry::archived_track",
+      "docs": "Add FsArchivedTelemetryFactoryAdapter. IN-10 / CN-03 / AC-09.",
+      "spec_refs": [
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-10" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "CN-03" },
         { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "AC-09" }
       ],
       "informal_grounds": []
@@ -389,6 +409,19 @@
           "docs": "Unit-struct constructor."
         }
       ]
+    },
+    {
+      "type_name": "FsArchivedTelemetryFactoryAdapter",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [],
+          "returns": "Self",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "Unit-struct constructor."
+        }
+      ]
     }
   ],
   "trait_impls": [
@@ -414,6 +447,8 @@
     { "action": "reference", "trait_ref": "core::fmt::Debug",                              "for_type": "TrackBranchRecord" },
     { "action": "reference", "trait_ref": "core::clone::Clone",                            "for_type": "TrackBranchRecord" },
     { "action": "reference", "trait_ref": "core::cmp::PartialEq",                          "for_type": "TrackBranchRecord" },
-    { "action": "reference", "trait_ref": "core::cmp::Eq",                                 "for_type": "TrackBranchRecord" }
+    { "action": "reference", "trait_ref": "core::cmp::Eq",                                 "for_type": "TrackBranchRecord" },
+    { "action": "add",       "trait_ref": "core::default::Default",                           "for_type": "FsArchivedTelemetryFactoryAdapter" },
+    { "action": "add",       "trait_ref": "usecase::telemetry::ArchivedTelemetryFactoryPort", "for_type": "FsArchivedTelemetryFactoryAdapter" }
   ]
 }

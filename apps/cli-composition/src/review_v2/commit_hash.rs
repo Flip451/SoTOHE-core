@@ -22,10 +22,13 @@ use infrastructure::review_v2::FsCommitHashStore;
 ///
 /// Returns an error string describing the failure (invalid track id, branch mismatch,
 /// git failure, or I/O error).
-pub fn persist_commit_hash_for_track(track_id: &str) -> Result<String, String> {
-    use domain::CommitHash;
+pub(crate) fn persist_commit_hash_for_track(track_id: &str) -> Result<String, String> {
+    use std::sync::Arc;
+
     use domain::review_v2::CommitHashWriter;
-    use infrastructure::git_cli::{GitRepository, SystemGitRepo};
+    use infrastructure::FsGitWorkflowAdapter;
+    use infrastructure::git_cli::SystemGitRepo;
+    use usecase::git_workflow::{GitPrimitivePort, ReviewGitInteractor};
 
     let validated_id =
         domain::TrackId::try_new(track_id).map_err(|e| format!("invalid track id: {e}"))?;
@@ -33,14 +36,14 @@ pub fn persist_commit_hash_for_track(track_id: &str) -> Result<String, String> {
     let git = SystemGitRepo::discover().map_err(|e| format!("git discover: {e}"))?;
     let root = git.root().to_path_buf();
 
-    // Branch guard: prevent cross-track corruption.
-    let branch_output = git
-        .output(&["rev-parse", "--abbrev-ref", "HEAD"])
-        .map_err(|e| format!("git rev-parse --abbrev-ref HEAD: {e}"))?;
-    if !branch_output.status.success() {
-        return Err("git rev-parse --abbrev-ref HEAD failed (cannot verify branch)".to_owned());
-    }
-    let branch = String::from_utf8_lossy(&branch_output.stdout).trim().to_owned();
+    // Branch guard: prevent cross-track corruption (semantic
+    // SystemGitRepo::current_branch call retained per T007).
+    let branch = git
+        .current_branch()
+        .map_err(|e| format!("git rev-parse --abbrev-ref HEAD: {e}"))?
+        .ok_or_else(|| {
+            "git rev-parse --abbrev-ref HEAD failed (cannot verify branch)".to_owned()
+        })?;
     let expected = format!("track/{validated_id}");
     if branch != expected {
         return Err(format!(
@@ -49,13 +52,14 @@ pub fn persist_commit_hash_for_track(track_id: &str) -> Result<String, String> {
         ));
     }
 
-    let head_output =
-        git.output(&["rev-parse", "HEAD"]).map_err(|e| format!("git rev-parse HEAD: {e}"))?;
-    if !head_output.status.success() {
-        return Err("git rev-parse HEAD failed".to_owned());
-    }
-    let head_sha = String::from_utf8_lossy(&head_output.stdout).trim().to_owned();
-    let commit_hash = CommitHash::try_new(&head_sha).map_err(|e| format!("{e}"))?;
+    // Route HEAD resolution through the review git interactor so the
+    // composition root does not invoke git primitives directly.
+    let port: Arc<dyn GitPrimitivePort> = Arc::new(FsGitWorkflowAdapter::new());
+    let interactor = ReviewGitInteractor::new(port);
+    let commit_hash = interactor
+        .resolve_head_for_track_branch(&validated_id)
+        .map_err(|e| format!("git rev-parse HEAD: {e}"))?;
+    let head_sha = commit_hash.as_ref().to_owned();
 
     // Use the canonicalized repo root as the trusted_root for symlink guards:
     // `canonicalize()` resolves symlinks and returns the physical path, so

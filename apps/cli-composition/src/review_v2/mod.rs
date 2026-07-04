@@ -25,7 +25,10 @@ pub use inputs::{
 // All composition builders, infrastructure-typed helpers, and internal DTOs are
 // pub(crate) — they do not appear on the cli_composition public face (CN-02).
 pub use briefing::append_scope_briefing_reference_str;
-pub use commit_hash::persist_commit_hash_for_track;
+// Demoted to pub(crate) in T010/F3: the persist helper is consumed only by
+// in-crate callers (review_v2 shim + ReviewCompositionRoot + track set-commit-hash),
+// so it must not appear on the cli_composition public face (CN-02 / AC-04).
+pub(crate) use commit_hash::persist_commit_hash_for_track;
 pub use scope::{validate_review_group_name_str, validate_track_id_str};
 pub use shared::{CodexReviewOutcome, build_review_v2_str};
 

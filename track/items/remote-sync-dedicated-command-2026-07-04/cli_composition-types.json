@@ -51,7 +51,22 @@
     }
   },
   "traits": {},
-  "functions": {},
+  "functions": {
+    "cli_composition::review_v2::commit_hash::persist_commit_hash_for_track": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [{ "name": "track_id", "ty": "&str" }],
+      "returns": "Result<String, String>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Delete public FreeFunction entry. AC-09.",
+      "spec_refs": [
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "AC-09" }
+      ],
+      "informal_grounds": []
+    }
+  },
   "inherent_impls": [],
   "trait_impls": [
     { "action": "reference", "trait_ref": "core::default::Default", "for_type": "GitCompositionRoot" }

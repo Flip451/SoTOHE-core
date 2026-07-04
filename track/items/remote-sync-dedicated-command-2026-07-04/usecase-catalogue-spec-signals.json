@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "9e9e4fe7f35c2f62f9fe0121dbe419703a2d482cb5e443613f1cfdd6a24cc044",
+  "catalogue_declaration_hash": "f5fdab865ec35f58fe50395c778488539de0ecf0c34db5d8b49034fb2e57c12c",
   "signals": [
     {
       "type_name": "BranchReadError",
@@ -20,7 +20,7 @@
     {
       "type_name": "GitWorkflowError",
       "signal": "blue",
-      "entry_hash": "ece162657f5a93d85794c108332771ed1ffb6a05473c236f745831fa8dd123c3"
+      "entry_hash": "1894653e9c5de3d4ca9eb225366a26400a5ec113a9ffb4c504bee86cd8e405e3"
     },
     {
       "type_name": "GitWorkflowInteractor",
@@ -38,6 +38,31 @@
       "entry_hash": "79a9a2082d8bd94bfa2e5585702e9f2912c6d10d856851cda1a5bbf9e836484e"
     },
     {
+      "type_name": "TelemetryAggregateInteractor",
+      "signal": "blue",
+      "entry_hash": "93a8ef7ef33362bd172acc2fb1757fff0ba176d4e47b503d9a8bb791ef375357"
+    },
+    {
+      "type_name": "TelemetryAggregateServiceError",
+      "signal": "blue",
+      "entry_hash": "c9e16b22cde9a8f996572862752bc6748d1e80df3d59cae16544d18b86758f87"
+    },
+    {
+      "type_name": "TelemetryEmitInteractor",
+      "signal": "blue",
+      "entry_hash": "69acec59346cc4604160e611a547dc4cb35472ba9cc938ab93fa36362218a944"
+    },
+    {
+      "type_name": "TelemetryReportInteractor",
+      "signal": "blue",
+      "entry_hash": "14de549999fb4d272d976e950a651368861825dd2693b47a430fad8e5f510822"
+    },
+    {
+      "type_name": "TelemetryReportOutput",
+      "signal": "blue",
+      "entry_hash": "43bfcc0507f878d4edf7059dea14a97523377e6ee2c2503fde1fcfd5ad3da0fd"
+    },
+    {
       "type_name": "TrackBranchClaim",
       "signal": "blue",
       "entry_hash": "f3e9bc73585b6b464b0341256703d2868d1a00b7218e3f0115bc2a3de1a6f1e8"
@@ -48,6 +73,16 @@
       "entry_hash": "78ce61d8b36c1b0875da821d8c9ab6108288a217d7db69ac856b25b34d81bed5"
     },
     {
+      "type_name": "ArchivedTelemetryFactoryPort",
+      "signal": "blue",
+      "entry_hash": "fce3288631211ebe50e08765d5162b488d4642edda5e0ab4addb945411e79dd8"
+    },
+    {
+      "type_name": "ArchivedTrackTelemetryPort",
+      "signal": "blue",
+      "entry_hash": "da536079cb15f3a424396591642c4a3f629b2e7b23e1af9877c9f5e29c67e12e"
+    },
+    {
       "type_name": "BranchReaderPort",
       "signal": "blue",
       "entry_hash": "e9e497841b8dfa59bb877b87f5e2049f1b087ed1ec24f1a4f5680cc9f5383e0b"
@@ -55,12 +90,22 @@
     {
       "type_name": "GitPrimitivePort",
       "signal": "blue",
-      "entry_hash": "81026be7b83540f3bc134aaae4ba9b6f1832e3de65f8ed285f492d6272fb4974"
+      "entry_hash": "7aadec5c3bfb0e862003974403f1c1f7c7eade3c48bbb617b05826b41bf20732"
     },
     {
       "type_name": "GitWorkflowService",
       "signal": "blue",
       "entry_hash": "f66f0c08cf82856b6b16e196e02141c6e9bd0f38b7ae04ed90d7e025b92a19f5"
+    },
+    {
+      "type_name": "TelemetryAggregateService",
+      "signal": "blue",
+      "entry_hash": "6cb3fab6ad90a1db2fadee015ce1695b451b0b05d0d0d58691d53d6c3417391c"
+    },
+    {
+      "type_name": "TelemetryReportPort",
+      "signal": "blue",
+      "entry_hash": "9308e2726bceba5c4bea449990ca97d9f15a233472db08fa17263b96b890ab96"
     },
     {
       "type_name": "TrackArchiveFsPort",

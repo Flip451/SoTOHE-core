@@ -6,7 +6,7 @@ use std::time::Instant;
 use domain::review_v2::{CommitHashReader, ReviewScopeConfig};
 use domain::{CommitHash, TrackId};
 
-use infrastructure::git_cli::{GitRepository, SystemGitRepo};
+use infrastructure::git_cli::SystemGitRepo;
 use infrastructure::review_v2::{
     ClaudeReviewer, CodexReviewer, FsCommitHashStore, FsReviewStore, GitDiffGetter,
     SystemReviewHasher, load_v2_scope_config,
@@ -315,9 +315,14 @@ pub(super) fn with_repo_cwd<T>(
 /// Resolves the diff base commit hash.
 pub(super) fn resolve_diff_base(
     store: &FsCommitHashStore,
-    git: &SystemGitRepo,
+    _git: &SystemGitRepo,
     base_branch: &str,
 ) -> Result<CommitHash, ReviewSharedError> {
+    use std::sync::Arc;
+
+    use infrastructure::FsGitWorkflowAdapter;
+    use usecase::git_workflow::{GitPrimitivePort, ReviewGitInteractor};
+
     match store.read() {
         Ok(Some(hash)) => return Ok(hash),
         Ok(None) => {}
@@ -326,15 +331,18 @@ pub(super) fn resolve_diff_base(
         }
     }
 
-    let output = git
-        .output(&["rev-parse", base_branch])
-        .map_err(|e| ReviewSharedError::Git(format!("git rev-parse {base_branch}: {e}")))?;
-    if !output.status.success() {
-        return Err(ReviewSharedError::Git(format!("git rev-parse {base_branch} failed")));
+    // Route the base-branch resolution through the usecase ReviewGitInteractor
+    // (T007). `resolve_diff_base` returns `Ok(None)` when the rev cannot be
+    // resolved — surface that as a `Git` error for the caller.
+    let port: Arc<dyn GitPrimitivePort> = Arc::new(FsGitWorkflowAdapter::new());
+    let interactor = ReviewGitInteractor::new(port);
+    match interactor
+        .resolve_diff_base(base_branch)
+        .map_err(|e| ReviewSharedError::Git(format!("git rev-parse {base_branch}: {e}")))?
+    {
+        Some(hash) => Ok(hash),
+        None => Err(ReviewSharedError::Git(format!("git rev-parse {base_branch} failed"))),
     }
-    let sha = String::from_utf8_lossy(&output.stdout).trim().to_owned();
-    CommitHash::try_new(&sha)
-        .map_err(|e| ReviewSharedError::InvalidInput(format!("invalid {base_branch} SHA: {e}")))
 }
 
 /// Builds the v2 review composition with a real `CodexReviewer`.

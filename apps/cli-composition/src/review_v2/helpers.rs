@@ -68,16 +68,19 @@ pub(super) fn resolve_track_id_or_branch_write(
 pub(super) fn resolve_track_id_from_branch(
     items_dir: &std::path::Path,
 ) -> Result<String, CompositionError> {
-    use infrastructure::git_cli::{GitRepository, SystemGitRepo};
+    // Use the semantic `SystemGitRepo::current_branch` inherent method (T007
+    // "semantic SystemGitRepo current_branch where listed") rather than a raw
+    // `git rev-parse --abbrev-ref HEAD`.
+    use infrastructure::git_cli::SystemGitRepo;
 
     let project_root = crate::track::resolve_project_root(items_dir)?;
-    let output = SystemGitRepo::discover_from(&project_root)
-        .and_then(|r| r.output(&["rev-parse", "--abbrev-ref", "HEAD"]))
+    let branch = SystemGitRepo::discover_from(&project_root)
+        .and_then(|r| r.current_branch())
         .map_err(|e| {
             CompositionError::AdapterInit(format!("failed to detect current branch: {e}"))
-        })?;
+        })?
+        .unwrap_or_default();
 
-    let branch = String::from_utf8_lossy(&output.stdout).trim().to_owned();
     branch.strip_prefix("track/").map(str::to_owned).ok_or_else(|| {
         CompositionError::WiringFailed(format!(
             "current branch '{branch}' is not a track branch \

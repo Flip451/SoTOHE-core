@@ -27,7 +27,7 @@ impl TrackCompositionRoot {
         workspace_root: PathBuf,
         layer: Option<String>,
     ) -> Result<CommandOutcome, CompositionError> {
-        use infrastructure::git_cli::{GitRepository as _, SystemGitRepo};
+        use infrastructure::git_cli::SystemGitRepo;
         use infrastructure::tddd::tddd_layer_bindings_adapter::FsTdddLayerBindingsAdapter;
         use infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter;
         use usecase::type_signals::{

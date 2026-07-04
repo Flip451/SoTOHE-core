@@ -108,7 +108,7 @@ fn ensure_trusted_project_root(root: &Path) -> Result<(), RefVerifyAdapterError>
 }
 
 fn ensure_current_repo_root(root: &Path) -> Result<PathBuf, RefVerifyAdapterError> {
-    use crate::git_cli::{GitRepository as _, SystemGitRepo};
+    use crate::git_cli::SystemGitRepo;
 
     let canonical_root = root.canonicalize().map_err(|e| {
         RefVerifyAdapterError(format!(
@@ -218,7 +218,7 @@ fn load_agent_profiles(project_root: &Path) -> Result<AgentProfiles, RefVerifyAd
 }
 
 fn current_git_branch(project_root: &Path) -> Result<String, RefVerifyAdapterError> {
-    use crate::git_cli::{GitRepository as _, SystemGitRepo};
+    use crate::git_cli::SystemGitRepo;
     SystemGitRepo::discover_from(project_root)
         .map_err(|e| RefVerifyAdapterError(format!("cannot discover git repo: {e}")))?
         .current_branch()

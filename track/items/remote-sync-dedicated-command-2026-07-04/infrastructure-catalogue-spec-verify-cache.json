@@ -3,11 +3,83 @@
   "layer": "infrastructure",
   "entries": [
     {
-      "claim_hash": "f16095dbec67d73875a79ef9b372080f03caa47e9abedd191b174bc553298114",
-      "evidence_hash": "41681684a81e798f3a6a1a1bcfee24f1552ab284a94409c82cf8e6c167f2b2c8",
+      "claim_hash": "364e177b07801ddb1872483a3626f7ae646e68160602aa12f4682b4fb53f161c",
+      "evidence_hash": "328d76731e25df874eba80ce74446dd41231ace238ffef454a780e8dcb1c04ec",
       "verdict": {
         "kind": "pass",
-        "citation": "sync path を D5 の旗艦事例として、`libs/infrastructure/src/git_cli/` に「現在ブランチを upstream から fast-forward only で pull する」意味論 method（ADR 例示 `sync_current_branch`）を新設する。git コマンド文字列（`pull --ff-only`）と ff-only 意味論を infrastructure 内側に閉じ込め、generic passthrough には委ねない。"
+        "citation": "composition root は adapter の構築と注入（wiring / DI）だけを行う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsArchivedTelemetryFactoryAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-10",
+          "text_label": "git 関与フローの orchestration（意味論 method / service を呼ぶ側の手順）を usecase 層の interactor へ移管する。本 track census で特定した git 関与フロー — track branch ops の fail-closed 検証シーケンス、track archive の git mv + logs 移動の合成、pr 系の fetch → 解決 → 参照フロー、review_v2 の hash 解決フロー、および archived-track telemetry の emit フロー（`TelemetryAggregateServiceImpl::emit_archived`（`apps/cli-composition/src/telemetry.rs`）は git worktree 解決を伴う git 関与フローであり、application service 実装ごと usecase interactor + port 構造へ移設して composition から外す）— を、既存 `GitWorkflowInteractor` と同型の port + interactor 構造として usecase に置く。composition root は adapter の構築と注入（wiring / DI）だけを行う。適用範囲は git 関与フローに限定する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "364e177b07801ddb1872483a3626f7ae646e68160602aa12f4682b4fb53f161c",
+      "evidence_hash": "60e90498a7a6e413e1c0cc3508694d1e8e5ae1d7d448971d07a7df31afafb19b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "composition root は adapter の構築と注入（wiring / DI）だけを行い"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsArchivedTelemetryFactoryAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "git 関与フローについて composition root は adapter の構築と注入（wiring / DI）だけを行い、orchestration（呼ぶ側の手順・判定シーケンス）を持たない。意味論 method を呼ぶ手順は usecase interactor に置く。"
+        }
+      }
+    },
+    {
+      "claim_hash": "364e177b07801ddb1872483a3626f7ae646e68160602aa12f4682b4fb53f161c",
+      "evidence_hash": "fd04cb65809c583f462f7af6bd2fd3906994f5bdb6562eaa72a938bb835a722c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "対応する composition root 側が wiring（adapter 構築 + 注入）のみになっている"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsArchivedTelemetryFactoryAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "本 track census で特定した git 関与フロー（archived-track telemetry emit を含む）の orchestration が usecase 層の interactor に存在し、対応する composition root 側が wiring（adapter 構築 + 注入）のみになっていることを確認できる。移管された各手順が mock port を用いた usecase 単体テストで検証可能である。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f16095dbec67d73875a79ef9b372080f03caa47e9abedd191b174bc553298114",
+      "evidence_hash": "410f29d17f2e6db0a726027907816e2f6ab2710054d903d4aca27caaa0357558",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「現在ブランチを upstream から fast-forward only で pull する」infrastructure adapter primitive"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -22,16 +94,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-06",
-          "text_label": "sync path を D5 の旗艦事例として、`libs/infrastructure/src/git_cli/` に「現在ブランチを upstream から fast-forward only で pull する」意味論 method（ADR 例示 `sync_current_branch`）を新設する。git コマンド文字列（`pull --ff-only`）と ff-only 意味論を infrastructure 内側に閉じ込め、generic passthrough には委ねない。3 種 fail-closed failure modes（upstream 未設定 / non-fast-forward / worktree unresolved）を typed error（ADR 例示 `SyncError`）の variant として infrastructure boundary で分類する。"
+          "text_label": "sync path を D5 の旗艦事例として、`libs/infrastructure/src/git_cli/` に「現在ブランチを upstream から fast-forward only で pull する」infrastructure adapter primitive（ADR 例示 `SystemGitRepo::sync_current_branch(&self) -> Result<(), SyncError>`）を新設する。git process I/O・git コマンド文字列（`pull --ff-only`）・ff-only 意味論・失敗分類をこの下位 primitive に閉じ込め、generic passthrough には委ねない。3 種 fail-closed failure modes（upstream 未設定 / non-fast-forward / worktree unresolved）を typed error（ADR 例示 `SyncError`）の variant として infrastructure boundary で分類する。この primitive は git process I/O と失敗分類を所有する下位層であり、command-facing の公開契約ではない。"
         }
       }
     },
     {
       "claim_hash": "f16095dbec67d73875a79ef9b372080f03caa47e9abedd191b174bc553298114",
-      "evidence_hash": "6274d959b92c2852882a76b64c6664a3f180a24e676d6a256220162f40e1956d",
+      "evidence_hash": "eb2130c58bbc83b0b8c30ce003a2ed1bff49d794eed6380666e33424de0cb601",
       "verdict": {
         "kind": "pass",
-        "citation": "usecase port `GitWorkflowService` → infrastructure adapter `FsGitWorkflowAdapter` → delivery `GitDriver` の既存 chain を正とし、production caller ゼロの dead code から唯一の live chain へ統合する。"
+        "citation": "usecase port `GitWorkflowService` → infrastructure adapter `FsGitWorkflowAdapter` → delivery `GitDriver` の既存 chain を正とし... `FsGitWorkflowAdapter` が D5 の infrastructure primitive（`SystemGitRepo::sync_current_branch` / `SyncError`）を `GitWorkflowError` へ写像し"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -46,16 +118,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-08",
-          "text_label": "git workflow 操作の二重実装を解消する。usecase port `GitWorkflowService` → infrastructure adapter `FsGitWorkflowAdapter` → delivery `GitDriver` の既存 chain を正とし、production caller ゼロの dead code から唯一の live chain へ統合する。`GitCompositionRoot` の inline git method 群（Chain B）を削除し、`apps/cli` の git subcommand dispatch を配線済み `GitDriver` 経由にする。両系統に逐語重複している commit の fail-closed track-branch guard を単一箇所へ集約する。port method を再編し、`switch_and_pull` を trait から削除して sync（現在ブランチ pull 専用）と branch switch を分離した method として整備する。"
+          "text_label": "git workflow 操作の二重実装を解消する。usecase port `GitWorkflowService` → infrastructure adapter `FsGitWorkflowAdapter` → delivery `GitDriver` の既存 chain を正とし、production caller ゼロの dead code から唯一の live chain へ統合する。`GitCompositionRoot` の inline git method 群（Chain B）を削除し、`apps/cli` の git subcommand dispatch を配線済み `GitDriver` 経由にする。両系統に逐語重複している commit の fail-closed track-branch guard を単一箇所へ集約する。port method を再編し、`switch_and_pull` を trait から削除して sync（現在ブランチ pull 専用）と branch switch を分離した method として整備する。sync の command-facing 公開契約は usecase port（ADR 例示 `GitWorkflowService::sync_current_branch() -> Result<(), GitWorkflowError>`）に置き `bin/sotp git sync` の唯一の service API とする。`FsGitWorkflowAdapter` が D5 の infrastructure primitive（`SystemGitRepo::sync_current_branch` / `SyncError`）を `GitWorkflowError` へ写像し、`apps/cli` = parse + dispatch、`apps/cli-driver` = service 呼び出し + presentation 変換、`apps/cli-composition` = `GitDriver` への wiring のみ、と層責務を分ける。`track switch-base` は usecase 側 orchestration として「snapshot から base branch 解決 → branch switch service → sync service」を合成し、composition root に手順を置かない。"
         }
       }
     },
     {
       "claim_hash": "f16095dbec67d73875a79ef9b372080f03caa47e9abedd191b174bc553298114",
-      "evidence_hash": "200ea0af2e0afe029c771a274e7e798d03168a40fc3ef82f0576e2b677d2fe2b",
+      "evidence_hash": "de8d2a866e90275939b5b7c6ef19db6a6676caba4292fc797474a18ab3e8dc03",
       "verdict": {
         "kind": "pass",
-        "citation": "sync path の failure modes は `libs/infrastructure/src/git_cli/` 境界で typed error（例 `SyncError`）の variant として分類する。上位層（`apps/cli-composition` / `track switch-base` 内部合成）は自層 error 型への薄い変換に留め、失敗種別の判別・message 組み立て・string 化を持たない。error 判別ロジックを infrastructure 側に一元化する。"
+        "citation": "sync path の failure modes は infrastructure boundary（`SystemGitRepo::sync_current_branch`）で typed error（例 `SyncError`）の variant として分類する。上位層は自層の error 型への薄い変換のみを担い、失敗種別の再判別・message 組み立て・string 化を持たない。error 判別ロジックを infrastructure 側に一元化する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -70,7 +142,7 @@
         "data": {
           "section": "constraint",
           "element_id": "CN-02",
-          "text_label": "sync path の failure modes は `libs/infrastructure/src/git_cli/` 境界で typed error（例 `SyncError`）の variant として分類する。上位層（`apps/cli-composition` / `track switch-base` 内部合成）は自層 error 型への薄い変換に留め、失敗種別の判別・message 組み立て・string 化を持たない。error 判別ロジックを infrastructure 側に一元化する。"
+          "text_label": "sync path の failure modes は infrastructure boundary（`SystemGitRepo::sync_current_branch`）で typed error（例 `SyncError`）の variant として分類する。上位層は自層の error 型への薄い変換のみを担い、失敗種別の再判別・message 組み立て・string 化を持たない。error 判別ロジックを infrastructure 側に一元化する。"
         }
       }
     },
@@ -100,10 +172,10 @@
     },
     {
       "claim_hash": "f16095dbec67d73875a79ef9b372080f03caa47e9abedd191b174bc553298114",
-      "evidence_hash": "fbfc8d30a7fc96c2508fe11f5b12089f46fbe9864b2bc96381a96b5b6b9430c1",
+      "evidence_hash": "37cb0ffeb129c8ad5e7f77769aa96efdd8edd37939001394542ba4a3db83b306",
       "verdict": {
         "kind": "pass",
-        "citation": "`libs/infrastructure/src/git_cli/` に current-branch sync 用意味論 method（例 `sync_current_branch`）と typed error（例 `SyncError`）が declare され、3 fail-closed modes（upstream 未設定 / non-fast-forward / worktree unresolved）が distinguishable な variant として区別できる。infrastructure layer が対応 variant を返し pattern match で識別可能であること、`apps/cli-composition` 側が変換のみで失敗種別を再判定していないことをユニットテストで確認できる。"
+        "citation": "`libs/infrastructure/src/git_cli/` に current-branch sync 用の infrastructure adapter primitive（例 `SystemGitRepo::sync_current_branch`）と typed error（例 `SyncError`）が declare され、3 fail-closed modes（upstream 未設定 / non-fast-forward / worktree unresolved）が distinguishable な variant として区別できる。infrastructure layer が対応 variant を返し pattern match で識別可能であること、および上位層が `SyncError` を自層 error 型へ写像する薄い変換のみで失敗種別を再判定していないことをユニットテストで確認できる。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -118,16 +190,16 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-08",
-          "text_label": "`libs/infrastructure/src/git_cli/` に current-branch sync 用意味論 method（例 `sync_current_branch`）と typed error（例 `SyncError`）が declare され、3 fail-closed modes（upstream 未設定 / non-fast-forward / worktree unresolved）が distinguishable な variant として区別できる。infrastructure layer が対応 variant を返し pattern match で識別可能であること、`apps/cli-composition` 側が変換のみで失敗種別を再判定していないことをユニットテストで確認できる。"
+          "text_label": "`libs/infrastructure/src/git_cli/` に current-branch sync 用の infrastructure adapter primitive（例 `SystemGitRepo::sync_current_branch`）と typed error（例 `SyncError`）が declare され、3 fail-closed modes（upstream 未設定 / non-fast-forward / worktree unresolved）が distinguishable な variant として区別できる。infrastructure layer が対応 variant を返し pattern match で識別可能であること、および上位層が `SyncError` を自層 error 型へ写像する薄い変換のみで失敗種別を再判定していないことをユニットテストで確認できる。"
         }
       }
     },
     {
       "claim_hash": "11f0ec33ef4c28f467e8a54e6f5cfa80ca7128eb792e92d9d432923bbf3a7330",
-      "evidence_hash": "6274d959b92c2852882a76b64c6664a3f180a24e676d6a256220162f40e1956d",
+      "evidence_hash": "eb2130c58bbc83b0b8c30ce003a2ed1bff49d794eed6380666e33424de0cb601",
       "verdict": {
         "kind": "pass",
-        "citation": "usecase port `GitWorkflowService` → infrastructure adapter `FsGitWorkflowAdapter` → delivery `GitDriver` の既存 chain を正とし、production caller ゼロの dead code から唯一の live chain へ統合する。"
+        "citation": "`FsGitWorkflowAdapter` が D5 の infrastructure primitive（`SystemGitRepo::sync_current_branch` / `SyncError`）を `GitWorkflowError` へ写像し"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -142,16 +214,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-08",
-          "text_label": "git workflow 操作の二重実装を解消する。usecase port `GitWorkflowService` → infrastructure adapter `FsGitWorkflowAdapter` → delivery `GitDriver` の既存 chain を正とし、production caller ゼロの dead code から唯一の live chain へ統合する。`GitCompositionRoot` の inline git method 群（Chain B）を削除し、`apps/cli` の git subcommand dispatch を配線済み `GitDriver` 経由にする。両系統に逐語重複している commit の fail-closed track-branch guard を単一箇所へ集約する。port method を再編し、`switch_and_pull` を trait から削除して sync（現在ブランチ pull 専用）と branch switch を分離した method として整備する。"
+          "text_label": "git workflow 操作の二重実装を解消する。usecase port `GitWorkflowService` → infrastructure adapter `FsGitWorkflowAdapter` → delivery `GitDriver` の既存 chain を正とし、production caller ゼロの dead code から唯一の live chain へ統合する。`GitCompositionRoot` の inline git method 群（Chain B）を削除し、`apps/cli` の git subcommand dispatch を配線済み `GitDriver` 経由にする。両系統に逐語重複している commit の fail-closed track-branch guard を単一箇所へ集約する。port method を再編し、`switch_and_pull` を trait から削除して sync（現在ブランチ pull 専用）と branch switch を分離した method として整備する。sync の command-facing 公開契約は usecase port（ADR 例示 `GitWorkflowService::sync_current_branch() -> Result<(), GitWorkflowError>`）に置き `bin/sotp git sync` の唯一の service API とする。`FsGitWorkflowAdapter` が D5 の infrastructure primitive（`SystemGitRepo::sync_current_branch` / `SyncError`）を `GitWorkflowError` へ写像し、`apps/cli` = parse + dispatch、`apps/cli-driver` = service 呼び出し + presentation 変換、`apps/cli-composition` = `GitDriver` への wiring のみ、と層責務を分ける。`track switch-base` は usecase 側 orchestration として「snapshot から base branch 解決 → branch switch service → sync service」を合成し、composition root に手順を置かない。"
         }
       }
     },
     {
       "claim_hash": "11f0ec33ef4c28f467e8a54e6f5cfa80ca7128eb792e92d9d432923bbf3a7330",
-      "evidence_hash": "641f7c05989d880357cd9a20647b64c43dbcdea5bf9c16603491106039cce8ba",
+      "evidence_hash": "328d76731e25df874eba80ce74446dd41231ace238ffef454a780e8dcb1c04ec",
       "verdict": {
         "kind": "pass",
-        "citation": "track archive の git mv + logs 移動の合成を、既存 `GitWorkflowInteractor` と同型の port + interactor 構造として usecase に置く。composition root は adapter の構築と注入（wiring / DI）だけを行う。"
+        "citation": "既存 `GitWorkflowInteractor` と同型の port + interactor 構造として usecase に置く。composition root は adapter の構築と注入（wiring / DI）だけを行う。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -166,16 +238,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-10",
-          "text_label": "git 関与フローの orchestration（意味論 method を呼ぶ側の手順）を usecase 層の interactor へ移管する。track branch create の fail-closed 検証シーケンス、track archive の git mv + logs 移動の合成、pr 系の fetch → 解決 → 参照フロー、review_v2 の hash 解決フローを、既存 `GitWorkflowInteractor` と同型の port + interactor 構造として usecase に置く。composition root は adapter の構築と注入（wiring / DI）だけを行う。適用範囲は本 track census で特定した git 関与フローに限定する。"
+          "text_label": "git 関与フローの orchestration（意味論 method / service を呼ぶ側の手順）を usecase 層の interactor へ移管する。本 track census で特定した git 関与フロー — track branch ops の fail-closed 検証シーケンス、track archive の git mv + logs 移動の合成、pr 系の fetch → 解決 → 参照フロー、review_v2 の hash 解決フロー、および archived-track telemetry の emit フロー（`TelemetryAggregateServiceImpl::emit_archived`（`apps/cli-composition/src/telemetry.rs`）は git worktree 解決を伴う git 関与フローであり、application service 実装ごと usecase interactor + port 構造へ移設して composition から外す）— を、既存 `GitWorkflowInteractor` と同型の port + interactor 構造として usecase に置く。composition root は adapter の構築と注入（wiring / DI）だけを行う。適用範囲は git 関与フローに限定する。"
         }
       }
     },
     {
       "claim_hash": "11f0ec33ef4c28f467e8a54e6f5cfa80ca7128eb792e92d9d432923bbf3a7330",
-      "evidence_hash": "1b4629278e929edde6354e27477d0587fc845c9aa1d778c6bf60c1e6c8dedae6",
+      "evidence_hash": "fd04cb65809c583f462f7af6bd2fd3906994f5bdb6562eaa72a938bb835a722c",
       "verdict": {
         "kind": "pass",
-        "citation": "git 関与フロー（track branch ops / archive / pr / review_v2 系）の orchestration が usecase 層の interactor に存在し、composition root は wiring（adapter 構築 + 注入）のみになっていることを確認できる。"
+        "citation": "対応する composition root 側が wiring（adapter 構築 + 注入）のみになっていることを確認できる。移管された各手順が mock port を用いた usecase 単体テストで検証可能である。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -190,7 +262,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-09",
-          "text_label": "git 関与フロー（track branch ops / archive / pr / review_v2 系）の orchestration が usecase 層の interactor に存在し、composition root は wiring（adapter 構築 + 注入）のみになっていることを確認できる。移管された手順が usecase 単体テストで検証可能である。"
+          "text_label": "本 track census で特定した git 関与フロー（archived-track telemetry emit を含む）の orchestration が usecase 層の interactor に存在し、対応する composition root 側が wiring（adapter 構築 + 注入）のみになっていることを確認できる。移管された各手順が mock port を用いた usecase 単体テストで検証可能である。"
         }
       }
     },
@@ -219,11 +291,11 @@
       }
     },
     {
-      "claim_hash": "9e42e04474ef7b9b65c36aa83cfab5f29a01a22b3ebd064b1698a42a699e73e7",
-      "evidence_hash": "41681684a81e798f3a6a1a1bcfee24f1552ab284a94409c82cf8e6c167f2b2c8",
+      "claim_hash": "66502d2af08242d9bc05e64777fe91be476c180be296563aebaa66b04a282bb9",
+      "evidence_hash": "410f29d17f2e6db0a726027907816e2f6ab2710054d903d4aca27caaa0357558",
       "verdict": {
         "kind": "pass",
-        "citation": "3 種 fail-closed failure modes（upstream 未設定 / non-fast-forward / worktree unresolved）を typed error（ADR 例示 `SyncError`）の variant として infrastructure boundary で分類する。"
+        "citation": "sync path を D5 の旗艦事例として、`libs/infrastructure/src/git_cli/` に「現在ブランチを upstream から fast-forward only で pull する」infrastructure adapter primitive（ADR 例示 `SystemGitRepo::sync_current_branch(&self) -> Result<(), SyncError>`）を新設する。git process I/O・git コマンド文字列（`pull --ff-only`）・ff-only 意味論・失敗分類をこの下位 primitive に閉じ込め、generic passthrough には委ねない。3 種 fail-closed failure modes（upstream 未設定 / non-fast-forward / worktree unresolved）を typed error（ADR 例示 `SyncError`）の variant として infrastructure boundary で分類する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -238,16 +310,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-06",
-          "text_label": "sync path を D5 の旗艦事例として、`libs/infrastructure/src/git_cli/` に「現在ブランチを upstream から fast-forward only で pull する」意味論 method（ADR 例示 `sync_current_branch`）を新設する。git コマンド文字列（`pull --ff-only`）と ff-only 意味論を infrastructure 内側に閉じ込め、generic passthrough には委ねない。3 種 fail-closed failure modes（upstream 未設定 / non-fast-forward / worktree unresolved）を typed error（ADR 例示 `SyncError`）の variant として infrastructure boundary で分類する。"
+          "text_label": "sync path を D5 の旗艦事例として、`libs/infrastructure/src/git_cli/` に「現在ブランチを upstream から fast-forward only で pull する」infrastructure adapter primitive（ADR 例示 `SystemGitRepo::sync_current_branch(&self) -> Result<(), SyncError>`）を新設する。git process I/O・git コマンド文字列（`pull --ff-only`）・ff-only 意味論・失敗分類をこの下位 primitive に閉じ込め、generic passthrough には委ねない。3 種 fail-closed failure modes（upstream 未設定 / non-fast-forward / worktree unresolved）を typed error（ADR 例示 `SyncError`）の variant として infrastructure boundary で分類する。この primitive は git process I/O と失敗分類を所有する下位層であり、command-facing の公開契約ではない。"
         }
       }
     },
     {
-      "claim_hash": "9e42e04474ef7b9b65c36aa83cfab5f29a01a22b3ebd064b1698a42a699e73e7",
-      "evidence_hash": "200ea0af2e0afe029c771a274e7e798d03168a40fc3ef82f0576e2b677d2fe2b",
+      "claim_hash": "66502d2af08242d9bc05e64777fe91be476c180be296563aebaa66b04a282bb9",
+      "evidence_hash": "de8d2a866e90275939b5b7c6ef19db6a6676caba4292fc797474a18ab3e8dc03",
       "verdict": {
         "kind": "pass",
-        "citation": "sync path の failure modes は `libs/infrastructure/src/git_cli/` 境界で typed error（例 `SyncError`）の variant として分類する。上位層（`apps/cli-composition` / `track switch-base` 内部合成）は自層 error 型への薄い変換に留め、失敗種別の判別・message 組み立て・string 化を持たない。error 判別ロジックを infrastructure 側に一元化する。"
+        "citation": "sync path の failure modes は infrastructure boundary（`SystemGitRepo::sync_current_branch`）で typed error（例 `SyncError`）の variant として分類する。上位層は自層の error 型への薄い変換のみを担い、失敗種別の再判別・message 組み立て・string 化を持たない。error 判別ロジックを infrastructure 側に一元化する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -262,16 +334,16 @@
         "data": {
           "section": "constraint",
           "element_id": "CN-02",
-          "text_label": "sync path の failure modes は `libs/infrastructure/src/git_cli/` 境界で typed error（例 `SyncError`）の variant として分類する。上位層（`apps/cli-composition` / `track switch-base` 内部合成）は自層 error 型への薄い変換に留め、失敗種別の判別・message 組み立て・string 化を持たない。error 判別ロジックを infrastructure 側に一元化する。"
+          "text_label": "sync path の failure modes は infrastructure boundary（`SystemGitRepo::sync_current_branch`）で typed error（例 `SyncError`）の variant として分類する。上位層は自層の error 型への薄い変換のみを担い、失敗種別の再判別・message 組み立て・string 化を持たない。error 判別ロジックを infrastructure 側に一元化する。"
         }
       }
     },
     {
-      "claim_hash": "9e42e04474ef7b9b65c36aa83cfab5f29a01a22b3ebd064b1698a42a699e73e7",
-      "evidence_hash": "fbfc8d30a7fc96c2508fe11f5b12089f46fbe9864b2bc96381a96b5b6b9430c1",
+      "claim_hash": "66502d2af08242d9bc05e64777fe91be476c180be296563aebaa66b04a282bb9",
+      "evidence_hash": "37cb0ffeb129c8ad5e7f77769aa96efdd8edd37939001394542ba4a3db83b306",
       "verdict": {
         "kind": "pass",
-        "citation": "`libs/infrastructure/src/git_cli/` に current-branch sync 用意味論 method（例 `sync_current_branch`）と typed error（例 `SyncError`）が declare され、3 fail-closed modes（upstream 未設定 / non-fast-forward / worktree unresolved）が distinguishable な variant として区別できる。"
+        "citation": "`libs/infrastructure/src/git_cli/` に current-branch sync 用の infrastructure adapter primitive（例 `SystemGitRepo::sync_current_branch`）と typed error（例 `SyncError`）が declare され、3 fail-closed modes（upstream 未設定 / non-fast-forward / worktree unresolved）が distinguishable な variant として区別できる。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -286,16 +358,16 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-08",
-          "text_label": "`libs/infrastructure/src/git_cli/` に current-branch sync 用意味論 method（例 `sync_current_branch`）と typed error（例 `SyncError`）が declare され、3 fail-closed modes（upstream 未設定 / non-fast-forward / worktree unresolved）が distinguishable な variant として区別できる。infrastructure layer が対応 variant を返し pattern match で識別可能であること、`apps/cli-composition` 側が変換のみで失敗種別を再判定していないことをユニットテストで確認できる。"
+          "text_label": "`libs/infrastructure/src/git_cli/` に current-branch sync 用の infrastructure adapter primitive（例 `SystemGitRepo::sync_current_branch`）と typed error（例 `SyncError`）が declare され、3 fail-closed modes（upstream 未設定 / non-fast-forward / worktree unresolved）が distinguishable な variant として区別できる。infrastructure layer が対応 variant を返し pattern match で識別可能であること、および上位層が `SyncError` を自層 error 型へ写像する薄い変換のみで失敗種別を再判定していないことをユニットテストで確認できる。"
         }
       }
     },
     {
-      "claim_hash": "fa74de5aa302e8472524b5a8d1bb12dcc158f3dc5c67f355524925b484350fcb",
-      "evidence_hash": "41681684a81e798f3a6a1a1bcfee24f1552ab284a94409c82cf8e6c167f2b2c8",
+      "claim_hash": "bf453251208589f9ddee06db1604a07e709c25d30974ff3080437e30527767a9",
+      "evidence_hash": "410f29d17f2e6db0a726027907816e2f6ab2710054d903d4aca27caaa0357558",
       "verdict": {
         "kind": "pass",
-        "citation": "sync path を D5 の旗艦事例として、`libs/infrastructure/src/git_cli/` に「現在ブランチを upstream から fast-forward only で pull する」意味論 method（ADR 例示 `sync_current_branch`）を新設する。git コマンド文字列（`pull --ff-only`）と ff-only 意味論を infrastructure 内側に閉じ込め、generic passthrough には委ねない。3 種 fail-closed failure modes（upstream 未設定 / non-fast-forward / worktree unresolved）を typed error（ADR 例示 `SyncError`）の variant として infrastructure boundary で分類する。"
+        "citation": "sync path を D5 の旗艦事例として、`libs/infrastructure/src/git_cli/` に「現在ブランチを upstream から fast-forward only で pull する」infrastructure adapter primitive（ADR 例示 `SystemGitRepo::sync_current_branch(&self) -> Result<(), SyncError>`）を新設する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -310,16 +382,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-06",
-          "text_label": "sync path を D5 の旗艦事例として、`libs/infrastructure/src/git_cli/` に「現在ブランチを upstream から fast-forward only で pull する」意味論 method（ADR 例示 `sync_current_branch`）を新設する。git コマンド文字列（`pull --ff-only`）と ff-only 意味論を infrastructure 内側に閉じ込め、generic passthrough には委ねない。3 種 fail-closed failure modes（upstream 未設定 / non-fast-forward / worktree unresolved）を typed error（ADR 例示 `SyncError`）の variant として infrastructure boundary で分類する。"
+          "text_label": "sync path を D5 の旗艦事例として、`libs/infrastructure/src/git_cli/` に「現在ブランチを upstream から fast-forward only で pull する」infrastructure adapter primitive（ADR 例示 `SystemGitRepo::sync_current_branch(&self) -> Result<(), SyncError>`）を新設する。git process I/O・git コマンド文字列（`pull --ff-only`）・ff-only 意味論・失敗分類をこの下位 primitive に閉じ込め、generic passthrough には委ねない。3 種 fail-closed failure modes（upstream 未設定 / non-fast-forward / worktree unresolved）を typed error（ADR 例示 `SyncError`）の variant として infrastructure boundary で分類する。この primitive は git process I/O と失敗分類を所有する下位層であり、command-facing の公開契約ではない。"
         }
       }
     },
     {
-      "claim_hash": "fa74de5aa302e8472524b5a8d1bb12dcc158f3dc5c67f355524925b484350fcb",
+      "claim_hash": "bf453251208589f9ddee06db1604a07e709c25d30974ff3080437e30527767a9",
       "evidence_hash": "a439f4f58c3b373f04182f0f3cde5a4bad1373eeed77820c221934383321a573",
       "verdict": {
         "kind": "pass",
-        "citation": "cli 系レイヤー（cli / cli_composition / cli_driver）に埋め込まれた git コマンド文字列と判定ロジックを、infrastructure の意味論 method 群へ全面移管する。write 系（stage / commit / note / branch create / branch switch / mv / fetch）と read 系（rev-parse 系 / show / fetch）の両方を対象とする。sync path 限定ではなく、census で特定した cli_composition の git / track / pr / review_v2 系と delivery 層の直埋めを対象範囲に含める。上位層は自層 error 型への変換のみを行い、失敗判別ロジックを持たない。"
+        "citation": "cli 系レイヤー（cli / cli_composition / cli_driver）に埋め込まれた git コマンド文字列と判定ロジックを、infrastructure の意味論 method 群へ全面移管する。write 系（stage / commit / note / branch create / branch switch / mv / fetch）と read 系（rev-parse 系 / show / fetch）の両方を対象とする。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -339,11 +411,11 @@
       }
     },
     {
-      "claim_hash": "fa74de5aa302e8472524b5a8d1bb12dcc158f3dc5c67f355524925b484350fcb",
-      "evidence_hash": "88d0a756b820ba4037650bc0f9de864d0fd42c0f160b0fa284f874d5324ab19b",
+      "claim_hash": "bf453251208589f9ddee06db1604a07e709c25d30974ff3080437e30527767a9",
+      "evidence_hash": "1ea479924b3b92e82aea556b75bc513038e27d1e000ac150f2ea2a12e76d131d",
       "verdict": {
         "kind": "pass",
-        "citation": "GitRepository::status` / `output` の generic passthrough を infrastructure crate 内 `pub(crate)` に降格し"
+        "citation": "`GitRepository` trait（`status` / `output` の generic passthrough を公開している infrastructure trait）を削除し、`status` / `output` を `SystemGitRepo` の `pub(crate)` inherent method へ移す。既存の意味論 method（`current_branch` / `push_branch` / `index_tree_hash` / `stage_all_excluding` + 新設 `sync_current_branch` 等）は `SystemGitRepo` の `pub` inherent method として残す。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -358,16 +430,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-09",
-          "text_label": "`GitRepository::status` / `output` の generic passthrough を infrastructure crate 内 `pub(crate)` に降格し、上位層が git コマンド文字列を注入する経路を可視性レベルで塞ぐ（再発を compile-time で防止）。read 系の直埋め call site（rev-parse 系 / show / fetch。cli_composition の pr / review_v2 / track 系、および delivery 層 `apps/cli/src/commands/track/branch_ops.rs`）を意味論 method（branch 存在確認 / HEAD 解決 / ref 上のファイル読み出し等）へ置き換える。意味論 method（`current_branch` / `push_branch` / `index_tree_hash` / `stage_all_excluding` の既存前例に連なるもの）だけを公開 API とする。"
+          "text_label": "`GitRepository` trait（`status` / `output` の generic passthrough を公開している infrastructure trait）を削除し、`status` / `output` を `SystemGitRepo` の `pub(crate)` inherent method へ移す（`pub trait` の method は言語仕様上 method 単位で可視性を落とせないため、trait 経由の公開を撤去して達成する）。既存の意味論 method（`current_branch` / `push_branch` / `index_tree_hash` / `stage_all_excluding` + 新設 `sync_current_branch` 等）は `SystemGitRepo` の `pub` inherent method として残す。任意 git コマンド文字列を注入する generic passthrough は crate 内側だけの実装用ハッチとして上位層へ露出させない（再発を compile-time で防止）。read 系の直埋め call site（rev-parse 系 / show / fetch。cli_composition の pr / review_v2 / track 系、および delivery 層 `apps/cli/src/commands/track/branch_ops.rs`）を意味論 method（branch 存在確認 / HEAD 解決 / ref 上のファイル読み出し等）へ置き換える。"
         }
       }
     },
     {
-      "claim_hash": "fa74de5aa302e8472524b5a8d1bb12dcc158f3dc5c67f355524925b484350fcb",
-      "evidence_hash": "200ea0af2e0afe029c771a274e7e798d03168a40fc3ef82f0576e2b677d2fe2b",
+      "claim_hash": "bf453251208589f9ddee06db1604a07e709c25d30974ff3080437e30527767a9",
+      "evidence_hash": "de8d2a866e90275939b5b7c6ef19db6a6676caba4292fc797474a18ab3e8dc03",
       "verdict": {
         "kind": "pass",
-        "citation": "sync path の failure modes は `libs/infrastructure/src/git_cli/` 境界で typed error（例 `SyncError`）の variant として分類する。上位層（`apps/cli-composition` / `track switch-base` 内部合成）は自層 error 型への薄い変換に留め、失敗種別の判別・message 組み立て・string 化を持たない。error 判別ロジックを infrastructure 側に一元化する。"
+        "citation": "sync path の failure modes は infrastructure boundary（`SystemGitRepo::sync_current_branch`）で typed error（例 `SyncError`）の variant として分類する。上位層は自層の error 型への薄い変換のみを担い、失敗種別の再判別・message 組み立て・string 化を持たない。error 判別ロジックを infrastructure 側に一元化する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -382,16 +454,16 @@
         "data": {
           "section": "constraint",
           "element_id": "CN-02",
-          "text_label": "sync path の failure modes は `libs/infrastructure/src/git_cli/` 境界で typed error（例 `SyncError`）の variant として分類する。上位層（`apps/cli-composition` / `track switch-base` 内部合成）は自層 error 型への薄い変換に留め、失敗種別の判別・message 組み立て・string 化を持たない。error 判別ロジックを infrastructure 側に一元化する。"
+          "text_label": "sync path の failure modes は infrastructure boundary（`SystemGitRepo::sync_current_branch`）で typed error（例 `SyncError`）の variant として分類する。上位層は自層の error 型への薄い変換のみを担い、失敗種別の再判別・message 組み立て・string 化を持たない。error 判別ロジックを infrastructure 側に一元化する。"
         }
       }
     },
     {
-      "claim_hash": "fa74de5aa302e8472524b5a8d1bb12dcc158f3dc5c67f355524925b484350fcb",
-      "evidence_hash": "14b45f5f3978cd12826282402f9d098971e2a1cb44f0e7b64143570ae2264357",
+      "claim_hash": "bf453251208589f9ddee06db1604a07e709c25d30974ff3080437e30527767a9",
+      "evidence_hash": "0def82479a48064537f35a169e6331164e1cec4a319d5abab3c8fe01219ee2c9",
       "verdict": {
         "kind": "pass",
-        "citation": "cli 系レイヤーは git を意味論 method 経由でのみ操作する。generic passthrough（`GitRepository::status` / `output`）は infrastructure crate 内 `pub(crate)` とし、crate 外から git コマンド文字列を注入できない。新しい git 操作は意味論 port method として追加する（generic passthrough の再公開は ADR supersede を要する）。"
+        "citation": "cli 系レイヤーは git を意味論 method / service 経由でのみ操作する。generic passthrough（`status` / `output`）は `SystemGitRepo` の `pub(crate)` inherent method として infrastructure crate 内側に閉じ込め（`GitRepository` trait は削除する）、crate 外から任意の git コマンド文字列を注入できない。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -406,16 +478,16 @@
         "data": {
           "section": "constraint",
           "element_id": "CN-07",
-          "text_label": "cli 系レイヤーは git を意味論 method 経由でのみ操作する。generic passthrough（`GitRepository::status` / `output`）は infrastructure crate 内 `pub(crate)` とし、crate 外から git コマンド文字列を注入できない。新しい git 操作は意味論 port method として追加する（generic passthrough の再公開は ADR supersede を要する）。"
+          "text_label": "cli 系レイヤーは git を意味論 method / service 経由でのみ操作する。generic passthrough（`status` / `output`）は `SystemGitRepo` の `pub(crate)` inherent method として infrastructure crate 内側に閉じ込め（`GitRepository` trait は削除する）、crate 外から任意の git コマンド文字列を注入できない。新しい git 操作は意味論 method / port として追加する（generic passthrough の再公開は ADR supersede を要する）。"
         }
       }
     },
     {
-      "claim_hash": "fa74de5aa302e8472524b5a8d1bb12dcc158f3dc5c67f355524925b484350fcb",
-      "evidence_hash": "f9a2225d618ed961d0c0410280be4bc353a18b888f024613fb8504eede01efd8",
+      "claim_hash": "bf453251208589f9ddee06db1604a07e709c25d30974ff3080437e30527767a9",
+      "evidence_hash": "ba6aca8fc9bc00e9e8053ee3f7e9d2cbd930834c54b4d4e7bf3b621d4800eb97",
       "verdict": {
         "kind": "pass",
-        "citation": "`GitRepository::status` / `output` が infrastructure crate 外から不可視（`pub(crate)`）であり、`apps/cli` / `apps/cli-composition` / `apps/cli-driver` の非テストコード（テスト除く）に git コマンド文字列リテラルまたは git command の失敗種別判別ロジックが残存しないことを確認できる。read 系（rev-parse / show / fetch）が意味論 method 経由に置き換わっていることをテストで確認できる。"
+        "citation": "generic passthrough（`SystemGitRepo::status` / `output`）が `pub(crate)` inherent method として infrastructure crate 外から呼べないことを確認できる（コンパイルレベルの検証）。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -430,16 +502,16 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-07",
-          "text_label": "`GitRepository::status` / `output` が infrastructure crate 外から不可視（`pub(crate)`）であり、`apps/cli` / `apps/cli-composition` / `apps/cli-driver` の非テストコード（テスト除く）に git コマンド文字列リテラルまたは git command の失敗種別判別ロジックが残存しないことを確認できる。read 系（rev-parse / show / fetch）が意味論 method 経由に置き換わっていることをテストで確認できる。"
+          "text_label": "`GitRepository` trait が infrastructure crate の公開 API から削除され、generic passthrough（`SystemGitRepo::status` / `output`）が `pub(crate)` inherent method として infrastructure crate 外から呼べないことを確認できる（コンパイルレベルの検証）。`apps/cli` / `apps/cli-composition` / `apps/cli-driver` の非テストコード（テスト除く）に git コマンド文字列リテラルまたは git command の失敗種別判別ロジックが残存しないことを確認できる。read 系（rev-parse / show / fetch）が意味論 method 経由に置き換わっていることをテストで確認できる。"
         }
       }
     },
     {
-      "claim_hash": "fa74de5aa302e8472524b5a8d1bb12dcc158f3dc5c67f355524925b484350fcb",
-      "evidence_hash": "fbfc8d30a7fc96c2508fe11f5b12089f46fbe9864b2bc96381a96b5b6b9430c1",
+      "claim_hash": "bf453251208589f9ddee06db1604a07e709c25d30974ff3080437e30527767a9",
+      "evidence_hash": "37cb0ffeb129c8ad5e7f77769aa96efdd8edd37939001394542ba4a3db83b306",
       "verdict": {
         "kind": "pass",
-        "citation": "`libs/infrastructure/src/git_cli/` に current-branch sync 用意味論 method（例 `sync_current_branch`）と typed error（例 `SyncError`）が declare され、3 fail-closed modes（upstream 未設定 / non-fast-forward / worktree unresolved）が distinguishable な variant として区別できる。"
+        "citation": "`libs/infrastructure/src/git_cli/` に current-branch sync 用の infrastructure adapter primitive（例 `SystemGitRepo::sync_current_branch`）と typed error（例 `SyncError`）が declare され"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -454,16 +526,16 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-08",
-          "text_label": "`libs/infrastructure/src/git_cli/` に current-branch sync 用意味論 method（例 `sync_current_branch`）と typed error（例 `SyncError`）が declare され、3 fail-closed modes（upstream 未設定 / non-fast-forward / worktree unresolved）が distinguishable な variant として区別できる。infrastructure layer が対応 variant を返し pattern match で識別可能であること、`apps/cli-composition` 側が変換のみで失敗種別を再判定していないことをユニットテストで確認できる。"
+          "text_label": "`libs/infrastructure/src/git_cli/` に current-branch sync 用の infrastructure adapter primitive（例 `SystemGitRepo::sync_current_branch`）と typed error（例 `SyncError`）が declare され、3 fail-closed modes（upstream 未設定 / non-fast-forward / worktree unresolved）が distinguishable な variant として区別できる。infrastructure layer が対応 variant を返し pattern match で識別可能であること、および上位層が `SyncError` を自層 error 型へ写像する薄い変換のみで失敗種別を再判定していないことをユニットテストで確認できる。"
         }
       }
     },
     {
       "claim_hash": "cf6f55f6c67518454596b6bea0935a5bcca97d4c85ccdaf12770bd01e34730ad",
-      "evidence_hash": "6274d959b92c2852882a76b64c6664a3f180a24e676d6a256220162f40e1956d",
+      "evidence_hash": "eb2130c58bbc83b0b8c30ce003a2ed1bff49d794eed6380666e33424de0cb601",
       "verdict": {
         "kind": "pass",
-        "citation": "git workflow 操作の二重実装を解消する。usecase port `GitWorkflowService` → infrastructure adapter `FsGitWorkflowAdapter` → delivery `GitDriver` の既存 chain を正とし、production caller ゼロの dead code から唯一の live chain へ統合する。`GitCompositionRoot` の inline git method 群（Chain B）を削除し、`apps/cli` の git subcommand dispatch を配線済み `GitDriver` 経由にする。... port method を再編し、`switch_and_pull` を trait から削除して sync（現在ブランチ pull 専用）と branch switch を分離した method として整備する。"
+        "citation": "`switch_and_pull` を trait から削除して sync（現在ブランチ pull 専用）と branch switch を分離した method として整備する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -478,16 +550,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-08",
-          "text_label": "git workflow 操作の二重実装を解消する。usecase port `GitWorkflowService` → infrastructure adapter `FsGitWorkflowAdapter` → delivery `GitDriver` の既存 chain を正とし、production caller ゼロの dead code から唯一の live chain へ統合する。`GitCompositionRoot` の inline git method 群（Chain B）を削除し、`apps/cli` の git subcommand dispatch を配線済み `GitDriver` 経由にする。両系統に逐語重複している commit の fail-closed track-branch guard を単一箇所へ集約する。port method を再編し、`switch_and_pull` を trait から削除して sync（現在ブランチ pull 専用）と branch switch を分離した method として整備する。"
+          "text_label": "git workflow 操作の二重実装を解消する。usecase port `GitWorkflowService` → infrastructure adapter `FsGitWorkflowAdapter` → delivery `GitDriver` の既存 chain を正とし、production caller ゼロの dead code から唯一の live chain へ統合する。`GitCompositionRoot` の inline git method 群（Chain B）を削除し、`apps/cli` の git subcommand dispatch を配線済み `GitDriver` 経由にする。両系統に逐語重複している commit の fail-closed track-branch guard を単一箇所へ集約する。port method を再編し、`switch_and_pull` を trait から削除して sync（現在ブランチ pull 専用）と branch switch を分離した method として整備する。sync の command-facing 公開契約は usecase port（ADR 例示 `GitWorkflowService::sync_current_branch() -> Result<(), GitWorkflowError>`）に置き `bin/sotp git sync` の唯一の service API とする。`FsGitWorkflowAdapter` が D5 の infrastructure primitive（`SystemGitRepo::sync_current_branch` / `SyncError`）を `GitWorkflowError` へ写像し、`apps/cli` = parse + dispatch、`apps/cli-driver` = service 呼び出し + presentation 変換、`apps/cli-composition` = `GitDriver` への wiring のみ、と層責務を分ける。`track switch-base` は usecase 側 orchestration として「snapshot から base branch 解決 → branch switch service → sync service」を合成し、composition root に手順を置かない。"
         }
       }
     },
     {
       "claim_hash": "cf6f55f6c67518454596b6bea0935a5bcca97d4c85ccdaf12770bd01e34730ad",
-      "evidence_hash": "88d0a756b820ba4037650bc0f9de864d0fd42c0f160b0fa284f874d5324ab19b",
+      "evidence_hash": "1ea479924b3b92e82aea556b75bc513038e27d1e000ac150f2ea2a12e76d131d",
       "verdict": {
         "kind": "pass",
-        "citation": "`GitRepository::status` / `output` の generic passthrough を infrastructure crate 内 `pub(crate)` に降格し、上位層が git コマンド文字列を注入する経路を可視性レベルで塞ぐ（再発を compile-time で防止）。read 系の直埋め call site（rev-parse 系 / show / fetch。cli_composition の pr / review_v2 / track 系、および delivery 層 `apps/cli/src/commands/track/branch_ops.rs`）を意味論 method（branch 存在確認 / HEAD 解決 / ref 上のファイル読み出し等）へ置き換える。意味論 method（`current_branch` / `push_branch` / `index_tree_hash` / `stage_all_excluding` の既存前例に連なるもの）だけを公開 API とする。"
+        "citation": "`GitRepository` trait（`status` / `output` の generic passthrough を公開している infrastructure trait）を削除し、`status` / `output` を `SystemGitRepo` の `pub(crate)` inherent method へ移す。既存の意味論 method（`current_branch` / `index_tree_hash` / `stage_all_excluding` + 新設 `sync_current_branch` 等）は `SystemGitRepo` の `pub` inherent method として残す。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -502,16 +574,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-09",
-          "text_label": "`GitRepository::status` / `output` の generic passthrough を infrastructure crate 内 `pub(crate)` に降格し、上位層が git コマンド文字列を注入する経路を可視性レベルで塞ぐ（再発を compile-time で防止）。read 系の直埋め call site（rev-parse 系 / show / fetch。cli_composition の pr / review_v2 / track 系、および delivery 層 `apps/cli/src/commands/track/branch_ops.rs`）を意味論 method（branch 存在確認 / HEAD 解決 / ref 上のファイル読み出し等）へ置き換える。意味論 method（`current_branch` / `push_branch` / `index_tree_hash` / `stage_all_excluding` の既存前例に連なるもの）だけを公開 API とする。"
+          "text_label": "`GitRepository` trait（`status` / `output` の generic passthrough を公開している infrastructure trait）を削除し、`status` / `output` を `SystemGitRepo` の `pub(crate)` inherent method へ移す（`pub trait` の method は言語仕様上 method 単位で可視性を落とせないため、trait 経由の公開を撤去して達成する）。既存の意味論 method（`current_branch` / `push_branch` / `index_tree_hash` / `stage_all_excluding` + 新設 `sync_current_branch` 等）は `SystemGitRepo` の `pub` inherent method として残す。任意 git コマンド文字列を注入する generic passthrough は crate 内側だけの実装用ハッチとして上位層へ露出させない（再発を compile-time で防止）。read 系の直埋め call site（rev-parse 系 / show / fetch。cli_composition の pr / review_v2 / track 系、および delivery 層 `apps/cli/src/commands/track/branch_ops.rs`）を意味論 method（branch 存在確認 / HEAD 解決 / ref 上のファイル読み出し等）へ置き換える。"
         }
       }
     },
     {
       "claim_hash": "cf6f55f6c67518454596b6bea0935a5bcca97d4c85ccdaf12770bd01e34730ad",
-      "evidence_hash": "14b45f5f3978cd12826282402f9d098971e2a1cb44f0e7b64143570ae2264357",
+      "evidence_hash": "0def82479a48064537f35a169e6331164e1cec4a319d5abab3c8fe01219ee2c9",
       "verdict": {
         "kind": "pass",
-        "citation": "cli 系レイヤーは git を意味論 method 経由でのみ操作する。generic passthrough（`GitRepository::status` / `output`）は infrastructure crate 内 `pub(crate)` とし、crate 外から git コマンド文字列を注入できない。"
+        "citation": "cli 系レイヤーは git を意味論 method / service 経由でのみ操作する。generic passthrough（`status` / `output`）は `SystemGitRepo` の `pub(crate)` inherent method として infrastructure crate 内側に閉じ込め（`GitRepository` trait は削除する）、crate 外から任意の git コマンド文字列を注入できない。新しい git 操作は意味論 method / port として追加する（generic passthrough の再公開は ADR supersede を要する）。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -526,16 +598,16 @@
         "data": {
           "section": "constraint",
           "element_id": "CN-07",
-          "text_label": "cli 系レイヤーは git を意味論 method 経由でのみ操作する。generic passthrough（`GitRepository::status` / `output`）は infrastructure crate 内 `pub(crate)` とし、crate 外から git コマンド文字列を注入できない。新しい git 操作は意味論 port method として追加する（generic passthrough の再公開は ADR supersede を要する）。"
+          "text_label": "cli 系レイヤーは git を意味論 method / service 経由でのみ操作する。generic passthrough（`status` / `output`）は `SystemGitRepo` の `pub(crate)` inherent method として infrastructure crate 内側に閉じ込め（`GitRepository` trait は削除する）、crate 外から任意の git コマンド文字列を注入できない。新しい git 操作は意味論 method / port として追加する（generic passthrough の再公開は ADR supersede を要する）。"
         }
       }
     },
     {
       "claim_hash": "cf6f55f6c67518454596b6bea0935a5bcca97d4c85ccdaf12770bd01e34730ad",
-      "evidence_hash": "f9a2225d618ed961d0c0410280be4bc353a18b888f024613fb8504eede01efd8",
+      "evidence_hash": "ba6aca8fc9bc00e9e8053ee3f7e9d2cbd930834c54b4d4e7bf3b621d4800eb97",
       "verdict": {
         "kind": "pass",
-        "citation": "`GitRepository::status` / `output` が infrastructure crate 外から不可視（`pub(crate)`）であり、... `read` 系（rev-parse / show / fetch）が意味論 method 経由に置き換わっている"
+        "citation": "`GitRepository` trait が infrastructure crate の公開 API から削除され、generic passthrough（`SystemGitRepo::status` / `output`）が `pub(crate)` inherent method として infrastructure crate 外から呼べないことを確認できる（コンパイルレベルの検証）。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -550,7 +622,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-07",
-          "text_label": "`GitRepository::status` / `output` が infrastructure crate 外から不可視（`pub(crate)`）であり、`apps/cli` / `apps/cli-composition` / `apps/cli-driver` の非テストコード（テスト除く）に git コマンド文字列リテラルまたは git command の失敗種別判別ロジックが残存しないことを確認できる。read 系（rev-parse / show / fetch）が意味論 method 経由に置き換わっていることをテストで確認できる。"
+          "text_label": "`GitRepository` trait が infrastructure crate の公開 API から削除され、generic passthrough（`SystemGitRepo::status` / `output`）が `pub(crate)` inherent method として infrastructure crate 外から呼べないことを確認できる（コンパイルレベルの検証）。`apps/cli` / `apps/cli-composition` / `apps/cli-driver` の非テストコード（テスト除く）に git コマンド文字列リテラルまたは git command の失敗種別判別ロジックが残存しないことを確認できる。read 系（rev-parse / show / fetch）が意味論 method 経由に置き換わっていることをテストで確認できる。"
         }
       }
     }

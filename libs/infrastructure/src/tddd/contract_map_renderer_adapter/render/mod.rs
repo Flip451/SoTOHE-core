@@ -330,6 +330,13 @@ pub(super) fn render_mermaid(
     let mut out = String::new();
     out.push_str("<!-- Generated contract-map-renderer — DO NOT EDIT DIRECTLY -->\n");
     out.push_str("```mermaid\n");
+    // ELK layout engine sidesteps the dagre cluster-ordering crash that fires
+    // on large 3-level nested subgraphs (layer > module > type). Frontmatter
+    // must appear immediately after the fence for mermaid to parse it.
+    out.push_str("---\n");
+    out.push_str("config:\n");
+    out.push_str("  layout: elk\n");
+    out.push_str("---\n");
     out.push_str("flowchart LR\n");
 
     for line in &class_defs {

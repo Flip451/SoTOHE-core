@@ -14,7 +14,7 @@ use domain::TrackId;
 use domain::tddd::LayerId;
 use usecase::signal::{SignalLayerReader, SignalLayerReaderError};
 
-use crate::git_cli::{GitRepository as _, SystemGitRepo};
+use crate::git_cli::SystemGitRepo;
 use crate::verify::tddd_layers;
 
 /// Local filesystem adapter implementing [`SignalLayerReader`].

@@ -18,7 +18,7 @@ use domain::dry_check::{DiffFileHunks, DiffHunkRange, DiffHunkRangeError};
 use domain::review_v2::FilePath;
 use usecase::dry_check::{DryCheckDiffError, DryCheckDiffSource};
 
-use crate::git_cli::{GitRepository as _, SystemGitRepo};
+use crate::git_cli::SystemGitRepo;
 
 // ── GitDryCheckDiffGetter ─────────────────────────────────────────────────────
 

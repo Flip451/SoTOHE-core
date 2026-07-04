@@ -11,10 +11,10 @@ use cli_driver::track::TrackInput;
 use crate::CliError;
 
 use super::state_ops::track_driver_outcome_to_result;
-use super::{
-    BranchAction, BranchArgs, resolve_project_root, validate_track_branch_str,
-    validate_track_id_str,
-};
+use super::{BranchAction, BranchArgs};
+
+const _: fn(&str) -> Result<(), super::validate::TrackValidateError> =
+    super::validate_track_branch_str;
 
 pub(super) fn execute_branch(action: BranchAction) -> Result<ExitCode, CliError> {
     match action {
@@ -23,26 +23,12 @@ pub(super) fn execute_branch(action: BranchAction) -> Result<ExitCode, CliError>
     }
 }
 
-/// Creates a new `track/<track-id>` branch from `main` and switches to it.
+/// Creates a new `track/<track-id>` branch from the configured base branch and switches to it.
 ///
 /// # Errors
-/// Returns `CliError::Message` when any of the following holds:
-/// - `track_id` is malformed, or the derived branch name is invalid
-/// - `items_dir` does not point at `<project-root>/track/items`
-/// - the current branch is not `main`
-/// - a branch named `track/<track-id>` already exists
-/// - the underlying `git switch -c` invocation fails
+/// Returns `CliError::Message` when the track driver reports a branch creation failure.
 fn execute_branch_create(args: BranchArgs) -> Result<ExitCode, CliError> {
     let BranchArgs { items_dir, track_id } = args;
-
-    validate_track_id_str(&track_id)
-        .map_err(|err| CliError::Message(format!("invalid track id: {err}")))?;
-
-    let branch_name = format!("track/{track_id}");
-
-    validate_track_branch_str(&branch_name)
-        .map_err(|err| CliError::Message(format!("invalid track branch: {err}")))?;
-    resolve_project_root(&items_dir).map_err(|e| CliError::Message(e.to_string()))?;
 
     let outcome = TrackCompositionRoot::new()
         .track_driver()
@@ -53,22 +39,9 @@ fn execute_branch_create(args: BranchArgs) -> Result<ExitCode, CliError> {
 /// Switches to an existing `track/<track-id>` branch.
 ///
 /// # Errors
-/// Returns `CliError::Message` when any of the following holds:
-/// - `track_id` is malformed, or the derived branch name is invalid
-/// - `items_dir` does not point at `<project-root>/track/items`
-/// - a branch named `track/<track-id>` does not exist
-/// - the underlying `git switch` invocation fails
+/// Returns `CliError::Message` when the track driver reports a branch switch failure.
 fn execute_branch_switch(args: BranchArgs) -> Result<ExitCode, CliError> {
     let BranchArgs { items_dir, track_id } = args;
-
-    validate_track_id_str(&track_id)
-        .map_err(|err| CliError::Message(format!("invalid track id: {err}")))?;
-
-    let branch_name = format!("track/{track_id}");
-
-    validate_track_branch_str(&branch_name)
-        .map_err(|err| CliError::Message(format!("invalid track branch: {err}")))?;
-    resolve_project_root(&items_dir).map_err(|e| CliError::Message(e.to_string()))?;
 
     let outcome = TrackCompositionRoot::new()
         .track_driver()
@@ -76,236 +49,21 @@ fn execute_branch_switch(args: BranchArgs) -> Result<ExitCode, CliError> {
     track_driver_outcome_to_result(outcome)
 }
 
+// The former `#[cfg(test)] mod tests { ... }` block (StubRepo / RecordingRepo
+// trait-based test scaffolding + `branch_create_git_commands` /
+// `preflight_branch_operation` / `branch_create_execute` helpers) has been
+// removed as part of the T008 cutover: the `GitRepository` trait no longer
+// exists (its methods moved to `pub` inherent methods on `SystemGitRepo`), and
+// the actual branch-create / branch-switch orchestration lives in
+// `usecase::git_workflow::TrackGitInteractor` (T006) with its own mock-port
+// unit tests in `libs/usecase/src/git_workflow.rs::tests`. The lightweight
+// `resolve_project_root` sanity tests are preserved below.
 #[cfg(test)]
-#[allow(clippy::indexing_slicing, clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+#[allow(clippy::unwrap_used)]
 mod tests {
-    use std::collections::HashMap;
-    use std::os::unix::process::ExitStatusExt;
-    use std::path::PathBuf;
-    use std::process::Output;
-    use std::sync::Mutex;
-
-    use infrastructure::git_cli::{GitError, GitRepository};
+    use std::path::{Path, PathBuf};
 
     use super::super::resolve_project_root;
-    use std::path::Path;
-
-    #[derive(Debug, thiserror::Error)]
-    #[error("{0}")]
-    pub(super) struct BranchTestError(String);
-
-    // ---------------------------------------------------------------------------
-    // Git helper functions — test-only (only called from this test module)
-    // ---------------------------------------------------------------------------
-
-    /// Returns the git command list for a branch-create invocation.
-    ///
-    /// The create path intentionally emits only `git switch -c track/<id> <base_branch>`; it must
-    /// never stage or commit metadata so that `base_branch` stays untouched while the new track
-    /// branch is being bootstrapped. `base_branch` is resolved by the caller from
-    /// `BranchStrategyPort::base_branch()` / the active track's `branch_strategy_snapshot.base_branch`.
-    pub(super) fn branch_create_git_commands(
-        branch_name: &str,
-        base_branch: &str,
-    ) -> Vec<Vec<String>> {
-        vec![vec![
-            "switch".to_owned(),
-            "-c".to_owned(),
-            branch_name.to_owned(),
-            base_branch.to_owned(),
-        ]]
-    }
-
-    pub(super) fn branch_exists(
-        repo: &impl GitRepository,
-        branch_name: &str,
-    ) -> Result<bool, BranchTestError> {
-        let output = repo
-            .output(&["rev-parse", "--verify", "--quiet", branch_name])
-            .map_err(|e| BranchTestError(e.to_string()))?;
-        Ok(output.status.success())
-    }
-
-    pub(super) fn rev_parse_oid(
-        repo: &impl GitRepository,
-        rev: &str,
-    ) -> Result<Option<String>, BranchTestError> {
-        let spec = format!("{rev}^{{commit}}");
-        let output = repo
-            .output(&["rev-parse", "--verify", "--quiet", spec.as_str()])
-            .map_err(|e| BranchTestError(e.to_string()))?;
-        if !output.status.success() {
-            return Ok(None);
-        }
-        Ok(Some(String::from_utf8_lossy(&output.stdout).trim().to_owned()))
-    }
-
-    fn reject_stale_or_divergent_branch(
-        repo: &impl GitRepository,
-        branch_name: &str,
-        exists: bool,
-    ) -> Result<(), BranchTestError> {
-        if !exists {
-            return Ok(());
-        }
-
-        if repo.current_branch().map_err(|e| BranchTestError(e.to_string()))?.as_deref()
-            == Some(branch_name)
-        {
-            return Ok(());
-        }
-
-        let current_head = rev_parse_oid(repo, "HEAD")?.ok_or_else(|| {
-            BranchTestError("cannot resolve current HEAD for activation preflight".to_owned())
-        })?;
-        let branch_head = rev_parse_oid(repo, branch_name)?.ok_or_else(|| {
-            BranchTestError(format!("cannot resolve existing branch '{branch_name}'"))
-        })?;
-
-        if current_head != branch_head {
-            return Err(BranchTestError(format!(
-                "branch '{branch_name}' exists but does not point at the current HEAD; refuse to activate onto a stale/divergent branch"
-            )));
-        }
-
-        Ok(())
-    }
-
-    pub(super) fn preflight_branch_operation(
-        repo: &impl GitRepository,
-        branch_name: &str,
-        require_alignment: bool,
-    ) -> Result<bool, BranchTestError> {
-        let exists = branch_exists(repo, branch_name)?;
-        if require_alignment {
-            reject_stale_or_divergent_branch(repo, branch_name, exists)?;
-        }
-        Ok(exists)
-    }
-
-    /// Executes the branch-create git commands against `repo` after validating preconditions.
-    ///
-    /// Preconditions:
-    /// - current branch must be `base_branch` (branch create must fork from the configured base
-    ///   branch — resolved by the caller from `BranchStrategyPort::base_branch()` / the active
-    ///   track's `branch_strategy_snapshot.base_branch`)
-    /// - target branch `branch_name` must not yet exist
-    ///
-    /// The function guarantees it never runs `git add` / `git commit` — only the commands produced
-    /// by [`branch_create_git_commands`] are issued.
-    pub(super) fn branch_create_execute(
-        repo: &impl GitRepository,
-        branch_name: &str,
-        base_branch: &str,
-    ) -> Result<(), BranchTestError> {
-        let current = repo.current_branch().map_err(|err| BranchTestError(err.to_string()))?;
-        if current.as_deref() != Some(base_branch) {
-            return Err(BranchTestError(format!(
-                "branch create must start from '{base_branch}'; current branch is {}",
-                current.as_deref().unwrap_or("<detached>")
-            )));
-        }
-
-        if branch_exists(repo, branch_name)? {
-            return Err(BranchTestError(format!("branch '{branch_name}' already exists")));
-        }
-
-        for command in branch_create_git_commands(branch_name, base_branch) {
-            let args: Vec<&str> = command.iter().map(String::as_str).collect();
-            match repo.status(&args) {
-                Ok(0) => {}
-                Ok(_) => return Err(BranchTestError(format!("git {} failed", args.join(" ")))),
-                Err(err) => {
-                    return Err(BranchTestError(format!(
-                        "failed to run git {}: {err}",
-                        args.join(" ")
-                    )));
-                }
-            }
-        }
-        Ok(())
-    }
-
-    struct StubRepo {
-        current_branch: Option<String>,
-        outputs: HashMap<Vec<String>, Output>,
-    }
-
-    impl GitRepository for StubRepo {
-        fn root(&self) -> &Path {
-            Path::new(".")
-        }
-
-        fn status(&self, _args: &[&str]) -> Result<i32, GitError> {
-            Ok(0)
-        }
-
-        fn output(&self, args: &[&str]) -> Result<Output, GitError> {
-            self.outputs
-                .get(&args.iter().map(|arg| (*arg).to_owned()).collect::<Vec<_>>())
-                .cloned()
-                .ok_or_else(|| GitError::CommandFailed {
-                    command: args.join(" "),
-                    code: -1,
-                    stderr: format!("unexpected git args: {}", args.join(" ")),
-                })
-        }
-
-        fn current_branch(&self) -> Result<Option<String>, GitError> {
-            Ok(self.current_branch.clone())
-        }
-    }
-
-    struct RecordingRepo {
-        current_branch: Option<String>,
-        outputs: HashMap<Vec<String>, Output>,
-        status_calls: Mutex<Vec<Vec<String>>>,
-    }
-
-    impl GitRepository for RecordingRepo {
-        fn root(&self) -> &Path {
-            Path::new(".")
-        }
-
-        fn status(&self, args: &[&str]) -> Result<i32, GitError> {
-            self.status_calls
-                .lock()
-                .unwrap()
-                .push(args.iter().map(|arg| (*arg).to_owned()).collect());
-            Ok(0)
-        }
-
-        fn output(&self, args: &[&str]) -> Result<Output, GitError> {
-            self.outputs
-                .get(&args.iter().map(|arg| (*arg).to_owned()).collect::<Vec<_>>())
-                .cloned()
-                .ok_or_else(|| GitError::CommandFailed {
-                    command: args.join(" "),
-                    code: -1,
-                    stderr: format!("unexpected git args: {}", args.join(" ")),
-                })
-        }
-
-        fn current_branch(&self) -> Result<Option<String>, GitError> {
-            Ok(self.current_branch.clone())
-        }
-    }
-
-    fn success_output(stdout: &str) -> Output {
-        Output {
-            status: std::process::ExitStatus::from_raw(0),
-            stdout: stdout.as_bytes().to_vec(),
-            stderr: Vec::new(),
-        }
-    }
-
-    fn exit_output(code: i32, stdout: &str) -> Output {
-        Output {
-            status: std::process::ExitStatus::from_raw(code << 8),
-            stdout: stdout.as_bytes().to_vec(),
-            stderr: Vec::new(),
-        }
-    }
 
     #[test]
     fn resolve_project_root_accepts_standard_track_items_layout() {
@@ -330,281 +88,5 @@ mod tests {
         // resolve_project_root must return "." instead of "" so that callers can pass
         // the result to Command::current_dir without triggering ENOENT (empty cwd).
         assert_eq!(resolve_project_root(Path::new("track/items")), Ok(PathBuf::from(".")));
-    }
-
-    #[test]
-    fn branch_create_git_commands_returns_switch_c_main_only() {
-        // Regression guard (ADR 2026-04-22-1432 §D3): branch create must only emit
-        // `git switch -c track/<id> <base_branch>`. No commit, no add, no branch -f —
-        // any additional command would risk generating a commit on the base branch.
-        let commands = branch_create_git_commands("track/demo", "main");
-
-        assert_eq!(
-            commands,
-            vec![vec![
-                "switch".to_owned(),
-                "-c".to_owned(),
-                "track/demo".to_owned(),
-                "main".to_owned(),
-            ]]
-        );
-    }
-
-    #[test]
-    fn branch_create_git_commands_uses_configured_base_branch() {
-        // ADR 2026-06-30-1441 §D1: the base branch is config-driven, not hardcoded
-        // to "main" — a non-"main" base_branch must flow through unchanged.
-        let commands = branch_create_git_commands("track/demo", "develop");
-
-        assert_eq!(
-            commands,
-            vec![vec![
-                "switch".to_owned(),
-                "-c".to_owned(),
-                "track/demo".to_owned(),
-                "develop".to_owned(),
-            ]]
-        );
-    }
-
-    #[test]
-    fn branch_create_execute_runs_only_switch_c_main_and_no_commit() {
-        // Regression guard (ADR 2026-04-22-1432 §D1): the execute_branch(Create)
-        // path must never invoke `git add` or `git commit`. If any future refactor
-        // reintroduces metadata persistence into this path, this test fails.
-        let repo = RecordingRepo {
-            current_branch: Some("main".to_owned()),
-            outputs: HashMap::from([(
-                vec![
-                    "rev-parse".to_owned(),
-                    "--verify".to_owned(),
-                    "--quiet".to_owned(),
-                    "track/demo".to_owned(),
-                ],
-                exit_output(1, ""),
-            )]),
-            status_calls: Mutex::new(Vec::new()),
-        };
-
-        branch_create_execute(&repo, "track/demo", "main").unwrap();
-
-        let calls = repo.status_calls.lock().unwrap().clone();
-        assert_eq!(
-            calls,
-            vec![vec![
-                "switch".to_owned(),
-                "-c".to_owned(),
-                "track/demo".to_owned(),
-                "main".to_owned(),
-            ]],
-            "branch create must only execute `git switch -c`; any commit/add call is a regression"
-        );
-        assert!(
-            !calls.iter().any(|args| args.first().map(String::as_str) == Some("commit")),
-            "branch create must not invoke `git commit`"
-        );
-        assert!(
-            !calls.iter().any(|args| args.first().map(String::as_str) == Some("add")),
-            "branch create must not invoke `git add`"
-        );
-    }
-
-    #[test]
-    fn branch_create_execute_rejects_non_main_source_branch() {
-        let repo = RecordingRepo {
-            current_branch: Some("feature".to_owned()),
-            outputs: HashMap::new(),
-            status_calls: Mutex::new(Vec::new()),
-        };
-
-        let err = branch_create_execute(&repo, "track/demo", "main").unwrap_err().to_string();
-        assert!(err.contains("must start from 'main'"));
-        assert!(
-            repo.status_calls.lock().unwrap().is_empty(),
-            "no git side-effects must happen when preflight fails"
-        );
-    }
-
-    #[test]
-    fn branch_create_execute_rejects_source_branch_other_than_configured_base() {
-        // ADR 2026-06-30-1441 §D1: the guard compares against the configured
-        // base_branch, not a hardcoded "main" — a "develop"-configured track must
-        // reject a "main" source branch just as the default rejects "feature".
-        let repo = RecordingRepo {
-            current_branch: Some("main".to_owned()),
-            outputs: HashMap::new(),
-            status_calls: Mutex::new(Vec::new()),
-        };
-
-        let err = branch_create_execute(&repo, "track/demo", "develop").unwrap_err().to_string();
-        assert!(err.contains("must start from 'develop'"));
-        assert!(
-            repo.status_calls.lock().unwrap().is_empty(),
-            "no git side-effects must happen when preflight fails"
-        );
-    }
-
-    #[test]
-    fn branch_create_execute_rejects_existing_branch() {
-        let repo = RecordingRepo {
-            current_branch: Some("main".to_owned()),
-            outputs: HashMap::from([(
-                vec![
-                    "rev-parse".to_owned(),
-                    "--verify".to_owned(),
-                    "--quiet".to_owned(),
-                    "track/demo".to_owned(),
-                ],
-                success_output("track/demo\n"),
-            )]),
-            status_calls: Mutex::new(Vec::new()),
-        };
-
-        let err = branch_create_execute(&repo, "track/demo", "main").unwrap_err().to_string();
-        assert!(err.contains("already exists"));
-        assert!(
-            repo.status_calls.lock().unwrap().is_empty(),
-            "no git side-effects must happen when preflight fails"
-        );
-    }
-
-    #[test]
-    fn preflight_branch_operation_rejects_existing_divergent_branch_in_auto_mode() {
-        let repo = StubRepo {
-            current_branch: Some("main".to_owned()),
-            outputs: HashMap::from([
-                (
-                    vec![
-                        "rev-parse".to_owned(),
-                        "--verify".to_owned(),
-                        "--quiet".to_owned(),
-                        "track/demo".to_owned(),
-                    ],
-                    success_output("track/demo\n"),
-                ),
-                (
-                    vec![
-                        "rev-parse".to_owned(),
-                        "--verify".to_owned(),
-                        "--quiet".to_owned(),
-                        "HEAD^{commit}".to_owned(),
-                    ],
-                    success_output("aaa\n"),
-                ),
-                (
-                    vec![
-                        "rev-parse".to_owned(),
-                        "--verify".to_owned(),
-                        "--quiet".to_owned(),
-                        "track/demo^{commit}".to_owned(),
-                    ],
-                    success_output("bbb\n"),
-                ),
-            ]),
-        };
-
-        let err = preflight_branch_operation(&repo, "track/demo", true).unwrap_err().to_string();
-
-        assert!(err.contains("stale/divergent"));
-    }
-
-    #[test]
-    fn preflight_branch_operation_allows_existing_aligned_branch() {
-        let repo = StubRepo {
-            current_branch: Some("main".to_owned()),
-            outputs: HashMap::from([
-                (
-                    vec![
-                        "rev-parse".to_owned(),
-                        "--verify".to_owned(),
-                        "--quiet".to_owned(),
-                        "track/demo".to_owned(),
-                    ],
-                    success_output("track/demo\n"),
-                ),
-                (
-                    vec![
-                        "rev-parse".to_owned(),
-                        "--verify".to_owned(),
-                        "--quiet".to_owned(),
-                        "HEAD^{commit}".to_owned(),
-                    ],
-                    success_output("aaa\n"),
-                ),
-                (
-                    vec![
-                        "rev-parse".to_owned(),
-                        "--verify".to_owned(),
-                        "--quiet".to_owned(),
-                        "track/demo^{commit}".to_owned(),
-                    ],
-                    success_output("aaa\n"),
-                ),
-            ]),
-        };
-
-        let result = preflight_branch_operation(&repo, "track/demo", true);
-
-        assert!(result.is_ok());
-    }
-
-    #[test]
-    fn preflight_branch_operation_allows_switch_to_existing_branch_with_different_head() {
-        let repo = StubRepo {
-            current_branch: Some("main".to_owned()),
-            outputs: HashMap::from([(
-                vec![
-                    "rev-parse".to_owned(),
-                    "--verify".to_owned(),
-                    "--quiet".to_owned(),
-                    "track/demo".to_owned(),
-                ],
-                success_output("track/demo\n"),
-            )]),
-        };
-
-        let result = preflight_branch_operation(&repo, "track/demo", false);
-
-        assert!(result.is_ok());
-    }
-
-    #[test]
-    fn preflight_branch_operation_rejects_existing_divergent_branch_when_alignment_required() {
-        let repo = StubRepo {
-            current_branch: Some("main".to_owned()),
-            outputs: HashMap::from([
-                (
-                    vec![
-                        "rev-parse".to_owned(),
-                        "--verify".to_owned(),
-                        "--quiet".to_owned(),
-                        "track/demo".to_owned(),
-                    ],
-                    success_output("track/demo\n"),
-                ),
-                (
-                    vec![
-                        "rev-parse".to_owned(),
-                        "--verify".to_owned(),
-                        "--quiet".to_owned(),
-                        "HEAD^{commit}".to_owned(),
-                    ],
-                    success_output("aaa\n"),
-                ),
-                (
-                    vec![
-                        "rev-parse".to_owned(),
-                        "--verify".to_owned(),
-                        "--quiet".to_owned(),
-                        "track/demo^{commit}".to_owned(),
-                    ],
-                    success_output("bbb\n"),
-                ),
-            ]),
-        };
-
-        let err = preflight_branch_operation(&repo, "track/demo", true).unwrap_err().to_string();
-
-        assert!(err.contains("stale/divergent"));
     }
 }

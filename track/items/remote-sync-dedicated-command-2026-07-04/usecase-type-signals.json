@@ -1,14 +1,20 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-04T09:07:05Z",
-  "declaration_hash": "9e9e4fe7f35c2f62f9fe0121dbe419703a2d482cb5e443613f1cfdd6a24cc044",
+  "generated_at": "2026-07-04T18:56:04Z",
+  "declaration_hash": "f5fdab865ec35f58fe50395c778488539de0ecf0c34db5d8b49034fb2e57c12c",
   "signals": [
+    {
+      "type_name": "ArchivedTelemetryFactoryPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
     {
       "type_name": "DiagnosticText",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -19,19 +25,19 @@
     {
       "type_name": "GitPrimitivePort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "GitWorkflowError",
       "kind_tag": "error_type",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
       "type_name": "GitWorkflowInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "GitWorkflowService"
@@ -40,32 +46,59 @@
     {
       "type_name": "GitWorkflowService",
       "kind_tag": "application_service",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
       "type_name": "PrGitInteractor",
       "kind_tag": "use_case",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "ReviewGitInteractor",
       "kind_tag": "use_case",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TelemetryAggregateInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "TelemetryAggregateService"
+      ]
+    },
+    {
+      "type_name": "TelemetryEmitInteractor",
+      "kind_tag": "use_case",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TelemetryReportInteractor",
+      "kind_tag": "use_case",
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "TrackArchiveFsPort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "TrackGitInteractor",
       "kind_tag": "use_case",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ArchivedTrackTelemetryPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "BranchReadError",
@@ -82,6 +115,30 @@
     {
       "type_name": "ExplicitTrackBranch",
       "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TelemetryAggregateService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TelemetryAggregateServiceError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TelemetryReportOutput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TelemetryReportPort",
+      "kind_tag": "secondary_port",
       "signal": "blue",
       "found_type": true
     },

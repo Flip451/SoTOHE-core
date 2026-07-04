@@ -1,24 +1,33 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-04T09:07:10Z",
-  "declaration_hash": "cc5b2168a0c3e4ffe0044106c07cdfa68f6538e52b902c67d13ac7280bdfe881",
+  "generated_at": "2026-07-04T18:56:09Z",
+  "declaration_hash": "d4d4cf219d11747171affd8e12d58a0bec942575c86c09a6af891b955073dd64",
   "signals": [
+    {
+      "type_name": "FsArchivedTelemetryFactoryAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "ArchivedTelemetryFactoryPort",
+        "core::default::Default"
+      ]
+    },
     {
       "type_name": "FsGitWorkflowAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
-      "missing_items": [
-        "GitPrimitivePort",
-        "GitWorkflowService"
+      "found_items": [
+        "GitPrimitivePort"
       ]
     },
     {
       "type_name": "FsWorkspaceAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "TrackArchiveFsPort",
         "core::default::Default"
       ]
@@ -26,9 +35,9 @@
     {
       "type_name": "SyncError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::error::Error",
         "core::fmt::Debug",
         "core::fmt::Display"
@@ -37,17 +46,14 @@
     {
       "type_name": "SystemGitRepo",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": true,
-      "missing_items": [
-        "GitRepository"
-      ]
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "GitRepository",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": true
+      "signal": "blue",
+      "found_type": false
     },
     {
       "type_name": "GitError",

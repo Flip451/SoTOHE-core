@@ -5,14 +5,14 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | GitError | error_type | reference | CurrentDir, Spawn, CommandFailed, EmptyRepoRoot | 🔵 | 🔵 |
-| SyncError | error_type | add | UpstreamNotSet, NonFastForward, WorktreeUnresolved | 🟡 | 🔵 |
+| SyncError | error_type | add | UpstreamNotSet, NonFastForward, WorktreeUnresolved, Spawn | 🔵 | 🔵 |
 | TrackBranchError | error_type | reference | LoadFailed | 🔵 | 🔵 |
 
 ## Secondary Ports
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| GitRepository | secondary_port | delete | fn root(&self) -> &std::path::Path, fn status(&self, args: &[&str]) -> Result<i32, GitError>, fn output(&self, args: &[&str]) -> Result<std::process::Output, GitError>, fn resolve_path(&self, path: &std::path::Path) -> std::path::PathBuf, fn current_branch(&self) -> Result<Option<String>, GitError>, fn push_branch(&self, branch: &str) -> Result<(), GitError>, fn index_tree_hash(&self) -> Result<String, GitError>, fn stage_all_excluding(&self, exclude_files: &[&str], exclude_dirs: &[&str]) -> Result<(), GitError> | 🟡 | 🔵 |
+| GitRepository | secondary_port | delete | fn root(&self) -> &std::path::Path, fn status(&self, args: &[&str]) -> Result<i32, GitError>, fn output(&self, args: &[&str]) -> Result<std::process::Output, GitError>, fn resolve_path(&self, path: &std::path::Path) -> std::path::PathBuf, fn current_branch(&self) -> Result<Option<String>, GitError>, fn push_branch(&self, branch: &str) -> Result<(), GitError>, fn index_tree_hash(&self) -> Result<String, GitError>, fn stage_all_excluding(&self, exclude_files: &[&str], exclude_dirs: &[&str]) -> Result<(), GitError> | 🔵 | 🔵 |
 
 ## DTOs
 
@@ -24,9 +24,10 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| FsGitWorkflowAdapter | secondary_adapter | modify | impl Default, impl GitWorkflowService, impl GitPrimitivePort | 🟡 | 🔵 |
-| FsWorkspaceAdapter | secondary_adapter | add | impl Default, impl TrackArchiveFsPort | 🟡 | 🔵 |
-| SystemGitRepo | secondary_adapter | modify | impl Debug, impl Clone, impl GitRepository, impl WorktreeReader, impl BranchReaderPort | 🟡 | 🔵 |
+| FsArchivedTelemetryFactoryAdapter | secondary_adapter | add | impl Default, impl ArchivedTelemetryFactoryPort | 🔵 | 🔵 |
+| FsGitWorkflowAdapter | secondary_adapter | modify | impl Default, impl GitWorkflowService, impl GitPrimitivePort | 🔵 | 🔵 |
+| FsWorkspaceAdapter | secondary_adapter | add | impl Default, impl TrackArchiveFsPort | 🔵 | 🔵 |
+| SystemGitRepo | secondary_adapter | modify | impl Debug, impl Clone, impl GitRepository, impl WorktreeReader, impl BranchReaderPort | 🔵 | 🔵 |
 
 ## Free Functions
 

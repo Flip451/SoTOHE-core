@@ -19,7 +19,7 @@
     },
     {
       "id": "GO-02",
-      "text": "git を触るフロー（stage / commit / note / sync / branch 操作 / archive / pr / review 系）について、git コマンド文字列と失敗判定を cli 系レイヤー（cli / cli_composition / cli_driver）から排除し infrastructure の意味論 port + typed error に移管する。さらに意味論 method を呼ぶ側の手順（orchestration）を usecase 層の interactor へ移し、composition root を wiring（DI）に、cli 層を parse + dispatch に限定する。結果として git 関与フローの層責務を「cli = parse + dispatch / composition = wiring / usecase = orchestration / infrastructure = git 意味論」に整流する。",
+      "text": "git を触るフロー（stage / commit / note / sync / branch 操作 / archive / pr / review 系）について、git コマンド文字列と失敗判定を cli 系レイヤー（cli / cli_composition / cli_driver）から排除し infrastructure の意味論 method + typed error に移管する（D5）。さらに意味論 method / service を呼ぶ側の手順（orchestration）を usecase 層の interactor へ移し composition root を wiring（DI）に限定し（D8）、cli 層を parse + dispatch に限定する（D9）。結果として git 関与フローの層責務を「cli = parse + dispatch / composition = wiring / usecase = orchestration / infrastructure = git 意味論」に整流する。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
@@ -90,7 +90,7 @@
       },
       {
         "id": "IN-06",
-        "text": "sync path を D5 の旗艦事例として、`libs/infrastructure/src/git_cli/` に「現在ブランチを upstream から fast-forward only で pull する」意味論 method（ADR 例示 `sync_current_branch`）を新設する。git コマンド文字列（`pull --ff-only`）と ff-only 意味論を infrastructure 内側に閉じ込め、generic passthrough には委ねない。3 種 fail-closed failure modes（upstream 未設定 / non-fast-forward / worktree unresolved）を typed error（ADR 例示 `SyncError`）の variant として infrastructure boundary で分類する。",
+        "text": "sync path を D5 の旗艦事例として、`libs/infrastructure/src/git_cli/` に「現在ブランチを upstream から fast-forward only で pull する」infrastructure adapter primitive（ADR 例示 `SystemGitRepo::sync_current_branch(&self) -> Result<(), SyncError>`）を新設する。git process I/O・git コマンド文字列（`pull --ff-only`）・ff-only 意味論・失敗分類をこの下位 primitive に閉じ込め、generic passthrough には委ねない。3 種 fail-closed failure modes（upstream 未設定 / non-fast-forward / worktree unresolved）を typed error（ADR 例示 `SyncError`）の variant として infrastructure boundary で分類する。この primitive は git process I/O と失敗分類を所有する下位層であり、command-facing の公開契約ではない。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
@@ -110,7 +110,7 @@
       },
       {
         "id": "IN-08",
-        "text": "git workflow 操作の二重実装を解消する。usecase port `GitWorkflowService` → infrastructure adapter `FsGitWorkflowAdapter` → delivery `GitDriver` の既存 chain を正とし、production caller ゼロの dead code から唯一の live chain へ統合する。`GitCompositionRoot` の inline git method 群（Chain B）を削除し、`apps/cli` の git subcommand dispatch を配線済み `GitDriver` 経由にする。両系統に逐語重複している commit の fail-closed track-branch guard を単一箇所へ集約する。port method を再編し、`switch_and_pull` を trait から削除して sync（現在ブランチ pull 専用）と branch switch を分離した method として整備する。",
+        "text": "git workflow 操作の二重実装を解消する。usecase port `GitWorkflowService` → infrastructure adapter `FsGitWorkflowAdapter` → delivery `GitDriver` の既存 chain を正とし、production caller ゼロの dead code から唯一の live chain へ統合する。`GitCompositionRoot` の inline git method 群（Chain B）を削除し、`apps/cli` の git subcommand dispatch を配線済み `GitDriver` 経由にする。両系統に逐語重複している commit の fail-closed track-branch guard を単一箇所へ集約する。port method を再編し、`switch_and_pull` を trait から削除して sync（現在ブランチ pull 専用）と branch switch を分離した method として整備する。sync の command-facing 公開契約は usecase port（ADR 例示 `GitWorkflowService::sync_current_branch() -> Result<(), GitWorkflowError>`）に置き `bin/sotp git sync` の唯一の service API とする。`FsGitWorkflowAdapter` が D5 の infrastructure primitive（`SystemGitRepo::sync_current_branch` / `SyncError`）を `GitWorkflowError` へ写像し、`apps/cli` = parse + dispatch、`apps/cli-driver` = service 呼び出し + presentation 変換、`apps/cli-composition` = `GitDriver` への wiring のみ、と層責務を分ける。`track switch-base` は usecase 側 orchestration として「snapshot から base branch 解決 → branch switch service → sync service」を合成し、composition root に手順を置かない。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
@@ -120,7 +120,7 @@
       },
       {
         "id": "IN-09",
-        "text": "`GitRepository::status` / `output` の generic passthrough を infrastructure crate 内 `pub(crate)` に降格し、上位層が git コマンド文字列を注入する経路を可視性レベルで塞ぐ（再発を compile-time で防止）。read 系の直埋め call site（rev-parse 系 / show / fetch。cli_composition の pr / review_v2 / track 系、および delivery 層 `apps/cli/src/commands/track/branch_ops.rs`）を意味論 method（branch 存在確認 / HEAD 解決 / ref 上のファイル読み出し等）へ置き換える。意味論 method（`current_branch` / `push_branch` / `index_tree_hash` / `stage_all_excluding` の既存前例に連なるもの）だけを公開 API とする。",
+        "text": "`GitRepository` trait（`status` / `output` の generic passthrough を公開している infrastructure trait）を削除し、`status` / `output` を `SystemGitRepo` の `pub(crate)` inherent method へ移す（`pub trait` の method は言語仕様上 method 単位で可視性を落とせないため、trait 経由の公開を撤去して達成する）。既存の意味論 method（`current_branch` / `push_branch` / `index_tree_hash` / `stage_all_excluding` + 新設 `sync_current_branch` 等）は `SystemGitRepo` の `pub` inherent method として残す。任意 git コマンド文字列を注入する generic passthrough は crate 内側だけの実装用ハッチとして上位層へ露出させない（再発を compile-time で防止）。read 系の直埋め call site（rev-parse 系 / show / fetch。cli_composition の pr / review_v2 / track 系、および delivery 層 `apps/cli/src/commands/track/branch_ops.rs`）を意味論 method（branch 存在確認 / HEAD 解決 / ref 上のファイル読み出し等）へ置き換える。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
@@ -130,7 +130,7 @@
       },
       {
         "id": "IN-10",
-        "text": "git 関与フローの orchestration（意味論 method を呼ぶ側の手順）を usecase 層の interactor へ移管する。track branch create の fail-closed 検証シーケンス、track archive の git mv + logs 移動の合成、pr 系の fetch → 解決 → 参照フロー、review_v2 の hash 解決フローを、既存 `GitWorkflowInteractor` と同型の port + interactor 構造として usecase に置く。composition root は adapter の構築と注入（wiring / DI）だけを行う。適用範囲は本 track census で特定した git 関与フローに限定する。",
+        "text": "git 関与フローの orchestration（意味論 method / service を呼ぶ側の手順）を usecase 層の interactor へ移管する。本 track census で特定した git 関与フロー — track branch ops の fail-closed 検証シーケンス、track archive の git mv + logs 移動の合成、pr 系の fetch → 解決 → 参照フロー、review_v2 の hash 解決フロー、および archived-track telemetry の emit フロー（`TelemetryAggregateServiceImpl::emit_archived`（`apps/cli-composition/src/telemetry.rs`）は git worktree 解決を伴う git 関与フローであり、application service 実装ごと usecase interactor + port 構造へ移設して composition から外す）— を、既存 `GitWorkflowInteractor` と同型の port + interactor 構造として usecase に置く。composition root は adapter の構築と注入（wiring / DI）だけを行う。適用範囲は git 関与フローに限定する。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
@@ -216,7 +216,7 @@
       },
       {
         "id": "OS-06",
-        "text": "git を触らないフローの composition root 純化は対象外とする。D8 の orchestration → usecase interactor 移管は本 track census で特定した git 関与フロー（track branch ops / archive / pr / review_v2 系）に限定し、git 非関与フローの composition = wiring only 化は将来トリガ（別 ADR）に送る。",
+        "text": "composition root 純化の対象外となるのは git を触らないフロー（signal chain 評価等の git 非関与 application service）のみとする。git worktree 解決を伴う archived-track telemetry emit（`TelemetryAggregateServiceImpl::emit_archived`）は git 関与フローであり IN-10 の対象に含まれる（本 out-of-scope では除外しない）。git 非関与フローへの composition = wiring only 化の拡張は将来トリガ（別 ADR）に送る。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
@@ -259,7 +259,7 @@
     },
     {
       "id": "CN-02",
-      "text": "sync path の failure modes は `libs/infrastructure/src/git_cli/` 境界で typed error（例 `SyncError`）の variant として分類する。上位層（`apps/cli-composition` / `track switch-base` 内部合成）は自層 error 型への薄い変換に留め、失敗種別の判別・message 組み立て・string 化を持たない。error 判別ロジックを infrastructure 側に一元化する。",
+      "text": "sync path の failure modes は infrastructure boundary（`SystemGitRepo::sync_current_branch`）で typed error（例 `SyncError`）の variant として分類する。上位層は自層の error 型への薄い変換のみを担い、失敗種別の再判別・message 組み立て・string 化を持たない。error 判別ロジックを infrastructure 側に一元化する。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
@@ -309,7 +309,7 @@
     },
     {
       "id": "CN-07",
-      "text": "cli 系レイヤーは git を意味論 method 経由でのみ操作する。generic passthrough（`GitRepository::status` / `output`）は infrastructure crate 内 `pub(crate)` とし、crate 外から git コマンド文字列を注入できない。新しい git 操作は意味論 port method として追加する（generic passthrough の再公開は ADR supersede を要する）。",
+      "text": "cli 系レイヤーは git を意味論 method / service 経由でのみ操作する。generic passthrough（`status` / `output`）は `SystemGitRepo` の `pub(crate)` inherent method として infrastructure crate 内側に閉じ込め（`GitRepository` trait は削除する）、crate 外から任意の git コマンド文字列を注入できない。新しい git 操作は意味論 method / port として追加する（generic passthrough の再公開は ADR supersede を要する）。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
@@ -381,7 +381,7 @@
     },
     {
       "id": "AC-07",
-      "text": "`GitRepository::status` / `output` が infrastructure crate 外から不可視（`pub(crate)`）であり、`apps/cli` / `apps/cli-composition` / `apps/cli-driver` の非テストコード（テスト除く）に git コマンド文字列リテラルまたは git command の失敗種別判別ロジックが残存しないことを確認できる。read 系（rev-parse / show / fetch）が意味論 method 経由に置き換わっていることをテストで確認できる。",
+      "text": "`GitRepository` trait が infrastructure crate の公開 API から削除され、generic passthrough（`SystemGitRepo::status` / `output`）が `pub(crate)` inherent method として infrastructure crate 外から呼べないことを確認できる（コンパイルレベルの検証）。`apps/cli` / `apps/cli-composition` / `apps/cli-driver` の非テストコード（テスト除く）に git コマンド文字列リテラルまたは git command の失敗種別判別ロジックが残存しないことを確認できる。read 系（rev-parse / show / fetch）が意味論 method 経由に置き換わっていることをテストで確認できる。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
@@ -391,7 +391,7 @@
     },
     {
       "id": "AC-08",
-      "text": "`libs/infrastructure/src/git_cli/` に current-branch sync 用意味論 method（例 `sync_current_branch`）と typed error（例 `SyncError`）が declare され、3 fail-closed modes（upstream 未設定 / non-fast-forward / worktree unresolved）が distinguishable な variant として区別できる。infrastructure layer が対応 variant を返し pattern match で識別可能であること、`apps/cli-composition` 側が変換のみで失敗種別を再判定していないことをユニットテストで確認できる。",
+      "text": "`libs/infrastructure/src/git_cli/` に current-branch sync 用の infrastructure adapter primitive（例 `SystemGitRepo::sync_current_branch`）と typed error（例 `SyncError`）が declare され、3 fail-closed modes（upstream 未設定 / non-fast-forward / worktree unresolved）が distinguishable な variant として区別できる。infrastructure layer が対応 variant を返し pattern match で識別可能であること、および上位層が `SyncError` を自層 error 型へ写像する薄い変換のみで失敗種別を再判定していないことをユニットテストで確認できる。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
@@ -401,7 +401,7 @@
     },
     {
       "id": "AC-09",
-      "text": "git 関与フロー（track branch ops / archive / pr / review_v2 系）の orchestration が usecase 層の interactor に存在し、composition root は wiring（adapter 構築 + 注入）のみになっていることを確認できる。移管された手順が usecase 単体テストで検証可能である。",
+      "text": "本 track census で特定した git 関与フロー（archived-track telemetry emit を含む）の orchestration が usecase 層の interactor に存在し、対応する composition root 側が wiring（adapter 構築 + 注入）のみになっていることを確認できる。移管された各手順が mock port を用いた usecase 単体テストで検証可能である。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",

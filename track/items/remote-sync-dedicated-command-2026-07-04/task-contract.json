@@ -4,13 +4,11 @@
   "entries": {
     "T001": [
       { "layer": "usecase", "entry_key": "DiagnosticText" },
-      { "layer": "usecase", "entry_key": "GitWorkflowError" },
       { "layer": "usecase", "entry_key": "usecase::git_workflow::validate_stage_path_entries" },
       { "layer": "usecase", "entry_key": "usecase::git_workflow::verify_explicit_track_branch" },
       { "layer": "usecase", "entry_key": "usecase::git_workflow::verify_auto_detected_branch" }
     ],
     "T002": [
-      { "layer": "usecase", "entry_key": "GitPrimitivePort" },
       { "layer": "usecase", "entry_key": "TrackArchiveFsPort" },
       { "layer": "usecase", "entry_key": "ExplicitTrackBranch" },
       { "layer": "usecase", "entry_key": "TrackBranchClaim" },
@@ -25,7 +23,6 @@
       { "layer": "domain", "entry_key": "TrackId" }
     ],
     "T004": [
-      { "layer": "infrastructure", "entry_key": "SyncError" },
       { "layer": "infrastructure", "entry_key": "FsWorkspaceAdapter" },
       { "layer": "infrastructure", "entry_key": "GitError" },
       { "layer": "infrastructure", "entry_key": "TrackBranchError" },
@@ -38,7 +35,6 @@
     "T005": [
       { "layer": "usecase", "entry_key": "GitWorkflowService" },
       { "layer": "usecase", "entry_key": "GitWorkflowInteractor" },
-      { "layer": "infrastructure", "entry_key": "FsGitWorkflowAdapter" },
       { "layer": "cli_driver", "entry_key": "GitInput" },
       { "layer": "cli", "entry_key": "GitCommand" },
       { "layer": "cli", "entry_key": "SwitchAndPullArgs" },
@@ -56,6 +52,25 @@
       { "layer": "infrastructure", "entry_key": "SystemGitRepo" },
       { "layer": "infrastructure", "entry_key": "GitRepository" }
     ],
-    "T009": []
+    "T009": [],
+    "T010": [
+      { "layer": "usecase", "entry_key": "GitWorkflowError" },
+      { "layer": "infrastructure", "entry_key": "SyncError" },
+      { "layer": "cli_composition", "entry_key": "cli_composition::review_v2::commit_hash::persist_commit_hash_for_track" }
+    ],
+    "T011": [
+      { "layer": "usecase", "entry_key": "GitPrimitivePort" },
+      { "layer": "usecase", "entry_key": "TelemetryAggregateInteractor" },
+      { "layer": "usecase", "entry_key": "TelemetryReportInteractor" },
+      { "layer": "usecase", "entry_key": "TelemetryEmitInteractor" },
+      { "layer": "usecase", "entry_key": "ArchivedTelemetryFactoryPort" },
+      { "layer": "usecase", "entry_key": "TelemetryAggregateService" },
+      { "layer": "usecase", "entry_key": "TelemetryReportPort" },
+      { "layer": "usecase", "entry_key": "ArchivedTrackTelemetryPort" },
+      { "layer": "usecase", "entry_key": "TelemetryReportOutput" },
+      { "layer": "usecase", "entry_key": "TelemetryAggregateServiceError" },
+      { "layer": "infrastructure", "entry_key": "FsGitWorkflowAdapter" },
+      { "layer": "infrastructure", "entry_key": "FsArchivedTelemetryFactoryAdapter" }
+    ]
   }
 }

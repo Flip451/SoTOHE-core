@@ -94,7 +94,7 @@ read 系の直埋め call site（`rev-parse` 系 / `show` / `fetch`。cli_compos
 
 D5–D7 で git 意味論を infrastructure に降ろしても、意味論 method を「呼ぶ側の手順」— track branch create の fail-closed 検証シーケンス、track archive の git mv + logs 移動の合成、pr 系の fetch → 解決 → 参照のフロー、review_v2 の hash 解決フロー — が composition root に残れば、composition root は orchestration を持ち続ける。git を触るフローについては、この手順部分を usecase 層の interactor（既存 `GitWorkflowInteractor` と同型の port + interactor 構造）へ移管し、composition root は adapter の構築と注入（wiring / DI）だけを行う。
 
-適用範囲は git 関与フローに限定する（本 track の census で特定した cli_composition の track branch ops / archive / pr / review_v2 系）。git を触らないフローの composition root 純化は本 ADR の対象外。
+適用範囲は git 関与フローに限定する（Context の census で特定した cli_composition の track branch ops / archive / pr / review_v2 系、および archived-track telemetry の emit フロー — `TelemetryAggregateServiceImpl::emit_archived` は git worktree 解決を伴う git 関与フローであり、application service 実装ごと usecase interactor + port 化して composition から移設する）。git を触らないフロー（signal chain 評価等）の composition root 純化は本 ADR の対象外。
 
 ### D9: cli 層は parse + dispatch に限定し、infrastructure 直参照を持たない
 
@@ -126,9 +126,9 @@ cli_composition 側に `repo.status(&["pull", "--ff-only"])` を直接埋め込�
 
 統合方向の逆向き案。生きている側（`GitCompositionRoot` の inline method 群）を残し、dead code になっている `GitWorkflowService` / `FsGitWorkflowAdapter` / `GitDriver` を削除すれば実装距離は最短になる。しかし composition root にロジックが定着し、composition root を wiring に限定する既存の責務分離方針と矛盾する。port 側の抽象は既に完備されており、正しい構造を捨てて違反構造を正当化する理由がないため却下。
 
-### G. 段階実施（write-path のみ本 track、read 系は別 track）
+### G. 段階実施（write-path を先行させ、read 系を後続の実装単位に分割する）
 
-差分規模を抑えるため read 系（`rev-parse` / `show` / `fetch`）の意味論化と delivery 層の是正を別 track に先送りする案。generic passthrough の封じ込め（D7）が完了せず、違反の再発経路が残ったまま中途半端な状態が続く。一括是正を選好する判断により却下。
+差分規模を抑えるため read 系（`rev-parse` / `show` / `fetch`）の意味論化と delivery 層の是正を後続の実装単位に先送りする案。generic passthrough の封じ込め（D7）が完了せず、違反の再発経路が残ったまま中途半端な状態が続く。一括是正を選好する判断により却下。
 
 ## Consequences
 
@@ -144,7 +144,7 @@ cli_composition 側に `repo.status(&["pull", "--ff-only"])` を直接埋め込�
 ### Negative
 
 - 新 subcommand の実装・テストコストが発生する
-- `git switch-and-pull` 廃止・`git sync` 新設に伴い、関連運用文書の**同時更新**が必要になる。実装 track のスコープに以下の更新を含めること（maintainer checklist の「影響レイヤー同時更新」原則）:
+- `git switch-and-pull` 廃止・`git sync` 新設に伴い、関連運用文書の**同時更新**が必要になる。実装時に以下の更新を同一変更セットへ含めること（maintainer checklist の「影響レイヤー同時更新」原則）:
   - `knowledge/conventions/branch-strategy.md` — ブランチ操作コマンドの記述（`track-switch-base` の説明更新、sync 動線の追記）
   - `.claude/rules/07-dev-environment.md` — `cargo make` タスク一覧と `bin/sotp` native subcommand 一覧
   - `.claude/commands/track/done.md` / `.harness/workflows/track/done.md` — `/track:done` の base 復帰手順
@@ -152,7 +152,7 @@ cli_composition 側に `repo.status(&["pull", "--ff-only"])` を直接埋め込�
   - `.claude/settings.json` — `permissions.allow` の wrapper エントリ
   - `Makefile.toml` — wrapper task の追加・整理（enforcement 面）
 - 是正範囲が cli 系全域（infrastructure / usecase / cli_composition / cli / cli_driver + テスト）に及び、実装・レビューの差分規模が大きい。feature batch が per-scope diff ceiling を超えて分割される可能性が高い（ceiling は advisory）。
-- D8 の interactor 移管により usecase 層に track branch ops / archive / pr / review_v2 系の port + interactor が新設され、型・テストの追加コストが発生する。
+- D8 の interactor 移管により usecase 層に track branch ops / archive / pr / review_v2 / telemetry emit 系の port + interactor が新設され、型・テストの追加コストが発生する。
 - infrastructure adapter primitive の意味論化に伴い、`SystemGitRepo` の inherent impl が追加型（`SyncError` 等の意味論 error）と新 method 群の実装・テストを持つ。さらに `FsGitWorkflowAdapter` が `SyncError` から `GitWorkflowError` への写像を持つ（generic passthrough 案（E）に対して型定義とマッピング層のコストが増える）。
 
 ### Neutral

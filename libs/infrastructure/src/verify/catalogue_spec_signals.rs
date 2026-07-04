@@ -564,7 +564,7 @@ pub fn execute_catalogue_spec_signals_check(
 ) -> VerifyOutcome {
     use std::sync::Arc;
 
-    use crate::git_cli::{GitRepository, resolve_repo_path};
+    use crate::git_cli::resolve_repo_path;
     use usecase::track_resolution::{ActiveTrackResolveInteractor, ActiveTrackResolveService};
 
     let repo = match crate::git_cli::SystemGitRepo::discover() {

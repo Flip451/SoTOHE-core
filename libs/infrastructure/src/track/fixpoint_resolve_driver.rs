@@ -32,7 +32,7 @@ use crate::dry_check::approval_factory::FsDryApprovalFactoryAdapter;
 use crate::dry_check::diff_base_resolver::FsDiffBaseResolverAdapter;
 use crate::dry_check::noop_approval::NoOpDryApprovalService;
 use crate::dry_check::{DryCheckConfig as InfraDryCheckConfig, FsDryCorpusMetaAdapter};
-use crate::git_cli::{GitRepository as _, SystemGitRepo};
+use crate::git_cli::SystemGitRepo;
 use crate::semantic_dup::CodeFragmentExtractorAdapter;
 use crate::track::gate_state::{FsRefVerifyGateStateAdapter, FsReviewGateStateAdapter};
 use crate::track::symlink_guard::reject_symlinks_below;

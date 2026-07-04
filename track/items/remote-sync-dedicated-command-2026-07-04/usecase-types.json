@@ -67,17 +67,23 @@
           ] } },
           { "name": "Fs", "payload": { "kind": "struct", "fields": [
             { "name": "detail", "ty": "DiagnosticText" }
+          ] } },
+          { "name": "SwitchFailed", "payload": { "kind": "struct", "fields": [
+            { "name": "branch",    "ty": "DiagnosticText" },
+            { "name": "exit_code", "ty": "i32" }
           ] } }
         ]
       },
       "methods": [],
       "module_path": "git_workflow",
-      "docs": "ErrorType for the git-workflow surface. Adds Sync variants (SyncUpstreamNotSet / SyncNonFastForward{stderr} / SyncWorktreeUnresolved{stderr}) and Fs{detail}; every free-text String variant field retyped to DiagnosticText. Full post-modify variant set enumerated. IN-06 / IN-08 / IN-10 / CN-02 / AC-08.",
+      "docs": "ErrorType for the git-workflow surface. Adds Sync variants (SyncUpstreamNotSet / SyncNonFastForward{stderr} / SyncWorktreeUnresolved{stderr}), Fs{detail}, and SwitchFailed{branch, exit_code}; every free-text String variant field retyped to DiagnosticText. Full post-modify variant set enumerated. IN-06 / IN-08 / IN-10 / CN-02 / CN-05 / AC-04 / AC-08.",
       "spec_refs": [
         { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-06" },
         { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-08" },
         { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-10" },
         { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "CN-02" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "CN-05" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "AC-04" },
         { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "AC-08" }
       ],
       "informal_grounds": []
@@ -215,9 +221,151 @@
       "docs": "Pre-existing usecase error for BranchReaderPort::current_branch; unchanged by this track. Declared reference for edge visibility (BranchReaderPort return type).",
       "spec_refs": [],
       "informal_grounds": []
+    },
+    "TelemetryReportInteractor": {
+      "action": "add",
+      "role": { "UseCase": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "telemetry",
+      "docs": "Add TelemetryReportInteractor usecase surface (new/report); one private field is stripped (has_stripped_fields: true / fields: []). IN-10 / CN-03 / AC-09.",
+      "spec_refs": [
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-10" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "CN-03" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "AC-09" }
+      ],
+      "informal_grounds": []
+    },
+    "TelemetryEmitInteractor": {
+      "action": "add",
+      "role": { "UseCase": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "telemetry",
+      "docs": "Add TelemetryEmitInteractor usecase surface (new/emit_archived); two private fields are stripped (has_stripped_fields: true / fields: []). IN-10 / CN-03 / AC-09.",
+      "spec_refs": [
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-10" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "CN-03" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "AC-09" }
+      ],
+      "informal_grounds": []
+    },
+    "TelemetryAggregateInteractor": {
+      "action": "add",
+      "role": { "Interactor": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "telemetry",
+      "docs": "Add TelemetryAggregateInteractor. IN-10 / CN-03 / AC-09.",
+      "spec_refs": [
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-10" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "CN-03" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "AC-09" }
+      ],
+      "informal_grounds": []
+    },
+    "TelemetryReportOutput": {
+      "action": "reference",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "phase_durations", "ty": "Vec<TelemetryPhaseDuration>" },
+            { "name": "errors",          "ty": "Vec<TelemetryErrorEntry>" },
+            { "name": "hook_blocks",     "ty": "Vec<TelemetryHookBlockEntry>" },
+            { "name": "skipped_lines",   "ty": "usize" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "telemetry",
+      "docs": "Pre-existing telemetry report DTO; unchanged by this track. Declared reference for the TelemetryReportInteractor::report return edge.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "TelemetryAggregateServiceError": {
+      "action": "reference",
+      "role": { "ErrorType": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "ReportUnavailable", "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "EmitUnavailable",   "payload": { "kind": "tuple", "fields": ["String"] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "telemetry",
+      "docs": "Pre-existing error for the telemetry aggregate service; unchanged by this track. Declared reference for the telemetry interactor return edges.",
+      "spec_refs": [],
+      "informal_grounds": []
     }
   },
   "traits": {
+    "ArchivedTelemetryFactoryPort": {
+      "action": "add",
+      "role": { "SecondaryPort": {} },
+      "methods": [
+        {
+          "name": "build",
+          "receiver": "&self",
+          "params": [{ "name": "telemetry_dir", "ty": "&std::path::Path" }],
+          "returns": "std::sync::Arc<dyn ArchivedTrackTelemetryPort>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "Constructs a path-parameterized ArchivedTrackTelemetryPort."
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "telemetry",
+      "docs": "Add ArchivedTelemetryFactoryPort. IN-10 / CN-03 / AC-09.",
+      "spec_refs": [
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-10" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "CN-03" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "AC-09" }
+      ],
+      "informal_grounds": []
+    },
+    "TelemetryAggregateService": {
+      "action": "reference",
+      "role": { "ApplicationService": {} },
+      "methods": [],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "telemetry",
+      "docs": "Pre-existing ApplicationService for the telemetry family; unchanged by this track. Declared reference for the TelemetryAggregateInteractor trait_impl edge.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "TelemetryReportPort": {
+      "action": "reference",
+      "role": { "SecondaryPort": {} },
+      "methods": [],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "telemetry",
+      "docs": "Pre-existing SecondaryPort for telemetry aggregation; unchanged by this track. Declared reference for the TelemetryAggregateInteractor constructor edge.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "ArchivedTrackTelemetryPort": {
+      "action": "reference",
+      "role": { "SecondaryPort": {} },
+      "methods": [],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "telemetry",
+      "docs": "Pre-existing SecondaryPort for archived-track telemetry emission; unchanged by this track. Declared reference for the ArchivedTelemetryFactoryPort::build return edge.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
     "GitPrimitivePort": {
       "action": "add",
       "role": { "SecondaryPort": {} },
@@ -315,6 +463,14 @@
             { "name": "rev",          "ty": "&str" }
           ],
           "returns": "Result<Option<domain::CommitHash>, GitWorkflowError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "GitPrimitivePort primitive; see entry spec_refs."
+        },
+        {
+          "name": "resolve_repo_root",
+          "receiver": "&self",
+          "params": [{ "name": "project_root", "ty": "Option<&std::path::Path>" }],
+          "returns": "Result<std::path::PathBuf, GitWorkflowError>",
           "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
           "docs": "GitPrimitivePort primitive; see entry spec_refs."
         },
@@ -758,6 +914,76 @@
           "docs": "Resolves a rev to a CommitHash. IN-10 / CN-03."
         }
       ]
+    },
+    {
+      "type_name": "TelemetryReportInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [{ "name": "report_port", "ty": "std::sync::Arc<dyn TelemetryReportPort>" }],
+          "returns": "Self",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "Inject the telemetry-report port."
+        },
+        {
+          "name": "report",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id",  "ty": "&domain::TrackId" },
+            { "name": "items_dir", "ty": "&std::path::Path" }
+          ],
+          "returns": "Result<TelemetryReportOutput, TelemetryAggregateServiceError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "Aggregates telemetry for a track. IN-10 / CN-03 / AC-09."
+        }
+      ]
+    },
+    {
+      "type_name": "TelemetryEmitInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "git",              "ty": "std::sync::Arc<dyn GitPrimitivePort>" },
+            { "name": "archived_factory", "ty": "std::sync::Arc<dyn ArchivedTelemetryFactoryPort>" }
+          ],
+          "returns": "Self",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "Inject the git-primitive and archived-telemetry-factory ports."
+        },
+        {
+          "name": "emit_archived",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir",   "ty": "&std::path::Path" },
+            { "name": "track_id",    "ty": "&domain::TrackId" },
+            { "name": "subcommand",  "ty": "String" },
+            { "name": "exit_code",   "ty": "i32" },
+            { "name": "duration_ms", "ty": "u64" }
+          ],
+          "returns": "Result<(), TelemetryAggregateServiceError>",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "TelemetryEmitInteractor::emit_archived method. IN-10 / CN-03 / AC-09."
+        }
+      ]
+    },
+    {
+      "type_name": "TelemetryAggregateInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "report", "ty": "TelemetryReportInteractor" },
+            { "name": "emit",   "ty": "TelemetryEmitInteractor" }
+          ],
+          "returns": "Self",
+          "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [],
+          "docs": "Compose the report and emit sub-interactors into the TelemetryAggregateService facade."
+        }
+      ]
     }
   ],
   "trait_impls": [
@@ -780,6 +1006,7 @@
     { "action": "modify",    "trait_ref": "GitWorkflowService",     "for_type": "GitWorkflowInteractor" },
     { "action": "reference", "trait_ref": "core::fmt::Debug",       "for_type": "BranchReadError" },
     { "action": "reference", "trait_ref": "core::fmt::Display",     "for_type": "BranchReadError" },
-    { "action": "reference", "trait_ref": "core::error::Error",     "for_type": "BranchReadError" }
+    { "action": "reference", "trait_ref": "core::error::Error",     "for_type": "BranchReadError" },
+    { "action": "add",       "trait_ref": "TelemetryAggregateService", "for_type": "TelemetryAggregateInteractor" }
   ]
 }

@@ -1,7 +1,12 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "cc5b2168a0c3e4ffe0044106c07cdfa68f6538e52b902c67d13ac7280bdfe881",
+  "catalogue_declaration_hash": "d4d4cf219d11747171affd8e12d58a0bec942575c86c09a6af891b955073dd64",
   "signals": [
+    {
+      "type_name": "FsArchivedTelemetryFactoryAdapter",
+      "signal": "blue",
+      "entry_hash": "364e177b07801ddb1872483a3626f7ae646e68160602aa12f4682b4fb53f161c"
+    },
     {
       "type_name": "FsGitWorkflowAdapter",
       "signal": "blue",
@@ -20,12 +25,12 @@
     {
       "type_name": "SyncError",
       "signal": "blue",
-      "entry_hash": "9e42e04474ef7b9b65c36aa83cfab5f29a01a22b3ebd064b1698a42a699e73e7"
+      "entry_hash": "66502d2af08242d9bc05e64777fe91be476c180be296563aebaa66b04a282bb9"
     },
     {
       "type_name": "SystemGitRepo",
       "signal": "blue",
-      "entry_hash": "fa74de5aa302e8472524b5a8d1bb12dcc158f3dc5c67f355524925b484350fcb"
+      "entry_hash": "bf453251208589f9ddee06db1604a07e709c25d30974ff3080437e30527767a9"
     },
     {
       "type_name": "TrackBranchError",

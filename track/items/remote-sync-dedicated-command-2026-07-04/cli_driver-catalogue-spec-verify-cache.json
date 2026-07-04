@@ -52,10 +52,10 @@
     },
     {
       "claim_hash": "d67fef13d4d84357274d11ab3e488c1c47579f5f9783dcbc36e1b0f4f93508da",
-      "evidence_hash": "6274d959b92c2852882a76b64c6664a3f180a24e676d6a256220162f40e1956d",
+      "evidence_hash": "eb2130c58bbc83b0b8c30ce003a2ed1bff49d794eed6380666e33424de0cb601",
       "verdict": {
         "kind": "pass",
-        "citation": "port method を再編し、`switch_and_pull` を trait から削除して sync（現在ブランチ pull 専用）と branch switch を分離した method として整備する。"
+        "citation": "switch_and_pull を trait から削除して sync（現在ブランチ pull 専用）と branch switch を分離した method として整備する。sync の command-facing 公開契約は usecase port ... に置き `bin/sotp git sync` の唯一の service API とする。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -70,7 +70,7 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-08",
-          "text_label": "git workflow 操作の二重実装を解消する。usecase port `GitWorkflowService` → infrastructure adapter `FsGitWorkflowAdapter` → delivery `GitDriver` の既存 chain を正とし、production caller ゼロの dead code から唯一の live chain へ統合する。`GitCompositionRoot` の inline git method 群（Chain B）を削除し、`apps/cli` の git subcommand dispatch を配線済み `GitDriver` 経由にする。両系統に逐語重複している commit の fail-closed track-branch guard を単一箇所へ集約する。port method を再編し、`switch_and_pull` を trait から削除して sync（現在ブランチ pull 専用）と branch switch を分離した method として整備する。"
+          "text_label": "git workflow 操作の二重実装を解消する。usecase port `GitWorkflowService` → infrastructure adapter `FsGitWorkflowAdapter` → delivery `GitDriver` の既存 chain を正とし、production caller ゼロの dead code から唯一の live chain へ統合する。`GitCompositionRoot` の inline git method 群（Chain B）を削除し、`apps/cli` の git subcommand dispatch を配線済み `GitDriver` 経由にする。両系統に逐語重複している commit の fail-closed track-branch guard を単一箇所へ集約する。port method を再編し、`switch_and_pull` を trait から削除して sync（現在ブランチ pull 専用）と branch switch を分離した method として整備する。sync の command-facing 公開契約は usecase port（ADR 例示 `GitWorkflowService::sync_current_branch() -> Result<(), GitWorkflowError>`）に置き `bin/sotp git sync` の唯一の service API とする。`FsGitWorkflowAdapter` が D5 の infrastructure primitive（`SystemGitRepo::sync_current_branch` / `SyncError`）を `GitWorkflowError` へ写像し、`apps/cli` = parse + dispatch、`apps/cli-driver` = service 呼び出し + presentation 変換、`apps/cli-composition` = `GitDriver` への wiring のみ、と層責務を分ける。`track switch-base` は usecase 側 orchestration として「snapshot から base branch 解決 → branch switch service → sync service」を合成し、composition root に手順を置かない。"
         }
       }
     },

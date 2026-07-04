@@ -4,5 +4,5 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| GitInput | enum | modify | AddAll, AddFromFile, CommitFromFile, NoteFromFile, Sync, Unstage, CurrentBranchTrackIdStrict | 🟡 | 🔵 |
+| GitInput | enum | modify | AddAll, AddFromFile, CommitFromFile, NoteFromFile, Sync, Unstage, CurrentBranchTrackIdStrict | 🔵 | 🔵 |
 
