@@ -4,68 +4,68 @@
     {
       "id": "T001",
       "description": "libs/usecase/src/git_workflow.rs — add DiagnosticText; update error variant payloads and diagnostic construction sites in validate_stage_path_entries / verify_explicit_track_branch / verify_auto_detected_branch. libs/infrastructure/src/git_cli/workflow_adapter.rs — update DiagnosticText construction sites. Add DiagnosticText display tests (IN-06 / CN-02).",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done",
+      "commit_hash": "5374711ce91f069952ea2dc23da14e3441b716b6"
     },
     {
       "id": "T002",
       "description": "libs/usecase/src/git_workflow.rs — add the git primitive-operation method surface (current_branch / sync_current_branch / switch_branch / create_branch / branch_exists / move_path / fetch_branch / show_file_at_ref / resolve_commit / stage_all / stage_from_file / commit_from_message_file / note_from_file / unstage / read_explicit_track_branch -> ExplicitTrackBranch / collect_track_branch_claims -> Vec<TrackBranchClaim>); add TrackArchiveFsPort with path_is_dir / path_exists / create_dir_all / rename_path / list_dir_file_names / remove_dir; add dyn-safety compile test (IN-08).",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done",
+      "commit_hash": "5374711ce91f069952ea2dc23da14e3441b716b6"
     },
     {
       "id": "T003",
       "description": "libs/usecase/src/git_workflow.rs — add TrackGitInteractor::new / create_track_branch / switch_to_track_branch / switch_to_base / archive_track, PrGitInteractor::new / fetch_and_read_metadata_at_ref / resolve_head, and ReviewGitInteractor::new / resolve_head_for_track_branch / resolve_diff_base; add mock GitPrimitivePort / TrackArchiveFsPort unit tests for listed methods and error branches (IN-05 / IN-07 / AC-09).",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done",
+      "commit_hash": "5374711ce91f069952ea2dc23da14e3441b716b6"
     },
     {
       "id": "T004",
       "description": "libs/infrastructure/src/git_cli/mod.rs — add SystemGitRepo::sync_current_branch and sync tests. libs/infrastructure/src/git_cli/workflow_adapter.rs — add the git primitive-method adapter implementations; add FsWorkspaceAdapter implementing TrackArchiveFsPort; map sync / fs failures through usecase error surfaces. Add adapter and fs-port tests (IN-02 / CN-02 / AC-08).",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done",
+      "commit_hash": "5374711ce91f069952ea2dc23da14e3441b716b6"
     },
     {
       "id": "T005",
       "description": "Compile-atomic edit. libs/usecase/src/git_workflow.rs — replace GitWorkflowService::switch_and_pull with sync_current_branch and rewrite GitWorkflowInteractor over GitPrimitivePort. libs/infrastructure/src/git_cli/workflow_adapter.rs — delete FsGitWorkflowAdapter's GitWorkflowService impl. apps/cli-composition/src/git.rs — delete git-family inline methods and rewire git_driver. apps/cli-driver/src/git.rs — replace GitInput::SwitchAndPull with Sync. apps/cli/src/commands/git.rs — replace GitCommand::SwitchAndPull / SwitchAndPullArgs with Sync, keep FileArgs / CommitFromFileArgs / UnstageArgs payload DTOs compiling, and update dispatch/tests (IN-01 / AC-01 / AC-02 / AC-03 / AC-06).",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done",
+      "commit_hash": "5374711ce91f069952ea2dc23da14e3441b716b6"
     },
     {
       "id": "T006",
       "description": "apps/cli-composition/src/track/branch_strategy.rs — route track_switch_base and track_branch_create through TrackGitInteractor. apps/cli-composition/src/track/mod.rs — route track_branch_switch and track_archive through TrackGitInteractor / FsWorkspaceAdapter. apps/cli-composition/src/git.rs — delete git_switch_and_pull_in / git_switch_and_pull_impl and dead helpers. Update track-family tests (IN-05 / IN-10 / CN-05 / AC-04 / AC-10).",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done",
+      "commit_hash": "5374711ce91f069952ea2dc23da14e3441b716b6"
     },
     {
       "id": "T007",
       "description": "apps/cli-composition/src/pr.rs and pr/poll.rs — replace inline fetch / metadata / HEAD / branch reads with PrGitInteractor. apps/cli-composition/src/review_v2/commit_hash.rs, shared.rs, and helpers.rs — replace inline git reads with ReviewGitInteractor or semantic SystemGitRepo current_branch where listed. Preserve review_v2/run.rs test-support fixture. Update pr/review_v2 tests (IN-07 / IN-10 / CN-03 / CN-05 / AC-09).",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done",
+      "commit_hash": "5374711ce91f069952ea2dc23da14e3441b716b6"
     },
     {
       "id": "T008",
       "description": "libs/infrastructure/src/git_cli/mod.rs — delete pub GitRepository; move root / resolve_path / current_branch / push_branch / index_tree_hash / stage_all_excluding to pub inherent SystemGitRepo methods; make status / output pub(crate); preserve SystemGitRepo BranchReaderPort and WorktreeReader impls. apps/cli/src/commands/track/branch_ops.rs — replace non-test GitRepository / rev-parse branch checks with usecase or cli_driver routing. apps/cli/src/commands/git.rs tests and apps/cli/src/commands/track/branch_ops.rs tests — remove GitRepository imports/stubs. Run AC-07 / AC-10 grep audit and cargo make ci (IN-09 / IN-11 / CN-04 / CN-07 / AC-07 / AC-10).",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done",
+      "commit_hash": "5374711ce91f069952ea2dc23da14e3441b716b6"
     },
     {
       "id": "T009",
       "description": "Makefile.toml — add tasks.sync wrapper (command = bin/sotp, args = git sync, no shell logic). .claude/settings.json — add Bash(cargo make sync) to permissions.allow. .codex/rules/default.rules — add prefix_rule for cargo make sync and remove the stale track-switch-main line 12 prefix_rule. .claude/rules/07-dev-environment.md, knowledge/conventions/branch-strategy.md, .claude/commands/track/done.md, and .harness/workflows/track/done.md — add cargo make sync / bin/sotp git sync references and update the track-switch-base description. Verification (final in-task check): Grep each of the 7 files edited above — Makefile.toml, .claude/settings.json, .codex/rules/default.rules, .claude/rules/07-dev-environment.md, knowledge/conventions/branch-strategy.md, .claude/commands/track/done.md, .harness/workflows/track/done.md — and confirm none contains the literal switch-and-pull or the identifier SwitchAndPull; any residual match in these 7 files blocks task completion. Residual matches in this track's spec.md / plan.md / impl-plan.json and in the ADR knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md are expected (SoT records) and out of scope for this check (IN-12 / CN-06 / AC-05 / AC-11).",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done",
+      "commit_hash": "5374711ce91f069952ea2dc23da14e3441b716b6"
     },
     {
       "id": "T010",
       "description": "Git-debt review repayment round 2. libs/usecase/src/git_workflow.rs — add GitWorkflowError::SwitchFailed { branch: DiagnosticText, exit_code: i32 } and update variant/display tests. libs/infrastructure/src/git_cli/workflow_adapter.rs — update FsGitWorkflowAdapter switch_branch and sync_current_branch error mapping. libs/infrastructure/src/git_cli/mod.rs — add SyncError::Spawn { detail: DiagnosticText }, extract classify_sync_failure, and add classification regression tests for UpstreamNotSet / NonFastForward / WorktreeUnresolved / Spawn. apps/cli-composition/src/review_v2/commit_hash.rs — demote persist_commit_hash_for_track to pub(crate). Verify track switch-base typed failure behavior through existing branch_strategy tests. Update touched-surface tests (IN-06 / IN-07 / CN-02 / CN-05 / AC-02 / AC-04 / AC-08).",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done",
+      "commit_hash": "5374711ce91f069952ea2dc23da14e3441b716b6"
     },
     {
       "id": "T011",
       "description": "Git-debt review repayment round 2. libs/usecase/src/git_workflow.rs — add GitPrimitivePort::resolve_repo_root(&self, project_root: Option<&std::path::Path>) -> Result<std::path::PathBuf, GitWorkflowError>. libs/infrastructure/src/git_cli/workflow_adapter.rs — implement resolve_repo_root on FsGitWorkflowAdapter. libs/usecase/src/telemetry.rs — add ArchivedTelemetryFactoryPort; add TelemetryReportInteractor (report) and TelemetryEmitInteractor (emit_archived) sub-interactors; update TelemetryAggregateInteractor to compose the two sub-interactors; add mock-port unit tests. libs/infrastructure/src/telemetry/archived_track.rs — add FsArchivedTelemetryFactoryAdapter. apps/cli-composition/src/telemetry.rs and apps/cli-composition/src/telemetry_wiring.rs — remove archived-telemetry emit orchestration from composition and wire TelemetryAggregateInteractor / FsArchivedTelemetryFactoryAdapter only. Verify telemetry_driver interactor wiring through touched-surface tests. Update touched-surface tests (IN-08 / IN-10 / CN-03 / AC-09).",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done",
+      "commit_hash": "5374711ce91f069952ea2dc23da14e3441b716b6"
     }
   ],
   "plan": {
@@ -85,7 +85,10 @@
         "description": [
           "libs/usecase/src/git_workflow.rs — run T001 then T002 (IN-06 / IN-08 / CN-02)."
         ],
-        "task_ids": ["T001", "T002"]
+        "task_ids": [
+          "T001",
+          "T002"
+        ]
       },
       {
         "id": "S2",
@@ -93,7 +96,9 @@
         "description": [
           "libs/usecase/src/git_workflow.rs — add interactor types and mock-port tests (IN-05 / IN-07 / AC-09)."
         ],
-        "task_ids": ["T003"]
+        "task_ids": [
+          "T003"
+        ]
       },
       {
         "id": "S3",
@@ -101,7 +106,9 @@
         "description": [
           "libs/infrastructure/src/git_cli/mod.rs and workflow_adapter.rs — add sync primitive, port impl, fs adapter, and tests (IN-02 / AC-08)."
         ],
-        "task_ids": ["T004"]
+        "task_ids": [
+          "T004"
+        ]
       },
       {
         "id": "S4",
@@ -109,7 +116,9 @@
         "description": [
           "libs/usecase, libs/infrastructure, apps/cli-composition, apps/cli-driver, and apps/cli — perform T005 compile-atomic cutover (IN-01 / AC-03 / AC-06)."
         ],
-        "task_ids": ["T005"]
+        "task_ids": [
+          "T005"
+        ]
       },
       {
         "id": "S5",
@@ -117,7 +126,10 @@
         "description": [
           "apps/cli-composition/src/{track,pr,review_v2,git}.rs — run T006 then T007 migrations (IN-05 / IN-07 / CN-05 / AC-09 / AC-10)."
         ],
-        "task_ids": ["T006", "T007"]
+        "task_ids": [
+          "T006",
+          "T007"
+        ]
       },
       {
         "id": "S6",
@@ -125,7 +137,9 @@
         "description": [
           "libs/infrastructure/src/git_cli/mod.rs plus apps/cli/src/commands/track/branch_ops.rs and cli tests — run T008 closure and audits (IN-09 / IN-11 / CN-04 / CN-07 / AC-07 / AC-10)."
         ],
-        "task_ids": ["T008"]
+        "task_ids": [
+          "T008"
+        ]
       },
       {
         "id": "S7",
@@ -133,7 +147,9 @@
         "description": [
           "Makefile.toml plus .claude/.harness/.codex/knowledge docs — run T009 wrapper/doc update (IN-12 / CN-06 / AC-05 / AC-11)."
         ],
-        "task_ids": ["T009"]
+        "task_ids": [
+          "T009"
+        ]
       },
       {
         "id": "S8",
@@ -142,7 +158,10 @@
           "libs/usecase/src/git_workflow.rs, libs/infrastructure/src/git_cli/{mod,workflow_adapter}.rs, apps/cli-composition/src/review_v2/commit_hash.rs — run T010 typed-error and visibility updates; verify branch-switch failure behavior with existing branch_strategy tests (IN-06 / IN-07 / CN-02 / CN-05 / AC-02 / AC-04 / AC-08).",
           "libs/usecase/src/{git_workflow,telemetry}.rs, libs/infrastructure/src/git_cli/workflow_adapter.rs, libs/infrastructure/src/telemetry/archived_track.rs, and apps/cli-composition/src/{telemetry,telemetry_wiring}.rs — run T011 telemetry interactor / adapter / composition wiring updates; verify telemetry_driver wiring with touched-surface tests (IN-08 / IN-10 / CN-03 / AC-09)."
         ],
-        "task_ids": ["T010", "T011"]
+        "task_ids": [
+          "T010",
+          "T011"
+        ]
       }
     ]
   }

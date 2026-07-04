@@ -1,6 +1,190 @@
 {
   "schema_version": 2,
   "scopes": {
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`switch_to_base` downgrades `SyncNonFastForward` and `SyncWorktreeUnresolved` to a warning and then returns `Ok(...)`, so `git sync` can report success even though `git pull --ff-only` failed. The surrounding docs say only `SyncUpstreamNotSet` is the non-fatal case; the other sync failures should propagate so callers do not continue on a stale branch.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/git_workflow.rs",
+              "line": 658,
+              "category": "error handling"
+            },
+            {
+              "message": "`commit_from_file` wraps pure branch-guard failures from `verify_explicit_track_branch` / `verify_auto_detected_branch` in `GitWorkflowError::Unavailable`, which turns a user-context or validation failure into an infrastructure outage. Callers can no longer distinguish a branch mismatch or missing claim from a real git/process failure, so the abstraction boundary is lost.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/git_workflow.rs",
+              "line": 514,
+              "category": "error type confusion"
+            }
+          ],
+          "hash": "rvw1:sha256:c54ac6880583bdaddd4291786326c133d849443e3ad371bf5428f7a23954d267",
+          "at": "2026-07-04T10:50:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3f6724e323e2ce6aeaeba3a3c9fb4d035fda4b57a0c5a3f5f800c1aabf02d2d2",
+          "at": "2026-07-04T11:01:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3f6724e323e2ce6aeaeba3a3c9fb4d035fda4b57a0c5a3f5f800c1aabf02d2d2",
+          "at": "2026-07-04T11:06:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`switch_to_base` now folds `SyncNonFastForward` into the warning/`Ok(String)` path, but this test still calls `unwrap_err()` and expects that variant to propagate. As written, the usecase test suite fails before it can validate the new orchestration contract; update this case to assert the warning output or restore propagation in the implementation.",
+              "severity": "P1",
+              "file": "libs/usecase/src/git_workflow.rs",
+              "line": 1311,
+              "category": "test"
+            }
+          ],
+          "hash": "rvw1:sha256:719a6e57e690d979a48b924b046b069ed3fb8b06128088c44de9bee4e5a3ce5b",
+          "at": "2026-07-04T11:25:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9948bd334c20c751a2c5de7aa781d58f38652d7bfcbbea046b72ecf67e5e3f22",
+          "at": "2026-07-04T11:34:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`current_branch_track_id` collapses every parse error except `InvalidTrackId` into `Ok(None)`, so `DetachedHead` and `NoBranch` are treated as \"no track\" instead of a failure. In the `CurrentBranchTrackIdStrict` CLI path that becomes a successful exit, which silently hides detached-HEAD / branch-detection problems.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/git_workflow.rs",
+              "line": 556,
+              "category": "correctness"
+            },
+            {
+              "message": "If the `logs/` rename fails, the attempted rollback `self.git.move_path(Some(project_root), &dst_dir, &src_dir)` discards its result. A second failure can leave the track half-archived while the API only reports the original rename error, so the caller cannot tell the rollback also failed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/git_workflow.rs",
+              "line": 726,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:0cdc2350ae695d52ada1e01a3391863c3c1200788aa0045a3ad15997739fc39d",
+          "at": "2026-07-04T14:06:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TelemetryAggregateInteractor::emit_archived` builds `telemetry_dir` from a raw `track_id` string without validating it as a `domain::TrackId`. A malformed id such as `../evil` would escape `track/archive` and let the archived telemetry writer write outside the intended tree if a caller bypasses the CLI-level prevalidation.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/telemetry.rs",
+              "line": 392,
+              "category": "security"
+            },
+            {
+              "message": "The new public `GitWorkflowInteractor` APIs are missing direct coverage for their success/forwarding paths: `current_branch_track_id` only has detached-head/no-branch tests, and `sync_current_branch` is only exercised indirectly through `switch_to_base`. A regression in branch parsing or sync delegation could ship without a failing test.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/git_workflow.rs",
+              "line": 537,
+              "category": "testing"
+            },
+            {
+              "message": "`TelemetryAggregateInteractor::emit_archived` has no test that `ArchivedTrackTelemetryPort::emit` failures are propagated as `EmitUnavailable`; the current tests only cover the happy path, repo-root failure, and malformed `items_dir`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/telemetry.rs",
+              "line": 394,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:eecbaba114b9d4aec49d5c4ee32f4d1fb86a8145e43af20c40d25ddd0f3a1080",
+          "at": "2026-07-04T14:22:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce755ebcba4ce8165ce5bf5144e91c4a465f718922a5f18ccdaba726ecda4290",
+          "at": "2026-07-04T14:47:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce755ebcba4ce8165ce5bf5144e91c4a465f718922a5f18ccdaba726ecda4290",
+          "at": "2026-07-04T14:49:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce755ebcba4ce8165ce5bf5144e91c4a465f718922a5f18ccdaba726ecda4290",
+          "at": "2026-07-04T14:52:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e53c70df6340fddc9bc789e4ce8da066503dd19aadc0d71ea124357ffb9879e",
+          "at": "2026-07-04T16:01:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e53c70df6340fddc9bc789e4ce8da066503dd19aadc0d71ea124357ffb9879e",
+          "at": "2026-07-04T16:06:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:acd20b69c83a1cc936aaa226438a1bfc9d7815427d359fde85ae15cb3353c857",
+          "at": "2026-07-04T17:10:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`archive_track` records that `logs/` existed before the `git mv`, but this branch only handles the case where `dst_logs` is absent and `src_logs` is still present. If the git move or adapter behavior leaves neither path present, the function falls through to `Ok(...)`, reporting a successful archive after losing the archived telemetry logs. This should fail closed and roll back when `logs_was_dir` is true and `dst_logs` is not present.",
+              "severity": "P0",
+              "file": "libs/usecase/src/git_workflow/flow_interactors.rs",
+              "line": 162,
+              "category": "orchestration_correctness"
+            },
+            {
+              "message": "On a filesystem rename failure, the rollback attempts `git mv dst_dir src_dir` while `src_dir` still exists because it contains the untracked `logs/` directory. The real git adapter will reject moving the archive directory over an existing source directory, so the rollback path leaves tracked files under `track/archive/...` and logs under `track/items/...`. The previous composition logic moved archive children back into the existing source directory before removing the empty archive dir; this interactor should preserve that behavior through the existing fs port methods.",
+              "severity": "P0",
+              "file": "libs/usecase/src/git_workflow/flow_interactors.rs",
+              "line": 167,
+              "category": "orchestration_correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:acd20b69c83a1cc936aaa226438a1bfc9d7815427d359fde85ae15cb3353c857",
+          "at": "2026-07-04T17:16:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:674f839e8fb79c1d597084604f8f31d1030c8471b02669cf94ba421918a3fa31",
+          "at": "2026-07-04T17:24:31Z"
+        }
+      ]
+    },
     "types": {
       "rounds": [
         {
@@ -315,217 +499,6 @@
         }
       ]
     },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`persist_commit_hash_for_track` is still a `pub fn` with the stringly-typed return type `Result<String, String>`. This layer is supposed to use typed composition errors so callers can handle failures structurally, not by parsing strings.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/apps/cli-composition/src/review_v2/commit_hash.rs",
-              "line": 25,
-              "category": "Result<_, String> in public API"
-            },
-            {
-              "message": "The exported validators in this module still return `Result<(), String>` (`validate_track_id_str` and `validate_review_group_name_str`). Public CLI-composition entry points should return a typed error enum instead of leaking stringly failures.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/apps/cli-composition/src/review_v2/scope.rs",
-              "line": 102,
-              "category": "Result<_, String> in public API"
-            }
-          ],
-          "hash": "rvw1:sha256:13f465b61938a381c30ade0ce10a87ff8efe59ece92eeef62d2cbf24c3c45675",
-          "at": "2026-07-04T10:51:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TelemetryAggregateServiceImpl` is a secondary adapter implementation defined inside `cli_composition` and it implements `usecase::TelemetryAggregateService` here. That violates the layer boundary this scope is reviewing; the implementation belongs in `infrastructure`, with `cli_composition` only wiring it.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/apps/cli-composition/src/telemetry.rs",
-              "line": 62,
-              "category": "adapter defined here"
-            },
-            {
-              "message": "`signal_check_gate` defines `AdrChainAdapter`, `SpecAdrChainAdapter`, and `LayerChainAdapter` locally and implements `AdrChainRunnerPort` / `SpecAdrChainRunnerPort` / `LayerChainRunnerPort` inside `cli_composition`. These are secondary adapter implementations in the composition layer instead of infrastructure.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/apps/cli-composition/src/signal/gate_check.rs",
-              "line": 76,
-              "category": "adapter defined here"
-            }
-          ],
-          "hash": "rvw1:sha256:aabd7fa3d6f6503d28c5398eb3c20ae69b8ab026fe00defd4fa8ab11c2b7d33c",
-          "at": "2026-07-04T11:03:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Delegating `track_archive` to `TrackGitInteractor::archive_track` removed the previous rollback-on-log-rename-failure behavior. If `git mv` succeeds and the follow-up `logs/` rename fails, the command now returns an error after leaving the track partially moved under `track/archive`, which is a data-loss regression.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/apps/cli-composition/src/track/mod.rs",
-              "line": 513,
-              "category": "correctness"
-            },
-            {
-              "message": "`track_switch_base` no longer preserves the old contract of treating every non-zero `git pull --ff-only` result as a warning. `TrackGitInteractor::switch_to_base` now surfaces `SyncNonFastForward` and `SyncWorktreeUnresolved` as errors, so this path can fail where the previous composition returned exit 0 with a warning, breaking the bit-equivalent CLI behavior called out in the brief.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/apps/cli-composition/src/track/branch_strategy.rs",
-              "line": 116,
-              "category": "correctness"
-            },
-            {
-              "message": "The old implementation forced `+refs/heads/<branch>:refs/remotes/origin/<branch>` before reading `origin/<branch>:track/items/.../metadata.json`; the new plain `fetch origin <branch>` path depends on the clone's default fetch refspec. On a single-branch or custom-refspec clone, `origin/<branch>` may not be refreshed, so omitted `--method` resolution can read stale track metadata.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/apps/cli-composition/src/pr.rs",
-              "line": 294,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:aabd7fa3d6f6503d28c5398eb3c20ae69b8ab026fe00defd4fa8ab11c2b7d33c",
-          "at": "2026-07-04T11:13:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:aabd7fa3d6f6503d28c5398eb3c20ae69b8ab026fe00defd4fa8ab11c2b7d33c",
-          "at": "2026-07-04T11:32:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`track_switch_base` no longer preserves the legacy checkout-failure outcome. The old `git_switch_and_pull_impl` returned `Ok(CommandOutcome { stdout: Some(\"Failed to checkout {branch}\"), exit_code: git_code })` when checkout failed, so the CLI printed that stdout and returned git's status. The new wiring delegates to `TrackGitInteractor::switch_to_base`, whose first `switch_branch` failure is propagated as `Err` here and then rendered by `outcome_to_exit` as stderr with a generic failure exit. That breaks the briefing's CN-05 bit-equivalence requirement for `track_switch_base` on the switch/checkout failure path.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/branch_strategy.rs",
-              "line": 116,
-              "category": "CN-05 bit-equivalence regression"
-            }
-          ],
-          "hash": "rvw1:sha256:aabd7fa3d6f6503d28c5398eb3c20ae69b8ab026fe00defd4fa8ab11c2b7d33c",
-          "at": "2026-07-04T11:38:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`switch_base_error_to_outcome` assembles user-facing command output in the composition layer via `stdout: Some(format!(\"Failed to checkout {base_branch}\"))`. Under the cli_composition policy, rendering/output templating belongs in `cli_driver` (ADR D2/D3); this fallback should return typed state/error data and let the driver render the legacy message.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/branch_strategy.rs",
-              "line": 68,
-              "category": "render leak"
-            }
-          ],
-          "hash": "rvw1:sha256:18ce35c13fc7351059549b3e84d998b0f55d761b209a1b3c08d49a00350afbd1",
-          "at": "2026-07-04T11:48:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:34d0df18ca18db6c80f4d6d884f8ae85f8d32812d7aefd83900afa887f254d6f",
-          "at": "2026-07-04T14:03:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fdd70d19fc7033abf17e1f3991af4558c67f7d2523f9c8f97f9e0053ce3313b1",
-          "at": "2026-07-04T14:50:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fdd70d19fc7033abf17e1f3991af4558c67f7d2523f9c8f97f9e0053ce3313b1",
-          "at": "2026-07-04T15:02:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:90900f368e22c7f7013f42605d4202e089edbf95a2ff92b21be3871a751928ad",
-          "at": "2026-07-04T17:11:50Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`pr_wait_and_merge` constructs `FsGitWorkflowAdapter` and invokes `GitPrimitivePort::fetch_branch` directly from cli_composition. That leaves a git side effect in the composition root instead of routing through the PR git interactor/driver boundary; the following metadata helper already goes through `PrGitInteractor::fetch_and_read_metadata_at_ref`, so this fetch should not be performed here. This is an invoke/wiring leak under the cli_composition policy and ADR D2.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/pr.rs",
-              "line": 295,
-              "category": "invoke_leak"
-            },
-            {
-              "message": "`persist_commit_hash_for_track` constructs `FsGitWorkflowAdapter` and calls `GitPrimitivePort::resolve_commit` directly to resolve `HEAD`. That keeps the `git rev-parse HEAD` operation in cli_composition rather than routing it through the review git interactor boundary, violating the T007 routing intent and the wiring-only rule for the composition root.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/review_v2/commit_hash.rs",
-              "line": 64,
-              "category": "invoke_leak"
-            }
-          ],
-          "hash": "rvw1:sha256:90900f368e22c7f7013f42605d4202e089edbf95a2ff92b21be3871a751928ad",
-          "at": "2026-07-04T17:19:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:69e86a55a757c70e3d93f0f42eefba317cff39afb2cd63a8d0c74413360fb64f",
-          "at": "2026-07-04T17:26:29Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a88b2a56f27f4f8d99bde691fced18d75aa5a74c280a5868cb4abf6cd35237b6",
-          "at": "2026-07-04T10:49:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: `execute_branch_create`/`execute_branch_switch` still perform domain validation and branch-name derivation in the CLI layer before dispatching to `TrackDriver` (`validate_track_id_str`, `format!(\"track/{track_id}\")`, `validate_track_branch_str`, and `resolve_project_root`). Under the cli thin-bin policy, ADR D5/D8 require these handlers to only parse args, build `TrackInput`, call `TrackCompositionRoot::new().track_driver().handle(...)`, and emit the `CommandOutcome`; this pre-dispatch business logic should move behind the driver/usecase boundary. The same pattern is repeated in the switch path around line 64.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/track/branch_ops.rs",
-              "line": 38,
-              "category": "business logic in bin"
-            }
-          ],
-          "hash": "rvw1:sha256:a88b2a56f27f4f8d99bde691fced18d75aa5a74c280a5868cb4abf6cd35237b6",
-          "at": "2026-07-04T10:53:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3c5200054ddf34d27cf6d85e614d1c2c652e441b8f372913ca5721ece3211a65",
-          "at": "2026-07-04T11:07:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3c5200054ddf34d27cf6d85e614d1c2c652e441b8f372913ca5721ece3211a65",
-          "at": "2026-07-04T11:11:41Z"
-        }
-      ]
-    },
     "infrastructure": {
       "rounds": [
         {
@@ -671,188 +644,6 @@
           "findings": [],
           "hash": "rvw1:sha256:c19a11693d715a626c5c2e8885eb6eda476f65a90f6ecb36bb060afbc5249e44",
           "at": "2026-07-04T18:38:44Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8bd1f474595b5327597aa70992136690318b7a48db43bb4b8e83f84fabd4225a",
-          "at": "2026-07-04T06:44:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8bd1f474595b5327597aa70992136690318b7a48db43bb4b8e83f84fabd4225a",
-          "at": "2026-07-04T06:47:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`.harness/workflows/track/done.md:26-33` makes the sync step warning-only for `UpstreamNotSet` / `NonFastForward` / `WorktreeUnresolved`, but the same workflow still says the output should confirm the tree is 'updated from origin' and `.claude/commands/track/done.md:19-21` asks for it to be 'up to date with origin'. That lets `/track:done` report a successful completion even when the ff-only pull failed, so the completion contract is false in the warning path. Reword the summary/output to say the sync was attempted unless the pull actually succeeded.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/done.md",
-              "line": 61,
-              "category": "convention contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:c96483be97b7a80bbd86dcfe121587315883f223c9dab1ea0784c2f9fc8b06a3",
-          "at": "2026-07-04T10:48:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: The new `done` workflow docs overstate the sync failure contract. In [`/.harness/workflows/track/done.md:12`](/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.harness/workflows/track/done.md#L12) and [`knowledge/conventions/branch-strategy.md:40`](/home/flip451/individual/t-rust/templates/SoTOHE-core-003/knowledge/conventions/branch-strategy.md#L40), the text says `UpstreamNotSet` / `NonFastForward` / `WorktreeUnresolved` are all downgraded to `[WARN]` and that `cargo make sync` is a generic pull/rebase path. The implementation only downgrades `SyncUpstreamNotSet`; `SyncNonFastForward` and `SyncWorktreeUnresolved` still bubble out as errors in [`libs/usecase/src/git_workflow.rs:650`](/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/git_workflow.rs#L650) and [`libs/usecase/src/git_workflow.rs:653`](/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/git_workflow.rs#L653). As written, `/track:done` will be documented as more failure-tolerant than it really is.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.harness/workflows/track/done.md",
-              "line": 12,
-              "category": "convention contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:485eaed280284c9fe4b103978fa3c6f92df4cf9602b54fcb7bfe9dbcc891477d",
-          "at": "2026-07-04T11:00:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e4ca71699234ed4f201d8e0c9173d5e8669e428ef8112963a8757923b28ef035",
-          "at": "2026-07-04T11:06:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new direct `bin/sotp git sync` entry contradicts this section's own boundary that git-write operations stay behind `cargo make` wrappers for hook coverage. `sync` runs `git pull --ff-only` and can update the current branch/worktree, while the change also adds the intended `cargo make sync` wrapper and permission. Advertising the native command in the \"Direct bin/sotp\" list creates a bypass/miswiring of the documented hook boundary; keep the runnable guidance on `cargo make sync` and mention `bin/sotp git sync` only as the wrapper implementation if needed.",
-              "severity": "P1",
-              "file": ".claude/rules/07-dev-environment.md",
-              "line": 95,
-              "category": "hook coverage gap"
-            }
-          ],
-          "hash": "rvw1:sha256:e4ca71699234ed4f201d8e0c9173d5e8669e428ef8112963a8757923b28ef035",
-          "at": "2026-07-04T11:12:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`.claude/commands/**/*.md` must not cite a specific ADR by date slug; the pre-track ADR authoring convention requires command docs to be self-contained and to express the workflow behavior directly instead. This adapter now embeds `ADR 2026-07-04-0155 D6`, so the harness command surface is drifting against that convention. Drop the ADR citation and keep only the operational description.",
-              "severity": "P1",
-              "file": ".claude/commands/track/done.md",
-              "line": 14,
-              "category": "convention contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:48c5b1876ce9e4dc50af54eb36394524c6924d82ff3a2d128f363ef60b776294",
-          "at": "2026-07-04T11:16:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`track-switch-base` is documented here as downgrading only missing-upstream to `[WARN] Pull failed` while letting non-fast-forward and unresolved-worktree sync failures fail as typed errors. That contradicts the workflow SSoT and implementation contract for `/track:done`, where `TrackGitInteractor::switch_to_base` downgrades all known sync refusal modes, including non-fast-forward and unresolved worktree, to the non-fatal warning so the branch switch can still complete. This drift changes the operator-facing failure semantics for the base-return path; align the convention text with the SSoT or clearly separate standalone `cargo make sync` failure behavior from `track-switch-base`'s downgraded sync behavior.",
-              "severity": "P1",
-              "file": "knowledge/conventions/branch-strategy.md",
-              "line": 40,
-              "category": "convention contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:94eac3216de6fe9244c10afa60472c28230b1e29af9a2da2db554c292def338b",
-          "at": "2026-07-04T11:31:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:479d45cd7c5ee5a4e68435c90ef0569c7e5611f18727dacbce23440f841c41b4",
-          "at": "2026-07-04T11:38:02Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9b5ed29fc07cf08fa4a949a035eabb9b4ad7a64050d11870e05a0f5d8207b3dc",
-          "at": "2026-07-04T02:10:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9b5ed29fc07cf08fa4a949a035eabb9b4ad7a64050d11870e05a0f5d8207b3dc",
-          "at": "2026-07-04T02:13:16Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D5-D9 split the new sync refactor across three ownership layers without choosing one coherent public contract. D5 introduces `sync_current_branch`/`SyncError` at the infrastructure boundary, D6 rehomes sync/pull separation into the `GitWorkflowService` port chain, and D8/D9 then move orchestration out of composition root and cli. As written, `spec.json` and the later type catalogue cannot derive a single API surface or error-mapping boundary for `git sync`, so implementers can satisfy the prose while wiring incompatible layers.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
-              "line": 67,
-              "category": "inconsistent decisions within the same ADR"
-            }
-          ],
-          "hash": "rvw1:sha256:56e923e1c54de0d5def86d8488a5e37828728fff61b8e9229c23a8bc91893f76",
-          "at": "2026-07-04T06:46:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3c7beefbba50efd196b349718a91ffca4acde61f7546d8393e726426b77b5c42",
-          "at": "2026-07-04T06:52:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3c7beefbba50efd196b349718a91ffca4acde61f7546d8393e726426b77b5c42",
-          "at": "2026-07-04T06:56:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:047f8002fbc02c94b9565c08d85ae52ea7f9edcd47e45ff10831f4b5c62880c5",
-          "at": "2026-07-04T13:55:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:047f8002fbc02c94b9565c08d85ae52ea7f9edcd47e45ff10831f4b5c62880c5",
-          "at": "2026-07-04T13:58:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2c0de310e576cad7d5fae2f2ea74034a66447090af9836a15e39627d31e41d58",
-          "at": "2026-07-04T15:05:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2c0de310e576cad7d5fae2f2ea74034a66447090af9836a15e39627d31e41d58",
-          "at": "2026-07-04T15:09:51Z"
         }
       ]
     },
@@ -1257,190 +1048,127 @@
           "findings": [],
           "hash": "rvw1:sha256:6285e353e65268cb9db37650884acead1483e36d75a8d950ed0522dd9a2d8f8b",
           "at": "2026-07-04T16:48:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ed887ee391ce7788b6fe8d8843c97b4a6d020b841e230438537002c90ea21068",
+          "at": "2026-07-04T19:05:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ed887ee391ce7788b6fe8d8843c97b4a6d020b841e230438537002c90ea21068",
+          "at": "2026-07-04T19:08:40Z"
         }
       ]
     },
-    "usecase": {
+    "harness-policy": {
       "rounds": [
         {
           "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`switch_to_base` downgrades `SyncNonFastForward` and `SyncWorktreeUnresolved` to a warning and then returns `Ok(...)`, so `git sync` can report success even though `git pull --ff-only` failed. The surrounding docs say only `SyncUpstreamNotSet` is the non-fatal case; the other sync failures should propagate so callers do not continue on a stale branch.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/git_workflow.rs",
-              "line": 658,
-              "category": "error handling"
-            },
-            {
-              "message": "`commit_from_file` wraps pure branch-guard failures from `verify_explicit_track_branch` / `verify_auto_detected_branch` in `GitWorkflowError::Unavailable`, which turns a user-context or validation failure into an infrastructure outage. Callers can no longer distinguish a branch mismatch or missing claim from a real git/process failure, so the abstraction boundary is lost.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/git_workflow.rs",
-              "line": 514,
-              "category": "error type confusion"
-            }
-          ],
-          "hash": "rvw1:sha256:c54ac6880583bdaddd4291786326c133d849443e3ad371bf5428f7a23954d267",
-          "at": "2026-07-04T10:50:30Z"
-        },
-        {
-          "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:3f6724e323e2ce6aeaeba3a3c9fb4d035fda4b57a0c5a3f5f800c1aabf02d2d2",
-          "at": "2026-07-04T11:01:44Z"
+          "hash": "rvw1:sha256:8bd1f474595b5327597aa70992136690318b7a48db43bb4b8e83f84fabd4225a",
+          "at": "2026-07-04T06:44:09Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:3f6724e323e2ce6aeaeba3a3c9fb4d035fda4b57a0c5a3f5f800c1aabf02d2d2",
-          "at": "2026-07-04T11:06:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`switch_to_base` now folds `SyncNonFastForward` into the warning/`Ok(String)` path, but this test still calls `unwrap_err()` and expects that variant to propagate. As written, the usecase test suite fails before it can validate the new orchestration contract; update this case to assert the warning output or restore propagation in the implementation.",
-              "severity": "P1",
-              "file": "libs/usecase/src/git_workflow.rs",
-              "line": 1311,
-              "category": "test"
-            }
-          ],
-          "hash": "rvw1:sha256:719a6e57e690d979a48b924b046b069ed3fb8b06128088c44de9bee4e5a3ce5b",
-          "at": "2026-07-04T11:25:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9948bd334c20c751a2c5de7aa781d58f38652d7bfcbbea046b72ecf67e5e3f22",
-          "at": "2026-07-04T11:34:33Z"
+          "hash": "rvw1:sha256:8bd1f474595b5327597aa70992136690318b7a48db43bb4b8e83f84fabd4225a",
+          "at": "2026-07-04T06:47:46Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`current_branch_track_id` collapses every parse error except `InvalidTrackId` into `Ok(None)`, so `DetachedHead` and `NoBranch` are treated as \"no track\" instead of a failure. In the `CurrentBranchTrackIdStrict` CLI path that becomes a successful exit, which silently hides detached-HEAD / branch-detection problems.",
+              "message": "`.harness/workflows/track/done.md:26-33` makes the sync step warning-only for `UpstreamNotSet` / `NonFastForward` / `WorktreeUnresolved`, but the same workflow still says the output should confirm the tree is 'updated from origin' and `.claude/commands/track/done.md:19-21` asks for it to be 'up to date with origin'. That lets `/track:done` report a successful completion even when the ff-only pull failed, so the completion contract is false in the warning path. Reword the summary/output to say the sync was attempted unless the pull actually succeeded.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/git_workflow.rs",
-              "line": 556,
-              "category": "correctness"
-            },
-            {
-              "message": "If the `logs/` rename fails, the attempted rollback `self.git.move_path(Some(project_root), &dst_dir, &src_dir)` discards its result. A second failure can leave the track half-archived while the API only reports the original rename error, so the caller cannot tell the rollback also failed.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/git_workflow.rs",
-              "line": 726,
-              "category": "error handling"
+              "file": ".harness/workflows/track/done.md",
+              "line": 61,
+              "category": "convention contradiction"
             }
           ],
-          "hash": "rvw1:sha256:0cdc2350ae695d52ada1e01a3391863c3c1200788aa0045a3ad15997739fc39d",
-          "at": "2026-07-04T14:06:31Z"
+          "hash": "rvw1:sha256:c96483be97b7a80bbd86dcfe121587315883f223c9dab1ea0784c2f9fc8b06a3",
+          "at": "2026-07-04T10:48:45Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`TelemetryAggregateInteractor::emit_archived` builds `telemetry_dir` from a raw `track_id` string without validating it as a `domain::TrackId`. A malformed id such as `../evil` would escape `track/archive` and let the archived telemetry writer write outside the intended tree if a caller bypasses the CLI-level prevalidation.",
-              "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/telemetry.rs",
-              "line": 392,
-              "category": "security"
-            },
-            {
-              "message": "The new public `GitWorkflowInteractor` APIs are missing direct coverage for their success/forwarding paths: `current_branch_track_id` only has detached-head/no-branch tests, and `sync_current_branch` is only exercised indirectly through `switch_to_base`. A regression in branch parsing or sync delegation could ship without a failing test.",
+              "message": "P1: The new `done` workflow docs overstate the sync failure contract. In [`/.harness/workflows/track/done.md:12`](/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.harness/workflows/track/done.md#L12) and [`knowledge/conventions/branch-strategy.md:40`](/home/flip451/individual/t-rust/templates/SoTOHE-core-003/knowledge/conventions/branch-strategy.md#L40), the text says `UpstreamNotSet` / `NonFastForward` / `WorktreeUnresolved` are all downgraded to `[WARN]` and that `cargo make sync` is a generic pull/rebase path. The implementation only downgrades `SyncUpstreamNotSet`; `SyncNonFastForward` and `SyncWorktreeUnresolved` still bubble out as errors in [`libs/usecase/src/git_workflow.rs:650`](/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/git_workflow.rs#L650) and [`libs/usecase/src/git_workflow.rs:653`](/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/git_workflow.rs#L653). As written, `/track:done` will be documented as more failure-tolerant than it really is.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/git_workflow.rs",
-              "line": 537,
-              "category": "testing"
-            },
-            {
-              "message": "`TelemetryAggregateInteractor::emit_archived` has no test that `ArchivedTrackTelemetryPort::emit` failures are propagated as `EmitUnavailable`; the current tests only cover the happy path, repo-root failure, and malformed `items_dir`.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/telemetry.rs",
-              "line": 394,
-              "category": "testing"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.harness/workflows/track/done.md",
+              "line": 12,
+              "category": "convention contradiction"
             }
           ],
-          "hash": "rvw1:sha256:eecbaba114b9d4aec49d5c4ee32f4d1fb86a8145e43af20c40d25ddd0f3a1080",
-          "at": "2026-07-04T14:22:49Z"
+          "hash": "rvw1:sha256:485eaed280284c9fe4b103978fa3c6f92df4cf9602b54fcb7bfe9dbcc891477d",
+          "at": "2026-07-04T11:00:10Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ce755ebcba4ce8165ce5bf5144e91c4a465f718922a5f18ccdaba726ecda4290",
-          "at": "2026-07-04T14:47:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ce755ebcba4ce8165ce5bf5144e91c4a465f718922a5f18ccdaba726ecda4290",
-          "at": "2026-07-04T14:49:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ce755ebcba4ce8165ce5bf5144e91c4a465f718922a5f18ccdaba726ecda4290",
-          "at": "2026-07-04T14:52:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5e53c70df6340fddc9bc789e4ce8da066503dd19aadc0d71ea124357ffb9879e",
-          "at": "2026-07-04T16:01:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5e53c70df6340fddc9bc789e4ce8da066503dd19aadc0d71ea124357ffb9879e",
-          "at": "2026-07-04T16:06:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:acd20b69c83a1cc936aaa226438a1bfc9d7815427d359fde85ae15cb3353c857",
-          "at": "2026-07-04T17:10:40Z"
+          "hash": "rvw1:sha256:e4ca71699234ed4f201d8e0c9173d5e8669e428ef8112963a8757923b28ef035",
+          "at": "2026-07-04T11:06:51Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`archive_track` records that `logs/` existed before the `git mv`, but this branch only handles the case where `dst_logs` is absent and `src_logs` is still present. If the git move or adapter behavior leaves neither path present, the function falls through to `Ok(...)`, reporting a successful archive after losing the archived telemetry logs. This should fail closed and roll back when `logs_was_dir` is true and `dst_logs` is not present.",
-              "severity": "P0",
-              "file": "libs/usecase/src/git_workflow/flow_interactors.rs",
-              "line": 162,
-              "category": "orchestration_correctness"
-            },
-            {
-              "message": "On a filesystem rename failure, the rollback attempts `git mv dst_dir src_dir` while `src_dir` still exists because it contains the untracked `logs/` directory. The real git adapter will reject moving the archive directory over an existing source directory, so the rollback path leaves tracked files under `track/archive/...` and logs under `track/items/...`. The previous composition logic moved archive children back into the existing source directory before removing the empty archive dir; this interactor should preserve that behavior through the existing fs port methods.",
-              "severity": "P0",
-              "file": "libs/usecase/src/git_workflow/flow_interactors.rs",
-              "line": 167,
-              "category": "orchestration_correctness"
+              "message": "The new direct `bin/sotp git sync` entry contradicts this section's own boundary that git-write operations stay behind `cargo make` wrappers for hook coverage. `sync` runs `git pull --ff-only` and can update the current branch/worktree, while the change also adds the intended `cargo make sync` wrapper and permission. Advertising the native command in the \"Direct bin/sotp\" list creates a bypass/miswiring of the documented hook boundary; keep the runnable guidance on `cargo make sync` and mention `bin/sotp git sync` only as the wrapper implementation if needed.",
+              "severity": "P1",
+              "file": ".claude/rules/07-dev-environment.md",
+              "line": 95,
+              "category": "hook coverage gap"
             }
           ],
-          "hash": "rvw1:sha256:acd20b69c83a1cc936aaa226438a1bfc9d7815427d359fde85ae15cb3353c857",
-          "at": "2026-07-04T17:16:32Z"
+          "hash": "rvw1:sha256:e4ca71699234ed4f201d8e0c9173d5e8669e428ef8112963a8757923b28ef035",
+          "at": "2026-07-04T11:12:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`.claude/commands/**/*.md` must not cite a specific ADR by date slug; the pre-track ADR authoring convention requires command docs to be self-contained and to express the workflow behavior directly instead. This adapter now embeds `ADR 2026-07-04-0155 D6`, so the harness command surface is drifting against that convention. Drop the ADR citation and keep only the operational description.",
+              "severity": "P1",
+              "file": ".claude/commands/track/done.md",
+              "line": 14,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:48c5b1876ce9e4dc50af54eb36394524c6924d82ff3a2d128f363ef60b776294",
+          "at": "2026-07-04T11:16:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track-switch-base` is documented here as downgrading only missing-upstream to `[WARN] Pull failed` while letting non-fast-forward and unresolved-worktree sync failures fail as typed errors. That contradicts the workflow SSoT and implementation contract for `/track:done`, where `TrackGitInteractor::switch_to_base` downgrades all known sync refusal modes, including non-fast-forward and unresolved worktree, to the non-fatal warning so the branch switch can still complete. This drift changes the operator-facing failure semantics for the base-return path; align the convention text with the SSoT or clearly separate standalone `cargo make sync` failure behavior from `track-switch-base`'s downgraded sync behavior.",
+              "severity": "P1",
+              "file": "knowledge/conventions/branch-strategy.md",
+              "line": 40,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:94eac3216de6fe9244c10afa60472c28230b1e29af9a2da2db554c292def338b",
+          "at": "2026-07-04T11:31:57Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:674f839e8fb79c1d597084604f8f31d1030c8471b02669cf94ba421918a3fa31",
-          "at": "2026-07-04T17:24:31Z"
+          "hash": "rvw1:sha256:479d45cd7c5ee5a4e68435c90ef0569c7e5611f18727dacbce23440f841c41b4",
+          "at": "2026-07-04T11:38:02Z"
         }
       ]
     },
@@ -1516,6 +1244,292 @@
           "findings": [],
           "hash": "rvw1:sha256:6e46e9c19b096751c758c5d38cf6099b047795576ebfc649a72a1f6b9be019fa",
           "at": "2026-07-04T14:00:59Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9b5ed29fc07cf08fa4a949a035eabb9b4ad7a64050d11870e05a0f5d8207b3dc",
+          "at": "2026-07-04T02:10:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9b5ed29fc07cf08fa4a949a035eabb9b4ad7a64050d11870e05a0f5d8207b3dc",
+          "at": "2026-07-04T02:13:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D5-D9 split the new sync refactor across three ownership layers without choosing one coherent public contract. D5 introduces `sync_current_branch`/`SyncError` at the infrastructure boundary, D6 rehomes sync/pull separation into the `GitWorkflowService` port chain, and D8/D9 then move orchestration out of composition root and cli. As written, `spec.json` and the later type catalogue cannot derive a single API surface or error-mapping boundary for `git sync`, so implementers can satisfy the prose while wiring incompatible layers.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md",
+              "line": 67,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:56e923e1c54de0d5def86d8488a5e37828728fff61b8e9229c23a8bc91893f76",
+          "at": "2026-07-04T06:46:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c7beefbba50efd196b349718a91ffca4acde61f7546d8393e726426b77b5c42",
+          "at": "2026-07-04T06:52:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c7beefbba50efd196b349718a91ffca4acde61f7546d8393e726426b77b5c42",
+          "at": "2026-07-04T06:56:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:047f8002fbc02c94b9565c08d85ae52ea7f9edcd47e45ff10831f4b5c62880c5",
+          "at": "2026-07-04T13:55:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:047f8002fbc02c94b9565c08d85ae52ea7f9edcd47e45ff10831f4b5c62880c5",
+          "at": "2026-07-04T13:58:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c0de310e576cad7d5fae2f2ea74034a66447090af9836a15e39627d31e41d58",
+          "at": "2026-07-04T15:05:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c0de310e576cad7d5fae2f2ea74034a66447090af9836a15e39627d31e41d58",
+          "at": "2026-07-04T15:09:51Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a88b2a56f27f4f8d99bde691fced18d75aa5a74c280a5868cb4abf6cd35237b6",
+          "at": "2026-07-04T10:49:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `execute_branch_create`/`execute_branch_switch` still perform domain validation and branch-name derivation in the CLI layer before dispatching to `TrackDriver` (`validate_track_id_str`, `format!(\"track/{track_id}\")`, `validate_track_branch_str`, and `resolve_project_root`). Under the cli thin-bin policy, ADR D5/D8 require these handlers to only parse args, build `TrackInput`, call `TrackCompositionRoot::new().track_driver().handle(...)`, and emit the `CommandOutcome`; this pre-dispatch business logic should move behind the driver/usecase boundary. The same pattern is repeated in the switch path around line 64.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/branch_ops.rs",
+              "line": 38,
+              "category": "business logic in bin"
+            }
+          ],
+          "hash": "rvw1:sha256:a88b2a56f27f4f8d99bde691fced18d75aa5a74c280a5868cb4abf6cd35237b6",
+          "at": "2026-07-04T10:53:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c5200054ddf34d27cf6d85e614d1c2c652e441b8f372913ca5721ece3211a65",
+          "at": "2026-07-04T11:07:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c5200054ddf34d27cf6d85e614d1c2c652e441b8f372913ca5721ece3211a65",
+          "at": "2026-07-04T11:11:41Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`persist_commit_hash_for_track` is still a `pub fn` with the stringly-typed return type `Result<String, String>`. This layer is supposed to use typed composition errors so callers can handle failures structurally, not by parsing strings.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/apps/cli-composition/src/review_v2/commit_hash.rs",
+              "line": 25,
+              "category": "Result<_, String> in public API"
+            },
+            {
+              "message": "The exported validators in this module still return `Result<(), String>` (`validate_track_id_str` and `validate_review_group_name_str`). Public CLI-composition entry points should return a typed error enum instead of leaking stringly failures.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/apps/cli-composition/src/review_v2/scope.rs",
+              "line": 102,
+              "category": "Result<_, String> in public API"
+            }
+          ],
+          "hash": "rvw1:sha256:13f465b61938a381c30ade0ce10a87ff8efe59ece92eeef62d2cbf24c3c45675",
+          "at": "2026-07-04T10:51:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TelemetryAggregateServiceImpl` is a secondary adapter implementation defined inside `cli_composition` and it implements `usecase::TelemetryAggregateService` here. That violates the layer boundary this scope is reviewing; the implementation belongs in `infrastructure`, with `cli_composition` only wiring it.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/apps/cli-composition/src/telemetry.rs",
+              "line": 62,
+              "category": "adapter defined here"
+            },
+            {
+              "message": "`signal_check_gate` defines `AdrChainAdapter`, `SpecAdrChainAdapter`, and `LayerChainAdapter` locally and implements `AdrChainRunnerPort` / `SpecAdrChainRunnerPort` / `LayerChainRunnerPort` inside `cli_composition`. These are secondary adapter implementations in the composition layer instead of infrastructure.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/apps/cli-composition/src/signal/gate_check.rs",
+              "line": 76,
+              "category": "adapter defined here"
+            }
+          ],
+          "hash": "rvw1:sha256:aabd7fa3d6f6503d28c5398eb3c20ae69b8ab026fe00defd4fa8ab11c2b7d33c",
+          "at": "2026-07-04T11:03:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Delegating `track_archive` to `TrackGitInteractor::archive_track` removed the previous rollback-on-log-rename-failure behavior. If `git mv` succeeds and the follow-up `logs/` rename fails, the command now returns an error after leaving the track partially moved under `track/archive`, which is a data-loss regression.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/apps/cli-composition/src/track/mod.rs",
+              "line": 513,
+              "category": "correctness"
+            },
+            {
+              "message": "`track_switch_base` no longer preserves the old contract of treating every non-zero `git pull --ff-only` result as a warning. `TrackGitInteractor::switch_to_base` now surfaces `SyncNonFastForward` and `SyncWorktreeUnresolved` as errors, so this path can fail where the previous composition returned exit 0 with a warning, breaking the bit-equivalent CLI behavior called out in the brief.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/apps/cli-composition/src/track/branch_strategy.rs",
+              "line": 116,
+              "category": "correctness"
+            },
+            {
+              "message": "The old implementation forced `+refs/heads/<branch>:refs/remotes/origin/<branch>` before reading `origin/<branch>:track/items/.../metadata.json`; the new plain `fetch origin <branch>` path depends on the clone's default fetch refspec. On a single-branch or custom-refspec clone, `origin/<branch>` may not be refreshed, so omitted `--method` resolution can read stale track metadata.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/apps/cli-composition/src/pr.rs",
+              "line": 294,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:aabd7fa3d6f6503d28c5398eb3c20ae69b8ab026fe00defd4fa8ab11c2b7d33c",
+          "at": "2026-07-04T11:13:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aabd7fa3d6f6503d28c5398eb3c20ae69b8ab026fe00defd4fa8ab11c2b7d33c",
+          "at": "2026-07-04T11:32:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track_switch_base` no longer preserves the legacy checkout-failure outcome. The old `git_switch_and_pull_impl` returned `Ok(CommandOutcome { stdout: Some(\"Failed to checkout {branch}\"), exit_code: git_code })` when checkout failed, so the CLI printed that stdout and returned git's status. The new wiring delegates to `TrackGitInteractor::switch_to_base`, whose first `switch_branch` failure is propagated as `Err` here and then rendered by `outcome_to_exit` as stderr with a generic failure exit. That breaks the briefing's CN-05 bit-equivalence requirement for `track_switch_base` on the switch/checkout failure path.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/branch_strategy.rs",
+              "line": 116,
+              "category": "CN-05 bit-equivalence regression"
+            }
+          ],
+          "hash": "rvw1:sha256:aabd7fa3d6f6503d28c5398eb3c20ae69b8ab026fe00defd4fa8ab11c2b7d33c",
+          "at": "2026-07-04T11:38:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`switch_base_error_to_outcome` assembles user-facing command output in the composition layer via `stdout: Some(format!(\"Failed to checkout {base_branch}\"))`. Under the cli_composition policy, rendering/output templating belongs in `cli_driver` (ADR D2/D3); this fallback should return typed state/error data and let the driver render the legacy message.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/branch_strategy.rs",
+              "line": 68,
+              "category": "render leak"
+            }
+          ],
+          "hash": "rvw1:sha256:18ce35c13fc7351059549b3e84d998b0f55d761b209a1b3c08d49a00350afbd1",
+          "at": "2026-07-04T11:48:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:34d0df18ca18db6c80f4d6d884f8ae85f8d32812d7aefd83900afa887f254d6f",
+          "at": "2026-07-04T14:03:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fdd70d19fc7033abf17e1f3991af4558c67f7d2523f9c8f97f9e0053ce3313b1",
+          "at": "2026-07-04T14:50:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fdd70d19fc7033abf17e1f3991af4558c67f7d2523f9c8f97f9e0053ce3313b1",
+          "at": "2026-07-04T15:02:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:90900f368e22c7f7013f42605d4202e089edbf95a2ff92b21be3871a751928ad",
+          "at": "2026-07-04T17:11:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`pr_wait_and_merge` constructs `FsGitWorkflowAdapter` and invokes `GitPrimitivePort::fetch_branch` directly from cli_composition. That leaves a git side effect in the composition root instead of routing through the PR git interactor/driver boundary; the following metadata helper already goes through `PrGitInteractor::fetch_and_read_metadata_at_ref`, so this fetch should not be performed here. This is an invoke/wiring leak under the cli_composition policy and ADR D2.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/pr.rs",
+              "line": 295,
+              "category": "invoke_leak"
+            },
+            {
+              "message": "`persist_commit_hash_for_track` constructs `FsGitWorkflowAdapter` and calls `GitPrimitivePort::resolve_commit` directly to resolve `HEAD`. That keeps the `git rev-parse HEAD` operation in cli_composition rather than routing it through the review git interactor boundary, violating the T007 routing intent and the wiring-only rule for the composition root.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/review_v2/commit_hash.rs",
+              "line": 64,
+              "category": "invoke_leak"
+            }
+          ],
+          "hash": "rvw1:sha256:90900f368e22c7f7013f42605d4202e089edbf95a2ff92b21be3871a751928ad",
+          "at": "2026-07-04T17:19:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69e86a55a757c70e3d93f0f42eefba317cff39afb2cd63a8d0c74413360fb64f",
+          "at": "2026-07-04T17:26:29Z"
         }
       ]
     }
