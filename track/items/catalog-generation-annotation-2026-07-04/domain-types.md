@@ -21,4 +21,5 @@
 | TodoInstruction | value_object | add | — | 🔵 | 🔵 |
 | TraitEntry | value_object | modify | — | 🔵 | 🔵 |
 | TypeEntry | value_object | modify | — | 🔵 | 🔵 |
+| TypeInfo | value_object | modify | — | 🔵 | 🔵 |
 

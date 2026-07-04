@@ -164,10 +164,13 @@ fn kind_value(type_info: &TypeInfo) -> Value {
             let variants: Vec<Value> = type_info.members().iter().map(variant_value).collect();
             json!({ "kind": "enum", "variants": variants })
         }
-        TypeKind::TypeAlias => json!({
-            "kind": "type_alias",
-            "target": { "$todo": "the aliased type (not captured by extraction)" }
-        }),
+        TypeKind::TypeAlias => match type_info.alias_target() {
+            Some(target) => json!({ "kind": "type_alias", "target": target }),
+            None => json!({
+                "kind": "type_alias",
+                "target": { "$todo": "the aliased type (not captured by extraction)" }
+            }),
+        },
     }
 }
 
@@ -213,14 +216,17 @@ fn variant_value(member: &MemberDeclaration) -> Value {
 /// Impls are matched on both the target's short name and its crate-qualified
 /// module path (segment for segment), so a same-short-named type in another
 /// module (e.g. `shop::bar_foo::Order` vs `shop::foo::Order`) does not
-/// contribute its methods. The impl's target module path is `None` when
-/// extraction could not resolve it, in which case only a request whose module
-/// is likewise unresolved matches.
+/// contribute its methods. A generic type's impl target is recorded with its
+/// generic arguments (`impl<T> Foo<T>` → `Foo<T>`), so the target is compared
+/// after stripping that argument list against the bare catalogue entry name
+/// `Foo`. The impl's target module path is `None` when extraction could not
+/// resolve it, in which case only a request whose module is likewise unresolved
+/// matches.
 fn collect_methods(schema: &SchemaExport, name: &str, module_path: Option<&str>) -> Vec<Value> {
     let expected = module_segments(module_path);
     let mut methods = Vec::new();
     for impl_info in schema.impls() {
-        if impl_info.target_type() == name
+        if strip_generic_args(impl_info.target_type()) == name
             && impl_info.trait_name().is_none()
             && module_segments(impl_info.target_module_path()) == expected
         {
@@ -230,6 +236,19 @@ fn collect_methods(schema: &SchemaExport, name: &str, module_path: Option<&str>)
         }
     }
     methods
+}
+
+/// The bare type name of an impl target, with any trailing generic-argument
+/// list stripped (`Foo<T, U>` → `Foo`).
+///
+/// The schema exporter renders a generic impl's target verbatim, including its
+/// generic parameters, but a catalogue entry is keyed by the bare type name, so
+/// the two are compared after normalisation.
+fn strip_generic_args(target_type: &str) -> &str {
+    match target_type.split_once('<') {
+        Some((base, _)) => base.trim_end(),
+        None => target_type,
+    }
 }
 
 /// Build a `MethodDeclaration` node from a [`FunctionInfo`].
@@ -463,5 +482,71 @@ mod tests {
         assert_eq!(kind["shape"]["kind"], json!("plain"));
         assert_eq!(kind["shape"]["fields"][0]["name"], json!("path"));
         assert_eq!(kind["shape"]["fields"][0]["ty"], json!("String"));
+    }
+
+    // Finding F1 (round 8): an existing type alias (`pub type MyAlias =
+    // Vec<String>`) is resolved from rustdoc extraction, so its target is
+    // emitted verbatim (`Vec<String>`) rather than left as a `$todo` hole that
+    // would otherwise block the strict phase-2 / merge hole check.
+    #[test]
+    fn test_kind_value_type_alias_uses_rustdoc_target() {
+        let ti = TypeInfo::new("MyAlias".to_owned(), TypeKind::TypeAlias, None, vec![])
+            .with_alias_target(Some("Vec<String>".to_owned()));
+        let kind = kind_value(&ti);
+        assert_eq!(kind["kind"], json!("type_alias"));
+        assert_eq!(kind["target"], json!("Vec<String>"));
+        // The rustdoc-derived target replaces the `$todo` hole entirely.
+        assert!(kind["target"].get("$todo").is_none());
+    }
+
+    // When extraction cannot resolve the alias target, the `$todo` hole is
+    // retained so the annotation is still surfaced to the author.
+    #[test]
+    fn test_kind_value_type_alias_without_target_keeps_todo() {
+        let ti = TypeInfo::new("MyAlias".to_owned(), TypeKind::TypeAlias, None, vec![]);
+        let kind = kind_value(&ti);
+        assert_eq!(kind["kind"], json!("type_alias"));
+        assert!(kind["target"].get("$todo").is_some());
+    }
+
+    #[test]
+    fn test_strip_generic_args_normalises_target() {
+        assert_eq!(strip_generic_args("Foo"), "Foo");
+        assert_eq!(strip_generic_args("Foo<T>"), "Foo");
+        assert_eq!(strip_generic_args("Foo<T, U>"), "Foo");
+        assert_eq!(strip_generic_args("Map<K, Vec<V>>"), "Map");
+    }
+
+    // Finding F2 (round 8): a generic type's impl target is recorded with its
+    // generic arguments (`impl<T> Foo<T>` → target `Foo<T>`). Inherent methods
+    // must still be attributed to the bare catalogue entry name `Foo`, so the
+    // generic arguments are stripped before comparison; otherwise the rustdoc
+    // methods are silently dropped from the generated catalogue.
+    #[test]
+    fn test_collect_methods_matches_generic_impl_target() {
+        use domain::schema::ImplInfo;
+
+        let generic_impl = ImplInfo::with_target_details(
+            "Foo<T>".to_owned(),
+            None,
+            vec![FunctionInfo::new(
+                "get".to_owned(),
+                None,
+                vec![],
+                true,
+                vec![],
+                "&T".to_owned(),
+                Some("&self".to_owned()),
+                false,
+            )],
+            None,
+            Some("crate_root::foo".to_owned()),
+        );
+        let schema =
+            SchemaExport::new("crate_root".to_owned(), vec![], vec![], vec![], vec![generic_impl]);
+
+        let methods = collect_methods(&schema, "Foo", Some("crate_root::foo"));
+        assert_eq!(methods.len(), 1);
+        assert_eq!(methods[0]["name"], json!("get"));
     }
 }

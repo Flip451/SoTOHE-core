@@ -54,6 +54,19 @@ subgraph domain["domain"]
     T22_domain_domain_ImplInfo_trait_def_path([trait_def_path])
     T22_domain_domain_ImplInfo_target_module_path([target_module_path])
   end
+  subgraph T22_domain_domain_TypeInfo["schema::TypeInfo"]
+    direction TB
+    T22_domain_domain_TypeInfo__self[TypeInfo]
+    T22_domain_domain_TypeInfo_new([new])
+    T22_domain_domain_TypeInfo_with_module_path([with_module_path])
+    T22_domain_domain_TypeInfo_with_alias_target([with_alias_target])
+    T22_domain_domain_TypeInfo_name([name])
+    T22_domain_domain_TypeInfo_kind([kind])
+    T22_domain_domain_TypeInfo_docs([docs])
+    T22_domain_domain_TypeInfo_members([members])
+    T22_domain_domain_TypeInfo_module_path([module_path])
+    T22_domain_domain_TypeInfo_alias_target([alias_target])
+  end
   end
   subgraph domain_domain_module_tddd["domain::tddd"]
     direction TB
@@ -443,6 +456,9 @@ T22_domain_domain_ImplInfo_with_trait_def_path --> T22_domain_domain_ImplInfo__s
 T22_domain_domain_ImplInfo_with_target_details --o T26_domain_domain_FunctionInfo__self
 T22_domain_domain_ImplInfo_with_target_details --> T22_domain_domain_ImplInfo__self
 T22_domain_domain_ImplInfo_methods --> T26_domain_domain_FunctionInfo__self
+T22_domain_domain_TypeInfo_new --> T22_domain_domain_TypeInfo__self
+T22_domain_domain_TypeInfo_with_module_path --> T22_domain_domain_TypeInfo__self
+T22_domain_domain_TypeInfo_with_alias_target --> T22_domain_domain_TypeInfo__self
 T30_domain_domain_CatalogEntryName_try_new --> T30_domain_domain_CatalogEntryName__self
 T23_domain_domain_DocString_new --> T23_domain_domain_DocString__self
 T23_domain_domain_DraftHole_new --o T27_domain_domain_DraftHolePath__self
@@ -560,6 +576,16 @@ class T22_domain_domain_ImplInfo_methods method_node
 class T22_domain_domain_ImplInfo_trait_def_path method_node
 class T22_domain_domain_ImplInfo_target_module_path method_node
 class T22_domain_domain_ImplInfo__self value_object
+class T22_domain_domain_TypeInfo_new method_node
+class T22_domain_domain_TypeInfo_with_module_path method_node
+class T22_domain_domain_TypeInfo_with_alias_target method_node
+class T22_domain_domain_TypeInfo_name method_node
+class T22_domain_domain_TypeInfo_kind method_node
+class T22_domain_domain_TypeInfo_docs method_node
+class T22_domain_domain_TypeInfo_members method_node
+class T22_domain_domain_TypeInfo_module_path method_node
+class T22_domain_domain_TypeInfo_alias_target method_node
+class T22_domain_domain_TypeInfo__self value_object
 class T30_domain_domain_CatalogEntryKind_Struct variant_node
 class T30_domain_domain_CatalogEntryKind_Enum variant_node
 class T30_domain_domain_CatalogEntryKind_TypeAlias variant_node

@@ -101,7 +101,7 @@ pub enum TypeKind {
 }
 
 /// Information about a public type (struct, enum, or type alias).
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TypeInfo {
     name: String,
     kind: TypeKind,
@@ -111,6 +111,10 @@ pub struct TypeInfo {
     members: Vec<MemberDeclaration>,
     /// Module path for disambiguation (e.g., `"domain::review"`). `None` if unknown.
     module_path: Option<String>,
+    /// For type aliases: the aliased target type string (e.g., `"Vec<String>"`),
+    /// as rendered by the schema exporter. `None` for non-alias types or when
+    /// extraction could not resolve the target.
+    alias_target: Option<String>,
 }
 
 impl TypeInfo {
@@ -121,7 +125,7 @@ impl TypeInfo {
         docs: Option<String>,
         members: Vec<MemberDeclaration>,
     ) -> Self {
-        Self { name, kind, docs, members, module_path: None }
+        Self { name, kind, docs, members, module_path: None, alias_target: None }
     }
 
     /// Creates a new type info with a module path.
@@ -132,7 +136,16 @@ impl TypeInfo {
         members: Vec<MemberDeclaration>,
         module_path: String,
     ) -> Self {
-        Self { name, kind, docs, members, module_path: Some(module_path) }
+        Self { name, kind, docs, members, module_path: Some(module_path), alias_target: None }
+    }
+
+    /// Sets the aliased target type string for a type alias (e.g., `"Vec<String>"`).
+    ///
+    /// Non-alias types leave this `None`.
+    #[must_use]
+    pub fn with_alias_target(mut self, alias_target: Option<String>) -> Self {
+        self.alias_target = alias_target;
+        self
     }
 
     /// Returns the type name.
@@ -158,6 +171,11 @@ impl TypeInfo {
     /// Returns the module path, if known.
     pub fn module_path(&self) -> Option<&str> {
         self.module_path.as_deref()
+    }
+
+    /// Returns the aliased target type string for a type alias, if known.
+    pub fn alias_target(&self) -> Option<&str> {
+        self.alias_target.as_deref()
     }
 }
 

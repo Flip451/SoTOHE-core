@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "b5dd1a4b1cc7fbb3fea8ce0b91bb6a0da23a8c9715686de866eadbf990615251",
+  "catalogue_declaration_hash": "2adc6aed31de23c2f9a7479afaf82aeb87ef2b19bcdb3a1601d1aa18870eb115",
   "signals": [
     {
       "type_name": "CatalogEntryKind",
@@ -61,6 +61,11 @@
       "type_name": "TypeEntry",
       "signal": "blue",
       "entry_hash": "4bcba2de913ca3b63477b362cbae5f7420c83201d642a78b9568fbb40e52014e"
+    },
+    {
+      "type_name": "TypeInfo",
+      "signal": "blue",
+      "entry_hash": "55feb7ad4ae73d173a75bc0366d52cceb981c7499c6dbab335b5c80b39d69a38"
     }
   ]
 }

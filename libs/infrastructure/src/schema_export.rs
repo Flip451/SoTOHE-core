@@ -264,7 +264,8 @@ fn build_schema_export(
                 };
                 types.push(ti);
             }
-            ItemEnum::TypeAlias(_) => {
+            ItemEnum::TypeAlias(alias) => {
+                let alias_target = Some(format_helpers::format_type(&alias.type_));
                 let ti = if let Some(mp) = module_path {
                     TypeInfo::with_module_path(
                         name,
@@ -275,7 +276,8 @@ fn build_schema_export(
                     )
                 } else {
                     TypeInfo::new(name, TypeKind::TypeAlias, item.docs.clone(), Vec::new())
-                };
+                }
+                .with_alias_target(alias_target);
                 types.push(ti);
             }
             ItemEnum::Function(f) if !method_ids.contains(&item.id) => {
@@ -967,5 +969,55 @@ mod tests {
         assert_eq!(origins.get("std::fmt::Display"), Some(&"std".to_string()));
         // The old short-name key is gone — no ambiguous "Display" entry.
         assert!(!origins.contains_key("Display"));
+    }
+
+    /// Helper: build a public type-alias `Item` aliasing the given target type.
+    fn make_type_alias_item(
+        id: u32,
+        name: &str,
+        target: rustdoc_types::Type,
+    ) -> (rustdoc_types::Id, rustdoc_types::Item) {
+        let item_id = rustdoc_types::Id(id);
+        let alias_inner = rustdoc_types::TypeAlias {
+            type_: target,
+            generics: rustdoc_types::Generics { params: vec![], where_predicates: vec![] },
+        };
+        let item = rustdoc_types::Item {
+            id: item_id,
+            crate_id: 0,
+            name: Some(name.to_owned()),
+            span: None,
+            visibility: Visibility::Public,
+            docs: None,
+            links: std::collections::HashMap::new(),
+            attrs: vec![],
+            deprecation: None,
+            inner: ItemEnum::TypeAlias(alias_inner),
+        };
+        (item_id, item)
+    }
+
+    /// Finding F1 (round 8): `build_schema_export` records a type alias's target
+    /// type (short-name rendered form) so `catalog import` can emit it verbatim
+    /// instead of a `$todo` hole.
+    #[test]
+    fn test_build_schema_export_type_alias_captures_target() {
+        let (alias_id, alias_item) = make_type_alias_item(
+            1,
+            "MyAlias",
+            resolved("Vec", Some(vec![type_arg(simple("String"))])),
+        );
+        let mut index = std::collections::HashMap::new();
+        index.insert(alias_id, alias_item);
+        let krate = minimal_krate(
+            index,
+            std::collections::HashMap::new(),
+            std::collections::HashMap::new(),
+        );
+
+        let export = build_schema_export("crate_root", &krate).unwrap();
+        let alias = export.types().iter().find(|t| t.name() == "MyAlias").unwrap();
+        assert_eq!(alias.kind(), &TypeKind::TypeAlias);
+        assert_eq!(alias.alias_target(), Some("Vec<String>"));
     }
 }

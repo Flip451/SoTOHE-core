@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-04T22:32:06Z",
-  "declaration_hash": "b5dd1a4b1cc7fbb3fea8ce0b91bb6a0da23a8c9715686de866eadbf990615251",
+  "generated_at": "2026-07-04T23:23:21Z",
+  "declaration_hash": "2adc6aed31de23c2f9a7479afaf82aeb87ef2b19bcdb3a1601d1aa18870eb115",
   "signals": [
     {
       "type_name": "CatalogEntryKind",
@@ -128,6 +128,16 @@
       "kind_tag": "value_object",
       "signal": "blue",
       "found_type": true
+    },
+    {
+      "type_name": "TypeInfo",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::cmp::Eq",
+        "core::cmp::PartialEq"
+      ]
     }
   ]
 }

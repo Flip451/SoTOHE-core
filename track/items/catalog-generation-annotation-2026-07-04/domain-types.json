@@ -233,6 +233,22 @@
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-08" }
       ],
       "informal_grounds": []
+    },
+    "TypeInfo": {
+      "action": "modify",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "schema",
+      "docs": "Existing rustdoc extraction record for a public type. See AC-04, IN-08.",
+      "spec_refs": [
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-04" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-08" }
+      ],
+      "informal_grounds": []
     }
   },
   "traits": {},
@@ -972,6 +988,123 @@
       ]
     },
     {
+      "type_name": "TypeInfo",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "name",    "ty": "String" },
+            { "name": "kind",    "ty": "TypeKind" },
+            { "name": "docs",    "ty": "Option<String>" },
+            { "name": "members", "ty": "Vec<MemberDeclaration>" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Catalogue method declaration `TypeInfo::new`."
+        },
+        {
+          "name": "with_module_path",
+          "receiver": null,
+          "params": [
+            { "name": "name",        "ty": "String" },
+            { "name": "kind",        "ty": "TypeKind" },
+            { "name": "docs",        "ty": "Option<String>" },
+            { "name": "members",     "ty": "Vec<MemberDeclaration>" },
+            { "name": "module_path", "ty": "String" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Catalogue method declaration `TypeInfo::with_module_path`."
+        },
+        {
+          "name": "with_alias_target",
+          "receiver": "self",
+          "params": [
+            { "name": "alias_target", "ty": "Option<String>" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Catalogue method declaration `TypeInfo::with_alias_target`."
+        },
+        {
+          "name": "name",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Catalogue method declaration `TypeInfo::name`."
+        },
+        {
+          "name": "kind",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&TypeKind",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Catalogue method declaration `TypeInfo::kind`."
+        },
+        {
+          "name": "docs",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&str>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Catalogue method declaration `TypeInfo::docs`."
+        },
+        {
+          "name": "members",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[MemberDeclaration]",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Catalogue method declaration `TypeInfo::members`."
+        },
+        {
+          "name": "module_path",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&str>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Catalogue method declaration `TypeInfo::module_path`."
+        },
+        {
+          "name": "alias_target",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&str>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Catalogue method declaration `TypeInfo::alias_target`."
+        }
+      ]
+    },
+    {
       "type_name": "FunctionEntry",
       "methods": [
         {
@@ -1168,6 +1301,11 @@
     { "action": "reference", "trait_ref": "core::clone::Clone",   "for_type": "FunctionInfo" },
     { "trait_ref": "core::cmp::PartialEq",                        "for_type": "FunctionInfo" },
     { "trait_ref": "core::cmp::Eq",                               "for_type": "FunctionInfo" },
+
+    { "action": "reference", "trait_ref": "core::fmt::Debug",     "for_type": "TypeInfo" },
+    { "action": "reference", "trait_ref": "core::clone::Clone",   "for_type": "TypeInfo" },
+    { "trait_ref": "core::cmp::PartialEq",                        "for_type": "TypeInfo" },
+    { "trait_ref": "core::cmp::Eq",                               "for_type": "TypeInfo" },
 
     { "trait_ref": "core::fmt::Debug",         "for_type": "DocString" },
     { "trait_ref": "core::clone::Clone",       "for_type": "DocString" },

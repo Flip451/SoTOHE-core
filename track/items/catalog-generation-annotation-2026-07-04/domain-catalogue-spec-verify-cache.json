@@ -745,6 +745,54 @@
           "text_label": "refactor 後の entry 型に対し catalogue linter の `NoPublicField` / `ForbidPrimitiveInTypes` が発火しない。`TypeEntry` への型宣言レベル generics / where フィールド追加を `action: Modify` で宣言した状態で catalogue linter が pass する。"
         }
       }
+    },
+    {
+      "claim_hash": "55feb7ad4ae73d173a75bc0366d52cceb981c7499c6dbab335b5c80b39d69a38",
+      "evidence_hash": "1df985a886d4289a766713a84486d90919cd5f5a208b50a337e140d5beb3790f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp catalog import --type <Rust パス>` を実行すると、rustdoc 抽出から既存型の同定情報・シグネチャ・フィールドを解決できる。`--action reference|modify|delete` の各ケースで、入力が `--layer` / `--type` / `--action` / `--anchor` のみでもエントリが生成され、reference / modify は rustdoc 由来の現状 shape を含み、delete は同定情報を含む。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeInfo"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "`sotp catalog import --type <Rust パス>` を実行すると、rustdoc 抽出から既存型の同定情報・シグネチャ・フィールドを解決できる。`--action reference|modify|delete` の各ケースで、入力が `--layer` / `--type` / `--action` / `--anchor` のみでもエントリが生成され、reference / modify は rustdoc 由来の現状 shape を含み、delete は同定情報を含む。"
+        }
+      }
+    },
+    {
+      "claim_hash": "55feb7ad4ae73d173a75bc0366d52cceb981c7499c6dbab335b5c80b39d69a38",
+      "evidence_hash": "22db512186f463ce4829289ff2181f9b00a5012358fa9b79224b0dcf4029cf78",
+      "verdict": {
+        "kind": "pass",
+        "citation": "型形状（fields / methods / variants / generics / where predicates / impl blocks）の入力は Rust 宣言断片またはシグネチャ文字列として受け取り、sotp が parse して構造化する（既存の TypeRef parser / syn 資産を流用）。parse できない宣言・シグネチャは入力時 reject する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeInfo"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "型形状（fields / methods / variants / generics / where predicates / impl blocks）の入力は Rust 宣言断片またはシグネチャ文字列として受け取り、sotp が parse して構造化する（既存の TypeRef parser / syn 資産を流用）。parse できない宣言・シグネチャは入力時 reject する。生成時に確定できない箇所は引数で渡さず、生成されたエントリの該当ノードを `$todo` として保留できる。"
+        }
+      }
     }
   ]
 }
