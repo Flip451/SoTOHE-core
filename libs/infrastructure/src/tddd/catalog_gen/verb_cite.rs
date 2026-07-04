@@ -9,7 +9,7 @@ use serde_json::{Value, json};
 use usecase::catalog_gen::{CatalogCiteCommand, CatalogError, CatalogWriteReport};
 
 use super::fs_access::{
-    catalogue_path, find_entry_section, load_bindings, read_catalogue, scan_entry_holes,
+    catalogue_path, load_bindings, read_catalogue, resolve_entry_section, scan_entry_holes,
     schema_error, spec_ref_file, track_dir, write_catalogue,
 };
 use super::validate::{load_spec_anchors, validate_anchor};
@@ -47,8 +47,7 @@ fn cite_anchors_in_file(
     for anchor in &command.anchors {
         validated.push(validate_anchor(anchor, spec_anchors)?);
     }
-    let section = find_entry_section(&document, &command.entry)
-        .ok_or_else(|| schema_error(format!("entry `{}` not found in catalogue", command.entry)))?;
+    let section = resolve_entry_section(&document, &command.entry)?;
     append_spec_refs(&mut document, section, &command.entry, spec_file, &validated)?;
     write_catalogue(path, trusted_root, &document)?;
     let holes = scan_entry_holes(&document, section, &command.entry);
@@ -168,5 +167,35 @@ mod tests {
         )
         .unwrap_err();
         assert!(matches!(err, CatalogError::SchemaInvalid { .. }));
+    }
+
+    #[test]
+    fn test_cite_rejects_ambiguous_entry() {
+        // `Foo` exists as both a type and a trait: cite by bare name cannot pick
+        // one, so it must fail closed instead of anchoring the first-match
+        // section, and must leave the file untouched.
+        let temp = tempfile::tempdir().unwrap();
+        let path = temp.path().join("domain-types.json");
+        let value = json!({
+            "schema_version": 5,
+            "crate_name": "domain",
+            "layer": "domain",
+            "types": { "Foo": { "role": { "ValueObject": {} }, "spec_refs": [] } },
+            "traits": { "Foo": { "role": { "SecondaryPort": {} }, "spec_refs": [] } },
+            "functions": {}
+        });
+        let seeded = serde_json::to_string_pretty(&value).unwrap();
+        std::fs::write(&path, &seeded).unwrap();
+
+        let err = cite_anchors_in_file(
+            &path,
+            temp.path(),
+            &cite_command("Foo", "IN-01"),
+            "spec.json",
+            &anchors(),
+        )
+        .unwrap_err();
+        assert!(matches!(err, CatalogError::SchemaInvalid { .. }));
+        assert_eq!(std::fs::read_to_string(&path).unwrap(), seeded);
     }
 }

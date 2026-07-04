@@ -342,11 +342,39 @@ pub(super) fn scan_entry_holes(document: &Value, section: &str, entry: &str) -> 
         .unwrap_or_default()
 }
 
-/// Find which section (`types` / `traits` / `functions`) holds `entry`.
-pub(super) fn find_entry_section(document: &Value, entry: &str) -> Option<&'static str> {
-    ["types", "traits", "functions"]
+/// Resolve the single section (`types` / `traits` / `functions`) that holds
+/// `entry`, failing closed when the bare name is ambiguous.
+///
+/// # Errors
+///
+/// Returns [`CatalogError::SchemaInvalid`] when `entry` is absent, or when it
+/// appears in more than one section. Catalogue keys are unique only within a
+/// section, so a `types.Foo` / `traits.Foo` pair leaves a bare `--entry Foo`
+/// with no way to pick the target; silently mutating the first-match section
+/// would anchor the wrong entry, so cite rejects and asks the caller to
+/// disambiguate.
+pub(super) fn resolve_entry_section(
+    document: &Value,
+    entry: &str,
+) -> Result<&'static str, CatalogError> {
+    let matches: Vec<&'static str> = ["types", "traits", "functions"]
         .into_iter()
-        .find(|&section| document.get(section).and_then(|value| value.get(entry)).is_some())
+        .filter(|&section| document.get(section).and_then(|value| value.get(entry)).is_some())
+        .collect();
+    match matches.as_slice() {
+        [] => Err(schema_error(format!("entry `{entry}` not found in catalogue"))),
+        [section] => Ok(section),
+        sections => {
+            let candidates =
+                sections.iter().map(|section| format!("{section}.{entry}")).collect::<Vec<_>>();
+            Err(schema_error(format!(
+                "entry `{entry}` is ambiguous across catalogue sections ({}); `cite --entry` \
+                 selects by bare name and cannot disambiguate — rename one entry so the name is \
+                 unique within the catalogue, or cite it once a section selector is available",
+                candidates.join(", ")
+            )))
+        }
+    }
 }
 
 #[cfg(test)]
@@ -479,6 +507,39 @@ mod tests {
         let key = CatalogEntryName::try_new("Bar".to_owned()).unwrap();
         insert_entry(&mut document, "types", &key, serde_json::json!({ "role": "x" })).unwrap();
         assert!(document["types"].get("Bar").is_some());
+    }
+
+    #[test]
+    fn test_resolve_entry_section_returns_sole_section() {
+        // A name present only in `traits` resolves there even though `types` is
+        // scanned first — the resolver is not a fixed first-match order.
+        let document = serde_json::json!({
+            "types": {},
+            "traits": { "Foo": {} },
+            "functions": {}
+        });
+        assert_eq!(resolve_entry_section(&document, "Foo").unwrap(), "traits");
+    }
+
+    #[test]
+    fn test_resolve_entry_section_rejects_ambiguous() {
+        // The same bare name under both `types` and `traits` cannot be picked by
+        // `--entry` alone, so the resolver fails closed rather than silently
+        // targeting the first-match section.
+        let document = serde_json::json!({
+            "types": { "Foo": {} },
+            "traits": { "Foo": {} },
+            "functions": {}
+        });
+        let err = resolve_entry_section(&document, "Foo").unwrap_err();
+        assert!(matches!(err, CatalogError::SchemaInvalid { .. }));
+    }
+
+    #[test]
+    fn test_resolve_entry_section_rejects_absent() {
+        let document = serde_json::json!({ "types": {}, "traits": {}, "functions": {} });
+        let err = resolve_entry_section(&document, "Missing").unwrap_err();
+        assert!(matches!(err, CatalogError::SchemaInvalid { .. }));
     }
 
     fn single_domain_binding() -> Vec<TdddLayerBinding> {

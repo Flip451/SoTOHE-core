@@ -54,7 +54,7 @@ fn add_entry_to_file(
     let (entry, trait_impls) = build_add_entry(command, spec_file, spec_anchors)?;
     let section = section_for_kind(command.kind);
     insert_entry(&mut document, section, &name, entry)?;
-    append_trait_impls(&mut document, trait_impls);
+    append_trait_impls(&mut document, trait_impls)?;
     write_catalogue(path, trusted_root, &document)?;
     let holes = scan_entry_holes(&document, section, name.as_str());
     Ok(CatalogWriteReport {
@@ -65,16 +65,31 @@ fn add_entry_to_file(
 }
 
 /// Append document-level trait-impl declarations, if any.
-fn append_trait_impls(document: &mut Value, trait_impls: Vec<Value>) {
+///
+/// # Errors
+///
+/// Returns [`CatalogError::SchemaInvalid`] when the draft already carries a
+/// top-level `trait_impls` that is not a JSON array (e.g. a `$todo` hole or a
+/// hand-edited scalar). `as_array_mut` would return `None` there, and appending
+/// into nothing would report success while silently dropping the parsed impls;
+/// the draft must be normalised (e.g. via a codec pass) so `trait_impls` is an
+/// array first.
+fn append_trait_impls(document: &mut Value, trait_impls: Vec<Value>) -> Result<(), CatalogError> {
     if trait_impls.is_empty() {
-        return;
+        return Ok(());
     }
-    if let Some(root) = document.as_object_mut() {
-        let list = root.entry("trait_impls".to_owned()).or_insert_with(|| Value::Array(Vec::new()));
-        if let Some(array) = list.as_array_mut() {
-            array.extend(trait_impls);
-        }
-    }
+    let root = document
+        .as_object_mut()
+        .ok_or_else(|| schema_error("catalogue root is not a JSON object"))?;
+    let list = root.entry("trait_impls".to_owned()).or_insert_with(|| Value::Array(Vec::new()));
+    let array = list.as_array_mut().ok_or_else(|| {
+        schema_error(
+            "catalogue top-level `trait_impls` is not a JSON array; normalise the draft \
+             (e.g. run it through a codec pass) before adding trait impls",
+        )
+    })?;
+    array.extend(trait_impls);
+    Ok(())
 }
 
 /// Fail-closed pre-write validation of `--name` against the entry kind and the
@@ -302,5 +317,35 @@ mod tests {
         )
         .unwrap_err();
         assert!(matches!(err, CatalogError::ParseFragment { .. }));
+    }
+
+    // A draft whose top-level `trait_impls` is a `$todo` hole (not an array)
+    // must reject an `add` that carries trait impls, rather than reporting
+    // success while silently dropping them. The file must be left untouched.
+    #[test]
+    fn test_add_entry_rejects_malformed_trait_impls() {
+        let temp = tempfile::tempdir().unwrap();
+        let path = temp.path().join("domain-types.json");
+        let seeded = serde_json::to_string_pretty(&serde_json::json!({
+            "schema_version": 5,
+            "crate_name": "domain",
+            "layer": "domain",
+            "types": {},
+            "traits": {},
+            "functions": {},
+            "trait_impls": { "$todo": "list the trait impls declared in this layer" }
+        }))
+        .unwrap();
+        std::fs::write(&path, &seeded).unwrap();
+
+        let mut command = struct_command("Foo");
+        command.fields = vec!["message: String".to_owned()];
+        command.trait_impls = vec!["From<CodecError>".to_owned()];
+
+        let err =
+            add_entry_to_file(&path, temp.path(), &command, "spec.json", &anchors()).unwrap_err();
+        assert!(matches!(err, CatalogError::SchemaInvalid { .. }));
+        // No silent drop: the malformed draft is neither mutated nor rewritten.
+        assert_eq!(std::fs::read_to_string(&path).unwrap(), seeded);
     }
 }
