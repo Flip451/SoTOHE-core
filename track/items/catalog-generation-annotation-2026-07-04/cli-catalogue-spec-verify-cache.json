@@ -1,0 +1,582 @@
+{
+  "schema_version": 1,
+  "layer": "cli",
+  "entries": [
+    {
+      "claim_hash": "1a2b276ac905050f8d6659548ae8eb6898a7d5fa9574ba9081e9f8fcc45726ba",
+      "evidence_hash": "a64182baca06538e362f87cffe556f3f223de5aedf15a504bcb942f7d5265e80",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`--action reference|modify|delete`（既定 `reference`）/ `--anchor`。reference は変更なし参照、modify は現状 shape を baseline として取り込み変更差分だけを後で type-designer が編集、delete は同定情報の取り込みで足りる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogActionArg"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "`sotp catalog import`: 既存型の取り込み。`--layer` / `--type`（Rust パス、rustdoc から解決）/ `--action reference|modify|delete`（既定 `reference`）/ `--anchor`。reference は変更なし参照、modify は現状 shape を baseline として取り込み変更差分だけを後で type-designer が編集、delete は同定情報の取り込みで足りる。手動転記が残るのは新規型の add のみとする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "1a2b276ac905050f8d6659548ae8eb6898a7d5fa9574ba9081e9f8fcc45726ba",
+      "evidence_hash": "1df985a886d4289a766713a84486d90919cd5f5a208b50a337e140d5beb3790f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`--action reference|modify|delete` の各ケースで、入力が `--layer` / `--type` / `--action` / `--anchor` のみでもエントリが生成され、reference / modify は rustdoc 由来の現状 shape を含み、delete は同定情報を含む。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogActionArg"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "`sotp catalog import --type <Rust パス>` を実行すると、rustdoc 抽出から既存型の同定情報・シグネチャ・フィールドを解決できる。`--action reference|modify|delete` の各ケースで、入力が `--layer` / `--type` / `--action` / `--anchor` のみでもエントリが生成され、reference / modify は rustdoc 由来の現状 shape を含み、delete は同定情報を含む。"
+        }
+      }
+    },
+    {
+      "claim_hash": "2a65cd3786b89b2ecc5a21439376a083e4887e2ba5d27b5701f2504f2624ea4f",
+      "evidence_hash": "20728c2cea358b7d15e5246e45b0b72c7177fdf1af85587d90a3e15c7ae5e90b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp catalog add`: 新規型の意図入力。`--layer` / `--kind` / `--name` / `--role` / `--anchor`（repeatable）で同定・ロール・spec anchor を渡し、`--field` / `--method` / `--variant` / `--trait-impl`（Rust 宣言断片またはシグネチャ文字列、repeatable）で型形状を渡す。宣言レベルの型パラメータと where 句は `--generic` / `--where`（repeatable）、impl block レベルは `--impl-generic` / `--impl-where`（repeatable）で渡す。省略した形状ノードは `$todo` として生成する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogAddArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "`sotp catalog add`: 新規型の意図入力。`--layer` / `--kind` / `--name` / `--role` / `--anchor`（repeatable）で同定・ロール・spec anchor を渡し、`--field` / `--method` / `--variant` / `--trait-impl`（Rust 宣言断片またはシグネチャ文字列、repeatable）で型形状を渡す。宣言レベルの型パラメータと where 句は `--generic` / `--where`（repeatable）、impl block レベルは `--impl-generic` / `--impl-where`（repeatable）で渡す。省略した形状ノードは `$todo` として生成する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "2a65cd3786b89b2ecc5a21439376a083e4887e2ba5d27b5701f2504f2624ea4f",
+      "evidence_hash": "a46cb2315cb446b2f5a36229589118230eca9764bc9684555bcf2212cc57a6fe",
+      "verdict": {
+        "kind": "pass",
+        "citation": "generics / where 句を、型・trait・function・method・impl block の各宣言レベルを区別して入力し、カタログ schema の対応フィールド（`generics` / `where_predicates` / `impl_generics` / `impl_where_predicates` 等）へ構造化する。... silent drop・docs 文字列への退避・別宣言レベルへの代用は行わない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogAddArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-09",
+          "text_label": "generics / where 句を、型・trait・function・method・impl block の各宣言レベルを区別して入力し、カタログ schema の対応フィールド（`generics` / `where_predicates` / `impl_generics` / `impl_where_predicates` 等）へ構造化する。method / function シグネチャ内の generics / where 句はそのシグネチャから parse する。ある宣言レベルの generics / where 句に現行 schema の正規フィールドがない場合、完全型情報維持に従い、本 API 実装と同じ変更内で正規フィールドを追加してから生成する。silent drop・docs 文字列への退避・別宣言レベルへの代用は行わない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "2a65cd3786b89b2ecc5a21439376a083e4887e2ba5d27b5701f2504f2624ea4f",
+      "evidence_hash": "883f3c9c1c9b467a4de8694b813ca3072522e52790fcc0b6453387da11162dfa",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp catalog add` に意図（layer / kind / name / role / spec anchor / 一部の型形状）を渡すと、エントリ骨格がカタログ draft JSON に追記され、渡した同定・role・spec_refs・型形状が正規フィールドに格納され、渡さなかった形状ノードが `$todo`（記入指示付き）として生成される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogAddArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "`sotp catalog add` に意図（layer / kind / name / role / spec anchor / 一部の型形状）を渡すと、エントリ骨格がカタログ draft JSON に追記され、渡した同定・role・spec_refs・型形状が正規フィールドに格納され、渡さなかった形状ノードが `$todo`（記入指示付き）として生成される。生成結果は JSON として parse でき、`$todo` が残る間は typed DTO への `try_complete` が Err を返し、未入力箇所は `$todo` ノードとして JSON path と指示文で列挙できる。`$todo` を全て埋めた後の完成エントリはカタログ schema の検証を通る。"
+        }
+      }
+    },
+    {
+      "claim_hash": "2a65cd3786b89b2ecc5a21439376a083e4887e2ba5d27b5701f2504f2624ea4f",
+      "evidence_hash": "cc9e50820a5145ed0c5357c187f8967b6a5a6b94c4d83bebbd77a9fb33b716db",
+      "verdict": {
+        "kind": "pass",
+        "citation": "型・trait・function・method・impl block の各宣言レベルで渡した generics / where 句が、カタログ schema の対応フィールド（`generics` / `where_predicates` / `impl_generics` / `impl_where_predicates` 等）に構造化される。ある宣言レベルに正規フィールドがない場合は本 API 実装と同じ変更内で正規フィールドが追加されている。silent drop・docs 文字列への退避・別宣言レベルへの代用が発生しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogAddArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "型・trait・function・method・impl block の各宣言レベルで渡した generics / where 句が、カタログ schema の対応フィールド（`generics` / `where_predicates` / `impl_generics` / `impl_where_predicates` 等）に構造化される。ある宣言レベルに正規フィールドがない場合は本 API 実装と同じ変更内で正規フィールドが追加されている。silent drop・docs 文字列への退避・別宣言レベルへの代用が発生しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "9dfcaea4c4ab0e05df3c54b7f4ef3020d3985c528d8db17668c052c68aa9e396",
+      "evidence_hash": "d2b1a59b74d97beb0280051ab0f32873db7370007b7cfa32986d3d1144154394",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp catalog check`: 完成検査。`--layer` 省略時は全 TDDD layer を対象とする。`--gate phase2|commit|merge` で厳格度を解決し、`$todo` 残存・anchor 実在・role 語彙・schema 妥当を一括再検証する。phase2 / merge は strict、commit は組み込みの TDDD interim + 欠損入力 skip 規則に従う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogCheckArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "`sotp catalog check`: 完成検査。`--layer` 省略時は全 TDDD layer を対象とする。`--gate phase2|commit|merge` で厳格度を解決し、`$todo` 残存・anchor 実在・role 語彙・schema 妥当を一括再検証する。phase2 / merge は strict、commit は組み込みの TDDD interim + 欠損入力 skip 規則に従う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "9dfcaea4c4ab0e05df3c54b7f4ef3020d3985c528d8db17668c052c68aa9e396",
+      "evidence_hash": "717c5a9950a450042711a1784444643e8dfebb37015139963bf80860f8d23ac8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`--gate commit` は既存の TDDD interim / 欠損入力 skip 意味論に従い"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogCheckArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-11",
+          "text_label": "`sotp catalog check --gate phase2` および `--gate merge` は `$todo` 残存・anchor 不在・role 語彙外・schema 不正・TDDD 対象 layer の catalogue file 不在のいずれでも非零 exit で block する。`--gate commit` は既存の TDDD interim / 欠損入力 skip 意味論に従い、catalogue 不在で skip、`$todo` などの未完成で warning 通過、schema parse 不能で block する。いずれの gate でも `signal-gates.json` の存在・妥当性を prerequisite にしない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "84b7a23dcc6802580954c6322404b53025b48b496f36af1234e3dd6b960a3009",
+      "evidence_hash": "b692130819a859457ae02a03b4e2da43473fdf0189622a671ccc354ce5eb3372",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp catalog cite`: 生成後の anchor 追加。`--layer` / `--entry` / `--anchor`。D5 の検証付き入力（anchor 実在検証）を通す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogCiteArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "`sotp catalog cite`: 生成後の anchor 追加。`--layer` / `--entry` / `--anchor`。D5 の検証付き入力（anchor 実在検証）を通す。"
+        }
+      }
+    },
+    {
+      "claim_hash": "84b7a23dcc6802580954c6322404b53025b48b496f36af1234e3dd6b960a3009",
+      "evidence_hash": "d8b63ceee3331ca60fee75d0ecccd3e3d5cc210c2d34558c2b4a5b7897764168",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実在しない anchor を `spec_refs` に渡す入力、および role 語彙外の値を `role` に渡す入力が、いずれも入力時に reject される（fail-closed、下流の signal 評価まで遅延しない）。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogCiteArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "実在しない anchor を `spec_refs` に渡す入力、および role 語彙外の値を `role` に渡す入力が、いずれも入力時に reject される（fail-closed、下流の signal 評価まで遅延しない）。"
+        }
+      }
+    },
+    {
+      "claim_hash": "4b3766e862d2663e277156f57f12af6e7533b5398218527aac9cbfbbe6528353",
+      "evidence_hash": "491806b658f2c4affa709bb990673cd2262ebb156ded3b4d0b2fc7af13f4db0e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "top-level コマンド群 `sotp catalog` の新設。動詞は `init` / `add` / `import` / `cite` / `check` の 5 つ。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "top-level コマンド群 `sotp catalog` の新設。動詞は `init` / `add` / `import` / `cite` / `check` の 5 つ。UI 表記の綴りは `catalog`（米綴り）で統一する。既存機構の名称（`.harness/catalogue-lint/` や catalogue-spec-signals 等）の rename は含まない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "4b3766e862d2663e277156f57f12af6e7533b5398218527aac9cbfbbe6528353",
+      "evidence_hash": "9fa838958978bcb533590e1c1e8ecd5237720811d692f876e2cd82520ff59206",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp catalog {init,add,import,cite,check}` の 5 コマンドが CLI に存在する。UI 表記の綴りは `catalog`。既存機構の Rust 型名・ディレクトリ名（catalogue 綴り）は変更されていない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`sotp catalog {init,add,import,cite,check}` の 5 コマンドが CLI に存在する。UI 表記の綴りは `catalog`。既存機構の Rust 型名・ディレクトリ名（catalogue 綴り）は変更されていない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c0164b7ec80ce2c14ec8d1d762aa8444afc8b2e69e56efc1290279946a64e521",
+      "evidence_hash": "d2b1a59b74d97beb0280051ab0f32873db7370007b7cfa32986d3d1144154394",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`--gate phase2|commit|merge` で厳格度を解決し、`$todo` 残存・anchor 実在・role 語彙・schema 妥当を一括再検証する。phase2 / merge は strict、commit は組み込みの TDDD interim + 欠損入力 skip 規則に従う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogGateArg"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "`sotp catalog check`: 完成検査。`--layer` 省略時は全 TDDD layer を対象とする。`--gate phase2|commit|merge` で厳格度を解決し、`$todo` 残存・anchor 実在・role 語彙・schema 妥当を一括再検証する。phase2 / merge は strict、commit は組み込みの TDDD interim + 欠損入力 skip 規則に従う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c0164b7ec80ce2c14ec8d1d762aa8444afc8b2e69e56efc1290279946a64e521",
+      "evidence_hash": "717c5a9950a450042711a1784444643e8dfebb37015139963bf80860f8d23ac8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp catalog check --gate phase2` および `--gate merge` ... `--gate commit` は既存の TDDD interim / 欠損入力 skip 意味論に従い"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogGateArg"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-11",
+          "text_label": "`sotp catalog check --gate phase2` および `--gate merge` は `$todo` 残存・anchor 不在・role 語彙外・schema 不正・TDDD 対象 layer の catalogue file 不在のいずれでも非零 exit で block する。`--gate commit` は既存の TDDD interim / 欠損入力 skip 意味論に従い、catalogue 不在で skip、`$todo` などの未完成で warning 通過、schema parse 不能で block する。いずれの gate でも `signal-gates.json` の存在・妥当性を prerequisite にしない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d9f5345be98b4f8b272628a4be7b0adc2fc43d0b6c9cffcfe4dd8103d2a0598c",
+      "evidence_hash": "a64182baca06538e362f87cffe556f3f223de5aedf15a504bcb942f7d5265e80",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp catalog import`: 既存型の取り込み。`--layer` / `--type`（Rust パス、rustdoc から解決）/ `--action reference|modify|delete`（既定 `reference`）/ `--anchor`。reference は変更なし参照、modify は現状 shape を baseline として取り込み変更差分だけを後で type-designer が編集、delete は同定情報の取り込みで足りる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogImportArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "`sotp catalog import`: 既存型の取り込み。`--layer` / `--type`（Rust パス、rustdoc から解決）/ `--action reference|modify|delete`（既定 `reference`）/ `--anchor`。reference は変更なし参照、modify は現状 shape を baseline として取り込み変更差分だけを後で type-designer が編集、delete は同定情報の取り込みで足りる。手動転記が残るのは新規型の add のみとする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d9f5345be98b4f8b272628a4be7b0adc2fc43d0b6c9cffcfe4dd8103d2a0598c",
+      "evidence_hash": "1df985a886d4289a766713a84486d90919cd5f5a208b50a337e140d5beb3790f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp catalog import --type <Rust パス>` を実行すると、rustdoc 抽出から既存型の同定情報・シグネチャ・フィールドを解決できる。`--action reference|modify|delete` の各ケースで、入力が `--layer` / `--type` / `--action` / `--anchor` のみでもエントリが生成され、reference / modify は rustdoc 由来の現状 shape を含み、delete は同定情報を含む。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogImportArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "`sotp catalog import --type <Rust パス>` を実行すると、rustdoc 抽出から既存型の同定情報・シグネチャ・フィールドを解決できる。`--action reference|modify|delete` の各ケースで、入力が `--layer` / `--type` / `--action` / `--anchor` のみでもエントリが生成され、reference / modify は rustdoc 由来の現状 shape を含み、delete は同定情報を含む。"
+        }
+      }
+    },
+    {
+      "claim_hash": "eb07285130e20c7d118ef1935f3825d73b3286a3c430aad3130f6d4528547e88",
+      "evidence_hash": "5b7e543c6f4fc77da30848745177510f76dd63a335a93b13403f082255e19253",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp catalog init`: active track の全 TDDD 対象 layer（architecture-rules.json から解決）の catalogue file を空の skeleton（schema_version 付き）として生成する。既存 file があれば error とし、一部生成はしない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogInitArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "`sotp catalog init`: active track の全 TDDD 対象 layer（architecture-rules.json から解決）の catalogue file を空の skeleton（schema_version 付き）として生成する。エントリゼロの layer にも file の存在を要求する現行運用（全 layer 被覆の pre-review 検査、documentation-only track の空 catalogue）の bootstrap を機械化する。既存 file があれば error とし、一部生成はしない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "eb07285130e20c7d118ef1935f3825d73b3286a3c430aad3130f6d4528547e88",
+      "evidence_hash": "0310d801f58440950fd767569f6a31ebc612e11de12ef97d421e976e8da33440",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp catalog init` を TDDD 対象 layer を持つ track ブランチで実行すると、architecture-rules.json から解決した全 TDDD layer の catalogue file が空の skeleton（schema_version 付き）として生成される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogInitArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "`sotp catalog init` を TDDD 対象 layer を持つ track ブランチで実行すると、architecture-rules.json から解決した全 TDDD layer の catalogue file が空の skeleton（schema_version 付き）として生成される。既存 file がある状態では error となり、一部の layer だけを生成する部分適用は起きない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d4bf32edb2f9d699fd5cb43d713e78a7576ab779d43c5d189373631fafc6924d",
+      "evidence_hash": "20728c2cea358b7d15e5246e45b0b72c7177fdf1af85587d90a3e15c7ae5e90b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`--layer` / `--kind` / `--name` / `--role` / `--anchor`（repeatable）で同定・ロール・spec anchor を渡し、`--field` / `--method` / `--variant` / `--trait-impl`（Rust 宣言断片またはシグネチャ文字列、repeatable）で型形状を渡す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogKindArg"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "`sotp catalog add`: 新規型の意図入力。`--layer` / `--kind` / `--name` / `--role` / `--anchor`（repeatable）で同定・ロール・spec anchor を渡し、`--field` / `--method` / `--variant` / `--trait-impl`（Rust 宣言断片またはシグネチャ文字列、repeatable）で型形状を渡す。宣言レベルの型パラメータと where 句は `--generic` / `--where`（repeatable）、impl block レベルは `--impl-generic` / `--impl-where`（repeatable）で渡す。省略した形状ノードは `$todo` として生成する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d4bf32edb2f9d699fd5cb43d713e78a7576ab779d43c5d189373631fafc6924d",
+      "evidence_hash": "883f3c9c1c9b467a4de8694b813ca3072522e52790fcc0b6453387da11162dfa",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp catalog add` に意図（layer / kind / name / role / spec anchor / 一部の型形状）を渡すと、エントリ骨格がカタログ draft JSON に追記され、渡した同定・role・spec_refs・型形状が正規フィールドに格納され"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogKindArg"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "`sotp catalog add` に意図（layer / kind / name / role / spec anchor / 一部の型形状）を渡すと、エントリ骨格がカタログ draft JSON に追記され、渡した同定・role・spec_refs・型形状が正規フィールドに格納され、渡さなかった形状ノードが `$todo`（記入指示付き）として生成される。生成結果は JSON として parse でき、`$todo` が残る間は typed DTO への `try_complete` が Err を返し、未入力箇所は `$todo` ノードとして JSON path と指示文で列挙できる。`$todo` を全て埋めた後の完成エントリはカタログ schema の検証を通る。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a278c8dc0908019822b4a203993983c5686fa4dcd44e3b0747cff66a203b46e6",
+      "evidence_hash": "491806b658f2c4affa709bb990673cd2262ebb156ded3b4d0b2fc7af13f4db0e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "top-level コマンド群 `sotp catalog` の新設。動詞は `init` / `add` / `import` / `cite` / `check` の 5 つ。UI 表記の綴りは `catalog`（米綴り）で統一する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::catalog::execute"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "top-level コマンド群 `sotp catalog` の新設。動詞は `init` / `add` / `import` / `cite` / `check` の 5 つ。UI 表記の綴りは `catalog`（米綴り）で統一する。既存機構の名称（`.harness/catalogue-lint/` や catalogue-spec-signals 等）の rename は含まない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a278c8dc0908019822b4a203993983c5686fa4dcd44e3b0747cff66a203b46e6",
+      "evidence_hash": "207ca484bc05e6088f6df26ea2b4b0132a47e5415faaa01226c4763184ebb4d8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track の解決と `--track-id` の扱い。track は省略時に現ブランチから自動解決する。`init` / `add` / `import` / `cite` は WRITE 操作なので、明示 `--track-id` は現在ブランチから導出した id と一致する場合だけ受理し、不一致または非 track ブランチでは fail-closed で停止する（cross-track override として扱わない）。`check` は読み取り専用のため、明示 `--track-id` を READ override として使える。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::catalog::execute"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-11",
+          "text_label": "track の解決と `--track-id` の扱い。track は省略時に現ブランチから自動解決する。`init` / `add` / `import` / `cite` は WRITE 操作なので、明示 `--track-id` は現在ブランチから導出した id と一致する場合だけ受理し、不一致または非 track ブランチでは fail-closed で停止する（cross-track override として扱わない）。`check` は読み取り専用のため、明示 `--track-id` を READ override として使える。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a278c8dc0908019822b4a203993983c5686fa4dcd44e3b0747cff66a203b46e6",
+      "evidence_hash": "9fa838958978bcb533590e1c1e8ecd5237720811d692f876e2cd82520ff59206",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp catalog {init,add,import,cite,check}` の 5 コマンドが CLI に存在する。UI 表記の綴りは `catalog`。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::catalog::execute"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`sotp catalog {init,add,import,cite,check}` の 5 コマンドが CLI に存在する。UI 表記の綴りは `catalog`。既存機構の Rust 型名・ディレクトリ名（catalogue 綴り）は変更されていない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a278c8dc0908019822b4a203993983c5686fa4dcd44e3b0747cff66a203b46e6",
+      "evidence_hash": "7bccbc50f813ec68acd4f618f3c0125ee188873d0f5a02588293d7344bcda8b1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "WRITE 操作（`init` / `add` / `import` / `cite`）で現在ブランチと一致しない `--track-id`、または非 track ブランチでの実行が fail-closed で停止する。READ 操作（`check`）では `--track-id` が現在ブランチと異なっても READ override として受理される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::catalog::execute"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "WRITE 操作（`init` / `add` / `import` / `cite`）で現在ブランチと一致しない `--track-id`、または非 track ブランチでの実行が fail-closed で停止する。READ 操作（`check`）では `--track-id` が現在ブランチと異なっても READ override として受理される。"
+        }
+      }
+    }
+  ]
+}

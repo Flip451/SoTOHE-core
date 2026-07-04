@@ -1,0 +1,318 @@
+{
+  "schema_version": 1,
+  "layer": "infrastructure",
+  "entries": [
+    {
+      "claim_hash": "3fc8b97c4dbe0e91b83a6d12111b500db4d7c5731037bbcb7b8bb8067fbbbd40",
+      "evidence_hash": "0289640fe4ee0a2ccc4f039887d7017c52abfb468c2f069cb9c73ba4fd1e00d2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "draft の扱いは型付きスキーマの手前の draft 層に置き、カタログ file を JSON tree として走査して `$todo` を検出する汎用関数と、完成境界（`$todo` が残っていれば穴のパス + 指示文の一覧を Err で返し、なければ従来の typed DTO へ parse する `try_complete`）で構成する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogDraftError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "穴の `$todo` ノード表現。木の任意のノード（リーフ・オブジェクト・配列要素・セクション丸ごと）を `{ \"$todo\": \"記入指示\" }` に置き換えられる。draft の扱いは型付きスキーマの手前の draft 層に置き、カタログ file を JSON tree として走査して `$todo` を検出する汎用関数と、完成境界（`$todo` が残っていれば穴のパス + 指示文の一覧を Err で返し、なければ従来の typed DTO へ parse する `try_complete`）で構成する。既存の catalogue DTO・signal evaluator・linter・renderer は完成カタログのみを受け取るため無変更で済む形にする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "3fc8b97c4dbe0e91b83a6d12111b500db4d7c5731037bbcb7b8bb8067fbbbd40",
+      "evidence_hash": "599f4cb93fe3d6cd3faa0edbe227dc3dbae5b0f9cfe6c365a5121dc2e3256e6f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "完成境界（`try_complete`）は `$todo` が残っていれば穴のパス + 指示文の一覧を Err で返し、残っていなければ typed DTO を返す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogDraftError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "カタログの任意位置に置かれた `{ \"$todo\": \"...\" }` ノードが検出される。完成境界（`try_complete`）は `$todo` が残っていれば穴のパス + 指示文の一覧を Err で返し、残っていなければ typed DTO を返す。既存の catalogue DTO・signal evaluator・linter・renderer は無変更で完成カタログのみを処理する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5baf5e51af77da2c225d6c0afdd0cee0a163e1c7b8b406f96f5cc69f1f93dcc2",
+      "evidence_hash": "491806b658f2c4affa709bb990673cd2262ebb156ded3b4d0b2fc7af13f4db0e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "top-level コマンド群 `sotp catalog` の新設。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsCatalogAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "top-level コマンド群 `sotp catalog` の新設。動詞は `init` / `add` / `import` / `cite` / `check` の 5 つ。UI 表記の綴りは `catalog`（米綴り）で統一する。既存機構の名称（`.harness/catalogue-lint/` や catalogue-spec-signals 等）の rename は含まない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5baf5e51af77da2c225d6c0afdd0cee0a163e1c7b8b406f96f5cc69f1f93dcc2",
+      "evidence_hash": "20728c2cea358b7d15e5246e45b0b72c7177fdf1af85587d90a3e15c7ae5e90b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp catalog add`: 新規型の意図入力。`--layer` / `--kind` / `--name` / `--role` / `--anchor`（repeatable）で同定・ロール・spec anchor を渡し、`--field` / `--method` / `--variant` / `--trait-impl`（Rust 宣言断片またはシグネチャ文字列、repeatable）で型形状を渡す。宣言レベルの型パラメータと where 句は `--generic` / `--where`（repeatable）、impl block レベルは `--impl-generic` / `--impl-where`（repeatable）で渡す。省略した形状ノードは `$todo` として生成する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsCatalogAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "`sotp catalog add`: 新規型の意図入力。`--layer` / `--kind` / `--name` / `--role` / `--anchor`（repeatable）で同定・ロール・spec anchor を渡し、`--field` / `--method` / `--variant` / `--trait-impl`（Rust 宣言断片またはシグネチャ文字列、repeatable）で型形状を渡す。宣言レベルの型パラメータと where 句は `--generic` / `--where`（repeatable）、impl block レベルは `--impl-generic` / `--impl-where`（repeatable）で渡す。省略した形状ノードは `$todo` として生成する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5baf5e51af77da2c225d6c0afdd0cee0a163e1c7b8b406f96f5cc69f1f93dcc2",
+      "evidence_hash": "a64182baca06538e362f87cffe556f3f223de5aedf15a504bcb942f7d5265e80",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp catalog import`: 既存型の取り込み。`--layer` / `--type`（Rust パス、rustdoc から解決）/ `--action reference|modify|delete`（既定 `reference`）/ `--anchor`。reference は変更なし参照、modify は現状 shape を baseline として取り込み変更差分だけを後で type-designer が編集、delete は同定情報の取り込みで足りる。手動転記が残るのは新規型の add のみとする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsCatalogAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "`sotp catalog import`: 既存型の取り込み。`--layer` / `--type`（Rust パス、rustdoc から解決）/ `--action reference|modify|delete`（既定 `reference`）/ `--anchor`。reference は変更なし参照、modify は現状 shape を baseline として取り込み変更差分だけを後で type-designer が編集、delete は同定情報の取り込みで足りる。手動転記が残るのは新規型の add のみとする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5baf5e51af77da2c225d6c0afdd0cee0a163e1c7b8b406f96f5cc69f1f93dcc2",
+      "evidence_hash": "b692130819a859457ae02a03b4e2da43473fdf0189622a671ccc354ce5eb3372",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp catalog cite`: 生成後の anchor 追加。`--layer` / `--entry` / `--anchor`。D5 の検証付き入力（anchor 実在検証）を通す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsCatalogAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "`sotp catalog cite`: 生成後の anchor 追加。`--layer` / `--entry` / `--anchor`。D5 の検証付き入力（anchor 実在検証）を通す。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5baf5e51af77da2c225d6c0afdd0cee0a163e1c7b8b406f96f5cc69f1f93dcc2",
+      "evidence_hash": "9fa838958978bcb533590e1c1e8ecd5237720811d692f876e2cd82520ff59206",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp catalog {init,add,import,cite,check}` の 5 コマンドが CLI に存在する。UI 表記の綴りは `catalog`。既存機構の Rust 型名・ディレクトリ名（catalogue 綴り）は変更されていない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsCatalogAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`sotp catalog {init,add,import,cite,check}` の 5 コマンドが CLI に存在する。UI 表記の綴りは `catalog`。既存機構の Rust 型名・ディレクトリ名（catalogue 綴り）は変更されていない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5baf5e51af77da2c225d6c0afdd0cee0a163e1c7b8b406f96f5cc69f1f93dcc2",
+      "evidence_hash": "1df985a886d4289a766713a84486d90919cd5f5a208b50a337e140d5beb3790f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp catalog import --type <Rust パス>` を実行すると、rustdoc 抽出から既存型の同定情報・シグネチャ・フィールドを解決できる。`--action reference|modify|delete` の各ケースで、入力が `--layer` / `--type` / `--action` / `--anchor` のみでもエントリが生成され、reference / modify は rustdoc 由来の現状 shape を含み、delete は同定情報を含む。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsCatalogAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "`sotp catalog import --type <Rust パス>` を実行すると、rustdoc 抽出から既存型の同定情報・シグネチャ・フィールドを解決できる。`--action reference|modify|delete` の各ケースで、入力が `--layer` / `--type` / `--action` / `--anchor` のみでもエントリが生成され、reference / modify は rustdoc 由来の現状 shape を含み、delete は同定情報を含む。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5baf5e51af77da2c225d6c0afdd0cee0a163e1c7b8b406f96f5cc69f1f93dcc2",
+      "evidence_hash": "a3ec51d92123aa28d46ae7c608c0a145252102095802afad7f9b9e37550f3ad6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "生成されたエントリに対して稼働済みの catalogue linter ルール群（ロール意味論・Aggregate 境界・アーキテクチャ配置・primitive obsession 防止）と impl → catalogue の type-signals 構造検証が従来どおり動作する。完全な型情報（メソッド署名の型・trait impl 宣言・field 可視性・generic bound）が生成エントリに保持されている。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsCatalogAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-12",
+          "text_label": "生成されたエントリに対して稼働済みの catalogue linter ルール群（ロール意味論・Aggregate 境界・アーキテクチャ配置・primitive obsession 防止）と impl → catalogue の type-signals 構造検証が従来どおり動作する。完全な型情報（メソッド署名の型・trait impl 宣言・field 可視性・generic bound）が生成エントリに保持されている。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d8298fb2fdbb5972d89d64d273bbb1965e51a21721a45b1aa5b3094e6e8c31d5",
+      "evidence_hash": "0289640fe4ee0a2ccc4f039887d7017c52abfb468c2f069cb9c73ba4fd1e00d2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "カタログ file を JSON tree として走査して `$todo` を検出する汎用関数"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::tddd::catalog_gen::scan_todo_holes"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "穴の `$todo` ノード表現。木の任意のノード（リーフ・オブジェクト・配列要素・セクション丸ごと）を `{ \"$todo\": \"記入指示\" }` に置き換えられる。draft の扱いは型付きスキーマの手前の draft 層に置き、カタログ file を JSON tree として走査して `$todo` を検出する汎用関数と、完成境界（`$todo` が残っていれば穴のパス + 指示文の一覧を Err で返し、なければ従来の typed DTO へ parse する `try_complete`）で構成する。既存の catalogue DTO・signal evaluator・linter・renderer は完成カタログのみを受け取るため無変更で済む形にする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d8298fb2fdbb5972d89d64d273bbb1965e51a21721a45b1aa5b3094e6e8c31d5",
+      "evidence_hash": "599f4cb93fe3d6cd3faa0edbe227dc3dbae5b0f9cfe6c365a5121dc2e3256e6f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "カタログの任意位置に置かれた `{ \"$todo\": \"...\" }` ノードが検出される。完成境界（`try_complete`）は `$todo` が残っていれば穴のパス + 指示文の一覧を Err で返し、なければ typed DTO を返す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::tddd::catalog_gen::scan_todo_holes"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "カタログの任意位置に置かれた `{ \"$todo\": \"...\" }` ノードが検出される。完成境界（`try_complete`）は `$todo` が残っていれば穴のパス + 指示文の一覧を Err で返し、残っていなければ typed DTO を返す。既存の catalogue DTO・signal evaluator・linter・renderer は無変更で完成カタログのみを処理する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "604211de615178c699518467501789d0448890e5eb903a7ada9aa031d333e529",
+      "evidence_hash": "0289640fe4ee0a2ccc4f039887d7017c52abfb468c2f069cb9c73ba4fd1e00d2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "完成境界（`$todo` が残っていれば穴のパス + 指示文の一覧を Err で返し、なければ従来の typed DTO へ parse する `try_complete`）"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::tddd::catalog_gen::try_complete"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "穴の `$todo` ノード表現。木の任意のノード（リーフ・オブジェクト・配列要素・セクション丸ごと）を `{ \"$todo\": \"記入指示\" }` に置き換えられる。draft の扱いは型付きスキーマの手前の draft 層に置き、カタログ file を JSON tree として走査して `$todo` を検出する汎用関数と、完成境界（`$todo` が残っていれば穴のパス + 指示文の一覧を Err で返し、なければ従来の typed DTO へ parse する `try_complete`）で構成する。既存の catalogue DTO・signal evaluator・linter・renderer は完成カタログのみを受け取るため無変更で済む形にする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "604211de615178c699518467501789d0448890e5eb903a7ada9aa031d333e529",
+      "evidence_hash": "599f4cb93fe3d6cd3faa0edbe227dc3dbae5b0f9cfe6c365a5121dc2e3256e6f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "完成境界（`try_complete`）は `$todo` が残っていれば穴のパス + 指示文の一覧を Err で返し、残っていなければ typed DTO を返す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::tddd::catalog_gen::try_complete"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "カタログの任意位置に置かれた `{ \"$todo\": \"...\" }` ノードが検出される。完成境界（`try_complete`）は `$todo` が残っていれば穴のパス + 指示文の一覧を Err で返し、残っていなければ typed DTO を返す。既存の catalogue DTO・signal evaluator・linter・renderer は無変更で完成カタログのみを処理する。"
+        }
+      }
+    }
+  ]
+}

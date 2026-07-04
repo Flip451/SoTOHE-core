@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "cb7d94736869709ae21c06a7052df152a1af2067e45a366d2662033d51fb9210",
+  "signals": [
+    {
+      "type_name": "CatalogAddCommand",
+      "signal": "blue",
+      "entry_hash": "ef928f307b0f3fe454b2952936851d6c6ecd792678fa494a56ce851d5efadcdc"
+    },
+    {
+      "type_name": "CatalogCheckQuery",
+      "signal": "blue",
+      "entry_hash": "f2a0969403873685e4ba62e487805e402fe396582463e37788029af795d89857"
+    },
+    {
+      "type_name": "CatalogCheckReport",
+      "signal": "blue",
+      "entry_hash": "98f8aa3a50699876b912a34ee4b4d82e3d5c022aea89841beb9b627c356d1374"
+    },
+    {
+      "type_name": "CatalogCheckVerdict",
+      "signal": "blue",
+      "entry_hash": "e7b17617be63bbd10dc7fd863c97ea87a4cecd5054b1817e7e7164f14595b6f9"
+    },
+    {
+      "type_name": "CatalogCiteCommand",
+      "signal": "blue",
+      "entry_hash": "c209f9f6fabac51972c849a5ccd3d29d479974d924b483e3623e8c2a09f596bc"
+    },
+    {
+      "type_name": "CatalogError",
+      "signal": "blue",
+      "entry_hash": "824d251b2427734f803395059b834b29a44cda267887d79aa1c076be605ec6a5"
+    },
+    {
+      "type_name": "CatalogGateContext",
+      "signal": "blue",
+      "entry_hash": "d25b08f02fde99bb57e2a3acb05a5b9b534448277ac30f0dda088cbef83cbd25"
+    },
+    {
+      "type_name": "CatalogImportCommand",
+      "signal": "blue",
+      "entry_hash": "ce2cfc0ca06d83fac7309b2bec17f983e836599314dda8e640028ee253cd8e53"
+    },
+    {
+      "type_name": "CatalogInitReport",
+      "signal": "blue",
+      "entry_hash": "b0988419819ca6703e33db7f4c45903c31ac38641f25e3a1c592d309acd6afa1"
+    },
+    {
+      "type_name": "CatalogInteractor",
+      "signal": "blue",
+      "entry_hash": "0ec1ea3f15ad60740e7b607e6beb14a7295d674cc435426eb9949e1037f2f4eb"
+    },
+    {
+      "type_name": "CatalogWriteReport",
+      "signal": "blue",
+      "entry_hash": "a77ceaba8be86c486bc0942ac19c85017756f1595b785cd61b7f7da6aca41c60"
+    },
+    {
+      "type_name": "CatalogPort",
+      "signal": "blue",
+      "entry_hash": "0bd73b3468751db372b9db67fdaaf2fc0cc6ee3c89ede2157cceb85491427455"
+    },
+    {
+      "type_name": "CatalogService",
+      "signal": "blue",
+      "entry_hash": "22e2a4559636e3add937b6979f370383149a9c77eb3edacfc065090af17813cb"
+    }
+  ]
+}

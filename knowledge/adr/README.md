@@ -218,6 +218,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | ADR | Status | Date |
 |-----|--------|------|
 | [既存 DRY 違反の一掃 — 横断・既存重複を正典へ集約する](2026-06-19-0924-existing-dry-violation-cleanup.md) | Proposed | 2026-06-19 |
+| [catalogue_v2 エントリ型の catalogue linter 適合 refactor](2026-07-04-0525-catalogue-v2-entry-lint-conformance.md) | Proposed | 2026-07-04 |
 
 ### Review コマンド / API
 

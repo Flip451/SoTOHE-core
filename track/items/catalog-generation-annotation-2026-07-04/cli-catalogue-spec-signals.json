@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "33b050fb4741fe2199a40d681d3f2bff580db26b427638155cf5e74a925cb27e",
+  "signals": [
+    {
+      "type_name": "CatalogActionArg",
+      "signal": "blue",
+      "entry_hash": "1a2b276ac905050f8d6659548ae8eb6898a7d5fa9574ba9081e9f8fcc45726ba"
+    },
+    {
+      "type_name": "CatalogAddArgs",
+      "signal": "blue",
+      "entry_hash": "2a65cd3786b89b2ecc5a21439376a083e4887e2ba5d27b5701f2504f2624ea4f"
+    },
+    {
+      "type_name": "CatalogCheckArgs",
+      "signal": "blue",
+      "entry_hash": "9dfcaea4c4ab0e05df3c54b7f4ef3020d3985c528d8db17668c052c68aa9e396"
+    },
+    {
+      "type_name": "CatalogCiteArgs",
+      "signal": "blue",
+      "entry_hash": "84b7a23dcc6802580954c6322404b53025b48b496f36af1234e3dd6b960a3009"
+    },
+    {
+      "type_name": "CatalogCommand",
+      "signal": "blue",
+      "entry_hash": "4b3766e862d2663e277156f57f12af6e7533b5398218527aac9cbfbbe6528353"
+    },
+    {
+      "type_name": "CatalogGateArg",
+      "signal": "blue",
+      "entry_hash": "c0164b7ec80ce2c14ec8d1d762aa8444afc8b2e69e56efc1290279946a64e521"
+    },
+    {
+      "type_name": "CatalogImportArgs",
+      "signal": "blue",
+      "entry_hash": "d9f5345be98b4f8b272628a4be7b0adc2fc43d0b6c9cffcfe4dd8103d2a0598c"
+    },
+    {
+      "type_name": "CatalogInitArgs",
+      "signal": "blue",
+      "entry_hash": "eb07285130e20c7d118ef1935f3825d73b3286a3c430aad3130f6d4528547e88"
+    },
+    {
+      "type_name": "CatalogKindArg",
+      "signal": "blue",
+      "entry_hash": "d4bf32edb2f9d699fd5cb43d713e78a7576ab779d43c5d189373631fafc6924d"
+    },
+    {
+      "type_name": "cli::commands::catalog::execute",
+      "signal": "blue",
+      "entry_hash": "a278c8dc0908019822b4a203993983c5686fa4dcd44e3b0747cff66a203b46e6"
+    }
+  ]
+}

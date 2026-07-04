@@ -1,0 +1,294 @@
+{
+  "schema_version": 5,
+  "crate_name": "cli",
+  "layer": "cli",
+  "types": {
+    "CatalogKindArg": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Struct",    "payload": { "kind": "unit" } },
+          { "name": "Enum",      "payload": { "kind": "unit" } },
+          { "name": "TypeAlias", "payload": { "kind": "unit" } },
+          { "name": "Trait",     "payload": { "kind": "unit" } },
+          { "name": "Function",  "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "commands::catalog",
+      "docs": "DTO value-enum of the five catalogue entry kinds. See IN-03, AC-03.",
+      "spec_refs": [
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-03" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-03" }
+      ],
+      "informal_grounds": []
+    },
+    "CatalogActionArg": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Reference", "payload": { "kind": "unit" } },
+          { "name": "Modify",    "payload": { "kind": "unit" } },
+          { "name": "Delete",    "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "commands::catalog",
+      "docs": "DTO value-enum of the three import actions. See IN-04, AC-04.",
+      "spec_refs": [
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-04" }
+      ],
+      "informal_grounds": []
+    },
+    "CatalogGateArg": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Phase2", "payload": { "kind": "unit" } },
+          { "name": "Commit", "payload": { "kind": "unit" } },
+          { "name": "Merge",  "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "commands::catalog",
+      "docs": "DTO value-enum of the three gate contexts. See IN-06, AC-11.",
+      "spec_refs": [
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-06" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-11" }
+      ],
+      "informal_grounds": []
+    },
+    "CatalogInitArgs": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "track_id",  "ty": "Option<String>" },
+            { "name": "items_dir", "ty": "std::path::PathBuf" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "commands::catalog",
+      "docs": "Args DTO carrying an optional track_id and items_dir. See IN-02, AC-02.",
+      "spec_refs": [
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-02" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-02" }
+      ],
+      "informal_grounds": []
+    },
+    "CatalogAddArgs": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "track_id",       "ty": "Option<String>" },
+            { "name": "items_dir",      "ty": "std::path::PathBuf" },
+            { "name": "layer",          "ty": "String" },
+            { "name": "kind",           "ty": "CatalogKindArg" },
+            { "name": "name",           "ty": "String" },
+            { "name": "role",           "ty": "String" },
+            { "name": "anchors",        "ty": "Vec<String>" },
+            { "name": "fields",         "ty": "Vec<String>" },
+            { "name": "methods",        "ty": "Vec<String>" },
+            { "name": "variants",       "ty": "Vec<String>" },
+            { "name": "trait_impls",           "ty": "Vec<String>" },
+            { "name": "generics",              "ty": "Vec<String>" },
+            { "name": "where_predicates",      "ty": "Vec<String>" },
+            { "name": "impl_generics",         "ty": "Vec<String>" },
+            { "name": "impl_where_predicates", "ty": "Vec<String>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "commands::catalog",
+      "docs": "Args DTO carrying the add-entry command-line fields. See IN-03, IN-09, AC-03, AC-07.",
+      "spec_refs": [
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-03" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-09" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-03" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-07" }
+      ],
+      "informal_grounds": []
+    },
+    "CatalogImportArgs": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "track_id",  "ty": "Option<String>" },
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "layer",     "ty": "String" },
+            { "name": "type_path", "ty": "String" },
+            { "name": "action",    "ty": "CatalogActionArg" },
+            { "name": "anchors",   "ty": "Vec<String>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "commands::catalog",
+      "docs": "Args DTO carrying layer, type_path, action, and anchors. See IN-04, AC-04.",
+      "spec_refs": [
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-04" }
+      ],
+      "informal_grounds": []
+    },
+    "CatalogCiteArgs": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "track_id",  "ty": "Option<String>" },
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "layer",     "ty": "String" },
+            { "name": "entry",     "ty": "String" },
+            { "name": "anchors",   "ty": "Vec<String>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "commands::catalog",
+      "docs": "Args DTO carrying layer, entry, and anchors. See IN-05, AC-06.",
+      "spec_refs": [
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-05" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-06" }
+      ],
+      "informal_grounds": []
+    },
+    "CatalogCheckArgs": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "track_id",  "ty": "Option<String>" },
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "layer",     "ty": "Option<String>" },
+            { "name": "gate",      "ty": "CatalogGateArg" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "commands::catalog",
+      "docs": "Args DTO carrying track_id, items_dir, optional layer, and gate. See IN-06, AC-11.",
+      "spec_refs": [
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-06" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-11" }
+      ],
+      "informal_grounds": []
+    },
+    "CatalogCommand": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Init",   "payload": { "kind": "tuple", "fields": ["CatalogInitArgs"] } },
+          { "name": "Add",    "payload": { "kind": "tuple", "fields": ["CatalogAddArgs"] } },
+          { "name": "Import", "payload": { "kind": "tuple", "fields": ["CatalogImportArgs"] } },
+          { "name": "Cite",   "payload": { "kind": "tuple", "fields": ["CatalogCiteArgs"] } },
+          { "name": "Check",  "payload": { "kind": "tuple", "fields": ["CatalogCheckArgs"] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "commands::catalog",
+      "docs": "DTO enum of the five catalog subcommands. See IN-01, AC-01.",
+      "spec_refs": [
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-01" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-01" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {
+    "cli::commands::catalog::execute": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [{ "name": "cmd", "ty": "CatalogCommand" }],
+      "returns": "std::process::ExitCode",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Free function with signature `(CatalogCommand) -> ExitCode`. See IN-01, IN-11, AC-01, AC-09.",
+      "spec_refs": [
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-01" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-11" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-01" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-09" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "inherent_impls": [],
+  "trait_impls": [
+    { "trait_ref": "core::fmt::Debug",                "for_type": "CatalogKindArg" },
+    { "trait_ref": "core::clone::Clone",              "for_type": "CatalogKindArg" },
+    { "trait_ref": "core::cmp::PartialEq",            "for_type": "CatalogKindArg" },
+    { "trait_ref": "core::cmp::Eq",                   "for_type": "CatalogKindArg" },
+    { "trait_ref": "clap_builder::derive::ValueEnum", "for_type": "CatalogKindArg" },
+
+    { "trait_ref": "core::fmt::Debug",                "for_type": "CatalogActionArg" },
+    { "trait_ref": "core::clone::Clone",              "for_type": "CatalogActionArg" },
+    { "trait_ref": "core::cmp::PartialEq",            "for_type": "CatalogActionArg" },
+    { "trait_ref": "core::cmp::Eq",                   "for_type": "CatalogActionArg" },
+    { "trait_ref": "clap_builder::derive::ValueEnum", "for_type": "CatalogActionArg" },
+
+    { "trait_ref": "core::fmt::Debug",                "for_type": "CatalogGateArg" },
+    { "trait_ref": "core::clone::Clone",              "for_type": "CatalogGateArg" },
+    { "trait_ref": "core::cmp::PartialEq",            "for_type": "CatalogGateArg" },
+    { "trait_ref": "core::cmp::Eq",                   "for_type": "CatalogGateArg" },
+    { "trait_ref": "clap_builder::derive::ValueEnum", "for_type": "CatalogGateArg" },
+
+    { "trait_ref": "core::fmt::Debug",                     "for_type": "CatalogInitArgs" },
+    { "trait_ref": "clap_builder::derive::Args",           "for_type": "CatalogInitArgs" },
+    { "trait_ref": "clap_builder::derive::FromArgMatches", "for_type": "CatalogInitArgs" },
+
+    { "trait_ref": "core::fmt::Debug",                     "for_type": "CatalogAddArgs" },
+    { "trait_ref": "clap_builder::derive::Args",           "for_type": "CatalogAddArgs" },
+    { "trait_ref": "clap_builder::derive::FromArgMatches", "for_type": "CatalogAddArgs" },
+
+    { "trait_ref": "core::fmt::Debug",                     "for_type": "CatalogImportArgs" },
+    { "trait_ref": "clap_builder::derive::Args",           "for_type": "CatalogImportArgs" },
+    { "trait_ref": "clap_builder::derive::FromArgMatches", "for_type": "CatalogImportArgs" },
+
+    { "trait_ref": "core::fmt::Debug",                     "for_type": "CatalogCiteArgs" },
+    { "trait_ref": "clap_builder::derive::Args",           "for_type": "CatalogCiteArgs" },
+    { "trait_ref": "clap_builder::derive::FromArgMatches", "for_type": "CatalogCiteArgs" },
+
+    { "trait_ref": "core::fmt::Debug",                     "for_type": "CatalogCheckArgs" },
+    { "trait_ref": "clap_builder::derive::Args",           "for_type": "CatalogCheckArgs" },
+    { "trait_ref": "clap_builder::derive::FromArgMatches", "for_type": "CatalogCheckArgs" },
+
+    { "trait_ref": "core::fmt::Debug",                     "for_type": "CatalogCommand" },
+    { "trait_ref": "clap_builder::derive::FromArgMatches", "for_type": "CatalogCommand" },
+    { "trait_ref": "clap_builder::derive::Subcommand",     "for_type": "CatalogCommand" }
+  ]
+}

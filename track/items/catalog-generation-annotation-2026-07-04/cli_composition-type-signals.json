@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-04T08:22:03Z",
+  "declaration_hash": "289272c9a9fdb6939671fbee0037551825a327f03b6ffe251fb4ae3694ff029c",
+  "signals": [
+    {
+      "type_name": "CatalogCompositionRoot",
+      "kind_tag": "composition_root",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::default::Default",
+        "core::fmt::Debug"
+      ]
+    }
+  ]
+}
