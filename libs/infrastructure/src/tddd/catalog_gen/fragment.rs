@@ -11,6 +11,8 @@ use domain::tddd::catalogue_linter::FreeText;
 use serde_json::{Value, json};
 use usecase::catalog_gen::CatalogError;
 
+use super::fs_access::schema_error;
+
 /// Build a [`CatalogError::ParseFragment`].
 pub(super) fn parse_error(message: impl Into<String>) -> CatalogError {
     CatalogError::ParseFragment { message: FreeText::new(message) }
@@ -40,10 +42,29 @@ pub(super) fn parse_field(fragment: &str) -> Result<Value, CatalogError> {
 /// # Errors
 ///
 /// Returns [`CatalogError::ParseFragment`] when the fragment is not a valid
-/// generic parameter.
+/// generic parameter, or [`CatalogError::SchemaInvalid`] when the fragment is a
+/// valid lifetime or const generic parameter — forms the catalogue's
+/// `MethodGenericParam` DTO (a `name` + type `bounds`) cannot encode. Rejecting
+/// them here keeps `catalog add` fail-closed instead of emitting a `name` such
+/// as `'a` or `const N` that the codec later rejects as a non-identifier.
 pub(super) fn parse_generic(fragment: &str) -> Result<Value, CatalogError> {
-    let _: syn::GenericParam = syn::parse_str(fragment)
+    let param: syn::GenericParam = syn::parse_str(fragment)
         .map_err(|err| parse_error(format!("generic `{fragment}`: {err}")))?;
+    match param {
+        syn::GenericParam::Type(_) => {}
+        syn::GenericParam::Lifetime(_) => {
+            return Err(schema_error(format!(
+                "generic `{fragment}`: lifetime parameters are unsupported by the catalogue \
+                 (only simple type parameters like `T` or `T: Bound` are allowed)"
+            )));
+        }
+        syn::GenericParam::Const(_) => {
+            return Err(schema_error(format!(
+                "generic `{fragment}`: const generic parameters are unsupported by the catalogue \
+                 (only simple type parameters like `T` or `T: Bound` are allowed)"
+            )));
+        }
+    }
     let (name, bounds) = match split_binding(fragment) {
         Some((name, rest)) => (name, split_top_level(&rest, '+')),
         None => (fragment.trim().to_owned(), Vec::new()),
@@ -78,10 +99,20 @@ pub(super) fn parse_where(fragment: &str) -> Result<Value, CatalogError> {
 /// # Errors
 ///
 /// Returns [`CatalogError::ParseFragment`] when the fragment is not a valid
-/// variant.
+/// variant, or [`CatalogError::SchemaInvalid`] when the variant carries an
+/// explicit discriminant (`Name = <expr>`) — a form the catalogue's
+/// `VariantDecl` DTO cannot encode. Rejecting it here keeps `catalog add`
+/// fail-closed instead of storing `Name = <expr>` as the variant `name`, which
+/// the codec later rejects as a non-identifier.
 pub(super) fn parse_variant(fragment: &str) -> Result<Value, CatalogError> {
-    let _: syn::Variant = syn::parse_str(fragment)
+    let variant: syn::Variant = syn::parse_str(fragment)
         .map_err(|err| parse_error(format!("variant `{fragment}`: {err}")))?;
+    if variant.discriminant.is_some() {
+        return Err(schema_error(format!(
+            "variant `{fragment}`: explicit discriminants (`= <expr>`) are unsupported by the \
+             catalogue"
+        )));
+    }
     let trimmed = fragment.trim();
     if trimmed.contains('(') {
         let name = leading_name(trimmed, '(');
@@ -548,5 +579,41 @@ mod tests {
         let value = parse_trait_impl("From<CodecError>", "MyType").unwrap();
         assert_eq!(value["trait_ref"], json!("From<CodecError>"));
         assert_eq!(value["for_type"], json!("MyType"));
+    }
+
+    // Finding F1: lifetime and const generic parameters parse as valid Rust
+    // (`syn::GenericParam`) but the catalogue's `MethodGenericParam` DTO cannot
+    // encode them, so they must be rejected at the fragment boundary rather than
+    // emitting a `name` like `'a` / `const N` that the codec later rejects.
+    // A simple type parameter (with or without bounds) is still accepted.
+    #[test]
+    fn test_parse_generic_rejects_lifetime_and_const_but_accepts_type_param() {
+        assert!(matches!(parse_generic("'a"), Err(CatalogError::SchemaInvalid { .. })));
+        assert!(matches!(parse_generic("const N: usize"), Err(CatalogError::SchemaInvalid { .. })));
+        assert!(parse_generic("T").is_ok());
+        assert!(parse_generic("T: Clone + Send").is_ok());
+    }
+
+    // Finding F1: a lifetime generic on a method signature routes through
+    // `extract_method_generics` → `parse_generic`, so the whole signature is
+    // rejected instead of writing an invalid `'a` generic-param name.
+    #[test]
+    fn test_parse_method_rejects_lifetime_generic() {
+        assert!(matches!(
+            parse_method("fn make<'a>() -> &'a str"),
+            Err(CatalogError::SchemaInvalid { .. })
+        ));
+    }
+
+    // Finding F2: a fieldless variant with an explicit discriminant parses as a
+    // valid `syn::Variant` but the catalogue's `VariantDecl` DTO cannot encode
+    // the discriminant, so it must be rejected instead of storing `Error = 1` as
+    // the variant name. A plain fieldless variant is still accepted.
+    #[test]
+    fn test_parse_variant_rejects_discriminant_but_accepts_fieldless() {
+        assert!(matches!(parse_variant("Error = 1"), Err(CatalogError::SchemaInvalid { .. })));
+        let ok = parse_variant("Error").unwrap();
+        assert_eq!(ok["name"], json!("Error"));
+        assert_eq!(ok["payload"]["kind"], json!("unit"));
     }
 }
