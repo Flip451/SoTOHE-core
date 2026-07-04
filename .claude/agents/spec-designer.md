@@ -1,6 +1,6 @@
 ---
 name: spec-designer
-model: claude-opus-4-8[1m]
+model: claude-opus-4-7[1m]
 effort: max
 tools:
   - Read

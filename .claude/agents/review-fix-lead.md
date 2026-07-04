@@ -1,6 +1,6 @@
 ---
 name: review-fix-lead
-model: claude-opus-4-8[1m]
+model: claude-opus-4-7[1m]
 description: Claude subagent adapter for review-fix-lead when routing dispatches the Claude path.
 ---
 
