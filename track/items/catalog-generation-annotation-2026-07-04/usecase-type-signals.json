@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-04T11:04:34Z",
-  "declaration_hash": "cb7d94736869709ae21c06a7052df152a1af2067e45a366d2662033d51fb9210",
+  "generated_at": "2026-07-04T12:08:17Z",
+  "declaration_hash": "b4d22cd28517c39d1408748cfcd5f8d67817630f97a34bae865bab119a51b8db",
   "signals": [
     {
       "type_name": "CatalogAddCommand",
       "kind_tag": "command",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -18,9 +18,9 @@
     {
       "type_name": "CatalogCheckQuery",
       "kind_tag": "query",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -30,9 +30,9 @@
     {
       "type_name": "CatalogCheckReport",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::fmt::Debug"
       ]
@@ -40,10 +40,11 @@
     {
       "type_name": "CatalogCheckVerdict",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
+        "core::clone::TrivialClone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
         "core::fmt::Debug",
@@ -53,9 +54,9 @@
     {
       "type_name": "CatalogCiteCommand",
       "kind_tag": "command",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -65,9 +66,9 @@
     {
       "type_name": "CatalogError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::error::Error",
         "core::fmt::Debug",
         "core::fmt::Display"
@@ -76,10 +77,11 @@
     {
       "type_name": "CatalogGateContext",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
+        "core::clone::TrivialClone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
         "core::fmt::Debug",
@@ -89,9 +91,9 @@
     {
       "type_name": "CatalogImportCommand",
       "kind_tag": "command",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -101,9 +103,9 @@
     {
       "type_name": "CatalogInitReport",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::fmt::Debug"
       ]
@@ -111,30 +113,30 @@
     {
       "type_name": "CatalogInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "CatalogService"
       ]
     },
     {
       "type_name": "CatalogPort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "CatalogService",
       "kind_tag": "application_service",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "CatalogWriteReport",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::fmt::Debug"
       ]

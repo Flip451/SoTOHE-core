@@ -15,6 +15,7 @@
 mod baseline;
 pub mod baseline_document;
 pub mod baseline_graph_ports;
+pub mod catalog_gen;
 pub mod catalogue;
 pub mod catalogue_linter;
 pub mod catalogue_ports;

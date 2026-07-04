@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "cb7d94736869709ae21c06a7052df152a1af2067e45a366d2662033d51fb9210",
+  "catalogue_declaration_hash": "b4d22cd28517c39d1408748cfcd5f8d67817630f97a34bae865bab119a51b8db",
   "signals": [
     {
       "type_name": "CatalogAddCommand",
