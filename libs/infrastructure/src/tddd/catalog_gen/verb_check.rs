@@ -11,6 +11,8 @@ use usecase::catalog_gen::{
     CatalogCheckQuery, CatalogCheckReport, CatalogCheckVerdict, CatalogError, CatalogGateContext,
 };
 
+use crate::tddd::catalogue_document_codec::derive_filename_stem;
+
 use super::fs_access::{catalogue_path, load_bindings, read_catalogue, track_dir};
 use super::validate::load_spec_anchors_for_check;
 use super::{scan_todo_holes, try_complete};
@@ -80,7 +82,8 @@ fn check_layer(
 
     let mut anchor_strings = Vec::new();
     collect_anchor_strings(&value, &mut anchor_strings);
-    if let Err(err) = try_complete(value) {
+    let expected_stem = derive_filename_stem(path);
+    if let Err(err) = try_complete(value, &expected_stem) {
         return Ok(blocked(format!("{layer_name}: schema error: {err}")));
     }
 
@@ -309,6 +312,33 @@ mod tests {
                 .unwrap();
         assert_eq!(outcome.verdict, CatalogCheckVerdict::Blocked);
         assert!(outcome.holes.is_empty());
+    }
+
+    #[test]
+    fn test_mismatched_crate_name_blocks_via_filename_stem() {
+        // Hole-free, otherwise-valid catalogue whose `crate_name` disagrees with
+        // the filename stem (`domain-types.json` → `domain`). The check must
+        // derive the expected crate from the path, not trust the JSON field, so
+        // this tampered file is blocked instead of passing.
+        let body = r#"{"schema_version":5,"crate_name":"wrong","layer":"domain","types":{},"traits":{},"functions":{}}"#;
+        let (temp, path) = write_file("domain-types.json", body);
+        let outcome =
+            check_layer(CatalogGateContext::Phase2, "domain", &path, temp.path(), &empty_set())
+                .unwrap();
+        assert_eq!(outcome.verdict, CatalogCheckVerdict::Blocked);
+    }
+
+    #[test]
+    fn test_duplicate_entry_key_blocks_check() {
+        // Two `Foo` entries under `types`: parsing through `serde_json::Value`
+        // would collapse them to last-wins and bypass the codec's StrictMap
+        // duplicate rejection. The check must fail closed on the raw duplicate.
+        let body = r#"{"schema_version":5,"crate_name":"domain","layer":"domain","types":{"Foo":{"role":{"ValueObject":{}}},"Foo":{"role":{"ValueObject":{}}}},"traits":{},"functions":{}}"#;
+        let (temp, path) = write_file("domain-types.json", body);
+        let outcome =
+            check_layer(CatalogGateContext::Phase2, "domain", &path, temp.path(), &empty_set())
+                .unwrap();
+        assert_eq!(outcome.verdict, CatalogCheckVerdict::Blocked);
     }
 
     #[test]

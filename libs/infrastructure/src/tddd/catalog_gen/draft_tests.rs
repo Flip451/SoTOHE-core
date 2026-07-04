@@ -77,10 +77,27 @@ fn test_scan_collects_multiple_holes() {
 
 #[test]
 fn test_try_complete_returns_document_for_hole_free_draft() {
-    let document = try_complete(empty_catalogue()).expect("hole-free draft should decode");
+    let document =
+        try_complete(empty_catalogue(), "domain").expect("hole-free draft should decode");
     assert_eq!(document.crate_name.as_str(), "domain");
     assert_eq!(document.layer.as_ref(), "domain");
     assert!(document.types.is_empty());
+}
+
+#[test]
+fn test_try_complete_rejects_crate_name_mismatch_with_expected_stem() {
+    // The `crate_name` field disagrees with the caller-supplied stem (derived
+    // from the filename). A tampered field must not be trusted as its own
+    // expectation; the decode must fail closed.
+    let value = json!({
+        "schema_version": 5,
+        "crate_name": "domain",
+        "layer": "domain",
+        "types": {},
+        "traits": {},
+        "functions": {}
+    });
+    assert!(matches!(try_complete(value, "usecase"), Err(CatalogDraftError::Codec { .. })));
 }
 
 #[test]
@@ -93,7 +110,7 @@ fn test_try_complete_reports_incomplete_with_hole_list() {
         "traits": {},
         "functions": {}
     });
-    match try_complete(value) {
+    match try_complete(value, "domain") {
         Err(CatalogDraftError::Incomplete { holes }) => {
             assert_eq!(holes.len(), 1);
             assert_eq!(holes[0].path().as_str(), "types.Foo.role");
@@ -112,5 +129,5 @@ fn test_try_complete_reports_codec_error_on_bad_schema_version() {
         "traits": {},
         "functions": {}
     });
-    assert!(matches!(try_complete(value), Err(CatalogDraftError::Codec { .. })));
+    assert!(matches!(try_complete(value, "domain"), Err(CatalogDraftError::Codec { .. })));
 }

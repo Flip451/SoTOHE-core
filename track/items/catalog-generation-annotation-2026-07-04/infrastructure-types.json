@@ -67,13 +67,14 @@
       "action": "add",
       "role": "FreeFunction",
       "params": [
-        { "name": "value", "ty": "serde_json::Value" }
+        { "name": "value", "ty": "serde_json::Value" },
+        { "name": "expected_stem", "ty": "&str" }
       ],
       "returns": "Result<domain::tddd::catalogue_v2::CatalogueDocument, CatalogDraftError>",
       "is_async": false,
       "generics": [],
       "where_predicates": [],
-      "docs": "Free function with signature `(serde_json::Value) -> Result<CatalogueDocument, CatalogDraftError>`. See IN-07, AC-05.",
+      "docs": "Free function with signature `(serde_json::Value, &str) -> Result<CatalogueDocument, CatalogDraftError>`. See IN-07, AC-05.",
       "spec_refs": [
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-07" },
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-05" }

@@ -17,5 +17,5 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | infrastructure::tddd::catalog_gen::scan_todo_holes | free_function | add | fn(value: &serde_json::Value) -> Vec<domain::tddd::catalog_gen::DraftHole> | 🔵 | 🔵 |
-| infrastructure::tddd::catalog_gen::try_complete | free_function | add | fn(value: serde_json::Value) -> Result<domain::tddd::catalogue_v2::CatalogueDocument, CatalogDraftError> | 🔵 | 🔵 |
+| infrastructure::tddd::catalog_gen::try_complete | free_function | add | fn(value: serde_json::Value, expected_stem: &str) -> Result<domain::tddd::catalogue_v2::CatalogueDocument, CatalogDraftError> | 🔵 | 🔵 |
 

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "c8b328f8f58a29271c2dd126f5461d55b7a176dd5985ed4e8327ab649008e912",
+  "catalogue_declaration_hash": "f7e292ab4b1f3e224301051c37e776a1f113321e7519be65bd4541c8e7d306a1",
   "signals": [
     {
       "type_name": "CatalogDraftError",
@@ -20,7 +20,7 @@
     {
       "type_name": "infrastructure::tddd::catalog_gen::try_complete",
       "signal": "blue",
-      "entry_hash": "604211de615178c699518467501789d0448890e5eb903a7ada9aa031d333e529"
+      "entry_hash": "20d888d68151e87ab4c5fceb0df400dbad3bfdc660cf1a3498fa3842e2ef0e48"
     }
   ]
 }

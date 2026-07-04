@@ -130,20 +130,30 @@ fn push_hole(path: &str, instruction: &str, out: &mut Vec<DraftHole>) {
 /// while any `$todo` remains, and otherwise decodes the JSON via the shared
 /// catalogue codec, surfacing schema violations as [`CatalogDraftError::Codec`].
 ///
+/// `expected_stem` is the crate name the caller derived from the catalogue's
+/// filename (e.g. `"domain"` for `domain-types.json`); the decode step validates
+/// the JSON `crate_name` field against it. Deriving it from the untrusted
+/// `crate_name` field would make that check a tautology and let a tampered
+/// catalogue decode where the canonical `CatalogueDocumentCodec::load` path
+/// would reject it.
+///
 /// See IN-07, AC-05.
 ///
 /// # Errors
 ///
 /// Returns [`CatalogDraftError::Incomplete`] when holes remain, or
-/// [`CatalogDraftError::Codec`] when the hole-free draft violates the schema.
-pub fn try_complete(value: Value) -> Result<CatalogueDocument, CatalogDraftError> {
+/// [`CatalogDraftError::Codec`] when the hole-free draft violates the schema
+/// (including a `crate_name` that disagrees with `expected_stem`).
+pub fn try_complete(
+    value: Value,
+    expected_stem: &str,
+) -> Result<CatalogueDocument, CatalogDraftError> {
     let holes = scan_todo_holes(&value);
     if !holes.is_empty() {
         return Err(CatalogDraftError::Incomplete { holes });
     }
-    let stem = value.get("crate_name").and_then(Value::as_str).unwrap_or_default().to_owned();
     let json = serde_json::to_string(&value).map_err(CatalogueDocumentCodecError::from)?;
-    let document = CatalogueDocumentCodec::decode(&json, &stem)?;
+    let document = CatalogueDocumentCodec::decode(&json, expected_stem)?;
     Ok(document)
 }
 

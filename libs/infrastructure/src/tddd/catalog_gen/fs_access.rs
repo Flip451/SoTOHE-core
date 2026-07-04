@@ -122,8 +122,126 @@ pub(super) fn read_catalogue(path: &Path, trusted_root: &Path) -> Result<Value, 
         .map_err(|err| port_error(format!("failed to read {}: {err}", path.display())))?;
     let value: Value = serde_json::from_str(&text)
         .map_err(|err| schema_error(format!("{}: {err}", path.display())))?;
+    reject_duplicate_keys(path, &text)?;
     validate_catalogue_schema_version(path, &value)?;
     Ok(value)
+}
+
+/// Reject a catalogue whose raw JSON contains duplicate object keys at any depth.
+///
+/// `serde_json::Value` silently collapses duplicate keys to last-wins, so the
+/// [`Value`] returned by [`read_catalogue`] can no longer expose them. The
+/// canonical codec rejects duplicate keys in the `types` / `traits` /
+/// `functions` maps via its `StrictMap` deserializer; without this probe an
+/// add/cite/check operating on the `Value`-parsed draft would bypass that
+/// rejection and let a schema-invalid catalogue through. This walks the raw
+/// text and fails closed on the first duplicate.
+fn reject_duplicate_keys(path: &Path, text: &str) -> Result<(), CatalogError> {
+    struct NoDupKeys;
+
+    impl<'de> serde::Deserialize<'de> for NoDupKeys {
+        fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+        where
+            D: serde::Deserializer<'de>,
+        {
+            struct NoDupVisitor;
+
+            impl<'de> serde::de::Visitor<'de> for NoDupVisitor {
+                type Value = NoDupKeys;
+
+                fn expecting(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                    f.write_str("a JSON value with unique object keys")
+                }
+
+                fn visit_map<A>(self, mut access: A) -> Result<Self::Value, A::Error>
+                where
+                    A: serde::de::MapAccess<'de>,
+                {
+                    let mut seen = std::collections::BTreeSet::new();
+                    while let Some(key) = access.next_key::<String>()? {
+                        access.next_value::<NoDupKeys>()?;
+                        if seen.contains(&key) {
+                            return Err(serde::de::Error::custom(format!(
+                                "duplicate object key `{key}`"
+                            )));
+                        }
+                        seen.insert(key);
+                    }
+                    Ok(NoDupKeys)
+                }
+
+                fn visit_seq<A>(self, mut access: A) -> Result<Self::Value, A::Error>
+                where
+                    A: serde::de::SeqAccess<'de>,
+                {
+                    while access.next_element::<NoDupKeys>()?.is_some() {}
+                    Ok(NoDupKeys)
+                }
+
+                fn visit_bool<E>(self, _: bool) -> Result<Self::Value, E>
+                where
+                    E: serde::de::Error,
+                {
+                    Ok(NoDupKeys)
+                }
+
+                fn visit_i64<E>(self, _: i64) -> Result<Self::Value, E>
+                where
+                    E: serde::de::Error,
+                {
+                    Ok(NoDupKeys)
+                }
+
+                fn visit_i128<E>(self, _: i128) -> Result<Self::Value, E>
+                where
+                    E: serde::de::Error,
+                {
+                    Ok(NoDupKeys)
+                }
+
+                fn visit_u64<E>(self, _: u64) -> Result<Self::Value, E>
+                where
+                    E: serde::de::Error,
+                {
+                    Ok(NoDupKeys)
+                }
+
+                fn visit_u128<E>(self, _: u128) -> Result<Self::Value, E>
+                where
+                    E: serde::de::Error,
+                {
+                    Ok(NoDupKeys)
+                }
+
+                fn visit_f64<E>(self, _: f64) -> Result<Self::Value, E>
+                where
+                    E: serde::de::Error,
+                {
+                    Ok(NoDupKeys)
+                }
+
+                fn visit_str<E>(self, _: &str) -> Result<Self::Value, E>
+                where
+                    E: serde::de::Error,
+                {
+                    Ok(NoDupKeys)
+                }
+
+                fn visit_unit<E>(self) -> Result<Self::Value, E>
+                where
+                    E: serde::de::Error,
+                {
+                    Ok(NoDupKeys)
+                }
+            }
+
+            deserializer.deserialize_any(NoDupVisitor)
+        }
+    }
+
+    serde_json::from_str::<NoDupKeys>(text)
+        .map(|_| ())
+        .map_err(|err| schema_error(format!("{}: {err}", path.display())))
 }
 
 /// Write a JSON tree to a catalogue file with deterministic 2-space formatting
@@ -290,6 +408,38 @@ mod tests {
 
         let err = read_catalogue(&path, temp.path()).unwrap_err();
         assert!(matches!(err, CatalogError::SchemaInvalid { .. }));
+    }
+
+    #[test]
+    fn test_read_catalogue_rejects_duplicate_object_key() {
+        let temp = tempfile::tempdir().unwrap();
+        let path = temp.path().join("domain-types.json");
+        // Two `Foo` entries under `types`: `serde_json::Value` would collapse
+        // these to last-wins, hiding the duplicate from the codec's StrictMap
+        // rejection. read_catalogue must fail closed on the raw duplicate.
+        std::fs::write(
+            &path,
+            r#"{"schema_version":5,"crate_name":"domain","layer":"domain","types":{"Foo":{"role":"a"},"Foo":{"role":"b"}},"traits":{},"functions":{}}"#,
+        )
+        .unwrap();
+
+        let err = read_catalogue(&path, temp.path()).unwrap_err();
+        assert!(matches!(err, CatalogError::SchemaInvalid { .. }));
+    }
+
+    #[test]
+    fn test_read_catalogue_accepts_unique_keys() {
+        let temp = tempfile::tempdir().unwrap();
+        let path = temp.path().join("domain-types.json");
+        std::fs::write(
+            &path,
+            r#"{"schema_version":5,"crate_name":"domain","layer":"domain","types":{"Foo":{"role":"a"},"Bar":{"role":"b"}},"traits":{},"functions":{}}"#,
+        )
+        .unwrap();
+
+        let value = read_catalogue(&path, temp.path()).unwrap();
+        assert!(value.get("types").and_then(|types| types.get("Foo")).is_some());
+        assert!(value.get("types").and_then(|types| types.get("Bar")).is_some());
     }
 
     #[test]

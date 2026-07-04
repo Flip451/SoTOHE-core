@@ -267,11 +267,11 @@
       }
     },
     {
-      "claim_hash": "604211de615178c699518467501789d0448890e5eb903a7ada9aa031d333e529",
+      "claim_hash": "20d888d68151e87ab4c5fceb0df400dbad3bfdc660cf1a3498fa3842e2ef0e48",
       "evidence_hash": "0289640fe4ee0a2ccc4f039887d7017c52abfb468c2f069cb9c73ba4fd1e00d2",
       "verdict": {
         "kind": "pass",
-        "citation": "完成境界（`$todo` が残っていれば穴のパス + 指示文の一覧を Err で返し、なければ従来の typed DTO へ parse する `try_complete`）"
+        "citation": "draft の扱いは型付きスキーマの手前の draft 層に置き、カタログ file を JSON tree として走査して `$todo` を検出する汎用関数と、完成境界（`$todo` が残っていれば穴のパス + 指示文の一覧を Err で返し、なければ従来の typed DTO へ parse する `try_complete`）で構成する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -291,7 +291,7 @@
       }
     },
     {
-      "claim_hash": "604211de615178c699518467501789d0448890e5eb903a7ada9aa031d333e529",
+      "claim_hash": "20d888d68151e87ab4c5fceb0df400dbad3bfdc660cf1a3498fa3842e2ef0e48",
       "evidence_hash": "599f4cb93fe3d6cd3faa0edbe227dc3dbae5b0f9cfe6c365a5121dc2e3256e6f",
       "verdict": {
         "kind": "pass",
