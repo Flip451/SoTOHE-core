@@ -158,17 +158,7 @@ fn path_segments(path: &str) -> Vec<&str> {
 fn kind_value(type_info: &TypeInfo) -> Value {
     match type_info.kind() {
         TypeKind::Struct => {
-            let fields: Vec<Value> = type_info
-                .members()
-                .iter()
-                .filter_map(|member| {
-                    member.ty().map(|ty| json!({ "name": member.name(), "ty": ty }))
-                })
-                .collect();
-            json!({
-                "kind": "struct",
-                "shape": { "kind": "plain", "fields": fields, "has_stripped_fields": false }
-            })
+            json!({ "kind": "struct", "shape": struct_shape_value(type_info.members()) })
         }
         TypeKind::Enum => {
             let variants: Vec<Value> = type_info.members().iter().map(variant_value).collect();
@@ -179,6 +169,31 @@ fn kind_value(type_info: &TypeInfo) -> Value {
             "target": { "$todo": "the aliased type (not captured by extraction)" }
         }),
     }
+}
+
+/// Build the `shape` node for a struct from its extracted members.
+///
+/// Rustdoc extraction flattens `StructKind` into a member list, so the shape is
+/// recovered from the field names: tuple fields are extracted with positional
+/// names (`"0"`, `"1"`, …) that are not valid Rust identifiers, plain fields
+/// keep their declared names, and a unit struct has no members. Emitting the
+/// matching shape keeps a tuple / unit struct from being written as a `plain`
+/// struct with numeric field names, which the catalogue codec rejects because a
+/// plain `FieldName` must be a Rust identifier.
+fn struct_shape_value(members: &[MemberDeclaration]) -> Value {
+    if members.is_empty() {
+        return json!({ "kind": "unit" });
+    }
+    if members.iter().all(|member| member.name().parse::<usize>().is_ok()) {
+        let fields: Vec<Value> =
+            members.iter().filter_map(|member| member.ty().map(|ty| json!(ty))).collect();
+        return json!({ "kind": "tuple", "fields": fields, "has_stripped_fields": false });
+    }
+    let fields: Vec<Value> = members
+        .iter()
+        .filter_map(|member| member.ty().map(|ty| json!({ "name": member.name(), "ty": ty })))
+        .collect();
+    json!({ "kind": "plain", "fields": fields, "has_stripped_fields": false })
 }
 
 /// Build a `VariantDecl` node from an enum member.
@@ -401,5 +416,52 @@ mod tests {
         let methods = collect_methods(&schema, "Order", Some("shop::foo"));
         assert_eq!(methods.len(), 1);
         assert_eq!(methods[0]["name"], json!("in_foo"));
+    }
+
+    // Finding (round 4): a tuple struct (`struct Pair(u32, String)`) is extracted
+    // with positional field names `"0"` / `"1"`. It must be emitted as a `tuple`
+    // shape carrying bare type strings, not a `plain` shape whose numeric field
+    // names the catalogue codec would reject.
+    #[test]
+    fn test_kind_value_tuple_struct_uses_tuple_shape() {
+        let ti = TypeInfo::new(
+            "Pair".to_owned(),
+            TypeKind::Struct,
+            None,
+            vec![MemberDeclaration::field("0", "u32"), MemberDeclaration::field("1", "String")],
+        );
+        let kind = kind_value(&ti);
+        assert_eq!(kind["kind"], json!("struct"));
+        assert_eq!(kind["shape"]["kind"], json!("tuple"));
+        assert_eq!(kind["shape"]["fields"], json!(["u32", "String"]));
+        // Tuple fields are positional strings — no `name` key, so the invalid
+        // `"0"` / `"1"` field names never reach the codec.
+        assert!(kind["shape"]["fields"][0].get("name").is_none());
+    }
+
+    // Finding (round 4): a unit struct (`struct Marker;`) has no members and must
+    // be emitted as a `unit` shape, not a `plain` shape with zero fields.
+    #[test]
+    fn test_kind_value_unit_struct_uses_unit_shape() {
+        let ti = TypeInfo::new("Marker".to_owned(), TypeKind::Struct, None, vec![]);
+        let kind = kind_value(&ti);
+        assert_eq!(kind["shape"]["kind"], json!("unit"));
+        assert!(kind["shape"].get("fields").is_none());
+    }
+
+    // A named-field struct is unchanged: it stays a `plain` shape keyed by field
+    // name.
+    #[test]
+    fn test_kind_value_plain_struct_uses_plain_shape() {
+        let ti = TypeInfo::new(
+            "Config".to_owned(),
+            TypeKind::Struct,
+            None,
+            vec![MemberDeclaration::field("path", "String")],
+        );
+        let kind = kind_value(&ti);
+        assert_eq!(kind["shape"]["kind"], json!("plain"));
+        assert_eq!(kind["shape"]["fields"][0]["name"], json!("path"));
+        assert_eq!(kind["shape"]["fields"][0]["ty"], json!("String"));
     }
 }

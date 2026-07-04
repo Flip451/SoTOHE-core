@@ -10,7 +10,7 @@ use usecase::catalog_gen::{CatalogCiteCommand, CatalogError, CatalogWriteReport}
 
 use super::fs_access::{
     catalogue_path, find_entry_section, load_bindings, read_catalogue, scan_entry_holes,
-    schema_error, track_dir, write_catalogue,
+    schema_error, spec_ref_file, track_dir, write_catalogue,
 };
 use super::validate::{load_spec_anchors, validate_anchor};
 
@@ -27,8 +27,8 @@ pub(super) fn run(
 ) -> Result<CatalogWriteReport, CatalogError> {
     let bindings = load_bindings(items_dir)?;
     let dir = track_dir(items_dir, track_id)?;
-    let path = catalogue_path(&dir, &bindings, &command.layer);
-    let spec_file = format!("{}/spec.json", dir.display());
+    let path = catalogue_path(&dir, &bindings, &command.layer)?;
+    let spec_file = spec_ref_file(track_id);
     let spec_anchors = load_spec_anchors(&dir, items_dir)?;
     cite_anchors_in_file(&path, items_dir, &command, &spec_file, &spec_anchors)
 }

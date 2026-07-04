@@ -72,18 +72,40 @@ pub(super) fn load_bindings(items_dir: &Path) -> Result<Vec<TdddLayerBinding>, C
         .map_err(|err| port_error(format!("failed to load TDDD layers: {err}")))
 }
 
-/// Resolve the catalogue file path for `layer` under `track_dir`, using the
-/// binding's `catalogue_file` when available and the `<layer>-types.json`
-/// convention otherwise.
+/// Resolve the catalogue file path for `layer` under `track_dir` from the
+/// layer's `catalogue_file` binding.
+///
+/// # Errors
+///
+/// Returns [`CatalogError::SchemaInvalid`] when `layer` is not a TDDD-enabled
+/// layer in `architecture-rules.json`. A syntactically valid but unconfigured
+/// `--layer` (e.g. the typo `usecaes`) must fail here rather than resolve to an
+/// invented `<layer>-types.json`: that file is absent, and the commit gate
+/// treats an absent catalogue as `Skipped`, so a silent fallback would let a
+/// misspelled layer validate nothing while appearing to succeed.
 pub(super) fn catalogue_path(
     track_dir: &Path,
     bindings: &[TdddLayerBinding],
     layer: &LayerId,
-) -> PathBuf {
-    let file = find_binding(bindings, layer.as_ref())
-        .map(|binding| binding.catalogue_file().to_owned())
-        .unwrap_or_else(|| format!("{}-types.json", layer.as_ref()));
-    track_dir.join(file)
+) -> Result<PathBuf, CatalogError> {
+    let binding = find_binding(bindings, layer.as_ref()).ok_or_else(|| {
+        schema_error(format!(
+            "layer `{}` is not a TDDD-enabled layer in architecture-rules.json",
+            layer.as_ref()
+        ))
+    })?;
+    Ok(track_dir.join(binding.catalogue_file()))
+}
+
+/// The portable, repo-relative `spec.json` path recorded in catalogue
+/// `spec_refs[].file` entries for `track_id`.
+///
+/// Always `track/items/<track_id>/spec.json`, independent of the (possibly
+/// absolute) `items_dir` the CLI was invoked with, so the written catalogue
+/// stays host-independent and every `add` / `import` / `cite` spells the ref
+/// identically. Callers pass a `track_id` already validated by [`track_dir`].
+pub(super) fn spec_ref_file(track_id: &str) -> String {
+    format!("track/items/{track_id}/spec.json")
 }
 
 /// The catalogue section (`types` / `traits` / `functions`) an entry kind
@@ -457,5 +479,38 @@ mod tests {
         let key = CatalogEntryName::try_new("Bar".to_owned()).unwrap();
         insert_entry(&mut document, "types", &key, serde_json::json!({ "role": "x" })).unwrap();
         assert!(document["types"].get("Bar").is_some());
+    }
+
+    fn single_domain_binding() -> Vec<TdddLayerBinding> {
+        crate::verify::tddd_layers::parse_tddd_layers(
+            r#"{"layers":[{"crate":"domain","tddd":{"enabled":true,"catalogue_file":"domain-types.json"}}]}"#,
+        )
+        .unwrap()
+    }
+
+    #[test]
+    fn test_catalogue_path_resolves_configured_layer() {
+        let bindings = single_domain_binding();
+        let layer = LayerId::try_new("domain").unwrap();
+        let path = catalogue_path(Path::new("track/items/t"), &bindings, &layer).unwrap();
+        assert_eq!(path, PathBuf::from("track/items/t/domain-types.json"));
+    }
+
+    #[test]
+    fn test_catalogue_path_rejects_unconfigured_layer() {
+        // `usecaes` is a syntactically valid LayerId (a typo of `usecase`) that
+        // is not a configured TDDD layer. It must fail closed rather than invent
+        // `usecaes-types.json`, which the commit gate would silently skip.
+        let bindings = single_domain_binding();
+        let layer = LayerId::try_new("usecaes").unwrap();
+        let err = catalogue_path(Path::new("track/items/t"), &bindings, &layer).unwrap_err();
+        assert!(matches!(err, CatalogError::SchemaInvalid { .. }));
+    }
+
+    #[test]
+    fn test_spec_ref_file_is_repo_relative() {
+        // The recorded spec ref is a pure function of the track id, so it can
+        // never embed the (possibly absolute) items_dir.
+        assert_eq!(spec_ref_file("my-track-2026"), "track/items/my-track-2026/spec.json");
     }
 }

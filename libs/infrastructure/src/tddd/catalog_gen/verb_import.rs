@@ -10,7 +10,7 @@ use usecase::catalog_gen::{CatalogError, CatalogImportCommand, CatalogWriteRepor
 
 use super::fs_access::{
     catalogue_path, insert_entry, load_bindings, read_catalogue, scan_entry_holes, schema_error,
-    track_dir, workspace_root, write_catalogue,
+    spec_ref_file, track_dir, workspace_root, write_catalogue,
 };
 use super::import_shape::{ImportedShape, build_import_entry, resolve_shape};
 use super::validate::load_spec_anchors;
@@ -28,8 +28,8 @@ pub(super) fn run(
 ) -> Result<CatalogWriteReport, CatalogError> {
     let bindings = load_bindings(items_dir)?;
     let dir = track_dir(items_dir, track_id)?;
-    let path = catalogue_path(&dir, &bindings, &command.layer);
-    let spec_file = format!("{}/spec.json", dir.display());
+    let path = catalogue_path(&dir, &bindings, &command.layer)?;
+    let spec_file = spec_ref_file(track_id);
     let spec_anchors = load_spec_anchors(&dir, items_dir)?;
     let root = workspace_root(items_dir);
     let shape = resolve_shape(&root, &command.type_path)?;

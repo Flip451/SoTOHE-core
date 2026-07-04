@@ -42,7 +42,7 @@ pub(super) fn run(
     let spec_anchors = load_spec_anchors_for_check(&dir, items_dir)?;
 
     let targets: Vec<(String, PathBuf)> = match &query.layer {
-        Some(layer) => vec![(layer.as_ref().to_owned(), catalogue_path(&dir, &bindings, layer))],
+        Some(layer) => vec![(layer.as_ref().to_owned(), catalogue_path(&dir, &bindings, layer)?)],
         None => bindings
             .iter()
             .map(|binding| (binding.layer_id().to_owned(), dir.join(binding.catalogue_file())))
