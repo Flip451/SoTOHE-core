@@ -147,7 +147,10 @@ pub(super) fn parse_method(fragment: &str) -> Result<Value, CatalogError> {
     let name = signature.ident.to_string();
     let is_async = signature.asyncness.is_some();
 
-    let params_inner = extract_delimited(fragment, '(', ')')
+    let param_open = find_param_open(fragment)
+        .ok_or_else(|| parse_error(format!("method `{fragment}`: missing parameter list")))?;
+    let params_region = fragment.get(param_open..).unwrap_or_default();
+    let params_inner = extract_delimited(params_region, '(', ')')
         .ok_or_else(|| parse_error(format!("method `{fragment}`: missing parameter list")))?;
     let mut receiver: Option<String> = None;
     let mut params: Vec<Value> = Vec::new();
@@ -161,10 +164,10 @@ pub(super) fn parse_method(fragment: &str) -> Result<Value, CatalogError> {
         params.push(parse_field(&part)?);
     }
 
-    let after_params = tail_after_delimited(fragment, '(', ')').unwrap_or_default();
+    let after_params = tail_after_delimited(params_region, '(', ')').unwrap_or_default();
     let has_where = signature.generics.where_clause.is_some();
     let (returns, where_body) = split_return_and_where(&after_params, has_where);
-    let generics = extract_method_generics(fragment)?;
+    let generics = extract_method_generics(fragment, param_open)?;
     let mut where_predicates = Vec::new();
     if let Some(body) = where_body {
         for predicate in split_top_level(&body, ',') {
@@ -302,8 +305,18 @@ fn extract_delimited(input: &str, open: char, close: char) -> Option<String> {
     let start = input.find(open)?;
     let mut depth: i32 = 0;
     let mut result = String::new();
-    for (idx, ch) in input.char_indices() {
+    let mut chars = input.char_indices().peekable();
+    while let Some((idx, ch)) = chars.next() {
         if idx < start {
+            continue;
+        }
+        if ch == '-' && matches!(chars.peek(), Some(&(_, '>'))) {
+            // Treat `->` as a literal token so a return arrow inside the region
+            // (e.g. a `Fn(u32) -> bool` bound) never perturbs `<`/`>` depth.
+            chars.next();
+            if depth >= 1 {
+                result.push_str("->");
+            }
             continue;
         }
         if ch == open {
@@ -340,6 +353,28 @@ fn tail_after_delimited(input: &str, open: char, close: char) -> Option<String> 
                 let after = idx + ch.len_utf8();
                 return Some(input.get(after..).unwrap_or("").to_owned());
             }
+        }
+    }
+    None
+}
+
+/// Locate the byte offset of the parameter-list `(` in a `fn` signature — the
+/// first `(` that appears at angle-bracket depth ≤ 0. Scanning past the generic
+/// block this way keeps a parenthesised bound (`<F: Fn(u32) -> bool>`) from being
+/// mistaken for the parameter list. `->` is consumed as a literal token so a
+/// return arrow inside a bound does not perturb `<`/`>` depth tracking.
+fn find_param_open(fragment: &str) -> Option<usize> {
+    let mut angle_depth: i32 = 0;
+    let mut chars = fragment.char_indices().peekable();
+    while let Some((idx, ch)) = chars.next() {
+        match ch {
+            '-' if matches!(chars.peek(), Some(&(_, '>'))) => {
+                chars.next();
+            }
+            '<' => angle_depth += 1,
+            '>' => angle_depth -= 1,
+            '(' if angle_depth <= 0 => return Some(idx),
+            _ => {}
         }
     }
     None
@@ -431,10 +466,11 @@ fn split_return_and_where(after: &str, has_where: bool) -> (String, Option<Strin
     (returns, where_body)
 }
 
-/// Extract declaration generics from `fn name<...>(` into a vec of values.
-fn extract_method_generics(fragment: &str) -> Result<Vec<Value>, CatalogError> {
-    let paren = fragment.find('(').unwrap_or(fragment.len());
-    let head = fragment.get(..paren).unwrap_or("");
+/// Extract declaration generics — the `<...>` block in `fragment[..param_open]`,
+/// where `param_open` is the byte offset of the parameter-list `(` — into a vec
+/// of values.
+fn extract_method_generics(fragment: &str, param_open: usize) -> Result<Vec<Value>, CatalogError> {
+    let head = fragment.get(..param_open).unwrap_or("");
     if !head.contains('<') {
         return Ok(Vec::new());
     }
@@ -551,6 +587,18 @@ mod tests {
     #[test]
     fn test_parse_method_rejects_non_signature() {
         assert!(matches!(parse_method("not a function"), Err(CatalogError::ParseFragment { .. })));
+    }
+
+    // Finding F1 (PR #182 round 10): a parenthesised bound in the generic list
+    // (`Fn(u32) -> bool`) contains `(...)` that precedes the real parameter list.
+    // The signature is valid Rust, so it must parse — the parameter list is the
+    // `(...)` following the closed generic block, not the bound's parentheses.
+    #[test]
+    fn test_parse_method_accepts_fn_bound_in_generics() {
+        let value = parse_method("fn run<F: Fn(u32) -> bool>(f: F) -> bool").unwrap();
+        assert_eq!(value["name"], json!("run"));
+        assert_eq!(value["params"], json!([{ "name": "f", "ty": "F" }]));
+        assert_eq!(value["returns"], json!("bool"));
     }
 
     // Finding 3: a return type whose path contains the substring `where`
