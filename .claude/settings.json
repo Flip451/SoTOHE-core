@@ -130,6 +130,7 @@
       "Bash(cargo make ci-rust)",
       "Bash(cargo make ci)",
       "Bash(cargo make add-all)",
+      "Bash(cargo make sync)",
       "Bash(cargo make track-add-paths)",
       "Bash(cargo make track-commit-message)",
       "Bash(cargo make track-note)",
@@ -212,7 +213,6 @@
     ]
   },
   "env": {
-    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
-    "CLAUDE_CODE_SUBAGENT_MODEL": "claude-sonnet-5"
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   }
 }

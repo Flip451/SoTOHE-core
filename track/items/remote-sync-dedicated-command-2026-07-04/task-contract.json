@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "track_id": "remote-sync-dedicated-command-2026-07-04",
+  "entries": {
+    "T001": [
+      { "layer": "usecase", "entry_key": "DiagnosticText" },
+      { "layer": "usecase", "entry_key": "usecase::git_workflow::validate_stage_path_entries" },
+      { "layer": "usecase", "entry_key": "usecase::git_workflow::verify_explicit_track_branch" },
+      { "layer": "usecase", "entry_key": "usecase::git_workflow::verify_auto_detected_branch" }
+    ],
+    "T002": [
+      { "layer": "usecase", "entry_key": "TrackArchiveFsPort" },
+      { "layer": "usecase", "entry_key": "ExplicitTrackBranch" },
+      { "layer": "usecase", "entry_key": "TrackBranchClaim" },
+      { "layer": "domain", "entry_key": "WorktreeError" },
+      { "layer": "domain", "entry_key": "WorktreeReader" },
+      { "layer": "domain", "entry_key": "CommitHash" }
+    ],
+    "T003": [
+      { "layer": "usecase", "entry_key": "TrackGitInteractor" },
+      { "layer": "usecase", "entry_key": "PrGitInteractor" },
+      { "layer": "usecase", "entry_key": "ReviewGitInteractor" },
+      { "layer": "domain", "entry_key": "TrackId" }
+    ],
+    "T004": [
+      { "layer": "infrastructure", "entry_key": "FsWorkspaceAdapter" },
+      { "layer": "infrastructure", "entry_key": "GitError" },
+      { "layer": "infrastructure", "entry_key": "TrackBranchError" },
+      { "layer": "infrastructure", "entry_key": "TrackBranchRecord" },
+      { "layer": "infrastructure", "entry_key": "infrastructure::git_cli::resolve_repo_path" },
+      { "layer": "infrastructure", "entry_key": "infrastructure::git_cli::load_explicit_track_branch" },
+      { "layer": "infrastructure", "entry_key": "infrastructure::git_cli::load_explicit_track_branch_from_items_dir" },
+      { "layer": "infrastructure", "entry_key": "infrastructure::git_cli::collect_track_branch_claims" }
+    ],
+    "T005": [
+      { "layer": "usecase", "entry_key": "GitWorkflowService" },
+      { "layer": "usecase", "entry_key": "GitWorkflowInteractor" },
+      { "layer": "cli_driver", "entry_key": "GitInput" },
+      { "layer": "cli", "entry_key": "GitCommand" },
+      { "layer": "cli", "entry_key": "SwitchAndPullArgs" },
+      { "layer": "cli", "entry_key": "FileArgs" },
+      { "layer": "cli", "entry_key": "CommitFromFileArgs" },
+      { "layer": "cli", "entry_key": "UnstageArgs" }
+    ],
+    "T006": [
+      { "layer": "cli_composition", "entry_key": "GitCompositionRoot" }
+    ],
+    "T007": [],
+    "T008": [
+      { "layer": "usecase", "entry_key": "BranchReaderPort" },
+      { "layer": "usecase", "entry_key": "BranchReadError" },
+      { "layer": "infrastructure", "entry_key": "SystemGitRepo" },
+      { "layer": "infrastructure", "entry_key": "GitRepository" }
+    ],
+    "T009": [],
+    "T010": [
+      { "layer": "usecase", "entry_key": "GitWorkflowError" },
+      { "layer": "infrastructure", "entry_key": "SyncError" },
+      { "layer": "cli_composition", "entry_key": "cli_composition::review_v2::commit_hash::persist_commit_hash_for_track" }
+    ],
+    "T011": [
+      { "layer": "usecase", "entry_key": "GitPrimitivePort" },
+      { "layer": "usecase", "entry_key": "TelemetryAggregateInteractor" },
+      { "layer": "usecase", "entry_key": "TelemetryReportInteractor" },
+      { "layer": "usecase", "entry_key": "TelemetryEmitInteractor" },
+      { "layer": "usecase", "entry_key": "ArchivedTelemetryFactoryPort" },
+      { "layer": "usecase", "entry_key": "TelemetryAggregateService" },
+      { "layer": "usecase", "entry_key": "TelemetryReportPort" },
+      { "layer": "usecase", "entry_key": "ArchivedTrackTelemetryPort" },
+      { "layer": "usecase", "entry_key": "TelemetryReportOutput" },
+      { "layer": "usecase", "entry_key": "TelemetryAggregateServiceError" },
+      { "layer": "infrastructure", "entry_key": "FsGitWorkflowAdapter" },
+      { "layer": "infrastructure", "entry_key": "FsArchivedTelemetryFactoryAdapter" }
+    ]
+  }
+}

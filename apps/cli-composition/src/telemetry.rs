@@ -2,20 +2,14 @@
 //!
 //! Provides:
 //! - `TelemetryCompositionRoot::telemetry_driver`: builds a wired
-//!   `TelemetryDriver` backed by `TelemetryAggregateServiceImpl`.
+//!   `TelemetryDriver` backed by `usecase::telemetry::TelemetryAggregateInteractor`.
 //!
-//! `TelemetryAggregateServiceImpl` implements both methods of
-//! `TelemetryAggregateService`:
-//!   - `report`: aggregates telemetry data via `FsTelemetryReportAdapter` and
-//!     returns a `TelemetryReportOutput` DTO. Presentation formatting is
-//!     delegated to `cli_driver::telemetry::TelemetryDriver` (OS-04 / AC-06).
-//!   - `emit_archived`: wires `FsArchivedTrackTelemetryAdapter` →
-//!     `ArchivedTrackTelemetryInteractor` and emits a single archived-track
-//!     telemetry event (D8 / AC-10).
-//!
-//! No telemetry writer is constructed or invoked here for `report`; it is a
-//! pure data-aggregation command that reads and returns structured data
-//! without emitting any `TelemetryEvent` itself.
+//! This module is wiring-only (CN-03): it constructs the infrastructure
+//! adapters (`FsGitWorkflowAdapter`, `FsTelemetryReportAdapter`,
+//! `FsArchivedTelemetryFactoryAdapter`) and injects them into the usecase
+//! `TelemetryAggregateInteractor`, which owns both the `report` aggregation and
+//! the `emit_archived` archive orchestration (repo-root resolution via
+//! `GitPrimitivePort::resolve_repo_root`). No orchestration logic lives here.
 
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -51,83 +45,32 @@ pub struct TelemetryReportInput {
     pub items_dir: PathBuf,
 }
 
-/// Concrete implementation of `TelemetryAggregateService` that wires
-/// the infrastructure adapters for both the `report` and `emit_archived`
-/// service methods.
-///
-/// `report` returns the aggregated `TelemetryReportOutput` DTO directly;
-/// presentation formatting is performed by `cli_driver::telemetry::TelemetryDriver`.
-/// `emit_archived` wires `FsArchivedTrackTelemetryAdapter` →
-/// `ArchivedTrackTelemetryInteractor` inline (no composition-root helper shim).
-struct TelemetryAggregateServiceImpl;
-
-impl usecase::TelemetryAggregateService for TelemetryAggregateServiceImpl {
-    fn report(
-        &self,
-        track_id: &str,
-        items_dir: &std::path::Path,
-    ) -> Result<
-        usecase::telemetry::TelemetryReportOutput,
-        usecase::telemetry::TelemetryAggregateServiceError,
-    > {
-        use infrastructure::FsTelemetryReportAdapter;
-        use usecase::telemetry::{TelemetryAggregateServiceError, TelemetryReportPort as _};
-        let adapter = FsTelemetryReportAdapter::new();
-        adapter.aggregate(track_id, items_dir).map_err(|e| {
-            TelemetryAggregateServiceError::ReportUnavailable(format!("telemetry report: {e}"))
-        })
-    }
-
-    fn emit_archived(
-        &self,
-        items_dir: &std::path::Path,
-        track_id: &str,
-        subcommand: String,
-        exit_code: i32,
-        duration_ms: u64,
-    ) -> Result<(), usecase::telemetry::TelemetryAggregateServiceError> {
-        use infrastructure::FsArchivedTrackTelemetryAdapter;
-        use infrastructure::git_cli::GitRepository as _;
+impl TelemetryCompositionRoot {
+    /// Build a wired [`cli_driver::telemetry::TelemetryDriver`] for the telemetry
+    /// family.
+    ///
+    /// Wiring-only (CN-03): constructs the infrastructure adapters and injects
+    /// them into `usecase::telemetry::TelemetryAggregateInteractor`, which owns
+    /// the report + archive orchestration. No orchestration logic lives here.
+    pub fn telemetry_driver(&self) -> cli_driver::telemetry::TelemetryDriver {
+        use infrastructure::{
+            FsArchivedTelemetryFactoryAdapter, FsGitWorkflowAdapter, FsTelemetryReportAdapter,
+        };
+        use usecase::git_workflow::GitPrimitivePort;
         use usecase::telemetry::{
-            ArchivedTrackTelemetryCommand, ArchivedTrackTelemetryInteractor,
-            ArchivedTrackTelemetryService as _, TelemetryAggregateServiceError,
+            ArchivedTelemetryFactoryPort, TelemetryAggregateInteractor, TelemetryEmitInteractor,
+            TelemetryReportInteractor, TelemetryReportPort,
         };
 
-        // Derive the project root, then discover the repo to get an absolute root path.
-        let project_root = crate::track::resolve_project_root(items_dir)
-            .map_err(|e| TelemetryAggregateServiceError::EmitUnavailable(e.to_string()))?;
-        let repo =
-            infrastructure::git_cli::SystemGitRepo::discover_from(&project_root).map_err(|e| {
-                TelemetryAggregateServiceError::EmitUnavailable(format!(
-                    "failed to discover git repository: {e}"
-                ))
-            })?;
-        let repo_root = repo.root().to_path_buf();
+        let git: Arc<dyn GitPrimitivePort> = Arc::new(FsGitWorkflowAdapter::new());
+        let report_port: Arc<dyn TelemetryReportPort> = Arc::new(FsTelemetryReportAdapter::new());
+        let archived_factory: Arc<dyn ArchivedTelemetryFactoryPort> =
+            Arc::new(FsArchivedTelemetryFactoryAdapter::new());
 
-        // Telemetry directory for the archived track.
-        let telemetry_dir = repo_root.join("track").join("archive").join(track_id).join("logs");
-
-        let adapter = FsArchivedTrackTelemetryAdapter::new(telemetry_dir);
-        let interactor = ArchivedTrackTelemetryInteractor::new(Arc::new(adapter));
-
-        interactor
-            .emit(ArchivedTrackTelemetryCommand {
-                subcommand,
-                track_id: track_id.to_owned(),
-                exit_code,
-                duration_ms,
-            })
-            .map_err(|e: usecase::telemetry::ArchivedTrackTelemetryError| {
-                TelemetryAggregateServiceError::EmitUnavailable(e.to_string())
-            })
-    }
-}
-
-impl TelemetryCompositionRoot {
-    /// Build a wired [`cli_driver::telemetry::TelemetryDriver`] for the telemetry family.
-    pub fn telemetry_driver(&self) -> cli_driver::telemetry::TelemetryDriver {
-        let service =
-            Arc::new(TelemetryAggregateServiceImpl) as Arc<dyn usecase::TelemetryAggregateService>;
+        let service = Arc::new(TelemetryAggregateInteractor::new(
+            TelemetryReportInteractor::new(report_port),
+            TelemetryEmitInteractor::new(git, archived_factory),
+        )) as Arc<dyn usecase::TelemetryAggregateService>;
         cli_driver::telemetry::TelemetryDriver::new(service)
     }
 }

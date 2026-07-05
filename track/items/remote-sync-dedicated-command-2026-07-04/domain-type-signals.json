@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-04T19:29:03Z",
+  "declaration_hash": "9d2ee0c7f84962393ee3c940d986201ab843ffbb4ce6ea62e02f22f885da55d8",
+  "signals": [
+    {
+      "type_name": "CommitHash",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TrackId",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "WorktreeError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "WorktreeReader",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

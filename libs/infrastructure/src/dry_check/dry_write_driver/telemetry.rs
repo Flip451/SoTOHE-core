@@ -39,7 +39,7 @@ pub(super) fn resolve_dry_write_telemetry_writer(
     items_dir: &Path,
     track_id: &str,
 ) -> Option<TelemetryWriter> {
-    use crate::git_cli::{GitRepository as _, SystemGitRepo};
+    use crate::git_cli::SystemGitRepo;
 
     let repo = SystemGitRepo::discover_from(repo_root).ok()?;
     let branch = repo.current_branch().ok().flatten()?;

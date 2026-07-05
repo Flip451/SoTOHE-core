@@ -21,7 +21,7 @@ use usecase::dry_driver_shared::{
 
 use crate::dry_check::diff_base_resolver::FsDiffBaseResolverAdapter;
 use crate::dry_check::{FsDryCheckCoverageAdapter, FsDryCheckStore};
-use crate::git_cli::{GitRepository as _, SystemGitRepo};
+use crate::git_cli::SystemGitRepo;
 use crate::track::symlink_guard::reject_symlinks_below;
 
 // ── Local helpers (reimplemented — see per-fn docs) ───────────────────────────

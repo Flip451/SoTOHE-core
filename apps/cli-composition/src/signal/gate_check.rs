@@ -35,7 +35,7 @@ impl SignalCompositionRoot {
         let resolved_root: PathBuf = match workspace_root.clone() {
             Some(root) => root,
             None => {
-                use infrastructure::git_cli::{GitRepository as _, SystemGitRepo};
+                use infrastructure::git_cli::SystemGitRepo;
                 match SystemGitRepo::discover() {
                     Ok(repo) => repo.root().to_path_buf(),
                     Err(e) => {

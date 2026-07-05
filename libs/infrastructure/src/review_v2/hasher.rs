@@ -4,7 +4,7 @@ use domain::review_v2::{FilePath, ReviewHash, ReviewTarget};
 use sha2::Digest;
 use usecase::review_v2::{ReviewHasher, ReviewHasherError};
 
-use crate::git_cli::{GitRepository, SystemGitRepo};
+use crate::git_cli::SystemGitRepo;
 
 /// Review hasher that computes sorted-manifest SHA256 hashes from worktree files.
 ///

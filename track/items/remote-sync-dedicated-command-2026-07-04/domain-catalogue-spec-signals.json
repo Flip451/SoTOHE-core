@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "9d2ee0c7f84962393ee3c940d986201ab843ffbb4ce6ea62e02f22f885da55d8",
+  "signals": [
+    {
+      "type_name": "CommitHash",
+      "signal": "blue",
+      "entry_hash": "500f39744b1c1fc161e800136446e6cfedb771df2b394571efdceaf2afec8cf2"
+    },
+    {
+      "type_name": "TrackId",
+      "signal": "blue",
+      "entry_hash": "8621e9cdc49701a193f1416c65fe10f0f6ed0ba492cbf51e5f96e1fdb5497366"
+    },
+    {
+      "type_name": "WorktreeError",
+      "signal": "blue",
+      "entry_hash": "afde981d36b53b2976b0371864ebf4e808f170ad2925eda0f3b057bfea43bc25"
+    },
+    {
+      "type_name": "WorktreeReader",
+      "signal": "blue",
+      "entry_hash": "9c17f4fddf9b65c3c3383bf435786fbe564af94a0b425ad0504710a34b0cb460"
+    }
+  ]
+}

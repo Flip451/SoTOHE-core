@@ -30,7 +30,7 @@ use usecase::fixpoint_resolve::{
 };
 use usecase::review_v2::{ReviewCycle, ReviewerError, ports::Reviewer};
 
-use crate::git_cli::{GitRepository as _, SystemGitRepo};
+use crate::git_cli::SystemGitRepo;
 use crate::ref_verify::{
     RefVerifyCacheAdapter, RefVerifyPairSourceAdapter, RefVerifyScopeResolver,
 };
@@ -820,7 +820,7 @@ mod tests {
     #[test]
     fn test_fs_review_gate_state_adapter_returns_approved_when_diff_is_empty() {
         let _lock = cwd_lock().lock().expect("cwd lock must not be poisoned");
-        use crate::git_cli::{GitRepository as _, SystemGitRepo};
+        use crate::git_cli::SystemGitRepo;
 
         // Derive workspace root from CARGO_MANIFEST_DIR (libs/infrastructure → ../.. = workspace).
         let manifest_dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));

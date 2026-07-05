@@ -4,10 +4,39 @@ use std::process::{Command, Output};
 
 use serde::Deserialize;
 use thiserror::Error;
+use usecase::git_workflow::DiagnosticText;
 use usecase::track_resolution::{BranchReadError, BranchReaderPort};
 
 pub(crate) mod show;
 pub mod workflow_adapter;
+
+/// Typed error for [`SystemGitRepo::sync_current_branch`].
+///
+/// Distinguishes the three fatal `git pull --ff-only` outcomes so callers
+/// (adapter -> `usecase::git_workflow::GitWorkflowError::Sync*`) can present
+/// stable, structured error messages. IN-06 / CN-02 / AC-08.
+#[derive(Debug, Error)]
+pub enum SyncError {
+    /// The current branch has no upstream configured. Equivalent to git's
+    /// `no tracking information` message.
+    #[error("current branch has no upstream configured")]
+    UpstreamNotSet,
+    /// Remote diverged from the local branch and a fast-forward is not
+    /// possible. `stderr` is git's raw stderr output.
+    #[error("git pull refused: not a fast-forward: {stderr}")]
+    NonFastForward { stderr: DiagnosticText },
+    /// The worktree cannot be updated (dirty tree, rebase/merge/cherry-pick
+    /// in progress, or an index lock is held). `stderr` is git's raw stderr.
+    #[error("git pull refused: worktree unresolvable: {stderr}")]
+    WorktreeUnresolved { stderr: DiagnosticText },
+    /// The `git pull --ff-only` process could not be spawned (git binary
+    /// missing, CWD gone, etc.) or returned an unclassified infrastructure /
+    /// remote failure. Distinct from the three fail-closed sync modes: callers
+    /// map this to an infra-availability failure, not a sync refusal.
+    /// IN-06 / CN-02 / AC-08.
+    #[error("git pull unavailable: {detail}")]
+    Spawn { detail: DiagnosticText },
+}
 
 const GUARDED_GIT_ENV: &str = "SOTP_GUARDED_GIT";
 const GUARDED_GIT_VALUE: &str = "1";
@@ -16,6 +45,43 @@ pub(crate) fn guarded_git_command() -> Command {
     let mut command = Command::new("git");
     command.env(GUARDED_GIT_ENV, GUARDED_GIT_VALUE);
     command
+}
+
+fn diagnostic_stderr(stderr: &str) -> DiagnosticText {
+    DiagnosticText::new(stderr.trim().to_owned())
+}
+
+fn classify_sync_failure(stderr: &str) -> SyncError {
+    let lower = stderr.to_ascii_lowercase();
+    if lower.contains("no tracking information") || lower.contains("no upstream configured") {
+        return SyncError::UpstreamNotSet;
+    }
+
+    if stderr.contains("Not possible to fast-forward")
+        || lower.contains("not a fast-forward")
+        || lower.contains("non-fast-forward")
+        || lower.contains("need to specify how to reconcile divergent branches")
+    {
+        return SyncError::NonFastForward { stderr: diagnostic_stderr(stderr) };
+    }
+
+    if lower.contains("your local changes to the following files would be overwritten")
+        || lower.contains("your untracked working tree files would be overwritten")
+        || lower.contains("please commit your changes or stash them")
+        || lower.contains("you have not concluded your merge")
+        || lower.contains("pulling is not possible because you have unmerged files")
+        || lower.contains("needs merge")
+        || lower.contains("index.lock")
+    {
+        return SyncError::WorktreeUnresolved { stderr: diagnostic_stderr(stderr) };
+    }
+
+    SyncError::Spawn {
+        detail: DiagnosticText::new(format!(
+            "unclassified git pull --ff-only failure: {}",
+            stderr.trim()
+        )),
+    }
 }
 
 /// Structured error type for git CLI operations.
@@ -35,107 +101,10 @@ pub enum GitError {
     EmptyRepoRoot,
 }
 
-pub trait GitRepository {
-    fn root(&self) -> &Path;
-    fn status(&self, args: &[&str]) -> Result<i32, GitError>;
-    fn output(&self, args: &[&str]) -> Result<Output, GitError>;
-
-    fn resolve_path(&self, path: &Path) -> PathBuf {
-        resolve_repo_path(self.root(), path)
-    }
-
-    fn current_branch(&self) -> Result<Option<String>, GitError> {
-        let output = self.output(&["rev-parse", "--abbrev-ref", "HEAD"])?;
-        if !output.status.success() {
-            return Ok(None);
-        }
-        Ok(Some(String::from_utf8_lossy(&output.stdout).trim().to_owned()))
-    }
-
-    /// Push the given branch to origin with tracking (`-u`).
-    ///
-    /// # Errors
-    ///
-    /// Returns [`GitError::CommandFailed`] if `git push` fails.
-    fn push_branch(&self, branch: &str) -> Result<(), GitError> {
-        let command = format!("push -u origin {branch}");
-        let output = self.output(&["push", "-u", "origin", branch])?;
-        if output.status.success() {
-            return Ok(());
-        }
-        let stderr = String::from_utf8_lossy(&output.stderr).trim().to_owned();
-        let code = output.status.code().unwrap_or(-1);
-        Err(GitError::CommandFailed { command, code, stderr })
-    }
-
-    /// Returns the tree hash of the current index (staged state).
-    ///
-    /// Uses `git write-tree` to compute the tree object hash from the index,
-    /// which reflects staged changes (not just the last commit). This is the
-    /// correct hash for review state tracking since it captures what will
-    /// actually be committed.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`GitError::CommandFailed`] if `git write-tree` fails.
-    fn index_tree_hash(&self) -> Result<String, GitError> {
-        let output = self.output(&["write-tree"])?;
-        if !output.status.success() {
-            let stderr = String::from_utf8_lossy(&output.stderr).trim().to_owned();
-            let code = output.status.code().unwrap_or(-1);
-            return Err(GitError::CommandFailed { command: "write-tree".to_owned(), code, stderr });
-        }
-        Ok(String::from_utf8_lossy(&output.stdout).trim().to_owned())
-    }
-
-    /// Stage all worktree changes using `git add -A`, excluding the given pathspecs.
-    ///
-    /// Tolerates gitignore warnings when the only stderr lines match a known
-    /// benign pattern ("ignored by …" + hint lines + listed dir names).
-    ///
-    /// # Errors
-    ///
-    /// Returns [`GitError::CommandFailed`] if `git add` fails for a reason other than
-    /// the gitignore warning, or if the index cannot be verified after staging.
-    fn stage_all_excluding(
-        &self,
-        exclude_files: &[&str],
-        exclude_dirs: &[&str],
-    ) -> Result<(), GitError> {
-        let mut owned_args =
-            vec!["add".to_owned(), "-A".to_owned(), "--".to_owned(), ".".to_owned()];
-        owned_args.extend(exclude_files.iter().map(|p| format!(":(exclude){p}")));
-        owned_args.extend(exclude_dirs.iter().map(|p| format!(":(exclude){p}")));
-        let args: Vec<&str> = owned_args.iter().map(String::as_str).collect();
-
-        let output = self.output(&args)?;
-        if output.status.success() {
-            return Ok(());
-        }
-
-        let stderr = String::from_utf8_lossy(&output.stderr);
-        let is_only_ignored_warning = !stderr.is_empty()
-            && stderr.contains("ignored by")
-            && stderr.lines().filter(|line| !line.trim().is_empty()).all(|line| {
-                line.contains("ignored by")
-                    || line.starts_with("hint:")
-                    || exclude_dirs.iter().any(|dir| line.trim() == *dir)
-                    || exclude_files.iter().any(|file| line.trim() == *file)
-            });
-
-        if is_only_ignored_warning {
-            // git add -A updates the index for all non-ignored paths even when
-            // it emits this warning and returns exit 1. The warning is advisory
-            // only — the staging operation completes successfully for all
-            // trackable files. No post-add verification is needed.
-            return Ok(());
-        }
-
-        let code = output.status.code().unwrap_or(-1);
-        let stderr = stderr.trim().to_owned();
-        Err(GitError::CommandFailed { command: "add -A".to_owned(), code, stderr })
-    }
-}
+// The former `pub trait GitRepository { ... }` has been removed as part of
+// track `remote-sync-dedicated-command-2026-07-04` (T008): its methods
+// migrated to `pub` inherent methods on `SystemGitRepo` (below) with
+// `status` / `output` demoted to `pub(crate)`. IN-09 / CN-07 / AC-07.
 
 #[derive(Debug, Clone)]
 pub struct SystemGitRepo {
@@ -194,14 +163,128 @@ impl SystemGitRepo {
 
         Ok(Self { root: PathBuf::from(root) })
     }
-}
 
-impl GitRepository for SystemGitRepo {
-    fn root(&self) -> &Path {
+    /// Fast-forward pull the current branch (`git pull --ff-only`).
+    ///
+    /// Returns a typed [`SyncError`] classifying the failure mode when git
+    /// exits non-zero, so callers can distinguish "no upstream configured"
+    /// from "non-fast-forward" from "worktree unresolvable". IN-06 / CN-02
+    /// / AC-08.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`SyncError::UpstreamNotSet`] when no upstream is configured
+    /// (git's `no tracking information` message), [`SyncError::NonFastForward`]
+    /// when the remote diverged, or [`SyncError::WorktreeUnresolved`] when
+    /// the worktree state prevents the update.
+    /// Repo root accessor (migrated from the removed `GitRepository` trait, IN-09).
+    #[must_use]
+    pub fn root(&self) -> &Path {
         &self.root
     }
 
-    fn status(&self, args: &[&str]) -> Result<i32, GitError> {
+    /// Anchor a repo-relative path at the repo root (migrated from the removed
+    /// `GitRepository` trait, IN-09).
+    #[must_use]
+    pub fn resolve_path(&self, path: &Path) -> PathBuf {
+        resolve_repo_path(&self.root, path)
+    }
+
+    /// Current branch name (migrated from the removed `GitRepository` trait, IN-09).
+    ///
+    /// # Errors
+    /// Returns [`GitError`] when the underlying `git rev-parse --abbrev-ref HEAD`
+    /// spawn fails.
+    pub fn current_branch(&self) -> Result<Option<String>, GitError> {
+        let output = self.output(&["rev-parse", "--abbrev-ref", "HEAD"])?;
+        if !output.status.success() {
+            return Ok(None);
+        }
+        Ok(Some(String::from_utf8_lossy(&output.stdout).trim().to_owned()))
+    }
+
+    /// Push the given branch to origin with tracking (`-u`) (migrated from the
+    /// removed `GitRepository` trait, IN-09).
+    ///
+    /// # Errors
+    /// Returns [`GitError::CommandFailed`] if `git push` fails.
+    pub fn push_branch(&self, branch: &str) -> Result<(), GitError> {
+        let command = format!("push -u origin {branch}");
+        let output = self.output(&["push", "-u", "origin", branch])?;
+        if output.status.success() {
+            return Ok(());
+        }
+        let stderr = String::from_utf8_lossy(&output.stderr).trim().to_owned();
+        let code = output.status.code().unwrap_or(-1);
+        Err(GitError::CommandFailed { command, code, stderr })
+    }
+
+    /// `git write-tree` tree hash of the current index (migrated from the removed
+    /// `GitRepository` trait, IN-09).
+    ///
+    /// # Errors
+    /// Returns [`GitError::CommandFailed`] if `git write-tree` fails.
+    pub fn index_tree_hash(&self) -> Result<String, GitError> {
+        let output = self.output(&["write-tree"])?;
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr).trim().to_owned();
+            let code = output.status.code().unwrap_or(-1);
+            return Err(GitError::CommandFailed { command: "write-tree".to_owned(), code, stderr });
+        }
+        Ok(String::from_utf8_lossy(&output.stdout).trim().to_owned())
+    }
+
+    /// `git add -A` excluding the given pathspecs (migrated from the removed
+    /// `GitRepository` trait, IN-09).
+    ///
+    /// # Errors
+    /// Returns [`GitError::CommandFailed`] if `git add` fails for a reason other
+    /// than the gitignore warning tolerated by the existing behavior.
+    pub fn stage_all_excluding(
+        &self,
+        exclude_files: &[&str],
+        exclude_dirs: &[&str],
+    ) -> Result<(), GitError> {
+        let mut owned_args =
+            vec!["add".to_owned(), "-A".to_owned(), "--".to_owned(), ".".to_owned()];
+        owned_args.extend(exclude_files.iter().map(|p| format!(":(exclude){p}")));
+        owned_args.extend(exclude_dirs.iter().map(|p| format!(":(exclude){p}")));
+        let args: Vec<&str> = owned_args.iter().map(String::as_str).collect();
+
+        let output = self.output(&args)?;
+        if output.status.success() {
+            return Ok(());
+        }
+
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        let is_only_ignored_warning = !stderr.is_empty()
+            && stderr.contains("ignored by")
+            && stderr.lines().filter(|line| !line.trim().is_empty()).all(|line| {
+                line.contains("ignored by")
+                    || line.starts_with("hint:")
+                    || exclude_dirs.iter().any(|dir| line.trim() == *dir)
+                    || exclude_files.iter().any(|file| line.trim() == *file)
+            });
+
+        if is_only_ignored_warning {
+            // git add -A updates the index for all non-ignored paths even when
+            // it emits this warning and returns exit 1. The warning is advisory
+            // only — the staging operation completes successfully for all
+            // trackable files. No post-add verification is needed.
+            return Ok(());
+        }
+
+        let code = output.status.code().unwrap_or(-1);
+        let stderr = stderr.trim().to_owned();
+        Err(GitError::CommandFailed { command: "add -A".to_owned(), code, stderr })
+    }
+
+    /// Run `git <args>` and return the process exit status code. Demoted to
+    /// `pub(crate)` in T008 (CN-07 / AC-07).
+    ///
+    /// # Errors
+    /// Returns [`GitError::Spawn`] when the git process cannot be spawned.
+    pub(crate) fn status(&self, args: &[&str]) -> Result<i32, GitError> {
         let status = guarded_git_command()
             .args(args)
             .current_dir(&self.root)
@@ -210,14 +293,43 @@ impl GitRepository for SystemGitRepo {
         Ok(status.code().unwrap_or(1))
     }
 
-    fn output(&self, args: &[&str]) -> Result<Output, GitError> {
+    /// Run `git <args>` and return the captured `Output`. Demoted to
+    /// `pub(crate)` in T008 (CN-07 / AC-07).
+    ///
+    /// # Errors
+    /// Returns [`GitError::Spawn`] when the git process cannot be spawned.
+    pub(crate) fn output(&self, args: &[&str]) -> Result<Output, GitError> {
         guarded_git_command()
             .args(args)
             .current_dir(&self.root)
             .output()
             .map_err(|source| GitError::Spawn { command: args.join(" "), source })
     }
+
+    pub fn sync_current_branch(&self) -> Result<(), SyncError> {
+        // Force English stderr so substring matching is locale-stable
+        // (mirrors the LANG=C pattern used in `show.rs`).
+        let output = guarded_git_command()
+            .env("LANG", "C")
+            .env("LC_ALL", "C")
+            .env("LANGUAGE", "C")
+            .args(["pull", "--ff-only"])
+            .current_dir(&self.root)
+            .output()
+            .map_err(|source| SyncError::Spawn {
+                detail: DiagnosticText::new(format!("failed to spawn git pull: {source}")),
+            })?;
+        if output.status.success() {
+            return Ok(());
+        }
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        Err(classify_sync_failure(&stderr))
+    }
 }
+
+// The former `impl GitRepository for SystemGitRepo` has been deleted as part
+// of the T008 cutover — every method migrated to a `pub` (or `pub(crate)` for
+// `status` / `output`) inherent method above.
 
 impl domain::WorktreeReader for SystemGitRepo {
     fn porcelain_status(&self) -> Result<String, domain::WorktreeError> {
@@ -243,7 +355,9 @@ impl domain::WorktreeReader for SystemGitRepo {
 }
 
 impl BranchReaderPort for SystemGitRepo {
-    /// Returns the current git branch name by delegating to [`GitRepository::current_branch`].
+    /// Returns the current git branch name by delegating to
+    /// [`SystemGitRepo::current_branch`] (migrated from the removed
+    /// `GitRepository` trait in T008).
     ///
     /// Passes `Some("HEAD")` through for detached HEAD (as reported by
     /// `git rev-parse --abbrev-ref HEAD`). Returns `None` when the underlying
@@ -256,9 +370,7 @@ impl BranchReaderPort for SystemGitRepo {
     /// Returns [`BranchReadError::ReadFailed`] if the underlying git operation
     /// cannot complete (I/O error, git not found, etc.).
     fn current_branch(&self) -> Result<Option<String>, BranchReadError> {
-        // Delegate to GitRepository::current_branch() which already handles the
-        // rev-parse --abbrev-ref HEAD invocation.  Map GitError to BranchReadError.
-        GitRepository::current_branch(self).map_err(|e| BranchReadError::ReadFailed(e.to_string()))
+        SystemGitRepo::current_branch(self).map_err(|e| BranchReadError::ReadFailed(e.to_string()))
     }
 }
 
@@ -490,7 +602,7 @@ mod tests {
     use usecase::track_resolution::{BranchReadError, BranchReaderPort};
 
     use super::{
-        GUARDED_GIT_ENV, GUARDED_GIT_VALUE, GitRepository, SystemGitRepo,
+        GUARDED_GIT_ENV, GUARDED_GIT_VALUE, SyncError, SystemGitRepo, classify_sync_failure,
         collect_track_branch_claims, guarded_git_command, load_explicit_track_branch,
         load_explicit_track_branch_from_items_dir, resolve_repo_path,
     };
@@ -531,6 +643,74 @@ mod tests {
         // Integration perspective deferred to T009: wrapper git calls should
         // pass reference-transaction with this token while bare git is blocked.
         assert!(has_guarded_env);
+    }
+
+    #[test]
+    fn test_classify_sync_failure_non_fast_forward_returns_non_fast_forward() {
+        let stderr = "fatal: Not possible to fast-forward, aborting.";
+
+        let err = classify_sync_failure(stderr);
+
+        match err {
+            SyncError::NonFastForward { stderr: detail } => assert_eq!(detail.as_str(), stderr),
+            other => panic!("expected NonFastForward, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_classify_sync_failure_dirty_worktree_returns_worktree_unresolved() {
+        let stderr =
+            "error: Your local changes to the following files would be overwritten by merge:";
+
+        let err = classify_sync_failure(stderr);
+
+        match err {
+            SyncError::WorktreeUnresolved { stderr } => {
+                assert!(stderr.as_str().contains("local changes"));
+            }
+            other => panic!("expected WorktreeUnresolved, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_classify_sync_failure_unknown_stderr_returns_spawn_unavailable() {
+        let stderr = "fatal: remote origin unexpectedly disconnected";
+
+        let err = classify_sync_failure(stderr);
+
+        match err {
+            SyncError::Spawn { detail } => {
+                assert!(detail.as_str().contains("unclassified git pull --ff-only failure"));
+                assert!(detail.as_str().contains("unexpectedly disconnected"));
+            }
+            other => panic!("expected Spawn availability failure, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_classify_sync_failure_no_tracking_information_returns_upstream_not_set() {
+        let stderr = "There is no tracking information for the current branch.";
+
+        let err = classify_sync_failure(stderr);
+
+        assert!(matches!(err, SyncError::UpstreamNotSet), "expected UpstreamNotSet, got {err:?}");
+    }
+
+    /// `SyncError::Spawn` is constructed directly by `sync_current_branch` when
+    /// the process fails to spawn, and by `classify_sync_failure` for
+    /// unclassified non-zero stderr. Pin its `Debug`/`Display` shape here by
+    /// construction so the four-branch `SyncError` surface stays
+    /// regression-covered (AC-02 / AC-08).
+    #[test]
+    fn test_sync_error_spawn_variant_display_embeds_detail() {
+        let err = SyncError::Spawn {
+            detail: usecase::git_workflow::DiagnosticText::new(
+                "failed to spawn git pull: No such file or directory",
+            ),
+        };
+
+        assert!(matches!(err, SyncError::Spawn { .. }));
+        assert!(err.to_string().contains("failed to spawn git pull"));
     }
 
     #[test]

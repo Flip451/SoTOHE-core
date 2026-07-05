@@ -145,7 +145,7 @@ fn load_ref_verify_config(
 }
 
 fn current_git_branch(project_root: &Path) -> Result<String, CompositionError> {
-    use infrastructure::git_cli::{GitRepository as _, SystemGitRepo};
+    use infrastructure::git_cli::SystemGitRepo;
     SystemGitRepo::discover_from(project_root)
         .map_err(|e| CompositionError::Infrastructure(format!("cannot discover git repo: {e}")))?
         .current_branch()

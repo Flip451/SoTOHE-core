@@ -355,7 +355,7 @@ pub(super) fn dispatch_plan_artifact_refs_with_resolver(
         None => {
             use std::sync::Arc;
 
-            use infrastructure::git_cli::GitRepository as _;
+            // GitRepository trait removed in T008; SystemGitRepo methods are now inherent.
             use usecase::track_resolution::{
                 ActiveTrackResolveInteractor, ActiveTrackResolveService as _,
             };

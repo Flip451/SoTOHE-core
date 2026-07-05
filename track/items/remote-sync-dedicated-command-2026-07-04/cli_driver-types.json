@@ -1,0 +1,54 @@
+{
+  "schema_version": 5,
+  "crate_name": "cli_driver",
+  "layer": "cli_driver",
+  "types": {
+    "GitInput": {
+      "action": "modify",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "AddAll",         "payload": { "kind": "unit" } },
+          { "name": "AddFromFile",    "payload": { "kind": "struct", "fields": [
+            { "name": "path",    "ty": "std::path::PathBuf" },
+            { "name": "cleanup", "ty": "bool" }
+          ] } },
+          { "name": "CommitFromFile", "payload": { "kind": "struct", "fields": [
+            { "name": "path",      "ty": "std::path::PathBuf" },
+            { "name": "cleanup",   "ty": "bool" },
+            { "name": "track_dir", "ty": "Option<std::path::PathBuf>" }
+          ] } },
+          { "name": "NoteFromFile",   "payload": { "kind": "struct", "fields": [
+            { "name": "path",    "ty": "std::path::PathBuf" },
+            { "name": "cleanup", "ty": "bool" }
+          ] } },
+          { "name": "Sync",           "payload": { "kind": "unit" } },
+          { "name": "Unstage",        "payload": { "kind": "struct", "fields": [
+            { "name": "paths", "ty": "Vec<std::path::PathBuf>" }
+          ] } },
+          { "name": "CurrentBranchTrackIdStrict", "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "git",
+      "docs": "Modify GitInput: delete SwitchAndPull { branch: String }, add unit Sync, and record the post-modify variant set. IN-01 / IN-04 / IN-08 / IN-11 / CN-01 / CN-04 / CN-05 / AC-01 / AC-03.",
+      "spec_refs": [
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-01" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-08" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "IN-11" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "CN-01" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "CN-04" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "CN-05" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "AC-01" },
+        { "file": "track/items/remote-sync-dedicated-command-2026-07-04/spec.json", "anchor": "AC-03" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [],
+  "trait_impls": []
+}

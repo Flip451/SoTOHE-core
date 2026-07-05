@@ -293,6 +293,10 @@ pub(super) fn render_mermaid(
         for doc in &sorted_docs {
             let crate_str = doc.crate_name.as_str();
             for trait_impl in &doc.trait_impls {
+                use domain::tddd::catalogue_v2::roles::ItemAction;
+                if trait_impl.action == ItemAction::Delete {
+                    continue; // deleted trait impls must not appear in the rendered map
+                }
                 let for_type_str = trait_impl.for_type.as_str();
                 let trait_ref_str = trait_impl.trait_ref.as_str();
 
@@ -326,6 +330,13 @@ pub(super) fn render_mermaid(
     let mut out = String::new();
     out.push_str("<!-- Generated contract-map-renderer — DO NOT EDIT DIRECTLY -->\n");
     out.push_str("```mermaid\n");
+    // ELK layout engine sidesteps the dagre cluster-ordering crash that fires
+    // on large 3-level nested subgraphs (layer > module > type). Frontmatter
+    // must appear immediately after the fence for mermaid to parse it.
+    out.push_str("---\n");
+    out.push_str("config:\n");
+    out.push_str("  layout: elk\n");
+    out.push_str("---\n");
     out.push_str("flowchart LR\n");
 
     for line in &class_defs {

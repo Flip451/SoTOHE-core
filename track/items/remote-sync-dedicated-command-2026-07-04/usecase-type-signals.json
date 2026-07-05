@@ -1,0 +1,170 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-04T19:29:04Z",
+  "declaration_hash": "f5fdab865ec35f58fe50395c778488539de0ecf0c34db5d8b49034fb2e57c12c",
+  "signals": [
+    {
+      "type_name": "ArchivedTelemetryFactoryPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "DiagnosticText",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "GitPrimitivePort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "GitWorkflowError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "GitWorkflowInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "GitWorkflowService"
+      ]
+    },
+    {
+      "type_name": "GitWorkflowService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "PrGitInteractor",
+      "kind_tag": "use_case",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ReviewGitInteractor",
+      "kind_tag": "use_case",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TelemetryAggregateInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "TelemetryAggregateService"
+      ]
+    },
+    {
+      "type_name": "TelemetryEmitInteractor",
+      "kind_tag": "use_case",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TelemetryReportInteractor",
+      "kind_tag": "use_case",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TrackArchiveFsPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TrackGitInteractor",
+      "kind_tag": "use_case",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ArchivedTrackTelemetryPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "BranchReadError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "BranchReaderPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ExplicitTrackBranch",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TelemetryAggregateService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TelemetryAggregateServiceError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TelemetryReportOutput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TelemetryReportPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TrackBranchClaim",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "usecase::git_workflow::validate_stage_path_entries",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "usecase::git_workflow::verify_auto_detected_branch",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "usecase::git_workflow::verify_explicit_track_branch",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

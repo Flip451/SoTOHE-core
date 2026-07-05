@@ -27,7 +27,7 @@ use domain::TrackId;
 use usecase::dry_driver::{DryDriverOutcome, DryDriverPort, DryFixLocalDriverInput};
 
 use crate::agent_profiles::{AGENT_PROFILES_PATH, AgentProfiles, RoundType};
-use crate::git_cli::{GitRepository, SystemGitRepo};
+use crate::git_cli::SystemGitRepo;
 use crate::track::symlink_guard::reject_symlinks_below;
 
 use env::{

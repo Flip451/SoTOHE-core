@@ -22,7 +22,7 @@ use domain::CommitHash;
 use usecase::fixpoint_resolve::{DiffBaseResolverError, DiffBaseResolverPort};
 
 use crate::dry_check::{DryCheckCommitHashError, FsDryCheckCommitHashStore};
-use crate::git_cli::{GitRepository, SystemGitRepo};
+use crate::git_cli::SystemGitRepo;
 
 /// Filesystem adapter implementing [`DiffBaseResolverPort`].
 ///

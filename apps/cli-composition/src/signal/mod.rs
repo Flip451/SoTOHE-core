@@ -90,7 +90,7 @@ pub(super) fn load_gate_matrix(
     let config_path = match workspace_root {
         Some(root) => root.join(".harness/config/signal-gates.json"),
         None => {
-            use infrastructure::git_cli::GitRepository as _;
+            // GitRepository trait removed in T008; SystemGitRepo methods are now inherent.
             let repo = infrastructure::git_cli::SystemGitRepo::discover().map_err(|e| {
                 CommandOutcome::failure(Some(format!("cannot discover git repository: {e}")))
             })?;
@@ -141,7 +141,7 @@ pub(super) fn resolve_spec_json_path(
     workspace_root: Option<&Path>,
     override_path: Option<PathBuf>,
 ) -> Result<PathBuf, CommandOutcome> {
-    use infrastructure::git_cli::{GitRepository as _, SystemGitRepo};
+    use infrastructure::git_cli::SystemGitRepo;
     use infrastructure::signal_layer_reader::LocalSignalLayerReaderAdapter;
 
     let resolved_root: PathBuf = match workspace_root {
@@ -291,7 +291,7 @@ impl SignalCompositionRoot {
 
     /// Compute and persist chain ② (catalog→spec) signals for all TDDD-enabled layers.
     pub fn signal_calc_catalog_spec(&self) -> Result<CommandOutcome, CompositionError> {
-        use infrastructure::git_cli::{GitRepository as _, SystemGitRepo};
+        use infrastructure::git_cli::SystemGitRepo;
         use infrastructure::signal_layer_reader::LocalSignalLayerReaderAdapter;
         use infrastructure::tddd::fs_catalogue_spec_signals_store::FsCatalogueSpecSignalsStore;
         use infrastructure::verify::tddd_layers::{
@@ -392,7 +392,7 @@ impl SignalCompositionRoot {
 
     /// Compute and persist chain ③ (impl↔catalog) signals for all TDDD-enabled layers.
     pub fn signal_calc_impl_catalog(&self) -> Result<CommandOutcome, CompositionError> {
-        use infrastructure::git_cli::{GitRepository as _, SystemGitRepo};
+        use infrastructure::git_cli::SystemGitRepo;
         use infrastructure::signal_layer_reader::LocalSignalLayerReaderAdapter;
         use infrastructure::tddd::tddd_layer_bindings_adapter::FsTdddLayerBindingsAdapter;
         use infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter;
