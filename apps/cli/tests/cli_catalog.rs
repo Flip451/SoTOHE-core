@@ -61,12 +61,17 @@ const RULES_TWO_LAYERS_JSON: &str = r#"{
   ]
 }"#;
 
-/// Minimal valid `spec.json` (schema_version 2, no requirements).
+/// Minimal valid `spec.json` (schema_version 2, with one citeable anchor).
 const SPEC_JSON: &str = r#"{
   "schema_version": 2,
   "version": "1.0.0",
   "title": "Test spec",
-  "scope": { "in_scope": [], "out_of_scope": [] }
+  "scope": {
+    "in_scope": [
+      { "id": "IN-01", "text": "Fixture anchor" }
+    ],
+    "out_of_scope": []
+  }
 }"#;
 
 /// A clean, empty v5 catalogue (passes every gate).
@@ -244,7 +249,7 @@ fn catalog_add_produces_todo_and_rejects_bad_input() {
     );
     assert_eq!(out.status.code(), Some(1), "invalid role: {}", show(&out));
 
-    // dangling spec anchor → non-zero (spec.json declares no anchors).
+    // dangling spec anchor -> non-zero (`ZZ-99` is absent from the fixture spec).
     let out = sotp(
         root,
         &[
@@ -361,6 +366,92 @@ fn catalog_add_rejects_non_path_trait_impl_before_write() {
         !catalogue.contains("BadImpl"),
         "rejected trait impl must not write the entry:\n{catalogue}"
     );
+}
+
+#[test]
+fn catalog_add_rejects_function_signature_name_mismatch_before_write() {
+    let ws = setup_git_track("test-track");
+    let root = ws.path();
+    let items = items_arg(root);
+    let out = sotp(root, &["catalog", "init", "--items-dir", &items]);
+    assert!(out.status.success(), "init: {}", show(&out));
+    let catalogue_path = root.join("track/items/test-track/domain-types.json");
+    let before = std::fs::read_to_string(&catalogue_path).unwrap();
+
+    let out = sotp(
+        root,
+        &[
+            "catalog",
+            "add",
+            "--items-dir",
+            &items,
+            "--layer",
+            "domain",
+            "--kind",
+            "function",
+            "--name",
+            "domain::users::create_user",
+            "--role",
+            "FreeFunction",
+            "--method",
+            "fn delete_user(id: UserId) -> Result<(), Error>",
+        ],
+    );
+    assert_eq!(out.status.code(), Some(1), "signature name mismatch: {}", show(&out));
+    let after = std::fs::read_to_string(&catalogue_path).unwrap();
+    assert_eq!(
+        after, before,
+        "rejected function signature mismatch must not rewrite the catalogue"
+    );
+}
+
+#[test]
+fn catalog_cite_rejects_delete_tombstone_before_write() {
+    let ws = setup_git_track("test-track");
+    let root = ws.path();
+    let items = items_arg(root);
+    let out = sotp(root, &["catalog", "init", "--items-dir", &items]);
+    assert!(out.status.success(), "init: {}", show(&out));
+
+    let out = sotp(
+        root,
+        &[
+            "catalog",
+            "import",
+            "--items-dir",
+            &items,
+            "--layer",
+            "domain",
+            "--type",
+            "domain::tddd::Deleted",
+            "--action",
+            "delete",
+        ],
+    );
+    assert!(out.status.success(), "delete import: {}", show(&out));
+    let before =
+        std::fs::read_to_string(root.join("track/items/test-track/domain-types.json")).unwrap();
+
+    let out = sotp(
+        root,
+        &[
+            "catalog",
+            "cite",
+            "--items-dir",
+            &items,
+            "--layer",
+            "domain",
+            "--entry",
+            "Deleted",
+            "--anchor",
+            "IN-01",
+        ],
+    );
+    assert_eq!(out.status.code(), Some(1), "cite delete tombstone: {}", show(&out));
+    let after =
+        std::fs::read_to_string(root.join("track/items/test-track/domain-types.json")).unwrap();
+    assert_eq!(after, before, "rejected tombstone cite must not rewrite the catalogue");
+    assert!(!after.contains("spec_refs"), "delete tombstone must remain identity-only:\n{after}");
 }
 
 #[test]

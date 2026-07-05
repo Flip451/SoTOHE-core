@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "9a37c19fb3a22afe73d8722a273ef23a8fba6c5cfbec27d75df741865eaefb9b",
+  "catalogue_declaration_hash": "57f41d77f6caec798b60ed62d2a4e5f56ee40316048cd4bed354bdbd4afef3a0",
   "signals": [
     {
       "type_name": "CatalogActionArg",
@@ -10,7 +10,7 @@
     {
       "type_name": "CatalogAddArgs",
       "signal": "blue",
-      "entry_hash": "2a65cd3786b89b2ecc5a21439376a083e4887e2ba5d27b5701f2504f2624ea4f"
+      "entry_hash": "694c9abf724f06771227fc8375352acd7bd6f6bc3b8d99c054c26454b2008ac5"
     },
     {
       "type_name": "CatalogCheckArgs",
@@ -20,7 +20,7 @@
     {
       "type_name": "CatalogCiteArgs",
       "signal": "blue",
-      "entry_hash": "84b7a23dcc6802580954c6322404b53025b48b496f36af1234e3dd6b960a3009"
+      "entry_hash": "8f5b3586d6de590c35ab7e5b0f0ec7431f1eb7b7654d15b4ae6f78b7e7648723"
     },
     {
       "type_name": "CatalogCommand",
@@ -30,7 +30,7 @@
     {
       "type_name": "CatalogImportArgs",
       "signal": "blue",
-      "entry_hash": "d9f5345be98b4f8b272628a4be7b0adc2fc43d0b6c9cffcfe4dd8103d2a0598c"
+      "entry_hash": "560bd118cc95957ee56b4e7e059bac618362a5dfa39b8b5d1a6daca82feb9ce6"
     },
     {
       "type_name": "CatalogInitArgs",

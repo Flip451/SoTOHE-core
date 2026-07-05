@@ -76,10 +76,10 @@
     },
     {
       "claim_hash": "5baf5e51af77da2c225d6c0afdd0cee0a163e1c7b8b406f96f5cc69f1f93dcc2",
-      "evidence_hash": "20728c2cea358b7d15e5246e45b0b72c7177fdf1af85587d90a3e15c7ae5e90b",
+      "evidence_hash": "680f650be5df841eb74a1b5df18f7dcc13a60b7b379812fc349b59327a6ebc7c",
       "verdict": {
         "kind": "pass",
-        "citation": "`sotp catalog add`: 新規型の意図入力。`--layer` / `--kind` / `--name` / `--role` / `--anchor`（repeatable）で同定・ロール・spec anchor を渡し、`--field` / `--method` / `--variant` / `--trait-impl`（Rust 宣言断片またはシグネチャ文字列、repeatable）で型形状を渡す。宣言レベルの型パラメータと where 句は `--generic` / `--where`（repeatable）、impl block レベルは `--impl-generic` / `--impl-where`（repeatable）で渡す。省略した形状ノードは `$todo` として生成する。"
+        "citation": "`sotp catalog add`: 新規型の意図入力。`--layer` / `--kind` / `--name` / `--role` / `--anchor`（repeatable）で同定・ロール・spec anchor を渡し、`--field` / `--method` / `--variant` / `--trait-impl`（Rust 宣言断片またはシグネチャ文字列、repeatable）で型形状を渡す。宣言レベルの型パラメータと where 句は `--generic` / `--where`（repeatable）、impl block レベルは `--impl-generic` / `--impl-where`（repeatable）で渡す。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -94,16 +94,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-03",
-          "text_label": "`sotp catalog add`: 新規型の意図入力。`--layer` / `--kind` / `--name` / `--role` / `--anchor`（repeatable）で同定・ロール・spec anchor を渡し、`--field` / `--method` / `--variant` / `--trait-impl`（Rust 宣言断片またはシグネチャ文字列、repeatable）で型形状を渡す。宣言レベルの型パラメータと where 句は `--generic` / `--where`（repeatable）、impl block レベルは `--impl-generic` / `--impl-where`（repeatable）で渡す。省略した形状ノードは `$todo` として生成する。"
+          "text_label": "`sotp catalog add`: 新規型の意図入力。`--layer` / `--kind` / `--name` / `--role` / `--anchor`（repeatable）で同定・ロール・spec anchor を渡し、`--field` / `--method` / `--variant` / `--trait-impl`（Rust 宣言断片またはシグネチャ文字列、repeatable）で型形状を渡す。宣言レベルの型パラメータと where 句は `--generic` / `--where`（repeatable）、impl block レベルは `--impl-generic` / `--impl-where`（repeatable）で渡す。function entry では `--name` の末尾と `--method` から parse した `fn` 名が一致しない入力を reject し、signature 名の silent drop を起こさない。省略した形状ノードは `$todo` として生成する。"
         }
       }
     },
     {
       "claim_hash": "5baf5e51af77da2c225d6c0afdd0cee0a163e1c7b8b406f96f5cc69f1f93dcc2",
-      "evidence_hash": "a64182baca06538e362f87cffe556f3f223de5aedf15a504bcb942f7d5265e80",
+      "evidence_hash": "c31d4f51c43ead5f27606c6698ede9899a030c911d0514130f4c0c3c4f86caa4",
       "verdict": {
         "kind": "pass",
-        "citation": "`sotp catalog import`: 既存型の取り込み。`--layer` / `--type`（Rust パス、rustdoc から解決）/ `--action reference|modify|delete`（既定 `reference`）/ `--anchor`。reference は変更なし参照、modify は現状 shape を baseline として取り込み変更差分だけを後で type-designer が編集、delete は同定情報の取り込みで足りる。手動転記が残るのは新規型の add のみとする。"
+        "citation": "`sotp catalog import`: 既存型の取り込み。`--layer` / `--type`（Rust パス、rustdoc から解決）/ `--action reference|modify|delete`（既定 `reference`）/ `--anchor`。reference は変更なし参照、modify は現状 shape を baseline として取り込み変更差分だけを後で type-designer が編集、delete は同定情報の取り込みで足りる identity-only tombstone とし、spec_refs を持たないため `--anchor` を reject する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -118,16 +118,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-04",
-          "text_label": "`sotp catalog import`: 既存型の取り込み。`--layer` / `--type`（Rust パス、rustdoc から解決）/ `--action reference|modify|delete`（既定 `reference`）/ `--anchor`。reference は変更なし参照、modify は現状 shape を baseline として取り込み変更差分だけを後で type-designer が編集、delete は同定情報の取り込みで足りる。手動転記が残るのは新規型の add のみとする。"
+          "text_label": "`sotp catalog import`: 既存型の取り込み。`--layer` / `--type`（Rust パス、rustdoc から解決）/ `--action reference|modify|delete`（既定 `reference`）/ `--anchor`。reference は変更なし参照、modify は現状 shape を baseline として取り込み変更差分だけを後で type-designer が編集、delete は同定情報の取り込みで足りる identity-only tombstone とし、spec_refs を持たないため `--anchor` を reject する。手動転記が残るのは新規型の add のみとする。"
         }
       }
     },
     {
       "claim_hash": "5baf5e51af77da2c225d6c0afdd0cee0a163e1c7b8b406f96f5cc69f1f93dcc2",
-      "evidence_hash": "b692130819a859457ae02a03b4e2da43473fdf0189622a671ccc354ce5eb3372",
+      "evidence_hash": "4e4e60d5a4b53b65f73e1ad272aefa4e11ef006e3dc4d12085fe753c5f1b35a2",
       "verdict": {
         "kind": "pass",
-        "citation": "`sotp catalog cite`: 生成後の anchor 追加。`--layer` / `--entry` / `--anchor`。D5 の検証付き入力（anchor 実在検証）を通す。"
+        "citation": "生成後の anchor 追加。`--layer` / `--entry` / `--anchor`。D5 の検証付き入力（anchor 実在検証）を通す。delete tombstone は spec_refs を持たないため対象にできず reject する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -142,7 +142,7 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-05",
-          "text_label": "`sotp catalog cite`: 生成後の anchor 追加。`--layer` / `--entry` / `--anchor`。D5 の検証付き入力（anchor 実在検証）を通す。"
+          "text_label": "`sotp catalog cite`: 生成後の anchor 追加。`--layer` / `--entry` / `--anchor`。D5 の検証付き入力（anchor 実在検証）を通す。delete tombstone は spec_refs を持たないため対象にできず reject する。"
         }
       }
     },
@@ -172,10 +172,10 @@
     },
     {
       "claim_hash": "5baf5e51af77da2c225d6c0afdd0cee0a163e1c7b8b406f96f5cc69f1f93dcc2",
-      "evidence_hash": "1df985a886d4289a766713a84486d90919cd5f5a208b50a337e140d5beb3790f",
+      "evidence_hash": "158c3485fc4b78d1859fbcb1ae4e569603cdf5abdd2025432e4821177f501893",
       "verdict": {
         "kind": "pass",
-        "citation": "`sotp catalog import --type <Rust パス>` を実行すると、rustdoc 抽出から既存型の同定情報・シグネチャ・フィールドを解決できる。`--action reference|modify|delete` の各ケースで、入力が `--layer` / `--type` / `--action` / `--anchor` のみでもエントリが生成され、reference / modify は rustdoc 由来の現状 shape を含み、delete は同定情報を含む。"
+        "citation": "`sotp catalog import --type <Rust パス>` を実行すると、rustdoc 抽出から既存型の同定情報・シグネチャ・フィールドを解決できる。`--action reference|modify` では `--anchor` を含む入力でエントリが生成され、rustdoc 由来の現状 shape を含む。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -190,7 +190,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-04",
-          "text_label": "`sotp catalog import --type <Rust パス>` を実行すると、rustdoc 抽出から既存型の同定情報・シグネチャ・フィールドを解決できる。`--action reference|modify|delete` の各ケースで、入力が `--layer` / `--type` / `--action` / `--anchor` のみでもエントリが生成され、reference / modify は rustdoc 由来の現状 shape を含み、delete は同定情報を含む。"
+          "text_label": "`sotp catalog import --type <Rust パス>` を実行すると、rustdoc 抽出から既存型の同定情報・シグネチャ・フィールドを解決できる。`--action reference|modify` では `--anchor` を含む入力でエントリが生成され、rustdoc 由来の現状 shape を含む。`--action delete` は同定情報だけを含む identity-only tombstone を生成し、spec_refs を持たないため `--anchor` 付き入力を reject する。"
         }
       }
     },

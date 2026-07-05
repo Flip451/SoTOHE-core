@@ -74,6 +74,7 @@ fn append_spec_refs(
         .and_then(|section_obj| section_obj.get_mut(entry))
         .and_then(Value::as_object_mut)
         .ok_or_else(|| schema_error(format!("entry `{entry}` is not a JSON object")))?;
+    reject_delete_tombstone(entry, entry_obj)?;
     let refs = entry_obj.entry("spec_refs".to_owned()).or_insert_with(|| Value::Array(Vec::new()));
     let list =
         refs.as_array_mut().ok_or_else(|| schema_error("`spec_refs` is not a JSON array"))?;
@@ -82,6 +83,19 @@ fn append_spec_refs(
         if !list.contains(&candidate) {
             list.push(candidate);
         }
+    }
+    Ok(())
+}
+
+/// Delete tombstones are identity-only and cannot carry `spec_refs`.
+fn reject_delete_tombstone(
+    entry: &str,
+    entry_obj: &serde_json::Map<String, Value>,
+) -> Result<(), CatalogError> {
+    if entry_obj.get("action").and_then(Value::as_str) == Some("delete") {
+        return Err(schema_error(format!(
+            "entry `{entry}` is a delete tombstone and cannot be cited"
+        )));
     }
     Ok(())
 }
@@ -111,6 +125,21 @@ mod tests {
         });
         std::fs::write(&path, serde_json::to_string_pretty(&value).unwrap()).unwrap();
         path
+    }
+
+    fn seed_with_delete_tombstone(dir: &Path) -> (std::path::PathBuf, String) {
+        let path = dir.join("domain-types.json");
+        let value = json!({
+            "schema_version": 5,
+            "crate_name": "domain",
+            "layer": "domain",
+            "types": { "Deleted": { "action": "delete", "module_path": "tddd" } },
+            "traits": {},
+            "functions": {}
+        });
+        let seeded = serde_json::to_string_pretty(&value).unwrap();
+        std::fs::write(&path, &seeded).unwrap();
+        (path, seeded)
     }
 
     fn cite_command(entry: &str, anchor: &str) -> CatalogCiteCommand {
@@ -167,6 +196,22 @@ mod tests {
         )
         .unwrap_err();
         assert!(matches!(err, CatalogError::SchemaInvalid { .. }));
+    }
+
+    #[test]
+    fn test_cite_rejects_delete_tombstone() {
+        let temp = tempfile::tempdir().unwrap();
+        let (path, seeded) = seed_with_delete_tombstone(temp.path());
+        let err = cite_anchors_in_file(
+            &path,
+            temp.path(),
+            &cite_command("Deleted", "IN-01"),
+            "spec.json",
+            &anchors(),
+        )
+        .unwrap_err();
+        assert!(matches!(err, CatalogError::SchemaInvalid { .. }));
+        assert_eq!(std::fs::read_to_string(&path).unwrap(), seeded);
     }
 
     #[test]

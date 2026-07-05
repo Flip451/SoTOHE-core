@@ -3,11 +3,11 @@
   "layer": "usecase",
   "entries": [
     {
-      "claim_hash": "ef928f307b0f3fe454b2952936851d6c6ecd792678fa494a56ce851d5efadcdc",
-      "evidence_hash": "20728c2cea358b7d15e5246e45b0b72c7177fdf1af85587d90a3e15c7ae5e90b",
+      "claim_hash": "87eb3f988e24f903a46c0cc1136a7d457decdaf4fb38a270ea8b9e5075c5746f",
+      "evidence_hash": "680f650be5df841eb74a1b5df18f7dcc13a60b7b379812fc349b59327a6ebc7c",
       "verdict": {
         "kind": "pass",
-        "citation": "`sotp catalog add`: 新規型の意図入力。`--layer` / `--kind` / `--name` / `--role` / `--anchor`（repeatable）で同定・ロール・spec anchor を渡し、`--field` / `--method` / `--variant` / `--trait-impl`（Rust 宣言断片またはシグネチャ文字列、repeatable）で型形状を渡す。宣言レベルの型パラメータと where 句は `--generic` / `--where`（repeatable）、impl block レベルは `--impl-generic` / `--impl-where`（repeatable）で渡す。省略した形状ノードは `$todo` として生成する。"
+        "citation": "`--layer` / `--kind` / `--name` / `--role` / `--anchor`（repeatable）"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -22,13 +22,13 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-03",
-          "text_label": "`sotp catalog add`: 新規型の意図入力。`--layer` / `--kind` / `--name` / `--role` / `--anchor`（repeatable）で同定・ロール・spec anchor を渡し、`--field` / `--method` / `--variant` / `--trait-impl`（Rust 宣言断片またはシグネチャ文字列、repeatable）で型形状を渡す。宣言レベルの型パラメータと where 句は `--generic` / `--where`（repeatable）、impl block レベルは `--impl-generic` / `--impl-where`（repeatable）で渡す。省略した形状ノードは `$todo` として生成する。"
+          "text_label": "`sotp catalog add`: 新規型の意図入力。`--layer` / `--kind` / `--name` / `--role` / `--anchor`（repeatable）で同定・ロール・spec anchor を渡し、`--field` / `--method` / `--variant` / `--trait-impl`（Rust 宣言断片またはシグネチャ文字列、repeatable）で型形状を渡す。宣言レベルの型パラメータと where 句は `--generic` / `--where`（repeatable）、impl block レベルは `--impl-generic` / `--impl-where`（repeatable）で渡す。function entry では `--name` の末尾と `--method` から parse した `fn` 名が一致しない入力を reject し、signature 名の silent drop を起こさない。省略した形状ノードは `$todo` として生成する。"
         }
       }
     },
     {
-      "claim_hash": "ef928f307b0f3fe454b2952936851d6c6ecd792678fa494a56ce851d5efadcdc",
-      "evidence_hash": "3728031af6b9577bf9144940f4fe83b4044090e0e85bfafd2d310f3059fec37f",
+      "claim_hash": "87eb3f988e24f903a46c0cc1136a7d457decdaf4fb38a270ea8b9e5075c5746f",
+      "evidence_hash": "cfb8073e228d0b11c01f88bdde5b71c19cd3069b3113b817df614af1e4e6d9b9",
       "verdict": {
         "kind": "pass",
         "citation": "型形状（fields / methods / variants / generics / where predicates / impl blocks）の入力は Rust 宣言断片またはシグネチャ文字列として受け取り、sotp が parse して構造化する"
@@ -46,16 +46,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-08",
-          "text_label": "型形状（fields / methods / variants / generics / where predicates / impl blocks）の入力は Rust 宣言断片またはシグネチャ文字列として受け取り、sotp が parse して構造化する（既存の TypeRef parser / syn 資産を流用）。public enum の variants は source 側に extension-tolerant な明示（例: `#[non_exhaustive]`）がない限り、downstream が exhaustive match してよい閉じた variant set として扱う。parse できない宣言・シグネチャは入力時 reject する。生成時に確定できない箇所は引数で渡さず、生成されたエントリの該当ノードを `$todo` として保留できる。"
+          "text_label": "型形状（fields / methods / variants / generics / where predicates / impl blocks）の入力は Rust 宣言断片またはシグネチャ文字列として受け取り、sotp が parse して構造化する（既存の TypeRef parser / syn 資産を流用）。public enum の variants は source 側に extension-tolerant な明示（例: `#[non_exhaustive]`）がない限り、downstream が exhaustive match してよい閉じた variant set として扱う。parse できない宣言・シグネチャ、および function entry の `--name` を `::` で区切った末尾と parsed `fn` 名が一致しないシグネチャは入力時 reject する。生成時に確定できない箇所は引数で渡さず、生成されたエントリの該当ノードを `$todo` として保留できる。"
         }
       }
     },
     {
-      "claim_hash": "ef928f307b0f3fe454b2952936851d6c6ecd792678fa494a56ce851d5efadcdc",
+      "claim_hash": "87eb3f988e24f903a46c0cc1136a7d457decdaf4fb38a270ea8b9e5075c5746f",
       "evidence_hash": "a46cb2315cb446b2f5a36229589118230eca9764bc9684555bcf2212cc57a6fe",
       "verdict": {
         "kind": "pass",
-        "citation": "generics / where 句を、型・trait・function・method・impl block の各宣言レベルを区別して入力し、カタログ schema の対応フィールド（`generics` / `where_predicates` / `impl_generics` / `impl_where_predicates` 等）へ構造化する。method / function シグネチャ内の generics / where 句はそのシグネチャから parse する。"
+        "citation": "generics / where 句を、型・trait・function・method・impl block の各宣言レベルを区別して入力し、カタログ schema の対応フィールド（`generics` / `where_predicates` / `impl_generics` / `impl_where_predicates` 等）へ構造化する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -75,11 +75,11 @@
       }
     },
     {
-      "claim_hash": "ef928f307b0f3fe454b2952936851d6c6ecd792678fa494a56ce851d5efadcdc",
-      "evidence_hash": "883f3c9c1c9b467a4de8694b813ca3072522e52790fcc0b6453387da11162dfa",
+      "claim_hash": "87eb3f988e24f903a46c0cc1136a7d457decdaf4fb38a270ea8b9e5075c5746f",
+      "evidence_hash": "aba39e3d0da0fc8767753c585de41cc1a144c9bc75985126170e426051da0572",
       "verdict": {
         "kind": "pass",
-        "citation": "`sotp catalog add` に意図（layer / kind / name / role / spec anchor / 一部の型形状）を渡すと、エントリ骨格がカタログ draft JSON に追記され、渡した同定・role・spec_refs・型形状が正規フィールドに格納され、渡さなかった形状ノードが `$todo`（記入指示付き）として生成される。"
+        "citation": "`sotp catalog add` に意図（layer / kind / name / role / spec anchor / 一部の型形状）を渡すと、エントリ骨格がカタログ draft JSON に追記され、渡した同定・role・spec_refs・型形状が正規フィールドに格納され"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -94,12 +94,12 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-03",
-          "text_label": "`sotp catalog add` に意図（layer / kind / name / role / spec anchor / 一部の型形状）を渡すと、エントリ骨格がカタログ draft JSON に追記され、渡した同定・role・spec_refs・型形状が正規フィールドに格納され、渡さなかった形状ノードが `$todo`（記入指示付き）として生成される。生成結果は JSON として parse でき、`$todo` が残る間は typed DTO への `try_complete` が Err を返し、未入力箇所は `$todo` ノードとして JSON path と指示文で列挙できる。`$todo` を全て埋めた後の完成エントリはカタログ schema の検証を通る。"
+          "text_label": "`sotp catalog add` に意図（layer / kind / name / role / spec anchor / 一部の型形状）を渡すと、エントリ骨格がカタログ draft JSON に追記され、渡した同定・role・spec_refs・型形状が正規フィールドに格納され、渡さなかった形状ノードが `$todo`（記入指示付き）として生成される。function entry で `--method` を渡す場合は、parsed `fn` 名が `--name` を `::` で区切った末尾と一致し、不一致なら入力時に reject される。生成結果は JSON として parse でき、`$todo` が残る間は typed DTO への `try_complete` が Err を返し、未入力箇所は `$todo` ノードとして JSON path と指示文で列挙できる。`$todo` を全て埋めた後の完成エントリはカタログ schema の検証を通る。"
         }
       }
     },
     {
-      "claim_hash": "ef928f307b0f3fe454b2952936851d6c6ecd792678fa494a56ce851d5efadcdc",
+      "claim_hash": "87eb3f988e24f903a46c0cc1136a7d457decdaf4fb38a270ea8b9e5075c5746f",
       "evidence_hash": "cc9e50820a5145ed0c5357c187f8967b6a5a6b94c4d83bebbd77a9fb33b716db",
       "verdict": {
         "kind": "pass",
@@ -267,11 +267,11 @@
       }
     },
     {
-      "claim_hash": "c209f9f6fabac51972c849a5ccd3d29d479974d924b483e3623e8c2a09f596bc",
-      "evidence_hash": "b692130819a859457ae02a03b4e2da43473fdf0189622a671ccc354ce5eb3372",
+      "claim_hash": "99ac711dbe632082ee5b69f9d8566666b2f76d9676cfd9a56785d73f4bbe9d52",
+      "evidence_hash": "4e4e60d5a4b53b65f73e1ad272aefa4e11ef006e3dc4d12085fe753c5f1b35a2",
       "verdict": {
         "kind": "pass",
-        "citation": "`sotp catalog cite`: 生成後の anchor 追加。`--layer` / `--entry` / `--anchor`。D5 の検証付き入力（anchor 実在検証）を通す。"
+        "citation": "`sotp catalog cite`: 生成後の anchor 追加。`--layer` / `--entry` / `--anchor`。D5 の検証付き入力（anchor 実在検証）を通す。delete tombstone は spec_refs を持たないため対象にできず reject する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -286,13 +286,13 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-05",
-          "text_label": "`sotp catalog cite`: 生成後の anchor 追加。`--layer` / `--entry` / `--anchor`。D5 の検証付き入力（anchor 実在検証）を通す。"
+          "text_label": "`sotp catalog cite`: 生成後の anchor 追加。`--layer` / `--entry` / `--anchor`。D5 の検証付き入力（anchor 実在検証）を通す。delete tombstone は spec_refs を持たないため対象にできず reject する。"
         }
       }
     },
     {
-      "claim_hash": "c209f9f6fabac51972c849a5ccd3d29d479974d924b483e3623e8c2a09f596bc",
-      "evidence_hash": "d8b63ceee3331ca60fee75d0ecccd3e3d5cc210c2d34558c2b4a5b7897764168",
+      "claim_hash": "99ac711dbe632082ee5b69f9d8566666b2f76d9676cfd9a56785d73f4bbe9d52",
+      "evidence_hash": "a355a9f9646f27a0614c6d59ad9ae7464a1edcf702a9e152cf49e44499f9866a",
       "verdict": {
         "kind": "pass",
         "citation": "実在しない anchor を `spec_refs` に渡す入力、および role 語彙外の値を `role` に渡す入力が、いずれも入力時に reject される（fail-closed、下流の signal 評価まで遅延しない）。"
@@ -310,7 +310,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-06",
-          "text_label": "実在しない anchor を `spec_refs` に渡す入力、および role 語彙外の値を `role` に渡す入力が、いずれも入力時に reject される（fail-closed、下流の signal 評価まで遅延しない）。"
+          "text_label": "実在しない anchor を `spec_refs` に渡す入力、および role 語彙外の値を `role` に渡す入力が、いずれも入力時に reject される（fail-closed、下流の signal 評価まで遅延しない）。delete tombstone は spec_refs を持たないため、delete import への `--anchor` と delete tombstone を対象にした `catalog cite` も入力時に reject される。"
         }
       }
     },
@@ -364,10 +364,10 @@
     },
     {
       "claim_hash": "824d251b2427734f803395059b834b29a44cda267887d79aa1c076be605ec6a5",
-      "evidence_hash": "d8b63ceee3331ca60fee75d0ecccd3e3d5cc210c2d34558c2b4a5b7897764168",
+      "evidence_hash": "a355a9f9646f27a0614c6d59ad9ae7464a1edcf702a9e152cf49e44499f9866a",
       "verdict": {
         "kind": "pass",
-        "citation": "「実在しない anchor を `spec_refs` に渡す入力、および role 語彙外の値を `role` に渡す入力が、いずれも入力時に reject される（fail-closed、下流の signal 評価まで遅延しない）。」"
+        "citation": "実在しない anchor を `spec_refs` に渡す入力、および role 語彙外の値を `role` に渡す入力が、いずれも入力時に reject される（fail-closed、下流の signal 評価まで遅延しない）。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -382,7 +382,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-06",
-          "text_label": "実在しない anchor を `spec_refs` に渡す入力、および role 語彙外の値を `role` に渡す入力が、いずれも入力時に reject される（fail-closed、下流の signal 評価まで遅延しない）。"
+          "text_label": "実在しない anchor を `spec_refs` に渡す入力、および role 語彙外の値を `role` に渡す入力が、いずれも入力時に reject される（fail-closed、下流の signal 評価まで遅延しない）。delete tombstone は spec_refs を持たないため、delete import への `--anchor` と delete tombstone を対象にした `catalog cite` も入力時に reject される。"
         }
       }
     },
@@ -435,11 +435,11 @@
       }
     },
     {
-      "claim_hash": "ce2cfc0ca06d83fac7309b2bec17f983e836599314dda8e640028ee253cd8e53",
-      "evidence_hash": "a64182baca06538e362f87cffe556f3f223de5aedf15a504bcb942f7d5265e80",
+      "claim_hash": "774e94d127834762036bc857d7ca24c8c8e6a5013bfef275ee8f43ad5cb8218c",
+      "evidence_hash": "c31d4f51c43ead5f27606c6698ede9899a030c911d0514130f4c0c3c4f86caa4",
       "verdict": {
         "kind": "pass",
-        "citation": "`sotp catalog import`: 既存型の取り込み。`--layer` / `--type`（Rust パス、rustdoc から解決）/ `--action reference|modify|delete`（既定 `reference`）/ `--anchor`。reference は変更なし参照、modify は現状 shape を baseline として取り込み変更差分だけを後で type-designer が編集、delete は同定情報の取り込みで足りる。"
+        "citation": "`sotp catalog import`: 既存型の取り込み。`--layer` / `--type`（Rust パス、rustdoc から解決）/ `--action reference|modify|delete`（既定 `reference`）/ `--anchor`。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -454,16 +454,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-04",
-          "text_label": "`sotp catalog import`: 既存型の取り込み。`--layer` / `--type`（Rust パス、rustdoc から解決）/ `--action reference|modify|delete`（既定 `reference`）/ `--anchor`。reference は変更なし参照、modify は現状 shape を baseline として取り込み変更差分だけを後で type-designer が編集、delete は同定情報の取り込みで足りる。手動転記が残るのは新規型の add のみとする。"
+          "text_label": "`sotp catalog import`: 既存型の取り込み。`--layer` / `--type`（Rust パス、rustdoc から解決）/ `--action reference|modify|delete`（既定 `reference`）/ `--anchor`。reference は変更なし参照、modify は現状 shape を baseline として取り込み変更差分だけを後で type-designer が編集、delete は同定情報の取り込みで足りる identity-only tombstone とし、spec_refs を持たないため `--anchor` を reject する。手動転記が残るのは新規型の add のみとする。"
         }
       }
     },
     {
-      "claim_hash": "ce2cfc0ca06d83fac7309b2bec17f983e836599314dda8e640028ee253cd8e53",
-      "evidence_hash": "1df985a886d4289a766713a84486d90919cd5f5a208b50a337e140d5beb3790f",
+      "claim_hash": "774e94d127834762036bc857d7ca24c8c8e6a5013bfef275ee8f43ad5cb8218c",
+      "evidence_hash": "158c3485fc4b78d1859fbcb1ae4e569603cdf5abdd2025432e4821177f501893",
       "verdict": {
         "kind": "pass",
-        "citation": "`--action reference|modify|delete` の各ケースで、入力が `--layer` / `--type` / `--action` / `--anchor` のみでもエントリが生成され、reference / modify は rustdoc 由来の現状 shape を含み、delete は同定情報を含む。"
+        "citation": "`sotp catalog import --type <Rust パス>` を実行すると、rustdoc 抽出から既存型の同定情報・シグネチャ・フィールドを解決できる。`--action reference|modify` では `--anchor` を含む入力でエントリが生成され、rustdoc 由来の現状 shape を含む。`--action delete` は同定情報だけを含む identity-only tombstone を生成し、spec_refs を持たないため `--anchor` 付き入力を reject する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -478,7 +478,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-04",
-          "text_label": "`sotp catalog import --type <Rust パス>` を実行すると、rustdoc 抽出から既存型の同定情報・シグネチャ・フィールドを解決できる。`--action reference|modify|delete` の各ケースで、入力が `--layer` / `--type` / `--action` / `--anchor` のみでもエントリが生成され、reference / modify は rustdoc 由来の現状 shape を含み、delete は同定情報を含む。"
+          "text_label": "`sotp catalog import --type <Rust パス>` を実行すると、rustdoc 抽出から既存型の同定情報・シグネチャ・フィールドを解決できる。`--action reference|modify` では `--anchor` を含む入力でエントリが生成され、rustdoc 由来の現状 shape を含む。`--action delete` は同定情報だけを含む identity-only tombstone を生成し、spec_refs を持たないため `--anchor` 付き入力を reject する。"
         }
       }
     },
@@ -580,10 +580,10 @@
     },
     {
       "claim_hash": "a77ceaba8be86c486bc0942ac19c85017756f1595b785cd61b7f7da6aca41c60",
-      "evidence_hash": "20728c2cea358b7d15e5246e45b0b72c7177fdf1af85587d90a3e15c7ae5e90b",
+      "evidence_hash": "680f650be5df841eb74a1b5df18f7dcc13a60b7b379812fc349b59327a6ebc7c",
       "verdict": {
         "kind": "pass",
-        "citation": "省略した形状ノードは $todo として生成する。"
+        "citation": "省略した形状ノードは `$todo` として生成する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -598,7 +598,7 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-03",
-          "text_label": "`sotp catalog add`: 新規型の意図入力。`--layer` / `--kind` / `--name` / `--role` / `--anchor`（repeatable）で同定・ロール・spec anchor を渡し、`--field` / `--method` / `--variant` / `--trait-impl`（Rust 宣言断片またはシグネチャ文字列、repeatable）で型形状を渡す。宣言レベルの型パラメータと where 句は `--generic` / `--where`（repeatable）、impl block レベルは `--impl-generic` / `--impl-where`（repeatable）で渡す。省略した形状ノードは `$todo` として生成する。"
+          "text_label": "`sotp catalog add`: 新規型の意図入力。`--layer` / `--kind` / `--name` / `--role` / `--anchor`（repeatable）で同定・ロール・spec anchor を渡し、`--field` / `--method` / `--variant` / `--trait-impl`（Rust 宣言断片またはシグネチャ文字列、repeatable）で型形状を渡す。宣言レベルの型パラメータと where 句は `--generic` / `--where`（repeatable）、impl block レベルは `--impl-generic` / `--impl-where`（repeatable）で渡す。function entry では `--name` の末尾と `--method` から parse した `fn` 名が一致しない入力を reject し、signature 名の silent drop を起こさない。省略した形状ノードは `$todo` として生成する。"
         }
       }
     },
@@ -628,10 +628,10 @@
     },
     {
       "claim_hash": "a77ceaba8be86c486bc0942ac19c85017756f1595b785cd61b7f7da6aca41c60",
-      "evidence_hash": "883f3c9c1c9b467a4de8694b813ca3072522e52790fcc0b6453387da11162dfa",
+      "evidence_hash": "aba39e3d0da0fc8767753c585de41cc1a144c9bc75985126170e426051da0572",
       "verdict": {
         "kind": "pass",
-        "citation": "`$todo` が残る間は typed DTO への `try_complete` が Err を返し、未入力箇所は `$todo` ノードとして JSON path と指示文で列挙できる。"
+        "citation": "`渡さなかった形状ノードが `$todo`（記入指示付き）として生成される。... `未入力箇所は `$todo` ノードとして JSON path と指示文で列挙できる。`"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -646,7 +646,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-03",
-          "text_label": "`sotp catalog add` に意図（layer / kind / name / role / spec anchor / 一部の型形状）を渡すと、エントリ骨格がカタログ draft JSON に追記され、渡した同定・role・spec_refs・型形状が正規フィールドに格納され、渡さなかった形状ノードが `$todo`（記入指示付き）として生成される。生成結果は JSON として parse でき、`$todo` が残る間は typed DTO への `try_complete` が Err を返し、未入力箇所は `$todo` ノードとして JSON path と指示文で列挙できる。`$todo` を全て埋めた後の完成エントリはカタログ schema の検証を通る。"
+          "text_label": "`sotp catalog add` に意図（layer / kind / name / role / spec anchor / 一部の型形状）を渡すと、エントリ骨格がカタログ draft JSON に追記され、渡した同定・role・spec_refs・型形状が正規フィールドに格納され、渡さなかった形状ノードが `$todo`（記入指示付き）として生成される。function entry で `--method` を渡す場合は、parsed `fn` 名が `--name` を `::` で区切った末尾と一致し、不一致なら入力時に reject される。生成結果は JSON として parse でき、`$todo` が残る間は typed DTO への `try_complete` が Err を返し、未入力箇所は `$todo` ノードとして JSON path と指示文で列挙できる。`$todo` を全て埋めた後の完成エントリはカタログ schema の検証を通る。"
         }
       }
     },

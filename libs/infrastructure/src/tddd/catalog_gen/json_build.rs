@@ -236,6 +236,10 @@ fn function_signature(command: &CatalogAddCommand) -> Result<FunctionSignaturePa
     match command.methods.first() {
         Some(signature) => {
             let parsed = parse_method(signature)?;
+            let parsed_name = parsed.get("name").and_then(Value::as_str).ok_or_else(|| {
+                schema_error(format!("method `{signature}` did not produce a string `name`"))
+            })?;
+            validate_function_signature_name(&command.name, parsed_name)?;
             let params = parsed.get("params").cloned().unwrap_or_else(|| json!([]));
             let returns = parsed.get("returns").cloned().unwrap_or_else(|| json!("()"));
             let is_async = parsed.get("is_async").and_then(Value::as_bool).unwrap_or(false);
@@ -255,6 +259,21 @@ fn function_signature(command: &CatalogAddCommand) -> Result<FunctionSignaturePa
             where_predicates: Vec::new(),
         }),
     }
+}
+
+/// Ensure the parsed `fn` name is the function entry's identity tail.
+fn validate_function_signature_name(
+    entry_name: &str,
+    signature_name: &str,
+) -> Result<(), CatalogError> {
+    let entry_tail = entry_name.rsplit("::").next().unwrap_or(entry_name);
+    if entry_tail == signature_name {
+        return Ok(());
+    }
+    Err(parse_error(format!(
+        "function entry `{entry_name}` cannot use signature for `fn {signature_name}`; \
+         the signature name must match `{entry_tail}`"
+    )))
 }
 
 /// Clone the array stored at `key` in `value`, or an empty vec when absent.
@@ -396,6 +415,7 @@ mod tests {
     #[test]
     fn test_build_add_entry_function_with_signature() {
         let mut command = base_command(CatalogEntryKind::Function, "FreeFunction");
+        command.name = "domain::tddd::run".to_owned();
         command.methods = vec!["fn run(input: u32) -> bool".to_owned()];
         let (entry, _) =
             build_add_entry(&command, "track/items/t/spec.json", &anchor_set()).unwrap();
@@ -455,6 +475,15 @@ mod tests {
     }
 
     #[test]
+    fn test_build_add_entry_function_rejects_signature_name_mismatch() {
+        let mut command = base_command(CatalogEntryKind::Function, "FreeFunction");
+        command.name = "domain::users::create_user".to_owned();
+        command.methods = vec!["fn delete_user(id: UserId) -> Result<(), Error>".to_owned()];
+        let err = build_add_entry(&command, "track/items/t/spec.json", &anchor_set()).unwrap_err();
+        assert!(matches!(err, CatalogError::ParseFragment { .. }));
+    }
+
+    #[test]
     fn test_build_add_entry_rejects_invalid_role() {
         let command = base_command(CatalogEntryKind::Struct, "Bogus");
         let err = build_add_entry(&command, "track/items/t/spec.json", &anchor_set()).unwrap_err();
@@ -485,6 +514,7 @@ mod tests {
     #[test]
     fn test_build_add_entry_function_wires_signature_generics_and_where() {
         let mut command = base_command(CatalogEntryKind::Function, "FreeFunction");
+        command.name = "domain::tddd::parse".to_owned();
         command.methods = vec!["fn parse<T: Clone>(input: T) -> T where T: Send".to_owned()];
         let (entry, _) =
             build_add_entry(&command, "track/items/t/spec.json", &anchor_set()).unwrap();
@@ -500,6 +530,7 @@ mod tests {
     #[test]
     fn test_build_add_entry_function_unions_flag_generics_without_duplicates() {
         let mut command = base_command(CatalogEntryKind::Function, "FreeFunction");
+        command.name = "domain::tddd::parse".to_owned();
         command.methods = vec!["fn parse<T: Clone>(input: T) -> T".to_owned()];
         command.generics = vec!["T: Clone".to_owned(), "U: Send".to_owned()];
         let (entry, _) =

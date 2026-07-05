@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "af179a2d5be9f35e7f3059d8c9cc573c5e8a7462647767b64c2e8da013ef2232",
+  "catalogue_declaration_hash": "8193a676ca7e1b7c36e97781a2236dce8b3bc58ab88d734933504b6b6c66ca0c",
   "signals": [
     {
       "type_name": "CatalogAddCommand",
       "signal": "blue",
-      "entry_hash": "ef928f307b0f3fe454b2952936851d6c6ecd792678fa494a56ce851d5efadcdc"
+      "entry_hash": "87eb3f988e24f903a46c0cc1136a7d457decdaf4fb38a270ea8b9e5075c5746f"
     },
     {
       "type_name": "CatalogCheckQuery",
@@ -25,7 +25,7 @@
     {
       "type_name": "CatalogCiteCommand",
       "signal": "blue",
-      "entry_hash": "c209f9f6fabac51972c849a5ccd3d29d479974d924b483e3623e8c2a09f596bc"
+      "entry_hash": "99ac711dbe632082ee5b69f9d8566666b2f76d9676cfd9a56785d73f4bbe9d52"
     },
     {
       "type_name": "CatalogError",
@@ -35,7 +35,7 @@
     {
       "type_name": "CatalogImportCommand",
       "signal": "blue",
-      "entry_hash": "ce2cfc0ca06d83fac7309b2bec17f983e836599314dda8e640028ee253cd8e53"
+      "entry_hash": "774e94d127834762036bc857d7ca24c8c8e6a5013bfef275ee8f43ad5cb8218c"
     },
     {
       "type_name": "CatalogInitReport",

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-05T15:45:19Z",
-  "declaration_hash": "af179a2d5be9f35e7f3059d8c9cc573c5e8a7462647767b64c2e8da013ef2232",
+  "generated_at": "2026-07-05T22:12:07Z",
+  "declaration_hash": "8193a676ca7e1b7c36e97781a2236dce8b3bc58ab88d734933504b6b6c66ca0c",
   "signals": [
     {
       "type_name": "CatalogAddCommand",

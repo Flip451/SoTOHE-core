@@ -97,7 +97,7 @@
       },
       "methods": [],
       "module_path": "commands::catalog",
-      "docs": "Args DTO carrying the add-entry command-line fields. See IN-03, IN-09, AC-03, AC-07.",
+      "docs": "Args DTO carrying the catalog add command-line fields. See IN-03, IN-09, AC-03, AC-07.",
       "spec_refs": [
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-03" },
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-09" },
@@ -126,7 +126,7 @@
       },
       "methods": [],
       "module_path": "commands::catalog",
-      "docs": "Args DTO carrying layer, type_path, action, and anchors. See IN-04, AC-04.",
+      "docs": "Args DTO carrying the catalog import command-line fields. See IN-04, AC-04.",
       "spec_refs": [
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-04" },
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-04" }
@@ -152,7 +152,7 @@
       },
       "methods": [],
       "module_path": "commands::catalog",
-      "docs": "Args DTO carrying layer, entry, and anchors. See IN-05, AC-06.",
+      "docs": "Args DTO carrying the catalog cite command-line fields. See IN-05, AC-06.",
       "spec_refs": [
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-05" },
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-06" }

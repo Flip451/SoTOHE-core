@@ -50,7 +50,7 @@
       },
       "methods": [],
       "module_path": "catalog_gen",
-      "docs": "Command DTO carrying the add-entry fields (layer, kind, name, role, anchors, and shape vectors). See IN-03, IN-08, IN-09, AC-03, AC-07.",
+      "docs": "Command DTO carrying catalog add input fields. See IN-03, IN-08, IN-09, AC-03, AC-07.",
       "spec_refs": [
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-03" },
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-08" },
@@ -78,7 +78,7 @@
       },
       "methods": [],
       "module_path": "catalog_gen",
-      "docs": "Command DTO carrying layer, type_path, action, and anchors. See IN-04, AC-04.",
+      "docs": "Command DTO carrying catalog import input fields. See IN-04, AC-04.",
       "spec_refs": [
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-04" },
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-04" }
@@ -102,7 +102,7 @@
       },
       "methods": [],
       "module_path": "catalog_gen",
-      "docs": "Command DTO carrying layer, entry, and anchors. See IN-05, AC-06.",
+      "docs": "Command DTO carrying catalog cite input fields. See IN-05, AC-06.",
       "spec_refs": [
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-05" },
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-06" }
