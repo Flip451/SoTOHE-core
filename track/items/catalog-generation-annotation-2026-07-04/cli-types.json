@@ -45,26 +45,6 @@
       ],
       "informal_grounds": []
     },
-    "CatalogGateArg": {
-      "action": "add",
-      "role": { "Dto": {} },
-      "kind": {
-        "kind": "enum",
-        "variants": [
-          { "name": "Phase2", "payload": { "kind": "unit" } },
-          { "name": "Commit", "payload": { "kind": "unit" } },
-          { "name": "Merge",  "payload": { "kind": "unit" } }
-        ]
-      },
-      "methods": [],
-      "module_path": "commands::catalog",
-      "docs": "DTO value-enum of the three gate contexts. See IN-06, AC-11.",
-      "spec_refs": [
-        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-06" },
-        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-11" }
-      ],
-      "informal_grounds": []
-    },
     "CatalogInitArgs": {
       "action": "add",
       "role": { "Dto": {} },
@@ -189,15 +169,14 @@
           "fields": [
             { "name": "track_id",  "ty": "Option<String>" },
             { "name": "items_dir", "ty": "std::path::PathBuf" },
-            { "name": "layer",     "ty": "Option<String>" },
-            { "name": "gate",      "ty": "CatalogGateArg" }
+            { "name": "layer",     "ty": "Option<String>" }
           ],
           "has_stripped_fields": false
         }
       },
       "methods": [],
       "module_path": "commands::catalog",
-      "docs": "Args DTO carrying track_id, items_dir, optional layer, and gate. See IN-06, AC-11.",
+      "docs": "Args DTO carrying track_id, items_dir, and optional layer. See IN-06, AC-11.",
       "spec_refs": [
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-06" },
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-11" }
@@ -390,20 +369,6 @@
       ],
       "informal_grounds": []
     },
-    "cli::commands::catalog::gate_to_select": {
-      "action": "add",
-      "role": "FreeFunction",
-      "params": [{ "name": "gate", "ty": "CatalogGateArg" }],
-      "returns": "cli_driver::catalog_gen::CatalogGateSelect",
-      "is_async": false,
-      "generics": [],
-      "where_predicates": [],
-      "docs": "Map the cli-local gate value-enum to the cli_driver gate-select enum. See IN-01.",
-      "spec_refs": [
-        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-01" }
-      ],
-      "informal_grounds": []
-    },
     "cli::commands::catalog::kind_to_select": {
       "action": "add",
       "role": "FreeFunction",
@@ -459,45 +424,32 @@
   "trait_impls": [
     { "action": "reference", "trait_ref": "clap_builder::derive::FromArgMatches", "for_type": "CliCommand" },
     { "action": "reference", "trait_ref": "clap_builder::derive::Subcommand",     "for_type": "CliCommand" },
-
     { "trait_ref": "core::fmt::Debug",                "for_type": "CatalogKindArg" },
     { "trait_ref": "core::clone::Clone",              "for_type": "CatalogKindArg" },
     { "trait_ref": "core::cmp::PartialEq",            "for_type": "CatalogKindArg" },
     { "trait_ref": "core::cmp::Eq",                   "for_type": "CatalogKindArg" },
     { "trait_ref": "clap_builder::derive::ValueEnum", "for_type": "CatalogKindArg" },
-
     { "trait_ref": "core::fmt::Debug",                "for_type": "CatalogActionArg" },
     { "trait_ref": "core::clone::Clone",              "for_type": "CatalogActionArg" },
     { "trait_ref": "core::cmp::PartialEq",            "for_type": "CatalogActionArg" },
     { "trait_ref": "core::cmp::Eq",                   "for_type": "CatalogActionArg" },
     { "trait_ref": "clap_builder::derive::ValueEnum", "for_type": "CatalogActionArg" },
 
-    { "trait_ref": "core::fmt::Debug",                "for_type": "CatalogGateArg" },
-    { "trait_ref": "core::clone::Clone",              "for_type": "CatalogGateArg" },
-    { "trait_ref": "core::cmp::PartialEq",            "for_type": "CatalogGateArg" },
-    { "trait_ref": "core::cmp::Eq",                   "for_type": "CatalogGateArg" },
-    { "trait_ref": "clap_builder::derive::ValueEnum", "for_type": "CatalogGateArg" },
-
     { "trait_ref": "core::fmt::Debug",                     "for_type": "CatalogInitArgs" },
     { "trait_ref": "clap_builder::derive::Args",           "for_type": "CatalogInitArgs" },
     { "trait_ref": "clap_builder::derive::FromArgMatches", "for_type": "CatalogInitArgs" },
-
     { "trait_ref": "core::fmt::Debug",                     "for_type": "CatalogAddArgs" },
     { "trait_ref": "clap_builder::derive::Args",           "for_type": "CatalogAddArgs" },
     { "trait_ref": "clap_builder::derive::FromArgMatches", "for_type": "CatalogAddArgs" },
-
     { "trait_ref": "core::fmt::Debug",                     "for_type": "CatalogImportArgs" },
     { "trait_ref": "clap_builder::derive::Args",           "for_type": "CatalogImportArgs" },
     { "trait_ref": "clap_builder::derive::FromArgMatches", "for_type": "CatalogImportArgs" },
-
     { "trait_ref": "core::fmt::Debug",                     "for_type": "CatalogCiteArgs" },
     { "trait_ref": "clap_builder::derive::Args",           "for_type": "CatalogCiteArgs" },
     { "trait_ref": "clap_builder::derive::FromArgMatches", "for_type": "CatalogCiteArgs" },
-
     { "trait_ref": "core::fmt::Debug",                     "for_type": "CatalogCheckArgs" },
     { "trait_ref": "clap_builder::derive::Args",           "for_type": "CatalogCheckArgs" },
     { "trait_ref": "clap_builder::derive::FromArgMatches", "for_type": "CatalogCheckArgs" },
-
     { "trait_ref": "core::fmt::Debug",                     "for_type": "CatalogCommand" },
     { "trait_ref": "clap_builder::derive::FromArgMatches", "for_type": "CatalogCommand" },
     { "trait_ref": "clap_builder::derive::Subcommand",     "for_type": "CatalogCommand" }

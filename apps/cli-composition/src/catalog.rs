@@ -61,8 +61,7 @@ mod tests {
     use std::path::{Path, PathBuf};
 
     use cli_driver::catalog_gen::{
-        CatalogAddInput, CatalogCheckInput, CatalogGateSelect, CatalogInitInput, CatalogInput,
-        CatalogKindSelect,
+        CatalogAddInput, CatalogCheckInput, CatalogInitInput, CatalogInput, CatalogKindSelect,
     };
 
     use super::CatalogCompositionRoot;
@@ -127,7 +126,7 @@ mod tests {
     }
 
     #[test]
-    fn add_then_check_commit_via_composition_root() {
+    fn add_then_check_blocks_on_residual_holes_via_composition_root() {
         let (_ws, items_dir, track_id) = fixture();
         let root = CatalogCompositionRoot::new();
 
@@ -144,20 +143,15 @@ mod tests {
         assert_eq!(add.exit_code, 0, "add: {add:?}");
         assert!(add.stdout.unwrap().contains("Foo"), "add stdout must name the entry");
 
-        // Residual $todo holes are tolerated at the commit gate (Interim → 0).
+        // Residual $todo holes block once catalogue generation has started.
         let check = root
-            .handle(CatalogInput::Check(CatalogCheckInput {
-                track_id,
-                items_dir,
-                layer: None,
-                gate: CatalogGateSelect::Commit,
-            }))
+            .handle(CatalogInput::Check(CatalogCheckInput { track_id, items_dir, layer: None }))
             .unwrap();
-        assert_eq!(check.exit_code, 0, "check(commit) tolerates holes: {check:?}");
+        assert_eq!(check.exit_code, 1, "check blocks holes: {check:?}");
     }
 
     #[test]
-    fn check_phase2_blocks_on_residual_holes() {
+    fn check_blocks_on_residual_holes() {
         let (_ws, items_dir, track_id) = fixture();
         let root = CatalogCompositionRoot::new();
 
@@ -168,15 +162,10 @@ mod tests {
         .unwrap();
         root.handle(add_input(&items_dir, &track_id, vec![])).unwrap();
 
-        // The strict phase2 gate blocks while $todo holes remain (exit non-zero).
+        // The check blocks while $todo holes remain (exit non-zero).
         let check = root
-            .handle(CatalogInput::Check(CatalogCheckInput {
-                track_id,
-                items_dir,
-                layer: None,
-                gate: CatalogGateSelect::Phase2,
-            }))
+            .handle(CatalogInput::Check(CatalogCheckInput { track_id, items_dir, layer: None }))
             .unwrap();
-        assert_eq!(check.exit_code, 1, "check(phase2) blocks on holes: {check:?}");
+        assert_eq!(check.exit_code, 1, "check blocks on holes: {check:?}");
     }
 }

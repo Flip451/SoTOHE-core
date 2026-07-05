@@ -240,7 +240,6 @@ subgraph usecase["usecase"]
     direction TB
     T35_usecase_usecase_CatalogCheckVerdict__self[CatalogCheckVerdict]
     T35_usecase_usecase_CatalogCheckVerdict_Pass[Pass]
-    T35_usecase_usecase_CatalogCheckVerdict_Interim[Interim]
     T35_usecase_usecase_CatalogCheckVerdict_Blocked[Blocked]
     T35_usecase_usecase_CatalogCheckVerdict_Skipped[Skipped]
   end
@@ -260,13 +259,6 @@ subgraph usecase["usecase"]
     T28_usecase_usecase_CatalogError_SchemaInvalid[SchemaInvalid]
     T28_usecase_usecase_CatalogError_DraftIncomplete[DraftIncomplete]
     T28_usecase_usecase_CatalogError_Port[Port]
-  end
-  subgraph T34_usecase_usecase_CatalogGateContext["catalog_gen::CatalogGateContext"]
-    direction TB
-    T34_usecase_usecase_CatalogGateContext__self[CatalogGateContext]
-    T34_usecase_usecase_CatalogGateContext_Phase2[Phase2]
-    T34_usecase_usecase_CatalogGateContext_Commit[Commit]
-    T34_usecase_usecase_CatalogGateContext_Merge[Merge]
   end
   subgraph T36_usecase_usecase_CatalogImportCommand["catalog_gen::CatalogImportCommand"]
     direction TB
@@ -345,13 +337,6 @@ subgraph cli_driver["cli_driver"]
     T35_cli_driver_cli_driver_CatalogDriver__self[CatalogDriver]
     T35_cli_driver_cli_driver_CatalogDriver_new([new])
     T35_cli_driver_cli_driver_CatalogDriver_handle([handle])
-  end
-  subgraph T39_cli_driver_cli_driver_CatalogGateSelect["catalog_gen::CatalogGateSelect"]
-    direction TB
-    T39_cli_driver_cli_driver_CatalogGateSelect__self[CatalogGateSelect]
-    T39_cli_driver_cli_driver_CatalogGateSelect_Phase2[Phase2]
-    T39_cli_driver_cli_driver_CatalogGateSelect_Commit[Commit]
-    T39_cli_driver_cli_driver_CatalogGateSelect_Merge[Merge]
   end
   subgraph T40_cli_driver_cli_driver_CatalogImportInput["catalog_gen::CatalogImportInput"]
     direction TB
@@ -460,13 +445,6 @@ subgraph cli["cli"]
     T22_cli_cli_CatalogCommand_Cite[Cite]
     T22_cli_cli_CatalogCommand_Check[Check]
   end
-  subgraph T22_cli_cli_CatalogGateArg["commands::catalog::CatalogGateArg"]
-    direction TB
-    T22_cli_cli_CatalogGateArg__self[CatalogGateArg]
-    T22_cli_cli_CatalogGateArg_Phase2[Phase2]
-    T22_cli_cli_CatalogGateArg_Commit[Commit]
-    T22_cli_cli_CatalogGateArg_Merge[Merge]
-  end
   subgraph T25_cli_cli_CatalogImportArgs["commands::catalog::CatalogImportArgs"]
     direction TB
     T25_cli_cli_CatalogImportArgs__self[CatalogImportArgs]
@@ -492,7 +470,6 @@ subgraph cli["cli"]
   F44_cli_cli_cli__commands__catalog__execute_cite[[execute_cite]]
   F46_cli_cli_cli__commands__catalog__execute_import[[execute_import]]
   F44_cli_cli_cli__commands__catalog__execute_init[[execute_init]]
-  F46_cli_cli_cli__commands__catalog__gate_to_select[[gate_to_select]]
   F46_cli_cli_cli__commands__catalog__kind_to_select[[kind_to_select]]
   F48_cli_cli_cli__commands__catalog__resolve_for_read[[resolve_for_read]]
   F49_cli_cli_cli__commands__catalog__resolve_for_write[[resolve_for_write]]
@@ -546,7 +523,6 @@ T23_domain_domain_TypeEntry_new --o T23_domain_domain_DocString__self
 T23_domain_domain_TypeEntry_new --> T23_domain_domain_TypeEntry__self
 T23_domain_domain_TypeEntry_docs --> T23_domain_domain_DocString__self
 T33_usecase_usecase_CatalogAddCommand__self --o|kind| T30_domain_domain_CatalogEntryKind__self
-T33_usecase_usecase_CatalogCheckQuery__self --o|gate| T34_usecase_usecase_CatalogGateContext__self
 T34_usecase_usecase_CatalogCheckReport__self --o|verdict| T35_usecase_usecase_CatalogCheckVerdict__self
 T34_usecase_usecase_CatalogCheckReport__self --o|remaining_holes| T23_domain_domain_DraftHole__self
 T28_usecase_usecase_CatalogError_DuplicateEntry --o|entry_key| T30_domain_domain_CatalogEntryName__self
@@ -590,7 +566,6 @@ F77_infrastructure_infrastructure_infrastructure__tddd__catalog_gen__try_complet
 F77_infrastructure_infrastructure_infrastructure__tddd__catalog_gen__try_complete --> T31_domain_domain_CatalogueDocument__self
 T46_infrastructure_infrastructure_FsCatalogAdapter__self -.impl.-> R27_usecase_usecase_CatalogPort__self
 T37_cli_driver_cli_driver_CatalogAddInput__self --o|kind| T39_cli_driver_cli_driver_CatalogKindSelect__self
-T39_cli_driver_cli_driver_CatalogCheckInput__self --o|gate| T39_cli_driver_cli_driver_CatalogGateSelect__self
 T35_cli_driver_cli_driver_CatalogDriver_new --> T35_cli_driver_cli_driver_CatalogDriver__self
 T35_cli_driver_cli_driver_CatalogDriver_handle --o T34_cli_driver_cli_driver_CatalogInput__self
 T40_cli_driver_cli_driver_CatalogImportInput__self --o|action| T41_cli_driver_cli_driver_CatalogImportSelect__self
@@ -604,7 +579,6 @@ T54_cli_composition_cli_composition_CatalogCompositionRoot_catalog_driver --> T3
 T54_cli_composition_cli_composition_CatalogCompositionRoot_handle --o T34_cli_driver_cli_driver_CatalogInput__self
 T18_cli_cli_CliCommand_Catalog --o|cmd| T22_cli_cli_CatalogCommand__self
 T22_cli_cli_CatalogAddArgs__self --o|kind| T22_cli_cli_CatalogKindArg__self
-T24_cli_cli_CatalogCheckArgs__self --o|gate| T22_cli_cli_CatalogGateArg__self
 T22_cli_cli_CatalogCommand_Init --o T23_cli_cli_CatalogInitArgs__self
 T22_cli_cli_CatalogCommand_Add --o T22_cli_cli_CatalogAddArgs__self
 T22_cli_cli_CatalogCommand_Import --o T25_cli_cli_CatalogImportArgs__self
@@ -620,8 +594,6 @@ F45_cli_cli_cli__commands__catalog__execute_check --o T24_cli_cli_CatalogCheckAr
 F44_cli_cli_cli__commands__catalog__execute_cite --o T23_cli_cli_CatalogCiteArgs__self
 F46_cli_cli_cli__commands__catalog__execute_import --o T25_cli_cli_CatalogImportArgs__self
 F44_cli_cli_cli__commands__catalog__execute_init --o T23_cli_cli_CatalogInitArgs__self
-F46_cli_cli_cli__commands__catalog__gate_to_select --o T22_cli_cli_CatalogGateArg__self
-F46_cli_cli_cli__commands__catalog__gate_to_select --> T39_cli_driver_cli_driver_CatalogGateSelect__self
 F46_cli_cli_cli__commands__catalog__kind_to_select --o T22_cli_cli_CatalogKindArg__self
 F46_cli_cli_cli__commands__catalog__kind_to_select --> T39_cli_driver_cli_driver_CatalogKindSelect__self
 class T26_domain_domain_FunctionInfo_new method_node
@@ -758,7 +730,6 @@ class T33_usecase_usecase_CatalogAddCommand__self command
 class T33_usecase_usecase_CatalogCheckQuery__self query
 class T34_usecase_usecase_CatalogCheckReport__self dto
 class T35_usecase_usecase_CatalogCheckVerdict_Pass variant_node
-class T35_usecase_usecase_CatalogCheckVerdict_Interim variant_node
 class T35_usecase_usecase_CatalogCheckVerdict_Blocked variant_node
 class T35_usecase_usecase_CatalogCheckVerdict_Skipped variant_node
 class T35_usecase_usecase_CatalogCheckVerdict__self value_object
@@ -773,10 +744,6 @@ class T28_usecase_usecase_CatalogError_SchemaInvalid variant_node
 class T28_usecase_usecase_CatalogError_DraftIncomplete variant_node
 class T28_usecase_usecase_CatalogError_Port variant_node
 class T28_usecase_usecase_CatalogError__self error_type
-class T34_usecase_usecase_CatalogGateContext_Phase2 variant_node
-class T34_usecase_usecase_CatalogGateContext_Commit variant_node
-class T34_usecase_usecase_CatalogGateContext_Merge variant_node
-class T34_usecase_usecase_CatalogGateContext__self value_object
 class T36_usecase_usecase_CatalogImportCommand__self command
 class T33_usecase_usecase_CatalogInitReport__self dto
 class T33_usecase_usecase_CatalogInteractor_new method_node
@@ -808,10 +775,6 @@ class T39_cli_driver_cli_driver_CatalogCheckInput__self dto
 class T38_cli_driver_cli_driver_CatalogCiteInput__self dto
 class T35_cli_driver_cli_driver_CatalogDriver_new method_node
 class T35_cli_driver_cli_driver_CatalogDriver_handle method_node
-class T39_cli_driver_cli_driver_CatalogGateSelect_Phase2 variant_node
-class T39_cli_driver_cli_driver_CatalogGateSelect_Commit variant_node
-class T39_cli_driver_cli_driver_CatalogGateSelect_Merge variant_node
-class T39_cli_driver_cli_driver_CatalogGateSelect__self dto
 class T40_cli_driver_cli_driver_CatalogImportInput__self dto
 class T41_cli_driver_cli_driver_CatalogImportSelect_Reference variant_node
 class T41_cli_driver_cli_driver_CatalogImportSelect_Modify variant_node
@@ -870,10 +833,6 @@ class T22_cli_cli_CatalogCommand_Import variant_node
 class T22_cli_cli_CatalogCommand_Cite variant_node
 class T22_cli_cli_CatalogCommand_Check variant_node
 class T22_cli_cli_CatalogCommand__self dto
-class T22_cli_cli_CatalogGateArg_Phase2 variant_node
-class T22_cli_cli_CatalogGateArg_Commit variant_node
-class T22_cli_cli_CatalogGateArg_Merge variant_node
-class T22_cli_cli_CatalogGateArg__self dto
 class T25_cli_cli_CatalogImportArgs__self dto
 class T23_cli_cli_CatalogInitArgs__self dto
 class T22_cli_cli_CatalogKindArg_Struct variant_node
@@ -898,8 +857,6 @@ class F46_cli_cli_cli__commands__catalog__execute_import free_function
 class F46_cli_cli_cli__commands__catalog__execute_import function_node
 class F44_cli_cli_cli__commands__catalog__execute_init free_function
 class F44_cli_cli_cli__commands__catalog__execute_init function_node
-class F46_cli_cli_cli__commands__catalog__gate_to_select free_function
-class F46_cli_cli_cli__commands__catalog__gate_to_select function_node
 class F46_cli_cli_cli__commands__catalog__kind_to_select free_function
 class F46_cli_cli_cli__commands__catalog__kind_to_select function_node
 class F48_cli_cli_cli__commands__catalog__resolve_for_read free_function

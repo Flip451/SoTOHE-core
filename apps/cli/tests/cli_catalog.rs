@@ -2,7 +2,7 @@
 //!
 //! Covers: parsing / dispatch, `add` skeleton + `$todo` output, validated-input
 //! rejections (InvalidRole / AnchorNotFound / ParseFragment / DuplicateEntry /
-//! FileMissing), `check` gate exit-code mapping, and the WRITE track-id
+//! FileMissing), `check` exit-code mapping, and the WRITE track-id
 //! fail-closed guard (D8 / AC-03 / AC-06 / AC-09 / AC-11 / AC-13).
 //!
 //! WRITE verbs (init/add/import/cite) resolve the track via the git branch, so
@@ -27,6 +27,35 @@ const RULES_JSON: &str = r#"{
         "enabled": true,
         "catalogue_file": "domain-types.json",
         "schema_export": {"method": "rustdoc", "targets": ["domain"]}
+      }
+    }
+  ]
+}"#;
+
+/// Two enabled TDDD layers for partial-catalogue check coverage.
+const RULES_TWO_LAYERS_JSON: &str = r#"{
+  "version": 2,
+  "layers": [
+    {
+      "crate": "domain",
+      "path": "libs/domain",
+      "may_depend_on": [],
+      "deny_reason": "",
+      "tddd": {
+        "enabled": true,
+        "catalogue_file": "domain-types.json",
+        "schema_export": {"method": "rustdoc", "targets": ["domain"]}
+      }
+    },
+    {
+      "crate": "usecase",
+      "path": "libs/usecase",
+      "may_depend_on": ["domain"],
+      "deny_reason": "",
+      "tddd": {
+        "enabled": true,
+        "catalogue_file": "usecase-types.json",
+        "schema_export": {"method": "rustdoc", "targets": ["usecase"]}
       }
     }
   ]
@@ -303,11 +332,11 @@ fn catalog_write_track_id_mismatch_fails_closed() {
 }
 
 // ---------------------------------------------------------------------------
-// READ check gate exit-code mapping (no git; explicit --track-id override)
+// READ check exit-code mapping (no git; explicit --track-id override)
 // ---------------------------------------------------------------------------
 
 #[test]
-fn catalog_check_gate_exit_code_mapping() {
+fn catalog_check_exit_code_mapping() {
     let ws = tempfile::tempdir().unwrap();
     let root = ws.path();
     write(&root.join("architecture-rules.json"), RULES_JSON);
@@ -315,83 +344,27 @@ fn catalog_check_gate_exit_code_mapping() {
     write(&root.join("track/items/clean-track/domain-types.json"), EMPTY_CATALOGUE);
     write(&root.join("track/items/holes-track/domain-types.json"), HOLES_CATALOGUE);
 
-    // Pass: clean catalogue at the strict phase2 gate → 0.
-    let out = sotp(
-        root,
-        &[
-            "catalog",
-            "check",
-            "--track-id",
-            "clean-track",
-            "--items-dir",
-            &items,
-            "--gate",
-            "phase2",
-        ],
-    );
-    assert!(out.status.success(), "clean phase2 → Pass: {}", show(&out));
+    // Pass: clean catalogue → 0.
+    let out = sotp(root, &["catalog", "check", "--track-id", "clean-track", "--items-dir", &items]);
+    assert!(out.status.success(), "clean → Pass: {}", show(&out));
 
-    // Interim: residual holes tolerated at the commit gate → 0.
-    let out = sotp(
-        root,
-        &[
-            "catalog",
-            "check",
-            "--track-id",
-            "holes-track",
-            "--items-dir",
-            &items,
-            "--gate",
-            "commit",
-        ],
-    );
-    assert!(out.status.success(), "holes commit → Interim: {}", show(&out));
+    // Blocked: residual holes after catalogue generation starts → non-zero.
+    let out = sotp(root, &["catalog", "check", "--track-id", "holes-track", "--items-dir", &items]);
+    assert_eq!(out.status.code(), Some(1), "holes → Blocked: {}", show(&out));
 
-    // Blocked: residual holes at the strict phase2 gate → non-zero.
-    let out = sotp(
-        root,
-        &[
-            "catalog",
-            "check",
-            "--track-id",
-            "holes-track",
-            "--items-dir",
-            &items,
-            "--gate",
-            "phase2",
-        ],
-    );
-    assert_eq!(out.status.code(), Some(1), "holes phase2 → Blocked: {}", show(&out));
+    // Skipped: no target catalogue files exist yet → 0.
+    let out =
+        sotp(root, &["catalog", "check", "--track-id", "missing-track", "--items-dir", &items]);
+    assert!(out.status.success(), "missing → Skipped: {}", show(&out));
 
-    // Skipped: absent catalogue tolerated at the commit gate → 0.
-    let out = sotp(
-        root,
-        &[
-            "catalog",
-            "check",
-            "--track-id",
-            "missing-track",
-            "--items-dir",
-            &items,
-            "--gate",
-            "commit",
-        ],
-    );
-    assert!(out.status.success(), "missing commit → Skipped: {}", show(&out));
-
-    // Blocked: absent catalogue at the strict merge gate → non-zero.
-    let out = sotp(
-        root,
-        &[
-            "catalog",
-            "check",
-            "--track-id",
-            "missing-track",
-            "--items-dir",
-            &items,
-            "--gate",
-            "merge",
-        ],
-    );
-    assert_eq!(out.status.code(), Some(1), "missing merge → Blocked: {}", show(&out));
+    // Blocked: once any layer catalogue exists, another expected layer being
+    // absent is a partial catalogue and must block.
+    let ws = tempfile::tempdir().unwrap();
+    let root = ws.path();
+    write(&root.join("architecture-rules.json"), RULES_TWO_LAYERS_JSON);
+    let items = items_arg(root);
+    write(&root.join("track/items/partial-track/domain-types.json"), EMPTY_CATALOGUE);
+    let out =
+        sotp(root, &["catalog", "check", "--track-id", "partial-track", "--items-dir", &items]);
+    assert_eq!(out.status.code(), Some(1), "partial missing layer → Blocked: {}", show(&out));
 }

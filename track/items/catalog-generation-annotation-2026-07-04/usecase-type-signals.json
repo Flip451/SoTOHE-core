@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-05T12:31:39Z",
-  "declaration_hash": "b4d22cd28517c39d1408748cfcd5f8d67817630f97a34bae865bab119a51b8db",
+  "generated_at": "2026-07-05T15:01:48Z",
+  "declaration_hash": "af179a2d5be9f35e7f3059d8c9cc573c5e8a7462647767b64c2e8da013ef2232",
   "signals": [
     {
       "type_name": "CatalogAddCommand",
@@ -72,20 +72,6 @@
         "core::error::Error",
         "core::fmt::Debug",
         "core::fmt::Display"
-      ]
-    },
-    {
-      "type_name": "CatalogGateContext",
-      "kind_tag": "enum",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "core::clone::Clone",
-        "core::clone::TrivialClone",
-        "core::cmp::Eq",
-        "core::cmp::PartialEq",
-        "core::fmt::Debug",
-        "core::marker::Copy"
       ]
     },
     {

@@ -45,26 +45,6 @@
       ],
       "informal_grounds": []
     },
-    "CatalogGateSelect": {
-      "action": "add",
-      "role": { "Dto": {} },
-      "kind": {
-        "kind": "enum",
-        "variants": [
-          { "name": "Phase2", "payload": { "kind": "unit" } },
-          { "name": "Commit", "payload": { "kind": "unit" } },
-          { "name": "Merge",  "payload": { "kind": "unit" } }
-        ]
-      },
-      "methods": [],
-      "module_path": "catalog_gen",
-      "docs": "DTO enum of the three gate contexts. See IN-06, AC-11.",
-      "spec_refs": [
-        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-06" },
-        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-11" }
-      ],
-      "informal_grounds": []
-    },
     "CatalogInitInput": {
       "action": "add",
       "role": { "Dto": {} },
@@ -187,15 +167,14 @@
           "fields": [
             { "name": "track_id",  "ty": "String" },
             { "name": "items_dir", "ty": "std::path::PathBuf" },
-            { "name": "layer",     "ty": "Option<String>" },
-            { "name": "gate",      "ty": "CatalogGateSelect" }
+            { "name": "layer",     "ty": "Option<String>" }
           ],
           "has_stripped_fields": false
         }
       },
       "methods": [],
       "module_path": "catalog_gen",
-      "docs": "Input DTO carrying track_id, items_dir, optional layer, and gate. See IN-06, AC-11.",
+      "docs": "Input DTO carrying track_id, items_dir, and optional layer. See IN-06, AC-11.",
       "spec_refs": [
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-06" },
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-11" }
@@ -283,7 +262,6 @@
     { "trait_ref": "core::clone::TrivialClone", "for_type": "CatalogKindSelect" },
     { "trait_ref": "core::cmp::PartialEq",     "for_type": "CatalogKindSelect" },
     { "trait_ref": "core::cmp::Eq",            "for_type": "CatalogKindSelect" },
-
     { "trait_ref": "core::fmt::Debug",         "for_type": "CatalogImportSelect" },
     { "trait_ref": "core::clone::Clone",       "for_type": "CatalogImportSelect" },
     { "trait_ref": "core::marker::Copy",       "for_type": "CatalogImportSelect" },
@@ -291,28 +269,16 @@
     { "trait_ref": "core::cmp::PartialEq",     "for_type": "CatalogImportSelect" },
     { "trait_ref": "core::cmp::Eq",            "for_type": "CatalogImportSelect" },
 
-    { "trait_ref": "core::fmt::Debug",         "for_type": "CatalogGateSelect" },
-    { "trait_ref": "core::clone::Clone",       "for_type": "CatalogGateSelect" },
-    { "trait_ref": "core::marker::Copy",       "for_type": "CatalogGateSelect" },
-    { "trait_ref": "core::clone::TrivialClone", "for_type": "CatalogGateSelect" },
-    { "trait_ref": "core::cmp::PartialEq",     "for_type": "CatalogGateSelect" },
-    { "trait_ref": "core::cmp::Eq",            "for_type": "CatalogGateSelect" },
-
     { "trait_ref": "core::fmt::Debug",   "for_type": "CatalogInitInput" },
     { "trait_ref": "core::clone::Clone", "for_type": "CatalogInitInput" },
-
     { "trait_ref": "core::fmt::Debug",   "for_type": "CatalogAddInput" },
     { "trait_ref": "core::clone::Clone", "for_type": "CatalogAddInput" },
-
     { "trait_ref": "core::fmt::Debug",   "for_type": "CatalogImportInput" },
     { "trait_ref": "core::clone::Clone", "for_type": "CatalogImportInput" },
-
     { "trait_ref": "core::fmt::Debug",   "for_type": "CatalogCiteInput" },
     { "trait_ref": "core::clone::Clone", "for_type": "CatalogCiteInput" },
-
     { "trait_ref": "core::fmt::Debug",   "for_type": "CatalogCheckInput" },
     { "trait_ref": "core::clone::Clone", "for_type": "CatalogCheckInput" },
-
     { "trait_ref": "core::fmt::Debug",   "for_type": "CatalogInput" },
     { "trait_ref": "core::clone::Clone", "for_type": "CatalogInput" }
   ]

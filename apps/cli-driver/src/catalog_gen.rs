@@ -15,8 +15,8 @@ use std::sync::Arc;
 use usecase::LayerId;
 use usecase::catalog_gen::{
     CatalogAddCommand, CatalogCheckQuery, CatalogCheckReport, CatalogCheckVerdict,
-    CatalogCiteCommand, CatalogEntryKind, CatalogGateContext, CatalogImportAction,
-    CatalogImportCommand, CatalogInitReport, CatalogService, CatalogWriteReport,
+    CatalogCiteCommand, CatalogEntryKind, CatalogImportAction, CatalogImportCommand,
+    CatalogInitReport, CatalogService, CatalogWriteReport,
 };
 
 use crate::render::CommandOutcome;
@@ -49,17 +49,6 @@ pub enum CatalogImportSelect {
     Modify,
     /// Import identity only to declare a deletion.
     Delete,
-}
-
-/// DTO enum of the three gate contexts. See IN-06, AC-11.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum CatalogGateSelect {
-    /// Phase 2 (type-design) strict gate.
-    Phase2,
-    /// Pre-commit gate (TDDD interim + missing-input skip rules).
-    Commit,
-    /// Pre-merge strict gate.
-    Merge,
 }
 
 // ---------------------------------------------------------------------------
@@ -142,7 +131,7 @@ pub struct CatalogCiteInput {
     pub anchors: Vec<String>,
 }
 
-/// Input DTO carrying track_id, items_dir, optional layer, and gate. See IN-06, AC-11.
+/// Input DTO carrying track_id, items_dir, and optional layer. See IN-06, AC-11.
 #[derive(Debug, Clone)]
 pub struct CatalogCheckInput {
     /// Resolved track identifier.
@@ -151,8 +140,6 @@ pub struct CatalogCheckInput {
     pub items_dir: PathBuf,
     /// Optional layer filter; `None` checks every TDDD layer.
     pub layer: Option<String>,
-    /// Gate context determining strictness.
-    pub gate: CatalogGateSelect,
 }
 
 /// DTO enum of the five catalog driver inputs. See IN-01, AC-01.
@@ -284,12 +271,12 @@ impl CatalogDriver {
     }
 
     fn catalog_check(&self, input: CatalogCheckInput) -> CommandOutcome {
-        let CatalogCheckInput { track_id, items_dir, layer, gate } = input;
+        let CatalogCheckInput { track_id, items_dir, layer } = input;
         let layer = match layer.map(LayerId::try_new).transpose() {
             Ok(layer) => layer,
             Err(e) => return CommandOutcome::failure(Some(format!("invalid layer: {e}"))),
         };
-        let query = CatalogCheckQuery { layer, gate: gate_to_usecase(gate) };
+        let query = CatalogCheckQuery { layer };
         match self.service.check(&track_id, &items_dir, query) {
             Ok(report) => render_check_report(&report),
             Err(e) => CommandOutcome::failure(Some(e.to_string())),
@@ -316,14 +303,6 @@ fn action_to_domain(action: CatalogImportSelect) -> CatalogImportAction {
         CatalogImportSelect::Reference => CatalogImportAction::Reference,
         CatalogImportSelect::Modify => CatalogImportAction::Modify,
         CatalogImportSelect::Delete => CatalogImportAction::Delete,
-    }
-}
-
-fn gate_to_usecase(gate: CatalogGateSelect) -> CatalogGateContext {
-    match gate {
-        CatalogGateSelect::Phase2 => CatalogGateContext::Phase2,
-        CatalogGateSelect::Commit => CatalogGateContext::Commit,
-        CatalogGateSelect::Merge => CatalogGateContext::Merge,
     }
 }
 
@@ -359,7 +338,7 @@ fn render_write_report(report: &CatalogWriteReport) -> String {
 
 /// Map a [`CatalogCheckReport`] to a [`CommandOutcome`].
 ///
-/// Pass / Interim / Skipped are non-blocking (exit 0); Blocked exits non-zero.
+/// Pass / Skipped are non-blocking (exit 0); Blocked exits non-zero.
 fn render_check_report(report: &CatalogCheckReport) -> CommandOutcome {
     let mut lines: Vec<String> = Vec::new();
     for finding in &report.findings {
@@ -376,11 +355,6 @@ fn render_check_report(report: &CatalogCheckReport) -> CommandOutcome {
         CatalogCheckVerdict::Pass => CommandOutcome::success(Some(
             detail.unwrap_or_else(|| "catalog check passed".to_owned()),
         )),
-        CatalogCheckVerdict::Interim => {
-            CommandOutcome::success(Some(detail.unwrap_or_else(|| {
-                "catalog check: interim (incomplete tolerated at this gate)".to_owned()
-            })))
-        }
         CatalogCheckVerdict::Skipped => CommandOutcome::success(Some(
             detail.unwrap_or_else(|| "catalog check skipped".to_owned()),
         )),
@@ -405,8 +379,8 @@ mod tests {
     };
 
     use super::{
-        CatalogAddInput, CatalogCheckInput, CatalogCiteInput, CatalogDriver, CatalogGateSelect,
-        CatalogImportInput, CatalogImportSelect, CatalogInitInput, CatalogInput, CatalogKindSelect,
+        CatalogAddInput, CatalogCheckInput, CatalogCiteInput, CatalogDriver, CatalogImportInput,
+        CatalogImportSelect, CatalogInitInput, CatalogInput, CatalogKindSelect,
     };
 
     /// Hand-rolled `CatalogService` double (cli_driver carries no mock deps).
@@ -517,12 +491,11 @@ mod tests {
         }
     }
 
-    fn check_input(gate: CatalogGateSelect) -> CatalogInput {
+    fn check_input() -> CatalogInput {
         CatalogInput::Check(CatalogCheckInput {
             track_id: "t".to_owned(),
             items_dir: PathBuf::from("track/items"),
             layer: None,
-            gate,
         })
     }
 
@@ -604,29 +577,19 @@ mod tests {
 
     #[test]
     fn check_pass_exits_zero() {
-        let outcome = driver(FakeService::ok(CatalogCheckVerdict::Pass))
-            .handle(check_input(CatalogGateSelect::Phase2));
-        assert_eq!(outcome.exit_code, 0);
-    }
-
-    #[test]
-    fn check_interim_exits_zero() {
-        let outcome = driver(FakeService::ok(CatalogCheckVerdict::Interim))
-            .handle(check_input(CatalogGateSelect::Commit));
+        let outcome = driver(FakeService::ok(CatalogCheckVerdict::Pass)).handle(check_input());
         assert_eq!(outcome.exit_code, 0);
     }
 
     #[test]
     fn check_skipped_exits_zero() {
-        let outcome = driver(FakeService::ok(CatalogCheckVerdict::Skipped))
-            .handle(check_input(CatalogGateSelect::Commit));
+        let outcome = driver(FakeService::ok(CatalogCheckVerdict::Skipped)).handle(check_input());
         assert_eq!(outcome.exit_code, 0);
     }
 
     #[test]
     fn check_blocked_exits_nonzero() {
-        let outcome = driver(FakeService::ok(CatalogCheckVerdict::Blocked))
-            .handle(check_input(CatalogGateSelect::Merge));
+        let outcome = driver(FakeService::ok(CatalogCheckVerdict::Blocked)).handle(check_input());
         assert_eq!(outcome.exit_code, 1);
     }
 }

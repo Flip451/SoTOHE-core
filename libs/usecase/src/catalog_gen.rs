@@ -25,33 +25,18 @@ use domain::tddd::catalogue_linter::FreeText;
 
 use crate::dry_driver_shared::IoFailureDetail;
 
-// ── Gate / verdict vocabularies ────────────────────────────────────────────
+// ── Check verdict vocabulary ───────────────────────────────────────────────
 
-/// The three catalogue-completion gate contexts.
-///
-/// See IN-06, AC-11.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum CatalogGateContext {
-    /// Phase 2 (type-design) strict gate.
-    Phase2,
-    /// Pre-commit gate — the TDDD interim + missing-input skip rules apply.
-    Commit,
-    /// Pre-merge strict gate.
-    Merge,
-}
-
-/// The four catalogue check verdicts.
+/// The three catalogue check verdicts.
 ///
 /// See IN-06, AC-11.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CatalogCheckVerdict {
-    /// The catalogue passes the resolved gate.
+    /// The catalogue passed completion checks.
     Pass,
-    /// The catalogue is acceptably incomplete for an interim (commit) gate.
-    Interim,
     /// The catalogue is blocked by unresolved holes or invalid input.
     Blocked,
-    /// The check was skipped (e.g. missing input under the commit gate).
+    /// The check was skipped because catalogue generation has not started.
     Skipped,
 }
 
@@ -125,8 +110,6 @@ pub struct CatalogCiteCommand {
 pub struct CatalogCheckQuery {
     /// Target layer; `None` means all TDDD layers.
     pub layer: Option<LayerId>,
-    /// Gate context resolving the check strictness.
-    pub gate: CatalogGateContext,
 }
 
 // ── Report DTOs ────────────────────────────────────────────────────────────
@@ -282,7 +265,7 @@ pub trait CatalogService: Send + Sync {
         command: CatalogCiteCommand,
     ) -> Result<CatalogWriteReport, CatalogError>;
 
-    /// Check catalogue completion against the resolved gate.
+    /// Check catalogue completion.
     ///
     /// # Errors
     ///
@@ -347,7 +330,7 @@ pub trait CatalogPort: Send + Sync {
         command: CatalogCiteCommand,
     ) -> Result<CatalogWriteReport, CatalogError>;
 
-    /// Check catalogue completion against the resolved gate.
+    /// Check catalogue completion.
     ///
     /// # Errors
     ///
@@ -463,8 +446,7 @@ mod tests {
         };
         assert_eq!(cite.entry, "Foo");
 
-        let query = CatalogCheckQuery { layer: None, gate: CatalogGateContext::Phase2 };
-        assert_eq!(query.gate, CatalogGateContext::Phase2);
+        let query = CatalogCheckQuery { layer: None };
         assert!(query.layer.is_none());
     }
 
@@ -596,7 +578,7 @@ mod tests {
         };
         assert_eq!(interactor.cite("t", dir, cite).unwrap().entry_key, "cited");
 
-        let query = CatalogCheckQuery { layer: None, gate: CatalogGateContext::Commit };
+        let query = CatalogCheckQuery { layer: None };
         assert_eq!(
             interactor.check("t", dir, query).unwrap().verdict,
             CatalogCheckVerdict::Blocked

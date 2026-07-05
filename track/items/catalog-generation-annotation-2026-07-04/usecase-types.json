@@ -3,26 +3,6 @@
   "crate_name": "usecase",
   "layer": "usecase",
   "types": {
-    "CatalogGateContext": {
-      "action": "add",
-      "role": { "ValueObject": {} },
-      "kind": {
-        "kind": "enum",
-        "variants": [
-          { "name": "Phase2",  "payload": { "kind": "unit" } },
-          { "name": "Commit",  "payload": { "kind": "unit" } },
-          { "name": "Merge",   "payload": { "kind": "unit" } }
-        ]
-      },
-      "methods": [],
-      "module_path": "catalog_gen",
-      "docs": "Closed enum of the three gate contexts (Phase2, Commit, Merge). See IN-06, AC-11.",
-      "spec_refs": [
-        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-06" },
-        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-11" }
-      ],
-      "informal_grounds": []
-    },
     "CatalogCheckVerdict": {
       "action": "add",
       "role": { "ValueObject": {} },
@@ -30,14 +10,13 @@
         "kind": "enum",
         "variants": [
           { "name": "Pass",    "payload": { "kind": "unit" } },
-          { "name": "Interim", "payload": { "kind": "unit" } },
           { "name": "Blocked", "payload": { "kind": "unit" } },
           { "name": "Skipped", "payload": { "kind": "unit" } }
         ]
       },
       "methods": [],
       "module_path": "catalog_gen",
-      "docs": "Closed enum of the four check verdicts (Pass, Interim, Blocked, Skipped). See IN-06, AC-11.",
+      "docs": "Closed enum of the three check verdicts (Pass, Blocked, Skipped). See IN-06, AC-11.",
       "spec_refs": [
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-06" },
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-11" }
@@ -138,15 +117,14 @@
         "shape": {
           "kind": "plain",
           "fields": [
-            { "name": "layer", "ty": "Option<domain::tddd::LayerId>" },
-            { "name": "gate",  "ty": "CatalogGateContext" }
+            { "name": "layer", "ty": "Option<domain::tddd::LayerId>" }
           ],
           "has_stripped_fields": false
         }
       },
       "methods": [],
       "module_path": "catalog_gen",
-      "docs": "Query DTO carrying an optional layer and a gate context. See IN-06, AC-11.",
+      "docs": "Query DTO carrying an optional layer. See IN-06, AC-11.",
       "spec_refs": [
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-06" },
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-11" }
@@ -472,53 +450,37 @@
     }
   ],
   "trait_impls": [
-    { "trait_ref": "core::fmt::Debug",         "for_type": "CatalogGateContext" },
-    { "trait_ref": "core::clone::Clone",       "for_type": "CatalogGateContext" },
-    { "trait_ref": "core::marker::Copy",       "for_type": "CatalogGateContext" },
-    { "trait_ref": "core::clone::TrivialClone", "for_type": "CatalogGateContext" },
-    { "trait_ref": "core::cmp::PartialEq",     "for_type": "CatalogGateContext" },
-    { "trait_ref": "core::cmp::Eq",            "for_type": "CatalogGateContext" },
-
     { "trait_ref": "core::fmt::Debug",         "for_type": "CatalogCheckVerdict" },
     { "trait_ref": "core::clone::Clone",       "for_type": "CatalogCheckVerdict" },
     { "trait_ref": "core::marker::Copy",       "for_type": "CatalogCheckVerdict" },
     { "trait_ref": "core::clone::TrivialClone", "for_type": "CatalogCheckVerdict" },
     { "trait_ref": "core::cmp::PartialEq",     "for_type": "CatalogCheckVerdict" },
     { "trait_ref": "core::cmp::Eq",            "for_type": "CatalogCheckVerdict" },
-
     { "trait_ref": "core::fmt::Debug",     "for_type": "CatalogAddCommand" },
     { "trait_ref": "core::clone::Clone",   "for_type": "CatalogAddCommand" },
     { "trait_ref": "core::cmp::PartialEq", "for_type": "CatalogAddCommand" },
     { "trait_ref": "core::cmp::Eq",        "for_type": "CatalogAddCommand" },
-
     { "trait_ref": "core::fmt::Debug",     "for_type": "CatalogImportCommand" },
     { "trait_ref": "core::clone::Clone",   "for_type": "CatalogImportCommand" },
     { "trait_ref": "core::cmp::PartialEq", "for_type": "CatalogImportCommand" },
     { "trait_ref": "core::cmp::Eq",        "for_type": "CatalogImportCommand" },
-
     { "trait_ref": "core::fmt::Debug",     "for_type": "CatalogCiteCommand" },
     { "trait_ref": "core::clone::Clone",   "for_type": "CatalogCiteCommand" },
     { "trait_ref": "core::cmp::PartialEq", "for_type": "CatalogCiteCommand" },
     { "trait_ref": "core::cmp::Eq",        "for_type": "CatalogCiteCommand" },
-
     { "trait_ref": "core::fmt::Debug",     "for_type": "CatalogCheckQuery" },
     { "trait_ref": "core::clone::Clone",   "for_type": "CatalogCheckQuery" },
     { "trait_ref": "core::cmp::PartialEq", "for_type": "CatalogCheckQuery" },
     { "trait_ref": "core::cmp::Eq",        "for_type": "CatalogCheckQuery" },
-
     { "trait_ref": "core::fmt::Debug",   "for_type": "CatalogInitReport" },
     { "trait_ref": "core::clone::Clone", "for_type": "CatalogInitReport" },
-
     { "trait_ref": "core::fmt::Debug",   "for_type": "CatalogWriteReport" },
     { "trait_ref": "core::clone::Clone", "for_type": "CatalogWriteReport" },
-
     { "trait_ref": "core::fmt::Debug",   "for_type": "CatalogCheckReport" },
     { "trait_ref": "core::clone::Clone", "for_type": "CatalogCheckReport" },
-
     { "trait_ref": "core::fmt::Debug",   "for_type": "CatalogError" },
     { "trait_ref": "core::fmt::Display", "for_type": "CatalogError" },
     { "trait_ref": "core::error::Error", "for_type": "CatalogError" },
-
     { "trait_ref": "CatalogService", "for_type": "CatalogInteractor" }
   ]
 }

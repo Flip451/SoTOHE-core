@@ -4,7 +4,6 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CatalogGateSelect | enum | add | Phase2, Commit, Merge | 🔵 | 🔵 |
 | CatalogImportSelect | enum | add | Reference, Modify, Delete | 🔵 | 🔵 |
 | CatalogInput | enum | add | Init, Add, Import, Cite, Check | 🔵 | 🔵 |
 | CatalogKindSelect | enum | add | Struct, Enum, TypeAlias, Trait, Function | 🔵 | 🔵 |

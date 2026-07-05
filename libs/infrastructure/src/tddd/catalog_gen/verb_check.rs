@@ -1,5 +1,4 @@
-//! `sotp catalog check` (D7 / IN-06 / AC-11): re-validate catalogue completion
-//! against a gate context, resolving strictness per phase2 / commit / merge.
+//! `sotp catalog check` (D7 / IN-06 / AC-11): re-validate catalogue completion.
 
 use std::collections::BTreeSet;
 use std::path::{Path, PathBuf};
@@ -8,12 +7,14 @@ use domain::plan_ref::SpecElementId;
 use domain::tddd::catalog_gen::DraftHole;
 use serde_json::Value;
 use usecase::catalog_gen::{
-    CatalogCheckQuery, CatalogCheckReport, CatalogCheckVerdict, CatalogError, CatalogGateContext,
+    CatalogCheckQuery, CatalogCheckReport, CatalogCheckVerdict, CatalogError,
 };
 
 use crate::tddd::catalogue_document_codec::derive_filename_stem;
 
-use super::fs_access::{catalogue_path, load_bindings, read_catalogue, track_dir};
+use super::fs_access::{
+    catalogue_path, catalogue_present, load_bindings, read_catalogue, track_dir,
+};
 use super::validate::load_spec_anchors_for_check;
 use super::{scan_todo_holes, try_complete, validate_hole_free_schema};
 
@@ -24,7 +25,7 @@ struct LayerOutcome {
     holes: Vec<DraftHole>,
 }
 
-/// Check catalogue completion for the resolved gate.
+/// Check catalogue completion.
 ///
 /// # Errors
 ///
@@ -41,33 +42,57 @@ pub(super) fn run(
     // still fail closed.
     let spec_anchors = load_spec_anchors_for_check(&dir, items_dir)?;
 
+    let all_catalogue_files: Vec<(String, PathBuf)> = bindings
+        .iter()
+        .map(|binding| (binding.layer_id().to_owned(), dir.join(binding.catalogue_file())))
+        .collect();
+    let any_catalogue_exists = has_any_catalogue_file(&all_catalogue_files, items_dir)?;
+
     let targets: Vec<(String, PathBuf)> = match &query.layer {
         Some(layer) => vec![(layer.as_ref().to_owned(), catalogue_path(&dir, &bindings, layer)?)],
-        None => bindings
-            .iter()
-            .map(|binding| (binding.layer_id().to_owned(), dir.join(binding.catalogue_file())))
-            .collect(),
+        None => all_catalogue_files,
     };
 
     let mut outcomes = Vec::new();
     for (layer_name, path) in &targets {
-        outcomes.push(check_layer(query.gate, layer_name, path, items_dir, &spec_anchors)?);
+        outcomes.push(check_layer(
+            layer_name,
+            path,
+            items_dir,
+            &spec_anchors,
+            any_catalogue_exists,
+        )?);
     }
     Ok(aggregate(outcomes))
 }
 
-/// Check a single layer's catalogue file against the gate.
+/// Return whether any expected catalogue file is present, using the same guarded
+/// real-file boundary as catalogue reads.
+fn has_any_catalogue_file(
+    catalogue_files: &[(String, PathBuf)],
+    trusted_root: &Path,
+) -> Result<bool, CatalogError> {
+    let mut any_present = false;
+    for (_, path) in catalogue_files {
+        if catalogue_present(path, trusted_root)? {
+            any_present = true;
+        }
+    }
+    Ok(any_present)
+}
+
+/// Check a single layer's catalogue file.
 fn check_layer(
-    gate: CatalogGateContext,
     layer_name: &str,
     path: &Path,
     trusted_root: &Path,
     spec_anchors: &BTreeSet<SpecElementId>,
+    any_catalogue_exists: bool,
 ) -> Result<LayerOutcome, CatalogError> {
     let value: Value = match read_catalogue(path, trusted_root) {
         Ok(value) => value,
         Err(CatalogError::FileMissing { .. }) => {
-            return Ok(missing_outcome(gate, layer_name, path));
+            return Ok(missing_outcome(layer_name, path, any_catalogue_exists));
         }
         Err(err @ CatalogError::SchemaInvalid { .. }) => {
             return Ok(blocked(format!("{layer_name}: schema error: {err}")));
@@ -78,16 +103,15 @@ fn check_layer(
     let holes = scan_todo_holes(&value);
     let expected_stem = derive_filename_stem(path);
     if !holes.is_empty() {
-        // A residual `$todo` hole is tolerated as an interim result at the commit
-        // gate, but it must not mask a schema violation in a *hole-free* entry
-        // (invalid role, unknown field, crate-name mismatch) — those would
-        // otherwise slip through as interim / exit 0. Validate the hole-free
-        // portion first and block on a real schema error; keep the hole interim
-        // when only holes remain.
+        // Residual `$todo` holes block every gate once a catalogue file exists.
+        // Validate the hole-free portion first so a real schema violation in a
+        // completed entry (invalid role, unknown field, crate-name mismatch)
+        // is still reported as a schema error instead of being hidden by the
+        // residual-hole finding.
         if let Err(err) = validate_hole_free_schema(&value, &expected_stem) {
             return Ok(blocked(format!("{layer_name}: schema error: {err}")));
         }
-        return Ok(hole_outcome(gate, layer_name, holes));
+        return Ok(hole_outcome(layer_name, holes));
     }
 
     let mut anchor_strings = Vec::new();
@@ -104,68 +128,48 @@ fn check_layer(
             holes: vec![],
         });
     }
-    Ok(dangling_outcome(gate, layer_name, &dangling))
+    Ok(dangling_outcome(layer_name, &dangling))
 }
 
 /// Outcome for an absent catalogue file.
-fn missing_outcome(gate: CatalogGateContext, layer_name: &str, path: &Path) -> LayerOutcome {
-    match gate {
-        CatalogGateContext::Commit => LayerOutcome {
-            verdict: CatalogCheckVerdict::Skipped,
-            findings: vec![format!("{layer_name}: catalogue file absent — skipped")],
-            holes: vec![],
-        },
-        _ => LayerOutcome {
+fn missing_outcome(layer_name: &str, path: &Path, any_catalogue_exists: bool) -> LayerOutcome {
+    if any_catalogue_exists {
+        LayerOutcome {
             verdict: CatalogCheckVerdict::Blocked,
             findings: vec![format!(
                 "{layer_name}: TDDD catalogue file missing: {}",
                 path.display()
             )],
             holes: vec![],
-        },
+        }
+    } else {
+        LayerOutcome {
+            verdict: CatalogCheckVerdict::Skipped,
+            findings: vec![format!("{layer_name}: catalogue file absent — skipped")],
+            holes: vec![],
+        }
     }
 }
 
 /// Outcome for a catalogue with residual `$todo` holes.
-fn hole_outcome(gate: CatalogGateContext, layer_name: &str, holes: Vec<DraftHole>) -> LayerOutcome {
+fn hole_outcome(layer_name: &str, holes: Vec<DraftHole>) -> LayerOutcome {
     let count = holes.len();
-    match gate {
-        CatalogGateContext::Commit => LayerOutcome {
-            verdict: CatalogCheckVerdict::Interim,
-            findings: vec![format!("{layer_name}: {count} unfilled $todo hole(s) (interim)")],
-            holes,
-        },
-        _ => LayerOutcome {
-            verdict: CatalogCheckVerdict::Blocked,
-            findings: vec![format!("{layer_name}: {count} unfilled $todo hole(s)")],
-            holes,
-        },
+    LayerOutcome {
+        verdict: CatalogCheckVerdict::Blocked,
+        findings: vec![format!("{layer_name}: {count} unfilled $todo hole(s)")],
+        holes,
     }
 }
 
 /// Outcome for a catalogue with dangling spec anchors.
-fn dangling_outcome(
-    gate: CatalogGateContext,
-    layer_name: &str,
-    dangling: &[String],
-) -> LayerOutcome {
-    match gate {
-        CatalogGateContext::Commit => LayerOutcome {
-            verdict: CatalogCheckVerdict::Pass,
-            findings: vec![format!(
-                "{layer_name}: {} dangling anchor(s) tolerated at commit",
-                dangling.len()
-            )],
-            holes: vec![],
-        },
-        _ => LayerOutcome {
-            verdict: CatalogCheckVerdict::Blocked,
-            findings: dangling
-                .iter()
-                .map(|anchor| format!("{layer_name}: dangling spec anchor `{anchor}`"))
-                .collect(),
-            holes: vec![],
-        },
+fn dangling_outcome(layer_name: &str, dangling: &[String]) -> LayerOutcome {
+    LayerOutcome {
+        verdict: CatalogCheckVerdict::Blocked,
+        findings: dangling
+            .iter()
+            .map(|anchor| format!("{layer_name}: dangling spec anchor `{anchor}`"))
+            .collect(),
+        holes: vec![],
     }
 }
 
@@ -174,27 +178,23 @@ fn blocked(finding: String) -> LayerOutcome {
     LayerOutcome { verdict: CatalogCheckVerdict::Blocked, findings: vec![finding], holes: vec![] }
 }
 
-/// Aggregate per-layer outcomes; precedence Blocked > Interim > Pass > Skipped.
+/// Aggregate per-layer outcomes; precedence Blocked > Pass > Skipped.
 fn aggregate(outcomes: Vec<LayerOutcome>) -> CatalogCheckReport {
     let mut findings = Vec::new();
     let mut remaining_holes = Vec::new();
     let mut any_blocked = false;
-    let mut any_interim = false;
     let mut any_pass = false;
     for outcome in outcomes {
         findings.extend(outcome.findings);
         remaining_holes.extend(outcome.holes);
         match outcome.verdict {
             CatalogCheckVerdict::Blocked => any_blocked = true,
-            CatalogCheckVerdict::Interim => any_interim = true,
             CatalogCheckVerdict::Pass => any_pass = true,
             CatalogCheckVerdict::Skipped => {}
         }
     }
     let verdict = if any_blocked {
         CatalogCheckVerdict::Blocked
-    } else if any_interim {
-        CatalogCheckVerdict::Interim
     } else if any_pass {
         CatalogCheckVerdict::Pass
     } else {
@@ -254,180 +254,149 @@ mod tests {
         BTreeSet::new()
     }
 
+    #[cfg(unix)]
     #[test]
-    fn test_missing_file_skipped_at_commit_blocked_at_phase2() {
-        let missing = Path::new("/nonexistent/domain-types.json");
-        let commit = check_layer(
-            CatalogGateContext::Commit,
-            "domain",
-            missing,
-            Path::new("/"),
-            &empty_set(),
-        )
-        .unwrap();
-        assert_eq!(commit.verdict, CatalogCheckVerdict::Skipped);
-        let phase2 = check_layer(
-            CatalogGateContext::Phase2,
-            "domain",
-            missing,
-            Path::new("/"),
-            &empty_set(),
-        )
-        .unwrap();
-        assert_eq!(phase2.verdict, CatalogCheckVerdict::Blocked);
+    fn test_has_any_catalogue_file_rejects_symlinked_catalogue_path() {
+        let temp = tempfile::tempdir().unwrap();
+        let target = temp.path().join("real.json");
+        let link = temp.path().join("domain-types.json");
+        std::fs::write(&target, "{}").unwrap();
+        std::os::unix::fs::symlink(&target, &link).unwrap();
+        let files = vec![("domain".to_owned(), link)];
+
+        let err = has_any_catalogue_file(&files, temp.path()).unwrap_err();
+
+        assert!(err.to_string().contains("symlink"), "{err}");
     }
 
     #[test]
-    fn test_holes_interim_at_commit_blocked_at_merge() {
+    fn test_missing_file_skipped_before_catalogue_init_blocked_after_partial_init() {
+        let missing = Path::new("/nonexistent/domain-types.json");
+        let before_init =
+            check_layer("domain", missing, Path::new("/"), &empty_set(), false).unwrap();
+        assert_eq!(before_init.verdict, CatalogCheckVerdict::Skipped);
+        let after_partial_init =
+            check_layer("domain", missing, Path::new("/"), &empty_set(), true).unwrap();
+        assert_eq!(after_partial_init.verdict, CatalogCheckVerdict::Blocked);
+    }
+
+    #[test]
+    fn test_holes_block_after_catalogue_init() {
         let body = r#"{"schema_version":5,"crate_name":"domain","layer":"domain","types":{"Foo":{"role":{"$todo":"pick"}}},"traits":{},"functions":{}}"#;
         let (temp, path) = write_file("domain-types.json", body);
-        let commit =
-            check_layer(CatalogGateContext::Commit, "domain", &path, temp.path(), &empty_set())
-                .unwrap();
-        assert_eq!(commit.verdict, CatalogCheckVerdict::Interim);
-        assert!(!commit.holes.is_empty());
-        let merge =
-            check_layer(CatalogGateContext::Merge, "domain", &path, temp.path(), &empty_set())
-                .unwrap();
-        assert_eq!(merge.verdict, CatalogCheckVerdict::Blocked);
+        let outcome = check_layer("domain", &path, temp.path(), &empty_set(), true).unwrap();
+        assert_eq!(outcome.verdict, CatalogCheckVerdict::Blocked);
+        assert!(!outcome.holes.is_empty());
     }
 
     #[test]
     fn test_clean_empty_catalogue_passes() {
         let body = r#"{"schema_version":5,"crate_name":"domain","layer":"domain","types":{},"traits":{},"functions":{}}"#;
         let (temp, path) = write_file("domain-types.json", body);
-        let outcome =
-            check_layer(CatalogGateContext::Phase2, "domain", &path, temp.path(), &empty_set())
-                .unwrap();
+        let outcome = check_layer("domain", &path, temp.path(), &empty_set(), true).unwrap();
         assert_eq!(outcome.verdict, CatalogCheckVerdict::Pass);
     }
 
     #[test]
-    fn test_delete_only_catalogue_passes_strict_gates() {
+    fn test_delete_only_catalogue_passes() {
         // An identity-only delete tombstone has no `$todo` holes and decodes
-        // cleanly, so it must pass the strict phase2 / merge gates rather than
+        // cleanly, so it must pass the completion check rather than
         // being blocked for missing role/docs (spec IN-04 / GO-03 / AC-04).
         let body = r#"{"schema_version":5,"crate_name":"domain","layer":"domain","types":{"OldType":{"action":"delete","module_path":"tddd"}},"traits":{},"functions":{}}"#;
         let (temp, path) = write_file("domain-types.json", body);
-        let phase2 =
-            check_layer(CatalogGateContext::Phase2, "domain", &path, temp.path(), &empty_set())
-                .unwrap();
-        assert_eq!(phase2.verdict, CatalogCheckVerdict::Pass);
-        let merge =
-            check_layer(CatalogGateContext::Merge, "domain", &path, temp.path(), &empty_set())
-                .unwrap();
-        assert_eq!(merge.verdict, CatalogCheckVerdict::Pass);
+        let outcome = check_layer("domain", &path, temp.path(), &empty_set(), true).unwrap();
+        assert_eq!(outcome.verdict, CatalogCheckVerdict::Pass);
     }
 
     #[test]
-    fn test_invalid_schema_blocks_all_gates() {
+    fn test_invalid_schema_blocks() {
         let body = r#"{"schema_version":99,"crate_name":"domain","layer":"domain","types":{},"traits":{},"functions":{}}"#;
         let (temp, path) = write_file("domain-types.json", body);
-        let outcome =
-            check_layer(CatalogGateContext::Commit, "domain", &path, temp.path(), &empty_set())
-                .unwrap();
+        let outcome = check_layer("domain", &path, temp.path(), &empty_set(), true).unwrap();
         assert_eq!(outcome.verdict, CatalogCheckVerdict::Blocked);
     }
 
     #[test]
-    fn test_invalid_schema_with_holes_blocks_before_interim() {
+    fn test_invalid_schema_with_holes_blocks_before_hole_finding() {
         let body = r#"{"schema_version":99,"crate_name":"domain","layer":"domain","types":{"Foo":{"role":{"$todo":"pick"}}},"traits":{},"functions":{}}"#;
         let (temp, path) = write_file("domain-types.json", body);
-        let outcome =
-            check_layer(CatalogGateContext::Commit, "domain", &path, temp.path(), &empty_set())
-                .unwrap();
+        let outcome = check_layer("domain", &path, temp.path(), &empty_set(), true).unwrap();
         assert_eq!(outcome.verdict, CatalogCheckVerdict::Blocked);
         assert!(outcome.holes.is_empty());
     }
 
     #[test]
-    fn test_schema_error_in_hole_free_entry_blocks_despite_unrelated_hole_at_commit() {
+    fn test_schema_error_in_hole_free_entry_blocks_despite_unrelated_hole() {
         // `Foo` carries a legitimate `$todo` hole (still being annotated). `Bar` is
         // hole-free but has an unknown field that `read_catalogue`'s schema_version
-        // probe does not catch — only a full decode does. At the commit gate the
-        // unrelated hole must not mask `Bar`'s schema violation as an interim result.
+        // probe does not catch — only a full decode does. The unrelated hole must
+        // not mask `Bar`'s schema violation.
         let body = r#"{"schema_version":5,"crate_name":"domain","layer":"domain","types":{"Foo":{"role":{"$todo":"pick"}},"Bar":{"action":"add","role":{"ValueObject":{}},"kind":{"kind":"struct","shape":{"kind":"unit"}},"bogus_field":true}},"traits":{},"functions":{}}"#;
         let (temp, path) = write_file("domain-types.json", body);
-        let outcome =
-            check_layer(CatalogGateContext::Commit, "domain", &path, temp.path(), &empty_set())
-                .unwrap();
+        let outcome = check_layer("domain", &path, temp.path(), &empty_set(), true).unwrap();
         assert_eq!(outcome.verdict, CatalogCheckVerdict::Blocked);
     }
 
     #[test]
-    fn test_crate_name_mismatch_with_hole_blocks_at_commit() {
+    fn test_crate_name_mismatch_with_hole_blocks() {
         // A `crate_name` that disagrees with the filename stem is a decode-time
-        // schema error the schema_version probe never catches. It must be blocked
-        // at the commit gate even when an unrelated `$todo` hole is present.
+        // schema error the schema_version probe never catches. It must be blocked even when an unrelated `$todo` hole is present.
         let body = r#"{"schema_version":5,"crate_name":"wrong","layer":"domain","types":{"Foo":{"role":{"$todo":"pick"}}},"traits":{},"functions":{}}"#;
         let (temp, path) = write_file("domain-types.json", body);
-        let outcome =
-            check_layer(CatalogGateContext::Commit, "domain", &path, temp.path(), &empty_set())
-                .unwrap();
+        let outcome = check_layer("domain", &path, temp.path(), &empty_set(), true).unwrap();
         assert_eq!(outcome.verdict, CatalogCheckVerdict::Blocked);
     }
 
     #[test]
-    fn test_hole_free_valid_entry_alongside_hole_stays_interim_at_commit() {
+    fn test_hole_free_valid_entry_alongside_hole_blocks() {
         // `Foo` carries a hole; `Bar` is hole-free and schema-valid. The hole-free
-        // schema validation must not block a legitimately-interim catalogue: the
-        // outcome stays interim (and still reports the residual hole).
+        // schema validation must not mask the residual hole: the check still blocks and reports the hole.
         let body = r#"{"schema_version":5,"crate_name":"domain","layer":"domain","types":{"Foo":{"role":{"$todo":"pick"}},"Bar":{"action":"add","role":{"ValueObject":{}},"kind":{"kind":"struct","shape":{"kind":"unit"}}}},"traits":{},"functions":{}}"#;
         let (temp, path) = write_file("domain-types.json", body);
-        let outcome =
-            check_layer(CatalogGateContext::Commit, "domain", &path, temp.path(), &empty_set())
-                .unwrap();
-        assert_eq!(outcome.verdict, CatalogCheckVerdict::Interim);
+        let outcome = check_layer("domain", &path, temp.path(), &empty_set(), true).unwrap();
+        assert_eq!(outcome.verdict, CatalogCheckVerdict::Blocked);
         assert!(!outcome.holes.is_empty());
     }
 
     #[test]
-    fn test_top_level_hole_does_not_mask_hole_free_schema_error_at_commit() {
+    fn test_top_level_hole_does_not_mask_hole_free_schema_error() {
         // A top-level scalar hole used to survive pruning and make `try_complete`
-        // return `Incomplete` before the strict codec could decode `Bar`. The
-        // hole-free `Bar` schema error must still block instead of becoming Interim.
+        // return `Incomplete` before the codec could decode `Bar`. The
+        // hole-free `Bar` schema error must still block instead of becoming non-blocking.
         let body = r#"{"schema_version":5,"crate_name":"domain","layer":{"$todo":"pick"},"types":{"Bar":{"action":"add","role":{"ValueObject":{}},"kind":{"kind":"struct","shape":{"kind":"unit"}},"bogus_field":true}},"traits":{},"functions":{}}"#;
         let (temp, path) = write_file("domain-types.json", body);
-        let outcome =
-            check_layer(CatalogGateContext::Commit, "domain", &path, temp.path(), &empty_set())
-                .unwrap();
+        let outcome = check_layer("domain", &path, temp.path(), &empty_set(), true).unwrap();
         assert_eq!(outcome.verdict, CatalogCheckVerdict::Blocked);
     }
 
     #[test]
-    fn test_top_level_hole_with_valid_remainder_stays_interim_at_commit() {
-        // Top-level scalar holes are still tolerated by the commit gate when the
-        // hole-free remainder decodes cleanly.
+    fn test_top_level_hole_with_valid_remainder_blocks() {
+        // Top-level scalar holes still block even when the hole-free remainder
+        // decodes cleanly.
         let body = r#"{"schema_version":5,"crate_name":"domain","layer":{"$todo":"pick"},"types":{},"traits":{},"functions":{}}"#;
         let (temp, path) = write_file("domain-types.json", body);
-        let outcome =
-            check_layer(CatalogGateContext::Commit, "domain", &path, temp.path(), &empty_set())
-                .unwrap();
-        assert_eq!(outcome.verdict, CatalogCheckVerdict::Interim);
+        let outcome = check_layer("domain", &path, temp.path(), &empty_set(), true).unwrap();
+        assert_eq!(outcome.verdict, CatalogCheckVerdict::Blocked);
         assert!(!outcome.holes.is_empty());
     }
 
     #[test]
-    fn test_root_hole_does_not_mask_hole_free_schema_error_at_commit() {
+    fn test_root_hole_does_not_mask_hole_free_schema_error() {
         // A root-level marker is valid draft syntax for "the document is still
         // incomplete", but when other fields are present the hole-free remainder
-        // must still be decoded so schema errors cannot become Interim.
+        // must still be decoded so schema errors cannot become non-blocking.
         let body = r#"{"$todo":"finish draft","schema_version":5,"crate_name":"domain","layer":"domain","types":{"Bar":{"action":"add","role":{"ValueObject":{}},"kind":{"kind":"struct","shape":{"kind":"unit"}},"bogus_field":true}},"traits":{},"functions":{}}"#;
         let (temp, path) = write_file("domain-types.json", body);
-        let outcome =
-            check_layer(CatalogGateContext::Commit, "domain", &path, temp.path(), &empty_set())
-                .unwrap();
+        let outcome = check_layer("domain", &path, temp.path(), &empty_set(), true).unwrap();
         assert_eq!(outcome.verdict, CatalogCheckVerdict::Blocked);
     }
 
     #[test]
-    fn test_root_hole_with_valid_remainder_stays_interim_at_commit() {
+    fn test_root_hole_with_valid_remainder_blocks() {
         let body = r#"{"$todo":"finish draft","schema_version":5,"crate_name":"domain","layer":"domain","types":{},"traits":{},"functions":{}}"#;
         let (temp, path) = write_file("domain-types.json", body);
-        let outcome =
-            check_layer(CatalogGateContext::Commit, "domain", &path, temp.path(), &empty_set())
-                .unwrap();
-        assert_eq!(outcome.verdict, CatalogCheckVerdict::Interim);
+        let outcome = check_layer("domain", &path, temp.path(), &empty_set(), true).unwrap();
+        assert_eq!(outcome.verdict, CatalogCheckVerdict::Blocked);
         assert!(!outcome.holes.is_empty());
     }
 
@@ -439,9 +408,7 @@ mod tests {
         // this tampered file is blocked instead of passing.
         let body = r#"{"schema_version":5,"crate_name":"wrong","layer":"domain","types":{},"traits":{},"functions":{}}"#;
         let (temp, path) = write_file("domain-types.json", body);
-        let outcome =
-            check_layer(CatalogGateContext::Phase2, "domain", &path, temp.path(), &empty_set())
-                .unwrap();
+        let outcome = check_layer("domain", &path, temp.path(), &empty_set(), true).unwrap();
         assert_eq!(outcome.verdict, CatalogCheckVerdict::Blocked);
     }
 
@@ -452,38 +419,37 @@ mod tests {
         // duplicate rejection. The check must fail closed on the raw duplicate.
         let body = r#"{"schema_version":5,"crate_name":"domain","layer":"domain","types":{"Foo":{"role":{"ValueObject":{}}},"Foo":{"role":{"ValueObject":{}}}},"traits":{},"functions":{}}"#;
         let (temp, path) = write_file("domain-types.json", body);
-        let outcome =
-            check_layer(CatalogGateContext::Phase2, "domain", &path, temp.path(), &empty_set())
-                .unwrap();
+        let outcome = check_layer("domain", &path, temp.path(), &empty_set(), true).unwrap();
         assert_eq!(outcome.verdict, CatalogCheckVerdict::Blocked);
     }
 
     #[test]
-    fn test_dangling_anchor_blocks_phase2_passes_commit() {
+    fn test_dangling_anchor_blocks() {
         let body = r#"{"schema_version":5,"crate_name":"domain","layer":"domain","types":{"Foo":{"role":{"ValueObject":{}},"kind":{"kind":"struct","shape":{"kind":"unit"}},"spec_refs":[{"file":"spec.json","anchor":"ZZ-99"}]}},"traits":{},"functions":{}}"#;
         let (temp, path) = write_file("domain-types.json", body);
-        let phase2 =
-            check_layer(CatalogGateContext::Phase2, "domain", &path, temp.path(), &empty_set())
-                .unwrap();
-        assert_eq!(phase2.verdict, CatalogCheckVerdict::Blocked);
-        let commit =
-            check_layer(CatalogGateContext::Commit, "domain", &path, temp.path(), &empty_set())
-                .unwrap();
-        assert_eq!(commit.verdict, CatalogCheckVerdict::Pass);
+        let outcome = check_layer("domain", &path, temp.path(), &empty_set(), true).unwrap();
+        assert_eq!(outcome.verdict, CatalogCheckVerdict::Blocked);
     }
 
     #[test]
     fn test_aggregate_precedence() {
         let outcomes = vec![
             LayerOutcome { verdict: CatalogCheckVerdict::Pass, findings: vec![], holes: vec![] },
-            LayerOutcome { verdict: CatalogCheckVerdict::Interim, findings: vec![], holes: vec![] },
-        ];
-        assert_eq!(aggregate(outcomes).verdict, CatalogCheckVerdict::Interim);
-
-        let outcomes = vec![
-            LayerOutcome { verdict: CatalogCheckVerdict::Skipped, findings: vec![], holes: vec![] },
             LayerOutcome { verdict: CatalogCheckVerdict::Blocked, findings: vec![], holes: vec![] },
         ];
         assert_eq!(aggregate(outcomes).verdict, CatalogCheckVerdict::Blocked);
+
+        let outcomes = vec![
+            LayerOutcome { verdict: CatalogCheckVerdict::Skipped, findings: vec![], holes: vec![] },
+            LayerOutcome { verdict: CatalogCheckVerdict::Pass, findings: vec![], holes: vec![] },
+        ];
+        assert_eq!(aggregate(outcomes).verdict, CatalogCheckVerdict::Pass);
+
+        let outcomes = vec![LayerOutcome {
+            verdict: CatalogCheckVerdict::Skipped,
+            findings: vec![],
+            holes: vec![],
+        }];
+        assert_eq!(aggregate(outcomes).verdict, CatalogCheckVerdict::Skipped);
     }
 }

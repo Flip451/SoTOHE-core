@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "025aece02ada02f87fb89dea5b35455568c8223d38ed3ffc2b1070a55aa741b2",
+  "catalogue_declaration_hash": "453c50b68c3aa327f6d7ec9e3d6d3ae801b51dfb76e60927d448a08ed7cbd80f",
   "signals": [
     {
       "type_name": "CatalogAddInput",
@@ -10,7 +10,7 @@
     {
       "type_name": "CatalogCheckInput",
       "signal": "blue",
-      "entry_hash": "5b17ee8b2f329016c23a174fd1de6fc285f3acbf97966319431d9e16d02439f6"
+      "entry_hash": "e7b97f88f8926e99334d413331e7a09fbe61ee6af8bc7be97bbcfb3dfdfd0fed"
     },
     {
       "type_name": "CatalogCiteInput",
@@ -21,11 +21,6 @@
       "type_name": "CatalogDriver",
       "signal": "blue",
       "entry_hash": "815474cd4319de860c9e13199be71f2b2e3f6be032fd8f1fcb6e523217b06210"
-    },
-    {
-      "type_name": "CatalogGateSelect",
-      "signal": "blue",
-      "entry_hash": "f6e5d3bae7bb7c4081529e12e930b52bf94be22835f0e0eac19e2f5fa87bd02e"
     },
     {
       "type_name": "CatalogImportInput",

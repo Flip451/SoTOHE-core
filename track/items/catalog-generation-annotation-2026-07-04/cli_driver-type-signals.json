@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-05T12:31:44Z",
-  "declaration_hash": "025aece02ada02f87fb89dea5b35455568c8223d38ed3ffc2b1070a55aa741b2",
+  "generated_at": "2026-07-05T15:01:53Z",
+  "declaration_hash": "453c50b68c3aa327f6d7ec9e3d6d3ae801b51dfb76e60927d448a08ed7cbd80f",
   "signals": [
     {
       "type_name": "CatalogAddInput",
@@ -38,20 +38,6 @@
       "kind_tag": "primary_adapter",
       "signal": "blue",
       "found_type": true
-    },
-    {
-      "type_name": "CatalogGateSelect",
-      "kind_tag": "enum",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "core::clone::Clone",
-        "core::clone::TrivialClone",
-        "core::cmp::Eq",
-        "core::cmp::PartialEq",
-        "core::fmt::Debug",
-        "core::marker::Copy"
-      ]
     },
     {
       "type_name": "CatalogImportInput",

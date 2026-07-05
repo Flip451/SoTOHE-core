@@ -35,7 +35,7 @@
     },
     {
       "id": "GO-04",
-      "text": "入力時検証（早期フィードバック）と `sotp catalog check`（gate 時の一括再検証）の二段構えで fail-closed の網を張る。生成後のカタログ編集の自由度を保ちつつ、Phase 2 完了 / merge では strict に、commit gate では既存の TDDD interim / 欠損入力 skip 意味論を維持したまま強制する。",
+      "text": "入力時検証（早期フィードバック）と `sotp catalog check`（一括再検証）の二段構えで fail-closed の網を張る。生成後のカタログ編集の自由度を保ちつつ、Phase 2 完了ゲートと commit gate で `$todo` 残存を block する。`catalog check` は呼び出し側から判定モードを受け取らず、catalogue file の存在状況から Phase 0 / 1 の no-op skip と catalogue 作成開始後の blocking を自動判定する。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
@@ -114,7 +114,7 @@
       },
       {
         "id": "IN-06",
-        "text": "`sotp catalog check`: 完成検査。`--layer` 省略時は全 TDDD layer を対象とする。`--gate phase2|commit|merge` で厳格度を解決し、`$todo` 残存・anchor 実在・role 語彙・schema 妥当を一括再検証する。phase2 / merge は strict、commit は組み込みの TDDD interim + 欠損入力 skip 規則に従う。",
+        "text": "`sotp catalog check`: 完成検査。`--layer` 省略時は全 TDDD layer を対象とする。`$todo` 残存・anchor 実在・role 語彙・schema 妥当を一括再検証する。対象 catalogue file がまだ 1 つも存在しない Phase 0 / 1 では no-op + warning で skip し、対象 track に catalogue file が 1 つでも存在する場合は `$todo` 残存・anchor 不在・role 語彙外・schema 不正・TDDD 対象 layer の catalogue file 不在を非零 exit で block する。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
@@ -272,7 +272,7 @@
       },
       {
         "id": "OS-06",
-        "text": "`sotp catalog check` が `.harness/config/signal-gates.json` の存在・値・妥当性を prerequisite にすること。利用者所有の gate 設定を CI で強制しない境界を保つため対象外。より厳格な commit 運用は呼び出し側が明示 strict context を選ぶ場合に限る。",
+        "text": "`sotp catalog check` が `.harness/config/signal-gates.json` の存在・値・妥当性を prerequisite にすること。利用者所有の gate 設定を CI で強制しない境界を保つため対象外。`catalog check` は単一の完成検査として、catalogue file の存在状況だけから no-op skip / blocking を自動判定する。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
@@ -371,7 +371,7 @@
     },
     {
       "id": "CN-06",
-      "text": "commit gate への配線は既存の TDDD ゲート意味論を変更しない。catalogue file 不在（Phase 0 / 1）は no-op + warning で skip し非零終了にしない。catalogue file が存在するが `$todo` などの未完成状態を含む場合は chain ③ commit-gate 既定と同じ interim 扱いで warning 通過させる。schema parse 不能などの Red 相当の破損は commit gate でも block する。",
+      "text": "`sotp catalog check` は呼び出し側から判定モードを受け取らない。対象 catalogue file がまだ 1 つも存在しない Phase 0 / 1 だけ no-op + warning で skip し、非零終了にしない。catalogue file が 1 つでも存在する場合、TDDD 対象 layer の catalogue file 不在、`$todo` 残存、anchor 不在、role 語彙外、schema 不正は block する。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
@@ -547,7 +547,7 @@
     },
     {
       "id": "AC-11",
-      "text": "`sotp catalog check --gate phase2` および `--gate merge` は `$todo` 残存・anchor 不在・role 語彙外・schema 不正・TDDD 対象 layer の catalogue file 不在のいずれでも非零 exit で block する。`--gate commit` は既存の TDDD interim / 欠損入力 skip 意味論に従い、catalogue 不在で skip、`$todo` などの未完成で warning 通過、schema parse 不能で block する。いずれの gate でも `signal-gates.json` の存在・妥当性を prerequisite にしない。",
+      "text": "`sotp catalog check` は `$todo` 残存・anchor 不在・role 語彙外・schema 不正・TDDD 対象 layer の catalogue file 不在のいずれでも、catalogue 作成開始後は非零 exit で block する。対象 catalogue file がまだ 1 つも存在しない Phase 0 / 1 では no-op + warning で skip する。`signal-gates.json` の存在・妥当性を prerequisite にしない。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
@@ -571,7 +571,7 @@
     },
     {
       "id": "AC-13",
-      "text": "`cargo make ci`（fmt-check + clippy + nextest + deny + check-layers + verify-*）が pass する。次のケースを網羅するユニット / 統合テストが追加されている: (a) `add` の骨格生成と省略形状の `$todo` 化、(b) `$todo` 走査と完成境界の Err / typed 返却、(c) 実在しない anchor / 語彙外 role の入力時 reject、(d) `import` の rustdoc からの reference / modify / delete 取り込み、(e) `check --gate phase2|commit|merge` の厳格度解決、(f) 同名エントリの error（no force）、(g) WRITE の track-id 不一致 fail-closed、(h) public enum variants が source の `#[non_exhaustive]` 有無に応じて closed / extension-tolerant として保持されること。既存テストへのリグレッションがない。",
+      "text": "`cargo make ci`（fmt-check + clippy + nextest + deny + check-layers + verify-*）が pass する。次のケースを網羅するユニット / 統合テストが追加されている: (a) `add` の骨格生成と省略形状の `$todo` 化、(b) `$todo` 走査と完成境界の Err / typed 返却、(c) 実在しない anchor / 語彙外 role の入力時 reject、(d) `import` の rustdoc からの reference / modify / delete 取り込み、(e) `catalog check` の exit-code mapping（完成 catalogue は pass、catalogue 作成開始後の `$todo` 残存 / schema 不正 / 対象 layer 欠損は block、catalogue file がまだ 1 つも存在しない Phase 0 / 1 は skip）、(f) 同名エントリの error（no force）、(g) WRITE の track-id 不一致 fail-closed、(h) public enum variants が source の `#[non_exhaustive]` 有無に応じて closed / extension-tolerant として保持されること。既存テストへのリグレッションがない。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",

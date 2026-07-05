@@ -12,8 +12,8 @@ use std::process::ExitCode;
 use clap::{Args, Subcommand, ValueEnum};
 use cli_composition::CatalogCompositionRoot;
 use cli_driver::catalog_gen::{
-    CatalogAddInput, CatalogCheckInput, CatalogCiteInput, CatalogGateSelect, CatalogImportInput,
-    CatalogImportSelect, CatalogInitInput, CatalogInput, CatalogKindSelect,
+    CatalogAddInput, CatalogCheckInput, CatalogCiteInput, CatalogImportInput, CatalogImportSelect,
+    CatalogInitInput, CatalogInput, CatalogKindSelect,
 };
 
 // ---------------------------------------------------------------------------
@@ -44,17 +44,6 @@ pub enum CatalogActionArg {
     Modify,
     /// Import identity only to declare a deletion.
     Delete,
-}
-
-/// Value-enum of the three gate contexts. See IN-06, AC-11.
-#[derive(Debug, Clone, PartialEq, Eq, ValueEnum)]
-pub enum CatalogGateArg {
-    /// Phase 2 (type-design) strict gate.
-    Phase2,
-    /// Pre-commit gate (TDDD interim + missing-input skip rules).
-    Commit,
-    /// Pre-merge strict gate.
-    Merge,
 }
 
 // ---------------------------------------------------------------------------
@@ -204,10 +193,6 @@ pub struct CatalogCheckArgs {
     /// Optional layer filter; when omitted, every TDDD layer is checked.
     #[arg(long)]
     pub layer: Option<String>,
-
-    /// Gate context determining strictness.
-    #[arg(long, value_enum)]
-    pub gate: CatalogGateArg,
 }
 
 /// Subcommands for `sotp catalog`.
@@ -226,7 +211,7 @@ pub enum CatalogCommand {
     Import(CatalogImportArgs),
     /// Append spec anchors to a generated entry.
     Cite(CatalogCiteArgs),
-    /// Re-validate catalogue completion against a gate context.
+    /// Re-validate catalogue completion.
     Check(CatalogCheckArgs),
 }
 
@@ -324,13 +309,8 @@ fn execute_check(args: CatalogCheckArgs) -> ExitCode {
         Ok(id) => id,
         Err(code) => return code,
     };
-    let CatalogCheckArgs { track_id: _, items_dir, layer, gate } = args;
-    dispatch(CatalogInput::Check(CatalogCheckInput {
-        track_id,
-        items_dir,
-        layer,
-        gate: gate_to_select(gate),
-    }))
+    let CatalogCheckArgs { track_id: _, items_dir, layer } = args;
+    dispatch(CatalogInput::Check(CatalogCheckInput { track_id, items_dir, layer }))
 }
 
 /// Dispatch an assembled input through the composition root and map the outcome.
@@ -369,13 +349,5 @@ fn action_to_select(action: CatalogActionArg) -> CatalogImportSelect {
         CatalogActionArg::Reference => CatalogImportSelect::Reference,
         CatalogActionArg::Modify => CatalogImportSelect::Modify,
         CatalogActionArg::Delete => CatalogImportSelect::Delete,
-    }
-}
-
-fn gate_to_select(gate: CatalogGateArg) -> CatalogGateSelect {
-    match gate {
-        CatalogGateArg::Phase2 => CatalogGateSelect::Phase2,
-        CatalogGateArg::Commit => CatalogGateSelect::Commit,
-        CatalogGateArg::Merge => CatalogGateSelect::Merge,
     }
 }

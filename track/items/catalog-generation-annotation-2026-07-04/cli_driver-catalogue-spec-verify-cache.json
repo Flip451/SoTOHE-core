@@ -51,11 +51,11 @@
       }
     },
     {
-      "claim_hash": "5b17ee8b2f329016c23a174fd1de6fc285f3acbf97966319431d9e16d02439f6",
-      "evidence_hash": "d2b1a59b74d97beb0280051ab0f32873db7370007b7cfa32986d3d1144154394",
+      "claim_hash": "e7b97f88f8926e99334d413331e7a09fbe61ee6af8bc7be97bbcfb3dfdfd0fed",
+      "evidence_hash": "23ba7935add43033a783790df33043bc17b003b6a5b0a5a2b57a6e3e6a91d086",
       "verdict": {
         "kind": "pass",
-        "citation": "`sotp catalog check`: 完成検査。`--layer` 省略時は全 TDDD layer を対象とする。`--gate phase2|commit|merge` で厳格度を解決し、`$todo` 残存・anchor 実在・role 語彙・schema 妥当を一括再検証する。"
+        "citation": "`sotp catalog check`: 完成検査。`--layer` 省略時は全 TDDD layer を対象とする。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -70,16 +70,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-06",
-          "text_label": "`sotp catalog check`: 完成検査。`--layer` 省略時は全 TDDD layer を対象とする。`--gate phase2|commit|merge` で厳格度を解決し、`$todo` 残存・anchor 実在・role 語彙・schema 妥当を一括再検証する。phase2 / merge は strict、commit は組み込みの TDDD interim + 欠損入力 skip 規則に従う。"
+          "text_label": "`sotp catalog check`: 完成検査。`--layer` 省略時は全 TDDD layer を対象とする。`$todo` 残存・anchor 実在・role 語彙・schema 妥当を一括再検証する。対象 catalogue file がまだ 1 つも存在しない Phase 0 / 1 では no-op + warning で skip し、対象 track に catalogue file が 1 つでも存在する場合は `$todo` 残存・anchor 不在・role 語彙外・schema 不正・TDDD 対象 layer の catalogue file 不在を非零 exit で block する。"
         }
       }
     },
     {
-      "claim_hash": "5b17ee8b2f329016c23a174fd1de6fc285f3acbf97966319431d9e16d02439f6",
-      "evidence_hash": "717c5a9950a450042711a1784444643e8dfebb37015139963bf80860f8d23ac8",
+      "claim_hash": "e7b97f88f8926e99334d413331e7a09fbe61ee6af8bc7be97bbcfb3dfdfd0fed",
+      "evidence_hash": "110dac926dce0fe5ac79b714f112160b351abbca6767e9ffad4b238a8feaae12",
       "verdict": {
         "kind": "pass",
-        "citation": "`sotp catalog check --gate phase2` および `--gate merge` は ... `--gate commit` は ... `signal-gates.json` の存在・妥当性を prerequisite にしない。"
+        "citation": "`sotp catalog check` は `$todo` 残存・anchor 不在・role 語彙外・schema 不正・TDDD 対象 layer の catalogue file 不在のいずれでも、catalogue 作成開始後は非零 exit で block する。対象 catalogue file がまだ 1 つも存在しない Phase 0 / 1 では no-op + warning で skip する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -94,7 +94,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-11",
-          "text_label": "`sotp catalog check --gate phase2` および `--gate merge` は `$todo` 残存・anchor 不在・role 語彙外・schema 不正・TDDD 対象 layer の catalogue file 不在のいずれでも非零 exit で block する。`--gate commit` は既存の TDDD interim / 欠損入力 skip 意味論に従い、catalogue 不在で skip、`$todo` などの未完成で warning 通過、schema parse 不能で block する。いずれの gate でも `signal-gates.json` の存在・妥当性を prerequisite にしない。"
+          "text_label": "`sotp catalog check` は `$todo` 残存・anchor 不在・role 語彙外・schema 不正・TDDD 対象 layer の catalogue file 不在のいずれでも、catalogue 作成開始後は非零 exit で block する。対象 catalogue file がまだ 1 つも存在しない Phase 0 / 1 では no-op + warning で skip する。`signal-gates.json` の存在・妥当性を prerequisite にしない。"
         }
       }
     },
@@ -191,54 +191,6 @@
           "section": "acceptance_criteria",
           "element_id": "AC-01",
           "text_label": "`sotp catalog {init,add,import,cite,check}` の 5 コマンドが CLI に存在する。UI 表記の綴りは `catalog`。既存機構の Rust 型名・ディレクトリ名（catalogue 綴り）は変更されていない。"
-        }
-      }
-    },
-    {
-      "claim_hash": "f6e5d3bae7bb7c4081529e12e930b52bf94be22835f0e0eac19e2f5fa87bd02e",
-      "evidence_hash": "d2b1a59b74d97beb0280051ab0f32873db7370007b7cfa32986d3d1144154394",
-      "verdict": {
-        "kind": "pass",
-        "citation": "`--gate phase2|commit|merge` で厳格度を解決し、`$todo` 残存・anchor 実在・role 語彙・schema 妥当を一括再検証する。"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli_driver-types.json",
-          "section_key": "types",
-          "entry_key": "CatalogGateSelect"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "in_scope",
-          "element_id": "IN-06",
-          "text_label": "`sotp catalog check`: 完成検査。`--layer` 省略時は全 TDDD layer を対象とする。`--gate phase2|commit|merge` で厳格度を解決し、`$todo` 残存・anchor 実在・role 語彙・schema 妥当を一括再検証する。phase2 / merge は strict、commit は組み込みの TDDD interim + 欠損入力 skip 規則に従う。"
-        }
-      }
-    },
-    {
-      "claim_hash": "f6e5d3bae7bb7c4081529e12e930b52bf94be22835f0e0eac19e2f5fa87bd02e",
-      "evidence_hash": "717c5a9950a450042711a1784444643e8dfebb37015139963bf80860f8d23ac8",
-      "verdict": {
-        "kind": "pass",
-        "citation": "`sotp catalog check --gate phase2` および `--gate merge` ... `--gate commit` ..."
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli_driver-types.json",
-          "section_key": "types",
-          "entry_key": "CatalogGateSelect"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "acceptance_criteria",
-          "element_id": "AC-11",
-          "text_label": "`sotp catalog check --gate phase2` および `--gate merge` は `$todo` 残存・anchor 不在・role 語彙外・schema 不正・TDDD 対象 layer の catalogue file 不在のいずれでも非零 exit で block する。`--gate commit` は既存の TDDD interim / 欠損入力 skip 意味論に従い、catalogue 不在で skip、`$todo` などの未完成で warning 通過、schema parse 不能で block する。いずれの gate でも `signal-gates.json` の存在・妥当性を prerequisite にしない。"
         }
       }
     },

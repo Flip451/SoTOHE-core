@@ -4,8 +4,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CatalogCheckVerdict | enum | add | Pass, Interim, Blocked, Skipped | 🔵 | 🔵 |
-| CatalogGateContext | enum | add | Phase2, Commit, Merge | 🔵 | 🔵 |
+| CatalogCheckVerdict | enum | add | Pass, Blocked, Skipped | 🔵 | 🔵 |
 
 ## Error Types
 

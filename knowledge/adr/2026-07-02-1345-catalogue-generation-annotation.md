@@ -86,7 +86,7 @@ JSON はコメントを持てないため、穴埋め箇所は機械検出可能
 
 draft の扱いは型付きスキーマの手前の層に置く: カタログ file を JSON tree として走査して `$todo` ノードを検出する汎用関数と、完成境界 `try_complete`（`$todo` が残っていれば穴のパス + 指示文の一覧を Err で返し、なければ従来の typed DTO へ parse する）で構成する。既存の catalogue DTO・signal evaluator・linter・renderer は完成カタログのみを受け取るため無変更で済み、draft を読みうる入口は codec の共有ロード地点 1 箇所で「`$todo` あり → 当該エントリ pending 扱い」に分岐する。typed catalogue が try_complete 経由でしか構築できないという境界で、完成状態の保証を型に残す。
 
-残存 `$todo` の検出は D7 の check に統合する。Phase 2 完了 / merge の strict context では残存 = 非零 exit で block し、commit context では D7 の TDDD interim 意味論に従う（tech-stack.md の未解決 `TODO:` が実装を block する既存ゲートと同型の binary check だが、commit 中間状態の扱いだけは TDDD の既存ゲート設定に合わせる）。
+残存 `$todo` の検出は D7 の check に統合し、残存 = 非零 exit で block する（tech-stack.md の未解決 `TODO:` が実装を block する既存ゲートと同型の binary check）。
 
 ### D5: 構造化フィールドは穴埋めではなく検証付き入力にする
 
@@ -109,11 +109,9 @@ draft の扱いは型付きスキーマの手前の層に置く: カタログ fi
 
 ### D7: 強制境界 — 生成後の編集は自由、fail-closed の網は check で張る
 
-生成後のカタログ編集（穴埋め・修正）は通常の file edit として自由とする（1 ファイル = 1 writer の原則は従来どおり）。入力時検証（D5）は早期フィードバックであり、強制ではない。強制は `sotp catalog check`（D8）— `$todo` 残存（try_complete の Err）・anchor 実在・role 語彙・schema 妥当の一括再検証 — が担う。
+生成後のカタログ編集（穴埋め・修正）は通常の file edit として自由とする（1 ファイル = 1 writer の原則は従来どおり）。入力時検証（D5）は早期フィードバックであり、強制ではない。強制は `sotp catalog check`（D8）— `$todo` 残存（try_complete の Err）・anchor 実在・role 語彙・schema 妥当の一括再検証 — が担い、Phase 2 完了ゲートと commit gate（track-active-gate の依存チェーン）の両方に配線する。check の fail は非零 exit で block する。
 
-Phase 2 完了ゲートでは `catalog check` を strict に実行する。TDDD 対象 layer の catalogue file 不在、`$todo` 残存、anchor 不在、role 語彙外、schema 不正はいずれも非零 exit で block する。
-
-commit gate への配線は既存の TDDD ゲート意味論を変更しない。catalogue file がまだ存在しない Phase 0 / 1 では、`2026-06-01-0406-review-gate-tolerate-missing-catalogue.md` と同じく no-op + warning で skip し、非零終了にしない。catalogue file が存在するが `$todo` などの未完成状態を含む場合は、chain ③ の commit-gate 既定と同じ `interim` 扱いで warning として通過させる。Red 相当の破損（schema parse 不能など）は commit gate でも block するが、`catalog check` 自体は `.harness/config/signal-gates.json` の存在・値・妥当性を prerequisite にしない。利用者所有の gate 設定を CI で強制しないという `knowledge/conventions/responsibility-boundary.md` の境界を保ち、より厳格な commit 運用は呼び出し側が明示 strict context を選ぶ場合に限る。merge gate / Phase 2 完了ゲートでは strict に block する。
+`catalog check` は呼び出し側から判定モードを受け取らない。catalogue file の存在状況から状態を自動判定する。対象 catalogue file がまだ 1 つも存在しない Phase 0 / 1 では no-op + warning で skip し、非零終了にしない。一方で、対象 track に catalogue file が 1 つでも存在する場合は catalogue 作成が開始済みとみなし、TDDD 対象 layer の catalogue file 不在、`$todo` 残存、anchor 不在、role 語彙外、schema 不正を非零 exit で block する。`catalog check` 自体は `.harness/config/signal-gates.json` の存在・値・妥当性を prerequisite にしない。利用者所有の gate 設定を CI で強制しないという `knowledge/conventions/responsibility-boundary.md` の境界を保つ。
 
 ### D8: CLI surface — `sotp catalog` コマンド群
 
@@ -125,7 +123,7 @@ commit gate への配線は既存の TDDD ゲート意味論を変更しない�
 - `sotp catalog add` — 新規型の意図入力（D2 / D6）。`--layer` / `--kind` / `--name` / `--role` / `--anchor`（repeatable）に加え、`--field` / `--method` / `--variant` / `--trait-impl`（Rust 宣言断片またはシグネチャ文字列、repeatable）で形状を渡す。宣言レベルの型パラメータと where 句は `--generic` / `--where`（repeatable）で渡し、impl block レベルでは `--impl-generic` / `--impl-where`（repeatable）で `impl_generics` / `impl_where_predicates` に対応させる。method / function シグネチャ内の generics / where 句はそのシグネチャから parse する。省略した形状ノードは `$todo` で生成される（D4）
 - `sotp catalog import` — 既存型の取り込み（D3）。`--layer` / `--type`（Rust パス、rustdoc から解決）/ `--action reference|modify|delete`（既定 `reference`）/ `--anchor`
 - `sotp catalog cite` — 生成後の anchor 追加（D5 の検証付き入力）。`--layer` / `--entry` / `--anchor`
-- `sotp catalog check` — 完成検査（D7）。`--layer` 省略時は全 TDDD layer を対象とする。`--gate phase2|commit|merge`（または同等の gate context）で厳格度を解決し、phase2 / merge は strict、commit は組み込みの TDDD interim + 欠損入力 skip 規則に従う。`catalog check` は signal-gates 設定ファイルを必須入力にしない
+- `sotp catalog check` — 完成検査（D7）。`--layer` 省略時は全 TDDD layer を対象とし、fail は非零 exit。対象 catalogue file がまだ 1 つも存在しない Phase 0 / 1 では no-op + warning で skip し、対象 track に catalogue file が 1 つでも存在する場合は `$todo` 残存・anchor 不在・role 語彙外・schema 不正・TDDD 対象 layer の catalogue file 不在を block する。`catalog check` は signal-gates 設定ファイルを必須入力にしない
 
 共通仕様: track は省略時に現ブランチから自動解決する。`init` / `add` / `import` / `cite` は `track/items/<id>/` 配下を書き込む WRITE 操作なので、明示 `--track-id` は現在ブランチから導出した id と一致する場合だけ受理し、不一致または非 track ブランチでは fail-closed で停止する。これらのコマンドでは `--track-id` を cross-track override として扱わない。`check` は読み取り専用のため、明示 `--track-id` を READ override として使える。`add` / `import` / `cite` は対象 layer の catalogue file 不在時に error として `sotp catalog init` を案内し、暗黙の file 生成は行わない。
 
@@ -169,7 +167,7 @@ null は型を問わず穴を表現できるが、記入指示を運べない。
 - エントリの順序・整形が安定し、diff ノイズ起因のレビュー hash 陳腐化・再レビューが減る
 - カタログ段階 linter の検査面（完全な型情報）は無傷で維持され、生成による構造保証で lint 入力の構文的な質も安定する
 - テスト義務導出（role × spec anchor）を前提とする設計と要求フィールドが一致し、両立する
-- 生成後の編集の自由度を保ったまま、`sotp catalog check` の一括再検証が Phase 2 完了と merge で fail-closed の網を張る（入力時検証と gate 時強制の二段構え）。commit gate は既存の TDDD interim / 欠損入力 skip 意味論を維持する
+- 生成後の編集の自由度を保ったまま、`sotp catalog check` の一括再検証が Phase 2 完了・commit で `$todo` 残存を fail-closed にする（入力時検証と gate 時強制の二段構え）。catalogue file がまだ 1 つも存在しない Phase 0 / 1 の欠損入力 skip 意味論だけ維持する
 - 残存穴の一覧がパス・記入指示付きで try_complete の Err として機械導出され、drift レポートを別途実装する必要がない
 
 ### Negative

@@ -8,7 +8,7 @@ Domain: add catalog_gen draft/value types and catalogue_v2 entry schema/refactor
 Usecase: add catalog_gen commands, reports, errors, ports, and interactor (IN-02/IN-03/IN-04/IN-05/IN-06/IN-10/IN-12/AC-02/AC-03/AC-04/AC-06/AC-10/AC-11).
 Infrastructure: add draft scan/completion functions, FsCatalogAdapter helpers, verb helpers, and CatalogPort impl (IN-02/IN-03/IN-04/IN-05/IN-06/IN-08/IN-09/IN-10/IN-12/AC-02/AC-03/AC-04/AC-05/AC-06/AC-07/AC-08/AC-10/AC-11/AC-12).
 CLI driver/composition: add CatalogDriver and CatalogCompositionRoot wiring (IN-01/AC-01).
-Gates: wire `sotp catalog check` into commit, phase2, and merge paths (IN-06/AC-11/CN-06/CN-07/CN-08).
+Gates: update catalog-check implementation, CLI coverage, and shared active-gate invocation (IN-06/AC-11/CN-06/CN-07).
 Batching: land T002+T012+T013 in one commit; review T006+T007 in one batch (CN-10/AC-17).
 
 ## Tasks (13/13 resolved)
@@ -31,7 +31,7 @@ Batching: land T002+T012+T013 in one commit; review T006+T007 in one batch (CN-1
 
 > Targets T003/T004 usecase catalog_gen data, ports, and interactor (IN-01/IN-02/IN-03/IN-04/IN-05/IN-06/IN-10/IN-12/AC-01/AC-02/AC-03/AC-04/AC-06/AC-10/AC-11).
 
-- [x] **T003**: Target libs/usecase catalog_gen. Add CatalogGateContext, CatalogCheckVerdict, CatalogAddCommand, CatalogImportCommand, CatalogCiteCommand, CatalogCheckQuery, CatalogInitReport, CatalogWriteReport, CatalogCheckReport, and CatalogError with shapes/variants from usecase-types.json; CatalogError variants are FileExists/FileMissing/DuplicateEntry/AnchorNotFound/InvalidRole/ParseFragment/SchemaInvalid/DraftIncomplete/Port only (IN-02/IN-03/IN-04/IN-05/IN-06/IN-10/IN-12/AC-02/AC-03/AC-04/AC-06/AC-10/AC-11). Add unit tests for CatalogError Display/Error over all variants and command/query/report construction. (`f9b46e78`)
+- [x] **T003**: Target libs/usecase catalog_gen. Add CatalogCheckVerdict, CatalogAddCommand, CatalogImportCommand, CatalogCiteCommand, CatalogCheckQuery, CatalogInitReport, CatalogWriteReport, CatalogCheckReport, and CatalogError with shapes/variants from usecase-types.json; CatalogError variants are FileExists/FileMissing/DuplicateEntry/AnchorNotFound/InvalidRole/ParseFragment/SchemaInvalid/DraftIncomplete/Port only (IN-02/IN-03/IN-04/IN-05/IN-06/IN-10/IN-12/AC-02/AC-03/AC-04/AC-06/AC-10/AC-11). Add unit tests for CatalogError Display/Error over all variants and command/query/report construction. (`f9b46e78`)
 - [x] **T004**: Target libs/usecase catalog_gen. Add CatalogService trait, CatalogPort trait, and CatalogInteractor with signatures from usecase-types.json; implement CatalogService by delegating to injected CatalogPort (IN-01/AC-01). Add unit tests with a CatalogPort double for all five methods. (`f9b46e78`)
 
 ### S3 — Infrastructure: draft layer and filesystem adapter
@@ -40,18 +40,18 @@ Batching: land T002+T012+T013 in one commit; review T006+T007 in one batch (CN-1
 
 - [x] **T005**: Target libs/infrastructure tddd::catalog_gen. Add scan_todo_holes, try_complete, and CatalogDraftError with shape from infrastructure-types.json, including Codec { source: CatalogueDocumentCodecError } and From<CatalogueDocumentCodecError> (IN-07/CN-01/AC-05). Add unit tests for $todo locations, dotted paths, hole-free draft, incomplete draft, typed completion, and codec error. (`5c013f77`)
 - [x] **T006**: Target libs/infrastructure tddd::catalog_gen::FsCatalogAdapter helper layer. Add FsCatalogAdapter new/Default without CatalogPort impl; add private helpers for skeleton generation, syn fragment parsing, anchor/role validation, and draft scan/completion integration (IN-03/IN-07/IN-08/IN-09/IN-10/CN-01/CN-02/CN-03/CN-05/AC-03/AC-05/AC-06/AC-07). Add unit tests for helper outputs and errors. Batch review with T007. (`5c013f77`)
-- [x] **T007**: Target libs/infrastructure tddd::catalog_gen::FsCatalogAdapter. Add verb helpers for init/add/import/cite/check and the complete impl usecase::catalog_gen::CatalogPort for FsCatalogAdapter (IN-02/IN-03/IN-04/IN-05/IN-06/IN-12/CN-05/CN-06/CN-07/CN-08/AC-02/AC-03/AC-04/AC-08/AC-10/AC-11/AC-12). Add unit tests for init, add/import/cite, duplicate entry, missing file, and phase2/commit/merge contexts. Batch review with T006. (`5c013f77`)
+- [x] **T007**: Target libs/infrastructure tddd::catalog_gen::FsCatalogAdapter. Add verb helpers for init/add/import/cite/check and the complete impl usecase::catalog_gen::CatalogPort for FsCatalogAdapter (IN-02/IN-03/IN-04/IN-05/IN-06/IN-12/CN-05/CN-06/CN-07/CN-08/AC-02/AC-03/AC-04/AC-08/AC-10/AC-11/AC-12). Add unit tests for init, add/import/cite, duplicate entry, missing file, and AC-11 check outcomes. Batch review with T006. (`5c013f77`)
 
 ### S4 — Presentation wiring: driver, composition, CLI
 
 > Targets T008/T009/T010 cli_driver, cli_composition, and cli catalog command surface (IN-01/IN-03/IN-04/IN-05/IN-06/IN-11/AC-01/AC-03/AC-04/AC-06/AC-09/AC-11).
 
-- [x] **T008**: Target apps/cli-driver catalog_gen. Add CatalogKindSelect, CatalogImportSelect, CatalogGateSelect, CatalogInitInput, CatalogAddInput, CatalogImportInput, CatalogCiteInput, CatalogCheckInput, CatalogInput, and CatalogDriver; implement handle(input) -> CommandOutcome mapping to CatalogService commands/queries (IN-01/IN-03/IN-04/IN-05/IN-06/AC-01/AC-03/AC-04/AC-06/AC-11). Add unit tests with a CatalogService double. (`74edb0d8`)
+- [x] **T008**: Target apps/cli-driver catalog_gen. Add CatalogKindSelect, CatalogImportSelect, CatalogInitInput, CatalogAddInput, CatalogImportInput, CatalogCiteInput, CatalogCheckInput, CatalogInput, and CatalogDriver; implement handle(input) -> CommandOutcome mapping to CatalogService commands/queries (IN-01/IN-03/IN-04/IN-05/IN-06/AC-01/AC-03/AC-04/AC-06/AC-11). Add unit tests with a CatalogService double. (`74edb0d8`)
 - [x] **T009**: Target apps/cli-composition catalog module. Add CatalogCompositionRoot new/Default, catalog_driver(), and handle(CatalogInput) wiring FsCatalogAdapter -> CatalogInteractor -> CatalogDriver (IN-01/AC-01). Add integration test for a composition-root catalog operation. (`74edb0d8`)
-- [x] **T010**: Target apps/cli commands::catalog and apps/cli/src/main.rs. Add CatalogKindArg, CatalogActionArg, CatalogGateArg, CatalogInitArgs, CatalogAddArgs, CatalogImportArgs, CatalogCiteArgs, CatalogCheckArgs, CatalogCommand, execute(CatalogCommand) -> ExitCode, and top-level registration (IN-01/IN-03/IN-04/IN-05/IN-06/IN-11/OS-02/AC-01/AC-03/AC-04/AC-06/AC-09/AC-11). Add CLI integration tests for parsing, dispatch, add output, validation errors, check gates, duplicate entry, and track-id cases. (`74edb0d8`)
+- [x] **T010**: Target apps/cli commands::catalog and apps/cli/src/main.rs. Add CatalogKindArg, CatalogActionArg, CatalogInitArgs, CatalogAddArgs, CatalogImportArgs, CatalogCiteArgs, CatalogCheckArgs, CatalogCommand, execute(CatalogCommand) -> ExitCode, and top-level registration (IN-01/IN-03/IN-04/IN-05/IN-06/IN-11/OS-02/AC-01/AC-03/AC-04/AC-06/AC-09/AC-11). Add CLI integration tests for parsing, dispatch, add output, validation errors, catalog check exit-code mapping, duplicate entry, and track-id cases. (`74edb0d8`)
 
 ### S5 — Gate enforcement
 
-> Targets T011 catalog check gate wiring (IN-06/CN-06/CN-07/CN-08/AC-11).
+> Targets T011 catalog-check implementation, CLI coverage, and active-gate invocation (IN-06/CN-06/CN-07/AC-11).
 
-- [x] **T011**: Target Makefile.toml and gate wiring. Add a command+args wrapper for `sotp catalog check --gate commit`; insert it into track-active-gate; add phase2/merge invocations alongside the catalogue-lint gate path; keep signal-gates.json out of prerequisites (IN-06/CN-06/CN-07/CN-08/AC-11). Add gate integration tests for commit and phase2/merge contexts. (`74edb0d8`)
+- [x] **T011**: Target libs/infrastructure tddd::catalog_gen::verb_check, apps/cli/tests/cli_catalog.rs, and Makefile.toml. Keep catalog check input limited to track and optional layer selection, call `bin/sotp catalog check` from the shared active gate, and add AC-11 check-outcome integration tests (IN-06/CN-06/CN-07/AC-11). Leave merge workflow files untouched. (`74edb0d8`)

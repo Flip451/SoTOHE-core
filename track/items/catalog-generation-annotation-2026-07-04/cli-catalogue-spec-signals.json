@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "41c56e38592d466f2b8681d951650927a36f401e44fd0aaad9fe201623d56ebe",
+  "catalogue_declaration_hash": "9a37c19fb3a22afe73d8722a273ef23a8fba6c5cfbec27d75df741865eaefb9b",
   "signals": [
     {
       "type_name": "CatalogActionArg",
@@ -15,7 +15,7 @@
     {
       "type_name": "CatalogCheckArgs",
       "signal": "blue",
-      "entry_hash": "9dfcaea4c4ab0e05df3c54b7f4ef3020d3985c528d8db17668c052c68aa9e396"
+      "entry_hash": "23bc0e355b6a1100d0eced2a6d4c4ae19eb4056c945d2745d14ebc681bbc93e3"
     },
     {
       "type_name": "CatalogCiteArgs",
@@ -26,11 +26,6 @@
       "type_name": "CatalogCommand",
       "signal": "blue",
       "entry_hash": "4b3766e862d2663e277156f57f12af6e7533b5398218527aac9cbfbbe6528353"
-    },
-    {
-      "type_name": "CatalogGateArg",
-      "signal": "blue",
-      "entry_hash": "c0164b7ec80ce2c14ec8d1d762aa8444afc8b2e69e56efc1290279946a64e521"
     },
     {
       "type_name": "CatalogImportArgs",
@@ -91,11 +86,6 @@
       "type_name": "cli::commands::catalog::execute_init",
       "signal": "blue",
       "entry_hash": "73b452d9d1c6102778a08b18b322263a7ad82797bf498364e8ef4aad89950220"
-    },
-    {
-      "type_name": "cli::commands::catalog::gate_to_select",
-      "signal": "blue",
-      "entry_hash": "199d1cbc709e39f79fb8454286b75915c3bd0c8e6a707e432c96f9f950dca81a"
     },
     {
       "type_name": "cli::commands::catalog::kind_to_select",
