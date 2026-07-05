@@ -12,7 +12,9 @@ use super::fs_access::{
     catalogue_path, insert_entry, load_bindings, read_catalogue, scan_entry_holes, schema_error,
     spec_ref_file, track_dir, workspace_root, write_catalogue,
 };
-use super::import_shape::{ImportedShape, build_delete_entry, build_import_entry, resolve_shape};
+use super::import_shape::{
+    ImportedShape, build_delete_entry, build_import_entry, parse_type_path, resolve_shape,
+};
 use super::validate::load_spec_anchors;
 
 /// Import an existing type into the layer's catalogue.
@@ -55,6 +57,8 @@ fn import_entry_to_file(
     resolve: impl FnOnce() -> Result<ImportedShape, CatalogError>,
 ) -> Result<CatalogWriteReport, CatalogError> {
     let mut document = read_catalogue(path, trusted_root)?;
+    validate_type_path_crate_matches_catalogue(&document, &command.type_path)?;
+    reject_delete_anchors(command)?;
     let (entry_name, entry) = match command.action {
         // A delete import is identity-only (spec IN-04 / GO-03 / AC-04): record the
         // removed type's identity without resolving the (expensive, nightly)
@@ -76,6 +80,32 @@ fn import_entry_to_file(
         entry_key: name.as_str().to_owned(),
         holes,
     })
+}
+
+fn validate_type_path_crate_matches_catalogue(
+    document: &serde_json::Value,
+    type_path: &str,
+) -> Result<(), CatalogError> {
+    let (crate_name, _, _) = parse_type_path(type_path)?;
+    let catalogue_crate = document
+        .get("crate_name")
+        .and_then(serde_json::Value::as_str)
+        .ok_or_else(|| schema_error("catalogue is missing a string `crate_name`"))?;
+    if crate_name == catalogue_crate {
+        return Ok(());
+    }
+    Err(schema_error(format!(
+        "type path `{type_path}` targets crate `{crate_name}`, but catalogue crate_name is `{catalogue_crate}`"
+    )))
+}
+
+fn reject_delete_anchors(command: &CatalogImportCommand) -> Result<(), CatalogError> {
+    if command.action != CatalogImportAction::Delete || command.anchors.is_empty() {
+        return Ok(());
+    }
+    Err(schema_error(
+        "delete imports do not accept --anchor because deletion tombstones do not persist spec_refs",
+    ))
 }
 
 #[cfg(test)]
@@ -172,6 +202,52 @@ mod tests {
         assert!(entry.get("role").is_none(), "delete tombstone must not carry a role");
         assert!(entry.get("docs").is_none(), "delete tombstone must not carry docs");
         assert!(entry.get("kind").is_none(), "delete tombstone must not carry a kind");
+    }
+
+    #[test]
+    fn test_import_delete_rejects_anchors() {
+        let temp = tempfile::tempdir().unwrap();
+        let path = seed_catalogue(temp.path());
+        let mut command = import_command(CatalogImportAction::Delete);
+        command.anchors = vec!["IN-01".to_owned()];
+        let resolver_called = std::cell::Cell::new(false);
+        let err = import_entry_to_file(
+            &path,
+            temp.path(),
+            &command,
+            "spec.json",
+            &BTreeSet::new(),
+            || {
+                resolver_called.set(true);
+                Ok(sample_shape())
+            },
+        )
+        .unwrap_err();
+        assert!(matches!(err, CatalogError::SchemaInvalid { .. }));
+        assert!(!resolver_called.get(), "delete import anchor rejection must not resolve rustdoc");
+    }
+
+    #[test]
+    fn test_import_rejects_type_path_crate_mismatch() {
+        let temp = tempfile::tempdir().unwrap();
+        let path = seed_catalogue(temp.path());
+        let mut command = import_command(CatalogImportAction::Reference);
+        command.type_path = "usecase::tddd::LayerId".to_owned();
+        let resolver_called = std::cell::Cell::new(false);
+        let err = import_entry_to_file(
+            &path,
+            temp.path(),
+            &command,
+            "spec.json",
+            &BTreeSet::new(),
+            || {
+                resolver_called.set(true);
+                Ok(sample_shape())
+            },
+        )
+        .unwrap_err();
+        assert!(matches!(err, CatalogError::SchemaInvalid { .. }));
+        assert!(!resolver_called.get(), "crate mismatch must fail before rustdoc resolution");
     }
 
     #[test]

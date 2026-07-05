@@ -124,7 +124,7 @@ pub(super) fn build_delete_entry(type_path: &str) -> Result<(String, Value), Cat
 }
 
 /// Split a crate-qualified type path into `(crate, module, name)`.
-fn parse_type_path(type_path: &str) -> Result<(String, String, String), CatalogError> {
+pub(super) fn parse_type_path(type_path: &str) -> Result<(String, String, String), CatalogError> {
     let segments: Vec<&str> =
         type_path.split("::").map(str::trim).filter(|segment| !segment.is_empty()).collect();
     if segments.len() < 2 {
