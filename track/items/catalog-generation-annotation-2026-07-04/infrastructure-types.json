@@ -12,13 +12,106 @@
       },
       "methods": [],
       "module_path": "tddd::catalog_gen",
-      "docs": "Filesystem secondary adapter for the CatalogPort. See IN-01, IN-03, IN-04, IN-05, AC-01, AC-04, AC-12.",
+      "docs": "Filesystem secondary adapter for the CatalogPort. See IN-01, IN-03, IN-04, IN-05, AC-01, AC-03, AC-04, AC-12.",
       "spec_refs": [
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-01" },
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-03" },
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-04" },
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-05" },
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-01" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-03" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-04" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-12" }
+      ],
+      "informal_grounds": []
+    },
+    "TypeInfoDto": {
+      "action": "modify",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "name",          "ty": "String" },
+            { "name": "kind",          "ty": "TypeKindDto" },
+            { "name": "docs",          "ty": "Option<String>" },
+            { "name": "members",       "ty": "Vec<MemberDeclarationDto>" },
+            { "name": "module_path",   "ty": "Option<String>" },
+            { "name": "alias_target",  "ty": "Option<String>" },
+            { "name": "struct_shape",  "ty": "Option<StructShapeKindDto>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "schema_export_codec",
+      "docs": "Schema export DTO for TypeInfo. See IN-04, AC-04, AC-12.",
+      "spec_refs": [
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-04" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-12" }
+      ],
+      "informal_grounds": []
+    },
+    "ImplInfoDto": {
+      "action": "modify",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "target_type",        "ty": "String" },
+            { "name": "trait_name",         "ty": "Option<String>" },
+            { "name": "methods",            "ty": "Vec<FunctionInfoDto>" },
+            { "name": "target_module_path", "ty": "Option<String>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "schema_export_codec",
+      "docs": "Schema export DTO for ImplInfo. See IN-04, AC-04, AC-12.",
+      "spec_refs": [
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-04" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-12" }
+      ],
+      "informal_grounds": []
+    },
+    "StructShapeKindDto": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Unit", "payload": { "kind": "unit" } },
+          {
+            "name": "Tuple",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "has_stripped_fields", "ty": "bool" }
+              ]
+            }
+          },
+          {
+            "name": "Plain",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "has_stripped_fields", "ty": "bool" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "schema_export_codec",
+      "docs": "Schema export DTO for StructShapeKind. See IN-04, AC-04, AC-12.",
+      "spec_refs": [
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-04" },
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-04" },
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-12" }
       ],
@@ -108,6 +201,16 @@
     { "trait_ref": "core::fmt::Debug",   "for_type": "CatalogDraftError" },
     { "trait_ref": "core::fmt::Display", "for_type": "CatalogDraftError" },
     { "trait_ref": "core::error::Error", "for_type": "CatalogDraftError" },
-    { "trait_ref": "core::convert::From<CatalogueDocumentCodecError>", "for_type": "CatalogDraftError" }
+    { "trait_ref": "core::convert::From<CatalogueDocumentCodecError>", "for_type": "CatalogDraftError" },
+
+    { "action": "reference", "trait_ref": "core::fmt::Debug",           "for_type": "TypeInfoDto" },
+    { "action": "reference", "trait_ref": "serde_core::ser::Serialize", "for_type": "TypeInfoDto" },
+    { "action": "reference", "trait_ref": "core::convert::From<&domain::schema::TypeInfo>", "for_type": "TypeInfoDto" },
+    { "action": "reference", "trait_ref": "core::fmt::Debug",           "for_type": "ImplInfoDto" },
+    { "action": "reference", "trait_ref": "serde_core::ser::Serialize", "for_type": "ImplInfoDto" },
+    { "action": "reference", "trait_ref": "core::convert::From<&domain::schema::ImplInfo>", "for_type": "ImplInfoDto" },
+    { "trait_ref": "core::fmt::Debug",              "for_type": "StructShapeKindDto" },
+    { "trait_ref": "serde_core::ser::Serialize",    "for_type": "StructShapeKindDto" },
+    { "trait_ref": "core::convert::From<&domain::schema::StructShapeKind>", "for_type": "StructShapeKindDto" }
   ]
 }

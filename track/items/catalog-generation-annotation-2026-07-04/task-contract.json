@@ -38,6 +38,7 @@
       { "layer": "infrastructure", "entry_key": "CatalogDraftError" }
     ],
     "T006": [
+      { "layer": "infrastructure", "entry_key": "FsCatalogAdapter" },
       { "layer": "domain", "entry_key": "InherentImplDeclV2" },
       { "layer": "domain", "entry_key": "TraitImplDeclV2" }
     ],
@@ -48,7 +49,10 @@
       { "layer": "domain", "entry_key": "TypeInfo" },
       { "layer": "domain", "entry_key": "DeletionRecord" },
       { "layer": "domain", "entry_key": "CatalogueDocument" },
-      { "layer": "domain", "entry_key": "StructShapeKind" }
+      { "layer": "domain", "entry_key": "StructShapeKind" },
+      { "layer": "infrastructure", "entry_key": "TypeInfoDto" },
+      { "layer": "infrastructure", "entry_key": "ImplInfoDto" },
+      { "layer": "infrastructure", "entry_key": "StructShapeKindDto" }
     ],
     "T008": [
       { "layer": "cli_driver", "entry_key": "CatalogKindSelect" },

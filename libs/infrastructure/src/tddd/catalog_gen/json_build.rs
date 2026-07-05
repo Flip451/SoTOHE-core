@@ -166,12 +166,48 @@ fn kind_label(kind: CatalogEntryKind) -> &'static str {
 fn role_value(kind: CatalogEntryKind, role: &str) -> Value {
     match kind {
         CatalogEntryKind::Function => json!(role),
-        _ => {
-            let mut map = Map::new();
-            map.insert(role.to_owned(), json!({}));
-            Value::Object(map)
+        CatalogEntryKind::Trait => contract_role_value(role),
+        CatalogEntryKind::Struct | CatalogEntryKind::Enum | CatalogEntryKind::TypeAlias => {
+            data_role_value(role)
         }
     }
+}
+
+/// Build the tagged data-role node, including `$todo` holes for required
+/// catalogue payload fields that cannot be inferred from `--role` alone.
+fn data_role_value(role: &str) -> Value {
+    let payload = match role {
+        "Entity" => json!({
+            "identity": { "method_name": todo("identity accessor method name") }
+        }),
+        "AggregateRoot" => json!({
+            "identity": { "method_name": todo("aggregate identity accessor method name") }
+        }),
+        "EventPolicy" => json!({
+            "reacts_to": todo("non-empty list of domain event type refs")
+        }),
+        _ => json!({}),
+    };
+    tagged_role(role, payload)
+}
+
+/// Build the tagged contract-role node, including `$todo` holes for required
+/// catalogue payload fields that cannot be inferred from `--role` alone.
+fn contract_role_value(role: &str) -> Value {
+    let payload = match role {
+        "Repository" => json!({
+            "aggregate": todo("aggregate root type ref")
+        }),
+        _ => json!({}),
+    };
+    tagged_role(role, payload)
+}
+
+/// Build `{ "<role>": <payload> }`.
+fn tagged_role(role: &str, payload: Value) -> Value {
+    let mut map = Map::new();
+    map.insert(role.to_owned(), payload);
+    Value::Object(map)
 }
 
 /// Build the `kind` node for a struct / enum / type-alias entry.
@@ -389,6 +425,35 @@ mod tests {
         assert!(entry["docs"].get("$todo").is_some());
         assert!(entry["methods"].get("$todo").is_some());
         assert!(entry["module_path"].get("$todo").is_some());
+    }
+
+    #[test]
+    fn test_build_add_entry_scaffolds_data_role_payload_holes() {
+        let mut command = base_command(CatalogEntryKind::Struct, "Entity");
+        command.fields = vec!["id: UserId".to_owned()];
+        let (entry, _) =
+            build_add_entry(&command, "track/items/t/spec.json", &anchor_set()).unwrap();
+        assert!(entry["role"]["Entity"]["identity"]["method_name"].get("$todo").is_some());
+
+        let mut command = base_command(CatalogEntryKind::Struct, "AggregateRoot");
+        command.fields = vec!["id: OrderId".to_owned()];
+        let (entry, _) =
+            build_add_entry(&command, "track/items/t/spec.json", &anchor_set()).unwrap();
+        assert!(entry["role"]["AggregateRoot"]["identity"]["method_name"].get("$todo").is_some());
+
+        let mut command = base_command(CatalogEntryKind::Struct, "EventPolicy");
+        command.fields = vec!["marker: ()".to_owned()];
+        let (entry, _) =
+            build_add_entry(&command, "track/items/t/spec.json", &anchor_set()).unwrap();
+        assert!(entry["role"]["EventPolicy"]["reacts_to"].get("$todo").is_some());
+    }
+
+    #[test]
+    fn test_build_add_entry_scaffolds_contract_role_payload_holes() {
+        let command = base_command(CatalogEntryKind::Trait, "Repository");
+        let (entry, _) =
+            build_add_entry(&command, "track/items/t/spec.json", &anchor_set()).unwrap();
+        assert!(entry["role"]["Repository"]["aggregate"].get("$todo").is_some());
     }
 
     #[test]

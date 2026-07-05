@@ -1,10 +1,23 @@
 <!-- Generated from infrastructure-types.json — DO NOT EDIT DIRECTLY -->
 
+## Enums
+
+| Name | Kind | Action | Details | Signal | Cat-Spec |
+|------|------|--------|---------|--------|----------|
+| StructShapeKindDto | enum | add | Unit, Tuple, Plain | 🔵 | 🔵 |
+
 ## Error Types
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | CatalogDraftError | error_type | add | Incomplete, Codec | 🔵 | 🔵 |
+
+## DTOs
+
+| Name | Kind | Action | Details | Signal | Cat-Spec |
+|------|------|--------|---------|--------|----------|
+| ImplInfoDto | dto | modify | — | 🔵 | 🔵 |
+| TypeInfoDto | dto | modify | — | 🔵 | 🔵 |
 
 ## Secondary Adapters
 

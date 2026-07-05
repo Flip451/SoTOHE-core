@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "f7e292ab4b1f3e224301051c37e776a1f113321e7519be65bd4541c8e7d306a1",
+  "catalogue_declaration_hash": "10763809fe20bcc6acfd3d4593e4720c08bb9237c0a004d7ff9dad2c726e414c",
   "signals": [
     {
       "type_name": "CatalogDraftError",
@@ -10,7 +10,22 @@
     {
       "type_name": "FsCatalogAdapter",
       "signal": "blue",
-      "entry_hash": "5baf5e51af77da2c225d6c0afdd0cee0a163e1c7b8b406f96f5cc69f1f93dcc2"
+      "entry_hash": "c92a02ad63465f8f1050ba4d6fb5b41a1f0e6ee5c24de6aa0094acc5449d2e86"
+    },
+    {
+      "type_name": "ImplInfoDto",
+      "signal": "blue",
+      "entry_hash": "3395b75dd0cf5cee40ce180c2402e828420e7a33508867cc43db552c5868795a"
+    },
+    {
+      "type_name": "StructShapeKindDto",
+      "signal": "blue",
+      "entry_hash": "29a52293a0ecb033c6ee35956e7eec2465b944dfaeed88d4c0b356c88798ebe9"
+    },
+    {
+      "type_name": "TypeInfoDto",
+      "signal": "blue",
+      "entry_hash": "8acf752114d7d2b621507c938ae88687f119606ae932dc4f0cb9bcb218905aeb"
     },
     {
       "type_name": "infrastructure::tddd::catalog_gen::scan_todo_holes",

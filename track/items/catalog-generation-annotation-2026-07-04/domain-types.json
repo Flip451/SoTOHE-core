@@ -245,9 +245,10 @@
       },
       "methods": [],
       "module_path": "schema",
-      "docs": "Existing rustdoc extraction record for an impl block. See AC-04, IN-08.",
+      "docs": "Existing rustdoc extraction record for an impl block. See AC-04, AC-12, IN-08.",
       "spec_refs": [
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-04" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-12" },
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-08" }
       ],
       "informal_grounds": []
@@ -283,9 +284,10 @@
       },
       "methods": [],
       "module_path": "schema",
-      "docs": "Existing rustdoc extraction record for a public type. See AC-04, IN-08.",
+      "docs": "Existing rustdoc extraction record for a public type. See AC-04, AC-12, IN-08.",
       "spec_refs": [
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-04" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-12" },
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-08" }
       ],
       "informal_grounds": []
@@ -319,9 +321,10 @@
       },
       "methods": [],
       "module_path": "schema",
-      "docs": "See AC-04, IN-08.",
+      "docs": "See AC-04, AC-12, IN-08.",
       "spec_refs": [
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-04" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-12" },
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-08" }
       ],
       "informal_grounds": []

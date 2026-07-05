@@ -68,7 +68,7 @@
       },
       {
         "id": "IN-03",
-        "text": "`sotp catalog add`: 新規型の意図入力。`--layer` / `--kind` / `--name` / `--role` / `--anchor`（repeatable）で同定・ロール・spec anchor を渡し、`--field` / `--method` / `--variant` / `--trait-impl`（Rust 宣言断片またはシグネチャ文字列、repeatable）で型形状を渡す。宣言レベルの型パラメータと where 句は `--generic` / `--where`（repeatable）、impl block レベルは `--impl-generic` / `--impl-where`（repeatable）で渡す。function entry では `--name` の末尾と `--method` から parse した `fn` 名が一致しない入力を reject し、signature 名の silent drop を起こさない。省略した形状ノードは `$todo` として生成する。",
+        "text": "`sotp catalog add`: 新規型の意図入力。`--layer` / `--kind` / `--name` / `--role` / `--anchor`（repeatable）で同定・ロール・spec anchor を渡し、`--field` / `--method` / `--variant` / `--trait-impl`（Rust 宣言断片またはシグネチャ文字列、repeatable）で型形状を渡す。宣言レベルの型パラメータと where 句は `--generic` / `--where`（repeatable）、impl block レベルは `--impl-generic` / `--impl-where`（repeatable）で渡す。function entry では `--name` の末尾と `--method` から parse した `fn` 名が一致しない入力を reject し、signature 名の silent drop を起こさない。省略した形状ノードと、選択 role の catalogue DTO が要求する未入力 payload（`Entity.identity` / `AggregateRoot.identity` / `EventPolicy.reacts_to` / `Repository.aggregate`）は `$todo` として生成する。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
@@ -86,7 +86,7 @@
       },
       {
         "id": "IN-04",
-        "text": "`sotp catalog import`: 既存型の取り込み。`--layer` / `--type`（Rust パス、rustdoc から解決）/ `--action reference|modify|delete`（既定 `reference`）/ `--anchor`。reference は変更なし参照、modify は現状 shape を baseline として取り込み変更差分だけを後で type-designer が編集、delete は同定情報の取り込みで足りる identity-only tombstone とし、spec_refs を持たないため `--anchor` を reject する。手動転記が残るのは新規型の add のみとする。",
+        "text": "`sotp catalog import`: 既存型の取り込み。`--layer` / `--type`（Rust パス、rustdoc から解決）/ `--action reference|modify|delete`（既定 `reference`）/ `--anchor`。reference は変更なし参照、modify は現状 shape を baseline として取り込み変更差分だけを後で type-designer が編集、delete は同定情報の取り込みで足りる identity-only tombstone とし、spec_refs を持たないため `--anchor` を reject する。rustdoc から import へ渡る schema export JSON は、type alias の alias target、struct の unit / tuple / plain 形状と `has_stripped_fields`、impl target の module path を落とさず保持する。手動転記が残るのは新規型の add のみとする。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
@@ -459,7 +459,7 @@
     },
     {
       "id": "AC-03",
-      "text": "`sotp catalog add` に意図（layer / kind / name / role / spec anchor / 一部の型形状）を渡すと、エントリ骨格がカタログ draft JSON に追記され、渡した同定・role・spec_refs・型形状が正規フィールドに格納され、渡さなかった形状ノードが `$todo`（記入指示付き）として生成される。function entry で `--method` を渡す場合は、parsed `fn` 名が `--name` を `::` で区切った末尾と一致し、不一致なら入力時に reject される。生成結果は JSON として parse でき、`$todo` が残る間は typed DTO への `try_complete` が Err を返し、未入力箇所は `$todo` ノードとして JSON path と指示文で列挙できる。`$todo` を全て埋めた後の完成エントリはカタログ schema の検証を通る。",
+      "text": "`sotp catalog add` に意図（layer / kind / name / role / spec anchor / 一部の型形状）を渡すと、エントリ骨格がカタログ draft JSON に追記され、渡した同定・role・spec_refs・型形状が正規フィールドに格納され、渡さなかった形状ノードが `$todo`（記入指示付き）として生成される。`Entity.identity` / `AggregateRoot.identity` / `EventPolicy.reacts_to` / `Repository.aggregate` のように選択 role の catalogue DTO が必須 payload を要求する場合は、空 payload ではなく該当 payload 位置にも `$todo` が生成される。function entry で `--method` を渡す場合は、parsed `fn` 名が `--name` を `::` で区切った末尾と一致し、不一致なら入力時に reject される。生成結果は JSON として parse でき、`$todo` が残る間は typed DTO への `try_complete` が Err を返し、未入力箇所は `$todo` ノードとして JSON path と指示文で列挙できる。`$todo` を全て埋めた後の完成エントリはカタログ schema の検証を通る。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
@@ -473,7 +473,7 @@
     },
     {
       "id": "AC-04",
-      "text": "`sotp catalog import --type <Rust パス>` を実行すると、rustdoc 抽出から既存型の同定情報・シグネチャ・フィールドを解決できる。`--action reference|modify` では `--anchor` を含む入力でエントリが生成され、rustdoc 由来の現状 shape を含む。`--action delete` は同定情報だけを含む identity-only tombstone を生成し、spec_refs を持たないため `--anchor` 付き入力を reject する。",
+      "text": "`sotp catalog import --type <Rust パス>` を実行すると、rustdoc 抽出から既存型の同定情報・シグネチャ・フィールドを解決できる。`--action reference|modify` では `--anchor` を含む入力でエントリが生成され、rustdoc 由来の現状 shape を含む。type alias の alias target、private / hidden field の除去後も必要な struct shape と `has_stripped_fields`、impl target の module path は schema export JSON から import 側へ保持される。`--action delete` は同定情報だけを含む identity-only tombstone を生成し、spec_refs を持たないため `--anchor` 付き入力を reject する。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
@@ -557,7 +557,7 @@
     },
     {
       "id": "AC-12",
-      "text": "生成されたエントリに対して稼働済みの catalogue linter ルール群（ロール意味論・Aggregate 境界・アーキテクチャ配置・primitive obsession 防止）と impl → catalogue の type-signals 構造検証が従来どおり動作する。完全な型情報（メソッド署名の型・trait impl 宣言・field 可視性・generic bound・public enum variants の閉じた集合か extension-tolerant かの区別）が生成エントリに保持されている。通常の public enum と `#[non_exhaustive]` 付き public enum の fixture / test で、前者は downstream が exhaustive match してよい閉じた variant set として扱われ、後者は extension-tolerant として保持されることが確認できる。",
+      "text": "生成されたエントリに対して稼働済みの catalogue linter ルール群（ロール意味論・Aggregate 境界・アーキテクチャ配置・primitive obsession 防止）と impl → catalogue の type-signals 構造検証が従来どおり動作する。完全な型情報（メソッド署名の型・trait impl 宣言・field 可視性・generic bound・type alias target・struct shape と `has_stripped_fields`・impl target module path・public enum variants の閉じた集合か extension-tolerant かの区別）が生成エントリに保持されている。通常の public enum と `#[non_exhaustive]` 付き public enum の fixture / test で、前者は downstream が exhaustive match してよい閉じた variant set として扱われ、後者は extension-tolerant として保持されることが確認できる。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
@@ -571,7 +571,7 @@
     },
     {
       "id": "AC-13",
-      "text": "`cargo make ci`（fmt-check + clippy + nextest + deny + check-layers + verify-*）が pass する。次のケースを網羅するユニット / 統合テストが追加されている: (a) `add` の骨格生成と省略形状の `$todo` 化、(b) `$todo` 走査と完成境界の Err / typed 返却、(c) 実在しない anchor / 語彙外 role / function entry 名と signature 名の不一致 / delete tombstone への anchor 付与の入力時 reject、(d) `import` の rustdoc からの reference / modify / delete 取り込み、(e) `catalog check` の exit-code mapping（完成 catalogue は pass、catalogue 作成開始後の `$todo` 残存 / schema 不正 / 対象 layer 欠損は block、catalogue file がまだ 1 つも存在しない Phase 0 / 1 は skip）、(f) 同名エントリの error（no force）、(g) WRITE の track-id 不一致 fail-closed、(h) public enum variants が source の `#[non_exhaustive]` 有無に応じて closed / extension-tolerant として保持されること。既存テストへのリグレッションがない。",
+      "text": "`cargo make ci`（fmt-check + clippy + nextest + deny + check-layers + verify-*）が pass する。次のケースを網羅するユニット / 統合テストが追加されている: (a) `add` の骨格生成、省略形状の `$todo` 化、必須 payload を持つ role の payload `$todo` 化、(b) `$todo` 走査と完成境界の Err / typed 返却、(c) 実在しない anchor / 語彙外 role / function entry 名と signature 名の不一致 / delete tombstone への anchor 付与の入力時 reject、(d) `import` の rustdoc からの reference / modify / delete 取り込みと schema export JSON の alias target / struct shape / impl target module path 保持、(e) `catalog check` の exit-code mapping（完成 catalogue は pass、catalogue 作成開始後の `$todo` 残存 / schema 不正 / 対象 layer 欠損は block、catalogue file がまだ 1 つも存在しない Phase 0 / 1 は skip）、(f) 同名エントリの error（no force）、(g) WRITE の track-id 不一致 fail-closed、(h) public enum variants が source の `#[non_exhaustive]` 有無に応じて closed / extension-tolerant として保持されること。既存テストへのリグレッションがない。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",

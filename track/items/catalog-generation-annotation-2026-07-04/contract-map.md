@@ -299,6 +299,24 @@ subgraph usecase["usecase"]
 end
 subgraph infrastructure["infrastructure"]
   direction TB
+  subgraph infrastructure_infrastructure_module_schema_export_codec["infrastructure::schema_export_codec"]
+    direction TB
+  subgraph T41_infrastructure_infrastructure_ImplInfoDto["schema_export_codec::ImplInfoDto"]
+    direction TB
+    T41_infrastructure_infrastructure_ImplInfoDto__self[ImplInfoDto]
+  end
+  subgraph T48_infrastructure_infrastructure_StructShapeKindDto["schema_export_codec::StructShapeKindDto"]
+    direction TB
+    T48_infrastructure_infrastructure_StructShapeKindDto__self[StructShapeKindDto]
+    T48_infrastructure_infrastructure_StructShapeKindDto_Unit[Unit]
+    T48_infrastructure_infrastructure_StructShapeKindDto_Tuple[Tuple]
+    T48_infrastructure_infrastructure_StructShapeKindDto_Plain[Plain]
+  end
+  subgraph T41_infrastructure_infrastructure_TypeInfoDto["schema_export_codec::TypeInfoDto"]
+    direction TB
+    T41_infrastructure_infrastructure_TypeInfoDto__self[TypeInfoDto]
+  end
+  end
   subgraph infrastructure_infrastructure_module_tddd["infrastructure::tddd"]
     direction TB
   subgraph T47_infrastructure_infrastructure_CatalogDraftError["tddd::catalog_gen::CatalogDraftError"]
@@ -559,6 +577,7 @@ R30_usecase_usecase_CatalogService_check --o T33_usecase_usecase_CatalogCheckQue
 R30_usecase_usecase_CatalogService_check --> T34_usecase_usecase_CatalogCheckReport__self
 R30_usecase_usecase_CatalogService_check --> T28_usecase_usecase_CatalogError__self
 T33_usecase_usecase_CatalogInteractor__self -.impl.-> R30_usecase_usecase_CatalogService__self
+T41_infrastructure_infrastructure_TypeInfoDto__self --o|struct_shape| T48_infrastructure_infrastructure_StructShapeKindDto__self
 T47_infrastructure_infrastructure_CatalogDraftError_Incomplete --o|holes| T23_domain_domain_DraftHole__self
 T46_infrastructure_infrastructure_FsCatalogAdapter_new --> T46_infrastructure_infrastructure_FsCatalogAdapter__self
 F80_infrastructure_infrastructure_infrastructure__tddd__catalog_gen__scan_todo_holes --> T23_domain_domain_DraftHole__self
@@ -761,6 +780,12 @@ class R30_usecase_usecase_CatalogService_import method_node
 class R30_usecase_usecase_CatalogService_cite method_node
 class R30_usecase_usecase_CatalogService_check method_node
 class R30_usecase_usecase_CatalogService__self app_service
+class T41_infrastructure_infrastructure_ImplInfoDto__self dto
+class T48_infrastructure_infrastructure_StructShapeKindDto_Unit variant_node
+class T48_infrastructure_infrastructure_StructShapeKindDto_Tuple variant_node
+class T48_infrastructure_infrastructure_StructShapeKindDto_Plain variant_node
+class T48_infrastructure_infrastructure_StructShapeKindDto__self dto
+class T41_infrastructure_infrastructure_TypeInfoDto__self dto
 class T47_infrastructure_infrastructure_CatalogDraftError_Incomplete variant_node
 class T47_infrastructure_infrastructure_CatalogDraftError_Codec variant_node
 class T47_infrastructure_infrastructure_CatalogDraftError__self error_type

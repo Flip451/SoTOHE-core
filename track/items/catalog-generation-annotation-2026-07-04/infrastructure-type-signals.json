@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-05T22:12:13Z",
-  "declaration_hash": "f7e292ab4b1f3e224301051c37e776a1f113321e7519be65bd4541c8e7d306a1",
+  "generated_at": "2026-07-05T23:29:15Z",
+  "declaration_hash": "10763809fe20bcc6acfd3d4593e4720c08bb9237c0a004d7ff9dad2c726e414c",
   "signals": [
     {
       "type_name": "CatalogDraftError",
@@ -25,6 +25,29 @@
         "core::default::Default",
         "core::fmt::Debug"
       ]
+    },
+    {
+      "type_name": "ImplInfoDto",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "StructShapeKindDto",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::convert::From<&StructShapeKind>",
+        "core::fmt::Debug",
+        "serde_core::ser::Serialize"
+      ]
+    },
+    {
+      "type_name": "TypeInfoDto",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "infrastructure::tddd::catalog_gen::scan_todo_holes",

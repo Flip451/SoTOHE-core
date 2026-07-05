@@ -61,7 +61,7 @@ schema の知識（フィールド構成・schema_version・書式・エント�
 
 ### D3: 既存型 reference API
 
-既存の型をカタログに載せる場合は、rustdoc 抽出（既存の実装カタログ計算機構を流用）から完全な型情報（同定情報・シグネチャ・フィールド）を取り込む reference API を使う。type-designer による既存 shape の手動転記を廃止する。
+既存の型をカタログに載せる場合は、rustdoc 抽出（既存の実装カタログ計算機構を流用）から完全な型情報（同定情報・シグネチャ・フィールド）を取り込む reference API を使う。reference API の入力元になる schema export JSON も、type alias の alias target、struct の unit / tuple / plain 形状と `has_stripped_fields`、impl target の module path を落とさず保持する。type-designer による既存 shape の手動転記を廃止する。
 
 reference API は action の種類を問わず使える。変更なしで参照するだけのエントリに加え、既存型を変更する modify エントリでは現状 shape を baseline として取り込んだ上で変更差分だけを type-designer が編集し、削除エントリは同定情報の取り込みで足りる。いずれの action でも「現状の記述」を人手で書き起こす工程が消える。手動転記が残らないのは新規型の add のみで、そこは型形状の設計自体が Phase 2 の作業であるため、type-designer が設計した形状を D6 の検証付き入力（Rust シグネチャ文字列）として渡す。
 
@@ -101,7 +101,7 @@ draft の扱いは型付きスキーマの手前の層に置く: カタログ fi
 
 意図入力は 1 エントリ = 1 回の sotp サブコマンド呼び出しとし、意図（layer / kind / name / role / spec anchor / 型形状）は引数として渡す。意図マニフェストのような第二の入力 schema は作らない（schema 知識が writer prompt に戻るため）。入力仕様の参照面は `--help` とする。コマンド群の命名は D8 で定める。
 
-- 型形状（fields / methods / variants / generics / where predicates / impl blocks）は Rust 宣言断片またはシグネチャ文字列として渡し、sotp が parse して構造化する（既存の TypeRef parser / syn 資産を流用）。parse できない宣言・シグネチャは入力時 reject。生成時に確定できない箇所は引数で渡さず、生成されたエントリの該当ノードを `$todo` として保留できる（D4）
+- 型形状（fields / methods / variants / generics / where predicates / impl blocks）は Rust 宣言断片またはシグネチャ文字列として渡し、sotp が parse して構造化する（既存の TypeRef parser / syn 資産を流用）。parse できない宣言・シグネチャは入力時 reject。生成時に確定できない箇所は引数で渡さず、生成されたエントリの該当ノードを `$todo` として保留できる（D4）。catalogue DTO が必須 payload を持つ role（`Entity.identity`、`AggregateRoot.identity`、`EventPolicy.reacts_to`、`Repository.aggregate`）は、空オブジェクトではなく該当 payload 位置に `$todo` を生成する
 - generics / where 句は、型・trait・function・method・impl block の各宣言レベルを区別して入力し、カタログ schema の対応フィールド（`generics` / `where_predicates` / `impl_generics` / `impl_where_predicates` 等）へ構造化する。ある宣言レベルの generics / where 句に現行 schema の正規フィールドがない場合、D1 の完全型情報維持に従い、本 API 実装と同じ変更内で正規フィールドを追加してから生成する。silent drop、docs 文字列への退避、別宣言レベルへの代用は行わない
 - 既存型の形状は D3 の reference API が rustdoc から取り込む
 - 同名エントリが既に存在する場合は error とする。lenient / force 系フラグは設けない（既決の方針に従う）
@@ -120,7 +120,7 @@ draft の扱いは型付きスキーマの手前の層に置く: カタログ fi
 動詞は 5 つ:
 
 - `sotp catalog init` — active track の全 TDDD 対象 layer（architecture-rules.json から解決）の catalogue file を空の skeleton（schema_version 付き）として生成する。既存 file があれば error とし、一部生成はしない。エントリゼロの layer にも file の存在を要求する現行運用（全 layer 被覆の pre-review 検査、documentation-only track の空 catalogue）の bootstrap を機械化する
-- `sotp catalog add` — 新規型の意図入力（D2 / D6）。`--layer` / `--kind` / `--name` / `--role` / `--anchor`（repeatable）に加え、`--field` / `--method` / `--variant` / `--trait-impl`（Rust 宣言断片またはシグネチャ文字列、repeatable）で形状を渡す。宣言レベルの型パラメータと where 句は `--generic` / `--where`（repeatable）で渡し、impl block レベルでは `--impl-generic` / `--impl-where`（repeatable）で `impl_generics` / `impl_where_predicates` に対応させる。method / function シグネチャ内の generics / where 句はそのシグネチャから parse する。function entry では `--name` の末尾と `--method` から parse した `fn` 名が一致しない入力を reject し、signature 名の silent drop を起こさない。省略した形状ノードは `$todo` で生成される（D4）
+- `sotp catalog add` — 新規型の意図入力（D2 / D6）。`--layer` / `--kind` / `--name` / `--role` / `--anchor`（repeatable）に加え、`--field` / `--method` / `--variant` / `--trait-impl`（Rust 宣言断片またはシグネチャ文字列、repeatable）で形状を渡す。宣言レベルの型パラメータと where 句は `--generic` / `--where`（repeatable）で渡し、impl block レベルでは `--impl-generic` / `--impl-where`（repeatable）で `impl_generics` / `impl_where_predicates` に対応させる。method / function シグネチャ内の generics / where 句はそのシグネチャから parse する。function entry では `--name` の末尾と `--method` から parse した `fn` 名が一致しない入力を reject し、signature 名の silent drop を起こさない。省略した形状ノードと、選択 role の catalogue DTO が要求する未入力 payload は `$todo` で生成される（D4）
 - `sotp catalog import` — 既存型の取り込み（D3）。`--layer` / `--type`（Rust パス、rustdoc から解決）/ `--action reference|modify|delete`（既定 `reference`）/ `--anchor`。`--anchor` は reference / modify のみで受理し、delete は spec_refs を持たない identity-only tombstone なので reject する
 - `sotp catalog cite` — 生成後の anchor 追加（D5 の検証付き入力）。`--layer` / `--entry` / `--anchor`。delete tombstone は spec_refs を持たないため対象にできず reject する
 - `sotp catalog check` — 完成検査（D7）。`--layer` 省略時は全 TDDD layer を対象とし、fail は非零 exit。対象 catalogue file がまだ 1 つも存在しない Phase 0 / 1 では no-op + warning で skip し、対象 track に catalogue file が 1 つでも存在する場合は `$todo` 残存・anchor 不在・role 語彙外・schema 不正・TDDD 対象 layer の catalogue file 不在を block する。`catalog check` は signal-gates 設定ファイルを必須入力にしない

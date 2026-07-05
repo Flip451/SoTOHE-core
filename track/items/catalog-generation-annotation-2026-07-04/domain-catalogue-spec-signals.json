@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "29d2deb170c4f93b7e12137fd29fd8bcbdc3369168c63d7c6c75263484bd895c",
+  "catalogue_declaration_hash": "7f71bd1aa44dd6250e87890535ef1d29251f6af3f85e42c1ad044e0fb3473870",
   "signals": [
     {
       "type_name": "CatalogEntryKind",
@@ -55,7 +55,7 @@
     {
       "type_name": "ImplInfo",
       "signal": "blue",
-      "entry_hash": "a9b64da880d7eff84c5c6d4c4b2d048a6d194fabde47863011a08236e4752723"
+      "entry_hash": "c4a9e296a507b05f72c0fd64be6163fdf45599e10d12a149a9a1759a26d6ea1f"
     },
     {
       "type_name": "InherentImplDeclV2",
@@ -65,7 +65,7 @@
     {
       "type_name": "StructShapeKind",
       "signal": "blue",
-      "entry_hash": "da97dc9831bdd39a416347545cba3deade6a5bf1f7e609b723234793fd5dd962"
+      "entry_hash": "0a4e9c8fc5407f213f5a65d84ce08f6a21cdf9d0c89d2297150d3110b88bcc62"
     },
     {
       "type_name": "TodoInstruction",
@@ -90,7 +90,7 @@
     {
       "type_name": "TypeInfo",
       "signal": "blue",
-      "entry_hash": "d3af6bf57353999efb6ef49a335f75752b4f0c438c7ef9321fa7ba0c37a49bd8"
+      "entry_hash": "b52a0723fa4a5f73cae0cf71890ebcb93a3b2358b6103632917ee7289f4c025f"
     }
   ]
 }
