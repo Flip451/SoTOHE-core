@@ -1,877 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "cli_driver": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1d19f89bf21b4b347c0a461faf6aeb568154c01f04ffb9142f968afca0ce9bff",
-          "at": "2026-07-04T12:15:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1d19f89bf21b4b347c0a461faf6aeb568154c01f04ffb9142f968afca0ce9bff",
-          "at": "2026-07-04T12:18:04Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a4d61360311e3983915bd4252491587731b729a50af6e53c5abe9029f3916190",
-          "at": "2026-07-04T15:51:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a4d61360311e3983915bd4252491587731b729a50af6e53c5abe9029f3916190",
-          "at": "2026-07-04T16:08:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5a15d870996c7005b272a6b071a6ae7cdb2e32fee6ec8a3a51d9537616befc22",
-          "at": "2026-07-05T14:23:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5a15d870996c7005b272a6b071a6ae7cdb2e32fee6ec8a3a51d9537616befc22",
-          "at": "2026-07-05T14:25:10Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0ccbad4c1757bc4097f43ceb2a125cb72e8a435debf4d4c59a82a7e0b071e577",
-          "at": "2026-07-04T10:42:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0ccbad4c1757bc4097f43ceb2a125cb72e8a435debf4d4c59a82a7e0b071e577",
-          "at": "2026-07-04T10:47:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:af2e2991490a22ba94f8ae532554ab458d52d8b8520f87b51904a2929cdd1eff",
-          "at": "2026-07-04T11:55:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:af2e2991490a22ba94f8ae532554ab458d52d8b8520f87b51904a2929cdd1eff",
-          "at": "2026-07-04T11:58:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d9b4ba20d36761f1e3991cb043c1132df0a4bc51d7e3cc90bf4cada6a3869f6f",
-          "at": "2026-07-04T15:50:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d9b4ba20d36761f1e3991cb043c1132df0a4bc51d7e3cc90bf4cada6a3869f6f",
-          "at": "2026-07-04T16:06:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d6d19d9d562ea534713b44424d0de6157cde2f8a930867c87323a3f622920a73",
-          "at": "2026-07-05T06:28:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d6d19d9d562ea534713b44424d0de6157cde2f8a930867c87323a3f622920a73",
-          "at": "2026-07-05T06:32:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5e208eeead5dc94da904ec083da67d6e30a6eff8bb1e57d52cbf81d958b9b96b",
-          "at": "2026-07-05T14:09:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5e208eeead5dc94da904ec083da67d6e30a6eff8bb1e57d52cbf81d958b9b96b",
-          "at": "2026-07-05T14:10:24Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6e5c3f80132da943d5ec5e02c5ba28741c43dc4eb386a1392f719e560402f51a",
-          "at": "2026-07-04T15:51:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6e5c3f80132da943d5ec5e02c5ba28741c43dc4eb386a1392f719e560402f51a",
-          "at": "2026-07-04T16:06:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:138a20c6c9495faa8480a773b6f00ea0d92a01f93154cc8fd783c16348fb4058",
-          "at": "2026-07-05T14:30:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:138a20c6c9495faa8480a773b6f00ea0d92a01f93154cc8fd783c16348fb4058",
-          "at": "2026-07-05T14:40:23Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md` lets `sotp catalog` auto-resolve the current track *and* accept `--track-id` as an override for `add/import/cite`. Those commands write under `track/items/<id>/`, so that wording conflicts with the established write-safety rule in [track-id default ADR](/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-26-1813-track-id-default-active-track.md#L149-L157), which requires write operations to fail closed on a branch/id mismatch rather than allow cross-track overrides.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
-              "line": 125,
-              "category": "inconsistent decision"
-            },
-            {
-              "message": "The phase-2 command surface is still missing an explicit way to supply a new type's own `generics` / `where` bounds. D1 says the catalog must preserve that information, but D6/D8 only expose member-level Rust signatures plus rustdoc import. As written, downstream tooling cannot unambiguously author or validate generic-bearing structs, traits, or impl blocks unless that encoding is stated somewhere explicit.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
-              "line": 102,
-              "category": "decision underspecified for downstream consumption"
-            }
-          ],
-          "hash": "rvw1:sha256:f1b3a8acf5cdabbe3899f7ed923fa8988ccc28c9bbe4532a5a92165a5699bb13",
-          "at": "2026-07-04T01:38:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`D7` wires `sotp catalog check` into both the Phase 2 gate and the commit gate, but it never says whether that check is skipped or downgraded when a catalog file is still absent or only partially filled. As written, that reintroduces the Phase 0/1 commit-blocking behavior that `knowledge/adr/2026-06-01-0406-review-gate-tolerate-missing-catalogue.md` explicitly removed, and it also conflicts with `knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md`, which keeps TDDD catalogue-impl checks `interim` at commit time. The commit-gate semantics here are therefore inconsistent and underspecified.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
-              "line": 110,
-              "category": "consistency"
-            }
-          ],
-          "hash": "rvw1:sha256:a7f734059dc8bcceb5d7baeac55f36522a204d62a6c3a43e6160c444741cdf7a",
-          "at": "2026-07-04T01:45:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`catalog check` is coupled to a mandatory `.harness/config/signal-gates.json` and treats missing/malformed gate config as a hard failure. That turns a user-owned signal-gate setting into a framework-enforced prerequisite, which conflicts with `knowledge/conventions/responsibility-boundary.md`'s rule that signal-gate settings are provide+docs only, not CI-enforced. Downstream forks that intentionally omit the file will now be blocked before any catalogue work can run.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
-              "line": 116,
-              "category": "scope_leakage"
-            }
-          ],
-          "hash": "rvw1:sha256:ddc0e82f9f351b7cb33b5b2746a708e42c4accc2cf9722956288ab52089be2a8",
-          "at": "2026-07-04T01:51:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:87e6d3ad477eefba96779d029e9ad08fbc257a21eb936645134a082336f2e447",
-          "at": "2026-07-04T01:54:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:87e6d3ad477eefba96779d029e9ad08fbc257a21eb936645134a082336f2e447",
-          "at": "2026-07-04T01:58:36Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dccd63cd1702dbf874e8fe1cde1a981286f2ce6486b7e0294e793e092be9cf97",
-          "at": "2026-07-04T07:30:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dccd63cd1702dbf874e8fe1cde1a981286f2ce6486b7e0294e793e092be9cf97",
-          "at": "2026-07-04T07:36:05Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8a84d3385a53d3fceb997e2dfe0ebc1e0cbdb39579087121642ed4e0a4e9b7ab",
-          "at": "2026-07-05T13:40:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8a84d3385a53d3fceb997e2dfe0ebc1e0cbdb39579087121642ed4e0a4e9b7ab",
-          "at": "2026-07-05T13:42:23Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7ffd3fbf84f51de9c36b19d7d9a5784fa471c96f0c13fa5e3a46fbb5ddd58585",
-          "at": "2026-07-04T15:53:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7ffd3fbf84f51de9c36b19d7d9a5784fa471c96f0c13fa5e3a46fbb5ddd58585",
-          "at": "2026-07-04T16:07:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:94542df95c6e13a1e88aa102454a8721640396e244c1abdb27a6d97a4dce31ca",
-          "at": "2026-07-05T14:27:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:94542df95c6e13a1e88aa102454a8721640396e244c1abdb27a6d97a4dce31ca",
-          "at": "2026-07-05T14:29:27Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`ForbidPrimitiveInTypes` still only scans a `TypeEntry`'s shape, methods, and inherent impls. The new `TypeEntry.generics` and `TypeEntry.where_predicates` fields are never collected here, so forbidden primitives can be hidden in type-declaration bounds and the domain linter will miss them.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval_primitives.rs",
-              "line": 230,
-              "category": "typestate / parse-don't-validate gap"
-            }
-          ],
-          "hash": "rvw1:sha256:9f173b0dd8be3b22f09c74360daca60cf277f03388efb205a469439013d8f93d",
-          "at": "2026-07-04T10:44:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b99e288b3d4424ac019e9d92e1f8027bb295a11faa25cb6efd32576e41268d5d",
-          "at": "2026-07-04T10:52:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b99e288b3d4424ac019e9d92e1f8027bb295a11faa25cb6efd32576e41268d5d",
-          "at": "2026-07-04T10:58:36Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:05c07f4001ac2346daa04c618daa0e65ac86156a7fc530c4a401727845310166",
-          "at": "2026-07-04T11:54:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:05c07f4001ac2346daa04c618daa0e65ac86156a7fc530c4a401727845310166",
-          "at": "2026-07-04T11:58:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d34ef7f08273c88fbc588ec5db63d0af7b74826fb684100936ab12f26efe1240",
-          "at": "2026-07-04T18:24:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d34ef7f08273c88fbc588ec5db63d0af7b74826fb684100936ab12f26efe1240",
-          "at": "2026-07-04T18:28:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:94428e7c93c5c2c35e0980b5727bd26a13af430047768906e60745d257660d24",
-          "at": "2026-07-04T23:13:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:94428e7c93c5c2c35e0980b5727bd26a13af430047768906e60745d257660d24",
-          "at": "2026-07-04T23:16:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:91bf9a89bdcf4750253eef616f0e4bdfa7e837f9b49fc378fc8ea67afc624d8d",
-          "at": "2026-07-05T05:45:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:91bf9a89bdcf4750253eef616f0e4bdfa7e837f9b49fc378fc8ea67afc624d8d",
-          "at": "2026-07-05T05:50:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:91bf9a89bdcf4750253eef616f0e4bdfa7e837f9b49fc378fc8ea67afc624d8d",
-          "at": "2026-07-05T06:18:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:91bf9a89bdcf4750253eef616f0e4bdfa7e837f9b49fc378fc8ea67afc624d8d",
-          "at": "2026-07-05T06:26:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a61305ac7aaa339990b56efc5b172bbe06cc349bcfe697b482aab6f087c1c934",
-          "at": "2026-07-05T10:21:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a61305ac7aaa339990b56efc5b172bbe06cc349bcfe697b482aab6f087c1c934",
-          "at": "2026-07-05T10:24:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e0eb2bb103bb7c18d0be2825e750b884bb2d4f94d3a9133422b8cabb1ebad4ab",
-          "at": "2026-07-05T11:01:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e0eb2bb103bb7c18d0be2825e750b884bb2d4f94d3a9133422b8cabb1ebad4ab",
-          "at": "2026-07-05T11:04:24Z"
-        }
-      ]
-    },
-    "impl-plan": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1251e9684a3fde4ae66e1b1fd7c8d4f6820d1352210118c8af4fe7995d6d569b",
-          "at": "2026-07-04T01:35:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1251e9684a3fde4ae66e1b1fd7c8d4f6820d1352210118c8af4fe7995d6d569b",
-          "at": "2026-07-04T01:37:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "GO-01 through GO-04 in `spec.json` have no corresponding entries in `task-coverage.json`; that file only maps `in_scope`/`out_of_scope`/`constraints`/`acceptance_criteria`, so the four goals are completely uncovered.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/task-coverage.json",
-              "line": 3,
-              "category": "task-coverage gap"
-            },
-            {
-              "message": "T005 says `CatalogDraftError::Codec` is `Codec { message: String }`, but the contract in `infrastructure-types.json` defines `Codec { source: CatalogueDocumentCodecError }` and a `From<CatalogueDocumentCodecError>` conversion. Implementing the plan as written would produce the wrong error shape.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/plan.md",
-              "line": 41,
-              "category": "task description non-executable"
-            }
-          ],
-          "hash": "rvw1:sha256:4f878deccff16422b42b19775a68ee8a066adbae1af8906ee32ab960dceedf9b",
-          "at": "2026-07-04T06:18:49Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The Summary block at lines 6-12 is upstream-rationale prose (for example, \"type-designer inputs intent and fills `$todo` holes\") instead of the allowed target + operation + anchor-only form.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/plan.md",
-              "line": 6,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:000f8491355dd276cec8ee5ee89762f1a96ef1b86383947c892a892984718b34",
-          "at": "2026-07-04T06:25:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`T001`'s contract attributes `CatalogEntryName`, but the task text never claims to add or modify that entry. This overstates the task's catalogue-entry scope.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/task-contract.json",
-              "line": 5,
-              "category": "task-contract attribution mismatch"
-            },
-            {
-              "message": "`T002` explains why the commit must be atomic and why the lint shape matters. That's upstream rationale/behavior prose, not just target + operation + anchor cite, so it violates `knowledge/conventions/no-upstream-restatement.md`.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/impl-plan.json",
-              "line": 11,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "`T003` and `T004` provide only prose summaries of the usecase layer and do not cite any `AC-NN`/`IN-NN`/`CN-NN`/spec anchor. Under the scope policy that makes them non-executable.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/impl-plan.json",
-              "line": 17,
-              "category": "task description non-executable"
-            },
-            {
-              "message": "`T005`/`T006`/`T007` mix the implementation target with upstream behavior and rationale prose (`single place a draft crosses`, `schema authority`, `strict block`). That is the kind of restatement `knowledge/conventions/no-upstream-restatement.md` forbids.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/impl-plan.json",
-              "line": 29,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "`T008` and `T009` omit an anchor cite, so the executable boundary is left implicit and the implementer has to infer the split from prose. That is non-executable under the scope policy.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/impl-plan.json",
-              "line": 47,
-              "category": "task description non-executable"
-            },
-            {
-              "message": "`T010` restates the upstream CLI semantics (`fail-closed`, strict exit behavior) instead of only pointing to the anchors. That is an upstream restatement.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/impl-plan.json",
-              "line": 59,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "`T011` restates the gate semantics (`interim/skip/block`, strict phase2/merge behavior) instead of only citing the anchors. That is an upstream restatement.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/impl-plan.json",
-              "line": 65,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:e7c43fbaa9eeeb9ab4e4a47e804b42ec88377893f3791b706074a2e8049b83a7",
-          "at": "2026-07-04T06:33:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1f2ac167d420e893b384e03bd6ba5952b05a43dfb0f2cb9150bba6a404d47236",
-          "at": "2026-07-04T06:42:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1f2ac167d420e893b384e03bd6ba5952b05a43dfb0f2cb9150bba6a404d47236",
-          "at": "2026-07-04T07:03:57Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1f2ac167d420e893b384e03bd6ba5952b05a43dfb0f2cb9150bba6a404d47236",
-          "at": "2026-07-04T08:12:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1f2ac167d420e893b384e03bd6ba5952b05a43dfb0f2cb9150bba6a404d47236",
-          "at": "2026-07-04T08:20:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7574b7d973a4ee2586956f2469a6070431bd330f8d7705609c5b52d6f47be98e",
-          "at": "2026-07-04T10:42:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7574b7d973a4ee2586956f2469a6070431bd330f8d7705609c5b52d6f47be98e",
-          "at": "2026-07-04T10:46:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cbe9e5e7eb5c9b02600b3b5d4cd84dfde81bde06ef58e95e9d7459b956e718d2",
-          "at": "2026-07-04T11:53:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cbe9e5e7eb5c9b02600b3b5d4cd84dfde81bde06ef58e95e9d7459b956e718d2",
-          "at": "2026-07-04T11:58:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8521722f5378acc8b095488d6e0e70081d40d0e756db80f3326b6f5ca4e59f81",
-          "at": "2026-07-04T12:21:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8521722f5378acc8b095488d6e0e70081d40d0e756db80f3326b6f5ca4e59f81",
-          "at": "2026-07-04T12:24:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b40d955f629dc2d574d52b2d331d1a3072007680ec8d7a750ef8c5b24e9ce901",
-          "at": "2026-07-04T13:38:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b40d955f629dc2d574d52b2d331d1a3072007680ec8d7a750ef8c5b24e9ce901",
-          "at": "2026-07-04T13:42:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:977f01de15bd7814a00e6eb2d5772839d37e5e9e02ea683d3230754c0b7080c5",
-          "at": "2026-07-04T15:52:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:977f01de15bd7814a00e6eb2d5772839d37e5e9e02ea683d3230754c0b7080c5",
-          "at": "2026-07-04T16:07:36Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:665ed1eb1148a7f5b1ba042bd5389edb047ff8ffebfa9aa7c634419e93ae7dfe",
-          "at": "2026-07-04T16:14:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:665ed1eb1148a7f5b1ba042bd5389edb047ff8ffebfa9aa7c634419e93ae7dfe",
-          "at": "2026-07-04T16:18:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8dcb2be3d343b73540b8c1cfb779e37fdc0c375263b0f9731b4e6b1419802d12",
-          "at": "2026-07-04T18:37:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8dcb2be3d343b73540b8c1cfb779e37fdc0c375263b0f9731b4e6b1419802d12",
-          "at": "2026-07-04T18:41:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:62a31bc0f6ae8c14d2371b54605b4317f4a5180a67a8bc3b525720b2385e1a2f",
-          "at": "2026-07-04T23:13:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:62a31bc0f6ae8c14d2371b54605b4317f4a5180a67a8bc3b525720b2385e1a2f",
-          "at": "2026-07-04T23:17:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c75bc599d9fd23a9953d24b42e4ee36bdd6967a3045b28038f1c109216bd5231",
-          "at": "2026-07-05T05:43:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c75bc599d9fd23a9953d24b42e4ee36bdd6967a3045b28038f1c109216bd5231",
-          "at": "2026-07-05T05:47:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`T007` is only described in the impl-plan as `FsCatalogAdapter` verb helpers + `CatalogPort` over `IN-02/03/04/05/06/12` and `AC-02/03/04/08/10/11/12`, but these added attributions pull in `InherentImplDeclV2` and `TraitImplDeclV2` (`IN-08`/`IN-09` data-model work). That makes the task-contract over-attribute T007 to entries its description does not actually touch.",
-              "severity": "P1",
-              "file": "track/items/catalog-generation-annotation-2026-07-04/task-contract.json",
-              "line": 49,
-              "category": "task-contract attribution mismatch"
-            }
-          ],
-          "hash": "rvw1:sha256:7b3588f06f0395a666cc2a153de28134d4c2401f41d21338649456daa28ffc9b",
-          "at": "2026-07-05T06:19:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0f119699e577ac6e60600f2236baba1ddab54da254a50352a3b4d636953c0ee2",
-          "at": "2026-07-05T06:31:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0f119699e577ac6e60600f2236baba1ddab54da254a50352a3b4d636953c0ee2",
-          "at": "2026-07-05T06:36:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:96e8ced8a76c8fe6e9dfd51b14c7f019ba930230a23f65cd5b4267a3fc48b927",
-          "at": "2026-07-05T11:55:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:96e8ced8a76c8fe6e9dfd51b14c7f019ba930230a23f65cd5b4267a3fc48b927",
-          "at": "2026-07-05T11:58:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`plan.md` line 11 restates the upstream catalog-check behavior contract (`enforce ... completion semantics`) instead of staying in target + operation + anchor form. The same restatement also shows up again in S5/T011, so both should be trimmed.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/plan.md",
-              "line": 11,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:851a2656b646a7c3e6a8288a498b266733250d4f408fea3cf57e7928255780ba",
-          "at": "2026-07-05T13:54:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f2efad450bb1a5a2594a6e5b53aa8a408d3ca3090d2bb1f769ce0707e09d9560",
-          "at": "2026-07-05T14:02:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f2efad450bb1a5a2594a6e5b53aa8a408d3ca3090d2bb1f769ce0707e09d9560",
-          "at": "2026-07-05T14:06:59Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "[AC-03] の末尾の「type-designer はカタログ schema の深い理解なしに意図入力と穴埋めのみでエントリを完成できる」は、人間の理解度・作業感に関する主張で、CLI 出力やファイル状態だけでは決定的に検証できません。AC としては、生成結果と `$todo` の有無のような機械的に判定できる条件に落とす必要があります。",
-              "severity": "P1",
-              "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json",
-              "line": 462,
-              "category": "acceptance criterion non-observable"
-            }
-          ],
-          "hash": "rvw1:sha256:5a7901d45d6ae72c55c22a4b022d2cc5b445f16a2f5629e62de4637c42203dc6",
-          "at": "2026-07-04T06:14:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-04 mixes an observable import behavior with the process claim `手動転記なし`; that part is not deterministically checkable from the branch state or CI output, so the acceptance criterion is not fully observable.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/spec.json",
-              "line": 476,
-              "category": "acceptance criterion non-observable"
-            }
-          ],
-          "hash": "rvw1:sha256:4f3a0a00c5806b938f6d1983d2b9f54db1d0743051165fd29fec4f833819e42c",
-          "at": "2026-07-04T06:20:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6c1da74e1bc277690ccb1b2c47696f583f8200cd3b33b894cd010e42de8386dc",
-          "at": "2026-07-04T06:27:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-03 requires an `add` result with omitted shape nodes to contain `$todo` nodes and still pass catalogue schema validation. That conflicts with IN-07/AC-05, which define `$todo` as draft-layer data before the typed schema and require `try_complete` to return Err while any `$todo` remains. Downstream phases cannot tell whether incomplete generated entries should validate as completed catalogue DTOs or only as draft JSON.",
-              "severity": "P1",
-              "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json",
-              "line": 462,
-              "category": "scope / acceptance_criteria contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:6c1da74e1bc277690ccb1b2c47696f583f8200cd3b33b894cd010e42de8386dc",
-          "at": "2026-07-04T06:32:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f57b6e2224123abfd98f0d04c0e07bc98e7a5d52c25f4726a081daa6d7a01fa7",
-          "at": "2026-07-04T06:37:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c6f9494ffb36ae6950453612a313eb20895c56b8c207fbe2e6d2adc1ff773af4",
-          "at": "2026-07-05T11:29:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "IN-08 now defines a new enum exhaustiveness contract: public enum variants are closed for downstream exhaustive matching unless the source explicitly declares extension tolerance. None of the acceptance criteria proves this behavior; AC-03 only checks generic shape storage, AC-04 does not mention enum variants, and AC-12's complete-type-info check omits the non_exhaustive/closed-set distinction. As written, Phase 2/3 can satisfy every AC while silently dropping the new enum policy, leaving GO-02's complete type-information goal under-covered.",
-              "severity": "P1",
-              "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json",
-              "line": 141,
-              "category": "missing AC coverage for stated goal"
-            }
-          ],
-          "hash": "rvw1:sha256:c6f9494ffb36ae6950453612a313eb20895c56b8c207fbe2e6d2adc1ff773af4",
-          "at": "2026-07-05T11:32:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0478f734818f9d4b001891099d3f770433fdb4b5c0f0450634c7b0473aa71bf2",
-          "at": "2026-07-05T11:37:15Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0478f734818f9d4b001891099d3f770433fdb4b5c0f0450634c7b0473aa71bf2",
-          "at": "2026-07-05T11:41:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0478f734818f9d4b001891099d3f770433fdb4b5c0f0450634c7b0473aa71bf2",
-          "at": "2026-07-05T11:45:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:69b23a43bc7cb4d19812904ebb78d8713a0197ae731751ad4acf6475ada8d16c",
-          "at": "2026-07-05T13:45:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:69b23a43bc7cb4d19812904ebb78d8713a0197ae731751ad4acf6475ada8d16c",
-          "at": "2026-07-05T13:46:44Z"
-        }
-      ]
-    },
     "harness-policy": {
       "rounds": [
         {
@@ -1016,6 +145,104 @@
           "findings": [],
           "hash": "rvw1:sha256:ff19a6f30b8c4c169b73675b56a5126017ea335fcc85ba8789fc312bdd4d6158",
           "at": "2026-07-05T14:43:22Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md` lets `sotp catalog` auto-resolve the current track *and* accept `--track-id` as an override for `add/import/cite`. Those commands write under `track/items/<id>/`, so that wording conflicts with the established write-safety rule in [track-id default ADR](/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-26-1813-track-id-default-active-track.md#L149-L157), which requires write operations to fail closed on a branch/id mismatch rather than allow cross-track overrides.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+              "line": 125,
+              "category": "inconsistent decision"
+            },
+            {
+              "message": "The phase-2 command surface is still missing an explicit way to supply a new type's own `generics` / `where` bounds. D1 says the catalog must preserve that information, but D6/D8 only expose member-level Rust signatures plus rustdoc import. As written, downstream tooling cannot unambiguously author or validate generic-bearing structs, traits, or impl blocks unless that encoding is stated somewhere explicit.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+              "line": 102,
+              "category": "decision underspecified for downstream consumption"
+            }
+          ],
+          "hash": "rvw1:sha256:f1b3a8acf5cdabbe3899f7ed923fa8988ccc28c9bbe4532a5a92165a5699bb13",
+          "at": "2026-07-04T01:38:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`D7` wires `sotp catalog check` into both the Phase 2 gate and the commit gate, but it never says whether that check is skipped or downgraded when a catalog file is still absent or only partially filled. As written, that reintroduces the Phase 0/1 commit-blocking behavior that `knowledge/adr/2026-06-01-0406-review-gate-tolerate-missing-catalogue.md` explicitly removed, and it also conflicts with `knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md`, which keeps TDDD catalogue-impl checks `interim` at commit time. The commit-gate semantics here are therefore inconsistent and underspecified.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+              "line": 110,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:a7f734059dc8bcceb5d7baeac55f36522a204d62a6c3a43e6160c444741cdf7a",
+          "at": "2026-07-04T01:45:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`catalog check` is coupled to a mandatory `.harness/config/signal-gates.json` and treats missing/malformed gate config as a hard failure. That turns a user-owned signal-gate setting into a framework-enforced prerequisite, which conflicts with `knowledge/conventions/responsibility-boundary.md`'s rule that signal-gate settings are provide+docs only, not CI-enforced. Downstream forks that intentionally omit the file will now be blocked before any catalogue work can run.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+              "line": 116,
+              "category": "scope_leakage"
+            }
+          ],
+          "hash": "rvw1:sha256:ddc0e82f9f351b7cb33b5b2746a708e42c4accc2cf9722956288ab52089be2a8",
+          "at": "2026-07-04T01:51:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:87e6d3ad477eefba96779d029e9ad08fbc257a21eb936645134a082336f2e447",
+          "at": "2026-07-04T01:54:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:87e6d3ad477eefba96779d029e9ad08fbc257a21eb936645134a082336f2e447",
+          "at": "2026-07-04T01:58:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dccd63cd1702dbf874e8fe1cde1a981286f2ce6486b7e0294e793e092be9cf97",
+          "at": "2026-07-04T07:30:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dccd63cd1702dbf874e8fe1cde1a981286f2ce6486b7e0294e793e092be9cf97",
+          "at": "2026-07-04T07:36:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8a84d3385a53d3fceb997e2dfe0ebc1e0cbdb39579087121642ed4e0a4e9b7ab",
+          "at": "2026-07-05T13:40:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8a84d3385a53d3fceb997e2dfe0ebc1e0cbdb39579087121642ed4e0a4e9b7ab",
+          "at": "2026-07-05T13:42:23Z"
         }
       ]
     },
@@ -1435,6 +662,644 @@
           "findings": [],
           "hash": "rvw1:sha256:04184ec8ed27c4726155d2d8a4477ca30eae201fe90789fba27e776ea3e80d0d",
           "at": "2026-07-05T15:18:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ec3591d8c8b994ffb57c1ae149d567e7a87516436df9c4ea86cc108fbaddb1da",
+          "at": "2026-07-05T15:37:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ec3591d8c8b994ffb57c1ae149d567e7a87516436df9c4ea86cc108fbaddb1da",
+          "at": "2026-07-05T15:40:09Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7ffd3fbf84f51de9c36b19d7d9a5784fa471c96f0c13fa5e3a46fbb5ddd58585",
+          "at": "2026-07-04T15:53:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7ffd3fbf84f51de9c36b19d7d9a5784fa471c96f0c13fa5e3a46fbb5ddd58585",
+          "at": "2026-07-04T16:07:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:94542df95c6e13a1e88aa102454a8721640396e244c1abdb27a6d97a4dce31ca",
+          "at": "2026-07-05T14:27:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:94542df95c6e13a1e88aa102454a8721640396e244c1abdb27a6d97a4dce31ca",
+          "at": "2026-07-05T14:29:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e666bc31dd62fcb7edc42090941023b336801c5792d76cb0652908811006cc74",
+          "at": "2026-07-05T15:42:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e666bc31dd62fcb7edc42090941023b336801c5792d76cb0652908811006cc74",
+          "at": "2026-07-05T15:44:13Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "[AC-03] の末尾の「type-designer はカタログ schema の深い理解なしに意図入力と穴埋めのみでエントリを完成できる」は、人間の理解度・作業感に関する主張で、CLI 出力やファイル状態だけでは決定的に検証できません。AC としては、生成結果と `$todo` の有無のような機械的に判定できる条件に落とす必要があります。",
+              "severity": "P1",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json",
+              "line": 462,
+              "category": "acceptance criterion non-observable"
+            }
+          ],
+          "hash": "rvw1:sha256:5a7901d45d6ae72c55c22a4b022d2cc5b445f16a2f5629e62de4637c42203dc6",
+          "at": "2026-07-04T06:14:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-04 mixes an observable import behavior with the process claim `手動転記なし`; that part is not deterministically checkable from the branch state or CI output, so the acceptance criterion is not fully observable.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/spec.json",
+              "line": 476,
+              "category": "acceptance criterion non-observable"
+            }
+          ],
+          "hash": "rvw1:sha256:4f3a0a00c5806b938f6d1983d2b9f54db1d0743051165fd29fec4f833819e42c",
+          "at": "2026-07-04T06:20:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6c1da74e1bc277690ccb1b2c47696f583f8200cd3b33b894cd010e42de8386dc",
+          "at": "2026-07-04T06:27:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-03 requires an `add` result with omitted shape nodes to contain `$todo` nodes and still pass catalogue schema validation. That conflicts with IN-07/AC-05, which define `$todo` as draft-layer data before the typed schema and require `try_complete` to return Err while any `$todo` remains. Downstream phases cannot tell whether incomplete generated entries should validate as completed catalogue DTOs or only as draft JSON.",
+              "severity": "P1",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json",
+              "line": 462,
+              "category": "scope / acceptance_criteria contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:6c1da74e1bc277690ccb1b2c47696f583f8200cd3b33b894cd010e42de8386dc",
+          "at": "2026-07-04T06:32:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f57b6e2224123abfd98f0d04c0e07bc98e7a5d52c25f4726a081daa6d7a01fa7",
+          "at": "2026-07-04T06:37:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c6f9494ffb36ae6950453612a313eb20895c56b8c207fbe2e6d2adc1ff773af4",
+          "at": "2026-07-05T11:29:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-08 now defines a new enum exhaustiveness contract: public enum variants are closed for downstream exhaustive matching unless the source explicitly declares extension tolerance. None of the acceptance criteria proves this behavior; AC-03 only checks generic shape storage, AC-04 does not mention enum variants, and AC-12's complete-type-info check omits the non_exhaustive/closed-set distinction. As written, Phase 2/3 can satisfy every AC while silently dropping the new enum policy, leaving GO-02's complete type-information goal under-covered.",
+              "severity": "P1",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json",
+              "line": 141,
+              "category": "missing AC coverage for stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:c6f9494ffb36ae6950453612a313eb20895c56b8c207fbe2e6d2adc1ff773af4",
+          "at": "2026-07-05T11:32:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0478f734818f9d4b001891099d3f770433fdb4b5c0f0450634c7b0473aa71bf2",
+          "at": "2026-07-05T11:37:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0478f734818f9d4b001891099d3f770433fdb4b5c0f0450634c7b0473aa71bf2",
+          "at": "2026-07-05T11:41:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0478f734818f9d4b001891099d3f770433fdb4b5c0f0450634c7b0473aa71bf2",
+          "at": "2026-07-05T11:45:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69b23a43bc7cb4d19812904ebb78d8713a0197ae731751ad4acf6475ada8d16c",
+          "at": "2026-07-05T13:45:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69b23a43bc7cb4d19812904ebb78d8713a0197ae731751ad4acf6475ada8d16c",
+          "at": "2026-07-05T13:46:44Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1251e9684a3fde4ae66e1b1fd7c8d4f6820d1352210118c8af4fe7995d6d569b",
+          "at": "2026-07-04T01:35:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1251e9684a3fde4ae66e1b1fd7c8d4f6820d1352210118c8af4fe7995d6d569b",
+          "at": "2026-07-04T01:37:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-01 through GO-04 in `spec.json` have no corresponding entries in `task-coverage.json`; that file only maps `in_scope`/`out_of_scope`/`constraints`/`acceptance_criteria`, so the four goals are completely uncovered.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/task-coverage.json",
+              "line": 3,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "T005 says `CatalogDraftError::Codec` is `Codec { message: String }`, but the contract in `infrastructure-types.json` defines `Codec { source: CatalogueDocumentCodecError }` and a `From<CatalogueDocumentCodecError>` conversion. Implementing the plan as written would produce the wrong error shape.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/plan.md",
+              "line": 41,
+              "category": "task description non-executable"
+            }
+          ],
+          "hash": "rvw1:sha256:4f878deccff16422b42b19775a68ee8a066adbae1af8906ee32ab960dceedf9b",
+          "at": "2026-07-04T06:18:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Summary block at lines 6-12 is upstream-rationale prose (for example, \"type-designer inputs intent and fills `$todo` holes\") instead of the allowed target + operation + anchor-only form.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/plan.md",
+              "line": 6,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:000f8491355dd276cec8ee5ee89762f1a96ef1b86383947c892a892984718b34",
+          "at": "2026-07-04T06:25:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T001`'s contract attributes `CatalogEntryName`, but the task text never claims to add or modify that entry. This overstates the task's catalogue-entry scope.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/task-contract.json",
+              "line": 5,
+              "category": "task-contract attribution mismatch"
+            },
+            {
+              "message": "`T002` explains why the commit must be atomic and why the lint shape matters. That's upstream rationale/behavior prose, not just target + operation + anchor cite, so it violates `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/impl-plan.json",
+              "line": 11,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`T003` and `T004` provide only prose summaries of the usecase layer and do not cite any `AC-NN`/`IN-NN`/`CN-NN`/spec anchor. Under the scope policy that makes them non-executable.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/impl-plan.json",
+              "line": 17,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "`T005`/`T006`/`T007` mix the implementation target with upstream behavior and rationale prose (`single place a draft crosses`, `schema authority`, `strict block`). That is the kind of restatement `knowledge/conventions/no-upstream-restatement.md` forbids.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/impl-plan.json",
+              "line": 29,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`T008` and `T009` omit an anchor cite, so the executable boundary is left implicit and the implementer has to infer the split from prose. That is non-executable under the scope policy.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/impl-plan.json",
+              "line": 47,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "`T010` restates the upstream CLI semantics (`fail-closed`, strict exit behavior) instead of only pointing to the anchors. That is an upstream restatement.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/impl-plan.json",
+              "line": 59,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`T011` restates the gate semantics (`interim/skip/block`, strict phase2/merge behavior) instead of only citing the anchors. That is an upstream restatement.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/impl-plan.json",
+              "line": 65,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:e7c43fbaa9eeeb9ab4e4a47e804b42ec88377893f3791b706074a2e8049b83a7",
+          "at": "2026-07-04T06:33:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1f2ac167d420e893b384e03bd6ba5952b05a43dfb0f2cb9150bba6a404d47236",
+          "at": "2026-07-04T06:42:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1f2ac167d420e893b384e03bd6ba5952b05a43dfb0f2cb9150bba6a404d47236",
+          "at": "2026-07-04T07:03:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1f2ac167d420e893b384e03bd6ba5952b05a43dfb0f2cb9150bba6a404d47236",
+          "at": "2026-07-04T08:12:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1f2ac167d420e893b384e03bd6ba5952b05a43dfb0f2cb9150bba6a404d47236",
+          "at": "2026-07-04T08:20:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7574b7d973a4ee2586956f2469a6070431bd330f8d7705609c5b52d6f47be98e",
+          "at": "2026-07-04T10:42:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7574b7d973a4ee2586956f2469a6070431bd330f8d7705609c5b52d6f47be98e",
+          "at": "2026-07-04T10:46:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cbe9e5e7eb5c9b02600b3b5d4cd84dfde81bde06ef58e95e9d7459b956e718d2",
+          "at": "2026-07-04T11:53:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cbe9e5e7eb5c9b02600b3b5d4cd84dfde81bde06ef58e95e9d7459b956e718d2",
+          "at": "2026-07-04T11:58:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8521722f5378acc8b095488d6e0e70081d40d0e756db80f3326b6f5ca4e59f81",
+          "at": "2026-07-04T12:21:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8521722f5378acc8b095488d6e0e70081d40d0e756db80f3326b6f5ca4e59f81",
+          "at": "2026-07-04T12:24:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b40d955f629dc2d574d52b2d331d1a3072007680ec8d7a750ef8c5b24e9ce901",
+          "at": "2026-07-04T13:38:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b40d955f629dc2d574d52b2d331d1a3072007680ec8d7a750ef8c5b24e9ce901",
+          "at": "2026-07-04T13:42:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:977f01de15bd7814a00e6eb2d5772839d37e5e9e02ea683d3230754c0b7080c5",
+          "at": "2026-07-04T15:52:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:977f01de15bd7814a00e6eb2d5772839d37e5e9e02ea683d3230754c0b7080c5",
+          "at": "2026-07-04T16:07:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:665ed1eb1148a7f5b1ba042bd5389edb047ff8ffebfa9aa7c634419e93ae7dfe",
+          "at": "2026-07-04T16:14:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:665ed1eb1148a7f5b1ba042bd5389edb047ff8ffebfa9aa7c634419e93ae7dfe",
+          "at": "2026-07-04T16:18:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8dcb2be3d343b73540b8c1cfb779e37fdc0c375263b0f9731b4e6b1419802d12",
+          "at": "2026-07-04T18:37:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8dcb2be3d343b73540b8c1cfb779e37fdc0c375263b0f9731b4e6b1419802d12",
+          "at": "2026-07-04T18:41:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:62a31bc0f6ae8c14d2371b54605b4317f4a5180a67a8bc3b525720b2385e1a2f",
+          "at": "2026-07-04T23:13:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:62a31bc0f6ae8c14d2371b54605b4317f4a5180a67a8bc3b525720b2385e1a2f",
+          "at": "2026-07-04T23:17:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c75bc599d9fd23a9953d24b42e4ee36bdd6967a3045b28038f1c109216bd5231",
+          "at": "2026-07-05T05:43:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c75bc599d9fd23a9953d24b42e4ee36bdd6967a3045b28038f1c109216bd5231",
+          "at": "2026-07-05T05:47:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T007` is only described in the impl-plan as `FsCatalogAdapter` verb helpers + `CatalogPort` over `IN-02/03/04/05/06/12` and `AC-02/03/04/08/10/11/12`, but these added attributions pull in `InherentImplDeclV2` and `TraitImplDeclV2` (`IN-08`/`IN-09` data-model work). That makes the task-contract over-attribute T007 to entries its description does not actually touch.",
+              "severity": "P1",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/task-contract.json",
+              "line": 49,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:7b3588f06f0395a666cc2a153de28134d4c2401f41d21338649456daa28ffc9b",
+          "at": "2026-07-05T06:19:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0f119699e577ac6e60600f2236baba1ddab54da254a50352a3b4d636953c0ee2",
+          "at": "2026-07-05T06:31:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0f119699e577ac6e60600f2236baba1ddab54da254a50352a3b4d636953c0ee2",
+          "at": "2026-07-05T06:36:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:96e8ced8a76c8fe6e9dfd51b14c7f019ba930230a23f65cd5b4267a3fc48b927",
+          "at": "2026-07-05T11:55:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:96e8ced8a76c8fe6e9dfd51b14c7f019ba930230a23f65cd5b4267a3fc48b927",
+          "at": "2026-07-05T11:58:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan.md` line 11 restates the upstream catalog-check behavior contract (`enforce ... completion semantics`) instead of staying in target + operation + anchor form. The same restatement also shows up again in S5/T011, so both should be trimmed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/plan.md",
+              "line": 11,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:851a2656b646a7c3e6a8288a498b266733250d4f408fea3cf57e7928255780ba",
+          "at": "2026-07-05T13:54:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2efad450bb1a5a2594a6e5b53aa8a408d3ca3090d2bb1f769ce0707e09d9560",
+          "at": "2026-07-05T14:02:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2efad450bb1a5a2594a6e5b53aa8a408d3ca3090d2bb1f769ce0707e09d9560",
+          "at": "2026-07-05T14:06:59Z"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1d19f89bf21b4b347c0a461faf6aeb568154c01f04ffb9142f968afca0ce9bff",
+          "at": "2026-07-04T12:15:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1d19f89bf21b4b347c0a461faf6aeb568154c01f04ffb9142f968afca0ce9bff",
+          "at": "2026-07-04T12:18:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a4d61360311e3983915bd4252491587731b729a50af6e53c5abe9029f3916190",
+          "at": "2026-07-04T15:51:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a4d61360311e3983915bd4252491587731b729a50af6e53c5abe9029f3916190",
+          "at": "2026-07-04T16:08:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5a15d870996c7005b272a6b071a6ae7cdb2e32fee6ec8a3a51d9537616befc22",
+          "at": "2026-07-05T14:23:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5a15d870996c7005b272a6b071a6ae7cdb2e32fee6ec8a3a51d9537616befc22",
+          "at": "2026-07-05T14:25:10Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0ccbad4c1757bc4097f43ceb2a125cb72e8a435debf4d4c59a82a7e0b071e577",
+          "at": "2026-07-04T10:42:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0ccbad4c1757bc4097f43ceb2a125cb72e8a435debf4d4c59a82a7e0b071e577",
+          "at": "2026-07-04T10:47:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:af2e2991490a22ba94f8ae532554ab458d52d8b8520f87b51904a2929cdd1eff",
+          "at": "2026-07-04T11:55:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:af2e2991490a22ba94f8ae532554ab458d52d8b8520f87b51904a2929cdd1eff",
+          "at": "2026-07-04T11:58:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d9b4ba20d36761f1e3991cb043c1132df0a4bc51d7e3cc90bf4cada6a3869f6f",
+          "at": "2026-07-04T15:50:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d9b4ba20d36761f1e3991cb043c1132df0a4bc51d7e3cc90bf4cada6a3869f6f",
+          "at": "2026-07-04T16:06:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d6d19d9d562ea534713b44424d0de6157cde2f8a930867c87323a3f622920a73",
+          "at": "2026-07-05T06:28:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d6d19d9d562ea534713b44424d0de6157cde2f8a930867c87323a3f622920a73",
+          "at": "2026-07-05T06:32:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e208eeead5dc94da904ec083da67d6e30a6eff8bb1e57d52cbf81d958b9b96b",
+          "at": "2026-07-05T14:09:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e208eeead5dc94da904ec083da67d6e30a6eff8bb1e57d52cbf81d958b9b96b",
+          "at": "2026-07-05T14:10:24Z"
         }
       ]
     },
@@ -1828,6 +1693,169 @@
           "findings": [],
           "hash": "rvw1:sha256:d464b121d29c18f818a838386f771aea0719306d289e97e7959cebbe238b99d2",
           "at": "2026-07-05T13:52:06Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ForbidPrimitiveInTypes` still only scans a `TypeEntry`'s shape, methods, and inherent impls. The new `TypeEntry.generics` and `TypeEntry.where_predicates` fields are never collected here, so forbidden primitives can be hidden in type-declaration bounds and the domain linter will miss them.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval_primitives.rs",
+              "line": 230,
+              "category": "typestate / parse-don't-validate gap"
+            }
+          ],
+          "hash": "rvw1:sha256:9f173b0dd8be3b22f09c74360daca60cf277f03388efb205a469439013d8f93d",
+          "at": "2026-07-04T10:44:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b99e288b3d4424ac019e9d92e1f8027bb295a11faa25cb6efd32576e41268d5d",
+          "at": "2026-07-04T10:52:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b99e288b3d4424ac019e9d92e1f8027bb295a11faa25cb6efd32576e41268d5d",
+          "at": "2026-07-04T10:58:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:05c07f4001ac2346daa04c618daa0e65ac86156a7fc530c4a401727845310166",
+          "at": "2026-07-04T11:54:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:05c07f4001ac2346daa04c618daa0e65ac86156a7fc530c4a401727845310166",
+          "at": "2026-07-04T11:58:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d34ef7f08273c88fbc588ec5db63d0af7b74826fb684100936ab12f26efe1240",
+          "at": "2026-07-04T18:24:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d34ef7f08273c88fbc588ec5db63d0af7b74826fb684100936ab12f26efe1240",
+          "at": "2026-07-04T18:28:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:94428e7c93c5c2c35e0980b5727bd26a13af430047768906e60745d257660d24",
+          "at": "2026-07-04T23:13:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:94428e7c93c5c2c35e0980b5727bd26a13af430047768906e60745d257660d24",
+          "at": "2026-07-04T23:16:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:91bf9a89bdcf4750253eef616f0e4bdfa7e837f9b49fc378fc8ea67afc624d8d",
+          "at": "2026-07-05T05:45:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:91bf9a89bdcf4750253eef616f0e4bdfa7e837f9b49fc378fc8ea67afc624d8d",
+          "at": "2026-07-05T05:50:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:91bf9a89bdcf4750253eef616f0e4bdfa7e837f9b49fc378fc8ea67afc624d8d",
+          "at": "2026-07-05T06:18:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:91bf9a89bdcf4750253eef616f0e4bdfa7e837f9b49fc378fc8ea67afc624d8d",
+          "at": "2026-07-05T06:26:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a61305ac7aaa339990b56efc5b172bbe06cc349bcfe697b482aab6f087c1c934",
+          "at": "2026-07-05T10:21:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a61305ac7aaa339990b56efc5b172bbe06cc349bcfe697b482aab6f087c1c934",
+          "at": "2026-07-05T10:24:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e0eb2bb103bb7c18d0be2825e750b884bb2d4f94d3a9133422b8cabb1ebad4ab",
+          "at": "2026-07-05T11:01:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e0eb2bb103bb7c18d0be2825e750b884bb2d4f94d3a9133422b8cabb1ebad4ab",
+          "at": "2026-07-05T11:04:24Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6e5c3f80132da943d5ec5e02c5ba28741c43dc4eb386a1392f719e560402f51a",
+          "at": "2026-07-04T15:51:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6e5c3f80132da943d5ec5e02c5ba28741c43dc4eb386a1392f719e560402f51a",
+          "at": "2026-07-04T16:06:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:138a20c6c9495faa8480a773b6f00ea0d92a01f93154cc8fd783c16348fb4058",
+          "at": "2026-07-05T14:30:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:138a20c6c9495faa8480a773b6f00ea0d92a01f93154cc8fd783c16348fb4058",
+          "at": "2026-07-05T14:40:23Z"
         }
       ]
     }

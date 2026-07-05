@@ -205,10 +205,14 @@ pub(super) fn parse_method(fragment: &str) -> Result<Value, CatalogError> {
 ///
 /// # Errors
 ///
-/// Returns [`CatalogError::ParseFragment`] when the trait reference is invalid.
+/// Returns [`CatalogError::ParseFragment`] when the trait reference is not a
+/// Rust path accepted by the catalogue codec's `trait_ref` boundary.
 pub(super) fn parse_trait_impl(fragment: &str, for_type: &str) -> Result<Value, CatalogError> {
-    let _: syn::TypeParamBound = syn::parse_str(fragment)
-        .map_err(|err| parse_error(format!("trait impl `{fragment}`: {err}")))?;
+    let _: syn::Path = syn::parse_str(fragment).map_err(|err| {
+        parse_error(format!(
+            "trait impl `{fragment}`: expected a trait path such as `From<CodecError>`: {err}"
+        ))
+    })?;
     Ok(json!({ "trait_ref": fragment.trim(), "for_type": for_type }))
 }
 
@@ -655,6 +659,18 @@ mod tests {
         let value = parse_trait_impl("From<CodecError>", "MyType").unwrap();
         assert_eq!(value["trait_ref"], json!("From<CodecError>"));
         assert_eq!(value["for_type"], json!("MyType"));
+    }
+
+    #[test]
+    fn test_parse_trait_impl_rejects_non_path_bounds() {
+        assert!(matches!(
+            parse_trait_impl("?Sized", "MyType"),
+            Err(CatalogError::ParseFragment { .. })
+        ));
+        assert!(matches!(
+            parse_trait_impl("'a", "MyType"),
+            Err(CatalogError::ParseFragment { .. })
+        ));
     }
 
     // Finding F1: lifetime and const generic parameters parse as valid Rust

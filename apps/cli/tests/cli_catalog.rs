@@ -290,6 +290,80 @@ fn catalog_add_produces_todo_and_rejects_bad_input() {
 }
 
 #[test]
+fn catalog_add_rejects_incompatible_shape_flags_before_write() {
+    let ws = setup_git_track("test-track");
+    let root = ws.path();
+    let items = items_arg(root);
+    let out = sotp(root, &["catalog", "init", "--items-dir", &items]);
+    assert!(out.status.success(), "init: {}", show(&out));
+
+    let out = sotp(
+        root,
+        &[
+            "catalog",
+            "add",
+            "--items-dir",
+            &items,
+            "--layer",
+            "domain",
+            "--kind",
+            "enum",
+            "--name",
+            "WrongShape",
+            "--role",
+            "ErrorType",
+            "--field",
+            "id: u64",
+        ],
+    );
+    assert_eq!(out.status.code(), Some(1), "incompatible --field: {}", show(&out));
+    let catalogue =
+        std::fs::read_to_string(root.join("track/items/test-track/domain-types.json")).unwrap();
+    assert!(
+        !catalogue.contains("WrongShape"),
+        "rejected shape flags must not write the entry:\n{catalogue}"
+    );
+}
+
+#[test]
+fn catalog_add_rejects_non_path_trait_impl_before_write() {
+    let ws = setup_git_track("test-track");
+    let root = ws.path();
+    let items = items_arg(root);
+    let out = sotp(root, &["catalog", "init", "--items-dir", &items]);
+    assert!(out.status.success(), "init: {}", show(&out));
+
+    let out = sotp(
+        root,
+        &[
+            "catalog",
+            "add",
+            "--items-dir",
+            &items,
+            "--layer",
+            "domain",
+            "--kind",
+            "struct",
+            "--name",
+            "BadImpl",
+            "--role",
+            "ValueObject",
+            "--field",
+            "value: u32",
+            "--trait-impl",
+            "?Sized",
+        ],
+    );
+    assert_eq!(out.status.code(), Some(1), "non-path --trait-impl: {}", show(&out));
+    let catalogue =
+        std::fs::read_to_string(root.join("track/items/test-track/domain-types.json")).unwrap();
+    assert!(
+        !catalogue.contains("BadImpl"),
+        "rejected trait impl must not write the entry:\n{catalogue}"
+    );
+}
+
+#[test]
 fn catalog_add_without_init_guides_to_init() {
     let ws = setup_git_track("test-track");
     let root = ws.path();

@@ -62,6 +62,7 @@ pub(super) fn build_add_entry(
     spec_file: &str,
     spec_anchors: &BTreeSet<SpecElementId>,
 ) -> Result<(Value, Vec<Value>), CatalogError> {
+    validate_shape_flag_compatibility(command)?;
     validate_role(command.kind, &command.role)?;
     let spec_refs = spec_refs_value(&command.anchors, spec_file, spec_anchors)?;
     let generics = parse_list(&command.generics, parse_generic)?;
@@ -110,6 +111,54 @@ pub(super) fn build_add_entry(
 
     let trait_impls = build_trait_impls(command)?;
     Ok((Value::Object(entry), trait_impls))
+}
+
+/// Reject shape flags that the selected entry kind cannot consume.
+///
+/// `catalog add` must either persist supplied shape information or fail before
+/// writing; accepting a flag and then building a kind that has no slot for it
+/// silently loses the caller's design intent.
+fn validate_shape_flag_compatibility(command: &CatalogAddCommand) -> Result<(), CatalogError> {
+    if !command.fields.is_empty() && command.kind != CatalogEntryKind::Struct {
+        return Err(incompatible_flag_error("--field", command.kind, "struct entries"));
+    }
+    if !command.variants.is_empty() && command.kind != CatalogEntryKind::Enum {
+        return Err(incompatible_flag_error("--variant", command.kind, "enum entries"));
+    }
+    if command.trait_impls.is_empty() {
+        if !command.impl_generics.is_empty() {
+            return Err(parse_error(
+                "--impl-generic requires at least one --trait-impl; otherwise the impl generic \
+                 would be dropped",
+            ));
+        }
+        if !command.impl_where_predicates.is_empty() {
+            return Err(parse_error(
+                "--impl-where requires at least one --trait-impl; otherwise the impl where \
+                 predicate would be dropped",
+            ));
+        }
+    }
+    Ok(())
+}
+
+/// Build a parse failure for a shape flag that does not apply to `kind`.
+fn incompatible_flag_error(flag: &str, kind: CatalogEntryKind, expected: &str) -> CatalogError {
+    parse_error(format!(
+        "{flag} is incompatible with --kind {}; use it only for {expected}",
+        kind_label(kind)
+    ))
+}
+
+/// User-facing label for an entry kind.
+fn kind_label(kind: CatalogEntryKind) -> &'static str {
+    match kind {
+        CatalogEntryKind::Struct => "struct",
+        CatalogEntryKind::Enum => "enum",
+        CatalogEntryKind::TypeAlias => "type-alias",
+        CatalogEntryKind::Trait => "trait",
+        CatalogEntryKind::Function => "function",
+    }
 }
 
 /// Emit the role node: a tagged object for types/traits, a bare string for
@@ -374,6 +423,35 @@ mod tests {
         let (entry, _) =
             build_add_entry(&command, "track/items/t/spec.json", &anchor_set()).unwrap();
         assert_eq!(entry["methods"].as_array().map(Vec::len), Some(2));
+    }
+
+    #[test]
+    fn test_build_add_entry_enum_rejects_field_flag() {
+        let mut command = base_command(CatalogEntryKind::Enum, "ErrorType");
+        command.fields = vec!["id: u64".to_owned()];
+        let err = build_add_entry(&command, "track/items/t/spec.json", &anchor_set()).unwrap_err();
+        assert!(matches!(err, CatalogError::ParseFragment { .. }));
+    }
+
+    #[test]
+    fn test_build_add_entry_struct_rejects_variant_flag() {
+        let mut command = base_command(CatalogEntryKind::Struct, "ValueObject");
+        command.variants = vec!["Ready".to_owned()];
+        let err = build_add_entry(&command, "track/items/t/spec.json", &anchor_set()).unwrap_err();
+        assert!(matches!(err, CatalogError::ParseFragment { .. }));
+    }
+
+    #[test]
+    fn test_build_add_entry_rejects_impl_bounds_without_trait_impl() {
+        let mut command = base_command(CatalogEntryKind::Struct, "ValueObject");
+        command.impl_generics = vec!["T: Clone".to_owned()];
+        let err = build_add_entry(&command, "track/items/t/spec.json", &anchor_set()).unwrap_err();
+        assert!(matches!(err, CatalogError::ParseFragment { .. }));
+
+        let mut command = base_command(CatalogEntryKind::Struct, "ValueObject");
+        command.impl_where_predicates = vec!["T: Send".to_owned()];
+        let err = build_add_entry(&command, "track/items/t/spec.json", &anchor_set()).unwrap_err();
+        assert!(matches!(err, CatalogError::ParseFragment { .. }));
     }
 
     #[test]
