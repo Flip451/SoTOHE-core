@@ -7,6 +7,7 @@
 | CatalogEntryKind | enum | add | Struct, Enum, TypeAlias, Trait, Function | 🔵 | 🔵 |
 | CatalogImportAction | enum | add | Reference, Modify, Delete | 🔵 | 🔵 |
 | DeletionRecord | enum | add | Type, Trait, Function | 🔵 | 🔵 |
+| StructShapeKind | enum | add | Unit, Tuple, Plain | 🔵 | 🔵 |
 
 ## Value Objects
 

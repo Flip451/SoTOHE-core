@@ -370,18 +370,18 @@
       }
     },
     {
-      "claim_hash": "22db512186f463ce4829289ff2181f9b00a5012358fa9b79224b0dcf4029cf78",
+      "claim_hash": "3728031af6b9577bf9144940f4fe83b4044090e0e85bfafd2d310f3059fec37f",
       "evidence_hash": "11932868ed61e9987ee8248c1767cfeb04a56420b09c8b3216331e580345fcea",
       "verdict": {
         "kind": "pass",
-        "citation": "型形状（fields / methods / variants / generics / where predicates / impl blocks）は Rust 宣言断片またはシグネチャ文字列として渡し、sotp が parse して構造化する（既存の TypeRef parser / syn 資産を流用）。parse できない宣言・シグネチャは入力時 reject。生成時に確定できない箇所は引数で渡さず、生成されたエントリの該当ノードを `$todo` として保留できる（D4）"
+        "citation": "型形状（fields / methods / variants / generics / where predicates / impl blocks）は Rust 宣言断片またはシグネチャ文字列として渡し、sotp が parse して構造化する（既存の TypeRef parser / syn 資産を流用）。parse できない宣言・シグネチャは入力時 reject。生成時に確定できない箇所は引数で渡さず、生成されたエントリの該当ノードを `$todo` として保留できる"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "in_scope",
           "element_id": "IN-08",
-          "text_label": "型形状（fields / methods / variants / generics / where predicates / impl blocks）の入力は Rust 宣言断片またはシグネチャ文字列として受け取り、sotp が parse して構造化する（既存の TypeRef parser / syn 資産を流用）。parse できない宣言・シグネチャは入力時 reject する。生成時に確定できない箇所は引数で渡さず、生成されたエントリの該当ノードを `$todo` として保留できる。"
+          "text_label": "型形状（fields / methods / variants / generics / where predicates / impl blocks）の入力は Rust 宣言断片またはシグネチャ文字列として受け取り、sotp が parse して構造化する（既存の TypeRef parser / syn 資産を流用）。public enum の variants は source 側に extension-tolerant な明示（例: `#[non_exhaustive]`）がない限り、downstream が exhaustive match してよい閉じた variant set として扱う。parse できない宣言・シグネチャは入力時 reject する。生成時に確定できない箇所は引数で渡さず、生成されたエントリの該当ノードを `$todo` として保留できる。"
         }
       },
       "evidence_origin": {
@@ -1359,7 +1359,7 @@
       }
     },
     {
-      "claim_hash": "a3ec51d92123aa28d46ae7c608c0a145252102095802afad7f9b9e37550f3ad6",
+      "claim_hash": "bfbb2fcea38f270e0306549344c37aadbed4a3a4f78b2141ac2f36c939e966ca",
       "evidence_hash": "11932868ed61e9987ee8248c1767cfeb04a56420b09c8b3216331e580345fcea",
       "verdict": {
         "kind": "pass",
@@ -1370,7 +1370,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-12",
-          "text_label": "生成されたエントリに対して稼働済みの catalogue linter ルール群（ロール意味論・Aggregate 境界・アーキテクチャ配置・primitive obsession 防止）と impl → catalogue の type-signals 構造検証が従来どおり動作する。完全な型情報（メソッド署名の型・trait impl 宣言・field 可視性・generic bound）が生成エントリに保持されている。"
+          "text_label": "生成されたエントリに対して稼働済みの catalogue linter ルール群（ロール意味論・Aggregate 境界・アーキテクチャ配置・primitive obsession 防止）と impl → catalogue の type-signals 構造検証が従来どおり動作する。完全な型情報（メソッド署名の型・trait impl 宣言・field 可視性・generic bound・public enum variants の閉じた集合か extension-tolerant かの区別）が生成エントリに保持されている。通常の public enum と `#[non_exhaustive]` 付き public enum の fixture / test で、前者は downstream が exhaustive match してよい閉じた variant set として扱われ、後者は extension-tolerant として保持されることが確認できる。"
         }
       },
       "evidence_origin": {
@@ -1382,18 +1382,41 @@
       }
     },
     {
-      "claim_hash": "1a81d8176da07fe2d8316b935b3c45dd78ed9105ddbeec68566934f879b32abc",
+      "claim_hash": "bfbb2fcea38f270e0306549344c37aadbed4a3a4f78b2141ac2f36c939e966ca",
       "evidence_hash": "11932868ed61e9987ee8248c1767cfeb04a56420b09c8b3216331e580345fcea",
       "verdict": {
         "kind": "pass",
-        "citation": "`sotp` が提供する API に意図（どの型に、どの role、どの spec anchor、どんな型形状）を入力すると、schema 準拠のエントリ骨格が穴埋め箇所付きでカタログ JSON に追記される"
+        "citation": "「型形状（fields / methods / variants / generics / where predicates / impl blocks）は Rust 宣言断片またはシグネチャ文字列として渡し、sotp が parse して構造化する（既存の TypeRef parser / syn 資産を流用）。」「generics / where 句は…カタログ schema の対応フィールドへ構造化する。…silent drop、docs 文字列への退避、別宣言レベルへの代用は行わない」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-12",
+          "text_label": "生成されたエントリに対して稼働済みの catalogue linter ルール群（ロール意味論・Aggregate 境界・アーキテクチャ配置・primitive obsession 防止）と impl → catalogue の type-signals 構造検証が従来どおり動作する。完全な型情報（メソッド署名の型・trait impl 宣言・field 可視性・generic bound・public enum variants の閉じた集合か extension-tolerant かの区別）が生成エントリに保持されている。通常の public enum と `#[non_exhaustive]` 付き public enum の fixture / test で、前者は downstream が exhaustive match してよい閉じた variant set として扱われ、後者は extension-tolerant として保持されることが確認できる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "20fa2f25f999309fb2060f57814926e97b712a984467711458f067c37c3cb809",
+      "evidence_hash": "11932868ed61e9987ee8248c1767cfeb04a56420b09c8b3216331e580345fcea",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp` が提供する API に意図を入力すると、schema 準拠のエントリ骨格が穴埋め箇所付きでカタログ JSON に追記される。穴埋め箇所（`$todo` ノード, D4）には記入指示を埋め込める"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-13",
-          "text_label": "`cargo make ci`（fmt-check + clippy + nextest + deny + check-layers + verify-*）が pass する。次のケースを網羅するユニット / 統合テストが追加されている: (a) `add` の骨格生成と省略形状の `$todo` 化、(b) `$todo` 走査と完成境界の Err / typed 返却、(c) 実在しない anchor / 語彙外 role の入力時 reject、(d) `import` の rustdoc からの reference / modify / delete 取り込み、(e) `check --gate phase2|commit|merge` の厳格度解決、(f) 同名エントリの error（no force）、(g) WRITE の track-id 不一致 fail-closed。既存テストへのリグレッションがない。"
+          "text_label": "`cargo make ci`（fmt-check + clippy + nextest + deny + check-layers + verify-*）が pass する。次のケースを網羅するユニット / 統合テストが追加されている: (a) `add` の骨格生成と省略形状の `$todo` 化、(b) `$todo` 走査と完成境界の Err / typed 返却、(c) 実在しない anchor / 語彙外 role の入力時 reject、(d) `import` の rustdoc からの reference / modify / delete 取り込み、(e) `check --gate phase2|commit|merge` の厳格度解決、(f) 同名エントリの error（no force）、(g) WRITE の track-id 不一致 fail-closed、(h) public enum variants が source の `#[non_exhaustive]` 有無に応じて closed / extension-tolerant として保持されること。既存テストへのリグレッションがない。"
         }
       },
       "evidence_origin": {
@@ -1405,18 +1428,18 @@
       }
     },
     {
-      "claim_hash": "1a81d8176da07fe2d8316b935b3c45dd78ed9105ddbeec68566934f879b32abc",
+      "claim_hash": "20fa2f25f999309fb2060f57814926e97b712a984467711458f067c37c3cb809",
       "evidence_hash": "11932868ed61e9987ee8248c1767cfeb04a56420b09c8b3216331e580345fcea",
       "verdict": {
         "kind": "pass",
-        "citation": "「強制は `sotp catalog check`（D8）— `$todo` 残存（try_complete の Err）・anchor 実在・role 語彙・schema 妥当の一括再検証 — が担う。Phase 2 完了ゲートでは `catalog check` を strict に実行する。TDDD 対象 layer の catalogue file 不在、`$todo` 残存、anchor 不在、role 語彙外、schema 不正はいずれも非零 exit で block する。... merge gate / Phase 2 完了ゲートでは strict に block する。」"
+        "citation": "TDDD 対象 layer の catalogue file 不在、`$todo` 残存、anchor 不在、role 語彙外、schema 不正はいずれも非零 exit で block する。"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-13",
-          "text_label": "`cargo make ci`（fmt-check + clippy + nextest + deny + check-layers + verify-*）が pass する。次のケースを網羅するユニット / 統合テストが追加されている: (a) `add` の骨格生成と省略形状の `$todo` 化、(b) `$todo` 走査と完成境界の Err / typed 返却、(c) 実在しない anchor / 語彙外 role の入力時 reject、(d) `import` の rustdoc からの reference / modify / delete 取り込み、(e) `check --gate phase2|commit|merge` の厳格度解決、(f) 同名エントリの error（no force）、(g) WRITE の track-id 不一致 fail-closed。既存テストへのリグレッションがない。"
+          "text_label": "`cargo make ci`（fmt-check + clippy + nextest + deny + check-layers + verify-*）が pass する。次のケースを網羅するユニット / 統合テストが追加されている: (a) `add` の骨格生成と省略形状の `$todo` 化、(b) `$todo` 走査と完成境界の Err / typed 返却、(c) 実在しない anchor / 語彙外 role の入力時 reject、(d) `import` の rustdoc からの reference / modify / delete 取り込み、(e) `check --gate phase2|commit|merge` の厳格度解決、(f) 同名エントリの error（no force）、(g) WRITE の track-id 不一致 fail-closed、(h) public enum variants が source の `#[non_exhaustive]` 有無に応じて closed / extension-tolerant として保持されること。既存テストへのリグレッションがない。"
         }
       },
       "evidence_origin": {
@@ -1428,18 +1451,18 @@
       }
     },
     {
-      "claim_hash": "1a81d8176da07fe2d8316b935b3c45dd78ed9105ddbeec68566934f879b32abc",
+      "claim_hash": "20fa2f25f999309fb2060f57814926e97b712a984467711458f067c37c3cb809",
       "evidence_hash": "11932868ed61e9987ee8248c1767cfeb04a56420b09c8b3216331e580345fcea",
       "verdict": {
         "kind": "pass",
-        "citation": "`sotp catalog add` — 新規型の意図入力（D2 / D6）。`--layer` / `--kind` / `--name` / `--role` / `--anchor`（repeatable）に加え、`--field` / `--method` / `--variant` / `--trait-impl`（Rust 宣言断片またはシグネチャ文字列、repeatable）で形状を渡す。... 省略した形状ノードは `$todo` で生成される（D4）"
+        "citation": "`sotp catalog add` — 新規型の意図入力（D2 / D6）。`sotp catalog import` — 既存型の取り込み（D3）。`sotp catalog check` — 完成検査（D7）。"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-13",
-          "text_label": "`cargo make ci`（fmt-check + clippy + nextest + deny + check-layers + verify-*）が pass する。次のケースを網羅するユニット / 統合テストが追加されている: (a) `add` の骨格生成と省略形状の `$todo` 化、(b) `$todo` 走査と完成境界の Err / typed 返却、(c) 実在しない anchor / 語彙外 role の入力時 reject、(d) `import` の rustdoc からの reference / modify / delete 取り込み、(e) `check --gate phase2|commit|merge` の厳格度解決、(f) 同名エントリの error（no force）、(g) WRITE の track-id 不一致 fail-closed。既存テストへのリグレッションがない。"
+          "text_label": "`cargo make ci`（fmt-check + clippy + nextest + deny + check-layers + verify-*）が pass する。次のケースを網羅するユニット / 統合テストが追加されている: (a) `add` の骨格生成と省略形状の `$todo` 化、(b) `$todo` 走査と完成境界の Err / typed 返却、(c) 実在しない anchor / 語彙外 role の入力時 reject、(d) `import` の rustdoc からの reference / modify / delete 取り込み、(e) `check --gate phase2|commit|merge` の厳格度解決、(f) 同名エントリの error（no force）、(g) WRITE の track-id 不一致 fail-closed、(h) public enum variants が source の `#[non_exhaustive]` 有無に応じて closed / extension-tolerant として保持されること。既存テストへのリグレッションがない。"
         }
       },
       "evidence_origin": {
@@ -1447,6 +1470,29 @@
         "data": {
           "file_path": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
           "decision_id": "D8"
+        }
+      }
+    },
+    {
+      "claim_hash": "20fa2f25f999309fb2060f57814926e97b712a984467711458f067c37c3cb809",
+      "evidence_hash": "11932868ed61e9987ee8248c1767cfeb04a56420b09c8b3216331e580345fcea",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「parse できない宣言・シグネチャは入力時 reject」「`$todo` として保留できる」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-13",
+          "text_label": "`cargo make ci`（fmt-check + clippy + nextest + deny + check-layers + verify-*）が pass する。次のケースを網羅するユニット / 統合テストが追加されている: (a) `add` の骨格生成と省略形状の `$todo` 化、(b) `$todo` 走査と完成境界の Err / typed 返却、(c) 実在しない anchor / 語彙外 role の入力時 reject、(d) `import` の rustdoc からの reference / modify / delete 取り込み、(e) `check --gate phase2|commit|merge` の厳格度解決、(f) 同名エントリの error（no force）、(g) WRITE の track-id 不一致 fail-closed、(h) public enum variants が source の `#[non_exhaustive]` 有無に応じて closed / extension-tolerant として保持されること。既存テストへのリグレッションがない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+          "decision_id": "D6"
         }
       }
     },

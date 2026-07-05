@@ -100,6 +100,33 @@ pub enum TypeKind {
     TypeAlias,
 }
 
+/// The declared structural form of a struct, captured from rustdoc's
+/// `StructKind` before the visibility filter drops private fields.
+///
+/// The schema exporter keeps only the public fields in a `TypeInfo`'s member
+/// list, so a plain or tuple struct whose fields are all private extracts to an
+/// empty member list — indistinguishable from a genuine unit struct by the
+/// members alone. Recording the shape discriminant plus the stripped-field flag
+/// lets a consumer (e.g. `catalog import`) emit the correct `unit` / `tuple` /
+/// `plain` shape, and its `has_stripped_fields`, even when no public field
+/// survives. `None` on a [`TypeInfo`] means the shape was not captured (a
+/// non-struct type, or an in-memory value built without extraction).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum StructShapeKind {
+    /// A unit struct (`struct Foo;`). Never has fields.
+    Unit,
+    /// A tuple struct (`struct Foo(Bar)`).
+    Tuple {
+        /// `true` when at least one positional field was stripped (private/hidden).
+        has_stripped_fields: bool,
+    },
+    /// A plain named-field struct.
+    Plain {
+        /// `true` when at least one field was stripped (private/hidden).
+        has_stripped_fields: bool,
+    },
+}
+
 /// Information about a public type (struct, enum, or type alias).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TypeInfo {
@@ -115,6 +142,10 @@ pub struct TypeInfo {
     /// as rendered by the schema exporter. `None` for non-alias types or when
     /// extraction could not resolve the target.
     alias_target: Option<String>,
+    /// For structs: the declared structural form (unit / tuple / plain) plus its
+    /// stripped-field flag, captured before the member list is filtered to public
+    /// fields. `None` for non-struct types or when extraction did not capture it.
+    struct_shape: Option<StructShapeKind>,
 }
 
 impl TypeInfo {
@@ -125,7 +156,15 @@ impl TypeInfo {
         docs: Option<String>,
         members: Vec<MemberDeclaration>,
     ) -> Self {
-        Self { name, kind, docs, members, module_path: None, alias_target: None }
+        Self {
+            name,
+            kind,
+            docs,
+            members,
+            module_path: None,
+            alias_target: None,
+            struct_shape: None,
+        }
     }
 
     /// Creates a new type info with a module path.
@@ -136,7 +175,15 @@ impl TypeInfo {
         members: Vec<MemberDeclaration>,
         module_path: String,
     ) -> Self {
-        Self { name, kind, docs, members, module_path: Some(module_path), alias_target: None }
+        Self {
+            name,
+            kind,
+            docs,
+            members,
+            module_path: Some(module_path),
+            alias_target: None,
+            struct_shape: None,
+        }
     }
 
     /// Sets the aliased target type string for a type alias (e.g., `"Vec<String>"`).
@@ -145,6 +192,16 @@ impl TypeInfo {
     #[must_use]
     pub fn with_alias_target(mut self, alias_target: Option<String>) -> Self {
         self.alias_target = alias_target;
+        self
+    }
+
+    /// Sets the declared struct shape (unit / tuple / plain + stripped-field flag).
+    ///
+    /// Non-struct types always clear this to `None`.
+    #[must_use]
+    pub fn with_struct_shape(mut self, struct_shape: Option<StructShapeKind>) -> Self {
+        self.struct_shape =
+            if matches!(&self.kind, TypeKind::Struct) { struct_shape } else { None };
         self
     }
 
@@ -176,6 +233,16 @@ impl TypeInfo {
     /// Returns the aliased target type string for a type alias, if known.
     pub fn alias_target(&self) -> Option<&str> {
         self.alias_target.as_deref()
+    }
+
+    /// Returns the declared struct shape (unit / tuple / plain), if captured.
+    pub fn struct_shape(&self) -> Option<&StructShapeKind> {
+        self.struct_shape.as_ref()
+    }
+
+    /// Returns whether any captured struct shape is valid for this type kind.
+    pub fn struct_shape_matches_kind(&self) -> bool {
+        matches!(&self.kind, TypeKind::Struct) || self.struct_shape.is_none()
     }
 }
 
@@ -518,5 +585,35 @@ mod tests {
             "domain::review".to_string(),
         );
         assert_eq!(ti.module_path(), Some("domain::review"));
+    }
+
+    #[test]
+    fn type_info_struct_shape_none_by_default() {
+        let ti = TypeInfo::new("Foo".to_string(), TypeKind::Struct, None, vec![]);
+        assert!(ti.struct_shape().is_none());
+    }
+
+    #[test]
+    fn type_info_with_struct_shape_stores_shape() {
+        let ti = TypeInfo::new("Opaque".to_string(), TypeKind::Struct, None, vec![])
+            .with_struct_shape(Some(StructShapeKind::Plain { has_stripped_fields: true }));
+        assert_eq!(ti.struct_shape(), Some(&StructShapeKind::Plain { has_stripped_fields: true }));
+    }
+
+    #[test]
+    fn test_type_info_with_struct_shape_when_kind_is_enum_clears_shape() {
+        let ti = TypeInfo::new("Kind".to_string(), TypeKind::Enum, None, vec![])
+            .with_struct_shape(Some(StructShapeKind::Plain { has_stripped_fields: true }));
+
+        assert!(ti.struct_shape().is_none());
+        assert!(ti.struct_shape_matches_kind());
+    }
+
+    #[test]
+    fn test_type_info_struct_shape_matches_kind_for_struct_shape_returns_true() {
+        let ti = TypeInfo::new("Opaque".to_string(), TypeKind::Struct, None, vec![])
+            .with_struct_shape(Some(StructShapeKind::Tuple { has_stripped_fields: false }));
+
+        assert!(ti.struct_shape_matches_kind());
     }
 }

@@ -138,7 +138,7 @@
       },
       {
         "id": "IN-08",
-        "text": "型形状（fields / methods / variants / generics / where predicates / impl blocks）の入力は Rust 宣言断片またはシグネチャ文字列として受け取り、sotp が parse して構造化する（既存の TypeRef parser / syn 資産を流用）。parse できない宣言・シグネチャは入力時 reject する。生成時に確定できない箇所は引数で渡さず、生成されたエントリの該当ノードを `$todo` として保留できる。",
+        "text": "型形状（fields / methods / variants / generics / where predicates / impl blocks）の入力は Rust 宣言断片またはシグネチャ文字列として受け取り、sotp が parse して構造化する（既存の TypeRef parser / syn 資産を流用）。public enum の variants は source 側に extension-tolerant な明示（例: `#[non_exhaustive]`）がない限り、downstream が exhaustive match してよい閉じた variant set として扱う。parse できない宣言・シグネチャは入力時 reject する。生成時に確定できない箇所は引数で渡さず、生成されたエントリの該当ノードを `$todo` として保留できる。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
@@ -557,17 +557,21 @@
     },
     {
       "id": "AC-12",
-      "text": "生成されたエントリに対して稼働済みの catalogue linter ルール群（ロール意味論・Aggregate 境界・アーキテクチャ配置・primitive obsession 防止）と impl → catalogue の type-signals 構造検証が従来どおり動作する。完全な型情報（メソッド署名の型・trait impl 宣言・field 可視性・generic bound）が生成エントリに保持されている。",
+      "text": "生成されたエントリに対して稼働済みの catalogue linter ルール群（ロール意味論・Aggregate 境界・アーキテクチャ配置・primitive obsession 防止）と impl → catalogue の type-signals 構造検証が従来どおり動作する。完全な型情報（メソッド署名の型・trait impl 宣言・field 可視性・generic bound・public enum variants の閉じた集合か extension-tolerant かの区別）が生成エントリに保持されている。通常の public enum と `#[non_exhaustive]` 付き public enum の fixture / test で、前者は downstream が exhaustive match してよい閉じた variant set として扱われ、後者は extension-tolerant として保持されることが確認できる。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
           "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+          "anchor": "D6"
         }
       ]
     },
     {
       "id": "AC-13",
-      "text": "`cargo make ci`（fmt-check + clippy + nextest + deny + check-layers + verify-*）が pass する。次のケースを網羅するユニット / 統合テストが追加されている: (a) `add` の骨格生成と省略形状の `$todo` 化、(b) `$todo` 走査と完成境界の Err / typed 返却、(c) 実在しない anchor / 語彙外 role の入力時 reject、(d) `import` の rustdoc からの reference / modify / delete 取り込み、(e) `check --gate phase2|commit|merge` の厳格度解決、(f) 同名エントリの error（no force）、(g) WRITE の track-id 不一致 fail-closed。既存テストへのリグレッションがない。",
+      "text": "`cargo make ci`（fmt-check + clippy + nextest + deny + check-layers + verify-*）が pass する。次のケースを網羅するユニット / 統合テストが追加されている: (a) `add` の骨格生成と省略形状の `$todo` 化、(b) `$todo` 走査と完成境界の Err / typed 返却、(c) 実在しない anchor / 語彙外 role の入力時 reject、(d) `import` の rustdoc からの reference / modify / delete 取り込み、(e) `check --gate phase2|commit|merge` の厳格度解決、(f) 同名エントリの error（no force）、(g) WRITE の track-id 不一致 fail-closed、(h) public enum variants が source の `#[non_exhaustive]` 有無に応じて closed / extension-tolerant として保持されること。既存テストへのリグレッションがない。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
@@ -580,6 +584,10 @@
         {
           "file": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
           "anchor": "D8"
+        },
+        {
+          "file": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+          "anchor": "D6"
         }
       ]
     },

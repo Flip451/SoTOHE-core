@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-05T08:56:01Z",
-  "declaration_hash": "be09af85692f1451ad5edff5083538d92c3af2671aa81e4164e20daa734723c2",
+  "generated_at": "2026-07-05T12:31:37Z",
+  "declaration_hash": "29d2deb170c4f93b7e12137fd29fd8bcbdc3369168c63d7c6c75263484bd895c",
   "signals": [
     {
       "type_name": "CatalogEntryKind",
@@ -121,6 +121,18 @@
       "found_items": [
         "core::cmp::Eq",
         "core::cmp::PartialEq"
+      ]
+    },
+    {
+      "type_name": "StructShapeKind",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
       ]
     },
     {

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "be09af85692f1451ad5edff5083538d92c3af2671aa81e4164e20daa734723c2",
+  "catalogue_declaration_hash": "29d2deb170c4f93b7e12137fd29fd8bcbdc3369168c63d7c6c75263484bd895c",
   "signals": [
     {
       "type_name": "CatalogEntryKind",
@@ -63,6 +63,11 @@
       "entry_hash": "7159dea7602abfa900f19ba9010a33d2c056f8936595bb7c272ddc618ae2014d"
     },
     {
+      "type_name": "StructShapeKind",
+      "signal": "blue",
+      "entry_hash": "da97dc9831bdd39a416347545cba3deade6a5bf1f7e609b723234793fd5dd962"
+    },
+    {
       "type_name": "TodoInstruction",
       "signal": "blue",
       "entry_hash": "f7b2676dd11164dadc2df0adc1eca3f77a928518d441039d6c2bd5eab45d6773"
@@ -85,7 +90,7 @@
     {
       "type_name": "TypeInfo",
       "signal": "blue",
-      "entry_hash": "55feb7ad4ae73d173a75bc0366d52cceb981c7499c6dbab335b5c80b39d69a38"
+      "entry_hash": "d3af6bf57353999efb6ef49a335f75752b4f0c438c7ef9321fa7ba0c37a49bd8"
     }
   ]
 }

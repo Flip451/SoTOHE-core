@@ -28,7 +28,7 @@
     },
     {
       "claim_hash": "ef928f307b0f3fe454b2952936851d6c6ecd792678fa494a56ce851d5efadcdc",
-      "evidence_hash": "22db512186f463ce4829289ff2181f9b00a5012358fa9b79224b0dcf4029cf78",
+      "evidence_hash": "3728031af6b9577bf9144940f4fe83b4044090e0e85bfafd2d310f3059fec37f",
       "verdict": {
         "kind": "pass",
         "citation": "型形状（fields / methods / variants / generics / where predicates / impl blocks）の入力は Rust 宣言断片またはシグネチャ文字列として受け取り、sotp が parse して構造化する"
@@ -46,7 +46,7 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-08",
-          "text_label": "型形状（fields / methods / variants / generics / where predicates / impl blocks）の入力は Rust 宣言断片またはシグネチャ文字列として受け取り、sotp が parse して構造化する（既存の TypeRef parser / syn 資産を流用）。parse できない宣言・シグネチャは入力時 reject する。生成時に確定できない箇所は引数で渡さず、生成されたエントリの該当ノードを `$todo` として保留できる。"
+          "text_label": "型形状（fields / methods / variants / generics / where predicates / impl blocks）の入力は Rust 宣言断片またはシグネチャ文字列として受け取り、sotp が parse して構造化する（既存の TypeRef parser / syn 資産を流用）。public enum の variants は source 側に extension-tolerant な明示（例: `#[non_exhaustive]`）がない限り、downstream が exhaustive match してよい閉じた variant set として扱う。parse できない宣言・シグネチャは入力時 reject する。生成時に確定できない箇所は引数で渡さず、生成されたエントリの該当ノードを `$todo` として保留できる。"
         }
       }
     },

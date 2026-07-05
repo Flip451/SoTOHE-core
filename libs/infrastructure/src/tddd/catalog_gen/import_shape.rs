@@ -15,7 +15,9 @@ use std::path::Path;
 use std::str::FromStr;
 
 use domain::plan_ref::SpecElementId;
-use domain::schema::{FunctionInfo, SchemaExport, SchemaExporter, TypeInfo, TypeKind};
+use domain::schema::{
+    FunctionInfo, SchemaExport, SchemaExporter, StructShapeKind, TypeInfo, TypeKind,
+};
 use domain::tddd::catalog_gen::CatalogImportAction;
 use domain::tddd::catalogue::MemberDeclaration;
 use domain::tddd::catalogue_v2::identifiers::{CrateName, ModulePath, TypeName};
@@ -193,7 +195,7 @@ fn path_segments(path: &str) -> Vec<&str> {
 fn kind_value(type_info: &TypeInfo) -> Value {
     match type_info.kind() {
         TypeKind::Struct => {
-            json!({ "kind": "struct", "shape": struct_shape_value(type_info.members()) })
+            json!({ "kind": "struct", "shape": struct_shape_value(type_info) })
         }
         TypeKind::Enum => {
             let variants: Vec<Value> = type_info.members().iter().map(variant_value).collect();
@@ -209,29 +211,75 @@ fn kind_value(type_info: &TypeInfo) -> Value {
     }
 }
 
-/// Build the `shape` node for a struct from its extracted members.
+/// Build the `shape` node for a struct.
 ///
-/// Rustdoc extraction flattens `StructKind` into a member list, so the shape is
-/// recovered from the field names: tuple fields are extracted with positional
-/// names (`"0"`, `"1"`, …) that are not valid Rust identifiers, plain fields
-/// keep their declared names, and a unit struct has no members. Emitting the
-/// matching shape keeps a tuple / unit struct from being written as a `plain`
-/// struct with numeric field names, which the catalogue codec rejects because a
-/// plain `FieldName` must be a Rust identifier.
-fn struct_shape_value(members: &[MemberDeclaration]) -> Value {
+/// Prefers the shape discriminant captured by rustdoc extraction
+/// ([`TypeInfo::struct_shape`]): the member list alone cannot tell a unit struct
+/// apart from a plain / tuple struct whose fields are all private, since both
+/// extract to an empty member list. A rustdoc-resolved struct therefore carries
+/// the authoritative shape plus its `has_stripped_fields` flag, so an all-private
+/// struct is emitted as `plain` / `tuple` (not `unit`) and its hidden state is
+/// surfaced. When the shape was not captured (`None` — e.g. an in-memory
+/// `TypeInfo` built without extraction), the shape is reconstructed from the
+/// member field names.
+fn struct_shape_value(type_info: &TypeInfo) -> Value {
+    let members = type_info.members();
+    match type_info.struct_shape() {
+        Some(StructShapeKind::Unit) => json!({ "kind": "unit" }),
+        Some(StructShapeKind::Tuple { has_stripped_fields }) => json!({
+            "kind": "tuple",
+            "fields": tuple_field_values(members),
+            "has_stripped_fields": *has_stripped_fields,
+        }),
+        Some(StructShapeKind::Plain { has_stripped_fields }) => json!({
+            "kind": "plain",
+            "fields": plain_field_values(members),
+            "has_stripped_fields": *has_stripped_fields,
+        }),
+        None => struct_shape_from_members(members),
+    }
+}
+
+/// Positional tuple-field type nodes (bare type strings, no `name` key).
+fn tuple_field_values(members: &[MemberDeclaration]) -> Vec<Value> {
+    members.iter().filter_map(|member| member.ty().map(|ty| json!(ty))).collect()
+}
+
+/// Named plain-field nodes (`{ "name", "ty" }`).
+fn plain_field_values(members: &[MemberDeclaration]) -> Vec<Value> {
+    members
+        .iter()
+        .filter_map(|member| member.ty().map(|ty| json!({ "name": member.name(), "ty": ty })))
+        .collect()
+}
+
+/// Reconstruct a struct `shape` node from its members when the rustdoc shape
+/// discriminant was not captured (e.g. an in-memory `TypeInfo`).
+///
+/// Tuple fields are extracted with positional names (`"0"`, `"1"`, …) that are
+/// not valid Rust identifiers, plain fields keep their declared names, and an
+/// empty member list is treated as a unit struct. Emitting the matching shape
+/// keeps a tuple / unit struct from being written as a `plain` struct with
+/// numeric field names, which the catalogue codec rejects because a plain
+/// `FieldName` must be a Rust identifier. Without the captured discriminant an
+/// all-private plain / tuple struct is indistinguishable from a unit struct;
+/// `has_stripped_fields` therefore defaults to `false` on this fallback path.
+fn struct_shape_from_members(members: &[MemberDeclaration]) -> Value {
     if members.is_empty() {
         return json!({ "kind": "unit" });
     }
     if members.iter().all(|member| member.name().parse::<usize>().is_ok()) {
-        let fields: Vec<Value> =
-            members.iter().filter_map(|member| member.ty().map(|ty| json!(ty))).collect();
-        return json!({ "kind": "tuple", "fields": fields, "has_stripped_fields": false });
+        return json!({
+            "kind": "tuple",
+            "fields": tuple_field_values(members),
+            "has_stripped_fields": false,
+        });
     }
-    let fields: Vec<Value> = members
-        .iter()
-        .filter_map(|member| member.ty().map(|ty| json!({ "name": member.name(), "ty": ty })))
-        .collect();
-    json!({ "kind": "plain", "fields": fields, "has_stripped_fields": false })
+    json!({
+        "kind": "plain",
+        "fields": plain_field_values(members),
+        "has_stripped_fields": false,
+    })
 }
 
 /// Build a `VariantDecl` node from an enum member.
@@ -556,6 +604,64 @@ mod tests {
         assert_eq!(kind["shape"]["kind"], json!("plain"));
         assert_eq!(kind["shape"]["fields"][0]["name"], json!("path"));
         assert_eq!(kind["shape"]["fields"][0]["ty"], json!("String"));
+    }
+
+    // Finding F1 (round 12): a plain struct whose fields are ALL private is
+    // extracted with an empty member list but a `StructShapeKind::Plain` hint.
+    // It must be emitted as a `plain` shape with an empty field list and
+    // `has_stripped_fields: true` — NOT misclassified as a `unit` struct, which
+    // would wrongly claim the type has no hidden state.
+    #[test]
+    fn test_kind_value_stripped_plain_struct_uses_plain_shape() {
+        let ti = TypeInfo::new("Opaque".to_owned(), TypeKind::Struct, None, vec![])
+            .with_struct_shape(Some(StructShapeKind::Plain { has_stripped_fields: true }));
+        let kind = kind_value(&ti);
+        assert_eq!(kind["kind"], json!("struct"));
+        assert_eq!(kind["shape"]["kind"], json!("plain"));
+        assert_eq!(kind["shape"]["fields"], json!([]));
+        assert_eq!(kind["shape"]["has_stripped_fields"], json!(true));
+    }
+
+    // Finding F1 (round 12): a tuple struct whose positional fields are all
+    // private is likewise extracted with an empty member list but a
+    // `StructShapeKind::Tuple` hint, and must be emitted as a `tuple` shape with
+    // `has_stripped_fields: true` rather than collapsing to `unit`.
+    #[test]
+    fn test_kind_value_stripped_tuple_struct_uses_tuple_shape() {
+        let ti = TypeInfo::new("Handle".to_owned(), TypeKind::Struct, None, vec![])
+            .with_struct_shape(Some(StructShapeKind::Tuple { has_stripped_fields: true }));
+        let kind = kind_value(&ti);
+        assert_eq!(kind["shape"]["kind"], json!("tuple"));
+        assert_eq!(kind["shape"]["fields"], json!([]));
+        assert_eq!(kind["shape"]["has_stripped_fields"], json!(true));
+    }
+
+    // A partially public plain struct keeps its public field and still reports
+    // `has_stripped_fields: true` from the captured shape hint (the member-only
+    // fallback path hard-codes `false`, which would understate hidden state).
+    #[test]
+    fn test_kind_value_plain_struct_shape_hint_reports_stripped_flag() {
+        let ti = TypeInfo::new(
+            "Partial".to_owned(),
+            TypeKind::Struct,
+            None,
+            vec![MemberDeclaration::field("visible", "String")],
+        )
+        .with_struct_shape(Some(StructShapeKind::Plain { has_stripped_fields: true }));
+        let kind = kind_value(&ti);
+        assert_eq!(kind["shape"]["kind"], json!("plain"));
+        assert_eq!(kind["shape"]["fields"][0]["name"], json!("visible"));
+        assert_eq!(kind["shape"]["has_stripped_fields"], json!(true));
+    }
+
+    // A `StructShapeKind::Unit` hint emits a `unit` shape with no `fields` node.
+    #[test]
+    fn test_kind_value_unit_shape_hint_uses_unit_shape() {
+        let ti = TypeInfo::new("Marker".to_owned(), TypeKind::Struct, None, vec![])
+            .with_struct_shape(Some(StructShapeKind::Unit));
+        let kind = kind_value(&ti);
+        assert_eq!(kind["shape"]["kind"], json!("unit"));
+        assert!(kind["shape"].get("fields").is_none());
     }
 
     // Finding F1 (round 8): an existing type alias (`pub type MyAlias =

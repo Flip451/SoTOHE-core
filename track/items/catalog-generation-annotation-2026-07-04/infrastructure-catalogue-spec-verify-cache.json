@@ -196,10 +196,10 @@
     },
     {
       "claim_hash": "5baf5e51af77da2c225d6c0afdd0cee0a163e1c7b8b406f96f5cc69f1f93dcc2",
-      "evidence_hash": "a3ec51d92123aa28d46ae7c608c0a145252102095802afad7f9b9e37550f3ad6",
+      "evidence_hash": "bfbb2fcea38f270e0306549344c37aadbed4a3a4f78b2141ac2f36c939e966ca",
       "verdict": {
         "kind": "pass",
-        "citation": "生成されたエントリに対して稼働済みの catalogue linter ルール群（ロール意味論・Aggregate 境界・アーキテクチャ配置・primitive obsession 防止）と impl → catalogue の type-signals 構造検証が従来どおり動作する。完全な型情報（メソッド署名の型・trait impl 宣言・field 可視性・generic bound）が生成エントリに保持されている。"
+        "citation": "生成されたエントリに対して稼働済みの catalogue linter ルール群（ロール意味論・Aggregate 境界・アーキテクチャ配置・primitive obsession 防止）と impl → catalogue の type-signals 構造検証が従来どおり動作する。完全な型情報が生成エントリに保持されている。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -214,7 +214,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-12",
-          "text_label": "生成されたエントリに対して稼働済みの catalogue linter ルール群（ロール意味論・Aggregate 境界・アーキテクチャ配置・primitive obsession 防止）と impl → catalogue の type-signals 構造検証が従来どおり動作する。完全な型情報（メソッド署名の型・trait impl 宣言・field 可視性・generic bound）が生成エントリに保持されている。"
+          "text_label": "生成されたエントリに対して稼働済みの catalogue linter ルール群（ロール意味論・Aggregate 境界・アーキテクチャ配置・primitive obsession 防止）と impl → catalogue の type-signals 構造検証が従来どおり動作する。完全な型情報（メソッド署名の型・trait impl 宣言・field 可視性・generic bound・public enum variants の閉じた集合か extension-tolerant かの区別）が生成エントリに保持されている。通常の public enum と `#[non_exhaustive]` 付き public enum の fixture / test で、前者は downstream が exhaustive match してよい閉じた variant set として扱われ、後者は extension-tolerant として保持されることが確認できる。"
         }
       }
     },

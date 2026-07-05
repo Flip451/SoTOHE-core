@@ -270,7 +270,13 @@
     },
     "TypeInfo": {
       "action": "modify",
-      "role": { "ValueObject": {} },
+      "role": {
+        "ValueObject": {
+          "invariants": [
+            { "name": "struct_shape_matches_kind", "predicate": { "SelfMethod": "struct_shape_matches_kind" } }
+          ]
+        }
+      },
       "kind": {
         "kind": "struct",
         "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
@@ -278,6 +284,42 @@
       "methods": [],
       "module_path": "schema",
       "docs": "Existing rustdoc extraction record for a public type. See AC-04, IN-08.",
+      "spec_refs": [
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-04" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-08" }
+      ],
+      "informal_grounds": []
+    },
+    "StructShapeKind": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Unit", "payload": { "kind": "unit" } },
+          {
+            "name": "Tuple",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "has_stripped_fields", "ty": "bool" }
+              ]
+            }
+          },
+          {
+            "name": "Plain",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "has_stripped_fields", "ty": "bool" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "schema",
+      "docs": "See AC-04, IN-08.",
       "spec_refs": [
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-04" },
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-08" }
@@ -1135,6 +1177,19 @@
           "docs": "Catalogue method declaration `TypeInfo::with_alias_target`."
         },
         {
+          "name": "with_struct_shape",
+          "receiver": "self",
+          "params": [
+            { "name": "struct_shape", "ty": "Option<StructShapeKind>" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Catalogue method declaration `TypeInfo::with_struct_shape`."
+        },
+        {
           "name": "name",
           "receiver": "&self",
           "params": [],
@@ -1199,6 +1254,28 @@
           "has_default_impl": false,
           "where_predicates": [],
           "docs": "Catalogue method declaration `TypeInfo::alias_target`."
+        },
+        {
+          "name": "struct_shape",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&StructShapeKind>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Catalogue method declaration `TypeInfo::struct_shape`."
+        },
+        {
+          "name": "struct_shape_matches_kind",
+          "receiver": "&self",
+          "params": [],
+          "returns": "bool",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Catalogue method declaration `TypeInfo::struct_shape_matches_kind`."
         }
       ]
     },
@@ -1646,6 +1723,11 @@
     { "action": "reference", "trait_ref": "core::clone::Clone",   "for_type": "TypeInfo" },
     { "trait_ref": "core::cmp::PartialEq",                        "for_type": "TypeInfo" },
     { "trait_ref": "core::cmp::Eq",                               "for_type": "TypeInfo" },
+
+    { "trait_ref": "core::fmt::Debug",         "for_type": "StructShapeKind" },
+    { "trait_ref": "core::clone::Clone",       "for_type": "StructShapeKind" },
+    { "trait_ref": "core::cmp::PartialEq",     "for_type": "StructShapeKind" },
+    { "trait_ref": "core::cmp::Eq",            "for_type": "StructShapeKind" },
 
     { "trait_ref": "core::fmt::Debug",         "for_type": "DocString" },
     { "trait_ref": "core::clone::Clone",       "for_type": "DocString" },

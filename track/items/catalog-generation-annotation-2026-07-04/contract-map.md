@@ -1,5 +1,9 @@
 <!-- Generated contract-map-renderer — DO NOT EDIT DIRECTLY -->
 ```mermaid
+---
+config:
+  layout: elk
+---
 flowchart LR
 classDef aggregate_root fill:#ede9fe,stroke:#4c1d95,stroke-width:2px
 classDef app_service fill:#ecfdf5,stroke:#059669,stroke-width:2px
@@ -54,18 +58,28 @@ subgraph domain["domain"]
     T22_domain_domain_ImplInfo_trait_def_path([trait_def_path])
     T22_domain_domain_ImplInfo_target_module_path([target_module_path])
   end
+  subgraph T29_domain_domain_StructShapeKind["schema::StructShapeKind"]
+    direction TB
+    T29_domain_domain_StructShapeKind__self[StructShapeKind]
+    T29_domain_domain_StructShapeKind_Unit[Unit]
+    T29_domain_domain_StructShapeKind_Tuple[Tuple]
+    T29_domain_domain_StructShapeKind_Plain[Plain]
+  end
   subgraph T22_domain_domain_TypeInfo["schema::TypeInfo"]
     direction TB
     T22_domain_domain_TypeInfo__self[TypeInfo]
     T22_domain_domain_TypeInfo_new([new])
     T22_domain_domain_TypeInfo_with_module_path([with_module_path])
     T22_domain_domain_TypeInfo_with_alias_target([with_alias_target])
+    T22_domain_domain_TypeInfo_with_struct_shape([with_struct_shape])
     T22_domain_domain_TypeInfo_name([name])
     T22_domain_domain_TypeInfo_kind([kind])
     T22_domain_domain_TypeInfo_docs([docs])
     T22_domain_domain_TypeInfo_members([members])
     T22_domain_domain_TypeInfo_module_path([module_path])
     T22_domain_domain_TypeInfo_alias_target([alias_target])
+    T22_domain_domain_TypeInfo_struct_shape([struct_shape])
+    T22_domain_domain_TypeInfo_struct_shape_matches_kind([struct_shape_matches_kind])
   end
   end
   subgraph domain_domain_module_tddd["domain::tddd"]
@@ -496,6 +510,9 @@ T22_domain_domain_ImplInfo_methods --> T26_domain_domain_FunctionInfo__self
 T22_domain_domain_TypeInfo_new --> T22_domain_domain_TypeInfo__self
 T22_domain_domain_TypeInfo_with_module_path --> T22_domain_domain_TypeInfo__self
 T22_domain_domain_TypeInfo_with_alias_target --> T22_domain_domain_TypeInfo__self
+T22_domain_domain_TypeInfo_with_struct_shape --o T29_domain_domain_StructShapeKind__self
+T22_domain_domain_TypeInfo_with_struct_shape --> T22_domain_domain_TypeInfo__self
+T22_domain_domain_TypeInfo_struct_shape --> T29_domain_domain_StructShapeKind__self
 T30_domain_domain_CatalogEntryName_try_new --> T30_domain_domain_CatalogEntryName__self
 T31_domain_domain_CatalogueDocument_new --> T31_domain_domain_CatalogueDocument__self
 T31_domain_domain_CatalogueDocument_types --> T23_domain_domain_TypeEntry__self
@@ -628,15 +645,22 @@ class T22_domain_domain_ImplInfo_methods method_node
 class T22_domain_domain_ImplInfo_trait_def_path method_node
 class T22_domain_domain_ImplInfo_target_module_path method_node
 class T22_domain_domain_ImplInfo__self value_object
+class T29_domain_domain_StructShapeKind_Unit variant_node
+class T29_domain_domain_StructShapeKind_Tuple variant_node
+class T29_domain_domain_StructShapeKind_Plain variant_node
+class T29_domain_domain_StructShapeKind__self value_object
 class T22_domain_domain_TypeInfo_new method_node
 class T22_domain_domain_TypeInfo_with_module_path method_node
 class T22_domain_domain_TypeInfo_with_alias_target method_node
+class T22_domain_domain_TypeInfo_with_struct_shape method_node
 class T22_domain_domain_TypeInfo_name method_node
 class T22_domain_domain_TypeInfo_kind method_node
 class T22_domain_domain_TypeInfo_docs method_node
 class T22_domain_domain_TypeInfo_members method_node
 class T22_domain_domain_TypeInfo_module_path method_node
 class T22_domain_domain_TypeInfo_alias_target method_node
+class T22_domain_domain_TypeInfo_struct_shape method_node
+class T22_domain_domain_TypeInfo_struct_shape_matches_kind method_node
 class T22_domain_domain_TypeInfo__self value_object
 class T30_domain_domain_CatalogEntryKind_Struct variant_node
 class T30_domain_domain_CatalogEntryKind_Enum variant_node
