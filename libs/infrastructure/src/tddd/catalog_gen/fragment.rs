@@ -114,24 +114,31 @@ pub(super) fn parse_variant(fragment: &str) -> Result<Value, CatalogError> {
         )));
     }
     let trimmed = fragment.trim();
-    if trimmed.contains('(') {
-        let name = leading_name(trimmed, '(');
-        let inner = extract_delimited(trimmed, '(', ')')
-            .ok_or_else(|| parse_error(format!("variant `{fragment}`: unbalanced parentheses")))?;
-        let fields = split_top_level(&inner, ',');
-        return Ok(json!({ "name": name, "payload": { "kind": "tuple", "fields": fields } }));
-    }
-    if trimmed.contains('{') {
-        let name = leading_name(trimmed, '{');
-        let inner = extract_delimited(trimmed, '{', '}')
-            .ok_or_else(|| parse_error(format!("variant `{fragment}`: unbalanced braces")))?;
-        let mut fields = Vec::new();
-        for field_frag in split_top_level(&inner, ',') {
-            fields.push(parse_field(&field_frag)?);
+    // Discriminate on the parsed `syn::Variant.fields`, not the first `(`/`{` in
+    // the raw text: a struct variant whose field type contains parentheses (e.g.
+    // `Point { coords: (u8, u8) }`) would otherwise enter the tuple branch and
+    // store everything before the paren (`Point { coords:`) as the variant name.
+    match variant.fields {
+        syn::Fields::Unnamed(_) => {
+            let name = leading_name(trimmed, '(');
+            let inner = extract_delimited(trimmed, '(', ')').ok_or_else(|| {
+                parse_error(format!("variant `{fragment}`: unbalanced parentheses"))
+            })?;
+            let fields = split_top_level(&inner, ',');
+            Ok(json!({ "name": name, "payload": { "kind": "tuple", "fields": fields } }))
         }
-        return Ok(json!({ "name": name, "payload": { "kind": "struct", "fields": fields } }));
+        syn::Fields::Named(_) => {
+            let name = leading_name(trimmed, '{');
+            let inner = extract_delimited(trimmed, '{', '}')
+                .ok_or_else(|| parse_error(format!("variant `{fragment}`: unbalanced braces")))?;
+            let mut fields = Vec::new();
+            for field_frag in split_top_level(&inner, ',') {
+                fields.push(parse_field(&field_frag)?);
+            }
+            Ok(json!({ "name": name, "payload": { "kind": "struct", "fields": fields } }))
+        }
+        syn::Fields::Unit => Ok(json!({ "name": trimmed, "payload": { "kind": "unit" } })),
     }
-    Ok(json!({ "name": trimmed, "payload": { "kind": "unit" } }))
 }
 
 /// Parse a method / function signature (`fn name<G>(recv, p: T) -> R where W`)
@@ -552,6 +559,27 @@ mod tests {
         assert_eq!(tuple["name"], json!("Pair"));
         assert_eq!(tuple["payload"]["kind"], json!("tuple"));
         assert_eq!(tuple["payload"]["fields"], json!(["i32", "u8"]));
+    }
+
+    // A struct variant whose field type contains parentheses (`(u8, u8)`) must be
+    // recognised as a struct variant, not misread as a tuple variant that stores
+    // `Point { coords:` as the name.
+    #[test]
+    fn test_parse_variant_named_with_paren_in_field_type() {
+        let value = parse_variant("Point { coords: (u8, u8) }").unwrap();
+        assert_eq!(value["name"], json!("Point"));
+        assert_eq!(value["payload"]["kind"], json!("struct"));
+        assert_eq!(value["payload"]["fields"], json!([{ "name": "coords", "ty": "(u8, u8)" }]));
+    }
+
+    // A struct variant with an `fn`-pointer field type (also parenthesised) is
+    // likewise recognised as a struct variant.
+    #[test]
+    fn test_parse_variant_named_with_fn_field_type() {
+        let value = parse_variant("Callback { f: fn(u8) }").unwrap();
+        assert_eq!(value["name"], json!("Callback"));
+        assert_eq!(value["payload"]["kind"], json!("struct"));
+        assert_eq!(value["payload"]["fields"], json!([{ "name": "f", "ty": "fn(u8)" }]));
     }
 
     #[test]
