@@ -250,7 +250,7 @@ include_function_roles = []
 
         // Declare `PayloadType` so that the variant payload edge target resolves.
         // This is necessary for the edge-config lookup to be triggered (CN-02).
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("PayloadType").unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
@@ -273,7 +273,7 @@ include_function_roles = []
             VariantName::new("Value").unwrap(),
             vec![TypeRef::new("PayloadType").unwrap()],
         );
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("MyEnum").unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
@@ -365,7 +365,7 @@ include_function_roles = []
         let mut doc = CatalogueDocument::new(3, crate_name, layer.clone());
 
         // Module-level type (creates layer → module → entry nesting).
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("ModuleType").unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
@@ -385,7 +385,7 @@ include_function_roles = []
         );
 
         // Root-level trait (creates layer → entry nesting without module subgraph).
-        doc.traits.insert(
+        doc.insert_trait(
             TraitName::new("RootTrait").unwrap(),
             TraitEntry::new(
                 ItemAction::Add,
@@ -475,8 +475,8 @@ include_function_roles = []
         let mut doc_a = CatalogueDocument::new(3, crate_a.clone(), layer.clone());
         let mut doc_b = CatalogueDocument::new(3, crate_b.clone(), layer.clone());
 
-        doc_a.traits.insert(TraitName::new("TraitA").unwrap(), make_empty_trait_entry());
-        doc_b.traits.insert(TraitName::new("TraitB").unwrap(), make_empty_trait_entry());
+        doc_a.insert_trait(TraitName::new("TraitA").unwrap(), make_empty_trait_entry());
+        doc_b.insert_trait(TraitName::new("TraitB").unwrap(), make_empty_trait_entry());
 
         let index = render::build_trait_index(&[doc_a, doc_b]);
         assert!(index.contains_key(&("crate_a".to_string(), "TraitA".to_string())));
@@ -500,7 +500,7 @@ include_function_roles = []
         let mut doc = CatalogueDocument::new(3, crate_name, layer.clone());
 
         // Root entry (module_path = [])
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("RootType").unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
@@ -520,7 +520,7 @@ include_function_roles = []
         );
 
         // Non-root entry
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("ModuleType").unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
@@ -579,7 +579,7 @@ include_function_roles = []
             None,
         );
 
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("Pending").unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
@@ -599,7 +599,7 @@ include_function_roles = []
         );
 
         // Declare `Approved` as a catalogue type so the transition edge target resolves.
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("Approved").unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
@@ -640,7 +640,7 @@ include_function_roles = []
         let layer = LayerId::try_new("domain").unwrap();
         let mut doc = CatalogueDocument::new(3, crate_name, layer.clone());
 
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("Email").unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
@@ -677,13 +677,13 @@ include_function_roles = []
             None,
         );
 
-        doc.inherent_impls.push(InherentImplDeclV2 {
+        doc.push_inherent_impl(InherentImplDeclV2 {
             type_name: TypeName::new("Email").unwrap(),
             impl_generics: vec![],
             impl_where_predicates: vec![],
             methods: vec![m1],
         });
-        doc.inherent_impls.push(InherentImplDeclV2 {
+        doc.push_inherent_impl(InherentImplDeclV2 {
             type_name: TypeName::new("Email").unwrap(),
             impl_generics: vec![],
             impl_where_predicates: vec![],
@@ -717,7 +717,7 @@ include_function_roles = []
         );
         let unit_variant = VariantDecl::unit(VariantName::new("None").unwrap());
 
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("Option").unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
@@ -756,7 +756,7 @@ include_function_roles = []
         let mut doc = CatalogueDocument::new(3, crate_name, layer.clone());
 
         // Declare `ErrorMessage` as a catalogue type so the variant payload edge resolves.
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("ErrorMessage").unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
@@ -782,7 +782,7 @@ include_function_roles = []
         let struct_variant =
             VariantDecl::struct_variant(VariantName::new("Error").unwrap(), vec![field]);
 
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("AppError").unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
@@ -823,7 +823,7 @@ include_function_roles = []
         let mut doc = CatalogueDocument::new(3, crate_name, layer.clone());
 
         // Declare `Email` as a catalogue type so the field edge target resolves.
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("Email").unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
@@ -844,7 +844,7 @@ include_function_roles = []
 
         let field =
             FieldDecl::new(FieldName::new("email").unwrap(), TypeRef::new("Email").unwrap());
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("User").unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
@@ -881,7 +881,7 @@ include_function_roles = []
 
         let field =
             FieldDecl::new(FieldName::new("secret").unwrap(), TypeRef::new("SecretKey").unwrap());
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("Config").unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
@@ -929,7 +929,7 @@ include_function_roles = []
 
         // Declare both target types so that positional edges can be resolved.
         for type_name in ["UserId", "GroupId"] {
-            doc.types.insert(
+            doc.insert_type(
                 TypeName::new(type_name).unwrap(),
                 TypeEntry::new(
                     ItemAction::Add,
@@ -949,7 +949,7 @@ include_function_roles = []
             );
         }
 
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("Pair").unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
@@ -1005,7 +1005,7 @@ include_function_roles = []
         let mut doc = CatalogueDocument::new(3, crate_name, layer.clone());
 
         // Declare the alias target so the alias_of edge resolves.
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("RawId").unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
@@ -1024,7 +1024,7 @@ include_function_roles = []
             ),
         );
 
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("UserId").unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
@@ -1061,10 +1061,10 @@ include_function_roles = []
         let mut doc = CatalogueDocument::new(3, crate_name.clone(), layer.clone());
 
         // Add a trait to the catalogue so it appears in the trait index.
-        doc.traits.insert(TraitName::new("MyPort").unwrap(), make_empty_trait_entry());
+        doc.insert_trait(TraitName::new("MyPort").unwrap(), make_empty_trait_entry());
 
         // Add a type.
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("MyAdapter").unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
@@ -1084,7 +1084,7 @@ include_function_roles = []
         );
 
         // Trait impl: MyAdapter implements MyPort.
-        doc.trait_impls.push(TraitImplDeclV2::new(
+        doc.push_trait_impl(TraitImplDeclV2::new(
             TypeRef::new("MyPort").unwrap(),
             TypeRef::new("MyAdapter").unwrap(),
         ));
@@ -1177,7 +1177,7 @@ include_function_roles = []
         // domain catalogue: declares MyPort trait.
         let mut domain_doc =
             CatalogueDocument::new(3, CrateName::new("domain").unwrap(), domain_layer.clone());
-        domain_doc.traits.insert(TraitName::new("MyPort").unwrap(), make_empty_trait_entry());
+        domain_doc.insert_trait(TraitName::new("MyPort").unwrap(), make_empty_trait_entry());
 
         // infrastructure catalogue: declares MyAdapter type + cross-crate trait impl.
         let mut infra_doc = CatalogueDocument::new(
@@ -1185,7 +1185,7 @@ include_function_roles = []
             CrateName::new("infrastructure").unwrap(),
             infra_layer.clone(),
         );
-        infra_doc.types.insert(
+        infra_doc.insert_type(
             TypeName::new("MyAdapter").unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
@@ -1204,7 +1204,7 @@ include_function_roles = []
             ),
         );
         // Qualified cross-crate trait_ref (as used in real catalogues).
-        infra_doc.trait_impls.push(TraitImplDeclV2::new(
+        infra_doc.push_trait_impl(TraitImplDeclV2::new(
             TypeRef::new("domain::tddd::MyPort").unwrap(),
             TypeRef::new("MyAdapter").unwrap(),
         ));
@@ -1231,7 +1231,7 @@ include_function_roles = []
             let layer = LayerId::try_new("domain").unwrap();
             let mut doc =
                 CatalogueDocument::new(3, CrateName::new("domain").unwrap(), layer.clone());
-            doc.types.insert(
+            doc.insert_type(
                 TypeName::new("MyType").unwrap(),
                 TypeEntry::new(
                     ItemAction::Add,
@@ -1249,7 +1249,7 @@ include_function_roles = []
                     vec![],
                 ),
             );
-            doc.trait_impls.push(TraitImplDeclV2::new(
+            doc.push_trait_impl(TraitImplDeclV2::new(
                 TypeRef::new(trait_ref).unwrap(),
                 TypeRef::new("MyType").unwrap(),
             ));
@@ -1277,7 +1277,7 @@ include_function_roles = []
         let mut doc = CatalogueDocument::new(3, crate_name, layer.clone());
 
         // Deleted trait — must be absent from output and trait index.
-        doc.traits.insert(
+        doc.insert_trait(
             TraitName::new("RemovedTrait").unwrap(),
             TraitEntry::new(
                 ItemAction::Delete,
@@ -1297,7 +1297,7 @@ include_function_roles = []
 
         // A type that tries to impl the deleted trait — the trait_impl edge must be skipped
         // (deleted trait is absent from the trait index).
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("MyAdapter").unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
@@ -1315,7 +1315,7 @@ include_function_roles = []
                 vec![],
             ),
         );
-        doc.trait_impls.push(TraitImplDeclV2::new(
+        doc.push_trait_impl(TraitImplDeclV2::new(
             TypeRef::new("RemovedTrait").unwrap(),
             TypeRef::new("MyAdapter").unwrap(),
         ));
@@ -1351,7 +1351,7 @@ include_function_roles = []
 
         let fn_path =
             FunctionPath::at_root(crate_name.clone(), FunctionName::new("removed_fn").unwrap());
-        doc.functions.insert(
+        doc.insert_function(
             fn_path,
             FunctionEntry::new(
                 ItemAction::Delete,
@@ -1395,7 +1395,7 @@ include_function_roles = []
         // `name: String` — `String` is not a catalogue entry; edge must be silently skipped.
         let field =
             FieldDecl::new(FieldName::new("name").unwrap(), TypeRef::new("String").unwrap());
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("Product").unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
@@ -1451,7 +1451,7 @@ include_function_roles = []
             false,
             None,
         );
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("Converter").unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
@@ -1500,7 +1500,7 @@ include_function_roles = []
         let mut doc = CatalogueDocument::new(3, crate_name, layer.clone());
 
         // Type that is being deleted.
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("OldToken").unwrap(),
             TypeEntry::new(
                 ItemAction::Delete,
@@ -1522,7 +1522,7 @@ include_function_roles = []
         // Type with a field pointing at the deleted type — edge must be silently skipped.
         let field =
             FieldDecl::new(FieldName::new("token").unwrap(), TypeRef::new("OldToken").unwrap());
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("Session").unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
@@ -1573,7 +1573,7 @@ include_function_roles = []
 
         // Declare both result variants as catalogue types.
         for type_name in ["ContractMapContent", "ContractMapRendererError"] {
-            doc.types.insert(
+            doc.insert_type(
                 TypeName::new(type_name).unwrap(),
                 TypeEntry::new(
                     ItemAction::Add,
@@ -1602,7 +1602,7 @@ include_function_roles = []
             false,
             None,
         );
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("ContractMapRenderer").unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
@@ -1661,7 +1661,7 @@ include_function_roles = []
             let layer = LayerId::try_new("domain").unwrap();
             let mut doc = CatalogueDocument::new(3, crate_name, layer.clone());
 
-            doc.types.insert(
+            doc.insert_type(
                 TypeName::new(target_type).unwrap(),
                 TypeEntry::new(
                     ItemAction::Add,
@@ -1691,7 +1691,7 @@ include_function_roles = []
                 false,
                 None,
             );
-            doc.types.insert(
+            doc.insert_type(
                 TypeName::new(owner_type).unwrap(),
                 TypeEntry::new(
                     ItemAction::Add,
@@ -1757,7 +1757,7 @@ include_function_roles = []
             false,
             None,
         );
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("Store").unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
@@ -1814,7 +1814,7 @@ include_function_roles = []
         let mut doc = CatalogueDocument::new(3, crate_name.clone(), layer.clone());
 
         // Declare a trait that will be the impl target.
-        doc.traits.insert(TraitName::new("ContractMapRenderer").unwrap(), make_empty_trait_entry());
+        doc.insert_trait(TraitName::new("ContractMapRenderer").unwrap(), make_empty_trait_entry());
 
         // Declare an adapter with a constructor method returning Self.
         let new_method = MethodDeclaration::new(
@@ -1825,7 +1825,7 @@ include_function_roles = []
             false,
             None,
         );
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("ContractMapRendererAdapter").unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
@@ -1845,7 +1845,7 @@ include_function_roles = []
         );
 
         // Trait impl: ContractMapRendererAdapter implements ContractMapRenderer.
-        doc.trait_impls.push(TraitImplDeclV2::new(
+        doc.push_trait_impl(TraitImplDeclV2::new(
             TypeRef::new("ContractMapRenderer").unwrap(),
             TypeRef::new("ContractMapRendererAdapter").unwrap(),
         ));
@@ -1924,7 +1924,7 @@ include_function_roles = []
         let layer = LayerId::try_new("domain").unwrap();
         let mut doc = CatalogueDocument::new(3, crate_name, layer.clone());
 
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("MyType").unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
@@ -1942,7 +1942,7 @@ include_function_roles = []
                 vec![],
             ),
         );
-        doc.traits.insert(TraitName::new("MyTrait").unwrap(), make_empty_trait_entry());
+        doc.insert_trait(TraitName::new("MyTrait").unwrap(), make_empty_trait_entry());
 
         let result = adapter.render(&[doc], &[layer], &opts).unwrap();
         let output = result.as_ref();

@@ -12,9 +12,9 @@ use domain::tddd::catalogue_v2::entries::{TraitEntry, TypeEntry};
 use domain::tddd::catalogue_v2::identifiers::{DocString, FieldName, VariantName};
 use domain::tddd::catalogue_v2::variants::{FieldDecl, VariantDecl, VariantPayload};
 use domain::tddd::catalogue_v2::{
-    BoundOp, CatalogueDocument, CrateName, FunctionPath, ItemAction, MethodDeclaration,
-    MethodGenericParam, MethodName, ModulePath, ParamDeclaration, ParamName, SelfReceiver,
-    TraitImplDeclV2, TraitName, TypeName, TypeRef, WherePredicateDecl,
+    BoundOp, CatalogueDocument, CrateName, DeletionRecord, FunctionPath, ItemAction,
+    MethodDeclaration, MethodGenericParam, MethodName, ModulePath, ParamDeclaration, ParamName,
+    SelfReceiver, TraitImplDeclV2, TraitName, TypeName, TypeRef, WherePredicateDecl,
 };
 
 use crate::tddd::spec_ground_codec::{informal_grounds_from_dtos, spec_refs_from_dtos};
@@ -30,6 +30,7 @@ use super::dto::{
     ParamDto, StructShapeDto, TraitEntryDto, TraitImplDto, TypeEntryDto, TypeKindDto,
     TypestateMarkerDto, VariantDeclDto, VariantPayloadDto, WherePredicateDeclDto,
 };
+use super::dto_slots::{EntrySlotDto, TombstoneDto};
 use super::validate::validate_bound_str;
 pub(super) use super::validate::{validate_trait_ref_is_path, validate_type_ref_str}; // re-exported for encode.rs
 
@@ -53,26 +54,43 @@ pub(super) fn dto_to_domain(
 
     let mut doc = CatalogueDocument::new(dto.schema_version, crate_name, layer);
 
-    // Types
-    for (type_name_str, entry_dto) in dto.types {
+    // Types — an `action: delete` slot becomes an identity-only deletion record
+    // (routed to `doc.deletions`) rather than a live `types` entry.
+    for (type_name_str, slot) in dto.types {
         let type_name = TypeName::new(&type_name_str)
             .map_err(|e| err(&type_name_str, format!("invalid type name: {e}")))?;
-        let entry = type_entry_from_dto(&type_name_str, entry_dto)?;
-        doc.types.insert(type_name, entry);
+        match slot {
+            EntrySlotDto::Tombstone(tombstone) => {
+                let module_path = tombstone_module_path(&type_name_str, &tombstone)?;
+                doc.push_deletion(DeletionRecord::Type { name: type_name, module_path });
+            }
+            EntrySlotDto::Live(entry_dto) => {
+                let entry = type_entry_from_dto(&type_name_str, entry_dto)?;
+                doc.insert_type(type_name, entry);
+            }
+        }
     }
 
     // Traits
-    for (trait_name_str, entry_dto) in dto.traits {
+    for (trait_name_str, slot) in dto.traits {
         let trait_name = TraitName::new(&trait_name_str)
             .map_err(|e| err(&trait_name_str, format!("invalid trait name: {e}")))?;
-        let entry = trait_entry_from_dto(&trait_name_str, entry_dto)?;
-        doc.traits.insert(trait_name, entry);
+        match slot {
+            EntrySlotDto::Tombstone(tombstone) => {
+                let module_path = tombstone_module_path(&trait_name_str, &tombstone)?;
+                doc.push_deletion(DeletionRecord::Trait { name: trait_name, module_path });
+            }
+            EntrySlotDto::Live(entry_dto) => {
+                let entry = trait_entry_from_dto(&trait_name_str, entry_dto)?;
+                doc.insert_trait(trait_name, entry);
+            }
+        }
     }
 
     // Functions
     // D4: all function path keys must start with `<crate_name>::`
     let expected_prefix = format!("{}::", dto.crate_name);
-    for (fn_path_str, entry_dto) in dto.functions {
+    for (fn_path_str, slot) in dto.functions {
         if !fn_path_str.starts_with(&expected_prefix) {
             return Err(CatalogueDocumentCodecError::CrossCrateFunctionPath {
                 key: fn_path_str,
@@ -81,23 +99,62 @@ pub(super) fn dto_to_domain(
         }
         let fn_path = FunctionPath::from_str(&fn_path_str)
             .map_err(|e| err(&fn_path_str, format!("invalid function path: {e}")))?;
-        let entry = function_entry_from_dto(&fn_path_str, entry_dto)?;
-        doc.functions.insert(fn_path, entry);
+        match slot {
+            // A function's module is embedded in its path key, so the tombstone
+            // body carries no module_path of its own. Reject non-empty values
+            // instead of silently dropping them on re-encode.
+            EntrySlotDto::Tombstone(tombstone) => {
+                if !tombstone.module_path.is_empty() {
+                    return Err(CatalogueDocumentCodecError::InvalidEntry {
+                        entry_name: fn_path_str,
+                        reason: "function delete tombstone must not carry module_path; \
+                                 the function path map key is the full identity"
+                            .to_owned(),
+                    });
+                }
+                doc.push_deletion(DeletionRecord::Function { path: fn_path });
+            }
+            EntrySlotDto::Live(entry_dto) => {
+                let entry = function_entry_from_dto(&fn_path_str, entry_dto)?;
+                doc.insert_function(fn_path, entry);
+            }
+        }
     }
 
     // InherentImpls
     for impl_dto in dto.inherent_impls {
         let impl_decl = inherent_impl_from_dto(impl_dto)?;
-        doc.inherent_impls.push(impl_decl);
+        doc.push_inherent_impl(impl_decl);
     }
 
     // TraitImpls (top-level, ADR `2026-05-20-0048` D1)
     for ti_dto in dto.trait_impls {
         let ti = trait_impl_from_dto(ti_dto)?;
-        doc.trait_impls.push(ti);
+        doc.push_trait_impl(ti);
     }
 
     Ok(doc)
+}
+
+/// Resolve the crate-relative `module_path` of a deletion tombstone.
+///
+/// An empty `module_path` denotes the crate root; a non-empty value is parsed as
+/// a [`ModulePath`], surfacing a malformed path as an `InvalidEntry` keyed by the
+/// deleted entry's name.
+fn tombstone_module_path(
+    entry_name: &str,
+    tombstone: &TombstoneDto,
+) -> Result<ModulePath, CatalogueDocumentCodecError> {
+    if tombstone.module_path.is_empty() {
+        Ok(ModulePath::root())
+    } else {
+        ModulePath::from_str(&tombstone.module_path).map_err(|e| {
+            CatalogueDocumentCodecError::InvalidEntry {
+                entry_name: entry_name.to_owned(),
+                reason: format!("invalid delete module_path '{}': {e}", tombstone.module_path),
+            }
+        })
+    }
 }
 
 // ---------------------------------------------------------------------------

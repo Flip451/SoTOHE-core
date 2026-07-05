@@ -519,7 +519,7 @@ mod tests {
             spec_refs,
             informal_grounds,
         );
-        doc.types.insert(TypeName::new(name).unwrap(), entry);
+        doc.insert_type(TypeName::new(name).unwrap(), entry);
         doc
     }
 
@@ -557,7 +557,7 @@ mod tests {
                 spec_refs,
                 informal_grounds,
             );
-            doc.types.insert(TypeName::new(name).unwrap(), entry);
+            doc.insert_type(TypeName::new(name).unwrap(), entry);
         }
         doc
     }

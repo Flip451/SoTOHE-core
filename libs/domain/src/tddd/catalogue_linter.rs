@@ -989,7 +989,7 @@ mod tests {
         // always empty for that role).  The evaluator must return InvalidRuleConfig
         // rather than silently treating every Entity as a violation (D19 fail-closed).
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("MyEntity").unwrap(),
             make_type_entry(DataRole::entity().unwrap()),
         );
@@ -999,7 +999,7 @@ mod tests {
         )
         .unwrap();
         let all = all_catalogues_single(&doc);
-        let target_layer = doc.layer.clone();
+        let target_layer = doc.layer().clone();
         let result = evaluate_catalogue_lint(&[rule], &all, &target_layer, &StubPrimitiveScanner);
         assert!(
             matches!(
@@ -1018,7 +1018,7 @@ mod tests {
         // for that role, so the rule trivially fires false negatives).  The
         // evaluator must return InvalidRuleConfig (D19 fail-closed).
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("MyUseCase").unwrap(),
             make_type_entry(DataRole::UseCase { handles: vec![] }),
         );
@@ -1028,7 +1028,7 @@ mod tests {
         )
         .unwrap();
         let all = all_catalogues_single(&doc);
-        let target_layer = doc.layer.clone();
+        let target_layer = doc.layer().clone();
         let result = evaluate_catalogue_lint(&[rule], &all, &target_layer, &StubPrimitiveScanner);
         assert!(
             matches!(
@@ -1046,7 +1046,7 @@ mod tests {
         // accepted because many DataRole variants never carry "emits" and would
         // be false positives if those entries were present.
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("MyService").unwrap(),
             make_type_entry(DataRole::DomainService {
                 emits: vec![TypeRef::new("OrderPlaced").unwrap()],
@@ -1058,7 +1058,7 @@ mod tests {
         )
         .unwrap();
         let all = all_catalogues_single(&doc);
-        let target_layer = doc.layer.clone();
+        let target_layer = doc.layer().clone();
         let result = evaluate_catalogue_lint(&[rule], &all, &target_layer, &StubPrimitiveScanner);
         assert!(
             matches!(
@@ -1075,7 +1075,7 @@ mod tests {
         // An empty RuleTarget means all roles. FieldEmpty "emits" must not be
         // accepted because roles that never carry "emits" would silently pass.
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("MyService").unwrap(),
             make_type_entry(DataRole::DomainService { emits: vec![] }),
         );
@@ -1085,7 +1085,7 @@ mod tests {
         )
         .unwrap();
         let all = all_catalogues_single(&doc);
-        let target_layer = doc.layer.clone();
+        let target_layer = doc.layer().clone();
         let result = evaluate_catalogue_lint(&[rule], &all, &target_layer, &StubPrimitiveScanner);
         assert!(
             matches!(
@@ -1247,7 +1247,7 @@ mod tests {
     /// call `evaluate_catalogue_lint`. Helper for single-layer tests.
     fn all_catalogues_single(doc: &CatalogueDocument) -> BTreeMap<LayerId, CatalogueDocument> {
         let mut map = BTreeMap::new();
-        map.insert(doc.layer.clone(), doc.clone());
+        map.insert(doc.layer().clone(), doc.clone());
         map
     }
 
@@ -1395,7 +1395,7 @@ mod tests {
     ) -> Vec<CatalogueLintViolation> {
         let rule = CatalogueLinterRule::new(target, kind).unwrap();
         let all = all_catalogues_single(doc);
-        let target_layer = doc.layer.clone();
+        let target_layer = doc.layer().clone();
         evaluate_catalogue_lint(&[rule], &all, &target_layer, &StubPrimitiveScanner).unwrap()
     }
 
@@ -1404,11 +1404,11 @@ mod tests {
     ) {
         let rule_kind = kind.discriminant_name();
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("OrderAgg").unwrap(),
             make_type_entry(DataRole::aggregate_root().unwrap()),
         );
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("OrderEntity").unwrap(),
             make_type_entry(DataRole::Entity {
                 identity: identity_accessor("id"),
@@ -1423,7 +1423,7 @@ mod tests {
         .unwrap();
 
         let all = all_catalogues_single(&doc);
-        let target_layer = doc.layer.clone();
+        let target_layer = doc.layer().clone();
         let result = evaluate_catalogue_lint(&[rule], &all, &target_layer, &StubPrimitiveScanner);
 
         assert!(
@@ -1444,7 +1444,7 @@ mod tests {
     fn test_field_empty_happy_path_when_field_is_empty() {
         // DomainService with emits: [] → FieldEmpty "emits" → no violation
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("MyService").unwrap(),
             make_type_entry(DataRole::DomainService { emits: vec![] }),
         );
@@ -1460,7 +1460,7 @@ mod tests {
     fn test_field_empty_violation_when_field_is_not_empty() {
         // DomainService with emits: ["OrderPlaced"] → FieldEmpty "emits" → 1 violation
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("MyService").unwrap(),
             make_type_entry(DataRole::DomainService {
                 emits: vec![TypeRef::new("OrderPlaced").unwrap()],
@@ -1482,7 +1482,7 @@ mod tests {
         // FieldEmpty only evaluates TypeEntry/DataRole entries. A ContractRole-only
         // target would otherwise iterate no entries and return success.
         let mut doc = make_doc("domain");
-        doc.traits.insert(
+        doc.insert_trait(
             TraitName::new("OrderRepo").unwrap(),
             make_trait_entry(ContractRole::Repository {
                 aggregate: TypeRef::new("Order").unwrap(),
@@ -1496,7 +1496,7 @@ mod tests {
         .unwrap();
 
         let all = all_catalogues_single(&doc);
-        let target_layer = doc.layer.clone();
+        let target_layer = doc.layer().clone();
         let result = evaluate_catalogue_lint(&[rule], &all, &target_layer, &StubPrimitiveScanner);
 
         assert!(
@@ -1517,7 +1517,7 @@ mod tests {
     fn test_field_non_empty_happy_path_when_field_is_non_empty() {
         // UseCase with handles: ["OrderCommand"] → FieldNonEmpty "handles" → no violation
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("MyUseCase").unwrap(),
             make_type_entry(DataRole::UseCase {
                 handles: vec![TypeRef::new("OrderCommand").unwrap()],
@@ -1535,7 +1535,7 @@ mod tests {
     fn test_field_non_empty_violation_when_field_is_empty() {
         // UseCase with handles: [] → FieldNonEmpty "handles" → 1 violation
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("MyUseCase").unwrap(),
             make_type_entry(DataRole::UseCase { handles: vec![] }),
         );
@@ -1555,7 +1555,7 @@ mod tests {
         // FieldNonEmpty only evaluates TypeEntry/DataRole entries. A ContractRole-only
         // target would otherwise iterate no entries and return success.
         let mut doc = make_doc("domain");
-        doc.traits.insert(
+        doc.insert_trait(
             TraitName::new("OrderRepo").unwrap(),
             make_trait_entry(ContractRole::Repository {
                 aggregate: TypeRef::new("Order").unwrap(),
@@ -1569,7 +1569,7 @@ mod tests {
         .unwrap();
 
         let all = all_catalogues_single(&doc);
-        let target_layer = doc.layer.clone();
+        let target_layer = doc.layer().clone();
         let result = evaluate_catalogue_lint(&[rule], &all, &target_layer, &StubPrimitiveScanner);
 
         assert!(
@@ -1590,7 +1590,7 @@ mod tests {
     fn test_kind_layer_constraint_happy_path_when_layer_is_permitted() {
         // EventPolicy in domain layer → permitted_layers: [domain] → no violation
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("MyEventPolicy").unwrap(),
             make_type_entry(DataRole::EventPolicy {
                 reacts_to: NonEmptyVec::new(TypeRef::new("OrderPlaced").unwrap(), vec![]),
@@ -1611,7 +1611,7 @@ mod tests {
         // Table-driven: EventPolicy in various non-domain layers → 1 violation each
         for disallowed_layer in ["usecase", "infrastructure"] {
             let mut doc = make_doc(disallowed_layer);
-            doc.types.insert(
+            doc.insert_type(
                 TypeName::new("MyEventPolicy").unwrap(),
                 make_type_entry(DataRole::EventPolicy {
                     reacts_to: NonEmptyVec::new(TypeRef::new("OrderPlaced").unwrap(), vec![]),
@@ -1645,8 +1645,7 @@ mod tests {
             CrateName::new("domain").unwrap(),
             FunctionName::new("register_user").unwrap(),
         );
-        doc.functions
-            .insert(function_path.clone(), make_function_entry(FunctionRole::FreeFunction));
+        doc.insert_function(function_path.clone(), make_function_entry(FunctionRole::FreeFunction));
 
         let violations = run_rule(
             &doc,
@@ -1674,9 +1673,11 @@ mod tests {
     fn test_referenced_role_constraint_happy_path_when_role_matches() {
         // AggregateRoot emits→["OrderPlaced"] where OrderPlaced is DomainEvent → no violation
         let mut doc = make_doc("domain");
-        doc.types
-            .insert(TypeName::new("OrderPlaced").unwrap(), make_type_entry(DataRole::DomainEvent));
-        doc.types.insert(
+        doc.insert_type(
+            TypeName::new("OrderPlaced").unwrap(),
+            make_type_entry(DataRole::DomainEvent),
+        );
+        doc.insert_type(
             TypeName::new("OrderAgg").unwrap(),
             make_type_entry(DataRole::AggregateRoot {
                 identity: identity_accessor("id"),
@@ -1701,14 +1702,14 @@ mod tests {
     fn test_referenced_role_constraint_violation_when_wrong_role() {
         // AggregateRoot emits→["OrderEntity"] where OrderEntity is Entity (not DomainEvent) → 1 violation
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("OrderEntity").unwrap(),
             make_type_entry(DataRole::Entity {
                 identity: identity_accessor("id"),
                 invariants: vec![],
             }),
         );
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("OrderAgg").unwrap(),
             make_type_entry(DataRole::AggregateRoot {
                 identity: identity_accessor("id"),
@@ -1746,7 +1747,7 @@ mod tests {
         let mut doc = make_doc("domain");
         // Add a Repository trait entry so the rule has at least one candidate entry
         // to iterate if the pre-check were absent.
-        doc.traits.insert(
+        doc.insert_trait(
             TraitName::new("OrderRepo").unwrap(),
             make_trait_entry(ContractRole::Repository {
                 aggregate: TypeRef::new("Order").unwrap(),
@@ -1763,7 +1764,7 @@ mod tests {
         .unwrap();
 
         let all = all_catalogues_single(&doc);
-        let target_layer = doc.layer.clone();
+        let target_layer = doc.layer().clone();
         let result = evaluate_catalogue_lint(&[rule], &all, &target_layer, &StubPrimitiveScanner);
 
         assert!(
@@ -1780,13 +1781,15 @@ mod tests {
     fn test_trait_impl_required_happy_path_when_all_traits_present() {
         // ValueObject with PartialEq + Eq in trait_impls → no violation
         let mut doc = make_doc("domain");
-        doc.types
-            .insert(TypeName::new("MyValue").unwrap(), make_type_entry(DataRole::value_object()));
-        doc.trait_impls.push(TraitImplDeclV2::new(
+        doc.insert_type(
+            TypeName::new("MyValue").unwrap(),
+            make_type_entry(DataRole::value_object()),
+        );
+        doc.push_trait_impl(TraitImplDeclV2::new(
             TypeRef::new("PartialEq").unwrap(),
             TypeRef::new("MyValue").unwrap(),
         ));
-        doc.trait_impls.push(TraitImplDeclV2::new(
+        doc.push_trait_impl(TraitImplDeclV2::new(
             TypeRef::new("Eq").unwrap(),
             TypeRef::new("MyValue").unwrap(),
         ));
@@ -1807,9 +1810,11 @@ mod tests {
     fn test_trait_impl_required_violation_when_trait_missing() {
         // ValueObject with only PartialEq (missing Eq) → 1 violation
         let mut doc = make_doc("domain");
-        doc.types
-            .insert(TypeName::new("MyValue").unwrap(), make_type_entry(DataRole::value_object()));
-        doc.trait_impls.push(TraitImplDeclV2::new(
+        doc.insert_type(
+            TypeName::new("MyValue").unwrap(),
+            make_type_entry(DataRole::value_object()),
+        );
+        doc.push_trait_impl(TraitImplDeclV2::new(
             TypeRef::new("PartialEq").unwrap(),
             TypeRef::new("MyValue").unwrap(),
         ));
@@ -1837,7 +1842,7 @@ mod tests {
     fn test_no_role_in_method_signature_happy_path_when_no_forbidden_role_in_sig() {
         // ValueObject method returns "String" (not Entity) → no violation
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("MyValue").unwrap(),
             make_type_entry_with_methods(
                 DataRole::value_object(),
@@ -1861,14 +1866,14 @@ mod tests {
     fn test_no_role_in_method_signature_violation_when_forbidden_role_in_return() {
         // ValueObject method returns "OrderEntity" which is Entity → 1 violation
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("OrderEntity").unwrap(),
             make_type_entry(DataRole::Entity {
                 identity: identity_accessor("id"),
                 invariants: vec![],
             }),
         );
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("MyValue").unwrap(),
             make_type_entry_with_methods(
                 DataRole::value_object(),
@@ -1911,7 +1916,7 @@ mod tests {
             vec![],
             vec![],
         );
-        doc.types.insert(TypeName::new("Order").unwrap(), entity);
+        doc.insert_type(TypeName::new("Order").unwrap(), entity);
         let violations = run_rule(
             &doc,
             RuleTarget::new(vec![RoleKind::Entity]),
@@ -1941,7 +1946,7 @@ mod tests {
             vec![],
             vec![],
         );
-        doc.types.insert(TypeName::new("Order").unwrap(), entity);
+        doc.insert_type(TypeName::new("Order").unwrap(), entity);
         let violations = run_rule(
             &doc,
             RuleTarget::new(vec![RoleKind::Entity]),
@@ -1974,7 +1979,7 @@ mod tests {
             vec![],
             vec![],
         );
-        doc.types.insert(TypeName::new("Order").unwrap(), entity);
+        doc.insert_type(TypeName::new("Order").unwrap(), entity);
         let violations = run_rule(
             &doc,
             RuleTarget::new(vec![RoleKind::Entity]),
@@ -2015,7 +2020,7 @@ mod tests {
             vec![],
             vec![],
         );
-        doc.types.insert(TypeName::new("Order").unwrap(), entity);
+        doc.insert_type(TypeName::new("Order").unwrap(), entity);
         let violations = run_rule(
             &doc,
             RuleTarget::new(vec![RoleKind::Entity]),
@@ -2048,7 +2053,7 @@ mod tests {
             vec![],
             vec![],
         );
-        doc.types.insert(TypeName::new("Order").unwrap(), entity);
+        doc.insert_type(TypeName::new("Order").unwrap(), entity);
         let violations = run_rule(
             &doc,
             RuleTarget::new(vec![RoleKind::Entity]),
@@ -2075,7 +2080,7 @@ mod tests {
             vec![],
             vec![],
         );
-        doc.types.insert(TypeName::new("Order").unwrap(), entity);
+        doc.insert_type(TypeName::new("Order").unwrap(), entity);
         let violations = run_rule(
             &doc,
             RuleTarget::new(vec![RoleKind::Entity]),
@@ -2105,7 +2110,7 @@ mod tests {
             vec![],
             vec![],
         );
-        doc.types.insert(TypeName::new("Order").unwrap(), entity);
+        doc.insert_type(TypeName::new("Order").unwrap(), entity);
         let violations = run_rule(
             &doc,
             RuleTarget::new(vec![RoleKind::Entity]),
@@ -2126,7 +2131,7 @@ mod tests {
     fn test_field_element_unique_across_entries_happy_path_when_no_overlap() {
         // Two AggregateRoots with disjoint exclusive_members → no violation
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("AggA").unwrap(),
             make_type_entry(DataRole::AggregateRoot {
                 identity: identity_accessor("id"),
@@ -2136,7 +2141,7 @@ mod tests {
                 emits: vec![],
             }),
         );
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("AggB").unwrap(),
             make_type_entry(DataRole::AggregateRoot {
                 identity: identity_accessor("id"),
@@ -2163,7 +2168,7 @@ mod tests {
     fn test_field_element_unique_across_entries_violation_when_overlap() {
         // Two AggregateRoots sharing "EntityA" → 1 violation
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("AggA").unwrap(),
             make_type_entry(DataRole::AggregateRoot {
                 identity: identity_accessor("id"),
@@ -2173,7 +2178,7 @@ mod tests {
                 emits: vec![],
             }),
         );
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("AggB").unwrap(),
             make_type_entry(DataRole::AggregateRoot {
                 identity: identity_accessor("id"),
@@ -2212,7 +2217,7 @@ mod tests {
         .unwrap();
 
         let all = all_catalogues_single(&doc);
-        let target_layer = doc.layer.clone();
+        let target_layer = doc.layer().clone();
         let result = evaluate_catalogue_lint(&[rule], &all, &target_layer, &StubPrimitiveScanner);
 
         assert!(
@@ -2228,7 +2233,7 @@ mod tests {
         // Targeting a role that cannot carry that field must fail closed instead of
         // silently seeing an empty refs slice.
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("OrderEntity").unwrap(),
             make_type_entry(DataRole::Entity {
                 identity: identity_accessor("id"),
@@ -2245,7 +2250,7 @@ mod tests {
         .unwrap();
 
         let all = all_catalogues_single(&doc);
-        let target_layer = doc.layer.clone();
+        let target_layer = doc.layer().clone();
         let result = evaluate_catalogue_lint(&[rule], &all, &target_layer, &StubPrimitiveScanner);
 
         assert!(
@@ -2272,7 +2277,7 @@ mod tests {
     fn test_field_element_unique_across_entries_rejects_all_roles_target() {
         // RuleTarget::all_roles includes roles that do not carry exclusive_members.
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("OrderAgg").unwrap(),
             make_type_entry(DataRole::aggregate_root().unwrap()),
         );
@@ -2286,7 +2291,7 @@ mod tests {
         .unwrap();
 
         let all = all_catalogues_single(&doc);
-        let target_layer = doc.layer.clone();
+        let target_layer = doc.layer().clone();
         let result = evaluate_catalogue_lint(&[rule], &all, &target_layer, &StubPrimitiveScanner);
 
         assert!(
@@ -2310,7 +2315,7 @@ mod tests {
     fn test_no_external_reference_in_methods_happy_path_when_no_external_ref() {
         // AggA with exclusive_member EntityA; no other type references EntityA in methods → no violation
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("AggA").unwrap(),
             make_type_entry(DataRole::AggregateRoot {
                 identity: identity_accessor("id"),
@@ -2320,7 +2325,7 @@ mod tests {
                 emits: vec![],
             }),
         );
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("EntityA").unwrap(),
             make_type_entry_with_methods(
                 DataRole::Entity { identity: identity_accessor("id"), invariants: vec![] },
@@ -2328,7 +2333,7 @@ mod tests {
             ),
         );
         // EntityA method returns "EntityAId" — not a reference to EntityA → pass
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("AnotherService").unwrap(),
             make_type_entry_with_methods(
                 DataRole::DomainService { emits: vec![] },
@@ -2352,7 +2357,7 @@ mod tests {
     fn test_no_external_reference_in_methods_violation_when_external_ref_exists() {
         // AggA exclusive_member EntityA; ExternalService has method referencing EntityA → 1 violation
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("AggA").unwrap(),
             make_type_entry(DataRole::AggregateRoot {
                 identity: identity_accessor("id"),
@@ -2362,7 +2367,7 @@ mod tests {
                 emits: vec![],
             }),
         );
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("EntityA").unwrap(),
             make_type_entry(DataRole::Entity {
                 identity: identity_accessor("id"),
@@ -2370,7 +2375,7 @@ mod tests {
             }),
         );
         // ExternalService references EntityA in its method signature (violation of boundary)
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("ExternalService").unwrap(),
             make_type_entry_with_methods(
                 DataRole::DomainService { emits: vec![] },
@@ -2400,7 +2405,7 @@ mod tests {
         // AggA exclusive_member EntityA; ExternalService has no legacy methods, but
         // its inherent impl references EntityA. The rule must scan both method sources.
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("AggA").unwrap(),
             make_type_entry(DataRole::AggregateRoot {
                 identity: identity_accessor("id"),
@@ -2410,18 +2415,18 @@ mod tests {
                 emits: vec![],
             }),
         );
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("EntityA").unwrap(),
             make_type_entry(DataRole::Entity {
                 identity: identity_accessor("id"),
                 invariants: vec![],
             }),
         );
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("ExternalService").unwrap(),
             make_type_entry(DataRole::DomainService { emits: vec![] }),
         );
-        doc.inherent_impls.push(InherentImplDeclV2 {
+        doc.push_inherent_impl(InherentImplDeclV2 {
             type_name: TypeName::new("ExternalService").unwrap(),
             impl_generics: vec![],
             impl_where_predicates: vec![],
@@ -2453,7 +2458,7 @@ mod tests {
         // Targeting a role that cannot carry that field must fail closed instead of
         // silently building an empty aggregate boundary set.
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("OrderEntity").unwrap(),
             make_type_entry(DataRole::Entity {
                 identity: identity_accessor("id"),
@@ -2470,7 +2475,7 @@ mod tests {
         .unwrap();
 
         let all = all_catalogues_single(&doc);
-        let target_layer = doc.layer.clone();
+        let target_layer = doc.layer().clone();
         let result = evaluate_catalogue_lint(&[rule], &all, &target_layer, &StubPrimitiveScanner);
 
         assert!(
@@ -2500,7 +2505,7 @@ mod tests {
     fn test_no_public_field_happy_path_when_struct_is_unit() {
         // DomainEvent with Unit struct → no violation
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("OrderPlaced").unwrap(),
             make_type_entry_with_kind(DataRole::DomainEvent, unit_struct_kind()),
         );
@@ -2517,7 +2522,7 @@ mod tests {
         // DomainEvent with Plain struct + field → 1 violation
         let mut doc = make_doc("domain");
         let kind = plain_struct_kind(vec![field_decl("order_id", "OrderId")]);
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("OrderPlaced").unwrap(),
             make_type_entry_with_kind(DataRole::DomainEvent, kind),
         );
@@ -2540,7 +2545,7 @@ mod tests {
     fn test_forbidden_method_receiver_happy_path_when_no_forbidden_receiver() {
         // DomainEvent with &self method → ForbiddenMethodReceiver "&mut self" → no violation
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("OrderPlaced").unwrap(),
             make_type_entry_with_methods(
                 DataRole::DomainEvent,
@@ -2561,7 +2566,7 @@ mod tests {
     fn test_forbidden_method_receiver_violation_when_forbidden_receiver_used() {
         // DomainEvent with &mut self method → ForbiddenMethodReceiver "&mut self" → 1 violation
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("OrderPlaced").unwrap(),
             make_type_entry_with_methods(
                 DataRole::DomainEvent,
@@ -2595,19 +2600,19 @@ mod tests {
         // `OrderEntity` — which has role Entity (forbidden).
         // The rule must detect the violation sourced from the inherent impl.
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("OrderEntity").unwrap(),
             make_type_entry(DataRole::Entity {
                 identity: identity_accessor("id"),
                 invariants: vec![],
             }),
         );
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("Money").unwrap(),
             make_type_entry(DataRole::value_object()), // methods: vec![]
         );
         // The method lives in an inherent impl, not in TypeEntry::methods.
-        doc.inherent_impls.push(InherentImplDeclV2 {
+        doc.push_inherent_impl(InherentImplDeclV2 {
             type_name: TypeName::new("Money").unwrap(),
             impl_generics: vec![],
             impl_where_predicates: vec![],
@@ -2644,12 +2649,12 @@ mod tests {
         // An inherent impl block for `OrderPlaced` declares a method with `&mut self`.
         // The ForbiddenMethodReceiver rule must detect the violation from the impl block.
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("OrderPlaced").unwrap(),
             make_type_entry(DataRole::DomainEvent), // methods: vec![]
         );
         // The &mut self method lives in an inherent impl, not in TypeEntry::methods.
-        doc.inherent_impls.push(InherentImplDeclV2 {
+        doc.push_inherent_impl(InherentImplDeclV2 {
             type_name: TypeName::new("OrderPlaced").unwrap(),
             impl_generics: vec![],
             impl_where_predicates: vec![],
@@ -2683,14 +2688,14 @@ mod tests {
         // `inherent_impls`. The linter treats the method name as the identity, so
         // duplicate source representations must not double-report one Rust method.
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("OrderPlaced").unwrap(),
             make_type_entry_with_methods(
                 DataRole::DomainEvent,
                 vec![method_exclusive_ref_no_params("set_payload", "()")],
             ),
         );
-        doc.inherent_impls.push(InherentImplDeclV2 {
+        doc.push_inherent_impl(InherentImplDeclV2 {
             type_name: TypeName::new("OrderPlaced").unwrap(),
             impl_generics: vec![],
             impl_where_predicates: vec![],
@@ -2716,14 +2721,14 @@ mod tests {
         // A stale legacy method declaration must not hide a different declaration
         // for the same Rust method in `inherent_impls`.
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("OrderPlaced").unwrap(),
             make_type_entry_with_methods(
                 DataRole::DomainEvent,
                 vec![method_shared_ref_no_params("set_payload", "()")],
             ),
         );
-        doc.inherent_impls.push(InherentImplDeclV2 {
+        doc.push_inherent_impl(InherentImplDeclV2 {
             type_name: TypeName::new("OrderPlaced").unwrap(),
             impl_generics: vec![],
             impl_where_predicates: vec![],
@@ -2738,7 +2743,7 @@ mod tests {
         )
         .unwrap();
         let all = all_catalogues_single(&doc);
-        let target_layer = doc.layer.clone();
+        let target_layer = doc.layer().clone();
         let result = evaluate_catalogue_lint(&[rule], &all, &target_layer, &StubPrimitiveScanner);
 
         assert!(
@@ -2759,7 +2764,7 @@ mod tests {
     fn test_ac15_entity_requires_partial_eq_and_eq_trait_impls() {
         // Entity without PartialEq/Eq trait_impls → 2 violations
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("OrderEntity").unwrap(),
             make_type_entry(DataRole::Entity {
                 identity: identity_accessor("id"),
@@ -2790,15 +2795,15 @@ mod tests {
     fn test_ac15_aggregate_root_requires_partial_eq_and_eq_trait_impls() {
         // AggregateRoot with PartialEq + Eq → no violations
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("OrderAgg").unwrap(),
             make_type_entry(DataRole::aggregate_root().unwrap()),
         );
-        doc.trait_impls.push(TraitImplDeclV2::new(
+        doc.push_trait_impl(TraitImplDeclV2::new(
             TypeRef::new("PartialEq").unwrap(),
             TypeRef::new("OrderAgg").unwrap(),
         ));
-        doc.trait_impls.push(TraitImplDeclV2::new(
+        doc.push_trait_impl(TraitImplDeclV2::new(
             TypeRef::new("Eq").unwrap(),
             TypeRef::new("OrderAgg").unwrap(),
         ));
@@ -2827,9 +2832,8 @@ mod tests {
     fn test_ac16_aggregate_boundary_exclusive_members_must_be_entities() {
         // AggregateRoot exclusive_member is a ValueObject (not Entity) → 1 violation
         let mut doc = make_doc("domain");
-        doc.types
-            .insert(TypeName::new("Price").unwrap(), make_type_entry(DataRole::value_object()));
-        doc.types.insert(
+        doc.insert_type(TypeName::new("Price").unwrap(), make_type_entry(DataRole::value_object()));
+        doc.insert_type(
             TypeName::new("OrderAgg").unwrap(),
             make_type_entry(DataRole::AggregateRoot {
                 identity: identity_accessor("id"),
@@ -2856,14 +2860,14 @@ mod tests {
     fn test_ac16_aggregate_boundary_shared_value_objects_must_be_value_objects() {
         // AggregateRoot shared_value_objects includes Entity → 1 violation
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("OrderLine").unwrap(),
             make_type_entry(DataRole::Entity {
                 identity: identity_accessor("id"),
                 invariants: vec![],
             }),
         );
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("OrderAgg").unwrap(),
             make_type_entry(DataRole::AggregateRoot {
                 identity: identity_accessor("id"),
@@ -2893,14 +2897,14 @@ mod tests {
     fn test_ac16_value_object_no_entity_in_method_signature() {
         // ValueObject method param is an Entity → 1 violation
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("OrderEntity").unwrap(),
             make_type_entry(DataRole::Entity {
                 identity: identity_accessor("id"),
                 invariants: vec![],
             }),
         );
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("MyValue").unwrap(),
             make_type_entry_with_methods(
                 DataRole::value_object(),
@@ -2943,11 +2947,11 @@ mod tests {
     fn test_ac18_repository_aggregate_field_must_be_aggregate_root_happy_path() {
         // Repository TraitEntry with aggregate → AggregateRoot: no violation.
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("OrderAgg").unwrap(),
             make_type_entry(DataRole::aggregate_root().unwrap()),
         );
-        doc.traits.insert(
+        doc.insert_trait(
             TraitName::new("OrderRepository").unwrap(),
             make_trait_entry(ContractRole::Repository {
                 aggregate: TypeRef::new("OrderAgg").unwrap(),
@@ -2968,14 +2972,14 @@ mod tests {
     fn test_ac18_repository_aggregate_pointing_to_non_aggregate_root_is_violation() {
         // Repository TraitEntry with aggregate → Entity (wrong role): 1 violation.
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("OrderItem").unwrap(),
             make_type_entry(DataRole::Entity {
                 identity: identity_accessor("id"),
                 invariants: vec![],
             }),
         );
-        doc.traits.insert(
+        doc.insert_trait(
             TraitName::new("OrderItemRepository").unwrap(),
             make_trait_entry(ContractRole::Repository {
                 aggregate: TypeRef::new("OrderItem").unwrap(),
@@ -3014,11 +3018,11 @@ mod tests {
     fn test_ac19_event_policy_reacts_to_must_be_domain_event() {
         // EventPolicy reacts_to references a UseCase (wrong role) → 1 violation
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("PlaceOrderUseCase").unwrap(),
             make_type_entry(DataRole::use_case()),
         );
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("OrderPolicy").unwrap(),
             make_type_entry(DataRole::EventPolicy {
                 reacts_to: NonEmptyVec::new(TypeRef::new("PlaceOrderUseCase").unwrap(), vec![]),
@@ -3048,7 +3052,7 @@ mod tests {
     fn test_ac19_event_policy_no_mut_self_method() {
         // EventPolicy with &mut self method → 1 violation
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("OrderPolicy").unwrap(),
             make_type_entry_with_methods(
                 DataRole::EventPolicy {
@@ -3072,13 +3076,13 @@ mod tests {
     fn test_ac19_event_policy_no_repository_or_usecase_in_method_sig() {
         // EventPolicy method param is a Repository role (TraitEntry) → 1 violation
         let mut doc = make_doc("domain");
-        doc.traits.insert(
+        doc.insert_trait(
             TraitName::new("OrderRepo").unwrap(),
             make_trait_entry(ContractRole::Repository {
                 aggregate: TypeRef::new("Order").unwrap(),
             }),
         );
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("OrderPolicy").unwrap(),
             make_type_entry_with_methods(
                 DataRole::EventPolicy {
@@ -3115,7 +3119,7 @@ mod tests {
     fn test_ac20_value_object_no_mut_self_method() {
         // ValueObject with &mut self method → 1 violation
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("Money").unwrap(),
             make_type_entry_with_methods(
                 DataRole::value_object(),
@@ -3138,7 +3142,7 @@ mod tests {
         // ValueObject with public field → 1 violation
         let mut doc = make_doc("domain");
         let kind = plain_struct_kind(vec![field_decl("amount", "i64")]);
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("Money").unwrap(),
             make_type_entry_with_kind(DataRole::value_object(), kind),
         );
@@ -3155,8 +3159,7 @@ mod tests {
     fn test_ac20_value_object_equality_trait_required() {
         // ValueObject without PartialEq → 1 violation
         let mut doc = make_doc("domain");
-        doc.types
-            .insert(TypeName::new("Money").unwrap(), make_type_entry(DataRole::value_object()));
+        doc.insert_type(TypeName::new("Money").unwrap(), make_type_entry(DataRole::value_object()));
         let violations = run_rule(
             &doc,
             RuleTarget::new(vec![RoleKind::ValueObject]),
@@ -3186,13 +3189,14 @@ mod tests {
         let usecase_layer = layer("usecase");
 
         let mut domain_doc = make_doc("domain");
-        domain_doc
-            .types
-            .insert(TypeName::new("OrderPlaced").unwrap(), make_type_entry(DataRole::DomainEvent));
+        domain_doc.insert_type(
+            TypeName::new("OrderPlaced").unwrap(),
+            make_type_entry(DataRole::DomainEvent),
+        );
 
         let mut usecase_doc =
             CatalogueDocument::new(3, CrateName::new("usecase").unwrap(), usecase_layer.clone());
-        usecase_doc.types.insert(
+        usecase_doc.insert_type(
             TypeName::new("PlaceOrder").unwrap(),
             make_type_entry(DataRole::UseCase {
                 handles: vec![TypeRef::new("domain::OrderPlaced").unwrap()],
@@ -3240,11 +3244,11 @@ mod tests {
         // domain layer has NO OrderPlaced at all; usecase has it as ValueObject (wrong)
         let mut usecase_doc =
             CatalogueDocument::new(3, CrateName::new("usecase").unwrap(), usecase_layer.clone());
-        usecase_doc.types.insert(
+        usecase_doc.insert_type(
             TypeName::new("OrderPlaced").unwrap(),
             make_type_entry(DataRole::value_object()),
         );
-        usecase_doc.types.insert(
+        usecase_doc.insert_type(
             TypeName::new("PlaceOrder").unwrap(),
             make_type_entry(DataRole::UseCase {
                 handles: vec![TypeRef::new("OrderPlaced").unwrap()],
@@ -3285,7 +3289,7 @@ mod tests {
         let usecase_layer = layer("usecase");
 
         let mut domain_doc = make_doc("domain");
-        domain_doc.traits.insert(
+        domain_doc.insert_trait(
             crate::tddd::catalogue_v2::identifiers::TraitName::new("OrderRepo").unwrap(),
             make_trait_entry(ContractRole::Repository {
                 aggregate: TypeRef::new("OrderAgg").unwrap(),
@@ -3294,7 +3298,7 @@ mod tests {
 
         let mut usecase_doc =
             CatalogueDocument::new(3, CrateName::new("usecase").unwrap(), usecase_layer.clone());
-        usecase_doc.types.insert(
+        usecase_doc.insert_type(
             TypeName::new("MyDto").unwrap(),
             make_type_entry_with_methods(
                 DataRole::value_object(),
@@ -3375,12 +3379,12 @@ mod tests {
             vec![],
             vec![],
         );
-        domain_doc.types.insert(TypeName::new("OrderPlaced").unwrap(), deleted_entry);
+        domain_doc.insert_type(TypeName::new("OrderPlaced").unwrap(), deleted_entry);
 
         // usecase layer: PlaceOrder.handles references "domain::OrderPlaced"
         let mut usecase_doc =
             CatalogueDocument::new(3, CrateName::new("usecase").unwrap(), usecase_layer.clone());
-        usecase_doc.types.insert(
+        usecase_doc.insert_type(
             TypeName::new("PlaceOrder").unwrap(),
             make_type_entry(DataRole::UseCase {
                 handles: vec![TypeRef::new("domain::OrderPlaced").unwrap()],
@@ -3421,7 +3425,7 @@ mod tests {
         // that sig_type_contains_entry takes Rule 1 (layer_qualified_name_in_sig →
         // true) without consulting find_in_catalogue. This means the ONLY guard that
         // prevents a false violation is the `action != Delete` filter on
-        // cat.traits.iter() in catalogue_linter_eval.rs — not find_in_catalogue.
+        // cat.traits().iter() in catalogue_linter_eval.rs — not find_in_catalogue.
         // Without that filter the deleted trait would be iterated, sig_type_contains_entry
         // would return true, and a forbidden-role violation would be emitted.
         let domain_layer = layer("domain");
@@ -3444,7 +3448,7 @@ mod tests {
             vec![],
             vec![],
         );
-        domain_doc.traits.insert(TraitName::new("OrderRepo").unwrap(), deleted_trait);
+        domain_doc.insert_trait(TraitName::new("OrderRepo").unwrap(), deleted_trait);
 
         // usecase layer: MyDto method param uses the qualified form "domain::OrderRepo"
         // so that sig_type_contains_entry resolves via Rule 1 (qualified layer match)
@@ -3452,7 +3456,7 @@ mod tests {
         // decisive guard.
         let mut usecase_doc =
             CatalogueDocument::new(3, CrateName::new("usecase").unwrap(), usecase_layer.clone());
-        usecase_doc.types.insert(
+        usecase_doc.insert_type(
             TypeName::new("MyDto").unwrap(),
             make_type_entry_with_methods(
                 DataRole::value_object(),
@@ -3496,7 +3500,7 @@ mod tests {
         // that sig_type_contains_entry takes Rule 1 (layer_qualified_name_in_sig →
         // true) without consulting find_in_catalogue. This means the ONLY guard that
         // prevents a false violation is the `action != Delete` filter on
-        // cat.types.iter() in catalogue_linter_eval.rs — not find_in_catalogue.
+        // cat.types().iter() in catalogue_linter_eval.rs — not find_in_catalogue.
         // Without that filter the deleted type would be iterated, entry_role_kind
         // would return DomainEvent, and a forbidden-role violation would be emitted.
         let domain_layer = layer("domain");
@@ -3517,15 +3521,15 @@ mod tests {
             vec![],
             vec![],
         );
-        domain_doc.types.insert(TypeName::new("OrderPlaced").unwrap(), deleted_type);
+        domain_doc.insert_type(TypeName::new("OrderPlaced").unwrap(), deleted_type);
 
         // usecase layer: MyUseCase method return type uses the qualified form
         // "domain::OrderPlaced" so that sig_type_contains_entry resolves via
         // Rule 1 (qualified layer match) without calling find_in_catalogue —
-        // making the eval.rs outer cat.types.iter() filter the decisive guard.
+        // making the eval.rs outer cat.types().iter() filter the decisive guard.
         let mut usecase_doc =
             CatalogueDocument::new(3, CrateName::new("usecase").unwrap(), usecase_layer.clone());
-        usecase_doc.types.insert(
+        usecase_doc.insert_type(
             TypeName::new("MyUseCase").unwrap(),
             make_type_entry_with_methods(
                 DataRole::UseCase { handles: vec![] },
@@ -3551,7 +3555,7 @@ mod tests {
             "expected no violations: Delete-marked TypeEntry must be skipped by the \
              action != Delete filter in the NoRoleInMethodSignature type loop — \
              the qualified 'domain::OrderPlaced' reference bypasses find_in_catalogue \
-             so the outer cat.types.iter() filter is the decisive guard, \
+             so the outer cat.types().iter() filter is the decisive guard, \
              got: {violations:?}"
         );
     }
@@ -3562,8 +3566,10 @@ mod tests {
         // TraitImplRequired for "PartialEq" fires a violation because the only
         // PartialEq impl entry is Delete-marked.
         let mut doc = make_doc("domain");
-        doc.types
-            .insert(TypeName::new("MyValue").unwrap(), make_type_entry(DataRole::value_object()));
+        doc.insert_type(
+            TypeName::new("MyValue").unwrap(),
+            make_type_entry(DataRole::value_object()),
+        );
 
         // Only a Delete-marked PartialEq impl exists — must be treated as absent.
         let mut deleted_impl = TraitImplDeclV2::new(
@@ -3571,7 +3577,7 @@ mod tests {
             TypeRef::new("MyValue").unwrap(),
         );
         deleted_impl.action = ItemAction::Delete;
-        doc.trait_impls.push(deleted_impl);
+        doc.push_trait_impl(deleted_impl);
 
         let violations = run_rule(
             &doc,
@@ -3620,7 +3626,7 @@ mod tests {
                 vec![],
                 vec![],
             );
-            doc.types.insert(TypeName::new("DeletedValue").unwrap(), deleted_entry);
+            doc.insert_type(TypeName::new("DeletedValue").unwrap(), deleted_entry);
 
             let violations = run_rule(
                 &doc,
@@ -3654,7 +3660,7 @@ mod tests {
                 vec![],
                 vec![],
             );
-            doc.types.insert(TypeName::new("DeletedValue").unwrap(), deleted_entry);
+            doc.insert_type(TypeName::new("DeletedValue").unwrap(), deleted_entry);
 
             let violations = run_rule(
                 &doc,
@@ -3692,7 +3698,7 @@ mod tests {
             vec![],
             vec![],
         );
-        doc.types.insert(TypeName::new("ReferencedValue").unwrap(), reference_entry);
+        doc.insert_type(TypeName::new("ReferencedValue").unwrap(), reference_entry);
         // Deliberately no TraitImplDeclV2 pushed to doc.trait_impls: a
         // Reference entry's trait impls are not restated in this catalogue.
 
@@ -3725,7 +3731,7 @@ mod tests {
         // using it as a `FieldEmpty` target on a `DataRole` must still return
         // Err(InvalidRuleConfig) rather than silently treating the field as empty.
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("MyService").unwrap(),
             make_type_entry(DataRole::DomainService {
                 emits: vec![TypeRef::new("OrderPlaced").unwrap()],
@@ -3738,7 +3744,7 @@ mod tests {
         .unwrap();
         let all = all_catalogues_single(&doc);
         let result =
-            evaluate_catalogue_lint(&[rule], &all, &doc.layer.clone(), &StubPrimitiveScanner);
+            evaluate_catalogue_lint(&[rule], &all, &doc.layer().clone(), &StubPrimitiveScanner);
         let is_invalid = matches!(&result, Err(CatalogueLinterError::InvalidRuleConfig(msg)) if msg.as_str().contains("aggregate"));
         assert!(
             is_invalid,
@@ -3758,9 +3764,11 @@ mod tests {
         // still return Err(InvalidRuleConfig) rather than silently reporting zero
         // violations.
         let mut doc = make_doc("domain");
-        doc.types
-            .insert(TypeName::new("OrderPlaced").unwrap(), make_type_entry(DataRole::DomainEvent));
-        doc.types.insert(
+        doc.insert_type(
+            TypeName::new("OrderPlaced").unwrap(),
+            make_type_entry(DataRole::DomainEvent),
+        );
+        doc.insert_type(
             TypeName::new("PlaceOrder").unwrap(),
             make_type_entry(DataRole::UseCase {
                 handles: vec![TypeRef::new("OrderPlaced").unwrap()],
@@ -3776,7 +3784,7 @@ mod tests {
         .unwrap();
         let all = all_catalogues_single(&doc);
         let result =
-            evaluate_catalogue_lint(&[rule], &all, &doc.layer.clone(), &StubPrimitiveScanner);
+            evaluate_catalogue_lint(&[rule], &all, &doc.layer().clone(), &StubPrimitiveScanner);
         let is_invalid = matches!(&result, Err(CatalogueLinterError::InvalidRuleConfig(msg)) if msg.as_str().contains("identity"));
         assert!(
             is_invalid,
@@ -3790,7 +3798,7 @@ mod tests {
         // but it contains predicate declarations rather than TypeRef role references.
         // ReferencedRoleConstraint must reject it instead of silently checking no refs.
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("Order").unwrap(),
             make_type_entry(DataRole::Entity {
                 identity: identity_accessor("id"),
@@ -3807,7 +3815,7 @@ mod tests {
         .unwrap();
         let all = all_catalogues_single(&doc);
         let result =
-            evaluate_catalogue_lint(&[rule], &all, &doc.layer.clone(), &StubPrimitiveScanner);
+            evaluate_catalogue_lint(&[rule], &all, &doc.layer().clone(), &StubPrimitiveScanner);
         let is_invalid = matches!(
             &result,
             Err(CatalogueLinterError::InvalidRuleConfig(msg))
@@ -3825,7 +3833,7 @@ mod tests {
         // Entity does not carry "emits"; an explicit Entity target must not silently
         // evaluate zero refs for ReferencedRoleConstraint.
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("OrderEntity").unwrap(),
             make_type_entry(DataRole::Entity {
                 identity: identity_accessor("id"),
@@ -3842,7 +3850,7 @@ mod tests {
         .unwrap();
         let all = all_catalogues_single(&doc);
         let result =
-            evaluate_catalogue_lint(&[rule], &all, &doc.layer.clone(), &StubPrimitiveScanner);
+            evaluate_catalogue_lint(&[rule], &all, &doc.layer().clone(), &StubPrimitiveScanner);
         let is_invalid = matches!(
             &result,
             Err(CatalogueLinterError::InvalidRuleConfig(msg))
@@ -3858,7 +3866,7 @@ mod tests {
     fn test_referenced_role_constraint_rejects_field_not_carried_by_contract_target_role() {
         // SpecificationPort does not carry "aggregate"; only Repository does.
         let mut doc = make_doc("domain");
-        doc.traits.insert(
+        doc.insert_trait(
             TraitName::new("OrderSpecPort").unwrap(),
             make_trait_entry(ContractRole::SpecificationPort),
         );
@@ -3872,7 +3880,7 @@ mod tests {
         .unwrap();
         let all = all_catalogues_single(&doc);
         let result =
-            evaluate_catalogue_lint(&[rule], &all, &doc.layer.clone(), &StubPrimitiveScanner);
+            evaluate_catalogue_lint(&[rule], &all, &doc.layer().clone(), &StubPrimitiveScanner);
         let is_invalid = matches!(
             &result,
             Err(CatalogueLinterError::InvalidRuleConfig(msg))
@@ -3939,11 +3947,11 @@ mod tests {
         // still reject it with Err(InvalidRuleConfig) rather than silently
         // reporting zero violations.
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("OrderAgg").unwrap(),
             make_type_entry(DataRole::aggregate_root().unwrap()),
         );
-        doc.traits.insert(
+        doc.insert_trait(
             TraitName::new("OrderRepository").unwrap(),
             make_trait_entry(ContractRole::Repository {
                 aggregate: TypeRef::new("OrderAgg").unwrap(),
@@ -3959,7 +3967,7 @@ mod tests {
         .unwrap();
         let all = all_catalogues_single(&doc);
         let result =
-            evaluate_catalogue_lint(&[rule], &all, &doc.layer.clone(), &StubPrimitiveScanner);
+            evaluate_catalogue_lint(&[rule], &all, &doc.layer().clone(), &StubPrimitiveScanner);
         let is_invalid = matches!(
             &result,
             Err(CatalogueLinterError::InvalidRuleConfig(msg))
@@ -4007,7 +4015,7 @@ mod tests {
             shared_value_objects: vec![TypeRef::new("Money").unwrap()],
             emits: vec![],
         });
-        doc.types.insert(TypeName::new("OrderAgg").unwrap(), order_agg);
+        doc.insert_type(TypeName::new("OrderAgg").unwrap(), order_agg);
 
         // Delete-action aggregate: also has exclusive_members=[OrderLine],
         // shared_value_objects=[Money], and a method that references OrderLine.
@@ -4034,14 +4042,14 @@ mod tests {
             vec![],
             vec![],
         );
-        doc.types.insert(TypeName::new("DeletedAgg").unwrap(), deleted_agg);
+        doc.insert_type(TypeName::new("DeletedAgg").unwrap(), deleted_agg);
 
         // ExternalEntry: references OrderLine (exclusive member) — should be a violation.
         let external_entry = make_type_entry_with_methods(
             DataRole::value_object(),
             vec![method_shared_ref_no_params("get_line", "OrderLine")],
         );
-        doc.types.insert(TypeName::new("ExternalEntry").unwrap(), external_entry);
+        doc.insert_type(TypeName::new("ExternalEntry").unwrap(), external_entry);
 
         // ExternalEntry2: references Money (shared_value_object of active OrderAgg) —
         // inside the boundary, so no violation expected.
@@ -4049,7 +4057,7 @@ mod tests {
             DataRole::value_object(),
             vec![method_shared_ref_no_params("get_money", "Money")],
         );
-        doc.types.insert(TypeName::new("ExternalEntry2").unwrap(), external_entry2);
+        doc.insert_type(TypeName::new("ExternalEntry2").unwrap(), external_entry2);
 
         let violations = run_rule(
             &doc,
@@ -4087,7 +4095,7 @@ mod tests {
     #[test]
     fn test_forbid_primitive_in_types_detects_named_field_occurrence() {
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("Money").unwrap(),
             make_type_entry_with_kind(
                 DataRole::value_object(),
@@ -4116,7 +4124,7 @@ mod tests {
     #[test]
     fn test_forbid_primitive_in_types_no_violation_when_primitive_absent() {
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("Money").unwrap(),
             make_type_entry_with_kind(
                 DataRole::value_object(),
@@ -4143,7 +4151,7 @@ mod tests {
         // Enum with both a Tuple-payload variant and a Struct-payload variant,
         // each carrying a String — both must be classified as VariantField.
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("PaymentEvent").unwrap(),
             make_type_entry_with_kind(
                 DataRole::DomainEvent,
@@ -4182,7 +4190,7 @@ mod tests {
     #[test]
     fn test_forbid_primitive_in_types_detects_type_alias_target_occurrence() {
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("Description").unwrap(),
             make_type_entry_with_kind(
                 DataRole::value_object(),
@@ -4209,7 +4217,7 @@ mod tests {
     #[test]
     fn test_forbid_primitive_in_types_detects_param_and_return_on_type_method() {
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("Money").unwrap(),
             make_type_entry_with_methods(
                 DataRole::value_object(),
@@ -4263,7 +4271,7 @@ mod tests {
             vec![],
             vec![],
         );
-        doc.traits.insert(TraitName::new("Checker").unwrap(), trait_entry);
+        doc.insert_trait(TraitName::new("Checker").unwrap(), trait_entry);
 
         let violations = run_rule(
             &doc,
@@ -4303,7 +4311,7 @@ mod tests {
             vec![],
             vec![],
         );
-        doc.functions.insert(
+        doc.insert_function(
             FunctionPath::at_root(
                 CrateName::new("domain").unwrap(),
                 FunctionName::new("do_thing").unwrap(),
@@ -4352,7 +4360,7 @@ mod tests {
             }],
             ..method_shared_ref_no_params("do_thing", "()")
         };
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("Money").unwrap(),
             make_type_entry_with_methods(DataRole::value_object(), vec![method]),
         );
@@ -4450,7 +4458,7 @@ mod tests {
             }],
             ..method_shared_ref_no_params("do_thing", "()")
         };
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("Money").unwrap(),
             make_type_entry_with_methods(DataRole::value_object(), vec![method]),
         );
@@ -4465,7 +4473,7 @@ mod tests {
         )
         .unwrap();
         let all = all_catalogues_single(&doc);
-        let target_layer = doc.layer.clone();
+        let target_layer = doc.layer().clone();
         let result =
             evaluate_catalogue_lint(&[rule], &all, &target_layer, &BoundReferenceLhsFailingScanner);
 
@@ -4491,7 +4499,7 @@ mod tests {
             }],
             ..method_shared_ref_no_params("do_thing", "()")
         };
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("Money").unwrap(),
             make_type_entry_with_methods(DataRole::value_object(), vec![method]),
         );
@@ -4525,7 +4533,7 @@ mod tests {
         // The String occurrence is at NamedField, but the rule only requests Param —
         // it must not be reported.
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("Money").unwrap(),
             make_type_entry_with_kind(
                 DataRole::value_object(),
@@ -4553,7 +4561,7 @@ mod tests {
         // payload, reusing RuleTarget.target_roles instead. A target that only
         // selects Entity must skip a ValueObject entry entirely.
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("Money").unwrap(),
             make_type_entry_with_kind(
                 DataRole::value_object(),
@@ -4583,7 +4591,7 @@ mod tests {
         // its own `layers` list (that would double-count when the composition
         // root already loops over layers).
         let mut domain_doc = make_doc("domain");
-        domain_doc.types.insert(
+        domain_doc.insert_type(
             TypeName::new("Money").unwrap(),
             make_type_entry_with_kind(
                 DataRole::value_object(),
@@ -4591,7 +4599,7 @@ mod tests {
             ),
         );
         let mut usecase_doc = make_doc("usecase");
-        usecase_doc.types.insert(
+        usecase_doc.insert_type(
             TypeName::new("MoneyDto").unwrap(),
             make_type_entry_with_kind(
                 DataRole::value_object(),
@@ -4599,8 +4607,8 @@ mod tests {
             ),
         );
         let mut all = BTreeMap::new();
-        all.insert(domain_doc.layer.clone(), domain_doc.clone());
-        all.insert(usecase_doc.layer.clone(), usecase_doc.clone());
+        all.insert(domain_doc.layer().clone(), domain_doc.clone());
+        all.insert(usecase_doc.layer().clone(), usecase_doc.clone());
 
         let rule = CatalogueLinterRule::new(
             RuleTarget::all_roles(),
@@ -4635,7 +4643,7 @@ mod tests {
         // targets layer_id=domain (the composition-root loop invokes the rule
         // once per layer; layers not in the rule's own list are skipped).
         let mut domain_doc = make_doc("domain");
-        domain_doc.types.insert(
+        domain_doc.insert_type(
             TypeName::new("Money").unwrap(),
             make_type_entry_with_kind(
                 DataRole::value_object(),
@@ -4644,8 +4652,8 @@ mod tests {
         );
         let usecase_doc = make_doc("usecase");
         let mut all = all_catalogues_single(&domain_doc);
-        all.insert(usecase_doc.layer.clone(), usecase_doc);
-        let target_layer = domain_doc.layer.clone();
+        all.insert(usecase_doc.layer().clone(), usecase_doc);
+        let target_layer = domain_doc.layer().clone();
         let rule = CatalogueLinterRule::new(
             RuleTarget::all_roles(),
             CatalogueLinterRuleKind::ForbidPrimitiveInTypes {
@@ -4671,7 +4679,7 @@ mod tests {
         // evaluation call.
         let domain_doc = make_doc("domain");
         let all = all_catalogues_single(&domain_doc);
-        let target_layer = domain_doc.layer.clone();
+        let target_layer = domain_doc.layer().clone();
         let missing_layer = layer("usecase");
         let rule = CatalogueLinterRule::new(
             RuleTarget::all_roles(),
@@ -4696,7 +4704,7 @@ mod tests {
     #[test]
     fn test_forbid_primitive_in_types_scan_failed_propagates_as_catalogue_linter_error() {
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("Money").unwrap(),
             make_type_entry_with_kind(
                 DataRole::value_object(),
@@ -4704,7 +4712,7 @@ mod tests {
             ),
         );
         let all = all_catalogues_single(&doc);
-        let target_layer = doc.layer.clone();
+        let target_layer = doc.layer().clone();
         let rule = CatalogueLinterRule::new(
             RuleTarget::all_roles(),
             CatalogueLinterRuleKind::ForbidPrimitiveInTypes {
@@ -4749,13 +4757,13 @@ mod tests {
             }],
             ..method_shared_ref_no_params("do_thing", "()")
         };
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("Money").unwrap(),
             make_type_entry_with_methods(DataRole::value_object(), vec![method]),
         );
 
         let all = all_catalogues_single(&doc);
-        let target_layer = doc.layer.clone();
+        let target_layer = doc.layer().clone();
         let rule = CatalogueLinterRule::new(
             RuleTarget::all_roles(),
             CatalogueLinterRuleKind::ForbidPrimitiveInTypes {
@@ -4803,10 +4811,10 @@ mod tests {
             vec![],
             vec![],
         );
-        doc.traits.insert(TraitName::new("Checker").unwrap(), trait_entry);
+        doc.insert_trait(TraitName::new("Checker").unwrap(), trait_entry);
 
         let all = all_catalogues_single(&doc);
-        let target_layer = doc.layer.clone();
+        let target_layer = doc.layer().clone();
         let rule = CatalogueLinterRule::new(
             RuleTarget::all_roles(),
             CatalogueLinterRuleKind::ForbidPrimitiveInTypes {
@@ -4851,13 +4859,13 @@ mod tests {
             }],
             ..method_shared_ref_no_params("do_thing", "()")
         };
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("Money").unwrap(),
             make_type_entry_with_methods(DataRole::value_object(), vec![method]),
         );
 
         let all = all_catalogues_single(&doc);
-        let target_layer = doc.layer.clone();
+        let target_layer = doc.layer().clone();
         let rule = CatalogueLinterRule::new(
             RuleTarget::all_roles(),
             CatalogueLinterRuleKind::ForbidPrimitiveInTypes {
@@ -4887,7 +4895,7 @@ mod tests {
     #[test]
     fn test_forbid_primitive_in_types_scans_result_err_inside_type_entry_generic_bound() {
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("Money").unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
@@ -4907,7 +4915,7 @@ mod tests {
         );
 
         let all = all_catalogues_single(&doc);
-        let target_layer = doc.layer.clone();
+        let target_layer = doc.layer().clone();
         let rule = CatalogueLinterRule::new(
             RuleTarget::all_roles(),
             CatalogueLinterRuleKind::ForbidPrimitiveInTypes {
@@ -4933,7 +4941,7 @@ mod tests {
     #[test]
     fn test_forbid_primitive_in_types_scans_result_err_inside_type_entry_where_predicate() {
         let mut doc = make_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("Money").unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
@@ -4954,7 +4962,7 @@ mod tests {
         );
 
         let all = all_catalogues_single(&doc);
-        let target_layer = doc.layer.clone();
+        let target_layer = doc.layer().clone();
         let rule = CatalogueLinterRule::new(
             RuleTarget::all_roles(),
             CatalogueLinterRuleKind::ForbidPrimitiveInTypes {
@@ -4990,9 +4998,8 @@ mod tests {
     #[test]
     fn test_forbid_primitive_in_types_scans_result_err_inside_inherent_impl_generic_bound() {
         let mut doc = make_doc("domain");
-        doc.types
-            .insert(TypeName::new("Money").unwrap(), make_type_entry(DataRole::value_object()));
-        doc.inherent_impls.push(InherentImplDeclV2 {
+        doc.insert_type(TypeName::new("Money").unwrap(), make_type_entry(DataRole::value_object()));
+        doc.push_inherent_impl(InherentImplDeclV2 {
             type_name: TypeName::new("Money").unwrap(),
             impl_generics: vec![MethodGenericParam {
                 name: ParamName::new("T").unwrap(),
@@ -5003,7 +5010,7 @@ mod tests {
         });
 
         let all = all_catalogues_single(&doc);
-        let target_layer = doc.layer.clone();
+        let target_layer = doc.layer().clone();
         let rule = CatalogueLinterRule::new(
             RuleTarget::all_roles(),
             CatalogueLinterRuleKind::ForbidPrimitiveInTypes {
@@ -5029,9 +5036,8 @@ mod tests {
     #[test]
     fn test_forbid_primitive_in_types_scans_result_err_inside_inherent_impl_where_predicate() {
         let mut doc = make_doc("domain");
-        doc.types
-            .insert(TypeName::new("Money").unwrap(), make_type_entry(DataRole::value_object()));
-        doc.inherent_impls.push(InherentImplDeclV2 {
+        doc.insert_type(TypeName::new("Money").unwrap(), make_type_entry(DataRole::value_object()));
+        doc.push_inherent_impl(InherentImplDeclV2 {
             type_name: TypeName::new("Money").unwrap(),
             impl_generics: vec![],
             impl_where_predicates: vec![WherePredicateDecl {
@@ -5043,7 +5049,7 @@ mod tests {
         });
 
         let all = all_catalogues_single(&doc);
-        let target_layer = doc.layer.clone();
+        let target_layer = doc.layer().clone();
         let rule = CatalogueLinterRule::new(
             RuleTarget::all_roles(),
             CatalogueLinterRuleKind::ForbidPrimitiveInTypes {

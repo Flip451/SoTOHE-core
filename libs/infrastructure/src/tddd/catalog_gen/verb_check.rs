@@ -303,6 +303,23 @@ mod tests {
     }
 
     #[test]
+    fn test_delete_only_catalogue_passes_strict_gates() {
+        // An identity-only delete tombstone has no `$todo` holes and decodes
+        // cleanly, so it must pass the strict phase2 / merge gates rather than
+        // being blocked for missing role/docs (spec IN-04 / GO-03 / AC-04).
+        let body = r#"{"schema_version":5,"crate_name":"domain","layer":"domain","types":{"OldType":{"action":"delete","module_path":"tddd"}},"traits":{},"functions":{}}"#;
+        let (temp, path) = write_file("domain-types.json", body);
+        let phase2 =
+            check_layer(CatalogGateContext::Phase2, "domain", &path, temp.path(), &empty_set())
+                .unwrap();
+        assert_eq!(phase2.verdict, CatalogCheckVerdict::Pass);
+        let merge =
+            check_layer(CatalogGateContext::Merge, "domain", &path, temp.path(), &empty_set())
+                .unwrap();
+        assert_eq!(merge.verdict, CatalogCheckVerdict::Pass);
+    }
+
+    #[test]
     fn test_invalid_schema_blocks_all_gates() {
         let body = r#"{"schema_version":99,"crate_name":"domain","layer":"domain","types":{},"traits":{},"functions":{}}"#;
         let (temp, path) = write_file("domain-types.json", body);

@@ -347,7 +347,7 @@ mod tests {
             spec_refs,
             vec![],
         );
-        doc.types.insert(TypeName::new(name).unwrap(), entry);
+        doc.insert_type(TypeName::new(name).unwrap(), entry);
     }
 
     /// Consume the catalogue from a `Mutex<Option<...>>`, returning `Found` or panicking on

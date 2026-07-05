@@ -392,7 +392,7 @@ pub fn render_type_catalogue_v3(
     // row corresponds to the correct positional entry in the signals document.
     let mut spec_idx: usize = 0;
 
-    for (type_name, type_entry) in &doc.types {
+    for (type_name, type_entry) in doc.types() {
         // Group by the real v3 role (display tag) so the rendered view reflects
         // the v3 taxonomy; structural shapes (enum, typestate) still take
         // precedence over the semantic DataRole. Signal lookup within the
@@ -403,8 +403,8 @@ pub fn render_type_catalogue_v3(
         let details = v3_type_entry_details(
             type_entry,
             type_name.as_str(),
-            doc.crate_name.as_str(),
-            &doc.trait_impls,
+            doc.crate_name().as_str(),
+            doc.trait_impls(),
         );
         let sig_idx = has_spec_signals.then_some(spec_idx);
         spec_idx += 1;
@@ -416,7 +416,7 @@ pub fn render_type_catalogue_v3(
         ));
     }
 
-    for (trait_name, trait_entry) in &doc.traits {
+    for (trait_name, trait_entry) in doc.traits() {
         let kind_tag = contract_role_display_tag(trait_entry.role());
         let action = v3_action_tag(trait_entry.action());
         let details = v3_trait_entry_details(trait_entry);
@@ -430,7 +430,7 @@ pub fn render_type_catalogue_v3(
         ));
     }
 
-    for (fn_path, fn_entry) in &doc.functions {
+    for (fn_path, fn_entry) in doc.functions() {
         let kind_tag = function_role_display_tag(fn_entry.role());
         let action = v3_action_tag(fn_entry.action());
         let details = v3_function_entry_details(fn_entry);
@@ -624,7 +624,7 @@ mod tests {
             vec![],
             vec![],
         );
-        doc.types.insert(TypeName::new(type_name).unwrap(), entry);
+        doc.insert_type(TypeName::new(type_name).unwrap(), entry);
         doc
     }
 
@@ -711,8 +711,8 @@ mod tests {
             vec![],
             vec![],
         );
-        doc.types.insert(TypeName::new("AType").unwrap(), plain_entry.clone());
-        doc.types.insert(TypeName::new("ZType").unwrap(), plain_entry);
+        doc.insert_type(TypeName::new("AType").unwrap(), plain_entry.clone());
+        doc.insert_type(TypeName::new("ZType").unwrap(), plain_entry);
         // Signals doc has only 1 entry (for index 0 = "AType").
         // "ZType" at index 1 has no corresponding signal → should show "—".
         let spec_signals =
@@ -747,7 +747,7 @@ mod tests {
         let layer = LayerId::try_new("domain".to_owned()).unwrap();
         let crate_name = CrateName::new("domain").unwrap();
         let mut doc = CatalogueDocument::new(3, crate_name, layer);
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("AType").unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
@@ -794,7 +794,7 @@ mod tests {
         let layer = LayerId::try_new("domain".to_owned()).unwrap();
         let crate_name = CrateName::new("domain").unwrap();
         let mut doc = CatalogueDocument::new(3, crate_name, layer);
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("UserAccount").unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
@@ -856,7 +856,7 @@ mod tests {
         let mut doc = CatalogueDocument::new(3, crate_name.clone(), layer);
         let fn_path =
             FunctionPath::at_root(crate_name, FunctionName::new("register_user").unwrap());
-        doc.functions.insert(
+        doc.insert_function(
             fn_path.clone(),
             FunctionEntry::new(
                 ItemAction::Add,
@@ -913,7 +913,7 @@ mod tests {
         let layer = LayerId::try_new("domain".to_owned()).unwrap();
         let crate_name = CrateName::new("domain").unwrap();
         let mut doc = CatalogueDocument::new(3, crate_name, layer);
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("UserRegistered").unwrap(),
             TypeEntry::new(
                 ItemAction::Add,

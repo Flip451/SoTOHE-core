@@ -1417,7 +1417,7 @@ mod tests {
         let crate_name = CrateName::new("domain").unwrap();
         let layer = LayerId::try_new("domain").unwrap();
         let doc = CatalogueDocument::new(3, crate_name, layer);
-        assert!(doc.inherent_impls.is_empty());
+        assert!(doc.inherent_impls().is_empty());
     }
 
     #[test]
@@ -1430,22 +1430,22 @@ mod tests {
         let mut doc = CatalogueDocument::new(3, crate_name, layer);
 
         let type_name = TypeName::new("Email").unwrap();
-        doc.inherent_impls.push(InherentImplDeclV2 {
+        doc.push_inherent_impl(InherentImplDeclV2 {
             type_name: type_name.clone(),
             impl_generics: vec![],
             impl_where_predicates: vec![],
             methods: vec![],
         });
-        doc.inherent_impls.push(InherentImplDeclV2 {
+        doc.push_inherent_impl(InherentImplDeclV2 {
             type_name: type_name.clone(),
             impl_generics: vec![],
             impl_where_predicates: vec![],
             methods: vec![],
         });
 
-        assert_eq!(doc.inherent_impls.len(), 2);
-        assert_eq!(doc.inherent_impls[0].type_name, type_name);
-        assert_eq!(doc.inherent_impls[1].type_name, type_name);
+        assert_eq!(doc.inherent_impls().len(), 2);
+        assert_eq!(doc.inherent_impls()[0].type_name, type_name);
+        assert_eq!(doc.inherent_impls()[1].type_name, type_name);
     }
 
     // -----------------------------------------------------------------------

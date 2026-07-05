@@ -1,5 +1,7 @@
 //! Domain → DTO conversions for [`CatalogueDocument`] (encode path).
 
+use std::collections::{BTreeMap, btree_map::Entry};
+
 use domain::tddd::catalogue_v2::composite::{StructShape, TypeKindV2, TypestateMarker};
 use domain::tddd::catalogue_v2::entries::{
     AssocConstDecl, AssocTypeDecl, FunctionEntry, InherentImplDeclV2, TraitEntry, TypeEntry,
@@ -7,8 +9,8 @@ use domain::tddd::catalogue_v2::entries::{
 use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, InvariantPredicate};
 use domain::tddd::catalogue_v2::variants::{FieldDecl, VariantDecl, VariantPayload};
 use domain::tddd::catalogue_v2::{
-    BoundOp, CatalogueDocument, InvariantDecl, MethodDeclaration, MethodGenericParam,
-    ParamDeclaration, TraitImplDeclV2, WherePredicateDecl,
+    BoundOp, CatalogueDocument, DeletionRecord, InvariantDecl, MethodDeclaration,
+    MethodGenericParam, ParamDeclaration, TraitImplDeclV2, WherePredicateDecl,
 };
 
 use crate::tddd::spec_ground_codec::{informal_grounds_to_dtos, spec_refs_to_dtos};
@@ -24,6 +26,7 @@ use super::dto::{
 use super::dto_roles::{
     ContractRoleDto, DataRoleDto, IdentityAccessorDto, InvariantDeclDto, InvariantPredicateDto,
 };
+use super::dto_slots::{EntrySlotDto, TombstoneDto};
 
 // ---------------------------------------------------------------------------
 // Top-level entry point
@@ -32,35 +35,104 @@ use super::dto_roles::{
 pub(super) fn domain_to_dto(
     doc: &CatalogueDocument,
 ) -> Result<CatalogueDocumentDto, CatalogueDocumentCodecError> {
-    let types = doc
-        .types
+    let mut types: BTreeMap<String, EntrySlotDto<TypeEntryDto>> = doc
+        .types()
         .iter()
-        .map(|(k, v)| type_entry_to_dto(v).map(|dto| (k.as_str().to_owned(), dto)))
+        .map(|(k, v)| {
+            type_entry_to_dto(v).map(|dto| (k.as_str().to_owned(), EntrySlotDto::Live(dto)))
+        })
         .collect::<Result<_, _>>()?;
-    let traits = doc
-        .traits
+    let mut traits: BTreeMap<String, EntrySlotDto<TraitEntryDto>> = doc
+        .traits()
         .iter()
-        .map(|(k, v)| trait_entry_to_dto(v).map(|dto| (k.as_str().to_owned(), dto)))
+        .map(|(k, v)| {
+            trait_entry_to_dto(v).map(|dto| (k.as_str().to_owned(), EntrySlotDto::Live(dto)))
+        })
         .collect::<Result<_, _>>()?;
-    let functions = doc
-        .functions
+    let mut functions: BTreeMap<String, EntrySlotDto<FunctionEntryDto>> = doc
+        .functions()
         .iter()
-        .map(|(k, v)| function_entry_to_dto(v).map(|dto| (k.to_string(), dto)))
+        .map(|(k, v)| function_entry_to_dto(v).map(|dto| (k.to_string(), EntrySlotDto::Live(dto))))
         .collect::<Result<_, _>>()?;
+
+    // Deletion records re-join their section's map as identity-only tombstones,
+    // keyed by name (types / traits) or path (functions). BTreeMap keeps the
+    // merged map in name order, so live entries and tombstones interleave
+    // deterministically.
+    for record in doc.deletions() {
+        match record {
+            DeletionRecord::Type { name, module_path } => {
+                insert_tombstone(
+                    &mut types,
+                    "type",
+                    name.as_str().to_owned(),
+                    tombstone_dto(module_path.to_string()),
+                )?;
+            }
+            DeletionRecord::Trait { name, module_path } => {
+                insert_tombstone(
+                    &mut traits,
+                    "trait",
+                    name.as_str().to_owned(),
+                    tombstone_dto(module_path.to_string()),
+                )?;
+            }
+            DeletionRecord::Function { path } => {
+                insert_tombstone(
+                    &mut functions,
+                    "function",
+                    path.to_string(),
+                    tombstone_dto(String::new()),
+                )?;
+            }
+        }
+    }
+
     let inherent_impls =
-        doc.inherent_impls.iter().map(inherent_impl_to_dto).collect::<Result<Vec<_>, _>>()?;
+        doc.inherent_impls().iter().map(inherent_impl_to_dto).collect::<Result<Vec<_>, _>>()?;
     let trait_impls =
-        doc.trait_impls.iter().map(trait_impl_to_dto).collect::<Result<Vec<_>, _>>()?;
+        doc.trait_impls().iter().map(trait_impl_to_dto).collect::<Result<Vec<_>, _>>()?;
     Ok(CatalogueDocumentDto {
         schema_version: SCHEMA_VERSION,
-        crate_name: doc.crate_name.as_str().to_owned(),
-        layer: doc.layer.as_ref().to_owned(),
+        crate_name: doc.crate_name().as_str().to_owned(),
+        layer: doc.layer().as_ref().to_owned(),
         types,
         traits,
         functions,
         inherent_impls,
         trait_impls,
     })
+}
+
+/// Build an identity-only deletion tombstone DTO for a removed entry.
+///
+/// `module_path` is the crate-relative module of a type / trait deletion, or the
+/// empty string for a crate-root item or a function (whose module lives in the
+/// map key). `ModulePath::root()` renders as the empty string, which the DTO
+/// omits from JSON.
+fn tombstone_dto(module_path: String) -> TombstoneDto {
+    TombstoneDto { action: "delete".to_owned(), module_path }
+}
+
+fn insert_tombstone<T>(
+    map: &mut BTreeMap<String, EntrySlotDto<T>>,
+    entry_kind: &str,
+    key: String,
+    tombstone: TombstoneDto,
+) -> Result<(), CatalogueDocumentCodecError> {
+    match map.entry(key) {
+        Entry::Vacant(slot) => {
+            slot.insert(EntrySlotDto::Tombstone(tombstone));
+            Ok(())
+        }
+        Entry::Occupied(slot) => Err(CatalogueDocumentCodecError::InvalidEntry {
+            entry_name: slot.key().clone(),
+            reason: format!(
+                "delete tombstone collides with an existing {entry_kind} entry; refusing to \
+                 overwrite a semantics-affecting catalogue entry during encode"
+            ),
+        }),
+    }
 }
 
 // ---------------------------------------------------------------------------

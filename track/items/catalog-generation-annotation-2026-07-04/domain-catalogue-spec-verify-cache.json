@@ -147,6 +147,150 @@
       }
     },
     {
+      "claim_hash": "bcf0729a259aa3f9b02972a49c14abcaf290eb645afea8c624f5e9ef2d2c87ec",
+      "evidence_hash": "a64182baca06538e362f87cffe556f3f223de5aedf15a504bcb942f7d5265e80",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存型の取り込み。`--layer` / `--type`（Rust パス、rustdoc から解決）/ `--action reference|modify|delete`（既定 `reference`）/ `--anchor`。reference は変更なし参照、modify は現状 shape を baseline として取り込み変更差分だけを後で type-designer が編集、delete は同定情報の取り込みで足りる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogueDocument"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "`sotp catalog import`: 既存型の取り込み。`--layer` / `--type`（Rust パス、rustdoc から解決）/ `--action reference|modify|delete`（既定 `reference`）/ `--anchor`。reference は変更なし参照、modify は現状 shape を baseline として取り込み変更差分だけを後で type-designer が編集、delete は同定情報の取り込みで足りる。手動転記が残るのは新規型の add のみとする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "bcf0729a259aa3f9b02972a49c14abcaf290eb645afea8c624f5e9ef2d2c87ec",
+      "evidence_hash": "5a77e2a15800b7d1321d018293442db6e0fb7f77f727b81cef6ca2b31824a736",
+      "verdict": {
+        "kind": "pass",
+        "citation": "rustdoc 抽出（既存の実装カタログ計算機構を流用）から完全な型情報を取り込む reference API を提供し、reference / modify / delete の全 action で「現状の記述」の人手による書き起こしを消す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogueDocument"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-03",
+          "text_label": "既存型をカタログに載せる際の手動転記を廃止する。rustdoc 抽出（既存の実装カタログ計算機構を流用）から完全な型情報を取り込む reference API を提供し、reference / modify / delete の全 action で「現状の記述」の人手による書き起こしを消す。"
+        }
+      }
+    },
+    {
+      "claim_hash": "bcf0729a259aa3f9b02972a49c14abcaf290eb645afea8c624f5e9ef2d2c87ec",
+      "evidence_hash": "1df985a886d4289a766713a84486d90919cd5f5a208b50a337e140d5beb3790f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`--action reference|modify|delete` の各ケースで、入力が `--layer` / `--type` / `--action` / `--anchor` のみでもエントリが生成され、reference / modify は rustdoc 由来の現状 shape を含み、delete は同定情報を含む。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogueDocument"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "`sotp catalog import --type <Rust パス>` を実行すると、rustdoc 抽出から既存型の同定情報・シグネチャ・フィールドを解決できる。`--action reference|modify|delete` の各ケースで、入力が `--layer` / `--type` / `--action` / `--anchor` のみでもエントリが生成され、reference / modify は rustdoc 由来の現状 shape を含み、delete は同定情報を含む。"
+        }
+      }
+    },
+    {
+      "claim_hash": "1927f5cdf90d9ecc9ec278e2ce0eb5bdd36d05aa51460c52501e5ad3e0a09e8a",
+      "evidence_hash": "a64182baca06538e362f87cffe556f3f223de5aedf15a504bcb942f7d5265e80",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`delete` は同定情報の取り込みで足りる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "DeletionRecord"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "`sotp catalog import`: 既存型の取り込み。`--layer` / `--type`（Rust パス、rustdoc から解決）/ `--action reference|modify|delete`（既定 `reference`）/ `--anchor`。reference は変更なし参照、modify は現状 shape を baseline として取り込み変更差分だけを後で type-designer が編集、delete は同定情報の取り込みで足りる。手動転記が残るのは新規型の add のみとする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "1927f5cdf90d9ecc9ec278e2ce0eb5bdd36d05aa51460c52501e5ad3e0a09e8a",
+      "evidence_hash": "5a77e2a15800b7d1321d018293442db6e0fb7f77f727b81cef6ca2b31824a736",
+      "verdict": {
+        "kind": "pass",
+        "citation": "reference / modify / delete の全 action で「現状の記述」の人手による書き起こしを消す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "DeletionRecord"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-03",
+          "text_label": "既存型をカタログに載せる際の手動転記を廃止する。rustdoc 抽出（既存の実装カタログ計算機構を流用）から完全な型情報を取り込む reference API を提供し、reference / modify / delete の全 action で「現状の記述」の人手による書き起こしを消す。"
+        }
+      }
+    },
+    {
+      "claim_hash": "1927f5cdf90d9ecc9ec278e2ce0eb5bdd36d05aa51460c52501e5ad3e0a09e8a",
+      "evidence_hash": "1df985a886d4289a766713a84486d90919cd5f5a208b50a337e140d5beb3790f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`--action reference|modify|delete` の各ケースで、入力が `--layer` / `--type` / `--action` / `--anchor` のみでもエントリが生成され、reference / modify は rustdoc 由来の現状 shape を含み、delete は同定情報を含む。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "DeletionRecord"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "`sotp catalog import --type <Rust パス>` を実行すると、rustdoc 抽出から既存型の同定情報・シグネチャ・フィールドを解決できる。`--action reference|modify|delete` の各ケースで、入力が `--layer` / `--type` / `--action` / `--anchor` のみでもエントリが生成され、reference / modify は rustdoc 由来の現状 shape を含み、delete は同定情報を含む。"
+        }
+      }
+    },
+    {
       "claim_hash": "05c842d82f8a5fed97b2d855e76be5916e9c0646ebef8c0f49ec5cb68aff9b2c",
       "evidence_hash": "2372078a9df788d9b977436c973c42ef4cb77a7cce8531e70e8f8803e40ef28a",
       "verdict": {
@@ -483,6 +627,78 @@
       }
     },
     {
+      "claim_hash": "7159dea7602abfa900f19ba9010a33d2c056f8936595bb7c272ddc618ae2014d",
+      "evidence_hash": "589e5f3bda85abd9f2316efc973b607381ffd2399e7348d35e8968376b380137",
+      "verdict": {
+        "kind": "pass",
+        "citation": "impl → catalogue の構造検証（type-signals）が検査面として前提とする完全な型情報を維持する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "InherentImplDeclV2"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-02",
+          "text_label": "カタログエントリの完全な型情報（引数型・返り値型・generics・bound・codec 等）を削減しない。稼働済みの catalogue linter ルール群（DDD ロール意味論・Aggregate 境界・アーキテクチャ配置・primitive obsession 防止）と impl → catalogue の構造検証（type-signals）が検査面として前提とする完全な型情報を維持する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "7159dea7602abfa900f19ba9010a33d2c056f8936595bb7c272ddc618ae2014d",
+      "evidence_hash": "22db512186f463ce4829289ff2181f9b00a5012358fa9b79224b0dcf4029cf78",
+      "verdict": {
+        "kind": "pass",
+        "citation": "型形状（fields / methods / variants / generics / where predicates / impl blocks）の入力は Rust 宣言断片またはシグネチャ文字列として受け取り、sotp が parse して構造化する（既存の TypeRef parser / syn 資産を流用）。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "InherentImplDeclV2"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "型形状（fields / methods / variants / generics / where predicates / impl blocks）の入力は Rust 宣言断片またはシグネチャ文字列として受け取り、sotp が parse して構造化する（既存の TypeRef parser / syn 資産を流用）。parse できない宣言・シグネチャは入力時 reject する。生成時に確定できない箇所は引数で渡さず、生成されたエントリの該当ノードを `$todo` として保留できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "7159dea7602abfa900f19ba9010a33d2c056f8936595bb7c272ddc618ae2014d",
+      "evidence_hash": "a46cb2315cb446b2f5a36229589118230eca9764bc9684555bcf2212cc57a6fe",
+      "verdict": {
+        "kind": "pass",
+        "citation": "generics / where 句を、型・trait・function・method・impl block の各宣言レベルを区別して入力し、カタログ schema の対応フィールド（`generics` / `where_predicates` / `impl_generics` / `impl_where_predicates` 等）へ構造化する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "InherentImplDeclV2"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-09",
+          "text_label": "generics / where 句を、型・trait・function・method・impl block の各宣言レベルを区別して入力し、カタログ schema の対応フィールド（`generics` / `where_predicates` / `impl_generics` / `impl_where_predicates` 等）へ構造化する。method / function シグネチャ内の generics / where 句はそのシグネチャから parse する。ある宣言レベルの generics / where 句に現行 schema の正規フィールドがない場合、完全型情報維持に従い、本 API 実装と同じ変更内で正規フィールドを追加してから生成する。silent drop・docs 文字列への退避・別宣言レベルへの代用は行わない。"
+        }
+      }
+    },
+    {
       "claim_hash": "f7b2676dd11164dadc2df0adc1eca3f77a928518d441039d6c2bd5eab45d6773",
       "evidence_hash": "0289640fe4ee0a2ccc4f039887d7017c52abfb468c2f069cb9c73ba4fd1e00d2",
       "verdict": {
@@ -623,6 +839,78 @@
           "section": "acceptance_criteria",
           "element_id": "AC-16",
           "text_label": "refactor 後の entry 型に対し catalogue linter の `NoPublicField` / `ForbidPrimitiveInTypes` が発火しない。`TypeEntry` への型宣言レベル generics / where フィールド追加を `action: Modify` で宣言した状態で catalogue linter が pass する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ab2dd7b3a94595951edff03fb66a6999fea80100848dd14c6e62025a3de22902",
+      "evidence_hash": "589e5f3bda85abd9f2316efc973b607381ffd2399e7348d35e8968376b380137",
+      "verdict": {
+        "kind": "pass",
+        "citation": "カタログエントリの完全な型情報（引数型・返り値型・generics・bound・codec 等）を削減しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TraitImplDeclV2"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-02",
+          "text_label": "カタログエントリの完全な型情報（引数型・返り値型・generics・bound・codec 等）を削減しない。稼働済みの catalogue linter ルール群（DDD ロール意味論・Aggregate 境界・アーキテクチャ配置・primitive obsession 防止）と impl → catalogue の構造検証（type-signals）が検査面として前提とする完全な型情報を維持する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ab2dd7b3a94595951edff03fb66a6999fea80100848dd14c6e62025a3de22902",
+      "evidence_hash": "22db512186f463ce4829289ff2181f9b00a5012358fa9b79224b0dcf4029cf78",
+      "verdict": {
+        "kind": "pass",
+        "citation": "型形状（fields / methods / variants / generics / where predicates / impl blocks）の入力は Rust 宣言断片またはシグネチャ文字列として受け取り、sotp が parse して構造化する（既存の TypeRef parser / syn 資産を流用）。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TraitImplDeclV2"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "型形状（fields / methods / variants / generics / where predicates / impl blocks）の入力は Rust 宣言断片またはシグネチャ文字列として受け取り、sotp が parse して構造化する（既存の TypeRef parser / syn 資産を流用）。parse できない宣言・シグネチャは入力時 reject する。生成時に確定できない箇所は引数で渡さず、生成されたエントリの該当ノードを `$todo` として保留できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ab2dd7b3a94595951edff03fb66a6999fea80100848dd14c6e62025a3de22902",
+      "evidence_hash": "a46cb2315cb446b2f5a36229589118230eca9764bc9684555bcf2212cc57a6fe",
+      "verdict": {
+        "kind": "pass",
+        "citation": "generics / where 句を、型・trait・function・method・impl block の各宣言レベルを区別して入力し、カタログ schema の対応フィールド（`generics` / `where_predicates` / `impl_generics` / `impl_where_predicates` 等）へ構造化する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TraitImplDeclV2"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-09",
+          "text_label": "generics / where 句を、型・trait・function・method・impl block の各宣言レベルを区別して入力し、カタログ schema の対応フィールド（`generics` / `where_predicates` / `impl_generics` / `impl_where_predicates` 等）へ構造化する。method / function シグネチャ内の generics / where 句はそのシグネチャから parse する。ある宣言レベルの generics / where 句に現行 schema の正規フィールドがない場合、完全型情報維持に従い、本 API 実装と同じ変更内で正規フィールドを追加してから生成する。silent drop・docs 文字列への退避・別宣言レベルへの代用は行わない。"
         }
       }
     },

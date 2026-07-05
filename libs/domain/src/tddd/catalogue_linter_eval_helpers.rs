@@ -490,7 +490,7 @@ pub(super) fn find_in_catalogue(
 ) -> Option<RoleKind> {
     // Check type entries first, excluding delete-action entries.
     if let Some((_, entry)) = catalogue
-        .types
+        .types()
         .iter()
         .find(|(tn, entry)| tn.as_str() == bare_name && entry.action() != ItemAction::Delete)
     {
@@ -498,7 +498,7 @@ pub(super) fn find_in_catalogue(
     }
     // Check trait entries, excluding delete-action entries.
     catalogue
-        .traits
+        .traits()
         .iter()
         .find(|(tn, entry)| tn.as_str() == bare_name && entry.action() != ItemAction::Delete)
         .map(|(_, e)| RoleKind::from_contract_role(e.role()))

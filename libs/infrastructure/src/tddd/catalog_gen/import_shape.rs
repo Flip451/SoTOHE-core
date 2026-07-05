@@ -12,11 +12,13 @@
 
 use std::collections::BTreeSet;
 use std::path::Path;
+use std::str::FromStr;
 
 use domain::plan_ref::SpecElementId;
 use domain::schema::{FunctionInfo, SchemaExport, SchemaExporter, TypeInfo, TypeKind};
 use domain::tddd::catalog_gen::CatalogImportAction;
 use domain::tddd::catalogue::MemberDeclaration;
+use domain::tddd::catalogue_v2::identifiers::{CrateName, ModulePath, TypeName};
 use serde_json::{Map, Value, json};
 use usecase::catalog_gen::{CatalogError, CatalogImportCommand};
 
@@ -97,6 +99,28 @@ pub(super) fn build_import_entry(
     Ok(Value::Object(entry))
 }
 
+/// Build an identity-only deletion tombstone entry from `type_path`.
+///
+/// A `delete` import records only the removed type's identity (its name + module
+/// path), so — unlike [`build_import_entry`] — it neither resolves the (expensive)
+/// rustdoc shape nor emits `role` / `docs` `$todo` holes. The returned
+/// `(name, entry)` is inserted into the `types` map with `action: "delete"`; the
+/// catalogue codec routes it to `CatalogueDocument::deletions`. A crate-root type
+/// omits `module_path` entirely. See spec IN-04, GO-03, AC-04.
+///
+/// # Errors
+///
+/// Returns [`CatalogError::SchemaInvalid`] when `type_path` is not crate-qualified.
+pub(super) fn build_delete_entry(type_path: &str) -> Result<(String, Value), CatalogError> {
+    let (_crate_name, module, name) = parse_type_path(type_path)?;
+    let mut entry = Map::new();
+    entry.insert("action".to_owned(), json!("delete"));
+    if !module.is_empty() {
+        entry.insert("module_path".to_owned(), json!(module));
+    }
+    Ok((name, Value::Object(entry)))
+}
+
 /// Split a crate-qualified type path into `(crate, module, name)`.
 fn parse_type_path(type_path: &str) -> Result<(String, String, String), CatalogError> {
     let segments: Vec<&str> =
@@ -112,6 +136,17 @@ fn parse_type_path(type_path: &str) -> Result<(String, String, String), CatalogE
         .get(1..segments.len().saturating_sub(1))
         .map(|middle| middle.join("::"))
         .unwrap_or_default();
+    CrateName::new(crate_name.clone()).map_err(|e| {
+        schema_error(format!("type path `{type_path}` has invalid crate name `{crate_name}`: {e}"))
+    })?;
+    if !module.is_empty() {
+        ModulePath::from_str(&module).map_err(|e| {
+            schema_error(format!("type path `{type_path}` has invalid module path `{module}`: {e}"))
+        })?;
+    }
+    TypeName::new(name.clone()).map_err(|e| {
+        schema_error(format!("type path `{type_path}` has invalid type name `{name}`: {e}"))
+    })?;
     Ok((crate_name, module, name))
 }
 
@@ -316,6 +351,45 @@ mod tests {
     #[test]
     fn test_parse_type_path_rejects_bare_name() {
         assert!(parse_type_path("LayerId").is_err());
+    }
+
+    #[test]
+    fn test_build_delete_entry_is_identity_only() {
+        // A delete import emits an identity-only tombstone: action + module_path,
+        // with no role / docs / kind / methods holes to fill in.
+        let (name, entry) = build_delete_entry("domain::tddd::LayerId").unwrap();
+        assert_eq!(name, "LayerId");
+        assert_eq!(entry["action"], json!("delete"));
+        assert_eq!(entry["module_path"], json!("tddd"));
+        assert!(entry.get("role").is_none(), "delete tombstone must not carry a role");
+        assert!(entry.get("docs").is_none(), "delete tombstone must not carry docs");
+        assert!(entry.get("kind").is_none(), "delete tombstone must not carry a kind");
+        assert!(entry.get("methods").is_none(), "delete tombstone must not carry methods");
+    }
+
+    #[test]
+    fn test_build_delete_entry_root_module_omits_module_path() {
+        let (name, entry) = build_delete_entry("domain::Foo").unwrap();
+        assert_eq!(name, "Foo");
+        assert_eq!(entry["action"], json!("delete"));
+        assert!(entry.get("module_path").is_none(), "crate-root delete omits module_path");
+    }
+
+    #[test]
+    fn test_build_delete_entry_rejects_bare_name() {
+        assert!(build_delete_entry("LayerId").is_err());
+    }
+
+    #[test]
+    fn test_build_delete_entry_rejects_invalid_module_path() {
+        let result = build_delete_entry("domain::bad-segment::LayerId");
+        assert!(result.is_err(), "invalid module_path must be rejected before writing");
+    }
+
+    #[test]
+    fn test_build_delete_entry_rejects_invalid_type_name() {
+        let result = build_delete_entry("domain::tddd::Layer-Id");
+        assert!(result.is_err(), "invalid type name must be rejected before writing");
     }
 
     #[test]

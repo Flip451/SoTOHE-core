@@ -274,17 +274,17 @@ pub fn execute_type_signals_for_layer(
     // report omits reference items.
     let kind_tag_map: BTreeMap<String, Vec<&'static str>> = {
         let mut m: BTreeMap<String, Vec<&'static str>> = BTreeMap::new();
-        for (name, entry) in &doc.types {
+        for (name, entry) in doc.types() {
             m.entry(name.as_str().to_owned())
                 .or_default()
                 .push(data_role_kind_tag(entry.role(), entry.kind()));
         }
-        for (name, entry) in &doc.traits {
+        for (name, entry) in doc.traits() {
             m.entry(name.as_str().to_owned())
                 .or_default()
                 .push(contract_role_kind_tag(entry.role()));
         }
-        for (path, entry) in &doc.functions {
+        for (path, entry) in doc.functions() {
             // T012 ensures that CatalogueDocumentCodec rejects cross-crate function
             // paths at decode time (CrossCrateFunctionPath error), so all function
             // paths here already carry the catalogue's own crate_name prefix.

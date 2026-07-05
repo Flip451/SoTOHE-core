@@ -38,12 +38,17 @@
       { "layer": "infrastructure", "entry_key": "infrastructure::tddd::catalog_gen::try_complete" },
       { "layer": "infrastructure", "entry_key": "CatalogDraftError" }
     ],
-    "T006": [],
+    "T006": [
+      { "layer": "domain", "entry_key": "InherentImplDeclV2" },
+      { "layer": "domain", "entry_key": "TraitImplDeclV2" }
+    ],
     "T007": [
       { "layer": "infrastructure", "entry_key": "FsCatalogAdapter" },
       { "layer": "domain", "entry_key": "ImplInfo" },
       { "layer": "domain", "entry_key": "FunctionInfo" },
-      { "layer": "domain", "entry_key": "TypeInfo" }
+      { "layer": "domain", "entry_key": "TypeInfo" },
+      { "layer": "domain", "entry_key": "DeletionRecord" },
+      { "layer": "domain", "entry_key": "CatalogueDocument" }
     ],
     "T008": [
       { "layer": "cli_driver", "entry_key": "CatalogKindSelect" },

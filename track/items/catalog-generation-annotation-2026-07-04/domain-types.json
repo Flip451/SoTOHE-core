@@ -202,6 +202,40 @@
       ],
       "informal_grounds": []
     },
+    "InherentImplDeclV2": {
+      "action": "reference",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "tddd::catalogue_v2::entries",
+      "docs": "See GO-02, IN-08, IN-09.",
+      "spec_refs": [
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "GO-02" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-08" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-09" }
+      ],
+      "informal_grounds": []
+    },
+    "TraitImplDeclV2": {
+      "action": "reference",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "tddd::catalogue_v2::traits",
+      "docs": "See GO-02, IN-08, IN-09.",
+      "spec_refs": [
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "GO-02" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-08" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-09" }
+      ],
+      "informal_grounds": []
+    },
     "ImplInfo": {
       "action": "modify",
       "role": { "ValueObject": {} },
@@ -247,6 +281,70 @@
       "spec_refs": [
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-04" },
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-08" }
+      ],
+      "informal_grounds": []
+    },
+    "CatalogueDocument": {
+      "action": "modify",
+      "role": { "DomainService": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "tddd::catalogue_v2::document",
+      "docs": "See IN-04, GO-03, AC-04.",
+      "spec_refs": [
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "GO-03" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-04" }
+      ],
+      "informal_grounds": []
+    },
+    "DeletionRecord": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Type",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "name",        "ty": "TypeName" },
+                { "name": "module_path", "ty": "ModulePath" }
+              ]
+            }
+          },
+          {
+            "name": "Trait",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "name",        "ty": "TraitName" },
+                { "name": "module_path", "ty": "ModulePath" }
+              ]
+            }
+          },
+          {
+            "name": "Function",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "path", "ty": "FunctionPath" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::catalogue_v2::deletions",
+      "docs": "See IN-04, GO-03, AC-04.",
+      "spec_refs": [
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "GO-03" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-04" }
       ],
       "informal_grounds": []
     }
@@ -1240,6 +1338,238 @@
           "docs": "Catalogue method declaration `FunctionEntry::informal_grounds`."
         }
       ]
+    },
+    {
+      "type_name": "CatalogueDocument",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "schema_version", "ty": "u32" },
+            { "name": "crate_name",     "ty": "CrateName" },
+            { "name": "layer",          "ty": "LayerId" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Catalogue method declaration `CatalogueDocument::new`."
+        },
+        {
+          "name": "validate_filename",
+          "receiver": "&self",
+          "params": [
+            { "name": "filename_stem", "ty": "&str" }
+          ],
+          "returns": "Result<(), CatalogueDocumentError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Catalogue method declaration `CatalogueDocument::validate_filename`; producible errors: `CatalogueDocumentError::CrateNameMismatch`."
+        },
+        {
+          "name": "schema_version",
+          "receiver": "&self",
+          "params": [],
+          "returns": "u32",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Catalogue method declaration `CatalogueDocument::schema_version`."
+        },
+        {
+          "name": "crate_name",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&CrateName",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Catalogue method declaration `CatalogueDocument::crate_name`."
+        },
+        {
+          "name": "layer",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&LayerId",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Catalogue method declaration `CatalogueDocument::layer`."
+        },
+        {
+          "name": "types",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&std::collections::BTreeMap<TypeName, TypeEntry>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Catalogue method declaration `CatalogueDocument::types`."
+        },
+        {
+          "name": "traits",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&std::collections::BTreeMap<TraitName, TraitEntry>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Catalogue method declaration `CatalogueDocument::traits`."
+        },
+        {
+          "name": "functions",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&std::collections::BTreeMap<FunctionPath, FunctionEntry>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Catalogue method declaration `CatalogueDocument::functions`."
+        },
+        {
+          "name": "inherent_impls",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[InherentImplDeclV2]",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Catalogue method declaration `CatalogueDocument::inherent_impls`."
+        },
+        {
+          "name": "trait_impls",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[TraitImplDeclV2]",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Catalogue method declaration `CatalogueDocument::trait_impls`."
+        },
+        {
+          "name": "deletions",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[DeletionRecord]",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Catalogue method declaration `CatalogueDocument::deletions`."
+        },
+        {
+          "name": "insert_type",
+          "receiver": "&mut self",
+          "params": [
+            { "name": "name",  "ty": "TypeName" },
+            { "name": "entry", "ty": "TypeEntry" }
+          ],
+          "returns": "()",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Catalogue method declaration `CatalogueDocument::insert_type`."
+        },
+        {
+          "name": "insert_trait",
+          "receiver": "&mut self",
+          "params": [
+            { "name": "name",  "ty": "TraitName" },
+            { "name": "entry", "ty": "TraitEntry" }
+          ],
+          "returns": "()",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Catalogue method declaration `CatalogueDocument::insert_trait`."
+        },
+        {
+          "name": "insert_function",
+          "receiver": "&mut self",
+          "params": [
+            { "name": "path",  "ty": "FunctionPath" },
+            { "name": "entry", "ty": "FunctionEntry" }
+          ],
+          "returns": "()",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Catalogue method declaration `CatalogueDocument::insert_function`."
+        },
+        {
+          "name": "push_inherent_impl",
+          "receiver": "&mut self",
+          "params": [
+            { "name": "decl", "ty": "InherentImplDeclV2" }
+          ],
+          "returns": "()",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Catalogue method declaration `CatalogueDocument::push_inherent_impl`."
+        },
+        {
+          "name": "push_trait_impl",
+          "receiver": "&mut self",
+          "params": [
+            { "name": "decl", "ty": "TraitImplDeclV2" }
+          ],
+          "returns": "()",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Catalogue method declaration `CatalogueDocument::push_trait_impl`."
+        },
+        {
+          "name": "push_deletion",
+          "receiver": "&mut self",
+          "params": [
+            { "name": "record", "ty": "DeletionRecord" }
+          ],
+          "returns": "()",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Catalogue method declaration `CatalogueDocument::push_deletion`."
+        }
+      ]
+    },
+    {
+      "type_name": "TraitImplDeclV2",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "trait_ref", "ty": "TypeRef" },
+            { "name": "for_type",  "ty": "TypeRef" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Catalogue method declaration `TraitImplDeclV2::new`."
+        }
+      ]
     }
   ],
   "trait_impls": [
@@ -1292,6 +1622,16 @@
     { "action": "reference", "trait_ref": "core::cmp::PartialEq", "for_type": "FunctionEntry" },
     { "action": "reference", "trait_ref": "core::cmp::Eq",        "for_type": "FunctionEntry" },
 
+    { "action": "reference", "trait_ref": "core::fmt::Debug",     "for_type": "InherentImplDeclV2" },
+    { "action": "reference", "trait_ref": "core::clone::Clone",   "for_type": "InherentImplDeclV2" },
+    { "action": "reference", "trait_ref": "core::cmp::PartialEq", "for_type": "InherentImplDeclV2" },
+    { "action": "reference", "trait_ref": "core::cmp::Eq",        "for_type": "InherentImplDeclV2" },
+
+    { "action": "reference", "trait_ref": "core::fmt::Debug",     "for_type": "TraitImplDeclV2" },
+    { "action": "reference", "trait_ref": "core::clone::Clone",   "for_type": "TraitImplDeclV2" },
+    { "action": "reference", "trait_ref": "core::cmp::PartialEq", "for_type": "TraitImplDeclV2" },
+    { "action": "reference", "trait_ref": "core::cmp::Eq",        "for_type": "TraitImplDeclV2" },
+
     { "action": "reference", "trait_ref": "core::fmt::Debug",     "for_type": "ImplInfo" },
     { "action": "reference", "trait_ref": "core::clone::Clone",   "for_type": "ImplInfo" },
     { "trait_ref": "core::cmp::PartialEq",                        "for_type": "ImplInfo" },
@@ -1310,6 +1650,16 @@
     { "trait_ref": "core::fmt::Debug",         "for_type": "DocString" },
     { "trait_ref": "core::clone::Clone",       "for_type": "DocString" },
     { "trait_ref": "core::cmp::PartialEq",     "for_type": "DocString" },
-    { "trait_ref": "core::cmp::Eq",            "for_type": "DocString" }
+    { "trait_ref": "core::cmp::Eq",            "for_type": "DocString" },
+
+    { "action": "reference", "trait_ref": "core::fmt::Debug",     "for_type": "CatalogueDocument" },
+    { "action": "reference", "trait_ref": "core::clone::Clone",   "for_type": "CatalogueDocument" },
+    { "action": "reference", "trait_ref": "core::cmp::PartialEq", "for_type": "CatalogueDocument" },
+    { "action": "reference", "trait_ref": "core::cmp::Eq",        "for_type": "CatalogueDocument" },
+
+    { "trait_ref": "core::fmt::Debug",         "for_type": "DeletionRecord" },
+    { "trait_ref": "core::clone::Clone",       "for_type": "DeletionRecord" },
+    { "trait_ref": "core::cmp::PartialEq",     "for_type": "DeletionRecord" },
+    { "trait_ref": "core::cmp::Eq",            "for_type": "DeletionRecord" }
   ]
 }

@@ -1873,7 +1873,7 @@ mod tests {
         let crate_name = CrateName::new("domain").unwrap();
         let layer = LayerId::try_new("domain").unwrap();
         let mut doc = CatalogueDocument::new(3, crate_name, layer);
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("TrackId").unwrap(),
             TypeEntry::new(
                 ItemAction::Add,

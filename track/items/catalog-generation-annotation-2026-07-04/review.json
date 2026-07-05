@@ -1,95 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9150414d3e8894f6249036886ba388cf82b91f476739693dacc632e4b2cc24bd",
-          "at": "2026-07-04T06:13:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The description still says this adapter \"enforces Opus via frontmatter\", but the briefing documents that `CLAUDE_CODE_SUBAGENT_MODEL` takes precedence over agent frontmatter. Leaving this wording in the distributed agent policy preserves the incorrect routing contract that caused the incident, so it should be updated to describe the explicit Opus frontmatter as the selected/default model rather than an enforcement mechanism.",
-              "severity": "P1",
-              "file": ".claude/agents/adr-editor.md",
-              "line": 6,
-              "category": "harness-policy factual routing drift"
-            },
-            {
-              "message": "The description still says this adapter \"enforces Opus via frontmatter\", but the briefing documents that `CLAUDE_CODE_SUBAGENT_MODEL` takes precedence over agent frontmatter. This keeps an incorrect routing guarantee in the harness policy surface and can mislead future fixes into relying on frontmatter as an override-proof control.",
-              "severity": "P1",
-              "file": ".claude/agents/spec-designer.md",
-              "line": 15,
-              "category": "harness-policy factual routing drift"
-            },
-            {
-              "message": "The description still says this adapter \"enforces Opus via frontmatter\", but the briefing documents that `CLAUDE_CODE_SUBAGENT_MODEL` takes precedence over agent frontmatter. This keeps an incorrect routing guarantee in the harness policy surface and should be revised with the model-setting change.",
-              "severity": "P1",
-              "file": ".claude/agents/impl-planner.md",
-              "line": 15,
-              "category": "harness-policy factual routing drift"
-            },
-            {
-              "message": "The description still says this adapter \"enforces Opus via frontmatter\", but the briefing documents that `CLAUDE_CODE_SUBAGENT_MODEL` takes precedence over agent frontmatter. This preserves the same false routing contract in the distributed adapter docs and should be corrected alongside the explicit model ID.",
-              "severity": "P1",
-              "file": ".claude/agents/rollback-diagnoser.md",
-              "line": 12,
-              "category": "harness-policy factual routing drift"
-            }
-          ],
-          "hash": "rvw1:sha256:9150414d3e8894f6249036886ba388cf82b91f476739693dacc632e4b2cc24bd",
-          "at": "2026-07-04T06:17:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:202334dcbff77abf61de3f2acf2b47a73098d9c3f93f8db3ebe49cf18de68e65",
-          "at": "2026-07-04T06:35:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:202334dcbff77abf61de3f2acf2b47a73098d9c3f93f8db3ebe49cf18de68e65",
-          "at": "2026-07-04T06:41:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5ef11e60ce5b13fd88ff600bcb978c17f3a4687d6f7ae87abb3ef02eab3645c2",
-          "at": "2026-07-04T08:43:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5ef11e60ce5b13fd88ff600bcb978c17f3a4687d6f7ae87abb3ef02eab3645c2",
-          "at": "2026-07-04T08:47:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:78043345b7bd572f0dfd37f298678a81ac22ad5355d0281f9e47407c5f076eaf",
-          "at": "2026-07-04T15:52:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:78043345b7bd572f0dfd37f298678a81ac22ad5355d0281f9e47407c5f076eaf",
-          "at": "2026-07-04T16:07:24Z"
-        }
-      ]
-    },
     "domain": {
       "rounds": [
         {
@@ -162,249 +73,439 @@
           "findings": [],
           "hash": "rvw1:sha256:94428e7c93c5c2c35e0980b5727bd26a13af430047768906e60745d257660d24",
           "at": "2026-07-04T23:16:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:91bf9a89bdcf4750253eef616f0e4bdfa7e837f9b49fc378fc8ea67afc624d8d",
+          "at": "2026-07-05T05:45:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:91bf9a89bdcf4750253eef616f0e4bdfa7e837f9b49fc378fc8ea67afc624d8d",
+          "at": "2026-07-05T05:50:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:91bf9a89bdcf4750253eef616f0e4bdfa7e837f9b49fc378fc8ea67afc624d8d",
+          "at": "2026-07-05T06:18:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:91bf9a89bdcf4750253eef616f0e4bdfa7e837f9b49fc378fc8ea67afc624d8d",
+          "at": "2026-07-05T06:26:38Z"
         }
       ]
     },
-    "types": {
+    "cli_composition": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:bd9d875871090c255653a6fd83458934021dcce67dcd2cd51cc0353d83f37ab1",
-          "at": "2026-07-04T06:29:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1 upstream restatement: `domain::DocString`, `domain::TypeEntry`, `domain::TraitEntry`, and `domain::FunctionEntry` docs restate the lint-conformance ADR/spec behavior in prose, including why fields are private, why `docs` becomes `Option<DocString>`, and the constructor/accessor strategy. Per `knowledge/conventions/no-upstream-restatement.md`, these catalogue docs should cite IN-13/IN-14/AC-14..AC-16 rather than restating the upstream contract.",
-              "severity": "P1",
-              "file": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
-              "line": 143,
-              "category": "upstream_restatement"
-            },
-            {
-              "message": "P1 upstream restatement: multiple usecase entries restate spec behavior instead of only anchoring it. Examples include `usecase::CatalogGateContext` spelling out phase2/merge/commit strictness, `usecase::CatalogCheckVerdict` restating exit semantics, and `usecase::CatalogError` restating per-variant AC/D decision behavior. This duplicates the upstream spec/ADR contract in the type catalogue docs.",
-              "severity": "P1",
-              "file": "track/items/catalog-generation-annotation-2026-07-04/usecase-types.json",
-              "line": 19,
-              "category": "upstream_restatement"
-            },
-            {
-              "message": "P1 upstream restatement: infrastructure catalogue docs restate upstream D4/CN-02 behavior. `infrastructure::FsCatalogAdapter`, `infrastructure::CatalogDraftError`, `scan_todo_holes`, and `try_complete` describe schema authority, `$todo` traversal, completion-boundary behavior, and consumer impact in prose instead of leaving those behaviors to the cited anchors.",
-              "severity": "P1",
-              "file": "track/items/catalog-generation-annotation-2026-07-04/infrastructure-types.json",
-              "line": 15,
-              "category": "upstream_restatement"
-            },
-            {
-              "message": "P1 upstream restatement: CLI catalogue docs restate command behavior from the spec/ADR, especially the D8/IN-11 track-id guard and read/write resolution rules in `cli::CatalogInitArgs` and `cli::commands::catalog::execute`. These docs should identify the surface and cite IN-11/AC-09 rather than reproducing the fail-closed contract.",
-              "severity": "P1",
-              "file": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
-              "line": 84,
-              "category": "upstream_restatement"
-            },
-            {
-              "message": "P1 upstream restatement: cli_driver DTO docs restate upstream validation and guard behavior, such as `CatalogInitInput` describing the D8 write guard and `CatalogAddInput`/`CatalogCiteInput` describing downstream validation semantics. The type catalogue should cite the relevant anchors instead of duplicating the behavior contract.",
-              "severity": "P1",
-              "file": "track/items/catalog-generation-annotation-2026-07-04/cli_driver-types.json",
-              "line": 84,
-              "category": "upstream_restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:bd9d875871090c255653a6fd83458934021dcce67dcd2cd51cc0353d83f37ab1",
-          "at": "2026-07-04T06:37:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`CatalogService::init` / `CatalogPort::init` reuse the full `CatalogError`, but the `init` verb can only plausibly emit file-creation and I/O failures. Callers still have to handle dead branches such as `DuplicateEntry`, `AnchorNotFound`, `InvalidRole`, `ParseFragment`, `SchemaInvalid`, and `DraftIncomplete`, and the method docs do not narrow that subset or justify the broad enum.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/usecase-types.json",
-              "line": 280,
-              "category": "per-method error imprecision"
-            }
-          ],
-          "hash": "rvw1:sha256:644fbababe296a28603ed439fa9df1fb0f4224ca17000efac38c9c3df453897a",
-          "at": "2026-07-04T07:07:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8b69765cf49970ddcb26d2fa94874a065f19e4828adec3ab1daf4a52bcf0505b",
-          "at": "2026-07-04T07:20:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The `docs` fields for domain catalogue entries such as `domain::TodoInstruction`, `domain::DraftHole`, `domain::CatalogImportAction`, `domain::TypeEntry`, `domain::TraitEntry`, and `domain::FunctionEntry` restate upstream ADR/spec behavior in prose instead of only citing the upstream anchors. For example, `TodoInstruction` re-describes how `$todo` nodes are generated and consumed. `knowledge/conventions/no-upstream-restatement.md` applies to `<layer>-types.json` docs, so these downstream restatements should be replaced with concise entry identification plus anchor cites.",
-              "severity": "P1",
-              "file": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
-              "line": 21,
-              "category": "SoT integrity / upstream restatement"
-            },
-            {
-              "message": "The usecase catalogue has the same upstream-restatement problem across keys including `usecase::CatalogGateContext`, `usecase::CatalogAddCommand`, `usecase::CatalogError`, `usecase::CatalogInteractor`, `usecase::CatalogService`, and `usecase::CatalogPort`. These docs repeat gate semantics, validation ownership, error semantics, track guard behavior, and port wiring rationale that already live in ADR/spec anchors. Per `knowledge/conventions/no-upstream-restatement.md`, the docs must cite anchors rather than re-explain the behavioral contract.",
-              "severity": "P1",
-              "file": "track/items/catalog-generation-annotation-2026-07-04/usecase-types.json",
-              "line": 19,
-              "category": "SoT integrity / upstream restatement"
-            },
-            {
-              "message": "CLI catalogue docs for keys such as `cli::CatalogKindArg`, `cli::CatalogAddArgs`, `cli::CatalogCheckArgs`, `cli::CatalogCommand`, and `cli::commands::catalog::execute` restate clap spelling, argument mapping, track-id guard behavior, dispatch, and exit-code behavior in prose. Those are upstream behavior contracts already covered by spec refs; keeping the narrative here violates `knowledge/conventions/no-upstream-restatement.md` and creates another drift source.",
-              "severity": "P1",
-              "file": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
-              "line": 21,
-              "category": "SoT integrity / upstream restatement"
-            },
-            {
-              "message": "The cli_driver catalogue docs for `cli_driver::CatalogKindSelect`, `cli_driver::CatalogAddInput`, `cli_driver::CatalogCheckInput`, `cli_driver::CatalogInput`, and `cli_driver::CatalogDriver` restate boundary conversion, dynamic layer handling, trusted track-id handling, and dispatch behavior. These should be anchor-backed type declarations, not prose copies of the upstream contract, under `knowledge/conventions/no-upstream-restatement.md`.",
-              "severity": "P1",
-              "file": "track/items/catalog-generation-annotation-2026-07-04/cli_driver-types.json",
-              "line": 21,
-              "category": "SoT integrity / upstream restatement"
-            },
-            {
-              "message": "`cli_composition::CatalogCompositionRoot` docs restate DI wiring, full-stack handling, and test-entry behavior instead of limiting the catalogue entry to the declared type surface plus upstream anchor refs. That is downstream prose duplication of the composition behavior and violates `knowledge/conventions/no-upstream-restatement.md`.",
-              "severity": "P1",
-              "file": "track/items/catalog-generation-annotation-2026-07-04/cli_composition-types.json",
-              "line": 15,
-              "category": "SoT integrity / upstream restatement"
-            },
-            {
-              "message": "Infrastructure catalogue docs for `infrastructure::FsCatalogAdapter`, `infrastructure::CatalogDraftError`, `infrastructure::tddd::catalog_gen::scan_todo_holes`, and `infrastructure::tddd::catalog_gen::try_complete` restate adapter parsing choices, schema authority, `$todo` traversal semantics, and completion/error behavior. Those are ADR/spec contracts already cited in `spec_refs`; the type catalogue docs should not reproduce them under `knowledge/conventions/no-upstream-restatement.md`.",
-              "severity": "P1",
-              "file": "track/items/catalog-generation-annotation-2026-07-04/infrastructure-types.json",
-              "line": 15,
-              "category": "SoT integrity / upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:8b69765cf49970ddcb26d2fa94874a065f19e4828adec3ab1daf4a52bcf0505b",
-          "at": "2026-07-04T07:28:00Z"
+          "hash": "rvw1:sha256:6e5c3f80132da943d5ec5e02c5ba28741c43dc4eb386a1392f719e560402f51a",
+          "at": "2026-07-04T15:51:38Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8751b88bff03f7056b67887b713e805f89576c86023da1c279ac0f6b2f7e4cd6",
-          "at": "2026-07-04T07:49:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:80b9df95ed8cea6e949b96e1e08e94f327311e38a4d9d961fd76665c8d93294c",
-          "at": "2026-07-04T12:02:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:80b9df95ed8cea6e949b96e1e08e94f327311e38a4d9d961fd76665c8d93294c",
-          "at": "2026-07-04T12:07:16Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:403f04a41a3244051d0b8b18c382d94d8194bb6c170739e6fe4b75abb4163209",
-          "at": "2026-07-04T15:59:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:403f04a41a3244051d0b8b18c382d94d8194bb6c170739e6fe4b75abb4163209",
-          "at": "2026-07-04T16:09:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`ImplInfo.docs` restates the F2 rationale (`target_module_path` disambiguation) instead of keeping the catalogue text contract-only. Per policy, anchor this entry to AC-04/IN-08 without reproducing upstream reasoning.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
-              "line": 214,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "`FunctionInfo.docs` restates the cross-entry derive rationale (“Family-cohesion PartialEq/Eq derives added alongside ImplInfo”) instead of just describing the type contract. Keep the field anchor-only and move the rationale out of the catalogue.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
-              "line": 230,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:c236a24864f3fbef8cb0e90d1df953492cfdf812b966c8391103fd52000cd174",
-          "at": "2026-07-04T18:39:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e56f337d5807c311896a0e03f68aa770e68ab5260b26a8fa2ff1d7c7245ef623",
-          "at": "2026-07-04T18:42:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e56f337d5807c311896a0e03f68aa770e68ab5260b26a8fa2ff1d7c7245ef623",
-          "at": "2026-07-04T18:47:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0cc3ceba4e6e4024b806c9b58708876e6389ec84f5ea846b564d45f649c02974",
-          "at": "2026-07-04T19:28:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0cc3ceba4e6e4024b806c9b58708876e6389ec84f5ea846b564d45f649c02974",
-          "at": "2026-07-04T19:32:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:890aa25b28c2b2b70fe438337c5915778c137d0f01ceded83305ac44776f1b90",
-          "at": "2026-07-04T23:15:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:890aa25b28c2b2b70fe438337c5915778c137d0f01ceded83305ac44776f1b90",
-          "at": "2026-07-04T23:19:24Z"
+          "hash": "rvw1:sha256:6e5c3f80132da943d5ec5e02c5ba28741c43dc4eb386a1392f719e560402f51a",
+          "at": "2026-07-04T16:06:52Z"
         }
       ]
     },
-    "cli": {
+    "infrastructure": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7ffd3fbf84f51de9c36b19d7d9a5784fa471c96f0c13fa5e3a46fbb5ddd58585",
-          "at": "2026-07-04T15:53:30Z"
+          "hash": "rvw1:sha256:e8ba8f758395f0547ec02da8bd87c8cd9b58e1aaeb7d201ea4b6e5272942a42e",
+          "at": "2026-07-04T10:45:23Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7ffd3fbf84f51de9c36b19d7d9a5784fa471c96f0c13fa5e3a46fbb5ddd58585",
-          "at": "2026-07-04T16:07:47Z"
+          "hash": "rvw1:sha256:e8ba8f758395f0547ec02da8bd87c8cd9b58e1aaeb7d201ea4b6e5272942a42e",
+          "at": "2026-07-04T11:00:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Joining raw `track_id` here lets `../` or absolute inputs escape `items_dir`, and every verb reuses this helper before any root check. That creates a workspace traversal boundary break; validate `track_id` as a `TrackId` and verify the resolved directory stays under the trusted root.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalog_gen/fs_access.rs",
+              "line": 40,
+              "category": "trusted-root violation"
+            },
+            {
+              "message": "Catalogue I/O follows whatever path this helper returns with `read_to_string`/`write`, but it never rejects symlinked leaves or ancestors. A symlinked `*-types.json` can redirect reads and writes outside the workspace; reject symlinks at the boundary like the other infra loaders do.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalog_gen/fs_access.rs",
+              "line": 81,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "`unwrap_or_default()` masks all `load_spec_anchors` failures, not just a missing Phase-0 spec. A malformed or unreadable `spec.json` is treated as an empty anchor set, so `check` can proceed instead of failing closed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalog_gen/verb_check.rs",
+              "line": 39,
+              "category": "non-fail-closed config"
+            }
+          ],
+          "hash": "rvw1:sha256:83b114c3f7e84a5664d7d9e7a458429627f901193fef3474a6c813ba51bf61a8",
+          "at": "2026-07-04T13:46:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The add/import/cite path reads catalogue files as raw `serde_json::Value` and rewrites them without any `schema_version` probe. That means a v4 or future catalogue is silently mutated instead of being rejected fail-closed, which is the same versioning footgun the strict DTO codecs are meant to prevent.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalog_gen/fs_access.rs",
+              "line": 115,
+              "category": "serde codec break"
+            },
+            {
+              "message": "`check_layer` validates schema only after the `$todo` scan. If a catalogue is on an unsupported schema version but still contains holes, the function returns the hole verdict and never reaches `try_complete`, so the version error is not fail-closed. Commit-mode checks can therefore downgrade a schema break to an interim warning.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalog_gen/verb_check.rs",
+              "line": 77,
+              "category": "serde codec break"
+            }
+          ],
+          "hash": "rvw1:sha256:5fc7ad9903529f2278e5b5af04177aa9717e6329c21b0e01472676f54859b0c2",
+          "at": "2026-07-04T14:07:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f9dac1c301be637bb7a7b989efe6658224ac11c3098d3ea860ad4177bdade225",
+          "at": "2026-07-04T14:19:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f9dac1c301be637bb7a7b989efe6658224ac11c3098d3ea860ad4177bdade225",
+          "at": "2026-07-04T14:25:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3067326ce699e2cf6318be66813d7d28cb752dc5d71cfcf03e9dd0d601944204",
+          "at": "2026-07-04T16:53:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3067326ce699e2cf6318be66813d7d28cb752dc5d71cfcf03e9dd0d601944204",
+          "at": "2026-07-04T16:57:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9c5e0578d4ae0d759a290d0f3f456fd9b210eb3604e092642762549a8ec4399d",
+          "at": "2026-07-04T18:25:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9c5e0578d4ae0d759a290d0f3f456fd9b210eb3604e092642762549a8ec4399d",
+          "at": "2026-07-04T18:29:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2e45561ae37f332247a0fc0bfeb9871009e20bd28538db24323f46c7aa2e258",
+          "at": "2026-07-04T19:28:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2e45561ae37f332247a0fc0bfeb9871009e20bd28538db24323f46c7aa2e258",
+          "at": "2026-07-04T19:33:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eb187a1060059ad8e24f55b1a79fe4c85b0aa84e471d3cdfa46c1212fac5a7b4",
+          "at": "2026-07-04T20:08:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eb187a1060059ad8e24f55b1a79fe4c85b0aa84e471d3cdfa46c1212fac5a7b4",
+          "at": "2026-07-04T20:13:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:16afdc861a1eb5bfabb93f7e3949a92aeaf70a5223a93de3ee7e692de4aa54b5",
+          "at": "2026-07-04T20:37:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:16afdc861a1eb5bfabb93f7e3949a92aeaf70a5223a93de3ee7e692de4aa54b5",
+          "at": "2026-07-04T20:41:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`validate_hole_free_schema` treats any `CatalogDraftError::Incomplete` from the pruned document as success, so a remaining top-level hole (`layer`, `crate_name`, etc.) can short-circuit decoding before a later hole-free schema error is checked. In `check_layer`, that means a catalogue with a `$todo` hole plus an unknown field / invalid role in a later section can still be reported as `Interim` at the commit gate instead of `Blocked`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalog_gen/mod.rs",
+              "line": 183,
+              "category": "non-fail-closed config"
+            }
+          ],
+          "hash": "rvw1:sha256:4513d94ddb4978103beca2d747b63a0ce1f80c471580547637ef7ea3c3ea1886",
+          "at": "2026-07-04T21:20:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`validate_hole_free_schema()` still fails open for a root-level `{\"$todo\": ...}` marker. `prune_hole_bearing_entries()` removes holes inside `types`/`traits`/`functions`, but `remove_unknown_top_level_holes()` does not strip the root `$todo` key because its value is just the instruction string, not a nested subtree. That leaves `try_complete()` returning `Incomplete` before `CatalogueDocumentCodec::decode()` runs, so `check_layer()` can still return `Interim` at commit even when the remaining hole-free portion has a real schema error.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalog_gen/mod.rs",
+              "line": 248,
+              "category": "serde codec break"
+            }
+          ],
+          "hash": "rvw1:sha256:5b5a23e27fdb26b7a38d52a8143e8cb054f9ed7bcc315c61f0364732b33f5e98",
+          "at": "2026-07-04T21:33:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:11fac1d0dc458b69dc40db463e451cd150926305125858473023dd872455fbf9",
+          "at": "2026-07-04T21:40:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:11fac1d0dc458b69dc40db463e451cd150926305125858473023dd872455fbf9",
+          "at": "2026-07-04T21:54:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce361eb9c280f5a5a9b93b06d0adc0af8969546758a3edc2057115a628c83f6c",
+          "at": "2026-07-04T22:27:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce361eb9c280f5a5a9b93b06d0adc0af8969546758a3edc2057115a628c83f6c",
+          "at": "2026-07-04T22:31:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7d76c603158833478399d918983f48be206ee647e6f0f862a5a6b6e49352356b",
+          "at": "2026-07-04T23:16:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7d76c603158833478399d918983f48be206ee647e6f0f862a5a6b6e49352356b",
+          "at": "2026-07-04T23:22:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`EntrySlotDto::deserialize` round-trips each entry through `serde_json::Value` before the typed DTO parse. That collapses duplicate object keys to last-wins semantics, so a malformed catalogue entry can now silently override fields such as `action` or `module_path` instead of failing closed the way the strict DTO deserializer did before.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/dto.rs",
+              "line": 257,
+              "category": "serde codec break"
+            },
+            {
+              "message": "`build_delete_entry` copies the module segment string into the tombstone without validating it as a `ModulePath`. The decode path later rejects non-empty invalid delete `module_path` values, so a delete import can write a `*-types.json` that the same codec cannot read back, turning bad input into a broken catalogue file instead of a typed error.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalog_gen/import_shape.rs",
+              "line": 112,
+              "category": "serde codec break"
+            }
+          ],
+          "hash": "rvw1:sha256:98f93e71977e3b4b62bd9528c12ea9787e414444117c82094231aae71effff7f",
+          "at": "2026-07-05T05:49:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a93f89c43164fe4878796e3ce926e99551ec57d20aab6aa40f6d6f4f97946f12",
+          "at": "2026-07-05T06:03:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a93f89c43164fe4878796e3ce926e99551ec57d20aab6aa40f6d6f4f97946f12",
+          "at": "2026-07-05T06:21:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Function delete tombstones are decoded with the shared `TombstoneDto`, which permits `module_path`, but this branch ignores the tombstone payload and `encode` always writes function deletions back with an empty module path. A catalogue row like `\"functions\":{\"domain::old_fn\":{\"action\":\"delete\",\"module_path\":\"other\"}}` therefore decodes successfully and is silently truncated on re-encode instead of failing closed. Since function tombstones are documented as carrying no `module_path`, reject a non-empty value here or use a function-specific DTO so the versioned codec preserves `deny_unknown_fields`-style strictness.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/decode.rs",
+              "line": 105,
+              "category": "serde codec break"
+            }
+          ],
+          "hash": "rvw1:sha256:a93f89c43164fe4878796e3ce926e99551ec57d20aab6aa40f6d6f4f97946f12",
+          "at": "2026-07-05T06:31:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1fb77466be15f56939ad302e23cda85feaaa9d6f2c6d1c601782de8b0289ea17",
+          "at": "2026-07-05T06:37:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CatalogueToExtendedCratePort::encode()` no longer preserves delete actions: this implementation only walks `doc.types()`, `doc.traits()`, `doc.functions()`, and never consumes `doc.deletions()`. As a result, `action: delete` tombstones decoded by `CatalogueDocumentCodec` are silently dropped when building `ExtendedCrate`, so downstream phase-1/phase-2 signal evaluation cannot see delete-declared items at all.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder.rs",
+              "line": 200,
+              "category": "port impl missing a domain trait method"
+            }
+          ],
+          "hash": "rvw1:sha256:1bd77d7ee86f7cf4d79014fd45d86facd9836c6e3876da99281905774325f091",
+          "at": "2026-07-05T07:06:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d0813beda11d1761fc20233e81cb2ed4de32fe63996ee406e081833cf5754117",
+          "at": "2026-07-05T07:23:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`domain_to_dto` merges deletion records into the same `BTreeMap` with plain `insert`, so a `CatalogueDocument` that contains both a live entry and a deletion record for the same type name is encoded as delete-only and decodes back with the live entry silently lost. The domain API exposes `insert_type` and `push_deletion` independently, and the extended-crate encoder already treats the same collision as an error, so the JSON codec should fail closed instead of truncating a semantics-affecting entry. The same overwrite pattern below applies to traits and functions too.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/encode.rs",
+              "line": 65,
+              "category": "serde codec break"
+            }
+          ],
+          "hash": "rvw1:sha256:d0813beda11d1761fc20233e81cb2ed4de32fe63996ee406e081833cf5754117",
+          "at": "2026-07-05T07:31:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d385bb3186c6712d3b8e591914a1e8b21bb6c1f648e09be3a0dc94cf70144bfa",
+          "at": "2026-07-05T07:41:47Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0ccbad4c1757bc4097f43ceb2a125cb72e8a435debf4d4c59a82a7e0b071e577",
+          "at": "2026-07-04T10:42:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0ccbad4c1757bc4097f43ceb2a125cb72e8a435debf4d4c59a82a7e0b071e577",
+          "at": "2026-07-04T10:47:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:af2e2991490a22ba94f8ae532554ab458d52d8b8520f87b51904a2929cdd1eff",
+          "at": "2026-07-04T11:55:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:af2e2991490a22ba94f8ae532554ab458d52d8b8520f87b51904a2929cdd1eff",
+          "at": "2026-07-04T11:58:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d9b4ba20d36761f1e3991cb043c1132df0a4bc51d7e3cc90bf4cada6a3869f6f",
+          "at": "2026-07-04T15:50:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d9b4ba20d36761f1e3991cb043c1132df0a4bc51d7e3cc90bf4cada6a3869f6f",
+          "at": "2026-07-04T16:06:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d6d19d9d562ea534713b44424d0de6157cde2f8a930867c87323a3f622920a73",
+          "at": "2026-07-05T06:28:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d6d19d9d562ea534713b44424d0de6157cde2f8a930867c87323a3f622920a73",
+          "at": "2026-07-05T06:32:38Z"
         }
       ]
     },
@@ -657,263 +758,49 @@
           "findings": [],
           "hash": "rvw1:sha256:62a31bc0f6ae8c14d2371b54605b4317f4a5180a67a8bc3b525720b2385e1a2f",
           "at": "2026-07-04T23:17:45Z"
-        }
-      ]
-    },
-    "cli_driver": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1d19f89bf21b4b347c0a461faf6aeb568154c01f04ffb9142f968afca0ce9bff",
-          "at": "2026-07-04T12:15:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1d19f89bf21b4b347c0a461faf6aeb568154c01f04ffb9142f968afca0ce9bff",
-          "at": "2026-07-04T12:18:04Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a4d61360311e3983915bd4252491587731b729a50af6e53c5abe9029f3916190",
-          "at": "2026-07-04T15:51:36Z"
+          "hash": "rvw1:sha256:c75bc599d9fd23a9953d24b42e4ee36bdd6967a3045b28038f1c109216bd5231",
+          "at": "2026-07-05T05:43:10Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a4d61360311e3983915bd4252491587731b729a50af6e53c5abe9029f3916190",
-          "at": "2026-07-04T16:08:08Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e8ba8f758395f0547ec02da8bd87c8cd9b58e1aaeb7d201ea4b6e5272942a42e",
-          "at": "2026-07-04T10:45:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e8ba8f758395f0547ec02da8bd87c8cd9b58e1aaeb7d201ea4b6e5272942a42e",
-          "at": "2026-07-04T11:00:01Z"
+          "hash": "rvw1:sha256:c75bc599d9fd23a9953d24b42e4ee36bdd6967a3045b28038f1c109216bd5231",
+          "at": "2026-07-05T05:47:22Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "Joining raw `track_id` here lets `../` or absolute inputs escape `items_dir`, and every verb reuses this helper before any root check. That creates a workspace traversal boundary break; validate `track_id` as a `TrackId` and verify the resolved directory stays under the trusted root.",
-              "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalog_gen/fs_access.rs",
-              "line": 40,
-              "category": "trusted-root violation"
-            },
-            {
-              "message": "Catalogue I/O follows whatever path this helper returns with `read_to_string`/`write`, but it never rejects symlinked leaves or ancestors. A symlinked `*-types.json` can redirect reads and writes outside the workspace; reject symlinks at the boundary like the other infra loaders do.",
-              "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalog_gen/fs_access.rs",
-              "line": 81,
-              "category": "symlink not rejected at boundary"
-            },
-            {
-              "message": "`unwrap_or_default()` masks all `load_spec_anchors` failures, not just a missing Phase-0 spec. A malformed or unreadable `spec.json` is treated as an empty anchor set, so `check` can proceed instead of failing closed.",
+              "message": "`T007` is only described in the impl-plan as `FsCatalogAdapter` verb helpers + `CatalogPort` over `IN-02/03/04/05/06/12` and `AC-02/03/04/08/10/11/12`, but these added attributions pull in `InherentImplDeclV2` and `TraitImplDeclV2` (`IN-08`/`IN-09` data-model work). That makes the task-contract over-attribute T007 to entries its description does not actually touch.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalog_gen/verb_check.rs",
-              "line": 39,
-              "category": "non-fail-closed config"
+              "file": "track/items/catalog-generation-annotation-2026-07-04/task-contract.json",
+              "line": 49,
+              "category": "task-contract attribution mismatch"
             }
           ],
-          "hash": "rvw1:sha256:83b114c3f7e84a5664d7d9e7a458429627f901193fef3474a6c813ba51bf61a8",
-          "at": "2026-07-04T13:46:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The add/import/cite path reads catalogue files as raw `serde_json::Value` and rewrites them without any `schema_version` probe. That means a v4 or future catalogue is silently mutated instead of being rejected fail-closed, which is the same versioning footgun the strict DTO codecs are meant to prevent.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalog_gen/fs_access.rs",
-              "line": 115,
-              "category": "serde codec break"
-            },
-            {
-              "message": "`check_layer` validates schema only after the `$todo` scan. If a catalogue is on an unsupported schema version but still contains holes, the function returns the hole verdict and never reaches `try_complete`, so the version error is not fail-closed. Commit-mode checks can therefore downgrade a schema break to an interim warning.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalog_gen/verb_check.rs",
-              "line": 77,
-              "category": "serde codec break"
-            }
-          ],
-          "hash": "rvw1:sha256:5fc7ad9903529f2278e5b5af04177aa9717e6329c21b0e01472676f54859b0c2",
-          "at": "2026-07-04T14:07:27Z"
+          "hash": "rvw1:sha256:7b3588f06f0395a666cc2a153de28134d4c2401f41d21338649456daa28ffc9b",
+          "at": "2026-07-05T06:19:08Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:f9dac1c301be637bb7a7b989efe6658224ac11c3098d3ea860ad4177bdade225",
-          "at": "2026-07-04T14:19:35Z"
+          "hash": "rvw1:sha256:0f119699e577ac6e60600f2236baba1ddab54da254a50352a3b4d636953c0ee2",
+          "at": "2026-07-05T06:31:22Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:f9dac1c301be637bb7a7b989efe6658224ac11c3098d3ea860ad4177bdade225",
-          "at": "2026-07-04T14:25:35Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3067326ce699e2cf6318be66813d7d28cb752dc5d71cfcf03e9dd0d601944204",
-          "at": "2026-07-04T16:53:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3067326ce699e2cf6318be66813d7d28cb752dc5d71cfcf03e9dd0d601944204",
-          "at": "2026-07-04T16:57:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9c5e0578d4ae0d759a290d0f3f456fd9b210eb3604e092642762549a8ec4399d",
-          "at": "2026-07-04T18:25:37Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9c5e0578d4ae0d759a290d0f3f456fd9b210eb3604e092642762549a8ec4399d",
-          "at": "2026-07-04T18:29:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f2e45561ae37f332247a0fc0bfeb9871009e20bd28538db24323f46c7aa2e258",
-          "at": "2026-07-04T19:28:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f2e45561ae37f332247a0fc0bfeb9871009e20bd28538db24323f46c7aa2e258",
-          "at": "2026-07-04T19:33:49Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:eb187a1060059ad8e24f55b1a79fe4c85b0aa84e471d3cdfa46c1212fac5a7b4",
-          "at": "2026-07-04T20:08:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:eb187a1060059ad8e24f55b1a79fe4c85b0aa84e471d3cdfa46c1212fac5a7b4",
-          "at": "2026-07-04T20:13:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:16afdc861a1eb5bfabb93f7e3949a92aeaf70a5223a93de3ee7e692de4aa54b5",
-          "at": "2026-07-04T20:37:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:16afdc861a1eb5bfabb93f7e3949a92aeaf70a5223a93de3ee7e692de4aa54b5",
-          "at": "2026-07-04T20:41:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`validate_hole_free_schema` treats any `CatalogDraftError::Incomplete` from the pruned document as success, so a remaining top-level hole (`layer`, `crate_name`, etc.) can short-circuit decoding before a later hole-free schema error is checked. In `check_layer`, that means a catalogue with a `$todo` hole plus an unknown field / invalid role in a later section can still be reported as `Interim` at the commit gate instead of `Blocked`.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalog_gen/mod.rs",
-              "line": 183,
-              "category": "non-fail-closed config"
-            }
-          ],
-          "hash": "rvw1:sha256:4513d94ddb4978103beca2d747b63a0ce1f80c471580547637ef7ea3c3ea1886",
-          "at": "2026-07-04T21:20:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`validate_hole_free_schema()` still fails open for a root-level `{\"$todo\": ...}` marker. `prune_hole_bearing_entries()` removes holes inside `types`/`traits`/`functions`, but `remove_unknown_top_level_holes()` does not strip the root `$todo` key because its value is just the instruction string, not a nested subtree. That leaves `try_complete()` returning `Incomplete` before `CatalogueDocumentCodec::decode()` runs, so `check_layer()` can still return `Interim` at commit even when the remaining hole-free portion has a real schema error.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalog_gen/mod.rs",
-              "line": 248,
-              "category": "serde codec break"
-            }
-          ],
-          "hash": "rvw1:sha256:5b5a23e27fdb26b7a38d52a8143e8cb054f9ed7bcc315c61f0364732b33f5e98",
-          "at": "2026-07-04T21:33:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:11fac1d0dc458b69dc40db463e451cd150926305125858473023dd872455fbf9",
-          "at": "2026-07-04T21:40:42Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:11fac1d0dc458b69dc40db463e451cd150926305125858473023dd872455fbf9",
-          "at": "2026-07-04T21:54:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ce361eb9c280f5a5a9b93b06d0adc0af8969546758a3edc2057115a628c83f6c",
-          "at": "2026-07-04T22:27:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ce361eb9c280f5a5a9b93b06d0adc0af8969546758a3edc2057115a628c83f6c",
-          "at": "2026-07-04T22:31:05Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7d76c603158833478399d918983f48be206ee647e6f0f862a5a6b6e49352356b",
-          "at": "2026-07-04T23:16:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7d76c603158833478399d918983f48be206ee647e6f0f862a5a6b6e49352356b",
-          "at": "2026-07-04T23:22:12Z"
+          "hash": "rvw1:sha256:0f119699e577ac6e60600f2236baba1ddab54da254a50352a3b4d636953c0ee2",
+          "at": "2026-07-05T06:36:45Z"
         }
       ]
     },
@@ -1001,21 +888,53 @@
         }
       ]
     },
-    "cli_composition": {
+    "cli": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:6e5c3f80132da943d5ec5e02c5ba28741c43dc4eb386a1392f719e560402f51a",
-          "at": "2026-07-04T15:51:38Z"
+          "hash": "rvw1:sha256:7ffd3fbf84f51de9c36b19d7d9a5784fa471c96f0c13fa5e3a46fbb5ddd58585",
+          "at": "2026-07-04T15:53:30Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:6e5c3f80132da943d5ec5e02c5ba28741c43dc4eb386a1392f719e560402f51a",
-          "at": "2026-07-04T16:06:52Z"
+          "hash": "rvw1:sha256:7ffd3fbf84f51de9c36b19d7d9a5784fa471c96f0c13fa5e3a46fbb5ddd58585",
+          "at": "2026-07-04T16:07:47Z"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1d19f89bf21b4b347c0a461faf6aeb568154c01f04ffb9142f968afca0ce9bff",
+          "at": "2026-07-04T12:15:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1d19f89bf21b4b347c0a461faf6aeb568154c01f04ffb9142f968afca0ce9bff",
+          "at": "2026-07-04T12:18:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a4d61360311e3983915bd4252491587731b729a50af6e53c5abe9029f3916190",
+          "at": "2026-07-04T15:51:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a4d61360311e3983915bd4252491587731b729a50af6e53c5abe9029f3916190",
+          "at": "2026-07-04T16:08:08Z"
         }
       ]
     },
@@ -1082,49 +1001,376 @@
         }
       ]
     },
-    "usecase": {
+    "types": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0ccbad4c1757bc4097f43ceb2a125cb72e8a435debf4d4c59a82a7e0b071e577",
-          "at": "2026-07-04T10:42:58Z"
+          "hash": "rvw1:sha256:bd9d875871090c255653a6fd83458934021dcce67dcd2cd51cc0353d83f37ab1",
+          "at": "2026-07-04T06:29:19Z"
         },
         {
           "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0ccbad4c1757bc4097f43ceb2a125cb72e8a435debf4d4c59a82a7e0b071e577",
-          "at": "2026-07-04T10:47:34Z"
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1 upstream restatement: `domain::DocString`, `domain::TypeEntry`, `domain::TraitEntry`, and `domain::FunctionEntry` docs restate the lint-conformance ADR/spec behavior in prose, including why fields are private, why `docs` becomes `Option<DocString>`, and the constructor/accessor strategy. Per `knowledge/conventions/no-upstream-restatement.md`, these catalogue docs should cite IN-13/IN-14/AC-14..AC-16 rather than restating the upstream contract.",
+              "severity": "P1",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+              "line": 143,
+              "category": "upstream_restatement"
+            },
+            {
+              "message": "P1 upstream restatement: multiple usecase entries restate spec behavior instead of only anchoring it. Examples include `usecase::CatalogGateContext` spelling out phase2/merge/commit strictness, `usecase::CatalogCheckVerdict` restating exit semantics, and `usecase::CatalogError` restating per-variant AC/D decision behavior. This duplicates the upstream spec/ADR contract in the type catalogue docs.",
+              "severity": "P1",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/usecase-types.json",
+              "line": 19,
+              "category": "upstream_restatement"
+            },
+            {
+              "message": "P1 upstream restatement: infrastructure catalogue docs restate upstream D4/CN-02 behavior. `infrastructure::FsCatalogAdapter`, `infrastructure::CatalogDraftError`, `scan_todo_holes`, and `try_complete` describe schema authority, `$todo` traversal, completion-boundary behavior, and consumer impact in prose instead of leaving those behaviors to the cited anchors.",
+              "severity": "P1",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/infrastructure-types.json",
+              "line": 15,
+              "category": "upstream_restatement"
+            },
+            {
+              "message": "P1 upstream restatement: CLI catalogue docs restate command behavior from the spec/ADR, especially the D8/IN-11 track-id guard and read/write resolution rules in `cli::CatalogInitArgs` and `cli::commands::catalog::execute`. These docs should identify the surface and cite IN-11/AC-09 rather than reproducing the fail-closed contract.",
+              "severity": "P1",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+              "line": 84,
+              "category": "upstream_restatement"
+            },
+            {
+              "message": "P1 upstream restatement: cli_driver DTO docs restate upstream validation and guard behavior, such as `CatalogInitInput` describing the D8 write guard and `CatalogAddInput`/`CatalogCiteInput` describing downstream validation semantics. The type catalogue should cite the relevant anchors instead of duplicating the behavior contract.",
+              "severity": "P1",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/cli_driver-types.json",
+              "line": 84,
+              "category": "upstream_restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:bd9d875871090c255653a6fd83458934021dcce67dcd2cd51cc0353d83f37ab1",
+          "at": "2026-07-04T06:37:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CatalogService::init` / `CatalogPort::init` reuse the full `CatalogError`, but the `init` verb can only plausibly emit file-creation and I/O failures. Callers still have to handle dead branches such as `DuplicateEntry`, `AnchorNotFound`, `InvalidRole`, `ParseFragment`, `SchemaInvalid`, and `DraftIncomplete`, and the method docs do not narrow that subset or justify the broad enum.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/usecase-types.json",
+              "line": 280,
+              "category": "per-method error imprecision"
+            }
+          ],
+          "hash": "rvw1:sha256:644fbababe296a28603ed439fa9df1fb0f4224ca17000efac38c9c3df453897a",
+          "at": "2026-07-04T07:07:58Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:af2e2991490a22ba94f8ae532554ab458d52d8b8520f87b51904a2929cdd1eff",
-          "at": "2026-07-04T11:55:02Z"
+          "hash": "rvw1:sha256:8b69765cf49970ddcb26d2fa94874a065f19e4828adec3ab1daf4a52bcf0505b",
+          "at": "2026-07-04T07:20:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `docs` fields for domain catalogue entries such as `domain::TodoInstruction`, `domain::DraftHole`, `domain::CatalogImportAction`, `domain::TypeEntry`, `domain::TraitEntry`, and `domain::FunctionEntry` restate upstream ADR/spec behavior in prose instead of only citing the upstream anchors. For example, `TodoInstruction` re-describes how `$todo` nodes are generated and consumed. `knowledge/conventions/no-upstream-restatement.md` applies to `<layer>-types.json` docs, so these downstream restatements should be replaced with concise entry identification plus anchor cites.",
+              "severity": "P1",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+              "line": 21,
+              "category": "SoT integrity / upstream restatement"
+            },
+            {
+              "message": "The usecase catalogue has the same upstream-restatement problem across keys including `usecase::CatalogGateContext`, `usecase::CatalogAddCommand`, `usecase::CatalogError`, `usecase::CatalogInteractor`, `usecase::CatalogService`, and `usecase::CatalogPort`. These docs repeat gate semantics, validation ownership, error semantics, track guard behavior, and port wiring rationale that already live in ADR/spec anchors. Per `knowledge/conventions/no-upstream-restatement.md`, the docs must cite anchors rather than re-explain the behavioral contract.",
+              "severity": "P1",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/usecase-types.json",
+              "line": 19,
+              "category": "SoT integrity / upstream restatement"
+            },
+            {
+              "message": "CLI catalogue docs for keys such as `cli::CatalogKindArg`, `cli::CatalogAddArgs`, `cli::CatalogCheckArgs`, `cli::CatalogCommand`, and `cli::commands::catalog::execute` restate clap spelling, argument mapping, track-id guard behavior, dispatch, and exit-code behavior in prose. Those are upstream behavior contracts already covered by spec refs; keeping the narrative here violates `knowledge/conventions/no-upstream-restatement.md` and creates another drift source.",
+              "severity": "P1",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+              "line": 21,
+              "category": "SoT integrity / upstream restatement"
+            },
+            {
+              "message": "The cli_driver catalogue docs for `cli_driver::CatalogKindSelect`, `cli_driver::CatalogAddInput`, `cli_driver::CatalogCheckInput`, `cli_driver::CatalogInput`, and `cli_driver::CatalogDriver` restate boundary conversion, dynamic layer handling, trusted track-id handling, and dispatch behavior. These should be anchor-backed type declarations, not prose copies of the upstream contract, under `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/cli_driver-types.json",
+              "line": 21,
+              "category": "SoT integrity / upstream restatement"
+            },
+            {
+              "message": "`cli_composition::CatalogCompositionRoot` docs restate DI wiring, full-stack handling, and test-entry behavior instead of limiting the catalogue entry to the declared type surface plus upstream anchor refs. That is downstream prose duplication of the composition behavior and violates `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/cli_composition-types.json",
+              "line": 15,
+              "category": "SoT integrity / upstream restatement"
+            },
+            {
+              "message": "Infrastructure catalogue docs for `infrastructure::FsCatalogAdapter`, `infrastructure::CatalogDraftError`, `infrastructure::tddd::catalog_gen::scan_todo_holes`, and `infrastructure::tddd::catalog_gen::try_complete` restate adapter parsing choices, schema authority, `$todo` traversal semantics, and completion/error behavior. Those are ADR/spec contracts already cited in `spec_refs`; the type catalogue docs should not reproduce them under `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/infrastructure-types.json",
+              "line": 15,
+              "category": "SoT integrity / upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:8b69765cf49970ddcb26d2fa94874a065f19e4828adec3ab1daf4a52bcf0505b",
+          "at": "2026-07-04T07:28:00Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:af2e2991490a22ba94f8ae532554ab458d52d8b8520f87b51904a2929cdd1eff",
-          "at": "2026-07-04T11:58:47Z"
+          "hash": "rvw1:sha256:8751b88bff03f7056b67887b713e805f89576c86023da1c279ac0f6b2f7e4cd6",
+          "at": "2026-07-04T07:49:09Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d9b4ba20d36761f1e3991cb043c1132df0a4bc51d7e3cc90bf4cada6a3869f6f",
-          "at": "2026-07-04T15:50:35Z"
+          "hash": "rvw1:sha256:80b9df95ed8cea6e949b96e1e08e94f327311e38a4d9d961fd76665c8d93294c",
+          "at": "2026-07-04T12:02:40Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d9b4ba20d36761f1e3991cb043c1132df0a4bc51d7e3cc90bf4cada6a3869f6f",
-          "at": "2026-07-04T16:06:41Z"
+          "hash": "rvw1:sha256:80b9df95ed8cea6e949b96e1e08e94f327311e38a4d9d961fd76665c8d93294c",
+          "at": "2026-07-04T12:07:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:403f04a41a3244051d0b8b18c382d94d8194bb6c170739e6fe4b75abb4163209",
+          "at": "2026-07-04T15:59:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:403f04a41a3244051d0b8b18c382d94d8194bb6c170739e6fe4b75abb4163209",
+          "at": "2026-07-04T16:09:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ImplInfo.docs` restates the F2 rationale (`target_module_path` disambiguation) instead of keeping the catalogue text contract-only. Per policy, anchor this entry to AC-04/IN-08 without reproducing upstream reasoning.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+              "line": 214,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`FunctionInfo.docs` restates the cross-entry derive rationale (“Family-cohesion PartialEq/Eq derives added alongside ImplInfo”) instead of just describing the type contract. Keep the field anchor-only and move the rationale out of the catalogue.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+              "line": 230,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:c236a24864f3fbef8cb0e90d1df953492cfdf812b966c8391103fd52000cd174",
+          "at": "2026-07-04T18:39:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e56f337d5807c311896a0e03f68aa770e68ab5260b26a8fa2ff1d7c7245ef623",
+          "at": "2026-07-04T18:42:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e56f337d5807c311896a0e03f68aa770e68ab5260b26a8fa2ff1d7c7245ef623",
+          "at": "2026-07-04T18:47:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0cc3ceba4e6e4024b806c9b58708876e6389ec84f5ea846b564d45f649c02974",
+          "at": "2026-07-04T19:28:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0cc3ceba4e6e4024b806c9b58708876e6389ec84f5ea846b564d45f649c02974",
+          "at": "2026-07-04T19:32:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:890aa25b28c2b2b70fe438337c5915778c137d0f01ceded83305ac44776f1b90",
+          "at": "2026-07-04T23:15:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:890aa25b28c2b2b70fe438337c5915778c137d0f01ceded83305ac44776f1b90",
+          "at": "2026-07-04T23:19:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `docs` fields for both `CatalogueDocument` and `DeletionRecord` restate the track’s behavior contract in prose instead of just anchoring to upstream spec/ADR refs. Examples: `CatalogueDocument` says the track \"adds a `deletions` collection\" and explains the role choice; `DeletionRecord` explains the tombstone semantics and variant mapping. Per the review policy, this belongs in `spec_refs[]`, not in `docs`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+              "line": 262,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:7e48776ab11dcf8d1a14c48a22e79903839ad69052574da1311d0b857f9f2567",
+          "at": "2026-07-05T05:44:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CatalogueDocument::validate_filename` is typed as `Result<(), CatalogueDocumentError>`, but the method can structurally only return `CrateNameMismatch`; the shared enum also contains `DuplicateTypeName`, `DuplicateTraitName`, `DuplicateFunctionPath`, and `InvalidIdentifier`, which this API cannot produce. The entry docs do not justify the broader error surface or narrow it to the producible subset.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+              "line": 1327,
+              "category": "per-method error imprecision"
+            }
+          ],
+          "hash": "rvw1:sha256:70c2c9797ebff5eb0ecfd7e0d4bafab86d2d4a220fa3213d4805ff1b89476f0e",
+          "at": "2026-07-05T05:52:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`contract-map.md` adds `CatalogueDocument.push_inherent_impl` and `push_trait_impl` as method nodes, but it never connects them to the `InherentImplDeclV2` and `TraitImplDeclV2` parameter types that `domain-types.json` declares for those methods. The merged contract view is therefore incomplete and no longer matches the JSON API surface.",
+              "severity": "P1",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/contract-map.md",
+              "line": 113,
+              "category": "branch-wide consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:4771ee099a3a923a134c7ec6fc7fe7dcf172e7f499bc199ac92e11c2aa4b37cc",
+          "at": "2026-07-05T06:00:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e9ec0fe01f8f6a8192b7323edcd721a4123e56a7d424bbcc06b4a8d752428f0",
+          "at": "2026-07-05T06:20:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e9ec0fe01f8f6a8192b7323edcd721a4123e56a7d424bbcc06b4a8d752428f0",
+          "at": "2026-07-05T06:26:04Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9150414d3e8894f6249036886ba388cf82b91f476739693dacc632e4b2cc24bd",
+          "at": "2026-07-04T06:13:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The description still says this adapter \"enforces Opus via frontmatter\", but the briefing documents that `CLAUDE_CODE_SUBAGENT_MODEL` takes precedence over agent frontmatter. Leaving this wording in the distributed agent policy preserves the incorrect routing contract that caused the incident, so it should be updated to describe the explicit Opus frontmatter as the selected/default model rather than an enforcement mechanism.",
+              "severity": "P1",
+              "file": ".claude/agents/adr-editor.md",
+              "line": 6,
+              "category": "harness-policy factual routing drift"
+            },
+            {
+              "message": "The description still says this adapter \"enforces Opus via frontmatter\", but the briefing documents that `CLAUDE_CODE_SUBAGENT_MODEL` takes precedence over agent frontmatter. This keeps an incorrect routing guarantee in the harness policy surface and can mislead future fixes into relying on frontmatter as an override-proof control.",
+              "severity": "P1",
+              "file": ".claude/agents/spec-designer.md",
+              "line": 15,
+              "category": "harness-policy factual routing drift"
+            },
+            {
+              "message": "The description still says this adapter \"enforces Opus via frontmatter\", but the briefing documents that `CLAUDE_CODE_SUBAGENT_MODEL` takes precedence over agent frontmatter. This keeps an incorrect routing guarantee in the harness policy surface and should be revised with the model-setting change.",
+              "severity": "P1",
+              "file": ".claude/agents/impl-planner.md",
+              "line": 15,
+              "category": "harness-policy factual routing drift"
+            },
+            {
+              "message": "The description still says this adapter \"enforces Opus via frontmatter\", but the briefing documents that `CLAUDE_CODE_SUBAGENT_MODEL` takes precedence over agent frontmatter. This preserves the same false routing contract in the distributed adapter docs and should be corrected alongside the explicit model ID.",
+              "severity": "P1",
+              "file": ".claude/agents/rollback-diagnoser.md",
+              "line": 12,
+              "category": "harness-policy factual routing drift"
+            }
+          ],
+          "hash": "rvw1:sha256:9150414d3e8894f6249036886ba388cf82b91f476739693dacc632e4b2cc24bd",
+          "at": "2026-07-04T06:17:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:202334dcbff77abf61de3f2acf2b47a73098d9c3f93f8db3ebe49cf18de68e65",
+          "at": "2026-07-04T06:35:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:202334dcbff77abf61de3f2acf2b47a73098d9c3f93f8db3ebe49cf18de68e65",
+          "at": "2026-07-04T06:41:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5ef11e60ce5b13fd88ff600bcb978c17f3a4687d6f7ae87abb3ef02eab3645c2",
+          "at": "2026-07-04T08:43:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5ef11e60ce5b13fd88ff600bcb978c17f3a4687d6f7ae87abb3ef02eab3645c2",
+          "at": "2026-07-04T08:47:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:78043345b7bd572f0dfd37f298678a81ac22ad5355d0281f9e47407c5f076eaf",
+          "at": "2026-07-04T15:52:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:78043345b7bd572f0dfd37f298678a81ac22ad5355d0281f9e47407c5f076eaf",
+          "at": "2026-07-04T16:07:24Z"
         }
       ]
     }

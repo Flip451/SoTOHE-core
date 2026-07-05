@@ -314,7 +314,7 @@ fn collect_type_entry_slots(
         // above only merges each impl block's *methods*, so these must be
         // collected separately here (PR #179 round 2 P1).
         for impl_decl in catalogue
-            .inherent_impls
+            .inherent_impls()
             .iter()
             .filter(|decl| decl.type_name.as_str() == entry_name.as_str())
         {

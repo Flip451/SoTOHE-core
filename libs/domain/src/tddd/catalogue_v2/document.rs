@@ -26,6 +26,7 @@
 
 use std::collections::BTreeMap;
 
+use crate::tddd::catalogue_v2::deletions::DeletionRecord;
 use crate::tddd::catalogue_v2::entries::{
     FunctionEntry, InherentImplDeclV2, TraitEntry, TypeEntry,
 };
@@ -115,23 +116,23 @@ pub enum CatalogueDocumentError {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CatalogueDocument {
     /// Format version; currently `3` for the v2 schema.
-    pub schema_version: u32,
+    schema_version: u32,
     /// The crate this catalogue describes.
-    pub crate_name: CrateName,
+    crate_name: CrateName,
     /// The architectural layer identifier (e.g. `"domain"`, `"usecase"`, `"infrastructure"`).
-    pub layer: LayerId,
+    layer: LayerId,
     /// Type entries (struct / enum / type alias declarations).
-    pub types: BTreeMap<TypeName, TypeEntry>,
+    types: BTreeMap<TypeName, TypeEntry>,
     /// Trait entries (trait declarations).
-    pub traits: BTreeMap<TraitName, TraitEntry>,
+    traits: BTreeMap<TraitName, TraitEntry>,
     /// Function entries (free function declarations).
-    pub functions: BTreeMap<FunctionPath, FunctionEntry>,
+    functions: BTreeMap<FunctionPath, FunctionEntry>,
     /// Inherent impl block declarations (one entry per impl block).
     ///
     /// Multiple entries sharing the same `type_name` represent multiple inherent
     /// `impl` blocks for one struct. Default empty Vec — catalogues predating
     /// this field decode as if they had no inherent impl blocks.
-    pub inherent_impls: Vec<InherentImplDeclV2>,
+    inherent_impls: Vec<InherentImplDeclV2>,
 
     /// Trait impl block declarations (top-level, ADR `2026-05-20-0048` D1).
     ///
@@ -140,7 +141,16 @@ pub struct CatalogueDocument {
     /// enables declaring impls for external-crate self types (Case B orphan impls).
     ///
     /// Default empty Vec — catalogues predating this field decode without trait impl blocks.
-    pub trait_impls: Vec<TraitImplDeclV2>,
+    trait_impls: Vec<TraitImplDeclV2>,
+
+    /// Identity-only deletion records (`action: delete` entries).
+    ///
+    /// A `sotp catalog import --action delete` entry records the identity of a
+    /// removed item here rather than as a live `types` / `traits` / `functions`
+    /// entry, so a deletion carries no role / shape / methods / docs. Default
+    /// empty Vec — catalogues predating this field decode without deletions.
+    /// See spec IN-04, GO-03, AC-04.
+    deletions: Vec<DeletionRecord>,
 }
 
 impl CatalogueDocument {
@@ -156,7 +166,92 @@ impl CatalogueDocument {
             functions: BTreeMap::new(),
             inherent_impls: Vec::new(),
             trait_impls: Vec::new(),
+            deletions: Vec::new(),
         }
+    }
+
+    /// The catalogue schema format version.
+    #[must_use]
+    pub fn schema_version(&self) -> u32 {
+        self.schema_version
+    }
+
+    /// The crate this catalogue describes.
+    #[must_use]
+    pub fn crate_name(&self) -> &CrateName {
+        &self.crate_name
+    }
+
+    /// The architectural layer identifier.
+    #[must_use]
+    pub fn layer(&self) -> &LayerId {
+        &self.layer
+    }
+
+    /// Type entries (struct / enum / type alias declarations).
+    #[must_use]
+    pub fn types(&self) -> &BTreeMap<TypeName, TypeEntry> {
+        &self.types
+    }
+
+    /// Trait entries (trait declarations).
+    #[must_use]
+    pub fn traits(&self) -> &BTreeMap<TraitName, TraitEntry> {
+        &self.traits
+    }
+
+    /// Function entries (free function declarations).
+    #[must_use]
+    pub fn functions(&self) -> &BTreeMap<FunctionPath, FunctionEntry> {
+        &self.functions
+    }
+
+    /// Inherent impl block declarations (one entry per impl block).
+    #[must_use]
+    pub fn inherent_impls(&self) -> &[InherentImplDeclV2] {
+        &self.inherent_impls
+    }
+
+    /// Trait impl block declarations (top-level, ADR `2026-05-20-0048` D1).
+    #[must_use]
+    pub fn trait_impls(&self) -> &[TraitImplDeclV2] {
+        &self.trait_impls
+    }
+
+    /// Identity-only deletion records (`action: delete` entries).
+    #[must_use]
+    pub fn deletions(&self) -> &[DeletionRecord] {
+        &self.deletions
+    }
+
+    /// Inserts a type entry under `name`.
+    pub fn insert_type(&mut self, name: TypeName, entry: TypeEntry) {
+        self.types.insert(name, entry);
+    }
+
+    /// Inserts a trait entry under `name`.
+    pub fn insert_trait(&mut self, name: TraitName, entry: TraitEntry) {
+        self.traits.insert(name, entry);
+    }
+
+    /// Inserts a function entry under `path`.
+    pub fn insert_function(&mut self, path: FunctionPath, entry: FunctionEntry) {
+        self.functions.insert(path, entry);
+    }
+
+    /// Appends an inherent impl block declaration.
+    pub fn push_inherent_impl(&mut self, decl: InherentImplDeclV2) {
+        self.inherent_impls.push(decl);
+    }
+
+    /// Appends a top-level trait impl block declaration.
+    pub fn push_trait_impl(&mut self, decl: TraitImplDeclV2) {
+        self.trait_impls.push(decl);
+    }
+
+    /// Appends an identity-only deletion record.
+    pub fn push_deletion(&mut self, record: DeletionRecord) {
+        self.deletions.push(record);
     }
 
     /// Validates that `crate_name` matches the given `filename_stem`.
@@ -245,26 +340,26 @@ mod tests {
     fn test_catalogue_document_new_creates_empty_document() {
         let crate_name = CrateName::new("domain").unwrap();
         let doc = CatalogueDocument::new(2, crate_name.clone(), layer_domain());
-        assert_eq!(doc.schema_version, 2);
-        assert_eq!(doc.crate_name, crate_name);
-        assert_eq!(doc.layer, layer_domain());
-        assert!(doc.types.is_empty());
-        assert!(doc.traits.is_empty());
-        assert!(doc.functions.is_empty());
+        assert_eq!(doc.schema_version(), 2);
+        assert_eq!(doc.crate_name(), &crate_name);
+        assert_eq!(doc.layer(), &layer_domain());
+        assert!(doc.types().is_empty());
+        assert!(doc.traits().is_empty());
+        assert!(doc.functions().is_empty());
     }
 
     #[test]
     fn test_catalogue_document_with_usecase_layer() {
         let crate_name = CrateName::new("usecase").unwrap();
         let doc = CatalogueDocument::new(2, crate_name.clone(), layer_usecase());
-        assert_eq!(doc.layer, layer_usecase());
+        assert_eq!(doc.layer(), &layer_usecase());
     }
 
     #[test]
     fn test_catalogue_document_with_infrastructure_layer() {
         let crate_name = CrateName::new("infrastructure").unwrap();
         let doc = CatalogueDocument::new(2, crate_name.clone(), layer_infrastructure());
-        assert_eq!(doc.layer, layer_infrastructure());
+        assert_eq!(doc.layer(), &layer_infrastructure());
     }
 
     // -----------------------------------------------------------------------
@@ -276,9 +371,9 @@ mod tests {
         let crate_name = CrateName::new("domain").unwrap();
         let mut doc = CatalogueDocument::new(2, crate_name, layer_domain());
         let type_name = TypeName::new("UserId").unwrap();
-        doc.types.insert(type_name.clone(), make_simple_type_entry());
-        assert_eq!(doc.types.len(), 1);
-        assert!(doc.types.contains_key(&type_name));
+        doc.insert_type(type_name.clone(), make_simple_type_entry());
+        assert_eq!(doc.types().len(), 1);
+        assert!(doc.types().contains_key(&type_name));
     }
 
     #[test]
@@ -287,9 +382,9 @@ mod tests {
         let mut doc = CatalogueDocument::new(2, crate_name.clone(), layer_domain());
         let fn_path =
             FunctionPath::at_root(crate_name.clone(), FunctionName::new("register_user").unwrap());
-        doc.functions.insert(fn_path.clone(), make_simple_function_entry());
-        assert_eq!(doc.functions.len(), 1);
-        assert!(doc.functions.contains_key(&fn_path));
+        doc.insert_function(fn_path.clone(), make_simple_function_entry());
+        assert_eq!(doc.functions().len(), 1);
+        assert!(doc.functions().contains_key(&fn_path));
     }
 
     #[test]
@@ -297,10 +392,10 @@ mod tests {
         // BTreeMap ensures sorted key iteration — verify type key order.
         let crate_name = CrateName::new("domain").unwrap();
         let mut doc = CatalogueDocument::new(2, crate_name, layer_domain());
-        doc.types.insert(TypeName::new("ZOrder").unwrap(), make_simple_type_entry());
-        doc.types.insert(TypeName::new("AUser").unwrap(), make_simple_type_entry());
-        doc.types.insert(TypeName::new("MItem").unwrap(), make_simple_type_entry());
-        let keys: Vec<_> = doc.types.keys().map(|k| k.as_str()).collect();
+        doc.insert_type(TypeName::new("ZOrder").unwrap(), make_simple_type_entry());
+        doc.insert_type(TypeName::new("AUser").unwrap(), make_simple_type_entry());
+        doc.insert_type(TypeName::new("MItem").unwrap(), make_simple_type_entry());
+        let keys: Vec<_> = doc.types().keys().map(|k| k.as_str()).collect();
         assert_eq!(keys, vec!["AUser", "MItem", "ZOrder"]);
     }
 
@@ -405,7 +500,7 @@ mod tests {
         let crate_name = CrateName::new("domain").unwrap();
         let layer = LayerId::try_new("domain").unwrap();
         let doc = CatalogueDocument::new(3, crate_name, layer);
-        assert!(doc.trait_impls.is_empty());
+        assert!(doc.trait_impls().is_empty());
     }
 
     #[test]
@@ -428,12 +523,25 @@ mod tests {
             TypeRef::new("std::vec::Vec<i32>").unwrap(),
         );
 
-        doc.trait_impls.push(impl_a.clone());
-        doc.trait_impls.push(impl_b.clone());
+        doc.push_trait_impl(impl_a.clone());
+        doc.push_trait_impl(impl_b.clone());
 
-        assert_eq!(doc.trait_impls.len(), 2);
-        assert_eq!(doc.trait_impls[0], impl_a);
-        assert_eq!(doc.trait_impls[1], impl_b);
+        assert_eq!(doc.trait_impls().len(), 2);
+        assert_eq!(doc.trait_impls()[0], impl_a);
+        assert_eq!(doc.trait_impls()[1], impl_b);
+    }
+
+    #[test]
+    fn test_catalogue_document_deletions_defaults_to_empty_and_stores_records() {
+        use crate::tddd::catalogue_v2::deletions::DeletionRecord;
+        let crate_name = CrateName::new("domain").unwrap();
+        let mut doc = CatalogueDocument::new(5, crate_name, layer_domain());
+        assert!(doc.deletions().is_empty(), "new() must default deletions to empty");
+        doc.push_deletion(DeletionRecord::Type {
+            name: TypeName::new("OldType").unwrap(),
+            module_path: ModulePath::root(),
+        });
+        assert_eq!(doc.deletions().len(), 1);
     }
 
     #[test]
@@ -443,8 +551,8 @@ mod tests {
         // in one document at the type level (ADR 1 D6).
         let crate_name = CrateName::new("domain").unwrap();
         let doc = CatalogueDocument::new(2, crate_name.clone(), layer_domain());
-        assert_eq!(doc.crate_name, crate_name);
+        assert_eq!(doc.crate_name(), &crate_name);
         // No "other crate name" field — the invariant is structural.
-        let _ = &doc.layer;
+        let _ = doc.layer();
     }
 }

@@ -251,8 +251,10 @@ where
         // `rendered_layer_count` reflects only the layers that were actually rendered
         // (respecting `layer_filter`), while `total_entry_count` reflects the full
         // loader catalogue volume regardless of any filter.
-        let total_entry_count: usize =
-            catalogues.values().map(|d| d.types.len() + d.traits.len() + d.functions.len()).sum();
+        let total_entry_count: usize = catalogues
+            .values()
+            .map(|d| d.types().len() + d.traits().len() + d.functions().len())
+            .sum();
 
         Ok(RenderContractMapOutput {
             rendered_layer_count: filtered_layer_order.len(),
@@ -333,7 +335,7 @@ mod tests {
 
         // domain: 1 type entry (User)
         let mut domain_doc = empty_v3_doc("domain");
-        domain_doc.types.insert(
+        domain_doc.insert_type(
             TypeName::new("User").unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
@@ -356,7 +358,7 @@ mod tests {
         // usecase: 2 trait entries (RegisterUser, RegisterUserCommand)
         let mut usecase_doc = empty_v3_doc("usecase");
         for trait_name in ["RegisterUser", "RegisterUserCommand"] {
-            usecase_doc.traits.insert(
+            usecase_doc.insert_trait(
                 TraitName::new(trait_name).unwrap(),
                 TraitEntry::new(
                     ItemAction::Add,
@@ -389,7 +391,7 @@ mod tests {
         let fn_crate = CrateName::new("infrastructure").unwrap();
         let fn_path =
             FunctionPath::at_root(fn_crate, FunctionName::new("render_contract_map").unwrap());
-        infra_doc.functions.insert(
+        infra_doc.insert_function(
             fn_path,
             FunctionEntry::new(
                 ItemAction::Add,

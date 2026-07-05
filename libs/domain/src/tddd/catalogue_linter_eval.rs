@@ -184,7 +184,7 @@ pub fn evaluate_catalogue_lint<S: PrimitiveOccurrenceScanner>(
             }
 
             CatalogueLinterRuleKind::KindLayerConstraint { permitted_layers } => {
-                let doc_layer = &catalogue.layer;
+                let doc_layer = catalogue.layer();
                 if !permitted_layers.as_slice().contains(doc_layer) {
                     for (name, _entry) in type_entries_for_target(catalogue, rule.target()) {
                         violations.push(CatalogueLintViolation::new(
@@ -322,7 +322,7 @@ pub fn evaluate_catalogue_lint<S: PrimitiveOccurrenceScanner>(
                             for (cat_layer_id, cat) in all_catalogues {
                                 // Check type entries, excluding delete-action entries.
                                 for (tn, e) in cat
-                                    .types
+                                    .types()
                                     .iter()
                                     .filter(|(_, e)| e.action() != ItemAction::Delete)
                                 {
@@ -352,7 +352,7 @@ pub fn evaluate_catalogue_lint<S: PrimitiveOccurrenceScanner>(
                                 }
                                 // Check trait entries (ContractRole), excluding delete-action entries.
                                 for (tn, e) in cat
-                                    .traits
+                                    .traits()
                                     .iter()
                                     .filter(|(_, e)| e.action() != ItemAction::Delete)
                                 {
@@ -558,7 +558,7 @@ pub fn evaluate_catalogue_lint<S: PrimitiveOccurrenceScanner>(
                         // Shared value objects of this aggregate.
                         // Exclude delete-action aggregates: a deleted aggregate's
                         // shared_value_objects no longer define the boundary set.
-                        if let Some((_name, entry)) = catalogue.types.iter().find(|(n, e)| {
+                        if let Some((_name, entry)) = catalogue.types().iter().find(|(n, e)| {
                             n.as_str() == agg_name.as_str() && e.action() != ItemAction::Delete
                         }) {
                             // "shared_value_objects" is a recognised field name — always succeeds.
@@ -575,7 +575,7 @@ pub fn evaluate_catalogue_lint<S: PrimitiveOccurrenceScanner>(
                     // Exclude delete-action entries: a deleted type cannot have methods
                     // that violate the exclusivity boundary.
                     for (other_name, other_entry) in
-                        catalogue.types.iter().filter(|(_, e)| e.action() != ItemAction::Delete)
+                        catalogue.types().iter().filter(|(_, e)| e.action() != ItemAction::Delete)
                     {
                         let other_bare =
                             other_name.as_str().split("::").last().unwrap_or(other_name.as_str());

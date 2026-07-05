@@ -44,7 +44,7 @@ pub(super) fn type_entries_for_target<'a>(
     catalogue: &'a CatalogueDocument,
     target: &RuleTarget,
 ) -> impl Iterator<Item = (&'a TypeName, &'a TypeEntry)> {
-    catalogue.types.iter().filter(move |(_name, entry)| {
+    catalogue.types().iter().filter(move |(_name, entry)| {
         entry.action() != ItemAction::Delete
             && entry.action() != ItemAction::Reference
             && target_matches(target, entry_role_kind(entry))
@@ -67,7 +67,7 @@ pub(super) fn trait_entries_for_target<'a>(
     catalogue: &'a CatalogueDocument,
     target: &RuleTarget,
 ) -> impl Iterator<Item = (&'a TraitName, &'a TraitEntry)> {
-    catalogue.traits.iter().filter(move |(_name, entry)| {
+    catalogue.traits().iter().filter(move |(_name, entry)| {
         entry.action() != ItemAction::Delete
             && entry.action() != ItemAction::Reference
             && target_matches(target, RoleKind::from_contract_role(entry.role()))
@@ -88,7 +88,7 @@ pub(super) fn function_entries_for_target<'a>(
     catalogue: &'a CatalogueDocument,
     target: &RuleTarget,
 ) -> impl Iterator<Item = (&'a FunctionPath, &'a FunctionEntry)> {
-    catalogue.functions.iter().filter(move |(_path, entry)| {
+    catalogue.functions().iter().filter(move |(_path, entry)| {
         entry.action() != ItemAction::Delete
             && entry.action() != ItemAction::Reference
             && target_matches(target, RoleKind::from_function_role(&entry.role()))
@@ -122,7 +122,7 @@ pub(super) fn collect_methods_for_type<'a>(
 
     for method in entry.methods().iter().chain(
         catalogue
-            .inherent_impls
+            .inherent_impls()
             .iter()
             .filter(|impl_| impl_.type_name.as_str() == type_name)
             .flat_map(|impl_| impl_.methods.iter()),
@@ -216,7 +216,7 @@ pub(super) fn has_trait_impl(
     trait_name_prefix: &str,
 ) -> bool {
     let path_suffix = format!("::{trait_name_prefix}");
-    catalogue.trait_impls.iter().any(|ti| {
+    catalogue.trait_impls().iter().any(|ti| {
         // Exclude delete-action impl entries: a deleted impl does not count as present.
         if ti.action == ItemAction::Delete {
             return false;

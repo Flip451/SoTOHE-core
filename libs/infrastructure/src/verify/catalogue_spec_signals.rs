@@ -535,13 +535,13 @@ fn read_and_decode_catalogue(
         }
     };
     let catalogue_entries: Vec<CatalogueEntryKey> = catalogue_doc
-        .types
+        .types()
         .keys()
         .map(|k| CatalogueEntryKey::new("types", k.as_str()))
-        .chain(catalogue_doc.traits.keys().map(|k| CatalogueEntryKey::new("traits", k.as_str())))
+        .chain(catalogue_doc.traits().keys().map(|k| CatalogueEntryKey::new("traits", k.as_str())))
         .chain(
             catalogue_doc
-                .functions
+                .functions()
                 .keys()
                 .map(|k| CatalogueEntryKey::new("functions", k.to_string())),
         )

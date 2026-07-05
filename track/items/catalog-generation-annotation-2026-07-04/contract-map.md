@@ -93,6 +93,34 @@ subgraph domain["domain"]
     T33_domain_domain_CatalogImportAction_Modify[Modify]
     T33_domain_domain_CatalogImportAction_Delete[Delete]
   end
+  subgraph T31_domain_domain_CatalogueDocument["tddd::catalogue_v2::document::CatalogueDocument"]
+    direction TB
+    T31_domain_domain_CatalogueDocument__self[CatalogueDocument]
+    T31_domain_domain_CatalogueDocument_new([new])
+    T31_domain_domain_CatalogueDocument_validate_filename([validate_filename])
+    T31_domain_domain_CatalogueDocument_schema_version([schema_version])
+    T31_domain_domain_CatalogueDocument_crate_name([crate_name])
+    T31_domain_domain_CatalogueDocument_layer([layer])
+    T31_domain_domain_CatalogueDocument_types([types])
+    T31_domain_domain_CatalogueDocument_traits([traits])
+    T31_domain_domain_CatalogueDocument_functions([functions])
+    T31_domain_domain_CatalogueDocument_inherent_impls([inherent_impls])
+    T31_domain_domain_CatalogueDocument_trait_impls([trait_impls])
+    T31_domain_domain_CatalogueDocument_deletions([deletions])
+    T31_domain_domain_CatalogueDocument_insert_type([insert_type])
+    T31_domain_domain_CatalogueDocument_insert_trait([insert_trait])
+    T31_domain_domain_CatalogueDocument_insert_function([insert_function])
+    T31_domain_domain_CatalogueDocument_push_inherent_impl([push_inherent_impl])
+    T31_domain_domain_CatalogueDocument_push_trait_impl([push_trait_impl])
+    T31_domain_domain_CatalogueDocument_push_deletion([push_deletion])
+  end
+  subgraph T28_domain_domain_DeletionRecord["tddd::catalogue_v2::deletions::DeletionRecord"]
+    direction TB
+    T28_domain_domain_DeletionRecord__self[DeletionRecord]
+    T28_domain_domain_DeletionRecord_Type[Type]
+    T28_domain_domain_DeletionRecord_Trait[Trait]
+    T28_domain_domain_DeletionRecord_Function[Function]
+  end
   subgraph T23_domain_domain_DocString["tddd::catalogue_v2::identifiers::DocString"]
     direction TB
     T23_domain_domain_DocString__self[DocString]
@@ -128,6 +156,10 @@ subgraph domain["domain"]
     T27_domain_domain_FunctionEntry_spec_refs([spec_refs])
     T27_domain_domain_FunctionEntry_informal_grounds([informal_grounds])
   end
+  subgraph T32_domain_domain_InherentImplDeclV2["tddd::catalogue_v2::entries::InherentImplDeclV2"]
+    direction TB
+    T32_domain_domain_InherentImplDeclV2__self[InherentImplDeclV2]
+  end
   subgraph T29_domain_domain_TodoInstruction["tddd::catalog_gen::TodoInstruction"]
     direction TB
     T29_domain_domain_TodoInstruction__self[TodoInstruction]
@@ -151,6 +183,11 @@ subgraph domain["domain"]
     T24_domain_domain_TraitEntry_docs([docs])
     T24_domain_domain_TraitEntry_spec_refs([spec_refs])
     T24_domain_domain_TraitEntry_informal_grounds([informal_grounds])
+  end
+  subgraph T29_domain_domain_TraitImplDeclV2["tddd::catalogue_v2::traits::TraitImplDeclV2"]
+    direction TB
+    T29_domain_domain_TraitImplDeclV2__self[TraitImplDeclV2]
+    T29_domain_domain_TraitImplDeclV2_new([new])
   end
   subgraph T23_domain_domain_TypeEntry["tddd::catalogue_v2::entries::TypeEntry"]
     direction TB
@@ -460,6 +497,19 @@ T22_domain_domain_TypeInfo_new --> T22_domain_domain_TypeInfo__self
 T22_domain_domain_TypeInfo_with_module_path --> T22_domain_domain_TypeInfo__self
 T22_domain_domain_TypeInfo_with_alias_target --> T22_domain_domain_TypeInfo__self
 T30_domain_domain_CatalogEntryName_try_new --> T30_domain_domain_CatalogEntryName__self
+T31_domain_domain_CatalogueDocument_new --> T31_domain_domain_CatalogueDocument__self
+T31_domain_domain_CatalogueDocument_types --> T23_domain_domain_TypeEntry__self
+T31_domain_domain_CatalogueDocument_traits --> T24_domain_domain_TraitEntry__self
+T31_domain_domain_CatalogueDocument_functions --> T27_domain_domain_FunctionEntry__self
+T31_domain_domain_CatalogueDocument_inherent_impls --> T32_domain_domain_InherentImplDeclV2__self
+T31_domain_domain_CatalogueDocument_trait_impls --> T29_domain_domain_TraitImplDeclV2__self
+T31_domain_domain_CatalogueDocument_deletions --> T28_domain_domain_DeletionRecord__self
+T31_domain_domain_CatalogueDocument_insert_type --o T23_domain_domain_TypeEntry__self
+T31_domain_domain_CatalogueDocument_insert_trait --o T24_domain_domain_TraitEntry__self
+T31_domain_domain_CatalogueDocument_insert_function --o T27_domain_domain_FunctionEntry__self
+T31_domain_domain_CatalogueDocument_push_inherent_impl --o T32_domain_domain_InherentImplDeclV2__self
+T31_domain_domain_CatalogueDocument_push_trait_impl --o T29_domain_domain_TraitImplDeclV2__self
+T31_domain_domain_CatalogueDocument_push_deletion --o T28_domain_domain_DeletionRecord__self
 T23_domain_domain_DocString_new --> T23_domain_domain_DocString__self
 T23_domain_domain_DraftHole_new --o T27_domain_domain_DraftHolePath__self
 T23_domain_domain_DraftHole_new --o T29_domain_domain_TodoInstruction__self
@@ -474,6 +524,7 @@ T29_domain_domain_TodoInstruction_try_new --> T29_domain_domain_TodoInstruction_
 T24_domain_domain_TraitEntry_new --o T23_domain_domain_DocString__self
 T24_domain_domain_TraitEntry_new --> T24_domain_domain_TraitEntry__self
 T24_domain_domain_TraitEntry_docs --> T23_domain_domain_DocString__self
+T29_domain_domain_TraitImplDeclV2_new --> T29_domain_domain_TraitImplDeclV2__self
 T23_domain_domain_TypeEntry_new --o T23_domain_domain_DocString__self
 T23_domain_domain_TypeEntry_new --> T23_domain_domain_TypeEntry__self
 T23_domain_domain_TypeEntry_docs --> T23_domain_domain_DocString__self
@@ -519,6 +570,7 @@ T47_infrastructure_infrastructure_CatalogDraftError_Incomplete --o|holes| T23_do
 T46_infrastructure_infrastructure_FsCatalogAdapter_new --> T46_infrastructure_infrastructure_FsCatalogAdapter__self
 F80_infrastructure_infrastructure_infrastructure__tddd__catalog_gen__scan_todo_holes --> T23_domain_domain_DraftHole__self
 F77_infrastructure_infrastructure_infrastructure__tddd__catalog_gen__try_complete --> T47_infrastructure_infrastructure_CatalogDraftError__self
+F77_infrastructure_infrastructure_infrastructure__tddd__catalog_gen__try_complete --> T31_domain_domain_CatalogueDocument__self
 T46_infrastructure_infrastructure_FsCatalogAdapter__self -.impl.-> R27_usecase_usecase_CatalogPort__self
 T37_cli_driver_cli_driver_CatalogAddInput__self --o|kind| T39_cli_driver_cli_driver_CatalogKindSelect__self
 T39_cli_driver_cli_driver_CatalogCheckInput__self --o|gate| T39_cli_driver_cli_driver_CatalogGateSelect__self
@@ -600,6 +652,28 @@ class T33_domain_domain_CatalogImportAction_Reference variant_node
 class T33_domain_domain_CatalogImportAction_Modify variant_node
 class T33_domain_domain_CatalogImportAction_Delete variant_node
 class T33_domain_domain_CatalogImportAction__self value_object
+class T31_domain_domain_CatalogueDocument_new method_node
+class T31_domain_domain_CatalogueDocument_validate_filename method_node
+class T31_domain_domain_CatalogueDocument_schema_version method_node
+class T31_domain_domain_CatalogueDocument_crate_name method_node
+class T31_domain_domain_CatalogueDocument_layer method_node
+class T31_domain_domain_CatalogueDocument_types method_node
+class T31_domain_domain_CatalogueDocument_traits method_node
+class T31_domain_domain_CatalogueDocument_functions method_node
+class T31_domain_domain_CatalogueDocument_inherent_impls method_node
+class T31_domain_domain_CatalogueDocument_trait_impls method_node
+class T31_domain_domain_CatalogueDocument_deletions method_node
+class T31_domain_domain_CatalogueDocument_insert_type method_node
+class T31_domain_domain_CatalogueDocument_insert_trait method_node
+class T31_domain_domain_CatalogueDocument_insert_function method_node
+class T31_domain_domain_CatalogueDocument_push_inherent_impl method_node
+class T31_domain_domain_CatalogueDocument_push_trait_impl method_node
+class T31_domain_domain_CatalogueDocument_push_deletion method_node
+class T31_domain_domain_CatalogueDocument__self domain_service
+class T28_domain_domain_DeletionRecord_Type variant_node
+class T28_domain_domain_DeletionRecord_Trait variant_node
+class T28_domain_domain_DeletionRecord_Function variant_node
+class T28_domain_domain_DeletionRecord__self value_object
 class T23_domain_domain_DocString_new method_node
 class T23_domain_domain_DocString_as_str method_node
 class T23_domain_domain_DocString__self value_object
@@ -623,6 +697,7 @@ class T27_domain_domain_FunctionEntry_docs method_node
 class T27_domain_domain_FunctionEntry_spec_refs method_node
 class T27_domain_domain_FunctionEntry_informal_grounds method_node
 class T27_domain_domain_FunctionEntry__self value_object
+class T32_domain_domain_InherentImplDeclV2__self value_object
 class T29_domain_domain_TodoInstruction_try_new method_node
 class T29_domain_domain_TodoInstruction_as_str method_node
 class T29_domain_domain_TodoInstruction_is_non_empty method_node
@@ -641,6 +716,8 @@ class T24_domain_domain_TraitEntry_docs method_node
 class T24_domain_domain_TraitEntry_spec_refs method_node
 class T24_domain_domain_TraitEntry_informal_grounds method_node
 class T24_domain_domain_TraitEntry__self value_object
+class T29_domain_domain_TraitImplDeclV2_new method_node
+class T29_domain_domain_TraitImplDeclV2__self value_object
 class T23_domain_domain_TypeEntry_new method_node
 class T23_domain_domain_TypeEntry_action method_node
 class T23_domain_domain_TypeEntry_role method_node

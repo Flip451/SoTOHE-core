@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-04T23:23:21Z",
-  "declaration_hash": "2adc6aed31de23c2f9a7479afaf82aeb87ef2b19bcdb3a1601d1aa18870eb115",
+  "generated_at": "2026-07-05T07:42:23Z",
+  "declaration_hash": "be09af85692f1451ad5edff5083538d92c3af2671aa81e4164e20daa734723c2",
   "signals": [
     {
       "type_name": "CatalogEntryKind",
@@ -41,6 +41,24 @@
         "core::cmp::PartialEq",
         "core::fmt::Debug",
         "core::marker::Copy"
+      ]
+    },
+    {
+      "type_name": "CatalogueDocument",
+      "kind_tag": "domain_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "DeletionRecord",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
       ]
     },
     {
@@ -138,6 +156,18 @@
         "core::cmp::Eq",
         "core::cmp::PartialEq"
       ]
+    },
+    {
+      "type_name": "InherentImplDeclV2",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TraitImplDeclV2",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
     }
   ]
 }

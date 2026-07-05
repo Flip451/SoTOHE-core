@@ -698,7 +698,7 @@ mod tests {
 
     fn single_entry_doc(crate_name: &str) -> CatalogueDocument {
         let mut doc = empty_doc(crate_name);
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("SentinelType").unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
@@ -1277,7 +1277,7 @@ mod tests {
     #[test]
     fn test_forbid_primitive_in_types_named_field_and_type_alias_target() {
         let mut doc = empty_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("Money").unwrap(),
             TypeEntry::new(
                 ItemAction::Add,
@@ -1301,7 +1301,7 @@ mod tests {
                 vec![],
             ),
         );
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("Description").unwrap(),
             TypeEntry::new(
                 ItemAction::Add,

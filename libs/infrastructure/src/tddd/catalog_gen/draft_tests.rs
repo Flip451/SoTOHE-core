@@ -79,9 +79,9 @@ fn test_scan_collects_multiple_holes() {
 fn test_try_complete_returns_document_for_hole_free_draft() {
     let document =
         try_complete(empty_catalogue(), "domain").expect("hole-free draft should decode");
-    assert_eq!(document.crate_name.as_str(), "domain");
-    assert_eq!(document.layer.as_ref(), "domain");
-    assert!(document.types.is_empty());
+    assert_eq!(document.crate_name().as_str(), "domain");
+    assert_eq!(document.layer().as_ref(), "domain");
+    assert!(document.types().is_empty());
 }
 
 #[test]

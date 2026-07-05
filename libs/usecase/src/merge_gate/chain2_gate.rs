@@ -114,7 +114,7 @@ pub(super) fn check_chain2_for_layer<R: TrackBlobReader>(
     let catalogue_file = format!("{layer_id}-types.json");
     let mut integrity_errors: Vec<VerifyFinding> = Vec::new();
 
-    for (type_name, entry) in &catalogue.types {
+    for (type_name, entry) in catalogue.types() {
         check_spec_refs_for_entry(
             layer_id,
             type_name.as_str(),
@@ -123,7 +123,7 @@ pub(super) fn check_chain2_for_layer<R: TrackBlobReader>(
             &mut integrity_errors,
         );
     }
-    for (trait_name, entry) in &catalogue.traits {
+    for (trait_name, entry) in catalogue.traits() {
         check_spec_refs_for_entry(
             layer_id,
             trait_name.as_str(),
@@ -132,7 +132,7 @@ pub(super) fn check_chain2_for_layer<R: TrackBlobReader>(
             &mut integrity_errors,
         );
     }
-    for (fn_path, entry) in &catalogue.functions {
+    for (fn_path, entry) in catalogue.functions() {
         check_spec_refs_for_entry(
             layer_id,
             &fn_path.to_string(),
@@ -163,7 +163,8 @@ pub(super) fn check_chain2_for_layer<R: TrackBlobReader>(
     //
     // Coverage check: total entry count must equal signals count, and
     // positional names must match (fail-closed against trimmed signals files).
-    let total_entries = catalogue.types.len() + catalogue.traits.len() + catalogue.functions.len();
+    let total_entries =
+        catalogue.types().len() + catalogue.traits().len() + catalogue.functions().len();
     let signals = &signals_doc.signals;
     if total_entries != signals.len() {
         outcome.merge(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
@@ -177,11 +178,11 @@ pub(super) fn check_chain2_for_layer<R: TrackBlobReader>(
 
     // Positional name match: types → traits → functions, BTreeMap iteration order.
     let catalogue_names: Vec<String> = catalogue
-        .types
+        .types()
         .keys()
         .map(|k| k.as_str().to_owned())
-        .chain(catalogue.traits.keys().map(|k| k.as_str().to_owned()))
-        .chain(catalogue.functions.keys().map(|k| k.to_string()))
+        .chain(catalogue.traits().keys().map(|k| k.as_str().to_owned()))
+        .chain(catalogue.functions().keys().map(|k| k.to_string()))
         .collect();
     if let Some((i, cat_name, sig)) = catalogue_names
         .iter()

@@ -130,7 +130,7 @@ pub(super) fn render_mermaid(
     // Index documents by layer id string for quick lookup.
     let mut docs_by_layer: BTreeMap<String, Vec<&CatalogueDocument>> = BTreeMap::new();
     for doc in catalogues {
-        docs_by_layer.entry(doc.layer.as_ref().to_string()).or_default().push(doc);
+        docs_by_layer.entry(doc.layer().as_ref().to_string()).or_default().push(doc);
     }
 
     // Output sections.
@@ -155,18 +155,18 @@ pub(super) fn render_mermaid(
         // Sort docs within layer alphabetically by crate_name (CN-08).
         let docs_in_layer = docs_by_layer.get(layer_str).cloned().unwrap_or_default();
         let mut sorted_docs: Vec<&CatalogueDocument> = docs_in_layer;
-        sorted_docs.sort_by_key(|d| d.crate_name.as_str());
+        sorted_docs.sort_by_key(|d| d.crate_name().as_str());
 
         for doc in &sorted_docs {
-            let crate_str = doc.crate_name.as_str();
-            let layer_str_doc = doc.layer.as_ref();
+            let crate_str = doc.crate_name().as_str();
+            let layer_str_doc = doc.layer().as_ref();
 
             // Build inherent_impls index for this doc: type_name -> Vec<methods>
             let mut inherent_methods: BTreeMap<
                 String,
                 Vec<&domain::tddd::catalogue_v2::methods::MethodDeclaration>,
             > = BTreeMap::new();
-            for impl_decl in &doc.inherent_impls {
+            for impl_decl in doc.inherent_impls() {
                 let tn = impl_decl.type_name.as_str().to_string();
                 for m in &impl_decl.methods {
                     inherent_methods.entry(tn.clone()).or_default().push(m);
@@ -182,7 +182,7 @@ pub(super) fn render_mermaid(
             use domain::tddd::catalogue_v2::roles::ItemAction;
 
             // Types
-            for (type_name, type_entry) in &doc.types {
+            for (type_name, type_entry) in doc.types() {
                 if type_entry.action() == ItemAction::Delete {
                     continue; // deleted types must not appear in the rendered map
                 }
@@ -204,7 +204,7 @@ pub(super) fn render_mermaid(
             }
 
             // Traits
-            for (trait_name, trait_entry) in &doc.traits {
+            for (trait_name, trait_entry) in doc.traits() {
                 if trait_entry.action() == ItemAction::Delete {
                     continue; // deleted traits must not appear in the rendered map
                 }
@@ -226,7 +226,7 @@ pub(super) fn render_mermaid(
             }
 
             // Functions
-            for (fn_path, fn_entry) in &doc.functions {
+            for (fn_path, fn_entry) in doc.functions() {
                 if fn_entry.action() == ItemAction::Delete {
                     continue; // deleted functions must not appear in the rendered map
                 }
@@ -291,8 +291,8 @@ pub(super) fn render_mermaid(
 
         // T008: trait impl edges for this layer's docs.
         for doc in &sorted_docs {
-            let crate_str = doc.crate_name.as_str();
-            for trait_impl in &doc.trait_impls {
+            let crate_str = doc.crate_name().as_str();
+            for trait_impl in doc.trait_impls() {
                 let for_type_str = trait_impl.for_type.as_str();
                 let trait_ref_str = trait_impl.trait_ref.as_str();
 

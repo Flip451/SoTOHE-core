@@ -69,21 +69,21 @@ pub struct CatalogueEntryRef<'a> {
 pub fn iter_catalogue_entries(
     catalogue: &CatalogueDocument,
 ) -> impl Iterator<Item = CatalogueEntryRef<'_>> {
-    let types = catalogue.types.iter().map(|(name, entry)| CatalogueEntryRef {
+    let types = catalogue.types().iter().map(|(name, entry)| CatalogueEntryRef {
         key: name.as_str().to_owned(),
         section_key: format!("types:{}", name.as_str()),
         action: entry.action(),
         spec_refs: entry.spec_refs(),
         informal_grounds: entry.informal_grounds(),
     });
-    let traits = catalogue.traits.iter().map(|(name, entry)| CatalogueEntryRef {
+    let traits = catalogue.traits().iter().map(|(name, entry)| CatalogueEntryRef {
         key: name.as_str().to_owned(),
         section_key: format!("traits:{}", name.as_str()),
         action: entry.action(),
         spec_refs: entry.spec_refs(),
         informal_grounds: entry.informal_grounds(),
     });
-    let functions = catalogue.functions.iter().map(|(path, entry)| CatalogueEntryRef {
+    let functions = catalogue.functions().iter().map(|(path, entry)| CatalogueEntryRef {
         key: path.to_string(),
         section_key: format!("functions:{path}"),
         action: entry.action(),
@@ -186,7 +186,7 @@ pub(crate) mod tests {
     #[test]
     fn type_entry_yields_correct_key_and_section_key() {
         let mut doc = empty_v3_doc("domain");
-        doc.types.insert(TypeName::new("FooType").unwrap(), type_entry());
+        doc.insert_type(TypeName::new("FooType").unwrap(), type_entry());
 
         let entries: Vec<_> = super::iter_catalogue_entries(&doc).collect();
         assert_eq!(entries.len(), 1);
@@ -199,7 +199,7 @@ pub(crate) mod tests {
     #[test]
     fn trait_entry_yields_correct_key_and_section_key() {
         let mut doc = empty_v3_doc("domain");
-        doc.traits.insert(TraitName::new("FooTrait").unwrap(), trait_entry());
+        doc.insert_trait(TraitName::new("FooTrait").unwrap(), trait_entry());
 
         let entries: Vec<_> = super::iter_catalogue_entries(&doc).collect();
         assert_eq!(entries.len(), 1);
@@ -214,7 +214,7 @@ pub(crate) mod tests {
         let mut doc = empty_v3_doc("domain");
         let path = function_path("domain", "my_fn");
         let expected_key = path.to_string(); // "domain::my_fn"
-        doc.functions.insert(path, function_entry());
+        doc.insert_function(path, function_entry());
 
         let entries: Vec<_> = super::iter_catalogue_entries(&doc).collect();
         assert_eq!(entries.len(), 1);
@@ -227,9 +227,9 @@ pub(crate) mod tests {
     #[test]
     fn traversal_order_is_types_then_traits_then_functions() {
         let mut doc = empty_v3_doc("domain");
-        doc.types.insert(TypeName::new("AType").unwrap(), type_entry());
-        doc.traits.insert(TraitName::new("BTrait").unwrap(), trait_entry());
-        doc.functions.insert(function_path("domain", "c_fn"), function_entry());
+        doc.insert_type(TypeName::new("AType").unwrap(), type_entry());
+        doc.insert_trait(TraitName::new("BTrait").unwrap(), trait_entry());
+        doc.insert_function(function_path("domain", "c_fn"), function_entry());
 
         let keys: Vec<String> =
             super::iter_catalogue_entries(&doc).map(|e| e.section_key.clone()).collect();
@@ -242,9 +242,9 @@ pub(crate) mod tests {
     fn types_are_yielded_in_btreemap_alphabetical_order() {
         let mut doc = empty_v3_doc("domain");
         // Inserted in reverse order; BTreeMap guarantees alphabetical iteration.
-        doc.types.insert(TypeName::new("Zebra").unwrap(), type_entry());
-        doc.types.insert(TypeName::new("Apple").unwrap(), type_entry());
-        doc.types.insert(TypeName::new("Mango").unwrap(), type_entry());
+        doc.insert_type(TypeName::new("Zebra").unwrap(), type_entry());
+        doc.insert_type(TypeName::new("Apple").unwrap(), type_entry());
+        doc.insert_type(TypeName::new("Mango").unwrap(), type_entry());
 
         let keys: Vec<String> = super::iter_catalogue_entries(&doc)
             .filter(|e| e.section_key.starts_with("types:"))
@@ -259,8 +259,8 @@ pub(crate) mod tests {
     fn same_short_name_in_types_and_traits_gets_distinct_section_keys() {
         let mut doc = empty_v3_doc("domain");
         // "Shared" appears in both types and traits.
-        doc.types.insert(TypeName::new("Shared").unwrap(), type_entry());
-        doc.traits.insert(TraitName::new("Shared").unwrap(), trait_entry());
+        doc.insert_type(TypeName::new("Shared").unwrap(), type_entry());
+        doc.insert_trait(TraitName::new("Shared").unwrap(), trait_entry());
 
         let section_keys: Vec<String> =
             super::iter_catalogue_entries(&doc).map(|e| e.section_key.clone()).collect();
@@ -291,7 +291,7 @@ pub(crate) mod tests {
             vec![],
             vec![],
         );
-        doc.types.insert(TypeName::new("ModType").unwrap(), te);
+        doc.insert_type(TypeName::new("ModType").unwrap(), te);
 
         let tre = TraitEntry::new(
             ItemAction::Reference,
@@ -307,7 +307,7 @@ pub(crate) mod tests {
             vec![],
             vec![],
         );
-        doc.traits.insert(TraitName::new("RefTrait").unwrap(), tre);
+        doc.insert_trait(TraitName::new("RefTrait").unwrap(), tre);
 
         let fe = FunctionEntry::new(
             ItemAction::Delete,
@@ -321,7 +321,7 @@ pub(crate) mod tests {
             vec![],
             vec![],
         );
-        doc.functions.insert(function_path("domain", "del_fn"), fe);
+        doc.insert_function(function_path("domain", "del_fn"), fe);
 
         let entries: Vec<_> = super::iter_catalogue_entries(&doc).collect();
         assert_eq!(entries.len(), 3);
