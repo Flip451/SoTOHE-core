@@ -62,11 +62,55 @@ fn create_skeletons(
     }
     let mut created = Vec::new();
     for target in targets {
-        let value = empty_catalogue_value(&target.crate_name, &target.layer)?;
-        write_catalogue(&target.path, trusted_root, &value)?;
-        created.push(target.path.display().to_string());
+        let value = match empty_catalogue_value(&target.crate_name, &target.layer) {
+            Ok(value) => value,
+            Err(err) => return fail_after_partial_create(&created, trusted_root, err),
+        };
+        if let Err(err) = write_catalogue(&target.path, trusted_root, &value) {
+            return fail_after_write_error(&created, &target.path, trusted_root, err);
+        }
+        created.push(target.path.clone());
     }
+    let created = created.into_iter().map(|path| path.display().to_string()).collect();
     Ok(CatalogInitReport { created_files: created })
+}
+
+fn fail_after_partial_create(
+    created_paths: &[PathBuf],
+    trusted_root: &Path,
+    err: CatalogError,
+) -> Result<CatalogInitReport, CatalogError> {
+    if let Err(rollback_err) = rollback_created_files(created_paths, trusted_root) {
+        return Err(port_error(format!(
+            "catalog init failed: {err}; rollback failed: {rollback_err}"
+        )));
+    }
+    Err(err)
+}
+
+fn fail_after_write_error(
+    created_paths: &[PathBuf],
+    failed_path: &Path,
+    trusted_root: &Path,
+    err: CatalogError,
+) -> Result<CatalogInitReport, CatalogError> {
+    let mut rollback_paths = created_paths.to_vec();
+    rollback_paths.push(failed_path.to_path_buf());
+    fail_after_partial_create(&rollback_paths, trusted_root, err)
+}
+
+fn rollback_created_files(
+    created_paths: &[PathBuf],
+    trusted_root: &Path,
+) -> Result<(), CatalogError> {
+    for path in created_paths.iter().rev() {
+        if catalogue_present(path, trusted_root)? {
+            std::fs::remove_file(path).map_err(|err| {
+                port_error(format!("failed to remove partial catalogue {}: {err}", path.display()))
+            })?;
+        }
+    }
+    Ok(())
 }
 
 #[cfg(test)]
@@ -125,5 +169,53 @@ mod tests {
         assert!(matches!(err, CatalogError::FileExists { .. }));
         // The first target must NOT have been written (no partial generation).
         assert!(!dir.join("domain-types.json").exists());
+    }
+
+    #[test]
+    fn test_create_skeletons_rolls_back_after_write_failure() {
+        let temp = tempfile::tempdir().unwrap();
+        let dir = temp.path().join("track");
+        let first = dir.join("domain-types.json");
+        let second = dir.join("missing-parent/usecase-types.json");
+        let targets = vec![
+            Target {
+                path: first.clone(),
+                crate_name: "domain".to_owned(),
+                layer: "domain".to_owned(),
+            },
+            Target {
+                path: second.clone(),
+                crate_name: "usecase".to_owned(),
+                layer: "usecase".to_owned(),
+            },
+        ];
+
+        let err = create_skeletons(&dir, temp.path(), &targets).unwrap_err();
+        assert!(matches!(err, CatalogError::Port { .. }));
+        assert!(!first.exists());
+        assert!(!second.exists());
+    }
+
+    #[test]
+    fn test_fail_after_write_error_rolls_back_failed_target() {
+        let temp = tempfile::tempdir().unwrap();
+        let dir = temp.path().join("track");
+        std::fs::create_dir_all(&dir).unwrap();
+        let first = dir.join("domain-types.json");
+        let failed = dir.join("usecase-types.json");
+        std::fs::write(&first, "{}").unwrap();
+        std::fs::write(&failed, "partial").unwrap();
+
+        let err = fail_after_write_error(
+            std::slice::from_ref(&first),
+            &failed,
+            temp.path(),
+            port_error("simulated partial write failure"),
+        )
+        .unwrap_err();
+
+        assert!(matches!(err, CatalogError::Port { .. }));
+        assert!(!first.exists());
+        assert!(!failed.exists());
     }
 }
