@@ -141,15 +141,12 @@ fn validate_shape_flag_compatibility(command: &CatalogAddCommand) -> Result<(), 
         }
     }
     if !command.inherent_methods.is_empty()
-        && !matches!(
-            command.kind,
-            CatalogEntryKind::Struct | CatalogEntryKind::Enum | CatalogEntryKind::TypeAlias
-        )
+        && !matches!(command.kind, CatalogEntryKind::Struct | CatalogEntryKind::Enum)
     {
         return Err(incompatible_flag_error(
             "--inherent-method",
             command.kind,
-            "struct, enum, or type-alias entries",
+            "struct or enum entries",
         ));
     }
     if command.inherent_methods.is_empty() {
@@ -303,6 +300,13 @@ fn function_signature(command: &CatalogAddCommand) -> Result<FunctionSignaturePa
                 schema_error(format!("method `{signature}` did not produce a string `name`"))
             })?;
             validate_function_signature_name(&command.name, parsed_name)?;
+            if let Some(receiver) = parsed.get("receiver").and_then(Value::as_str) {
+                return Err(parse_error(format!(
+                    "function entry `{}` cannot use method receiver `{receiver}`; \
+                     use a receiverless free-function signature",
+                    command.name
+                )));
+            }
             let params = parsed.get("params").cloned().unwrap_or_else(|| json!([]));
             let returns = parsed.get("returns").cloned().unwrap_or_else(|| json!("()"));
             let is_async = parsed.get("is_async").and_then(Value::as_bool).unwrap_or(false);
@@ -601,6 +605,15 @@ mod tests {
     }
 
     #[test]
+    fn test_build_add_entry_function_rejects_method_receiver() {
+        let mut command = base_command(CatalogEntryKind::Function, "FreeFunction");
+        command.name = "domain::tddd::run".to_owned();
+        command.methods = vec!["fn run(&self, input: u32) -> bool".to_owned()];
+        let err = build_add_entry(&command, "track/items/t/spec.json", &anchor_set()).unwrap_err();
+        assert!(matches!(err, CatalogError::ParseFragment { .. }));
+    }
+
+    #[test]
     fn test_build_add_entry_rejects_invalid_role() {
         let command = base_command(CatalogEntryKind::Struct, "Bogus");
         let err = build_add_entry(&command, "track/items/t/spec.json", &anchor_set()).unwrap_err();
@@ -719,6 +732,14 @@ mod tests {
     #[test]
     fn test_build_add_entry_rejects_inherent_method_on_trait() {
         let mut command = base_command(CatalogEntryKind::Trait, "SecondaryPort");
+        command.inherent_methods = vec!["fn helper(&self)".to_owned()];
+        let err = build_add_entry(&command, "track/items/t/spec.json", &anchor_set()).unwrap_err();
+        assert!(matches!(err, CatalogError::ParseFragment { .. }));
+    }
+
+    #[test]
+    fn test_build_add_entry_rejects_inherent_method_on_type_alias() {
+        let mut command = base_command(CatalogEntryKind::TypeAlias, "ValueObject");
         command.inherent_methods = vec!["fn helper(&self)".to_owned()];
         let err = build_add_entry(&command, "track/items/t/spec.json", &anchor_set()).unwrap_err();
         assert!(matches!(err, CatalogError::ParseFragment { .. }));
