@@ -19,6 +19,46 @@
         }
       ]
     },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:be73c391a9eadecf34a0af620a008c5dddc46e90b5d6488a4ce3f139b5113e13",
+          "at": "2026-07-06T13:50:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-01 says the `.harness/capabilities/type-designer.md` rewrite is limited to IN-01..IN-03 plus IN-07's 12a receipt text, but IN-04/IN-05 and AC-03/AC-06 require removing schema/cookbook sections from that same doc and adding a reference to the new manual. Downstream implementers cannot satisfy both the constraint and the in-scope/AC requirements deterministically.",
+              "severity": "P1",
+              "file": "track/items/type-designer-generate-annotate-doc-2026-07-06/spec.json",
+              "line": 178,
+              "category": "scope / acceptance_criteria contradiction"
+            },
+            {
+              "message": "GO-02 makes the separate reference document a goal, but its only adr_ref is D2. D2 moves schema knowledge out of the type-designer workflow; the decision to keep that knowledge in an independent `knowledge/conventions/` manual is D9, so this goal is not anchored to the decision that authorizes the reference-document outcome.",
+              "severity": "P1",
+              "file": "track/items/type-designer-generate-annotate-doc-2026-07-06/spec.json",
+              "line": 22,
+              "category": "goal not anchored to a decision"
+            }
+          ],
+          "hash": "rvw1:sha256:be73c391a9eadecf34a0af620a008c5dddc46e90b5d6488a4ce3f139b5113e13",
+          "at": "2026-07-06T13:55:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e12f1e57fb44dd13d04c164f7308e950531e3084986a4052cd38c7a0b46965e2",
+          "at": "2026-07-06T14:00:08Z"
+        }
+      ]
+    },
     "types": {
       "rounds": [
         {
@@ -179,46 +219,20 @@
           "findings": [],
           "hash": "rvw1:sha256:2123f31297c2c88b9e6d9201da05c7b16790d478c59ccdefbfca559fb7977f79",
           "at": "2026-07-06T14:24:54Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:be73c391a9eadecf34a0af620a008c5dddc46e90b5d6488a4ce3f139b5113e13",
-          "at": "2026-07-06T13:50:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "CN-01 says the `.harness/capabilities/type-designer.md` rewrite is limited to IN-01..IN-03 plus IN-07's 12a receipt text, but IN-04/IN-05 and AC-03/AC-06 require removing schema/cookbook sections from that same doc and adding a reference to the new manual. Downstream implementers cannot satisfy both the constraint and the in-scope/AC requirements deterministically.",
-              "severity": "P1",
-              "file": "track/items/type-designer-generate-annotate-doc-2026-07-06/spec.json",
-              "line": 178,
-              "category": "scope / acceptance_criteria contradiction"
-            },
-            {
-              "message": "GO-02 makes the separate reference document a goal, but its only adr_ref is D2. D2 moves schema knowledge out of the type-designer workflow; the decision to keep that knowledge in an independent `knowledge/conventions/` manual is D9, so this goal is not anchored to the decision that authorizes the reference-document outcome.",
-              "severity": "P1",
-              "file": "track/items/type-designer-generate-annotate-doc-2026-07-06/spec.json",
-              "line": 22,
-              "category": "goal not anchored to a decision"
-            }
-          ],
-          "hash": "rvw1:sha256:be73c391a9eadecf34a0af620a008c5dddc46e90b5d6488a4ce3f139b5113e13",
-          "at": "2026-07-06T13:55:02Z"
+          "hash": "rvw1:sha256:b20ea9e97772c24fd57370126deb981bd4c87ed5a072b84132e712e47a36f89b",
+          "at": "2026-07-06T14:44:12Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:e12f1e57fb44dd13d04c164f7308e950531e3084986a4052cd38c7a0b46965e2",
-          "at": "2026-07-06T14:00:08Z"
+          "hash": "rvw1:sha256:b20ea9e97772c24fd57370126deb981bd4c87ed5a072b84132e712e47a36f89b",
+          "at": "2026-07-06T14:47:10Z"
         }
       ]
     }
