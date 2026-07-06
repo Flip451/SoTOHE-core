@@ -1,0 +1,56 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b67223747b37ea8b9ea7cac08caf8c8f920471f8ce47471be2162c5265a25959",
+          "at": "2026-07-06T17:28:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b67223747b37ea8b9ea7cac08caf8c8f920471f8ce47471be2162c5265a25959",
+          "at": "2026-07-06T17:30:41Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:61814c909cafc741ea2105ded95760da3459506476196e273dbe526d566f14fd",
+          "at": "2026-07-06T17:32:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2 says the template bootstrap will not build sotp source, but the selected command is `cargo install --git`, which compiles the git source on the bootstrap host. That conflicts with the same ADR's grounding that protoc/MSRV/vendored dependencies constrain building sotp, not running a prebuilt binary, and later claims consumers are separated from those build constraints. Downstream spec/impl-plan cannot derive whether bootstrap must provision sotp build prerequisites or switch to a prebuilt/feature-gated distribution path.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+              "line": 68,
+              "category": "research_grounding_mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:61814c909cafc741ea2105ded95760da3459506476196e273dbe526d566f14fd",
+          "at": "2026-07-06T17:34:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1691fc6c2414ac693c4af607b40c015f1444303e0944a286239c872f0f5cf99b",
+          "at": "2026-07-06T18:42:03Z"
+        }
+      ]
+    }
+  }
+}
