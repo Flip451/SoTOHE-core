@@ -81,6 +81,35 @@
           "findings": [],
           "hash": "rvw1:sha256:6c79e91ce4be57d399fb3846a5702f732bfb5a78aa231dd5f802abfcaca32a9e",
           "at": "2026-07-06T15:06:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ca1cd481913c148e1fb491d6fd858a631c3569a901dbe9098c663a0259d8a85f",
+          "at": "2026-07-06T15:17:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new fallback route covers trait/function `delete` together with `reference`/`modify`, but the described edit is not enough to produce a valid deletion. `catalog add --kind trait|function` creates a live entry with fields such as `role`, `methods`/`params`, `returns`, and `docs`; simply changing `action` to `delete` leaves those live-entry fields in place. The catalogue decoder routes `action: delete` through the tombstone DTO, which rejects live-entry fields, so `catalog check` will fail for users following this workflow. Split the delete case out and instruct authors to create an identity-only tombstone with only the allowed grounding fields, including the required spec anchor.",
+              "severity": "P1",
+              "file": ".harness/capabilities/type-designer.md",
+              "line": 130,
+              "category": "workflow-gap"
+            }
+          ],
+          "hash": "rvw1:sha256:ca1cd481913c148e1fb491d6fd858a631c3569a901dbe9098c663a0259d8a85f",
+          "at": "2026-07-06T15:21:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8e505b171ddf61adc9f28275e8aa0ee5ed3a480795b79711b016ae9b4c6b6aec",
+          "at": "2026-07-06T15:25:36Z"
         }
       ]
     },
@@ -174,42 +203,6 @@
         }
       ]
     },
-    "types": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5adafd00e42a10a28e734f09d8a32aeadf3fb2efbe03535b9809620a9d642ce1",
-          "at": "2026-07-06T13:48:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5adafd00e42a10a28e734f09d8a32aeadf3fb2efbe03535b9809620a9d642ce1",
-          "at": "2026-07-06T13:52:46Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:65b0c82004e1723eb17ac89f75e372fd15cf00cc15b3307c2579a0ae282dc803",
-          "at": "2026-07-06T13:47:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:65b0c82004e1723eb17ac89f75e372fd15cf00cc15b3307c2579a0ae282dc803",
-          "at": "2026-07-06T13:50:55Z"
-        }
-      ]
-    },
     "spec": {
       "rounds": [
         {
@@ -247,6 +240,42 @@
           "findings": [],
           "hash": "rvw1:sha256:e12f1e57fb44dd13d04c164f7308e950531e3084986a4052cd38c7a0b46965e2",
           "at": "2026-07-06T14:00:08Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:65b0c82004e1723eb17ac89f75e372fd15cf00cc15b3307c2579a0ae282dc803",
+          "at": "2026-07-06T13:47:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:65b0c82004e1723eb17ac89f75e372fd15cf00cc15b3307c2579a0ae282dc803",
+          "at": "2026-07-06T13:50:55Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5adafd00e42a10a28e734f09d8a32aeadf3fb2efbe03535b9809620a9d642ce1",
+          "at": "2026-07-06T13:48:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5adafd00e42a10a28e734f09d8a32aeadf3fb2efbe03535b9809620a9d642ce1",
+          "at": "2026-07-06T13:52:46Z"
         }
       ]
     }
