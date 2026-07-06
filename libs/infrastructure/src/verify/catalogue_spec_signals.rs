@@ -8,6 +8,7 @@ use std::path::PathBuf;
 
 use domain::verify::{VerifyFinding, VerifyOutcome};
 use domain::{CatalogueSpecSignalsDocument, ContentHash, Strictness, check_catalogue_spec_signals};
+use usecase::catalogue_traversal::iter_catalogue_entries;
 
 use crate::tddd::catalogue_document_codec::CatalogueDocumentCodec;
 use crate::tddd::catalogue_spec_signals_codec;
@@ -133,13 +134,18 @@ impl CatalogueVerifyContext {
 }
 
 struct CatalogueEntryKey {
-    section: &'static str,
+    section: String,
+    entry_key: String,
     name: String,
 }
 
 impl CatalogueEntryKey {
-    fn new(section: &'static str, name: impl Into<String>) -> Self {
-        Self { section, name: name.into() }
+    fn new(
+        section: impl Into<String>,
+        entry_key: impl Into<String>,
+        name: impl Into<String>,
+    ) -> Self {
+        Self { section: section.into(), entry_key: entry_key.into(), name: name.into() }
     }
 }
 
@@ -175,7 +181,7 @@ fn catalogue_spec_signal_freshness_findings(
 
     for (entry, signal) in entries.iter().zip(doc.signals.iter()) {
         let current_entry_hash =
-            match compute_catalogue_entry_hash(catalogue_text, entry.section, &entry.name) {
+            match compute_catalogue_entry_hash(catalogue_text, &entry.section, &entry.entry_key) {
                 Ok(hash) => hash,
                 Err(e) => {
                     findings.push(VerifyFinding::error(format!(
@@ -534,18 +540,16 @@ fn read_and_decode_catalogue(
             ))]));
         }
     };
-    let catalogue_entries: Vec<CatalogueEntryKey> = catalogue_doc
-        .types
-        .keys()
-        .map(|k| CatalogueEntryKey::new("types", k.as_str()))
-        .chain(catalogue_doc.traits.keys().map(|k| CatalogueEntryKey::new("traits", k.as_str())))
-        .chain(
-            catalogue_doc
-                .functions
-                .keys()
-                .map(|k| CatalogueEntryKey::new("functions", k.to_string())),
-        )
-        .collect();
+    let mut catalogue_entries = Vec::new();
+    for entry in iter_catalogue_entries(&catalogue_doc) {
+        let (section, entry_key) = entry.section_key.split_once(':').ok_or_else(|| {
+            VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+                "internal: malformed catalogue section key '{}'",
+                entry.section_key
+            ))])
+        })?;
+        catalogue_entries.push(CatalogueEntryKey::new(section, entry_key, entry.key));
+    }
     Ok((catalogue_entries, catalogue_text))
 }
 
@@ -644,6 +648,25 @@ mod tests {
   "functions": {}
 }"#;
 
+    /// Minimal valid v3 domain catalogue with a single type deletion tombstone.
+    const V3_CATALOGUE_DELETE_TYPE: &str = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "RemovedType": {
+      "action": "delete",
+      "module_path": "old",
+      "spec_refs": [
+        { "file": "track/items/x/spec.json", "anchor": "IN-01" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+
     /// Builds a `domain-catalogue-spec-signals.json` fixture referencing the given `type_name`
     /// with a Blue signal.
     ///
@@ -679,6 +702,14 @@ mod tests {
             "MyType",
             &declaration_hash_for(V3_CATALOGUE_ONE_TYPE),
             &entry_hash_for(V3_CATALOGUE_ONE_TYPE, "types", "MyType"),
+        )
+    }
+
+    fn signals_referencing_deleted_type() -> String {
+        signals_referencing_type(
+            "RemovedType",
+            &declaration_hash_for(V3_CATALOGUE_DELETE_TYPE),
+            &entry_hash_for(V3_CATALOGUE_DELETE_TYPE, "types", "RemovedType"),
         )
     }
 
@@ -813,6 +844,26 @@ mod tests {
         assert!(
             outcome.findings().is_empty(),
             "valid fresh catalogue-spec signals must pass: {:?}",
+            outcome.findings()
+        );
+    }
+
+    #[test]
+    fn test_delete_tombstone_with_valid_signal_counts_as_catalogue_entry() {
+        let tmp = tempfile::TempDir::new().unwrap();
+        let (items_dir, track_id) = setup_workspace(
+            tmp.path(),
+            "my-track-2026-01-01",
+            V3_CATALOGUE_DELETE_TYPE,
+            &signals_referencing_deleted_type(),
+        );
+
+        let outcome =
+            execute_catalogue_spec_signals(items_dir, track_id, tmp.path().to_path_buf(), false);
+
+        assert!(
+            outcome.findings().is_empty(),
+            "delete tombstone must be covered by matching catalogue-spec signal: {:?}",
             outcome.findings()
         );
     }

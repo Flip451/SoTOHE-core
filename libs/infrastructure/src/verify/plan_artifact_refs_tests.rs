@@ -93,6 +93,31 @@ fn write_domain_catalogue_with_spec_ref(track_dir: &Path, file: &str, anchor: &s
     write_file(track_dir, "domain-types.json", &catalogue);
 }
 
+fn write_domain_delete_catalogue_with_spec_ref(track_dir: &Path, file: &str, anchor: &str) {
+    let catalogue = format!(
+        r#"{{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {{
+    "RemovedType": {{
+      "action": "delete",
+      "module_path": "old",
+      "spec_refs": [
+        {{
+          "file": "{file}",
+          "anchor": "{anchor}"
+        }}
+      ]
+    }}
+  }},
+  "traits": {{}},
+  "functions": {{}}
+}}"#
+    );
+    write_file(track_dir, "domain-types.json", &catalogue);
+}
+
 // -----------------------------------------------------------------------
 // Happy-path: all refs valid
 // -----------------------------------------------------------------------
@@ -251,6 +276,31 @@ fn test_spec_ref_with_unresolved_anchor_reports_error() {
     assert!(
         outcome.findings()[0].message().contains("IN-99"),
         "error must mention the missing anchor"
+    );
+}
+
+#[test]
+fn test_delete_tombstone_spec_ref_with_unresolved_anchor_reports_error() {
+    let tmp = TempDir::new().unwrap();
+    let track_dir = setup_repo(tmp.path(), "test-track");
+    write_file(&track_dir, "spec.json", MINIMAL_SPEC);
+
+    write_domain_delete_catalogue_with_spec_ref(
+        &track_dir,
+        "track/items/test-track/spec.json",
+        "IN-99",
+    );
+
+    let outcome = verify(&track_dir);
+
+    assert!(outcome.has_errors(), "unresolved tombstone anchor must produce error: {outcome:?}");
+    assert!(
+        outcome
+            .findings()
+            .iter()
+            .any(|f| f.message().contains("RemovedType") && f.message().contains("IN-99")),
+        "error must mention the delete tombstone and missing anchor: {:?}",
+        outcome.findings()
     );
 }
 

@@ -24,7 +24,9 @@
 //!
 //! ADR: `knowledge/adr/2026-04-14-1531-domain-serde-ripout.md`
 
-use domain::schema::{FunctionInfo, ImplInfo, SchemaExport, TraitInfo, TypeInfo, TypeKind};
+use domain::schema::{
+    FunctionInfo, ImplInfo, SchemaExport, StructShapeKind, TraitInfo, TypeInfo, TypeKind,
+};
 use domain::tddd::catalogue::{MemberDeclaration, ParamDeclaration};
 use serde::Serialize;
 
@@ -77,6 +79,16 @@ pub struct TypeInfoDto {
     pub docs: Option<String>,
     pub members: Vec<MemberDeclarationDto>,
     pub module_path: Option<String>,
+    pub alias_target: Option<String>,
+    pub struct_shape: Option<StructShapeKindDto>,
+}
+
+/// DTO mirror of `domain::schema::StructShapeKind`.
+#[derive(Debug, Serialize)]
+pub enum StructShapeKindDto {
+    Unit,
+    Tuple { has_stripped_fields: bool },
+    Plain { has_stripped_fields: bool },
 }
 
 /// DTO mirror of `domain::tddd::catalogue::MemberDeclaration`.
@@ -130,6 +142,7 @@ pub struct ImplInfoDto {
     pub target_type: String,
     pub trait_name: Option<String>,
     pub methods: Vec<FunctionInfoDto>,
+    pub target_module_path: Option<String>,
 }
 
 // ---------------------------------------------------------------------------
@@ -182,6 +195,20 @@ impl From<&TypeKind> for TypeKindDto {
     }
 }
 
+impl From<&StructShapeKind> for StructShapeKindDto {
+    fn from(shape: &StructShapeKind) -> Self {
+        match shape {
+            StructShapeKind::Unit => Self::Unit,
+            StructShapeKind::Tuple { has_stripped_fields } => {
+                Self::Tuple { has_stripped_fields: *has_stripped_fields }
+            }
+            StructShapeKind::Plain { has_stripped_fields } => {
+                Self::Plain { has_stripped_fields: *has_stripped_fields }
+            }
+        }
+    }
+}
+
 impl From<&TypeInfo> for TypeInfoDto {
     fn from(t: &TypeInfo) -> Self {
         Self {
@@ -190,6 +217,8 @@ impl From<&TypeInfo> for TypeInfoDto {
             docs: t.docs().map(str::to_owned),
             members: t.members().iter().map(MemberDeclarationDto::from).collect(),
             module_path: t.module_path().map(str::to_owned),
+            alias_target: t.alias_target().map(str::to_owned),
+            struct_shape: t.struct_shape().map(StructShapeKindDto::from),
         }
     }
 }
@@ -245,6 +274,7 @@ impl From<&ImplInfo> for ImplInfoDto {
             target_type: i.target_type().to_owned(),
             trait_name: i.trait_name().map(str::to_owned),
             methods: i.methods().iter().map(FunctionInfoDto::from).collect(),
+            target_module_path: i.target_module_path().map(str::to_owned),
         }
     }
 }
@@ -257,7 +287,9 @@ impl From<&ImplInfo> for ImplInfoDto {
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::indexing_slicing)]
 mod tests {
     use super::*;
-    use domain::schema::{FunctionInfo, ImplInfo, SchemaExport, TraitInfo, TypeInfo, TypeKind};
+    use domain::schema::{
+        FunctionInfo, ImplInfo, SchemaExport, StructShapeKind, TraitInfo, TypeInfo, TypeKind,
+    };
     use domain::tddd::catalogue::{MemberDeclaration, ParamDeclaration};
     use domain::tddd::catalogue_v2::identifiers::{ParamName, TypeRef};
 
@@ -320,6 +352,8 @@ mod tests {
         assert_eq!(parsed["types"][0]["members"][0]["Field"]["name"], "x");
         assert_eq!(parsed["types"][0]["members"][0]["Field"]["ty"], "i32");
         assert!(parsed["types"][0]["module_path"].is_null());
+        assert!(parsed["types"][0]["alias_target"].is_null());
+        assert!(parsed["types"][0]["struct_shape"].is_null());
 
         assert_eq!(parsed["functions"][0]["name"], "bar");
         assert_eq!(parsed["functions"][0]["params"][0]["name"], "x");
@@ -332,6 +366,52 @@ mod tests {
         assert_eq!(parsed["traits"][0]["name"], "MyTrait");
         assert_eq!(parsed["impls"][0]["target_type"], "Foo");
         assert!(parsed["impls"][0]["trait_name"].is_null());
+        assert!(parsed["impls"][0]["target_module_path"].is_null());
+    }
+
+    #[test]
+    fn encode_preserves_type_alias_target_struct_shape_and_impl_target_module_path() {
+        let alias_info = TypeInfo::with_module_path(
+            "Alias".to_string(),
+            TypeKind::TypeAlias,
+            None,
+            vec![],
+            "domain::aliases".to_string(),
+        )
+        .with_alias_target(Some("Vec<String>".to_string()));
+        let struct_info = TypeInfo::new(
+            "HiddenFields".to_string(),
+            TypeKind::Struct,
+            None,
+            vec![MemberDeclaration::field("visible", "u8")],
+        )
+        .with_struct_shape(Some(StructShapeKind::Plain { has_stripped_fields: true }));
+        let impl_info = ImplInfo::with_target_details(
+            "HiddenFields".to_string(),
+            Some("Display".to_string()),
+            vec![],
+            Some("core::fmt::Display".to_string()),
+            Some("domain::models".to_string()),
+        );
+        let schema = SchemaExport::new(
+            "test".to_string(),
+            vec![alias_info, struct_info],
+            vec![],
+            vec![],
+            vec![impl_info],
+        );
+
+        let json = encode(&schema, false).unwrap();
+        let parsed: serde_json::Value = serde_json::from_str(&json).unwrap();
+
+        assert_eq!(parsed["types"][0]["alias_target"], "Vec<String>");
+        assert!(parsed["types"][0]["struct_shape"].is_null());
+        assert!(parsed["types"][1]["alias_target"].is_null());
+        assert_eq!(
+            parsed["types"][1]["struct_shape"],
+            serde_json::json!({ "Plain": { "has_stripped_fields": true } })
+        );
+        assert_eq!(parsed["impls"][0]["target_module_path"], "domain::models");
     }
 
     #[test]

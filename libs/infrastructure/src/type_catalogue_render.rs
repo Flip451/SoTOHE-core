@@ -392,19 +392,19 @@ pub fn render_type_catalogue_v3(
     // row corresponds to the correct positional entry in the signals document.
     let mut spec_idx: usize = 0;
 
-    for (type_name, type_entry) in &doc.types {
+    for (type_name, type_entry) in doc.types() {
         // Group by the real v3 role (display tag) so the rendered view reflects
         // the v3 taxonomy; structural shapes (enum, typestate) still take
         // precedence over the semantic DataRole. Signal lookup within the
         // section translates this back to the v2-compat key via
         // section_to_signal_kind_tag.
-        let kind_tag = type_entry_display_tag(&type_entry.role, &type_entry.kind);
-        let action = v3_action_tag(type_entry.action);
+        let kind_tag = type_entry_display_tag(type_entry.role(), type_entry.kind());
+        let action = v3_action_tag(type_entry.action());
         let details = v3_type_entry_details(
             type_entry,
             type_name.as_str(),
-            doc.crate_name.as_str(),
-            &doc.trait_impls,
+            doc.crate_name().as_str(),
+            doc.trait_impls(),
         );
         let sig_idx = has_spec_signals.then_some(spec_idx);
         spec_idx += 1;
@@ -416,9 +416,9 @@ pub fn render_type_catalogue_v3(
         ));
     }
 
-    for (trait_name, trait_entry) in &doc.traits {
-        let kind_tag = contract_role_display_tag(&trait_entry.role);
-        let action = v3_action_tag(trait_entry.action);
+    for (trait_name, trait_entry) in doc.traits() {
+        let kind_tag = contract_role_display_tag(trait_entry.role());
+        let action = v3_action_tag(trait_entry.action());
         let details = v3_trait_entry_details(trait_entry);
         let sig_idx = has_spec_signals.then_some(spec_idx);
         spec_idx += 1;
@@ -430,9 +430,9 @@ pub fn render_type_catalogue_v3(
         ));
     }
 
-    for (fn_path, fn_entry) in &doc.functions {
-        let kind_tag = function_role_display_tag(fn_entry.role);
-        let action = v3_action_tag(fn_entry.action);
+    for (fn_path, fn_entry) in doc.functions() {
+        let kind_tag = function_role_display_tag(fn_entry.role());
+        let action = v3_action_tag(fn_entry.action());
         let details = v3_function_entry_details(fn_entry);
         let sig_idx = has_spec_signals.then_some(spec_idx);
         spec_idx += 1;
@@ -609,21 +609,22 @@ mod tests {
         let layer = LayerId::try_new("domain".to_owned()).unwrap();
         let crate_name = CrateName::new("domain").unwrap();
         let mut doc = CatalogueDocument::new(3, crate_name, layer);
-        let entry = TypeEntry {
-            action: ItemAction::Add,
-            role: DataRole::value_object(),
-            kind: TypeKindV2::Struct(StructKind::new(
+        let entry = TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: vec![], has_stripped_fields: false },
                 None,
             )),
-            methods: vec![],
-
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        };
-        doc.types.insert(TypeName::new(type_name).unwrap(), entry);
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        );
+        doc.insert_type(TypeName::new(type_name).unwrap(), entry);
         doc
     }
 
@@ -695,22 +696,23 @@ mod tests {
         let layer = LayerId::try_new("domain".to_owned()).unwrap();
         let crate_name = CrateName::new("domain").unwrap();
         let mut doc = CatalogueDocument::new(3, crate_name, layer);
-        let plain_entry = TypeEntry {
-            action: ItemAction::Add,
-            role: DataRole::value_object(),
-            kind: TypeKindV2::Struct(StructKind::new(
+        let plain_entry = TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: vec![], has_stripped_fields: false },
                 None,
             )),
-            methods: vec![],
-
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        };
-        doc.types.insert(TypeName::new("AType").unwrap(), plain_entry.clone());
-        doc.types.insert(TypeName::new("ZType").unwrap(), plain_entry);
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        );
+        doc.insert_type(TypeName::new("AType").unwrap(), plain_entry.clone());
+        doc.insert_type(TypeName::new("ZType").unwrap(), plain_entry);
         // Signals doc has only 1 entry (for index 0 = "AType").
         // "ZType" at index 1 has no corresponding signal → should show "—".
         let spec_signals =
@@ -745,22 +747,23 @@ mod tests {
         let layer = LayerId::try_new("domain".to_owned()).unwrap();
         let crate_name = CrateName::new("domain").unwrap();
         let mut doc = CatalogueDocument::new(3, crate_name, layer);
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("AType").unwrap(),
-            TypeEntry {
-                action: ItemAction::Add,
-                role: DataRole::value_object(),
-                kind: TypeKindV2::Struct(StructKind::new(
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(
                     StructShape::Plain { fields: vec![], has_stripped_fields: false },
                     None,
                 )),
-                methods: vec![],
-
-                module_path: ModulePath::root(),
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            },
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
         );
         let spec_signals =
             make_spec_signals_doc(vec![("Bogus".to_owned(), ConfidenceSignal::Blue)]);
@@ -791,22 +794,23 @@ mod tests {
         let layer = LayerId::try_new("domain".to_owned()).unwrap();
         let crate_name = CrateName::new("domain").unwrap();
         let mut doc = CatalogueDocument::new(3, crate_name, layer);
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("UserAccount").unwrap(),
-            TypeEntry {
-                action: ItemAction::Add,
-                role: DataRole::entity().unwrap(),
-                kind: TypeKindV2::Struct(StructKind::new(
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::entity().unwrap(),
+                TypeKindV2::Struct(StructKind::new(
                     StructShape::Plain { fields: vec![], has_stripped_fields: false },
                     None,
                 )),
-                methods: vec![],
-
-                module_path: ModulePath::root(),
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            },
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
         );
         let signals = vec![TypeSignal::new(
             "UserAccount",
@@ -852,20 +856,20 @@ mod tests {
         let mut doc = CatalogueDocument::new(3, crate_name.clone(), layer);
         let fn_path =
             FunctionPath::at_root(crate_name, FunctionName::new("register_user").unwrap());
-        doc.functions.insert(
+        doc.insert_function(
             fn_path.clone(),
-            FunctionEntry {
-                action: ItemAction::Add,
-                role: FunctionRole::UseCaseFunction,
-                params: vec![],
-                returns: TypeRef::new("()").unwrap(),
-                is_async: false,
-                generics: vec![],
-                where_predicates: vec![],
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            },
+            FunctionEntry::new(
+                ItemAction::Add,
+                FunctionRole::UseCaseFunction,
+                vec![],
+                TypeRef::new("()").unwrap(),
+                false,
+                vec![],
+                vec![],
+                None,
+                vec![],
+                vec![],
+            ),
         );
         let signals = vec![TypeSignal::new(
             fn_path.to_string(),
@@ -909,21 +913,23 @@ mod tests {
         let layer = LayerId::try_new("domain".to_owned()).unwrap();
         let crate_name = CrateName::new("domain").unwrap();
         let mut doc = CatalogueDocument::new(3, crate_name, layer);
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("UserRegistered").unwrap(),
-            TypeEntry {
-                action: ItemAction::Add,
-                role: DataRole::DomainEvent,
-                kind: TypeKindV2::Struct(StructKind::new(
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::DomainEvent,
+                TypeKindV2::Struct(StructKind::new(
                     StructShape::Plain { fields: vec![], has_stripped_fields: false },
                     None,
                 )),
-                methods: vec![],
-                module_path: ModulePath::root(),
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            },
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
         );
         let output = render_type_catalogue_v3(&doc, "domain-types.json", None, None);
         assert!(

@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "158673613e961f3c63f6641c7a0a88f32fb0312f1fba9f93b22b5b2ba82dc36d",
+  "signals": [
+    {
+      "type_name": "CatalogAddInput",
+      "signal": "blue",
+      "entry_hash": "241f272f741d90bff25ad87a5f933a3373fbc84202207bee7a9a8808179ce3c5"
+    },
+    {
+      "type_name": "CatalogCheckInput",
+      "signal": "blue",
+      "entry_hash": "e7b97f88f8926e99334d413331e7a09fbe61ee6af8bc7be97bbcfb3dfdfd0fed"
+    },
+    {
+      "type_name": "CatalogCiteInput",
+      "signal": "blue",
+      "entry_hash": "21c9c48738fe8880f229ce1427d5ef911d735a75face12ed63ef9aa40784a8cc"
+    },
+    {
+      "type_name": "CatalogDriver",
+      "signal": "blue",
+      "entry_hash": "815474cd4319de860c9e13199be71f2b2e3f6be032fd8f1fcb6e523217b06210"
+    },
+    {
+      "type_name": "CatalogImportInput",
+      "signal": "blue",
+      "entry_hash": "8118ef4b16c79f8aef33b8b3d96b6f065b4d34e264a03a4eea95ed03ac00f6b7"
+    },
+    {
+      "type_name": "CatalogImportSelect",
+      "signal": "blue",
+      "entry_hash": "0e7f0055469e1dbf71474dbd6cb26540f739f1cc0e8258785029d9dc34066be1"
+    },
+    {
+      "type_name": "CatalogInitInput",
+      "signal": "blue",
+      "entry_hash": "d09f14f1a7e33d9ec28f4142adbf5d09729e22bcbfbe0f7c3f2836d370e5e947"
+    },
+    {
+      "type_name": "CatalogInput",
+      "signal": "blue",
+      "entry_hash": "fdd993b4fa2fbccea1e892c062f4356e18f59aacb70be2c07b5916074bac9131"
+    },
+    {
+      "type_name": "CatalogKindSelect",
+      "signal": "blue",
+      "entry_hash": "dae6aafd8436f42692e98f20f2bdd59df4880d2d1c420abdf2ac3270a6af0473"
+    }
+  ]
+}

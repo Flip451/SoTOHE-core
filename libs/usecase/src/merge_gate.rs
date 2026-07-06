@@ -1873,21 +1873,23 @@ mod tests {
         let crate_name = CrateName::new("domain").unwrap();
         let layer = LayerId::try_new("domain").unwrap();
         let mut doc = CatalogueDocument::new(3, crate_name, layer);
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("TrackId").unwrap(),
-            TypeEntry {
-                action: ItemAction::Add,
-                role: DataRole::value_object(),
-                kind: TypeKindV2::Struct(StructKind::new(
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(
                     StructShape::Plain { fields: vec![], has_stripped_fields: false },
                     None,
                 )),
-                methods: vec![],
-                module_path: ModulePath::root(),
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            },
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
         );
         doc
     }

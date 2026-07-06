@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-06T11:57:50Z",
+  "declaration_hash": "98a85f85a2e6de8528a02e618292135223d1d28fdc695a46c29eda1a14b31c34",
+  "signals": [
+    {
+      "type_name": "CatalogDraftError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::convert::From<CatalogueDocumentCodecError>",
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "FsCatalogAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "CatalogPort",
+        "core::default::Default",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "ImplInfoDto",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "StructShapeKindDto",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::convert::From<&StructShapeKind>",
+        "core::fmt::Debug",
+        "serde_core::ser::Serialize"
+      ]
+    },
+    {
+      "type_name": "TypeInfoDto",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::tddd::catalog_gen::scan_todo_holes",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::tddd::catalog_gen::try_complete",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

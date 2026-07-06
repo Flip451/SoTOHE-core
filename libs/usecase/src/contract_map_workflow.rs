@@ -251,8 +251,10 @@ where
         // `rendered_layer_count` reflects only the layers that were actually rendered
         // (respecting `layer_filter`), while `total_entry_count` reflects the full
         // loader catalogue volume regardless of any filter.
-        let total_entry_count: usize =
-            catalogues.values().map(|d| d.types.len() + d.traits.len() + d.functions.len()).sum();
+        let total_entry_count: usize = catalogues
+            .values()
+            .map(|d| d.types().len() + d.traits().len() + d.functions().len())
+            .sum();
 
         Ok(RenderContractMapOutput {
             rendered_layer_count: filtered_layer_order.len(),
@@ -333,34 +335,35 @@ mod tests {
 
         // domain: 1 type entry (User)
         let mut domain_doc = empty_v3_doc("domain");
-        domain_doc.types.insert(
+        domain_doc.insert_type(
             TypeName::new("User").unwrap(),
-            TypeEntry {
-                action: ItemAction::Add,
-                role: DataRole::entity().unwrap(),
-                kind: TypeKindV2::Struct(StructKind::new(
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::entity().unwrap(),
+                TypeKindV2::Struct(StructKind::new(
                     StructShape::Plain { fields: vec![], has_stripped_fields: false },
                     None,
                 )),
-                methods: vec![],
-
-                module_path: ModulePath::root(),
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            },
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
         );
         catalogues.insert(domain_layer, domain_doc);
 
         // usecase: 2 trait entries (RegisterUser, RegisterUserCommand)
         let mut usecase_doc = empty_v3_doc("usecase");
         for trait_name in ["RegisterUser", "RegisterUserCommand"] {
-            usecase_doc.traits.insert(
+            usecase_doc.insert_trait(
                 TraitName::new(trait_name).unwrap(),
-                TraitEntry {
-                    action: ItemAction::Add,
-                    role: ContractRole::ApplicationService,
-                    methods: vec![MethodDeclaration::new(
+                TraitEntry::new(
+                    ItemAction::Add,
+                    ContractRole::ApplicationService,
+                    vec![MethodDeclaration::new(
                         domain::tddd::catalogue_v2::identifiers::MethodName::new("execute")
                             .unwrap(),
                         None,
@@ -369,16 +372,16 @@ mod tests {
                         false,
                         None,
                     )],
-                    assoc_types: vec![],
-                    assoc_consts: vec![],
-                    supertrait_bounds: vec![],
-                    generics: vec![],
-                    where_predicates: vec![],
-                    module_path: ModulePath::root(),
-                    docs: None,
-                    spec_refs: vec![],
-                    informal_grounds: vec![],
-                },
+                    vec![],
+                    vec![],
+                    vec![],
+                    vec![],
+                    vec![],
+                    ModulePath::root(),
+                    None,
+                    vec![],
+                    vec![],
+                ),
             );
         }
         catalogues.insert(usecase_layer, usecase_doc);
@@ -388,23 +391,21 @@ mod tests {
         let fn_crate = CrateName::new("infrastructure").unwrap();
         let fn_path =
             FunctionPath::at_root(fn_crate, FunctionName::new("render_contract_map").unwrap());
-        infra_doc.functions.insert(
+        infra_doc.insert_function(
             fn_path,
-            FunctionEntry {
-                action: ItemAction::Add,
-                role: FunctionRole::FreeFunction,
-                params: vec![],
-                returns: domain::tddd::catalogue_v2::identifiers::TypeRef::new(
-                    "ContractMapContent",
-                )
-                .unwrap(),
-                is_async: false,
-                generics: vec![],
-                where_predicates: vec![],
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            },
+            FunctionEntry::new(
+                ItemAction::Add,
+                FunctionRole::FreeFunction,
+                vec![],
+                domain::tddd::catalogue_v2::identifiers::TypeRef::new("ContractMapContent")
+                    .unwrap(),
+                false,
+                vec![],
+                vec![],
+                None,
+                vec![],
+                vec![],
+            ),
         );
         catalogues.insert(infra_layer, infra_doc);
 

@@ -24,6 +24,8 @@
 //! drift independently.
 
 use domain::tddd::catalogue_v2::CatalogueDocument;
+use domain::tddd::catalogue_v2::DeletionRecord;
+use domain::tddd::catalogue_v2::roles::ItemAction;
 use domain::{InformalGroundRef, SpecRef};
 
 /// A single entry extracted from a [`CatalogueDocument`] in canonical traversal order.
@@ -52,12 +54,14 @@ pub struct CatalogueEntryRef<'a> {
 }
 
 /// Returns an iterator over every entry in `catalogue` in canonical order:
-/// types (BTreeMap sorted) → traits (BTreeMap sorted) → functions (BTreeMap sorted).
+/// types (BTreeMap sorted) → traits (BTreeMap sorted) → functions (BTreeMap sorted)
+/// → deletion tombstones (stored order).
 ///
 /// Key derivation matches the signal-refresher entry ordering contract:
 /// - Types: `TypeName::as_str()` (bare) / `"types:<name>"` (section-qualified)
 /// - Traits: `TraitName::as_str()` (bare) / `"traits:<name>"` (section-qualified)
 /// - Functions: `FunctionPath::to_string()` (bare) / `"functions:<path>"` (section-qualified)
+/// - Deletions reuse the section key for the section whose entry is deleted
 ///
 /// # Examples
 ///
@@ -69,28 +73,51 @@ pub struct CatalogueEntryRef<'a> {
 pub fn iter_catalogue_entries(
     catalogue: &CatalogueDocument,
 ) -> impl Iterator<Item = CatalogueEntryRef<'_>> {
-    let types = catalogue.types.iter().map(|(name, entry)| CatalogueEntryRef {
+    let types = catalogue.types().iter().map(|(name, entry)| CatalogueEntryRef {
         key: name.as_str().to_owned(),
         section_key: format!("types:{}", name.as_str()),
-        action: entry.action,
-        spec_refs: &entry.spec_refs,
-        informal_grounds: &entry.informal_grounds,
+        action: entry.action(),
+        spec_refs: entry.spec_refs(),
+        informal_grounds: entry.informal_grounds(),
     });
-    let traits = catalogue.traits.iter().map(|(name, entry)| CatalogueEntryRef {
+    let traits = catalogue.traits().iter().map(|(name, entry)| CatalogueEntryRef {
         key: name.as_str().to_owned(),
         section_key: format!("traits:{}", name.as_str()),
-        action: entry.action,
-        spec_refs: &entry.spec_refs,
-        informal_grounds: &entry.informal_grounds,
+        action: entry.action(),
+        spec_refs: entry.spec_refs(),
+        informal_grounds: entry.informal_grounds(),
     });
-    let functions = catalogue.functions.iter().map(|(path, entry)| CatalogueEntryRef {
+    let functions = catalogue.functions().iter().map(|(path, entry)| CatalogueEntryRef {
         key: path.to_string(),
         section_key: format!("functions:{path}"),
-        action: entry.action,
-        spec_refs: &entry.spec_refs,
-        informal_grounds: &entry.informal_grounds,
+        action: entry.action(),
+        spec_refs: entry.spec_refs(),
+        informal_grounds: entry.informal_grounds(),
     });
-    types.chain(traits).chain(functions)
+    let deletions = catalogue.deletions().iter().map(|record| match record {
+        DeletionRecord::Type { name, spec_refs, informal_grounds, .. } => CatalogueEntryRef {
+            key: name.as_str().to_owned(),
+            section_key: format!("types:{}", name.as_str()),
+            action: ItemAction::Delete,
+            spec_refs,
+            informal_grounds,
+        },
+        DeletionRecord::Trait { name, spec_refs, informal_grounds, .. } => CatalogueEntryRef {
+            key: name.as_str().to_owned(),
+            section_key: format!("traits:{}", name.as_str()),
+            action: ItemAction::Delete,
+            spec_refs,
+            informal_grounds,
+        },
+        DeletionRecord::Function { path, spec_refs, informal_grounds } => CatalogueEntryRef {
+            key: path.to_string(),
+            section_key: format!("functions:{path}"),
+            action: ItemAction::Delete,
+            spec_refs,
+            informal_grounds,
+        },
+    });
+    types.chain(traits).chain(functions).chain(deletions)
 }
 
 #[cfg(test)]
@@ -116,51 +143,53 @@ pub(crate) mod tests {
     }
 
     fn type_entry() -> TypeEntry {
-        TypeEntry {
-            action: ItemAction::Add,
-            role: DataRole::value_object(),
-            kind: TypeKindV2::Struct(StructKind::new(
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: vec![], has_stripped_fields: false },
                 None,
             )),
-            methods: vec![],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        }
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        )
     }
 
     fn trait_entry() -> TraitEntry {
-        TraitEntry {
-            action: ItemAction::Add,
-            role: ContractRole::SecondaryPort,
-            methods: vec![],
-            assoc_types: vec![],
-            assoc_consts: vec![],
-            supertrait_bounds: vec![],
-            generics: vec![],
-            where_predicates: vec![],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        }
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SecondaryPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        )
     }
 
     fn function_entry() -> FunctionEntry {
-        FunctionEntry {
-            action: ItemAction::Add,
-            role: FunctionRole::FreeFunction,
-            params: vec![],
-            returns: TypeRef::new("()").unwrap(),
-            is_async: false,
-            generics: vec![],
-            where_predicates: vec![],
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        }
+        FunctionEntry::new(
+            ItemAction::Add,
+            FunctionRole::FreeFunction,
+            vec![],
+            TypeRef::new("()").unwrap(),
+            false,
+            vec![],
+            vec![],
+            None,
+            vec![],
+            vec![],
+        )
     }
 
     fn function_path(crate_name: &str, fn_name: &str) -> FunctionPath {
@@ -184,7 +213,7 @@ pub(crate) mod tests {
     #[test]
     fn type_entry_yields_correct_key_and_section_key() {
         let mut doc = empty_v3_doc("domain");
-        doc.types.insert(TypeName::new("FooType").unwrap(), type_entry());
+        doc.insert_type(TypeName::new("FooType").unwrap(), type_entry());
 
         let entries: Vec<_> = super::iter_catalogue_entries(&doc).collect();
         assert_eq!(entries.len(), 1);
@@ -197,7 +226,7 @@ pub(crate) mod tests {
     #[test]
     fn trait_entry_yields_correct_key_and_section_key() {
         let mut doc = empty_v3_doc("domain");
-        doc.traits.insert(TraitName::new("FooTrait").unwrap(), trait_entry());
+        doc.insert_trait(TraitName::new("FooTrait").unwrap(), trait_entry());
 
         let entries: Vec<_> = super::iter_catalogue_entries(&doc).collect();
         assert_eq!(entries.len(), 1);
@@ -212,7 +241,7 @@ pub(crate) mod tests {
         let mut doc = empty_v3_doc("domain");
         let path = function_path("domain", "my_fn");
         let expected_key = path.to_string(); // "domain::my_fn"
-        doc.functions.insert(path, function_entry());
+        doc.insert_function(path, function_entry());
 
         let entries: Vec<_> = super::iter_catalogue_entries(&doc).collect();
         assert_eq!(entries.len(), 1);
@@ -225,9 +254,9 @@ pub(crate) mod tests {
     #[test]
     fn traversal_order_is_types_then_traits_then_functions() {
         let mut doc = empty_v3_doc("domain");
-        doc.types.insert(TypeName::new("AType").unwrap(), type_entry());
-        doc.traits.insert(TraitName::new("BTrait").unwrap(), trait_entry());
-        doc.functions.insert(function_path("domain", "c_fn"), function_entry());
+        doc.insert_type(TypeName::new("AType").unwrap(), type_entry());
+        doc.insert_trait(TraitName::new("BTrait").unwrap(), trait_entry());
+        doc.insert_function(function_path("domain", "c_fn"), function_entry());
 
         let keys: Vec<String> =
             super::iter_catalogue_entries(&doc).map(|e| e.section_key.clone()).collect();
@@ -240,9 +269,9 @@ pub(crate) mod tests {
     fn types_are_yielded_in_btreemap_alphabetical_order() {
         let mut doc = empty_v3_doc("domain");
         // Inserted in reverse order; BTreeMap guarantees alphabetical iteration.
-        doc.types.insert(TypeName::new("Zebra").unwrap(), type_entry());
-        doc.types.insert(TypeName::new("Apple").unwrap(), type_entry());
-        doc.types.insert(TypeName::new("Mango").unwrap(), type_entry());
+        doc.insert_type(TypeName::new("Zebra").unwrap(), type_entry());
+        doc.insert_type(TypeName::new("Apple").unwrap(), type_entry());
+        doc.insert_type(TypeName::new("Mango").unwrap(), type_entry());
 
         let keys: Vec<String> = super::iter_catalogue_entries(&doc)
             .filter(|e| e.section_key.starts_with("types:"))
@@ -257,8 +286,8 @@ pub(crate) mod tests {
     fn same_short_name_in_types_and_traits_gets_distinct_section_keys() {
         let mut doc = empty_v3_doc("domain");
         // "Shared" appears in both types and traits.
-        doc.types.insert(TypeName::new("Shared").unwrap(), type_entry());
-        doc.traits.insert(TraitName::new("Shared").unwrap(), trait_entry());
+        doc.insert_type(TypeName::new("Shared").unwrap(), type_entry());
+        doc.insert_trait(TraitName::new("Shared").unwrap(), trait_entry());
 
         let section_keys: Vec<String> =
             super::iter_catalogue_entries(&doc).map(|e| e.section_key.clone()).collect();
@@ -274,17 +303,52 @@ pub(crate) mod tests {
     #[test]
     fn action_field_is_preserved_for_all_entry_kinds() {
         let mut doc = empty_v3_doc("domain");
-        let mut te = type_entry();
-        te.action = ItemAction::Modify;
-        doc.types.insert(TypeName::new("ModType").unwrap(), te);
+        let te = TypeEntry::new(
+            ItemAction::Modify,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                None,
+            )),
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        );
+        doc.insert_type(TypeName::new("ModType").unwrap(), te);
 
-        let mut tre = trait_entry();
-        tre.action = ItemAction::Reference;
-        doc.traits.insert(TraitName::new("RefTrait").unwrap(), tre);
+        let tre = TraitEntry::new(
+            ItemAction::Reference,
+            ContractRole::SecondaryPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        );
+        doc.insert_trait(TraitName::new("RefTrait").unwrap(), tre);
 
-        let mut fe = function_entry();
-        fe.action = ItemAction::Delete;
-        doc.functions.insert(function_path("domain", "del_fn"), fe);
+        let fe = FunctionEntry::new(
+            ItemAction::Delete,
+            FunctionRole::FreeFunction,
+            vec![],
+            TypeRef::new("()").unwrap(),
+            false,
+            vec![],
+            vec![],
+            None,
+            vec![],
+            vec![],
+        );
+        doc.insert_function(function_path("domain", "del_fn"), fe);
 
         let entries: Vec<_> = super::iter_catalogue_entries(&doc).collect();
         assert_eq!(entries.len(), 3);

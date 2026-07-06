@@ -138,11 +138,11 @@ pub(crate) fn build_trait_index(
 
     let mut index: BTreeMap<(String, String), String> = BTreeMap::new();
     for doc in catalogues {
-        let layer = doc.layer.as_ref();
-        let crate_name = doc.crate_name.as_str();
-        for (trait_name, trait_entry) in &doc.traits {
+        let layer = doc.layer().as_ref();
+        let crate_name = doc.crate_name().as_str();
+        for (trait_name, trait_entry) in doc.traits() {
             // Skip Delete-action entries — they must not appear in the rendered map.
-            if trait_entry.action == ItemAction::Delete {
+            if trait_entry.action() == ItemAction::Delete {
                 continue;
             }
             // Store the representative node id (not the subgraph container id) so that
@@ -179,11 +179,11 @@ pub(crate) fn build_node_index(catalogues: &[CatalogueDocument]) -> NodeIndex {
 
     let mut index = NodeIndex::new();
     for doc in catalogues {
-        let layer = doc.layer.as_ref();
-        let crate_name = doc.crate_name.as_str();
-        for (type_name, type_entry) in &doc.types {
+        let layer = doc.layer().as_ref();
+        let crate_name = doc.crate_name().as_str();
+        for (type_name, type_entry) in doc.types() {
             // Skip Delete-action entries — they must not appear in the rendered map.
-            if type_entry.action == ItemAction::Delete {
+            if type_entry.action() == ItemAction::Delete {
                 continue;
             }
             // Store the representative node id (not the subgraph container id) so that

@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "track_id": "catalog-generation-annotation-2026-07-04",
+  "entries": {
+    "T001": [
+      { "layer": "domain", "entry_key": "TodoInstruction" },
+      { "layer": "domain", "entry_key": "DraftHolePath" },
+      { "layer": "domain", "entry_key": "DraftHole" },
+      { "layer": "domain", "entry_key": "CatalogEntryName" },
+      { "layer": "domain", "entry_key": "CatalogImportAction" },
+      { "layer": "domain", "entry_key": "CatalogEntryKind" }
+    ],
+    "T002": [
+      { "layer": "domain", "entry_key": "TypeEntry" },
+      { "layer": "domain", "entry_key": "TraitEntry" },
+      { "layer": "domain", "entry_key": "FunctionEntry" },
+      { "layer": "domain", "entry_key": "DocString" }
+    ],
+    "T003": [
+      { "layer": "usecase", "entry_key": "CatalogCheckVerdict" },
+      { "layer": "usecase", "entry_key": "CatalogAddCommand" },
+      { "layer": "usecase", "entry_key": "CatalogImportCommand" },
+      { "layer": "usecase", "entry_key": "CatalogCiteCommand" },
+      { "layer": "usecase", "entry_key": "CatalogCheckQuery" },
+      { "layer": "usecase", "entry_key": "CatalogInitReport" },
+      { "layer": "usecase", "entry_key": "CatalogWriteReport" },
+      { "layer": "usecase", "entry_key": "CatalogCheckReport" },
+      { "layer": "usecase", "entry_key": "CatalogError" }
+    ],
+    "T004": [
+      { "layer": "usecase", "entry_key": "CatalogService" },
+      { "layer": "usecase", "entry_key": "CatalogPort" },
+      { "layer": "usecase", "entry_key": "CatalogInteractor" }
+    ],
+    "T005": [
+      { "layer": "infrastructure", "entry_key": "infrastructure::tddd::catalog_gen::scan_todo_holes" },
+      { "layer": "infrastructure", "entry_key": "infrastructure::tddd::catalog_gen::try_complete" },
+      { "layer": "infrastructure", "entry_key": "CatalogDraftError" }
+    ],
+    "T006": [
+      { "layer": "infrastructure", "entry_key": "FsCatalogAdapter" },
+      { "layer": "domain", "entry_key": "InherentImplDeclV2" },
+      { "layer": "domain", "entry_key": "TraitImplDeclV2" }
+    ],
+    "T007": [
+      { "layer": "infrastructure", "entry_key": "FsCatalogAdapter" },
+      { "layer": "domain", "entry_key": "ImplInfo" },
+      { "layer": "domain", "entry_key": "FunctionInfo" },
+      { "layer": "domain", "entry_key": "TypeInfo" },
+      { "layer": "domain", "entry_key": "DeletionRecord" },
+      { "layer": "domain", "entry_key": "CatalogueDocument" },
+      { "layer": "domain", "entry_key": "StructShapeKind" },
+      { "layer": "infrastructure", "entry_key": "TypeInfoDto" },
+      { "layer": "infrastructure", "entry_key": "ImplInfoDto" },
+      { "layer": "infrastructure", "entry_key": "StructShapeKindDto" }
+    ],
+    "T008": [
+      { "layer": "cli_driver", "entry_key": "CatalogKindSelect" },
+      { "layer": "cli_driver", "entry_key": "CatalogImportSelect" },
+      { "layer": "cli_driver", "entry_key": "CatalogInitInput" },
+      { "layer": "cli_driver", "entry_key": "CatalogAddInput" },
+      { "layer": "cli_driver", "entry_key": "CatalogImportInput" },
+      { "layer": "cli_driver", "entry_key": "CatalogCiteInput" },
+      { "layer": "cli_driver", "entry_key": "CatalogCheckInput" },
+      { "layer": "cli_driver", "entry_key": "CatalogInput" },
+      { "layer": "cli_driver", "entry_key": "CatalogDriver" }
+    ],
+    "T009": [
+      { "layer": "cli_composition", "entry_key": "CatalogCompositionRoot" }
+    ],
+    "T010": [
+      { "layer": "cli", "entry_key": "CatalogKindArg" },
+      { "layer": "cli", "entry_key": "CatalogActionArg" },
+      { "layer": "cli", "entry_key": "CatalogInitArgs" },
+      { "layer": "cli", "entry_key": "CatalogAddArgs" },
+      { "layer": "cli", "entry_key": "CatalogImportArgs" },
+      { "layer": "cli", "entry_key": "CatalogCiteArgs" },
+      { "layer": "cli", "entry_key": "CatalogCheckArgs" },
+      { "layer": "cli", "entry_key": "CatalogCommand" },
+      { "layer": "cli", "entry_key": "CliCommand" },
+      { "layer": "cli", "entry_key": "cli::commands::catalog::execute" },
+      { "layer": "cli", "entry_key": "cli::commands::catalog::execute_init" },
+      { "layer": "cli", "entry_key": "cli::commands::catalog::execute_add" },
+      { "layer": "cli", "entry_key": "cli::commands::catalog::execute_import" },
+      { "layer": "cli", "entry_key": "cli::commands::catalog::execute_cite" },
+      { "layer": "cli", "entry_key": "cli::commands::catalog::execute_check" },
+      { "layer": "cli", "entry_key": "cli::commands::catalog::dispatch" },
+      { "layer": "cli", "entry_key": "cli::commands::catalog::resolve_for_write" },
+      { "layer": "cli", "entry_key": "cli::commands::catalog::resolve_for_read" },
+      { "layer": "cli", "entry_key": "cli::commands::catalog::kind_to_select" },
+      { "layer": "cli", "entry_key": "cli::commands::catalog::action_to_select" }
+    ],
+    "T011": [],
+    "T012": [],
+    "T013": []
+  }
+}

@@ -304,9 +304,9 @@ mod tests {
         assert_eq!(order[0].as_ref(), "domain");
         assert_eq!(catalogues.len(), 1);
         let doc: &CatalogueDocument = catalogues.get(&order[0]).unwrap();
-        assert_eq!(doc.types.len(), 0);
-        assert_eq!(doc.traits.len(), 0);
-        assert_eq!(doc.functions.len(), 0);
+        assert_eq!(doc.types().len(), 0);
+        assert_eq!(doc.traits().len(), 0);
+        assert_eq!(doc.functions().len(), 0);
     }
 
     #[test]
@@ -510,7 +510,7 @@ mod tests {
         assert_eq!(layer_order.len(), 1, "expected 1 layer");
         let domain_doc = catalogues.get(&layer_order[0]).unwrap();
         // v3-native: 2 types loaded directly from CatalogueDocument.
-        assert_eq!(domain_doc.types.len(), 2, "expected 2 type entries from v3 doc");
+        assert_eq!(domain_doc.types().len(), 2, "expected 2 type entries from v3 doc");
 
         // Write a full style config and render via the adapter (T004–T009 pipeline).
         let style_path = root.join("contract-map-style.toml");

@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "289272c9a9fdb6939671fbee0037551825a327f03b6ffe251fb4ae3694ff029c",
+  "signals": [
+    {
+      "type_name": "CatalogCompositionRoot",
+      "signal": "blue",
+      "entry_hash": "b4b07518e709b93597f9fc22e3190399a16d1f85d30a76151ec9baf13f27ff34"
+    }
+  ]
+}

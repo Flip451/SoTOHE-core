@@ -1,0 +1,218 @@
+{
+  "schema_version": 5,
+  "crate_name": "infrastructure",
+  "layer": "infrastructure",
+  "types": {
+    "FsCatalogAdapter": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "unit" }
+      },
+      "methods": [],
+      "module_path": "tddd::catalog_gen",
+      "docs": "Secondary adapter for CatalogPort catalog operations. See IN-01, IN-03, IN-04, IN-05, IN-09, AC-01, AC-03, AC-04, AC-07, AC-12.",
+      "spec_refs": [
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-01" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-03" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-05" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-09" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-01" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-03" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-04" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-07" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-12" }
+      ],
+      "informal_grounds": []
+    },
+    "TypeInfoDto": {
+      "action": "modify",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "name",          "ty": "String" },
+            { "name": "kind",          "ty": "TypeKindDto" },
+            { "name": "docs",          "ty": "Option<String>" },
+            { "name": "members",       "ty": "Vec<MemberDeclarationDto>" },
+            { "name": "module_path",   "ty": "Option<String>" },
+            { "name": "alias_target",  "ty": "Option<String>" },
+            { "name": "struct_shape",  "ty": "Option<StructShapeKindDto>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "schema_export_codec",
+      "docs": "Schema export DTO for TypeInfo. See IN-04, AC-04, AC-12.",
+      "spec_refs": [
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-04" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-12" }
+      ],
+      "informal_grounds": []
+    },
+    "ImplInfoDto": {
+      "action": "modify",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "target_type",        "ty": "String" },
+            { "name": "trait_name",         "ty": "Option<String>" },
+            { "name": "methods",            "ty": "Vec<FunctionInfoDto>" },
+            { "name": "target_module_path", "ty": "Option<String>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "schema_export_codec",
+      "docs": "Schema export DTO for ImplInfo. See IN-04, AC-04, AC-12.",
+      "spec_refs": [
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-04" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-12" }
+      ],
+      "informal_grounds": []
+    },
+    "StructShapeKindDto": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Unit", "payload": { "kind": "unit" } },
+          {
+            "name": "Tuple",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "has_stripped_fields", "ty": "bool" }
+              ]
+            }
+          },
+          {
+            "name": "Plain",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "has_stripped_fields", "ty": "bool" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "schema_export_codec",
+      "docs": "Schema export DTO for StructShapeKind. See IN-04, AC-04, AC-12.",
+      "spec_refs": [
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-04" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-12" }
+      ],
+      "informal_grounds": []
+    },
+    "CatalogDraftError": {
+      "action": "add",
+      "role": { "ErrorType": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Incomplete", "payload": { "kind": "struct", "fields": [{ "name": "holes", "ty": "Vec<domain::tddd::catalog_gen::DraftHole>" }] } },
+          { "name": "Codec",      "payload": { "kind": "struct", "fields": [{ "name": "source", "ty": "CatalogueDocumentCodecError" }] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::catalog_gen",
+      "docs": "Error enum with Incomplete and Codec variants. See IN-07, AC-05.",
+      "spec_refs": [
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-07" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-05" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {
+    "infrastructure::tddd::catalog_gen::scan_todo_holes": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "value", "ty": "&serde_json::Value" }
+      ],
+      "returns": "Vec<domain::tddd::catalog_gen::DraftHole>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Free function with signature `(&serde_json::Value) -> Vec<DraftHole>`. See IN-07, AC-05.",
+      "spec_refs": [
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-07" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-05" }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::tddd::catalog_gen::try_complete": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "value", "ty": "serde_json::Value" },
+        { "name": "expected_stem", "ty": "&str" }
+      ],
+      "returns": "Result<domain::tddd::catalogue_v2::CatalogueDocument, CatalogDraftError>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Free function with signature `(serde_json::Value, &str) -> Result<CatalogueDocument, CatalogDraftError>`. See IN-07, AC-05.",
+      "spec_refs": [
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-07" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-05" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "inherent_impls": [
+    {
+      "type_name": "FsCatalogAdapter",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Catalogue method declaration `FsCatalogAdapter::new`."
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    { "trait_ref": "core::fmt::Debug",           "for_type": "FsCatalogAdapter" },
+    { "trait_ref": "core::default::Default",     "for_type": "FsCatalogAdapter" },
+    { "trait_ref": "usecase::catalog_gen::CatalogPort", "for_type": "FsCatalogAdapter" },
+
+    { "trait_ref": "core::fmt::Debug",   "for_type": "CatalogDraftError" },
+    { "trait_ref": "core::fmt::Display", "for_type": "CatalogDraftError" },
+    { "trait_ref": "core::error::Error", "for_type": "CatalogDraftError" },
+    { "trait_ref": "core::convert::From<CatalogueDocumentCodecError>", "for_type": "CatalogDraftError" },
+
+    { "action": "reference", "trait_ref": "core::fmt::Debug",           "for_type": "TypeInfoDto" },
+    { "action": "reference", "trait_ref": "serde_core::ser::Serialize", "for_type": "TypeInfoDto" },
+    { "action": "reference", "trait_ref": "core::convert::From<&domain::schema::TypeInfo>", "for_type": "TypeInfoDto" },
+    { "action": "reference", "trait_ref": "core::fmt::Debug",           "for_type": "ImplInfoDto" },
+    { "action": "reference", "trait_ref": "serde_core::ser::Serialize", "for_type": "ImplInfoDto" },
+    { "action": "reference", "trait_ref": "core::convert::From<&domain::schema::ImplInfo>", "for_type": "ImplInfoDto" },
+    { "trait_ref": "core::fmt::Debug",              "for_type": "StructShapeKindDto" },
+    { "trait_ref": "serde_core::ser::Serialize",    "for_type": "StructShapeKindDto" },
+    { "trait_ref": "core::convert::From<&domain::schema::StructShapeKind>", "for_type": "StructShapeKindDto" }
+  ]
+}

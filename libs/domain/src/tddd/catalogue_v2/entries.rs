@@ -15,7 +15,7 @@
 use crate::plan_ref::{InformalGroundRef, SpecRef};
 use crate::tddd::catalogue_v2::composite::TypeKindV2;
 use crate::tddd::catalogue_v2::identifiers::{
-    AssocConstName, ModulePath, RustExpression, TypeName, TypeRef,
+    AssocConstName, DocString, ModulePath, RustExpression, TypeName, TypeRef,
 };
 use crate::tddd::catalogue_v2::methods::{
     MethodDeclaration, MethodGenericParam, ParamDeclaration, WherePredicateDecl,
@@ -105,23 +105,124 @@ pub struct AssocConstDecl {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TypeEntry {
     /// The action for this entry (Add / Modify / Reference / Delete). Default: `Add`.
-    pub action: ItemAction,
+    action: ItemAction,
     /// The DDD / Clean Architecture role of this type. Only `DataRole` is accepted.
-    pub role: DataRole,
+    role: DataRole,
     /// The language-level kind (Struct / Enum / TypeAlias) with payload-encoded pattern.
-    pub kind: TypeKindV2,
+    kind: TypeKindV2,
     /// Inherent methods declared on this type.
-    pub methods: Vec<MethodDeclaration>,
+    methods: Vec<MethodDeclaration>,
+    /// Type-declaration-level generic type parameters (e.g. `[T]` for `struct Foo<T>`).
+    ///
+    /// Default empty Vec for catalogues that predate this field. Reuses
+    /// `MethodGenericParam` (ADR `2026-07-02-1345` D6 / IN-13).
+    generics: Vec<MethodGenericParam>,
+    /// Type-declaration-level `where`-clause bound predicates
+    /// (e.g. `[{ lhs: "T", rhs: ["Clone"] }]` for `struct Foo<T> where T: Clone`).
+    ///
+    /// Default empty Vec. Reuses `WherePredicateDecl` (ADR `2026-07-02-1345` D6 / IN-13).
+    where_predicates: Vec<WherePredicateDecl>,
     /// Module path within the crate (empty = crate root). Serde default = empty.
-    pub module_path: ModulePath,
+    module_path: ModulePath,
     /// Optional documentation string.
-    pub docs: Option<String>,
+    docs: Option<DocString>,
     /// SoT Chain ② references to spec.json elements.
     /// Empty vec when no spec elements have been linked yet.
-    pub spec_refs: Vec<SpecRef>,
+    spec_refs: Vec<SpecRef>,
     /// Informal ground citations (unpersisted rationale). Non-empty → 🟡 advisory signal.
     /// Empty vec when no informal grounds have been recorded.
-    pub informal_grounds: Vec<InformalGroundRef>,
+    informal_grounds: Vec<InformalGroundRef>,
+}
+
+impl TypeEntry {
+    /// Creates a `TypeEntry` from all fields.
+    #[allow(clippy::too_many_arguments)]
+    #[must_use]
+    pub fn new(
+        action: ItemAction,
+        role: DataRole,
+        kind: TypeKindV2,
+        methods: Vec<MethodDeclaration>,
+        generics: Vec<MethodGenericParam>,
+        where_predicates: Vec<WherePredicateDecl>,
+        module_path: ModulePath,
+        docs: Option<DocString>,
+        spec_refs: Vec<SpecRef>,
+        informal_grounds: Vec<InformalGroundRef>,
+    ) -> Self {
+        Self {
+            action,
+            role,
+            kind,
+            methods,
+            generics,
+            where_predicates,
+            module_path,
+            docs,
+            spec_refs,
+            informal_grounds,
+        }
+    }
+
+    /// The entry action (Add / Modify / Reference / Delete).
+    #[must_use]
+    pub fn action(&self) -> ItemAction {
+        self.action
+    }
+
+    /// The DDD / Clean Architecture role of this type.
+    #[must_use]
+    pub fn role(&self) -> &DataRole {
+        &self.role
+    }
+
+    /// The language-level kind (Struct / Enum / TypeAlias).
+    #[must_use]
+    pub fn kind(&self) -> &TypeKindV2 {
+        &self.kind
+    }
+
+    /// Inherent methods declared on this type.
+    #[must_use]
+    pub fn methods(&self) -> &[MethodDeclaration] {
+        &self.methods
+    }
+
+    /// Type-declaration-level generic type parameters.
+    #[must_use]
+    pub fn generics(&self) -> &[MethodGenericParam] {
+        &self.generics
+    }
+
+    /// Type-declaration-level `where`-clause bound predicates.
+    #[must_use]
+    pub fn where_predicates(&self) -> &[WherePredicateDecl] {
+        &self.where_predicates
+    }
+
+    /// Module path within the crate (empty = crate root).
+    #[must_use]
+    pub fn module_path(&self) -> &ModulePath {
+        &self.module_path
+    }
+
+    /// Optional documentation string.
+    #[must_use]
+    pub fn docs(&self) -> Option<&DocString> {
+        self.docs.as_ref()
+    }
+
+    /// SoT Chain ② references to spec.json elements.
+    #[must_use]
+    pub fn spec_refs(&self) -> &[SpecRef] {
+        &self.spec_refs
+    }
+
+    /// Informal ground citations (unpersisted rationale).
+    #[must_use]
+    pub fn informal_grounds(&self) -> &[InformalGroundRef] {
+        &self.informal_grounds
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -138,24 +239,24 @@ pub struct TypeEntry {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TraitEntry {
     /// The action for this entry (Add / Modify / Reference / Delete). Default: `Add`.
-    pub action: ItemAction,
+    action: ItemAction,
     /// The architectural role of this trait. Only `ContractRole` is accepted.
-    pub role: ContractRole,
+    role: ContractRole,
     /// Methods declared in this trait.
-    pub methods: Vec<MethodDeclaration>,
+    methods: Vec<MethodDeclaration>,
     /// Associated types declared in this trait (e.g. `type Foo: Bound`).
     ///
     /// Default empty Vec for backward compatibility with all existing catalogues.
     /// When non-empty, the A-codec emits an `ItemEnum::AssocType` item for each entry
     /// so that `Trait.items.len()` matches the C-side (rustdoc) count and the
     /// structural comparison in `build_trait_method_map` finds matching entries.
-    pub assoc_types: Vec<AssocTypeDecl>,
+    assoc_types: Vec<AssocTypeDecl>,
     /// Associated constants declared in this trait (e.g. `const ID: ChainId`).
     ///
     /// Default empty Vec for backward compatibility with all existing catalogues.
     /// When non-empty, the A-codec emits an `ItemEnum::AssocConst` item for each entry
     /// so that `Trait.items.len()` matches the C-side (rustdoc) count.
-    pub assoc_consts: Vec<AssocConstDecl>,
+    assoc_consts: Vec<AssocConstDecl>,
     /// Supertrait bounds for this trait (e.g. `[Send, Sync]` for `trait Foo: Send + Sync`).
     ///
     /// Default empty Vec for backward compatibility. When non-empty, the A-codec encodes
@@ -165,28 +266,135 @@ pub struct TraitEntry {
     /// Using `TypeRef` instead of `String` makes empty-bound entries unrepresentable:
     /// `TypeRef::new` rejects empty strings at construction time, so any stored bound is
     /// guaranteed to be a non-empty type/trait reference string.
-    pub supertrait_bounds: Vec<TypeRef>,
+    supertrait_bounds: Vec<TypeRef>,
     /// Trait-level generic type parameters (e.g. `[T]` for `trait Foo<T>`).
     ///
     /// Default empty Vec for backward compatibility with catalogues that predate this field.
     /// Reuses `MethodGenericParam` — no new type needed (ADR `2026-05-18-1223` D2 / IN-07).
-    pub generics: Vec<MethodGenericParam>,
+    generics: Vec<MethodGenericParam>,
     /// Trait-level `where`-clause bound predicates (e.g. `[{ lhs: "T", rhs: ["Clone"] }]`
     /// for `trait Foo<T> where T: Clone`).
     ///
     /// Default empty Vec for backward compatibility.
     /// Reuses `WherePredicateDecl` — no new type needed (ADR `2026-05-18-1223` D2 / IN-07).
-    pub where_predicates: Vec<WherePredicateDecl>,
+    where_predicates: Vec<WherePredicateDecl>,
     /// Module path within the crate (empty = crate root). Serde default = empty.
-    pub module_path: ModulePath,
+    module_path: ModulePath,
     /// Optional documentation string.
-    pub docs: Option<String>,
+    docs: Option<DocString>,
     /// SoT Chain ② references to spec.json elements.
     /// Empty vec when no spec elements have been linked yet.
-    pub spec_refs: Vec<SpecRef>,
+    spec_refs: Vec<SpecRef>,
     /// Informal ground citations (unpersisted rationale). Non-empty → 🟡 advisory signal.
     /// Empty vec when no informal grounds have been recorded.
-    pub informal_grounds: Vec<InformalGroundRef>,
+    informal_grounds: Vec<InformalGroundRef>,
+}
+
+impl TraitEntry {
+    /// Creates a `TraitEntry` from all fields.
+    #[allow(clippy::too_many_arguments)]
+    #[must_use]
+    pub fn new(
+        action: ItemAction,
+        role: ContractRole,
+        methods: Vec<MethodDeclaration>,
+        assoc_types: Vec<AssocTypeDecl>,
+        assoc_consts: Vec<AssocConstDecl>,
+        supertrait_bounds: Vec<TypeRef>,
+        generics: Vec<MethodGenericParam>,
+        where_predicates: Vec<WherePredicateDecl>,
+        module_path: ModulePath,
+        docs: Option<DocString>,
+        spec_refs: Vec<SpecRef>,
+        informal_grounds: Vec<InformalGroundRef>,
+    ) -> Self {
+        Self {
+            action,
+            role,
+            methods,
+            assoc_types,
+            assoc_consts,
+            supertrait_bounds,
+            generics,
+            where_predicates,
+            module_path,
+            docs,
+            spec_refs,
+            informal_grounds,
+        }
+    }
+
+    /// The entry action (Add / Modify / Reference / Delete).
+    #[must_use]
+    pub fn action(&self) -> ItemAction {
+        self.action
+    }
+
+    /// The architectural role of this trait.
+    #[must_use]
+    pub fn role(&self) -> &ContractRole {
+        &self.role
+    }
+
+    /// Methods declared in this trait.
+    #[must_use]
+    pub fn methods(&self) -> &[MethodDeclaration] {
+        &self.methods
+    }
+
+    /// Associated types declared in this trait.
+    #[must_use]
+    pub fn assoc_types(&self) -> &[AssocTypeDecl] {
+        &self.assoc_types
+    }
+
+    /// Associated constants declared in this trait.
+    #[must_use]
+    pub fn assoc_consts(&self) -> &[AssocConstDecl] {
+        &self.assoc_consts
+    }
+
+    /// Supertrait bounds for this trait.
+    #[must_use]
+    pub fn supertrait_bounds(&self) -> &[TypeRef] {
+        &self.supertrait_bounds
+    }
+
+    /// Trait-level generic type parameters.
+    #[must_use]
+    pub fn generics(&self) -> &[MethodGenericParam] {
+        &self.generics
+    }
+
+    /// Trait-level `where`-clause bound predicates.
+    #[must_use]
+    pub fn where_predicates(&self) -> &[WherePredicateDecl] {
+        &self.where_predicates
+    }
+
+    /// Module path within the crate (empty = crate root).
+    #[must_use]
+    pub fn module_path(&self) -> &ModulePath {
+        &self.module_path
+    }
+
+    /// Optional documentation string.
+    #[must_use]
+    pub fn docs(&self) -> Option<&DocString> {
+        self.docs.as_ref()
+    }
+
+    /// SoT Chain ② references to spec.json elements.
+    #[must_use]
+    pub fn spec_refs(&self) -> &[SpecRef] {
+        &self.spec_refs
+    }
+
+    /// Informal ground citations (unpersisted rationale).
+    #[must_use]
+    pub fn informal_grounds(&self) -> &[InformalGroundRef] {
+        &self.informal_grounds
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -204,15 +412,15 @@ pub struct TraitEntry {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FunctionEntry {
     /// The action for this entry (Add / Modify / Reference / Delete). Default: `Add`.
-    pub action: ItemAction,
+    action: ItemAction,
     /// The architectural role of this function. Only `FunctionRole` is accepted.
-    pub role: FunctionRole,
+    role: FunctionRole,
     /// The function parameters.
-    pub params: Vec<ParamDeclaration>,
+    params: Vec<ParamDeclaration>,
     /// The return type (generics-inclusive type reference string).
-    pub returns: TypeRef,
+    returns: TypeRef,
     /// Whether this function is `async`.
-    pub is_async: bool,
+    is_async: bool,
     /// Generic type parameters on this function.
     ///
     /// Populated when the function is declared with APIT (`impl Trait`) or an
@@ -221,7 +429,7 @@ pub struct FunctionEntry {
     /// entries in the function's `Generics`, mirroring `MethodDeclaration.generics`.
     ///
     /// (ADR `2026-05-08-0248` D14)
-    pub generics: Vec<MethodGenericParam>,
+    generics: Vec<MethodGenericParam>,
     /// `where`-clause bound predicates on this function's generics.
     ///
     /// Captures `BoundPredicate` entries whose LHS is an arbitrary type
@@ -229,15 +437,106 @@ pub struct FunctionEntry {
     /// cannot represent (e.g. `where Vec<T>: Clone`). Default empty Vec.
     ///
     /// (ADR `2026-05-13-1153-tddd-where-form-generics-normalization` D1, D2)
-    pub where_predicates: Vec<WherePredicateDecl>,
+    where_predicates: Vec<WherePredicateDecl>,
     /// Optional documentation string.
-    pub docs: Option<String>,
+    docs: Option<DocString>,
     /// SoT Chain ② references to spec.json elements.
     /// Empty vec when no spec elements have been linked yet.
-    pub spec_refs: Vec<SpecRef>,
+    spec_refs: Vec<SpecRef>,
     /// Informal ground citations (unpersisted rationale). Non-empty → 🟡 advisory signal.
     /// Empty vec when no informal grounds have been recorded.
-    pub informal_grounds: Vec<InformalGroundRef>,
+    informal_grounds: Vec<InformalGroundRef>,
+}
+
+impl FunctionEntry {
+    /// Creates a `FunctionEntry` from all fields.
+    #[allow(clippy::too_many_arguments)]
+    #[must_use]
+    pub fn new(
+        action: ItemAction,
+        role: FunctionRole,
+        params: Vec<ParamDeclaration>,
+        returns: TypeRef,
+        is_async: bool,
+        generics: Vec<MethodGenericParam>,
+        where_predicates: Vec<WherePredicateDecl>,
+        docs: Option<DocString>,
+        spec_refs: Vec<SpecRef>,
+        informal_grounds: Vec<InformalGroundRef>,
+    ) -> Self {
+        Self {
+            action,
+            role,
+            params,
+            returns,
+            is_async,
+            generics,
+            where_predicates,
+            docs,
+            spec_refs,
+            informal_grounds,
+        }
+    }
+
+    /// The entry action (Add / Modify / Reference / Delete).
+    #[must_use]
+    pub fn action(&self) -> ItemAction {
+        self.action
+    }
+
+    /// The architectural role of this function.
+    #[must_use]
+    pub fn role(&self) -> FunctionRole {
+        self.role
+    }
+
+    /// The function parameters.
+    #[must_use]
+    pub fn params(&self) -> &[ParamDeclaration] {
+        &self.params
+    }
+
+    /// The return type.
+    #[must_use]
+    pub fn returns(&self) -> &TypeRef {
+        &self.returns
+    }
+
+    /// Whether this function is `async`.
+    #[must_use]
+    pub fn is_async(&self) -> bool {
+        self.is_async
+    }
+
+    /// Generic type parameters on this function.
+    #[must_use]
+    pub fn generics(&self) -> &[MethodGenericParam] {
+        &self.generics
+    }
+
+    /// `where`-clause bound predicates on this function's generics.
+    #[must_use]
+    pub fn where_predicates(&self) -> &[WherePredicateDecl] {
+        &self.where_predicates
+    }
+
+    /// Optional documentation string.
+    #[must_use]
+    pub fn docs(&self) -> Option<&DocString> {
+        self.docs.as_ref()
+    }
+
+    /// SoT Chain ② references to spec.json elements.
+    #[must_use]
+    pub fn spec_refs(&self) -> &[SpecRef] {
+        &self.spec_refs
+    }
+
+    /// Informal ground citations (unpersisted rationale).
+    #[must_use]
+    pub fn informal_grounds(&self) -> &[InformalGroundRef] {
+        &self.informal_grounds
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -295,7 +594,8 @@ mod tests {
     use super::*;
     use crate::tddd::catalogue_v2::composite::{StructKind, StructShape};
     use crate::tddd::catalogue_v2::identifiers::{
-        CrateName, FieldName, MethodName, ModulePath, ParamName, RustExpression, TypeName, TypeRef,
+        CrateName, DocString, FieldName, MethodName, ModulePath, ParamName, RustExpression,
+        TypeName, TypeRef,
     };
     use crate::tddd::catalogue_v2::roles::{NonEmptyVec, SelfReceiver};
     use crate::tddd::catalogue_v2::variants::FieldDecl;
@@ -307,21 +607,23 @@ mod tests {
     #[test]
     fn test_type_entry_with_data_role_compiles() {
         // TypeEntry.role: DataRole — assigning ContractRole is a compile-time error.
-        let entry = TypeEntry {
-            action: ItemAction::Add,
-            role: DataRole::value_object(),
-            kind: TypeKindV2::Struct(StructKind::new(
+        let entry = TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: vec![], has_stripped_fields: false },
                 None,
             )),
-            methods: vec![],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        };
-        assert_eq!(entry.role, DataRole::value_object());
-        assert_eq!(entry.action, ItemAction::Add);
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        );
+        assert_eq!(entry.role(), &DataRole::value_object());
+        assert_eq!(entry.action(), ItemAction::Add);
     }
 
     #[test]
@@ -329,20 +631,22 @@ mod tests {
         let field_name = FieldName::new("email").unwrap();
         let field_ty = TypeRef::new("String").unwrap();
         let fields = vec![FieldDecl::new(field_name, field_ty)];
-        let entry = TypeEntry {
-            action: ItemAction::Add,
-            role: DataRole::entity().unwrap(),
-            kind: TypeKindV2::Struct(StructKind::new(
+        let entry = TypeEntry::new(
+            ItemAction::Add,
+            DataRole::entity().unwrap(),
+            TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: fields.clone(), has_stripped_fields: false },
                 None,
             )),
-            methods: vec![],
-            module_path: ModulePath::root(),
-            docs: Some("A domain entity.".to_string()),
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        };
-        match &entry.kind {
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            Some(DocString::new("A domain entity.".to_string())),
+            vec![],
+            vec![],
+        );
+        match entry.kind() {
             TypeKindV2::Struct(sk) => match &sk.shape {
                 StructShape::Plain { fields: k_fields, has_stripped_fields } => {
                     assert!(!has_stripped_fields);
@@ -353,7 +657,7 @@ mod tests {
             },
             _ => panic!("expected Struct kind"),
         }
-        assert_eq!(entry.docs, Some("A domain entity.".to_string()));
+        assert_eq!(entry.docs(), Some(&DocString::new("A domain entity.".to_string())));
     }
 
     #[test]
@@ -367,42 +671,46 @@ mod tests {
             None,
         );
         let field_ty = TypeRef::new("String").unwrap();
-        let entry = TypeEntry {
-            action: ItemAction::Add,
-            role: DataRole::value_object(),
-            kind: TypeKindV2::Struct(StructKind::new(
+        let entry = TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
                 StructShape::Tuple { fields: vec![field_ty], has_stripped_fields: false },
                 None,
             )),
-            methods: vec![method.clone()],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        };
-        assert_eq!(entry.methods.len(), 1);
-        assert_eq!(entry.methods[0], method);
+            vec![method.clone()],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        );
+        assert_eq!(entry.methods().len(), 1);
+        assert_eq!(entry.methods()[0], method);
     }
 
     #[test]
     fn test_type_entry_with_module_path() {
         let module_path =
             ModulePath::from_segments(vec!["user".to_string(), "domain".to_string()]).unwrap();
-        let entry = TypeEntry {
-            action: ItemAction::Modify,
-            role: DataRole::aggregate_root().unwrap(),
-            kind: TypeKindV2::Struct(StructKind::new(
+        let entry = TypeEntry::new(
+            ItemAction::Modify,
+            DataRole::aggregate_root().unwrap(),
+            TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: vec![], has_stripped_fields: false },
                 None,
             )),
-            methods: vec![],
-            module_path: module_path.clone(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        };
-        assert_eq!(entry.module_path, module_path);
-        assert_eq!(entry.action, ItemAction::Modify);
+            vec![],
+            vec![],
+            vec![],
+            module_path.clone(),
+            None,
+            vec![],
+            vec![],
+        );
+        assert_eq!(entry.module_path(), &module_path);
+        assert_eq!(entry.action(), ItemAction::Modify);
     }
 
     #[test]
@@ -428,20 +736,22 @@ mod tests {
             DataRole::DomainEvent,
         ];
         for role in roles {
-            let entry = TypeEntry {
-                action: ItemAction::Add,
-                role: role.clone(),
-                kind: TypeKindV2::Struct(StructKind::new(
+            let entry = TypeEntry::new(
+                ItemAction::Add,
+                role.clone(),
+                TypeKindV2::Struct(StructKind::new(
                     StructShape::Plain { fields: vec![], has_stripped_fields: false },
                     None,
                 )),
-                methods: vec![],
-                module_path: ModulePath::root(),
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            };
-            assert_eq!(entry.role, role);
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            );
+            assert_eq!(entry.role(), &role);
         }
     }
 
@@ -450,27 +760,27 @@ mod tests {
     // -----------------------------------------------------------------------
 
     fn trait_entry_fixture() -> TraitEntry {
-        TraitEntry {
-            action: ItemAction::Add,
-            role: ContractRole::SecondaryPort,
-            methods: vec![],
-            assoc_types: vec![],
-            assoc_consts: vec![],
-            supertrait_bounds: vec![],
-            generics: vec![],
-            where_predicates: vec![],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        }
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SecondaryPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        )
     }
 
     #[test]
     fn test_trait_entry_with_contract_role_compiles() {
         // TraitEntry.role: ContractRole — assigning DataRole is a compile-time error.
         let entry = trait_entry_fixture();
-        assert_eq!(entry.role, ContractRole::SecondaryPort);
+        assert_eq!(entry.role(), &ContractRole::SecondaryPort);
     }
 
     #[test]
@@ -486,23 +796,46 @@ mod tests {
             false,
             None,
         );
-        let mut entry = trait_entry_fixture();
-        entry.methods = vec![save_method.clone()];
-        entry.docs = Some("User repository port.".to_string());
-        assert_eq!(entry.methods.len(), 1);
-        assert_eq!(entry.methods[0], save_method);
-        assert_eq!(entry.docs, Some("User repository port.".to_string()));
+        let entry = TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SecondaryPort,
+            vec![save_method.clone()],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            Some(DocString::new("User repository port.".to_string())),
+            vec![],
+            vec![],
+        );
+        assert_eq!(entry.methods().len(), 1);
+        assert_eq!(entry.methods()[0], save_method);
+        assert_eq!(entry.docs(), Some(&DocString::new("User repository port.".to_string())));
     }
 
     #[test]
     fn test_trait_entry_with_supertrait_bounds() {
         let send = TypeRef::new("Send").unwrap();
         let sync = TypeRef::new("Sync").unwrap();
-        let mut entry = trait_entry_fixture();
-        entry.supertrait_bounds = vec![send.clone(), sync.clone()];
-        assert_eq!(entry.supertrait_bounds.len(), 2);
-        assert_eq!(entry.supertrait_bounds[0].as_str(), "Send");
-        assert_eq!(entry.supertrait_bounds[1].as_str(), "Sync");
+        let entry = TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SecondaryPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![send.clone(), sync.clone()],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        );
+        assert_eq!(entry.supertrait_bounds().len(), 2);
+        assert_eq!(entry.supertrait_bounds()[0].as_str(), "Send");
+        assert_eq!(entry.supertrait_bounds()[1].as_str(), "Sync");
     }
 
     #[test]
@@ -514,9 +847,21 @@ mod tests {
             ContractRole::Repository { aggregate: TypeRef::new("Order").unwrap() },
         ];
         for role in roles {
-            let mut entry = trait_entry_fixture();
-            entry.role = role.clone();
-            assert_eq!(entry.role, role);
+            let entry = TraitEntry::new(
+                ItemAction::Add,
+                role.clone(),
+                vec![],
+                vec![],
+                vec![],
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            );
+            assert_eq!(entry.role(), &role);
         }
     }
 
@@ -524,49 +869,70 @@ mod tests {
     fn test_trait_entry_new_has_empty_generics_by_default() {
         // AC-07: TraitEntry must carry a generics field defaulting to empty Vec.
         let entry = trait_entry_fixture();
-        assert!(entry.generics.is_empty());
+        assert!(entry.generics().is_empty());
     }
 
     #[test]
     fn test_trait_entry_new_has_empty_where_predicates_by_default() {
         // AC-07: TraitEntry must carry a where_predicates field defaulting to empty Vec.
         let entry = trait_entry_fixture();
-        assert!(entry.where_predicates.is_empty());
+        assert!(entry.where_predicates().is_empty());
     }
 
     #[test]
     fn test_trait_entry_new_has_empty_assoc_items_by_default() {
         let entry = trait_entry_fixture();
-        assert!(entry.assoc_types.is_empty());
-        assert!(entry.assoc_consts.is_empty());
+        assert!(entry.assoc_types().is_empty());
+        assert!(entry.assoc_consts().is_empty());
     }
 
     #[test]
     fn test_trait_entry_generics_and_where_predicates_for_generic_trait_decl() {
         // AC-07 primary: `trait Foo<T> where T: Clone` can be represented.
         use crate::tddd::catalogue_v2::methods::{BoundOp, WherePredicateDecl};
-        let mut entry = trait_entry_fixture();
-        entry.generics =
-            vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }];
-        entry.where_predicates = vec![WherePredicateDecl {
-            lhs: TypeRef::new("T").unwrap(),
-            rhs: vec![TypeRef::new("Clone").unwrap()],
-            operator: BoundOp::Bound,
-        }];
-        assert_eq!(entry.generics.len(), 1);
-        assert_eq!(entry.generics[0].name.as_str(), "T");
-        assert_eq!(entry.where_predicates.len(), 1);
-        assert_eq!(entry.where_predicates[0].lhs.as_str(), "T");
-        assert_eq!(entry.where_predicates[0].rhs[0].as_str(), "Clone");
+        let entry = TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SecondaryPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
+            vec![WherePredicateDecl {
+                lhs: TypeRef::new("T").unwrap(),
+                rhs: vec![TypeRef::new("Clone").unwrap()],
+                operator: BoundOp::Bound,
+            }],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        );
+        assert_eq!(entry.generics().len(), 1);
+        assert_eq!(entry.generics()[0].name.as_str(), "T");
+        assert_eq!(entry.where_predicates().len(), 1);
+        assert_eq!(entry.where_predicates()[0].lhs.as_str(), "T");
+        assert_eq!(entry.where_predicates()[0].rhs[0].as_str(), "Clone");
     }
 
     #[test]
     fn test_trait_entry_generics_participates_in_equality() {
         // generics field must participate in PartialEq (derive-level guarantee).
         let base = trait_entry_fixture();
-        let mut with_generic = base.clone();
-        with_generic.generics =
-            vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }];
+        let with_generic = TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SecondaryPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        );
         assert_ne!(base, with_generic, "generics field must participate in equality");
     }
 
@@ -575,12 +941,24 @@ mod tests {
         // where_predicates field must participate in PartialEq.
         use crate::tddd::catalogue_v2::methods::{BoundOp, WherePredicateDecl};
         let base = trait_entry_fixture();
-        let mut with_pred = base.clone();
-        with_pred.where_predicates = vec![WherePredicateDecl {
-            lhs: TypeRef::new("T").unwrap(),
-            rhs: vec![TypeRef::new("Clone").unwrap()],
-            operator: BoundOp::Bound,
-        }];
+        let with_pred = TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SecondaryPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![WherePredicateDecl {
+                lhs: TypeRef::new("T").unwrap(),
+                rhs: vec![TypeRef::new("Clone").unwrap()],
+                operator: BoundOp::Bound,
+            }],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        );
         assert_ne!(base, with_pred, "where_predicates field must participate in equality");
     }
 
@@ -588,20 +966,44 @@ mod tests {
     fn test_trait_entry_assoc_items_participate_in_equality() {
         let base = trait_entry_fixture();
 
-        let mut with_assoc_type = base.clone();
-        with_assoc_type.assoc_types = vec![AssocTypeDecl {
-            name: TypeName::new("Input").unwrap(),
-            bounds: vec![TypeRef::new("Send").unwrap()],
-            default: Some(TypeRef::new("Vec<u8>").unwrap()),
-        }];
+        let with_assoc_type = TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SecondaryPort,
+            vec![],
+            vec![AssocTypeDecl {
+                name: TypeName::new("Input").unwrap(),
+                bounds: vec![TypeRef::new("Send").unwrap()],
+                default: Some(TypeRef::new("Vec<u8>").unwrap()),
+            }],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        );
         assert_ne!(base, with_assoc_type, "assoc_types field must participate in equality");
 
-        let mut with_assoc_const = base.clone();
-        with_assoc_const.assoc_consts = vec![AssocConstDecl {
-            name: AssocConstName::new("CHAIN_ID").unwrap(),
-            ty: TypeRef::new("ChainId").unwrap(),
-            default_value: Some(RustExpression::try_new("DEFAULT_CHAIN_ID").unwrap()),
-        }];
+        let with_assoc_const = TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SecondaryPort,
+            vec![],
+            vec![],
+            vec![AssocConstDecl {
+                name: AssocConstName::new("CHAIN_ID").unwrap(),
+                ty: TypeRef::new("ChainId").unwrap(),
+                default_value: Some(RustExpression::try_new("DEFAULT_CHAIN_ID").unwrap()),
+            }],
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        );
         assert_ne!(base, with_assoc_const, "assoc_consts field must participate in equality");
     }
 
@@ -612,61 +1014,61 @@ mod tests {
     #[test]
     fn test_function_entry_with_function_role_compiles() {
         // FunctionEntry.role: FunctionRole — assigning DataRole is a compile-time error.
-        let entry = FunctionEntry {
-            action: ItemAction::Add,
-            role: FunctionRole::FreeFunction,
-            params: vec![],
-            returns: TypeRef::new("()").unwrap(),
-            is_async: false,
-            generics: vec![],
-            where_predicates: vec![],
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        };
-        assert_eq!(entry.role, FunctionRole::FreeFunction);
-        assert!(!entry.is_async);
+        let entry = FunctionEntry::new(
+            ItemAction::Add,
+            FunctionRole::FreeFunction,
+            vec![],
+            TypeRef::new("()").unwrap(),
+            false,
+            vec![],
+            vec![],
+            None,
+            vec![],
+            vec![],
+        );
+        assert_eq!(entry.role(), FunctionRole::FreeFunction);
+        assert!(!entry.is_async());
     }
 
     #[test]
     fn test_function_entry_async_with_params_and_returns() {
-        let entry = FunctionEntry {
-            action: ItemAction::Add,
-            role: FunctionRole::UseCaseFunction,
-            params: vec![ParamDeclaration::new(
+        let entry = FunctionEntry::new(
+            ItemAction::Add,
+            FunctionRole::UseCaseFunction,
+            vec![ParamDeclaration::new(
                 ParamName::new("cmd").unwrap(),
                 TypeRef::new("RegisterUserCommand").unwrap(),
             )],
-            returns: TypeRef::new("Result<UserId, ApplicationError>").unwrap(),
-            is_async: true,
-            generics: vec![],
-            where_predicates: vec![],
-            docs: Some("Register a new user.".to_string()),
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        };
-        assert!(entry.is_async);
-        assert_eq!(entry.params.len(), 1);
-        assert_eq!(entry.docs, Some("Register a new user.".to_string()));
+            TypeRef::new("Result<UserId, ApplicationError>").unwrap(),
+            true,
+            vec![],
+            vec![],
+            Some(DocString::new("Register a new user.".to_string())),
+            vec![],
+            vec![],
+        );
+        assert!(entry.is_async());
+        assert_eq!(entry.params().len(), 1);
+        assert_eq!(entry.docs(), Some(&DocString::new("Register a new user.".to_string())));
     }
 
     #[test]
     fn test_function_entry_all_function_roles_are_accepted() {
         let roles = [FunctionRole::FreeFunction, FunctionRole::UseCaseFunction];
         for role in roles {
-            let entry = FunctionEntry {
-                action: ItemAction::Add,
+            let entry = FunctionEntry::new(
+                ItemAction::Add,
                 role,
-                params: vec![],
-                returns: TypeRef::new("()").unwrap(),
-                is_async: false,
-                generics: vec![],
-                where_predicates: vec![],
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            };
-            assert_eq!(entry.role, role);
+                vec![],
+                TypeRef::new("()").unwrap(),
+                false,
+                vec![],
+                vec![],
+                None,
+                vec![],
+                vec![],
+            );
+            assert_eq!(entry.role(), role);
         }
     }
 
@@ -675,61 +1077,70 @@ mod tests {
         // ADR 2026-05-08-0248 D14: FunctionEntry carries explicit generic params
         // so the A-codec can mirror rustdoc's `Function.generics`.
         use crate::tddd::catalogue_v2::methods::MethodGenericParam;
-        let entry = FunctionEntry {
-            action: ItemAction::Add,
-            role: FunctionRole::FreeFunction,
-            params: vec![],
-            returns: TypeRef::new("T").unwrap(),
-            is_async: false,
-            generics: vec![MethodGenericParam {
+        let entry = FunctionEntry::new(
+            ItemAction::Add,
+            FunctionRole::FreeFunction,
+            vec![],
+            TypeRef::new("T").unwrap(),
+            false,
+            vec![MethodGenericParam {
                 name: ParamName::new("T").unwrap(),
                 bounds: vec![TypeRef::new("Clone").unwrap()],
             }],
-            where_predicates: vec![],
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        };
-        assert_eq!(entry.generics.len(), 1);
-        assert_eq!(entry.generics[0].name.as_str(), "T");
-        assert_eq!(entry.generics[0].bounds[0].as_str(), "Clone");
+            vec![],
+            None,
+            vec![],
+            vec![],
+        );
+        assert_eq!(entry.generics().len(), 1);
+        assert_eq!(entry.generics()[0].name.as_str(), "T");
+        assert_eq!(entry.generics()[0].bounds[0].as_str(), "Clone");
     }
 
     #[test]
     fn test_function_entry_default_generics_is_empty() {
-        let entry = FunctionEntry {
-            action: ItemAction::Add,
-            role: FunctionRole::FreeFunction,
-            params: vec![],
-            returns: TypeRef::new("()").unwrap(),
-            is_async: false,
-            generics: vec![],
-            where_predicates: vec![],
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        };
-        assert!(entry.generics.is_empty());
+        let entry = FunctionEntry::new(
+            ItemAction::Add,
+            FunctionRole::FreeFunction,
+            vec![],
+            TypeRef::new("()").unwrap(),
+            false,
+            vec![],
+            vec![],
+            None,
+            vec![],
+            vec![],
+        );
+        assert!(entry.generics().is_empty());
     }
 
     #[test]
     fn test_function_entry_generics_distinguishes_otherwise_equal_entries() {
         use crate::tddd::catalogue_v2::methods::MethodGenericParam;
-        let base = FunctionEntry {
-            action: ItemAction::Add,
-            role: FunctionRole::FreeFunction,
-            params: vec![],
-            returns: TypeRef::new("()").unwrap(),
-            is_async: false,
-            generics: vec![],
-            where_predicates: vec![],
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        };
-        let mut with_generic = base.clone();
-        with_generic.generics =
-            vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }];
+        let base = FunctionEntry::new(
+            ItemAction::Add,
+            FunctionRole::FreeFunction,
+            vec![],
+            TypeRef::new("()").unwrap(),
+            false,
+            vec![],
+            vec![],
+            None,
+            vec![],
+            vec![],
+        );
+        let with_generic = FunctionEntry::new(
+            ItemAction::Add,
+            FunctionRole::FreeFunction,
+            vec![],
+            TypeRef::new("()").unwrap(),
+            false,
+            vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
+            vec![],
+            None,
+            vec![],
+            vec![],
+        );
         assert_ne!(base, with_generic, "generics field participates in equality");
     }
 
@@ -739,48 +1150,58 @@ mod tests {
         // catalogue authors can express constraints whose LHS is a type expression
         // (e.g. `where Vec<T>: Bound`) that the inline form cannot represent.
         use crate::tddd::catalogue_v2::methods::BoundOp;
-        let entry = FunctionEntry {
-            action: ItemAction::Add,
-            role: FunctionRole::FreeFunction,
-            params: vec![],
-            returns: TypeRef::new("()").unwrap(),
-            is_async: false,
-            generics: vec![],
-            where_predicates: vec![WherePredicateDecl {
+        let entry = FunctionEntry::new(
+            ItemAction::Add,
+            FunctionRole::FreeFunction,
+            vec![],
+            TypeRef::new("()").unwrap(),
+            false,
+            vec![],
+            vec![WherePredicateDecl {
                 lhs: TypeRef::new("Vec<T>").unwrap(),
                 rhs: vec![TypeRef::new("Send").unwrap()],
                 operator: BoundOp::Bound,
             }],
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        };
-        assert_eq!(entry.where_predicates.len(), 1);
-        assert_eq!(entry.where_predicates[0].lhs.as_str(), "Vec<T>");
-        assert_eq!(entry.where_predicates[0].rhs[0].as_str(), "Send");
+            None,
+            vec![],
+            vec![],
+        );
+        assert_eq!(entry.where_predicates().len(), 1);
+        assert_eq!(entry.where_predicates()[0].lhs.as_str(), "Vec<T>");
+        assert_eq!(entry.where_predicates()[0].rhs[0].as_str(), "Send");
     }
 
     #[test]
     fn test_function_entry_where_predicates_distinguish_otherwise_equal_entries() {
         use crate::tddd::catalogue_v2::methods::BoundOp;
-        let base = FunctionEntry {
-            action: ItemAction::Add,
-            role: FunctionRole::FreeFunction,
-            params: vec![],
-            returns: TypeRef::new("()").unwrap(),
-            is_async: false,
-            generics: vec![],
-            where_predicates: vec![],
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        };
-        let mut with_where = base.clone();
-        with_where.where_predicates = vec![WherePredicateDecl {
-            lhs: TypeRef::new("T").unwrap(),
-            rhs: vec![TypeRef::new("Clone").unwrap()],
-            operator: BoundOp::Bound,
-        }];
+        let base = FunctionEntry::new(
+            ItemAction::Add,
+            FunctionRole::FreeFunction,
+            vec![],
+            TypeRef::new("()").unwrap(),
+            false,
+            vec![],
+            vec![],
+            None,
+            vec![],
+            vec![],
+        );
+        let with_where = FunctionEntry::new(
+            ItemAction::Add,
+            FunctionRole::FreeFunction,
+            vec![],
+            TypeRef::new("()").unwrap(),
+            false,
+            vec![],
+            vec![WherePredicateDecl {
+                lhs: TypeRef::new("T").unwrap(),
+                rhs: vec![TypeRef::new("Clone").unwrap()],
+                operator: BoundOp::Bound,
+            }],
+            None,
+            vec![],
+            vec![],
+        );
         assert_ne!(base, with_where, "where_predicates field participates in equality");
     }
 
@@ -796,22 +1217,24 @@ mod tests {
         let anchor = SpecElementId::try_new("IN-01").unwrap();
         let spec_ref = SpecRef::new(PathBuf::from("track/items/x/spec.json"), anchor);
 
-        let entry = TypeEntry {
-            action: ItemAction::Add,
-            role: DataRole::value_object(),
-            kind: TypeKindV2::Struct(StructKind::new(
+        let entry = TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: vec![], has_stripped_fields: false },
                 None,
             )),
-            methods: vec![],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![spec_ref.clone()],
-            informal_grounds: vec![],
-        };
-        assert_eq!(entry.spec_refs.len(), 1);
-        assert_eq!(entry.spec_refs[0], spec_ref);
-        assert!(entry.informal_grounds.is_empty());
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![spec_ref.clone()],
+            vec![],
+        );
+        assert_eq!(entry.spec_refs().len(), 1);
+        assert_eq!(entry.spec_refs()[0], spec_ref);
+        assert!(entry.informal_grounds().is_empty());
     }
 
     #[test]
@@ -821,11 +1244,23 @@ mod tests {
         let summary = InformalGroundSummary::try_new("discussed in planning session").unwrap();
         let ground = InformalGroundRef::new(InformalGroundKind::Discussion, summary);
 
-        let mut entry = trait_entry_fixture();
-        entry.informal_grounds = vec![ground.clone()];
-        assert_eq!(entry.informal_grounds.len(), 1);
-        assert_eq!(entry.informal_grounds[0], ground);
-        assert!(entry.spec_refs.is_empty());
+        let entry = TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SecondaryPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![ground.clone()],
+        );
+        assert_eq!(entry.informal_grounds().len(), 1);
+        assert_eq!(entry.informal_grounds()[0], ground);
+        assert!(entry.spec_refs().is_empty());
     }
 
     #[test]
@@ -841,22 +1276,22 @@ mod tests {
         let summary = InformalGroundSummary::try_new("user directive from session").unwrap();
         let ground = InformalGroundRef::new(InformalGroundKind::UserDirective, summary);
 
-        let entry = FunctionEntry {
-            action: ItemAction::Add,
-            role: FunctionRole::FreeFunction,
-            params: vec![],
-            returns: TypeRef::new("()").unwrap(),
-            is_async: false,
-            generics: vec![],
-            where_predicates: vec![],
-            docs: None,
-            spec_refs: vec![spec_ref.clone()],
-            informal_grounds: vec![ground.clone()],
-        };
-        assert_eq!(entry.spec_refs.len(), 1);
-        assert_eq!(entry.spec_refs[0], spec_ref);
-        assert_eq!(entry.informal_grounds.len(), 1);
-        assert_eq!(entry.informal_grounds[0], ground);
+        let entry = FunctionEntry::new(
+            ItemAction::Add,
+            FunctionRole::FreeFunction,
+            vec![],
+            TypeRef::new("()").unwrap(),
+            false,
+            vec![],
+            vec![],
+            None,
+            vec![spec_ref.clone()],
+            vec![ground.clone()],
+        );
+        assert_eq!(entry.spec_refs().len(), 1);
+        assert_eq!(entry.spec_refs()[0], spec_ref);
+        assert_eq!(entry.informal_grounds().len(), 1);
+        assert_eq!(entry.informal_grounds()[0], ground);
     }
 
     // -----------------------------------------------------------------------
@@ -982,7 +1417,7 @@ mod tests {
         let crate_name = CrateName::new("domain").unwrap();
         let layer = LayerId::try_new("domain").unwrap();
         let doc = CatalogueDocument::new(3, crate_name, layer);
-        assert!(doc.inherent_impls.is_empty());
+        assert!(doc.inherent_impls().is_empty());
     }
 
     #[test]
@@ -995,22 +1430,22 @@ mod tests {
         let mut doc = CatalogueDocument::new(3, crate_name, layer);
 
         let type_name = TypeName::new("Email").unwrap();
-        doc.inherent_impls.push(InherentImplDeclV2 {
+        doc.push_inherent_impl(InherentImplDeclV2 {
             type_name: type_name.clone(),
             impl_generics: vec![],
             impl_where_predicates: vec![],
             methods: vec![],
         });
-        doc.inherent_impls.push(InherentImplDeclV2 {
+        doc.push_inherent_impl(InherentImplDeclV2 {
             type_name: type_name.clone(),
             impl_generics: vec![],
             impl_where_predicates: vec![],
             methods: vec![],
         });
 
-        assert_eq!(doc.inherent_impls.len(), 2);
-        assert_eq!(doc.inherent_impls[0].type_name, type_name);
-        assert_eq!(doc.inherent_impls[1].type_name, type_name);
+        assert_eq!(doc.inherent_impls().len(), 2);
+        assert_eq!(doc.inherent_impls()[0].type_name, type_name);
+        assert_eq!(doc.inherent_impls()[1].type_name, type_name);
     }
 
     // -----------------------------------------------------------------------

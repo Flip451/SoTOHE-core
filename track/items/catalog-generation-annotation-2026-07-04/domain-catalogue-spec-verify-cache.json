@@ -1,0 +1,1206 @@
+{
+  "schema_version": 1,
+  "layer": "domain",
+  "entries": [
+    {
+      "claim_hash": "5c5d2e9bb1565c38cd834e705d724a25cb45f30f170e5e9580f96ab80a94c127",
+      "evidence_hash": "f64dcc735fe2bd57caf907c77cca5bc587148b4903bca633caaad950700b29c3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp catalog add`: 新規型の意図入力。`--layer` / `--kind` / `--name` / `--role` / `--anchor`（repeatable）で同定・ロール・spec anchor を渡し、`--field` / `--method` / `--variant` / `--trait-impl` / `--inherent-method`（repeatable）で型形状を渡す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogEntryKind"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "`sotp catalog add`: 新規型の意図入力。`--layer` / `--kind` / `--name` / `--role` / `--anchor`（repeatable）で同定・ロール・spec anchor を渡し、`--field` / `--method` / `--variant` / `--trait-impl` / `--inherent-method`（repeatable）で型形状を渡す。各形状 flag は格納先 catalogue schema の実物型に合わせて分解し、各 slot は `TypeRef::new` / `FieldName::new` / `MethodName::new` / `ParamName::new` / `VariantName::new` / `SelfReceiver::from_str` / `BoundOp` 等、対応する schema 型の constructor / parser を通す。`--trait-impl` は `TraitImplDeclV2.trait_ref` を `TypeRef::new` で受け、`TraitImplDeclV2.for_type` は同じ add 入力の `--name` から生成する。`--inherent-method` は `MethodDeclaration` に分解し、同じ add 入力の `--name` を `InherentImplDeclV2.type_name` とする top-level `inherent_impls` 行に格納する。宣言レベルの型パラメータと where 句は `--generic` / `--where`（repeatable）、trait impl block レベルは `--trait-impl` と同じ呼び出しに限って `--impl-generic` / `--impl-where`（repeatable）で渡し、生成される全 `TraitImplDeclV2` 行へ付与する。inherent impl block レベルは `--inherent-method` と同じ呼び出しに限って `--inherent-impl-generic` / `--inherent-impl-where`（repeatable）で渡し、生成される `InherentImplDeclV2` 行へ付与する。`--trait-impl` なしの `--impl-generic` / `--impl-where`、および `--inherent-method` なしの `--inherent-impl-generic` / `--inherent-impl-where` は reject する。`--kind function` では `--name` を `FunctionPath` として扱い、`--method` は 0 件または 1 件だけ受けて `FunctionEntry.params` / `returns` / `is_async` / `generics` / `where_predicates` へ分解する。function entry では `--name` の末尾と `--method` から得た `fn` 名が一致しない入力を reject し、signature 名の silent drop を起こさない。省略した形状ノードと、選択 role の catalogue DTO が要求する未入力 payload（`Entity.identity` / `AggregateRoot.identity` / `EventPolicy.reacts_to` / `Repository.aggregate`）は `$todo` として生成する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5c5d2e9bb1565c38cd834e705d724a25cb45f30f170e5e9580f96ab80a94c127",
+      "evidence_hash": "1acac90c39f6aef99eab7924594867c214b927eebd4e70a1306f3b648083d800",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp catalog add` に意図（layer / kind / name / role / spec anchor / 一部の型形状）を渡すと、エントリ骨格がカタログ draft JSON に追記される。`--kind function` は `--name` を `FunctionPath` として `functions` map へ追加し、0/1 件の `--method` を `FunctionEntry` の signature fields へ分解する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogEntryKind"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "`sotp catalog add` に意図（layer / kind / name / role / spec anchor / 一部の型形状）を渡すと、エントリ骨格がカタログ draft JSON に追記され、渡した同定・role・spec_refs・型形状が格納先 catalogue schema の実物型に合わせて正規フィールドに格納され、渡さなかった形状ノードが `$todo`（記入指示付き）として生成される。`--kind function` は `--name` を `FunctionPath` として `functions` map へ追加し、0/1 件の `--method` を `FunctionEntry` の signature fields へ分解する。`--inherent-method` は top-level `inherent_impls` の `InherentImplDeclV2.methods` へ分解され、同じ add 入力の `--name` を `type_name` に使う。`TypeRef` slot は `TypeRef::new` を通して保持され、追加の Rust 構文 parser で狭められない。`Entity.identity` / `AggregateRoot.identity` / `EventPolicy.reacts_to` / `Repository.aggregate` のように選択 role の catalogue DTO が必須 payload を要求する場合は、空 payload ではなく該当 payload 位置にも `$todo` が生成される。function entry で `--method` を渡す場合は、得た `fn` 名が `--name` を `::` で区切った末尾と一致し、不一致なら入力時に reject される。生成結果は JSON として parse でき、`$todo` が残る間は typed DTO への `try_complete` が Err を返し、未入力箇所は `$todo` ノードとして JSON path と指示文で列挙できる。`$todo` を全て埋めた後の完成エントリはカタログ schema の検証を通る。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b558ccbc562f218c62494c538aeb82d9c02991d8188e9d26649fddaf26e3807d",
+      "evidence_hash": "f64dcc735fe2bd57caf907c77cca5bc587148b4903bca633caaad950700b29c3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp catalog add`: 新規型の意図入力。`--layer` / `--kind` / `--name` / `--role` / `--anchor`（repeatable）で同定・ロール・spec anchor を渡し、`--field` / `--method` / `--variant` / `--trait-impl` / `--inherent-method`（repeatable）で型形状を渡す。各形状 flag は格納先 catalogue schema の実物型に合わせて分解し、各 slot は `TypeRef::new` / `FieldName::new` / `MethodName::new` / `ParamName::new` / `VariantName::new` / `SelfReceiver::from_str` / `BoundOp` 等、対応する schema 型の constructor / parser を通す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogEntryName"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "`sotp catalog add`: 新規型の意図入力。`--layer` / `--kind` / `--name` / `--role` / `--anchor`（repeatable）で同定・ロール・spec anchor を渡し、`--field` / `--method` / `--variant` / `--trait-impl` / `--inherent-method`（repeatable）で型形状を渡す。各形状 flag は格納先 catalogue schema の実物型に合わせて分解し、各 slot は `TypeRef::new` / `FieldName::new` / `MethodName::new` / `ParamName::new` / `VariantName::new` / `SelfReceiver::from_str` / `BoundOp` 等、対応する schema 型の constructor / parser を通す。`--trait-impl` は `TraitImplDeclV2.trait_ref` を `TypeRef::new` で受け、`TraitImplDeclV2.for_type` は同じ add 入力の `--name` から生成する。`--inherent-method` は `MethodDeclaration` に分解し、同じ add 入力の `--name` を `InherentImplDeclV2.type_name` とする top-level `inherent_impls` 行に格納する。宣言レベルの型パラメータと where 句は `--generic` / `--where`（repeatable）、trait impl block レベルは `--trait-impl` と同じ呼び出しに限って `--impl-generic` / `--impl-where`（repeatable）で渡し、生成される全 `TraitImplDeclV2` 行へ付与する。inherent impl block レベルは `--inherent-method` と同じ呼び出しに限って `--inherent-impl-generic` / `--inherent-impl-where`（repeatable）で渡し、生成される `InherentImplDeclV2` 行へ付与する。`--trait-impl` なしの `--impl-generic` / `--impl-where`、および `--inherent-method` なしの `--inherent-impl-generic` / `--inherent-impl-where` は reject する。`--kind function` では `--name` を `FunctionPath` として扱い、`--method` は 0 件または 1 件だけ受けて `FunctionEntry.params` / `returns` / `is_async` / `generics` / `where_predicates` へ分解する。function entry では `--name` の末尾と `--method` から得た `fn` 名が一致しない入力を reject し、signature 名の silent drop を起こさない。省略した形状ノードと、選択 role の catalogue DTO が要求する未入力 payload（`Entity.identity` / `AggregateRoot.identity` / `EventPolicy.reacts_to` / `Repository.aggregate`）は `$todo` として生成する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b558ccbc562f218c62494c538aeb82d9c02991d8188e9d26649fddaf26e3807d",
+      "evidence_hash": "ef3bd9aaa0023d50834657165295a313dac596d183150d77ad8b3202bcbfa89b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "同名エントリが既に存在する状態で `add` / `import` を実行すると error になり、lenient / force で上書きする経路が存在しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogEntryName"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "同名エントリが既に存在する状態で `add` / `import` を実行すると error になり、lenient / force で上書きする経路が存在しない。1 回の書き込みはエントリ単位で原子的であり、同じ入力からは同じ順序・整形のカタログ JSON が決定論的に生成される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "4111d85aeeaef5d19a4aa73a6fa8579b8bb428cd28b3a85202a67a775b4bc977",
+      "evidence_hash": "e7e3c0fa4390318309636fa7fb97d51b5c68caf0bea6c0e17c86e31ff2542277",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`--action reference|modify|delete`（既定 `reference`）"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogImportAction"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "`sotp catalog import`: 既存型の取り込み。`--layer` / `--type`（Rust パス、rustdoc から解決）/ `--action reference|modify|delete`（既定 `reference`）/ `--anchor`。reference は変更なし参照、modify は現状 shape を baseline として取り込み変更差分だけを後で type-designer が編集する。全 action の entry は完成時に formal / informal grounding を必ず持つ必要があり、`--anchor` は同じ `spec_refs` slot に保持される。delete は live shape を持たない tombstone として同定情報だけを取り込むため、根拠なし削除を防ぐ目的で `--anchor` を import 時点でも必須とする。rustdoc から import へ渡る schema export JSON は、type alias の alias target、struct の unit / tuple / plain 形状と `has_stripped_fields`、impl target の module path を落とさず保持する。手動転記が残るのは新規型の add のみとする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "4111d85aeeaef5d19a4aa73a6fa8579b8bb428cd28b3a85202a67a775b4bc977",
+      "evidence_hash": "52c0d568477bab4937b67391231b3d9ababd29b555c7b854e46fe14fd6cf4f73",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`--action reference|modify` では `--anchor` を含む入力でエントリが生成され、rustdoc 由来の現状 shape を含む。... `--action delete` は同定情報だけを含む tombstone を生成し、根拠なし削除を防ぐため `--anchor` を必須として `spec_refs` に保持する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogImportAction"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "`sotp catalog import --type <Rust パス>` を実行すると、rustdoc 抽出から既存型の同定情報・シグネチャ・フィールドを解決できる。`--action reference|modify` では `--anchor` を含む入力でエントリが生成され、rustdoc 由来の現状 shape を含む。type alias の alias target、private / hidden field の除去後も必要な struct shape と `has_stripped_fields`、impl target の module path は schema export JSON から import 側へ保持される。`--action delete` は同定情報だけを含む tombstone を生成し、根拠なし削除を防ぐため `--anchor` を必須として `spec_refs` に保持する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "bcf0729a259aa3f9b02972a49c14abcaf290eb645afea8c624f5e9ef2d2c87ec",
+      "evidence_hash": "e7e3c0fa4390318309636fa7fb97d51b5c68caf0bea6c0e17c86e31ff2542277",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存型の取り込み。`--layer` / `--type`（Rust パス、rustdoc から解決）/ `--action reference|modify|delete`（既定 `reference`）/ `--anchor`。reference は変更なし参照、modify は現状 shape を baseline として取り込み変更差分だけを後で type-designer が編集する。全 action の entry は完成時に formal / informal grounding を必ず持つ必要があり、`--anchor` は同じ `spec_refs` slot に保持される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogueDocument"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "`sotp catalog import`: 既存型の取り込み。`--layer` / `--type`（Rust パス、rustdoc から解決）/ `--action reference|modify|delete`（既定 `reference`）/ `--anchor`。reference は変更なし参照、modify は現状 shape を baseline として取り込み変更差分だけを後で type-designer が編集する。全 action の entry は完成時に formal / informal grounding を必ず持つ必要があり、`--anchor` は同じ `spec_refs` slot に保持される。delete は live shape を持たない tombstone として同定情報だけを取り込むため、根拠なし削除を防ぐ目的で `--anchor` を import 時点でも必須とする。rustdoc から import へ渡る schema export JSON は、type alias の alias target、struct の unit / tuple / plain 形状と `has_stripped_fields`、impl target の module path を落とさず保持する。手動転記が残るのは新規型の add のみとする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "bcf0729a259aa3f9b02972a49c14abcaf290eb645afea8c624f5e9ef2d2c87ec",
+      "evidence_hash": "5a77e2a15800b7d1321d018293442db6e0fb7f77f727b81cef6ca2b31824a736",
+      "verdict": {
+        "kind": "pass",
+        "citation": "rustdoc 抽出（既存の実装カタログ計算機構を流用）から完全な型情報を取り込む reference API を提供し、reference / modify / delete の全 action で「現状の記述」の人手による書き起こしを消す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogueDocument"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-03",
+          "text_label": "既存型をカタログに載せる際の手動転記を廃止する。rustdoc 抽出（既存の実装カタログ計算機構を流用）から完全な型情報を取り込む reference API を提供し、reference / modify / delete の全 action で「現状の記述」の人手による書き起こしを消す。"
+        }
+      }
+    },
+    {
+      "claim_hash": "bcf0729a259aa3f9b02972a49c14abcaf290eb645afea8c624f5e9ef2d2c87ec",
+      "evidence_hash": "52c0d568477bab4937b67391231b3d9ababd29b555c7b854e46fe14fd6cf4f73",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`--action reference|modify` では `--anchor` を含む入力でエントリが生成され、rustdoc 由来の現状 shape を含む。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogueDocument"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "`sotp catalog import --type <Rust パス>` を実行すると、rustdoc 抽出から既存型の同定情報・シグネチャ・フィールドを解決できる。`--action reference|modify` では `--anchor` を含む入力でエントリが生成され、rustdoc 由来の現状 shape を含む。type alias の alias target、private / hidden field の除去後も必要な struct shape と `has_stripped_fields`、impl target の module path は schema export JSON から import 側へ保持される。`--action delete` は同定情報だけを含む tombstone を生成し、根拠なし削除を防ぐため `--anchor` を必須として `spec_refs` に保持する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "6620dcd6a7266246b734dd6c259fec55afa9cb91bbf0af928bceaebadf49e288",
+      "evidence_hash": "e7e3c0fa4390318309636fa7fb97d51b5c68caf0bea6c0e17c86e31ff2542277",
+      "verdict": {
+        "kind": "pass",
+        "citation": "delete は live shape を持たない tombstone として同定情報だけを取り込むため、根拠なし削除を防ぐ目的で `--anchor` を import 時点でも必須とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "DeletionRecord"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "`sotp catalog import`: 既存型の取り込み。`--layer` / `--type`（Rust パス、rustdoc から解決）/ `--action reference|modify|delete`（既定 `reference`）/ `--anchor`。reference は変更なし参照、modify は現状 shape を baseline として取り込み変更差分だけを後で type-designer が編集する。全 action の entry は完成時に formal / informal grounding を必ず持つ必要があり、`--anchor` は同じ `spec_refs` slot に保持される。delete は live shape を持たない tombstone として同定情報だけを取り込むため、根拠なし削除を防ぐ目的で `--anchor` を import 時点でも必須とする。rustdoc から import へ渡る schema export JSON は、type alias の alias target、struct の unit / tuple / plain 形状と `has_stripped_fields`、impl target の module path を落とさず保持する。手動転記が残るのは新規型の add のみとする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "6620dcd6a7266246b734dd6c259fec55afa9cb91bbf0af928bceaebadf49e288",
+      "evidence_hash": "5a77e2a15800b7d1321d018293442db6e0fb7f77f727b81cef6ca2b31824a736",
+      "verdict": {
+        "kind": "pass",
+        "citation": "rustdoc 抽出（既存の実装カタログ計算機構を流用）から完全な型情報を取り込む reference API を提供し、reference / modify / delete の全 action で「現状の記述」の人手による書き起こしを消す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "DeletionRecord"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-03",
+          "text_label": "既存型をカタログに載せる際の手動転記を廃止する。rustdoc 抽出（既存の実装カタログ計算機構を流用）から完全な型情報を取り込む reference API を提供し、reference / modify / delete の全 action で「現状の記述」の人手による書き起こしを消す。"
+        }
+      }
+    },
+    {
+      "claim_hash": "6620dcd6a7266246b734dd6c259fec55afa9cb91bbf0af928bceaebadf49e288",
+      "evidence_hash": "52c0d568477bab4937b67391231b3d9ababd29b555c7b854e46fe14fd6cf4f73",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`--action delete` は同定情報だけを含む tombstone を生成し、根拠なし削除を防ぐため `--anchor` を必須として `spec_refs` に保持する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "DeletionRecord"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "`sotp catalog import --type <Rust パス>` を実行すると、rustdoc 抽出から既存型の同定情報・シグネチャ・フィールドを解決できる。`--action reference|modify` では `--anchor` を含む入力でエントリが生成され、rustdoc 由来の現状 shape を含む。type alias の alias target、private / hidden field の除去後も必要な struct shape と `has_stripped_fields`、impl target の module path は schema export JSON から import 側へ保持される。`--action delete` は同定情報だけを含む tombstone を生成し、根拠なし削除を防ぐため `--anchor` を必須として `spec_refs` に保持する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "05c842d82f8a5fed97b2d855e76be5916e9c0646ebef8c0f49ec5cb68aff9b2c",
+      "evidence_hash": "2372078a9df788d9b977436c973c42ef4cb77a7cce8531e70e8f8803e40ef28a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "フィールドを非公開化し、生 `String` の `docs` をドキュメント文字列の newtype に置き換える。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "DocString"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-13",
+          "text_label": "catalogue_v2 の entry 型（`TypeEntry` / `TraitEntry` / `FunctionEntry`、および同じ legacy shape を共有する他の entry 型）を catalogue linter（`NoPublicField` / `ForbidPrimitiveInTypes`）に適合する形へ refactor する作業を本トラックに含める。フィールドを非公開化し、生 `String` の `docs` をドキュメント文字列の newtype に置き換える。lint 設定側の緩和ではなく被検査対象の entry 型側を規約に合わせる。IN-09 の型宣言レベル generics / where フィールド追加を `action: Modify` で宣言する際に linter が発火する行き詰まりを解くための前提整備である。"
+        }
+      }
+    },
+    {
+      "claim_hash": "05c842d82f8a5fed97b2d855e76be5916e9c0646ebef8c0f49ec5cb68aff9b2c",
+      "evidence_hash": "86df7e8a5c2f79fc00ded6c57b9c3c89882e8faac3fcafd0afa3a7aa00f60b99",
+      "verdict": {
+        "kind": "pass",
+        "citation": "entry 型の `docs` フィールドが生 `String` からドキュメント文字列を表す newtype に置き換わり、その newtype 自体もカタログ規約（`ValueObject`）に沿って宣言される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "DocString"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-15",
+          "text_label": "entry 型の `docs` フィールドが生 `String` からドキュメント文字列を表す newtype に置き換わり、その newtype 自体もカタログ規約（`ValueObject`）に沿って宣言される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "e58d7b2c87dc7a3219731f13abe2e88a4cc2ffc51bfcf5f96221dbd26f61d530",
+      "evidence_hash": "0289640fe4ee0a2ccc4f039887d7017c52abfb468c2f069cb9c73ba4fd1e00d2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "完成境界（`$todo` が残っていれば穴のパス + 指示文の一覧を Err で返し、なければ従来の typed DTO へ parse する `try_complete`）"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "DraftHole"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "穴の `$todo` ノード表現。木の任意のノード（リーフ・オブジェクト・配列要素・セクション丸ごと）を `{ \"$todo\": \"記入指示\" }` に置き換えられる。draft の扱いは型付きスキーマの手前の draft 層に置き、カタログ file を JSON tree として走査して `$todo` を検出する汎用関数と、完成境界（`$todo` が残っていれば穴のパス + 指示文の一覧を Err で返し、なければ従来の typed DTO へ parse する `try_complete`）で構成する。既存の catalogue DTO・signal evaluator・linter・renderer は完成カタログのみを受け取るため無変更で済む形にする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "e58d7b2c87dc7a3219731f13abe2e88a4cc2ffc51bfcf5f96221dbd26f61d530",
+      "evidence_hash": "599f4cb93fe3d6cd3faa0edbe227dc3dbae5b0f9cfe6c365a5121dc2e3256e6f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "完成境界（`try_complete`）は `$todo` が残っていれば穴のパス + 指示文の一覧を Err で返し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "DraftHole"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "カタログの任意位置に置かれた `{ \"$todo\": \"...\" }` ノードが検出される。完成境界（`try_complete`）は `$todo` が残っていれば穴のパス + 指示文の一覧を Err で返し、残っていなければ typed DTO を返す。既存の catalogue DTO・signal evaluator・linter・renderer は無変更で完成カタログのみを処理する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "e8d8a04e526f98e79f91c33f0855c643b58b8f541a7fb531223c2cec8afa7a8a",
+      "evidence_hash": "0289640fe4ee0a2ccc4f039887d7017c52abfb468c2f069cb9c73ba4fd1e00d2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "完成境界（`$todo` が残っていれば穴のパス + 指示文の一覧を Err で返し、なければ従来の typed DTO へ parse する `try_complete`）"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "DraftHolePath"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "穴の `$todo` ノード表現。木の任意のノード（リーフ・オブジェクト・配列要素・セクション丸ごと）を `{ \"$todo\": \"記入指示\" }` に置き換えられる。draft の扱いは型付きスキーマの手前の draft 層に置き、カタログ file を JSON tree として走査して `$todo` を検出する汎用関数と、完成境界（`$todo` が残っていれば穴のパス + 指示文の一覧を Err で返し、なければ従来の typed DTO へ parse する `try_complete`）で構成する。既存の catalogue DTO・signal evaluator・linter・renderer は完成カタログのみを受け取るため無変更で済む形にする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "e8d8a04e526f98e79f91c33f0855c643b58b8f541a7fb531223c2cec8afa7a8a",
+      "evidence_hash": "599f4cb93fe3d6cd3faa0edbe227dc3dbae5b0f9cfe6c365a5121dc2e3256e6f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "完成境界（`try_complete`）は `$todo` が残っていれば穴のパス + 指示文の一覧を Err で返し、残っていなければ typed DTO を返す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "DraftHolePath"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "カタログの任意位置に置かれた `{ \"$todo\": \"...\" }` ノードが検出される。完成境界（`try_complete`）は `$todo` が残っていれば穴のパス + 指示文の一覧を Err で返し、残っていなければ typed DTO を返す。既存の catalogue DTO・signal evaluator・linter・renderer は無変更で完成カタログのみを処理する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f2a4fd023e3e86dfa24d72ec787c9af5d86621d1f3e81c5a50c4c07d66f10e03",
+      "evidence_hash": "2372078a9df788d9b977436c973c42ef4cb77a7cce8531e70e8f8803e40ef28a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue_v2 の entry 型（`TypeEntry` / `TraitEntry` / `FunctionEntry`、および同じ legacy shape を共有する他の entry 型）を catalogue linter（`NoPublicField` / `ForbidPrimitiveInTypes`）に適合する形へ refactor する作業を本トラックに含める。フィールドを非公開化し、生 `String` の `docs` をドキュメント文字列の newtype に置き換える。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "FunctionEntry"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-13",
+          "text_label": "catalogue_v2 の entry 型（`TypeEntry` / `TraitEntry` / `FunctionEntry`、および同じ legacy shape を共有する他の entry 型）を catalogue linter（`NoPublicField` / `ForbidPrimitiveInTypes`）に適合する形へ refactor する作業を本トラックに含める。フィールドを非公開化し、生 `String` の `docs` をドキュメント文字列の newtype に置き換える。lint 設定側の緩和ではなく被検査対象の entry 型側を規約に合わせる。IN-09 の型宣言レベル generics / where フィールド追加を `action: Modify` で宣言する際に linter が発火する行き詰まりを解くための前提整備である。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f2a4fd023e3e86dfa24d72ec787c9af5d86621d1f3e81c5a50c4c07d66f10e03",
+      "evidence_hash": "77fafa36522c15eb7834aa507efa36fea76f5dbd0fde441be8e5c1866375df86",
+      "verdict": {
+        "kind": "pass",
+        "citation": "entry 型のフィールド非公開化に伴い、クレート境界を越えて struct literal で entry を構築しフィールドを直読みしている全消費者を、検証付き constructor と read アクセサ経由の構築・読み出しへ移行する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "FunctionEntry"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-14",
+          "text_label": "entry 型のフィールド非公開化に伴い、クレート境界を越えて struct literal で entry を構築しフィールドを直読みしている全消費者（codec の decode / encode、linter helpers、signal evaluator、contract-map / type-graph renderer、これらのテスト）を、検証付き constructor と read アクセサ経由の構築・読み出しへ移行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f2a4fd023e3e86dfa24d72ec787c9af5d86621d1f3e81c5a50c4c07d66f10e03",
+      "evidence_hash": "31923e53a6288985d66c2d42f04b00f9e8ec42d85bf2d8052184350ebce37d65",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue_v2 の entry 型（`TypeEntry` / `TraitEntry` / `FunctionEntry` / ほか同じ legacy shape を共有する entry 型）のフィールドが非公開になり、構築が全フィールドを受け取る検証付き constructor 経由に一本化され、読み出しが read アクセサ経由になる。setter が存在しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "FunctionEntry"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-14",
+          "text_label": "catalogue_v2 の entry 型（`TypeEntry` / `TraitEntry` / `FunctionEntry` ほか同じ legacy shape を共有する entry 型）のフィールドが非公開になり、構築が全フィールドを受け取る検証付き constructor 経由に一本化され、読み出しが read アクセサ経由になる。setter が存在しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f2a4fd023e3e86dfa24d72ec787c9af5d86621d1f3e81c5a50c4c07d66f10e03",
+      "evidence_hash": "93d734ee847a4cacb06b9303151860214ca40140a2e1faae5710e8854dd9b4e4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "refactor 後の entry 型に対し catalogue linter の `NoPublicField` / `ForbidPrimitiveInTypes` が発火しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "FunctionEntry"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-16",
+          "text_label": "refactor 後の entry 型に対し catalogue linter の `NoPublicField` / `ForbidPrimitiveInTypes` が発火しない。`TypeEntry` への型宣言レベル generics / where フィールド追加を `action: Modify` で宣言した状態で catalogue linter が pass する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "af638ba0fc4dc96d3c418391b0c94b0976790a97813bcec071fce77e1f9b290e",
+      "evidence_hash": "52c0d568477bab4937b67391231b3d9ababd29b555c7b854e46fe14fd6cf4f73",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp catalog import --type <Rust パス>` を実行すると、rustdoc 抽出から既存型の同定情報・シグネチャ・フィールドを解決できる。`--action reference|modify` では `--anchor` を含む入力でエントリが生成され、rustdoc 由来の現状 shape を含む。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "FunctionInfo"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "`sotp catalog import --type <Rust パス>` を実行すると、rustdoc 抽出から既存型の同定情報・シグネチャ・フィールドを解決できる。`--action reference|modify` では `--anchor` を含む入力でエントリが生成され、rustdoc 由来の現状 shape を含む。type alias の alias target、private / hidden field の除去後も必要な struct shape と `has_stripped_fields`、impl target の module path は schema export JSON から import 側へ保持される。`--action delete` は同定情報だけを含む tombstone を生成し、根拠なし削除を防ぐため `--anchor` を必須として `spec_refs` に保持する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "af638ba0fc4dc96d3c418391b0c94b0976790a97813bcec071fce77e1f9b290e",
+      "evidence_hash": "459ae656950c1771b6b105b358d96b75930bc05f3dc4e7d0e1c69c3a1b1dd391",
+      "verdict": {
+        "kind": "pass",
+        "citation": "型形状（fields / methods / variants / generics / where predicates / impl blocks）の入力は、格納先 catalogue schema の正規フィールドへ lossless に分解して格納する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "FunctionInfo"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "型形状（fields / methods / variants / generics / where predicates / impl blocks）の入力は、格納先 catalogue schema の正規フィールドへ lossless に分解して格納する。入力時の受理条件は格納先フィールドの型と一致させ、`TypeRef` slot に対して `syn::Type` / `syn::Path` / `syn::GenericParam` 等の Rust 構文 parser を追加の門番として使わない。public enum の variants は source 側に extension-tolerant な明示（例: `#[non_exhaustive]`）がない限り、downstream が exhaustive match してよい閉じた variant set として扱う。function entry の `--name` を `::` で区切った末尾と `--method` から得た `fn` 名が一致しないシグネチャ、および呼び出し側が渡した入力を schema の正規フィールドへ情報損失なく分解できない場合は reject する。`$todo` は呼び出し側が値を渡さなかった未確定ノードにだけ生成し、渡された入力を `$todo` へ退避しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c4a9e296a507b05f72c0fd64be6163fdf45599e10d12a149a9a1759a26d6ea1f",
+      "evidence_hash": "52c0d568477bab4937b67391231b3d9ababd29b555c7b854e46fe14fd6cf4f73",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`--action reference|modify` では `--anchor` を含む入力でエントリが生成され、rustdoc 由来の現状 shape を含む。type alias の alias target、private / hidden field の除去後も必要な struct shape と `has_stripped_fields`、impl target の module path は schema export JSON から import 側へ保持される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ImplInfo"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "`sotp catalog import --type <Rust パス>` を実行すると、rustdoc 抽出から既存型の同定情報・シグネチャ・フィールドを解決できる。`--action reference|modify` では `--anchor` を含む入力でエントリが生成され、rustdoc 由来の現状 shape を含む。type alias の alias target、private / hidden field の除去後も必要な struct shape と `has_stripped_fields`、impl target の module path は schema export JSON から import 側へ保持される。`--action delete` は同定情報だけを含む tombstone を生成し、根拠なし削除を防ぐため `--anchor` を必須として `spec_refs` に保持する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c4a9e296a507b05f72c0fd64be6163fdf45599e10d12a149a9a1759a26d6ea1f",
+      "evidence_hash": "3690d812370f9fa18e6dbf214ee3e3a0f9835a85e0b2800d82f8d769b858146c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "完全な型情報（メソッド署名の型・trait impl 宣言・inherent impl 宣言・field 可視性・generic bound・type alias target・struct shape と `has_stripped_fields`・impl target module path・public enum variants の閉じた集合か extension-tolerant かの区別）が生成エントリに保持されている。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ImplInfo"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-12",
+          "text_label": "生成されたエントリに対して稼働済みの catalogue linter ルール群（ロール意味論・Aggregate 境界・アーキテクチャ配置・primitive obsession 防止）と impl → catalogue の type-signals 構造検証が従来どおり動作する。完全な型情報（メソッド署名の型・trait impl 宣言・inherent impl 宣言・field 可視性・generic bound・type alias target・struct shape と `has_stripped_fields`・impl target module path・public enum variants の閉じた集合か extension-tolerant かの区別）が生成エントリに保持されている。通常の public enum と `#[non_exhaustive]` 付き public enum の fixture / test で、前者は downstream が exhaustive match してよい閉じた variant set として扱われ、後者は extension-tolerant として保持されることが確認できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c4a9e296a507b05f72c0fd64be6163fdf45599e10d12a149a9a1759a26d6ea1f",
+      "evidence_hash": "459ae656950c1771b6b105b358d96b75930bc05f3dc4e7d0e1c69c3a1b1dd391",
+      "verdict": {
+        "kind": "pass",
+        "citation": "型形状（fields / methods / variants / generics / where predicates / impl blocks）の入力は、格納先 catalogue schema の正規フィールドへ lossless に分解して格納する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ImplInfo"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "型形状（fields / methods / variants / generics / where predicates / impl blocks）の入力は、格納先 catalogue schema の正規フィールドへ lossless に分解して格納する。入力時の受理条件は格納先フィールドの型と一致させ、`TypeRef` slot に対して `syn::Type` / `syn::Path` / `syn::GenericParam` 等の Rust 構文 parser を追加の門番として使わない。public enum の variants は source 側に extension-tolerant な明示（例: `#[non_exhaustive]`）がない限り、downstream が exhaustive match してよい閉じた variant set として扱う。function entry の `--name` を `::` で区切った末尾と `--method` から得た `fn` 名が一致しないシグネチャ、および呼び出し側が渡した入力を schema の正規フィールドへ情報損失なく分解できない場合は reject する。`$todo` は呼び出し側が値を渡さなかった未確定ノードにだけ生成し、渡された入力を `$todo` へ退避しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "7159dea7602abfa900f19ba9010a33d2c056f8936595bb7c272ddc618ae2014d",
+      "evidence_hash": "589e5f3bda85abd9f2316efc973b607381ffd2399e7348d35e8968376b380137",
+      "verdict": {
+        "kind": "pass",
+        "citation": "impl → catalogue の構造検証（type-signals）が検査面として前提とする完全な型情報を維持する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "InherentImplDeclV2"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-02",
+          "text_label": "カタログエントリの完全な型情報（引数型・返り値型・generics・bound・codec 等）を削減しない。稼働済みの catalogue linter ルール群（DDD ロール意味論・Aggregate 境界・アーキテクチャ配置・primitive obsession 防止）と impl → catalogue の構造検証（type-signals）が検査面として前提とする完全な型情報を維持する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "7159dea7602abfa900f19ba9010a33d2c056f8936595bb7c272ddc618ae2014d",
+      "evidence_hash": "459ae656950c1771b6b105b358d96b75930bc05f3dc4e7d0e1c69c3a1b1dd391",
+      "verdict": {
+        "kind": "pass",
+        "citation": "型形状（fields / methods / variants / generics / where predicates / impl blocks）の入力は、格納先 catalogue schema の正規フィールドへ lossless に分解して格納する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "InherentImplDeclV2"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "型形状（fields / methods / variants / generics / where predicates / impl blocks）の入力は、格納先 catalogue schema の正規フィールドへ lossless に分解して格納する。入力時の受理条件は格納先フィールドの型と一致させ、`TypeRef` slot に対して `syn::Type` / `syn::Path` / `syn::GenericParam` 等の Rust 構文 parser を追加の門番として使わない。public enum の variants は source 側に extension-tolerant な明示（例: `#[non_exhaustive]`）がない限り、downstream が exhaustive match してよい閉じた variant set として扱う。function entry の `--name` を `::` で区切った末尾と `--method` から得た `fn` 名が一致しないシグネチャ、および呼び出し側が渡した入力を schema の正規フィールドへ情報損失なく分解できない場合は reject する。`$todo` は呼び出し側が値を渡さなかった未確定ノードにだけ生成し、渡された入力を `$todo` へ退避しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "7159dea7602abfa900f19ba9010a33d2c056f8936595bb7c272ddc618ae2014d",
+      "evidence_hash": "60fe8aaf1daaf4c0d22b0f58923d34af3f633d60a6547255efb367d8b968e0f3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`--inherent-impl-generic` / `--inherent-impl-where` は同じ `catalog add` 呼び出しで生成される `--inherent-method` 由来の `InherentImplDeclV2` 行にだけ付与され、`--inherent-method` が 1 件もない入力では reject する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "InherentImplDeclV2"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-09",
+          "text_label": "generics / where 句を、型・trait・function・method・trait impl block・inherent impl block の各宣言レベルを区別して入力し、カタログ schema の対応フィールド（`generics` / `where_predicates` / `impl_generics` / `impl_where_predicates` 等）へ構造化する。`MethodGenericParam` は現行 schema と同じく `name: ParamName` + `bounds: Vec<TypeRef>` として扱い、`bounds` は Rust 境界の種類で狭めず、`name` には `ParamName` の識別子制約だけを適用する。where 句は `lhs: TypeRef` / `rhs: Vec<TypeRef>` / `operator: BoundOp` の粒度で受ける。`--impl-generic` / `--impl-where` は同じ `catalog add` 呼び出しで生成される `--trait-impl` 行にだけ付与され、`--trait-impl` が 1 件もない入力では reject する。`--inherent-impl-generic` / `--inherent-impl-where` は同じ `catalog add` 呼び出しで生成される `--inherent-method` 由来の `InherentImplDeclV2` 行にだけ付与され、`--inherent-method` が 1 件もない入力では reject する。ある宣言レベルまたは Rust 表現に現行 schema の正規フィールドがない場合、完全型情報維持に従い、本 API 実装と同じ変更内で正規フィールドを追加してから生成する。silent drop・docs 文字列への退避・別宣言レベルへの代用は行わない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0a4e9c8fc5407f213f5a65d84ce08f6a21cdf9d0c89d2297150d3110b88bcc62",
+      "evidence_hash": "52c0d568477bab4937b67391231b3d9ababd29b555c7b854e46fe14fd6cf4f73",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`--action reference|modify` では `--anchor` を含む入力でエントリが生成され、rustdoc 由来の現状 shape を含む。type alias の alias target、private / hidden field の除去後も必要な struct shape と `has_stripped_fields`、impl target の module path は schema export JSON から import 側へ保持される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "StructShapeKind"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "`sotp catalog import --type <Rust パス>` を実行すると、rustdoc 抽出から既存型の同定情報・シグネチャ・フィールドを解決できる。`--action reference|modify` では `--anchor` を含む入力でエントリが生成され、rustdoc 由来の現状 shape を含む。type alias の alias target、private / hidden field の除去後も必要な struct shape と `has_stripped_fields`、impl target の module path は schema export JSON から import 側へ保持される。`--action delete` は同定情報だけを含む tombstone を生成し、根拠なし削除を防ぐため `--anchor` を必須として `spec_refs` に保持する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0a4e9c8fc5407f213f5a65d84ce08f6a21cdf9d0c89d2297150d3110b88bcc62",
+      "evidence_hash": "3690d812370f9fa18e6dbf214ee3e3a0f9835a85e0b2800d82f8d769b858146c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "完全な型情報（メソッド署名の型・trait impl 宣言・inherent impl 宣言・field 可視性・generic bound・type alias target・struct shape と `has_stripped_fields`・impl target module path・public enum variants の閉じた集合か extension-tolerant かの区別）が生成エントリに保持されている。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "StructShapeKind"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-12",
+          "text_label": "生成されたエントリに対して稼働済みの catalogue linter ルール群（ロール意味論・Aggregate 境界・アーキテクチャ配置・primitive obsession 防止）と impl → catalogue の type-signals 構造検証が従来どおり動作する。完全な型情報（メソッド署名の型・trait impl 宣言・inherent impl 宣言・field 可視性・generic bound・type alias target・struct shape と `has_stripped_fields`・impl target module path・public enum variants の閉じた集合か extension-tolerant かの区別）が生成エントリに保持されている。通常の public enum と `#[non_exhaustive]` 付き public enum の fixture / test で、前者は downstream が exhaustive match してよい閉じた variant set として扱われ、後者は extension-tolerant として保持されることが確認できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0a4e9c8fc5407f213f5a65d84ce08f6a21cdf9d0c89d2297150d3110b88bcc62",
+      "evidence_hash": "459ae656950c1771b6b105b358d96b75930bc05f3dc4e7d0e1c69c3a1b1dd391",
+      "verdict": {
+        "kind": "pass",
+        "citation": "型形状（fields / methods / variants / generics / where predicates / impl blocks）の入力は、格納先 catalogue schema の正規フィールドへ lossless に分解して格納する。public enum の variants は source 側に extension-tolerant な明示（例: `#[non_exhaustive]`）がない限り、downstream が exhaustive match してよい閉じた variant set として扱う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "StructShapeKind"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "型形状（fields / methods / variants / generics / where predicates / impl blocks）の入力は、格納先 catalogue schema の正規フィールドへ lossless に分解して格納する。入力時の受理条件は格納先フィールドの型と一致させ、`TypeRef` slot に対して `syn::Type` / `syn::Path` / `syn::GenericParam` 等の Rust 構文 parser を追加の門番として使わない。public enum の variants は source 側に extension-tolerant な明示（例: `#[non_exhaustive]`）がない限り、downstream が exhaustive match してよい閉じた variant set として扱う。function entry の `--name` を `::` で区切った末尾と `--method` から得た `fn` 名が一致しないシグネチャ、および呼び出し側が渡した入力を schema の正規フィールドへ情報損失なく分解できない場合は reject する。`$todo` は呼び出し側が値を渡さなかった未確定ノードにだけ生成し、渡された入力を `$todo` へ退避しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f7b2676dd11164dadc2df0adc1eca3f77a928518d441039d6c2bd5eab45d6773",
+      "evidence_hash": "0289640fe4ee0a2ccc4f039887d7017c52abfb468c2f069cb9c73ba4fd1e00d2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "木の任意のノード（リーフ・オブジェクト・配列要素・セクション丸ごと）を `{ \"$todo\": \"記入指示\" }` に置き換えられる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TodoInstruction"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "穴の `$todo` ノード表現。木の任意のノード（リーフ・オブジェクト・配列要素・セクション丸ごと）を `{ \"$todo\": \"記入指示\" }` に置き換えられる。draft の扱いは型付きスキーマの手前の draft 層に置き、カタログ file を JSON tree として走査して `$todo` を検出する汎用関数と、完成境界（`$todo` が残っていれば穴のパス + 指示文の一覧を Err で返し、なければ従来の typed DTO へ parse する `try_complete`）で構成する。既存の catalogue DTO・signal evaluator・linter・renderer は完成カタログのみを受け取るため無変更で済む形にする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f7b2676dd11164dadc2df0adc1eca3f77a928518d441039d6c2bd5eab45d6773",
+      "evidence_hash": "52379daeb66fca360855bdd30d3c48cd75eaefa9005322ca960b855104375100",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`$todo` はカタログ schema 全域の予約キーとし、正規フィールド名としては使用しない。これにより木の任意位置での穴表現と、JSON tree 走査による残存穴の決定論的検出が両立する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TodoInstruction"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "`$todo` はカタログ schema 全域の予約キーとし、正規フィールド名としては使用しない。これにより木の任意位置での穴表現と、JSON tree 走査による残存穴の決定論的検出が両立する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d07377dba4a87b570be80fd58a474932e0c2b64dc233b9d937024951f0a47255",
+      "evidence_hash": "2372078a9df788d9b977436c973c42ef4cb77a7cce8531e70e8f8803e40ef28a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue_v2 の entry 型（`TypeEntry` / `TraitEntry` / `FunctionEntry`、および同じ legacy shape を共有する他の entry 型）を catalogue linter（`NoPublicField` / `ForbidPrimitiveInTypes`）に適合する形へ refactor する作業を本トラックに含める。フィールドを非公開化し、生 `String` の `docs` をドキュメント文字列の newtype に置き換える。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TraitEntry"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-13",
+          "text_label": "catalogue_v2 の entry 型（`TypeEntry` / `TraitEntry` / `FunctionEntry`、および同じ legacy shape を共有する他の entry 型）を catalogue linter（`NoPublicField` / `ForbidPrimitiveInTypes`）に適合する形へ refactor する作業を本トラックに含める。フィールドを非公開化し、生 `String` の `docs` をドキュメント文字列の newtype に置き換える。lint 設定側の緩和ではなく被検査対象の entry 型側を規約に合わせる。IN-09 の型宣言レベル generics / where フィールド追加を `action: Modify` で宣言する際に linter が発火する行き詰まりを解くための前提整備である。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d07377dba4a87b570be80fd58a474932e0c2b64dc233b9d937024951f0a47255",
+      "evidence_hash": "77fafa36522c15eb7834aa507efa36fea76f5dbd0fde441be8e5c1866375df86",
+      "verdict": {
+        "kind": "pass",
+        "citation": "entry 型のフィールド非公開化に伴い、クレート境界を越えて struct literal で entry を構築しフィールドを直読みしている全消費者（codec の decode / encode、linter helpers、signal evaluator、contract-map / type-graph renderer、これらのテスト）を、検証付き constructor と read アクセサ経由の構築・読み出しへ移行する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TraitEntry"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-14",
+          "text_label": "entry 型のフィールド非公開化に伴い、クレート境界を越えて struct literal で entry を構築しフィールドを直読みしている全消費者（codec の decode / encode、linter helpers、signal evaluator、contract-map / type-graph renderer、これらのテスト）を、検証付き constructor と read アクセサ経由の構築・読み出しへ移行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d07377dba4a87b570be80fd58a474932e0c2b64dc233b9d937024951f0a47255",
+      "evidence_hash": "31923e53a6288985d66c2d42f04b00f9e8ec42d85bf2d8052184350ebce37d65",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue_v2 の entry 型（`TypeEntry` / `TraitEntry` / `FunctionEntry` / ほか同じ legacy shape を共有する entry 型）のフィールドが非公開になり、構築が全フィールドを受け取る検証付き constructor 経由に一本化され、読み出しが read アクセサ経由になる。setter が存在しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TraitEntry"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-14",
+          "text_label": "catalogue_v2 の entry 型（`TypeEntry` / `TraitEntry` / `FunctionEntry` ほか同じ legacy shape を共有する entry 型）のフィールドが非公開になり、構築が全フィールドを受け取る検証付き constructor 経由に一本化され、読み出しが read アクセサ経由になる。setter が存在しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d07377dba4a87b570be80fd58a474932e0c2b64dc233b9d937024951f0a47255",
+      "evidence_hash": "93d734ee847a4cacb06b9303151860214ca40140a2e1faae5710e8854dd9b4e4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "refactor 後の entry 型に対し catalogue linter の `NoPublicField` / `ForbidPrimitiveInTypes` が発火しない。`TypeEntry` への型宣言レベル generics / where フィールド追加を `action: Modify` で宣言した状態で catalogue linter が pass する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TraitEntry"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-16",
+          "text_label": "refactor 後の entry 型に対し catalogue linter の `NoPublicField` / `ForbidPrimitiveInTypes` が発火しない。`TypeEntry` への型宣言レベル generics / where フィールド追加を `action: Modify` で宣言した状態で catalogue linter が pass する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ab2dd7b3a94595951edff03fb66a6999fea80100848dd14c6e62025a3de22902",
+      "evidence_hash": "589e5f3bda85abd9f2316efc973b607381ffd2399e7348d35e8968376b380137",
+      "verdict": {
+        "kind": "pass",
+        "citation": "カタログエントリの完全な型情報（引数型・返り値型・generics・bound・codec 等）を削減しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TraitImplDeclV2"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-02",
+          "text_label": "カタログエントリの完全な型情報（引数型・返り値型・generics・bound・codec 等）を削減しない。稼働済みの catalogue linter ルール群（DDD ロール意味論・Aggregate 境界・アーキテクチャ配置・primitive obsession 防止）と impl → catalogue の構造検証（type-signals）が検査面として前提とする完全な型情報を維持する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ab2dd7b3a94595951edff03fb66a6999fea80100848dd14c6e62025a3de22902",
+      "evidence_hash": "459ae656950c1771b6b105b358d96b75930bc05f3dc4e7d0e1c69c3a1b1dd391",
+      "verdict": {
+        "kind": "pass",
+        "citation": "impl blocks）の入力は、格納先 catalogue schema の正規フィールドへ lossless に分解して格納する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TraitImplDeclV2"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "型形状（fields / methods / variants / generics / where predicates / impl blocks）の入力は、格納先 catalogue schema の正規フィールドへ lossless に分解して格納する。入力時の受理条件は格納先フィールドの型と一致させ、`TypeRef` slot に対して `syn::Type` / `syn::Path` / `syn::GenericParam` 等の Rust 構文 parser を追加の門番として使わない。public enum の variants は source 側に extension-tolerant な明示（例: `#[non_exhaustive]`）がない限り、downstream が exhaustive match してよい閉じた variant set として扱う。function entry の `--name` を `::` で区切った末尾と `--method` から得た `fn` 名が一致しないシグネチャ、および呼び出し側が渡した入力を schema の正規フィールドへ情報損失なく分解できない場合は reject する。`$todo` は呼び出し側が値を渡さなかった未確定ノードにだけ生成し、渡された入力を `$todo` へ退避しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ab2dd7b3a94595951edff03fb66a6999fea80100848dd14c6e62025a3de22902",
+      "evidence_hash": "60fe8aaf1daaf4c0d22b0f58923d34af3f633d60a6547255efb367d8b968e0f3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "generics / where 句を、型・trait・function・method・trait impl block・inherent impl block の各宣言レベルを区別して入力し、カタログ schema の対応フィールド（`generics` / `where_predicates` / `impl_generics` / `impl_where_predicates` 等）へ構造化する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TraitImplDeclV2"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-09",
+          "text_label": "generics / where 句を、型・trait・function・method・trait impl block・inherent impl block の各宣言レベルを区別して入力し、カタログ schema の対応フィールド（`generics` / `where_predicates` / `impl_generics` / `impl_where_predicates` 等）へ構造化する。`MethodGenericParam` は現行 schema と同じく `name: ParamName` + `bounds: Vec<TypeRef>` として扱い、`bounds` は Rust 境界の種類で狭めず、`name` には `ParamName` の識別子制約だけを適用する。where 句は `lhs: TypeRef` / `rhs: Vec<TypeRef>` / `operator: BoundOp` の粒度で受ける。`--impl-generic` / `--impl-where` は同じ `catalog add` 呼び出しで生成される `--trait-impl` 行にだけ付与され、`--trait-impl` が 1 件もない入力では reject する。`--inherent-impl-generic` / `--inherent-impl-where` は同じ `catalog add` 呼び出しで生成される `--inherent-method` 由来の `InherentImplDeclV2` 行にだけ付与され、`--inherent-method` が 1 件もない入力では reject する。ある宣言レベルまたは Rust 表現に現行 schema の正規フィールドがない場合、完全型情報維持に従い、本 API 実装と同じ変更内で正規フィールドを追加してから生成する。silent drop・docs 文字列への退避・別宣言レベルへの代用は行わない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "4bcba2de913ca3b63477b362cbae5f7420c83201d642a78b9568fbb40e52014e",
+      "evidence_hash": "60fe8aaf1daaf4c0d22b0f58923d34af3f633d60a6547255efb367d8b968e0f3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "generics / where 句を、型・trait・function・method・trait impl block・inherent impl block の各宣言レベルを区別して入力し、カタログ schema の対応フィールド（`generics` / `where_predicates` / `impl_generics` / `impl_where_predicates` 等）へ構造化する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeEntry"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-09",
+          "text_label": "generics / where 句を、型・trait・function・method・trait impl block・inherent impl block の各宣言レベルを区別して入力し、カタログ schema の対応フィールド（`generics` / `where_predicates` / `impl_generics` / `impl_where_predicates` 等）へ構造化する。`MethodGenericParam` は現行 schema と同じく `name: ParamName` + `bounds: Vec<TypeRef>` として扱い、`bounds` は Rust 境界の種類で狭めず、`name` には `ParamName` の識別子制約だけを適用する。where 句は `lhs: TypeRef` / `rhs: Vec<TypeRef>` / `operator: BoundOp` の粒度で受ける。`--impl-generic` / `--impl-where` は同じ `catalog add` 呼び出しで生成される `--trait-impl` 行にだけ付与され、`--trait-impl` が 1 件もない入力では reject する。`--inherent-impl-generic` / `--inherent-impl-where` は同じ `catalog add` 呼び出しで生成される `--inherent-method` 由来の `InherentImplDeclV2` 行にだけ付与され、`--inherent-method` が 1 件もない入力では reject する。ある宣言レベルまたは Rust 表現に現行 schema の正規フィールドがない場合、完全型情報維持に従い、本 API 実装と同じ変更内で正規フィールドを追加してから生成する。silent drop・docs 文字列への退避・別宣言レベルへの代用は行わない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "4bcba2de913ca3b63477b362cbae5f7420c83201d642a78b9568fbb40e52014e",
+      "evidence_hash": "2372078a9df788d9b977436c973c42ef4cb77a7cce8531e70e8f8803e40ef28a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue_v2 の entry 型（`TypeEntry` / `TraitEntry` / `FunctionEntry`、および同じ legacy shape を共有する他の entry 型）を catalogue linter（`NoPublicField` / `ForbidPrimitiveInTypes`）に適合する形へ refactor する作業を本トラックに含める。フィールドを非公開化し、生 `String` の `docs` をドキュメント文字列の newtype に置き換える。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeEntry"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-13",
+          "text_label": "catalogue_v2 の entry 型（`TypeEntry` / `TraitEntry` / `FunctionEntry`、および同じ legacy shape を共有する他の entry 型）を catalogue linter（`NoPublicField` / `ForbidPrimitiveInTypes`）に適合する形へ refactor する作業を本トラックに含める。フィールドを非公開化し、生 `String` の `docs` をドキュメント文字列の newtype に置き換える。lint 設定側の緩和ではなく被検査対象の entry 型側を規約に合わせる。IN-09 の型宣言レベル generics / where フィールド追加を `action: Modify` で宣言する際に linter が発火する行き詰まりを解くための前提整備である。"
+        }
+      }
+    },
+    {
+      "claim_hash": "4bcba2de913ca3b63477b362cbae5f7420c83201d642a78b9568fbb40e52014e",
+      "evidence_hash": "b64fae295890cbb9ba48bbbf78c23d7ff9681a5074744766406d2ffe9f9ae1eb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "カタログ schema の対応フィールド（`generics` / `where_predicates` / `impl_generics` / `impl_where_predicates` 等）に構造化される"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeEntry"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "型・trait・function・method・trait impl block・inherent impl block の各宣言レベルで渡した generics / where 句が、カタログ schema の対応フィールド（`generics` / `where_predicates` / `impl_generics` / `impl_where_predicates` 等）に構造化される。`MethodGenericParam.bounds` と `WherePredicateDecl.lhs` / `rhs` は `TypeRef` として保持され、Rust 境界・型構文の種類で入力時に狭められない。`--trait-impl` で生成される `TraitImplDeclV2` は `--name` 由来の `for_type` を持ち、同じ呼び出しの `--impl-generic` / `--impl-where` がその trait-impl 行へ付与される。`--inherent-method` で生成される `InherentImplDeclV2` は `--name` 由来の `type_name` を持ち、同じ呼び出しの `--inherent-impl-generic` / `--inherent-impl-where` がその inherent-impl 行へ付与される。対応する impl entry を生成しない impl-level flags は reject される。ある宣言レベルに正規フィールドがない場合は本 API 実装と同じ変更内で正規フィールドが追加されている。silent drop・docs 文字列への退避・別宣言レベルへの代用が発生しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "4bcba2de913ca3b63477b362cbae5f7420c83201d642a78b9568fbb40e52014e",
+      "evidence_hash": "31923e53a6288985d66c2d42f04b00f9e8ec42d85bf2d8052184350ebce37d65",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue_v2 の entry 型（`TypeEntry` / `TraitEntry` / `FunctionEntry` / ほか同じ legacy shape を共有する entry 型）のフィールドが非公開になり、構築が全フィールドを受け取る検証付き constructor 経由に一本化され、読み出しが read アクセサ経由になる。setter が存在しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeEntry"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-14",
+          "text_label": "catalogue_v2 の entry 型（`TypeEntry` / `TraitEntry` / `FunctionEntry` ほか同じ legacy shape を共有する entry 型）のフィールドが非公開になり、構築が全フィールドを受け取る検証付き constructor 経由に一本化され、読み出しが read アクセサ経由になる。setter が存在しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "4bcba2de913ca3b63477b362cbae5f7420c83201d642a78b9568fbb40e52014e",
+      "evidence_hash": "93d734ee847a4cacb06b9303151860214ca40140a2e1faae5710e8854dd9b4e4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`TypeEntry` への型宣言レベル generics / where フィールド追加を `action: Modify` で宣言した状態で catalogue linter が pass する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeEntry"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-16",
+          "text_label": "refactor 後の entry 型に対し catalogue linter の `NoPublicField` / `ForbidPrimitiveInTypes` が発火しない。`TypeEntry` への型宣言レベル generics / where フィールド追加を `action: Modify` で宣言した状態で catalogue linter が pass する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b52a0723fa4a5f73cae0cf71890ebcb93a3b2358b6103632917ee7289f4c025f",
+      "evidence_hash": "52c0d568477bab4937b67391231b3d9ababd29b555c7b854e46fe14fd6cf4f73",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`--action reference|modify` では `--anchor` を含む入力でエントリが生成され、rustdoc 由来の現状 shape を含む。type alias の alias target、private / hidden field の除去後も必要な struct shape と `has_stripped_fields`、impl target の module path は schema export JSON から import 側へ保持される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeInfo"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "`sotp catalog import --type <Rust パス>` を実行すると、rustdoc 抽出から既存型の同定情報・シグネチャ・フィールドを解決できる。`--action reference|modify` では `--anchor` を含む入力でエントリが生成され、rustdoc 由来の現状 shape を含む。type alias の alias target、private / hidden field の除去後も必要な struct shape と `has_stripped_fields`、impl target の module path は schema export JSON から import 側へ保持される。`--action delete` は同定情報だけを含む tombstone を生成し、根拠なし削除を防ぐため `--anchor` を必須として `spec_refs` に保持する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b52a0723fa4a5f73cae0cf71890ebcb93a3b2358b6103632917ee7289f4c025f",
+      "evidence_hash": "3690d812370f9fa18e6dbf214ee3e3a0f9835a85e0b2800d82f8d769b858146c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "完全な型情報（メソッド署名の型・trait impl 宣言・inherent impl 宣言・field 可視性・generic bound・type alias target・struct shape と `has_stripped_fields`・impl target module path・public enum variants の閉じた集合か extension-tolerant かの区別）が生成エントリに保持されている。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeInfo"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-12",
+          "text_label": "生成されたエントリに対して稼働済みの catalogue linter ルール群（ロール意味論・Aggregate 境界・アーキテクチャ配置・primitive obsession 防止）と impl → catalogue の type-signals 構造検証が従来どおり動作する。完全な型情報（メソッド署名の型・trait impl 宣言・inherent impl 宣言・field 可視性・generic bound・type alias target・struct shape と `has_stripped_fields`・impl target module path・public enum variants の閉じた集合か extension-tolerant かの区別）が生成エントリに保持されている。通常の public enum と `#[non_exhaustive]` 付き public enum の fixture / test で、前者は downstream が exhaustive match してよい閉じた variant set として扱われ、後者は extension-tolerant として保持されることが確認できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b52a0723fa4a5f73cae0cf71890ebcb93a3b2358b6103632917ee7289f4c025f",
+      "evidence_hash": "459ae656950c1771b6b105b358d96b75930bc05f3dc4e7d0e1c69c3a1b1dd391",
+      "verdict": {
+        "kind": "pass",
+        "citation": "型形状（fields / methods / variants / generics / where predicates / impl blocks）の入力は、格納先 catalogue schema の正規フィールドへ lossless に分解して格納する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeInfo"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "型形状（fields / methods / variants / generics / where predicates / impl blocks）の入力は、格納先 catalogue schema の正規フィールドへ lossless に分解して格納する。入力時の受理条件は格納先フィールドの型と一致させ、`TypeRef` slot に対して `syn::Type` / `syn::Path` / `syn::GenericParam` 等の Rust 構文 parser を追加の門番として使わない。public enum の variants は source 側に extension-tolerant な明示（例: `#[non_exhaustive]`）がない限り、downstream が exhaustive match してよい閉じた variant set として扱う。function entry の `--name` を `::` で区切った末尾と `--method` から得た `fn` 名が一致しないシグネチャ、および呼び出し側が渡した入力を schema の正規フィールドへ情報損失なく分解できない場合は reject する。`$todo` は呼び出し側が値を渡さなかった未確定ノードにだけ生成し、渡された入力を `$todo` へ退避しない。"
+        }
+      }
+    }
+  ]
+}

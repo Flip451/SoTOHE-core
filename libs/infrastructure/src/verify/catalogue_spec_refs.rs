@@ -14,6 +14,7 @@ use std::path::Path;
 use domain::plan_ref::SpecRef;
 use domain::tddd::LayerId;
 use domain::{ContentHash, SpecElementId, SpecRefFinding, SpecRefFindingKind};
+use usecase::catalogue_traversal::iter_catalogue_entries;
 
 use crate::tddd::{
     catalogue_document_codec::CatalogueDocumentCodec, catalogue_spec_signals_codec,
@@ -254,14 +255,8 @@ fn verify_one_layer(
         }
     };
 
-    for (type_name, entry) in &catalogue.types {
-        check_entry_refs(type_name.as_str().to_owned(), &entry.spec_refs);
-    }
-    for (trait_name, entry) in &catalogue.traits {
-        check_entry_refs(trait_name.as_str().to_owned(), &entry.spec_refs);
-    }
-    for (fn_path, entry) in &catalogue.functions {
-        check_entry_refs(fn_path.to_string(), &entry.spec_refs);
+    for entry in iter_catalogue_entries(&catalogue) {
+        check_entry_refs(entry.key, entry.spec_refs);
     }
 
     // StaleSignals: compare signals_opt.catalogue_declaration_hash to current hash.
@@ -461,8 +456,72 @@ mod tests {
   "crate_name": "domain"
 }"#;
 
+    const ARCH_RULES_WITH_DOMAIN: &str = r#"{
+  "layers": [
+    {
+      "crate": "domain",
+      "tddd": {
+        "enabled": true,
+        "catalogue_spec_signal": { "enabled": true }
+      }
+    }
+  ]
+}"#;
+
+    const MINIMAL_SPEC: &str = r#"{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "Test Track",
+  "scope": {
+    "in_scope": [
+      {"id": "IN-01", "text": "requirement one"}
+    ],
+    "out_of_scope": []
+  }
+}"#;
+
     fn write_file(dir: &std::path::Path, name: &str, content: &str) {
         std::fs::write(dir.join(name), content).unwrap();
+    }
+
+    fn write_nested_file(dir: &std::path::Path, relative: &str, content: &str) {
+        let path = dir.join(relative);
+        if let Some(parent) = path.parent() {
+            std::fs::create_dir_all(parent).unwrap();
+        }
+        std::fs::write(path, content).unwrap();
+    }
+
+    fn delete_tombstone_catalogue(anchor: &str) -> String {
+        format!(
+            r#"{{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {{
+    "RemovedType": {{
+      "action": "delete",
+      "module_path": "old",
+      "spec_refs": [
+        {{ "file": "track/items/my-track-2026-01-01/spec.json", "anchor": "{anchor}" }}
+      ],
+      "informal_grounds": []
+    }}
+  }},
+  "traits": {{}},
+  "functions": {{}}
+}}"#
+        )
+    }
+
+    fn setup_catalogue_spec_refs_workspace(
+        tmp: &std::path::Path,
+        catalogue: &str,
+    ) -> (std::path::PathBuf, String) {
+        write_nested_file(tmp, "architecture-rules.json", ARCH_RULES_WITH_DOMAIN);
+        write_nested_file(tmp, "track/items/my-track-2026-01-01/spec.json", MINIMAL_SPEC);
+        write_nested_file(tmp, "track/items/my-track-2026-01-01/domain-types.json", catalogue);
+        (tmp.join("track").join("items"), "my-track-2026-01-01".to_owned())
     }
 
     // -----------------------------------------------------------------------
@@ -508,6 +567,29 @@ mod tests {
             Severity::Error,
             "malformed v3 catalogue must produce Error severity, got: {:?}",
             finding.severity()
+        );
+    }
+
+    #[test]
+    fn test_delete_tombstone_dangling_spec_ref_is_reported() {
+        let tmp = TempDir::new().unwrap();
+        let catalogue = delete_tombstone_catalogue("IN-99");
+        let (items_dir, track_id) = setup_catalogue_spec_refs_workspace(tmp.path(), &catalogue);
+        let mut formatted_findings = Vec::new();
+
+        let ok = execute_verify_catalogue_spec_refs(
+            items_dir,
+            track_id,
+            tmp.path().to_path_buf(),
+            true,
+            &mut formatted_findings,
+        )
+        .unwrap();
+
+        assert!(!ok, "dangling tombstone spec_ref must fail");
+        assert!(
+            formatted_findings.iter().any(|m| m.contains("RemovedType") && m.contains("IN-99")),
+            "finding must identify the delete tombstone and dangling anchor: {formatted_findings:?}"
         );
     }
 }

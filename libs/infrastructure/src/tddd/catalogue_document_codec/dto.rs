@@ -11,6 +11,7 @@ use crate::tddd::spec_ground_codec::{InformalGroundRefDto, SpecRefDto};
 
 use super::StrictMap;
 use super::dto_roles::{ContractRoleDto, DataRoleDto};
+use super::dto_slots::EntrySlotDto;
 
 // ---------------------------------------------------------------------------
 // Minimal version probe DTO
@@ -39,9 +40,9 @@ pub(super) struct CatalogueDocumentDto {
     pub(super) schema_version: u32,
     pub(super) crate_name: String,
     pub(super) layer: String,
-    pub(super) types: BTreeMap<String, TypeEntryDto>,
-    pub(super) traits: BTreeMap<String, TraitEntryDto>,
-    pub(super) functions: BTreeMap<String, FunctionEntryDto>,
+    pub(super) types: BTreeMap<String, EntrySlotDto<TypeEntryDto>>,
+    pub(super) traits: BTreeMap<String, EntrySlotDto<TraitEntryDto>>,
+    pub(super) functions: BTreeMap<String, EntrySlotDto<FunctionEntryDto>>,
     /// Inherent impl block declarations. Omitted from JSON when empty
     /// (`skip_serializing_if`) so legacy catalogues stay byte-stable.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
@@ -93,9 +94,9 @@ impl<'de> Deserialize<'de> for CatalogueDocumentDto {
                 let mut schema_version: Option<u32> = None;
                 let mut crate_name: Option<String> = None;
                 let mut layer: Option<String> = None;
-                let mut types: Option<StrictMap<String, TypeEntryDto>> = None;
-                let mut traits: Option<StrictMap<String, TraitEntryDto>> = None;
-                let mut functions: Option<StrictMap<String, FunctionEntryDto>> = None;
+                let mut types: Option<StrictMap<String, EntrySlotDto<TypeEntryDto>>> = None;
+                let mut traits: Option<StrictMap<String, EntrySlotDto<TraitEntryDto>>> = None;
+                let mut functions: Option<StrictMap<String, EntrySlotDto<FunctionEntryDto>>> = None;
                 let mut inherent_impls: Option<Vec<InherentImplDeclDto>> = None;
                 let mut trait_impls: Option<Vec<TraitImplDto>> = None;
 
@@ -214,6 +215,15 @@ pub(super) struct TypeEntryDto {
     pub(super) kind: TypeKindDto,
     #[serde(default)]
     pub(super) methods: Vec<MethodDeclarationDto>,
+    /// Type-declaration-level generic type parameters (e.g. `[{ name: "T", bounds: ["Clone"] }]`
+    /// for `struct Foo<T: Clone>`). Default empty for backward compatibility
+    /// (ADR `2026-07-02-1345` D6 / IN-13).
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub(super) generics: Vec<MethodGenericParamDto>,
+    /// Type-declaration-level `where`-clause bound predicates. Default empty for
+    /// backward compatibility (ADR `2026-07-02-1345` D6 / IN-13).
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub(super) where_predicates: Vec<WherePredicateDeclDto>,
     #[serde(default)]
     pub(super) module_path: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]

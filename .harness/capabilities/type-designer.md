@@ -1103,6 +1103,12 @@ A `reference` entry does NOT need to enumerate all methods for Phase 2 signals �
 7. Cross-crate references use FQN (`<other-crate>::module::TypeName`); in-crate references use last-segment names.
 8. No `kind: type_alias` for primitives that should be validated newtypes — newtypes are a `tuple` shape (single field) or a `plain` shape with a `value()` accessor.
 9. Core / port-hosting layers (per the convention's R1 matrix) have NO serde imports — serde conversion lives in adapter-tier DTOs.
+10. Every declared ErrorType variant has a **construction owner**: some method declared across the catalogues can actually produce it, and every payload field is data that owner possesses at failure time. A variant no declared caller can construct is dead vocabulary — remove it, or move the failure to the layer that owns the data.
+11. Cross-layer conversion chains (entries whose docs say "converted to X" — e.g. an `<adapter-crate>` input enum mirrored into a `<core-crate>` enum to keep the dependency direction legal) keep variant-name sets identical, and mirrored field lists keep identical names and ordering. Divergence is allowed only for a real boundary constraint (e.g. a reserved word at an external argument surface — decouple via the boundary-layer attribute, not the field name) and must be justified in the entry docs.
+12. Every rule the spec marks fail-closed has exactly **one enforcing layer**; that layer can construct the data its rejection path needs; and every affected entry's docs names the same owner. Contradictory "rejected upstream" vs "validated here" claims across layers are a contract bug, not wording.
+13. Every existing baseline public type the ADR / spec commits to changing carries its `action: modify` entry in THIS phase, and the declared post-modification shape is checked against the active catalogue-lint rules before finalizing. A legacy shape that cannot pass (grandfathered non-conformance) is surfaced under `## Open Questions` immediately — never deferred to implementation, where the deadlock resurfaces as a mid-task red.
+14. Structured payloads survive layer boundaries: when a lower layer produces typed detail (e.g. a list of typed values), upper-layer reports and errors carry the values themselves, not a lossy summary (count, joined string), unless the loss is justified in the entry docs.
+15. Before minting a newtype, search the existing catalogues and core-layer source for an equivalent concept and reuse it; record the reuse decision (or why nothing fits) in the entry docs.
 
 ## Scope Ownership
 

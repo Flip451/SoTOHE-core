@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "22a952117d0ff1d22ebec01d2559e7b67323877a1daeb47eeb006be7662ed757",
+  "signals": [
+    {
+      "type_name": "CatalogAddCommand",
+      "signal": "blue",
+      "entry_hash": "c97ce9cab52c0a9cdfa3ef90bf02e48416d910cea9865766fa4d4b382432c74d"
+    },
+    {
+      "type_name": "CatalogCheckQuery",
+      "signal": "blue",
+      "entry_hash": "a2c13b9fee8002755b1c2d43d53d0b335d880d2e4aed8eac8d5aa55e303cfb6c"
+    },
+    {
+      "type_name": "CatalogCheckReport",
+      "signal": "blue",
+      "entry_hash": "98f8aa3a50699876b912a34ee4b4d82e3d5c022aea89841beb9b627c356d1374"
+    },
+    {
+      "type_name": "CatalogCheckVerdict",
+      "signal": "blue",
+      "entry_hash": "e2e327efe5534c2d6b2d04ef4cf1c4bb0fcb95d9efe48dee6384b6bad1b0fe34"
+    },
+    {
+      "type_name": "CatalogCiteCommand",
+      "signal": "blue",
+      "entry_hash": "bf4041b4f10d65ecbadd9d56e7f2223da97f1bd442cadf9e686d207627349861"
+    },
+    {
+      "type_name": "CatalogError",
+      "signal": "blue",
+      "entry_hash": "824d251b2427734f803395059b834b29a44cda267887d79aa1c076be605ec6a5"
+    },
+    {
+      "type_name": "CatalogImportCommand",
+      "signal": "blue",
+      "entry_hash": "d933c3c922b42041b4a106b81bb12458eecdc83226519c5175b651a0afb51ff5"
+    },
+    {
+      "type_name": "CatalogInitReport",
+      "signal": "blue",
+      "entry_hash": "b0988419819ca6703e33db7f4c45903c31ac38641f25e3a1c592d309acd6afa1"
+    },
+    {
+      "type_name": "CatalogInteractor",
+      "signal": "blue",
+      "entry_hash": "0ec1ea3f15ad60740e7b607e6beb14a7295d674cc435426eb9949e1037f2f4eb"
+    },
+    {
+      "type_name": "CatalogWriteReport",
+      "signal": "blue",
+      "entry_hash": "a77ceaba8be86c486bc0942ac19c85017756f1595b785cd61b7f7da6aca41c60"
+    },
+    {
+      "type_name": "CatalogPort",
+      "signal": "blue",
+      "entry_hash": "0bd73b3468751db372b9db67fdaaf2fc0cc6ee3c89ede2157cceb85491427455"
+    },
+    {
+      "type_name": "CatalogService",
+      "signal": "blue",
+      "entry_hash": "22e2a4559636e3add937b6979f370383149a9c77eb3edacfc065090af17813cb"
+    }
+  ]
+}

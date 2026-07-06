@@ -49,6 +49,61 @@ spec_refs/role/action mismatch.
   must reference upstream behaviour by anchor cite, not reproduce it. Cite
   `knowledge/conventions/no-upstream-restatement.md`.
 
+### Cross-layer contract findings
+
+- **unconstructible error variant (dead vocabulary)**: an ErrorType variant
+  whose payload no declared layer can actually construct — e.g. a variant
+  carrying data (a resolved value, an "actual" comparand) that neither the
+  declaring layer nor any caller in the declared call chain possesses at the
+  failure point. Cite the variant and walk the missing data's origin.
+- **mirror chain divergence**: enums or field lists documented as conversion
+  mirrors across layers (CLI value-enum → driver select-enum → core enum, or
+  parallel command/input field sets) whose variant-name sets or field
+  names/ordering diverge without a documented language-level constraint
+  (reserved word at the flag surface). Cite both entry keys and the diverging
+  members.
+- **enforcement-owner contradiction**: a fail-closed rule whose enforcement is
+  claimed by different layers in different entries' docs ("rejected upstream"
+  in one, "validated here" in another), or claimed by no layer at all. The
+  catalogue must name exactly one owner and the owner must be able to construct
+  its rejection data.
+- **lossy boundary downgrade**: an upper-layer report or error that reduces
+  structured lower-layer detail (a list of typed values) to a count or joined
+  string without a documented justification, when the sibling read path carries
+  the full values.
+- **missing companion modify**: the track's ADR / spec commits to changing an
+  existing baseline public type, but no `action: modify` entry declares the
+  post-change shape — the change would land as an undeclared API mutation
+  caught only at implementation time.
+
+### API shape findings
+
+- **per-method error imprecision**: a method whose declared error type forces
+  callers to handle variants that operation can structurally never produce
+  (e.g. an `init`-style method returning a shared error enum containing
+  parse-failure variants when it parses nothing). A shared error enum is
+  acceptable; flag when the gap is large and the entry docs neither list the
+  producible subset nor justify the breadth. Cite the method and the
+  unreachable variants.
+- **ownership signature smell**: a read-only operation taking `String` /
+  `Vec<T>` / `PathBuf` by value where a borrow suffices; an owned return that
+  clones what a borrow could expose; `&mut self` on a method whose docs
+  describe a read. Judge from the declared receiver / params / returns.
+- **state-shape smell**: `Option<Option<T>>`; `Result<Option<T>, E>` where
+  `None` and `Err` overlap in meaning; a bool + `Option<T>` pair encoding a
+  tri-state that a dedicated enum would make unrepresentable-wrong. Cite the
+  field or signature and name the illegal state the current shape admits.
+- **sync/async color mismatch**: a port whose method set implies external I/O
+  (filesystem, network, database naming or failure vocabulary) declared fully
+  synchronous without the entry docs acknowledging the choice — or the
+  reverse, `is_async` on pure computation. Early color errors force rework at
+  the adapter.
+- **public enum evolution ambiguity**: a public enum that downstream projects
+  are expected to `match` on, where the entry does not indicate whether the
+  variant set is intentionally closed (exhaustive matching desired) or
+  extension-tolerant (`#[non_exhaustive]` intent). Flag only for enums on a
+  template-consumer-facing surface.
+
 ### SOLID findings
 
 - **Single Responsibility violation**: a single struct / interactor / port

@@ -11,6 +11,7 @@
 //! apps/cli main.rs wiring) per CN-06.
 
 pub mod arch;
+pub mod catalog_gen;
 pub mod conventions;
 pub mod demo;
 pub mod domain;

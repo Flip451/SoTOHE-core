@@ -698,21 +698,23 @@ mod tests {
 
     fn single_entry_doc(crate_name: &str) -> CatalogueDocument {
         let mut doc = empty_doc(crate_name);
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("SentinelType").unwrap(),
-            TypeEntry {
-                action: ItemAction::Add,
-                role: DataRole::value_object(),
-                kind: TypeKindV2::Struct(StructKind::new(
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(
                     StructShape::Plain { fields: vec![], has_stripped_fields: false },
                     None,
                 )),
-                methods: vec![],
-                module_path: ModulePath::root(),
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            },
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
         );
         doc
     }
@@ -1275,12 +1277,12 @@ mod tests {
     #[test]
     fn test_forbid_primitive_in_types_named_field_and_type_alias_target() {
         let mut doc = empty_doc("domain");
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("Money").unwrap(),
-            TypeEntry {
-                action: ItemAction::Add,
-                role: DataRole::value_object(),
-                kind: TypeKindV2::Struct(StructKind::new(
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(
                     StructShape::Plain {
                         fields: vec![FieldDecl::new(
                             FieldName::new("amount").unwrap(),
@@ -1290,25 +1292,29 @@ mod tests {
                     },
                     None,
                 )),
-                methods: vec![],
-                module_path: ModulePath::root(),
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            },
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
         );
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("Description").unwrap(),
-            TypeEntry {
-                action: ItemAction::Add,
-                role: DataRole::value_object(),
-                kind: TypeKindV2::TypeAlias { target: TypeRef::new("String").unwrap() },
-                methods: vec![],
-                module_path: ModulePath::root(),
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            },
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::TypeAlias { target: TypeRef::new("String").unwrap() },
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
         );
         let target_layer = layer("domain");
         let mut catalogues = BTreeMap::new();

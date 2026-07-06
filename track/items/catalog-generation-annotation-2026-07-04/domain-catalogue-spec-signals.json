@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "6f146e01b4bd3b2de6a9b400ce95cfbb8e63047de3425452e9e8a11e954c0b44",
+  "signals": [
+    {
+      "type_name": "CatalogEntryKind",
+      "signal": "blue",
+      "entry_hash": "5c5d2e9bb1565c38cd834e705d724a25cb45f30f170e5e9580f96ab80a94c127"
+    },
+    {
+      "type_name": "CatalogEntryName",
+      "signal": "blue",
+      "entry_hash": "b558ccbc562f218c62494c538aeb82d9c02991d8188e9d26649fddaf26e3807d"
+    },
+    {
+      "type_name": "CatalogImportAction",
+      "signal": "blue",
+      "entry_hash": "4111d85aeeaef5d19a4aa73a6fa8579b8bb428cd28b3a85202a67a775b4bc977"
+    },
+    {
+      "type_name": "CatalogueDocument",
+      "signal": "blue",
+      "entry_hash": "bcf0729a259aa3f9b02972a49c14abcaf290eb645afea8c624f5e9ef2d2c87ec"
+    },
+    {
+      "type_name": "DeletionRecord",
+      "signal": "blue",
+      "entry_hash": "6620dcd6a7266246b734dd6c259fec55afa9cb91bbf0af928bceaebadf49e288"
+    },
+    {
+      "type_name": "DocString",
+      "signal": "blue",
+      "entry_hash": "05c842d82f8a5fed97b2d855e76be5916e9c0646ebef8c0f49ec5cb68aff9b2c"
+    },
+    {
+      "type_name": "DraftHole",
+      "signal": "blue",
+      "entry_hash": "e58d7b2c87dc7a3219731f13abe2e88a4cc2ffc51bfcf5f96221dbd26f61d530"
+    },
+    {
+      "type_name": "DraftHolePath",
+      "signal": "blue",
+      "entry_hash": "e8d8a04e526f98e79f91c33f0855c643b58b8f541a7fb531223c2cec8afa7a8a"
+    },
+    {
+      "type_name": "FunctionEntry",
+      "signal": "blue",
+      "entry_hash": "f2a4fd023e3e86dfa24d72ec787c9af5d86621d1f3e81c5a50c4c07d66f10e03"
+    },
+    {
+      "type_name": "FunctionInfo",
+      "signal": "blue",
+      "entry_hash": "af638ba0fc4dc96d3c418391b0c94b0976790a97813bcec071fce77e1f9b290e"
+    },
+    {
+      "type_name": "ImplInfo",
+      "signal": "blue",
+      "entry_hash": "c4a9e296a507b05f72c0fd64be6163fdf45599e10d12a149a9a1759a26d6ea1f"
+    },
+    {
+      "type_name": "InherentImplDeclV2",
+      "signal": "blue",
+      "entry_hash": "7159dea7602abfa900f19ba9010a33d2c056f8936595bb7c272ddc618ae2014d"
+    },
+    {
+      "type_name": "StructShapeKind",
+      "signal": "blue",
+      "entry_hash": "0a4e9c8fc5407f213f5a65d84ce08f6a21cdf9d0c89d2297150d3110b88bcc62"
+    },
+    {
+      "type_name": "TodoInstruction",
+      "signal": "blue",
+      "entry_hash": "f7b2676dd11164dadc2df0adc1eca3f77a928518d441039d6c2bd5eab45d6773"
+    },
+    {
+      "type_name": "TraitEntry",
+      "signal": "blue",
+      "entry_hash": "d07377dba4a87b570be80fd58a474932e0c2b64dc233b9d937024951f0a47255"
+    },
+    {
+      "type_name": "TraitImplDeclV2",
+      "signal": "blue",
+      "entry_hash": "ab2dd7b3a94595951edff03fb66a6999fea80100848dd14c6e62025a3de22902"
+    },
+    {
+      "type_name": "TypeEntry",
+      "signal": "blue",
+      "entry_hash": "4bcba2de913ca3b63477b362cbae5f7420c83201d642a78b9568fbb40e52014e"
+    },
+    {
+      "type_name": "TypeInfo",
+      "signal": "blue",
+      "entry_hash": "b52a0723fa4a5f73cae0cf71890ebcb93a3b2358b6103632917ee7289f4c025f"
+    }
+  ]
+}

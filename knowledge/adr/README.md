@@ -117,6 +117,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [TDDD GAT trait サポート: パーサ QualifiedPath + 比較フォーマッター正規化 + カタログ関連アイテムスキーマ](2026-06-18-0822-typeref-parser-qualified-path-support.md) | Proposed | 2026-06-18 |
 | [cli 系 3 層への TDDD 適用と既存 linter によるロール配置制約の設定](2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md) | Proposed | 2026-06-21 |
 | [TDDD chain ③ の `cargo rustdoc` 呼び出しに `--document-hidden-items` を追加する](2026-06-27-0440-tddd-rustdoc-document-hidden-items.md) | Proposed | 2026-06-27 |
+| [型カタログ作成の「生成 + 注釈」への移行 — 意図入力スキャフォールディング API](2026-07-02-1345-catalogue-generation-annotation.md) | — | 2026-07-02 |
 
 ### トラック・ワークフロー
 
@@ -218,6 +219,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | ADR | Status | Date |
 |-----|--------|------|
 | [既存 DRY 違反の一掃 — 横断・既存重複を正典へ集約する](2026-06-19-0924-existing-dry-violation-cleanup.md) | Proposed | 2026-06-19 |
+| [catalogue_v2 エントリ型の catalogue linter 適合 refactor](2026-07-04-0525-catalogue-v2-entry-lint-conformance.md) | Proposed | 2026-07-04 |
 
 ### Review コマンド / API
 

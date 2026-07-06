@@ -108,35 +108,18 @@ pub(super) fn check_chain2_for_layer<R: TrackBlobReader>(
 
     // Step 3: integrity binary gate (dangling / stale).
     //
-    // Iterates types + traits + functions BTreeMaps and checks each entry's
+    // Iterates live entries plus deletion tombstones and checks each entry's
     // `spec_refs` for dangling anchors. StaleSignals check
     // uses `signals_doc.catalogue_declaration_hash`.
     let catalogue_file = format!("{layer_id}-types.json");
+    let catalogue_entries: Vec<_> = iter_catalogue_entries(&catalogue).collect();
     let mut integrity_errors: Vec<VerifyFinding> = Vec::new();
 
-    for (type_name, entry) in &catalogue.types {
+    for entry in &catalogue_entries {
         check_spec_refs_for_entry(
             layer_id,
-            type_name.as_str(),
-            &entry.spec_refs,
-            spec_element_hashes,
-            &mut integrity_errors,
-        );
-    }
-    for (trait_name, entry) in &catalogue.traits {
-        check_spec_refs_for_entry(
-            layer_id,
-            trait_name.as_str(),
-            &entry.spec_refs,
-            spec_element_hashes,
-            &mut integrity_errors,
-        );
-    }
-    for (fn_path, entry) in &catalogue.functions {
-        check_spec_refs_for_entry(
-            layer_id,
-            &fn_path.to_string(),
-            &entry.spec_refs,
+            entry.key.as_str(),
+            entry.spec_refs,
             spec_element_hashes,
             &mut integrity_errors,
         );
@@ -163,7 +146,7 @@ pub(super) fn check_chain2_for_layer<R: TrackBlobReader>(
     //
     // Coverage check: total entry count must equal signals count, and
     // positional names must match (fail-closed against trimmed signals files).
-    let total_entries = catalogue.types.len() + catalogue.traits.len() + catalogue.functions.len();
+    let total_entries = catalogue_entries.len();
     let signals = &signals_doc.signals;
     if total_entries != signals.len() {
         outcome.merge(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
@@ -175,25 +158,18 @@ pub(super) fn check_chain2_for_layer<R: TrackBlobReader>(
         return outcome;
     }
 
-    // Positional name match: types → traits → functions, BTreeMap iteration order.
-    let catalogue_names: Vec<String> = catalogue
-        .types
-        .keys()
-        .map(|k| k.as_str().to_owned())
-        .chain(catalogue.traits.keys().map(|k| k.as_str().to_owned()))
-        .chain(catalogue.functions.keys().map(|k| k.to_string()))
-        .collect();
-    if let Some((i, cat_name, sig)) = catalogue_names
+    // Positional name match: use the same canonical traversal as signal generation.
+    if let Some((i, entry, sig)) = catalogue_entries
         .iter()
         .zip(signals.iter())
         .enumerate()
-        .find(|(_, (cat_name, sig))| cat_name.as_str() != sig.type_name.as_str())
-        .map(|(i, (cat_name, sig))| (i, cat_name, sig))
+        .find(|(_, (entry, sig))| entry.key.as_str() != sig.type_name.as_str())
+        .map(|(i, (entry, sig))| (i, entry, sig))
     {
         outcome.merge(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
             "{catalogue_file}: catalogue-spec signals positional mismatch at index {i} \
-             (catalogue entry '{cat_name}' vs signal '{}'). Regenerate the signals file.",
-            sig.type_name
+             (catalogue entry '{}' vs signal '{}'). Regenerate the signals file.",
+            entry.key, sig.type_name
         ))]));
         return outcome;
     }
@@ -216,19 +192,19 @@ pub(super) fn check_chain2_for_layer<R: TrackBlobReader>(
     // the wrong entry content. The gate blocks until the signals file is
     // regenerated (`sotp signal calc-catalog-spec`).
     let mut entry_hash_errors: Vec<VerifyFinding> = Vec::new();
-    for (entry, signal) in iter_catalogue_entries(&catalogue).zip(signals.iter()) {
+    for (entry, signal) in catalogue_entries.iter().zip(signals.iter()) {
         match entry_hashes.get(entry.section_key.as_str()) {
             None => {
                 entry_hash_errors.push(VerifyFinding::error(format!(
                     "{catalogue_file}: per-entry hash missing for '{entry_key}' \
                      (section_key '{section_key}') — the catalogue adapter did not \
                      supply a hash for this entry. Run `sotp signal calc-catalog-spec` to regenerate.",
-                    entry_key = entry.key,
-                    section_key = entry.section_key,
+                    entry_key = entry.key.as_str(),
+                    section_key = entry.section_key.as_str(),
                 )));
             }
             Some(current_hash) if current_hash != signal.entry_hash() => {
-                let entry_key = &entry.key;
+                let entry_key = entry.key.as_str();
                 let declared_hex = signal.entry_hash().to_hex();
                 let actual_hex = current_hash.to_hex();
                 entry_hash_errors.push(VerifyFinding::error(format!(

@@ -320,6 +320,36 @@ impl fmt::Display for RustExpression {
 }
 
 // ---------------------------------------------------------------------------
+// DocString — documentation-text newtype
+// ---------------------------------------------------------------------------
+
+/// Newtype wrapping `String` for entry documentation text.
+///
+/// Wraps the opaque free-text documentation carried by the catalogue entry value
+/// objects (`TypeEntry` / `TraitEntry` / `FunctionEntry`). Keeps a raw `String` out
+/// of named-field position in those types so they satisfy the catalogue linter's
+/// `ForbidPrimitiveInTypes` rule (ADR `2026-07-04-0525-catalogue-v2-entry-lint-conformance` D4).
+///
+/// Documentation is arbitrary free text, so construction is infallible — no
+/// validation is performed.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DocString(String);
+
+impl DocString {
+    /// Creates a new `DocString` from arbitrary documentation text.
+    #[must_use]
+    pub fn new(text: String) -> Self {
+        Self(text)
+    }
+
+    /// Returns the underlying documentation text.
+    #[must_use]
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
+}
+
+// ---------------------------------------------------------------------------
 // ModulePath — Vec<Identifier> joined with ::
 // ---------------------------------------------------------------------------
 
@@ -591,6 +621,29 @@ mod assoc_const_name_tests {
         let displayed = original.to_string();
         let parsed: AssocConstName = displayed.parse().unwrap();
         assert_eq!(original, parsed);
+    }
+}
+
+#[cfg(test)]
+mod doc_string_tests {
+    use super::*;
+
+    #[test]
+    fn test_doc_string_new_preserves_text() {
+        let doc = DocString::new("A domain entity.".to_string());
+        assert_eq!(doc.as_str(), "A domain entity.");
+    }
+
+    #[test]
+    fn test_doc_string_empty_is_allowed() {
+        let doc = DocString::new(String::new());
+        assert_eq!(doc.as_str(), "");
+    }
+
+    #[test]
+    fn test_doc_string_equality_by_value() {
+        assert_eq!(DocString::new("x".to_string()), DocString::new("x".to_string()));
+        assert_ne!(DocString::new("x".to_string()), DocString::new("y".to_string()));
     }
 }
 

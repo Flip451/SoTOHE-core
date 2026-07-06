@@ -11,12 +11,12 @@ use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, ItemAction, Self
 use domain::tddd::catalogue_v2::traits::TraitImplDeclV2;
 use domain::tddd::catalogue_v2::variants::{FieldDecl, VariantDecl};
 use domain::tddd::catalogue_v2::{
-    AssocConstName, CatalogueDocument, CrateName, FieldName, MethodName, ModulePath, ParamName,
-    TraitName, TypeName, TypeRef, VariantName,
+    AssocConstName, CatalogueDocument, CrateName, DeletionRecord, FieldName, FunctionName,
+    FunctionPath, MethodName, ModulePath, ParamName, TraitName, TypeName, TypeRef, VariantName,
 };
 use rustdoc_types::{
     AssocItemConstraintKind, GenericArg, GenericArgs, GenericBound, GenericParamDefKind, Id,
-    ItemEnum, Term, Type, VariantKind, WherePredicate,
+    ItemEnum, ItemKind, Term, Type, VariantKind, WherePredicate,
 };
 
 use super::*;
@@ -30,6 +30,77 @@ fn make_doc(crate_name: &str) -> CatalogueDocument {
     )
 }
 
+fn item_id_for_path(ec: &domain::tddd::ExtendedCrate, path: &[&str]) -> Id {
+    let expected: Vec<String> = path.iter().map(|segment| (*segment).to_owned()).collect();
+    ec.krate()
+        .paths
+        .iter()
+        .find(|(_, summary)| summary.path == expected)
+        .map(|(id, _)| *id)
+        .expect("path should be present in encoded crate")
+}
+
+// -----------------------------------------------------------------------
+// Delete tombstones
+// -----------------------------------------------------------------------
+
+#[test]
+fn test_encode_type_deletion_record_emits_delete_action() {
+    let mut doc = make_doc("domain");
+    doc.push_deletion(DeletionRecord::Type {
+        name: TypeName::new("OldType").unwrap(),
+        module_path: ModulePath::root(),
+        spec_refs: vec![],
+        informal_grounds: vec![],
+    });
+
+    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let id = item_id_for_path(&ec, &["domain", "OldType"]);
+
+    assert_eq!(ec.action_for(&id), Some(ItemAction::Delete));
+    assert_eq!(ec.krate().paths[&id].kind, ItemKind::Struct);
+    assert!(matches!(ec.krate().index[&id].inner, ItemEnum::Struct(_)));
+}
+
+#[test]
+fn test_encode_trait_deletion_record_emits_delete_action() {
+    let mut doc = make_doc("domain");
+    doc.push_deletion(DeletionRecord::Trait {
+        name: TraitName::new("OldPort").unwrap(),
+        module_path: ModulePath::root(),
+        spec_refs: vec![],
+        informal_grounds: vec![],
+    });
+
+    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let id = item_id_for_path(&ec, &["domain", "OldPort"]);
+
+    assert_eq!(ec.action_for(&id), Some(ItemAction::Delete));
+    assert_eq!(ec.krate().paths[&id].kind, ItemKind::Trait);
+    assert!(matches!(ec.krate().index[&id].inner, ItemEnum::Trait(_)));
+}
+
+#[test]
+fn test_encode_function_deletion_record_emits_delete_action() {
+    let mut doc = make_doc("domain");
+    let path = FunctionPath::at_root(
+        CrateName::new("domain").unwrap(),
+        FunctionName::new("old_fn").unwrap(),
+    );
+    doc.push_deletion(DeletionRecord::Function {
+        path,
+        spec_refs: vec![],
+        informal_grounds: vec![],
+    });
+
+    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let id = item_id_for_path(&ec, &["domain", "old_fn"]);
+
+    assert_eq!(ec.action_for(&id), Some(ItemAction::Delete));
+    assert_eq!(ec.krate().paths[&id].kind, ItemKind::Function);
+    assert!(matches!(ec.krate().index[&id].inner, ItemEnum::Function(_)));
+}
+
 // -----------------------------------------------------------------------
 // Error path: AmbiguousIdentifier
 // -----------------------------------------------------------------------
@@ -39,36 +110,37 @@ fn test_encode_returns_ambiguous_identifier_when_type_and_trait_share_name() {
     // A type named "Foo" and a trait named "Foo" in the same catalogue collide
     // in the short-name index, triggering AmbiguousIdentifier.
     let mut doc = make_doc("domain");
-    doc.types.insert(
+    doc.insert_type(
         TypeName::new("Foo").unwrap(),
-        TypeEntry {
-            action: ItemAction::Add,
-            role: DataRole::value_object(),
-            kind: TypeKindV2::Enum { variants: vec![] },
-            methods: vec![],
-
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        },
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Enum { variants: vec![] },
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
     );
-    doc.traits.insert(
+    doc.insert_trait(
         TraitName::new("Foo").unwrap(),
-        TraitEntry {
-            action: ItemAction::Add,
-            role: ContractRole::SpecificationPort,
-            methods: vec![],
-            assoc_types: vec![],
-            assoc_consts: vec![],
-            supertrait_bounds: vec![],
-            generics: vec![],
-            where_predicates: vec![],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        },
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SpecificationPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
     );
 
     let result = CatalogueToExtendedCrateCodec::new().encode(doc);
@@ -89,12 +161,12 @@ fn test_encode_returns_ambiguous_identifier_when_type_and_trait_share_name() {
 fn test_encode_returns_invalid_type_ref_for_unparseable_field_type() {
     // A struct field with a TypeRef that syn cannot parse triggers InvalidTypeRef.
     let mut doc = make_doc("domain");
-    doc.types.insert(
+    doc.insert_type(
         TypeName::new("BadType").unwrap(),
-        TypeEntry {
-            action: ItemAction::Add,
-            role: DataRole::value_object(),
-            kind: TypeKindV2::Struct(StructKind::new(
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain {
                     fields: vec![FieldDecl::new(
                         FieldName::new("value").unwrap(),
@@ -105,7 +177,7 @@ fn test_encode_returns_invalid_type_ref_for_unparseable_field_type() {
                 },
                 None,
             )),
-            methods: vec![MethodDeclaration {
+            vec![MethodDeclaration {
                 name: MethodName::new("get_value").unwrap(),
                 receiver: Some(SelfReceiver::SharedRef),
                 params: vec![],
@@ -117,12 +189,13 @@ fn test_encode_returns_invalid_type_ref_for_unparseable_field_type() {
                 where_predicates: vec![],
                 docs: None,
             }],
-
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        },
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
     );
 
     let result = CatalogueToExtendedCrateCodec::new().encode(doc);
@@ -141,12 +214,12 @@ fn test_encode_returns_invalid_type_ref_for_unparseable_field_type() {
 #[test]
 fn test_encode_struct_fields_are_promoted_to_struct_field_items() {
     let mut doc = make_doc("domain");
-    doc.types.insert(
+    doc.insert_type(
         TypeName::new("User").unwrap(),
-        TypeEntry {
-            action: ItemAction::Add,
-            role: DataRole::value_object(),
-            kind: TypeKindV2::Struct(StructKind::new(
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain {
                     fields: vec![
                         FieldDecl::new(
@@ -159,13 +232,14 @@ fn test_encode_struct_fields_are_promoted_to_struct_field_items() {
                 },
                 None,
             )),
-            methods: vec![],
-
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        },
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
     );
 
     let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
@@ -185,12 +259,12 @@ fn test_encode_struct_fields_are_promoted_to_struct_field_items() {
 #[test]
 fn test_encode_enum_variants_are_promoted_to_variant_items() {
     let mut doc = make_doc("domain");
-    doc.types.insert(
+    doc.insert_type(
         TypeName::new("ItemAction").unwrap(),
-        TypeEntry {
-            action: ItemAction::Add,
-            role: DataRole::value_object(),
-            kind: TypeKindV2::Enum {
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Enum {
                 variants: vec![
                     VariantDecl::unit(VariantName::new("Add").unwrap()),
                     VariantDecl::tuple(
@@ -199,13 +273,14 @@ fn test_encode_enum_variants_are_promoted_to_variant_items() {
                     ),
                 ],
             },
-            methods: vec![],
-
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        },
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
     );
 
     let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
@@ -221,16 +296,16 @@ fn test_encode_enum_variants_are_promoted_to_variant_items() {
 #[test]
 fn test_encode_type_with_methods_produces_single_inherent_impl_block() {
     let mut doc = make_doc("domain");
-    doc.types.insert(
+    doc.insert_type(
         TypeName::new("Email").unwrap(),
-        TypeEntry {
-            action: ItemAction::Add,
-            role: DataRole::value_object(),
-            kind: TypeKindV2::Struct(StructKind::new(
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: vec![], has_stripped_fields: false },
                 None,
             )),
-            methods: vec![
+            vec![
                 MethodDeclaration::new(
                     MethodName::new("new").unwrap(),
                     None,
@@ -248,12 +323,13 @@ fn test_encode_type_with_methods_produces_single_inherent_impl_block() {
                     None,
                 ),
             ],
-
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        },
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
     );
 
     let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
@@ -280,22 +356,23 @@ fn test_encode_type_with_methods_produces_single_inherent_impl_block() {
 #[test]
 fn test_encode_paths_includes_module_path_segments() {
     let mut doc = make_doc("domain");
-    doc.types.insert(
+    doc.insert_type(
         TypeName::new("Draft").unwrap(),
-        TypeEntry {
-            action: ItemAction::Add,
-            role: DataRole::value_object(),
-            kind: TypeKindV2::Struct(StructKind::new(
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: vec![], has_stripped_fields: false },
                 None,
             )),
-            methods: vec![],
-
-            module_path: ModulePath::from_segments(vec!["review".to_string()]).unwrap(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        },
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::from_segments(vec!["review".to_string()]).unwrap(),
+            None,
+            vec![],
+            vec![],
+        ),
     );
 
     let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
@@ -311,22 +388,23 @@ fn test_encode_paths_includes_module_path_segments() {
 #[test]
 fn test_encode_paths_crate_root_type_has_two_segment_path() {
     let mut doc = make_doc("domain");
-    doc.types.insert(
+    doc.insert_type(
         TypeName::new("UserId").unwrap(),
-        TypeEntry {
-            action: ItemAction::Add,
-            role: DataRole::value_object(),
-            kind: TypeKindV2::Struct(StructKind::new(
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: vec![], has_stripped_fields: false },
                 None,
             )),
-            methods: vec![],
-
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        },
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
     );
 
     let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
@@ -346,12 +424,12 @@ fn test_encode_paths_crate_root_type_has_two_segment_path() {
 #[test]
 fn test_encode_field_with_generic_type_ref_creates_resolved_path_with_args() {
     let mut doc = make_doc("domain");
-    doc.types.insert(
+    doc.insert_type(
         TypeName::new("Cart").unwrap(),
-        TypeEntry {
-            action: ItemAction::Add,
-            role: DataRole::value_object(),
-            kind: TypeKindV2::Struct(StructKind::new(
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain {
                     fields: vec![FieldDecl::new(
                         FieldName::new("items").unwrap(),
@@ -361,13 +439,14 @@ fn test_encode_field_with_generic_type_ref_creates_resolved_path_with_args() {
                 },
                 None,
             )),
-            methods: vec![],
-
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        },
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
     );
 
     let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
@@ -384,12 +463,12 @@ fn test_encode_field_with_generic_type_ref_creates_resolved_path_with_args() {
 #[test]
 fn test_encode_std_prelude_type_creates_std_external_crate_entry() {
     let mut doc = make_doc("domain");
-    doc.types.insert(
+    doc.insert_type(
         TypeName::new("Foo").unwrap(),
-        TypeEntry {
-            action: ItemAction::Add,
-            role: DataRole::value_object(),
-            kind: TypeKindV2::Struct(StructKind::new(
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain {
                     fields: vec![FieldDecl::new(
                         FieldName::new("name").unwrap(),
@@ -399,13 +478,14 @@ fn test_encode_std_prelude_type_creates_std_external_crate_entry() {
                 },
                 None,
             )),
-            methods: vec![],
-
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        },
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
     );
 
     let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
@@ -420,12 +500,12 @@ fn test_encode_std_prelude_type_creates_std_external_crate_entry() {
 #[test]
 fn test_encode_undeclared_type_ref_field_gets_unresolved_marker_id() {
     let mut doc = make_doc("domain");
-    doc.types.insert(
+    doc.insert_type(
         TypeName::new("Foo").unwrap(),
-        TypeEntry {
-            action: ItemAction::Add,
-            role: DataRole::value_object(),
-            kind: TypeKindV2::Struct(StructKind::new(
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain {
                     fields: vec![FieldDecl::new(
                         FieldName::new("error").unwrap(),
@@ -435,13 +515,14 @@ fn test_encode_undeclared_type_ref_field_gets_unresolved_marker_id() {
                 },
                 None,
             )),
-            methods: vec![],
-
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        },
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
     );
 
     let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
@@ -458,22 +539,23 @@ fn test_encode_undeclared_type_ref_field_gets_unresolved_marker_id() {
 #[test]
 fn test_encode_item_actions_contains_declared_action() {
     let mut doc = make_doc("domain");
-    doc.types.insert(
+    doc.insert_type(
         TypeName::new("Email").unwrap(),
-        TypeEntry {
-            action: ItemAction::Modify,
-            role: DataRole::value_object(),
-            kind: TypeKindV2::Struct(StructKind::new(
+        TypeEntry::new(
+            ItemAction::Modify,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: vec![], has_stripped_fields: false },
                 None,
             )),
-            methods: vec![],
-
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        },
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
     );
 
     let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
@@ -488,24 +570,26 @@ fn test_encode_item_actions_contains_declared_action() {
 #[test]
 fn test_encode_trait_impl_origin_crate_registered_in_external_crates() {
     let mut doc = make_doc("domain");
-    doc.types.insert(
+    doc.insert_type(
         TypeName::new("Foo").unwrap(),
-        TypeEntry {
-            action: ItemAction::Add,
-            role: DataRole::value_object(),
-            kind: TypeKindV2::Struct(StructKind::new(
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: vec![], has_stripped_fields: false },
                 None,
             )),
-            methods: vec![],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        },
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
     );
     // ADR `2026-05-20-0048` D1: trait_impls are top-level on CatalogueDocument.
-    doc.trait_impls.push(TraitImplDeclV2::new(
+    doc.push_trait_impl(TraitImplDeclV2::new(
         TypeRef::new("serde::Serialize").unwrap(),
         TypeRef::new("Foo").unwrap(),
     ));
@@ -522,22 +606,22 @@ fn test_encode_trait_impl_origin_crate_registered_in_external_crates() {
 #[test]
 fn test_encode_trait_entry_produces_trait_item() {
     let mut doc = make_doc("domain");
-    doc.traits.insert(
+    doc.insert_trait(
         TraitName::new("UserRepository").unwrap(),
-        TraitEntry {
-            action: ItemAction::Add,
-            role: ContractRole::SecondaryPort,
-            methods: vec![],
-            assoc_types: vec![],
-            assoc_consts: vec![],
-            supertrait_bounds: vec![],
-            generics: vec![],
-            where_predicates: vec![],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        },
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SecondaryPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
     );
 
     let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
@@ -554,21 +638,20 @@ fn test_encode_trait_entry_produces_trait_item() {
 #[test]
 fn test_encode_type_alias_produces_type_alias_item() {
     let mut doc = make_doc("domain");
-    doc.types.insert(
+    doc.insert_type(
         TypeName::new("UserResult").unwrap(),
-        TypeEntry {
-            action: ItemAction::Add,
-            role: DataRole::value_object(),
-            kind: TypeKindV2::TypeAlias {
-                target: TypeRef::new("Result<User, DomainError>").unwrap(),
-            },
-            methods: vec![],
-
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        },
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::TypeAlias { target: TypeRef::new("Result<User, DomainError>").unwrap() },
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
     );
 
     let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
@@ -602,25 +685,27 @@ fn test_encode_trait_impl_with_generic_args_produces_impl_with_structured_trait_
     // producing `"RenderContractMapError: core::convert::From<CatalogueLoaderError>"` on
     // both the S-side (this codec) and the C-side (rustdoc).
     let mut doc = make_doc("usecase");
-    doc.types.insert(
+    doc.insert_type(
         TypeName::new("RenderContractMapError").unwrap(),
-        TypeEntry {
-            action: ItemAction::Modify,
-            role: DataRole::ErrorType,
-            kind: TypeKindV2::Enum { variants: vec![] },
-            methods: vec![],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        },
+        TypeEntry::new(
+            ItemAction::Modify,
+            DataRole::ErrorType,
+            TypeKindV2::Enum { variants: vec![] },
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
     );
     // ADR `2026-05-20-0048` D1/D2: trait_impls are top-level; generic args in trait_ref string.
-    doc.trait_impls.push(TraitImplDeclV2::new(
+    doc.push_trait_impl(TraitImplDeclV2::new(
         TypeRef::new("core::convert::From<CatalogueLoaderError>").unwrap(),
         TypeRef::new("RenderContractMapError").unwrap(),
     ));
-    doc.trait_impls.push(TraitImplDeclV2::new(
+    doc.push_trait_impl(TraitImplDeclV2::new(
         TypeRef::new("core::convert::From<ContractMapWriterError>").unwrap(),
         TypeRef::new("RenderContractMapError").unwrap(),
     ));
@@ -685,21 +770,23 @@ fn test_encode_trait_impl_without_generic_args_produces_impl_with_qualified_core
     // their canonical qualified form (e.g. `"core::convert::From"`) so S-side must
     // emit the same form to avoid identity-key mismatches.
     let mut doc = make_doc("domain");
-    doc.types.insert(
+    doc.insert_type(
         TypeName::new("SomeError").unwrap(),
-        TypeEntry {
-            action: ItemAction::Add,
-            role: DataRole::ErrorType,
-            kind: TypeKindV2::Enum { variants: vec![] },
-            methods: vec![],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        },
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::ErrorType,
+            TypeKindV2::Enum { variants: vec![] },
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
     );
     // ADR `2026-05-20-0048` D1/D2: trait_impls are top-level; full qualified path in trait_ref.
-    doc.trait_impls.push(TraitImplDeclV2::new(
+    doc.push_trait_impl(TraitImplDeclV2::new(
         TypeRef::new("core::convert::From").unwrap(),
         TypeRef::new("SomeError").unwrap(),
     ));
@@ -732,12 +819,12 @@ fn test_encode_trait_impl_without_generic_args_produces_impl_with_qualified_core
 #[test]
 fn test_encode_enum_struct_variant_produces_named_struct_field_items() {
     let mut doc = make_doc("domain");
-    doc.types.insert(
+    doc.insert_type(
         TypeName::new("ParseError").unwrap(),
-        TypeEntry {
-            action: ItemAction::Add,
-            role: DataRole::ErrorType,
-            kind: TypeKindV2::Enum {
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::ErrorType,
+            TypeKindV2::Enum {
                 variants: vec![VariantDecl::struct_variant(
                     VariantName::new("InvalidToken").unwrap(),
                     vec![FieldDecl::new(
@@ -746,13 +833,14 @@ fn test_encode_enum_struct_variant_produces_named_struct_field_items() {
                     )],
                 )],
             },
-            methods: vec![],
-
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        },
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
     );
 
     let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
@@ -789,22 +877,23 @@ fn test_encode_method_generic_param_type_emits_type_generic() {
         name: ParamName::new("T").unwrap(),
         bounds: vec![TypeRef::new("Into<String>").unwrap()],
     }];
-    doc.types.insert(
+    doc.insert_type(
         TypeName::new("ValueHolder").unwrap(),
-        TypeEntry {
-            action: ItemAction::Add,
-            role: DataRole::value_object(),
-            kind: TypeKindV2::Struct(StructKind::new(
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: vec![], has_stripped_fields: false },
                 None,
             )),
-            methods: vec![method],
-
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        },
+            vec![method],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
     );
 
     let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
@@ -822,6 +911,132 @@ fn test_encode_method_generic_param_type_emits_type_generic() {
     assert!(
         matches!(ty, Type::Generic(g) if g == "T"),
         "expected Type::Generic(\"T\") for generic param type, got: {ty:?}"
+    );
+}
+
+// -----------------------------------------------------------------------
+// ADR 2026-07-02-1345 D6: type-declaration-level generics on struct fields,
+// enum payloads, and alias targets encode as Type::Generic
+// -----------------------------------------------------------------------
+
+/// A plain-struct field whose type is a type-declaration-level generic
+/// (`value: T` in `struct Foo<T> { value: T }`) must encode as
+/// `Type::Generic("T")`, matching rustdoc's C-side. Without the generic wiring it
+/// falls through to an unresolved local-path marker, which surfaces a false
+/// non-Blue signal for a structurally-correct generic struct.
+#[test]
+fn test_encode_struct_field_generic_type_emits_type_generic() {
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        TypeName::new("Holder").unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain {
+                    fields: vec![FieldDecl::new(
+                        FieldName::new("value").unwrap(),
+                        TypeRef::new("T").unwrap(),
+                    )],
+                    has_stripped_fields: false,
+                },
+                None,
+            )),
+            vec![],
+            vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let field = ec.krate().index.values().find(|item| {
+        item.name.as_deref() == Some("value") && matches!(item.inner, ItemEnum::StructField(_))
+    });
+    assert!(field.is_some(), "expected StructField item for 'value'");
+    let ItemEnum::StructField(ref ty) = field.unwrap().inner else {
+        panic!("expected StructField")
+    };
+    assert!(
+        matches!(ty, Type::Generic(g) if g == "T"),
+        "expected Type::Generic(\"T\") for generic struct field, got: {ty:?}"
+    );
+}
+
+/// A tuple-variant payload referencing a type-declaration-level generic
+/// (`Some(T)` in `enum Opt<T> { Some(T) }`) must encode as `Type::Generic("T")`.
+#[test]
+fn test_encode_enum_tuple_variant_payload_generic_emits_type_generic() {
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        TypeName::new("Opt").unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Enum {
+                variants: vec![VariantDecl::tuple(
+                    VariantName::new("Some").unwrap(),
+                    vec![TypeRef::new("T").unwrap()],
+                )],
+            },
+            vec![],
+            vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    // The enum encoding produces exactly one StructField: the variant payload.
+    let field =
+        ec.krate().index.values().find(|item| matches!(item.inner, ItemEnum::StructField(_)));
+    assert!(field.is_some(), "expected a StructField item for the variant payload");
+    let ItemEnum::StructField(ref ty) = field.unwrap().inner else {
+        panic!("expected StructField")
+    };
+    assert!(
+        matches!(ty, Type::Generic(g) if g == "T"),
+        "expected Type::Generic(\"T\") for generic enum payload, got: {ty:?}"
+    );
+}
+
+/// A type-alias target referencing a type-declaration-level generic
+/// (`type Alias<T> = T`) must encode as `Type::Generic("T")`.
+#[test]
+fn test_encode_type_alias_target_generic_emits_type_generic() {
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        TypeName::new("Alias").unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::TypeAlias { target: TypeRef::new("T").unwrap() },
+            vec![],
+            vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let alias = ec.krate().index.values().find(|item| {
+        item.name.as_deref() == Some("Alias") && matches!(item.inner, ItemEnum::TypeAlias(_))
+    });
+    assert!(alias.is_some(), "expected TypeAlias item for 'Alias'");
+    let ItemEnum::TypeAlias(ref ta) = alias.unwrap().inner else { panic!("expected TypeAlias") };
+    assert!(
+        matches!(&ta.type_, Type::Generic(g) if g == "T"),
+        "expected alias target Type::Generic(\"T\"), got: {:?}",
+        ta.type_
     );
 }
 
@@ -844,22 +1059,22 @@ fn test_encode_trait_method_with_has_default_impl_true_produces_has_body_true() 
         None,
     );
     method.has_default_impl = true;
-    doc.traits.insert(
+    doc.insert_trait(
         TraitName::new("Describable").unwrap(),
-        TraitEntry {
-            action: ItemAction::Add,
-            role: ContractRole::SpecificationPort,
-            methods: vec![method],
-            assoc_types: vec![],
-            assoc_consts: vec![],
-            supertrait_bounds: vec![],
-            generics: vec![],
-            where_predicates: vec![],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        },
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SpecificationPort,
+            vec![method],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
     );
 
     let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
@@ -894,22 +1109,22 @@ fn test_encode_trait_method_with_has_default_impl_false_produces_has_body_false(
     );
     // has_default_impl defaults to false via MethodDeclaration::new.
     assert!(!method.has_default_impl);
-    doc.traits.insert(
+    doc.insert_trait(
         TraitName::new("RequiredOps").unwrap(),
-        TraitEntry {
-            action: ItemAction::Add,
-            role: ContractRole::SpecificationPort,
-            methods: vec![method],
-            assoc_types: vec![],
-            assoc_consts: vec![],
-            supertrait_bounds: vec![],
-            generics: vec![],
-            where_predicates: vec![],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        },
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SpecificationPort,
+            vec![method],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
     );
 
     let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
@@ -946,22 +1161,23 @@ fn test_encode_inherent_method_always_has_body_true_regardless_of_has_default_im
         None,
     );
     assert!(!method.has_default_impl);
-    doc.types.insert(
+    doc.insert_type(
         TypeName::new("Calculator").unwrap(),
-        TypeEntry {
-            action: ItemAction::Add,
-            role: DataRole::value_object(),
-            kind: TypeKindV2::Struct(StructKind::new(
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: vec![], has_stripped_fields: false },
                 None,
             )),
-            methods: vec![method],
-
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        },
+            vec![method],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
     );
 
     let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
@@ -998,25 +1214,22 @@ fn test_encode_function_with_generics_emits_type_generic_in_signature() {
     let mut doc = make_doc("domain");
     let crate_n = CrateName::new("domain").unwrap();
     let fn_path = FunctionPath::at_root(crate_n, FunctionName::new("generic_fn").unwrap());
-    let entry = FunctionEntry {
-        action: ItemAction::Add,
-        role: FunctionRole::FreeFunction,
-        params: vec![ParamDeclaration::new(
-            ParamName::new("value").unwrap(),
-            TypeRef::new("T").unwrap(),
-        )],
-        returns: TypeRef::new("T").unwrap(),
-        is_async: false,
-        generics: vec![MethodGenericParam {
+    let entry = FunctionEntry::new(
+        ItemAction::Add,
+        FunctionRole::FreeFunction,
+        vec![ParamDeclaration::new(ParamName::new("value").unwrap(), TypeRef::new("T").unwrap())],
+        TypeRef::new("T").unwrap(),
+        false,
+        vec![MethodGenericParam {
             name: ParamName::new("T").unwrap(),
             bounds: vec![TypeRef::new("Clone").unwrap()],
         }],
-        where_predicates: vec![],
-        docs: None,
-        spec_refs: vec![],
-        informal_grounds: vec![],
-    };
-    doc.functions.insert(fn_path, entry);
+        vec![],
+        None,
+        vec![],
+        vec![],
+    );
+    doc.insert_function(fn_path, entry);
 
     let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
     let fn_item = ec
@@ -1063,19 +1276,19 @@ fn test_encode_function_without_generics_emits_empty_generics() {
     let mut doc = make_doc("domain");
     let crate_n = CrateName::new("domain").unwrap();
     let fn_path = FunctionPath::at_root(crate_n, FunctionName::new("simple").unwrap());
-    let entry = FunctionEntry {
-        action: ItemAction::Add,
-        role: FunctionRole::FreeFunction,
-        params: vec![],
-        returns: TypeRef::new("()").unwrap(),
-        is_async: false,
-        generics: vec![],
-        where_predicates: vec![],
-        docs: None,
-        spec_refs: vec![],
-        informal_grounds: vec![],
-    };
-    doc.functions.insert(fn_path, entry);
+    let entry = FunctionEntry::new(
+        ItemAction::Add,
+        FunctionRole::FreeFunction,
+        vec![],
+        TypeRef::new("()").unwrap(),
+        false,
+        vec![],
+        vec![],
+        None,
+        vec![],
+        vec![],
+    );
+    doc.insert_function(fn_path, entry);
 
     let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
     let fn_item = ec
@@ -1110,26 +1323,26 @@ fn test_encode_function_with_use_capture_bound_in_where_predicate_succeeds() {
     let mut doc = make_doc("domain");
     let crate_n = CrateName::new("domain").unwrap();
     let fn_path = FunctionPath::at_root(crate_n, FunctionName::new("ok_use").unwrap());
-    let entry = FunctionEntry {
-        action: ItemAction::Add,
-        role: FunctionRole::FreeFunction,
-        params: vec![],
-        returns: TypeRef::new("()").unwrap(),
-        is_async: false,
-        generics: vec![
+    let entry = FunctionEntry::new(
+        ItemAction::Add,
+        FunctionRole::FreeFunction,
+        vec![],
+        TypeRef::new("()").unwrap(),
+        false,
+        vec![
             MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] },
             MethodGenericParam { name: ParamName::new("U").unwrap(), bounds: vec![] },
         ],
-        where_predicates: vec![WherePredicateDecl {
+        vec![WherePredicateDecl {
             lhs: TypeRef::new("T").unwrap(),
             rhs: vec![TypeRef::new("use<U>").unwrap()],
             operator: BoundOp::Bound,
         }],
-        docs: None,
-        spec_refs: vec![],
-        informal_grounds: vec![],
-    };
-    doc.functions.insert(fn_path, entry);
+        None,
+        vec![],
+        vec![],
+    );
+    doc.insert_function(fn_path, entry);
 
     let result = CatalogueToExtendedCrateCodec::new().encode(doc);
     assert!(
@@ -1153,27 +1366,27 @@ fn test_encode_function_with_use_capture_bound_with_space_succeeds() {
     let mut doc = make_doc("domain");
     let crate_n = CrateName::new("domain").unwrap();
     let fn_path = FunctionPath::at_root(crate_n, FunctionName::new("ok_use_space").unwrap());
-    let entry = FunctionEntry {
-        action: ItemAction::Add,
-        role: FunctionRole::FreeFunction,
-        params: vec![],
-        returns: TypeRef::new("()").unwrap(),
-        is_async: false,
-        generics: vec![
+    let entry = FunctionEntry::new(
+        ItemAction::Add,
+        FunctionRole::FreeFunction,
+        vec![],
+        TypeRef::new("()").unwrap(),
+        false,
+        vec![
             MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] },
             MethodGenericParam { name: ParamName::new("U").unwrap(), bounds: vec![] },
         ],
-        where_predicates: vec![WherePredicateDecl {
+        vec![WherePredicateDecl {
             lhs: TypeRef::new("T").unwrap(),
             // Precise-capture with whitespace between `use` and `<`.
             rhs: vec![TypeRef::new("use <U>").unwrap()],
             operator: BoundOp::Bound,
         }],
-        docs: None,
-        spec_refs: vec![],
-        informal_grounds: vec![],
-    };
-    doc.functions.insert(fn_path, entry);
+        None,
+        vec![],
+        vec![],
+    );
+    doc.insert_function(fn_path, entry);
 
     let result = CatalogueToExtendedCrateCodec::new().encode(doc);
     assert!(
@@ -1199,24 +1412,24 @@ fn test_encode_function_with_qualified_path_lhs_in_where_predicate_succeeds() {
     let mut doc = make_doc("domain");
     let crate_n = CrateName::new("domain").unwrap();
     let fn_path = FunctionPath::at_root(crate_n, FunctionName::new("qpath_lhs_fn").unwrap());
-    let entry = FunctionEntry {
-        action: ItemAction::Add,
-        role: FunctionRole::FreeFunction,
-        params: vec![],
-        returns: TypeRef::new("()").unwrap(),
-        is_async: false,
-        generics: vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
-        where_predicates: vec![WherePredicateDecl {
+    let entry = FunctionEntry::new(
+        ItemAction::Add,
+        FunctionRole::FreeFunction,
+        vec![],
+        TypeRef::new("()").unwrap(),
+        false,
+        vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
+        vec![WherePredicateDecl {
             // Qualified-path LHS: `<T as Iterator>::Item` — syn-parseable, accepted permissively.
             lhs: TypeRef::new("<T as Iterator>::Item").unwrap(),
             rhs: vec![TypeRef::new("Clone").unwrap()],
             operator: BoundOp::Bound,
         }],
-        docs: None,
-        spec_refs: vec![],
-        informal_grounds: vec![],
-    };
-    doc.functions.insert(fn_path, entry);
+        None,
+        vec![],
+        vec![],
+    );
+    doc.insert_function(fn_path, entry);
 
     // Permissive: encoding must succeed (no shape validation rejection).
     let result = CatalogueToExtendedCrateCodec::new().encode(doc);
@@ -1247,25 +1460,25 @@ fn test_encode_function_with_explicit_where_predicate_emits_bound_predicate() {
     let mut doc = make_doc("domain");
     let crate_n = CrateName::new("domain").unwrap();
     let fn_path = FunctionPath::at_root(crate_n, FunctionName::new("where_fn").unwrap());
-    let entry = FunctionEntry {
-        action: ItemAction::Add,
-        role: FunctionRole::FreeFunction,
-        params: vec![],
-        returns: TypeRef::new("()").unwrap(),
-        is_async: false,
+    let entry = FunctionEntry::new(
+        ItemAction::Add,
+        FunctionRole::FreeFunction,
+        vec![],
+        TypeRef::new("()").unwrap(),
+        false,
         // generic param `T` with no inline bounds
-        generics: vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
+        vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
         // explicit where predicate: `where T: Clone`
-        where_predicates: vec![WherePredicateDecl {
+        vec![WherePredicateDecl {
             lhs: TypeRef::new("T").unwrap(),
             rhs: vec![TypeRef::new("Clone").unwrap()],
             operator: BoundOp::Bound,
         }],
-        docs: None,
-        spec_refs: vec![],
-        informal_grounds: vec![],
-    };
-    doc.functions.insert(fn_path, entry);
+        None,
+        vec![],
+        vec![],
+    );
+    doc.insert_function(fn_path, entry);
 
     let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
     let fn_item = ec
@@ -1324,24 +1537,24 @@ fn test_encode_function_with_non_trivial_lhs_where_predicate_emits_bound_predica
     let mut doc = make_doc("domain");
     let crate_n = CrateName::new("domain").unwrap();
     let fn_path = FunctionPath::at_root(crate_n, FunctionName::new("vec_where_fn").unwrap());
-    let entry = FunctionEntry {
-        action: ItemAction::Add,
-        role: FunctionRole::FreeFunction,
-        params: vec![],
-        returns: TypeRef::new("()").unwrap(),
-        is_async: false,
-        generics: vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
+    let entry = FunctionEntry::new(
+        ItemAction::Add,
+        FunctionRole::FreeFunction,
+        vec![],
+        TypeRef::new("()").unwrap(),
+        false,
+        vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
         // explicit where predicate: `where Vec<T>: Clone` — non-trivial LHS
-        where_predicates: vec![WherePredicateDecl {
+        vec![WherePredicateDecl {
             lhs: TypeRef::new("Vec<T>").unwrap(),
             rhs: vec![TypeRef::new("Clone").unwrap()],
             operator: BoundOp::Bound,
         }],
-        docs: None,
-        spec_refs: vec![],
-        informal_grounds: vec![],
-    };
-    doc.functions.insert(fn_path, entry);
+        None,
+        vec![],
+        vec![],
+    );
+    doc.insert_function(fn_path, entry);
 
     let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
     let fn_item = ec
@@ -1389,24 +1602,24 @@ fn test_encode_function_with_equal_where_predicate_emits_eq_predicate() {
     let mut doc = make_doc("domain");
     let crate_n = CrateName::new("domain").unwrap();
     let fn_path = FunctionPath::at_root(crate_n, FunctionName::new("eq_where_fn").unwrap());
-    let entry = FunctionEntry {
-        action: ItemAction::Add,
-        role: FunctionRole::FreeFunction,
-        params: vec![],
-        returns: TypeRef::new("()").unwrap(),
-        is_async: false,
-        generics: vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
+    let entry = FunctionEntry::new(
+        ItemAction::Add,
+        FunctionRole::FreeFunction,
+        vec![],
+        TypeRef::new("()").unwrap(),
+        false,
+        vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
         // explicit where predicate: `where T::Assoc = u32` (Equal operator)
-        where_predicates: vec![WherePredicateDecl {
+        vec![WherePredicateDecl {
             lhs: TypeRef::new("T::Assoc").unwrap(),
             rhs: vec![TypeRef::new("u32").unwrap()],
             operator: BoundOp::Equal,
         }],
-        docs: None,
-        spec_refs: vec![],
-        informal_grounds: vec![],
-    };
-    doc.functions.insert(fn_path, entry);
+        None,
+        vec![],
+        vec![],
+    );
+    doc.insert_function(fn_path, entry);
 
     let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
     let fn_item = ec
@@ -1453,24 +1666,24 @@ fn test_encode_function_with_equal_predicate_multiple_rhs_returns_error() {
     let mut doc = make_doc("domain");
     let crate_n = CrateName::new("domain").unwrap();
     let fn_path = FunctionPath::at_root(crate_n, FunctionName::new("bad_eq_fn").unwrap());
-    let entry = FunctionEntry {
-        action: ItemAction::Add,
-        role: FunctionRole::FreeFunction,
-        params: vec![],
-        returns: TypeRef::new("()").unwrap(),
-        is_async: false,
-        generics: vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
+    let entry = FunctionEntry::new(
+        ItemAction::Add,
+        FunctionRole::FreeFunction,
+        vec![],
+        TypeRef::new("()").unwrap(),
+        false,
+        vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
         // Invalid: Equal with two RHS entries.
-        where_predicates: vec![WherePredicateDecl {
+        vec![WherePredicateDecl {
             lhs: TypeRef::new("T::Assoc").unwrap(),
             rhs: vec![TypeRef::new("u32").unwrap(), TypeRef::new("String").unwrap()],
             operator: BoundOp::Equal,
         }],
-        docs: None,
-        spec_refs: vec![],
-        informal_grounds: vec![],
-    };
-    doc.functions.insert(fn_path, entry);
+        None,
+        vec![],
+        vec![],
+    );
+    doc.insert_function(fn_path, entry);
 
     let result = CatalogueToExtendedCrateCodec::new().encode(doc);
     assert!(
@@ -1497,24 +1710,24 @@ fn test_encode_function_with_equal_predicate_bare_type_param_lhs_succeeds() {
     let mut doc = make_doc("domain");
     let crate_n = CrateName::new("domain").unwrap();
     let fn_path = FunctionPath::at_root(crate_n, FunctionName::new("bare_lhs_eq_fn").unwrap());
-    let entry = FunctionEntry {
-        action: ItemAction::Add,
-        role: FunctionRole::FreeFunction,
-        params: vec![],
-        returns: TypeRef::new("()").unwrap(),
-        is_async: false,
-        generics: vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
+    let entry = FunctionEntry::new(
+        ItemAction::Add,
+        FunctionRole::FreeFunction,
+        vec![],
+        TypeRef::new("()").unwrap(),
+        false,
+        vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
         // Permissive: bare type parameter as Equal-predicate LHS (`where T = u32`).
-        where_predicates: vec![WherePredicateDecl {
+        vec![WherePredicateDecl {
             lhs: TypeRef::new("T").unwrap(),
             rhs: vec![TypeRef::new("u32").unwrap()],
             operator: BoundOp::Equal,
         }],
-        docs: None,
-        spec_refs: vec![],
-        informal_grounds: vec![],
-    };
-    doc.functions.insert(fn_path, entry);
+        None,
+        vec![],
+        vec![],
+    );
+    doc.insert_function(fn_path, entry);
 
     let ec = CatalogueToExtendedCrateCodec::new()
         .encode(doc)
@@ -1564,13 +1777,13 @@ fn test_encode_function_with_lifetime_bound_static_succeeds() {
     let crate_n = CrateName::new("domain").unwrap();
     let fn_path = FunctionPath::at_root(crate_n, FunctionName::new("lifetime_bound_fn").unwrap());
     // `<F: Fn() + Send + Sync + 'static>` — inline bounds include a lifetime bound.
-    let entry = FunctionEntry {
-        action: ItemAction::Add,
-        role: FunctionRole::FreeFunction,
-        params: vec![],
-        returns: TypeRef::new("()").unwrap(),
-        is_async: false,
-        generics: vec![MethodGenericParam {
+    let entry = FunctionEntry::new(
+        ItemAction::Add,
+        FunctionRole::FreeFunction,
+        vec![],
+        TypeRef::new("()").unwrap(),
+        false,
+        vec![MethodGenericParam {
             name: ParamName::new("F").unwrap(),
             bounds: vec![
                 TypeRef::new("Fn()").unwrap(),
@@ -1580,12 +1793,12 @@ fn test_encode_function_with_lifetime_bound_static_succeeds() {
                 TypeRef::new("'static").unwrap(),
             ],
         }],
-        where_predicates: vec![],
-        docs: None,
-        spec_refs: vec![],
-        informal_grounds: vec![],
-    };
-    doc.functions.insert(fn_path, entry);
+        vec![],
+        None,
+        vec![],
+        vec![],
+    );
+    doc.insert_function(fn_path, entry);
 
     let result = CatalogueToExtendedCrateCodec::new().encode(doc);
     assert!(
@@ -1642,23 +1855,23 @@ fn test_encode_function_with_lifetime_bound_named_succeeds() {
     let crate_n = CrateName::new("domain").unwrap();
     let fn_path =
         FunctionPath::at_root(crate_n, FunctionName::new("named_lifetime_bound_fn").unwrap());
-    let entry = FunctionEntry {
-        action: ItemAction::Add,
-        role: FunctionRole::FreeFunction,
-        params: vec![],
-        returns: TypeRef::new("()").unwrap(),
-        is_async: false,
+    let entry = FunctionEntry::new(
+        ItemAction::Add,
+        FunctionRole::FreeFunction,
+        vec![],
+        TypeRef::new("()").unwrap(),
+        false,
         // `<T: Clone + 'a>` — named lifetime bound.
-        generics: vec![MethodGenericParam {
+        vec![MethodGenericParam {
             name: ParamName::new("T").unwrap(),
             bounds: vec![TypeRef::new("Clone").unwrap(), TypeRef::new("'a").unwrap()],
         }],
-        where_predicates: vec![],
-        docs: None,
-        spec_refs: vec![],
-        informal_grounds: vec![],
-    };
-    doc.functions.insert(fn_path, entry);
+        vec![],
+        None,
+        vec![],
+        vec![],
+    );
+    doc.insert_function(fn_path, entry);
 
     let result = CatalogueToExtendedCrateCodec::new().encode(doc);
     assert!(
@@ -1712,23 +1925,23 @@ fn test_encode_function_with_hrtb_trait_bound_succeeds() {
     let mut doc = make_doc("domain");
     let crate_n = CrateName::new("domain").unwrap();
     let fn_path = FunctionPath::at_root(crate_n, FunctionName::new("hrtb_bound_fn").unwrap());
-    let entry = FunctionEntry {
-        action: ItemAction::Add,
-        role: FunctionRole::FreeFunction,
-        params: vec![],
-        returns: TypeRef::new("()").unwrap(),
-        is_async: false,
+    let entry = FunctionEntry::new(
+        ItemAction::Add,
+        FunctionRole::FreeFunction,
+        vec![],
+        TypeRef::new("()").unwrap(),
+        false,
         // `<F: for<'a> Fn(&'a ())>` — HRTB on inline bound.
-        generics: vec![MethodGenericParam {
+        vec![MethodGenericParam {
             name: ParamName::new("F").unwrap(),
             bounds: vec![TypeRef::new("for<'a> Fn(&'a ())").unwrap()],
         }],
-        where_predicates: vec![],
-        docs: None,
-        spec_refs: vec![],
-        informal_grounds: vec![],
-    };
-    doc.functions.insert(fn_path, entry);
+        vec![],
+        None,
+        vec![],
+        vec![],
+    );
+    doc.insert_function(fn_path, entry);
 
     let result = CatalogueToExtendedCrateCodec::new().encode(doc);
     assert!(
@@ -1795,22 +2008,22 @@ fn test_trait_decl_generics_encoded_correctly() {
         operator: domain::tddd::catalogue_v2::BoundOp::Bound,
         rhs: vec![TypeRef::new("Send").unwrap()],
     };
-    doc.traits.insert(
+    doc.insert_trait(
         TraitName::new("MyTrait").unwrap(),
-        TraitEntry {
-            action: ItemAction::Add,
-            role: ContractRole::SpecificationPort,
-            methods: vec![],
-            assoc_types: vec![],
-            assoc_consts: vec![],
-            supertrait_bounds: vec![],
-            generics: vec![method_generic],
-            where_predicates: vec![where_pred],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        },
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SpecificationPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![method_generic],
+            vec![where_pred],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
     );
 
     let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
@@ -1897,23 +2110,25 @@ fn test_trait_impl_block_generics_encoded_correctly() {
         rhs: vec![TypeRef::new("Send").unwrap()],
     }];
 
-    doc.types.insert(
+    doc.insert_type(
         TypeName::new("Foo").unwrap(),
-        TypeEntry {
-            action: ItemAction::Add,
-            role: DataRole::value_object(),
-            kind: TypeKindV2::Struct(StructKind::new(
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: vec![], has_stripped_fields: false },
                 None,
             )),
-            methods: vec![],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        },
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
     );
-    doc.trait_impls.push(trait_impl);
+    doc.push_trait_impl(trait_impl);
 
     let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
     let krate = ec.krate();
@@ -1957,45 +2172,47 @@ fn test_trait_impl_block_generics_encoded_correctly() {
 #[test]
 fn test_trait_impl_for_type_generic_shadows_same_named_local_type() {
     let mut doc = make_doc("domain");
-    doc.types.insert(
+    doc.insert_type(
         TypeName::new("T").unwrap(),
-        TypeEntry {
-            action: ItemAction::Add,
-            role: DataRole::value_object(),
-            kind: TypeKindV2::Struct(StructKind::new(
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: vec![], has_stripped_fields: false },
                 None,
             )),
-            methods: vec![],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        },
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
     );
-    doc.traits.insert(
+    doc.insert_trait(
         TraitName::new("Port").unwrap(),
-        TraitEntry {
-            action: ItemAction::Add,
-            role: ContractRole::SpecificationPort,
-            methods: vec![],
-            assoc_types: vec![],
-            assoc_consts: vec![],
-            supertrait_bounds: vec![],
-            generics: vec![],
-            where_predicates: vec![],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        },
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SpecificationPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
     );
 
     let mut trait_impl =
         TraitImplDeclV2::new(TypeRef::new("Port").unwrap(), TypeRef::new("T").unwrap());
     trait_impl.impl_generics =
         vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }];
-    doc.trait_impls.push(trait_impl);
+    doc.push_trait_impl(trait_impl);
 
     let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
     let trait_impl_item = ec
@@ -2030,26 +2247,27 @@ fn test_inherent_impl_block_generics_encoded_correctly() {
     let mut doc = make_doc("domain");
 
     // Register the type "Bar" so the impl block can reference it.
-    doc.types.insert(
+    doc.insert_type(
         TypeName::new("Bar").unwrap(),
-        TypeEntry {
-            action: ItemAction::Add,
-            role: DataRole::value_object(),
-            kind: TypeKindV2::Struct(StructKind::new(
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: vec![], has_stripped_fields: false },
                 None,
             )),
-            methods: vec![],
-
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        },
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
     );
 
     // InherentImplDeclV2 with impl_generics: [L, R, W].
-    doc.inherent_impls.push(InherentImplDeclV2 {
+    doc.push_inherent_impl(InherentImplDeclV2 {
         type_name: TypeName::new("Bar").unwrap(),
         impl_generics: vec![
             MethodGenericParam {
@@ -2166,22 +2384,22 @@ fn test_inherent_impl_block_generics_encoded_correctly() {
 #[test]
 fn test_existing_catalogue_no_change_in_signal_for_trait_no_generics() {
     let mut doc = make_doc("domain");
-    doc.traits.insert(
+    doc.insert_trait(
         TraitName::new("MyPort").unwrap(),
-        TraitEntry {
-            action: ItemAction::Add,
-            role: ContractRole::SpecificationPort,
-            methods: vec![],
-            assoc_types: vec![],
-            assoc_consts: vec![],
-            supertrait_bounds: vec![],
-            generics: vec![],         // empty = old catalogue
-            where_predicates: vec![], // empty = old catalogue
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        },
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SpecificationPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![], // generics empty = old catalogue
+            vec![], // where_predicates empty = old catalogue
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
     );
 
     let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
@@ -2212,33 +2430,30 @@ fn test_existing_catalogue_no_change_in_signal_for_trait_no_generics() {
 #[test]
 fn test_trait_assoc_items_encode_trait_generic_projection_types() {
     let mut doc = make_doc("domain");
-    doc.traits.insert(
+    doc.insert_trait(
         TraitName::new("ProjectionPort").unwrap(),
-        TraitEntry {
-            action: ItemAction::Add,
-            role: ContractRole::SpecificationPort,
-            methods: vec![],
-            assoc_types: vec![AssocTypeDecl {
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SpecificationPort,
+            vec![],
+            vec![AssocTypeDecl {
                 name: TypeName::new("Output").unwrap(),
                 bounds: vec![],
                 default: Some(TypeRef::new("Vec<T::Item>").unwrap()),
             }],
-            assoc_consts: vec![AssocConstDecl {
+            vec![AssocConstDecl {
                 name: AssocConstName::new("ID").unwrap(),
                 ty: TypeRef::new("<T as Iterator>::Item").unwrap(),
                 default_value: None,
             }],
-            supertrait_bounds: vec![],
-            generics: vec![MethodGenericParam {
-                name: ParamName::new("T").unwrap(),
-                bounds: vec![],
-            }],
-            where_predicates: vec![],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        },
+            vec![],
+            vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
     );
 
     let encoded = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
@@ -2296,29 +2511,26 @@ fn test_trait_assoc_items_encode_trait_generic_projection_types() {
 #[test]
 fn test_trait_assoc_items_reject_invalid_trait_generic_projection_name() {
     let mut doc = make_doc("domain");
-    doc.traits.insert(
+    doc.insert_trait(
         TraitName::new("InvalidProjectionPort").unwrap(),
-        TraitEntry {
-            action: ItemAction::Add,
-            role: ContractRole::SpecificationPort,
-            methods: vec![],
-            assoc_types: vec![AssocTypeDecl {
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SpecificationPort,
+            vec![],
+            vec![AssocTypeDecl {
                 name: TypeName::new("Output").unwrap(),
                 bounds: vec![],
                 default: Some(TypeRef::new("T::Item-foo").unwrap()),
             }],
-            assoc_consts: vec![],
-            supertrait_bounds: vec![],
-            generics: vec![MethodGenericParam {
-                name: ParamName::new("T").unwrap(),
-                bounds: vec![],
-            }],
-            where_predicates: vec![],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        },
+            vec![],
+            vec![],
+            vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
     );
 
     let result = CatalogueToExtendedCrateCodec::new().encode(doc);
@@ -2331,26 +2543,26 @@ fn test_trait_assoc_items_reject_invalid_trait_generic_projection_name() {
 #[test]
 fn test_trait_assoc_items_resolve_external_ids_inside_explicit_qualified_paths() {
     let mut doc = make_doc("domain");
-    doc.traits.insert(
+    doc.insert_trait(
         TraitName::new("ExternalProjectionPort").unwrap(),
-        TraitEntry {
-            action: ItemAction::Add,
-            role: ContractRole::SpecificationPort,
-            methods: vec![],
-            assoc_types: vec![],
-            assoc_consts: vec![AssocConstDecl {
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SpecificationPort,
+            vec![],
+            vec![],
+            vec![AssocConstDecl {
                 name: AssocConstName::new("EXTERNAL").unwrap(),
                 ty: TypeRef::new("<ext::Foo as ext::Trait>::Assoc").unwrap(),
                 default_value: None,
             }],
-            supertrait_bounds: vec![],
-            generics: vec![],
-            where_predicates: vec![],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        },
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
     );
 
     let encoded = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
@@ -2438,13 +2650,13 @@ fn test_trait_assoc_items_rewrite_nested_trait_generic_projections() {
     }
 
     let mut doc = make_doc("domain");
-    doc.traits.insert(
+    doc.insert_trait(
         TraitName::new("NestedProjectionPort").unwrap(),
-        TraitEntry {
-            action: ItemAction::Add,
-            role: ContractRole::SpecificationPort,
-            methods: vec![],
-            assoc_types: vec![
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SpecificationPort,
+            vec![],
+            vec![
                 AssocTypeDecl {
                     name: TypeName::new("FnOutput").unwrap(),
                     bounds: vec![],
@@ -2471,18 +2683,18 @@ fn test_trait_assoc_items_rewrite_nested_trait_generic_projections() {
                     default: None,
                 },
             ],
-            assoc_consts: vec![],
-            supertrait_bounds: vec![],
-            generics: vec![
+            vec![],
+            vec![],
+            vec![
                 MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] },
                 MethodGenericParam { name: ParamName::new("From").unwrap(), bounds: vec![] },
             ],
-            where_predicates: vec![],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        },
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
     );
 
     let encoded = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
@@ -2561,5 +2773,67 @@ fn test_trait_assoc_items_rewrite_nested_trait_generic_projections() {
         shadowed_item_type,
         &Type::Generic("From".to_string()),
         "trait generic `From` must shadow the std prelude trait in assoc type bounds"
+    );
+}
+
+/// ADR `2026-07-02-1345` D6: a `TypeEntry`'s declared `generics` / `where_predicates`
+/// must be encoded into the A-side rustdoc `Struct.generics` so the signal comparator
+/// observes the declared values. They must NOT be silently dropped (the old
+/// `empty_generics()` behaviour) — that is exactly the "silent drop / substitution to
+/// another declaration level" D6 forbids.
+#[test]
+fn test_encode_struct_declared_generics_reach_rustdoc_generics() {
+    use domain::tddd::catalogue_v2::methods::{BoundOp, WherePredicateDecl};
+
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        TypeName::new("Container").unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                None,
+            )),
+            vec![],
+            vec![MethodGenericParam {
+                name: ParamName::new("T").unwrap(),
+                bounds: vec![TypeRef::new("Clone").unwrap()],
+            }],
+            vec![WherePredicateDecl {
+                lhs: TypeRef::new("T").unwrap(),
+                rhs: vec![TypeRef::new("Send").unwrap()],
+                operator: BoundOp::Bound,
+            }],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let a = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let krate = a.krate();
+    let struct_inner = krate
+        .index
+        .values()
+        .find_map(|item| match &item.inner {
+            ItemEnum::Struct(s) => Some(s),
+            _ => None,
+        })
+        .expect("encoded Container struct must be present in the index");
+
+    // Declared generic param `T` reaches the rustdoc struct generics (not empty).
+    assert_eq!(
+        struct_inner.generics.params.len(),
+        1,
+        "declared struct generic param must be encoded, not dropped"
+    );
+    assert_eq!(struct_inner.generics.params[0].name, "T");
+    // Declared bounds land in the maximally-desugared where form (symmetric with the
+    // trait / function encoders' `build_where_form_generics`).
+    assert!(
+        !struct_inner.generics.where_predicates.is_empty(),
+        "declared struct where-predicate / bound must be encoded, not dropped"
     );
 }

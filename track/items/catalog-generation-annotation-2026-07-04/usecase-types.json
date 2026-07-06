@@ -1,0 +1,489 @@
+{
+  "schema_version": 5,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {
+    "CatalogCheckVerdict": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Pass",    "payload": { "kind": "unit" } },
+          { "name": "Blocked", "payload": { "kind": "unit" } },
+          { "name": "Skipped", "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "catalog_gen",
+      "docs": "Closed enum of the three check verdicts (Pass, Blocked, Skipped). See IN-06, AC-11.",
+      "spec_refs": [
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-06" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-11" }
+      ],
+      "informal_grounds": []
+    },
+    "CatalogAddCommand": {
+      "action": "add",
+      "role": { "Command": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "layer",                 "ty": "domain::tddd::LayerId" },
+            { "name": "kind",                  "ty": "domain::tddd::catalog_gen::CatalogEntryKind" },
+            { "name": "name",                  "ty": "String" },
+            { "name": "role",                  "ty": "String" },
+            { "name": "anchors",               "ty": "Vec<String>" },
+            { "name": "fields",                "ty": "Vec<String>" },
+            { "name": "methods",               "ty": "Vec<String>" },
+            { "name": "variants",              "ty": "Vec<String>" },
+            { "name": "trait_impls",           "ty": "Vec<String>" },
+            { "name": "inherent_methods",      "ty": "Vec<String>" },
+            { "name": "generics",              "ty": "Vec<String>" },
+            { "name": "where_predicates",      "ty": "Vec<String>" },
+            { "name": "impl_generics",         "ty": "Vec<String>" },
+            { "name": "impl_where_predicates", "ty": "Vec<String>" },
+            { "name": "inherent_impl_generics", "ty": "Vec<String>" },
+            { "name": "inherent_impl_where_predicates", "ty": "Vec<String>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "catalog_gen",
+      "docs": "Usecase command DTO for catalog add. See IN-03, IN-08, IN-09, AC-03, AC-07.",
+      "spec_refs": [
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-03" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-08" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-09" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-03" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-07" }
+      ],
+      "informal_grounds": []
+    },
+    "CatalogImportCommand": {
+      "action": "add",
+      "role": { "Command": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "layer",     "ty": "domain::tddd::LayerId" },
+            { "name": "type_path", "ty": "String" },
+            { "name": "action",    "ty": "domain::tddd::catalog_gen::CatalogImportAction" },
+            { "name": "anchors",   "ty": "Vec<String>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "catalog_gen",
+      "docs": "Usecase command DTO for catalog import. See IN-04, AC-04.",
+      "spec_refs": [
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-04" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-04" }
+      ],
+      "informal_grounds": []
+    },
+    "CatalogCiteCommand": {
+      "action": "add",
+      "role": { "Command": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "layer",   "ty": "domain::tddd::LayerId" },
+            { "name": "entry",   "ty": "String" },
+            { "name": "anchors", "ty": "Vec<String>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "catalog_gen",
+      "docs": "Usecase command DTO for catalog cite. See IN-05, AC-06.",
+      "spec_refs": [
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-05" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-06" }
+      ],
+      "informal_grounds": []
+    },
+    "CatalogCheckQuery": {
+      "action": "add",
+      "role": { "Query": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "layer", "ty": "Option<domain::tddd::LayerId>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "catalog_gen",
+      "docs": "Query DTO carrying an optional layer. See IN-06, AC-11.",
+      "spec_refs": [
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-06" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-11" }
+      ],
+      "informal_grounds": []
+    },
+    "CatalogInitReport": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "created_files", "ty": "Vec<String>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "catalog_gen",
+      "docs": "DTO carrying the created file paths. See IN-02, AC-02.",
+      "spec_refs": [
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-02" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-02" }
+      ],
+      "informal_grounds": []
+    },
+    "CatalogWriteReport": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "file_path", "ty": "String" },
+            { "name": "entry_key", "ty": "String" },
+            { "name": "holes",     "ty": "Vec<domain::tddd::catalog_gen::DraftHole>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "catalog_gen",
+      "docs": "DTO carrying file_path, entry_key, and a Vec of DraftHole. See IN-03, IN-07, AC-03, AC-05.",
+      "spec_refs": [
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-03" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-07" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-03" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-05" }
+      ],
+      "informal_grounds": []
+    },
+    "CatalogCheckReport": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "verdict",         "ty": "CatalogCheckVerdict" },
+            { "name": "findings",        "ty": "Vec<String>" },
+            { "name": "remaining_holes", "ty": "Vec<domain::tddd::catalog_gen::DraftHole>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "catalog_gen",
+      "docs": "DTO carrying a verdict, findings, and remaining holes. See IN-06, AC-11.",
+      "spec_refs": [
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-06" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-11" }
+      ],
+      "informal_grounds": []
+    },
+    "CatalogError": {
+      "action": "add",
+      "role": { "ErrorType": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "FileExists",      "payload": { "kind": "struct", "fields": [{ "name": "path",      "ty": "std::path::PathBuf" }] } },
+          { "name": "FileMissing",     "payload": { "kind": "struct", "fields": [{ "name": "path",      "ty": "std::path::PathBuf" }] } },
+          { "name": "DuplicateEntry",  "payload": { "kind": "struct", "fields": [{ "name": "entry_key", "ty": "domain::tddd::catalog_gen::CatalogEntryName" }] } },
+          { "name": "AnchorNotFound",  "payload": { "kind": "struct", "fields": [{ "name": "anchor",    "ty": "domain::plan_ref::SpecElementId" }] } },
+          { "name": "InvalidRole",     "payload": { "kind": "struct", "fields": [{ "name": "role",      "ty": "domain::tddd::catalogue_linter::FreeText" }] } },
+          { "name": "ParseFragment",   "payload": { "kind": "struct", "fields": [{ "name": "message",   "ty": "domain::tddd::catalogue_linter::FreeText" }] } },
+          { "name": "SchemaInvalid",   "payload": { "kind": "struct", "fields": [{ "name": "message",   "ty": "domain::tddd::catalogue_linter::FreeText" }] } },
+          { "name": "DraftIncomplete", "payload": { "kind": "struct", "fields": [{ "name": "holes",     "ty": "Vec<domain::tddd::catalog_gen::DraftHole>" }] } },
+          { "name": "Port",            "payload": { "kind": "struct", "fields": [{ "name": "detail",    "ty": "IoFailureDetail" }] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "catalog_gen",
+      "docs": "Error enum over the catalogue operation failures. See IN-10, IN-12, AC-06, AC-08, AC-10.",
+      "spec_refs": [
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-10" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-12" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-06" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-08" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-10" }
+      ],
+      "informal_grounds": []
+    },
+    "CatalogInteractor": {
+      "action": "add",
+      "role": { "Interactor": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "catalog_gen",
+      "docs": "Interactor holding an Arc<dyn CatalogPort> dependency. See IN-01, AC-01.",
+      "spec_refs": [
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-01" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-01" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {
+    "CatalogService": {
+      "action": "add",
+      "role": { "ApplicationService": {} },
+      "methods": [
+        {
+          "name": "init",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id",  "ty": "&str" },
+            { "name": "items_dir", "ty": "&std::path::Path" }
+          ],
+          "returns": "Result<CatalogInitReport, CatalogError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Catalogue method declaration `CatalogService::init`; CatalogError subset FileExists/FileMissing/Port."
+        },
+        {
+          "name": "add",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id",  "ty": "&str" },
+            { "name": "items_dir", "ty": "&std::path::Path" },
+            { "name": "command",   "ty": "CatalogAddCommand" }
+          ],
+          "returns": "Result<CatalogWriteReport, CatalogError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Catalogue method declaration `CatalogService::add`."
+        },
+        {
+          "name": "import",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id",  "ty": "&str" },
+            { "name": "items_dir", "ty": "&std::path::Path" },
+            { "name": "command",   "ty": "CatalogImportCommand" }
+          ],
+          "returns": "Result<CatalogWriteReport, CatalogError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Catalogue method declaration `CatalogService::import`."
+        },
+        {
+          "name": "cite",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id",  "ty": "&str" },
+            { "name": "items_dir", "ty": "&std::path::Path" },
+            { "name": "command",   "ty": "CatalogCiteCommand" }
+          ],
+          "returns": "Result<CatalogWriteReport, CatalogError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Catalogue method declaration `CatalogService::cite`."
+        },
+        {
+          "name": "check",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id",  "ty": "&str" },
+            { "name": "items_dir", "ty": "&std::path::Path" },
+            { "name": "query",     "ty": "CatalogCheckQuery" }
+          ],
+          "returns": "Result<CatalogCheckReport, CatalogError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Catalogue method declaration `CatalogService::check`."
+        }
+      ],
+      "supertrait_bounds": ["core::marker::Send", "core::marker::Sync"],
+      "module_path": "catalog_gen",
+      "docs": "Application-service port trait for catalogue operations. See IN-01, AC-01.",
+      "spec_refs": [
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-01" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-01" }
+      ],
+      "informal_grounds": []
+    },
+    "CatalogPort": {
+      "action": "add",
+      "role": { "SecondaryPort": {} },
+      "methods": [
+        {
+          "name": "init",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id",  "ty": "&str" },
+            { "name": "items_dir", "ty": "&std::path::Path" }
+          ],
+          "returns": "Result<CatalogInitReport, CatalogError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Catalogue method declaration `CatalogPort::init`; CatalogError subset FileExists/FileMissing/Port."
+        },
+        {
+          "name": "add",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id",  "ty": "&str" },
+            { "name": "items_dir", "ty": "&std::path::Path" },
+            { "name": "command",   "ty": "CatalogAddCommand" }
+          ],
+          "returns": "Result<CatalogWriteReport, CatalogError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Catalogue method declaration `CatalogPort::add`."
+        },
+        {
+          "name": "import",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id",  "ty": "&str" },
+            { "name": "items_dir", "ty": "&std::path::Path" },
+            { "name": "command",   "ty": "CatalogImportCommand" }
+          ],
+          "returns": "Result<CatalogWriteReport, CatalogError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Catalogue method declaration `CatalogPort::import`."
+        },
+        {
+          "name": "cite",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id",  "ty": "&str" },
+            { "name": "items_dir", "ty": "&std::path::Path" },
+            { "name": "command",   "ty": "CatalogCiteCommand" }
+          ],
+          "returns": "Result<CatalogWriteReport, CatalogError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Catalogue method declaration `CatalogPort::cite`."
+        },
+        {
+          "name": "check",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id",  "ty": "&str" },
+            { "name": "items_dir", "ty": "&std::path::Path" },
+            { "name": "query",     "ty": "CatalogCheckQuery" }
+          ],
+          "returns": "Result<CatalogCheckReport, CatalogError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Catalogue method declaration `CatalogPort::check`."
+        }
+      ],
+      "supertrait_bounds": ["core::marker::Send", "core::marker::Sync"],
+      "module_path": "catalog_gen",
+      "docs": "Secondary port trait for catalogue operations. See IN-01, AC-01, CN-02.",
+      "spec_refs": [
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-01" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-01" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "CN-02" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "functions": {},
+  "inherent_impls": [
+    {
+      "type_name": "CatalogInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "port", "ty": "std::sync::Arc<dyn CatalogPort>" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Catalogue method declaration `CatalogInteractor::new`."
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    { "trait_ref": "core::fmt::Debug",         "for_type": "CatalogCheckVerdict" },
+    { "trait_ref": "core::clone::Clone",       "for_type": "CatalogCheckVerdict" },
+    { "trait_ref": "core::marker::Copy",       "for_type": "CatalogCheckVerdict" },
+    { "trait_ref": "core::clone::TrivialClone", "for_type": "CatalogCheckVerdict" },
+    { "trait_ref": "core::cmp::PartialEq",     "for_type": "CatalogCheckVerdict" },
+    { "trait_ref": "core::cmp::Eq",            "for_type": "CatalogCheckVerdict" },
+    { "trait_ref": "core::fmt::Debug",     "for_type": "CatalogAddCommand" },
+    { "trait_ref": "core::clone::Clone",   "for_type": "CatalogAddCommand" },
+    { "trait_ref": "core::cmp::PartialEq", "for_type": "CatalogAddCommand" },
+    { "trait_ref": "core::cmp::Eq",        "for_type": "CatalogAddCommand" },
+    { "trait_ref": "core::fmt::Debug",     "for_type": "CatalogImportCommand" },
+    { "trait_ref": "core::clone::Clone",   "for_type": "CatalogImportCommand" },
+    { "trait_ref": "core::cmp::PartialEq", "for_type": "CatalogImportCommand" },
+    { "trait_ref": "core::cmp::Eq",        "for_type": "CatalogImportCommand" },
+    { "trait_ref": "core::fmt::Debug",     "for_type": "CatalogCiteCommand" },
+    { "trait_ref": "core::clone::Clone",   "for_type": "CatalogCiteCommand" },
+    { "trait_ref": "core::cmp::PartialEq", "for_type": "CatalogCiteCommand" },
+    { "trait_ref": "core::cmp::Eq",        "for_type": "CatalogCiteCommand" },
+    { "trait_ref": "core::fmt::Debug",     "for_type": "CatalogCheckQuery" },
+    { "trait_ref": "core::clone::Clone",   "for_type": "CatalogCheckQuery" },
+    { "trait_ref": "core::cmp::PartialEq", "for_type": "CatalogCheckQuery" },
+    { "trait_ref": "core::cmp::Eq",        "for_type": "CatalogCheckQuery" },
+    { "trait_ref": "core::fmt::Debug",   "for_type": "CatalogInitReport" },
+    { "trait_ref": "core::clone::Clone", "for_type": "CatalogInitReport" },
+    { "trait_ref": "core::fmt::Debug",   "for_type": "CatalogWriteReport" },
+    { "trait_ref": "core::clone::Clone", "for_type": "CatalogWriteReport" },
+    { "trait_ref": "core::fmt::Debug",   "for_type": "CatalogCheckReport" },
+    { "trait_ref": "core::clone::Clone", "for_type": "CatalogCheckReport" },
+    { "trait_ref": "core::fmt::Debug",   "for_type": "CatalogError" },
+    { "trait_ref": "core::fmt::Display", "for_type": "CatalogError" },
+    { "trait_ref": "core::error::Error", "for_type": "CatalogError" },
+    { "trait_ref": "CatalogService", "for_type": "CatalogInteractor" }
+  ]
+}

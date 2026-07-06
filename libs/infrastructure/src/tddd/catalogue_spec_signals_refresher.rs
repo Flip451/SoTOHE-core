@@ -8,19 +8,18 @@
 //! Supports v3 (`CatalogueDocument`) catalogue format only. Per-entry signals
 //! are computed from `spec_refs[]` and `informal_grounds[]` via
 //! `evaluate_catalogue_entry_signal`.
-//! The informal-priority rule (ADR `2026-04-23-0344` §D1.1) applies, with the
-//! `action: "reference"` exemption from ADR `2026-05-11-1257` D5:
-//! - `action == Reference` + both empty → Blue (baseline-implicit grounding)
+//! The informal-priority rule (ADR `2026-04-23-0344` §D1.1) applies uniformly
+//! to every entry action:
 //! - `informal_grounds` non-empty → Yellow
 //! - `informal_grounds` empty + `spec_refs` non-empty → Blue
-//! - both empty (non-reference action) → Red
+//! - both empty → Red
 //!
 //! Non-v3 catalogues (schema_version ≠ 3) are treated as
 //! `CatalogueDocumentCodecError::UnsupportedSchemaVersion` and returned as a
 //! fail-closed error (CN-11). No v2 fallback is attempted.
 //!
 //! ADR reference: `2026-04-23-0344-catalogue-spec-signal-activation.md`
-//! §D2 / §D3.1 / IN-09; `2026-05-11-1257-tddd-v2-catalogue-spec-link-restoration.md` D5;
+//! §D2 / §D3.1 / IN-09; `2026-05-11-1257-tddd-v2-catalogue-spec-link-restoration.md`;
 //! `2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md` D1 (CN-11).
 
 use std::path::Path;
@@ -29,6 +28,7 @@ use domain::{
     CatalogueSpecSignal, CatalogueSpecSignalsDocument, ConfidenceSignal, ContentHash, TrackId,
     evaluate_catalogue_entry_signal,
 };
+use usecase::catalogue_traversal::iter_catalogue_entries;
 
 use crate::tddd::catalogue_document_codec::CatalogueDocumentCodec;
 use crate::tddd::fs_catalogue_spec_signals_store::FsCatalogueSpecSignalsStore;
@@ -162,36 +162,15 @@ pub fn refresh_one_layer(
     })?;
 
     let mut signals: Vec<CatalogueSpecSignal> = Vec::new();
-    for (type_name, entry) in &v3_doc.types {
-        let signal = evaluate_catalogue_entry_signal(
-            entry.action,
-            &entry.spec_refs,
-            &entry.informal_grounds,
-        );
-        let entry_hash = catalogue_entry_hash(&raw_json, "types", type_name.as_str())
-            .map_err(|e| format!("entry_hash for type '{type_name}': {e}"))?;
-        signals.push(CatalogueSpecSignal::new(type_name.as_str(), signal, entry_hash));
-    }
-    for (trait_name, entry) in &v3_doc.traits {
-        let signal = evaluate_catalogue_entry_signal(
-            entry.action,
-            &entry.spec_refs,
-            &entry.informal_grounds,
-        );
-        let entry_hash = catalogue_entry_hash(&raw_json, "traits", trait_name.as_str())
-            .map_err(|e| format!("entry_hash for trait '{trait_name}': {e}"))?;
-        signals.push(CatalogueSpecSignal::new(trait_name.as_str(), signal, entry_hash));
-    }
-    for (fn_path, entry) in &v3_doc.functions {
-        let signal = evaluate_catalogue_entry_signal(
-            entry.action,
-            &entry.spec_refs,
-            &entry.informal_grounds,
-        );
-        let fn_key = fn_path.to_string();
-        let entry_hash = catalogue_entry_hash(&raw_json, "functions", &fn_key)
-            .map_err(|e| format!("entry_hash for function '{fn_key}': {e}"))?;
-        signals.push(CatalogueSpecSignal::new(fn_key, signal, entry_hash));
+    for entry in iter_catalogue_entries(&v3_doc) {
+        let signal =
+            evaluate_catalogue_entry_signal(entry.action, entry.spec_refs, entry.informal_grounds);
+        let (section, entry_key) = entry.section_key.split_once(':').ok_or_else(|| {
+            format!("internal: malformed catalogue section key '{}'", entry.section_key)
+        })?;
+        let entry_hash = catalogue_entry_hash(&raw_json, section, entry_key)
+            .map_err(|e| format!("entry_hash for '{}': {e}", entry.section_key))?;
+        signals.push(CatalogueSpecSignal::new(entry.key, signal, entry_hash));
     }
 
     // Compute raw-bytes SHA-256 (same canonical-hash helper as merge_gate_adapter).
@@ -319,30 +298,30 @@ mod tests {
         // Replicate the refresher's signal computation inline.
         let raw_json: serde_json::Value = serde_json::from_str(json).unwrap();
         let mut signals: Vec<CatalogueSpecSignal> = Vec::new();
-        for (type_name, entry) in &v3_doc.types {
+        for (type_name, entry) in v3_doc.types() {
             let signal = evaluate_catalogue_entry_signal(
-                entry.action,
-                &entry.spec_refs,
-                &entry.informal_grounds,
+                entry.action(),
+                entry.spec_refs(),
+                entry.informal_grounds(),
             );
             let entry_hash = catalogue_entry_hash(&raw_json, "types", type_name.as_str()).unwrap();
             signals.push(CatalogueSpecSignal::new(type_name.as_str(), signal, entry_hash));
         }
-        for (trait_name, entry) in &v3_doc.traits {
+        for (trait_name, entry) in v3_doc.traits() {
             let signal = evaluate_catalogue_entry_signal(
-                entry.action,
-                &entry.spec_refs,
-                &entry.informal_grounds,
+                entry.action(),
+                entry.spec_refs(),
+                entry.informal_grounds(),
             );
             let entry_hash =
                 catalogue_entry_hash(&raw_json, "traits", trait_name.as_str()).unwrap();
             signals.push(CatalogueSpecSignal::new(trait_name.as_str(), signal, entry_hash));
         }
-        for (fn_path, entry) in &v3_doc.functions {
+        for (fn_path, entry) in v3_doc.functions() {
             let signal = evaluate_catalogue_entry_signal(
-                entry.action,
-                &entry.spec_refs,
-                &entry.informal_grounds,
+                entry.action(),
+                entry.spec_refs(),
+                entry.informal_grounds(),
             );
             let fn_key = fn_path.to_string();
             let entry_hash = catalogue_entry_hash(&raw_json, "functions", &fn_key).unwrap();

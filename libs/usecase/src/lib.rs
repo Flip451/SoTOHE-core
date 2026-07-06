@@ -12,6 +12,7 @@ pub mod arch;
 pub mod baseline_capture;
 pub mod baseline_graph_workflow;
 pub mod branch_strategy;
+pub mod catalog_gen;
 pub mod catalogue_impl_signals;
 pub mod catalogue_lint_workflow;
 pub mod catalogue_spec_refs;

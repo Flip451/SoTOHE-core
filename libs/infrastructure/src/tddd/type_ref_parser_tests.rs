@@ -429,29 +429,29 @@ fn test_trait_impl_decl_for_type_generic_param_encodes_type_generic() {
         CrateName::new("domain").unwrap(),
         LayerId::try_new("domain").unwrap(),
     );
-    doc.traits.insert(
+    doc.insert_trait(
         TraitName::new("MyTrait").unwrap(),
-        TraitEntry {
-            action: ItemAction::Add,
-            role: ContractRole::SpecificationPort,
-            methods: vec![],
-            assoc_types: vec![],
-            assoc_consts: vec![],
-            supertrait_bounds: vec![],
-            generics: vec![],
-            where_predicates: vec![],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        },
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SpecificationPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
     );
 
     let mut trait_impl =
         TraitImplDeclV2::new(TypeRef::new("MyTrait").unwrap(), TypeRef::new("T").unwrap());
     trait_impl.impl_generics =
         vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }];
-    doc.trait_impls.push(trait_impl);
+    doc.push_trait_impl(trait_impl);
 
     let encoded = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
     let for_type = encoded

@@ -5,7 +5,7 @@
 //! and convert them into domain `MemberDeclaration` / `ParamDeclaration` / `FunctionInfo`
 //! values suitable for inclusion in a `SchemaExport`.
 
-use domain::schema::{FunctionInfo, SchemaExportError};
+use domain::schema::{FunctionInfo, SchemaExportError, StructShapeKind};
 use domain::tddd::catalogue::{MemberDeclaration, ParamDeclaration};
 use domain::tddd::catalogue_v2::identifiers::{ParamName, TypeRef};
 use rustdoc_types::{ItemEnum, Type, Variant, VariantKind, Visibility};
@@ -45,6 +45,26 @@ pub(super) fn extract_struct_fields(
             })
             .collect(),
         rustdoc_types::StructKind::Unit => Vec::new(),
+    }
+}
+
+/// Determine a struct's declared shape (unit / tuple / plain) plus whether any
+/// field was stripped, from rustdoc's `StructKind`.
+///
+/// Captured before [`extract_struct_fields`]'s visibility filter drops private
+/// fields, so an all-private plain or tuple struct — whose public member list is
+/// empty — is not later mistaken for a unit struct. Tuple structs record stripped
+/// fields as `None` slots (order matters), so a stripped tuple field is detected
+/// as a `None` entry; plain structs carry an explicit `has_stripped_fields` flag.
+pub(super) fn struct_shape_kind(s: &rustdoc_types::Struct) -> StructShapeKind {
+    match &s.kind {
+        rustdoc_types::StructKind::Unit => StructShapeKind::Unit,
+        rustdoc_types::StructKind::Tuple(fields) => {
+            StructShapeKind::Tuple { has_stripped_fields: fields.iter().any(Option::is_none) }
+        }
+        rustdoc_types::StructKind::Plain { has_stripped_fields, .. } => {
+            StructShapeKind::Plain { has_stripped_fields: *has_stripped_fields }
+        }
     }
 }
 

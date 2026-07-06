@@ -609,13 +609,14 @@ args = ["catalogue-lint", "check-active-track"]
 
 [tasks.track-active-gate]
 private = true
-description = "[gate] Regen sequence: signal calc-impl-catalog → signal calc-catalog-spec → catalogue-lint check-active-track → views sync. Both track-commit-message and review invocations depend on this shared task. Fail-closed: non-zero exit aborts the chain."
+description = "[gate] Regen sequence: signal calc-impl-catalog → signal calc-catalog-spec → catalogue-lint check-active-track → catalog check → views sync. Both track-commit-message and review invocations depend on this shared task. Fail-closed: non-zero exit aborts the chain."
 script_runner = "@shell"
 script = ['''
 set -e
 bin/sotp signal calc-impl-catalog
 bin/sotp signal calc-catalog-spec
 bin/sotp catalogue-lint check-active-track
+bin/sotp catalog check
 bin/sotp track views sync
 ''']
 
