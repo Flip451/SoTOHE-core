@@ -29,6 +29,9 @@ decisions:
   - id: D8
     user_decision_ref: "chat:session-e823e003:2026-07-03 CLI 命名の裁定「catalogue → catalog としてください。それ以外は、その命名でよいです。ADRに決定として書いてください」"
     status: proposed
+  - id: D9
+    user_decision_ref: "chat:session-020cee20:2026-07-06 ユーザー指示「カタログのスキーマに関する情報はそれはそれで必要だから、別文書（マニュアル）として退避するべき」(「対比→退避」に字句訂正) + AskUserQuestion 裁定「承認 — grounding 付与して続行」"
+    status: proposed
 ---
 
 # 型カタログ作成の「生成 + 注釈」への移行 — 意図入力スキャフォールディング API
@@ -126,6 +129,14 @@ draft の扱いは型付きスキーマの手前の層に置く: カタログ fi
 - `sotp catalog check` — 完成検査（D7）。`--layer` 省略時は全 TDDD layer を対象とし、fail は非零 exit。対象 catalogue file がまだ 1 つも存在しない Phase 0 / 1 では no-op + warning で skip し、対象 track に catalogue file が 1 つでも存在する場合は `$todo` 残存・全 entry の `spec_refs` 参照先 anchor 不在・grounding absence（Reference を含む全 action の catalogue-spec signal Red）・role 語彙外・schema 不正・TDDD 対象 layer の catalogue file 不在を block する。delete tombstone の grounding fields も anchor 検査・catalogue-spec signal 評価に含める。`catalog check` は signal-gates 設定ファイルを必須入力にしない
 
 共通仕様: track は省略時に現ブランチから自動解決する。`init` / `add` / `import` / `cite` は `track/items/<id>/` 配下を書き込む WRITE 操作なので、明示 `--track-id` は現在ブランチから導出した id と一致する場合だけ受理し、不一致または非 track ブランチでは fail-closed で停止する。これらのコマンドでは `--track-id` を cross-track override として扱わない。`check` は読み取り専用のため、明示 `--track-id` を READ override として使える。`add` / `import` / `cite` は対象 layer の catalogue file 不在時に error として `sotp catalog init` を案内し、暗黙の file 生成は行わない。
+
+### D9: カタログ schema の詳細リファレンスは `knowledge/conventions/` 配下の参照文書として独立させる
+
+type-designer の workflow 手順書は生成 + 注釈の手順に限定し、カタログ schema の詳細（フィールド構成、role / kind / shape の表現形、entry の JSON 記述例）は持たない。この情報は `knowledge/conventions/` 配下の独立した参照マニュアルに置く。
+
+D2 で手順から schema の深い理解を外した後も、schema 情報そのものが不要になるわけではない。生成された穴埋め済みエントリの読解、`$todo` 残存箇所への記入内容の判断、生成物の保守やデバッグの場面では、schema の構造を確認できる文書が要る。手順から外した知識を受け皿なく失わせず、記述的な参照文書として正式な置き場所を定める。
+
+このマニュアルは参照のための記述であり、schema の権威は sotp の実装側にある。マニュアルの記述と実装が乖離した場合は sotp 側を正とする。
 
 ## Rejected Alternatives
 

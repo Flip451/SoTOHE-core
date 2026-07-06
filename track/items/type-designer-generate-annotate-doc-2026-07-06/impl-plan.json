@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "tasks": [
+    {
+      "id": "T002",
+      "description": "`knowledge/conventions/catalogue-schema-reference.md`; `knowledge/conventions/README.md`: create the manual via `bin/sotp conventions add`, migrate the IN-04 mandatory sections from `.harness/capabilities/type-designer.md`, add the IN-06 authority note, update the convention index via `bin/sotp conventions update-index`, and run `bin/sotp conventions verify-index` (IN-05/IN-06/CN-02/AC-04/AC-05/AC-06/AC-08).",
+      "status": "todo"
+    },
+    {
+      "id": "T001",
+      "description": "`.harness/capabilities/type-designer.md`; `knowledge/conventions/catalogue-schema-reference.md` only for CN-05 boundary-section placement; `.claude/agents/type-designer.md`; `.agents/skills/type-designer/SKILL.md`: update the internal pipeline, 12a receipt criteria, schema-reference/cookbook placement, CN-05 boundary-section placement, annotation-phase references to the T002-created manual, and wrapper delegation consistency (IN-01/IN-02/IN-03/IN-04/IN-05/IN-07/CN-01/CN-03/CN-05/AC-01/AC-02/AC-03/AC-06/AC-07/AC-08).",
+      "status": "todo"
+    },
+    {
+      "id": "T003",
+      "description": "`knowledge/conventions/type-designer-kind-selection.md`: redirect the three `kind` wire-format references to the T002-created manual without changing R1-R10 rule text (IN-08/CN-04/AC-08/AC-09).",
+      "status": "todo"
+    }
+  ],
+  "plan": {
+    "summary": [],
+    "sections": [
+      {
+        "id": "S1",
+        "title": "Schema reference manual",
+        "description": [
+          "`knowledge/conventions/catalogue-schema-reference.md`; `knowledge/conventions/README.md`: manual creation and convention-index registration (IN-05/IN-06/CN-02/AC-04/AC-05/AC-06/AC-08)."
+        ],
+        "task_ids": [
+          "T002"
+        ]
+      },
+      {
+        "id": "S2",
+        "title": "Generate / annotate / verify workflow in the capability doc",
+        "description": [
+          "`.harness/capabilities/type-designer.md`; optional CN-05 manual append; wrapper delegation check (IN-01/IN-02/IN-03/IN-04/IN-05/IN-07/CN-01/CN-03/CN-05/AC-01/AC-02/AC-03/AC-06/AC-07/AC-08)."
+        ],
+        "task_ids": [
+          "T001"
+        ]
+      },
+      {
+        "id": "S3",
+        "title": "Kind-selection convention reference fix",
+        "description": [
+          "`knowledge/conventions/type-designer-kind-selection.md`: `kind` wire-format reference redirect (IN-08/CN-04/AC-08/AC-09)."
+        ],
+        "task_ids": [
+          "T003"
+        ]
+      }
+    ]
+  }
+}

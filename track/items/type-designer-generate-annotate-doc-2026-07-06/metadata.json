@@ -8,6 +8,6 @@
   "branch_strategy_snapshot": {
     "base_branch": "develop",
     "merge_target": "develop",
-    "merge_method": "squash"
+    "merge_method": "merge"
   }
 }
