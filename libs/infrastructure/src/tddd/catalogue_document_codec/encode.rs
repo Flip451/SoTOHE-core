@@ -55,34 +55,34 @@ pub(super) fn domain_to_dto(
         .map(|(k, v)| function_entry_to_dto(v).map(|dto| (k.to_string(), EntrySlotDto::Live(dto))))
         .collect::<Result<_, _>>()?;
 
-    // Deletion records re-join their section's map as identity-only tombstones,
+    // Deletion records re-join their section's map as grounded tombstones,
     // keyed by name (types / traits) or path (functions). BTreeMap keeps the
     // merged map in name order, so live entries and tombstones interleave
     // deterministically.
     for record in doc.deletions() {
         match record {
-            DeletionRecord::Type { name, module_path } => {
+            DeletionRecord::Type { name, module_path, spec_refs, informal_grounds } => {
                 insert_tombstone(
                     &mut types,
                     "type",
                     name.as_str().to_owned(),
-                    tombstone_dto(module_path.to_string()),
+                    tombstone_dto(module_path.to_string(), spec_refs, informal_grounds),
                 )?;
             }
-            DeletionRecord::Trait { name, module_path } => {
+            DeletionRecord::Trait { name, module_path, spec_refs, informal_grounds } => {
                 insert_tombstone(
                     &mut traits,
                     "trait",
                     name.as_str().to_owned(),
-                    tombstone_dto(module_path.to_string()),
+                    tombstone_dto(module_path.to_string(), spec_refs, informal_grounds),
                 )?;
             }
-            DeletionRecord::Function { path } => {
+            DeletionRecord::Function { path, spec_refs, informal_grounds } => {
                 insert_tombstone(
                     &mut functions,
                     "function",
                     path.to_string(),
-                    tombstone_dto(String::new()),
+                    tombstone_dto(String::new(), spec_refs, informal_grounds),
                 )?;
             }
         }
@@ -104,14 +104,23 @@ pub(super) fn domain_to_dto(
     })
 }
 
-/// Build an identity-only deletion tombstone DTO for a removed entry.
+/// Build a grounded deletion tombstone DTO for a removed entry.
 ///
 /// `module_path` is the crate-relative module of a type / trait deletion, or the
 /// empty string for a crate-root item or a function (whose module lives in the
 /// map key). `ModulePath::root()` renders as the empty string, which the DTO
 /// omits from JSON.
-fn tombstone_dto(module_path: String) -> TombstoneDto {
-    TombstoneDto { action: "delete".to_owned(), module_path }
+fn tombstone_dto(
+    module_path: String,
+    spec_refs: &[domain::SpecRef],
+    informal_grounds: &[domain::InformalGroundRef],
+) -> TombstoneDto {
+    TombstoneDto {
+        action: "delete".to_owned(),
+        module_path,
+        spec_refs: spec_refs_to_dtos(spec_refs),
+        informal_grounds: informal_grounds_to_dtos(informal_grounds),
+    }
 }
 
 fn insert_tombstone<T>(
@@ -373,23 +382,9 @@ fn method_generic_params_to_dtos(generics: &[MethodGenericParam]) -> Vec<MethodG
 
 /// Encodes a top-level `TraitImplDeclV2` to its DTO form (ADR `2026-05-20-0048` D2).
 ///
-/// Emits `action`, `trait_ref`, and `for_type` fields. Validates `trait_ref` as a
-/// Rust path expression (not a reference, slice, or tuple) and validates both
-/// `trait_ref` and `for_type` as syn-parseable type expressions to guarantee
-/// encode/decode round-trip consistency for in-memory `TraitImplDeclV2` values
-/// that were not originally constructed via the JSON decoder.
+/// Emits `action`, `trait_ref`, and `for_type` fields exactly as stored in the
+/// schema's `TypeRef` slots.
 fn trait_impl_to_dto(t: &TraitImplDeclV2) -> Result<TraitImplDto, CatalogueDocumentCodecError> {
-    let err = |reason: String| CatalogueDocumentCodecError::InvalidEntry {
-        entry_name: t.trait_ref.as_str().to_owned(),
-        reason,
-    };
-    super::decode::validate_type_ref_str(t.trait_ref.as_str())
-        .map_err(|e| err(format!("invalid trait_ref syntax: {e}")))?;
-    // Mirror the decode-path path-type constraint: trait_ref must be a path, not a reference etc.
-    super::decode::validate_trait_ref_is_path(t.trait_ref.as_str())
-        .map_err(|e| err(format!("invalid trait_ref (must be a path): {e}")))?;
-    super::decode::validate_type_ref_str(t.for_type.as_str())
-        .map_err(|e| err(format!("invalid for_type syntax: {e}")))?;
     let impl_where_predicates = t
         .impl_where_predicates
         .iter()

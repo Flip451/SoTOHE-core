@@ -1,5 +1,4 @@
 //! DTO → domain conversions for [`CatalogueDocument`].
-//! Validates all fields at the DTO boundary before constructing domain values.
 
 use std::collections::HashSet;
 use std::str::FromStr;
@@ -31,12 +30,10 @@ use super::dto::{
     TypestateMarkerDto, VariantDeclDto, VariantPayloadDto, WherePredicateDeclDto,
 };
 use super::dto_slots::{EntrySlotDto, TombstoneDto};
-use super::validate::validate_bound_str;
-pub(super) use super::validate::{validate_trait_ref_is_path, validate_type_ref_str}; // re-exported for encode.rs
+use super::validate::{validate_bound_str, validate_type_ref_str};
 
-// ---------------------------------------------------------------------------
-// Top-level entry point
-// ---------------------------------------------------------------------------
+// Keep the path-only validator referenced for callers outside top-level impl slots.
+const _: fn(&str) -> Result<(), String> = super::validate::validate_trait_ref_is_path;
 
 pub(super) fn dto_to_domain(
     dto: CatalogueDocumentDto,
@@ -54,15 +51,21 @@ pub(super) fn dto_to_domain(
 
     let mut doc = CatalogueDocument::new(dto.schema_version, crate_name, layer);
 
-    // Types — an `action: delete` slot becomes an identity-only deletion record
-    // (routed to `doc.deletions`) rather than a live `types` entry.
+    // Delete slots become deletion records rather than live entries.
     for (type_name_str, slot) in dto.types {
         let type_name = TypeName::new(&type_name_str)
             .map_err(|e| err(&type_name_str, format!("invalid type name: {e}")))?;
         match slot {
             EntrySlotDto::Tombstone(tombstone) => {
                 let module_path = tombstone_module_path(&type_name_str, &tombstone)?;
-                doc.push_deletion(DeletionRecord::Type { name: type_name, module_path });
+                let (spec_refs, informal_grounds) =
+                    tombstone_grounding(&type_name_str, &tombstone)?;
+                doc.push_deletion(DeletionRecord::Type {
+                    name: type_name,
+                    module_path,
+                    spec_refs,
+                    informal_grounds,
+                });
             }
             EntrySlotDto::Live(entry_dto) => {
                 let entry = type_entry_from_dto(&type_name_str, entry_dto)?;
@@ -78,7 +81,14 @@ pub(super) fn dto_to_domain(
         match slot {
             EntrySlotDto::Tombstone(tombstone) => {
                 let module_path = tombstone_module_path(&trait_name_str, &tombstone)?;
-                doc.push_deletion(DeletionRecord::Trait { name: trait_name, module_path });
+                let (spec_refs, informal_grounds) =
+                    tombstone_grounding(&trait_name_str, &tombstone)?;
+                doc.push_deletion(DeletionRecord::Trait {
+                    name: trait_name,
+                    module_path,
+                    spec_refs,
+                    informal_grounds,
+                });
             }
             EntrySlotDto::Live(entry_dto) => {
                 let entry = trait_entry_from_dto(&trait_name_str, entry_dto)?;
@@ -112,7 +122,12 @@ pub(super) fn dto_to_domain(
                             .to_owned(),
                     });
                 }
-                doc.push_deletion(DeletionRecord::Function { path: fn_path });
+                let (spec_refs, informal_grounds) = tombstone_grounding(&fn_path_str, &tombstone)?;
+                doc.push_deletion(DeletionRecord::Function {
+                    path: fn_path,
+                    spec_refs,
+                    informal_grounds,
+                });
             }
             EntrySlotDto::Live(entry_dto) => {
                 let entry = function_entry_from_dto(&fn_path_str, entry_dto)?;
@@ -127,7 +142,6 @@ pub(super) fn dto_to_domain(
         doc.push_inherent_impl(impl_decl);
     }
 
-    // TraitImpls (top-level, ADR `2026-05-20-0048` D1)
     for ti_dto in dto.trait_impls {
         let ti = trait_impl_from_dto(ti_dto)?;
         doc.push_trait_impl(ti);
@@ -136,11 +150,6 @@ pub(super) fn dto_to_domain(
     Ok(doc)
 }
 
-/// Resolve the crate-relative `module_path` of a deletion tombstone.
-///
-/// An empty `module_path` denotes the crate root; a non-empty value is parsed as
-/// a [`ModulePath`], surfacing a malformed path as an `InvalidEntry` keyed by the
-/// deleted entry's name.
 fn tombstone_module_path(
     entry_name: &str,
     tombstone: &TombstoneDto,
@@ -157,9 +166,25 @@ fn tombstone_module_path(
     }
 }
 
-// ---------------------------------------------------------------------------
-// Entry converters
-// ---------------------------------------------------------------------------
+fn tombstone_grounding(
+    entry_name: &str,
+    tombstone: &TombstoneDto,
+) -> Result<(Vec<domain::SpecRef>, Vec<domain::InformalGroundRef>), CatalogueDocumentCodecError> {
+    let spec_refs = spec_refs_from_dtos(&tombstone.spec_refs).map_err(|e| {
+        CatalogueDocumentCodecError::InvalidEntry {
+            entry_name: entry_name.to_owned(),
+            reason: format!("{}: {}", e.field, e.reason),
+        }
+    })?;
+    let informal_grounds =
+        informal_grounds_from_dtos(&tombstone.informal_grounds).map_err(|e| {
+            CatalogueDocumentCodecError::InvalidEntry {
+                entry_name: entry_name.to_owned(),
+                reason: format!("{}: {}", e.field, e.reason),
+            }
+        })?;
+    Ok((spec_refs, informal_grounds))
+}
 
 pub(super) fn type_entry_from_dto(
     name: &str,
@@ -366,8 +391,6 @@ fn variant_payload_from_dto(
     }
 }
 
-/// Convert a Vec of `MethodGenericParamDto` (shared by Method and Function entries)
-/// into validated `MethodGenericParam` values, rejecting duplicate names.
 pub(super) fn method_generics_from_dtos(
     entry_name: &str,
     dtos: Vec<MethodGenericParamDto>,
@@ -418,13 +441,6 @@ pub(super) fn method_generics_from_dtos(
     Ok(generics)
 }
 
-/// Convert a Vec of `WherePredicateDeclDto` (shared by Method, Function, and Trait entries)
-/// into validated `WherePredicateDecl` values, rejecting empty `lhs` or `rhs` entries.
-///
-/// A `WherePredicateDeclDto` with an empty `rhs` vector and `BoundOp::Bound` operator is
-/// rejected because `where T:` (no bound after the colon) is syntactically invalid in Rust
-/// and would produce a `WherePredicate::BoundPredicate { bounds: vec![] }` in the extended
-/// crate representation.  For `BoundOp::Equal` predicates an empty `rhs` is also rejected.
 pub(super) fn where_predicates_from_dtos(
     entry_name: &str,
     dtos: Vec<WherePredicateDeclDto>,
@@ -435,7 +451,6 @@ pub(super) fn where_predicates_from_dtos(
     };
     dtos.into_iter()
         .map(|w| {
-            // Validate non-empty first (TypeRef::new check), then validate Rust type syntax.
             let lhs = TypeRef::new(w.lhs.clone())
                 .map_err(|e| err(format!("invalid where predicate lhs '{}': {e}", w.lhs)))?;
             validate_type_ref_str(w.lhs.as_str())
@@ -450,8 +465,7 @@ pub(super) fn where_predicates_from_dtos(
             let operator = match w.operator {
                 BoundOpDto::Bound => BoundOp::Bound,
                 BoundOpDto::Equal => {
-                    // `Equal` predicates (`where T::Assoc = U`) require exactly one RHS entry.
-                    // Multiple RHS entries would be invalid Rust syntax for an equality constraint.
+                    // Equality constraints accept a single RHS type.
                     if w.rhs.len() != 1 {
                         return Err(err(format!(
                             "where predicate for '{}' with operator Equal must have exactly one \
@@ -468,11 +482,6 @@ pub(super) fn where_predicates_from_dtos(
                 .into_iter()
                 .enumerate()
                 .map(|(idx, entry)| {
-                    // `Bound` RHS entries are trait bounds (e.g. `Clone`, `Iterator<Item = u32>`);
-                    // use `validate_bound_str` (parses `syn::TypeParamBound`).
-                    // `Equal` RHS entries are type expressions (e.g. `u32`, `Vec<T>`);
-                    // use `validate_type_ref_str` (parses `syn::Type`) because
-                    // `validate_bound_str` rejects plain types like `u32`.
                     match operator {
                         BoundOp::Bound => validate_bound_str(&entry)
                             .map_err(|e| err(format!("invalid where predicate rhs[{idx}]: {e}")))?,
@@ -548,39 +557,19 @@ pub(super) fn param_decl_from_dto(
     Ok(ParamDeclaration::new(name, ty))
 }
 
-/// Converts a top-level `TraitImplDto` into a `TraitImplDeclV2` (ADR `2026-05-20-0048` D2).
-///
-/// Decodes `action`, validates `trait_ref` as a Rust path (not an arbitrary type),
-/// validates both `trait_ref` and `for_type` as non-empty `TypeRef` values and as
-/// valid Rust type expressions via `syn::parse_str`. Round-trips the `action` field
-/// through `ItemAction::from_str` (mirrors `type_entry_from_dto`).
 fn trait_impl_from_dto(dto: TraitImplDto) -> Result<TraitImplDeclV2, CatalogueDocumentCodecError> {
     let err = |reason: String| CatalogueDocumentCodecError::InvalidEntry {
         entry_name: dto.trait_ref.clone(),
         reason,
     };
 
-    // Decode action (mirrors TypeEntryDto / TraitEntryDto action handling).
     let action = ItemAction::from_str(&dto.action)
         .map_err(|e| err(format!("invalid action '{}': {e}", dto.action)))?;
 
-    // Validate and construct trait_ref
     let trait_ref = TypeRef::new(dto.trait_ref.clone())
         .map_err(|e| err(format!("invalid trait_ref '{}': {e}", dto.trait_ref)))?;
-    // Validate as a general type expression first (non-empty, parseable Rust type).
-    validate_type_ref_str(trait_ref.as_str())
-        .map_err(|e| err(format!("invalid trait_ref syntax: {e}")))?;
-    // Then tighten: trait_ref must be a path type, not a reference / slice / tuple.
-    // This mirrors the invariant enforced by `resolve_trait_ref_for_top_level` in the
-    // downstream codec, surfacing invalid forms early at the DTO boundary.
-    validate_trait_ref_is_path(trait_ref.as_str())
-        .map_err(|e| err(format!("invalid trait_ref (must be a path): {e}")))?;
-
-    // Validate and construct for_type
     let for_type = TypeRef::new(dto.for_type.clone())
         .map_err(|e| err(format!("invalid for_type '{}': {e}", dto.for_type)))?;
-    validate_type_ref_str(for_type.as_str())
-        .map_err(|e| err(format!("invalid for_type syntax: {e}")))?;
 
     let entry_name = dto.trait_ref.clone();
     let impl_generics = method_generics_from_dtos(&entry_name, dto.impl_generics)?;
@@ -620,9 +609,6 @@ pub(super) fn trait_entry_from_dto(
             .map_err(|e| err(format!("invalid module_path '{}': {e}", dto.module_path)))?
     };
 
-    // Validate and convert supertrait_bounds: each must be syntactically well-formed
-    // as a Rust type param bound. `validate_bound_str` uses syn::TypeParamBound which
-    // accepts `?Sized` in addition to plain trait paths.
     let supertrait_bounds = dto
         .supertrait_bounds
         .into_iter()

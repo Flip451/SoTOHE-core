@@ -902,7 +902,14 @@ mod tests {
   "schema_version": 5,
   "crate_name": "domain",
   "layer": "domain",
-  "types": { "OldType": { "action": "delete", "module_path": "tddd::foo" } },
+  "types": {
+    "OldType": {
+      "action": "delete",
+      "module_path": "tddd::foo",
+      "spec_refs": [{ "file": "track/items/x/spec.json", "anchor": "IN-01" }],
+      "informal_grounds": []
+    }
+  },
   "traits": {},
   "functions": {}
 }"#;
@@ -910,9 +917,12 @@ mod tests {
         assert!(doc.types().is_empty(), "delete entry must not become a live type entry");
         assert_eq!(doc.deletions().len(), 1);
         match &doc.deletions()[0] {
-            DeletionRecord::Type { name, module_path } => {
+            DeletionRecord::Type { name, module_path, spec_refs, informal_grounds } => {
                 assert_eq!(name.as_str(), "OldType");
                 assert_eq!(module_path.to_string(), "tddd::foo");
+                assert_eq!(spec_refs.len(), 1);
+                assert_eq!(spec_refs[0].anchor.as_ref(), "IN-01");
+                assert!(informal_grounds.is_empty());
             }
             other => panic!("expected Type deletion, got {other:?}"),
         }
@@ -932,9 +942,11 @@ mod tests {
         assert!(doc.traits().is_empty());
         assert_eq!(doc.deletions().len(), 1);
         match &doc.deletions()[0] {
-            DeletionRecord::Trait { name, module_path } => {
+            DeletionRecord::Trait { name, module_path, spec_refs, informal_grounds } => {
                 assert_eq!(name.as_str(), "OldPort");
                 assert!(module_path.is_root(), "absent module_path decodes as crate root");
+                assert!(spec_refs.is_empty());
+                assert!(informal_grounds.is_empty());
             }
             other => panic!("expected Trait deletion, got {other:?}"),
         }
@@ -954,7 +966,11 @@ mod tests {
         assert!(doc.functions().is_empty());
         assert_eq!(doc.deletions().len(), 1);
         match &doc.deletions()[0] {
-            DeletionRecord::Function { path } => assert_eq!(path.to_string(), "domain::old_fn"),
+            DeletionRecord::Function { path, spec_refs, informal_grounds } => {
+                assert_eq!(path.to_string(), "domain::old_fn");
+                assert!(spec_refs.is_empty());
+                assert!(informal_grounds.is_empty());
+            }
             other => panic!("expected Function deletion, got {other:?}"),
         }
     }
@@ -978,7 +994,7 @@ mod tests {
 
     #[test]
     fn test_decode_delete_entry_with_role_is_rejected() {
-        // A delete entry is identity-only; carrying a `role` (or any live-entry
+        // A delete entry has no live shape; carrying a `role` (or any live-entry
         // field) must be rejected by TombstoneDto's deny_unknown_fields.
         let json = r#"{
   "schema_version": 5,
@@ -1091,6 +1107,8 @@ mod tests {
         doc.push_deletion(DeletionRecord::Type {
             name: TypeName::new("LiveType").unwrap(),
             module_path: ModulePath::root(),
+            spec_refs: vec![],
+            informal_grounds: vec![],
         });
 
         assert_encode_rejects_tombstone_collision(&doc, "LiveType");
@@ -1116,6 +1134,8 @@ mod tests {
         doc.push_deletion(DeletionRecord::Trait {
             name: TraitName::new("LivePort").unwrap(),
             module_path: ModulePath::root(),
+            spec_refs: vec![],
+            informal_grounds: vec![],
         });
 
         assert_encode_rejects_tombstone_collision(&doc, "LivePort");
@@ -1143,7 +1163,11 @@ mod tests {
             CrateName::new("domain").unwrap(),
             FunctionName::new("old_fn").unwrap(),
         );
-        doc.push_deletion(DeletionRecord::Function { path });
+        doc.push_deletion(DeletionRecord::Function {
+            path,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        });
 
         assert_encode_rejects_tombstone_collision(&doc, "domain::old_fn");
     }
@@ -1311,6 +1335,28 @@ mod tests {
 }"#;
         let result = CatalogueDocumentCodec::decode(json, "domain");
         assert!(result.is_err(), "empty trait_ref must be rejected, got: {result:?}");
+    }
+
+    #[test]
+    fn test_decode_encode_top_level_trait_impl_uses_typeref_slots_without_path_gate() {
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {},
+  "traits": {},
+  "functions": {},
+  "trait_impls": [
+    { "trait_ref": "?Sized", "for_type": "'a" }
+  ]
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        assert_eq!(doc.trait_impls()[0].trait_ref.as_str(), "?Sized");
+        assert_eq!(doc.trait_impls()[0].for_type.as_str(), "'a");
+
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let doc2 = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
+        assert_eq!(doc, doc2);
     }
 
     #[test]

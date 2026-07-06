@@ -123,7 +123,7 @@ impl Encoder {
             self.assign_function_id(&path)?;
         }
 
-        // Identity-only deletion records still participate in TypeGraph A as
+        // Deletion records still participate in TypeGraph A as
         // Delete-marked top-level items. Phase 1 uses only their identity to
         // move the matching B-side item into the delete set.
         let deletion_local_names: Vec<String> = self
@@ -145,7 +145,7 @@ impl Encoder {
             .deletions()
             .iter()
             .filter_map(|record| match record {
-                DeletionRecord::Function { path } => Some(path.to_string()),
+                DeletionRecord::Function { path, .. } => Some(path.to_string()),
                 DeletionRecord::Type { .. } | DeletionRecord::Trait { .. } => None,
             })
             .collect();
@@ -567,13 +567,15 @@ fn encode_deletion_record(
     record: &DeletionRecord,
 ) -> Result<(), CatalogueToExtendedCrateCodecError> {
     match record {
-        DeletionRecord::Type { name, module_path } => {
+        DeletionRecord::Type { name, module_path, .. } => {
             encode_type_deletion(state, item_actions, name, module_path)
         }
-        DeletionRecord::Trait { name, module_path } => {
+        DeletionRecord::Trait { name, module_path, .. } => {
             encode_trait_deletion(state, item_actions, name, module_path)
         }
-        DeletionRecord::Function { path } => encode_function_deletion(state, item_actions, path),
+        DeletionRecord::Function { path, .. } => {
+            encode_function_deletion(state, item_actions, path)
+        }
     }
 }
 

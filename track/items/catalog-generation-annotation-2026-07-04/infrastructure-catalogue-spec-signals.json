@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "10763809fe20bcc6acfd3d4593e4720c08bb9237c0a004d7ff9dad2c726e414c",
+  "catalogue_declaration_hash": "98a85f85a2e6de8528a02e618292135223d1d28fdc695a46c29eda1a14b31c34",
   "signals": [
     {
       "type_name": "CatalogDraftError",
@@ -10,7 +10,7 @@
     {
       "type_name": "FsCatalogAdapter",
       "signal": "blue",
-      "entry_hash": "c92a02ad63465f8f1050ba4d6fb5b41a1f0e6ee5c24de6aa0094acc5449d2e86"
+      "entry_hash": "298f3738e42c108efb013bd2da66d9b698e96d2dd43a49cfcf1ca78982432b0f"
     },
     {
       "type_name": "ImplInfoDto",

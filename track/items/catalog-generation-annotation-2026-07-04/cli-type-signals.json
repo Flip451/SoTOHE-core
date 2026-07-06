@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-05T23:29:19Z",
-  "declaration_hash": "57f41d77f6caec798b60ed62d2a4e5f56ee40316048cd4bed354bdbd4afef3a0",
+  "generated_at": "2026-07-06T06:17:33Z",
+  "declaration_hash": "9092e183f847b83daa03368f8d0b7e4bd20ee88b450042305a5c60b2e99a489e",
   "signals": [
     {
       "type_name": "CatalogActionArg",

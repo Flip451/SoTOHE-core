@@ -87,17 +87,20 @@
             { "name": "methods",        "ty": "Vec<String>" },
             { "name": "variants",       "ty": "Vec<String>" },
             { "name": "trait_impls",           "ty": "Vec<String>" },
+            { "name": "inherent_methods",      "ty": "Vec<String>" },
             { "name": "generics",              "ty": "Vec<String>" },
             { "name": "where_predicates",      "ty": "Vec<String>" },
             { "name": "impl_generics",         "ty": "Vec<String>" },
-            { "name": "impl_where_predicates", "ty": "Vec<String>" }
+            { "name": "impl_where_predicates", "ty": "Vec<String>" },
+            { "name": "inherent_impl_generics", "ty": "Vec<String>" },
+            { "name": "inherent_impl_where_predicates", "ty": "Vec<String>" }
           ],
           "has_stripped_fields": false
         }
       },
       "methods": [],
       "module_path": "commands::catalog",
-      "docs": "Args DTO carrying the catalog add command-line fields. See IN-03, IN-09, AC-03, AC-07.",
+      "docs": "Args DTO for catalog add at the CLI boundary. See IN-03, IN-09, AC-03, AC-07.",
       "spec_refs": [
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-03" },
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-09" },
@@ -126,7 +129,7 @@
       },
       "methods": [],
       "module_path": "commands::catalog",
-      "docs": "Args DTO carrying the catalog import command-line fields. See IN-04, AC-04.",
+      "docs": "Args DTO for catalog import at the CLI boundary. See IN-04, AC-04.",
       "spec_refs": [
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-04" },
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-04" }
@@ -152,7 +155,7 @@
       },
       "methods": [],
       "module_path": "commands::catalog",
-      "docs": "Args DTO carrying the catalog cite command-line fields. See IN-05, AC-06.",
+      "docs": "Args DTO for catalog cite at the CLI boundary. See IN-05, AC-06.",
       "spec_refs": [
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-05" },
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-06" }
@@ -238,7 +241,7 @@
       },
       "methods": [],
       "module_path": "",
-      "docs": "Cli command enum modified this track to add the Catalog variant. See IN-01, AC-01.",
+      "docs": "CLI command enum entry. See IN-01, AC-01.",
       "spec_refs": [
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-01" },
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-01" }
@@ -302,10 +305,14 @@
       "is_async": false,
       "generics": [],
       "where_predicates": [],
-      "docs": "Execute the `sotp catalog add` subcommand. See IN-01, AC-01.",
+      "docs": "Catalog add CLI free function. See IN-01, IN-03, IN-09, AC-01, AC-03, AC-07.",
       "spec_refs": [
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-01" },
-        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-01" }
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-03" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-09" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-01" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-03" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-07" }
       ],
       "informal_grounds": []
     },

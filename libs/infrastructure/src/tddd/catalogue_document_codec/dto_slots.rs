@@ -1,27 +1,28 @@
 //! Entry-slot serde DTOs for the [`CatalogueDocument`] wire format.
 //!
-//! A `types` / `traits` / `functions` map value is either a live entry or an
-//! identity-only deletion tombstone. [`EntrySlotDto`] discriminates the two on
-//! the entry's `action` field, and [`TombstoneDto`] carries the identity-only
-//! deletion payload.
+//! A `types` / `traits` / `functions` map value is either a live entry or a
+//! deletion tombstone. [`EntrySlotDto`] discriminates the two on the entry's
+//! `action` field, and [`TombstoneDto`] carries deletion identity plus grounding.
 //!
 //! All types in this module are infrastructure-private (`pub(super)`).
 
 use serde::{Deserialize, Serialize, de};
 use serde_json::{Map, Number, Value};
 
+use crate::tddd::spec_ground_codec::{InformalGroundRefDto, SpecRefDto};
+
 // ---------------------------------------------------------------------------
 // Deletion tombstone DTO
 // ---------------------------------------------------------------------------
 
-/// Wire format for an identity-only `action: delete` entry (spec IN-04 / GO-03 /
+/// Wire format for a deletion tombstone `action: delete` entry (spec IN-04 / GO-03 /
 /// AC-04).
 ///
-/// A deletion is identity-only: the map key supplies the name (or, for
-/// functions, the full path) and the body carries at most a `module_path`.
-/// `deny_unknown_fields` rejects any `role` / `kind` / `methods` / `docs` /
-/// `spec_refs`, so a `delete` entry cannot smuggle live-entry annotations — the
-/// decoder routes it into `CatalogueDocument::deletions` instead.
+/// A deletion has no live shape: the map key supplies the name (or, for
+/// functions, the full path) and the body carries at most a `module_path` plus
+/// the normal grounding fields. `deny_unknown_fields` rejects any `role` /
+/// `kind` / `methods` / `docs`, so a `delete` entry cannot smuggle live-entry
+/// annotations. The decoder routes it into `CatalogueDocument::deletions`.
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub(super) struct TombstoneDto {
@@ -32,10 +33,16 @@ pub(super) struct TombstoneDto {
     /// item or a function (whose module is embedded in the map key).
     #[serde(default, skip_serializing_if = "String::is_empty")]
     pub(super) module_path: String,
+    /// Formal spec grounds for the deletion.
+    #[serde(default)]
+    pub(super) spec_refs: Vec<SpecRefDto>,
+    /// Informal grounds for deletion work not yet promoted to spec refs.
+    #[serde(default)]
+    pub(super) informal_grounds: Vec<InformalGroundRefDto>,
 }
 
 // ---------------------------------------------------------------------------
-// Entry slot — live entry vs identity-only deletion tombstone
+// Entry slot — live entry vs deletion tombstone
 // ---------------------------------------------------------------------------
 
 /// JSON value used only for entry-slot dispatch.
@@ -159,7 +166,7 @@ impl<'de> Deserialize<'de> for StrictJsonValue {
 }
 
 /// One slot in a `types` / `traits` / `functions` map: either a live entry `T`
-/// or an identity-only deletion [`TombstoneDto`].
+/// or a deletion [`TombstoneDto`].
 ///
 /// Discriminated by the entry's `action` field: `"delete"` decodes as
 /// [`Self::Tombstone`], anything else (or an absent `action`, which defaults to
@@ -170,7 +177,7 @@ impl<'de> Deserialize<'de> for StrictJsonValue {
 pub(super) enum EntrySlotDto<T> {
     /// A live entry (`add` / `modify` / `reference`).
     Live(T),
-    /// An identity-only deletion (`action: delete`).
+    /// A deletion (`action: delete`).
     Tombstone(TombstoneDto),
 }
 

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "57f41d77f6caec798b60ed62d2a4e5f56ee40316048cd4bed354bdbd4afef3a0",
+  "catalogue_declaration_hash": "9092e183f847b83daa03368f8d0b7e4bd20ee88b450042305a5c60b2e99a489e",
   "signals": [
     {
       "type_name": "CatalogActionArg",
@@ -10,7 +10,7 @@
     {
       "type_name": "CatalogAddArgs",
       "signal": "blue",
-      "entry_hash": "694c9abf724f06771227fc8375352acd7bd6f6bc3b8d99c054c26454b2008ac5"
+      "entry_hash": "fc3b94755f002317a5022bf62adba97fde39d41e7a094f114d5c6180069f74ca"
     },
     {
       "type_name": "CatalogCheckArgs",
@@ -20,7 +20,7 @@
     {
       "type_name": "CatalogCiteArgs",
       "signal": "blue",
-      "entry_hash": "8f5b3586d6de590c35ab7e5b0f0ec7431f1eb7b7654d15b4ae6f78b7e7648723"
+      "entry_hash": "1e190b746e98eb1146254bf4e7b1ad875ff0b31207ebae3b66158cb7fcaab8fa"
     },
     {
       "type_name": "CatalogCommand",
@@ -30,7 +30,7 @@
     {
       "type_name": "CatalogImportArgs",
       "signal": "blue",
-      "entry_hash": "560bd118cc95957ee56b4e7e059bac618362a5dfa39b8b5d1a6daca82feb9ce6"
+      "entry_hash": "478c646361b893e008524818da02f9cbee25d8c03356897860bba83290aea628"
     },
     {
       "type_name": "CatalogInitArgs",
@@ -45,7 +45,7 @@
     {
       "type_name": "CliCommand",
       "signal": "blue",
-      "entry_hash": "84deda1cf6988b5ef0edf75a6ec5e3e5a3ff0fd7831b6f21400b2ef1a65afbbf"
+      "entry_hash": "0c9ceb253833db9db847752a21e10afc60589851572ac82e810baa6bd05e9cd9"
     },
     {
       "type_name": "cli::commands::catalog::action_to_select",
@@ -65,7 +65,7 @@
     {
       "type_name": "cli::commands::catalog::execute_add",
       "signal": "blue",
-      "entry_hash": "346f420b05744d1022ac21b1222cffbb961f7a0533e1954b8deafe46724d5fdc"
+      "entry_hash": "085df6ffa71f837fe3eeb13ee46d31985f11b76169ac51895a09886dd16e3242"
     },
     {
       "type_name": "cli::commands::catalog::execute_check",

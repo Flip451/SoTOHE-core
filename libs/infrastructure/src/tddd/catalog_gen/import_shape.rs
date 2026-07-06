@@ -101,25 +101,42 @@ pub(super) fn build_import_entry(
     Ok(Value::Object(entry))
 }
 
-/// Build an identity-only deletion tombstone entry from `type_path`.
+/// Build a grounded deletion tombstone entry from `type_path`.
 ///
 /// A `delete` import records only the removed type's identity (its name + module
 /// path), so — unlike [`build_import_entry`] — it neither resolves the (expensive)
-/// rustdoc shape nor emits `role` / `docs` `$todo` holes. The returned
-/// `(name, entry)` is inserted into the `types` map with `action: "delete"`; the
-/// catalogue codec routes it to `CatalogueDocument::deletions`. A crate-root type
-/// omits `module_path` entirely. See spec IN-04, GO-03, AC-04.
+/// rustdoc shape nor emits `role` / `docs` `$todo` holes. It still requires and
+/// persists `spec_refs` so a type cannot be removed without a spec-grounded
+/// reason. The returned `(name, entry)` is inserted into the `types` map with
+/// `action: "delete"`; the catalogue codec routes it to
+/// `CatalogueDocument::deletions`. A crate-root type omits `module_path`
+/// entirely. See spec IN-04, GO-03, AC-04.
 ///
 /// # Errors
 ///
-/// Returns [`CatalogError::SchemaInvalid`] when `type_path` is not crate-qualified.
-pub(super) fn build_delete_entry(type_path: &str) -> Result<(String, Value), CatalogError> {
+/// Returns [`CatalogError::SchemaInvalid`] when `type_path` is not crate-qualified
+/// or no `--anchor` was supplied, and [`CatalogError::AnchorNotFound`] when an
+/// anchor does not resolve.
+pub(super) fn build_delete_entry(
+    type_path: &str,
+    anchors: &[String],
+    spec_file: &str,
+    spec_anchors: &BTreeSet<SpecElementId>,
+) -> Result<(String, Value), CatalogError> {
+    if anchors.is_empty() {
+        return Err(schema_error(
+            "delete imports require at least one --anchor so the deletion remains grounded",
+        ));
+    }
     let (_crate_name, module, name) = parse_type_path(type_path)?;
+    let spec_refs = spec_refs_value(anchors, spec_file, spec_anchors)?;
     let mut entry = Map::new();
     entry.insert("action".to_owned(), json!("delete"));
     if !module.is_empty() {
         entry.insert("module_path".to_owned(), json!(module));
     }
+    entry.insert("spec_refs".to_owned(), spec_refs);
+    entry.insert("informal_grounds".to_owned(), json!([]));
     Ok((name, Value::Object(entry)))
 }
 
@@ -380,6 +397,10 @@ mod tests {
         }
     }
 
+    fn spec_anchors(ids: &[&str]) -> BTreeSet<SpecElementId> {
+        ids.iter().map(|id| SpecElementId::try_new(*id).unwrap()).collect()
+    }
+
     #[test]
     fn test_parse_type_path() {
         let (crate_name, module, name) = parse_type_path("domain::tddd::LayerId").unwrap();
@@ -402,13 +423,22 @@ mod tests {
     }
 
     #[test]
-    fn test_build_delete_entry_is_identity_only() {
-        // A delete import emits an identity-only tombstone: action + module_path,
-        // with no role / docs / kind / methods holes to fill in.
-        let (name, entry) = build_delete_entry("domain::tddd::LayerId").unwrap();
+    fn test_build_delete_entry_is_grounded_tombstone() {
+        // A delete import emits a tombstone with identity + grounding, but no
+        // role / docs / kind / methods holes to fill in.
+        let anchors = vec!["IN-01".to_owned()];
+        let (name, entry) = build_delete_entry(
+            "domain::tddd::LayerId",
+            &anchors,
+            "spec.json",
+            &spec_anchors(&["IN-01"]),
+        )
+        .unwrap();
         assert_eq!(name, "LayerId");
         assert_eq!(entry["action"], json!("delete"));
         assert_eq!(entry["module_path"], json!("tddd"));
+        assert_eq!(entry["spec_refs"][0]["anchor"], json!("IN-01"));
+        assert_eq!(entry["informal_grounds"], json!([]));
         assert!(entry.get("role").is_none(), "delete tombstone must not carry a role");
         assert!(entry.get("docs").is_none(), "delete tombstone must not carry docs");
         assert!(entry.get("kind").is_none(), "delete tombstone must not carry a kind");
@@ -417,26 +447,56 @@ mod tests {
 
     #[test]
     fn test_build_delete_entry_root_module_omits_module_path() {
-        let (name, entry) = build_delete_entry("domain::Foo").unwrap();
+        let anchors = vec!["IN-01".to_owned()];
+        let (name, entry) =
+            build_delete_entry("domain::Foo", &anchors, "spec.json", &spec_anchors(&["IN-01"]))
+                .unwrap();
         assert_eq!(name, "Foo");
         assert_eq!(entry["action"], json!("delete"));
         assert!(entry.get("module_path").is_none(), "crate-root delete omits module_path");
     }
 
     #[test]
+    fn test_build_delete_entry_rejects_missing_anchor() {
+        let result = build_delete_entry(
+            "domain::tddd::LayerId",
+            &[],
+            "spec.json",
+            &spec_anchors(&["IN-01"]),
+        );
+        assert!(result.is_err(), "delete tombstone must not be created without grounding");
+    }
+
+    #[test]
     fn test_build_delete_entry_rejects_bare_name() {
-        assert!(build_delete_entry("LayerId").is_err());
+        let anchors = vec!["IN-01".to_owned()];
+        assert!(
+            build_delete_entry("LayerId", &anchors, "spec.json", &spec_anchors(&["IN-01"]))
+                .is_err()
+        );
     }
 
     #[test]
     fn test_build_delete_entry_rejects_invalid_module_path() {
-        let result = build_delete_entry("domain::bad-segment::LayerId");
+        let anchors = vec!["IN-01".to_owned()];
+        let result = build_delete_entry(
+            "domain::bad-segment::LayerId",
+            &anchors,
+            "spec.json",
+            &spec_anchors(&["IN-01"]),
+        );
         assert!(result.is_err(), "invalid module_path must be rejected before writing");
     }
 
     #[test]
     fn test_build_delete_entry_rejects_invalid_type_name() {
-        let result = build_delete_entry("domain::tddd::Layer-Id");
+        let anchors = vec!["IN-01".to_owned()];
+        let result = build_delete_entry(
+            "domain::tddd::Layer-Id",
+            &anchors,
+            "spec.json",
+            &spec_anchors(&["IN-01"]),
+        );
         assert!(result.is_err(), "invalid type name must be rejected before writing");
     }
 

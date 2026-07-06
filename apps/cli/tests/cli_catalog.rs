@@ -331,7 +331,7 @@ fn catalog_add_rejects_incompatible_shape_flags_before_write() {
 }
 
 #[test]
-fn catalog_add_rejects_non_path_trait_impl_before_write() {
+fn catalog_add_accepts_trait_impl_typeref_before_write() {
     let ws = setup_git_track("test-track");
     let root = ws.path();
     let items = items_arg(root);
@@ -359,12 +359,70 @@ fn catalog_add_rejects_non_path_trait_impl_before_write() {
             "?Sized",
         ],
     );
-    assert_eq!(out.status.code(), Some(1), "non-path --trait-impl: {}", show(&out));
+    assert!(out.status.success(), "TypeRef --trait-impl: {}", show(&out));
     let catalogue =
         std::fs::read_to_string(root.join("track/items/test-track/domain-types.json")).unwrap();
     assert!(
-        !catalogue.contains("BadImpl"),
-        "rejected trait impl must not write the entry:\n{catalogue}"
+        catalogue.contains("BadImpl"),
+        "accepted TypeRef trait impl must write the entry:\n{catalogue}"
+    );
+    assert!(
+        catalogue.contains("\"trait_ref\": \"?Sized\""),
+        "trait_ref must be preserved as TypeRef without a Rust path gate:\n{catalogue}"
+    );
+}
+
+#[test]
+fn catalog_add_accepts_inherent_method_before_write() {
+    let ws = setup_git_track("test-track");
+    let root = ws.path();
+    let items = items_arg(root);
+    let out = sotp(root, &["catalog", "init", "--items-dir", &items]);
+    assert!(out.status.success(), "init: {}", show(&out));
+
+    let out = sotp(
+        root,
+        &[
+            "catalog",
+            "add",
+            "--items-dir",
+            &items,
+            "--layer",
+            "domain",
+            "--kind",
+            "struct",
+            "--name",
+            "HasImpl",
+            "--role",
+            "ValueObject",
+            "--field",
+            "value: u32",
+            "--inherent-method",
+            "fn value(&self) -> u32",
+            "--inherent-impl-generic",
+            "T: Clone",
+            "--inherent-impl-where",
+            "T: Send",
+        ],
+    );
+    assert!(out.status.success(), "inherent method add: {}", show(&out));
+    let catalogue =
+        std::fs::read_to_string(root.join("track/items/test-track/domain-types.json")).unwrap();
+    assert!(
+        catalogue.contains("\"inherent_impls\""),
+        "inherent impls must be written:\n{catalogue}"
+    );
+    assert!(
+        catalogue.contains("\"type_name\": \"HasImpl\""),
+        "inherent impl type_name must come from --name:\n{catalogue}"
+    );
+    assert!(
+        catalogue.contains("\"name\": \"value\""),
+        "inherent method signature must be decomposed:\n{catalogue}"
+    );
+    assert!(
+        catalogue.contains("\"impl_generics\""),
+        "inherent impl-level generics must be preserved:\n{catalogue}"
     );
 }
 
@@ -406,7 +464,7 @@ fn catalog_add_rejects_function_signature_name_mismatch_before_write() {
 }
 
 #[test]
-fn catalog_cite_rejects_delete_tombstone_before_write() {
+fn catalog_cite_accepts_delete_tombstone_grounding() {
     let ws = setup_git_track("test-track");
     let root = ws.path();
     let items = items_arg(root);
@@ -426,11 +484,11 @@ fn catalog_cite_rejects_delete_tombstone_before_write() {
             "domain::tddd::Deleted",
             "--action",
             "delete",
+            "--anchor",
+            "IN-01",
         ],
     );
     assert!(out.status.success(), "delete import: {}", show(&out));
-    let before =
-        std::fs::read_to_string(root.join("track/items/test-track/domain-types.json")).unwrap();
 
     let out = sotp(
         root,
@@ -447,11 +505,11 @@ fn catalog_cite_rejects_delete_tombstone_before_write() {
             "IN-01",
         ],
     );
-    assert_eq!(out.status.code(), Some(1), "cite delete tombstone: {}", show(&out));
+    assert!(out.status.success(), "cite delete tombstone: {}", show(&out));
     let after =
         std::fs::read_to_string(root.join("track/items/test-track/domain-types.json")).unwrap();
-    assert_eq!(after, before, "rejected tombstone cite must not rewrite the catalogue");
-    assert!(!after.contains("spec_refs"), "delete tombstone must remain identity-only:\n{after}");
+    assert!(after.contains("\"action\": \"delete\""), "delete tombstone must remain:\n{after}");
+    assert!(after.contains("\"spec_refs\""), "delete tombstone must carry grounding:\n{after}");
 }
 
 #[test]

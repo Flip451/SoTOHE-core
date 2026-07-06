@@ -89,6 +89,8 @@ pub struct CatalogAddInput {
     pub variants: Vec<String>,
     /// Trait-impl declaration fragments.
     pub trait_impls: Vec<String>,
+    /// Inherent-impl method signature fragments.
+    pub inherent_methods: Vec<String>,
     /// Declaration-level generics.
     pub generics: Vec<String>,
     /// Declaration-level where predicates.
@@ -97,6 +99,10 @@ pub struct CatalogAddInput {
     pub impl_generics: Vec<String>,
     /// Impl-block-level where predicates.
     pub impl_where_predicates: Vec<String>,
+    /// Inherent impl-block-level generics.
+    pub inherent_impl_generics: Vec<String>,
+    /// Inherent impl-block-level where predicates.
+    pub inherent_impl_where_predicates: Vec<String>,
 }
 
 /// Input DTO carrying layer, type_path, action, and anchors. See IN-04, AC-04.
@@ -213,10 +219,13 @@ impl CatalogDriver {
             methods,
             variants,
             trait_impls,
+            inherent_methods,
             generics,
             where_predicates,
             impl_generics,
             impl_where_predicates,
+            inherent_impl_generics,
+            inherent_impl_where_predicates,
         } = input;
         let layer = match LayerId::try_new(layer) {
             Ok(layer) => layer,
@@ -232,10 +241,13 @@ impl CatalogDriver {
             methods,
             variants,
             trait_impls,
+            inherent_methods,
             generics,
             where_predicates,
             impl_generics,
             impl_where_predicates,
+            inherent_impl_generics,
+            inherent_impl_where_predicates,
         };
         match self.service.add(&track_id, &items_dir, command) {
             Ok(report) => CommandOutcome::success(Some(render_write_report(&report))),
@@ -484,10 +496,13 @@ mod tests {
             methods: vec![],
             variants: vec![],
             trait_impls: vec![],
+            inherent_methods: vec![],
             generics: vec![],
             where_predicates: vec![],
             impl_generics: vec![],
             impl_where_predicates: vec![],
+            inherent_impl_generics: vec![],
+            inherent_impl_where_predicates: vec![],
         }
     }
 

@@ -12,15 +12,17 @@
       },
       "methods": [],
       "module_path": "tddd::catalog_gen",
-      "docs": "Filesystem secondary adapter for the CatalogPort. See IN-01, IN-03, IN-04, IN-05, AC-01, AC-03, AC-04, AC-12.",
+      "docs": "Secondary adapter for CatalogPort catalog operations. See IN-01, IN-03, IN-04, IN-05, IN-09, AC-01, AC-03, AC-04, AC-07, AC-12.",
       "spec_refs": [
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-01" },
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-03" },
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-04" },
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-05" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-09" },
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-01" },
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-03" },
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-04" },
+        { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-07" },
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-12" }
       ],
       "informal_grounds": []

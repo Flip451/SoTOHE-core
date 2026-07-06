@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "7f71bd1aa44dd6250e87890535ef1d29251f6af3f85e42c1ad044e0fb3473870",
+  "catalogue_declaration_hash": "6f146e01b4bd3b2de6a9b400ce95cfbb8e63047de3425452e9e8a11e954c0b44",
   "signals": [
     {
       "type_name": "CatalogEntryKind",
@@ -25,7 +25,7 @@
     {
       "type_name": "DeletionRecord",
       "signal": "blue",
-      "entry_hash": "1927f5cdf90d9ecc9ec278e2ce0eb5bdd36d05aa51460c52501e5ad3e0a09e8a"
+      "entry_hash": "6620dcd6a7266246b734dd6c259fec55afa9cb91bbf0af928bceaebadf49e288"
     },
     {
       "type_name": "DocString",

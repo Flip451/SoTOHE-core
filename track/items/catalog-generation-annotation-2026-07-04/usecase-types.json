@@ -40,17 +40,20 @@
             { "name": "methods",               "ty": "Vec<String>" },
             { "name": "variants",              "ty": "Vec<String>" },
             { "name": "trait_impls",           "ty": "Vec<String>" },
+            { "name": "inherent_methods",      "ty": "Vec<String>" },
             { "name": "generics",              "ty": "Vec<String>" },
             { "name": "where_predicates",      "ty": "Vec<String>" },
             { "name": "impl_generics",         "ty": "Vec<String>" },
-            { "name": "impl_where_predicates", "ty": "Vec<String>" }
+            { "name": "impl_where_predicates", "ty": "Vec<String>" },
+            { "name": "inherent_impl_generics", "ty": "Vec<String>" },
+            { "name": "inherent_impl_where_predicates", "ty": "Vec<String>" }
           ],
           "has_stripped_fields": false
         }
       },
       "methods": [],
       "module_path": "catalog_gen",
-      "docs": "Command DTO carrying catalog add input fields. See IN-03, IN-08, IN-09, AC-03, AC-07.",
+      "docs": "Usecase command DTO for catalog add. See IN-03, IN-08, IN-09, AC-03, AC-07.",
       "spec_refs": [
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-03" },
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-08" },
@@ -78,7 +81,7 @@
       },
       "methods": [],
       "module_path": "catalog_gen",
-      "docs": "Command DTO carrying catalog import input fields. See IN-04, AC-04.",
+      "docs": "Usecase command DTO for catalog import. See IN-04, AC-04.",
       "spec_refs": [
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-04" },
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-04" }
@@ -102,7 +105,7 @@
       },
       "methods": [],
       "module_path": "catalog_gen",
-      "docs": "Command DTO carrying catalog cite input fields. See IN-05, AC-06.",
+      "docs": "Usecase command DTO for catalog cite. See IN-05, AC-06.",
       "spec_refs": [
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "IN-05" },
         { "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json", "anchor": "AC-06" }

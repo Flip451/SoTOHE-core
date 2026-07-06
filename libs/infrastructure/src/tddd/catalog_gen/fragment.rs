@@ -1,14 +1,16 @@
-//! Rust-fragment parsing for the catalogue adapter (D6 / IN-08).
+//! Schema-field decomposition for the catalogue adapter (D6 / IN-08).
 //!
-//! Each declaration / signature fragment is first validated with `syn`
-//! (fail-closed — unparseable input is rejected), then the caller's original,
-//! human-formatted type strings are recovered with a bracket-aware splitter and
-//! stored verbatim into the catalogue's structured DTO shape. No hand-rolled
-//! type grammar is introduced; `syn` remains the parser of record and the
-//! splitters only slice already-validated input.
+//! Each declaration / signature fragment is decomposed into the destination
+//! catalogue schema fields. Validation goes through the destination field
+//! constructors/parsers (`TypeRef::new`, `FieldName::new`, `ParamName::new`,
+//! `SelfReceiver::from_str`, etc.) instead of adding a Rust syntax parser gate.
 
 use domain::tddd::catalogue_linter::FreeText;
+use domain::tddd::catalogue_v2::{
+    FieldName, MethodName, ParamName, SelfReceiver, TypeRef, VariantName,
+};
 use serde_json::{Value, json};
+use std::str::FromStr;
 use usecase::catalog_gen::CatalogError;
 
 use super::fs_access::schema_error;
@@ -22,17 +24,14 @@ pub(super) fn parse_error(message: impl Into<String>) -> CatalogError {
 ///
 /// # Errors
 ///
-/// Returns [`CatalogError::ParseFragment`] when the fragment does not parse as a
-/// named field.
+/// Returns [`CatalogError::ParseFragment`] when the fragment cannot be split as
+/// `name: Type`, or [`CatalogError::SchemaInvalid`] when either destination
+/// schema field rejects its value.
 pub(super) fn parse_field(fragment: &str) -> Result<Value, CatalogError> {
-    let wrapped = format!("struct __Wrapper {{ {fragment} }}");
-    let item: syn::ItemStruct = syn::parse_str(&wrapped)
-        .map_err(|err| parse_error(format!("field `{fragment}`: {err}")))?;
-    if item.fields.len() != 1 {
-        return Err(parse_error(format!("field `{fragment}`: expected exactly one `name: Type`")));
-    }
     let (name, ty) = split_binding(fragment)
         .ok_or_else(|| parse_error(format!("field `{fragment}`: expected `name: Type`")))?;
+    let name = field_name_value("field name", &name)?;
+    let ty = type_ref_value("field type", &ty)?;
     Ok(json!({ "name": name, "ty": ty }))
 }
 
@@ -41,34 +40,14 @@ pub(super) fn parse_field(fragment: &str) -> Result<Value, CatalogError> {
 ///
 /// # Errors
 ///
-/// Returns [`CatalogError::ParseFragment`] when the fragment is not a valid
-/// generic parameter, or [`CatalogError::SchemaInvalid`] when the fragment is a
-/// valid lifetime or const generic parameter — forms the catalogue's
-/// `MethodGenericParam` DTO (a `name` + type `bounds`) cannot encode. Rejecting
-/// them here keeps `catalog add` fail-closed instead of emitting a `name` such
-/// as `'a` or `const N` that the codec later rejects as a non-identifier.
+/// Returns [`CatalogError::SchemaInvalid`] when the destination
+/// `MethodGenericParam` schema fields reject their values.
 pub(super) fn parse_generic(fragment: &str) -> Result<Value, CatalogError> {
-    let param: syn::GenericParam = syn::parse_str(fragment)
-        .map_err(|err| parse_error(format!("generic `{fragment}`: {err}")))?;
-    match param {
-        syn::GenericParam::Type(_) => {}
-        syn::GenericParam::Lifetime(_) => {
-            return Err(schema_error(format!(
-                "generic `{fragment}`: lifetime parameters are unsupported by the catalogue \
-                 (only simple type parameters like `T` or `T: Bound` are allowed)"
-            )));
-        }
-        syn::GenericParam::Const(_) => {
-            return Err(schema_error(format!(
-                "generic `{fragment}`: const generic parameters are unsupported by the catalogue \
-                 (only simple type parameters like `T` or `T: Bound` are allowed)"
-            )));
-        }
-    }
     let (name, bounds) = match split_binding(fragment) {
-        Some((name, rest)) => (name, split_top_level(&rest, '+')),
+        Some((name, rest)) => (name, type_ref_list("generic bounds", &rest, '+')?),
         None => (fragment.trim().to_owned(), Vec::new()),
     };
+    let name = param_name_value("generic name", &name)?;
     Ok(json!({ "name": name, "bounds": bounds }))
 }
 
@@ -77,19 +56,20 @@ pub(super) fn parse_generic(fragment: &str) -> Result<Value, CatalogError> {
 ///
 /// # Errors
 ///
-/// Returns [`CatalogError::ParseFragment`] when the fragment is not a valid
-/// where predicate.
+/// Returns [`CatalogError::ParseFragment`] when the fragment cannot be split
+/// into the schema's `lhs` / `rhs` / `operator` fields, or
+/// [`CatalogError::SchemaInvalid`] when a destination field rejects its value.
 pub(super) fn parse_where(fragment: &str) -> Result<Value, CatalogError> {
-    let _: syn::WherePredicate = syn::parse_str(fragment)
-        .map_err(|err| parse_error(format!("where predicate `{fragment}`: {err}")))?;
     if let Some((lhs, rhs_part)) = split_once_top_level(fragment, '=') {
-        let rhs = split_top_level(&rhs_part, '+');
+        let lhs = type_ref_value("where lhs", &lhs)?;
+        let rhs = type_ref_list("where rhs", &rhs_part, '+')?;
         return Ok(json!({ "lhs": lhs, "rhs": rhs, "operator": "Equal" }));
     }
     let (lhs, rhs_part) = split_binding(fragment).ok_or_else(|| {
         parse_error(format!("where predicate `{fragment}`: expected `T: Bounds`"))
     })?;
-    let rhs = split_top_level(&rhs_part, '+');
+    let lhs = type_ref_value("where lhs", &lhs)?;
+    let rhs = type_ref_list("where rhs", &rhs_part, '+')?;
     Ok(json!({ "lhs": lhs, "rhs": rhs, "operator": "Bound" }))
 }
 
@@ -98,47 +78,70 @@ pub(super) fn parse_where(fragment: &str) -> Result<Value, CatalogError> {
 ///
 /// # Errors
 ///
-/// Returns [`CatalogError::ParseFragment`] when the fragment is not a valid
-/// variant, or [`CatalogError::SchemaInvalid`] when the variant carries an
-/// explicit discriminant (`Name = <expr>`) — a form the catalogue's
-/// `VariantDecl` DTO cannot encode. Rejecting it here keeps `catalog add`
-/// fail-closed instead of storing `Name = <expr>` as the variant `name`, which
-/// the codec later rejects as a non-identifier.
+/// Returns [`CatalogError::ParseFragment`] when the fragment cannot be split
+/// into the schema's variant fields, or [`CatalogError::SchemaInvalid`] when a
+/// destination field rejects its value.
 pub(super) fn parse_variant(fragment: &str) -> Result<Value, CatalogError> {
-    let variant: syn::Variant = syn::parse_str(fragment)
-        .map_err(|err| parse_error(format!("variant `{fragment}`: {err}")))?;
-    if variant.discriminant.is_some() {
+    let trimmed = fragment.trim();
+    if split_once_top_level(trimmed, '=').is_some() {
         return Err(schema_error(format!(
             "variant `{fragment}`: explicit discriminants (`= <expr>`) are unsupported by the \
              catalogue"
         )));
     }
-    let trimmed = fragment.trim();
-    // Discriminate on the parsed `syn::Variant.fields`, not the first `(`/`{` in
-    // the raw text: a struct variant whose field type contains parentheses (e.g.
-    // `Point { coords: (u8, u8) }`) would otherwise enter the tuple branch and
-    // store everything before the paren (`Point { coords:`) as the variant name.
-    match variant.fields {
-        syn::Fields::Unnamed(_) => {
-            let name = leading_name(trimmed, '(');
-            let inner = extract_delimited(trimmed, '(', ')').ok_or_else(|| {
-                parse_error(format!("variant `{fragment}`: unbalanced parentheses"))
-            })?;
-            let fields = split_top_level(&inner, ',');
-            Ok(json!({ "name": name, "payload": { "kind": "tuple", "fields": fields } }))
+
+    let tuple_open = find_top_level_char(trimmed, '(');
+    let struct_open = find_top_level_char(trimmed, '{');
+    match (tuple_open, struct_open) {
+        (Some(tuple_idx), None) => parse_tuple_variant(fragment, trimmed, tuple_idx),
+        (Some(tuple_idx), Some(struct_idx)) if tuple_idx < struct_idx => {
+            parse_tuple_variant(fragment, trimmed, tuple_idx)
         }
-        syn::Fields::Named(_) => {
-            let name = leading_name(trimmed, '{');
-            let inner = extract_delimited(trimmed, '{', '}')
-                .ok_or_else(|| parse_error(format!("variant `{fragment}`: unbalanced braces")))?;
-            let mut fields = Vec::new();
-            for field_frag in split_top_level(&inner, ',') {
-                fields.push(parse_field(&field_frag)?);
-            }
-            Ok(json!({ "name": name, "payload": { "kind": "struct", "fields": fields } }))
+        (_, Some(struct_idx)) => parse_struct_variant(fragment, trimmed, struct_idx),
+        (None, None) => {
+            let name = variant_name_value("variant name", trimmed)?;
+            Ok(json!({ "name": name, "payload": { "kind": "unit" } }))
         }
-        syn::Fields::Unit => Ok(json!({ "name": trimmed, "payload": { "kind": "unit" } })),
     }
+}
+
+fn parse_tuple_variant(
+    fragment: &str,
+    trimmed: &str,
+    tuple_idx: usize,
+) -> Result<Value, CatalogError> {
+    let name = variant_name_value("variant name", trimmed.get(..tuple_idx).unwrap_or(""))?;
+    let inner = extract_delimited(trimmed, '(', ')')
+        .ok_or_else(|| parse_error(format!("variant `{fragment}`: unbalanced parentheses")))?;
+    let tail = tail_after_delimited(trimmed, '(', ')').unwrap_or_default();
+    if !tail.trim().is_empty() {
+        return Err(parse_error(format!(
+            "variant `{fragment}`: unexpected text after tuple payload"
+        )));
+    }
+    let fields = type_ref_list("tuple variant field", &inner, ',')?;
+    Ok(json!({ "name": name, "payload": { "kind": "tuple", "fields": fields } }))
+}
+
+fn parse_struct_variant(
+    fragment: &str,
+    trimmed: &str,
+    struct_idx: usize,
+) -> Result<Value, CatalogError> {
+    let name = variant_name_value("variant name", trimmed.get(..struct_idx).unwrap_or(""))?;
+    let inner = extract_delimited(trimmed, '{', '}')
+        .ok_or_else(|| parse_error(format!("variant `{fragment}`: unbalanced braces")))?;
+    let tail = tail_after_delimited(trimmed, '{', '}').unwrap_or_default();
+    if !tail.trim().is_empty() {
+        return Err(parse_error(format!(
+            "variant `{fragment}`: unexpected text after struct payload"
+        )));
+    }
+    let mut fields = Vec::new();
+    for field_frag in split_top_level(&inner, ',') {
+        fields.push(parse_field(&field_frag)?);
+    }
+    Ok(json!({ "name": name, "payload": { "kind": "struct", "fields": fields } }))
 }
 
 /// Parse a method / function signature (`fn name<G>(recv, p: T) -> R where W`)
@@ -146,17 +149,24 @@ pub(super) fn parse_variant(fragment: &str) -> Result<Value, CatalogError> {
 ///
 /// # Errors
 ///
-/// Returns [`CatalogError::ParseFragment`] when the fragment is not a valid
-/// signature.
+/// Returns [`CatalogError::ParseFragment`] when the fragment cannot be split as
+/// a method/function signature, or [`CatalogError::SchemaInvalid`] when a
+/// destination field rejects its value.
 pub(super) fn parse_method(fragment: &str) -> Result<Value, CatalogError> {
-    let signature: syn::Signature = syn::parse_str(fragment)
-        .map_err(|err| parse_error(format!("method `{fragment}`: {err}")))?;
-    let name = signature.ident.to_string();
-    let is_async = signature.asyncness.is_some();
+    let trimmed = fragment.trim();
+    let (is_async, rest) = match strip_keyword(trimmed, "async") {
+        Some(rest) => (true, rest),
+        None => (false, trimmed),
+    };
+    let rest = strip_keyword(rest, "fn")
+        .ok_or_else(|| parse_error(format!("method `{fragment}`: expected `fn name(...)`")))?;
 
-    let param_open = find_param_open(fragment)
+    let param_open = find_param_open(rest)
         .ok_or_else(|| parse_error(format!("method `{fragment}`: missing parameter list")))?;
-    let params_region = fragment.get(param_open..).unwrap_or_default();
+    let head = rest.get(..param_open).unwrap_or("").trim();
+    let (name, generics) = parse_method_head(head, fragment)?;
+
+    let params_region = rest.get(param_open..).unwrap_or_default();
     let params_inner = extract_delimited(params_region, '(', ')')
         .ok_or_else(|| parse_error(format!("method `{fragment}`: missing parameter list")))?;
     let mut receiver: Option<String> = None;
@@ -167,14 +177,18 @@ pub(super) fn parse_method(fragment: &str) -> Result<Value, CatalogError> {
                 receiver = Some(recv);
                 continue;
             }
+            if looks_like_unsupported_receiver(&part) {
+                return Err(parse_error(format!(
+                    "method `{fragment}`: receiver `{part}` is not representable by SelfReceiver"
+                )));
+            }
         }
-        params.push(parse_field(&part)?);
+        params.push(parse_param(&part)?);
     }
 
     let after_params = tail_after_delimited(params_region, '(', ')').unwrap_or_default();
-    let has_where = signature.generics.where_clause.is_some();
-    let (returns, where_body) = split_return_and_where(&after_params, has_where);
-    let generics = extract_method_generics(fragment, param_open)?;
+    let (returns, where_body) = split_return_and_where(&after_params);
+    let returns = type_ref_value("method return type", &returns)?;
     let mut where_predicates = Vec::new();
     if let Some(body) = where_body {
         for predicate in split_top_level(&body, ',') {
@@ -205,24 +219,105 @@ pub(super) fn parse_method(fragment: &str) -> Result<Value, CatalogError> {
 ///
 /// # Errors
 ///
-/// Returns [`CatalogError::ParseFragment`] when the trait reference is not a
-/// Rust path accepted by the catalogue codec's `trait_ref` boundary.
+/// Returns [`CatalogError::SchemaInvalid`] when the destination `TypeRef` field
+/// rejects the trait reference.
 pub(super) fn parse_trait_impl(fragment: &str, for_type: &str) -> Result<Value, CatalogError> {
-    let _: syn::Path = syn::parse_str(fragment).map_err(|err| {
-        parse_error(format!(
-            "trait impl `{fragment}`: expected a trait path such as `From<CodecError>`: {err}"
-        ))
-    })?;
-    Ok(json!({ "trait_ref": fragment.trim(), "for_type": for_type }))
+    let trait_ref = type_ref_value("trait impl trait_ref", fragment)?;
+    let for_type = type_ref_value("trait impl for_type", for_type)?;
+    Ok(json!({ "trait_ref": trait_ref, "for_type": for_type }))
 }
 
 // ---------------------------------------------------------------------------
 // Bracket-aware substring recovery helpers
 // ---------------------------------------------------------------------------
 
-/// Split `input` on `delimiter` at bracket depth 0, trimming and dropping empty
-/// pieces. `->` is treated as a literal token so return arrows do not skew depth.
-fn split_top_level(input: &str, delimiter: char) -> Vec<String> {
+fn type_ref_value(label: &str, value: &str) -> Result<String, CatalogError> {
+    let trimmed = value.trim();
+    TypeRef::new(trimmed.to_owned())
+        .map(|ty| ty.as_str().to_owned())
+        .map_err(|err| schema_error(format!("{label} `{trimmed}` is not a valid TypeRef: {err}")))
+}
+
+fn type_ref_list(label: &str, input: &str, delimiter: char) -> Result<Vec<String>, CatalogError> {
+    let parts = split_top_level_preserving_empty(input, delimiter);
+    if parts.is_empty() {
+        return Err(schema_error(format!("{label} must contain at least one TypeRef")));
+    }
+    if parts.iter().any(|part| part.is_empty()) {
+        return Err(schema_error(format!("{label} contains an empty TypeRef")));
+    }
+    parts.into_iter().map(|part| type_ref_value(label, &part)).collect()
+}
+
+fn field_name_value(label: &str, value: &str) -> Result<String, CatalogError> {
+    let trimmed = value.trim();
+    FieldName::new(trimmed.to_owned())
+        .map(|name| name.as_str().to_owned())
+        .map_err(|err| schema_error(format!("{label} `{trimmed}` is not a valid FieldName: {err}")))
+}
+
+fn method_name_value(label: &str, value: &str) -> Result<String, CatalogError> {
+    let trimmed = value.trim();
+    MethodName::new(trimmed.to_owned()).map(|name| name.as_str().to_owned()).map_err(|err| {
+        schema_error(format!("{label} `{trimmed}` is not a valid MethodName: {err}"))
+    })
+}
+
+fn param_name_value(label: &str, value: &str) -> Result<String, CatalogError> {
+    let trimmed = value.trim();
+    ParamName::new(trimmed.to_owned())
+        .map(|name| name.as_str().to_owned())
+        .map_err(|err| schema_error(format!("{label} `{trimmed}` is not a valid ParamName: {err}")))
+}
+
+fn variant_name_value(label: &str, value: &str) -> Result<String, CatalogError> {
+    let trimmed = value.trim();
+    VariantName::new(trimmed.to_owned()).map(|name| name.as_str().to_owned()).map_err(|err| {
+        schema_error(format!("{label} `{trimmed}` is not a valid VariantName: {err}"))
+    })
+}
+
+fn parse_param(fragment: &str) -> Result<Value, CatalogError> {
+    let (name, ty) = split_binding(fragment)
+        .ok_or_else(|| parse_error(format!("parameter `{fragment}`: expected `name: Type`")))?;
+    let name = param_name_value("parameter name", &name)?;
+    let ty = type_ref_value("parameter type", &ty)?;
+    Ok(json!({ "name": name, "ty": ty }))
+}
+
+fn parse_method_head(head: &str, fragment: &str) -> Result<(String, Vec<Value>), CatalogError> {
+    let Some(generic_start) = find_top_level_char(head, '<') else {
+        return Ok((method_name_value("method name", head)?, Vec::new()));
+    };
+    let name = method_name_value("method name", head.get(..generic_start).unwrap_or(""))?;
+    let inner = extract_delimited(head, '<', '>')
+        .ok_or_else(|| parse_error(format!("method `{fragment}`: unbalanced generics")))?;
+    let tail = tail_after_delimited(head, '<', '>').unwrap_or_default();
+    if !tail.trim().is_empty() {
+        return Err(parse_error(format!("method `{fragment}`: unexpected text after generics")));
+    }
+    let mut generics = Vec::new();
+    for part in split_top_level(&inner, ',') {
+        generics.push(parse_generic(&part)?);
+    }
+    if generics.is_empty() {
+        return Err(parse_error(format!("method `{fragment}`: empty generic list")));
+    }
+    Ok((name, generics))
+}
+
+fn strip_keyword<'a>(input: &'a str, keyword: &str) -> Option<&'a str> {
+    let rest = input.strip_prefix(keyword)?;
+    if rest.chars().next().is_some_and(is_ident_char) {
+        return None;
+    }
+    Some(rest.trim_start())
+}
+
+/// Split `input` on `delimiter` at bracket depth 0, trimming each piece and
+/// preserving empty pieces. `->` is treated as a literal token so return arrows
+/// do not skew depth.
+fn split_top_level_preserving_empty(input: &str, delimiter: char) -> Vec<String> {
     let mut parts = Vec::new();
     let mut depth: i32 = 0;
     let mut current = String::new();
@@ -249,7 +344,16 @@ fn split_top_level(input: &str, delimiter: char) -> Vec<String> {
         }
     }
     parts.push(current.trim().to_owned());
-    parts.into_iter().filter(|part| !part.is_empty()).collect()
+    parts
+}
+
+/// Split `input` on `delimiter` at bracket depth 0, trimming and dropping empty
+/// pieces. `->` is treated as a literal token so return arrows do not skew depth.
+fn split_top_level(input: &str, delimiter: char) -> Vec<String> {
+    split_top_level_preserving_empty(input, delimiter)
+        .into_iter()
+        .filter(|part| !part.is_empty())
+        .collect()
 }
 
 /// Split `fragment` at the first single top-level `:` into `(name, rest)`.
@@ -303,14 +407,6 @@ fn split_once_top_level(fragment: &str, delimiter: char) -> Option<(String, Stri
     None
 }
 
-/// The identifier before the first `open` delimiter.
-fn leading_name(fragment: &str, open: char) -> String {
-    match fragment.find(open) {
-        Some(idx) => fragment.get(..idx).unwrap_or("").trim().to_owned(),
-        None => fragment.trim().to_owned(),
-    }
-}
-
 /// The substring strictly inside the first balanced `open`..`close` pair.
 fn extract_delimited(input: &str, open: char, close: char) -> Option<String> {
     let start = input.find(open)?;
@@ -352,8 +448,13 @@ fn extract_delimited(input: &str, open: char, close: char) -> Option<String> {
 fn tail_after_delimited(input: &str, open: char, close: char) -> Option<String> {
     let start = input.find(open)?;
     let mut depth: i32 = 0;
-    for (idx, ch) in input.char_indices() {
+    let mut chars = input.char_indices().peekable();
+    while let Some((idx, ch)) = chars.next() {
         if idx < start {
+            continue;
+        }
+        if ch == '-' && matches!(chars.peek(), Some(&(_, '>'))) {
+            chars.next();
             continue;
         }
         if ch == open {
@@ -385,6 +486,29 @@ fn find_param_open(fragment: &str) -> Option<usize> {
             '<' => angle_depth += 1,
             '>' => angle_depth -= 1,
             '(' if angle_depth <= 0 => return Some(idx),
+            _ => {}
+        }
+    }
+    None
+}
+
+/// Locate a single character at bracket depth ≤ 0.
+fn find_top_level_char(haystack: &str, needle: char) -> Option<usize> {
+    let mut depth: i32 = 0;
+    let mut chars = haystack.char_indices().peekable();
+    while let Some((idx, ch)) = chars.next() {
+        match ch {
+            '-' if matches!(chars.peek(), Some(&(_, '>'))) => {
+                chars.next();
+            }
+            '<' | '(' | '[' | '{' => {
+                if depth <= 0 && ch == needle {
+                    return Some(idx);
+                }
+                depth += 1;
+            }
+            '>' | ')' | ']' | '}' => depth -= 1,
+            c if depth <= 0 && c == needle => return Some(idx),
             _ => {}
         }
     }
@@ -456,12 +580,10 @@ fn is_ident_char(ch: char) -> bool {
 }
 
 /// Split a post-parameter tail into a return-type string and optional
-/// where-clause body. `has_where` is the syn-derived signal for whether the
-/// signature actually carries a where clause, so a return type that merely
-/// contains the substring `where` (e.g. `somewhere::T`) is never mistaken for
-/// one.
-fn split_return_and_where(after: &str, has_where: bool) -> (String, Option<String>) {
-    let where_start = if has_where { find_top_level_keyword(after, "where") } else { None };
+/// where-clause body. The `where` match must be a whole token, so a return type
+/// such as `somewhere::T` is never mistaken for a where clause.
+fn split_return_and_where(after: &str) -> (String, Option<String>) {
+    let where_start = find_top_level_keyword(after, "where");
     let (head, where_body) = match where_start {
         Some(idx) => {
             let before = after.get(..idx).unwrap_or("").to_owned();
@@ -477,32 +599,21 @@ fn split_return_and_where(after: &str, has_where: bool) -> (String, Option<Strin
     (returns, where_body)
 }
 
-/// Extract declaration generics — the `<...>` block in `fragment[..param_open]`,
-/// where `param_open` is the byte offset of the parameter-list `(` — into a vec
-/// of values.
-fn extract_method_generics(fragment: &str, param_open: usize) -> Result<Vec<Value>, CatalogError> {
-    let head = fragment.get(..param_open).unwrap_or("");
-    if !head.contains('<') {
-        return Ok(Vec::new());
-    }
-    let inner = extract_delimited(head, '<', '>')
-        .ok_or_else(|| parse_error(format!("method `{fragment}`: unbalanced generics")))?;
-    let mut generics = Vec::new();
-    for part in split_top_level(&inner, ',') {
-        generics.push(parse_generic(&part)?);
-    }
-    Ok(generics)
-}
-
 /// Recognise a `self` / `&self` / `&mut self` receiver.
 fn self_receiver(part: &str) -> Option<String> {
     let compact: String = part.chars().filter(|ch| !ch.is_whitespace()).collect();
-    match compact.as_str() {
-        "self" => Some("self".to_owned()),
-        "&self" => Some("&self".to_owned()),
-        "&mutself" => Some("&mut self".to_owned()),
-        _ => None,
-    }
+    let receiver = match compact.as_str() {
+        "self" => "self",
+        "&self" => "&self",
+        "&mutself" => "&mut self",
+        _ => return None,
+    };
+    SelfReceiver::from_str(receiver).ok().map(|receiver| receiver.to_string())
+}
+
+fn looks_like_unsupported_receiver(part: &str) -> bool {
+    let compact: String = part.chars().filter(|ch| !ch.is_whitespace()).collect();
+    compact.starts_with("self:") || compact.starts_with("mutself:")
 }
 
 #[cfg(test)]
@@ -524,6 +635,13 @@ mod tests {
     }
 
     #[test]
+    fn test_parse_field_uses_typeref_newtype_not_rust_syntax_gate() {
+        let value = parse_field("items: Vec<").unwrap();
+        assert_eq!(value["name"], json!("items"));
+        assert_eq!(value["ty"], json!("Vec<"));
+    }
+
+    #[test]
     fn test_parse_field_rejects_garbage() {
         assert!(matches!(
             parse_field("this is not a field"),
@@ -539,6 +657,15 @@ mod tests {
     }
 
     #[test]
+    fn test_parse_generic_rejects_empty_bound_fragment() {
+        assert!(matches!(parse_generic("T: Clone +"), Err(CatalogError::SchemaInvalid { .. })));
+        assert!(matches!(
+            parse_generic("T: Clone ++ Send"),
+            Err(CatalogError::SchemaInvalid { .. })
+        ));
+    }
+
+    #[test]
     fn test_parse_generic_without_bounds() {
         let value = parse_generic("T").unwrap();
         assert_eq!(value["name"], json!("T"));
@@ -551,6 +678,15 @@ mod tests {
         assert_eq!(value["lhs"], json!("T"));
         assert_eq!(value["rhs"], json!(["Clone"]));
         assert_eq!(value["operator"], json!("Bound"));
+    }
+
+    #[test]
+    fn test_parse_where_rejects_empty_rhs_fragment() {
+        assert!(matches!(parse_where("T: Clone +"), Err(CatalogError::SchemaInvalid { .. })));
+        assert!(matches!(
+            parse_where("T::Item = "),
+            Err(CatalogError::ParseFragment { .. } | CatalogError::SchemaInvalid { .. })
+        ));
     }
 
     #[test]
@@ -662,32 +798,28 @@ mod tests {
     }
 
     #[test]
-    fn test_parse_trait_impl_rejects_non_path_bounds() {
-        assert!(matches!(
-            parse_trait_impl("?Sized", "MyType"),
-            Err(CatalogError::ParseFragment { .. })
-        ));
-        assert!(matches!(
-            parse_trait_impl("'a", "MyType"),
-            Err(CatalogError::ParseFragment { .. })
-        ));
+    fn test_parse_trait_impl_uses_typeref_newtype_not_path_gate() {
+        let sized = parse_trait_impl("?Sized", "MyType").unwrap();
+        assert_eq!(sized["trait_ref"], json!("?Sized"));
+
+        let lifetime = parse_trait_impl("'a", "MyType").unwrap();
+        assert_eq!(lifetime["trait_ref"], json!("'a"));
     }
 
-    // Finding F1: lifetime and const generic parameters parse as valid Rust
-    // (`syn::GenericParam`) but the catalogue's `MethodGenericParam` DTO cannot
-    // encode them, so they must be rejected at the fragment boundary rather than
-    // emitting a `name` like `'a` / `const N` that the codec later rejects.
-    // A simple type parameter (with or without bounds) is still accepted.
+    // The real `MethodGenericParam` schema stores `name: ParamName`, so lifetime
+    // / const generic forms are rejected by `ParamName::new`, not by a Rust
+    // syntax parser. Bounds remain `TypeRef` values.
     #[test]
     fn test_parse_generic_rejects_lifetime_and_const_but_accepts_type_param() {
         assert!(matches!(parse_generic("'a"), Err(CatalogError::SchemaInvalid { .. })));
         assert!(matches!(parse_generic("const N: usize"), Err(CatalogError::SchemaInvalid { .. })));
         assert!(parse_generic("T").is_ok());
         assert!(parse_generic("T: Clone + Send").is_ok());
+        assert!(parse_generic("T: ?Sized + 'static").is_ok());
     }
 
-    // Finding F1: a lifetime generic on a method signature routes through
-    // `extract_method_generics` → `parse_generic`, so the whole signature is
+    // A lifetime generic on a method signature routes through the actual
+    // `MethodGenericParam.name: ParamName` schema type, so the whole signature is
     // rejected instead of writing an invalid `'a` generic-param name.
     #[test]
     fn test_parse_method_rejects_lifetime_generic() {
@@ -697,10 +829,9 @@ mod tests {
         ));
     }
 
-    // Finding F2: a fieldless variant with an explicit discriminant parses as a
-    // valid `syn::Variant` but the catalogue's `VariantDecl` DTO cannot encode
-    // the discriminant, so it must be rejected instead of storing `Error = 1` as
-    // the variant name. A plain fieldless variant is still accepted.
+    // A fieldless variant with an explicit discriminant carries information
+    // that the catalogue's `VariantDecl` DTO cannot encode, so it must be
+    // rejected instead of storing `Error = 1` as the variant name.
     #[test]
     fn test_parse_variant_rejects_discriminant_but_accepts_fieldless() {
         assert!(matches!(parse_variant("Error = 1"), Err(CatalogError::SchemaInvalid { .. })));

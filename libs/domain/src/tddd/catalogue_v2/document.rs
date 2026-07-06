@@ -143,12 +143,13 @@ pub struct CatalogueDocument {
     /// Default empty Vec — catalogues predating this field decode without trait impl blocks.
     trait_impls: Vec<TraitImplDeclV2>,
 
-    /// Identity-only deletion records (`action: delete` entries).
+    /// Grounded deletion records (`action: delete` entries).
     ///
     /// A `sotp catalog import --action delete` entry records the identity of a
     /// removed item here rather than as a live `types` / `traits` / `functions`
-    /// entry, so a deletion carries no role / shape / methods / docs. Default
-    /// empty Vec — catalogues predating this field decode without deletions.
+    /// entry, so a deletion carries no role / shape / methods / docs. It still
+    /// carries grounding fields. Default empty Vec — catalogues predating this
+    /// field decode without deletions.
     /// See spec IN-04, GO-03, AC-04.
     deletions: Vec<DeletionRecord>,
 }
@@ -218,7 +219,7 @@ impl CatalogueDocument {
         &self.trait_impls
     }
 
-    /// Identity-only deletion records (`action: delete` entries).
+    /// Grounded deletion records (`action: delete` entries).
     #[must_use]
     pub fn deletions(&self) -> &[DeletionRecord] {
         &self.deletions
@@ -249,7 +250,7 @@ impl CatalogueDocument {
         self.trait_impls.push(decl);
     }
 
-    /// Appends an identity-only deletion record.
+    /// Appends a grounded deletion record.
     pub fn push_deletion(&mut self, record: DeletionRecord) {
         self.deletions.push(record);
     }
@@ -540,6 +541,8 @@ mod tests {
         doc.push_deletion(DeletionRecord::Type {
             name: TypeName::new("OldType").unwrap(),
             module_path: ModulePath::root(),
+            spec_refs: vec![],
+            informal_grounds: vec![],
         });
         assert_eq!(doc.deletions().len(), 1);
     }

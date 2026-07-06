@@ -730,13 +730,13 @@ mod tests {
     }
 
     /// An `ItemAction::Reference` entry with empty `spec_refs` and empty
-    /// `informal_grounds` must evaluate to `Blue` (ADR
-    /// `2026-05-11-1257-tddd-v2-catalogue-spec-link-restoration.md` D5).
+    /// `informal_grounds` must evaluate to `Red`; every catalogue entry must
+    /// carry formal or informal grounding.
     /// This test verifies the action-threading path for the `Reference` variant
     /// specifically — a regression in `entry.action` access or the
     /// `evaluate_catalogue_entry_signal` call site would produce `Red` instead of `Blue`.
     #[test]
-    fn refresh_reference_action_with_no_spec_refs_or_informal_evaluates_to_blue() {
+    fn refresh_reference_action_with_no_spec_refs_or_informal_evaluates_to_red() {
         let (cat, _) = catalogue_entry_with_action(
             "ExternalType",
             ItemAction::Reference,
@@ -756,8 +756,8 @@ mod tests {
         assert_eq!(doc.signals[0].type_name, "ExternalType");
         assert_eq!(
             doc.signals[0].signal,
-            domain::ConfidenceSignal::Blue,
-            "Reference action with empty spec_refs + informal_grounds must be Blue (D5 exemption)"
+            domain::ConfidenceSignal::Red,
+            "Reference action with empty spec_refs + informal_grounds must be Red"
         );
     }
 

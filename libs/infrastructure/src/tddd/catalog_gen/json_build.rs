@@ -9,7 +9,7 @@ use std::collections::BTreeSet;
 use domain::plan_ref::SpecElementId;
 use domain::tddd::LayerId;
 use domain::tddd::catalog_gen::CatalogEntryKind;
-use domain::tddd::catalogue_v2::CrateName;
+use domain::tddd::catalogue_v2::{CrateName, TypeName};
 use serde_json::{Map, Value, json};
 use usecase::catalog_gen::{CatalogAddCommand, CatalogError};
 
@@ -48,7 +48,7 @@ pub(super) fn empty_catalogue_value(crate_name: &str, layer: &str) -> Result<Val
 }
 
 /// Build an annotated entry skeleton for `add`, plus any document-level
-/// trait-impl declarations.
+/// trait-impl and inherent-impl declarations.
 ///
 /// Supplied shape nodes are structured verbatim; omitted ones become `$todo`
 /// holes.
@@ -61,7 +61,7 @@ pub(super) fn build_add_entry(
     command: &CatalogAddCommand,
     spec_file: &str,
     spec_anchors: &BTreeSet<SpecElementId>,
-) -> Result<(Value, Vec<Value>), CatalogError> {
+) -> Result<(Value, Vec<Value>, Vec<Value>), CatalogError> {
     validate_shape_flag_compatibility(command)?;
     validate_role(command.kind, &command.role)?;
     let spec_refs = spec_refs_value(&command.anchors, spec_file, spec_anchors)?;
@@ -110,7 +110,8 @@ pub(super) fn build_add_entry(
     entry.insert("informal_grounds".to_owned(), json!([]));
 
     let trait_impls = build_trait_impls(command)?;
-    Ok((Value::Object(entry), trait_impls))
+    let inherent_impls = build_inherent_impls(command)?;
+    Ok((Value::Object(entry), trait_impls, inherent_impls))
 }
 
 /// Reject shape flags that the selected entry kind cannot consume.
@@ -136,6 +137,32 @@ fn validate_shape_flag_compatibility(command: &CatalogAddCommand) -> Result<(), 
             return Err(parse_error(
                 "--impl-where requires at least one --trait-impl; otherwise the impl where \
                  predicate would be dropped",
+            ));
+        }
+    }
+    if !command.inherent_methods.is_empty()
+        && !matches!(
+            command.kind,
+            CatalogEntryKind::Struct | CatalogEntryKind::Enum | CatalogEntryKind::TypeAlias
+        )
+    {
+        return Err(incompatible_flag_error(
+            "--inherent-method",
+            command.kind,
+            "struct, enum, or type-alias entries",
+        ));
+    }
+    if command.inherent_methods.is_empty() {
+        if !command.inherent_impl_generics.is_empty() {
+            return Err(parse_error(
+                "--inherent-impl-generic requires at least one --inherent-method; otherwise the \
+                 inherent impl generic would be dropped",
+            ));
+        }
+        if !command.inherent_impl_where_predicates.is_empty() {
+            return Err(parse_error(
+                "--inherent-impl-where requires at least one --inherent-method; otherwise the \
+                 inherent impl where predicate would be dropped",
             ));
         }
     }
@@ -342,8 +369,29 @@ fn build_trait_impls(command: &CatalogAddCommand) -> Result<Vec<Value>, CatalogE
     Ok(impls)
 }
 
-/// Attach `impl_generics` / `impl_where_predicates` to a trait-impl value when
-/// non-empty, matching the codec's `TraitImplDto` wire shape.
+/// Build the document-level inherent impl declaration for the entry, carrying
+/// the impl-block generics / where predicates onto that declaration.
+fn build_inherent_impls(command: &CatalogAddCommand) -> Result<Vec<Value>, CatalogError> {
+    if command.inherent_methods.is_empty() {
+        return Ok(Vec::new());
+    }
+    let type_name = TypeName::new(command.name.clone()).map_err(|err| {
+        schema_error(format!("inherent impl type_name `{}` is invalid: {err}", command.name))
+    })?;
+    let methods = parse_list(&command.inherent_methods, parse_method)?;
+    let impl_generics = parse_list(&command.inherent_impl_generics, parse_generic)?;
+    let impl_where_predicates = parse_list(&command.inherent_impl_where_predicates, parse_where)?;
+    let mut value = json!({
+        "type_name": type_name.as_str(),
+        "methods": methods
+    });
+    attach_impl_bounds(&mut value, &impl_generics, &impl_where_predicates);
+    Ok(vec![value])
+}
+
+/// Attach `impl_generics` / `impl_where_predicates` to an impl value when
+/// non-empty, matching the codec's `TraitImplDto` / `InherentImplDto` wire
+/// shape.
 fn attach_impl_bounds(value: &mut Value, generics: &[Value], where_predicates: &[Value]) {
     let Some(object) = value.as_object_mut() else {
         return;
@@ -395,10 +443,13 @@ mod tests {
             methods: vec![],
             variants: vec![],
             trait_impls: vec![],
+            inherent_methods: vec![],
             generics: vec![],
             where_predicates: vec![],
             impl_generics: vec![],
             impl_where_predicates: vec![],
+            inherent_impl_generics: vec![],
+            inherent_impl_where_predicates: vec![],
         }
     }
 
@@ -415,9 +466,10 @@ mod tests {
         let mut command = base_command(CatalogEntryKind::Struct, "ValueObject");
         command.fields = vec!["count: u32".to_owned()];
         command.anchors = vec!["IN-01".to_owned()];
-        let (entry, trait_impls) =
+        let (entry, trait_impls, inherent_impls) =
             build_add_entry(&command, "track/items/t/spec.json", &anchor_set()).unwrap();
         assert!(trait_impls.is_empty());
+        assert!(inherent_impls.is_empty());
         assert_eq!(entry["role"], json!({ "ValueObject": {} }));
         assert_eq!(entry["kind"]["shape"]["fields"], json!([{ "name": "count", "ty": "u32" }]));
         assert_eq!(entry["spec_refs"][0]["anchor"], json!("IN-01"));
@@ -431,19 +483,19 @@ mod tests {
     fn test_build_add_entry_scaffolds_data_role_payload_holes() {
         let mut command = base_command(CatalogEntryKind::Struct, "Entity");
         command.fields = vec!["id: UserId".to_owned()];
-        let (entry, _) =
+        let (entry, _, _) =
             build_add_entry(&command, "track/items/t/spec.json", &anchor_set()).unwrap();
         assert!(entry["role"]["Entity"]["identity"]["method_name"].get("$todo").is_some());
 
         let mut command = base_command(CatalogEntryKind::Struct, "AggregateRoot");
         command.fields = vec!["id: OrderId".to_owned()];
-        let (entry, _) =
+        let (entry, _, _) =
             build_add_entry(&command, "track/items/t/spec.json", &anchor_set()).unwrap();
         assert!(entry["role"]["AggregateRoot"]["identity"]["method_name"].get("$todo").is_some());
 
         let mut command = base_command(CatalogEntryKind::Struct, "EventPolicy");
         command.fields = vec!["marker: ()".to_owned()];
-        let (entry, _) =
+        let (entry, _, _) =
             build_add_entry(&command, "track/items/t/spec.json", &anchor_set()).unwrap();
         assert!(entry["role"]["EventPolicy"]["reacts_to"].get("$todo").is_some());
     }
@@ -451,7 +503,7 @@ mod tests {
     #[test]
     fn test_build_add_entry_scaffolds_contract_role_payload_holes() {
         let command = base_command(CatalogEntryKind::Trait, "Repository");
-        let (entry, _) =
+        let (entry, _, _) =
             build_add_entry(&command, "track/items/t/spec.json", &anchor_set()).unwrap();
         assert!(entry["role"]["Repository"]["aggregate"].get("$todo").is_some());
     }
@@ -459,7 +511,7 @@ mod tests {
     #[test]
     fn test_build_add_entry_struct_without_field_holes_shape() {
         let command = base_command(CatalogEntryKind::Struct, "ValueObject");
-        let (entry, _) =
+        let (entry, _, _) =
             build_add_entry(&command, "track/items/t/spec.json", &anchor_set()).unwrap();
         assert!(entry["kind"]["shape"].get("$todo").is_some());
         let holes = super::super::scan_todo_holes(&entry);
@@ -470,7 +522,7 @@ mod tests {
     fn test_build_add_entry_enum_with_variant() {
         let mut command = base_command(CatalogEntryKind::Enum, "ErrorType");
         command.variants = vec!["NotFound".to_owned(), "Io(String)".to_owned()];
-        let (entry, _) =
+        let (entry, _, _) =
             build_add_entry(&command, "track/items/t/spec.json", &anchor_set()).unwrap();
         assert_eq!(entry["kind"]["kind"], json!("enum"));
         assert_eq!(entry["kind"]["variants"][0]["name"], json!("NotFound"));
@@ -482,7 +534,7 @@ mod tests {
         let mut command = base_command(CatalogEntryKind::Function, "FreeFunction");
         command.name = "domain::tddd::run".to_owned();
         command.methods = vec!["fn run(input: u32) -> bool".to_owned()];
-        let (entry, _) =
+        let (entry, _, _) =
             build_add_entry(&command, "track/items/t/spec.json", &anchor_set()).unwrap();
         assert_eq!(entry["role"], json!("FreeFunction"));
         assert_eq!(entry["returns"], json!("bool"));
@@ -505,7 +557,7 @@ mod tests {
     fn test_build_add_entry_trait_accepts_multiple_methods() {
         let mut command = base_command(CatalogEntryKind::Trait, "SecondaryPort");
         command.methods = vec!["fn a()".to_owned(), "fn b() -> u32".to_owned()];
-        let (entry, _) =
+        let (entry, _, _) =
             build_add_entry(&command, "track/items/t/spec.json", &anchor_set()).unwrap();
         assert_eq!(entry["methods"].as_array().map(Vec::len), Some(2));
     }
@@ -568,7 +620,7 @@ mod tests {
         let mut command = base_command(CatalogEntryKind::Struct, "ErrorType");
         command.fields = vec!["message: String".to_owned()];
         command.trait_impls = vec!["From<CodecError>".to_owned()];
-        let (_, trait_impls) =
+        let (_, trait_impls, _) =
             build_add_entry(&command, "track/items/t/spec.json", &anchor_set()).unwrap();
         assert_eq!(trait_impls.len(), 1);
         assert_eq!(trait_impls[0]["for_type"], json!("Foo"));
@@ -581,7 +633,7 @@ mod tests {
         let mut command = base_command(CatalogEntryKind::Function, "FreeFunction");
         command.name = "domain::tddd::parse".to_owned();
         command.methods = vec!["fn parse<T: Clone>(input: T) -> T where T: Send".to_owned()];
-        let (entry, _) =
+        let (entry, _, _) =
             build_add_entry(&command, "track/items/t/spec.json", &anchor_set()).unwrap();
         assert_eq!(entry["generics"], json!([{ "name": "T", "bounds": ["Clone"] }]));
         assert_eq!(
@@ -598,7 +650,7 @@ mod tests {
         command.name = "domain::tddd::parse".to_owned();
         command.methods = vec!["fn parse<T: Clone>(input: T) -> T".to_owned()];
         command.generics = vec!["T: Clone".to_owned(), "U: Send".to_owned()];
-        let (entry, _) =
+        let (entry, _, _) =
             build_add_entry(&command, "track/items/t/spec.json", &anchor_set()).unwrap();
         assert_eq!(
             entry["generics"],
@@ -618,7 +670,7 @@ mod tests {
         command.trait_impls = vec!["From<T>".to_owned()];
         command.impl_generics = vec!["T: Clone".to_owned()];
         command.impl_where_predicates = vec!["T: Send".to_owned()];
-        let (_, trait_impls) =
+        let (_, trait_impls, _) =
             build_add_entry(&command, "track/items/t/spec.json", &anchor_set()).unwrap();
         assert_eq!(trait_impls.len(), 1);
         assert_eq!(trait_impls[0]["impl_generics"], json!([{ "name": "T", "bounds": ["Clone"] }]));
@@ -626,5 +678,49 @@ mod tests {
             trait_impls[0]["impl_where_predicates"],
             json!([{ "lhs": "T", "rhs": ["Send"], "operator": "Bound" }])
         );
+    }
+
+    #[test]
+    fn test_build_add_entry_inherent_impl_carries_methods_generics_and_where() {
+        let mut command = base_command(CatalogEntryKind::Struct, "ValueObject");
+        command.inherent_methods = vec!["fn as_str(&self) -> &str".to_owned()];
+        command.inherent_impl_generics = vec!["T: Clone".to_owned()];
+        command.inherent_impl_where_predicates = vec!["T: Send".to_owned()];
+
+        let (_, _, inherent_impls) =
+            build_add_entry(&command, "track/items/t/spec.json", &anchor_set()).unwrap();
+
+        assert_eq!(inherent_impls.len(), 1);
+        assert_eq!(inherent_impls[0]["type_name"], json!("Foo"));
+        assert_eq!(inherent_impls[0]["methods"][0]["name"], json!("as_str"));
+        assert_eq!(
+            inherent_impls[0]["impl_generics"],
+            json!([{ "name": "T", "bounds": ["Clone"] }])
+        );
+        assert_eq!(
+            inherent_impls[0]["impl_where_predicates"],
+            json!([{ "lhs": "T", "rhs": ["Send"], "operator": "Bound" }])
+        );
+    }
+
+    #[test]
+    fn test_build_add_entry_rejects_inherent_impl_bounds_without_inherent_method() {
+        let mut command = base_command(CatalogEntryKind::Struct, "ValueObject");
+        command.inherent_impl_generics = vec!["T: Clone".to_owned()];
+        let err = build_add_entry(&command, "track/items/t/spec.json", &anchor_set()).unwrap_err();
+        assert!(matches!(err, CatalogError::ParseFragment { .. }));
+
+        let mut command = base_command(CatalogEntryKind::Struct, "ValueObject");
+        command.inherent_impl_where_predicates = vec!["T: Send".to_owned()];
+        let err = build_add_entry(&command, "track/items/t/spec.json", &anchor_set()).unwrap_err();
+        assert!(matches!(err, CatalogError::ParseFragment { .. }));
+    }
+
+    #[test]
+    fn test_build_add_entry_rejects_inherent_method_on_trait() {
+        let mut command = base_command(CatalogEntryKind::Trait, "SecondaryPort");
+        command.inherent_methods = vec!["fn helper(&self)".to_owned()];
+        let err = build_add_entry(&command, "track/items/t/spec.json", &anchor_set()).unwrap_err();
+        assert!(matches!(err, CatalogError::ParseFragment { .. }));
     }
 }

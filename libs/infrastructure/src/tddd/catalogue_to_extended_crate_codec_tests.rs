@@ -50,6 +50,8 @@ fn test_encode_type_deletion_record_emits_delete_action() {
     doc.push_deletion(DeletionRecord::Type {
         name: TypeName::new("OldType").unwrap(),
         module_path: ModulePath::root(),
+        spec_refs: vec![],
+        informal_grounds: vec![],
     });
 
     let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
@@ -66,6 +68,8 @@ fn test_encode_trait_deletion_record_emits_delete_action() {
     doc.push_deletion(DeletionRecord::Trait {
         name: TraitName::new("OldPort").unwrap(),
         module_path: ModulePath::root(),
+        spec_refs: vec![],
+        informal_grounds: vec![],
     });
 
     let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
@@ -83,7 +87,11 @@ fn test_encode_function_deletion_record_emits_delete_action() {
         CrateName::new("domain").unwrap(),
         FunctionName::new("old_fn").unwrap(),
     );
-    doc.push_deletion(DeletionRecord::Function { path });
+    doc.push_deletion(DeletionRecord::Function {
+        path,
+        spec_refs: vec![],
+        informal_grounds: vec![],
+    });
 
     let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
     let id = item_id_for_path(&ec, &["domain", "old_fn"]);

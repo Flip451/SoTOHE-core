@@ -58,12 +58,13 @@ fn import_entry_to_file(
 ) -> Result<CatalogWriteReport, CatalogError> {
     let mut document = read_catalogue(path, trusted_root)?;
     validate_type_path_crate_matches_catalogue(&document, &command.type_path)?;
-    reject_delete_anchors(command)?;
     let (entry_name, entry) = match command.action {
-        // A delete import is identity-only (spec IN-04 / GO-03 / AC-04): record the
-        // removed type's identity without resolving the (expensive, nightly)
-        // rustdoc shape or emitting role/docs `$todo` holes.
-        CatalogImportAction::Delete => build_delete_entry(&command.type_path)?,
+        // A delete import records the removed type's identity plus grounding
+        // without resolving the (expensive, nightly) rustdoc shape or emitting
+        // role/docs `$todo` holes.
+        CatalogImportAction::Delete => {
+            build_delete_entry(&command.type_path, &command.anchors, spec_file, spec_anchors)?
+        }
         CatalogImportAction::Reference | CatalogImportAction::Modify => {
             let shape = resolve()?;
             let entry = build_import_entry(command, &shape, spec_file, spec_anchors)?;
@@ -97,15 +98,6 @@ fn validate_type_path_crate_matches_catalogue(
     Err(schema_error(format!(
         "type path `{type_path}` targets crate `{crate_name}`, but catalogue crate_name is `{catalogue_crate}`"
     )))
-}
-
-fn reject_delete_anchors(command: &CatalogImportCommand) -> Result<(), CatalogError> {
-    if command.action != CatalogImportAction::Delete || command.anchors.is_empty() {
-        return Ok(());
-    }
-    Err(schema_error(
-        "delete imports do not accept --anchor because deletion tombstones do not persist spec_refs",
-    ))
 }
 
 #[cfg(test)]
@@ -152,6 +144,10 @@ mod tests {
         }
     }
 
+    fn spec_anchors(ids: &[&str]) -> BTreeSet<domain::plan_ref::SpecElementId> {
+        ids.iter().map(|id| domain::plan_ref::SpecElementId::try_new(*id).unwrap()).collect()
+    }
+
     #[test]
     fn test_import_reference_writes_entry() {
         let temp = tempfile::tempdir().unwrap();
@@ -173,19 +169,21 @@ mod tests {
     }
 
     #[test]
-    fn test_import_delete_writes_identity_only_tombstone() {
-        // A delete import is identity-only (spec IN-04 / GO-03 / AC-04): it records
-        // the removed type's identity with no role/docs `$todo` holes, and never
-        // resolves the (expensive, nightly) rustdoc shape.
+    fn test_import_delete_writes_grounded_tombstone() {
+        // A delete import records the removed type's identity and spec grounding
+        // with no role/docs `$todo` holes, and never resolves the (expensive,
+        // nightly) rustdoc shape.
         let temp = tempfile::tempdir().unwrap();
         let path = seed_catalogue(temp.path());
+        let mut command = import_command(CatalogImportAction::Delete);
+        command.anchors = vec!["IN-01".to_owned()];
         let resolver_called = std::cell::Cell::new(false);
         let report = import_entry_to_file(
             &path,
             temp.path(),
-            &import_command(CatalogImportAction::Delete),
+            &command,
             "spec.json",
-            &BTreeSet::new(),
+            &spec_anchors(&["IN-01"]),
             || {
                 resolver_called.set(true);
                 Ok(sample_shape())
@@ -199,17 +197,18 @@ mod tests {
         let entry = &written["types"]["LayerId"];
         assert_eq!(entry["action"], json!("delete"));
         assert_eq!(entry["module_path"], json!("tddd"));
+        assert_eq!(entry["spec_refs"][0]["anchor"], json!("IN-01"));
+        assert_eq!(entry["informal_grounds"], json!([]));
         assert!(entry.get("role").is_none(), "delete tombstone must not carry a role");
         assert!(entry.get("docs").is_none(), "delete tombstone must not carry docs");
         assert!(entry.get("kind").is_none(), "delete tombstone must not carry a kind");
     }
 
     #[test]
-    fn test_import_delete_rejects_anchors() {
+    fn test_import_delete_requires_anchor() {
         let temp = tempfile::tempdir().unwrap();
         let path = seed_catalogue(temp.path());
-        let mut command = import_command(CatalogImportAction::Delete);
-        command.anchors = vec!["IN-01".to_owned()];
+        let command = import_command(CatalogImportAction::Delete);
         let resolver_called = std::cell::Cell::new(false);
         let err = import_entry_to_file(
             &path,
@@ -224,7 +223,10 @@ mod tests {
         )
         .unwrap_err();
         assert!(matches!(err, CatalogError::SchemaInvalid { .. }));
-        assert!(!resolver_called.get(), "delete import anchor rejection must not resolve rustdoc");
+        assert!(
+            !resolver_called.get(),
+            "delete import anchor requirement must not resolve rustdoc"
+        );
     }
 
     #[test]

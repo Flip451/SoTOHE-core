@@ -24,6 +24,8 @@
 //! drift independently.
 
 use domain::tddd::catalogue_v2::CatalogueDocument;
+use domain::tddd::catalogue_v2::DeletionRecord;
+use domain::tddd::catalogue_v2::roles::ItemAction;
 use domain::{InformalGroundRef, SpecRef};
 
 /// A single entry extracted from a [`CatalogueDocument`] in canonical traversal order.
@@ -52,12 +54,14 @@ pub struct CatalogueEntryRef<'a> {
 }
 
 /// Returns an iterator over every entry in `catalogue` in canonical order:
-/// types (BTreeMap sorted) → traits (BTreeMap sorted) → functions (BTreeMap sorted).
+/// types (BTreeMap sorted) → traits (BTreeMap sorted) → functions (BTreeMap sorted)
+/// → deletion tombstones (stored order).
 ///
 /// Key derivation matches the signal-refresher entry ordering contract:
 /// - Types: `TypeName::as_str()` (bare) / `"types:<name>"` (section-qualified)
 /// - Traits: `TraitName::as_str()` (bare) / `"traits:<name>"` (section-qualified)
 /// - Functions: `FunctionPath::to_string()` (bare) / `"functions:<path>"` (section-qualified)
+/// - Deletions reuse the section key for the section whose entry is deleted
 ///
 /// # Examples
 ///
@@ -90,7 +94,30 @@ pub fn iter_catalogue_entries(
         spec_refs: entry.spec_refs(),
         informal_grounds: entry.informal_grounds(),
     });
-    types.chain(traits).chain(functions)
+    let deletions = catalogue.deletions().iter().map(|record| match record {
+        DeletionRecord::Type { name, spec_refs, informal_grounds, .. } => CatalogueEntryRef {
+            key: name.as_str().to_owned(),
+            section_key: format!("types:{}", name.as_str()),
+            action: ItemAction::Delete,
+            spec_refs,
+            informal_grounds,
+        },
+        DeletionRecord::Trait { name, spec_refs, informal_grounds, .. } => CatalogueEntryRef {
+            key: name.as_str().to_owned(),
+            section_key: format!("traits:{}", name.as_str()),
+            action: ItemAction::Delete,
+            spec_refs,
+            informal_grounds,
+        },
+        DeletionRecord::Function { path, spec_refs, informal_grounds } => CatalogueEntryRef {
+            key: path.to_string(),
+            section_key: format!("functions:{path}"),
+            action: ItemAction::Delete,
+            spec_refs,
+            informal_grounds,
+        },
+    });
+    types.chain(traits).chain(functions).chain(deletions)
 }
 
 #[cfg(test)]

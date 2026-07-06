@@ -2,9 +2,11 @@
 //! entry skeleton for a new type to a layer's catalogue.
 
 use std::path::Path;
+use std::str::FromStr;
 
 use domain::tddd::catalog_gen::{CatalogEntryKind, CatalogEntryName};
 use domain::tddd::catalogue_linter::FreeText;
+use domain::tddd::catalogue_v2::{FunctionPath, TraitName, TypeName};
 use serde_json::Value;
 use usecase::catalog_gen::{CatalogAddCommand, CatalogError, CatalogWriteReport};
 
@@ -51,10 +53,11 @@ fn add_entry_to_file(
     validate_entry_name(command.kind, &command.name, &crate_name)?;
     let name = CatalogEntryName::try_new(command.name.clone())
         .map_err(|err| schema_error(format!("invalid entry name `{}`: {err}", command.name)))?;
-    let (entry, trait_impls) = build_add_entry(command, spec_file, spec_anchors)?;
+    let (entry, trait_impls, inherent_impls) = build_add_entry(command, spec_file, spec_anchors)?;
     let section = section_for_kind(command.kind);
     insert_entry(&mut document, section, &name, entry)?;
-    append_trait_impls(&mut document, trait_impls)?;
+    append_top_level_declarations(&mut document, "trait_impls", trait_impls)?;
+    append_top_level_declarations(&mut document, "inherent_impls", inherent_impls)?;
     write_catalogue(path, trusted_root, &document)?;
     let holes = scan_entry_holes(&document, section, name.as_str());
     Ok(CatalogWriteReport {
@@ -64,31 +67,35 @@ fn add_entry_to_file(
     })
 }
 
-/// Append document-level trait-impl declarations, if any.
+/// Append document-level declarations, if any.
 ///
 /// # Errors
 ///
 /// Returns [`CatalogError::SchemaInvalid`] when the draft already carries a
-/// top-level `trait_impls` that is not a JSON array (e.g. a `$todo` hole or a
+/// top-level declaration list that is not a JSON array (e.g. a `$todo` hole or a
 /// hand-edited scalar). `as_array_mut` would return `None` there, and appending
-/// into nothing would report success while silently dropping the parsed impls;
-/// the draft must be normalised (e.g. via a codec pass) so `trait_impls` is an
-/// array first.
-fn append_trait_impls(document: &mut Value, trait_impls: Vec<Value>) -> Result<(), CatalogError> {
-    if trait_impls.is_empty() {
+/// into nothing would report success while silently dropping the parsed
+/// declarations; the draft must be normalised (e.g. via a codec pass) so the
+/// field is an array first.
+fn append_top_level_declarations(
+    document: &mut Value,
+    field: &str,
+    declarations: Vec<Value>,
+) -> Result<(), CatalogError> {
+    if declarations.is_empty() {
         return Ok(());
     }
     let root = document
         .as_object_mut()
         .ok_or_else(|| schema_error("catalogue root is not a JSON object"))?;
-    let list = root.entry("trait_impls".to_owned()).or_insert_with(|| Value::Array(Vec::new()));
+    let list = root.entry(field.to_owned()).or_insert_with(|| Value::Array(Vec::new()));
     let array = list.as_array_mut().ok_or_else(|| {
-        schema_error(
-            "catalogue top-level `trait_impls` is not a JSON array; normalise the draft \
-             (e.g. run it through a codec pass) before adding trait impls",
-        )
+        schema_error(format!(
+            "catalogue top-level `{field}` is not a JSON array; normalise the draft \
+             (e.g. run it through a codec pass) before adding declarations"
+        ))
     })?;
-    array.extend(trait_impls);
+    array.extend(declarations);
     Ok(())
 }
 
@@ -97,7 +104,8 @@ fn append_trait_impls(document: &mut Value, trait_impls: Vec<Value>) -> Result<(
 ///
 /// - Function entries must be crate-qualified (`<crate>::…::<fn_name>`) so the
 ///   codec's cross-crate function-path guard accepts the key.
-/// - Type / trait entries must be a bare Rust identifier (no `::`).
+/// - Type entries validate through `TypeName`.
+/// - Trait entries validate through `TraitName`.
 fn validate_entry_name(
     kind: CatalogEntryKind,
     name: &str,
@@ -105,21 +113,20 @@ fn validate_entry_name(
 ) -> Result<(), CatalogError> {
     match kind {
         CatalogEntryKind::Function => validate_function_name(name, crate_name),
-        CatalogEntryKind::Struct
-        | CatalogEntryKind::Enum
-        | CatalogEntryKind::TypeAlias
-        | CatalogEntryKind::Trait => validate_type_name(name),
+        CatalogEntryKind::Struct | CatalogEntryKind::Enum | CatalogEntryKind::TypeAlias => {
+            validate_type_name(name)
+        }
+        CatalogEntryKind::Trait => validate_trait_name(name),
     }
 }
 
-/// A function entry name must be `<crate>::…::<fn_name>` with the leading
-/// segment equal to `crate_name` and every segment a valid Rust identifier.
+/// A function entry name must validate through `FunctionPath` and have the
+/// leading crate segment equal to the target catalogue crate.
 fn validate_function_name(name: &str, crate_name: &str) -> Result<(), CatalogError> {
-    let segments: Vec<&str> = name.split("::").collect();
-    let crate_matches = segments.first().is_some_and(|first| *first == crate_name);
-    let has_fn_segment = segments.len() >= 2;
-    let all_idents = segments.iter().all(|&segment| is_rust_ident(segment));
-    if crate_matches && has_fn_segment && all_idents {
+    let path = FunctionPath::from_str(name).map_err(|err| {
+        name_error(format!("function entry name `{name}` must be a valid FunctionPath: {err}"))
+    })?;
+    if path.crate_name.as_str() == crate_name {
         return Ok(());
     }
     Err(name_error(format!(
@@ -127,17 +134,18 @@ fn validate_function_name(name: &str, crate_name: &str) -> Result<(), CatalogErr
     )))
 }
 
-/// A type / trait entry name must be a single bare Rust identifier.
+/// A type entry name must validate through `TypeName`.
 fn validate_type_name(name: &str) -> Result<(), CatalogError> {
-    if is_rust_ident(name) {
-        return Ok(());
-    }
-    Err(name_error(format!("entry name `{name}` must be a bare Rust identifier (no `::`)")))
+    TypeName::new(name.to_owned())
+        .map(|_| ())
+        .map_err(|err| name_error(format!("entry name `{name}` must be a valid TypeName: {err}")))
 }
 
-/// Whether `text` is a single valid Rust identifier.
-fn is_rust_ident(text: &str) -> bool {
-    syn::parse_str::<syn::Ident>(text).is_ok()
+/// A trait entry name must validate through `TraitName`.
+fn validate_trait_name(name: &str) -> Result<(), CatalogError> {
+    TraitName::new(name.to_owned())
+        .map(|_| ())
+        .map_err(|err| name_error(format!("entry name `{name}` must be a valid TraitName: {err}")))
 }
 
 /// Build a [`CatalogError::ParseFragment`] for a rejected entry name.
@@ -188,10 +196,13 @@ mod tests {
             methods: vec![],
             variants: vec![],
             trait_impls: vec![],
+            inherent_methods: vec![],
             generics: vec![],
             where_predicates: vec![],
             impl_generics: vec![],
             impl_where_predicates: vec![],
+            inherent_impl_generics: vec![],
+            inherent_impl_where_predicates: vec![],
         }
     }
 
@@ -206,10 +217,13 @@ mod tests {
             methods: vec!["fn run(input: u32) -> bool".to_owned()],
             variants: vec![],
             trait_impls: vec![],
+            inherent_methods: vec![],
             generics: vec![],
             where_predicates: vec![],
             impl_generics: vec![],
             impl_where_predicates: vec![],
+            inherent_impl_generics: vec![],
+            inherent_impl_where_predicates: vec![],
         }
     }
 
@@ -346,6 +360,46 @@ mod tests {
             add_entry_to_file(&path, temp.path(), &command, "spec.json", &anchors()).unwrap_err();
         assert!(matches!(err, CatalogError::SchemaInvalid { .. }));
         // No silent drop: the malformed draft is neither mutated nor rewritten.
+        assert_eq!(std::fs::read_to_string(&path).unwrap(), seeded);
+    }
+
+    #[test]
+    fn test_add_entry_appends_inherent_impls() {
+        let temp = tempfile::tempdir().unwrap();
+        let path = seed_catalogue(temp.path());
+        let mut command = struct_command("Foo");
+        command.inherent_methods = vec!["fn value(&self) -> u32".to_owned()];
+
+        add_entry_to_file(&path, temp.path(), &command, "spec.json", &anchors()).unwrap();
+
+        let written: Value =
+            serde_json::from_str(&std::fs::read_to_string(&path).unwrap()).unwrap();
+        assert_eq!(written["inherent_impls"][0]["type_name"], serde_json::json!("Foo"));
+        assert_eq!(written["inherent_impls"][0]["methods"][0]["name"], serde_json::json!("value"));
+    }
+
+    #[test]
+    fn test_add_entry_rejects_malformed_inherent_impls() {
+        let temp = tempfile::tempdir().unwrap();
+        let path = temp.path().join("domain-types.json");
+        let seeded = serde_json::to_string_pretty(&serde_json::json!({
+            "schema_version": 5,
+            "crate_name": "domain",
+            "layer": "domain",
+            "types": {},
+            "traits": {},
+            "functions": {},
+            "inherent_impls": { "$todo": "list the inherent impls declared in this layer" }
+        }))
+        .unwrap();
+        std::fs::write(&path, &seeded).unwrap();
+
+        let mut command = struct_command("Foo");
+        command.inherent_methods = vec!["fn value(&self) -> u32".to_owned()];
+
+        let err =
+            add_entry_to_file(&path, temp.path(), &command, "spec.json", &anchors()).unwrap_err();
+        assert!(matches!(err, CatalogError::SchemaInvalid { .. }));
         assert_eq!(std::fs::read_to_string(&path).unwrap(), seeded);
     }
 }

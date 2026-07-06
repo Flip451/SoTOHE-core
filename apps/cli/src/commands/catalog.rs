@@ -109,6 +109,10 @@ pub struct CatalogAddArgs {
     #[arg(long = "trait-impl")]
     pub trait_impls: Vec<String>,
 
+    /// Inherent-impl method signature fragment (repeatable).
+    #[arg(long = "inherent-method")]
+    pub inherent_methods: Vec<String>,
+
     /// Declaration-level generic parameter (repeatable).
     #[arg(long = "generic")]
     pub generics: Vec<String>,
@@ -124,6 +128,14 @@ pub struct CatalogAddArgs {
     /// Impl-block-level where predicate (repeatable).
     #[arg(long = "impl-where")]
     pub impl_where_predicates: Vec<String>,
+
+    /// Inherent impl-block-level generic parameter (repeatable).
+    #[arg(long = "inherent-impl-generic")]
+    pub inherent_impl_generics: Vec<String>,
+
+    /// Inherent impl-block-level where predicate (repeatable).
+    #[arg(long = "inherent-impl-where")]
+    pub inherent_impl_where_predicates: Vec<String>,
 }
 
 /// Arguments for `sotp catalog import`.
@@ -255,10 +267,13 @@ fn execute_add(args: CatalogAddArgs) -> ExitCode {
         methods,
         variants,
         trait_impls,
+        inherent_methods,
         generics,
         where_predicates,
         impl_generics,
         impl_where_predicates,
+        inherent_impl_generics,
+        inherent_impl_where_predicates,
     } = args;
     dispatch(CatalogInput::Add(CatalogAddInput {
         track_id,
@@ -272,10 +287,13 @@ fn execute_add(args: CatalogAddArgs) -> ExitCode {
         methods,
         variants,
         trait_impls,
+        inherent_methods,
         generics,
         where_predicates,
         impl_generics,
         impl_where_predicates,
+        inherent_impl_generics,
+        inherent_impl_where_predicates,
     }))
 }
 

@@ -15,7 +15,7 @@
     },
     {
       "id": "T003",
-      "description": "Target libs/usecase catalog_gen. Add CatalogCheckVerdict, CatalogAddCommand, CatalogImportCommand, CatalogCiteCommand, CatalogCheckQuery, CatalogInitReport, CatalogWriteReport, CatalogCheckReport, and CatalogError with shapes/variants from usecase-types.json; CatalogError variants are FileExists/FileMissing/DuplicateEntry/AnchorNotFound/InvalidRole/ParseFragment/SchemaInvalid/DraftIncomplete/Port only (IN-02/IN-03/IN-04/IN-05/IN-06/IN-10/IN-12/AC-02/AC-03/AC-04/AC-06/AC-10/AC-11). Add unit tests for CatalogError Display/Error over all variants and command/query/report construction.",
+      "description": "Target libs/usecase catalog_gen. Add CatalogCheckVerdict, CatalogAddCommand, CatalogImportCommand, CatalogCiteCommand, CatalogCheckQuery, CatalogInitReport, CatalogWriteReport, CatalogCheckReport, and CatalogError with shapes/variants from usecase-types.json; CatalogAddCommand includes raw shape fragments for trait_impls, inherent_methods, declaration-level generics/where, trait impl-level generics/where, and inherent impl-level generics/where; CatalogError variants are FileExists/FileMissing/DuplicateEntry/AnchorNotFound/InvalidRole/ParseFragment/SchemaInvalid/DraftIncomplete/Port only (IN-02/IN-03/IN-04/IN-05/IN-06/IN-10/IN-12/AC-02/AC-03/AC-04/AC-06/AC-10/AC-11). Add unit tests for CatalogError Display/Error over all variants and command/query/report construction.",
       "status": "done",
       "commit_hash": "f9b46e78"
     },
@@ -33,19 +33,19 @@
     },
     {
       "id": "T006",
-      "description": "Target libs/infrastructure tddd::catalog_gen::FsCatalogAdapter helper layer. Add FsCatalogAdapter new/Default without CatalogPort impl; add private helpers for skeleton generation, syn fragment parsing, anchor/role validation, role payload $todo emission, and draft scan/completion integration (IN-03/IN-07/IN-08/IN-09/IN-10/CN-01/CN-02/CN-03/CN-05/AC-03/AC-05/AC-06/AC-07). Extend helper validation coverage for IN-03/IN-08/AC-03, including payload-bearing roles. Add unit tests for helper outputs and errors. Batch review with T007.",
+      "description": "Target libs/infrastructure tddd::catalog_gen::FsCatalogAdapter helper layer. Add FsCatalogAdapter new/Default without CatalogPort impl; add private helpers for skeleton generation, schema-field shape decomposition, anchor/role validation, role payload $todo emission, trait-impl for_type derivation, inherent-impl type_name derivation, impl-level generic/where attachment, and draft scan/completion integration (IN-03/IN-07/IN-08/IN-09/IN-10/CN-01/CN-02/CN-03/CN-05/AC-03/AC-05/AC-06/AC-07). Extend helper coverage for payload-bearing roles, TypeRef/FieldName/MethodName/ParamName/VariantName/SelfReceiver parser inputs, trait-impl for_type derivation, inherent-impl method decomposition, impl-level generic/where attachment, and unmatched impl-level flag errors. Add unit tests for helper outputs and errors. Batch review with T007.",
       "status": "done",
       "commit_hash": "5c013f77"
     },
     {
       "id": "T007",
-      "description": "Target libs/infrastructure tddd::catalog_gen::FsCatalogAdapter and schema_export_codec. Add verb helpers for init/add/import/cite/check and the complete impl usecase::catalog_gen::CatalogPort for FsCatalogAdapter; preserve rustdoc alias target, struct shape, and impl target module path in schema export JSON (IN-02/IN-03/IN-04/IN-05/IN-06/IN-12/CN-05/CN-06/CN-07/CN-08/AC-02/AC-03/AC-04/AC-08/AC-10/AC-11/AC-12). Extend import/cite and schema-export preservation coverage for IN-04/IN-05/AC-04/AC-06/AC-12. Add unit tests for init, add/import/cite, duplicate entry, missing file, schema export JSON preservation, and AC-11 check outcomes. Batch review with T006.",
+      "description": "Target libs/infrastructure tddd::catalog_gen::FsCatalogAdapter and schema_export_codec. Add verb helpers for init/add/import/cite/check and the complete impl usecase::catalog_gen::CatalogPort for FsCatalogAdapter; add appending of generated top-level trait_impls and inherent_impls from add; add delete-tombstone grounding support for import/cite; preserve rustdoc alias target, struct shape, and impl target module path in schema export JSON (IN-02/IN-03/IN-04/IN-05/IN-06/IN-12/CN-05/CN-06/CN-07/CN-08/AC-02/AC-03/AC-04/AC-08/AC-10/AC-11/AC-12). Extend import/cite and schema-export preservation coverage for IN-04/IN-05/AC-04/AC-06/AC-12. Add unit tests for init, add/import/cite including delete grounding, inherent impl appending, duplicate entry, missing file, schema export JSON preservation, and AC-11 check outcomes. Batch review with T006.",
       "status": "done",
       "commit_hash": "5c013f77"
     },
     {
       "id": "T008",
-      "description": "Target apps/cli-driver catalog_gen. Add CatalogKindSelect, CatalogImportSelect, CatalogInitInput, CatalogAddInput, CatalogImportInput, CatalogCiteInput, CatalogCheckInput, CatalogInput, and CatalogDriver; implement handle(input) -> CommandOutcome mapping to CatalogService commands/queries (IN-01/IN-03/IN-04/IN-05/IN-06/AC-01/AC-03/AC-04/AC-06/AC-11). Add unit tests with a CatalogService double.",
+      "description": "Target apps/cli-driver catalog_gen. Add CatalogKindSelect, CatalogImportSelect, CatalogInitInput, CatalogAddInput, CatalogImportInput, CatalogCiteInput, CatalogCheckInput, CatalogInput, and CatalogDriver; CatalogAddInput carries raw trait/inherent impl shape flags and impl-level generics/where fields through to CatalogAddCommand; implement handle(input) -> CommandOutcome mapping to CatalogService commands/queries (IN-01/IN-03/IN-04/IN-05/IN-06/AC-01/AC-03/AC-04/AC-06/AC-11). Add unit tests with a CatalogService double.",
       "status": "done",
       "commit_hash": "74edb0d8"
     },
@@ -57,13 +57,13 @@
     },
     {
       "id": "T010",
-      "description": "Target apps/cli commands::catalog and apps/cli/src/main.rs. Add CatalogKindArg, CatalogActionArg, CatalogInitArgs, CatalogAddArgs, CatalogImportArgs, CatalogCiteArgs, CatalogCheckArgs, CatalogCommand, execute(CatalogCommand) -> ExitCode, and top-level registration (IN-01/IN-03/IN-04/IN-05/IN-06/IN-11/OS-02/AC-01/AC-03/AC-04/AC-06/AC-09/AC-11). Add CLI integration tests for parsing, dispatch, add output, validation errors for AC-03/AC-04/AC-06, catalog check exit-code mapping, duplicate entry, and track-id cases.",
+      "description": "Target apps/cli commands::catalog and apps/cli/src/main.rs. Add CatalogKindArg, CatalogActionArg, CatalogInitArgs, CatalogAddArgs, CatalogImportArgs, CatalogCiteArgs, CatalogCheckArgs, CatalogCommand, execute(CatalogCommand) -> ExitCode, and top-level registration (IN-01/IN-03/IN-04/IN-05/IN-06/IN-11/OS-02/AC-01/AC-03/AC-04/AC-06/AC-09/AC-11). Add CLI integration tests for parsing, dispatch, add output, schema-field decomposition coverage, inherent-method / inherent-impl-generics writing, TypeRef add-input coverage, catalog check exit-code mapping, duplicate entry, and track-id cases.",
       "status": "done",
       "commit_hash": "74edb0d8"
     },
     {
       "id": "T011",
-      "description": "Target libs/infrastructure tddd::catalog_gen::verb_check, apps/cli/tests/cli_catalog.rs, and Makefile.toml. Keep catalog check input limited to track and optional layer selection, call `bin/sotp catalog check` from the shared active gate, and add AC-11 check-outcome integration tests (IN-06/CN-06/CN-07/AC-11). Leave merge workflow files untouched.",
+      "description": "Target libs/infrastructure tddd::catalog_gen::verb_check and apps/cli/tests/cli_catalog.rs. Keep catalog check input limited to track and optional layer selection; verify shared active-gate catalog check wiring; add AC-11 check-outcome integration coverage for file-presence, draft, schema, anchor, and Reference-grounding cases (IN-06/CN-06/CN-07/AC-11). Leave Makefile and merge workflow files untouched.",
       "status": "done",
       "commit_hash": "74edb0d8"
     },
@@ -75,7 +75,7 @@
     },
     {
       "id": "T013",
-      "description": "Target usecase consumers catalogue_lint_workflow.rs, catalogue_spec_refs.rs, catalogue_spec_signals.rs, catalogue_traversal.rs, contract_map_workflow.rs, merge_gate.rs, and pre_review_gate.rs. Migrate TypeEntry/TraitEntry/FunctionEntry construction/reads to T002 constructors/accessors with DocString handling (IN-14/AC-17). Batch: T002+T012+T013 same commit. Keep workflow/gate tests green.",
+      "description": "Target usecase consumers catalogue_lint_workflow.rs, catalogue_spec_refs.rs, catalogue_spec_signals.rs, catalogue_traversal.rs, contract_map_workflow.rs, merge_gate.rs, and pre_review_gate.rs. Migrate TypeEntry/TraitEntry/FunctionEntry construction/reads to T002 constructors/accessors with DocString handling; add DeletionRecord tombstone traversal/spec-ref/signal/per-entry-hash coverage (IN-14/AC-17). Batch: T002+T012+T013 same commit. Keep workflow/gate tests green.",
       "status": "done",
       "commit_hash": "82aff0c7"
     }

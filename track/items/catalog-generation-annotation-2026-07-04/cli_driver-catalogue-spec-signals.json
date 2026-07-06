@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "453c50b68c3aa327f6d7ec9e3d6d3ae801b51dfb76e60927d448a08ed7cbd80f",
+  "catalogue_declaration_hash": "158673613e961f3c63f6641c7a0a88f32fb0312f1fba9f93b22b5b2ba82dc36d",
   "signals": [
     {
       "type_name": "CatalogAddInput",
       "signal": "blue",
-      "entry_hash": "db9e68ebf603c2f491bcd5c6c5454735d83c43716ea9e221c1cd0ed5c447b1b0"
+      "entry_hash": "241f272f741d90bff25ad87a5f933a3373fbc84202207bee7a9a8808179ce3c5"
     },
     {
       "type_name": "CatalogCheckInput",
@@ -15,7 +15,7 @@
     {
       "type_name": "CatalogCiteInput",
       "signal": "blue",
-      "entry_hash": "fc62ef4853b4da44daa709dd3095e3741b1f6bddaffe5227e49f3f4cafd680f7"
+      "entry_hash": "21c9c48738fe8880f229ce1427d5ef911d735a75face12ed63ef9aa40784a8cc"
     },
     {
       "type_name": "CatalogDriver",
@@ -25,7 +25,7 @@
     {
       "type_name": "CatalogImportInput",
       "signal": "blue",
-      "entry_hash": "e751a217deb8ba163fd9e30a6ded67b04abd1bbff842525a104d8ce24afd5f2c"
+      "entry_hash": "8118ef4b16c79f8aef33b8b3d96b6f065b4d34e264a03a4eea95ed03ac00f6b7"
     },
     {
       "type_name": "CatalogImportSelect",

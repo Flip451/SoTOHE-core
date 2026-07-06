@@ -63,7 +63,7 @@ schema の知識（フィールド構成・schema_version・書式・エント�
 
 既存の型をカタログに載せる場合は、rustdoc 抽出（既存の実装カタログ計算機構を流用）から完全な型情報（同定情報・シグネチャ・フィールド）を取り込む reference API を使う。reference API の入力元になる schema export JSON も、type alias の alias target、struct の unit / tuple / plain 形状と `has_stripped_fields`、impl target の module path を落とさず保持する。type-designer による既存 shape の手動転記を廃止する。
 
-reference API は action の種類を問わず使える。変更なしで参照するだけのエントリに加え、既存型を変更する modify エントリでは現状 shape を baseline として取り込んだ上で変更差分だけを type-designer が編集し、削除エントリは同定情報の取り込みで足りる。いずれの action でも「現状の記述」を人手で書き起こす工程が消える。手動転記が残らないのは新規型の add のみで、そこは型形状の設計自体が Phase 2 の作業であるため、type-designer が設計した形状を D6 の検証付き入力（Rust シグネチャ文字列）として渡す。
+reference API は action の種類を問わず使える。変更なしで参照するだけのエントリに加え、既存型を変更する modify エントリでは現状 shape を baseline として取り込んだ上で変更差分だけを type-designer が編集する。削除エントリは live shape（role / kind / methods / docs）を持たないため、取り込む shape は同定情報だけで足りるが、catalogue entry としての grounding fields（`spec_refs` / `informal_grounds`）は D7/D8 と同じく必須の正規 schema として保持する。いずれの action でも「現状の記述」を人手で書き起こす工程が消える。手動転記が残らないのは新規型の add のみで、そこは型形状の設計自体が Phase 2 の作業であるため、type-designer が設計した形状を D6 の schema 型準拠入力として渡す。
 
 ### D4: 穴は `$todo` ノードで表現する — 任意位置・指示文付き・完成境界は try_complete
 
@@ -97,21 +97,21 @@ draft の扱いは型付きスキーマの手前の層に置く: カタログ fi
 
 いずれも従来は下流の signal 評価・レビューで発覚していた欠陥を入力時 reject に前倒しするものである。なお鮮度 hash は従来どおり catalogue-spec-signals 側の機械計算であり、カタログ schema に writer が hash を記入する箇所は存在しない。本 decision の対象は writer が記入する参照値・role 値の入力時検証である。
 
-### D6: API の入力契約 — per-entry サブコマンド、形状は検証付き入力、重複は fail-closed
+### D6: API の入力契約 — per-entry サブコマンド、形状は schema 型準拠入力、重複は fail-closed
 
 意図入力は 1 エントリ = 1 回の sotp サブコマンド呼び出しとし、意図（layer / kind / name / role / spec anchor / 型形状）は引数として渡す。意図マニフェストのような第二の入力 schema は作らない（schema 知識が writer prompt に戻るため）。入力仕様の参照面は `--help` とする。コマンド群の命名は D8 で定める。
 
-- 型形状（fields / methods / variants / generics / where predicates / impl blocks）は Rust 宣言断片またはシグネチャ文字列として渡し、sotp が parse して構造化する（既存の TypeRef parser / syn 資産を流用）。parse できない宣言・シグネチャは入力時 reject。生成時に確定できない箇所は引数で渡さず、生成されたエントリの該当ノードを `$todo` として保留できる（D4）。catalogue DTO が必須 payload を持つ role（`Entity.identity`、`AggregateRoot.identity`、`EventPolicy.reacts_to`、`Repository.aggregate`）は、空オブジェクトではなく該当 payload 位置に `$todo` を生成する
-- generics / where 句は、型・trait・function・method・impl block の各宣言レベルを区別して入力し、カタログ schema の対応フィールド（`generics` / `where_predicates` / `impl_generics` / `impl_where_predicates` 等）へ構造化する。ある宣言レベルの generics / where 句に現行 schema の正規フィールドがない場合、D1 の完全型情報維持に従い、本 API 実装と同じ変更内で正規フィールドを追加してから生成する。silent drop、docs 文字列への退避、別宣言レベルへの代用は行わない
+- 型形状（fields / methods / variants / generics / where predicates / impl blocks）は、入力文字列を出力先 catalogue schema の正規フィールドへ分解して格納する。入力時の受理条件は格納先フィールドの実物型と一致させ、各 slot は `TypeRef::new` / `FieldName::new` / `MethodName::new` / `ParamName::new` / `VariantName::new` / `SelfReceiver::from_str` / `BoundOp` 等、対応する schema 型の constructor / parser を通す。`TypeRef` slot に対して `syn::Type` / `syn::Path` / `syn::GenericParam` 等の Rust 構文 parser を追加の入力時門番として使ってはならず、既存 schema が保持できる Rust 表現を狭めてはならない。public enum variants は source 側に extension-tolerant な明示（例: `#[non_exhaustive]`）がない限り、catalogue 上は downstream が exhaustive match してよい閉じた variant set として保持する。extension-tolerant 明示がある場合は、その状態を保持し、閉じた集合として扱わない。function entry で `--method` 由来の `fn` 名が `--name` を `::` で区切った末尾と一致しない場合は、signature 名を落とす silent drop になるため reject する。呼び出し側が渡した入力文字列を schema の正規フィールドへ lossless に分解できない場合、または対応する正規フィールドが存在しない情報を含む場合は、情報損失防止として reject する。`$todo` は、生成時に呼び出し側が値を渡さなかった形状ノード・role 必須 payload・docs 等の未確定箇所にだけ生成する。silent drop、docs 文字列への退避、別フィールドへの代用は行わない。生成時に確定できない箇所は引数で渡さず、生成されたエントリの該当ノードを `$todo` として保留できる（D4）。catalogue DTO が必須 payload を持つ role（`Entity.identity`、`AggregateRoot.identity`、`EventPolicy.reacts_to`、`Repository.aggregate`）は、空オブジェクトではなく該当 payload 位置に `$todo` を生成する
+- generics / where 句は、型・trait・function・method・impl block の各宣言レベルを区別して入力し、カタログ schema の対応フィールド（`generics` / `where_predicates` / `impl_generics` / `impl_where_predicates` 等）へ構造化する。`MethodGenericParam` は現行 schema と同じく `name: ParamName` + `bounds: Vec<TypeRef>` として扱うため、`bounds` は Rust 境界の種類で狭めず、`name` は `ParamName` の識別子制約だけを適用する。where 句は `lhs: TypeRef` / `rhs: Vec<TypeRef>` / `operator: BoundOp` の粒度で受ける。`--impl-generic` / `--impl-where` は同じ `catalog add` 呼び出しで生成される `--trait-impl` 行にだけ付与され、`--trait-impl` が 1 件もない入力では reject する。ある宣言レベルまたは Rust 表現に現行 schema の正規フィールドがない場合、D1 の完全型情報維持に従い、本 API 実装と同じ変更内で正規フィールドを追加してから生成する。silent drop、docs 文字列への退避、別宣言レベルへの代用は行わない
 - 既存型の形状は D3 の reference API が rustdoc から取り込む
 - 同名エントリが既に存在する場合は error とする。lenient / force 系フラグは設けない（既決の方針に従う）
 - 書き込みはエントリ単位で原子的とし、エントリの順序・整形は決定論的とする
 
 ### D7: 強制境界 — 生成後の編集は自由、fail-closed の網は check で張る
 
-生成後のカタログ編集（穴埋め・修正）は通常の file edit として自由とする（1 ファイル = 1 writer の原則は従来どおり）。入力時検証（D5）は早期フィードバックであり、強制ではない。強制は `sotp catalog check`（D8）— `$todo` 残存（try_complete の Err）・anchor 実在・role 語彙・schema 妥当の一括再検証 — が担い、Phase 2 完了ゲートと commit gate（track-active-gate の依存チェーン）の両方に配線する。check の fail は非零 exit で block する。
+生成後のカタログ編集（穴埋め・修正）は通常の file edit として自由とする（1 ファイル = 1 writer の原則は従来どおり）。入力時検証（D5）は早期フィードバックであり、強制ではない。強制は `sotp catalog check`（D8）— `$todo` 残存（try_complete の Err）・全 entry の `spec_refs` 参照先 anchor 実在・grounding absence（catalogue-spec signal Red）・role 語彙・schema 妥当の一括再検証 — が担い、Phase 2 完了ゲートと commit gate（track-active-gate の依存チェーン）の両方に配線する。check の fail は非零 exit で block する。
 
-`catalog check` は呼び出し側から判定モードを受け取らない。catalogue file の存在状況から状態を自動判定する。対象 catalogue file がまだ 1 つも存在しない Phase 0 / 1 では no-op + warning で skip し、非零終了にしない。一方で、対象 track に catalogue file が 1 つでも存在する場合は catalogue 作成が開始済みとみなし、TDDD 対象 layer の catalogue file 不在、`$todo` 残存、anchor 不在、role 語彙外、schema 不正を非零 exit で block する。`catalog check` 自体は `.harness/config/signal-gates.json` の存在・値・妥当性を prerequisite にしない。利用者所有の gate 設定を CI で強制しないという `knowledge/conventions/responsibility-boundary.md` の境界を保つ。
+`catalog check` は呼び出し側から判定モードを受け取らない。catalogue file の存在状況から状態を自動判定する。対象 catalogue file がまだ 1 つも存在しない Phase 0 / 1 では no-op + warning で skip し、非零終了にしない。一方で、対象 track に catalogue file が 1 つでも存在する場合は catalogue 作成が開始済みとみなし、TDDD 対象 layer の catalogue file 不在、`$todo` 残存、全 entry の `spec_refs` 参照先 anchor 不在、grounding absence（Reference を含む全 action の catalogue-spec signal Red）、role 語彙外、schema 不正を非零 exit で block する。delete tombstone も catalogue entry であり、live shape（role / kind / methods / docs）は持たないが、根拠を失わせないため `spec_refs` / `informal_grounds` を正規 schema として保持し、anchor 検査・catalogue-spec signal 評価の対象に含める。`catalog check` 自体は `.harness/config/signal-gates.json` の存在・値・妥当性を prerequisite にしない。利用者所有の gate 設定を CI で強制しないという `knowledge/conventions/responsibility-boundary.md` の境界を保つ。
 
 ### D8: CLI surface — `sotp catalog` コマンド群
 
@@ -120,10 +120,10 @@ draft の扱いは型付きスキーマの手前の層に置く: カタログ fi
 動詞は 5 つ:
 
 - `sotp catalog init` — active track の全 TDDD 対象 layer（architecture-rules.json から解決）の catalogue file を空の skeleton（schema_version 付き）として生成する。既存 file があれば error とし、一部生成はしない。エントリゼロの layer にも file の存在を要求する現行運用（全 layer 被覆の pre-review 検査、documentation-only track の空 catalogue）の bootstrap を機械化する
-- `sotp catalog add` — 新規型の意図入力（D2 / D6）。`--layer` / `--kind` / `--name` / `--role` / `--anchor`（repeatable）に加え、`--field` / `--method` / `--variant` / `--trait-impl`（Rust 宣言断片またはシグネチャ文字列、repeatable）で形状を渡す。宣言レベルの型パラメータと where 句は `--generic` / `--where`（repeatable）で渡し、impl block レベルでは `--impl-generic` / `--impl-where`（repeatable）で `impl_generics` / `impl_where_predicates` に対応させる。method / function シグネチャ内の generics / where 句はそのシグネチャから parse する。function entry では `--name` の末尾と `--method` から parse した `fn` 名が一致しない入力を reject し、signature 名の silent drop を起こさない。省略した形状ノードと、選択 role の catalogue DTO が要求する未入力 payload は `$todo` で生成される（D4）
-- `sotp catalog import` — 既存型の取り込み（D3）。`--layer` / `--type`（Rust パス、rustdoc から解決）/ `--action reference|modify|delete`（既定 `reference`）/ `--anchor`。`--anchor` は reference / modify のみで受理し、delete は spec_refs を持たない identity-only tombstone なので reject する
-- `sotp catalog cite` — 生成後の anchor 追加（D5 の検証付き入力）。`--layer` / `--entry` / `--anchor`。delete tombstone は spec_refs を持たないため対象にできず reject する
-- `sotp catalog check` — 完成検査（D7）。`--layer` 省略時は全 TDDD layer を対象とし、fail は非零 exit。対象 catalogue file がまだ 1 つも存在しない Phase 0 / 1 では no-op + warning で skip し、対象 track に catalogue file が 1 つでも存在する場合は `$todo` 残存・anchor 不在・role 語彙外・schema 不正・TDDD 対象 layer の catalogue file 不在を block する。`catalog check` は signal-gates 設定ファイルを必須入力にしない
+- `sotp catalog add` — 新規型の意図入力（D2 / D6）。`--layer` / `--kind` / `--name` / `--role` / `--anchor`（repeatable）に加え、`--field` / `--method` / `--variant` / `--trait-impl` / `--inherent-method`（repeatable）で形状を渡す。各 flag は格納先 catalogue schema の実物型に合わせて分解される。例: `--field` は `FieldName::new` + `TypeRef::new`、`--variant` は `VariantName::new` + payload の `TypeRef::new` / field 群、`--trait-impl` は `TraitImplDeclV2.trait_ref: TypeRef` へ `TypeRef::new` し、`TraitImplDeclV2.for_type: TypeRef` は同じ add 入力の `--name` から生成する。`--inherent-method` は `MethodDeclaration` に分解し、同じ add 入力の `--name` を `InherentImplDeclV2.type_name` とする top-level `inherent_impls` 行へ格納する。`--generic` / `--impl-generic` / `--inherent-impl-generic` は `MethodGenericParam`、`--where` / `--impl-where` / `--inherent-impl-where` は `WherePredicateDecl` に対応する。宣言レベルの型パラメータと where 句は `--generic` / `--where`（repeatable）で渡す。trait impl block レベルでは `--trait-impl` と同じ呼び出しに限って `--impl-generic` / `--impl-where`（repeatable）を渡し、生成される全 `TraitImplDeclV2` 行の `impl_generics` / `impl_where_predicates` に対応させる。inherent impl block レベルでは `--inherent-method` と同じ呼び出しに限って `--inherent-impl-generic` / `--inherent-impl-where`（repeatable）を渡し、生成される `InherentImplDeclV2` 行の `impl_generics` / `impl_where_predicates` に対応させる。`--trait-impl` が 1 件もない入力で `--impl-generic` / `--impl-where` を渡した場合、および `--inherent-method` が 1 件もない入力で `--inherent-impl-generic` / `--inherent-impl-where` を渡した場合は reject する。`--kind function` では `--name` を `FunctionPath` として扱い、`--method` は 0 件または 1 件だけ受けて `FunctionEntry.params` / `returns` / `is_async` / `generics` / `where_predicates` へ分解する。method / function / inherent-method シグネチャ内の generics / where 句も同じ schema 型の粒度で分解する。function entry では `--name` の末尾と `--method` から得た `fn` 名が一致しない入力を reject し、signature 名の silent drop を起こさない。省略した形状ノードと、選択 role の catalogue DTO が要求する未入力 payload は `$todo` で生成される（D4）
+- `sotp catalog import` — 既存型の取り込み（D3）。`--layer` / `--type`（Rust パス、rustdoc から解決）/ `--action reference|modify|delete`（既定 `reference`）/ `--anchor`。全 action の entry は完成時に formal / informal grounding を必ず持つ必要があり、`--anchor` は同じ `spec_refs` slot に保持される。reference / modify は現状 shape を rustdoc から取り込んで `spec_refs` を付与する。delete は live shape を持たない tombstone として同定情報だけを取り込むため、根拠なし削除を防ぐ目的で `--anchor` を import 時点でも必須とする
+- `sotp catalog cite` — 生成後の anchor 追加（D5 の検証付き入力）。`--layer` / `--entry` / `--anchor`。delete tombstone も `spec_refs` を持つ entry なので対象にできる
+- `sotp catalog check` — 完成検査（D7）。`--layer` 省略時は全 TDDD layer を対象とし、fail は非零 exit。対象 catalogue file がまだ 1 つも存在しない Phase 0 / 1 では no-op + warning で skip し、対象 track に catalogue file が 1 つでも存在する場合は `$todo` 残存・全 entry の `spec_refs` 参照先 anchor 不在・grounding absence（Reference を含む全 action の catalogue-spec signal Red）・role 語彙外・schema 不正・TDDD 対象 layer の catalogue file 不在を block する。delete tombstone の grounding fields も anchor 検査・catalogue-spec signal 評価に含める。`catalog check` は signal-gates 設定ファイルを必須入力にしない
 
 共通仕様: track は省略時に現ブランチから自動解決する。`init` / `add` / `import` / `cite` は `track/items/<id>/` 配下を書き込む WRITE 操作なので、明示 `--track-id` は現在ブランチから導出した id と一致する場合だけ受理し、不一致または非 track ブランチでは fail-closed で停止する。これらのコマンドでは `--track-id` を cross-track override として扱わない。`check` は読み取り専用のため、明示 `--track-id` を READ override として使える。`add` / `import` / `cite` は対象 layer の catalogue file 不在時に error として `sotp catalog init` を案内し、暗黙の file 生成は行わない。
 
@@ -161,13 +161,13 @@ null は型を問わず穴を表現できるが、記入指示を運べない。
 
 ### Positive
 
-- schema 違反・必須フィールド漏れ・書式崩れ・実在しない anchor 参照という手書き起因の欠陥クラスが、生成と検証付き入力で構造的に消滅する
+- schema 違反・必須フィールド漏れ・書式崩れ・実在しない anchor 参照という手書き起因の欠陥クラスが、生成と D5 の参照 / role 検証で構造的に消滅する
 - 既存型のシグネチャ手動転記が reference API で消滅する
 - 表現・書式レベルの schema 変更が sotp のコード変更のみで完結する（writer prompt の追従は、意図入力の表面が変わる場合に限られる）
 - エントリの順序・整形が安定し、diff ノイズ起因のレビュー hash 陳腐化・再レビューが減る
-- カタログ段階 linter の検査面（完全な型情報）は無傷で維持され、生成による構造保証で lint 入力の構文的な質も安定する
+- カタログ段階 linter の検査面（完全な型情報）は無傷で維持され、生成による schema 準拠の構造保証で lint 入力の書式が安定する
 - テスト義務導出（role × spec anchor）を前提とする設計と要求フィールドが一致し、両立する
-- 生成後の編集の自由度を保ったまま、`sotp catalog check` の一括再検証が Phase 2 完了・commit で `$todo` 残存を fail-closed にする（入力時検証と gate 時強制の二段構え）。catalogue file がまだ 1 つも存在しない Phase 0 / 1 の欠損入力 skip 意味論だけ維持する
+- 生成後の編集の自由度を保ったまま、`sotp catalog check` の一括再検証が Phase 2 完了・commit で `$todo` 残存を fail-closed にする（D5 の入力時検証と gate 時強制の二段構え）。catalogue file がまだ 1 つも存在しない Phase 0 / 1 の欠損入力 skip 意味論だけ維持する
 - 残存穴の一覧がパス・記入指示付きで try_complete の Err として機械導出され、drift レポートを別途実装する必要がない
 
 ### Negative
@@ -189,7 +189,7 @@ null は型を問わず穴を表現できるが、記入指示を運べない。
 
 - telemetry の前後比較で Phase 2 所要時間が十分改善しない場合 — 意図入力からの自動導出範囲（生成の粒度）の再設計を検討
 - 型詳細層の整合 findings が高止まりする場合 — カタログ段階 linter の拡充（矛盾の機械検出化）を検討
-- role 語彙またはカタログ schema の大きな変更が入った場合 — 生成 API と検証付き入力の再設計
+- role 語彙またはカタログ schema の大きな変更が入った場合 — 生成 API と D5 の検証付き入力の再設計
 - テスト義務導出ゲートの導入で要求フィールドが変わった場合 — 生成骨格の既定フィールド集合を再確定
 
 ## Related

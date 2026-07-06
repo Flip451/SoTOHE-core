@@ -5,10 +5,12 @@ use std::path::{Path, PathBuf};
 
 use domain::plan_ref::SpecElementId;
 use domain::tddd::catalog_gen::DraftHole;
+use domain::{ConfidenceSignal, evaluate_catalogue_entry_signal};
 use serde_json::Value;
 use usecase::catalog_gen::{
     CatalogCheckQuery, CatalogCheckReport, CatalogCheckVerdict, CatalogError,
 };
+use usecase::catalogue_traversal::iter_catalogue_entries;
 
 use crate::tddd::catalogue_document_codec::derive_filename_stem;
 
@@ -116,19 +118,22 @@ fn check_layer(
 
     let mut anchor_strings = Vec::new();
     collect_anchor_strings(&value, &mut anchor_strings);
-    if let Err(err) = try_complete(value, &expected_stem) {
-        return Ok(blocked(format!("{layer_name}: schema error: {err}")));
-    }
+    let catalogue = match try_complete(value, &expected_stem) {
+        Ok(catalogue) => catalogue,
+        Err(err) => return Ok(blocked(format!("{layer_name}: schema error: {err}"))),
+    };
 
     let dangling = dangling_anchors(&anchor_strings, spec_anchors);
-    if dangling.is_empty() {
-        return Ok(LayerOutcome {
-            verdict: CatalogCheckVerdict::Pass,
-            findings: vec![],
-            holes: vec![],
-        });
+    if !dangling.is_empty() {
+        return Ok(dangling_outcome(layer_name, &dangling));
     }
-    Ok(dangling_outcome(layer_name, &dangling))
+
+    let ungrounded = ungrounded_entries(&catalogue);
+    if !ungrounded.is_empty() {
+        return Ok(grounding_outcome(layer_name, &ungrounded));
+    }
+
+    Ok(LayerOutcome { verdict: CatalogCheckVerdict::Pass, findings: vec![], holes: vec![] })
 }
 
 /// Outcome for an absent catalogue file.
@@ -171,6 +176,33 @@ fn dangling_outcome(layer_name: &str, dangling: &[String]) -> LayerOutcome {
             .collect(),
         holes: vec![],
     }
+}
+
+/// Outcome for completed entries that still lack formal or informal grounding.
+fn grounding_outcome(layer_name: &str, ungrounded: &[String]) -> LayerOutcome {
+    LayerOutcome {
+        verdict: CatalogCheckVerdict::Blocked,
+        findings: ungrounded
+            .iter()
+            .map(|entry| {
+                format!("{layer_name}: ungrounded catalogue entry `{entry}` has no spec_refs or informal_grounds")
+            })
+            .collect(),
+        holes: vec![],
+    }
+}
+
+fn ungrounded_entries(catalogue: &domain::tddd::catalogue_v2::CatalogueDocument) -> Vec<String> {
+    iter_catalogue_entries(catalogue)
+        .filter_map(|entry| {
+            let signal = evaluate_catalogue_entry_signal(
+                entry.action,
+                entry.spec_refs,
+                entry.informal_grounds,
+            );
+            (signal == ConfidenceSignal::Red).then_some(entry.key)
+        })
+        .collect()
 }
 
 /// A blocked outcome with a single finding.
@@ -254,6 +286,10 @@ mod tests {
         BTreeSet::new()
     }
 
+    fn spec_set(ids: &[&str]) -> BTreeSet<SpecElementId> {
+        ids.iter().map(|id| SpecElementId::try_new(*id).unwrap()).collect()
+    }
+
     #[cfg(unix)]
     #[test]
     fn test_has_any_catalogue_file_rejects_symlinked_catalogue_path() {
@@ -298,14 +334,23 @@ mod tests {
     }
 
     #[test]
-    fn test_delete_only_catalogue_passes() {
-        // An identity-only delete tombstone has no `$todo` holes and decodes
-        // cleanly, so it must pass the completion check rather than
-        // being blocked for missing role/docs (spec IN-04 / GO-03 / AC-04).
-        let body = r#"{"schema_version":5,"crate_name":"domain","layer":"domain","types":{"OldType":{"action":"delete","module_path":"tddd"}},"traits":{},"functions":{}}"#;
+    fn test_grounded_delete_only_catalogue_passes() {
+        // A delete tombstone has no role/docs holes, but it still carries
+        // grounding so deletion cannot happen without a spec reason.
+        let body = r#"{"schema_version":5,"crate_name":"domain","layer":"domain","types":{"OldType":{"action":"delete","module_path":"tddd","spec_refs":[{"file":"spec.json","anchor":"IN-01"}],"informal_grounds":[]}},"traits":{},"functions":{}}"#;
+        let (temp, path) = write_file("domain-types.json", body);
+        let outcome =
+            check_layer("domain", &path, temp.path(), &spec_set(&["IN-01"]), true).unwrap();
+        assert_eq!(outcome.verdict, CatalogCheckVerdict::Pass);
+    }
+
+    #[test]
+    fn test_ungrounded_delete_only_catalogue_blocks() {
+        let body = r#"{"schema_version":5,"crate_name":"domain","layer":"domain","types":{"OldType":{"action":"delete","module_path":"tddd","spec_refs":[],"informal_grounds":[]}},"traits":{},"functions":{}}"#;
         let (temp, path) = write_file("domain-types.json", body);
         let outcome = check_layer("domain", &path, temp.path(), &empty_set(), true).unwrap();
-        assert_eq!(outcome.verdict, CatalogCheckVerdict::Pass);
+        assert_eq!(outcome.verdict, CatalogCheckVerdict::Blocked);
+        assert!(outcome.findings[0].contains("ungrounded catalogue entry"));
     }
 
     #[test]

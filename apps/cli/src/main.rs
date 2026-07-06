@@ -20,6 +20,9 @@ struct Cli {
     command: Option<CliCommand>,
 }
 
+// Subcommand payloads intentionally stay unboxed so clap can derive the command
+// surface from the same DTO shapes documented in the catalogue contract.
+#[allow(clippy::large_enum_variant)]
 #[derive(Subcommand)]
 enum CliCommand {
     /// Architecture rules analysis tools.

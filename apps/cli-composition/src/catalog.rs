@@ -118,10 +118,13 @@ mod tests {
             methods: vec![],
             variants: vec![],
             trait_impls: vec![],
+            inherent_methods: vec![],
             generics: vec![],
             where_predicates: vec![],
             impl_generics: vec![],
             impl_where_predicates: vec![],
+            inherent_impl_generics: vec![],
+            inherent_impl_where_predicates: vec![],
         })
     }
 

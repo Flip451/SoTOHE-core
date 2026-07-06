@@ -134,6 +134,8 @@ subgraph domain["domain"]
     T28_domain_domain_DeletionRecord_Type[Type]
     T28_domain_domain_DeletionRecord_Trait[Trait]
     T28_domain_domain_DeletionRecord_Function[Function]
+    T28_domain_domain_DeletionRecord_spec_refs([spec_refs])
+    T28_domain_domain_DeletionRecord_informal_grounds([informal_grounds])
   end
   subgraph T23_domain_domain_DocString["tddd::catalogue_v2::identifiers::DocString"]
     direction TB
@@ -688,6 +690,8 @@ class T31_domain_domain_CatalogueDocument__self domain_service
 class T28_domain_domain_DeletionRecord_Type variant_node
 class T28_domain_domain_DeletionRecord_Trait variant_node
 class T28_domain_domain_DeletionRecord_Function variant_node
+class T28_domain_domain_DeletionRecord_spec_refs method_node
+class T28_domain_domain_DeletionRecord_informal_grounds method_node
 class T28_domain_domain_DeletionRecord__self value_object
 class T23_domain_domain_DocString_new method_node
 class T23_domain_domain_DocString_as_str method_node
