@@ -8,24 +8,8 @@
 
 use std::fs;
 use std::path::PathBuf;
-#[cfg(test)]
-use std::time::{Duration, Instant};
 
 use crate::error::CompositionError;
-
-// ---------------------------------------------------------------------------
-// Known Codex bot login names (case-insensitive comparison).
-// ---------------------------------------------------------------------------
-
-#[cfg(test)]
-pub(super) const CODEX_BOT_LOGINS: &[&str] =
-    &["openai-codex[bot]", "codex[bot]", "chatgpt-codex-connector[bot]"];
-
-#[cfg(test)]
-pub(super) fn is_codex_bot(login: &str) -> bool {
-    let lower = login.to_lowercase();
-    CODEX_BOT_LOGINS.iter().any(|known| *known == lower)
-}
 
 // ---------------------------------------------------------------------------
 // Outcome of a poll-review cycle
@@ -51,7 +35,7 @@ pub(super) struct TriggerState {
 }
 
 pub(super) fn trigger_state_path(track_id: &str) -> PathBuf {
-    use infrastructure::git_cli::{GitRepository as _, SystemGitRepo};
+    use infrastructure::git_cli::SystemGitRepo;
     let root = SystemGitRepo::discover().map(|r| r.root().to_path_buf()).unwrap_or_default();
     root.join("tmp/pr-review-state").join(format!("{track_id}.json"))
 }
@@ -102,7 +86,7 @@ pub(super) fn cleanup_trigger_state(track_id: &str) {
 pub(super) fn resolve_branch_context(
     explicit_track_id: Option<&str>,
 ) -> Result<usecase::pr_workflow::PrBranchContext, CompositionError> {
-    use infrastructure::git_cli::{GitRepository as _, SystemGitRepo};
+    use infrastructure::git_cli::SystemGitRepo;
     let repo =
         SystemGitRepo::discover().map_err(|e| CompositionError::AdapterInit(e.to_string()))?;
     let branch = repo
@@ -172,131 +156,44 @@ pub(super) fn ensure_pr_body_file(
 }
 
 // ---------------------------------------------------------------------------
-// Zero-findings detection helpers
+// Zero-findings detection helpers (legacy polling — unit-test suite only)
 // ---------------------------------------------------------------------------
 
 #[cfg(test)]
-#[derive(Debug, thiserror::Error)]
-#[error("{0}")]
-pub(super) struct PollTestError(String);
+mod test_support {
+    use std::time::{Duration, Instant};
 
-#[cfg(test)]
-pub(super) fn check_reaction_zero_findings<C: infrastructure::gh_cli::GhClient>(
-    client: &C,
-    repo: &str,
-    pr: &str,
-    trigger_dt: chrono::DateTime<chrono::FixedOffset>,
-) -> Result<bool, PollTestError> {
-    let reactions_json =
-        client.list_reactions(repo, pr).map_err(|e| PollTestError(e.to_string()))?;
-    let reactions = usecase::pr_review::parse_paginated_json(&reactions_json)
-        .map_err(|e| PollTestError(format!("failed to parse reactions JSON: {e}")))?;
-    for reaction in &reactions {
-        let content = reaction.get("content").and_then(|c| c.as_str()).unwrap_or("");
-        if content != "+1" {
-            continue;
-        }
-        let author = reaction
-            .get("user")
-            .and_then(|u| u.get("login"))
-            .and_then(|l| l.as_str())
-            .unwrap_or("");
-        if !is_codex_bot(author) {
-            continue;
-        }
-        let created_raw = reaction.get("created_at").and_then(|s| s.as_str()).unwrap_or("");
-        if created_raw.is_empty() {
-            continue;
-        }
-        let created_str = created_raw.replace('Z', "+00:00");
-        let created_dt = chrono::DateTime::parse_from_rfc3339(&created_str)
-            .map_err(|e| PollTestError(format!("invalid reaction created_at: {e}")))?;
-        if created_dt >= trigger_dt {
-            return Ok(true);
-        }
+    use super::PollReviewResult;
+
+    pub(super) const CODEX_BOT_LOGINS: &[&str] =
+        &["openai-codex[bot]", "codex[bot]", "chatgpt-codex-connector[bot]"];
+
+    pub(super) fn is_codex_bot(login: &str) -> bool {
+        let lower = login.to_lowercase();
+        CODEX_BOT_LOGINS.iter().any(|known| *known == lower)
     }
-    Ok(false)
-}
 
-#[cfg(test)]
-pub(super) fn check_comment_zero_findings<C: infrastructure::gh_cli::GhClient>(
-    client: &C,
-    repo: &str,
-    pr: &str,
-    trigger_dt: chrono::DateTime<chrono::FixedOffset>,
-) -> Result<bool, PollTestError> {
-    let comments_json =
-        client.list_issue_comments(repo, pr).map_err(|e| PollTestError(e.to_string()))?;
-    let comments = usecase::pr_review::parse_paginated_json(&comments_json)
-        .map_err(|e| PollTestError(format!("failed to parse comments JSON: {e}")))?;
-    for comment in &comments {
-        let author =
-            comment.get("user").and_then(|u| u.get("login")).and_then(|l| l.as_str()).unwrap_or("");
-        if !is_codex_bot(author) {
-            continue;
-        }
-        let created_raw = comment.get("created_at").and_then(|s| s.as_str()).unwrap_or("");
-        if created_raw.is_empty() {
-            continue;
-        }
-        let created_str = created_raw.replace('Z', "+00:00");
-        let created_dt = chrono::DateTime::parse_from_rfc3339(&created_str)
-            .map_err(|e| PollTestError(format!("invalid comment created_at: {e}")))?;
-        if created_dt < trigger_dt {
-            continue;
-        }
-        let body = comment.get("body").and_then(|b| b.as_str()).unwrap_or("");
-        if body.contains("Didn't find any major issues") {
-            return Ok(true);
-        }
-    }
-    Ok(false)
-}
+    #[derive(Debug, thiserror::Error)]
+    #[error("{0}")]
+    pub(super) struct PollTestError(String);
 
-// ---------------------------------------------------------------------------
-// Poll review for cycle
-// ---------------------------------------------------------------------------
-
-#[allow(clippy::too_many_lines)]
-#[cfg(test)]
-pub(super) fn poll_review_for_cycle<C, Sleep>(
-    pr: &str,
-    trigger_timestamp: &str,
-    interval: u64,
-    timeout: u64,
-    client: &C,
-    sleep: &Sleep,
-    head_commit: Option<&str>,
-) -> Result<PollReviewResult, PollTestError>
-where
-    C: infrastructure::gh_cli::GhClient,
-    Sleep: Fn(Duration),
-{
-    let trigger_time = trigger_timestamp.replace('Z', "+00:00");
-    let trigger_dt = chrono::DateTime::parse_from_rfc3339(&trigger_time)
-        .map_err(|e| PollTestError(format!("invalid trigger timestamp: {e}")))?;
-
-    let repo_nwo = client.repo_nwo().map_err(|e| PollTestError(e.to_string()))?;
-    let deadline = Instant::now() + Duration::from_secs(timeout.min(86400));
-    let mut any_bot_activity = false;
-
-    eprintln!("Polling for Codex review on PR #{pr} (interval={interval}s, timeout={timeout}s)...");
-
-    loop {
-        if Instant::now() >= deadline {
-            break;
-        }
-
-        let reviews_json =
-            client.list_reviews(&repo_nwo, pr).map_err(|e| PollTestError(e.to_string()))?;
-        let reviews = usecase::pr_review::parse_paginated_json(&reviews_json)
-            .map_err(|e| PollTestError(format!("failed to parse reviews JSON: {e}")))?;
-
-        // Collect all qualifying Codex bot reviews from this iteration (post-trigger,
-        // with a terminal state), then pick the latest one by submitted_at (AC-05 / CN-02).
-        let mut qualifying: Vec<&serde_json::Value> = Vec::new();
-        for review in &reviews {
-            let author = review
+    #[cfg(test)]
+    pub(super) fn check_reaction_zero_findings<C: infrastructure::gh_cli::GhClient>(
+        client: &C,
+        repo: &str,
+        pr: &str,
+        trigger_dt: chrono::DateTime<chrono::FixedOffset>,
+    ) -> Result<bool, PollTestError> {
+        let reactions_json =
+            client.list_reactions(repo, pr).map_err(|e| PollTestError(e.to_string()))?;
+        let reactions = usecase::pr_review::parse_paginated_json(&reactions_json)
+            .map_err(|e| PollTestError(format!("failed to parse reactions JSON: {e}")))?;
+        for reaction in &reactions {
+            let content = reaction.get("content").and_then(|c| c.as_str()).unwrap_or("");
+            if content != "+1" {
+                continue;
+            }
+            let author = reaction
                 .get("user")
                 .and_then(|u| u.get("login"))
                 .and_then(|l| l.as_str())
@@ -304,66 +201,104 @@ where
             if !is_codex_bot(author) {
                 continue;
             }
-            let submitted_raw = review.get("submitted_at").and_then(|s| s.as_str()).unwrap_or("");
-            if submitted_raw.is_empty() {
+            let created_raw = reaction.get("created_at").and_then(|s| s.as_str()).unwrap_or("");
+            if created_raw.is_empty() {
                 continue;
             }
-            let submitted_str = submitted_raw.replace('Z', "+00:00");
-            let submitted_dt = chrono::DateTime::parse_from_rfc3339(&submitted_str)
-                .map_err(|e| PollTestError(format!("invalid review submitted_at: {e}")))?;
-            if submitted_dt >= trigger_dt {
-                any_bot_activity = true;
-                let state = review.get("state").and_then(|s| s.as_str()).unwrap_or("");
-                if matches!(state, "APPROVED" | "CHANGES_REQUESTED" | "COMMENTED") {
-                    qualifying.push(review);
-                }
+            let created_str = created_raw.replace('Z', "+00:00");
+            let created_dt = chrono::DateTime::parse_from_rfc3339(&created_str)
+                .map_err(|e| PollTestError(format!("invalid reaction created_at: {e}")))?;
+            if created_dt >= trigger_dt {
+                return Ok(true);
             }
         }
-        if let Some(latest) = find_latest_bot_review_in(&qualifying) {
-            let review_id = latest.get("id").and_then(|v| v.as_u64()).unwrap_or(0);
-            let state = latest.get("state").and_then(|s| s.as_str()).unwrap_or("");
-            eprintln!("[OK] Found Codex review (id={review_id}, state={state})");
-            return Ok(PollReviewResult::ReviewFound(latest));
-        }
+        Ok(false)
+    }
 
-        if head_commit.is_some() {
-            if check_reaction_zero_findings(client, &repo_nwo, pr, trigger_dt)? {
-                eprintln!("[OK] Zero-findings detected via +1 reaction.");
-                return Ok(PollReviewResult::ZeroFindings);
+    #[cfg(test)]
+    pub(super) fn check_comment_zero_findings<C: infrastructure::gh_cli::GhClient>(
+        client: &C,
+        repo: &str,
+        pr: &str,
+        trigger_dt: chrono::DateTime<chrono::FixedOffset>,
+    ) -> Result<bool, PollTestError> {
+        let comments_json =
+            client.list_issue_comments(repo, pr).map_err(|e| PollTestError(e.to_string()))?;
+        let comments = usecase::pr_review::parse_paginated_json(&comments_json)
+            .map_err(|e| PollTestError(format!("failed to parse comments JSON: {e}")))?;
+        for comment in &comments {
+            let author = comment
+                .get("user")
+                .and_then(|u| u.get("login"))
+                .and_then(|l| l.as_str())
+                .unwrap_or("");
+            if !is_codex_bot(author) {
+                continue;
+            }
+            let created_raw = comment.get("created_at").and_then(|s| s.as_str()).unwrap_or("");
+            if created_raw.is_empty() {
+                continue;
+            }
+            let created_str = created_raw.replace('Z', "+00:00");
+            let created_dt = chrono::DateTime::parse_from_rfc3339(&created_str)
+                .map_err(|e| PollTestError(format!("invalid comment created_at: {e}")))?;
+            if created_dt < trigger_dt {
+                continue;
+            }
+            let body = comment.get("body").and_then(|b| b.as_str()).unwrap_or("");
+            if body.contains("Didn't find any major issues") {
+                return Ok(true);
+            }
+        }
+        Ok(false)
+    }
+
+    // ---------------------------------------------------------------------------
+    // Poll review for cycle
+    // ---------------------------------------------------------------------------
+
+    #[allow(clippy::too_many_lines)]
+    #[cfg(test)]
+    pub(super) fn poll_review_for_cycle<C, Sleep>(
+        pr: &str,
+        trigger_timestamp: &str,
+        interval: u64,
+        timeout: u64,
+        client: &C,
+        sleep: &Sleep,
+        head_commit: Option<&str>,
+    ) -> Result<PollReviewResult, PollTestError>
+    where
+        C: infrastructure::gh_cli::GhClient,
+        Sleep: Fn(Duration),
+    {
+        let trigger_time = trigger_timestamp.replace('Z', "+00:00");
+        let trigger_dt = chrono::DateTime::parse_from_rfc3339(&trigger_time)
+            .map_err(|e| PollTestError(format!("invalid trigger timestamp: {e}")))?;
+
+        let repo_nwo = client.repo_nwo().map_err(|e| PollTestError(e.to_string()))?;
+        let deadline = Instant::now() + Duration::from_secs(timeout.min(86400));
+        let mut any_bot_activity = false;
+
+        eprintln!(
+            "Polling for Codex review on PR #{pr} (interval={interval}s, timeout={timeout}s)..."
+        );
+
+        loop {
+            if Instant::now() >= deadline {
+                break;
             }
 
-            let has_stale_reaction = {
-                let reactions_json = client
-                    .list_reactions(&repo_nwo, pr)
-                    .map_err(|e| PollTestError(e.to_string()))?;
-                let reactions = usecase::pr_review::parse_paginated_json(&reactions_json)
-                    .map_err(|e| PollTestError(format!("failed to parse reactions JSON: {e}")))?;
-                reactions.iter().any(|r| {
-                    let content = r.get("content").and_then(|c| c.as_str()).unwrap_or("");
-                    let author = r
-                        .get("user")
-                        .and_then(|u| u.get("login"))
-                        .and_then(|l| l.as_str())
-                        .unwrap_or("");
-                    content == "+1" && is_codex_bot(author)
-                })
-            };
+            let reviews_json =
+                client.list_reviews(&repo_nwo, pr).map_err(|e| PollTestError(e.to_string()))?;
+            let reviews = usecase::pr_review::parse_paginated_json(&reviews_json)
+                .map_err(|e| PollTestError(format!("failed to parse reviews JSON: {e}")))?;
 
-            if has_stale_reaction && check_comment_zero_findings(client, &repo_nwo, pr, trigger_dt)?
-            {
-                eprintln!("[OK] Zero-findings detected via comment text fallback.");
-                return Ok(PollReviewResult::ZeroFindings);
-            }
-        }
-
-        if !any_bot_activity {
-            let comments_json = client
-                .list_issue_comments(&repo_nwo, pr)
-                .map_err(|e| PollTestError(e.to_string()))?;
-            let comments = usecase::pr_review::parse_paginated_json(&comments_json)
-                .map_err(|e| PollTestError(format!("failed to parse comments JSON: {e}")))?;
-            for comment in &comments {
-                let author = comment
+            // Collect all qualifying Codex bot reviews from this iteration (post-trigger,
+            // with a terminal state), then pick the latest one by submitted_at (AC-05 / CN-02).
+            let mut qualifying: Vec<&serde_json::Value> = Vec::new();
+            for review in &reviews {
+                let author = review
                     .get("user")
                     .and_then(|u| u.get("login"))
                     .and_then(|l| l.as_str())
@@ -371,92 +306,167 @@ where
                 if !is_codex_bot(author) {
                     continue;
                 }
-                let created_raw = comment.get("created_at").and_then(|s| s.as_str()).unwrap_or("");
-                if created_raw.is_empty() {
+                let submitted_raw =
+                    review.get("submitted_at").and_then(|s| s.as_str()).unwrap_or("");
+                if submitted_raw.is_empty() {
                     continue;
                 }
-                let created_str = created_raw.replace('Z', "+00:00");
-                let created_dt = chrono::DateTime::parse_from_rfc3339(&created_str)
-                    .map_err(|e| PollTestError(format!("invalid comment created_at: {e}")))?;
-                if created_dt >= trigger_dt {
+                let submitted_str = submitted_raw.replace('Z', "+00:00");
+                let submitted_dt = chrono::DateTime::parse_from_rfc3339(&submitted_str)
+                    .map_err(|e| PollTestError(format!("invalid review submitted_at: {e}")))?;
+                if submitted_dt >= trigger_dt {
                     any_bot_activity = true;
-                    break;
+                    let state = review.get("state").and_then(|s| s.as_str()).unwrap_or("");
+                    if matches!(state, "APPROVED" | "CHANGES_REQUESTED" | "COMMENTED") {
+                        qualifying.push(review);
+                    }
                 }
+            }
+            if let Some(latest) = find_latest_bot_review_in(&qualifying) {
+                let review_id = latest.get("id").and_then(|v| v.as_u64()).unwrap_or(0);
+                let state = latest.get("state").and_then(|s| s.as_str()).unwrap_or("");
+                eprintln!("[OK] Found Codex review (id={review_id}, state={state})");
+                return Ok(PollReviewResult::ReviewFound(latest));
+            }
+
+            if head_commit.is_some() {
+                if check_reaction_zero_findings(client, &repo_nwo, pr, trigger_dt)? {
+                    eprintln!("[OK] Zero-findings detected via +1 reaction.");
+                    return Ok(PollReviewResult::ZeroFindings);
+                }
+
+                let has_stale_reaction = {
+                    let reactions_json = client
+                        .list_reactions(&repo_nwo, pr)
+                        .map_err(|e| PollTestError(e.to_string()))?;
+                    let reactions = usecase::pr_review::parse_paginated_json(&reactions_json)
+                        .map_err(|e| {
+                            PollTestError(format!("failed to parse reactions JSON: {e}"))
+                        })?;
+                    reactions.iter().any(|r| {
+                        let content = r.get("content").and_then(|c| c.as_str()).unwrap_or("");
+                        let author = r
+                            .get("user")
+                            .and_then(|u| u.get("login"))
+                            .and_then(|l| l.as_str())
+                            .unwrap_or("");
+                        content == "+1" && is_codex_bot(author)
+                    })
+                };
+
+                if has_stale_reaction
+                    && check_comment_zero_findings(client, &repo_nwo, pr, trigger_dt)?
+                {
+                    eprintln!("[OK] Zero-findings detected via comment text fallback.");
+                    return Ok(PollReviewResult::ZeroFindings);
+                }
+            }
+
+            if !any_bot_activity {
+                let comments_json = client
+                    .list_issue_comments(&repo_nwo, pr)
+                    .map_err(|e| PollTestError(e.to_string()))?;
+                let comments = usecase::pr_review::parse_paginated_json(&comments_json)
+                    .map_err(|e| PollTestError(format!("failed to parse comments JSON: {e}")))?;
+                for comment in &comments {
+                    let author = comment
+                        .get("user")
+                        .and_then(|u| u.get("login"))
+                        .and_then(|l| l.as_str())
+                        .unwrap_or("");
+                    if !is_codex_bot(author) {
+                        continue;
+                    }
+                    let created_raw =
+                        comment.get("created_at").and_then(|s| s.as_str()).unwrap_or("");
+                    if created_raw.is_empty() {
+                        continue;
+                    }
+                    let created_str = created_raw.replace('Z', "+00:00");
+                    let created_dt = chrono::DateTime::parse_from_rfc3339(&created_str)
+                        .map_err(|e| PollTestError(format!("invalid comment created_at: {e}")))?;
+                    if created_dt >= trigger_dt {
+                        any_bot_activity = true;
+                        break;
+                    }
+                }
+            }
+
+            let remaining = deadline.saturating_duration_since(Instant::now()).as_secs();
+            eprintln!("  Waiting... ({remaining}s remaining)");
+            sleep(Duration::from_secs(interval));
+        }
+
+        // Timeout recovery: consider any Codex bot review on the exact same commit SHA.
+        // `review_commit == expected_commit` is itself the stale guard — a review on a
+        // different SHA cannot be resurrected as the current cycle's result. Restoring
+        // the pre-T005 cli behavior (the original `apps/cli/src/commands/pr.rs` did not
+        // carry an additional `submitted_after_trigger` predicate here). Per PR #143
+        // Codex Cloud reviewer: the extra timestamp filter rejects valid same-SHA
+        // reviews from prior cycles even though `commit_id == expected_commit` proves
+        // they cover the exact HEAD being reviewed.
+        if let Some(expected_commit) = head_commit {
+            let recovery_nwo = client.repo_nwo().map_err(|e| PollTestError(e.to_string()))?;
+            let recovery_reviews_json =
+                client.list_reviews(&recovery_nwo, pr).map_err(|e| PollTestError(e.to_string()))?;
+            let recovery_reviews = usecase::pr_review::parse_paginated_json(&recovery_reviews_json)
+                .map_err(|e| {
+                    PollTestError(format!("recovery: failed to parse reviews JSON: {e}"))
+                })?;
+            let recovery_refs: Vec<&serde_json::Value> = recovery_reviews
+                .iter()
+                .filter(|r| {
+                    let author = r
+                        .get("user")
+                        .and_then(|u| u.get("login"))
+                        .and_then(|l| l.as_str())
+                        .unwrap_or("");
+                    let state = r.get("state").and_then(|s| s.as_str()).unwrap_or("");
+                    let review_commit = r.get("commit_id").and_then(|s| s.as_str()).unwrap_or("");
+                    is_codex_bot(author)
+                        && matches!(state, "APPROVED" | "CHANGES_REQUESTED" | "COMMENTED")
+                        && review_commit == expected_commit
+                })
+                .collect();
+            if let Some(recovered) = find_latest_bot_review_in(&recovery_refs) {
+                eprintln!("[OK] Recovered Codex review after timeout (commit-based fallback).");
+                return Ok(PollReviewResult::ReviewFound(recovered));
             }
         }
 
-        let remaining = deadline.saturating_duration_since(Instant::now()).as_secs();
-        eprintln!("  Waiting... ({remaining}s remaining)");
-        sleep(Duration::from_secs(interval));
-    }
-
-    // Timeout recovery: consider any Codex bot review on the exact same commit SHA.
-    // `review_commit == expected_commit` is itself the stale guard — a review on a
-    // different SHA cannot be resurrected as the current cycle's result. Restoring
-    // the pre-T005 cli behavior (the original `apps/cli/src/commands/pr.rs` did not
-    // carry an additional `submitted_after_trigger` predicate here). Per PR #143
-    // Codex Cloud reviewer: the extra timestamp filter rejects valid same-SHA
-    // reviews from prior cycles even though `commit_id == expected_commit` proves
-    // they cover the exact HEAD being reviewed.
-    if let Some(expected_commit) = head_commit {
-        let recovery_nwo = client.repo_nwo().map_err(|e| PollTestError(e.to_string()))?;
-        let recovery_reviews_json =
-            client.list_reviews(&recovery_nwo, pr).map_err(|e| PollTestError(e.to_string()))?;
-        let recovery_reviews = usecase::pr_review::parse_paginated_json(&recovery_reviews_json)
-            .map_err(|e| PollTestError(format!("recovery: failed to parse reviews JSON: {e}")))?;
-        let recovery_refs: Vec<&serde_json::Value> = recovery_reviews
-            .iter()
-            .filter(|r| {
-                let author = r
-                    .get("user")
-                    .and_then(|u| u.get("login"))
-                    .and_then(|l| l.as_str())
-                    .unwrap_or("");
-                let state = r.get("state").and_then(|s| s.as_str()).unwrap_or("");
-                let review_commit = r.get("commit_id").and_then(|s| s.as_str()).unwrap_or("");
-                is_codex_bot(author)
-                    && matches!(state, "APPROVED" | "CHANGES_REQUESTED" | "COMMENTED")
-                    && review_commit == expected_commit
-            })
-            .collect();
-        if let Some(recovered) = find_latest_bot_review_in(&recovery_refs) {
-            eprintln!("[OK] Recovered Codex review after timeout (commit-based fallback).");
-            return Ok(PollReviewResult::ReviewFound(recovered));
-        }
-    }
-
-    if !any_bot_activity {
-        eprintln!(
-            "[ERROR] Timeout: No Codex bot activity detected. \
+        if !any_bot_activity {
+            eprintln!(
+                "[ERROR] Timeout: No Codex bot activity detected. \
              Ensure the Codex Cloud GitHub App is installed."
-        );
-    } else {
-        eprintln!("[ERROR] Timeout: Codex bot active but review not yet completed.");
-    }
-    Ok(PollReviewResult::Timeout)
-}
-
-#[cfg(test)]
-pub(super) fn find_latest_bot_review_in(
-    reviews: &[&serde_json::Value],
-) -> Option<serde_json::Value> {
-    let best = reviews.iter().max_by(|a, b| {
-        let ts_a = a.get("submitted_at").and_then(|s| s.as_str()).unwrap_or("");
-        let ts_b = b.get("submitted_at").and_then(|s| s.as_str()).unwrap_or("");
-        ts_a.cmp(ts_b).then_with(|| {
-            let id_a = a.get("id").and_then(|v| v.as_u64()).unwrap_or(0);
-            let id_b = b.get("id").and_then(|v| v.as_u64()).unwrap_or(0);
-            id_a.cmp(&id_b)
-        })
-    })?;
-    let mut sanitized = (*best).clone();
-    if let Some(obj) = sanitized.as_object_mut() {
-        if let Some(serde_json::Value::String(body)) = obj.get("body") {
-            let clean = usecase::pr_review::sanitize_text(body);
-            obj.insert("body".to_owned(), serde_json::Value::String(clean));
+            );
+        } else {
+            eprintln!("[ERROR] Timeout: Codex bot active but review not yet completed.");
         }
+        Ok(PollReviewResult::Timeout)
     }
-    Some(sanitized)
+
+    #[cfg(test)]
+    pub(super) fn find_latest_bot_review_in(
+        reviews: &[&serde_json::Value],
+    ) -> Option<serde_json::Value> {
+        let best = reviews.iter().max_by(|a, b| {
+            let ts_a = a.get("submitted_at").and_then(|s| s.as_str()).unwrap_or("");
+            let ts_b = b.get("submitted_at").and_then(|s| s.as_str()).unwrap_or("");
+            ts_a.cmp(ts_b).then_with(|| {
+                let id_a = a.get("id").and_then(|v| v.as_u64()).unwrap_or(0);
+                let id_b = b.get("id").and_then(|v| v.as_u64()).unwrap_or(0);
+                id_a.cmp(&id_b)
+            })
+        })?;
+        let mut sanitized = (*best).clone();
+        if let Some(obj) = sanitized.as_object_mut() {
+            if let Some(serde_json::Value::String(body)) = obj.get("body") {
+                let clean = usecase::pr_review::sanitize_text(body);
+                obj.insert("body".to_owned(), serde_json::Value::String(clean));
+            }
+        }
+        Some(sanitized)
+    }
 }
 
 pub(super) fn ensure_pr_for_cycle<C: infrastructure::gh_cli::GhClient>(
@@ -596,7 +606,7 @@ pub(super) fn format_review_summary(
 pub(super) fn resume_trigger_state(
     track_id: &str,
 ) -> Result<(String, String, Option<String>), CompositionError> {
-    use infrastructure::git_cli::{GitRepository as _, SystemGitRepo};
+    use infrastructure::git_cli::SystemGitRepo;
 
     let state = load_trigger_state(track_id)?.ok_or_else(|| {
         CompositionError::WiringFailed(format!(
@@ -605,13 +615,19 @@ pub(super) fn resume_trigger_state(
         ))
     })?;
 
-    let repo =
+    // Route HEAD resolution through the usecase PrGitInteractor (T007). We
+    // still perform `SystemGitRepo::discover` up-front to preserve the
+    // fail-closed "no git repo" contract of the surrounding function.
+    let _repo =
         SystemGitRepo::discover().map_err(|e| CompositionError::AdapterInit(e.to_string()))?;
-    let current_head = repo
-        .output(&["rev-parse", "HEAD"])
-        .ok()
-        .filter(|o| o.status.success())
-        .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_owned());
+    let current_head = {
+        use infrastructure::FsGitWorkflowAdapter;
+        use std::sync::Arc;
+        use usecase::git_workflow::{GitPrimitivePort, PrGitInteractor};
+        let port: Arc<dyn GitPrimitivePort> = Arc::new(FsGitWorkflowAdapter::new());
+        let interactor = PrGitInteractor::new(port);
+        interactor.resolve_head().ok().flatten().map(|h| h.as_ref().to_owned())
+    };
     if let (Some(saved), Some(current)) = (&state.head_hash, &current_head) {
         if saved != current {
             cleanup_trigger_state(track_id);
@@ -637,7 +653,7 @@ pub(super) fn trigger_new_review(
     client: &infrastructure::gh_cli::SystemGhClient,
 ) -> Result<Option<(String, String, Option<String>)>, CompositionError> {
     use infrastructure::gh_cli::GhClient as _;
-    use infrastructure::git_cli::{GitRepository as _, SystemGitRepo};
+    use infrastructure::git_cli::SystemGitRepo;
 
     let ctx = resolve_branch_context(explicit_track_id)?;
     let repo =
@@ -671,11 +687,15 @@ pub(super) fn trigger_new_review(
         ));
     }
 
-    let head_hash = repo
-        .output(&["rev-parse", "HEAD"])
-        .ok()
-        .filter(|o| o.status.success())
-        .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_owned());
+    // Route HEAD resolution through the usecase PrGitInteractor (T007).
+    let head_hash = {
+        use infrastructure::FsGitWorkflowAdapter;
+        use std::sync::Arc;
+        use usecase::git_workflow::{GitPrimitivePort, PrGitInteractor};
+        let port: Arc<dyn GitPrimitivePort> = Arc::new(FsGitWorkflowAdapter::new());
+        let interactor = PrGitInteractor::new(port);
+        interactor.resolve_head().ok().flatten().map(|h| h.as_ref().to_owned())
+    };
 
     save_trigger_state(&TriggerState {
         pr_number: pr_number.clone(),
@@ -700,7 +720,8 @@ mod tests {
 
     use infrastructure::gh_cli::{GhClient, GhError, PrCheckRecord};
 
-    use super::{PollReviewResult, poll_review_for_cycle};
+    use super::PollReviewResult;
+    use super::test_support::poll_review_for_cycle;
 
     // ------------------------------------------------------------------
     // Minimal fake GhClient for poll tests

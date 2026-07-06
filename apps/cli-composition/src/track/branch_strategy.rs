@@ -5,6 +5,7 @@
 //! code limit (see `knowledge/conventions/impl-delegation-arch-guard.md`).
 
 use std::path::{Path, PathBuf};
+use std::sync::Arc;
 
 use crate::CommandOutcome;
 use crate::error::CompositionError;
@@ -36,6 +37,44 @@ pub(super) fn resolve_branch_strategy_snapshot(
     Ok(domain::BranchStrategySnapshot::new(base_branch, merge_target, adapter.merge_method()))
 }
 
+/// Wire a fresh [`usecase::git_workflow::TrackGitInteractor`] from the standard
+/// infrastructure adapters. Every track-family call site routes through this
+/// factory so the port wiring is uniform.
+fn build_track_git_interactor() -> usecase::git_workflow::TrackGitInteractor {
+    use infrastructure::git_cli::workflow_adapter::{FsGitWorkflowAdapter, FsWorkspaceAdapter};
+    use usecase::git_workflow::{GitPrimitivePort, TrackArchiveFsPort, TrackGitInteractor};
+
+    let git: Arc<dyn GitPrimitivePort> = Arc::new(FsGitWorkflowAdapter::new());
+    let fs: Arc<dyn TrackArchiveFsPort> = Arc::new(FsWorkspaceAdapter::new());
+    TrackGitInteractor::new(git, fs)
+}
+
+pub(super) fn track_git_interactor() -> usecase::git_workflow::TrackGitInteractor {
+    build_track_git_interactor()
+}
+
+fn switch_base_error_to_outcome(
+    base_branch: &str,
+    error: usecase::git_workflow::GitWorkflowError,
+) -> Result<CommandOutcome, CompositionError> {
+    use usecase::git_workflow::GitWorkflowError;
+
+    // A typed `git switch` failure renders the legacy checkout-failure outcome:
+    // stdout `Failed to checkout <base>`, no stderr, and the u8-clamped exit
+    // code (CN-05 bit-equivalence with the pre-track inline behavior). All other
+    // errors remain typed composition errors.
+    if let GitWorkflowError::SwitchFailed { exit_code, .. } = &error {
+        let exit_code = u8::try_from(*exit_code).unwrap_or(1);
+        return Ok(CommandOutcome {
+            stdout: Some(format!("Failed to checkout {base_branch}")),
+            stderr: None,
+            exit_code,
+        });
+    }
+
+    Err(CompositionError::Infrastructure(error.to_string()))
+}
+
 impl TrackCompositionRoot {
     /// Create a new track branch from the configured base branch.
     /// # Errors
@@ -46,47 +85,19 @@ impl TrackCompositionRoot {
         items_dir: PathBuf,
         track_id: String,
     ) -> Result<CommandOutcome, CompositionError> {
-        use infrastructure::git_cli::GitRepository;
         validate_track_id_str(&track_id)?;
-        let branch_name = format!("track/{track_id}");
         let project_root = resolve_project_root(&items_dir)?;
         // No metadata.json exists yet for the track being created, so the base
         // branch is resolved from the global config (mirrors track_init).
         let snap = resolve_branch_strategy_snapshot(&project_root)?;
         let base_branch = snap.base_branch();
-        let repo =
-            infrastructure::git_cli::SystemGitRepo::discover_from(&project_root).map_err(|e| {
-                CompositionError::AdapterInit(format!(
-                    "failed to discover git repository from '{}': {e}",
-                    project_root.display()
-                ))
-            })?;
-        let current = GitRepository::current_branch(&repo)
-            .map_err(|e| CompositionError::Infrastructure(e.to_string()))?;
-        if current.as_deref() != Some(base_branch) {
-            return Err(CompositionError::WiringFailed(format!(
-                "branch create must start from '{base_branch}'; current branch is {}",
-                current.as_deref().unwrap_or("<detached>")
-            )));
-        }
-        let exists_output = repo
-            .output(&["rev-parse", "--verify", "--quiet", &branch_name])
-            .map_err(|e| CompositionError::Infrastructure(e.to_string()))?;
-        if exists_output.status.success() {
-            return Err(CompositionError::WiringFailed(format!(
-                "branch '{branch_name}' already exists"
-            )));
-        }
-        let code = repo
-            .status(&["switch", "-c", &branch_name, base_branch])
-            .map_err(|e| CompositionError::Infrastructure(e.to_string()))?;
-        if code == 0 {
-            Ok(CommandOutcome::success(None))
-        } else {
-            Err(CompositionError::Infrastructure(format!(
-                "git switch -c {branch_name} {base_branch} failed"
-            )))
-        }
+        let id = domain::TrackId::try_new(&track_id)
+            .map_err(|e| CompositionError::WiringFailed(format!("invalid track ID: {e}")))?;
+        let interactor = build_track_git_interactor();
+        interactor
+            .create_track_branch(&project_root, &id, base_branch)
+            .map(|()| CommandOutcome::success(None))
+            .map_err(|e| CompositionError::Infrastructure(e.to_string()))
     }
 
     /// Switch to the base branch from the active track's `branch_strategy_snapshot` (IN-05).
@@ -122,7 +133,61 @@ impl TrackCompositionRoot {
             })?;
         let adapter =
             SnapshotBranchStrategyAdapter::new(metadata.branch_strategy_snapshot().clone());
-        crate::GitCompositionRoot::new()
-            .git_switch_and_pull_in(&project_root, adapter.base_branch().to_owned())
+
+        let base_branch = adapter.base_branch().to_owned();
+        build_track_git_interactor()
+            .switch_to_base(&project_root, &base_branch)
+            .map(|msg| CommandOutcome::success(Some(msg)))
+            .or_else(|e| switch_base_error_to_outcome(&base_branch, e))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::switch_base_error_to_outcome;
+
+    #[test]
+    fn test_switch_base_error_to_outcome_checkout_failure_preserves_legacy_result()
+    -> Result<(), String> {
+        let result = switch_base_error_to_outcome(
+            "main",
+            usecase::git_workflow::GitWorkflowError::SwitchFailed {
+                branch: usecase::git_workflow::DiagnosticText::new("main"),
+                exit_code: 7,
+            },
+        );
+        let outcome = match result {
+            Ok(outcome) => outcome,
+            Err(error) => {
+                return Err(format!("checkout failure should map to legacy outcome: {error}"));
+            }
+        };
+
+        assert_eq!(outcome.stdout.as_deref(), Some("Failed to checkout main"));
+        assert_eq!(outcome.stderr, None);
+        assert_eq!(outcome.exit_code, 7);
+        Ok(())
+    }
+
+    #[test]
+    fn test_switch_base_error_to_outcome_unrelated_error_stays_infrastructure_error()
+    -> Result<(), String> {
+        let result = switch_base_error_to_outcome(
+            "main",
+            usecase::git_workflow::GitWorkflowError::Unavailable(
+                usecase::git_workflow::DiagnosticText::new("unexpected sync failure"),
+            ),
+        );
+        let error = match result {
+            Ok(outcome) => {
+                return Err(format!(
+                    "unrelated git errors must remain typed composition errors: {outcome:?}"
+                ));
+            }
+            Err(error) => error,
+        };
+
+        assert_eq!(error.to_string(), "git workflow unavailable: unexpected sync failure");
+        Ok(())
     }
 }

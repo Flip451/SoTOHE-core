@@ -4,7 +4,7 @@ use domain::CommitHash;
 use domain::review_v2::FilePath;
 use usecase::review_v2::{DiffGetError, DiffGetter};
 
-use crate::git_cli::{GitRepository, SystemGitRepo};
+use crate::git_cli::SystemGitRepo;
 
 /// Git-based diff getter that computes the union of 4 diff sources.
 ///

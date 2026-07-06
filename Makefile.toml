@@ -561,6 +561,11 @@ description = "[wrapper] Stage all worktree changes except transient automation 
 command = "bin/sotp"
 args = ["git", "add-all"]
 
+[tasks.sync]
+description = "[wrapper] Fast-forward pull the current branch (git pull --ff-only)"
+command = "bin/sotp"
+args = ["git", "sync"]
+
 [tasks.unstage]
 description = "[wrapper] Unstage paths (remove from index without discarding worktree changes)"
 command = "bin/sotp"

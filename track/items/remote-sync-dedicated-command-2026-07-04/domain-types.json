@@ -1,0 +1,92 @@
+{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "WorktreeError": {
+      "action": "reference",
+      "role": { "ErrorType": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "StatusFailed", "payload": { "kind": "tuple", "fields": ["String"] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "error",
+      "docs": "Pre-existing domain error for WorktreeReader operations; unchanged by this track. Declared reference for edge visibility (WorktreeReader::porcelain_status return type).",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "TrackId": {
+      "action": "reference",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "tuple", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "ids",
+      "docs": "Pre-existing validated track-identifier newtype; unchanged by this track. Declared reference for cross-layer edge visibility (usecase GitWorkflowService / TrackGitInteractor / PrGitInteractor / ReviewGitInteractor method params + current_branch_track_id return).",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "CommitHash": {
+      "action": "reference",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "tuple", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "ids",
+      "docs": "Pre-existing validated git-commit-hash newtype; unchanged by this track. Declared reference for cross-layer edge visibility (usecase GitPrimitivePort::resolve_commit + ReviewGitInteractor / PrGitInteractor hash returns).",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "traits": {
+    "WorktreeReader": {
+      "action": "reference",
+      "role": { "SecondaryPort": {} },
+      "methods": [
+        {
+          "name": "porcelain_status",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Result<String, WorktreeError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "(baseline) Returns the raw `git status --porcelain` output."
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "repository",
+      "docs": "Pre-existing domain-side driven port for worktree cleanliness; unchanged by this track. Declared reference for edge visibility (SystemGitRepo -.impl.-> WorktreeReader, R7).",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "functions": {},
+  "inherent_impls": [],
+  "trait_impls": [
+    { "action": "reference", "trait_ref": "core::fmt::Debug",      "for_type": "TrackId" },
+    { "action": "reference", "trait_ref": "core::clone::Clone",    "for_type": "TrackId" },
+    { "action": "reference", "trait_ref": "core::cmp::PartialEq",  "for_type": "TrackId" },
+    { "action": "reference", "trait_ref": "core::cmp::Eq",         "for_type": "TrackId" },
+    { "action": "reference", "trait_ref": "core::hash::Hash",      "for_type": "TrackId" },
+    { "action": "reference", "trait_ref": "core::cmp::PartialOrd", "for_type": "TrackId" },
+    { "action": "reference", "trait_ref": "core::cmp::Ord",        "for_type": "TrackId" },
+    { "action": "reference", "trait_ref": "core::fmt::Display",    "for_type": "TrackId" },
+    { "action": "reference", "trait_ref": "core::fmt::Debug",      "for_type": "CommitHash" },
+    { "action": "reference", "trait_ref": "core::clone::Clone",    "for_type": "CommitHash" },
+    { "action": "reference", "trait_ref": "core::cmp::PartialEq",  "for_type": "CommitHash" },
+    { "action": "reference", "trait_ref": "core::cmp::Eq",         "for_type": "CommitHash" },
+    { "action": "reference", "trait_ref": "core::hash::Hash",      "for_type": "CommitHash" },
+    { "action": "reference", "trait_ref": "core::cmp::PartialOrd", "for_type": "CommitHash" },
+    { "action": "reference", "trait_ref": "core::cmp::Ord",        "for_type": "CommitHash" },
+    { "action": "reference", "trait_ref": "core::fmt::Display",    "for_type": "CommitHash" }
+  ]
+}

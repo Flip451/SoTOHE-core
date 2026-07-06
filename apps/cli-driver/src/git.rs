@@ -41,11 +41,8 @@ pub enum GitInput {
         /// Remove the note file after attaching.
         cleanup: bool,
     },
-    /// Switch to a branch and pull latest changes.
-    SwitchAndPull {
-        /// Branch name to check out and pull.
-        branch: String,
-    },
+    /// Fast-forward pull the current branch (`git pull --ff-only`).
+    Sync,
     /// Unstage paths (remove from git index without discarding worktree changes).
     Unstage {
         /// Paths to remove from the index.
@@ -81,7 +78,7 @@ impl GitDriver {
                 self.git_commit_from_file(path, cleanup, track_dir)
             }
             GitInput::NoteFromFile { path, cleanup } => self.git_note_from_file(path, cleanup),
-            GitInput::SwitchAndPull { branch } => self.git_switch_and_pull(branch),
+            GitInput::Sync => self.git_sync(),
             GitInput::Unstage { paths } => self.git_unstage(paths),
             GitInput::CurrentBranchTrackIdStrict => self.current_branch_track_id_strict_outcome(),
         }
@@ -124,9 +121,9 @@ impl GitDriver {
         }
     }
 
-    fn git_switch_and_pull(&self, branch: String) -> CommandOutcome {
-        match self.service.switch_and_pull(&branch) {
-            Ok(msg) => CommandOutcome::success(Some(msg)),
+    fn git_sync(&self) -> CommandOutcome {
+        match self.service.sync_current_branch() {
+            Ok(()) => CommandOutcome::success(None),
             Err(e) => CommandOutcome::failure(Some(e.to_string())),
         }
     }
@@ -140,7 +137,7 @@ impl GitDriver {
 
     fn current_branch_track_id_strict_outcome(&self) -> CommandOutcome {
         match self.service.current_branch_track_id() {
-            Ok(Some(id)) => CommandOutcome::success(Some(id)),
+            Ok(Some(id)) => CommandOutcome::success(Some(id.as_ref().to_owned())),
             Ok(None) => CommandOutcome::success(None),
             Err(e) => CommandOutcome::failure(Some(e.to_string())),
         }

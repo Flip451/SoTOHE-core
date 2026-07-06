@@ -40,6 +40,7 @@ bin/sotp arch tree          # crate のみの workspace tree を表示
 bin/sotp arch tree-full     # crate + 非 crate ディレクトリを含む workspace tree を表示
 cargo make add <files>            # 手動の低レベル staging（terminal 直実行用）
 cargo make add-all                # worktree 全体を stage（transient scratch file は除外）
+cargo make sync                   # 現在のブランチを ff-only pull（bin/sotp git sync の wrapper）
 cargo make track-add-paths        # tmp/track-commit/add-paths.txt から選択的に stage
 cargo make unstage <paths>        # index から除去（worktree 変更は保持）
 cargo make track-commit-message   # tmp/track-commit/commit-message.txt から commit（唯一のコミット経路）
@@ -51,7 +52,7 @@ bin/sotp pr ensure-pr             # PR 作成（既存なら再利用）
 bin/sotp pr wait-and-merge <pr> --method <merge|squash|rebase>  # CI 待ち → マージ
 bin/sotp pr status <pr>           # PR チェック状況表示
 cargo make track-pr-review        # PR レビューサイクル（push + PR作成 + @codex review）
-cargo make track-switch-base      # configured base branch に切替 + pull
+cargo make track-switch-base      # configured base branch に切替 + ff-only sync (cargo make sync 相当)
 bin/sotp track resolve            # 現在の track phase / next command / blocker を表示
 cargo make track-branch-create    # configured base branch からトラックブランチを作成して切替
 cargo make track-branch-switch    # 既存トラックブランチに切替
@@ -66,8 +67,8 @@ cargo make test-doc               # ドキュメントテスト
 
 Non-git track operations (transition, sync-views, resolve, add-task, etc.) use
 `bin/sotp` native subcommands directly — there are no `cargo make` wrapper tasks for them.
-Git-write operations (add-all, commit, note, branch ops, PR push) remain routed
-through `cargo make` tasks to stay within the `block-direct-git-ops` hook boundary.
+Git-write operations (add-all, commit, note, branch ops, PR push, current-branch sync)
+remain routed through `cargo make` tasks to stay within the `block-direct-git-ops` hook boundary.
 
 ```bash
 # Direct bin/sotp (native subcommands with default --items-dir track/items)

@@ -120,7 +120,7 @@ pub(crate) fn resolve_telemetry_writer_inner(
 /// Git failure is intentionally silent (fire-and-forget: telemetry is disabled
 /// if we cannot determine the branch — AC-11).
 fn resolve_telemetry_context_from_branch(items_dir: &Path) -> Option<(String, PathBuf)> {
-    use infrastructure::git_cli::GitRepository as _;
+    // GitRepository trait removed in T008; SystemGitRepo methods are now inherent.
     use usecase::track_resolution::resolve_track_id_from_branch as resolve_fn;
 
     // Derive the project root from items_dir so discovery is anchored to the
@@ -134,7 +134,7 @@ fn resolve_telemetry_context_from_branch(items_dir: &Path) -> Option<(String, Pa
 }
 
 fn resolve_anchored_items_dir(items_dir: &Path) -> Option<PathBuf> {
-    use infrastructure::git_cli::GitRepository as _;
+    // GitRepository trait removed in T008; SystemGitRepo methods are now inherent.
 
     let repo = discover_telemetry_repo(items_dir)?;
     Some(anchor_items_dir_to_repo(items_dir, repo.root()))

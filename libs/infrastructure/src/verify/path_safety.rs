@@ -5,7 +5,7 @@ use std::path::{Path, PathBuf};
 
 use domain::verify::{VerifyFinding, VerifyOutcome};
 
-use crate::git_cli::GitRepository as _;
+// GitRepository trait was removed in T008; SystemGitRepo methods are now inherent.
 use crate::track::symlink_guard::reject_symlinks_below;
 
 /// Lexically normalize a path by collapsing `..` components without I/O (without following

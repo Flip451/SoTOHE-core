@@ -10,7 +10,7 @@ use std::path::PathBuf;
 use domain::CommitHash;
 use thiserror::Error;
 
-use crate::git_cli::{GitRepository, SystemGitRepo};
+use crate::git_cli::SystemGitRepo;
 use crate::track::symlink_guard::reject_symlinks_below;
 
 // ── DryCheckCommitHashError ───────────────────────────────────────────────────

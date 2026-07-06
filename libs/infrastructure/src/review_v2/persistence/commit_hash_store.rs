@@ -6,7 +6,7 @@ use domain::CommitHash;
 use domain::review_v2::{CommitHashError, CommitHashReader, CommitHashWriter};
 
 use super::{atomic_write_file, reject_symlinks_below};
-use crate::git_cli::{GitRepository, SystemGitRepo};
+use crate::git_cli::SystemGitRepo;
 
 /// Filesystem-based .commit_hash reader/writer with ancestry validation.
 pub struct FsCommitHashStore {

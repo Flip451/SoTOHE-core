@@ -44,7 +44,9 @@ pub use pr_review::SystemSleepAdapter;
 pub use semantic_dup::fragment_extractor_adapter::CodeFragmentExtractorAdapter;
 pub use semantic_dup::noop_adapter::NoopSemanticIndexPort;
 pub use semantic_dup::null_insert_proxy::NullInsertIndexProxy;
-pub use telemetry::archived_track::FsArchivedTrackTelemetryAdapter;
+pub use telemetry::archived_track::{
+    FsArchivedTelemetryFactoryAdapter, FsArchivedTrackTelemetryAdapter,
+};
 pub use telemetry::report_adapter::{FsTelemetryEmitDynamicAdapter, FsTelemetryReportAdapter};
 pub use track::fs_symlink_guard::FsSymlinkGuard;
 pub use track::gate_state::{FsRefVerifyGateStateAdapter, FsReviewGateStateAdapter};
@@ -61,7 +63,7 @@ pub(crate) fn resolve_items_dir_under_current_repo(
 ) -> Result<std::path::PathBuf, std::io::Error> {
     use std::path::Component;
 
-    use crate::git_cli::{GitRepository as _, SystemGitRepo};
+    use crate::git_cli::SystemGitRepo;
 
     if items_dir.as_os_str().is_empty() {
         return Err(std::io::Error::new(

@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "d4d4cf219d11747171affd8e12d58a0bec942575c86c09a6af891b955073dd64",
+  "signals": [
+    {
+      "type_name": "FsArchivedTelemetryFactoryAdapter",
+      "signal": "blue",
+      "entry_hash": "364e177b07801ddb1872483a3626f7ae646e68160602aa12f4682b4fb53f161c"
+    },
+    {
+      "type_name": "FsGitWorkflowAdapter",
+      "signal": "blue",
+      "entry_hash": "f16095dbec67d73875a79ef9b372080f03caa47e9abedd191b174bc553298114"
+    },
+    {
+      "type_name": "FsWorkspaceAdapter",
+      "signal": "blue",
+      "entry_hash": "11f0ec33ef4c28f467e8a54e6f5cfa80ca7128eb792e92d9d432923bbf3a7330"
+    },
+    {
+      "type_name": "GitError",
+      "signal": "blue",
+      "entry_hash": "d347f2ccf0c18c9fda6ed0e52a6812d05d888c4a30103a361b44f3a5aaf7b0ac"
+    },
+    {
+      "type_name": "SyncError",
+      "signal": "blue",
+      "entry_hash": "66502d2af08242d9bc05e64777fe91be476c180be296563aebaa66b04a282bb9"
+    },
+    {
+      "type_name": "SystemGitRepo",
+      "signal": "blue",
+      "entry_hash": "bf453251208589f9ddee06db1604a07e709c25d30974ff3080437e30527767a9"
+    },
+    {
+      "type_name": "TrackBranchError",
+      "signal": "blue",
+      "entry_hash": "f0dd39b265d9e4d84064b050642db2dbfb6c4a9f73ffde0290b396744b1917fe"
+    },
+    {
+      "type_name": "TrackBranchRecord",
+      "signal": "blue",
+      "entry_hash": "f7aa15b1a588732708e0329443a1e627af1a37aba0e59f1aba00177824d51dce"
+    },
+    {
+      "type_name": "GitRepository",
+      "signal": "blue",
+      "entry_hash": "cf6f55f6c67518454596b6bea0935a5bcca97d4c85ccdaf12770bd01e34730ad"
+    },
+    {
+      "type_name": "infrastructure::git_cli::collect_track_branch_claims",
+      "signal": "blue",
+      "entry_hash": "cb2be79c248041278ab155b4cb62b20ba9a33aa7adb260dd893945cf91a4c0ba"
+    },
+    {
+      "type_name": "infrastructure::git_cli::load_explicit_track_branch",
+      "signal": "blue",
+      "entry_hash": "30a7cb3e154ee3e0ca406b0009f6580ca5e40233b0cda6207740a6afdd9e18cf"
+    },
+    {
+      "type_name": "infrastructure::git_cli::load_explicit_track_branch_from_items_dir",
+      "signal": "blue",
+      "entry_hash": "432df7f644bc6b7b113954c76b0083493835bd30a8d7d2eb26efc2082b930336"
+    },
+    {
+      "type_name": "infrastructure::git_cli::resolve_repo_path",
+      "signal": "blue",
+      "entry_hash": "7931071e6b3693ec5103269cf1ac0789fb0672b2d53104c8755d1b49e14d02e0"
+    }
+  ]
+}

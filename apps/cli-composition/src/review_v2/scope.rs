@@ -5,7 +5,7 @@ use std::path::Path;
 use domain::TrackId;
 use domain::review_v2::ReviewScopeConfig;
 
-use infrastructure::git_cli::{GitRepository, SystemGitRepo};
+use infrastructure::git_cli::SystemGitRepo;
 use infrastructure::review_v2::load_v2_scope_config;
 
 /// Loads just the `ReviewScopeConfig` for a given track/items_dir, without

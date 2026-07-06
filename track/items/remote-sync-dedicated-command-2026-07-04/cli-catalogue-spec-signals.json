@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "9f276f1c4c4552d51267611775434aab1c0fc07fb9f7df60729496e65157b7c1",
+  "signals": [
+    {
+      "type_name": "CommitFromFileArgs",
+      "signal": "blue",
+      "entry_hash": "7c5a18b291e5967972b41f9237818432b58f67bd8bed7f153aea4f52f0ba1098"
+    },
+    {
+      "type_name": "FileArgs",
+      "signal": "blue",
+      "entry_hash": "3b8a6aabe25686bc49d84dd1e197c45fb7b743f51c72f3bad677e2276c94ce2a"
+    },
+    {
+      "type_name": "GitCommand",
+      "signal": "blue",
+      "entry_hash": "945a106fd2bcfbe191ed518586f299e88ac408d48338e26bac4eff73ea58b1ac"
+    },
+    {
+      "type_name": "SwitchAndPullArgs",
+      "signal": "blue",
+      "entry_hash": "e7e7db750b790d8969e93910b0dd50d3637dfd84c48cac349cdb1846b2e7f357"
+    },
+    {
+      "type_name": "UnstageArgs",
+      "signal": "blue",
+      "entry_hash": "3d379790a31c5819b03dedd4b68ffbe5b969668e4dadeebb49d43bc2bb6153eb"
+    }
+  ]
+}

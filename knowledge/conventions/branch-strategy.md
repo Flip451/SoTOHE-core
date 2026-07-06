@@ -37,7 +37,8 @@ branch strategy の実値は 2 段階で解決する。どちらの経路でも�
 ### ブランチの切り替え
 
 - `cargo make track-branch-switch '<id>'` で対象トラックのブランチに切り替える。
-- `cargo make track-switch-base` でアクティブなトラックの `branch_strategy_snapshot` から解決した base branch に切り替え、最新を pull する（`/track:done` が内部で使用する）。
+- `cargo make track-switch-base` でアクティブなトラックの `branch_strategy_snapshot` から解決した base branch に切り替え、そのあと ff-only sync（内部的には `bin/sotp git sync` — `git pull --ff-only`）で最新取り込みを試みる（`/track:done` が内部で使用する）。この合成コマンドでは、upstream 未設定 / non-fast-forward / worktree unresolved などの既知 sync refusal はすべて「[WARN] Pull failed (may not have remote tracking branch)」に downgrade され、branch switch 自体が可能な場合は workflow を失敗させない。
+- `cargo make sync` は現在のブランチを ff-only pull するのみの薄いラッパー。ブランチ切り替えは行わないので、track branch 上で upstream に fast-forward 追従する用途としても使える。単体実行時は upstream 未設定 / non-fast-forward / worktree unresolved を typed error として fail-closed する（トラック切替と remote sync を独立したコマンドに分離した理由については ADR `knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md` を参照）。
 
 ### マージワークフロー（track/ ブランチ）
 

@@ -17,8 +17,11 @@
 use std::fs::{File, OpenOptions};
 use std::io::Write as _;
 use std::path::{Path, PathBuf};
+use std::sync::Arc;
 
-use usecase::telemetry::{ArchivedTrackTelemetryError, ArchivedTrackTelemetryPort};
+use usecase::telemetry::{
+    ArchivedTelemetryFactoryPort, ArchivedTrackTelemetryError, ArchivedTrackTelemetryPort,
+};
 
 // ── Adapter ───────────────────────────────────────────────────────────────────
 
@@ -102,6 +105,31 @@ impl ArchivedTrackTelemetryPort for FsArchivedTrackTelemetryAdapter {
         }
 
         Ok(())
+    }
+}
+
+// ── Factory adapter ─────────────────────────────────────────────────────────────
+
+/// Adapter implementing [`ArchivedTelemetryFactoryPort`] by constructing a
+/// path-parameterized [`FsArchivedTrackTelemetryAdapter`] per `build` call.
+///
+/// Lets the usecase `TelemetryAggregateInteractor` own the archive orchestration
+/// while this infrastructure factory supplies the concrete `std::fs`/`chrono`
+/// emitter. IN-10 / CN-03 / AC-09.
+#[derive(Default)]
+pub struct FsArchivedTelemetryFactoryAdapter;
+
+impl FsArchivedTelemetryFactoryAdapter {
+    /// Unit-struct constructor.
+    #[must_use]
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+impl ArchivedTelemetryFactoryPort for FsArchivedTelemetryFactoryAdapter {
+    fn build(&self, telemetry_dir: &Path) -> Arc<dyn ArchivedTrackTelemetryPort> {
+        Arc::new(FsArchivedTrackTelemetryAdapter::new(telemetry_dir.to_path_buf()))
     }
 }
 

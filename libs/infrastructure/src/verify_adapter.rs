@@ -237,7 +237,7 @@ fn resolve_ci_verify_track_id_with_reader(
 }
 
 fn resolve_active_track_dir() -> Option<PathBuf> {
-    use crate::git_cli::GitRepository as _;
+    // GitRepository trait was removed in T008; SystemGitRepo methods are now inherent.
     use usecase::track_resolution::{ActiveTrackResolveInteractor, ActiveTrackResolveService as _};
     let repo = crate::git_cli::SystemGitRepo::discover().ok()?;
     let repo_root = repo.root().to_path_buf();
