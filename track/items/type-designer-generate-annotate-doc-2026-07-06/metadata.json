@@ -1,0 +1,13 @@
+{
+  "schema_version": 6,
+  "id": "type-designer-generate-annotate-doc-2026-07-06",
+  "title": "type-designer capability doc の「生成 + 注釈」workflow への同期 — ADR D2/D3 非整合 fix",
+  "branch": "track/type-designer-generate-annotate-doc-2026-07-06",
+  "created_at": "2026-07-06T12:25:25Z",
+  "updated_at": "2026-07-06T12:25:25Z",
+  "branch_strategy_snapshot": {
+    "base_branch": "develop",
+    "merge_target": "develop",
+    "merge_method": "squash"
+  }
+}

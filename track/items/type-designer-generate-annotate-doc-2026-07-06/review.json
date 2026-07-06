@@ -1,0 +1,23 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fd283ec3c01f224abef775a0aef2242740a75815a836e72ad272c5036d9cee4d",
+          "at": "2026-07-06T12:27:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fd283ec3c01f224abef775a0aef2242740a75815a836e72ad272c5036d9cee4d",
+          "at": "2026-07-06T12:29:44Z"
+        }
+      ]
+    }
+  }
+}
