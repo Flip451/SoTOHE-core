@@ -174,7 +174,7 @@ Using a type-section or function-section role here is a parse-time error. The pl
   "returns":           "<TypeRef>",
   "is_async":          true | false,
   "generics":          [{ "name": "<ParamName>", "bounds": ["<TypeRef>", ...] }, ...],
-  "where_predicates":  [{ "type": "<TypeRef>", "bounds": ["<TypeRef>", ...] }, ...],
+  "where_predicates":  [{ "lhs": "<TypeRef>", "rhs": ["<TypeRef>", ...], "operator": "Bound" | "Equal" }, ...],
   "docs":              "<optional docstring>" | null,
   "spec_refs":         [<SpecRef>, ...],
   "informal_grounds":  [<InformalGroundRef>, ...]
@@ -252,14 +252,14 @@ rustdoc **omits private fields** from the public API JSON and sets `has_stripped
   "is_async": true | false,
   "generics": [{ "name": "<ParamName>", "bounds": ["<TypeRef>", ...] }, ...],
   "has_default_impl": true | false,
-  "where_predicates": [{ "type": "<TypeRef>", "bounds": ["<TypeRef>", ...] }, ...],
+  "where_predicates": [{ "lhs": "<TypeRef>", "rhs": ["<TypeRef>", ...], "operator": "Bound" | "Equal" }, ...],
   "docs": "<optional docstring>" | null
 }
 ```
 
 - `receiver: null` = associated function (no `self`); the valid `receiver` tokens are `"self"`, `"&self"`, `"&mut self"`, and `null` (the codec also accepts `""` as equivalent to `null`). Prefer `null` over `""` for the absence case
 - `has_default_impl: true` = trait method has a default body (`fn foo(&self) { ... }`); used by A-codec to set the rustdoc `has_body` flag correctly
-- `where_predicates` captures `where Vec<T>: Clone` patterns whose LHS cannot be expressed in `generics[].bounds`
+- `where_predicates` captures `where Vec<T>: Clone` patterns whose LHS cannot be expressed in `generics[].bounds`. Fields: `lhs` (the constrained type), `rhs` (non-empty bound list), `operator` (`"Bound"` for `T: Trait`, `"Equal"` for `T = Type`; defaults to `"Bound"` when omitted). The legacy `"type"` / `"bounds"` field names are accepted on read for backward compatibility only — always write `lhs` / `rhs` in new entries
 
 ## TypeRef rules (`ty` / `returns` / `bounds`)
 
@@ -310,13 +310,13 @@ Codec error names worth knowing for catalogue work:
 
 Concrete catalogue shapes. In the generate + annotate workflow the skeletons are produced by `sotp catalog add` / `sotp catalog import` — use these patterns as **reading references**: to understand a generated entry, to judge what to fill into a `$todo` hole, and to verify hand-adjustments after generation. They also remain the target shapes the generated output converges to.
 
-> **Schema Reference takes precedence.** The `role` values in the cookbook examples below are shown in the **legacy plain-string form** (`"role": "ValueObject"`, `"role": "SecondaryPort"`, etc.) retained for brevity. The codec no longer accepts this form — the normative wire format is the **discriminated-object form** defined in the schema reference sections above (e.g. `"role": { "ValueObject": {} }`). When reading or editing catalogue entries, always follow the schema reference sections of this document, not the cookbook literals.
+> **Schema Reference takes precedence.** The cookbook examples below are written in the normative **v5 wire format**: `role` uses the discriminated-object form for type-section and trait-section entries (e.g. `"role": { "ValueObject": {} }`, `"role": { "SecondaryPort": {} }`), while function-section entries keep the plain-string form (`"role": "UseCaseFunction"` — `FunctionRole` is a fieldless enum, wired as `role: String` in the codec DTO). If a cookbook literal ever diverges from the schema reference sections above, the schema reference sections win.
 
 > **Layer-name disclaimer.** The cookbook examples below use the layer / crate name placeholders `<core-crate>` (a layer that may host roles like `"ValueObject"` / `"SecondaryPort"`) and `<adapter-crate>` (a layer that may host roles like `"SecondaryAdapter"`). For *this* workspace, the actual names are listed in `architecture-rules.json` and the legal role × layer combinations are specified in `knowledge/conventions/type-designer-kind-selection.md` § R1. Substitute the placeholders for the real names — do not copy the placeholders verbatim into the JSON. The catalogue file name follows the pattern `<layer>-types.json` (e.g. `<core-crate>-types.json`); locate the legal layer names from the SSoT pair.
 >
 > For a worked example in a real catalogue, consult the latest tracks under `track/items/<id>/` — each track ships `<layer>-types.json` files that show how the layer names from `architecture-rules.json` are substituted in.
 
-Patterns 1 and 3 show complete documents. Patterns 2, 4–8 show partial BTreeMap sections (e.g. `"types": { ... }`) extracted from a full document for conciseness; they use `jsonc` fences because some contain `//` annotation comments. The `schema_version` in these examples is **legacy** — always write `"schema_version": 5` in real catalogue files (the codec rejects versions 1–4 fail-closed; v4 is rejected with a migration prompt).
+Patterns 1 and 3 show complete documents with `"schema_version": 5`. Patterns 2, 4–8 show partial BTreeMap sections (e.g. `"types": { ... }`) extracted from a full document for conciseness; they use `jsonc` fences because some contain `//` annotation comments. The codec accepts only `"schema_version": 5` — versions 1–4 are rejected fail-closed (v4 with a migration prompt).
 
 ### Pattern 1: Typestate cluster + enum wrapper (state machine + heterogeneous Vec)
 
@@ -324,13 +324,13 @@ ADR decision lifecycle `Proposed → Accepted → Implemented → Superseded | D
 
 ```json
 {
-  "schema_version": 3,
+  "schema_version": 5,
   "crate_name": "<core-crate>",
   "layer":       "<core-crate>",
   "types": {
     "ProposedDecision": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": {
         "kind": "struct",
         "shape": {
@@ -361,7 +361,7 @@ ADR decision lifecycle `Proposed → Accepted → Implemented → Superseded | D
     },
     "AcceptedDecision": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": {
         "kind": "struct",
         "shape": {
@@ -389,7 +389,7 @@ ADR decision lifecycle `Proposed → Accepted → Implemented → Superseded | D
     },
     "ImplementedDecision": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": {
         "kind": "struct",
         "shape": {
@@ -409,7 +409,7 @@ ADR decision lifecycle `Proposed → Accepted → Implemented → Superseded | D
     },
     "SupersededDecision": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": {
         "kind": "struct",
         "shape": {
@@ -429,7 +429,7 @@ ADR decision lifecycle `Proposed → Accepted → Implemented → Superseded | D
     },
     "DeprecatedDecision": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": {
         "kind": "struct",
         "shape": {
@@ -446,7 +446,7 @@ ADR decision lifecycle `Proposed → Accepted → Implemented → Superseded | D
     },
     "AdrDecisionEntry": {
       "action": "add",
-      "role": "ValueObject",
+      "role": { "ValueObject": {} },
       "kind": {
         "kind": "enum",
         "variants": [
@@ -476,7 +476,7 @@ Anti-pattern: a flat `Enum` `DecisionStatus { Proposed, Accepted, ... }` plus a 
 "types": {
   "FailureDetail": {
     "action": "add",
-    "role": "ValueObject",
+    "role": { "ValueObject": {} },
     "kind": {
       "kind": "struct",
       "shape": { "kind": "plain", "fields": [{ "name": "message", "ty": "String" }], "has_stripped_fields": false }
@@ -486,11 +486,11 @@ Anti-pattern: a flat `Enum` `DecisionStatus { Proposed, Accepted, ... }` plus a 
   },
   "SomeResult": {
     "action": "add",
-    "role": "ValueObject",
+    "role": { "ValueObject": {} },
     "kind": {
       "kind": "enum",
       "variants": [
-        { "name": "Success" },
+        { "name": "Success", "payload": { "kind": "unit" } },
         { "name": "Failure", "payload": { "kind": "tuple", "fields": ["FailureDetail"] } }
       ]
     },
@@ -507,13 +507,13 @@ The core-tier crate declares the port + error type; an adapter-tier crate declar
 ```jsonc
 // <core-crate>-types.json
 {
-  "schema_version": 3,
+  "schema_version": 5,
   "crate_name": "<core-crate>",
   "layer":       "<core-crate>",
   "types": {
     "AdrFilePortError": {
       "action": "add",
-      "role": "ErrorType",
+      "role": { "ErrorType": {} },
       "kind": {
         "kind": "enum",
         "variants": [
@@ -528,7 +528,7 @@ The core-tier crate declares the port + error type; an adapter-tier crate declar
   "traits": {
     "AdrFilePort": {
       "action": "add",
-      "role": "SecondaryPort",
+      "role": { "SecondaryPort": {} },
       "methods": [
         {
           "name": "read_adr_frontmatter",
@@ -554,13 +554,13 @@ The core-tier crate declares the port + error type; an adapter-tier crate declar
 ```jsonc
 // <adapter-crate>-types.json — adapter side; the impl is a top-level trait_impls entry
 {
-  "schema_version": 3,
+  "schema_version": 5,
   "crate_name": "<adapter-crate>",
   "layer":       "<adapter-crate>",
   "types": {
     "FsAdrFileAdapter": {
       "action": "add",
-      "role": "SecondaryAdapter",
+      "role": { "SecondaryAdapter": {} },
       "kind": {
         "kind": "struct",
         "shape": { "kind": "plain", "fields": [{ "name": "adr_dir", "ty": "std::path::PathBuf" }], "has_stripped_fields": false }
@@ -596,7 +596,7 @@ When a trait is `modify`-ed, the declaration must enumerate every method. Partia
 "traits": {
   "TrackBlobReader": {
     "action": "modify",
-    "role":   "SecondaryPort",
+    "role":   { "SecondaryPort": {} },
     "methods": [
       {
         "name": "read_spec_document",
@@ -641,7 +641,7 @@ This example is from `<orchestration-crate>-types.json` (so `crate_name: "<orche
 "functions": {
   "<orchestration-crate>::merge_gate::check_strict_merge_gate": {
     "action":   "add",
-    "role":     "UseCaseFunction",
+    "role":     "UseCaseFunction",  // function-section roles keep the plain-string form (FunctionRole is fieldless)
     "params":   [{ "name": "registry", "ty": "R" }],
     "returns":  "Result<<core-crate>::verify::VerifyOutcome, MergeGateError>",
     "is_async": false,
@@ -661,7 +661,7 @@ For LHS forms that the inline `bounds` field cannot express (e.g. `where Vec<T>:
 ```jsonc
 "generics":         [{ "name": "T", "bounds": [] }],
 "where_predicates": [
-  { "type": "Vec<T>", "bounds": ["Clone"] }
+  { "lhs": "Vec<T>", "rhs": ["Clone"] }
 ]
 ```
 
@@ -673,7 +673,7 @@ A `type_alias` entry is for a genuine Rust `pub type` declaration — a named al
 "types": {
   "TrackResult": {
     "action": "add",
-    "role":   "Dto",
+    "role":   { "Dto": {} },
     "kind":   { "kind": "type_alias", "target": "Result<TrackId, TrackError>" },
     "methods": [],
     "module_path": "track", "docs": null, "spec_refs": [], "informal_grounds": []
@@ -706,7 +706,7 @@ A `reference` entry's methods / fields do not drive Phase 2 structural equality:
 "traits": {
   "UserRepository": {
     "action": "reference",
-    "role":   "SecondaryPort",
+    "role":   { "Repository": { "aggregate": "User" } },
     "methods": [
       {
         "name": "find_by_id",

@@ -439,18 +439,18 @@
       }
     },
     {
-      "claim_hash": "6b801d2181cb3252ffc8bfcd7778343f305f4f674d703ffa3e5ceabd05947bee",
+      "claim_hash": "cb66e380d507dfa5cd2effd0c04d5fbc6a804f95d4c3974b151dda2483432999",
       "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
       "verdict": {
         "kind": "pass",
-        "citation": "type-designer の workflow 手順書は生成 + 注釈の手順に限定し、カタログ schema の詳細（フィールド構成、role / kind / shape の表現形、entry の JSON 記述例）は持たない。この情報は `knowledge/conventions/` 配下の独立した参照マニュアルに置く。"
+        "citation": "type-designer の workflow 手順書は生成 + 注釈の手順に限定し、カタログ schema の詳細（フィールド構成、role / kind / shape の表現形、entry の JSON 記述例）は持たない。この情報は `knowledge/conventions/` 配下の独立した参照マニュアルに置く。\n\nこのマニュアルは参照のための記述であり、schema の権威は sotp の実装側にある。マニュアルの記述と実装が乖離した場合は sotp 側を正とする。"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "in_scope",
           "element_id": "IN-08",
-          "text_label": "`knowledge/conventions/type-designer-kind-selection.md` にある3箇所の `kind` field wire-format 参照（現状は「`.claude/agents/type-designer.md`「The `kind` field」節を参照」という記述だが、当該節は実在せず stale である）を、D9 が置き場所として定めた新設マニュアル（`knowledge/conventions/catalogue-schema-reference.md`）内の該当記述を指すよう更新する。`kind` field の wire-format 記述（role / kind / shape の表現形）は IN-04 / IN-05 により当該マニュアルへ移設されるため、この参照修正は D9 の配置決定を実装面で完成させるものである。R1〜R10 の規範内容（role / kind 選定規則）自体は変更しない。"
+          "text_label": "`knowledge/conventions/type-designer-kind-selection.md` に加える本トラックの変更を、D9 の配置決定に伴う3箇所の `kind` field wire-format 参照先修正と、レビューの過程で見つかった実装現況とのずれを説明文内で正す修正の二種類に限定して行う。参照先修正では、現状の「`.claude/agents/type-designer.md`「The `kind` field」節を参照」という stale な記述を、D9 が置き場所として定めた新設マニュアル（`knowledge/conventions/catalogue-schema-reference.md`）内の該当記述を指すよう更新する。`kind` field の wire-format 記述（role / kind / shape の表現形）は IN-04 / IN-05 により当該マニュアルへ移設されるため、この参照修正は D9 の配置決定を実装面で完成させるものである。実物一致修正では、R7 が参照先 port の role を `SecondaryPort` のみに限定していた記述を R1 のマトリクスが認める `Repository` も含む形に正し、declare 漏れの検出メカニズムの説明を、実在しない `port_index` ではなく実際に動く `build_trait_index` を指す記述に改める。これらはいずれも R1〜R10 が示す判断基準そのものの変更ではなく、参照先と説明文を D9 の配置先および実装現況に一致させる範囲にとどめる。"
         }
       },
       "evidence_origin": {
@@ -600,18 +600,18 @@
       }
     },
     {
-      "claim_hash": "e08d3ce8ae0663ff990397d1d144dde8b2faac9b63d9cf4e3a5105141e7d82b9",
+      "claim_hash": "766b6751ed66a390860689e3dcb40697f3da581e7c7605e7fd5d8f74b619cfb6",
       "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
       "verdict": {
         "kind": "pass",
-        "citation": "type-designer の仕事は意図の入力と穴埋めのみとなり"
+        "citation": "type-designer はカタログ JSON を直接執筆しない。`sotp` が提供する API に意図（どの型に、どの role、どの spec anchor、どんな型形状）を入力すると、schema 準拠のエントリ骨格が穴埋め箇所付きでカタログ JSON に追記される。type-designer の仕事は意図の入力と穴埋めのみとなり、カタログ schema の深い理解を必要としない。"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "constraint",
           "element_id": "CN-04",
-          "text_label": "role / kind の選定という意図形成は type-designer の作業として本変更後も残るため（D2）、その判断規則を定める `knowledge/conventions/type-designer-kind-selection.md` の R1〜R10 の規範内容は本トラックで変更しない。手順書からの当該 convention への参照（12c Review Checklist の SSoT としての位置づけ）も内容・意味とも維持する。本トラックで当該ファイルに加える変更は、D9 の配置決定に伴う参照先修正（IN-08）のみに限る。"
+          "text_label": "role / kind の選定という意図形成は type-designer の作業として本変更後も残るため（D2）、その判断の意図を定める `knowledge/conventions/type-designer-kind-selection.md` の R1〜R10 が示す判断基準そのものは本トラックで変更しない。手順書からの当該 convention への参照（12c Review Checklist の SSoT としての位置づけ）も内容・意味とも維持する。本トラックで当該ファイルに加える変更は、D9 の配置決定に伴う参照先修正（IN-08）と、レビューの過程で見つかった実装現況とのずれ（実在しない仕組みへの言及、R1 が定める規則との食い違い）を実物に合わせて正す修正の二種類に限る。後者は R1〜R10 が示す判断基準そのものを書き換えるものではなく、判断基準を説明する文中の記述を実物と一致させる範囲にとどめる。本トラックでは、R7 が参照先 port の role を `SecondaryPort` のみに限定していた記述を、R1 のマトリクスが認める `Repository` も含む形に正し、declare 漏れの検出メカニズムの説明を、実在しない `port_index` ではなく実際に動く `build_trait_index` を指す記述に改めた。"
         }
       },
       "evidence_origin": {
@@ -623,18 +623,18 @@
       }
     },
     {
-      "claim_hash": "e08d3ce8ae0663ff990397d1d144dde8b2faac9b63d9cf4e3a5105141e7d82b9",
+      "claim_hash": "766b6751ed66a390860689e3dcb40697f3da581e7c7605e7fd5d8f74b619cfb6",
       "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
       "verdict": {
         "kind": "pass",
-        "citation": "この情報は `knowledge/conventions/` 配下の独立した参照マニュアルに置く。"
+        "citation": "「workflow 手順書は生成 + 注釈の手順に限定し ... この情報は `knowledge/conventions/` 配下の独立した参照マニュアルに置く」"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "constraint",
           "element_id": "CN-04",
-          "text_label": "role / kind の選定という意図形成は type-designer の作業として本変更後も残るため（D2）、その判断規則を定める `knowledge/conventions/type-designer-kind-selection.md` の R1〜R10 の規範内容は本トラックで変更しない。手順書からの当該 convention への参照（12c Review Checklist の SSoT としての位置づけ）も内容・意味とも維持する。本トラックで当該ファイルに加える変更は、D9 の配置決定に伴う参照先修正（IN-08）のみに限る。"
+          "text_label": "role / kind の選定という意図形成は type-designer の作業として本変更後も残るため（D2）、その判断の意図を定める `knowledge/conventions/type-designer-kind-selection.md` の R1〜R10 が示す判断基準そのものは本トラックで変更しない。手順書からの当該 convention への参照（12c Review Checklist の SSoT としての位置づけ）も内容・意味とも維持する。本トラックで当該ファイルに加える変更は、D9 の配置決定に伴う参照先修正（IN-08）と、レビューの過程で見つかった実装現況とのずれ（実在しない仕組みへの言及、R1 が定める規則との食い違い）を実物に合わせて正す修正の二種類に限る。後者は R1〜R10 が示す判断基準そのものを書き換えるものではなく、判断基準を説明する文中の記述を実物と一致させる範囲にとどめる。本トラックでは、R7 が参照先 port の role を `SecondaryPort` のみに限定していた記述を、R1 のマトリクスが認める `Repository` も含む形に正し、declare 漏れの検出メカニズムの説明を、実在しない `port_index` ではなく実際に動く `build_trait_index` を指す記述に改めた。"
         }
       },
       "evidence_origin": {
@@ -945,18 +945,18 @@
       }
     },
     {
-      "claim_hash": "1d8a46ddbdd1938d7c6aeb75cf616ec20c144f37984e860bccf34dfffe381eb5",
+      "claim_hash": "e6dc25bed3423e6356c81c6bacdba461772b8a331d107e593a513790af3dc99e",
       "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
       "verdict": {
         "kind": "pass",
-        "citation": "カタログエントリの情報量（引数型・返り値型・generics・bound・codec 等の完全な型情報）は削減しない。稼働済みの catalogue linter ルール群（ロール意味論・Aggregate 境界・アーキテクチャ配置・primitive obsession 防止）は、いずれも完全な型情報を検査面として前提とする。impl → catalogue の構造検証（type-signals の宣言 vs 実装一致検査）も従来どおり維持する。"
+        "citation": "「稼働済みの catalogue linter ルール群（ロール意味論・Aggregate 境界・アーキテクチャ配置・primitive obsession 防止）は、いずれも完全な型情報を検査面として前提とする。impl → catalogue の構造検証（type-signals の宣言 vs 実装一致検査）も従来どおり維持する。」"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-08",
-          "text_label": "本トラックによる変更差分が、D2 / D9 が対象とする成果物（`.harness/capabilities/type-designer.md`・`knowledge/conventions/catalogue-schema-reference.md`・`knowledge/conventions/type-designer-kind-selection.md` の参照修正・wrapper 2 ファイルの整合性検証）に閉じており、D1 / D8 が対象とする sotp の Rust 実装（catalogue の型情報を検査する linter・型カタログ schema・`sotp catalog` CLI surface）・`Makefile.toml`・CI 設定には及んでいない。"
+          "text_label": "本トラックによる変更差分が、D2 / D9 が対象とする成果物（`.harness/capabilities/type-designer.md`・`knowledge/conventions/catalogue-schema-reference.md`・`knowledge/conventions/type-designer-kind-selection.md` の参照先修正および実装現況とのずれを正す修正・wrapper 2 ファイルの整合性検証）に閉じており、D1 / D8 が対象とする sotp の Rust 実装（catalogue の型情報を検査する linter・型カタログ schema・`sotp catalog` CLI surface）・`Makefile.toml`・CI 設定には及んでいない。"
         }
       },
       "evidence_origin": {
@@ -968,18 +968,18 @@
       }
     },
     {
-      "claim_hash": "1d8a46ddbdd1938d7c6aeb75cf616ec20c144f37984e860bccf34dfffe381eb5",
+      "claim_hash": "e6dc25bed3423e6356c81c6bacdba461772b8a331d107e593a513790af3dc99e",
       "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
       "verdict": {
         "kind": "pass",
-        "citation": "type-designer の仕事は意図の入力と穴埋めのみとなり、カタログ schema の深い理解を必要としない。"
+        "citation": "「type-designer はカタログ JSON を直接執筆しない。`sotp` が提供する API に意図（どの型に、どの role、どの spec anchor、どんな型形状）を入力すると、schema 準拠のエントリ骨格が穴埋め箇所付きでカタログ JSON に追記される。」"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-08",
-          "text_label": "本トラックによる変更差分が、D2 / D9 が対象とする成果物（`.harness/capabilities/type-designer.md`・`knowledge/conventions/catalogue-schema-reference.md`・`knowledge/conventions/type-designer-kind-selection.md` の参照修正・wrapper 2 ファイルの整合性検証）に閉じており、D1 / D8 が対象とする sotp の Rust 実装（catalogue の型情報を検査する linter・型カタログ schema・`sotp catalog` CLI surface）・`Makefile.toml`・CI 設定には及んでいない。"
+          "text_label": "本トラックによる変更差分が、D2 / D9 が対象とする成果物（`.harness/capabilities/type-designer.md`・`knowledge/conventions/catalogue-schema-reference.md`・`knowledge/conventions/type-designer-kind-selection.md` の参照先修正および実装現況とのずれを正す修正・wrapper 2 ファイルの整合性検証）に閉じており、D1 / D8 が対象とする sotp の Rust 実装（catalogue の型情報を検査する linter・型カタログ schema・`sotp catalog` CLI surface）・`Makefile.toml`・CI 設定には及んでいない。"
         }
       },
       "evidence_origin": {
@@ -991,18 +991,18 @@
       }
     },
     {
-      "claim_hash": "1d8a46ddbdd1938d7c6aeb75cf616ec20c144f37984e860bccf34dfffe381eb5",
+      "claim_hash": "e6dc25bed3423e6356c81c6bacdba461772b8a331d107e593a513790af3dc99e",
       "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
       "verdict": {
         "kind": "pass",
-        "citation": "### D8: CLI surface — `sotp catalog` コマンド群\n\nコマンド群は top-level group `sotp catalog` とする"
+        "citation": "「既存機構の名称（`.harness/catalogue-lint/` や catalogue-spec-signals 等）の rename は本 ADR の scope 外」"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-08",
-          "text_label": "本トラックによる変更差分が、D2 / D9 が対象とする成果物（`.harness/capabilities/type-designer.md`・`knowledge/conventions/catalogue-schema-reference.md`・`knowledge/conventions/type-designer-kind-selection.md` の参照修正・wrapper 2 ファイルの整合性検証）に閉じており、D1 / D8 が対象とする sotp の Rust 実装（catalogue の型情報を検査する linter・型カタログ schema・`sotp catalog` CLI surface）・`Makefile.toml`・CI 設定には及んでいない。"
+          "text_label": "本トラックによる変更差分が、D2 / D9 が対象とする成果物（`.harness/capabilities/type-designer.md`・`knowledge/conventions/catalogue-schema-reference.md`・`knowledge/conventions/type-designer-kind-selection.md` の参照先修正および実装現況とのずれを正す修正・wrapper 2 ファイルの整合性検証）に閉じており、D1 / D8 が対象とする sotp の Rust 実装（catalogue の型情報を検査する linter・型カタログ schema・`sotp catalog` CLI surface）・`Makefile.toml`・CI 設定には及んでいない。"
         }
       },
       "evidence_origin": {
@@ -1014,18 +1014,18 @@
       }
     },
     {
-      "claim_hash": "1d8a46ddbdd1938d7c6aeb75cf616ec20c144f37984e860bccf34dfffe381eb5",
+      "claim_hash": "e6dc25bed3423e6356c81c6bacdba461772b8a331d107e593a513790af3dc99e",
       "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
       "verdict": {
         "kind": "pass",
-        "citation": "type-designer の workflow 手順書は生成 + 注釈の手順に限定し"
+        "citation": "この情報は `knowledge/conventions/` 配下の独立した参照マニュアルに置く。マニュアルの記述と実装が乖離した場合は sotp 側を正とする。"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-08",
-          "text_label": "本トラックによる変更差分が、D2 / D9 が対象とする成果物（`.harness/capabilities/type-designer.md`・`knowledge/conventions/catalogue-schema-reference.md`・`knowledge/conventions/type-designer-kind-selection.md` の参照修正・wrapper 2 ファイルの整合性検証）に閉じており、D1 / D8 が対象とする sotp の Rust 実装（catalogue の型情報を検査する linter・型カタログ schema・`sotp catalog` CLI surface）・`Makefile.toml`・CI 設定には及んでいない。"
+          "text_label": "本トラックによる変更差分が、D2 / D9 が対象とする成果物（`.harness/capabilities/type-designer.md`・`knowledge/conventions/catalogue-schema-reference.md`・`knowledge/conventions/type-designer-kind-selection.md` の参照先修正および実装現況とのずれを正す修正・wrapper 2 ファイルの整合性検証）に閉じており、D1 / D8 が対象とする sotp の Rust 実装（catalogue の型情報を検査する linter・型カタログ schema・`sotp catalog` CLI surface）・`Makefile.toml`・CI 設定には及んでいない。"
         }
       },
       "evidence_origin": {
@@ -1037,18 +1037,18 @@
       }
     },
     {
-      "claim_hash": "b88e653f97cffaedd9c327e2d861c98153c7f70480be09ff1ffc6f38bbff9c66",
+      "claim_hash": "6283863f0e00657e9fcfa1fbabe9343201a0470dc36a91198710dc192a4100ed",
       "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
       "verdict": {
         "kind": "pass",
-        "citation": "この情報は `knowledge/conventions/` 配下の独立した参照マニュアルに置く。... このマニュアルは参照のための記述であり、schema の権威は sotp の実装側にある。"
+        "citation": "「schema の詳細リファレンスは `knowledge/conventions/` 配下の参照文書として独立させる」"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-09",
-          "text_label": "`knowledge/conventions/type-designer-kind-selection.md` の3箇所の `kind` field wire-format 参照が、`knowledge/conventions/catalogue-schema-reference.md`（D9 が定めた schema reference マニュアル）内の該当記述を指している。R1〜R10 の規範内容には本トラックによる差分がない。"
+          "text_label": "`knowledge/conventions/type-designer-kind-selection.md` の3箇所の `kind` field wire-format 参照が、`knowledge/conventions/catalogue-schema-reference.md`（D9 が定めた schema reference マニュアル）内の該当記述を指している。R1〜R10 が示す判断基準そのものには本トラックによる差分がない一方、判断基準を説明する文中の記述を実物と一致させる修正（R7 が参照先 port の role を `SecondaryPort` のみに限定していた記述を `Repository` も含む形に正したこと、および declare 漏れの検出メカニズムの参照を `port_index` から `build_trait_index` に改めたこと）は CN-04 が許可する範囲内の修正である。"
         }
       },
       "evidence_origin": {
