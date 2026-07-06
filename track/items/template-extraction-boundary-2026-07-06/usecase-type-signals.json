@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-06T21:02:24Z",
+  "declaration_hash": "ef4c09fda48a6d272331c2920ad57529378c43d71dded9eb70d0a82aa87e6e44",
+  "signals": [
+    {
+      "type_name": "TemplateBoundaryManifestPort",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "TemplateBoundaryManifestReadError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::convert::From<TemplateBoundaryManifestError>",
+        "core::convert::From<TemplatePathPatternError>",
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "TemplateExportCommand",
+      "kind_tag": "command",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "TemplateExportError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::convert::From<TemplateBoundaryManifestReadError>",
+        "core::convert::From<TemplateExportPortError>",
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "TemplateExportInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "TemplateExportService"
+      ]
+    },
+    {
+      "type_name": "TemplateExportPort",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "TemplateExportPortError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "TemplateExportReport",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "TemplateExportService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": false
+    }
+  ]
+}

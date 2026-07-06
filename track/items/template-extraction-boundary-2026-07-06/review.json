@@ -1,6 +1,127 @@
 {
   "schema_version": 2,
   "scopes": {
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:42f15231ee8cbae9cfbaca9867d9b89c5e520c4af640dcdf1f78b65819e6bf43",
+          "at": "2026-07-06T19:50:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:42f15231ee8cbae9cfbaca9867d9b89c5e520c4af640dcdf1f78b65819e6bf43",
+          "at": "2026-07-06T19:53:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c2e9d3a4d11aba1705e6b6833e7188632ead2c04c5b2a72fe1f7e97cb211e5cb",
+          "at": "2026-07-06T21:01:39Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9ce85877b945aa7704ddc8ad5d33bda71194cb56ca53a528e12460f2dae5724c",
+          "at": "2026-07-06T19:55:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TemplatePathPattern::try_new` returns `TemplateBoundaryManifestError`, but this constructor can only fail while validating a single pattern; the shared enum also exposes `DuplicatePattern` and `EmptyManifest`, which this method cannot structurally produce. The method docs do not list the producible subset or justify the wider error surface, so callers must handle impossible variants.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/domain-types.json",
+              "line": 123,
+              "category": "per-method error imprecision"
+            },
+            {
+              "message": "`TemplateBoundaryManifest::try_new` also returns the full `TemplateBoundaryManifestError`, but it receives already validated `TemplatePathEntry` values and its docs only describe duplicate/empty checks; `InvalidPattern` cannot be produced at this layer. Split the pattern/manifest errors or explicitly declare the reachable subset for each constructor.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/domain-types.json",
+              "line": 202,
+              "category": "per-method error imprecision"
+            },
+            {
+              "message": "`TemplateExportReport` cites `AC-05`, but that acceptance criterion is about running `cargo make ci` on the exported workspace and adding a smoke gate, not the successful-export report DTO. This is an off-topic `spec_refs` anchor for this entry.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/usecase-types.json",
+              "line": 53,
+              "category": "spec_refs off-topic"
+            },
+            {
+              "message": "`FsTemplateExportAdapter` also cites `AC-05`, but the adapter contract is copying/excluding/overlaying files; `AC-05` is the separate smoke-gate/CI-green requirement. Keeping that anchor here makes the adapter appear responsible for CI verification.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/infrastructure-types.json",
+              "line": 38,
+              "category": "spec_refs off-topic"
+            },
+            {
+              "message": "Domain catalogue docs restate upstream behavior instead of just naming the target and citing anchors: `TemplatePathPattern` restates path-shape validation, `TemplatePathClassification` restates Include/Exclude/Overlay effects, and `TemplateBoundaryManifest` restates classification and uniqueness behavior. `knowledge/conventions/no-upstream-restatement.md` forbids this in `<layer>-types.json` docs because the behavior contract belongs in spec/ADR anchors.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/domain-types.json",
+              "line": 21,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Usecase catalogue docs restate upstream behavior across `TemplateExportCommand`, `TemplateExportReport`, `TemplateExportError`, `TemplateExportService`, `TemplateBoundaryManifestPort`, and `TemplateExportPort` by describing pass-through paths, counts, fail-closed policy, manifest reading, tree filtering, overlay application, and copy/skip/replace behavior. These should be reduced to target/operation plus `IN-*`/`AC-*`/`CN-*` cites per the no-upstream-restatement convention.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/usecase-types.json",
+              "line": 24,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Infrastructure catalogue docs restate upstream behavior in `FsTemplateBoundaryManifestAdapter`, `FsTemplateExportAdapter`, `TemplateBoundaryManifestDto`, `TemplatePathEntryDto`, `TemplatePathClassificationDto`, `TemplateBoundaryManifestCodecError`, and `decode_manifest` by describing JSON reads, workspace walking, overlay-copy behavior, raw-string validation, mirror literal sets, schema mismatch/JSON/domain failure modes, and parse-to-domain behavior. Those behavior details should live behind the cited spec anchors, not be duplicated in the catalogue docs.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/infrastructure-types.json",
+              "line": 15,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "CLI-driver docs restate downstream behavior in `TemplateExportInput`, `TemplateInput`, `TemplateDriver`, and `TemplateDriver::handle`, including boundary import rationale, future variant behavior, service invocation, report/error rendering, stdout/stderr, and exit-code behavior. Per no-upstream-restatement, the catalogue should cite the relevant anchors rather than carrying those behavioral contracts itself.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/cli_driver-types.json",
+              "line": 24,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "CLI catalogue docs restate command behavior in `TemplateCommand`, `TemplateExportArgs`, `CliCommand`, `cli::commands::template::execute`, and `cli::commands::template::dispatch`, including future subcommand shape, flag mapping, Template dispatch, composition-root outcome mapping, and exit-code mapping. These duplicate upstream CLI/export behavior and should be anchor-only contract descriptions.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/cli-types.json",
+              "line": 17,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`TemplateCompositionRoot` and its methods restate wiring behavior by naming concrete adapters, interactor construction, driver injection, and error mapping. That wiring behavior is upstream contract content for `IN-01`/`AC-01`; the catalogue docs should not duplicate it in prose.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/cli_composition-types.json",
+              "line": 15,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:9ce85877b945aa7704ddc8ad5d33bda71194cb56ca53a528e12460f2dae5724c",
+          "at": "2026-07-06T20:00:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c812778ea0b6de1859afa50fd648ee78e6f09e6eb5e356c324c0c4c14e7d42fe",
+          "at": "2026-07-06T20:15:37Z"
+        }
+      ]
+    },
     "impl-plan": {
       "rounds": [
         {
@@ -16,6 +137,316 @@
           "findings": [],
           "hash": "rvw1:sha256:b67223747b37ea8b9ea7cac08caf8c8f920471f8ce47471be2162c5265a25959",
           "at": "2026-07-06T17:30:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T011 is not executable as written: it leaves the `architecture-rules.json` schema change open between an opt-in verifier block and an explicit layer-role field, so the implementer has to invent the schema shape before coding.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/track/items/template-extraction-boundary-2026-07-06/impl-plan.json",
+              "line": 65,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T012 is not executable as written: it leaves the `review-scope.json` sync strategy open between deriving patterns from `architecture-rules.json` and moving the mapping into `overlay`, so the source of truth is undefined.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/track/items/template-extraction-boundary-2026-07-06/impl-plan.json",
+              "line": 71,
+              "category": "task description non-executable"
+            }
+          ],
+          "hash": "rvw1:sha256:3b622338e5a23dbd61ddd2ed083ac810662d5b9d16f288256474f880b885b063",
+          "at": "2026-07-06T19:52:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7ad32256f00e619a3b29cd1c98cf14ec592ec293c18a3f9310ea018c110ecb83",
+          "at": "2026-07-06T19:57:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "task-coverage.json has no mapping for any goal element. The impl-plan severity policy requires GO-NN elements to be covered alongside IN/OS/CN/AC, but GO-01 through GO-05 are absent entirely, so the plan can pass lower-level coverage without preserving top-level traceability for the export goal, bootstrap separation, placeholder workspace, manifest/overlay boundary, and D5 genericity prerequisites.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/task-coverage.json",
+              "line": 1,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "T010 is mapped to OS-10 and CN-09, but the task text only says to run export and then `cargo make ci` in the output tree. It does not carry the OS-10/CN-09 constraint that the smoke gate must not hard-fail user-owned areas such as provider settings, permission policy, signal strictness, or user domain code, making this coverage implausible for a load-bearing exclusion.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/task-coverage.json",
+              "line": 27,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "T012 requires `.harness/config/review-scope.json` to derive per-layer review patterns from `architecture-rules.json` \"at load time\", but the task names only config/docs files and no loader file or symbol where that runtime derivation is implemented. An executor would have to discover and invent the code boundary, so the task is not executable as written.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/impl-plan.json",
+              "line": 72,
+              "category": "task description non-executable"
+            }
+          ],
+          "hash": "rvw1:sha256:7ad32256f00e619a3b29cd1c98cf14ec592ec293c18a3f9310ea018c110ecb83",
+          "at": "2026-07-06T20:03:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "task-coverage.json has no formal mapping for GO-01 through GO-05; it only maps in_scope, out_of_scope, constraints, and acceptance_criteria. The rendered goal traceability summary is not a task-coverage mapping, so the GO elements are uncovered under the impl-plan severity policy.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/task-coverage.json",
+              "line": 3,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "T004 restates the export behavior contract in prose: walking the workspace, classifying paths, copying Include, skipping Exclude, applying Overlay, and fail-closed error cases. Per knowledge/conventions/no-upstream-restatement.md, this should be target + operation + anchor cite only so it cannot drift from IN-01/IN-03/AC-01/AC-03/CN-03.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/impl-plan.json",
+              "line": 24,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T007 restates upstream boundary and bootstrap rules in prose, including which paths are include/exclude/overlay and how bootstrap reads the pinned tag and invokes cargo install. Per knowledge/conventions/no-upstream-restatement.md, keep this as target + operation + anchor cite only.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/impl-plan.json",
+              "line": 42,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T008 restates the upstream template-workspace contract: the exact 6-crate layout, absence of vendor patch/[patch.crates-io]/lancedb, and architecture-customizer premise. Per knowledge/conventions/no-upstream-restatement.md, these behavioral details should remain behind IN-04/AC-04/CN-05 anchors.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/impl-plan.json",
+              "line": 48,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T009 restates upstream genericity requirements, including no sotp-specific vendor build steps and no sotp-specific ADR/research references in overlay track docs. Per knowledge/conventions/no-upstream-restatement.md, this should be reduced to target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/impl-plan.json",
+              "line": 54,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T010 restates the smoke-gate behavior contract step by step, including output-tree CI behavior, non-zero propagation, and exclusion of user-owned hard-fail areas. Per knowledge/conventions/no-upstream-restatement.md, those details should be anchored to AC-05/OS-10/CN-09 rather than restated here.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/impl-plan.json",
+              "line": 60,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T011 restates the verifier-genericity contract: verify flags, target path resolution from architecture-rules, and preservation of equivalent sotp checks. Per knowledge/conventions/no-upstream-restatement.md, keep the task to the files/symbols to modify plus IN-08/AC-08/CN-07 anchors.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/impl-plan.json",
+              "line": 66,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T012 restates the harness-config alignment contract, including deriving review patterns, aligning catalogue-lint layers, resolving the apps/cli-composition vs apps/cli conflict, and arch-rules-derived catalogue references. Per knowledge/conventions/no-upstream-restatement.md, this should be target + operation + anchor cite only.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/impl-plan.json",
+              "line": 72,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T013 restates the provenance-removal behavior contract across harness docs, including which references to remove and the exception for sotp-context in ADRs/commit messages. Per knowledge/conventions/no-upstream-restatement.md, those requirements should be represented by IN-10/AC-10/AC-12 anchors, not prose.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/impl-plan.json",
+              "line": 78,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T014 restates the Python-leftover removal contract by listing the exact .tool-versions and .gitignore tokens to remove and verify. Per knowledge/conventions/no-upstream-restatement.md, this should be target + operation + IN-11/AC-11/AC-12 anchors only.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/impl-plan.json",
+              "line": 84,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:261271643ea274ffa39e1b032ffc2d08580e5b969d3deefc54961a9e662313a1",
+          "at": "2026-07-06T20:14:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-05 is mapped to T008, but T008 only says to author placeholder workspace files and an overlay-file-existence test; it does not require excluding sotp source, vendor patches, `[patch.crates-io] conch-parser`, or lancedb deps from the overlay Cargo workspace files it owns. That makes the CN-05 coverage load-bearing but implausible for the task that authors those files.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/task-coverage.json",
+              "line": 35,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "CN-10 is mapped to T007/T011/T012, but those tasks do not carry any active-track-only/no-retroactive-migration/no-compatibility-layer step. Since T011 and T012 change verifier and harness rule loading, CN-10 is load-bearing there; the current mapping can pass structurally while leaving the constraint unenforced in the executable plan.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/task-coverage.json",
+              "line": 40,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:5e4bc1f6f446083573ef6a01b8eff1d49cd567a48effaae9b965e9ff9db2d64e",
+          "at": "2026-07-06T20:21:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 attributes `TemplateBoundaryManifestReadError` in `task-contract.json`, but the task description tells the implementer to add `TemplateBoundaryManifestReadError (NotFound / Parse / Invalid / Io)`. The attributed usecase catalogue entry splits that invalid case into `InvalidPattern` and `InvalidManifest`; following this plan would implement the wrong enum surface and miss the catalogue contract.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/impl-plan.json",
+              "line": 12,
+              "category": "task-contract attribution mismatch"
+            },
+            {
+              "message": "T003 attributes `TemplateBoundaryManifestCodecError`, but the task description specifies `Domain { source } + From<TemplateBoundaryManifestError>`. The attributed infrastructure catalogue entry requires separate `Pattern` and `Manifest` variants, including pattern-error conversion; following the plan as written would omit part of the declared entry and implement a non-catalogue `Domain` variant.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/impl-plan.json",
+              "line": 18,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:02f81795e21ab7b27c86428f23dff697368a0ceb363a154deb21294ffb6d504c",
+          "at": "2026-07-06T20:25:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "task-coverage.json still has no formal mapping for GO-01 through GO-05; it only maps in_scope, out_of_scope, constraints, and acceptance_criteria. The impl-plan summary's goal traceability line is not a task-coverage mapping, so the GO elements remain uncovered under the impl-plan severity policy.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/task-coverage.json",
+              "line": 3,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:b92190ff6549f9fa2e0b6dbff73a33d9bee8e330904a62dc63676c1119a1b25e",
+          "at": "2026-07-06T20:30:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T007 restates upstream behavior in prose: \"bootstrap-host-only protoc / sotp MSRV requirements\" and \"no archive migration or default compatibility layer\" repeat CN-05/CN-10 instead of using target + operation + anchor cite only, contrary to knowledge/conventions/no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/impl-plan.json",
+              "line": 42,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T008 restates the CN-05/AC-06 workspace-exclusion contract in prose (\"exclude sotp source / vendor patches / conch-parser patch / lancedb deps\") instead of keeping the task to target + operation + anchor cite per knowledge/conventions/no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/impl-plan.json",
+              "line": 48,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T011 restates CN-10 behavior (\"scoped to active tracks only, with no archive migration or default compatibility layer\") rather than relying on the CN-10 anchor, violating knowledge/conventions/no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/impl-plan.json",
+              "line": 66,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T012 restates CN-10 behavior (\"scoped to active tracks only\" and \"without archive migration or default compatibility layer\") rather than relying on the CN-10 anchor, violating knowledge/conventions/no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/impl-plan.json",
+              "line": 72,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S5 repeats upstream behavior in its section description (bootstrap-host-only prerequisites, active-track-only schema application, Cargo dependency exclusions) instead of limiting the section to target + operation + anchor cites per knowledge/conventions/no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/impl-plan.json",
+              "line": 142,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S7 repeats CN-10/CN-08 behavior in its section description (active-track-only dispatch/loading and no archive/default compatibility behavior) instead of limiting the section to target + operation + anchor cites per knowledge/conventions/no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/impl-plan.json",
+              "line": 159,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "AC-03 omits T007 even though T007 authors overlay/Makefile.toml and the bootstrap task, while AC-03 explicitly covers static overlay files including Makefile/bootstrap tasks. That leaves a load-bearing AC-03 slice mapped only to tasks that do not own that file.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/task-coverage.json",
+              "line": 46,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "AC-06 maps only T007, but T008 is the task that edits the overlay Cargo workspace and explicitly excludes sotp source, vendor patches, conch-parser patch, and lancedb deps. The AC-06 workspace-exclusion requirement is therefore not covered by the task that implements it.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/task-coverage.json",
+              "line": 49,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "IN-12 omits T003 even though T003 owns the schema-versioned manifest DTO and decode_manifest validation path. The schema/read-stability part of IN-12 is load-bearing in the codec task but is not mapped there.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/task-coverage.json",
+              "line": 15,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "CN-04 omits T009 even though T009 authors overlay/architecture-rules.json, which CN-04 explicitly includes in the out-of-the-box CI consistency contract. The architecture-rules portion is not tracked on its owning task.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/task-coverage.json",
+              "line": 34,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:7359e58446ffb1b392bff8396c162edc716e953f59288486643951467d71fd94",
+          "at": "2026-07-06T20:41:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`task-coverage.json` claims several out-of-scope alternatives are covered by T007 (`OS-01` through `OS-04`, `OS-08`, `OS-11`), but T007 only authors the boundary manifest/bootstrap artifacts and related tests. There is no executable step or anchor in T007 for avoiding physical repo split, GitHub release binaries, lancedb feature-gating, or historical archive migration, so these mappings are load-bearing but implausible coverage rather than real plan coverage.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/task-coverage.json",
+              "line": 18,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:6287ffd5cb949c38901acb74c38b631097060f48bad4d226028583420b8412a7",
+          "at": "2026-07-06T20:46:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001's task text restates upstream behavior instead of staying at target + operation + anchor cite. The validation details (`non-empty`, forward-slash-only, no leading `/` or `..` segment) and manifest invariant details duplicate the IN-02/IN-12/AC-02/CN-02 contract in prose, which violates `knowledge/conventions/no-upstream-restatement.md`. Keep the file/symbol additions and anchors, but remove the behavior restatement from the impl plan.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:86b5d10674c80c5ba46ea7947751594a9895788f820e0dc94868902b21abedfc",
+          "at": "2026-07-06T20:52:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c934ebe806439fe49e3b9f7e21a8f3f2c3c52816d01f9f53b941ca0563fb720",
+          "at": "2026-07-06T20:58:15Z"
         }
       ]
     },

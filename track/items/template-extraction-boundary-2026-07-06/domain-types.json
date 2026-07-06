@@ -1,0 +1,297 @@
+{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "TemplatePathPattern": {
+      "action": "add",
+      "role": {
+        "ValueObject": {
+          "invariants": [
+            { "name": "is_workspace_relative", "predicate": { "SelfMethod": "is_workspace_relative" } }
+          ]
+        }
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "tuple", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "template_export",
+      "docs": "Manifest key value object (IN-02, AC-02, CN-02).",
+      "spec_refs": [
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "IN-02" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "AC-02" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "CN-02" }
+      ],
+      "informal_grounds": []
+    },
+    "TemplatePathClassification": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Include", "payload": { "kind": "unit" } },
+          { "name": "Exclude", "payload": { "kind": "unit" } },
+          { "name": "Overlay", "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "template_export",
+      "docs": "Boundary classification value-enum (IN-01, IN-02, AC-02, CN-03).",
+      "spec_refs": [
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "IN-01" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "IN-02" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "AC-02" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "CN-03" }
+      ],
+      "informal_grounds": []
+    },
+    "TemplatePathEntry": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "template_export",
+      "docs": "Manifest row value object (IN-02, AC-02).",
+      "spec_refs": [
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "IN-02" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "AC-02" }
+      ],
+      "informal_grounds": []
+    },
+    "TemplateBoundaryManifest": {
+      "action": "add",
+      "role": {
+        "ValueObject": {
+          "invariants": [
+            { "name": "patterns_are_unique", "predicate": { "SelfMethod": "patterns_are_unique" } }
+          ]
+        }
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "template_export",
+      "docs": "Boundary SSoT value object (IN-02, IN-12, AC-02, CN-02).",
+      "spec_refs": [
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "IN-02" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "IN-12" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "AC-02" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "CN-02" }
+      ],
+      "informal_grounds": []
+    },
+    "TemplatePathPatternError": {
+      "action": "add",
+      "role": { "ErrorType": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "InvalidPattern", "payload": { "kind": "struct", "fields": [{ "name": "reason", "ty": "domain::tddd::catalogue_linter::FreeText" }] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "template_export",
+      "docs": "`TemplatePathPattern::try_new` error (IN-02, IN-12, AC-02).",
+      "spec_refs": [
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "IN-02" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "IN-12" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "AC-02" }
+      ],
+      "informal_grounds": []
+    },
+    "TemplateBoundaryManifestError": {
+      "action": "add",
+      "role": { "ErrorType": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "DuplicatePattern", "payload": { "kind": "struct", "fields": [{ "name": "pattern", "ty": "TemplatePathPattern" }] } },
+          { "name": "EmptyManifest", "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "template_export",
+      "docs": "`TemplateBoundaryManifest::try_new` error (IN-02, IN-12, AC-02).",
+      "spec_refs": [
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "IN-02" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "IN-12" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "AC-02" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [
+    {
+      "type_name": "TemplatePathPattern",
+      "methods": [
+        {
+          "name": "try_new",
+          "receiver": null,
+          "params": [{ "name": "value", "ty": "String" }],
+          "returns": "Result<Self, TemplatePathPatternError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Constructor (IN-02, AC-02); producible errors: `TemplatePathPatternError::InvalidPattern`."
+        },
+        {
+          "name": "as_str",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Inner accessor."
+        },
+        {
+          "name": "is_workspace_relative",
+          "receiver": "&self",
+          "params": [],
+          "returns": "bool",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Invariant predicate for `is_workspace_relative`."
+        }
+      ]
+    },
+    {
+      "type_name": "TemplatePathEntry",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "pattern",        "ty": "TemplatePathPattern" },
+            { "name": "classification", "ty": "TemplatePathClassification" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Constructor."
+        },
+        {
+          "name": "pattern",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&TemplatePathPattern",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Field accessor."
+        },
+        {
+          "name": "classification",
+          "receiver": "&self",
+          "params": [],
+          "returns": "TemplatePathClassification",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Field accessor."
+        }
+      ]
+    },
+    {
+      "type_name": "TemplateBoundaryManifest",
+      "methods": [
+        {
+          "name": "try_new",
+          "receiver": null,
+          "params": [{ "name": "entries", "ty": "Vec<TemplatePathEntry>" }],
+          "returns": "Result<Self, TemplateBoundaryManifestError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Constructor (IN-02, AC-02); producible errors: `TemplateBoundaryManifestError::DuplicatePattern`, `TemplateBoundaryManifestError::EmptyManifest`."
+        },
+        {
+          "name": "entries",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[TemplatePathEntry]",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Field accessor."
+        },
+        {
+          "name": "classify",
+          "receiver": "&self",
+          "params": [{ "name": "path", "ty": "&TemplatePathPattern" }],
+          "returns": "Option<TemplatePathClassification>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Manifest lookup (IN-02, AC-02, CN-03)."
+        },
+        {
+          "name": "patterns_are_unique",
+          "receiver": "&self",
+          "params": [],
+          "returns": "bool",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Invariant predicate for `patterns_are_unique`."
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    { "trait_ref": "core::fmt::Debug",     "for_type": "TemplatePathPattern" },
+    { "trait_ref": "core::clone::Clone",   "for_type": "TemplatePathPattern" },
+    { "trait_ref": "core::cmp::PartialEq", "for_type": "TemplatePathPattern" },
+    { "trait_ref": "core::cmp::Eq",        "for_type": "TemplatePathPattern" },
+    { "trait_ref": "core::cmp::PartialOrd", "for_type": "TemplatePathPattern" },
+    { "trait_ref": "core::cmp::Ord",       "for_type": "TemplatePathPattern" },
+    { "trait_ref": "core::hash::Hash",     "for_type": "TemplatePathPattern" },
+
+    { "trait_ref": "core::fmt::Debug",         "for_type": "TemplatePathClassification" },
+    { "trait_ref": "core::clone::Clone",       "for_type": "TemplatePathClassification" },
+    { "trait_ref": "core::marker::Copy",       "for_type": "TemplatePathClassification" },
+    { "trait_ref": "core::clone::TrivialClone", "for_type": "TemplatePathClassification" },
+    { "trait_ref": "core::cmp::PartialEq",     "for_type": "TemplatePathClassification" },
+    { "trait_ref": "core::cmp::Eq",            "for_type": "TemplatePathClassification" },
+
+    { "trait_ref": "core::fmt::Debug",     "for_type": "TemplatePathEntry" },
+    { "trait_ref": "core::clone::Clone",   "for_type": "TemplatePathEntry" },
+    { "trait_ref": "core::cmp::PartialEq", "for_type": "TemplatePathEntry" },
+    { "trait_ref": "core::cmp::Eq",        "for_type": "TemplatePathEntry" },
+
+    { "trait_ref": "core::fmt::Debug",     "for_type": "TemplateBoundaryManifest" },
+    { "trait_ref": "core::clone::Clone",   "for_type": "TemplateBoundaryManifest" },
+    { "trait_ref": "core::cmp::PartialEq", "for_type": "TemplateBoundaryManifest" },
+    { "trait_ref": "core::cmp::Eq",        "for_type": "TemplateBoundaryManifest" },
+
+    { "trait_ref": "core::fmt::Debug",   "for_type": "TemplatePathPatternError" },
+    { "trait_ref": "core::fmt::Display", "for_type": "TemplatePathPatternError" },
+    { "trait_ref": "core::error::Error", "for_type": "TemplatePathPatternError" },
+
+    { "trait_ref": "core::fmt::Debug",   "for_type": "TemplateBoundaryManifestError" },
+    { "trait_ref": "core::fmt::Display", "for_type": "TemplateBoundaryManifestError" },
+    { "trait_ref": "core::error::Error", "for_type": "TemplateBoundaryManifestError" }
+  ]
+}

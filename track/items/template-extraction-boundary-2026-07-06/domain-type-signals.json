@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-06T21:02:22Z",
+  "declaration_hash": "c689cf18f6e3d3f97b7415d35653ad809cc354da75fd11846174e62283a40d1e",
+  "signals": [
+    {
+      "type_name": "TemplateBoundaryManifest",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "TemplateBoundaryManifestError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "TemplatePathClassification",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::clone::TrivialClone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::marker::Copy"
+      ]
+    },
+    {
+      "type_name": "TemplatePathEntry",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "TemplatePathPattern",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::Ord",
+        "core::cmp::PartialEq",
+        "core::cmp::PartialOrd",
+        "core::fmt::Debug",
+        "core::hash::Hash"
+      ]
+    },
+    {
+      "type_name": "TemplatePathPatternError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    }
+  ]
+}

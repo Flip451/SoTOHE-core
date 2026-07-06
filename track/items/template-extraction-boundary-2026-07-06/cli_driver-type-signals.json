@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-06T21:02:29Z",
+  "declaration_hash": "051f86f9041c7678e99bb14df474c09951c0e6d9471c671c1803357bbbf799da",
+  "signals": [
+    {
+      "type_name": "TemplateDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "TemplateExportInput",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "TemplateInput",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
+    }
+  ]
+}

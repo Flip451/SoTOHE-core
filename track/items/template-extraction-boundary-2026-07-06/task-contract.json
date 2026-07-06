@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "track_id": "template-extraction-boundary-2026-07-06",
+  "entries": {
+    "T001": [
+      { "layer": "domain", "entry_key": "TemplatePathPattern" },
+      { "layer": "domain", "entry_key": "TemplatePathPatternError" },
+      { "layer": "domain", "entry_key": "TemplatePathClassification" },
+      { "layer": "domain", "entry_key": "TemplatePathEntry" },
+      { "layer": "domain", "entry_key": "TemplateBoundaryManifest" },
+      { "layer": "domain", "entry_key": "TemplateBoundaryManifestError" }
+    ],
+    "T002": [
+      { "layer": "usecase", "entry_key": "TemplateExportCommand" },
+      { "layer": "usecase", "entry_key": "TemplateExportReport" },
+      { "layer": "usecase", "entry_key": "TemplateExportError" },
+      { "layer": "usecase", "entry_key": "TemplateBoundaryManifestReadError" },
+      { "layer": "usecase", "entry_key": "TemplateExportPortError" },
+      { "layer": "usecase", "entry_key": "TemplateExportInteractor" },
+      { "layer": "usecase", "entry_key": "TemplateExportService" },
+      { "layer": "usecase", "entry_key": "TemplateBoundaryManifestPort" },
+      { "layer": "usecase", "entry_key": "TemplateExportPort" }
+    ],
+    "T003": [
+      { "layer": "infrastructure", "entry_key": "TemplateBoundaryManifestDto" },
+      { "layer": "infrastructure", "entry_key": "TemplatePathEntryDto" },
+      { "layer": "infrastructure", "entry_key": "TemplatePathClassificationDto" },
+      { "layer": "infrastructure", "entry_key": "TemplateBoundaryManifestCodecError" },
+      { "layer": "infrastructure", "entry_key": "infrastructure::template_export::codec::decode_manifest" }
+    ],
+    "T004": [
+      { "layer": "infrastructure", "entry_key": "FsTemplateBoundaryManifestAdapter" },
+      { "layer": "infrastructure", "entry_key": "FsTemplateExportAdapter" }
+    ],
+    "T005": [
+      { "layer": "cli_driver", "entry_key": "TemplateExportInput" },
+      { "layer": "cli_driver", "entry_key": "TemplateInput" },
+      { "layer": "cli_driver", "entry_key": "TemplateDriver" }
+    ],
+    "T006": [
+      { "layer": "cli", "entry_key": "TemplateCommand" },
+      { "layer": "cli", "entry_key": "TemplateExportArgs" },
+      { "layer": "cli", "entry_key": "CliCommand" },
+      { "layer": "cli", "entry_key": "cli::commands::template::execute" },
+      { "layer": "cli", "entry_key": "cli::commands::template::dispatch" },
+      { "layer": "cli_composition", "entry_key": "TemplateCompositionRoot" }
+    ],
+    "T007": [],
+    "T008": [],
+    "T009": [],
+    "T010": [],
+    "T011": [],
+    "T012": [],
+    "T013": [],
+    "T014": []
+  }
+}
