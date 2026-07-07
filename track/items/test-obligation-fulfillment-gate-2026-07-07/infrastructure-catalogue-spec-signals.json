@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "20384e5f7f057581a9eb09256eeda9e56136fa5cb1db8ff1874c4b7b54b03856",
+  "catalogue_declaration_hash": "999b3e4660d2fb05f5f0f0370189803ee0b163c057375a340f6281030078e0e9",
   "signals": [
     {
       "type_name": "CatalogueEntryRefDto",
@@ -45,7 +45,7 @@
     {
       "type_name": "JsonTestObligationRulesLoader",
       "signal": "blue",
-      "entry_hash": "e2a7e9ba0ca6b110dbed5dc7a94df36f8c6a66981ae4814f353187191c9a4f34"
+      "entry_hash": "f080f12d6a2394b32ef744797a4957621c8662d0b4a6283243adb16dfa8efbda"
     },
     {
       "type_name": "JsonWaiverCacheCodec",

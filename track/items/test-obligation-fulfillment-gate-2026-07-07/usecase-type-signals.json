@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-07T16:00:50Z",
-  "declaration_hash": "e5c8ea5ec7be1e3a9d36a70eb82ecc2a883d13929d22568376e1a3747388b26e",
+  "generated_at": "2026-07-07T21:03:00Z",
+  "declaration_hash": "6e2d70cffb8812ac6a73fa153b9391a57b8c8d83d13882545ff5d8f0b4793806",
   "signals": [
     {
       "type_name": "CheckTestObligationsApplicationService",
@@ -102,9 +102,9 @@
     {
       "type_name": "SemanticCalibrationProbeConfig",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -114,14 +114,20 @@
     {
       "type_name": "SemanticEscalationDriverPort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "SemanticEscalationFuture",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "SemanticEscalationVerdictBridge",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "TestObligationChainLabel",

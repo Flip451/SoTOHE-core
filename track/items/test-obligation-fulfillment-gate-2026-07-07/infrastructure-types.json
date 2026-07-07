@@ -516,6 +516,36 @@
       "action": "add",
       "trait_ref": "core::cmp::Eq",
       "for_type": "WaiverVerdictDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::de::Deserialize<'de>",
+      "for_type": "TestObligationPerAxisDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::de::Deserialize<'de>",
+      "for_type": "TestObligationRuleDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::de::Deserialize<'de>",
+      "for_type": "RoleObligationRulesDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::de::Deserialize<'de>",
+      "for_type": "TestObligationRulesDocumentDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "JsonTestObligationRulesLoader"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "JsonTestObligationRulesLoader"
     }
   ],
   "traits": {},
@@ -947,6 +977,10 @@
           "params": [
             {
               "name": "config_path",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "trusted_root",
               "ty": "std::path::PathBuf"
             }
           ],

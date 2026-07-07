@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-07T16:00:55Z",
-  "declaration_hash": "20384e5f7f057581a9eb09256eeda9e56136fa5cb1db8ff1874c4b7b54b03856",
+  "generated_at": "2026-07-07T21:03:05Z",
+  "declaration_hash": "999b3e4660d2fb05f5f0f0370189803ee0b163c057375a340f6281030078e0e9",
   "signals": [
     {
       "type_name": "CatalogueEntryRefDto",
@@ -12,9 +12,9 @@
     {
       "type_name": "ContractRoleKey",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -24,9 +24,9 @@
     {
       "type_name": "DataRoleKey",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -48,9 +48,9 @@
     {
       "type_name": "FunctionRoleKey",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -87,10 +87,12 @@
     {
       "type_name": "JsonTestObligationRulesLoader",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
-        "TestObligationRulesLoaderPort"
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "TestObligationRulesLoaderPort",
+        "core::clone::Clone",
+        "core::fmt::Debug"
       ]
     },
     {
@@ -168,9 +170,9 @@
     {
       "type_name": "PatternKey",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -180,13 +182,14 @@
     {
       "type_name": "RoleObligationRulesDto",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
-        "core::fmt::Debug"
+        "core::fmt::Debug",
+        "serde_core::de::Deserialize<'de>"
       ]
     },
     {
@@ -303,37 +306,40 @@
     {
       "type_name": "TestObligationPerAxisDto",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
-        "core::fmt::Debug"
+        "core::fmt::Debug",
+        "serde_core::de::Deserialize<'de>"
       ]
     },
     {
       "type_name": "TestObligationRuleDto",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
-        "core::fmt::Debug"
+        "core::fmt::Debug",
+        "serde_core::de::Deserialize<'de>"
       ]
     },
     {
       "type_name": "TestObligationRulesDocumentDto",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
-        "core::fmt::Debug"
+        "core::fmt::Debug",
+        "serde_core::de::Deserialize<'de>"
       ]
     },
     {

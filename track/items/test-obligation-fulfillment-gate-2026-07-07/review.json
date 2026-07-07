@@ -1,6 +1,69 @@
 {
   "schema_version": 2,
   "scopes": {
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`JsonTestObligationRulesLoader::load` reads `config_path` with `read_to_string` but never rejects symlinks. That means a symlinked `test-obligation-rules.json` will be followed to its target instead of enforcing real-file semantics, unlike the other config loaders in this repo that `symlink_metadata()` and fail closed before reading.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/test_obligation/rules_codec.rs",
+              "line": 210,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:b0b4404aafdcfb307011e69ec47d371899b048c4cac6b98324e932c7d49442f4",
+          "at": "2026-07-07T18:06:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This guard only rejects symlinks; it never canonicalizes or verifies that `config_path` stays within a fixed trusted root. A non-symlink path with `..` components can therefore escape the expected `.harness/config` boundary and be read directly. The existing `scope_config_loader.rs` pattern canonicalizes the root/path and `starts_with`-checks containment before reading.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/test_obligation/rules_codec.rs",
+              "line": 223,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:4784c326a4e1cdc7dde7a31e580490fe89b9ce9649b3924ae4140a961ffa2e7d",
+          "at": "2026-07-07T18:29:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`JsonTestObligationRulesLoader` does not anchor its trust boundary to an external `trusted_root`. When `.harness/config` is absent, `infer_symlink_trusted_root` and `infer_config_boundary_root` both fall back to `config_path.parent()`, so the containment check at `guard_config_path` becomes tautological and the adapter will read arbitrary files or files under a symlinked directory if the leaf itself is not a symlink. This is a trusted-root violation; compare the explicit `trusted_root` + canonicalize pattern used by `load_v2_scope_config` in `review_v2/scope_config_loader.rs`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/test_obligation/rules_codec.rs",
+              "line": 223,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:de91c0b0d96e3feccfdecfcdfad33724c2ae5b1afdd806a1e4a07fe78f1d0b71",
+          "at": "2026-07-07T18:40:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:590e618dac6a1f1cbcbc2c7ecaa84f231a59f8b88189febb8c00ff0241c0496c",
+          "at": "2026-07-07T18:50:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:590e618dac6a1f1cbcbc2c7ecaa84f231a59f8b88189febb8c00ff0241c0496c",
+          "at": "2026-07-07T18:54:31Z"
+        }
+      ]
+    },
     "impl-plan": {
       "rounds": [
         {
@@ -275,31 +338,193 @@
           "findings": [],
           "hash": "rvw1:sha256:22a3221ea6d08654ff95bbd28617c74c36fcc7e5f81e70a7f3cad0decc5faa79",
           "at": "2026-07-07T12:37:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d63f47dcf5cbd3264aa21f3b989688cd080945ff0c3c746bec11de9287648d41",
+          "at": "2026-07-07T18:01:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d63f47dcf5cbd3264aa21f3b989688cd080945ff0c3c746bec11de9287648d41",
+          "at": "2026-07-07T18:06:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 is attributed to the usecase catalogue entry `SemanticEscalationFuture`, but the T001 plan text only instructs the executor to add `SemanticEscalationDriverPort`, `SemanticEscalationVerdictBridge`, and `SemanticCalibrationProbeConfig` plus tests. Under the impl-plan policy, task-contract entries must match entries the task actually describes touching; either add `SemanticEscalationFuture` to T001's executable description or remove this attribution.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/task-contract.json",
+              "line": 9,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:8e97dc24f97466c25a6cca1fbd48df914bcca3dadf87aa4fe6b849c6e433bda4",
+          "at": "2026-07-07T20:49:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003's task-contract attribution list includes the new ValidationError bookkeeping entry but omits DomainError, even though the review briefing says both ValidationError and DomainError were added to T003 as required pre-review coverage-gate attribution. Leaving DomainError out keeps the task-contract SSoT incomplete for the Batch A attribution update.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/task-contract.json",
+              "line": 24,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:9658f8e6953382428d969f0649ff96073e148f296077b98ca446d50882027fd9",
+          "at": "2026-07-07T20:52:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 now attributes `ValidationError` in `task-contract.json`, but the T003 executable task text in `impl-plan.json`/`plan.md` still only names `TestObligationRulesLoadError` and `TestObligationRulesLoaderPort` for the errors/ports work. Because the plan never tells the executor to add or modify `ValidationError`, this attribution is not backed by the task description and can leave the catalogue entry unimplemented or implemented by guesswork.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/task-contract.json",
+              "line": 24,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:9658f8e6953382428d969f0649ff96073e148f296077b98ca446d50882027fd9",
+          "at": "2026-07-07T20:56:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:913242546aef791c7ff6d7de15532340adee77f4ea9f5bba188778cc0b16d354",
+          "at": "2026-07-07T21:01:05Z"
         }
       ]
     },
-    "spec": {
+    "usecase": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:6b7a9402253fdb24d2375eb435222baa00a442a17e006f253b8639ca97f30d90",
-          "at": "2026-07-07T11:44:55Z"
+          "hash": "rvw1:sha256:69f14b4393f0e49a8e5650a1baf701821f483d322973f8ee968bba24f18a9335",
+          "at": "2026-07-07T18:03:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SemanticEscalationDriverPort` is the shared escalation/cache port for concurrent semantic evaluation, but the trait leaves `P`, `K`, `V`, `E`, and the future produced by the public `async fn` unconstrained. A non-`Send`/non-`Sync` implementation can satisfy this usecase port, so later ref-verify or obligation-gate orchestration cannot safely fan out evaluations across workers despite the port contract being the concurrency boundary. Add the required `Send`/`Sync` bounds and use a `Send` future shape at the trait boundary instead of an unconstrained public `async fn`.",
+              "severity": "P1",
+              "file": "libs/usecase/src/semantic_verdict_core/driver.rs",
+              "line": 21,
+              "category": "purity violation by trait or generic"
+            }
+          ],
+          "hash": "rvw1:sha256:69f14b4393f0e49a8e5650a1baf701821f483d322973f8ee968bba24f18a9335",
+          "at": "2026-07-07T18:07:11Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:6b7a9402253fdb24d2375eb435222baa00a442a17e006f253b8639ca97f30d90",
-          "at": "2026-07-07T11:48:41Z"
+          "hash": "rvw1:sha256:7febbedb200015d97b4887d237b8bdc37a49453d65756bb9c28b8a2deeb3a3f7",
+          "at": "2026-07-07T18:26:51Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2bc64b9f58b9c4710696f36d1807aa28299c3ef207394ca315bb874c6a22c115",
+          "at": "2026-07-07T08:38:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D9 makes `anchor id` part of the obligation id, but D2 explicitly says obligations are derived per entry and are not multiplied by cite count. Downstream derivation cannot know whether to emit one obligation per declaration item, reusing its test group across all cited anchors, or one obligation per `(entry, anchor, kind, item)`. That changes obligation counts, binding shape, and totality semantics, so the ADR needs one consistent identity model before spec/types can translate it.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+              "line": 224,
+              "category": "inconsistent_decisions"
+            }
+          ],
+          "hash": "rvw1:sha256:2bc64b9f58b9c4710696f36d1807aa28299c3ef207394ca315bb874c6a22c115",
+          "at": "2026-07-07T08:41:44Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:17f63b9787ca911a334b5bfdc3527f95e13f36c1b32058ef87ff4c51f450a407",
-          "at": "2026-07-07T15:58:51Z"
+          "hash": "rvw1:sha256:c597270bfdf492126d9a4038ef233eb9ae3cba96657c8f231b9aeac5a6914bd0",
+          "at": "2026-07-07T08:52:17Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:882d1c1b6579f723fbe86dcecd992a43da36f1bf985771a45c5ab857cf7ea0fc",
+          "at": "2026-07-07T18:02:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TestObligationRulesLoaderPort` is a domain-owned trait for loading `.harness/config/test-obligation-rules.json` from a configured source and reporting I/O / malformed JSON failures. That abstracts an infrastructure/application capability, while `knowledge/conventions/hexagonal-architecture.md` §Port Placement Rules says ports for infrastructure functions belong in `usecase`, with domain ports reserved for domain concepts such as persistence/worktree state. Keeping this loader in `libs/domain` misplaces the port boundary for the derivation/check use cases.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/test_obligation/ports.rs",
+              "line": 17,
+              "category": "port misplaced"
+            }
+          ],
+          "hash": "rvw1:sha256:882d1c1b6579f723fbe86dcecd992a43da36f1bf985771a45c5ab857cf7ea0fc",
+          "at": "2026-07-07T18:07:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:882d1c1b6579f723fbe86dcecd992a43da36f1bf985771a45c5ab857cf7ea0fc",
+          "at": "2026-07-07T18:29:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TargetEntryRoleKind` does not make the role-section invariant unrepresentable: each section variant accepts the global `RoleKind`, so callers can construct invalid states such as `TargetEntryRoleKind::DataRole(RoleKind::Repository)` or `ContractRole(RoleKind::ValueObject)`. Because this is public domain API and there is no validating constructor or narrower per-section role type, downstream rule lookup can receive a target whose outer section and inner role disagree. This violates the domain enum/type-safety intent from `prefer-type-safe-abstractions.md` §Enum-first; use section-specific payloads or otherwise prevent mismatched construction.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/test_obligation/vocab.rs",
+              "line": 132,
+              "category": "enum-first violation"
+            }
+          ],
+          "hash": "rvw1:sha256:882d1c1b6579f723fbe86dcecd992a43da36f1bf985771a45c5ab857cf7ea0fc",
+          "at": "2026-07-07T18:33:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f1f3b6ec5a5828195fe15a0dfd8b619041583471af2be6b694649ec9f4a736c5",
+          "at": "2026-07-07T18:40:29Z"
         }
       ]
     },
@@ -696,39 +921,246 @@
           "findings": [],
           "hash": "rvw1:sha256:3eb6fa5a717b055387946b46c33c5e6562c5ade9a434ad6585e26472f7da5893",
           "at": "2026-07-07T15:54:43Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ValidationError.docs` restates upstream rationale and rollout state instead of acting as a catalog anchor: it explains that this track adds `InvalidObligationMinimum(usize)` to support `TestObligationMinimum`, and even describes the Yellow signal / pre-review gate posture. In `<layer>-types.json`, this field should reference the upstream anchor, not reproduce the briefing narrative.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "line": 4825,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`core::convert::From<ValidationError>` for `DomainError` is marked `modify`, but the only branch change here is the new `ValidationError::InvalidObligationMinimum` variant; the `DomainError` conversion impl itself is unchanged. This overstates the diff and should be `reference`/omitted, as in the same pattern on prior tracks.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "line": 1015,
+              "category": "action incoherent with diff"
+            }
+          ],
+          "hash": "rvw1:sha256:8b723087365d7ab4831d571eabdb3101efff3d1ccb9b08e3d06c9565e929b6f7",
+          "at": "2026-07-07T18:04:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SemanticEscalationFuture`'s docs explain the object-safety/worker-task rationale instead of just anchoring the contract, which is an upstream restatement in the type catalogue.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+              "line": 1059,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`SemanticEscalationDriverPort` over-constrains `V` and `E` with `Sync`; the boxed `Send` future only needs them to be `Send`, so this rejects valid implementors without adding safety.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+              "line": 201,
+              "category": "Liskov violation in trait design"
+            }
+          ],
+          "hash": "rvw1:sha256:4919422b6c6cdb263f394cb26b84948a5df706168d58e7052378a4964b109608",
+          "at": "2026-07-07T18:43:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SemanticEscalationFuture` is missing the borrow lifetime from the source alias. In `libs/usecase/src/semantic_verdict_core/driver.rs` the alias is `SemanticEscalationFuture<'a, V, E>`, but this catalogue entry only records `V` and `E`, and the port method below it returns `SemanticEscalationFuture<'_, V, E>` without any lifetime parameter in the contract. That makes the type contract incomplete and can mislead consumers about the future's borrow relationship to `&self` / the inputs.",
+              "severity": "medium",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+              "line": 1046,
+              "category": "API shape"
+            }
+          ],
+          "hash": "rvw1:sha256:9dfdf33c6a0e8e311650b21cbb8284e63f1b5f1445dca3a25aa15dacbef0cd67",
+          "at": "2026-07-07T18:51:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SemanticEscalationDriverPort` is under-specified in the catalogue: [`usecase-types.json`]( /home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json ) records `P`/`K` as `Send + Sync`, but it only records `V`/`E` as `Send`. The implementation at [`libs/usecase/src/semantic_verdict_core/driver.rs`]( /home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/semantic_verdict_core/driver.rs#L28-L33 ) requires `V`/`E: Send + Sync` as well, so the published port contract is too permissive and would admit non-Sync verdict/error types that cannot actually implement the trait.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+              "line": 183,
+              "category": "Liskov violation in trait design"
+            },
+            {
+              "message": "`DomainError` now exposes a `Transition` arm whose payload is `TransitionError`, but none of the reviewed type catalogues declare `TransitionError` as a tracked type. The source definition exists at [`libs/domain/src/error.rs`]( /home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/domain/src/error.rs#L104-L110 ), yet the catalogue and contract map never surface the payload type, so `DomainError::Transition` is only partially representable in the type SSoT.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "line": 4819,
+              "category": "unconstructible error variant (dead vocabulary)"
+            }
+          ],
+          "hash": "rvw1:sha256:aae9956c4562e832a1cffb5d9922e9da2c7f62044c709746a5b0b4bb55360d58",
+          "at": "2026-07-07T19:00:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`domain::error::DomainError`'s docs field explains the rationale for keeping this entry as a reference instead of just anchoring the change to IN-02/T003. That prose restates upstream design intent in a `docs` field, which the no-upstream-restatement convention forbids for `<layer>-types.json` entries.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "line": 1683,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:ee043c53b4894f6585bfbf45698f3b17105778ca4eb38d1ff32c651e550bb987",
+          "at": "2026-07-07T19:21:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: [`domain-types.json`](file:///home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json#L4488-L4504) narrows `ValidationError` to only `InvalidObligationMinimum(usize)`, but the same file still exposes multiple public `try_new` constructors that return `Result<_, ValidationError>` for unrelated text/newtype validation, e.g. [`RoleName::try_new`](file:///home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json#L2528-L2555), [`TestObligationBrief::try_new`](file:///home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json#L3273-L3297), [`TestObligationAnchorId::try_new`](file:///home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json#L3216-L3243), and [`WaivedReason::try_new`](file:///home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json#L4565-L4588). Those constructors cannot structurally produce the only remaining variant, so callers are forced to handle an impossible branch and the failure space for those APIs is no longer represented.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "line": 4488,
+              "category": "per-method error imprecision"
+            }
+          ],
+          "hash": "rvw1:sha256:1a253a9b3ed6a2a92583830a296b5720f0014dc0ebdb9300dbfdd66dcf65452e",
+          "at": "2026-07-07T19:28:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`domain::ValidationError` is catalogued as if every pre-existing data-carrying variant were unit-shaped, but the real enum in [`libs/domain/src/error.rs`](file:///home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/domain/src/error.rs#L16) has payloads for variants such as `InvalidTrackId(String)`, `BranchIdMismatch { .. }`, `StatusOverrideMismatch { .. }`, `TrackActivationRequiresPlanningOnly { .. }`, `TrackActivationRequiresSchemaV3 { .. }`, `TrackAlreadyMaterialized { .. }`, `TaskDescriptionMutated { .. }`, and `TaskRemoved { .. }`. That strips the public contract down to an incorrect shape and would mislead downstream consumers.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "line": 4488,
+              "category": "SoT integrity"
+            }
+          ],
+          "hash": "rvw1:sha256:5fff22e120fbfda06da149b250541b26d95576dca3e5b4d4e1df0147cb5b0554",
+          "at": "2026-07-07T19:39:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`DomainError` is marked `reference`, but the catalogue is not baseline-identical: it only declares `From<ValidationError>` and omits the rustdoc-visible `Debug`, `Error`, and `From<TransitionError>` impls from `libs/domain/src/error.rs`. Because `TransitionError` has no type entry anywhere in this scope, the `Transition` arm's payload is invisible to the type SSoT.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "line": 1681,
+              "category": "action incoherent with diff"
+            }
+          ],
+          "hash": "rvw1:sha256:5fff22e120fbfda06da149b250541b26d95576dca3e5b4d4e1df0147cb5b0554",
+          "at": "2026-07-07T19:50:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ValidationError` is catalogued with `unit` payloads for variants that are payload-bearing in the real domain enum (`libs/domain/src/error.rs:16`), for example `InvalidTrackId`, `BranchIdMismatch`, `StatusOverrideMismatch`, `TrackActivationRequiresPlanningOnly`, `TrackActivationRequiresSchemaV3`, `TrackAlreadyMaterialized`, `TaskDescriptionMutated`, and `TaskRemoved`. That makes the domain type contract lossy and incorrect for downstream consumers.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "line": 4508,
+              "category": "cross-layer contract"
+            }
+          ],
+          "hash": "rvw1:sha256:38ccaaba8acbdc82ab49c366cb3215353c8f5fa8f72f253edec71f6ecfc54162",
+          "at": "2026-07-07T20:03:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`DomainError::Transition(TransitionError)` is only half-catalogued here: this scope adds the enum arm, but it never declares a `TransitionError` type entry, so the payload is dead vocabulary for catalog consumers. The source enum exposes that branch, but the type SSoT in this PR cannot represent it.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "line": 1701,
+              "category": "unconstructible error variant"
+            }
+          ],
+          "hash": "rvw1:sha256:ce9d12ec32bd2627b7e370ee17ac4b106419765976354066b2a24259dc929765",
+          "at": "2026-07-07T20:16:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`JsonTestObligationRulesLoader::new` is catalogued with only `config_path: PathBuf`, but the implementation also requires `trusted_root: PathBuf` and stores it for path-guarding. That leaves the new adapter contract incomplete and inconsistent with the actual public API (`libs/infrastructure/src/test_obligation/rules_codec.rs:207`).",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
+              "line": 973,
+              "category": "missing companion modify"
+            }
+          ],
+          "hash": "rvw1:sha256:4e233a2455e8a7049160cc413a525c7355594eef36aebc8b7bdb261557c3caf1",
+          "at": "2026-07-07T20:29:24Z"
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:2bc64b9f58b9c4710696f36d1807aa28299c3ef207394ca315bb874c6a22c115",
-          "at": "2026-07-07T08:38:10Z"
+          "hash": "rvw1:sha256:324bca623e0bd01ef13a33b70e338f87a12cac90f2527767d5daa83df4e914cd",
+          "at": "2026-07-07T20:36:00Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "D9 makes `anchor id` part of the obligation id, but D2 explicitly says obligations are derived per entry and are not multiplied by cite count. Downstream derivation cannot know whether to emit one obligation per declaration item, reusing its test group across all cited anchors, or one obligation per `(entry, anchor, kind, item)`. That changes obligation counts, binding shape, and totality semantics, so the ADR needs one consistent identity model before spec/types can translate it.",
+              "message": "`TestObligationRulesLoaderPort` is a synchronous secondary port for loading the test-obligation rules document, but its entry docs no longer acknowledge the sync choice. The port name/spec refs imply config/file I/O (`.harness/config/test-obligation-rules.json` via IN-02/IN-04), so the type contract should keep the sync rationale in the catalogue docs to avoid a sync/async color ambiguity at the adapter boundary.",
               "severity": "P1",
-              "file": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
-              "line": 224,
-              "category": "inconsistent_decisions"
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "line": 1232,
+              "category": "sync/async color mismatch"
             }
           ],
-          "hash": "rvw1:sha256:2bc64b9f58b9c4710696f36d1807aa28299c3ef207394ca315bb874c6a22c115",
-          "at": "2026-07-07T08:41:44Z"
+          "hash": "rvw1:sha256:324bca623e0bd01ef13a33b70e338f87a12cac90f2527767d5daa83df4e914cd",
+          "at": "2026-07-07T20:41:21Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:c597270bfdf492126d9a4038ef233eb9ae3cba96657c8f231b9aeac5a6914bd0",
-          "at": "2026-07-07T08:52:17Z"
+          "hash": "rvw1:sha256:e06912b99eb824069faed8194f05ddb4a70d51d71fb6d09b51c6253a0e49bb4e",
+          "at": "2026-07-07T20:45:52Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6b7a9402253fdb24d2375eb435222baa00a442a17e006f253b8639ca97f30d90",
+          "at": "2026-07-07T11:44:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6b7a9402253fdb24d2375eb435222baa00a442a17e006f253b8639ca97f30d90",
+          "at": "2026-07-07T11:48:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:17f63b9787ca911a334b5bfdc3527f95e13f36c1b32058ef87ff4c51f450a407",
+          "at": "2026-07-07T15:58:51Z"
         }
       ]
     },
@@ -747,6 +1179,20 @@
           "findings": [],
           "hash": "rvw1:sha256:ddf3e8c0bbab7460ec9809b78f9d96d20ab991a59ffc685511120f27b69e0426",
           "at": "2026-07-07T09:23:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d221f13079ac52fea12d5d991e74d9aad1e3bc97af5b4d7ee79df944c2bf3983",
+          "at": "2026-07-07T18:01:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d221f13079ac52fea12d5d991e74d9aad1e3bc97af5b4d7ee79df944c2bf3983",
+          "at": "2026-07-07T18:06:39Z"
         }
       ]
     }

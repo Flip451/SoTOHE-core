@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "e5c8ea5ec7be1e3a9d36a70eb82ecc2a883d13929d22568376e1a3747388b26e",
+  "catalogue_declaration_hash": "6e2d70cffb8812ac6a73fa153b9391a57b8c8d83d13882545ff5d8f0b4793806",
   "signals": [
     {
       "type_name": "CheckTestObligationsCommand",
@@ -46,6 +46,11 @@
       "type_name": "SemanticCalibrationProbeConfig",
       "signal": "blue",
       "entry_hash": "82f33e44746636c08c24eaaa609a79de1e7c60094f6f0ef46152a97784622ac6"
+    },
+    {
+      "type_name": "SemanticEscalationFuture",
+      "signal": "blue",
+      "entry_hash": "0bda77b4510e84e7e13966a19dc8aeccd69e13f4dc22829f0f0274a418f02812"
     },
     {
       "type_name": "TestObligationChainLabel",
@@ -95,7 +100,7 @@
     {
       "type_name": "SemanticEscalationDriverPort",
       "signal": "blue",
-      "entry_hash": "a76860ca215ae52560d0b0793e2adb2bf0114699f0f9796d2eda054ca6b13ab2"
+      "entry_hash": "16c0eb54711a6a4ebbf68374a0dd4368e3ba185906d5093193c8d74c797ddcc7"
     },
     {
       "type_name": "SemanticEscalationVerdictBridge",

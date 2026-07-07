@@ -140,16 +140,16 @@
       "methods": [
         {
           "has_default_impl": false,
-          "is_async": true,
+          "is_async": false,
           "name": "evaluate_with_escalation",
           "params": [
             {
               "name": "pair",
-              "ty": "&P"
+              "ty": "&'a P"
             },
             {
               "name": "key",
-              "ty": "&K"
+              "ty": "&'a K"
             },
             {
               "name": "initial_tier",
@@ -157,8 +157,9 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<V, E>",
-          "docs": "Caller-owned neutral core error type for the driver boundary."
+          "returns": "SemanticEscalationFuture<'a, V, E>",
+          "docs": "Caller-owned neutral core error type for the driver boundary.",
+          "generics": []
         }
       ],
       "module_path": "semantic_verdict_core::driver",
@@ -173,6 +174,44 @@
         {
           "anchor": "AC-15",
           "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ],
+      "where_predicates": [
+        {
+          "lhs": "P",
+          "rhs": [
+            "Send",
+            "Sync"
+          ],
+          "operator": "Bound"
+        },
+        {
+          "lhs": "K",
+          "rhs": [
+            "Send",
+            "Sync"
+          ],
+          "operator": "Bound"
+        },
+        {
+          "lhs": "V",
+          "rhs": [
+            "Send",
+            "Sync"
+          ],
+          "operator": "Bound"
+        },
+        {
+          "lhs": "E",
+          "rhs": [
+            "Send",
+            "Sync"
+          ],
+          "operator": "Bound"
         }
       ]
     },
@@ -1003,6 +1042,40 @@
         {
           "anchor": "AC-09",
           "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "SemanticEscalationFuture": {
+      "action": "add",
+      "role": {
+        "Dto": {}
+      },
+      "kind": {
+        "kind": "type_alias",
+        "target": "std::pin::Pin<std::boxed::Box<dyn core::future::Future<Output = Result<V, E>> + Send + 'a>>"
+      },
+      "methods": [],
+      "module_path": "semantic_verdict_core::driver",
+      "docs": "Schema note: target carries lifetime `'a`; generics lists V/E type parameters only. See IN-01 / AC-15.",
+      "spec_refs": [
+        {
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "anchor": "IN-01"
+        },
+        {
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "anchor": "AC-15"
+        }
+      ],
+      "informal_grounds": [],
+      "generics": [
+        {
+          "name": "V",
+          "bounds": []
+        },
+        {
+          "name": "E",
+          "bounds": []
         }
       ]
     }

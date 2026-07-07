@@ -51,6 +51,7 @@ pub mod review_v2;
 pub mod review_workflow;
 pub mod semantic_dup;
 pub mod semantic_dup_driver;
+pub mod semantic_verdict_core;
 pub mod signal;
 pub mod signal_gate;
 pub mod signal_service;

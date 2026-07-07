@@ -97,6 +97,8 @@ pub enum ValidationError {
     MultiLineInformalGroundSummary,
     #[error("decision ground reference must not be empty or whitespace-only")]
     EmptyDecisionGroundRef,
+    #[error("test-obligation minimum '{0}' must be at least 1")]
+    InvalidObligationMinimum(usize),
 }
 
 /// Errors from invalid task state transitions.

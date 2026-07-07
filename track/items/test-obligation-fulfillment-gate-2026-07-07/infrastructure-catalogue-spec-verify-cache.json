@@ -411,7 +411,7 @@
       }
     },
     {
-      "claim_hash": "e2a7e9ba0ca6b110dbed5dc7a94df36f8c6a66981ae4814f353187191c9a4f34",
+      "claim_hash": "f080f12d6a2394b32ef744797a4957621c8662d0b4a6283243adb16dfa8efbda",
       "evidence_hash": "35fb29717e9ffa94f0bfd806ced282d59085c048292878dd57e3faa4bfaa57f9",
       "verdict": {
         "kind": "pass",
@@ -435,11 +435,11 @@
       }
     },
     {
-      "claim_hash": "e2a7e9ba0ca6b110dbed5dc7a94df36f8c6a66981ae4814f353187191c9a4f34",
+      "claim_hash": "f080f12d6a2394b32ef744797a4957621c8662d0b4a6283243adb16dfa8efbda",
       "evidence_hash": "7f6eb1e2131b51fda5c2927db9f7ed7ce5f1174d0958cfc162a46d3d187aed70",
       "verdict": {
         "kind": "pass",
-        "citation": "「決定表 config のロード時 totality 検証。derive / check はロード時に、config が全 role（role enum は Rust 側 SSoT）を被覆し、義務 0 件も \"obligations\": [] と明示していることを fail-closed で検証する。」"
+        "citation": "決定表 config のロード時 totality 検証。`derive` / `check` はロード時に、config が全 role（role enum は Rust 側 SSoT）を被覆し、義務 0 件も \"obligations\": [] と明示していることを fail-closed で検証する。sotp に新 role が追加されて既存 config が未対応であれば loud に fail する（コンパイル時網羅 match による保証の、config ロード時への移設）。per 軸語彙の解釈器は Rust 側で per 軸への網羅 match として実装する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -459,11 +459,11 @@
       }
     },
     {
-      "claim_hash": "e2a7e9ba0ca6b110dbed5dc7a94df36f8c6a66981ae4814f353187191c9a4f34",
+      "claim_hash": "f080f12d6a2394b32ef744797a4957621c8662d0b4a6283243adb16dfa8efbda",
       "evidence_hash": "ef6f2857019f904e7e3b92bb1cd22b0f0b2514f37b6680b61ba1bc6cb244ee81",
       "verdict": {
         "kind": "pass",
-        "citation": "`sotp test-obligation derive` / `check` がロード時に fail-closed し、非零 exit で欠落 role / 未明示 role のリストを出力する。"
+        "citation": "決定表 config が全 role を被覆していない、または 0 件が `\"obligations\": []` として明示宣言されていない場合、`sotp test-obligation derive` / `check` がロード時に fail-closed し、非零 exit で欠落 role / 未明示 role のリストを出力する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",

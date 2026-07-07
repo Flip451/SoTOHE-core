@@ -10,15 +10,15 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| SemanticCalibrationProbeConfig | value_object | add | — | 🟡 | 🔵 |
+| SemanticCalibrationProbeConfig | value_object | add | — | 🔵 | 🔵 |
 | TestObligationEvaluateConfig | value_object | add | — | 🟡 | 🔵 |
 
 ## Secondary Ports
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| SemanticEscalationDriverPort | secondary_port | add | async fn evaluate_with_escalation(&self, pair: &P, key: &K, initial_tier: domain::tddd::semantic_verify::ModelTier) -> Result<V, E> | 🟡 | 🔵 |
-| SemanticEscalationVerdictBridge | secondary_port | add | fn project(&self, verdict: &V) -> domain::tddd::semantic_verify::SemanticVerdict | 🟡 | 🔵 |
+| SemanticEscalationDriverPort | secondary_port | add | fn evaluate_with_escalation(&self, pair: &'a P, key: &'a K, initial_tier: domain::tddd::semantic_verify::ModelTier) -> SemanticEscalationFuture<'a, V, E> | 🔵 | 🔵 |
+| SemanticEscalationVerdictBridge | secondary_port | add | fn project(&self, verdict: &V) -> domain::tddd::semantic_verify::SemanticVerdict | 🔵 | 🔵 |
 
 ## Application Services
 
@@ -44,6 +44,7 @@
 |------|------|--------|---------|--------|----------|
 | CheckTestObligationsOutcome | dto | add | — | 🟡 | 🔵 |
 | EvaluateTestObligationsOutcome | dto | add | — | 🟡 | 🔵 |
+| SemanticEscalationFuture | dto | add | — | 🔵 | 🔵 |
 | TestObligationLaneSummary | dto | add | — | 🟡 | 🔵 |
 | TestObligationResultsOutput | dto | add | — | 🟡 | 🔵 |
 

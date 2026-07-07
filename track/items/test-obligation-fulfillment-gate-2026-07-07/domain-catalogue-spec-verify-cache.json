@@ -1635,11 +1635,11 @@
       }
     },
     {
-      "claim_hash": "e495080272d19fb39678953186c65c4ac89d6e3c943b7393f6d079d1cfec26f0",
+      "claim_hash": "4e54a2e4a8801b25d1da26a4e70f5b3c78b60d0203feec6ddf9715fd9c0a45a5",
       "evidence_hash": "35fb29717e9ffa94f0bfd806ced282d59085c048292878dd57e3faa4bfaa57f9",
       "verdict": {
         "kind": "pass",
-        "citation": "決定表は role → 義務生成ルール（義務種別 + per 軸 + brief テンプレート）を JSON で表現する。"
+        "citation": "role → 義務生成ルール（義務種別 + per 軸 + brief テンプレート）を JSON で表現する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -2019,11 +2019,11 @@
       }
     },
     {
-      "claim_hash": "5a54cdd2089d25c7b7f4abfbcef309c61d031ca36c6de71322b71ac88560d7a3",
+      "claim_hash": "28be608877b4d7175b533f8e8209e75264e76e148bd96b45177661a29cd2b55f",
       "evidence_hash": "35fb29717e9ffa94f0bfd806ced282d59085c048292878dd57e3faa4bfaa57f9",
       "verdict": {
         "kind": "pass",
-        "citation": "決定表は role → 義務生成ルール（義務種別 + per 軸 + brief テンプレート）を JSON で表現する。"
+        "citation": "義務導出の決定表を `.harness/config/test-obligation-rules.json` として新設し、利用者所有 SSoT として ship する。Rust ソースへの hard-code は取らない。決定表は role → 義務生成ルール（義務種別 + per 軸 + brief テンプレート）を JSON で表現する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -2043,11 +2043,11 @@
       }
     },
     {
-      "claim_hash": "5a54cdd2089d25c7b7f4abfbcef309c61d031ca36c6de71322b71ac88560d7a3",
+      "claim_hash": "28be608877b4d7175b533f8e8209e75264e76e148bd96b45177661a29cd2b55f",
       "evidence_hash": "d0faf18c0a8c7116ccff5867e952d2aa881a7881e89ff2bb7ab64b22c640e747",
       "verdict": {
         "kind": "pass",
-        "citation": "`.harness/config/test-obligation-rules.json` が新設され、default config の初期内容が D13 の決定表と一致する: DataRole 17 種 / ContractRole 4 種 / FunctionRole 2 種 / patterns（typestate）/ trait_impls セクションを全て明示宣言し、義務 0 件も \"obligations\": [] として明示する。"
+        "citation": ".harness/config/test-obligation-rules.json が新設され、default config の初期内容が D13 の決定表と一致する: DataRole 17 種 / ContractRole 4 種 / FunctionRole 2 種 / patterns（typestate）/ trait_impls セクションを全て明示宣言し、義務 0 件も \"obligations\": [] として明示する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -2615,6 +2615,30 @@
           "section": "constraint",
           "element_id": "CN-07",
           "text_label": "spec 要素の種別（GO / IN / CN / AC）を edge 宇宙の事前フィルタにしない。テスト可能性の判断は edge ごとの verdict（fulfilled / waived / fail）に属する。種別の用途は verdict の事前情報（prior）と edge ゼロ警報の範囲限定に限る。"
+        }
+      }
+    },
+    {
+      "claim_hash": "1c4c6593031b2bf7fe9e4dce228667928403a1efb3a00b6cdce1cd76dcbcf371",
+      "evidence_hash": "35fb29717e9ffa94f0bfd806ced282d59085c048292878dd57e3faa4bfaa57f9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "義務導出の決定表を `.harness/config/test-obligation-rules.json` として新設し、利用者所有 SSoT として ship する。Rust ソースへの hard-code は取らない。決定表は role → 義務生成ルール（義務種別 + per 軸 + brief テンプレート）を JSON で表現する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ValidationError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "義務導出の決定表を `.harness/config/test-obligation-rules.json` として新設し、利用者所有 SSoT として ship する。Rust ソースへの hard-code は取らない。決定表は role → 義務生成ルール（義務種別 + per 軸 + brief テンプレート）を JSON で表現する。"
         }
       }
     },
@@ -3315,7 +3339,7 @@
       }
     },
     {
-      "claim_hash": "36cbf8c05ff6563bdf6e9ec4d704345d382c9337668a5c6350e1926ade4961b9",
+      "claim_hash": "676e053bc5c3b9a82893a01ff24cb126df316e5a275e798464af1f5d48a1f52a",
       "evidence_hash": "35fb29717e9ffa94f0bfd806ced282d59085c048292878dd57e3faa4bfaa57f9",
       "verdict": {
         "kind": "pass",
@@ -3339,11 +3363,11 @@
       }
     },
     {
-      "claim_hash": "36cbf8c05ff6563bdf6e9ec4d704345d382c9337668a5c6350e1926ade4961b9",
+      "claim_hash": "676e053bc5c3b9a82893a01ff24cb126df316e5a275e798464af1f5d48a1f52a",
       "evidence_hash": "7f6eb1e2131b51fda5c2927db9f7ed7ce5f1174d0958cfc162a46d3d187aed70",
       "verdict": {
         "kind": "pass",
-        "citation": "決定表 config のロード時 totality 検証。`derive` / `check` はロード時に、config が全 role（role enum は Rust 側 SSoT）を被覆し、義務 0 件も `\"obligations\": []` と明示していることを fail-closed で検証する。sotp に新 role が追加されて既存 config が未対応であれば loud に fail する（コンパイル時網羅 match による保証の、config ロード時への移設）。"
+        "citation": "決定表 config のロード時 totality 検証。`derive` / `check` はロード時に、config が全 role（role enum は Rust 側 SSoT）を被覆し、義務 0 件も `\"obligations\": []` と明示していることを fail-closed で検証する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -3363,7 +3387,7 @@
       }
     },
     {
-      "claim_hash": "36cbf8c05ff6563bdf6e9ec4d704345d382c9337668a5c6350e1926ade4961b9",
+      "claim_hash": "676e053bc5c3b9a82893a01ff24cb126df316e5a275e798464af1f5d48a1f52a",
       "evidence_hash": "ef6f2857019f904e7e3b92bb1cd22b0f0b2514f37b6680b61ba1bc6cb244ee81",
       "verdict": {
         "kind": "pass",

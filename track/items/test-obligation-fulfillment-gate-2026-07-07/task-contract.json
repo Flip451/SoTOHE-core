@@ -5,7 +5,8 @@
     "T001": [
       { "layer": "usecase", "entry_key": "SemanticEscalationDriverPort" },
       { "layer": "usecase", "entry_key": "SemanticEscalationVerdictBridge" },
-      { "layer": "usecase", "entry_key": "SemanticCalibrationProbeConfig" }
+      { "layer": "usecase", "entry_key": "SemanticCalibrationProbeConfig" },
+      { "layer": "usecase", "entry_key": "SemanticEscalationFuture" }
     ],
     "T002": [],
     "T003": [
@@ -19,7 +20,8 @@
       { "layer": "domain", "entry_key": "TestObligationPatternKind" },
       { "layer": "domain", "entry_key": "TargetEntryRoleKind" },
       { "layer": "domain", "entry_key": "TestObligationRulesLoadError" },
-      { "layer": "domain", "entry_key": "TestObligationRulesLoaderPort" }
+      { "layer": "domain", "entry_key": "TestObligationRulesLoaderPort" },
+      { "layer": "domain", "entry_key": "ValidationError" }
     ],
     "T004": [
       { "layer": "infrastructure", "entry_key": "DataRoleKey" },

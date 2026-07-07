@@ -363,6 +363,54 @@
       }
     },
     {
+      "claim_hash": "0bda77b4510e84e7e13966a19dc8aeccd69e13f4dc22829f0f0274a418f02812",
+      "evidence_hash": "83c27079d95d7f58d8277d3d8dfd0e35f3092800fbe785b5db797b8e61dee4a9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "(4) fast → final → 人間 の段階引き上げドライバ, (5) capability → provider 解決（既に共有済み）。検証器固有に残すのは pair / 義務の型、対象集合の生成（citation 走査 vs 決定表導出）、スコープ解決、fail routing。既存 ref-verify（chain1 / chain2）を本 core に載せ替える。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "SemanticEscalationFuture"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "責務中立な semantic-verdict core の抽出を先行タスクとして実装する。core は次を含む: (1) verdict 語彙 + 裏付け引用必須の規律（だんまり通過禁止）、(2) hash 凍結キャッシュの機構（キーの型は検証器ごとに定義）、(3) calibration probe（既知の誤り例）の注入と劣化検出、(4) fast → final → 人間 の段階引き上げドライバ、(5) capability → provider 解決（既に共有済み）。検証器固有に残すのは pair / 義務の型、対象集合の生成（citation 走査 vs 決定表導出）、スコープ解決、fail routing。既存 ref-verify（chain1 / chain2）を本 core に載せ替える。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0bda77b4510e84e7e13966a19dc8aeccd69e13f4dc22829f0f0274a418f02812",
+      "evidence_hash": "3aa4c994fc692bb806ba6fd404d9fdeea2978cdb86cacf1dd67c3ee2022e8021",
+      "verdict": {
+        "kind": "pass",
+        "citation": "(4) fast → final → 人間 の段階引き上げドライバ"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "SemanticEscalationFuture"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-15",
+          "text_label": "責務中立 semantic-verdict core が抽出されており、既存 ref-verify（chain1 / chain2）が本 core に相乗りするようリファクタされている。core は (1) verdict 語彙 + 裏付け引用必須の規律、(2) hash 凍結キャッシュの機構（キーの型は検証器ごとに定義）、(3) calibration probe の注入と劣化検出、(4) fast → final → 人間 の段階引き上げドライバ、(5) capability → provider 解決 を含む。検証器固有部分（pair / 義務の型、対象集合の生成、スコープ解決、fail routing）は各検証器に残る。ref-verify の既存挙動にリグレッションがないことを既存テスト群で検証する。"
+        }
+      }
+    },
+    {
       "claim_hash": "fc1dbaaca953db2b96cedd33ad0ec8ece8bc00fd5690f4bd93fbdd34e77434c7",
       "evidence_hash": "7666187f7f8164aa6a7221bf988b134ff59b59685ef6cd7ed171aa1339fe8dc1",
       "verdict": {
@@ -819,11 +867,11 @@
       }
     },
     {
-      "claim_hash": "a76860ca215ae52560d0b0793e2adb2bf0114699f0f9796d2eda054ca6b13ab2",
+      "claim_hash": "16c0eb54711a6a4ebbf68374a0dd4368e3ba185906d5093193c8d74c797ddcc7",
       "evidence_hash": "83c27079d95d7f58d8277d3d8dfd0e35f3092800fbe785b5db797b8e61dee4a9",
       "verdict": {
         "kind": "pass",
-        "citation": "core は次を含む: (4) fast → final → 人間 の段階引き上げドライバ, ... 検証器固有に残すのは pair / 義務の型, 対象集合の生成（citation 走査 vs 決定表導出）, スコープ解決, fail routing."
+        "citation": "(4) fast → final → 人間 の段階引き上げドライバ"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -843,11 +891,11 @@
       }
     },
     {
-      "claim_hash": "a76860ca215ae52560d0b0793e2adb2bf0114699f0f9796d2eda054ca6b13ab2",
+      "claim_hash": "16c0eb54711a6a4ebbf68374a0dd4368e3ba185906d5093193c8d74c797ddcc7",
       "evidence_hash": "3aa4c994fc692bb806ba6fd404d9fdeea2978cdb86cacf1dd67c3ee2022e8021",
       "verdict": {
         "kind": "pass",
-        "citation": "core は ... (4) fast → final → 人間 の段階引き上げドライバ ... を含む。検証器固有部分（pair / 義務の型、対象集合の生成、スコープ解決、fail routing）は各検証器に残る。"
+        "citation": "(4) fast → final → 人間 の段階引き上げドライバ、... 検証器固有部分（pair / 義務の型、対象集合の生成、スコープ解決、fail routing）は各検証器に残る。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",

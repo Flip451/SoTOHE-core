@@ -922,63 +922,98 @@
     },
     {
       "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "ArtifactCodecError"
+      "for_type": "ArtifactCodecError",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "add",
-      "trait_ref": "core::fmt::Display",
-      "for_type": "ArtifactCodecError"
+      "for_type": "ArtifactCodecError",
+      "trait_ref": "core::fmt::Display"
     },
     {
       "action": "add",
-      "trait_ref": "core::error::Error",
-      "for_type": "ArtifactCodecError"
+      "for_type": "ArtifactCodecError",
+      "trait_ref": "core::error::Error"
     },
     {
       "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "VerifyCacheError"
+      "for_type": "VerifyCacheError",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "add",
-      "trait_ref": "core::fmt::Display",
-      "for_type": "VerifyCacheError"
+      "for_type": "VerifyCacheError",
+      "trait_ref": "core::fmt::Display"
     },
     {
       "action": "add",
-      "trait_ref": "core::error::Error",
-      "for_type": "VerifyCacheError"
+      "for_type": "VerifyCacheError",
+      "trait_ref": "core::error::Error"
     },
     {
       "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "SemanticVerifierError"
+      "for_type": "SemanticVerifierError",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "add",
-      "trait_ref": "core::fmt::Display",
-      "for_type": "SemanticVerifierError"
+      "for_type": "SemanticVerifierError",
+      "trait_ref": "core::fmt::Display"
     },
     {
       "action": "add",
-      "trait_ref": "core::error::Error",
-      "for_type": "SemanticVerifierError"
+      "for_type": "SemanticVerifierError",
+      "trait_ref": "core::error::Error"
     },
     {
       "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "TestSourceScanError"
+      "for_type": "TestSourceScanError",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "add",
-      "trait_ref": "core::fmt::Display",
-      "for_type": "TestSourceScanError"
+      "for_type": "TestSourceScanError",
+      "trait_ref": "core::fmt::Display"
     },
     {
       "action": "add",
-      "trait_ref": "core::error::Error",
-      "for_type": "TestSourceScanError"
+      "for_type": "TestSourceScanError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "modify",
+      "for_type": "ValidationError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "ValidationError",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "modify",
+      "for_type": "ValidationError",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "modify",
+      "for_type": "ValidationError",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "modify",
+      "for_type": "ValidationError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "modify",
+      "for_type": "ValidationError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "reference",
+      "for_type": "DomainError",
+      "trait_ref": "core::convert::From<ValidationError>"
     }
   ],
   "traits": {
@@ -1001,6 +1036,7 @@
           "returns": "Result<Option<ObligationFulfillmentCacheDocument>, VerifyCacheError>"
         },
         {
+          "docs": "Persist an obligation-fulfillment cache document.",
           "has_default_impl": false,
           "is_async": false,
           "name": "save",
@@ -1011,8 +1047,7 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<(), DiagnosticMessage>",
-          "docs": "Persist an obligation-fulfillment cache document."
+          "returns": "Result<(), DiagnosticMessage>"
         }
       ],
       "module_path": "tddd::test_obligation::ports",
@@ -1111,6 +1146,7 @@
           "returns": "Result<Option<ObligationsDocument>, ArtifactCodecError>"
         },
         {
+          "docs": "Persist an obligations document.",
           "has_default_impl": false,
           "is_async": false,
           "name": "save",
@@ -1121,8 +1157,7 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<(), DiagnosticMessage>",
-          "docs": "Persist an obligations document."
+          "returns": "Result<(), DiagnosticMessage>"
         }
       ],
       "module_path": "tddd::test_obligation::ports",
@@ -1163,6 +1198,7 @@
           "returns": "Result<Option<TestBindingsDocument>, ArtifactCodecError>"
         },
         {
+          "docs": "Persist a test-bindings document.",
           "has_default_impl": false,
           "is_async": false,
           "name": "save",
@@ -1173,8 +1209,7 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<(), DiagnosticMessage>",
-          "docs": "Persist a test-bindings document."
+          "returns": "Result<(), DiagnosticMessage>"
         }
       ],
       "module_path": "tddd::test_obligation::ports",
@@ -1194,7 +1229,7 @@
     },
     "TestObligationRulesLoaderPort": {
       "action": "add",
-      "docs": "Domain rules-loader port for `.harness/config/test-obligation-rules.json`; synchronous to match the existing domain port baseline (IN-02 / IN-04 / AC-02).",
+      "docs": "Domain secondary port for loading the test-obligation rules document; synchronous to match the existing domain port baseline (IN-02 / IN-04 / AC-02).",
       "informal_grounds": [],
       "methods": [
         {
@@ -1295,6 +1330,7 @@
           "returns": "Result<Option<WaiverCacheDocument>, VerifyCacheError>"
         },
         {
+          "docs": "Persist a waiver cache document.",
           "has_default_impl": false,
           "is_async": false,
           "name": "save",
@@ -1305,8 +1341,7 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<(), DiagnosticMessage>",
-          "docs": "Persist a waiver cache document."
+          "returns": "Result<(), DiagnosticMessage>"
         }
       ],
       "module_path": "tddd::test_obligation::ports",
@@ -1824,76 +1859,76 @@
           {
             "name": "TrackNotActive",
             "payload": {
-              "kind": "struct",
               "fields": [
                 {
                   "name": "branch",
                   "ty": "DiagnosticMessage"
                 }
-              ]
+              ],
+              "kind": "struct"
             }
           },
           {
             "name": "DriftsDetected",
             "payload": {
-              "kind": "struct",
               "fields": [
                 {
                   "name": "drifts",
                   "ty": "Vec<TestObligationDrift>"
                 }
-              ]
+              ],
+              "kind": "struct"
             }
           },
           {
             "name": "UnresolvedEdges",
             "payload": {
-              "kind": "struct",
               "fields": [
                 {
                   "name": "edges",
                   "ty": "Vec<TestObligationEdgeId>"
                 }
-              ]
+              ],
+              "kind": "struct"
             }
           },
           {
             "name": "StaleVerdicts",
             "payload": {
-              "kind": "struct",
               "fields": [
                 {
                   "name": "edges",
                   "ty": "Vec<TestObligationEdgeId>"
                 }
-              ]
+              ],
+              "kind": "struct"
             }
           },
           {
             "name": "ArtifactCodec",
             "payload": {
-              "kind": "tuple",
               "fields": [
                 "ArtifactCodecError"
-              ]
+              ],
+              "kind": "tuple"
             }
           },
           {
             "name": "SourceScan",
             "payload": {
-              "kind": "tuple",
               "fields": [
                 "TestSourceScanError"
-              ]
+              ],
+              "kind": "tuple"
             }
           },
           {
             "name": "CacheIo",
             "payload": {
-              "kind": "tuple",
               "fields": [
                 "VerifyCacheError"
-              ]
+              ],
+              "kind": "tuple"
             }
           }
         ]
@@ -1936,67 +1971,67 @@
           {
             "name": "RulesLoad",
             "payload": {
-              "kind": "tuple",
               "fields": [
                 "TestObligationRulesLoadError"
-              ]
+              ],
+              "kind": "tuple"
             }
           },
           {
             "name": "TrackNotActive",
             "payload": {
-              "kind": "struct",
               "fields": [
                 {
                   "name": "branch",
                   "ty": "DiagnosticMessage"
                 }
-              ]
+              ],
+              "kind": "struct"
             }
           },
           {
             "name": "CatalogueLoad",
             "payload": {
-              "kind": "tuple",
               "fields": [
                 "DiagnosticMessage"
-              ]
+              ],
+              "kind": "tuple"
             }
           },
           {
             "name": "SpecLoad",
             "payload": {
-              "kind": "tuple",
               "fields": [
                 "DiagnosticMessage"
-              ]
+              ],
+              "kind": "tuple"
             }
           },
           {
             "name": "InvalidCatalogueState",
             "payload": {
-              "kind": "tuple",
               "fields": [
                 "DiagnosticMessage"
-              ]
+              ],
+              "kind": "tuple"
             }
           },
           {
             "name": "ArtifactCodec",
             "payload": {
-              "kind": "tuple",
               "fields": [
                 "ArtifactCodecError"
-              ]
+              ],
+              "kind": "tuple"
             }
           },
           {
             "name": "ArtifactWrite",
             "payload": {
-              "kind": "tuple",
               "fields": [
                 "DiagnosticMessage"
-              ]
+              ],
+              "kind": "tuple"
             }
           }
         ]
@@ -2027,76 +2062,76 @@
           {
             "name": "InvalidConfig",
             "payload": {
-              "kind": "struct",
               "fields": [
                 {
                   "name": "message",
                   "ty": "DiagnosticMessage"
                 }
-              ]
+              ],
+              "kind": "struct"
             }
           },
           {
             "name": "TrackNotActive",
             "payload": {
-              "kind": "struct",
               "fields": [
                 {
                   "name": "branch",
                   "ty": "DiagnosticMessage"
                 }
-              ]
+              ],
+              "kind": "struct"
             }
           },
           {
             "name": "VerifierPort",
             "payload": {
-              "kind": "tuple",
               "fields": [
                 "SemanticVerifierError"
-              ]
+              ],
+              "kind": "tuple"
             }
           },
           {
             "name": "CachePersistence",
             "payload": {
-              "kind": "tuple",
               "fields": [
                 "VerifyCacheError"
-              ]
+              ],
+              "kind": "tuple"
             }
           },
           {
             "name": "CacheWrite",
             "payload": {
-              "kind": "tuple",
               "fields": [
                 "DiagnosticMessage"
-              ]
+              ],
+              "kind": "tuple"
             }
           },
           {
             "name": "SemanticFailuresConfirmed",
             "payload": {
-              "kind": "struct",
               "fields": [
                 {
                   "name": "records",
                   "ty": "Vec<EdgeVerdictRecord>"
                 }
-              ]
+              ],
+              "kind": "struct"
             }
           },
           {
             "name": "HumanEscalationRequired",
             "payload": {
-              "kind": "struct",
               "fields": [
                 {
                   "name": "records",
                   "ty": "Vec<EdgeVerdictRecord>"
                 }
-              ]
+              ],
+              "kind": "struct"
             }
           }
         ]
@@ -3254,7 +3289,7 @@
         "shape": {
           "fields": [],
           "has_stripped_fields": true,
-          "kind": "plain"
+          "kind": "tuple"
         }
       },
       "methods": [
@@ -3304,6 +3339,7 @@
       },
       "methods": [
         {
+          "docs": "Constructor for Missing drift.",
           "has_default_impl": false,
           "is_async": false,
           "name": "missing_obligation",
@@ -3317,10 +3353,10 @@
               "ty": "DiagnosticMessage"
             }
           ],
-          "returns": "Self",
-          "docs": "Constructor for Missing drift."
+          "returns": "Self"
         },
         {
+          "docs": "Constructor for Orphaned drift.",
           "has_default_impl": false,
           "is_async": false,
           "name": "orphaned_edge",
@@ -3334,10 +3370,10 @@
               "ty": "DiagnosticMessage"
             }
           ],
-          "returns": "Self",
-          "docs": "Constructor for Orphaned drift."
+          "returns": "Self"
         },
         {
+          "docs": "Constructor for SpecChanged drift.",
           "has_default_impl": false,
           "is_async": false,
           "name": "spec_changed_edge",
@@ -3351,10 +3387,10 @@
               "ty": "DiagnosticMessage"
             }
           ],
-          "returns": "Self",
-          "docs": "Constructor for SpecChanged drift."
+          "returns": "Self"
         },
         {
+          "docs": "Constructor for DeclChanged drift.",
           "has_default_impl": false,
           "is_async": false,
           "name": "decl_changed_edge",
@@ -3368,10 +3404,10 @@
               "ty": "DiagnosticMessage"
             }
           ],
-          "returns": "Self",
-          "docs": "Constructor for DeclChanged drift."
+          "returns": "Self"
         },
         {
+          "docs": "Constructor for TestChanged drift.",
           "has_default_impl": false,
           "is_async": false,
           "name": "test_changed_edge",
@@ -3385,10 +3421,10 @@
               "ty": "DiagnosticMessage"
             }
           ],
-          "returns": "Self",
-          "docs": "Constructor for TestChanged drift."
+          "returns": "Self"
         },
         {
+          "docs": "Constructor for ReasonChanged drift.",
           "has_default_impl": false,
           "is_async": false,
           "name": "reason_changed_edge",
@@ -3402,8 +3438,7 @@
               "ty": "DiagnosticMessage"
             }
           ],
-          "returns": "Self",
-          "docs": "Constructor for ReasonChanged drift."
+          "returns": "Self"
         }
       ],
       "module_path": "tddd::test_obligation::drift",
@@ -3817,7 +3852,7 @@
         "shape": {
           "fields": [],
           "has_stripped_fields": true,
-          "kind": "plain"
+          "kind": "tuple"
         }
       },
       "methods": [
@@ -4071,6 +4106,7 @@
       },
       "methods": [
         {
+          "docs": "Producible variants: RoleNotCovered, InvalidRuleValue.",
           "has_default_impl": false,
           "is_async": false,
           "name": "try_new",
@@ -4096,8 +4132,7 @@
               "ty": "Vec<(ContractRole, RoleObligationRules)>"
             }
           ],
-          "returns": "Result<Self, TestObligationRulesLoadError>",
-          "docs": "Producible variants: RoleNotCovered, InvalidRuleValue."
+          "returns": "Result<Self, TestObligationRulesLoadError>"
         },
         {
           "has_default_impl": false,
@@ -4407,6 +4442,36 @@
         },
         {
           "anchor": "CN-07",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "ValidationError": {
+      "action": "modify",
+      "docs": "ValidationError variant inventory for IN-02 / T003.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "InvalidObligationMinimum",
+            "payload": {
+              "fields": [
+                "usize"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "error",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
           "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
         }
       ]

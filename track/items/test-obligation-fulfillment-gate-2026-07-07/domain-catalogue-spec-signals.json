@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "df22cb1553d0966bb8a662c52074f1605b23e45bdc5b5cda525cc23e72184d53",
+  "catalogue_declaration_hash": "8e67aa965fdc3f01862718e0bfb3de8471c285226c245d7809c01dc02857af3b",
   "signals": [
     {
       "type_name": "AnchorTextHash",
@@ -155,7 +155,7 @@
     {
       "type_name": "TestObligationBriefTemplate",
       "signal": "blue",
-      "entry_hash": "e495080272d19fb39678953186c65c4ac89d6e3c943b7393f6d079d1cfec26f0"
+      "entry_hash": "4e54a2e4a8801b25d1da26a4e70f5b3c78b60d0203feec6ddf9715fd9c0a45a5"
     },
     {
       "type_name": "TestObligationDrift",
@@ -190,7 +190,7 @@
     {
       "type_name": "TestObligationMinimum",
       "signal": "blue",
-      "entry_hash": "5a54cdd2089d25c7b7f4abfbcef309c61d031ca36c6de71322b71ac88560d7a3"
+      "entry_hash": "28be608877b4d7175b533f8e8209e75264e76e148bd96b45177661a29cd2b55f"
     },
     {
       "type_name": "TestObligationPatternKind",
@@ -231,6 +231,11 @@
       "type_name": "UncitedSpecElementFinding",
       "signal": "blue",
       "entry_hash": "f277018705a966df5086e8267b1d6aef29227f73b1a83dc6b1f0d7570aa626bf"
+    },
+    {
+      "type_name": "ValidationError",
+      "signal": "blue",
+      "entry_hash": "1c4c6593031b2bf7fe9e4dce228667928403a1efb3a00b6cdce1cd76dcbcf371"
     },
     {
       "type_name": "VerifyCacheError",
@@ -290,7 +295,7 @@
     {
       "type_name": "TestObligationRulesLoaderPort",
       "signal": "blue",
-      "entry_hash": "36cbf8c05ff6563bdf6e9ec4d704345d382c9337668a5c6350e1926ade4961b9"
+      "entry_hash": "676e053bc5c3b9a82893a01ff24cb126df316e5a275e798464af1f5d48a1f52a"
     },
     {
       "type_name": "TestSourceScannerPort",
