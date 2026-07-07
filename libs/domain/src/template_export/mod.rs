@@ -17,11 +17,12 @@ use crate::FreeText;
 /// A workspace-relative path pattern used as a manifest key.
 ///
 /// The wrapped value is canonicalized and validated on construction to be
-/// workspace-relative (spec IN-02, AC-02, CN-02): non-empty, not absolute, and
-/// free of any parent-directory (`..`) component that could escape the
-/// workspace. Canonicalization removes current-directory markers and trailing
-/// separators, so semantically identical spellings (`vendor`, `vendor/`,
-/// `./vendor`) construct equal patterns.
+/// workspace-relative (spec IN-02, AC-02, CN-02): it must name a proper
+/// workspace child — non-empty, not absolute, not the bare workspace root
+/// (`.`), and free of any parent-directory (`..`) component that could escape
+/// the workspace. Canonicalization removes current-directory markers and
+/// trailing separators, so semantically identical spellings (`vendor`,
+/// `vendor/`, `./vendor`) construct equal patterns.
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct TemplatePathPattern(String);
 
@@ -33,7 +34,8 @@ impl TemplatePathPattern {
     /// # Errors
     ///
     /// Returns [`TemplatePathPatternError::InvalidPattern`] when `value` is not
-    /// workspace-relative (empty, absolute, or containing a `..` component).
+    /// workspace-relative (empty, absolute, the bare workspace root `.`, or
+    /// containing a `..` component).
     pub fn try_new(value: String) -> Result<Self, TemplatePathPatternError> {
         match Self::normalize_workspace_relative(&value) {
             Some(normalized) => Ok(Self(normalized)),
@@ -54,9 +56,10 @@ impl TemplatePathPattern {
     /// Returns whether the pattern is workspace-relative.
     ///
     /// Invariant predicate for `is_workspace_relative`: a pattern is
-    /// workspace-relative when its normalized representation is non-empty and
-    /// every path component is a normal segment or the current-directory marker
-    /// (no root, prefix, or parent-directory component).
+    /// workspace-relative when its normalized representation is non-empty (at
+    /// least one normal segment, so the bare workspace root `.` does not qualify)
+    /// and every path component is a normal segment or the current-directory
+    /// marker (no root, prefix, or parent-directory component).
     #[must_use]
     pub fn is_workspace_relative(&self) -> bool {
         Self::normalize_workspace_relative(&self.0).as_deref() == Some(self.0.as_str())
@@ -64,7 +67,6 @@ impl TemplatePathPattern {
 
     fn normalize_workspace_relative(value: &str) -> Option<String> {
         let mut normalized = String::new();
-        let mut saw_current_dir = false;
 
         for component in Path::new(value).components() {
             match component {
@@ -75,20 +77,19 @@ impl TemplatePathPattern {
                     }
                     normalized.push_str(segment);
                 }
-                Component::CurDir => {
-                    saw_current_dir = true;
-                }
+                // Current-dir markers are canonicalized away (`./libs` → `libs`).
+                Component::CurDir => {}
                 Component::ParentDir | Component::RootDir | Component::Prefix(_) => {
                     return None;
                 }
             }
         }
 
-        if normalized.is_empty() {
-            saw_current_dir.then(|| ".".to_owned())
-        } else {
-            Some(normalized)
-        }
+        // A pattern must name a proper workspace child; the bare workspace-root
+        // form (`.` / `./`, which normalizes to no segments) classifies the whole
+        // workspace and is meaningless for boundary export, so it is rejected
+        // (spec IN-12).
+        if normalized.is_empty() { None } else { Some(normalized) }
     }
 }
 
@@ -256,18 +257,12 @@ impl TemplateBoundaryManifest {
 /// comparing canonical path segments rather than raw string prefixes.
 ///
 /// `a` is an ancestor of `a/b`, but `ab` is not an ancestor of `a/b` (segment
-/// boundaries are respected). The workspace-root pattern `.` is an ancestor of
-/// every other pattern and of nothing but itself. Equal patterns are never
-/// ancestors of each other (the relation is strict).
+/// boundaries are respected). Equal patterns are never ancestors of each other
+/// (the relation is strict). The bare workspace root `.` cannot occur here: it
+/// is rejected at [`TemplatePathPattern::try_new`], so every pattern names a
+/// proper workspace child.
 fn is_path_ancestor(ancestor: &TemplatePathPattern, descendant: &TemplatePathPattern) -> bool {
     if ancestor == descendant {
-        return false;
-    }
-    // The workspace root contains every other path; nothing contains the root.
-    if ancestor.as_str() == "." {
-        return true;
-    }
-    if descendant.as_str() == "." {
         return false;
     }
 
@@ -341,7 +336,6 @@ mod tests {
     #[case::cur_dir_prefixed("./libs/usecase", "libs/usecase")]
     #[case::embedded_cur_dir("libs/./domain", "libs/domain")]
     #[case::trailing_separator("vendor/", "vendor")]
-    #[case::workspace_root(".", ".")]
     fn pattern_normalizes_semantically_identical_paths(
         #[case] value: &str,
         #[case] expected: &str,
@@ -355,6 +349,8 @@ mod tests {
     #[case::absolute("/etc/passwd")]
     #[case::parent_escape("../outside")]
     #[case::embedded_parent("libs/../../secret")]
+    #[case::workspace_root(".")]
+    #[case::workspace_root_trailing_sep("./")]
     fn pattern_rejects_non_workspace_relative(#[case] value: &str) {
         let result = TemplatePathPattern::try_new(value.to_owned());
         assert!(
@@ -511,21 +507,14 @@ mod tests {
     }
 
     #[test]
-    fn manifest_rejects_workspace_root_combined_with_any_entry() {
-        // The workspace-root pattern `.` is an ancestor of everything, so it may
-        // never coexist with another entry.
-        let entries = vec![
-            entry(".", TemplatePathClassification::Include),
-            entry("libs/domain", TemplatePathClassification::Overlay),
-        ];
-        let err = TemplateBoundaryManifest::try_new(entries).unwrap_err();
+    fn pattern_rejects_bare_workspace_root() {
+        // The bare workspace root `.` classifies the whole workspace, which the
+        // walker (child-only) can never apply; it is rejected at construction so
+        // it can never reach a manifest (sole `.` and `.`+other both fail here).
+        let result = TemplatePathPattern::try_new(".".to_owned());
         assert!(
-            matches!(
-                err,
-                TemplateBoundaryManifestError::NestedPattern { ref ancestor, ref descendant }
-                    if ancestor.as_str() == "." && descendant.as_str() == "libs/domain"
-            ),
-            "unexpected error: {err:?}"
+            matches!(result, Err(TemplatePathPatternError::InvalidPattern { .. })),
+            "expected bare `.` to be rejected"
         );
     }
 
