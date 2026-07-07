@@ -1,203 +1,114 @@
 {
   "schema_version": 2,
   "scopes": {
-    "harness-policy": {
+    "other": {
       "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c4ea3515d904c2bfcbfdb53bff2b6b8a5fdc4d13e7035b14629e184fad4cacb0",
+          "at": "2026-07-07T00:24:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c4ea3515d904c2bfcbfdb53bff2b6b8a5fdc4d13e7035b14629e184fad4cacb0",
+          "at": "2026-07-07T00:27:00Z"
+        },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`template-export-smoke-local` is not portable to the exported template: it hardcodes `--overlay-dir overlay`, but `overlay/` is excluded by the boundary manifest (`.harness/config/template-boundary.json`), so the shipped task will fail in a fresh consumer checkout.",
+              "message": "P1, bootstrap: `install-sotp` shells out to `jq` to read `.harness/config/sotp-version.json`, but the bootstrap flow never checks for or installs jq. On a clean host without jq, `cargo make bootstrap` will fail midway with a shell error instead of a declared prerequisite. See [overlay/Makefile.toml](/home/flip451/individual/t-rust/templates/SoTOHE-core-004/overlay/Makefile.toml:101).",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/Makefile.toml",
-              "line": 375,
-              "category": "template-distribution reference leak"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/overlay/Makefile.toml",
+              "line": 101,
+              "category": "bootstrap"
             },
             {
-              "message": "The new smoke-task description embeds a source-only path, `libs/infrastructure/src/template_export/codec.rs::test_decode_real_repository_manifest_is_fail_closed_clean`. That file is not present in the exported skeleton, so the distributed Makefile now contains a dead reference to internal test code.",
+              "message": "P1, testing: the new public `GreetUser::execute` API only has a success-path test. The error branch where `SalutationProvider::salutation` returns `Err(GreetError::Unavailable)` is unverified, so the `?` propagation contract is not covered. See [overlay/libs/usecase/src/lib.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core-004/overlay/libs/usecase/src/lib.rs:51) and the existing happy-path-only test at [overlay/libs/usecase/src/lib.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core-004/overlay/libs/usecase/src/lib.rs:76).",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/Makefile.toml",
-              "line": 361,
-              "category": "template-distribution reference leak"
-            }
-          ],
-          "hash": "rvw1:sha256:ee16b4ea9970a48b9ed8617d2016cb9e82db3bc04d48a26eb2a23dd39901869a",
-          "at": "2026-07-07T02:50:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c0a99591fd489615f89dd9961e42f70f034049dc0d236253a9a4382d6f9673e1",
-          "at": "2026-07-07T02:59:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c0a99591fd489615f89dd9961e42f70f034049dc0d236253a9a4382d6f9673e1",
-          "at": "2026-07-07T03:04:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9f51871d7fc16d329ba69f69dd398a0bb4b0eefab65d85c3f86e797466ab4c48",
-          "at": "2026-07-07T04:28:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/overlay/libs/usecase/src/lib.rs",
+              "line": 51,
+              "category": "testing"
+            },
             {
-              "message": "The rewritten workflow now says the dedicated `git sync` command composes the branch switch and ff-only pull, but `git sync` only pulls the current branch; the switch+sync behavior belongs to `cargo make track-switch-base` / `bin/sotp track switch-base`. This makes the done workflow SSoT describe the wrong command boundary, so adapters following it can misroute users toward `bin/sotp git sync` when they need the fail-closed switch-base operation.",
+              "message": "P1, testing: the new public `GreetDriver::run` API is only exercised on the happy path. Add a failure-path test that injects an erroring `SalutationProvider` so the `success: false` rendering branch is covered. See [overlay/apps/cli-driver/src/lib.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core-004/overlay/apps/cli-driver/src/lib.rs:30) and the current success-only test at [overlay/apps/cli-driver/src/lib.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core-004/overlay/apps/cli-driver/src/lib.rs:57).",
               "severity": "P1",
-              "file": ".harness/workflows/track/done.md",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/overlay/apps/cli-driver/src/lib.rs",
               "line": 30,
-              "category": "command wiring breakage"
+              "category": "testing"
             }
           ],
-          "hash": "rvw1:sha256:9f51871d7fc16d329ba69f69dd398a0bb4b0eefab65d85c3f86e797466ab4c48",
-          "at": "2026-07-07T04:33:17Z"
+          "hash": "rvw1:sha256:dfadf59407f62e3282a324970d59e86c5a4ddab5e07546d45ec52da4d480599e",
+          "at": "2026-07-07T02:55:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1af424d6832d365da6db8a4df172a832cfa05b810bb4bdae5caed874bb35c9a5",
+          "at": "2026-07-07T03:04:01Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`diagnose.md` is still a `.claude/commands/track/*.md` adapter, but its opening contract points only at `.harness/capabilities/rollback-diagnoser.md` and never declares an existing `.harness/workflows/<path>.md` SSoT. The harness-policy adapter-SSoT check requires track command adapters to explicitly name a real workflow SSoT up front and avoid carrying workflow logic locally, so this command remains outside the workflow/adaptor split while embedding trigger, routing, dispatch, and recovery semantics in the adapter itself.",
+              "message": "Fresh exports intentionally omit Cargo.lock, but the template CI tasks still invoke Cargo with --locked. During `cargo make bootstrap`, Step 5 runs `ci-local`; the first locked Cargo gate such as `clippy-local` will fail in a newly exported tree before consumers have generated a lockfile. Either generate Cargo.lock before CI or drop `--locked` from the exported template gates.",
               "severity": "P1",
-              "file": ".claude/commands/track/diagnose.md",
-              "line": 5,
-              "category": "adapter-SSoT sync"
-            }
-          ],
-          "hash": "rvw1:sha256:d45aa6de35a8d3add354acb5362c011ae5025d5631e5c4d154c04369427684f9",
-          "at": "2026-07-07T04:37:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0d745a394fd3b60d044222c84337d464acf71a59d74be058527a67a76319b7f2",
-          "at": "2026-07-07T04:45:10Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6d9e28a6b5b37ba53612fd3f54751ba4c80aa71dab991a7a58565ae0fb3220d3",
-          "at": "2026-07-07T01:04:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6d9e28a6b5b37ba53612fd3f54751ba4c80aa71dab991a7a58565ae0fb3220d3",
-          "at": "2026-07-07T01:08:12Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
+              "file": "overlay/Makefile.toml",
+              "line": 197,
+              "category": "ci"
+            },
             {
-              "message": "P1: `TemplatePathPattern::try_new` accepts syntactically distinct but semantically identical paths like `libs/domain` and `./libs/domain`, while `TemplateBoundaryManifest::try_new` only checks duplicates by raw string equality. That lets the same workspace path appear twice with different classifications, bypassing the fail-closed duplicate guard and making `classify()` depend on the caller's spelling instead of the actual path. See [libs/domain/src/template_export/mod.rs:33](file:///home/flip451/individual/t-rust/templates/SoTOHE-core-004/libs/domain/src/template_export/mod.rs#L33) and [libs/domain/src/template_export/mod.rs:141](file:///home/flip451/individual/t-rust/templates/SoTOHE-core-004/libs/domain/src/template_export/mod.rs#L141).",
+              "message": "`ci-local` still includes `verify-tech-stack-local`, while the exported `track/tech-stack.md` is intentionally TODO-seeded. In a fresh export there are no track dirs and no `.track-template-dev` marker, so `sotp verify tech-stack` treats those consumer-owned TODO values as fatal and `cargo make bootstrap`/`cargo make ci` fails before project setup. This violates the stated deviation that the export gate must not hard-fail on consumer-owned configuration values.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/libs/domain/src/template_export/mod.rs",
-              "line": 33,
-              "category": "broken invariant in newtype constructor"
+              "file": "overlay/Makefile.toml",
+              "line": 388,
+              "category": "ci"
             }
           ],
-          "hash": "rvw1:sha256:888a5c94aec4898c486a1785228fba107f59ce949aae7a7b83c2b6f2fdb663ec",
-          "at": "2026-07-06T23:39:37Z"
+          "hash": "rvw1:sha256:1af424d6832d365da6db8a4df172a832cfa05b810bb4bdae5caed874bb35c9a5",
+          "at": "2026-07-07T03:09:27Z"
         },
         {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TemplatePathPattern::try_new` preserves a trailing `/` in the normalized value, so semantically identical workspace paths like `vendor` and `vendor/` become distinct `TemplatePathPattern`s. That lets `TemplateBoundaryManifest::try_new` accept conflicting rows for the same path and makes `classify()` depend on spelling rather than path identity.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/libs/domain/src/template_export/mod.rs",
-              "line": 88,
-              "category": "broken invariant in newtype constructor"
-            }
-          ],
-          "hash": "rvw1:sha256:6d5d9225395c72e39726c34a1b41b65232c062dfae777cf68ca3b50e354388f4",
-          "at": "2026-07-06T23:50:28Z"
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d3ece3143b915e5be79196341f2e39c69c5fd6c11150008f223c7b810e387fbe",
+          "at": "2026-07-07T03:18:53Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:676cf4e576f27d37483aaf4b780e007cfff10139bfefe5e80703465efc6424b1",
-          "at": "2026-07-07T00:05:51Z"
+          "hash": "rvw1:sha256:690b8a28f3ba46524d122275164fb352563fd2469651a24437c799a25ea4c3d8",
+          "at": "2026-07-07T04:27:46Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:676cf4e576f27d37483aaf4b780e007cfff10139bfefe5e80703465efc6424b1",
-          "at": "2026-07-07T00:10:01Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
+          "hash": "rvw1:sha256:690b8a28f3ba46524d122275164fb352563fd2469651a24437c799a25ea4c3d8",
+          "at": "2026-07-07T04:31:27Z"
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1d185a44dff71595621805768b365be642ba2b59de8e4bac5ca39804ae94f7e8",
-          "at": "2026-07-06T23:39:47Z"
+          "hash": "rvw1:sha256:b0d7759fccdb6bc748bec07efad62ad99a07fea320b963975115fc475533a506",
+          "at": "2026-07-07T05:57:56Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1d185a44dff71595621805768b365be642ba2b59de8e4bac5ca39804ae94f7e8",
-          "at": "2026-07-06T23:44:16Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:42f15231ee8cbae9cfbaca9867d9b89c5e520c4af640dcdf1f78b65819e6bf43",
-          "at": "2026-07-06T19:50:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:42f15231ee8cbae9cfbaca9867d9b89c5e520c4af640dcdf1f78b65819e6bf43",
-          "at": "2026-07-06T19:53:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c2e9d3a4d11aba1705e6b6833e7188632ead2c04c5b2a72fe1f7e97cb211e5cb",
-          "at": "2026-07-06T21:01:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:caff58e9259af16402d54c62a004098308da7841e5080aa352efb66df223c1a8",
-          "at": "2026-07-07T05:18:25Z"
+          "hash": "rvw1:sha256:b0d7759fccdb6bc748bec07efad62ad99a07fea320b963975115fc475533a506",
+          "at": "2026-07-07T06:00:44Z"
         }
       ]
     },
@@ -629,133 +540,165 @@
         }
       ]
     },
-    "adr": {
+    "cli_composition": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:61814c909cafc741ea2105ded95760da3459506476196e273dbe526d566f14fd",
-          "at": "2026-07-06T17:32:50Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D2 says the template bootstrap will not build sotp source, but the selected command is `cargo install --git`, which compiles the git source on the bootstrap host. That conflicts with the same ADR's grounding that protoc/MSRV/vendored dependencies constrain building sotp, not running a prebuilt binary, and later claims consumers are separated from those build constraints. Downstream spec/impl-plan cannot derive whether bootstrap must provision sotp build prerequisites or switch to a prebuilt/feature-gated distribution path.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
-              "line": 68,
-              "category": "research_grounding_mismatch"
-            }
-          ],
-          "hash": "rvw1:sha256:61814c909cafc741ea2105ded95760da3459506476196e273dbe526d566f14fd",
-          "at": "2026-07-06T17:34:50Z"
+          "hash": "rvw1:sha256:6d9e28a6b5b37ba53612fd3f54751ba4c80aa71dab991a7a58565ae0fb3220d3",
+          "at": "2026-07-07T01:04:05Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1691fc6c2414ac693c4af607b40c015f1444303e0944a286239c872f0f5cf99b",
-          "at": "2026-07-06T18:42:03Z"
+          "hash": "rvw1:sha256:6d9e28a6b5b37ba53612fd3f54751ba4c80aa71dab991a7a58565ae0fb3220d3",
+          "at": "2026-07-07T01:08:12Z"
         }
       ]
     },
-    "other": {
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `TemplatePathPattern::try_new` accepts syntactically distinct but semantically identical paths like `libs/domain` and `./libs/domain`, while `TemplateBoundaryManifest::try_new` only checks duplicates by raw string equality. That lets the same workspace path appear twice with different classifications, bypassing the fail-closed duplicate guard and making `classify()` depend on the caller's spelling instead of the actual path. See [libs/domain/src/template_export/mod.rs:33](file:///home/flip451/individual/t-rust/templates/SoTOHE-core-004/libs/domain/src/template_export/mod.rs#L33) and [libs/domain/src/template_export/mod.rs:141](file:///home/flip451/individual/t-rust/templates/SoTOHE-core-004/libs/domain/src/template_export/mod.rs#L141).",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/libs/domain/src/template_export/mod.rs",
+              "line": 33,
+              "category": "broken invariant in newtype constructor"
+            }
+          ],
+          "hash": "rvw1:sha256:888a5c94aec4898c486a1785228fba107f59ce949aae7a7b83c2b6f2fdb663ec",
+          "at": "2026-07-06T23:39:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TemplatePathPattern::try_new` preserves a trailing `/` in the normalized value, so semantically identical workspace paths like `vendor` and `vendor/` become distinct `TemplatePathPattern`s. That lets `TemplateBoundaryManifest::try_new` accept conflicting rows for the same path and makes `classify()` depend on spelling rather than path identity.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/libs/domain/src/template_export/mod.rs",
+              "line": 88,
+              "category": "broken invariant in newtype constructor"
+            }
+          ],
+          "hash": "rvw1:sha256:6d5d9225395c72e39726c34a1b41b65232c062dfae777cf68ca3b50e354388f4",
+          "at": "2026-07-06T23:50:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:676cf4e576f27d37483aaf4b780e007cfff10139bfefe5e80703465efc6424b1",
+          "at": "2026-07-07T00:05:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:676cf4e576f27d37483aaf4b780e007cfff10139bfefe5e80703465efc6424b1",
+          "at": "2026-07-07T00:10:01Z"
+        }
+      ]
+    },
+    "types": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:c4ea3515d904c2bfcbfdb53bff2b6b8a5fdc4d13e7035b14629e184fad4cacb0",
-          "at": "2026-07-07T00:24:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c4ea3515d904c2bfcbfdb53bff2b6b8a5fdc4d13e7035b14629e184fad4cacb0",
-          "at": "2026-07-07T00:27:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1, bootstrap: `install-sotp` shells out to `jq` to read `.harness/config/sotp-version.json`, but the bootstrap flow never checks for or installs jq. On a clean host without jq, `cargo make bootstrap` will fail midway with a shell error instead of a declared prerequisite. See [overlay/Makefile.toml](/home/flip451/individual/t-rust/templates/SoTOHE-core-004/overlay/Makefile.toml:101).",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/overlay/Makefile.toml",
-              "line": 101,
-              "category": "bootstrap"
-            },
-            {
-              "message": "P1, testing: the new public `GreetUser::execute` API only has a success-path test. The error branch where `SalutationProvider::salutation` returns `Err(GreetError::Unavailable)` is unverified, so the `?` propagation contract is not covered. See [overlay/libs/usecase/src/lib.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core-004/overlay/libs/usecase/src/lib.rs:51) and the existing happy-path-only test at [overlay/libs/usecase/src/lib.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core-004/overlay/libs/usecase/src/lib.rs:76).",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/overlay/libs/usecase/src/lib.rs",
-              "line": 51,
-              "category": "testing"
-            },
-            {
-              "message": "P1, testing: the new public `GreetDriver::run` API is only exercised on the happy path. Add a failure-path test that injects an erroring `SalutationProvider` so the `success: false` rendering branch is covered. See [overlay/apps/cli-driver/src/lib.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core-004/overlay/apps/cli-driver/src/lib.rs:30) and the current success-only test at [overlay/apps/cli-driver/src/lib.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core-004/overlay/apps/cli-driver/src/lib.rs:57).",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/overlay/apps/cli-driver/src/lib.rs",
-              "line": 30,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:dfadf59407f62e3282a324970d59e86c5a4ddab5e07546d45ec52da4d480599e",
-          "at": "2026-07-07T02:55:35Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1af424d6832d365da6db8a4df172a832cfa05b810bb4bdae5caed874bb35c9a5",
-          "at": "2026-07-07T03:04:01Z"
+          "hash": "rvw1:sha256:9ce85877b945aa7704ddc8ad5d33bda71194cb56ca53a528e12460f2dae5724c",
+          "at": "2026-07-06T19:55:15Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "Fresh exports intentionally omit Cargo.lock, but the template CI tasks still invoke Cargo with --locked. During `cargo make bootstrap`, Step 5 runs `ci-local`; the first locked Cargo gate such as `clippy-local` will fail in a newly exported tree before consumers have generated a lockfile. Either generate Cargo.lock before CI or drop `--locked` from the exported template gates.",
+              "message": "`TemplatePathPattern::try_new` returns `TemplateBoundaryManifestError`, but this constructor can only fail while validating a single pattern; the shared enum also exposes `DuplicatePattern` and `EmptyManifest`, which this method cannot structurally produce. The method docs do not list the producible subset or justify the wider error surface, so callers must handle impossible variants.",
               "severity": "P1",
-              "file": "overlay/Makefile.toml",
-              "line": 197,
-              "category": "ci"
+              "file": "track/items/template-extraction-boundary-2026-07-06/domain-types.json",
+              "line": 123,
+              "category": "per-method error imprecision"
             },
             {
-              "message": "`ci-local` still includes `verify-tech-stack-local`, while the exported `track/tech-stack.md` is intentionally TODO-seeded. In a fresh export there are no track dirs and no `.track-template-dev` marker, so `sotp verify tech-stack` treats those consumer-owned TODO values as fatal and `cargo make bootstrap`/`cargo make ci` fails before project setup. This violates the stated deviation that the export gate must not hard-fail on consumer-owned configuration values.",
+              "message": "`TemplateBoundaryManifest::try_new` also returns the full `TemplateBoundaryManifestError`, but it receives already validated `TemplatePathEntry` values and its docs only describe duplicate/empty checks; `InvalidPattern` cannot be produced at this layer. Split the pattern/manifest errors or explicitly declare the reachable subset for each constructor.",
               "severity": "P1",
-              "file": "overlay/Makefile.toml",
-              "line": 388,
-              "category": "ci"
+              "file": "track/items/template-extraction-boundary-2026-07-06/domain-types.json",
+              "line": 202,
+              "category": "per-method error imprecision"
+            },
+            {
+              "message": "`TemplateExportReport` cites `AC-05`, but that acceptance criterion is about running `cargo make ci` on the exported workspace and adding a smoke gate, not the successful-export report DTO. This is an off-topic `spec_refs` anchor for this entry.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/usecase-types.json",
+              "line": 53,
+              "category": "spec_refs off-topic"
+            },
+            {
+              "message": "`FsTemplateExportAdapter` also cites `AC-05`, but the adapter contract is copying/excluding/overlaying files; `AC-05` is the separate smoke-gate/CI-green requirement. Keeping that anchor here makes the adapter appear responsible for CI verification.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/infrastructure-types.json",
+              "line": 38,
+              "category": "spec_refs off-topic"
+            },
+            {
+              "message": "Domain catalogue docs restate upstream behavior instead of just naming the target and citing anchors: `TemplatePathPattern` restates path-shape validation, `TemplatePathClassification` restates Include/Exclude/Overlay effects, and `TemplateBoundaryManifest` restates classification and uniqueness behavior. `knowledge/conventions/no-upstream-restatement.md` forbids this in `<layer>-types.json` docs because the behavior contract belongs in spec/ADR anchors.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/domain-types.json",
+              "line": 21,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Usecase catalogue docs restate upstream behavior across `TemplateExportCommand`, `TemplateExportReport`, `TemplateExportError`, `TemplateExportService`, `TemplateBoundaryManifestPort`, and `TemplateExportPort` by describing pass-through paths, counts, fail-closed policy, manifest reading, tree filtering, overlay application, and copy/skip/replace behavior. These should be reduced to target/operation plus `IN-*`/`AC-*`/`CN-*` cites per the no-upstream-restatement convention.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/usecase-types.json",
+              "line": 24,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Infrastructure catalogue docs restate upstream behavior in `FsTemplateBoundaryManifestAdapter`, `FsTemplateExportAdapter`, `TemplateBoundaryManifestDto`, `TemplatePathEntryDto`, `TemplatePathClassificationDto`, `TemplateBoundaryManifestCodecError`, and `decode_manifest` by describing JSON reads, workspace walking, overlay-copy behavior, raw-string validation, mirror literal sets, schema mismatch/JSON/domain failure modes, and parse-to-domain behavior. Those behavior details should live behind the cited spec anchors, not be duplicated in the catalogue docs.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/infrastructure-types.json",
+              "line": 15,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "CLI-driver docs restate downstream behavior in `TemplateExportInput`, `TemplateInput`, `TemplateDriver`, and `TemplateDriver::handle`, including boundary import rationale, future variant behavior, service invocation, report/error rendering, stdout/stderr, and exit-code behavior. Per no-upstream-restatement, the catalogue should cite the relevant anchors rather than carrying those behavioral contracts itself.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/cli_driver-types.json",
+              "line": 24,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "CLI catalogue docs restate command behavior in `TemplateCommand`, `TemplateExportArgs`, `CliCommand`, `cli::commands::template::execute`, and `cli::commands::template::dispatch`, including future subcommand shape, flag mapping, Template dispatch, composition-root outcome mapping, and exit-code mapping. These duplicate upstream CLI/export behavior and should be anchor-only contract descriptions.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/cli-types.json",
+              "line": 17,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`TemplateCompositionRoot` and its methods restate wiring behavior by naming concrete adapters, interactor construction, driver injection, and error mapping. That wiring behavior is upstream contract content for `IN-01`/`AC-01`; the catalogue docs should not duplicate it in prose.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/cli_composition-types.json",
+              "line": 15,
+              "category": "upstream restatement"
             }
           ],
-          "hash": "rvw1:sha256:1af424d6832d365da6db8a4df172a832cfa05b810bb4bdae5caed874bb35c9a5",
-          "at": "2026-07-07T03:09:27Z"
+          "hash": "rvw1:sha256:9ce85877b945aa7704ddc8ad5d33bda71194cb56ca53a528e12460f2dae5724c",
+          "at": "2026-07-06T20:00:42Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d3ece3143b915e5be79196341f2e39c69c5fd6c11150008f223c7b810e387fbe",
-          "at": "2026-07-07T03:18:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:690b8a28f3ba46524d122275164fb352563fd2469651a24437c799a25ea4c3d8",
-          "at": "2026-07-07T04:27:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:690b8a28f3ba46524d122275164fb352563fd2469651a24437c799a25ea4c3d8",
-          "at": "2026-07-07T04:31:27Z"
+          "hash": "rvw1:sha256:c812778ea0b6de1859afa50fd648ee78e6f09e6eb5e356c324c0c4c14e7d42fe",
+          "at": "2026-07-06T20:15:37Z"
         }
       ]
     },
@@ -956,102 +899,136 @@
           "findings": [],
           "hash": "rvw1:sha256:f278211eb84ecbfee1293fa6b924b15f6f948e8cb5938de1609eb86e2091fa54",
           "at": "2026-07-07T05:19:28Z"
-        }
-      ]
-    },
-    "types": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:9ce85877b945aa7704ddc8ad5d33bda71194cb56ca53a528e12460f2dae5724c",
-          "at": "2026-07-06T19:55:15Z"
+          "hash": "rvw1:sha256:32003b00a9a4b2ddbda2ae85a034170356464eb40a3484f0f90f40abe0fff55e",
+          "at": "2026-07-07T05:59:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:32003b00a9a4b2ddbda2ae85a034170356464eb40a3484f0f90f40abe0fff55e",
+          "at": "2026-07-07T06:03:46Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`template-export-smoke-local` is not portable to the exported template: it hardcodes `--overlay-dir overlay`, but `overlay/` is excluded by the boundary manifest (`.harness/config/template-boundary.json`), so the shipped task will fail in a fresh consumer checkout.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/Makefile.toml",
+              "line": 375,
+              "category": "template-distribution reference leak"
+            },
+            {
+              "message": "The new smoke-task description embeds a source-only path, `libs/infrastructure/src/template_export/codec.rs::test_decode_real_repository_manifest_is_fail_closed_clean`. That file is not present in the exported skeleton, so the distributed Makefile now contains a dead reference to internal test code.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/Makefile.toml",
+              "line": 361,
+              "category": "template-distribution reference leak"
+            }
+          ],
+          "hash": "rvw1:sha256:ee16b4ea9970a48b9ed8617d2016cb9e82db3bc04d48a26eb2a23dd39901869a",
+          "at": "2026-07-07T02:50:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c0a99591fd489615f89dd9961e42f70f034049dc0d236253a9a4382d6f9673e1",
+          "at": "2026-07-07T02:59:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c0a99591fd489615f89dd9961e42f70f034049dc0d236253a9a4382d6f9673e1",
+          "at": "2026-07-07T03:04:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9f51871d7fc16d329ba69f69dd398a0bb4b0eefab65d85c3f86e797466ab4c48",
+          "at": "2026-07-07T04:28:29Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`TemplatePathPattern::try_new` returns `TemplateBoundaryManifestError`, but this constructor can only fail while validating a single pattern; the shared enum also exposes `DuplicatePattern` and `EmptyManifest`, which this method cannot structurally produce. The method docs do not list the producible subset or justify the wider error surface, so callers must handle impossible variants.",
+              "message": "The rewritten workflow now says the dedicated `git sync` command composes the branch switch and ff-only pull, but `git sync` only pulls the current branch; the switch+sync behavior belongs to `cargo make track-switch-base` / `bin/sotp track switch-base`. This makes the done workflow SSoT describe the wrong command boundary, so adapters following it can misroute users toward `bin/sotp git sync` when they need the fail-closed switch-base operation.",
               "severity": "P1",
-              "file": "track/items/template-extraction-boundary-2026-07-06/domain-types.json",
-              "line": 123,
-              "category": "per-method error imprecision"
-            },
-            {
-              "message": "`TemplateBoundaryManifest::try_new` also returns the full `TemplateBoundaryManifestError`, but it receives already validated `TemplatePathEntry` values and its docs only describe duplicate/empty checks; `InvalidPattern` cannot be produced at this layer. Split the pattern/manifest errors or explicitly declare the reachable subset for each constructor.",
-              "severity": "P1",
-              "file": "track/items/template-extraction-boundary-2026-07-06/domain-types.json",
-              "line": 202,
-              "category": "per-method error imprecision"
-            },
-            {
-              "message": "`TemplateExportReport` cites `AC-05`, but that acceptance criterion is about running `cargo make ci` on the exported workspace and adding a smoke gate, not the successful-export report DTO. This is an off-topic `spec_refs` anchor for this entry.",
-              "severity": "P1",
-              "file": "track/items/template-extraction-boundary-2026-07-06/usecase-types.json",
-              "line": 53,
-              "category": "spec_refs off-topic"
-            },
-            {
-              "message": "`FsTemplateExportAdapter` also cites `AC-05`, but the adapter contract is copying/excluding/overlaying files; `AC-05` is the separate smoke-gate/CI-green requirement. Keeping that anchor here makes the adapter appear responsible for CI verification.",
-              "severity": "P1",
-              "file": "track/items/template-extraction-boundary-2026-07-06/infrastructure-types.json",
-              "line": 38,
-              "category": "spec_refs off-topic"
-            },
-            {
-              "message": "Domain catalogue docs restate upstream behavior instead of just naming the target and citing anchors: `TemplatePathPattern` restates path-shape validation, `TemplatePathClassification` restates Include/Exclude/Overlay effects, and `TemplateBoundaryManifest` restates classification and uniqueness behavior. `knowledge/conventions/no-upstream-restatement.md` forbids this in `<layer>-types.json` docs because the behavior contract belongs in spec/ADR anchors.",
-              "severity": "P1",
-              "file": "track/items/template-extraction-boundary-2026-07-06/domain-types.json",
-              "line": 21,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "Usecase catalogue docs restate upstream behavior across `TemplateExportCommand`, `TemplateExportReport`, `TemplateExportError`, `TemplateExportService`, `TemplateBoundaryManifestPort`, and `TemplateExportPort` by describing pass-through paths, counts, fail-closed policy, manifest reading, tree filtering, overlay application, and copy/skip/replace behavior. These should be reduced to target/operation plus `IN-*`/`AC-*`/`CN-*` cites per the no-upstream-restatement convention.",
-              "severity": "P1",
-              "file": "track/items/template-extraction-boundary-2026-07-06/usecase-types.json",
-              "line": 24,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "Infrastructure catalogue docs restate upstream behavior in `FsTemplateBoundaryManifestAdapter`, `FsTemplateExportAdapter`, `TemplateBoundaryManifestDto`, `TemplatePathEntryDto`, `TemplatePathClassificationDto`, `TemplateBoundaryManifestCodecError`, and `decode_manifest` by describing JSON reads, workspace walking, overlay-copy behavior, raw-string validation, mirror literal sets, schema mismatch/JSON/domain failure modes, and parse-to-domain behavior. Those behavior details should live behind the cited spec anchors, not be duplicated in the catalogue docs.",
-              "severity": "P1",
-              "file": "track/items/template-extraction-boundary-2026-07-06/infrastructure-types.json",
-              "line": 15,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "CLI-driver docs restate downstream behavior in `TemplateExportInput`, `TemplateInput`, `TemplateDriver`, and `TemplateDriver::handle`, including boundary import rationale, future variant behavior, service invocation, report/error rendering, stdout/stderr, and exit-code behavior. Per no-upstream-restatement, the catalogue should cite the relevant anchors rather than carrying those behavioral contracts itself.",
-              "severity": "P1",
-              "file": "track/items/template-extraction-boundary-2026-07-06/cli_driver-types.json",
-              "line": 24,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "CLI catalogue docs restate command behavior in `TemplateCommand`, `TemplateExportArgs`, `CliCommand`, `cli::commands::template::execute`, and `cli::commands::template::dispatch`, including future subcommand shape, flag mapping, Template dispatch, composition-root outcome mapping, and exit-code mapping. These duplicate upstream CLI/export behavior and should be anchor-only contract descriptions.",
-              "severity": "P1",
-              "file": "track/items/template-extraction-boundary-2026-07-06/cli-types.json",
-              "line": 17,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "`TemplateCompositionRoot` and its methods restate wiring behavior by naming concrete adapters, interactor construction, driver injection, and error mapping. That wiring behavior is upstream contract content for `IN-01`/`AC-01`; the catalogue docs should not duplicate it in prose.",
-              "severity": "P1",
-              "file": "track/items/template-extraction-boundary-2026-07-06/cli_composition-types.json",
-              "line": 15,
-              "category": "upstream restatement"
+              "file": ".harness/workflows/track/done.md",
+              "line": 30,
+              "category": "command wiring breakage"
             }
           ],
-          "hash": "rvw1:sha256:9ce85877b945aa7704ddc8ad5d33bda71194cb56ca53a528e12460f2dae5724c",
-          "at": "2026-07-06T20:00:42Z"
+          "hash": "rvw1:sha256:9f51871d7fc16d329ba69f69dd398a0bb4b0eefab65d85c3f86e797466ab4c48",
+          "at": "2026-07-07T04:33:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`diagnose.md` is still a `.claude/commands/track/*.md` adapter, but its opening contract points only at `.harness/capabilities/rollback-diagnoser.md` and never declares an existing `.harness/workflows/<path>.md` SSoT. The harness-policy adapter-SSoT check requires track command adapters to explicitly name a real workflow SSoT up front and avoid carrying workflow logic locally, so this command remains outside the workflow/adaptor split while embedding trigger, routing, dispatch, and recovery semantics in the adapter itself.",
+              "severity": "P1",
+              "file": ".claude/commands/track/diagnose.md",
+              "line": 5,
+              "category": "adapter-SSoT sync"
+            }
+          ],
+          "hash": "rvw1:sha256:d45aa6de35a8d3add354acb5362c011ae5025d5631e5c4d154c04369427684f9",
+          "at": "2026-07-07T04:37:20Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:c812778ea0b6de1859afa50fd648ee78e6f09e6eb5e356c324c0c4c14e7d42fe",
-          "at": "2026-07-06T20:15:37Z"
+          "hash": "rvw1:sha256:0d745a394fd3b60d044222c84337d464acf71a59d74be058527a67a76319b7f2",
+          "at": "2026-07-07T04:45:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:42a667fa93ab1521bcee4344ab6eb1bbd202ed9d18a1a0a6355e92ad3f9fa1e5",
+          "at": "2026-07-07T05:59:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:42a667fa93ab1521bcee4344ab6eb1bbd202ed9d18a1a0a6355e92ad3f9fa1e5",
+          "at": "2026-07-07T06:04:09Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1d185a44dff71595621805768b365be642ba2b59de8e4bac5ca39804ae94f7e8",
+          "at": "2026-07-06T23:39:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1d185a44dff71595621805768b365be642ba2b59de8e4bac5ca39804ae94f7e8",
+          "at": "2026-07-06T23:44:16Z"
         }
       ]
     },
@@ -1070,6 +1047,39 @@
           "findings": [],
           "hash": "rvw1:sha256:d6914a63845d1c996a9e11e23d8ed08c70364a42310c4ea975fde3ea18acc874",
           "at": "2026-07-07T01:07:41Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:61814c909cafc741ea2105ded95760da3459506476196e273dbe526d566f14fd",
+          "at": "2026-07-06T17:32:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2 says the template bootstrap will not build sotp source, but the selected command is `cargo install --git`, which compiles the git source on the bootstrap host. That conflicts with the same ADR's grounding that protoc/MSRV/vendored dependencies constrain building sotp, not running a prebuilt binary, and later claims consumers are separated from those build constraints. Downstream spec/impl-plan cannot derive whether bootstrap must provision sotp build prerequisites or switch to a prebuilt/feature-gated distribution path.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+              "line": 68,
+              "category": "research_grounding_mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:61814c909cafc741ea2105ded95760da3459506476196e273dbe526d566f14fd",
+          "at": "2026-07-06T17:34:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1691fc6c2414ac693c4af607b40c015f1444303e0944a286239c872f0f5cf99b",
+          "at": "2026-07-06T18:42:03Z"
         }
       ]
     },
@@ -1102,6 +1112,38 @@
           "findings": [],
           "hash": "rvw1:sha256:258c22ec7c9ab06a98c9e2123117e5413fb6d2e57754df127f99d06f6101a96f",
           "at": "2026-07-07T04:31:46Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:42f15231ee8cbae9cfbaca9867d9b89c5e520c4af640dcdf1f78b65819e6bf43",
+          "at": "2026-07-06T19:50:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:42f15231ee8cbae9cfbaca9867d9b89c5e520c4af640dcdf1f78b65819e6bf43",
+          "at": "2026-07-06T19:53:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c2e9d3a4d11aba1705e6b6833e7188632ead2c04c5b2a72fe1f7e97cb211e5cb",
+          "at": "2026-07-06T21:01:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:caff58e9259af16402d54c62a004098308da7841e5080aa352efb66df223c1a8",
+          "at": "2026-07-07T05:18:25Z"
         }
       ]
     }

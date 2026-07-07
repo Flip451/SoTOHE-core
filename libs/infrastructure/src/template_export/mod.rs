@@ -138,12 +138,16 @@ fn decode_error_to_read_error(
 /// `TemplateExportPort` filesystem adapter (spec IN-01, IN-03, AC-01, AC-03,
 /// CN-03).
 ///
-/// Walks the workspace tree top-down and applies the boundary manifest
-/// classifications: `include` copies the classified subtree as-is, `exclude`
-/// skips it, and `overlay` copies the overlay directory's template version in
-/// its place. Traversal descends only into directories the manifest does not
-/// classify; a file with no classifying ancestor is a fail-closed
-/// [`TemplateExportPortError::UnclassifiedPath`] (spec IN-12). The export never
+/// Before walking, it preflights every manifest entry against the workspace so a
+/// pattern that no longer resolves to a real path fails closed with
+/// [`TemplateExportPortError::SourceMissing`] instead of being silently dropped
+/// (spec IN-12). It then walks the workspace tree top-down and applies the
+/// boundary manifest classifications: `include` copies the classified subtree
+/// as-is, `exclude` skips it, and `overlay` copies the overlay directory's
+/// template version in its place. Traversal descends only into directories the
+/// manifest does not classify; a file with no classifying ancestor is a
+/// fail-closed [`TemplateExportPortError::UnclassifiedPath`] (spec IN-12). The
+/// export never
 /// parses or rewrites file contents (spec CN-03) and reads directory entries in
 /// sorted order so identical inputs yield identical output (spec AC-01).
 #[derive(Debug, Default)]
@@ -166,6 +170,9 @@ impl TemplateExportPort for FsTemplateExportAdapter {
     ///   already exists (the export refuses to overwrite).
     /// - [`TemplateExportPortError::OverlayMissing`] if an `overlay`-classified
     ///   path has no file in the overlay directory.
+    /// - [`TemplateExportPortError::SourceMissing`] if a manifest-classified
+    ///   pattern has no corresponding path in the workspace (fail-closed drift
+    ///   detection, spec IN-12).
     /// - [`TemplateExportPortError::UnclassifiedPath`] if a workspace file is not
     ///   classified by the manifest (fail-closed, spec IN-12).
     /// - [`TemplateExportPortError::Io`] if any filesystem operation fails.
@@ -178,6 +185,7 @@ impl TemplateExportPort for FsTemplateExportAdapter {
         reject_existing_export_path_symlinks(&command.overlay_dir)?;
         ensure_output_dir_absent(&command.output_dir)?;
         ensure_output_dir_outside_source_roots(command)?;
+        preflight_manifest_sources(command, manifest)?;
 
         std::fs::create_dir_all(&command.output_dir)
             .map_err(|error| io_error(&command.output_dir, &error))?;
@@ -200,6 +208,29 @@ struct ExportCounts {
     included: usize,
     excluded: usize,
     overlay: usize,
+}
+
+/// Preflights every manifest entry against `command.workspace_root` before the
+/// export walk begins (fail-closed drift detection, spec IN-12).
+///
+/// The walk only visits paths that exist in the workspace, so a manifest row
+/// whose source has been renamed or removed would otherwise be silently skipped,
+/// yielding an incomplete template rather than a failure. Requiring each
+/// classified pattern to resolve to a real workspace path — for `overlay` rows as
+/// well, whose overlay-file requirement is still enforced during the walk — turns
+/// that drift into a [`TemplateExportPortError::SourceMissing`]. Symlinked
+/// sources are rejected in the same style as the rest of the export.
+fn preflight_manifest_sources(
+    command: &TemplateExportCommand,
+    manifest: &TemplateBoundaryManifest,
+) -> Result<(), TemplateExportPortError> {
+    for entry in manifest.entries() {
+        let source = command.workspace_root.join(entry.pattern().as_str());
+        if !reject_export_path_symlinks(&source)? {
+            return Err(TemplateExportPortError::SourceMissing { path: source });
+        }
+    }
+    Ok(())
 }
 
 /// Recursively walks `rel` (relative to `command.workspace_root`) and applies

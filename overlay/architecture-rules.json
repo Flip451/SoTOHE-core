@@ -30,6 +30,10 @@
       "path": "libs/domain",
       "may_depend_on": [],
       "deny_reason": "Domain dependencies are controlled by layer boundaries.",
+      "verify": {
+        "domain_purity": true,
+        "domain_strings": true
+      },
       "tddd": {
         "enabled": true,
         "catalogue_file": "domain-types.json",
@@ -48,6 +52,9 @@
       "may_depend_on": [
         "domain"
       ],
+      "verify": {
+        "usecase_purity": true
+      },
       "deny_reason": "Usecase crate must only be consumed by the cli layer.",
       "tddd": {
         "enabled": true,

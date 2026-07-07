@@ -442,6 +442,52 @@ fn test_export_unclassified_path_fails_closed() {
     );
 }
 
+#[test]
+fn test_export_missing_include_source_returns_source_missing() {
+    let dir = TempDir::new().unwrap();
+    let command = export_fixture(&dir);
+    // The manifest classifies an include path that does not exist in the
+    // workspace; the walk would never reach it, so the preflight must catch it.
+    let manifest = manifest_from_json(
+        r#"{
+  "schema_version": 1,
+  "entries": [
+    { "pattern": "libs/does-not-exist", "classification": "include" }
+  ]
+}"#,
+    );
+
+    let err = FsTemplateExportAdapter::new().export(&command, &manifest).unwrap_err();
+    let expected = command.workspace_root.join("libs/does-not-exist");
+    assert!(
+        matches!(err, TemplateExportPortError::SourceMissing { ref path } if path == &expected),
+        "unexpected error: {err}"
+    );
+}
+
+#[test]
+fn test_export_missing_overlay_anchor_returns_source_missing() {
+    let dir = TempDir::new().unwrap();
+    let command = export_fixture(&dir);
+    // An `overlay` row whose workspace anchor is absent is drift, not a valid
+    // overlay: the preflight rejects it before the OverlayMissing check runs.
+    let manifest = manifest_from_json(
+        r#"{
+  "schema_version": 1,
+  "entries": [
+    { "pattern": "missing-overlay-anchor", "classification": "overlay" }
+  ]
+}"#,
+    );
+
+    let err = FsTemplateExportAdapter::new().export(&command, &manifest).unwrap_err();
+    let expected = command.workspace_root.join("missing-overlay-anchor");
+    assert!(
+        matches!(err, TemplateExportPortError::SourceMissing { ref path } if path == &expected),
+        "unexpected error: {err}"
+    );
+}
+
 #[cfg(unix)]
 #[test]
 fn test_export_include_symlink_path_returns_io_error() {

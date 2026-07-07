@@ -48,8 +48,9 @@ artifact 間矛盾の発生源が増える。挙動契約の本文は上流だ�
 
 ## Decision Reference
 
-- [knowledge/adr/2026-07-02-1600-review-load-batch-findings-no-restatement.md](../adr/2026-07-02-1600-review-load-batch-findings-no-restatement.md)
-  — 本 convention の原典 ADR (D2)
+- `knowledge/adr/2026-07-02-1600-review-load-batch-findings-no-restatement.md`
+  — 本 convention の原典 ADR (D2)。`knowledge/adr/README.md` の索引から辿る
+  (テンプレート抽出後のツリーには ADR 本体が同梱されないため、リンクではなくパス表記で参照する)
 - [enforce-by-mechanism.md](./enforce-by-mechanism.md) — 本 convention は reviewer severity policy
   (`.harness/custom/review-prompts/impl-plan.md` / `types.md`) の finding class とセットで
   review gate から強制される
