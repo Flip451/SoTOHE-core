@@ -1,0 +1,147 @@
+{
+  "version": 2,
+  "module_limits": {
+    "max_lines": 700,
+    "warn_lines": 400,
+    "exclude": ["vendor/", ".cache/", "target/", "tmp/"]
+  },
+  "canonical_modules": [],
+  "extra_dirs": [
+    {
+      "path": "knowledge/conventions",
+      "label": "project-specific engineering rules"
+    },
+    {
+      "path": "track",
+      "label": "track workflow state and planning artifacts"
+    },
+    {
+      "path": "track/items/<id>",
+      "label": "active track directory"
+    },
+    {
+      "path": "track/archive/<id>",
+      "label": "archived track directory"
+    }
+  ],
+  "layers": [
+    {
+      "crate": "domain",
+      "path": "libs/domain",
+      "may_depend_on": [],
+      "deny_reason": "Domain dependencies are controlled by layer boundaries.",
+      "tddd": {
+        "enabled": true,
+        "catalogue_file": "domain-types.json",
+        "catalogue_spec_signal": {
+          "enabled": true
+        },
+        "schema_export": {
+          "method": "rustdoc",
+          "targets": ["domain"]
+        }
+      }
+    },
+    {
+      "crate": "usecase",
+      "path": "libs/usecase",
+      "may_depend_on": [
+        "domain"
+      ],
+      "deny_reason": "Usecase crate must only be consumed by the cli layer.",
+      "tddd": {
+        "enabled": true,
+        "catalogue_file": "usecase-types.json",
+        "catalogue_spec_signal": {
+          "enabled": true
+        },
+        "schema_export": {
+          "method": "rustdoc",
+          "targets": ["usecase"]
+        }
+      }
+    },
+    {
+      "crate": "infrastructure",
+      "path": "libs/infrastructure",
+      "may_depend_on": [
+        "domain",
+        "usecase"
+      ],
+      "deny_reason": "Infrastructure implements usecase ports and domain ports; wired at composition root.",
+      "tddd": {
+        "enabled": true,
+        "catalogue_file": "infrastructure-types.json",
+        "catalogue_spec_signal": {
+          "enabled": true
+        },
+        "schema_export": {
+          "method": "rustdoc",
+          "targets": ["infrastructure"]
+        }
+      }
+    },
+    {
+      "crate": "cli_driver",
+      "path": "apps/cli-driver",
+      "may_depend_on": [
+        "usecase"
+      ],
+      "deny_reason": "CLI primary adapter holds injected use cases, invokes them and renders the result into CommandOutcome.",
+      "tddd": {
+        "enabled": true,
+        "catalogue_file": "cli_driver-types.json",
+        "catalogue_spec_signal": {
+          "enabled": true
+        },
+        "schema_export": {
+          "method": "rustdoc",
+          "targets": ["cli_driver"]
+        }
+      }
+    },
+    {
+      "crate": "cli",
+      "path": "apps/cli",
+      "may_depend_on": [
+        "cli_composition",
+        "cli_driver"
+      ],
+      "deny_reason": "",
+      "tddd": {
+        "enabled": true,
+        "catalogue_file": "cli-types.json",
+        "catalogue_spec_signal": {
+          "enabled": true
+        },
+        "schema_export": {
+          "method": "rustdoc",
+          "targets": ["cli"],
+          "notes": "[[bin]] target (crate-type bin); bin-target schema export is routed through the infrastructure schema_export path before invoking nightly rustdoc --output-format json"
+        }
+      }
+    },
+    {
+      "crate": "cli_composition",
+      "path": "apps/cli-composition",
+      "may_depend_on": [
+        "domain",
+        "infrastructure",
+        "usecase",
+        "cli_driver"
+      ],
+      "deny_reason": "CLI composition root owns domain/usecase/infrastructure wiring for the CLI delivery adapter.",
+      "tddd": {
+        "enabled": true,
+        "catalogue_file": "cli_composition-types.json",
+        "catalogue_spec_signal": {
+          "enabled": true
+        },
+        "schema_export": {
+          "method": "rustdoc",
+          "targets": ["cli_composition"]
+        }
+      }
+    }
+  ]
+}

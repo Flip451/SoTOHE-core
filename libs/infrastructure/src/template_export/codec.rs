@@ -392,4 +392,25 @@ mod tests {
         let err = decode_manifest(json).unwrap_err();
         assert!(matches!(err, TemplateBoundaryManifestCodecError::Manifest { .. }));
     }
+
+    // --- decode: the real boundary SSoT file ---
+
+    #[test]
+    fn test_decode_real_repository_manifest_is_fail_closed_clean() {
+        // The committed boundary SSoT (`.harness/config/template-boundary.json`)
+        // must decode without error: supported schema version, only known
+        // fields, and a non-empty, duplicate-free set of workspace-relative
+        // patterns (spec IN-02, IN-12, AC-02, CN-02). This binds the codec to
+        // the real manifest so a schema-incompatible edit fails the test suite.
+        let manifest_path =
+            concat!(env!("CARGO_MANIFEST_DIR"), "/../../.harness/config/template-boundary.json");
+        let json = std::fs::read_to_string(manifest_path)
+            .unwrap_or_else(|e| panic!("failed to read real manifest {manifest_path}: {e}"));
+
+        let manifest = decode_manifest(&json)
+            .unwrap_or_else(|e| panic!("real manifest failed fail-closed decode: {e}"));
+
+        assert!(!manifest.entries().is_empty(), "real manifest must classify at least one path");
+        assert!(manifest.patterns_are_unique(), "real manifest patterns must be duplicate-free");
+    }
 }

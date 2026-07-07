@@ -7,7 +7,6 @@ members = [
   "apps/cli",
   "apps/cli-composition",
 ]
-exclude = ["vendor/*", "overlay/*"]
 resolver = "2"
 
 [workspace.package]
@@ -17,14 +16,7 @@ rust-version = "1.91"
 publish = false
 
 [workspace.dependencies]
-globset = "0.4"
-mockall = "0.13"
-regex = "1"
-rstest = "0.26.1"
-chrono = { version = "0.4", default-features = false, features = ["std"] }
-strum = { version = "0.27", features = ["derive"] }
 thiserror = "2"
-toml = "1"
 
 [workspace.lints.rust]
 warnings = "deny"
@@ -37,6 +29,3 @@ panic = "deny"
 unreachable = "deny"
 todo = "deny"
 unimplemented = "deny"
-
-[patch.crates-io]
-conch-parser = { path = "vendor/conch-parser" }

@@ -1,0 +1,43 @@
+[graph]
+targets = []
+all-features = false
+no-default-features = false
+exclude-dev = true
+
+[output]
+feature-depth = 1
+
+[advisories]
+ignore = []
+
+[licenses]
+allow = [
+    "MIT",
+    "Apache-2.0",
+    "Unicode-3.0",
+]
+confidence-threshold = 0.8
+exceptions = []
+
+[licenses.private]
+ignore = true
+
+[bans]
+multiple-versions = "warn"
+wildcards = "allow"
+highlight = "all"
+workspace-default-features = "allow"
+external-default-features = "allow"
+allow-workspace = false
+skip = [
+]
+
+# Enforce layered architecture boundaries for this template workspace.
+# Crate names can be changed, but wrappers must reflect your composition root.
+deny = [
+    { crate = "infrastructure", wrappers = ["cli_composition"], reason = "Infrastructure implements usecase ports and domain ports; wired at composition root." },
+    { crate = "usecase", wrappers = ["cli_composition", "cli_driver", "infrastructure"], reason = "Usecase crate must only be consumed by the cli layer." },
+    { crate = "domain", wrappers = ["cli_composition", "infrastructure", "usecase"], reason = "Domain dependencies are controlled by layer boundaries." },
+    { crate = "cli_composition", wrappers = ["cli"], reason = "CLI composition root owns domain/usecase/infrastructure wiring for the CLI delivery adapter." },
+    { crate = "cli_driver", wrappers = ["cli", "cli_composition"], reason = "CLI primary adapter holds injected use cases, invokes them and renders the result into CommandOutcome." },
+]

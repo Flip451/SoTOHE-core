@@ -25,7 +25,7 @@ command = "cargo"
 args = ["make", "--list-all-steps"]
 
 [tasks.bootstrap]
-description = "[gate] Build Docker images, sotp CLI, and run CI"
+description = "[gate] Build Docker images, install the pinned sotp CLI, and run CI"
 script_runner = "@shell"
 script = ['''
 set -e
@@ -50,6 +50,12 @@ if ! command -v cargo >/dev/null 2>&1; then
 fi
 echo "[OK] cargo available"
 
+if ! command -v jq >/dev/null 2>&1; then
+  echo "[FAIL] jq not found. Install jq so install-sotp can read .harness/config/sotp-version.json."
+  exit 1
+fi
+echo "[OK] jq available"
+
 # 2. Docker images
 echo ""
 echo "--- Step 2/6: Build Docker images ---"
@@ -57,11 +63,11 @@ mkdir -p target .cache/cargo/registry .cache/cargo/git .cache/sccache .cache/hom
 docker compose build tools
 echo "[OK] Docker tools image built"
 
-# 3. Build sotp CLI binary
+# 3. Install pinned sotp CLI binary
 echo ""
-echo "--- Step 3/6: Build sotp CLI binary ---"
-cargo make build-sotp
-echo "[OK] bin/sotp built and installed"
+echo "--- Step 3/6: Install sotp CLI binary (pinned tag) ---"
+cargo make install-sotp
+echo "[OK] bin/sotp installed"
 
 # 4. Git hooks path
 echo ""
@@ -98,23 +104,38 @@ echo ""
 echo "=== Bootstrap complete ==="
 ''']
 
-[tasks.build-sotp]
-description = "[host] Build sotp CLI binary and install to bin/sotp (with runtime verification)"
+[tasks.install-sotp]
+description = "[host] Install the pinned sotp CLI from its git tag into bin/sotp (tag SSoT: .harness/config/sotp-version.json)"
 script_runner = "@shell"
 script = ['''
-TARGET_DIR="${CARGO_TARGET_DIR:-target}"
-cargo build -p cli --release && mkdir -p bin && cp "$TARGET_DIR/release/sotp" bin/sotp.tmp || exit 1
-# Post-build verification: ensure the NEW binary is actually executable on this system.
-# Verify BEFORE replacing the old binary so a glibc mismatch doesn't destroy the working install.
-if bin/sotp.tmp --help >/dev/null 2>&1; then
-  mv -f bin/sotp.tmp bin/sotp || { echo "[ERROR] failed to install bin/sotp" >&2; exit 1; }
-  echo "[OK] bin/sotp built and verified"
+set -e
+PIN=".harness/config/sotp-version.json"
+if [ ! -f "$PIN" ]; then
+  echo "[ERROR] sotp version pin not found: $PIN" >&2
+  exit 1
+fi
+if ! command -v jq >/dev/null 2>&1; then
+  echo "[ERROR] jq not found. Install jq so install-sotp can read $PIN." >&2
+  exit 1
+fi
+GIT_URL="$(jq -r '.git_url' "$PIN")"
+TAG="$(jq -r '.tag' "$PIN")"
+CRATE="$(jq -r '.crate' "$PIN")"
+BINARY="$(jq -r '.binary' "$PIN")"
+echo "Installing $CRATE ($BINARY) from $GIT_URL @ $TAG ..."
+# Build the pinned sotp on the bootstrap host. protoc and the sotp MSRV are
+# required on the host only; the template's own cargo workspace does not carry
+# the sotp source, vendor patch, or lancedb dependency.
+cargo install "$CRATE" --git "$GIT_URL" --tag "$TAG" --locked --force --root .cargo-install
+mkdir -p bin
+cp ".cargo-install/bin/$BINARY" bin/sotp
+# Post-install verification: ensure the installed binary runs on this system.
+if bin/sotp --help >/dev/null 2>&1; then
+  echo "[OK] bin/sotp installed from $TAG"
 else
-  echo "[ERROR] bin/sotp.tmp was built but cannot execute on this system." >&2
-  echo "        This usually means a glibc version mismatch." >&2
-  echo "        Try building inside the tools container instead." >&2
-  echo "        The previous bin/sotp (if any) was preserved." >&2
-  rm -f bin/sotp.tmp
+  echo "[ERROR] installed bin/sotp cannot execute on this system." >&2
+  echo "        Check the bootstrap host toolchain (protoc / sotp MSRV)." >&2
+  rm -f bin/sotp
   exit 1
 fi
 ''']
@@ -173,40 +194,40 @@ args = ["fmt", "--all", "--", "--check"]
 private = true
 description = "[internal] Run clippy with warnings denied"
 command = "cargo"
-args = ["clippy", "--locked", "--all-targets", "--all-features", "--", "-D", "warnings"]
+args = ["clippy", "--all-targets", "--all-features", "--", "-D", "warnings"]
 
 [tasks.test-local]
 private = true
 description = "[internal] Run tests with nextest"
 env = { SOTP_TELEMETRY = "0" }
 command = "cargo"
-args = ["nextest", "run", "--locked", "--all-targets", "--all-features", "--no-tests=warn"]
+args = ["nextest", "run", "--all-targets", "--all-features", "--no-tests=warn"]
 
 [tasks.test-doc-local]
 private = true
 description = "[internal] Run documentation tests"
 env = { SOTP_TELEMETRY = "0" }
 command = "cargo"
-args = ["test", "--locked", "--doc", "--all-features"]
+args = ["test", "--doc", "--all-features"]
 
 [tasks.test-nocapture-local]
 private = true
 description = "[internal] Run tests with stdout/stderr shown"
 env = { SOTP_TELEMETRY = "0" }
 command = "cargo"
-args = ["test", "--locked", "--all-features", "--", "--nocapture"]
+args = ["test", "--all-features", "--", "--nocapture"]
 
 [tasks.check-local]
 private = true
 description = "[internal] Run cargo check"
 command = "cargo"
-args = ["check", "--locked", "--all-targets", "--all-features"]
+args = ["check", "--all-targets", "--all-features"]
 
 [tasks.deny-local]
 private = true
 description = "[internal] Run dependency policy checks"
 command = "cargo"
-args = ["deny", "--locked", "check"]
+args = ["deny", "check"]
 
 [tasks.machete-local]
 private = true
@@ -218,114 +239,114 @@ args = ["machete"]
 private = true
 description = "[internal] Run clippy for test targets"
 command = "cargo"
-args = ["clippy", "--locked", "--tests", "--all-features", "--", "-D", "warnings"]
+args = ["clippy", "--tests", "--all-features", "--", "-D", "warnings"]
 
 [tasks.llvm-cov-local]
 private = true
 description = "[internal] Generate HTML coverage report"
 env = { SOTP_TELEMETRY = "0" }
 command = "cargo"
-args = ["llvm-cov", "nextest", "--html", "--all-features", "--locked"]
+args = ["llvm-cov", "nextest", "--html", "--all-features"]
 
 [tasks.check-layers-local]
 private = true
 description = "[internal] Check architectural layer dependencies"
 script_runner = "@shell"
-script = ['cargo run --quiet -p cli -- verify layers']
+script = ['bin/sotp verify layers']
 
 [tasks.verify-arch-docs-local]
 private = true
 description = "[internal] Verify workspace architecture docs are in sync"
 script_runner = "@shell"
-script = ['cargo run --quiet -p cli -- verify arch-docs']
+script = ['bin/sotp verify arch-docs']
 
 [tasks.verify-plan-progress-local]
 private = true
 description = "[internal] Verify track plan status consistency"
 script_runner = "@shell"
-script = ['cargo run --quiet -p cli -- track views validate --project-root .']
+script = ['bin/sotp track views validate --project-root .']
 
 [tasks.verify-track-metadata-local]
 private = true
 description = "[internal] Verify track metadata.json: schema, task graph, and status validation"
 script_runner = "@shell"
-script = ['cargo run --quiet -p cli -- track views validate --project-root .']
+script = ['bin/sotp track views validate --project-root .']
 
 [tasks.verify-tech-stack-local]
 private = true
 description = "[internal] Verify tech stack decisions are fully resolved"
 script_runner = "@shell"
-script = ['cargo run --quiet -p cli -- verify tech-stack']
+script = ['bin/sotp verify tech-stack']
 
 [tasks.verify-hooks-path-local]
 private = true
 description = "[internal] Verify local Git config core.hooksPath points at .githooks"
 script_runner = "@shell"
-script = ['cargo run --quiet -p cli -- verify hooks-path']
+script = ['bin/sotp verify hooks-path']
 
 [tasks.verify-track-registry-local]
 private = true
 description = "[internal] Verify track registry.md is in sync with metadata.json"
 script_runner = "@shell"
-script = ['cargo run --quiet -p cli -- track views validate --project-root .']
+script = ['bin/sotp track views validate --project-root .']
 
 [tasks.verify-canonical-modules-local]
 private = true
 description = "[internal] Verify no reimplementation of canonical module concerns"
 script_runner = "@shell"
-script = ['cargo run --quiet -p cli -- verify canonical-modules']
+script = ['bin/sotp verify canonical-modules']
 
 [tasks.verify-module-size-local]
 private = true
 description = "[internal] Verify Rust source file sizes against module_limits"
 script_runner = "@shell"
-script = ['cargo run --quiet -p cli -- verify module-size']
+script = ['bin/sotp verify module-size']
 
 [tasks.verify-domain-strings-local]
 private = true
 description = "[internal] Verify no pub String fields in domain layer"
 script_runner = "@shell"
-script = ['cargo run --quiet -p cli -- verify domain-strings']
+script = ['bin/sotp verify domain-strings']
 
 [tasks.verify-domain-purity-local]
 private = true
 description = "[internal] Verify domain layer hexagonal purity (no forbidden I/O patterns)"
 script_runner = "@shell"
-script = ['cargo run --quiet -p cli -- verify domain-purity']
+script = ['bin/sotp verify domain-purity']
 
 [tasks.verify-usecase-purity-local]
 private = true
 description = "[internal] Verify usecase layer hexagonal purity (no forbidden patterns)"
 script_runner = "@shell"
-script = ['cargo run --quiet -p cli -- verify usecase-purity']
+script = ['bin/sotp verify usecase-purity']
 
 [tasks.verify-view-freshness-local]
 private = true
 description = "[internal] Verify plan.md is up-to-date with metadata.json"
 script_runner = "@shell"
-script = ['cargo run --quiet -p cli -- verify view-freshness']
+script = ['bin/sotp verify view-freshness']
 
 [tasks.verify-latest-track-local]
 private = true
 description = "[internal] Verify latest track has spec.md (or spec.json) and plan.md"
 script_runner = "@shell"
-script = ['cargo run --quiet -p cli -- verify latest-track']
+script = ['bin/sotp verify latest-track']
 
 [tasks.verify-plan-artifact-refs-local]
 private = true
 description = "[internal] Verify plan artifact refs + task-coverage integrity (active-track auto-resolved from branch)"
-command = "cargo"
-args = ["run", "--quiet", "-p", "cli", "--", "verify", "plan-artifact-refs"]
+command = "bin/sotp"
+args = ["verify", "plan-artifact-refs"]
 
 [tasks.verify-adr-signals-local]
 private = true
 description = "[internal] Verify ADR decision signal grounds across knowledge/adr/ (chain ⓪ check-adr-user --gate commit). Red blocks; strictness resolved from signal-gates.json."
-command = "cargo"
-args = ["run", "--quiet", "-p", "cli", "--", "signal", "check-adr-user", "--gate", "commit"]
+command = "bin/sotp"
+args = ["signal", "check-adr-user", "--gate", "commit"]
 
 [tasks.verify-spec-states-current-local]
 private = true
-description = "[internal] Chain ① spec→ADR signal gate. Active track auto-resolved from current branch; graceful skip when spec.json is absent (Phase 0 / pre-Phase-1 tracks — see ADR knowledge/adr/2026-06-03-1241-spec-states-gate-tolerate-missing-spec-artifact.md). Track-aware task: only invoked via ci-track-container / ci-track-local (PR CI, never push/base branch); the parent already fails-closed on non-track branches so the inner shell skips only on absent spec.json, not on branch shape."
+description = "[internal] Chain ① spec→ADR signal gate. Active track auto-resolved from current branch; graceful skip when spec.json is absent (Phase 0 / pre-Phase-1 tracks). Track-aware task: only invoked via ci-track-container / ci-track-local (PR CI, never push/base branch); the parent already fails-closed on non-track branches so the inner shell skips only on absent spec.json, not on branch shape."
 script_runner = "@shell"
 script = ['''
 BRANCH="$(git symbolic-ref --quiet --short HEAD 2>/dev/null || true)"
@@ -335,65 +356,26 @@ if [ ! -f "$SPEC_JSON" ]; then
   echo "[SKIP] signal check-spec-adr: spec.json absent (Phase 0 / pre-Phase-1 track ${TRACK_ID})"
   exit 0
 fi
-cargo run --quiet -p cli -- signal check-spec-adr --gate commit --spec-json "$SPEC_JSON"
+bin/sotp signal check-spec-adr --gate commit --spec-json "$SPEC_JSON"
 ''']
 
 [tasks.signal-check-impl-catalog-local]
 private = true
 description = "[internal] Chain ③ impl↔catalog signal gate. Active track + layers auto-resolved inside the CLI from the current git branch. Track-aware task: only invoked via ci-track-container / ci-track-local (PR CI, never push/base branch)."
-command = "cargo"
-args = ["run", "--quiet", "-p", "cli", "--", "signal", "check-impl-catalog", "--gate", "commit"]
+command = "bin/sotp"
+args = ["signal", "check-impl-catalog", "--gate", "commit"]
 
 [tasks.verify-catalogue-spec-refs-local]
 private = true
-description = "[internal] Verify catalogue-spec ref integrity (SoT Chain ② binary gate: dangling / drift / stale) per ADR 2026-04-23-0344 §D1.5. Active track auto-resolved from branch (IN-03, IN-08)."
-command = "cargo"
-args = ["run", "--quiet", "-p", "cli", "--", "verify", "catalogue-spec-refs"]
+description = "[internal] Verify catalogue-spec ref integrity (SoT Chain ② binary gate: dangling / drift / stale). Active track auto-resolved from branch."
+command = "bin/sotp"
+args = ["verify", "catalogue-spec-refs"]
 
 [tasks.check-catalogue-spec-signals-local]
 private = true
 description = "[internal] Chain ② catalog→spec signal gate. Active track + layers auto-resolved inside the CLI from the current git branch. Track-aware task: only invoked via ci-track-container / ci-track-local (PR CI, never push/base branch)."
-command = "cargo"
-args = ["run", "--quiet", "-p", "cli", "--", "signal", "check-catalog-spec", "--gate", "commit"]
-
-[tasks.template-export-smoke-local]
-private = true
-description = "[internal] Source-repo smoke gate: export the template tree to a fresh tmp dir OUTSIDE the workspace root, then run the exported skeleton's own fmt/clippy/test gates with the ambient toolchain. Smoke-level equivalent of AC-05 (export output CI green): fmt+clippy+test validate the shipped skeleton without needing docker-in-docker for a full `cargo make ci` inside the export. Uses `cargo run -p cli -- template export` (not bin/sotp) so the gate runs unchanged inside ci-container, where the host-built bin/sotp is absent. Scope boundary (OS-10/CN-09): the gate only asserts that the export succeeds and the shipped skeleton passes fmt/clippy/test; it deliberately does not re-run consumer-owned config gates and skips when source-only overlay artifacts are absent."
-script_runner = "@shell"
-script = ['''
-set -e
-OVERLAY_DIR="${SOTP_TEMPLATE_OVERLAY_DIR:-overlay}"
-if [ ! -d "$OVERLAY_DIR" ]; then
-  echo "[SKIP] template-export-smoke-local: source overlay tree absent; skipping source-repo smoke."
-  exit 0
-fi
-
-# The output dir must live OUTSIDE the workspace root: the exporter fail-closes when
-# the output path is inside the source root. Use a fresh mktemp dir (a sibling of the
-# workspace under the system tmp), and always clean it up — including on failure — via
-# a shell trap.
-SMOKE_OUT="$(mktemp -d)/template-export-smoke"
-trap 'rm -rf "$(dirname "$SMOKE_OUT")"' EXIT
-
-cargo run --quiet -p cli -- template export \
-  --workspace-root . \
-  --manifest-path .harness/config/template-boundary.json \
-  --overlay-dir "$OVERLAY_DIR" \
-  --output-dir "$SMOKE_OUT"
-
-# Run the exported skeleton's gates with the ambient cargo toolchain (host toolchain
-# on `cargo make`, container toolchain in ci-container). A full `cargo make ci` inside
-# the export would require docker-in-docker (out of scope); fmt+clippy+test is the
-# smoke-level equivalent per AC-05. Pin CARGO_TARGET_DIR INSIDE the tmp output so the
-# exported crates (domain/usecase/... share names with the source workspace) never
-# collide with the source's baked target dir, and the whole build is removed by the
-# trap. No --locked: keep the smoke resilient to skeleton Cargo.lock drift.
-export CARGO_TARGET_DIR="$SMOKE_OUT/target"
-cd "$SMOKE_OUT"
-cargo fmt --all -- --check
-cargo clippy --all-targets --all-features -- -D warnings
-cargo test --all-features
-''']
+command = "bin/sotp"
+args = ["signal", "check-catalog-spec", "--gate", "commit"]
 
 [tasks.ci-rust-local]
 private = true
@@ -403,7 +385,7 @@ dependencies = ["fmt-check-local", "clippy-local", "test-local", "deny-local", "
 [tasks.ci-local]
 private = true
 description = "[internal] Run local repo-wide CI checks. Track-aware gates live in ci-track-local."
-dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-hooks-path-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-adr-signals-local", "template-export-smoke-local"]
+dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-hooks-path-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-adr-signals-local"]
 
 [tasks.ci-track-local]
 private = true
@@ -416,7 +398,7 @@ dependencies = ["fmt-check-local", "clippy-local", "test-local", "deny-local", "
 
 [tasks.ci-container]
 description = "[gate] Run repo-wide CI checks inside a pre-existing container (no docker compose). Track-aware gates that require an active track/<id> branch are in ci-track-container."
-dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-hooks-path-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-adr-signals-local", "template-export-smoke-local"]
+dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-hooks-path-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-adr-signals-local"]
 
 [tasks.ci-track-container]
 description = "[gate] Track-aware CI gates that require a track/<id> branch context (task-contract coverage + check liveness + spec/catalogue/impl signal chains). Skip on base branch / non-track CI runs."
@@ -517,7 +499,7 @@ args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "
 private = true
 description = "[internal] Verify local Markdown links resolve to existing files"
 script_runner = "@shell"
-script = ['cargo run --quiet -p cli -- verify doc-links']
+script = ['bin/sotp verify doc-links']
 
 [tasks.verify-plan-progress]
 description = "[gate] Verify track plan status consistency (docker compose)"
@@ -556,7 +538,7 @@ command = "docker"
 args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "verify-canonical-modules-local"]
 
 [tasks.verify-latest-track]
-description = "[gate] Verify latest track files (host, no docker; uses bash/find only)"
+description = "[gate] Verify latest track files (host, no docker)"
 command = "cargo"
 args = ["make", "--allow-private", "verify-latest-track-local"]
 
@@ -571,12 +553,6 @@ description = "[gate] Verify ADR decision signal grounds across knowledge/adr/ (
 dependencies = ["prepare-local-cache-dirs"]
 command = "docker"
 args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "verify-adr-signals-local"]
-
-[tasks.template-export-smoke]
-description = "[gate] Export the template tree and run the exported skeleton's fmt/clippy/test gates (docker compose)"
-dependencies = ["prepare-local-cache-dirs"]
-command = "docker"
-args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "template-export-smoke-local"]
 
 [tasks.ci-rust]
 description = "[gate] Run Rust-only CI checks (docker compose) — inner loop for app developers"
@@ -682,7 +658,7 @@ command = "bin/sotp"
 args = ["signal", "calc-impl-catalog"]
 
 [tasks.task-contract-coverage]
-description = "[gate] Run attribution-completeness coverage check: verifies every catalogue entry in all 6 canonical TDDD layers is attributed to at least one task in task-contract.json, and every attributed entry exists in the catalogue. Active track auto-resolved from current git branch. Exits 0 on Passed, non-zero on Blocked."
+description = "[gate] Run attribution-completeness coverage check: verifies every catalogue entry in all canonical TDDD layers is attributed to at least one task in task-contract.json, and every attributed entry exists in the catalogue. Active track auto-resolved from current git branch. Exits 0 on Passed, non-zero on Blocked."
 dependencies = ["task-contract-refresh-impl-catalog"]
 command = "bin/sotp"
 args = ["task-contract", "coverage"]
@@ -695,15 +671,15 @@ args = ["task-contract", "check"]
 
 [tasks.task-contract-coverage-local]
 private = true
-description = "[internal] Attribution-completeness coverage gate. Active track auto-resolved by CLI. Does NOT depend on `task-contract-refresh-impl-catalog` (unlike the `task-contract-coverage` public wrapper): CI containers lack the nightly toolchain required by `signal calc-impl-catalog`, and the signal artifacts are committed alongside catalogue changes by `track-commit-message`'s pre-commit gate, so CI-time refresh is unnecessary."
-command = "cargo"
-args = ["run", "--quiet", "-p", "cli", "--", "task-contract", "coverage"]
+description = "[internal] Attribution-completeness coverage gate. Active track auto-resolved by CLI. Does NOT depend on `task-contract-refresh-impl-catalog`: CI containers lack the nightly toolchain required by `signal calc-impl-catalog`, and the signal artifacts are committed alongside catalogue changes by `track-commit-message`'s pre-commit gate, so CI-time refresh is unnecessary."
+command = "bin/sotp"
+args = ["task-contract", "coverage"]
 
 [tasks.task-contract-check-local]
 private = true
 description = "[internal] Liveness gate (`sotp task-contract check`): verifies in_progress/done attributed entries have Blue impl_catalog signals (Yellow allowed for todo-only). Active track auto-resolved by CLI. Mirrors `task-contract-check` (public wrapper) without the refresh dependency — CI containers lack nightly, and signal artifacts are committed by `track-commit-message` (same reasoning as `task-contract-coverage-local`)."
-command = "cargo"
-args = ["run", "--quiet", "-p", "cli", "--", "task-contract", "check"]
+command = "bin/sotp"
+args = ["task-contract", "check"]
 
 # Cargo-make dependencies run before task scripts, so pre-gate track/branch
 # guards must live outside these wrappers or inside the gate commands.
@@ -736,7 +712,7 @@ command = "bin/sotp"
 args = ["git", "add-from-file", "tmp/track-commit/add-paths.txt", "--cleanup"]
 
 [tasks.track-commit-message]
-description = "[wrapper] Regenerate signals + views (via track-active-gate; that gate runs no ref-verify call), then run the strict commit gate: stage working tree, full cargo make ci, code-review gate (review not approved → BLOCK), semantic review refresh (`sotp ref-verify run` — the scope derives from track artifact existence, so pre-Phase-1 tracks pass with zero pairs; the only writing step, positioned after the code-review gate per CN-02 / IN-02), re-stage to capture verify-cache artifact writes, `sotp ref-verify check-approved` (non-Pass pairs → BLOCK; same existence-derived scope), DRY gate (`sotp dry check-approved`; unresolved DRY violations → BLOCK), commit from tmp/track-commit/commit-message.txt, persist HEAD SHA to .commit_hash. The regen sequence is shared with review invocations via track-active-gate (CN-11 DRY, AC-12). The strict checks (ci + check-approved + semantic review + DRY gate) are NOT weakened by the bare-chain refactor (CN-12)."
+description = "[wrapper] Regenerate signals + views (via track-active-gate; that gate runs no ref-verify call), then run the strict commit gate: stage working tree, full cargo make ci, code-review gate (review not approved → BLOCK), semantic review refresh (`sotp ref-verify run` — the scope derives from track artifact existence, so pre-Phase-1 tracks pass with zero pairs; the only writing step, positioned after the code-review gate), re-stage to capture verify-cache artifact writes, `sotp ref-verify check-approved` (non-Pass pairs → BLOCK; same existence-derived scope), DRY gate (`sotp dry check-approved`; unresolved DRY violations → BLOCK), commit from tmp/track-commit/commit-message.txt, persist HEAD SHA to .commit_hash. The regen sequence is shared with review invocations via track-active-gate."
 dependencies = ["track-active-gate"]
 script_runner = "@shell"
 script = ['''
