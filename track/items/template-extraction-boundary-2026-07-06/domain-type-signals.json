@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-06T21:02:22Z",
+  "generated_at": "2026-07-07T00:35:28Z",
   "declaration_hash": "c689cf18f6e3d3f97b7415d35653ad809cc354da75fd11846174e62283a40d1e",
   "signals": [
     {
       "type_name": "TemplateBoundaryManifest",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -18,9 +18,9 @@
     {
       "type_name": "TemplateBoundaryManifestError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::error::Error",
         "core::fmt::Debug",
         "core::fmt::Display"
@@ -29,9 +29,9 @@
     {
       "type_name": "TemplatePathClassification",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::clone::TrivialClone",
         "core::cmp::Eq",
@@ -43,9 +43,9 @@
     {
       "type_name": "TemplatePathEntry",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -55,9 +55,9 @@
     {
       "type_name": "TemplatePathPattern",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::Ord",
@@ -70,9 +70,9 @@
     {
       "type_name": "TemplatePathPatternError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::error::Error",
         "core::fmt::Debug",
         "core::fmt::Display"

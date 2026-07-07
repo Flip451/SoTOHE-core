@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-06T21:02:29Z",
+  "generated_at": "2026-07-07T00:35:35Z",
   "declaration_hash": "94a59f52dab1b14bd33ea8a6d2aeff406417e87591ab0e115cefba18bbde56f7",
   "signals": [
     {
@@ -28,9 +28,9 @@
     {
       "type_name": "TemplateBoundaryManifestCodecError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::convert::From<TemplateBoundaryManifestError>",
         "core::convert::From<TemplatePathPatternError>",
         "core::error::Error",
@@ -41,9 +41,9 @@
     {
       "type_name": "TemplateBoundaryManifestDto",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::fmt::Debug",
         "serde_core::de::Deserialize"
@@ -52,9 +52,9 @@
     {
       "type_name": "TemplatePathClassificationDto",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::clone::TrivialClone",
         "core::cmp::Eq",
@@ -67,9 +67,9 @@
     {
       "type_name": "TemplatePathEntryDto",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::fmt::Debug",
         "serde_core::de::Deserialize"
@@ -78,8 +78,8 @@
     {
       "type_name": "infrastructure::template_export::codec::decode_manifest",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     }
   ]
 }

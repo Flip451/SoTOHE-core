@@ -16,25 +16,25 @@ T013: harness doc set — remove provenance references and add final grep verifi
 T014: .tool-versions + .gitignore — remove Python leftover entries and add final verification (GO-05, IN-11, AC-11, AC-12).
 Goal traceability: GO-01 -> T002/T004/T005/T006/T007/T010; GO-02 -> T007/T008; GO-03 -> T008/T009/T010; GO-04 -> T001/T003/T004/T007/T010; GO-05 -> T011/T012/T013/T014.
 
-## Tasks (0/14 resolved)
+## Tasks (3/14 resolved)
 
 ### S1 — Domain: boundary manifest value objects
 
 > libs/domain/src/template_export + libs/domain/src/lib.rs — run T001; add boundary-manifest symbols, wiring, and tests (GO-04, IN-02, IN-12, AC-02, CN-02).
 
-- [ ] **T001**: libs/domain/src/template_export/mod.rs and libs/domain/src/lib.rs — add TemplatePathPattern, TemplatePathPatternError, TemplatePathClassification, TemplatePathEntry, TemplateBoundaryManifest, TemplateBoundaryManifestError, module wiring, and unit tests for the listed symbols (GO-04, IN-02, IN-12, AC-02, CN-02).
+- [x] **T001**: libs/domain/src/template_export/mod.rs and libs/domain/src/lib.rs — add TemplatePathPattern, TemplatePathPatternError, TemplatePathClassification, TemplatePathEntry, TemplateBoundaryManifest, TemplateBoundaryManifestError, module wiring, and unit tests for the listed symbols (GO-04, IN-02, IN-12, AC-02, CN-02).
 
 ### S2 — Usecase: interactor + ports + errors
 
 > libs/usecase/src/template_export + libs/usecase/src/lib.rs — run T002; add command/report/error/port/interactor symbols, wiring, and tests (GO-01, IN-01, IN-02, IN-03, AC-01, AC-03, CN-02, CN-03).
 
-- [ ] **T002**: libs/usecase/src/template_export/mod.rs and libs/usecase/src/lib.rs — add TemplateExportCommand, TemplateExportReport, TemplateExportError, TemplateBoundaryManifestReadError, TemplateExportPortError, TemplateExportService, TemplateBoundaryManifestPort, TemplateExportPort, TemplateExportInteractor, module wiring, and mock-port unit tests (GO-01, IN-01, IN-02, IN-03, AC-01, AC-03, CN-02, CN-03).
+- [x] **T002**: libs/usecase/src/template_export/mod.rs and libs/usecase/src/lib.rs — add TemplateExportCommand, TemplateExportReport, TemplateExportError, TemplateBoundaryManifestReadError, TemplateExportPortError, TemplateExportService, TemplateBoundaryManifestPort, TemplateExportPort, TemplateExportInteractor, module wiring, and mock-port unit tests (GO-01, IN-01, IN-02, IN-03, AC-01, AC-03, CN-02, CN-03).
 
 ### S3 — Infrastructure: codec + fs adapters
 
 > libs/infrastructure/src/template_export + libs/infrastructure/src/lib.rs — run T003 (codec symbols and tests) then T004 (adapter symbols, wiring, tests) (GO-01, GO-04, IN-01, IN-02, IN-03, IN-12, OS-05, OS-06, AC-01, AC-02, AC-03, CN-02, CN-03).
 
-- [ ] **T003**: libs/infrastructure/src/template_export/codec.rs and libs/infrastructure/src/template_export/mod.rs — add TemplateBoundaryManifestDto, TemplatePathEntryDto, TemplatePathClassificationDto, TemplateBoundaryManifestCodecError, decode_manifest, module wiring, and codec unit tests (GO-04, IN-02, IN-12, AC-02, CN-02).
+- [x] **T003**: libs/infrastructure/src/template_export/codec.rs and libs/infrastructure/src/template_export/mod.rs — add TemplateBoundaryManifestDto, TemplatePathEntryDto, TemplatePathClassificationDto, TemplateBoundaryManifestCodecError, decode_manifest, module wiring, and codec unit tests (GO-04, IN-02, IN-12, AC-02, CN-02).
 - [ ] **T004**: libs/infrastructure/src/template_export/mod.rs and libs/infrastructure/src/lib.rs — add FsTemplateBoundaryManifestAdapter, FsTemplateExportAdapter, module wiring, and tempdir-backed adapter tests (GO-01, GO-04, IN-01, IN-02, IN-03, IN-12, OS-05, OS-06, AC-01, AC-02, AC-03, CN-02, CN-03).
 
 ### S4 — CLI wiring: cli-driver + cli-composition + cli

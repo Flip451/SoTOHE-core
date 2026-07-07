@@ -4,20 +4,20 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| TemplatePathClassificationDto | enum | add | Include, Exclude, Overlay | 🟡 | 🔵 |
+| TemplatePathClassificationDto | enum | add | Include, Exclude, Overlay | 🔵 | 🔵 |
 
 ## Error Types
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| TemplateBoundaryManifestCodecError | error_type | add | SchemaVersion, Json, Pattern, Manifest | 🟡 | 🔵 |
+| TemplateBoundaryManifestCodecError | error_type | add | SchemaVersion, Json, Pattern, Manifest | 🔵 | 🔵 |
 
 ## DTOs
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| TemplateBoundaryManifestDto | dto | add | — | 🟡 | 🔵 |
-| TemplatePathEntryDto | dto | add | — | 🟡 | 🔵 |
+| TemplateBoundaryManifestDto | dto | add | — | 🔵 | 🔵 |
+| TemplatePathEntryDto | dto | add | — | 🔵 | 🔵 |
 
 ## Secondary Adapters
 
@@ -30,5 +30,5 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| infrastructure::template_export::codec::decode_manifest | free_function | add | fn(json: &str) -> Result<domain::template_export::TemplateBoundaryManifest, TemplateBoundaryManifestCodecError> | 🟡 | 🔵 |
+| infrastructure::template_export::codec::decode_manifest | free_function | add | fn(json: &str) -> Result<domain::template_export::TemplateBoundaryManifest, TemplateBoundaryManifestCodecError> | 🔵 | 🔵 |
 
