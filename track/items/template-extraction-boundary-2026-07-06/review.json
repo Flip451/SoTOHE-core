@@ -1,238 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3288095fdc6a74bca9607097a8254dd17bec1d797087dfb66d70efec4de0e8c3",
-          "at": "2026-07-07T01:03:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3288095fdc6a74bca9607097a8254dd17bec1d797087dfb66d70efec4de0e8c3",
-          "at": "2026-07-07T01:07:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:258c22ec7c9ab06a98c9e2123117e5413fb6d2e57754df127f99d06f6101a96f",
-          "at": "2026-07-07T04:27:42Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:258c22ec7c9ab06a98c9e2123117e5413fb6d2e57754df127f99d06f6101a96f",
-          "at": "2026-07-07T04:31:46Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:65bb4c88f2d0bbc98b2b9136d18132d0410a2a1bb367a95edbc4b40317d18fd7",
-          "at": "2026-07-06T23:39:50Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`decode_manifest` deserializes the full `TemplateBoundaryManifestDto` before checking `schema_version`. Because that DTO has `deny_unknown_fields`, a future manifest such as `schema_version: 2` plus a newly added field is rejected as `Json` before the `SchemaVersion` guard runs, despite the codec contract documenting `SchemaVersion` for unsupported versions. This breaks the established versioned-codec pattern used by `agent_profiles.rs` and `dry_check/config.rs`: parse a minimal schema-version envelope first, reject unsupported versions, then parse the strict DTO for the supported schema.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/template_export/codec.rs",
-              "line": 145,
-              "category": "serde codec break"
-            }
-          ],
-          "hash": "rvw1:sha256:65bb4c88f2d0bbc98b2b9136d18132d0410a2a1bb367a95edbc4b40317d18fd7",
-          "at": "2026-07-06T23:45:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6aeae4ebf3573ea86623ddd525ab6e4d705cf16f4f9f971285656902f6d991cd",
-          "at": "2026-07-06T23:51:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f4992d5cbf7b00de676c905018f3458f543504ff328b2788b8cdcd5878025074",
-          "at": "2026-07-07T00:13:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`FsTemplateBoundaryManifestAdapter::read()` dereferences `manifest_path` with `std::fs::read_to_string()` and never rejects a symlinked leaf. This boundary loader is the manifest SSoT entrypoint, and the repo's other security-sensitive loaders reject symlinks before reading; without that check, a symlink can swap in an unexpected manifest and steer export with attacker-controlled classifications.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/libs/infrastructure/src/template_export/mod.rs",
-              "line": 75,
-              "category": "symlink not rejected at boundary"
-            },
-            {
-              "message": "`copy_tree()` uses `symlink_metadata()` to classify a symlink as a non-directory, then calls `std::fs::copy(source, destination)`, which follows the symlink target. As a result, an included or overlayed subtree can copy bytes from outside the workspace or overlay tree into the exported template instead of rejecting the symlink at the I/O boundary.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/libs/infrastructure/src/template_export/mod.rs",
-              "line": 267,
-              "category": "symlink not rejected at boundary"
-            }
-          ],
-          "hash": "rvw1:sha256:33700a8a6b179a4a79483ade461d154f502cba82d8dfc448b98b9b9c7d7666e2",
-          "at": "2026-07-07T01:05:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`reject_manifest_symlink()` only lstat's the final path component. If `manifest_path` is reached through a symlinked parent directory, `read_to_string()` still follows that chain and loads a manifest from outside the intended tree. The repo's symlink-hardening pattern rejects the whole ancestor chain, not just the leaf.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/libs/infrastructure/src/template_export/mod.rs",
-              "line": 93,
-              "category": "symlink not rejected at boundary"
-            },
-            {
-              "message": "`export()` starts walking `command.workspace_root` and later resolves `command.overlay_dir` without any root-level symlink check. A symlinked workspace or overlay root can redirect the export outside the intended tree because `read_dir()`/`copy()` follow that root.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/libs/infrastructure/src/template_export/mod.rs",
-              "line": 194,
-              "category": "symlink not rejected at boundary"
-            }
-          ],
-          "hash": "rvw1:sha256:f0e57dc117d388c17fef41062ed39ad553b411f6c900a513cd243772aeaa80db",
-          "at": "2026-07-07T01:14:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:46b6a99e8887be88529a9794928efbc87795c4cb147350ae2dc28df0daf7528f",
-          "at": "2026-07-07T01:21:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`copy_tree` creates the destination directory before enumerating the source. If `command.output_dir` is inside a manifest-included or overlay source directory, the destination becomes a child of the source during the copy, so the recursive walk sees its own output and keeps copying `out/.../out/...` until an I/O failure or disk exhaustion. Add a guard that rejects destinations under the source subtree, or reject output directories under workspace/overlay roots before export starts.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/template_export/mod.rs",
-              "line": 291,
-              "category": "unbounded I/O recursion"
-            }
-          ],
-          "hash": "rvw1:sha256:46b6a99e8887be88529a9794928efbc87795c4cb147350ae2dc28df0daf7528f",
-          "at": "2026-07-07T01:26:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4ea60e26d71c8840043c70987a77edefd34e8d55148d8e0ec41c0d852601d63c",
-          "at": "2026-07-07T01:33:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:209564c2785307a5021e3fbfbc9a5ba6386ccfe78dbbef2973f3eda936e5a3dc",
-          "at": "2026-07-07T02:46:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:209564c2785307a5021e3fbfbc9a5ba6386ccfe78dbbef2973f3eda936e5a3dc",
-          "at": "2026-07-07T02:49:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`architecture-rules.json` layer paths are now treated as trusted scan roots without any boundary check. `verify_targets()` builds `<layer.path>/src` directly from config and `check_arch_layers_purity()` then scans it, so a malicious or malformed `path` like `../..` or an absolute path can make the purity verifiers read outside `trusted_root`. The new review-scope drift guard in `review_v2/scope_config_loader.rs` also derives its expected pattern from the same unvalidated `layer.path`, so it can be satisfied by the same escape. This should follow the existing trusted-root pattern used for briefing files: resolve, canonicalize, and reject anything that does not stay under root before scanning.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/arch.rs",
-              "line": 57,
-              "category": "trusted-root violation"
-            }
-          ],
-          "hash": "rvw1:sha256:84f03fb0a3066465bda3fe6da4e99f2a55991180ff7f3b3e1cdc689eca129323",
-          "at": "2026-07-07T04:30:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`validate_layer_groups` treats `architecture-rules.json` as absent whenever `exists()` is false, so a dangling symlink at that path is silently classified as \"missing\" and the new drift guard is skipped instead of failing closed. That gives a PR author a way to neutralize the layer-group lockstep check by swapping the file for a broken symlink; use the same symlink-aware rejection pattern used elsewhere in the infra loaders before deciding the file is absent.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/libs/infrastructure/src/review_v2/scope_config_loader.rs",
-              "line": 285,
-              "category": "symlink not rejected at boundary"
-            },
-            {
-              "message": "The config-driven purity scan walks each `<layer>/src` tree with `read_dir`/`read_to_string` but never rejects symlinked directories or files at the boundary. Because `layer.path` now comes from `architecture-rules.json`, a symlinked source tree can make the verifier traverse outside the trusted root; the same pattern exists in `domain_strings.rs` as well.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/libs/infrastructure/src/verify/usecase_purity.rs",
-              "line": 103,
-              "category": "symlink not rejected at boundary"
-            }
-          ],
-          "hash": "rvw1:sha256:28bcab7f3c0f0301c72c7a11429e039c8bbee4bfb280ab4fe28f717115197236",
-          "at": "2026-07-07T04:41:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:08095716ce138b8dfcbe65946fbd5af21e5347615a502a892d79320dfc4e0347",
-          "at": "2026-07-07T04:59:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: `validate_layer_groups` only enforces the one-way check from `architecture-rules.json` to `review-scope.json`. If a layer is renamed or deleted in arch-rules, any stale review-scope group with the old layer name is still accepted because there is no reverse check for surplus layer groups. That leaves the drift guard non-fail-closed and can keep routing files into an obsolete scope.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/libs/infrastructure/src/review_v2/scope_config_loader.rs",
-              "line": 310,
-              "category": "non-fail-closed config"
-            }
-          ],
-          "hash": "rvw1:sha256:08095716ce138b8dfcbe65946fbd5af21e5347615a502a892d79320dfc4e0347",
-          "at": "2026-07-07T05:03:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f278211eb84ecbfee1293fa6b924b15f6f948e8cb5938de1609eb86e2091fa54",
-          "at": "2026-07-07T05:14:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f278211eb84ecbfee1293fa6b924b15f6f948e8cb5938de1609eb86e2091fa54",
-          "at": "2026-07-07T05:19:28Z"
-        }
-      ]
-    },
     "harness-policy": {
       "rounds": [
         {
@@ -317,39 +85,6 @@
         }
       ]
     },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:61814c909cafc741ea2105ded95760da3459506476196e273dbe526d566f14fd",
-          "at": "2026-07-06T17:32:50Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D2 says the template bootstrap will not build sotp source, but the selected command is `cargo install --git`, which compiles the git source on the bootstrap host. That conflicts with the same ADR's grounding that protoc/MSRV/vendored dependencies constrain building sotp, not running a prebuilt binary, and later claims consumers are separated from those build constraints. Downstream spec/impl-plan cannot derive whether bootstrap must provision sotp build prerequisites or switch to a prebuilt/feature-gated distribution path.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
-              "line": 68,
-              "category": "research_grounding_mismatch"
-            }
-          ],
-          "hash": "rvw1:sha256:61814c909cafc741ea2105ded95760da3459506476196e273dbe526d566f14fd",
-          "at": "2026-07-06T17:34:50Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1691fc6c2414ac693c4af607b40c015f1444303e0944a286239c872f0f5cf99b",
-          "at": "2026-07-06T18:42:03Z"
-        }
-      ]
-    },
     "cli_composition": {
       "rounds": [
         {
@@ -368,21 +103,101 @@
         }
       ]
     },
-    "cli_driver": {
+    "domain": {
       "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `TemplatePathPattern::try_new` accepts syntactically distinct but semantically identical paths like `libs/domain` and `./libs/domain`, while `TemplateBoundaryManifest::try_new` only checks duplicates by raw string equality. That lets the same workspace path appear twice with different classifications, bypassing the fail-closed duplicate guard and making `classify()` depend on the caller's spelling instead of the actual path. See [libs/domain/src/template_export/mod.rs:33](file:///home/flip451/individual/t-rust/templates/SoTOHE-core-004/libs/domain/src/template_export/mod.rs#L33) and [libs/domain/src/template_export/mod.rs:141](file:///home/flip451/individual/t-rust/templates/SoTOHE-core-004/libs/domain/src/template_export/mod.rs#L141).",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/libs/domain/src/template_export/mod.rs",
+              "line": 33,
+              "category": "broken invariant in newtype constructor"
+            }
+          ],
+          "hash": "rvw1:sha256:888a5c94aec4898c486a1785228fba107f59ce949aae7a7b83c2b6f2fdb663ec",
+          "at": "2026-07-06T23:39:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TemplatePathPattern::try_new` preserves a trailing `/` in the normalized value, so semantically identical workspace paths like `vendor` and `vendor/` become distinct `TemplatePathPattern`s. That lets `TemplateBoundaryManifest::try_new` accept conflicting rows for the same path and makes `classify()` depend on spelling rather than path identity.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/libs/domain/src/template_export/mod.rs",
+              "line": 88,
+              "category": "broken invariant in newtype constructor"
+            }
+          ],
+          "hash": "rvw1:sha256:6d5d9225395c72e39726c34a1b41b65232c062dfae777cf68ca3b50e354388f4",
+          "at": "2026-07-06T23:50:28Z"
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d6914a63845d1c996a9e11e23d8ed08c70364a42310c4ea975fde3ea18acc874",
-          "at": "2026-07-07T01:04:00Z"
+          "hash": "rvw1:sha256:676cf4e576f27d37483aaf4b780e007cfff10139bfefe5e80703465efc6424b1",
+          "at": "2026-07-07T00:05:51Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d6914a63845d1c996a9e11e23d8ed08c70364a42310c4ea975fde3ea18acc874",
-          "at": "2026-07-07T01:07:41Z"
+          "hash": "rvw1:sha256:676cf4e576f27d37483aaf4b780e007cfff10139bfefe5e80703465efc6424b1",
+          "at": "2026-07-07T00:10:01Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1d185a44dff71595621805768b365be642ba2b59de8e4bac5ca39804ae94f7e8",
+          "at": "2026-07-06T23:39:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1d185a44dff71595621805768b365be642ba2b59de8e4bac5ca39804ae94f7e8",
+          "at": "2026-07-06T23:44:16Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:42f15231ee8cbae9cfbaca9867d9b89c5e520c4af640dcdf1f78b65819e6bf43",
+          "at": "2026-07-06T19:50:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:42f15231ee8cbae9cfbaca9867d9b89c5e520c4af640dcdf1f78b65819e6bf43",
+          "at": "2026-07-06T19:53:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c2e9d3a4d11aba1705e6b6833e7188632ead2c04c5b2a72fe1f7e97cb211e5cb",
+          "at": "2026-07-06T21:01:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:caff58e9259af16402d54c62a004098308da7841e5080aa352efb66df223c1a8",
+          "at": "2026-07-07T05:18:25Z"
         }
       ]
     },
@@ -804,182 +619,46 @@
           "findings": [],
           "hash": "rvw1:sha256:93c3d09a1ddc598679215b7bb45020bfc1147d7b721793d4dd12e6c075e73772",
           "at": "2026-07-07T05:25:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:241c3621d5dd02dfc1054473e749c21e006a8b17f110f5a01196367d07841c40",
+          "at": "2026-07-07T05:35:50Z"
         }
       ]
     },
-    "spec": {
+    "adr": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:42f15231ee8cbae9cfbaca9867d9b89c5e520c4af640dcdf1f78b65819e6bf43",
-          "at": "2026-07-06T19:50:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:42f15231ee8cbae9cfbaca9867d9b89c5e520c4af640dcdf1f78b65819e6bf43",
-          "at": "2026-07-06T19:53:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c2e9d3a4d11aba1705e6b6833e7188632ead2c04c5b2a72fe1f7e97cb211e5cb",
-          "at": "2026-07-06T21:01:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:caff58e9259af16402d54c62a004098308da7841e5080aa352efb66df223c1a8",
-          "at": "2026-07-07T05:18:25Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: `TemplatePathPattern::try_new` accepts syntactically distinct but semantically identical paths like `libs/domain` and `./libs/domain`, while `TemplateBoundaryManifest::try_new` only checks duplicates by raw string equality. That lets the same workspace path appear twice with different classifications, bypassing the fail-closed duplicate guard and making `classify()` depend on the caller's spelling instead of the actual path. See [libs/domain/src/template_export/mod.rs:33](file:///home/flip451/individual/t-rust/templates/SoTOHE-core-004/libs/domain/src/template_export/mod.rs#L33) and [libs/domain/src/template_export/mod.rs:141](file:///home/flip451/individual/t-rust/templates/SoTOHE-core-004/libs/domain/src/template_export/mod.rs#L141).",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/libs/domain/src/template_export/mod.rs",
-              "line": 33,
-              "category": "broken invariant in newtype constructor"
-            }
-          ],
-          "hash": "rvw1:sha256:888a5c94aec4898c486a1785228fba107f59ce949aae7a7b83c2b6f2fdb663ec",
-          "at": "2026-07-06T23:39:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TemplatePathPattern::try_new` preserves a trailing `/` in the normalized value, so semantically identical workspace paths like `vendor` and `vendor/` become distinct `TemplatePathPattern`s. That lets `TemplateBoundaryManifest::try_new` accept conflicting rows for the same path and makes `classify()` depend on spelling rather than path identity.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/libs/domain/src/template_export/mod.rs",
-              "line": 88,
-              "category": "broken invariant in newtype constructor"
-            }
-          ],
-          "hash": "rvw1:sha256:6d5d9225395c72e39726c34a1b41b65232c062dfae777cf68ca3b50e354388f4",
-          "at": "2026-07-06T23:50:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:676cf4e576f27d37483aaf4b780e007cfff10139bfefe5e80703465efc6424b1",
-          "at": "2026-07-07T00:05:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:676cf4e576f27d37483aaf4b780e007cfff10139bfefe5e80703465efc6424b1",
-          "at": "2026-07-07T00:10:01Z"
-        }
-      ]
-    },
-    "types": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9ce85877b945aa7704ddc8ad5d33bda71194cb56ca53a528e12460f2dae5724c",
-          "at": "2026-07-06T19:55:15Z"
+          "hash": "rvw1:sha256:61814c909cafc741ea2105ded95760da3459506476196e273dbe526d566f14fd",
+          "at": "2026-07-06T17:32:50Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`TemplatePathPattern::try_new` returns `TemplateBoundaryManifestError`, but this constructor can only fail while validating a single pattern; the shared enum also exposes `DuplicatePattern` and `EmptyManifest`, which this method cannot structurally produce. The method docs do not list the producible subset or justify the wider error surface, so callers must handle impossible variants.",
+              "message": "D2 says the template bootstrap will not build sotp source, but the selected command is `cargo install --git`, which compiles the git source on the bootstrap host. That conflicts with the same ADR's grounding that protoc/MSRV/vendored dependencies constrain building sotp, not running a prebuilt binary, and later claims consumers are separated from those build constraints. Downstream spec/impl-plan cannot derive whether bootstrap must provision sotp build prerequisites or switch to a prebuilt/feature-gated distribution path.",
               "severity": "P1",
-              "file": "track/items/template-extraction-boundary-2026-07-06/domain-types.json",
-              "line": 123,
-              "category": "per-method error imprecision"
-            },
-            {
-              "message": "`TemplateBoundaryManifest::try_new` also returns the full `TemplateBoundaryManifestError`, but it receives already validated `TemplatePathEntry` values and its docs only describe duplicate/empty checks; `InvalidPattern` cannot be produced at this layer. Split the pattern/manifest errors or explicitly declare the reachable subset for each constructor.",
-              "severity": "P1",
-              "file": "track/items/template-extraction-boundary-2026-07-06/domain-types.json",
-              "line": 202,
-              "category": "per-method error imprecision"
-            },
-            {
-              "message": "`TemplateExportReport` cites `AC-05`, but that acceptance criterion is about running `cargo make ci` on the exported workspace and adding a smoke gate, not the successful-export report DTO. This is an off-topic `spec_refs` anchor for this entry.",
-              "severity": "P1",
-              "file": "track/items/template-extraction-boundary-2026-07-06/usecase-types.json",
-              "line": 53,
-              "category": "spec_refs off-topic"
-            },
-            {
-              "message": "`FsTemplateExportAdapter` also cites `AC-05`, but the adapter contract is copying/excluding/overlaying files; `AC-05` is the separate smoke-gate/CI-green requirement. Keeping that anchor here makes the adapter appear responsible for CI verification.",
-              "severity": "P1",
-              "file": "track/items/template-extraction-boundary-2026-07-06/infrastructure-types.json",
-              "line": 38,
-              "category": "spec_refs off-topic"
-            },
-            {
-              "message": "Domain catalogue docs restate upstream behavior instead of just naming the target and citing anchors: `TemplatePathPattern` restates path-shape validation, `TemplatePathClassification` restates Include/Exclude/Overlay effects, and `TemplateBoundaryManifest` restates classification and uniqueness behavior. `knowledge/conventions/no-upstream-restatement.md` forbids this in `<layer>-types.json` docs because the behavior contract belongs in spec/ADR anchors.",
-              "severity": "P1",
-              "file": "track/items/template-extraction-boundary-2026-07-06/domain-types.json",
-              "line": 21,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "Usecase catalogue docs restate upstream behavior across `TemplateExportCommand`, `TemplateExportReport`, `TemplateExportError`, `TemplateExportService`, `TemplateBoundaryManifestPort`, and `TemplateExportPort` by describing pass-through paths, counts, fail-closed policy, manifest reading, tree filtering, overlay application, and copy/skip/replace behavior. These should be reduced to target/operation plus `IN-*`/`AC-*`/`CN-*` cites per the no-upstream-restatement convention.",
-              "severity": "P1",
-              "file": "track/items/template-extraction-boundary-2026-07-06/usecase-types.json",
-              "line": 24,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "Infrastructure catalogue docs restate upstream behavior in `FsTemplateBoundaryManifestAdapter`, `FsTemplateExportAdapter`, `TemplateBoundaryManifestDto`, `TemplatePathEntryDto`, `TemplatePathClassificationDto`, `TemplateBoundaryManifestCodecError`, and `decode_manifest` by describing JSON reads, workspace walking, overlay-copy behavior, raw-string validation, mirror literal sets, schema mismatch/JSON/domain failure modes, and parse-to-domain behavior. Those behavior details should live behind the cited spec anchors, not be duplicated in the catalogue docs.",
-              "severity": "P1",
-              "file": "track/items/template-extraction-boundary-2026-07-06/infrastructure-types.json",
-              "line": 15,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "CLI-driver docs restate downstream behavior in `TemplateExportInput`, `TemplateInput`, `TemplateDriver`, and `TemplateDriver::handle`, including boundary import rationale, future variant behavior, service invocation, report/error rendering, stdout/stderr, and exit-code behavior. Per no-upstream-restatement, the catalogue should cite the relevant anchors rather than carrying those behavioral contracts itself.",
-              "severity": "P1",
-              "file": "track/items/template-extraction-boundary-2026-07-06/cli_driver-types.json",
-              "line": 24,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "CLI catalogue docs restate command behavior in `TemplateCommand`, `TemplateExportArgs`, `CliCommand`, `cli::commands::template::execute`, and `cli::commands::template::dispatch`, including future subcommand shape, flag mapping, Template dispatch, composition-root outcome mapping, and exit-code mapping. These duplicate upstream CLI/export behavior and should be anchor-only contract descriptions.",
-              "severity": "P1",
-              "file": "track/items/template-extraction-boundary-2026-07-06/cli-types.json",
-              "line": 17,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "`TemplateCompositionRoot` and its methods restate wiring behavior by naming concrete adapters, interactor construction, driver injection, and error mapping. That wiring behavior is upstream contract content for `IN-01`/`AC-01`; the catalogue docs should not duplicate it in prose.",
-              "severity": "P1",
-              "file": "track/items/template-extraction-boundary-2026-07-06/cli_composition-types.json",
-              "line": 15,
-              "category": "upstream restatement"
+              "file": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+              "line": 68,
+              "category": "research_grounding_mismatch"
             }
           ],
-          "hash": "rvw1:sha256:9ce85877b945aa7704ddc8ad5d33bda71194cb56ca53a528e12460f2dae5724c",
-          "at": "2026-07-06T20:00:42Z"
+          "hash": "rvw1:sha256:61814c909cafc741ea2105ded95760da3459506476196e273dbe526d566f14fd",
+          "at": "2026-07-06T17:34:50Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:c812778ea0b6de1859afa50fd648ee78e6f09e6eb5e356c324c0c4c14e7d42fe",
-          "at": "2026-07-06T20:15:37Z"
+          "hash": "rvw1:sha256:1691fc6c2414ac693c4af607b40c015f1444303e0944a286239c872f0f5cf99b",
+          "at": "2026-07-06T18:42:03Z"
         }
       ]
     },
@@ -1080,21 +759,349 @@
         }
       ]
     },
-    "usecase": {
+    "infrastructure": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1d185a44dff71595621805768b365be642ba2b59de8e4bac5ca39804ae94f7e8",
-          "at": "2026-07-06T23:39:47Z"
+          "hash": "rvw1:sha256:65bb4c88f2d0bbc98b2b9136d18132d0410a2a1bb367a95edbc4b40317d18fd7",
+          "at": "2026-07-06T23:39:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`decode_manifest` deserializes the full `TemplateBoundaryManifestDto` before checking `schema_version`. Because that DTO has `deny_unknown_fields`, a future manifest such as `schema_version: 2` plus a newly added field is rejected as `Json` before the `SchemaVersion` guard runs, despite the codec contract documenting `SchemaVersion` for unsupported versions. This breaks the established versioned-codec pattern used by `agent_profiles.rs` and `dry_check/config.rs`: parse a minimal schema-version envelope first, reject unsupported versions, then parse the strict DTO for the supported schema.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/template_export/codec.rs",
+              "line": 145,
+              "category": "serde codec break"
+            }
+          ],
+          "hash": "rvw1:sha256:65bb4c88f2d0bbc98b2b9136d18132d0410a2a1bb367a95edbc4b40317d18fd7",
+          "at": "2026-07-06T23:45:53Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1d185a44dff71595621805768b365be642ba2b59de8e4bac5ca39804ae94f7e8",
-          "at": "2026-07-06T23:44:16Z"
+          "hash": "rvw1:sha256:6aeae4ebf3573ea86623ddd525ab6e4d705cf16f4f9f971285656902f6d991cd",
+          "at": "2026-07-06T23:51:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f4992d5cbf7b00de676c905018f3458f543504ff328b2788b8cdcd5878025074",
+          "at": "2026-07-07T00:13:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`FsTemplateBoundaryManifestAdapter::read()` dereferences `manifest_path` with `std::fs::read_to_string()` and never rejects a symlinked leaf. This boundary loader is the manifest SSoT entrypoint, and the repo's other security-sensitive loaders reject symlinks before reading; without that check, a symlink can swap in an unexpected manifest and steer export with attacker-controlled classifications.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/libs/infrastructure/src/template_export/mod.rs",
+              "line": 75,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "`copy_tree()` uses `symlink_metadata()` to classify a symlink as a non-directory, then calls `std::fs::copy(source, destination)`, which follows the symlink target. As a result, an included or overlayed subtree can copy bytes from outside the workspace or overlay tree into the exported template instead of rejecting the symlink at the I/O boundary.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/libs/infrastructure/src/template_export/mod.rs",
+              "line": 267,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:33700a8a6b179a4a79483ade461d154f502cba82d8dfc448b98b9b9c7d7666e2",
+          "at": "2026-07-07T01:05:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`reject_manifest_symlink()` only lstat's the final path component. If `manifest_path` is reached through a symlinked parent directory, `read_to_string()` still follows that chain and loads a manifest from outside the intended tree. The repo's symlink-hardening pattern rejects the whole ancestor chain, not just the leaf.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/libs/infrastructure/src/template_export/mod.rs",
+              "line": 93,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "`export()` starts walking `command.workspace_root` and later resolves `command.overlay_dir` without any root-level symlink check. A symlinked workspace or overlay root can redirect the export outside the intended tree because `read_dir()`/`copy()` follow that root.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/libs/infrastructure/src/template_export/mod.rs",
+              "line": 194,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:f0e57dc117d388c17fef41062ed39ad553b411f6c900a513cd243772aeaa80db",
+          "at": "2026-07-07T01:14:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:46b6a99e8887be88529a9794928efbc87795c4cb147350ae2dc28df0daf7528f",
+          "at": "2026-07-07T01:21:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`copy_tree` creates the destination directory before enumerating the source. If `command.output_dir` is inside a manifest-included or overlay source directory, the destination becomes a child of the source during the copy, so the recursive walk sees its own output and keeps copying `out/.../out/...` until an I/O failure or disk exhaustion. Add a guard that rejects destinations under the source subtree, or reject output directories under workspace/overlay roots before export starts.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/template_export/mod.rs",
+              "line": 291,
+              "category": "unbounded I/O recursion"
+            }
+          ],
+          "hash": "rvw1:sha256:46b6a99e8887be88529a9794928efbc87795c4cb147350ae2dc28df0daf7528f",
+          "at": "2026-07-07T01:26:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4ea60e26d71c8840043c70987a77edefd34e8d55148d8e0ec41c0d852601d63c",
+          "at": "2026-07-07T01:33:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:209564c2785307a5021e3fbfbc9a5ba6386ccfe78dbbef2973f3eda936e5a3dc",
+          "at": "2026-07-07T02:46:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:209564c2785307a5021e3fbfbc9a5ba6386ccfe78dbbef2973f3eda936e5a3dc",
+          "at": "2026-07-07T02:49:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`architecture-rules.json` layer paths are now treated as trusted scan roots without any boundary check. `verify_targets()` builds `<layer.path>/src` directly from config and `check_arch_layers_purity()` then scans it, so a malicious or malformed `path` like `../..` or an absolute path can make the purity verifiers read outside `trusted_root`. The new review-scope drift guard in `review_v2/scope_config_loader.rs` also derives its expected pattern from the same unvalidated `layer.path`, so it can be satisfied by the same escape. This should follow the existing trusted-root pattern used for briefing files: resolve, canonicalize, and reject anything that does not stay under root before scanning.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/arch.rs",
+              "line": 57,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:84f03fb0a3066465bda3fe6da4e99f2a55991180ff7f3b3e1cdc689eca129323",
+          "at": "2026-07-07T04:30:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`validate_layer_groups` treats `architecture-rules.json` as absent whenever `exists()` is false, so a dangling symlink at that path is silently classified as \"missing\" and the new drift guard is skipped instead of failing closed. That gives a PR author a way to neutralize the layer-group lockstep check by swapping the file for a broken symlink; use the same symlink-aware rejection pattern used elsewhere in the infra loaders before deciding the file is absent.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/libs/infrastructure/src/review_v2/scope_config_loader.rs",
+              "line": 285,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "The config-driven purity scan walks each `<layer>/src` tree with `read_dir`/`read_to_string` but never rejects symlinked directories or files at the boundary. Because `layer.path` now comes from `architecture-rules.json`, a symlinked source tree can make the verifier traverse outside the trusted root; the same pattern exists in `domain_strings.rs` as well.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/libs/infrastructure/src/verify/usecase_purity.rs",
+              "line": 103,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:28bcab7f3c0f0301c72c7a11429e039c8bbee4bfb280ab4fe28f717115197236",
+          "at": "2026-07-07T04:41:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:08095716ce138b8dfcbe65946fbd5af21e5347615a502a892d79320dfc4e0347",
+          "at": "2026-07-07T04:59:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `validate_layer_groups` only enforces the one-way check from `architecture-rules.json` to `review-scope.json`. If a layer is renamed or deleted in arch-rules, any stale review-scope group with the old layer name is still accepted because there is no reverse check for surplus layer groups. That leaves the drift guard non-fail-closed and can keep routing files into an obsolete scope.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/libs/infrastructure/src/review_v2/scope_config_loader.rs",
+              "line": 310,
+              "category": "non-fail-closed config"
+            }
+          ],
+          "hash": "rvw1:sha256:08095716ce138b8dfcbe65946fbd5af21e5347615a502a892d79320dfc4e0347",
+          "at": "2026-07-07T05:03:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f278211eb84ecbfee1293fa6b924b15f6f948e8cb5938de1609eb86e2091fa54",
+          "at": "2026-07-07T05:14:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f278211eb84ecbfee1293fa6b924b15f6f948e8cb5938de1609eb86e2091fa54",
+          "at": "2026-07-07T05:19:28Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9ce85877b945aa7704ddc8ad5d33bda71194cb56ca53a528e12460f2dae5724c",
+          "at": "2026-07-06T19:55:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TemplatePathPattern::try_new` returns `TemplateBoundaryManifestError`, but this constructor can only fail while validating a single pattern; the shared enum also exposes `DuplicatePattern` and `EmptyManifest`, which this method cannot structurally produce. The method docs do not list the producible subset or justify the wider error surface, so callers must handle impossible variants.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/domain-types.json",
+              "line": 123,
+              "category": "per-method error imprecision"
+            },
+            {
+              "message": "`TemplateBoundaryManifest::try_new` also returns the full `TemplateBoundaryManifestError`, but it receives already validated `TemplatePathEntry` values and its docs only describe duplicate/empty checks; `InvalidPattern` cannot be produced at this layer. Split the pattern/manifest errors or explicitly declare the reachable subset for each constructor.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/domain-types.json",
+              "line": 202,
+              "category": "per-method error imprecision"
+            },
+            {
+              "message": "`TemplateExportReport` cites `AC-05`, but that acceptance criterion is about running `cargo make ci` on the exported workspace and adding a smoke gate, not the successful-export report DTO. This is an off-topic `spec_refs` anchor for this entry.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/usecase-types.json",
+              "line": 53,
+              "category": "spec_refs off-topic"
+            },
+            {
+              "message": "`FsTemplateExportAdapter` also cites `AC-05`, but the adapter contract is copying/excluding/overlaying files; `AC-05` is the separate smoke-gate/CI-green requirement. Keeping that anchor here makes the adapter appear responsible for CI verification.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/infrastructure-types.json",
+              "line": 38,
+              "category": "spec_refs off-topic"
+            },
+            {
+              "message": "Domain catalogue docs restate upstream behavior instead of just naming the target and citing anchors: `TemplatePathPattern` restates path-shape validation, `TemplatePathClassification` restates Include/Exclude/Overlay effects, and `TemplateBoundaryManifest` restates classification and uniqueness behavior. `knowledge/conventions/no-upstream-restatement.md` forbids this in `<layer>-types.json` docs because the behavior contract belongs in spec/ADR anchors.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/domain-types.json",
+              "line": 21,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Usecase catalogue docs restate upstream behavior across `TemplateExportCommand`, `TemplateExportReport`, `TemplateExportError`, `TemplateExportService`, `TemplateBoundaryManifestPort`, and `TemplateExportPort` by describing pass-through paths, counts, fail-closed policy, manifest reading, tree filtering, overlay application, and copy/skip/replace behavior. These should be reduced to target/operation plus `IN-*`/`AC-*`/`CN-*` cites per the no-upstream-restatement convention.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/usecase-types.json",
+              "line": 24,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Infrastructure catalogue docs restate upstream behavior in `FsTemplateBoundaryManifestAdapter`, `FsTemplateExportAdapter`, `TemplateBoundaryManifestDto`, `TemplatePathEntryDto`, `TemplatePathClassificationDto`, `TemplateBoundaryManifestCodecError`, and `decode_manifest` by describing JSON reads, workspace walking, overlay-copy behavior, raw-string validation, mirror literal sets, schema mismatch/JSON/domain failure modes, and parse-to-domain behavior. Those behavior details should live behind the cited spec anchors, not be duplicated in the catalogue docs.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/infrastructure-types.json",
+              "line": 15,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "CLI-driver docs restate downstream behavior in `TemplateExportInput`, `TemplateInput`, `TemplateDriver`, and `TemplateDriver::handle`, including boundary import rationale, future variant behavior, service invocation, report/error rendering, stdout/stderr, and exit-code behavior. Per no-upstream-restatement, the catalogue should cite the relevant anchors rather than carrying those behavioral contracts itself.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/cli_driver-types.json",
+              "line": 24,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "CLI catalogue docs restate command behavior in `TemplateCommand`, `TemplateExportArgs`, `CliCommand`, `cli::commands::template::execute`, and `cli::commands::template::dispatch`, including future subcommand shape, flag mapping, Template dispatch, composition-root outcome mapping, and exit-code mapping. These duplicate upstream CLI/export behavior and should be anchor-only contract descriptions.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/cli-types.json",
+              "line": 17,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`TemplateCompositionRoot` and its methods restate wiring behavior by naming concrete adapters, interactor construction, driver injection, and error mapping. That wiring behavior is upstream contract content for `IN-01`/`AC-01`; the catalogue docs should not duplicate it in prose.",
+              "severity": "P1",
+              "file": "track/items/template-extraction-boundary-2026-07-06/cli_composition-types.json",
+              "line": 15,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:9ce85877b945aa7704ddc8ad5d33bda71194cb56ca53a528e12460f2dae5724c",
+          "at": "2026-07-06T20:00:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c812778ea0b6de1859afa50fd648ee78e6f09e6eb5e356c324c0c4c14e7d42fe",
+          "at": "2026-07-06T20:15:37Z"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d6914a63845d1c996a9e11e23d8ed08c70364a42310c4ea975fde3ea18acc874",
+          "at": "2026-07-07T01:04:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d6914a63845d1c996a9e11e23d8ed08c70364a42310c4ea975fde3ea18acc874",
+          "at": "2026-07-07T01:07:41Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3288095fdc6a74bca9607097a8254dd17bec1d797087dfb66d70efec4de0e8c3",
+          "at": "2026-07-07T01:03:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3288095fdc6a74bca9607097a8254dd17bec1d797087dfb66d70efec4de0e8c3",
+          "at": "2026-07-07T01:07:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:258c22ec7c9ab06a98c9e2123117e5413fb6d2e57754df127f99d06f6101a96f",
+          "at": "2026-07-07T04:27:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:258c22ec7c9ab06a98c9e2123117e5413fb6d2e57754df127f99d06f6101a96f",
+          "at": "2026-07-07T04:31:46Z"
         }
       ]
     }
