@@ -138,16 +138,20 @@ fn decode_error_to_read_error(
 /// `TemplateExportPort` filesystem adapter (spec IN-01, IN-03, AC-01, AC-03,
 /// CN-03).
 ///
-/// Before walking, it preflights every manifest entry against the workspace so a
-/// pattern that no longer resolves to a real path fails closed with
+/// Before walking, it preflights every manifest entry per classification so a
+/// pattern that no longer resolves to a real source fails closed with
 /// [`TemplateExportPortError::SourceMissing`] instead of being silently dropped
-/// (spec IN-12). It then walks the workspace tree top-down and applies the
-/// boundary manifest classifications: `include` copies the classified subtree
-/// as-is, `exclude` skips it, and `overlay` copies the overlay directory's
-/// template version in its place. Traversal descends only into directories the
-/// manifest does not classify; a file with no classifying ancestor is a
-/// fail-closed [`TemplateExportPortError::UnclassifiedPath`] (spec IN-12). The
-/// export never
+/// (spec IN-12): an `include` requires its workspace path, an `overlay` requires
+/// either its workspace anchor or overlay content, and an `exclude` requires
+/// nothing (an already-absent excluded path is a no-op). It then walks the
+/// workspace tree top-down and applies the boundary manifest classifications:
+/// `include` copies the classified subtree as-is, `exclude` skips it, and
+/// `overlay` copies the overlay directory's template version in its place.
+/// `overlay` rows whose workspace anchor is absent are invisible to the walk, so
+/// a final pass emits their overlay content directly. Traversal descends only
+/// into directories the manifest does not classify; a file with no classifying
+/// ancestor is a fail-closed [`TemplateExportPortError::UnclassifiedPath`] (spec
+/// IN-12). The export never
 /// parses or rewrites file contents (spec CN-03) and reads directory entries in
 /// sorted order so identical inputs yield identical output (spec AC-01).
 #[derive(Debug, Default)]
@@ -169,10 +173,12 @@ impl TemplateExportPort for FsTemplateExportAdapter {
     /// - [`TemplateExportPortError::OutputDirExists`] if the output directory
     ///   already exists (the export refuses to overwrite).
     /// - [`TemplateExportPortError::OverlayMissing`] if an `overlay`-classified
-    ///   path has no file in the overlay directory.
-    /// - [`TemplateExportPortError::SourceMissing`] if a manifest-classified
-    ///   pattern has no corresponding path in the workspace (fail-closed drift
-    ///   detection, spec IN-12).
+    ///   path with a present workspace anchor has no file in the overlay
+    ///   directory.
+    /// - [`TemplateExportPortError::SourceMissing`] if an `include` pattern (or an
+    ///   `overlay` pattern with neither a workspace anchor nor overlay content)
+    ///   has no source in the workspace — fail-closed drift detection (spec
+    ///   IN-12). Absent `exclude` patterns are permitted.
     /// - [`TemplateExportPortError::UnclassifiedPath`] if a workspace file is not
     ///   classified by the manifest (fail-closed, spec IN-12).
     /// - [`TemplateExportPortError::Io`] if any filesystem operation fails.
@@ -192,6 +198,7 @@ impl TemplateExportPort for FsTemplateExportAdapter {
 
         let mut counts = ExportCounts::default();
         walk_and_export(Path::new(""), command, manifest, &mut counts)?;
+        emit_overlay_only_entries(command, manifest, &mut counts)?;
 
         Ok(TemplateExportReport {
             included_count: counts.included,
@@ -210,25 +217,84 @@ struct ExportCounts {
     overlay: usize,
 }
 
-/// Preflights every manifest entry against `command.workspace_root` before the
-/// export walk begins (fail-closed drift detection, spec IN-12).
+/// Preflights every manifest entry before the export walk begins so drift is
+/// caught up front rather than silently producing an incomplete template
+/// (fail-closed, spec IN-12). The requirement is per-classification, because the
+/// walk only ever visits paths that exist in the workspace:
 ///
-/// The walk only visits paths that exist in the workspace, so a manifest row
-/// whose source has been renamed or removed would otherwise be silently skipped,
-/// yielding an incomplete template rather than a failure. Requiring each
-/// classified pattern to resolve to a real workspace path — for `overlay` rows as
-/// well, whose overlay-file requirement is still enforced during the walk — turns
-/// that drift into a [`TemplateExportPortError::SourceMissing`]. Symlinked
-/// sources are rejected in the same style as the rest of the export.
+/// - `include`: the workspace path MUST exist — otherwise the walk would never
+///   reach it and the subtree would be silently dropped
+///   ([`TemplateExportPortError::SourceMissing`]).
+/// - `exclude`: absence is acceptable — an excluded path that is already gone
+///   just means there is nothing to skip, so no existence is required.
+/// - `overlay`: the workspace anchor OR the overlay content must exist. Only when
+///   *neither* is present is the row drift ([`TemplateExportPortError::SourceMissing`]).
+///   A present anchor with absent overlay content stays an `OverlayMissing`
+///   during the walk; an absent anchor with present overlay content is emitted by
+///   [`emit_overlay_only_entries`].
+///
+/// Symlinked sources are rejected in the same style as the rest of the export.
 fn preflight_manifest_sources(
     command: &TemplateExportCommand,
     manifest: &TemplateBoundaryManifest,
 ) -> Result<(), TemplateExportPortError> {
     for entry in manifest.entries() {
-        let source = command.workspace_root.join(entry.pattern().as_str());
-        if !reject_export_path_symlinks(&source)? {
-            return Err(TemplateExportPortError::SourceMissing { path: source });
+        let workspace_source = command.workspace_root.join(entry.pattern().as_str());
+        match entry.classification() {
+            TemplatePathClassification::Include => {
+                if !reject_export_path_symlinks(&workspace_source)? {
+                    return Err(TemplateExportPortError::SourceMissing { path: workspace_source });
+                }
+            }
+            // Nothing to ship: an absent excluded path is a no-op, not drift.
+            TemplatePathClassification::Exclude => {}
+            TemplatePathClassification::Overlay => {
+                let workspace_exists = reject_export_path_symlinks(&workspace_source)?;
+                let overlay_source = command.overlay_dir.join(entry.pattern().as_str());
+                let overlay_exists = reject_export_path_symlinks(&overlay_source)?;
+                if !workspace_exists && !overlay_exists {
+                    return Err(TemplateExportPortError::SourceMissing { path: workspace_source });
+                }
+            }
         }
+    }
+    Ok(())
+}
+
+/// Emits `overlay` rows whose workspace anchor is absent but whose overlay
+/// content exists (spec IN-01, AC-03).
+///
+/// The walk classifies only paths that exist in the workspace, so an overlay row
+/// backed solely by overlay content (e.g. a gitignored generated view that lives
+/// only under `overlay/`) is invisible to it. This pass copies that overlay
+/// content to the output path directly — creating parent directories as needed
+/// and counting it toward the overlay-applied tally — so such rows still ship.
+/// Rows whose workspace anchor exists are left to the walk, avoiding a double
+/// emission. Preflight already guaranteed overlay content is present when the
+/// anchor is absent, but the presence is re-checked to stay fail-closed.
+fn emit_overlay_only_entries(
+    command: &TemplateExportCommand,
+    manifest: &TemplateBoundaryManifest,
+    counts: &mut ExportCounts,
+) -> Result<(), TemplateExportPortError> {
+    for entry in manifest.entries() {
+        if !matches!(entry.classification(), TemplatePathClassification::Overlay) {
+            continue;
+        }
+        let workspace_source = command.workspace_root.join(entry.pattern().as_str());
+        // A present anchor is handled by the walk; only anchorless rows land here.
+        if reject_export_path_symlinks(&workspace_source)? {
+            continue;
+        }
+        let overlay_source = command.overlay_dir.join(entry.pattern().as_str());
+        if !ensure_overlay_source_exists(&overlay_source)? {
+            return Err(TemplateExportPortError::OverlayMissing {
+                pattern: entry.pattern().clone(),
+                overlay_path: overlay_source,
+            });
+        }
+        copy_tree(&overlay_source, &command.output_dir.join(entry.pattern().as_str()))?;
+        counts.overlay += 1;
     }
     Ok(())
 }

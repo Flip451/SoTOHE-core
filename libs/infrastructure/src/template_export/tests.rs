@@ -466,11 +466,12 @@ fn test_export_missing_include_source_returns_source_missing() {
 }
 
 #[test]
-fn test_export_missing_overlay_anchor_returns_source_missing() {
+fn test_export_overlay_row_missing_both_sources_returns_source_missing() {
     let dir = TempDir::new().unwrap();
     let command = export_fixture(&dir);
-    // An `overlay` row whose workspace anchor is absent is drift, not a valid
-    // overlay: the preflight rejects it before the OverlayMissing check runs.
+    // An `overlay` row with neither a workspace anchor nor overlay content is
+    // drift: the preflight rejects it before the walk runs. (The fixture overlay
+    // dir holds only Makefile.toml, so this pattern has no overlay content.)
     let manifest = manifest_from_json(
         r#"{
   "schema_version": 1,
@@ -486,6 +487,60 @@ fn test_export_missing_overlay_anchor_returns_source_missing() {
         matches!(err, TemplateExportPortError::SourceMissing { ref path } if path == &expected),
         "unexpected error: {err}"
     );
+}
+
+#[test]
+fn test_export_overlay_only_anchor_emits_overlay_content() {
+    let dir = TempDir::new().unwrap();
+    let command = export_fixture(&dir);
+    // The workspace has no `track/registry.md` (a gitignored generated view that
+    // lives only under overlay/), so the walk never sees it. The overlay-only
+    // emission pass must still ship the overlay content and count it.
+    write_file(dir.path(), "overlay/track/registry.md", "# generated view\n");
+    let manifest = manifest_from_json(
+        r#"{
+  "schema_version": 1,
+  "entries": [
+    { "pattern": "libs/domain", "classification": "include" },
+    { "pattern": "Makefile.toml", "classification": "overlay" },
+    { "pattern": "track/registry.md", "classification": "overlay" },
+    { "pattern": "vendor", "classification": "exclude" }
+  ]
+}"#,
+    );
+
+    let report = FsTemplateExportAdapter::new().export(&command, &manifest).unwrap();
+
+    // Makefile.toml (anchor present, via walk) + track/registry.md (overlay-only).
+    assert_eq!(report.overlay_applied_count, 2);
+    assert_eq!(read_file(&command.output_dir, "track/registry.md"), "# generated view\n");
+    assert_eq!(read_file(&command.output_dir, "Makefile.toml"), "# template tasks\n");
+}
+
+#[test]
+fn test_export_absent_exclude_row_succeeds() {
+    let dir = TempDir::new().unwrap();
+    let command = export_fixture(&dir);
+    // An `exclude` row whose workspace path does not exist is a no-op, not drift:
+    // the export must still succeed.
+    let manifest = manifest_from_json(
+        r#"{
+  "schema_version": 1,
+  "entries": [
+    { "pattern": "libs/domain", "classification": "include" },
+    { "pattern": "Makefile.toml", "classification": "overlay" },
+    { "pattern": "vendor", "classification": "exclude" },
+    { "pattern": "already-gone", "classification": "exclude" }
+  ]
+}"#,
+    );
+
+    let report = FsTemplateExportAdapter::new().export(&command, &manifest).unwrap();
+
+    assert_eq!(report.included_count, 1);
+    assert_eq!(report.overlay_applied_count, 1);
+    // Only the present `vendor` exclude is counted; the absent one is a silent no-op.
+    assert_eq!(report.excluded_count, 1);
 }
 
 #[cfg(unix)]
