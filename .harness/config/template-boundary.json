@@ -36,7 +36,12 @@
     { "pattern": "knowledge/research", "classification": "overlay" },
 
     { "pattern": ".cache", "classification": "exclude" },
+    { "pattern": ".fastembed_cache", "classification": "exclude" },
     { "pattern": ".git", "classification": "exclude" },
+    { "pattern": ".semantic_index", "classification": "exclude" },
+    { "pattern": ".semantic_index.lock", "classification": "exclude" },
+    { "pattern": ".semantic_index.manifest", "classification": "exclude" },
+    { "pattern": ".semantic_index.sotp-cache", "classification": "exclude" },
     { "pattern": "bin", "classification": "exclude" },
     { "pattern": "config", "classification": "exclude" },
     { "pattern": "overlay", "classification": "exclude" },
