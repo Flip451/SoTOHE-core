@@ -1,0 +1,181 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "20384e5f7f057581a9eb09256eeda9e56136fa5cb1db8ff1874c4b7b54b03856",
+  "signals": [
+    {
+      "type_name": "CatalogueEntryRefDto",
+      "signal": "blue",
+      "entry_hash": "61203f1b0c5773fbaef8d3f08d0877bd32a2f95ccef62caad94a8fbdadaa453d"
+    },
+    {
+      "type_name": "ContractRoleKey",
+      "signal": "blue",
+      "entry_hash": "c71134fcc5737b358c0f3ce14bcdd0e484300761158cde433097aa30c54cd0cf"
+    },
+    {
+      "type_name": "DataRoleKey",
+      "signal": "blue",
+      "entry_hash": "fbd518f7a308952461525b7b78152cf2c97184cdb900d1beb7fef2fafbdba2ba"
+    },
+    {
+      "type_name": "FulfillmentFailCategoryDto",
+      "signal": "blue",
+      "entry_hash": "401a947adb118d54e8715fdf206a19564fabbef535e6b6e14fb68a1c353d40a2"
+    },
+    {
+      "type_name": "FunctionRoleKey",
+      "signal": "blue",
+      "entry_hash": "bed762c6cb25542ed27cb1315455e7bafc01d57d2fcc953000737da56d625ce1"
+    },
+    {
+      "type_name": "JsonObligationFulfillmentCacheCodec",
+      "signal": "blue",
+      "entry_hash": "30a8c56350d1d3c2a434013faaaf87965d29dfbbe86ba97191f36e4f8c9c099a"
+    },
+    {
+      "type_name": "JsonObligationsCodec",
+      "signal": "blue",
+      "entry_hash": "e43548baef4a5a824d9489f5a0ef514e62f66d5157b29e4cb28f3cee305315ec"
+    },
+    {
+      "type_name": "JsonTestBindingsCodec",
+      "signal": "blue",
+      "entry_hash": "f346d8f7fda64bce5a03673a9c6b3ddcae927318d86ebca5a1ad5c3dfe3b9117"
+    },
+    {
+      "type_name": "JsonTestObligationRulesLoader",
+      "signal": "blue",
+      "entry_hash": "e2a7e9ba0ca6b110dbed5dc7a94df36f8c6a66981ae4814f353187191c9a4f34"
+    },
+    {
+      "type_name": "JsonWaiverCacheCodec",
+      "signal": "blue",
+      "entry_hash": "341b7c4c1f02f2a95ada747bb6e475572ab556559d36d00d1732094ffc6e79c6"
+    },
+    {
+      "type_name": "ObligationFulfillmentCacheDocumentDto",
+      "signal": "blue",
+      "entry_hash": "8d7a6de8b6caa82daa065233c8159b2954860392307712824cdbf1d2f4f40eca"
+    },
+    {
+      "type_name": "ObligationFulfillmentCacheEntryDto",
+      "signal": "blue",
+      "entry_hash": "69334e364047819d3f906158430a135836a54e88dfa4d3f76dfa79a886a44534"
+    },
+    {
+      "type_name": "ObligationFulfillmentVerdictDto",
+      "signal": "blue",
+      "entry_hash": "28250592d3b48e565d437852f7accfded70476d7214ac3024d69a1055b194d21"
+    },
+    {
+      "type_name": "ObligationFulfillmentVerifierAdapter",
+      "signal": "blue",
+      "entry_hash": "97acadf41ddd37045b96f7b114903350d2212aebb17de1591b76bacc0910a79f"
+    },
+    {
+      "type_name": "ObligationsCodecError",
+      "signal": "blue",
+      "entry_hash": "9fe850ba1120e9459dde6bbd4b1ac957982f8b1ba30ad961ff6e1d4c22cd118c"
+    },
+    {
+      "type_name": "ObligationsDocumentDto",
+      "signal": "blue",
+      "entry_hash": "9b2c0c2335223a41ea69bf6e6df93dba81482f96a829573bb946173cdb3dd642"
+    },
+    {
+      "type_name": "PatternKey",
+      "signal": "blue",
+      "entry_hash": "9285d6c1d4a8d51d89943452dc5f7cd1c07d686def9e7d01e899a406f34bc132"
+    },
+    {
+      "type_name": "RoleObligationRulesDto",
+      "signal": "blue",
+      "entry_hash": "a9d80136bdcd8b0bb2be6009727b0e1ab382db02db9462bb0970dfed3014a224"
+    },
+    {
+      "type_name": "SynTestSourceScanner",
+      "signal": "blue",
+      "entry_hash": "fe17d4b20b492b0450f6f3b21303f4767e2cca97b7448bcb5359f8be5a09ef03"
+    },
+    {
+      "type_name": "TestBindingRecordDto",
+      "signal": "blue",
+      "entry_hash": "b921ea5420a137bad2e17e172fe6ea648daa507c2074e4dba52a494f06e8159b"
+    },
+    {
+      "type_name": "TestBindingsCodecError",
+      "signal": "blue",
+      "entry_hash": "4da411629121bf2f38f8909b4c862d9bb1f2fa30540234a46c018841ba111462"
+    },
+    {
+      "type_name": "TestBindingsDocumentDto",
+      "signal": "blue",
+      "entry_hash": "2a85738d6b388c4b6cf68e1495ed9ddf4ba5928abe5d5dfd1f4687d52305fd9e"
+    },
+    {
+      "type_name": "TestLocationDto",
+      "signal": "blue",
+      "entry_hash": "3c105059581bef5dd2902589138c5a62c77f0bcb79c20b88fb6497c0661aa6ec"
+    },
+    {
+      "type_name": "TestObligationAnchorIdDto",
+      "signal": "blue",
+      "entry_hash": "475de2e537678f2043135c4d29cbfbfaf56679ef8f609ea7bc6346c7fdff695a"
+    },
+    {
+      "type_name": "TestObligationDto",
+      "signal": "blue",
+      "entry_hash": "44a9b9abe441329396ddb53d9b0df4d23635e1909f9f1fbe946edb0713f391c9"
+    },
+    {
+      "type_name": "TestObligationEdgeIdDto",
+      "signal": "blue",
+      "entry_hash": "087b537f6105696287cde7042b244b26fe5374a63542e0f0cf612ebeb533f9dc"
+    },
+    {
+      "type_name": "TestObligationIdDto",
+      "signal": "blue",
+      "entry_hash": "e43a3f66980d05174b39fb4bc2791dc8477e9c97444c2a0524e3ef55276669d4"
+    },
+    {
+      "type_name": "TestObligationKindDto",
+      "signal": "blue",
+      "entry_hash": "fbb668b2be779ec71eca5e2eef78cf232e1bd2584f861f9978d4188a3513be21"
+    },
+    {
+      "type_name": "TestObligationPerAxisDto",
+      "signal": "blue",
+      "entry_hash": "f62d9a00293a6684166fe2b2eae196c0d6a7c5e4bdfce1dae7ebe894501f1960"
+    },
+    {
+      "type_name": "TestObligationRuleDto",
+      "signal": "blue",
+      "entry_hash": "b978723c0889cf8f8365fdaf1c8df8f10f7b43eeeeec026a0bd9472b9d77b3c6"
+    },
+    {
+      "type_name": "TestObligationRulesDocumentDto",
+      "signal": "blue",
+      "entry_hash": "27a40f0c57ae6d7da2bee8d24858d08964b32239952e92b13750566b4745809a"
+    },
+    {
+      "type_name": "WaiverCacheDocumentDto",
+      "signal": "blue",
+      "entry_hash": "7275db9e65ac0a783a4a3d27446e96a7241041d48e90e3eebe3db120fe84f91f"
+    },
+    {
+      "type_name": "WaiverCacheEntryDto",
+      "signal": "blue",
+      "entry_hash": "1e13b279f967710e1d140450c5b7e8f2eb31a0e1353aa025f1e8117e9cf4d7ed"
+    },
+    {
+      "type_name": "WaiverVerdictDto",
+      "signal": "blue",
+      "entry_hash": "d58d8d1be6be2fe0fbd4c2e5c6dcd804f92f18617e754bf183bf7108591d839c"
+    },
+    {
+      "type_name": "WaiverVerifierAdapter",
+      "signal": "blue",
+      "entry_hash": "a40d0579a81afccbe5a3bf776ac733c1caad03abcc005f1bfc358779ca986d6b"
+    }
+  ]
+}

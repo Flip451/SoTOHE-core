@@ -1,0 +1,342 @@
+{
+  "schema_version": 1,
+  "layer": "cli",
+  "entries": [
+    {
+      "claim_hash": "bbd657139b85e87a7c7cade9aa1bedc02c41a67de772e38ad53fc962cc045b50",
+      "evidence_hash": "5da59f9485edd1ca1f266cac3333a0279d7012c6de1aca8feac7695c8aa44ea8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "obligation-fulfillment 検証 capability と waiver 検証 capability を `.harness/config/agent-profiles.json` に別 capability として新設する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/cli-types.json",
+          "section_key": "types",
+          "entry_key": "TestObligationArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-11",
+          "text_label": "obligation-fulfillment 検証 capability と waiver 検証 capability を `.harness/config/agent-profiles.json` に別 capability として新設する。前者はコード（テスト関数本体） → 自然言語（anchor 本文）の意味論比較、後者は自然言語（waived 理由） → 自然言語（anchor 本文 × entry 宣言）の意味論比較で、判定基準・prompt が異なるため（chain 別 prompt 分離と同じ論理）。各 capability は fast/final の段階引き上げ設定を独立に持ち、`agent-profiles.json` の `resolve_execution` 経路（既存機構）を再利用する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "bbd657139b85e87a7c7cade9aa1bedc02c41a67de772e38ad53fc962cc045b50",
+      "evidence_hash": "db08b121a20ec032b1c564b5769fcc4556839fe8a025eaf81f2fa68e032c3035",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp test-obligation {derive,check,evaluate,results}` は `--lenient` / `--force` フラグを持たず、scope 指定フラグも持たない。CLI 引数 parser の定義および help text が本方針に一致することを検証するテストがある。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/cli-types.json",
+          "section_key": "types",
+          "entry_key": "TestObligationArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-14",
+          "text_label": "`sotp test-obligation {derive,check,evaluate,results}` は `--lenient` / `--force` フラグを持たず、scope 指定フラグも持たない。CLI 引数 parser の定義および help text が本方針に一致することを検証するテストがある。"
+        }
+      }
+    },
+    {
+      "claim_hash": "bbd657139b85e87a7c7cade9aa1bedc02c41a67de772e38ad53fc962cc045b50",
+      "evidence_hash": "cd6500dd706114ac225855e87a9f2783be3deaf50eb4462eac3fdee194be39f2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI 4 サブコマンド（`derive` / `check` / `evaluate` / `results`）は fail-closed で、`--lenient` / `--force` 系フラグを持たず、scope 指定フラグも持たない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/cli-types.json",
+          "section_key": "types",
+          "entry_key": "TestObligationArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-09",
+          "text_label": "CLI 4 サブコマンド（`derive` / `check` / `evaluate` / `results`）は fail-closed で、`--lenient` / `--force` 系フラグを持たず、scope 指定フラグも持たない。スコープは artifact 存在ベースで自動解決される。verdict gate は `check` の責務であり、`results` は informational（exit 常に 0）。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5248875f6b9e41ef16149c501bfc85cb8600db7d79fb4a38b6a4ec9342545545",
+      "evidence_hash": "1ea999f83a13693dee35ecc945798f7da95fa1a0cbcf08776195af19519ca901",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp test-obligation check` の実装（pure-read の被覆ゲート）。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/cli-types.json",
+          "section_key": "types",
+          "entry_key": "TestObligationCheckArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "`bin/sotp test-obligation check` の実装（pure-read の被覆ゲート）。次の全てを決定論的に検査する: (a) 存在検証: 義務に対応する binding が存在し、binding の指すテストが実在すること（`missing` / `orphaned` の検出）、(b) 全 ref edge が bindings 上で解決宣言されていること（tests または waived の totality）、(c) 各 edge に現行 hash と一致する fulfilled / waived verdict が存在すること。fail-closed で、hash 再計算だけで鮮度を回復する経路はない（回復は `evaluate` の pass のみ）。commit gate / CI 用の pure-read subcommand として `signal check-*` / `task-contract check` と同用法。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5248875f6b9e41ef16149c501bfc85cb8600db7d79fb4a38b6a4ec9342545545",
+      "evidence_hash": "db08b121a20ec032b1c564b5769fcc4556839fe8a025eaf81f2fa68e032c3035",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp test-obligation {derive,check,evaluate,results}` は `--lenient` / `--force` フラグを持たず、scope 指定フラグも持たない。CLI 引数 parser の定義および help text が本方針に一致することを検証するテストがある。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/cli-types.json",
+          "section_key": "types",
+          "entry_key": "TestObligationCheckArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-14",
+          "text_label": "`sotp test-obligation {derive,check,evaluate,results}` は `--lenient` / `--force` フラグを持たず、scope 指定フラグも持たない。CLI 引数 parser の定義および help text が本方針に一致することを検証するテストがある。"
+        }
+      }
+    },
+    {
+      "claim_hash": "4ae0cb6db7ac4bf4986bc521e6e4f3cae918ef6954958c9b9d4a333f46586997",
+      "evidence_hash": "a2ff16310f5a09e7ad71e5f6cd3792b8ff9ac3604f959f5dbb64ecab338904bf",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp test-obligation derive` の実装。catalogue + spec + 決定表 config から obligations artifact を決定論的に導出して書き出す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/cli-types.json",
+          "section_key": "types",
+          "entry_key": "TestObligationDeriveArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "`bin/sotp test-obligation derive` の実装。catalogue + spec + 決定表 config から obligations artifact を決定論的に導出して書き出す。義務生成は entry 単位（宣言 → 義務一覧）で、件数は宣言のみの関数（anchor に乗算しない）。義務を導出するのは `Add` / `Modify` の entry のみで、`Reference` は edge 宇宙の外、`Delete` は 0 件。trait_impls セクションの適用は `trait_ref` を track の層別カタログ中の TraitEntry に解決し、その ContractRole をキーとする（外部 trait はカタログに解決できず明示的に 0 件）。"
+        }
+      }
+    },
+    {
+      "claim_hash": "4ae0cb6db7ac4bf4986bc521e6e4f3cae918ef6954958c9b9d4a333f46586997",
+      "evidence_hash": "db08b121a20ec032b1c564b5769fcc4556839fe8a025eaf81f2fa68e032c3035",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp test-obligation {derive,check,evaluate,results}` は `--lenient` / `--force` フラグを持たず、scope 指定フラグも持たない。CLI 引数 parser の定義および help text が本方針に一致することを検証するテストがある。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/cli-types.json",
+          "section_key": "types",
+          "entry_key": "TestObligationDeriveArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-14",
+          "text_label": "`sotp test-obligation {derive,check,evaluate,results}` は `--lenient` / `--force` フラグを持たず、scope 指定フラグも持たない。CLI 引数 parser の定義および help text が本方針に一致することを検証するテストがある。"
+        }
+      }
+    },
+    {
+      "claim_hash": "6320aaafddc7e3c77eede1629604c03b558421cb8f25d68c8f36454e2c1fe701",
+      "evidence_hash": "d7d0ec06b0eb150a8565139fc9453fcbb208af0e51587bd496234214115359d0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp test-obligation evaluate` の実装（LLM による履行の意味論検証実行）"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/cli-types.json",
+          "section_key": "types",
+          "entry_key": "TestObligationEvaluateArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-09",
+          "text_label": "`bin/sotp test-obligation evaluate` の実装（LLM による履行の意味論検証実行）。obligation-fulfillment pair（claim = bind されたテスト群の関数本体集合、evidence = entry 宣言 × anchor の対）と waiver pair（claim = author された waived 理由散文、evidence = entry 宣言 × anchor の対）の両者を評価し、verdict をキャッシュキーの三つ組で凍結する: tests pair は (bound tests 集合 hash, entry宣言 hash, anchor hash)、waiver pair は (waived理由 hash, entry宣言 hash, anchor hash)。pass verdict には裏付け引用を必須とする（引用を提示できない合格は判定保留として不合格方向に倒す）。"
+        }
+      }
+    },
+    {
+      "claim_hash": "6320aaafddc7e3c77eede1629604c03b558421cb8f25d68c8f36454e2c1fe701",
+      "evidence_hash": "db08b121a20ec032b1c564b5769fcc4556839fe8a025eaf81f2fa68e032c3035",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp test-obligation {derive,check,evaluate,results}` は `--lenient` / `--force` フラグを持たず、scope 指定フラグも持たない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/cli-types.json",
+          "section_key": "types",
+          "entry_key": "TestObligationEvaluateArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-14",
+          "text_label": "`sotp test-obligation {derive,check,evaluate,results}` は `--lenient` / `--force` フラグを持たず、scope 指定フラグも持たない。CLI 引数 parser の定義および help text が本方針に一致することを検証するテストがある。"
+        }
+      }
+    },
+    {
+      "claim_hash": "e6ae9bf61c47fa5ea7a7f8f7e6283e5d7f9e7cb0962b651455a58730cb9ad8df",
+      "evidence_hash": "7666187f7f8164aa6a7221bf988b134ff59b59685ef6cd7ed171aa1339fe8dc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp test-obligation results` の実装（verdict 閲覧）。`bin/sotp ref-verify results` / `bin/sotp review results` / `bin/sotp dry results` と対称の CLI 面。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/cli-types.json",
+          "section_key": "types",
+          "entry_key": "TestObligationResultsArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-10",
+          "text_label": "`bin/sotp test-obligation results` の実装（verdict 閲覧）。`bin/sotp ref-verify results` / `bin/sotp review results` / `bin/sotp dry results` と対称の CLI 面。default 出力: (1) 先頭ブロック: chain × layer 集計を `pass=N fail=N pending=N` 形式で 1 行/lane 表示、(2) レコードブロック: fail/pending の義務 / edge の詳細（義務 id / edge id / claim source / evidence source / verdict / reason / drift 種別）、(3) 末尾: summary 行。exit は常に 0（informational、verdict gate は `check` の責務）。"
+        }
+      }
+    },
+    {
+      "claim_hash": "e6ae9bf61c47fa5ea7a7f8f7e6283e5d7f9e7cb0962b651455a58730cb9ad8df",
+      "evidence_hash": "bc8ade098e87cb76c91a122047b9988d47717e992db217a1135a5b9dd4a591b3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`--track-id` は省略時に現在ブランチから自動解決される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/cli-types.json",
+          "section_key": "types",
+          "entry_key": "TestObligationResultsArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "`bin/sotp test-obligation results` が既存 `bin/sotp ref-verify results` と対称の出力面を提供する: (1) 集計ブロック（chain × layer で `pass=N fail=N pending=N` を 1 行 / lane）、(2) fail/pending の詳細（義務 id / edge id / claim source / evidence source / verdict / reason / drift 種別）、(3) summary 行。exit は常に 0（informational）で、verdict gate は `check` の責務であることが help text に明記される。`--track-id` は省略時に現在ブランチから自動解決される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "e6ae9bf61c47fa5ea7a7f8f7e6283e5d7f9e7cb0962b651455a58730cb9ad8df",
+      "evidence_hash": "db08b121a20ec032b1c564b5769fcc4556839fe8a025eaf81f2fa68e032c3035",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp test-obligation {derive,check,evaluate,results}` は `--lenient` / `--force` フラグを持たず、scope 指定フラグも持たない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/cli-types.json",
+          "section_key": "types",
+          "entry_key": "TestObligationResultsArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-14",
+          "text_label": "`sotp test-obligation {derive,check,evaluate,results}` は `--lenient` / `--force` フラグを持たず、scope 指定フラグも持たない。CLI 引数 parser の定義および help text が本方針に一致することを検証するテストがある。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b82f097e08a8f886d8e726cb1e3e330b4f67ae069e428e137d757bbccb246ec9",
+      "evidence_hash": "db08b121a20ec032b1c564b5769fcc4556839fe8a025eaf81f2fa68e032c3035",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp test-obligation {derive,check,evaluate,results}` は `--lenient` / `--force` フラグを持たず、scope 指定フラグも持たない。CLI 引数 parser の定義および help text が本方針に一致することを検証するテストがある。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/cli-types.json",
+          "section_key": "types",
+          "entry_key": "TestObligationSubcommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-14",
+          "text_label": "`sotp test-obligation {derive,check,evaluate,results}` は `--lenient` / `--force` フラグを持たず、scope 指定フラグも持たない。CLI 引数 parser の定義および help text が本方針に一致することを検証するテストがある。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b82f097e08a8f886d8e726cb1e3e330b4f67ae069e428e137d757bbccb246ec9",
+      "evidence_hash": "cd6500dd706114ac225855e87a9f2783be3deaf50eb4462eac3fdee194be39f2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI 4 サブコマンド（`derive` / `check` / `evaluate` / `results`）は fail-closed で、`--lenient` / `--force` 系フラグを持たず、scope 指定フラグも持たない。スコープは artifact 存在ベースで自動解決される。verdict gate は `check` の責務であり、`results` は informational（exit 常に 0）。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/cli-types.json",
+          "section_key": "types",
+          "entry_key": "TestObligationSubcommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-09",
+          "text_label": "CLI 4 サブコマンド（`derive` / `check` / `evaluate` / `results`）は fail-closed で、`--lenient` / `--force` 系フラグを持たず、scope 指定フラグも持たない。スコープは artifact 存在ベースで自動解決される。verdict gate は `check` の責務であり、`results` は informational（exit 常に 0）。"
+        }
+      }
+    }
+  ]
+}

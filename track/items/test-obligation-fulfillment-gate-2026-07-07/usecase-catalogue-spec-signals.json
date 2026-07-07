@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "e5c8ea5ec7be1e3a9d36a70eb82ecc2a883d13929d22568376e1a3747388b26e",
+  "signals": [
+    {
+      "type_name": "CheckTestObligationsCommand",
+      "signal": "blue",
+      "entry_hash": "95b0dc9663050eac882c9c7abeefc603551494f954b7cc4f8a069793c2b16bc0"
+    },
+    {
+      "type_name": "CheckTestObligationsInteractor",
+      "signal": "blue",
+      "entry_hash": "ce345a0b7b57c39f09de57e022b8e704189b8e832263c58f816d97d55e42fba4"
+    },
+    {
+      "type_name": "CheckTestObligationsOutcome",
+      "signal": "blue",
+      "entry_hash": "dda90589f99997c8cbf5819343cc62e02922e184dbdde203d2efec07206ddf6c"
+    },
+    {
+      "type_name": "DeriveTestObligationsCommand",
+      "signal": "blue",
+      "entry_hash": "2ed83dcf57b919a572001629c5b7a73f82ff0e93e7a3e4777e362e34ec3e13a4"
+    },
+    {
+      "type_name": "DeriveTestObligationsInteractor",
+      "signal": "blue",
+      "entry_hash": "1e81225cae34575b3bc7d65a8947b3c073cc2acc280288ab492780fe2055615f"
+    },
+    {
+      "type_name": "EvaluateTestObligationsCommand",
+      "signal": "blue",
+      "entry_hash": "cc84dbee2c11ecf1f2bc94d3f8fab4805a134c3a3fa3ce282d2ec216de72dda9"
+    },
+    {
+      "type_name": "EvaluateTestObligationsInteractor",
+      "signal": "blue",
+      "entry_hash": "7e77a2efa35e333b1c27a74cef82777ac2067f36704d172aaebe48aeb79a9269"
+    },
+    {
+      "type_name": "EvaluateTestObligationsOutcome",
+      "signal": "blue",
+      "entry_hash": "78f197ad35f3be19bf62b0baa9130091151369315e56b396f163b79ed14f489e"
+    },
+    {
+      "type_name": "SemanticCalibrationProbeConfig",
+      "signal": "blue",
+      "entry_hash": "82f33e44746636c08c24eaaa609a79de1e7c60094f6f0ef46152a97784622ac6"
+    },
+    {
+      "type_name": "TestObligationChainLabel",
+      "signal": "blue",
+      "entry_hash": "fc1dbaaca953db2b96cedd33ad0ec8ece8bc00fd5690f4bd93fbdd34e77434c7"
+    },
+    {
+      "type_name": "TestObligationEvaluateConfig",
+      "signal": "blue",
+      "entry_hash": "8d658f0afb7d234d2e6302cf887ec1a30e9f4f97ba5de7259194e7bf78c78525"
+    },
+    {
+      "type_name": "TestObligationLaneSummary",
+      "signal": "blue",
+      "entry_hash": "a3669a91c64d40d445144ac67aa278a112a2bcf4c5e24256dcd6eba0ac145e97"
+    },
+    {
+      "type_name": "TestObligationResultsCommand",
+      "signal": "blue",
+      "entry_hash": "cfd6f2c43decc6ff0a8639d1dc18f1469565cd59686e25ef6d2fdb4a06f025da"
+    },
+    {
+      "type_name": "TestObligationResultsInteractor",
+      "signal": "blue",
+      "entry_hash": "ebb892a40745485e7d1562f1bbabe9f145fad38749b18a3a6d42de68071daeec"
+    },
+    {
+      "type_name": "TestObligationResultsOutput",
+      "signal": "blue",
+      "entry_hash": "6d161640a19e8bf21033317f281662ddd5c8443fb1d7f8ba972cbde4503da35d"
+    },
+    {
+      "type_name": "CheckTestObligationsApplicationService",
+      "signal": "blue",
+      "entry_hash": "4d09d2fbfc6d2c983cd85cb3507bdc2ec55599f091df2a0c08bf2d355226dee9"
+    },
+    {
+      "type_name": "DeriveTestObligationsApplicationService",
+      "signal": "blue",
+      "entry_hash": "1b182a5ac05eb6820f4f065b365c5782c4f050f9b2be7c03128db956aafc0310"
+    },
+    {
+      "type_name": "EvaluateTestObligationsApplicationService",
+      "signal": "blue",
+      "entry_hash": "46cec8960d5cddd0be86d7917f0cd84cae2cb7299ae24e1249999fdb9920349c"
+    },
+    {
+      "type_name": "SemanticEscalationDriverPort",
+      "signal": "blue",
+      "entry_hash": "a76860ca215ae52560d0b0793e2adb2bf0114699f0f9796d2eda054ca6b13ab2"
+    },
+    {
+      "type_name": "SemanticEscalationVerdictBridge",
+      "signal": "blue",
+      "entry_hash": "abcdbca1fd6c914ab7aad02cba9d9d54ccd452fbc345283ff40791346d0dab8f"
+    },
+    {
+      "type_name": "TestObligationResultsApplicationService",
+      "signal": "blue",
+      "entry_hash": "c2a23f7a8f3b264ed0b1d34584cecd90bb33cf987da8a3af0932aedb4ff43c61"
+    }
+  ]
+}

@@ -1,6 +1,704 @@
 {
   "schema_version": 2,
   "scopes": {
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:af2253ae892ab1cbec06f35d8958d8c87bb9465caec89385fc3dacf61a5bc0c5",
+          "at": "2026-07-07T08:35:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:af2253ae892ab1cbec06f35d8958d8c87bb9465caec89385fc3dacf61a5bc0c5",
+          "at": "2026-07-07T08:39:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Summary block restates the upstream design intent for the whole track in prose instead of keeping the text to target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/plan.md",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "S1 restates the semantic-verdict migration contract in prose; T001/T002 should be described only as target + operation + anchor cite per `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/plan.md",
+              "line": 20,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "S2 restates the rules/config behavior contract in prose, including the default config contents; T003-T005 should stay at target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/plan.md",
+              "line": 27,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "S3 restates the domain-model contract in prose instead of limiting itself to executable task text.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/plan.md",
+              "line": 35,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "S4 restates the codec behavior contract in prose; the section should not re-explain the serialization guarantees.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/plan.md",
+              "line": 44,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "S5 restates the scanner/verifier behavior contract in prose; T013-T015 should avoid re-describing the upstream semantics.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/plan.md",
+              "line": 52,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "S6 restates the derive/check/evaluate/results contracts in prose, including deterministic projection, totality, cache freezing, and aggregation semantics.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/plan.md",
+              "line": 60,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "S7 restates the CLI wiring contract in prose; T020-T022 should be trimmed to target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/plan.md",
+              "line": 69,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "S8 restates the capability-registration contract in prose instead of keeping the section to the executable change description.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/plan.md",
+              "line": 77,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T006's contract attributes `RoleName` and `DiagnosticMessage`, but the task text only scopes hashes/ids plus `WaivedReason`; that attribution is broader than the described work.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/task-contract.json",
+              "line": 50,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:7a20e6456bcfedec54ae578b79d6d8303fc4bd4e6c065af570578df8245d49dc",
+          "at": "2026-07-07T11:46:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T005 restates ADR D13 content (`data_roles (17), contract_roles (4), function_roles (2), patterns.typestate, trait_impls sections`) instead of keeping the task to target + operation + anchor cite; this violates `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
+              "line": 30,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "S3 (T006-T008) embeds upstream behavior prose (`deterministic from identity fields only`, `cache-key triple invalidates verdict`, `six variants`) rather than just executable task directives; strip the contract prose and keep the target/operation/anchor cites.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
+              "line": 36,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "S5 (T014-T015) restates verifier prompt semantics and fail-category behavior (`required supporting quotations`, `three-fail-type discrimination`, `edge-local self-containment`) in the task text; that belongs in the spec, not the impl-plan wording.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
+              "line": 84,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "S6 (T016-T019) embeds the derive/check/evaluate/results behavioral contract (`Deterministic projection`, `Pure-read totality gate`, `always returns success outcome`, cache/traversal semantics) directly in task prose, which is upstream restatement.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
+              "line": 96,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T022 restates CLI behavior and exit semantics (`No --lenient / --force / --context / --layer / --scope flags`, `results exit is always 0`) instead of staying at target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
+              "line": 132,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T023 restates capability-routing behavior (`fast → final escalation resolves per capability`) rather than just naming the config/registry edits and anchor cite.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
+              "line": 138,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:2abdfbda1bd562e4a78e8c3153fbdce39f5864512ce16878651a4a2c6c10c3f1",
+          "at": "2026-07-07T11:52:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T009's contract overstates the task text: it attributes `SemanticVerifierError`, `ArtifactCodecError`, `TestSourceScanError`, and `VerifyCacheError`, but the task description only names `ObligationCheckError`, `ObligationDeriveError`, `ObligationEvaluateError`, `ObligationResultsError`, `FulfillmentFailCategory`, and the port types. Either expand the task description to cover those entries or remove them from the contract.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/task-contract.json",
+              "line": 76,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:c937a472718ac2415cdcf1054a9178a198c8d94c2230a571e9d077ad0c3fbb7e",
+          "at": "2026-07-07T12:07:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b5e4e311299575c2ff8eb2b0a458cff7834f812fbe2a19faece1a4b3cb24e464",
+          "at": "2026-07-07T12:11:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T020's task-contract attributes `TestObligationDeriveInput`, `TestObligationCheckInput`, `TestObligationEvaluateInput`, and `TestObligationResultsInput`, but the T020 task description only names the four handler types and does not claim to add or modify these input entries. This is a task-contract attribution mismatch: an executor following the plan would not know those catalogue entries are part of T020.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/task-contract.json",
+              "line": 163,
+              "category": "task-contract attribution mismatch"
+            },
+            {
+              "message": "T022's task-contract omits `TestObligationResultsArgs` even though the T022 task description explicitly lists `TestObligationResultsArgs` among the CLI args to add. That leaves a catalogue entry claimed by the task without task-contract attribution.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/task-contract.json",
+              "line": 171,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:b5e4e311299575c2ff8eb2b0a458cff7834f812fbe2a19faece1a4b3cb24e464",
+          "at": "2026-07-07T12:15:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AC-16` is mapped to `T014`, but `T014` only targets `test_obligation::fulfillment_verifier` provider wiring and its cited anchors are `IN-09/IN-12/CN-03/CN-08/AC-06/AC-08/OS-01`; it does not touch `trait_impls`, `contract_conformance`, or trait-edge evidence selection. This makes the `AC-16` coverage assignment implausible and misassigns load-bearing fulfillment-evaluation work away from the tasks that actually describe it.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/task-coverage.json",
+              "line": 68,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "`AC-11` is mapped to `T015`, but `T015` only adds the `WaiverVerifierAdapter` provider wiring. It does not target waiver-fail routing, preserving obligations without verifier-injected additions, or routing-brief handling, which are the load-bearing parts of `AC-11`; those are usecase/evaluate responsibilities already described by `T018`.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/task-coverage.json",
+              "line": 63,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:4fd0d4b2030718de20c2db3a54c78f747ff64976c494ab52b155c6da5ef90c01",
+          "at": "2026-07-07T12:22:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-12 is mapped to T016 and T017, but those task descriptions do not cite AC-12 or describe the derive/check work needed for voluntary bindings; only T018 carries the AC-12 cite. That makes the coverage mapping implausible for the derive/check portions of AC-12's transition path.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/task-coverage.json",
+              "line": 64,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "T004 restates upstream behavior in prose: `load-time totality verification and per-axis vocabulary parsing` plus the named fail cases duplicate AC-02/CN-05 details. Per `knowledge/conventions/no-upstream-restatement.md`, this should be target + operation + anchor cite only.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
+              "line": 24,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T010's test text restates the upstream identity/drift contract: `preserves TestObligationId identity when only declaration hash changes`. The impl-plan should cite IN-05/AC-03/CN-01 rather than restating that behavior.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
+              "line": 60,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T013 restates scanner/source-editing behavior in prose: locating tests by `(layer, module_path, test_name)`, extracting body spans, computing `TestBodySpanHash` without editing source, and whitespace stability. Those are upstream contract details covered by the cited anchors and should not be repeated here.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
+              "line": 78,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T023 restates AC-07's provider resolution behavior by spelling out `provider/model`, `fast_provider/fast_model`, and `RoundType::Fast` / `RoundType::Final` expectations. This violates the no-upstream-restatement convention for impl-plan task text.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
+              "line": 138,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:31ea1e8d9b3e7fd5fc802271dfdf3296e83a907b71d649f3fb7920e984e5448c",
+          "at": "2026-07-07T12:27:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T018 cites AC-07 and AC-08 and requires unit tests for those anchors, but task-coverage.json assigns AC-07 only to T023 and AC-08 only to T014. Those ACs cover capability registration / resolve_execution and fulfillment-verifier prompt calibration, while T018 targets the usecase evaluate interactor, so the plan gives T018 obligations that are not represented in coverage and are not executable at that target. Remove those citations from T018 or add explicit executable work plus matching coverage if the interactor must own them.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
+              "line": 108,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:14dead1d234cc012bc9ae67d118111b71d1e73b90a7972c65ab7cf9f5b7d228f",
+          "at": "2026-07-07T12:32:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:22a3221ea6d08654ff95bbd28617c74c36fcc7e5f81e70a7f3cad0decc5faa79",
+          "at": "2026-07-07T12:37:43Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6b7a9402253fdb24d2375eb435222baa00a442a17e006f253b8639ca97f30d90",
+          "at": "2026-07-07T11:44:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6b7a9402253fdb24d2375eb435222baa00a442a17e006f253b8639ca97f30d90",
+          "at": "2026-07-07T11:48:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:17f63b9787ca911a334b5bfdc3527f95e13f36c1b32058ef87ff4c51f450a407",
+          "at": "2026-07-07T15:58:51Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`domain::tddd::test_obligation::ports::ObligationsArtifactPort` and `TestBindingsArtifactPort` expose `load`/`save` with `ObligationCheckError` / `ObligationDeriveError`, but these codec boundaries can only surface I/O / JSON / invariant failures. Variants such as `RulesLoad`, `CatalogueLoad`, `SpecLoad`, `InvalidCatalogueState`, `ObligationsAbsent`, `BindingsAbsent`, `PartialArtifactState`, `DriftsDetected`, `UnresolvedEdges`, and `StaleVerdicts` are not constructible at the port layer.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "line": 1034,
+              "category": "per-method error imprecision"
+            },
+            {
+              "message": "`domain::tddd::test_obligation::ports::ObligationFulfillmentCachePort`, `WaiverCachePort`, `ObligationFulfillmentVerifierPort`, and `WaiverVerifierPort` all return `ObligationEvaluateError`, but the adapters behind those methods can only produce a narrow subset (`CachePersistence` for cache I/O, `VerifierPortError` for the LLM ports). Control-plane variants like `InvalidConfig`, `TrackNotActive`, `SemanticFailuresConfirmed`, and `HumanEscalationRequired` are not reachable from those methods.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "line": 925,
+              "category": "per-method error imprecision"
+            },
+            {
+              "message": "`domain::tddd::test_obligation::ports::TestSourceScannerPort::scan_test_body` returns `ObligationCheckError`, but the scanner can only fail on I/O / parse / missing-test conditions. Higher-level check outcomes such as `ObligationsAbsent`, `BindingsAbsent`, `PartialArtifactState`, `DriftsDetected`, `UnresolvedEdges`, and `StaleVerdicts` are not constructible from that boundary.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "line": 1165,
+              "category": "per-method error imprecision"
+            }
+          ],
+          "hash": "rvw1:sha256:d5dcdf70876d68d62b6cbd0b64f479688277db5fe998c327a905f4086d2f5831",
+          "at": "2026-07-07T11:52:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Ownership smell: `ObligationFulfillmentVerifierPort::verify_pair` takes `tests_source`, `entry_declaration`, and `anchor_text` as owned `String`s even though the port is read-only and could borrow `&str`; this forces avoidable allocation/cloning at the usecase boundary.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "line": 1036,
+              "category": "ownership signature smell"
+            },
+            {
+              "message": "Ownership smell: `WaiverVerifierPort::verify_pair` takes `waived_reason`, `entry_declaration`, and `anchor_text` as owned `String`s even though the port is read-only and could borrow `&str`; this forces avoidable allocation/cloning at the usecase boundary.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "line": 1327,
+              "category": "ownership signature smell"
+            },
+            {
+              "message": "Lossy boundary downgrade: `ObligationCheckError::DriftsDetected`, `UnresolvedEdges`, and `StaleVerdicts` collapse structured failure data into counts, while `CheckTestObligationsOutcome` already carries the full `Vec<TestObligationDrift>`, `Vec<TestObligationEdgeId>`, and `Vec<UncitedSpecElementFinding>`; the error shape drops actionable detail without justification.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "line": 1801,
+              "category": "lossy boundary downgrade"
+            }
+          ],
+          "hash": "rvw1:sha256:331427382111218e597b742f930cbd7b2f39f2a2b9c16bb6a9ee933017635529",
+          "at": "2026-07-07T12:16:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`test_obligation::evaluate::TestObligationEvaluateConfig::try_new` returns `ObligationEvaluateError`, but this constructor can only reject invalid config values. Callers still have to handle `TrackNotActive`, `VerifierPort`, `CachePersistence`, `SemanticFailuresConfirmed`, and `HumanEscalationRequired`, none of which are reachable at this boundary. Narrow the error type or document why the full enum is intentional.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+              "line": 772,
+              "category": "per-method error imprecision"
+            },
+            {
+              "message": "`semantic_verdict_core::driver::SemanticEscalationDriverPort::evaluate_with_escalation` also returns `ObligationEvaluateError`, but the method only takes `key` and `initial_tier`. The config-only and track-only variants (`InvalidConfig`, `TrackNotActive`) are not structurally reachable here, so the shared error enum is broader than the port boundary warrants unless the catalogue explains that reuse.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+              "line": 136,
+              "category": "per-method error imprecision"
+            },
+            {
+              "message": "`ObligationFulfillmentVerifierPort::verify_pair` and `WaiverVerifierPort::verify_pair` are synchronous `&self` methods even though both docs describe dispatching to LLM capabilities. That hides blocking external I/O behind a sync boundary without any justification in the catalogue; make the ports async or explicitly document the blocking choice.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "line": 1044,
+              "category": "sync/async color mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:5427d47dc83c674773232332831d7a6703903d11a7e84e9d3d871ea91e8c4f2b",
+          "at": "2026-07-07T12:40:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Track-active guard ownership is split across layers. The cli_driver DTOs for derive/check/evaluate say the handler enforces `track/<id>` before translation, while `DeriveTestObligationsCommand` and `CheckTestObligationsCommand` say the interactor rejects on the guard even though `ObligationDeriveError` and `ObligationCheckError` have no `TrackNotActive` variant. That leaves no single owner for the rule, and the derive/check error contracts cannot carry the rejection data they claim to produce.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+              "line": 374,
+              "category": "enforcement-owner contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b6a4f4593bf087ff0784487fc82a940e56cf9e709deeea1ccdec8d9d4194b91b",
+          "at": "2026-07-07T12:51:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:50aa76806ca7fde7fe4700f9d0bd731fd8e1305894092b7dee8c52dd19449944",
+          "at": "2026-07-07T13:04:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SemanticEscalationDriverPort::evaluate_with_escalation` is declared as the responsibility-neutral D7 core shared by ref-verify and the test-obligation lanes, but its error type is `domain::tddd::test_obligation::errors::ObligationEvaluateError`. That forces non-obligation callers of the shared core to handle obligation-only variants such as `InvalidConfig` and `TrackNotActive`, and the method docs only narrow the subset instead of making the type precise. Use a neutral core error or associated error and map it to `ObligationEvaluateError` at the evaluate interactor boundary.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+              "line": 148,
+              "category": "API shape"
+            },
+            {
+              "message": "`ObligationCheckError` includes `VerifierPort(SemanticVerifierError)`, but `check` is specified and catalogued as pure-read with no LLM/verifier execution, and `CheckTestObligationsInteractor::new` does not receive either verifier port. This leaves an unconstructible check error variant and makes `CheckTestObligationsApplicationService::execute` callers handle a failure mode the operation cannot structurally produce.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "line": 1905,
+              "category": "API shape"
+            },
+            {
+              "message": "`SemanticEscalationDriverPort::evaluate_with_escalation` claims to run a verification pair, but its signature only accepts `key: K` and `initial_tier`; the documented `K` is the per-verifier cache key, and the declared cache keys are hash tuples, not the claim/evidence text needed by the fulfillment, waiver, or ref-verify verifier ports. As written, a conforming implementation cannot perform the documented verification without relying on hidden state not represented by the contract.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+              "line": 136,
+              "category": "API shape"
+            }
+          ],
+          "hash": "rvw1:sha256:50aa76806ca7fde7fe4700f9d0bd731fd8e1305894092b7dee8c52dd19449944",
+          "at": "2026-07-07T13:14:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ObligationFulfillmentCachePort`, `ObligationFulfillmentVerifierPort`, `TestSourceScannerPort`, `WaiverCachePort`, and `WaiverVerifierPort` are declared as domain-layer `SecondaryPort`s even though their docs describe verify-cache file I/O, syn-based source scanning, and LLM capability invocation. Per `knowledge/conventions/hexagonal-architecture.md` Port Placement Rules, infrastructure capabilities that are not domain concepts belong behind usecase ports; keeping them in `domain::tddd::test_obligation::ports` makes the inner layer own application/provider/cache/scanner abstractions and their adapter-fault vocabulary.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "line": 985,
+              "category": "role/kind mismatch"
+            },
+            {
+              "message": "`ObligationCheckError::PartialArtifactState(TestObligationScopePresence)` accepts the full scope enum even though `TestObligationScopePresence` documents `Both` as gate evaluation and `Neither` as zero-pair pass; only `ObligationsOnly` and `BindingsOnly` are partial fail-closed states. This payload shape makes impossible error states representable, and the sibling `ObligationsAbsent` / `BindingsAbsent` variants further blur which state owns the rejection.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "line": 1821,
+              "category": "state-shape smell"
+            },
+            {
+              "message": "`TestObligationDrift::new` takes independent `Option<TestObligationId>` and `Option<TestObligationEdgeId>` parameters while the entry describes each drift as targeting a single obligation or edge. The contract admits `None/None` drifts with no target and `Some/Some` drifts with two targets, so the drift kind-to-target invariant is not represented in the type shape.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "line": 3279,
+              "category": "state-shape smell"
+            },
+            {
+              "message": "`ObligationEvaluateError::SemanticFailuresConfirmed` and `HumanEscalationRequired` collapse the failed/pending evaluation set to `pair_count`, while the sibling results path carries typed `Vec<EdgeVerdictRecord>` detail records. The evaluate gate has the edge/pair identities at the failure point, but this error contract discards them without a documented justification, leaving callers unable to report or route the exact failed edges from the failing command.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "line": 2066,
+              "category": "lossy boundary downgrade"
+            }
+          ],
+          "hash": "rvw1:sha256:b33edd4f8b12827eccd79850eecdb6e9457b0bd94766c298b41cd465dbd36b78",
+          "at": "2026-07-07T13:25:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TestObligation` is constructed with `target_role`, `declaration_hash`, and `spec_refs`, but its public surface only exposes `id`, `target_entry`, and `brief` while the fields are stripped/private. The check/evaluate usecases need those values to derive edge coverage and cache keys, so the domain contract makes required cross-layer data unobservable outside the domain crate.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "line": 3007,
+              "category": "API shape"
+            },
+            {
+              "message": "`TestObligationRulesDocument::try_new` accepts `function_roles`, `patterns`, and `trait_impls`, but the public accessors expose only `data_roles` and `contract_roles` while the fields are stripped/private. IN-03 requires derive to apply all five rule sections, so the usecase layer cannot consume the complete validated rules document through the declared contract.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "line": 3952,
+              "category": "API shape"
+            },
+            {
+              "message": "`ObligationFulfillmentVerifierPort`, `WaiverVerifierPort`, and `TestSourceScannerPort` are declared as domain-layer `SecondaryPort`s even though their docs describe LLM capability invocation and source parsing/materialization. Per `knowledge/conventions/hexagonal-architecture.md` Port Placement Rules, infrastructure capabilities needed by application services belong behind usecase ports, not in the inner domain layer.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "line": 1036,
+              "category": "role/kind mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:7016c13b0731e8c83bd9e25ca79c5af02cef6189bc4919e4d552b713dd703c63",
+          "at": "2026-07-07T13:38:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CheckTestObligationsOutcome::new` accepts the full `TestObligationScopePresence`, but `ObligationsOnly` and `BindingsOnly` are fail-closed states modeled as `ObligationCheckError` variants. This permits an `Ok(CheckTestObligationsOutcome)` to carry a partial-artifact failure state, so the success DTO admits an illegal state. Use a success-only presence type or constructors that cannot encode the partial states.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+              "line": 321,
+              "category": "state-shape smell"
+            },
+            {
+              "message": "`TestObligationDrift` takes an unconstrained `TestObligationDriftKind` in both `new_obligation` and `new_edge`, even though the six drift kinds have different origins/targets. The contract can construct nonsensical combinations such as an obligation-targeted `ReasonChanged` drift or an edge-targeted `Missing` drift. Split the target-specific drift shapes or expose constructors per valid drift family so invalid kind/target pairs are unrepresentable.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "line": 3271,
+              "category": "state-shape smell"
+            },
+            {
+              "message": "The artifact save methods return read-side codec errors. For example, `ObligationsArtifactPort::save(&ObligationsDocument)` returns `ArtifactCodecError`, whose variants include `MalformedJson` and `DomainInvariant` during `into_domain`; saving an already-validated domain document cannot produce those variants, and the method docs do not state a producible subset or justify the broad enum. The same issue applies to `TestBindingsArtifactPort::save` and the cache `save` methods with `VerifyCacheError`, forcing callers to handle impossible failures.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "line": 1115,
+              "category": "per-method error imprecision"
+            },
+            {
+              "message": "`SemanticEscalationDriverPort::evaluate_with_escalation` is declared synchronous while the docs describe verifier adapter failures, cache persistence, and fast/final/human escalation through capability-backed verification. That method set implies external I/O, but unlike the domain verifier ports this entry does not acknowledge or justify the synchronous color, so the catalogue can lock adapters into a blocking API unexpectedly.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+              "line": 118,
+              "category": "sync/async color mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:0a0eb580e646f81213a565934d969d0499c29fad25cdda607d5a9275d3d235c7",
+          "at": "2026-07-07T13:45:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ObligationsCodecError` and `TestBindingsCodecError` duplicate the same error contract already declared as domain `ArtifactCodecError`: all three expose `Io`, `MalformedJson`, and `DomainInvariant` variants carrying `DiagnosticMessage`, and the bindings error is explicitly documented as a mirror. This is duplicated structural declaration across neighbouring layers without one entry being a reference to the shared contract, so any codec error-shape change now has to be made in three catalogue entries instead of the port-boundary error being the SSoT.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
+              "line": 1214,
+              "category": "DRY"
+            }
+          ],
+          "hash": "rvw1:sha256:880ad546eef586c9956163e2ed291d8c939cd06c6ea26491c0838253849540e2",
+          "at": "2026-07-07T14:19:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`domain-types.json` has multiple `docs` fields that restate upstream behavior instead of only citing the relevant anchors. Examples include `ArtifactCodecError` spelling out load/save failure-mode behavior, `ObligationCheckError` restating partial-artifact and staleness recovery semantics, `ObligationFulfillmentCacheKey` / `WaiverCacheKey` restating CN-04 invalidation/recovery rules, `ObligationFulfillmentVerdict` / `WaiverVerdict` restating citation and pending-fails-gate behavior, `TestObligationRulesDocument` / `TestObligationRulesLoadError` restating CN-05 totality requirements, `TestObligationScopePresence` restating AC-10 scope outcomes, `VerifyCacheError` restating fail-closed cache semantics, and `ObligationResultsError` restating results exit behavior. This violates `knowledge/conventions/no-upstream-restatement.md`; these docs should be reduced to type purpose plus anchor cites.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "line": 1438,
+              "category": "SoT integrity: upstream restatement"
+            },
+            {
+              "message": "`usecase-types.json` repeats behavioral contract text in catalogue docs rather than deferring to anchors. `CheckTestObligationsApplicationService`, `EvaluateTestObligationsApplicationService`, `TestObligationResultsApplicationService`, `CheckTestObligationsInteractor`, `CheckTestObligationsOutcome`, `EvaluateTestObligationsOutcome`, `TestObligationResultsCommand`, and `TestObligationResultsInteractor` restate pure-read/fail-closed, escalation/cache, branch-guard, calibration, and exit-code rules from the spec. Per the no-upstream-restatement convention, these should reference the anchors without re-describing the behavior.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+              "line": 10,
+              "category": "SoT integrity: upstream restatement"
+            },
+            {
+              "message": "Infrastructure catalogue docs restate upstream behavior across adapter entries. `JsonObligationsCodec` restates atomic write and absent-file behavior, `JsonTestBindingsCodec` restates production write ownership, `JsonTestObligationRulesLoader` restates load-time totality validation, `ObligationFulfillmentVerifierAdapter` / `WaiverVerifierAdapter` restate capability-resolution and escalation details, `SynTestSourceScanner` restates scanner behavior, and `TestObligationRulesDocumentDto` restates total map decoding / fail-closed behavior. These are behavioral contracts that belong behind spec/ADR anchors, not duplicated in `<layer>-types.json` docs.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
+              "line": 870,
+              "category": "SoT integrity: upstream restatement"
+            },
+            {
+              "message": "The CLI catalogue docs restate the CLI behavior contract. `TestObligationArgs` restates the no `--lenient` / `--force` / scope-flag rule, the per-subcommand arg entries restate branch-resolution behavior, and `TestObligationSubcommand` restates the closed command set and extension policy. These should be anchor-only references under the no-upstream-restatement convention.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/cli-types.json",
+              "line": 11,
+              "category": "SoT integrity: upstream restatement"
+            },
+            {
+              "message": "The CLI driver catalogue docs restate presentation behavior from the spec. `TestObligationCheckHandler` restates rendered failure categories and fail-closed exit behavior, `TestObligationResultsHandler` restates result block structure and exit code, and `TestObligationResultsInput` restates the no-branch-guard/read-only viewer rule. These duplicate upstream behavior instead of citing anchors.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/cli_driver-types.json",
+              "line": 93,
+              "category": "SoT integrity: upstream restatement"
+            },
+            {
+              "message": "`TestObligationCompositionRoot` docs restate provider/capability resolution behavior from upstream (`agent-profiles.json` / resolve_execution path). The catalogue entry should cite the relevant anchors and avoid reproducing that behavior contract in prose.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/cli_composition-types.json",
+              "line": 11,
+              "category": "SoT integrity: upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:3e5b8d7c0b8f3d3b87a24346941132ec32a654fc6a5b14e1a2369444906ea88a",
+          "at": "2026-07-07T14:28:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TestObligationRulesDocument::try_new` takes already-typed `BTreeMap<...>` inputs but returns the full `TestObligationRulesLoadError` loader enum. That enum includes variants such as `IoError`, `MalformedJson`, and `UnknownRoleName` that this constructor cannot structurally produce after parsing and key conversion have already happened, forcing constructor callers to handle unreachable loader failures. Narrow this constructor's error type or document the producible subset.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "line": 4099,
+              "category": "per-method error imprecision"
+            },
+            {
+              "message": "`TestObligationEvaluateConfig::try_new` validates only `injection_rate`, `detection_threshold`, and `parallelism`, but returns the full `ObligationEvaluateError` enum. Besides `InvalidConfig`, that enum includes runtime failures like `TrackNotActive`, verifier/cache failures, and semantic escalation outcomes, none of which can be produced by this value-object constructor. Use a narrower config validation error or explicitly document the reachable subset.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+              "line": 806,
+              "category": "per-method error imprecision"
+            }
+          ],
+          "hash": "rvw1:sha256:116f419564c3120e158a3bff666a3b8b87bdfbf2c51129f0f17c6818854052e7",
+          "at": "2026-07-07T14:45:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TestObligationRulesDocument::try_new` exposes `BTreeMap<DataRole, ...>`, `BTreeMap<ContractRole, ...>`, `BTreeMap<FunctionRole, ...>`, and `BTreeMap<TestObligationPatternKind, ...>` in its public contract, but those key types are not declared as `Ord` in this catalogue/baseline. `BTreeMap<K, _>` requires `K: Ord`, so implementing this shape either fails to compile or requires undeclared modify entries on the role/key enums. Use an ordered key type that has the required bound, or declare the companion type modifications explicitly.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "line": 4080,
+              "category": "missing companion modify"
+            },
+            {
+              "message": "`TestObligationRulesDocument::try_new` claims `ObligationsFieldOmitted` is a producible error, but its inputs receive already-constructed `RoleObligationRules` values, and `RoleObligationRules::new` only accepts `Vec<TestObligationRule>`. At that point the JSON distinction between an omitted `obligations` field and an explicit empty `obligations: []` has been erased, so the domain constructor cannot own the AC-02/CN-05 fail-closed check it claims. Preserve field-presence in the type shape or make the DTO/loader the sole declared owner of this rejection.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "line": 4100,
+              "category": "enforcement-owner contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c2c15ea303aced6a22ef4a9448e4274a2bd2f83451f16e1cb320eb8d73cd6131",
+          "at": "2026-07-07T14:53:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SemanticCalibrationProbeConfig` is declared inside the responsibility-neutral `semantic_verdict_core::probe`, but its constructor takes `RefVerifyPercent` for both calibration values. `RefVerifyPercent` is ref-verify-specific vocabulary, so the shared semantic-verdict core would force the test-obligation gate and any later verifier to depend on ref-verify’s type contract instead of a neutral percent/config type. That contradicts the IN-01/AC-15 boundary that keeps verifier-specific pieces outside the shared core.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+              "line": 641,
+              "category": "SOLID / boundary violation"
+            },
+            {
+              "message": "`SemanticEscalationVerdictBridge` hard-codes the current verifier lanes (`Fulfillment`, `Waiver`, `RefVerify`) and carries their concrete verifier-specific verdict payloads inside `semantic_verdict_core`. A responsibility-neutral core should not need a new enum variant every time another semantic verifier is added; the existing generic `SemanticEscalationDriverPort<P, K, V, E>` already lets `V` remain verifier-owned. As catalogued, this is a closed extension point in the shared core and leaks verifier-specific types across the boundary required by IN-01/AC-15.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+              "line": 686,
+              "category": "Open/Closed violation in catalogue shape"
+            }
+          ],
+          "hash": "rvw1:sha256:42479bb0cf2bedf20cfbfe9d7d272664b1eb1b20abbdd3d806f77350db25c9fb",
+          "at": "2026-07-07T15:03:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CatalogueEntryRefDto` is being added as a new infrastructure DTO for `domain::tddd::semantic_verify::CatalogueEntryRef`, but the infrastructure layer already has the same-purpose DTO in `tddd::semantic_verify_codec`. This duplicates the wire-shape SSoT for catalogue entry references instead of reusing or declaring a reference to the existing DTO, so future changes to `CatalogueEntryRef` can diverge between semantic-verify and test-obligation codecs.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
+              "line": 543,
+              "category": "DRY: duplicated structural declaration"
+            }
+          ],
+          "hash": "rvw1:sha256:9deeed153a0e1a3694dbdb572ace82f8fcd1d70e3548af1f5ddc969f4da34f56",
+          "at": "2026-07-07T15:46:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3eb6fa5a717b055387946b46c33c5e6562c5ade9a434ad6585e26472f7da5893",
+          "at": "2026-07-07T15:54:43Z"
+        }
+      ]
+    },
     "adr": {
       "rounds": [
         {
@@ -31,24 +729,6 @@
           "findings": [],
           "hash": "rvw1:sha256:c597270bfdf492126d9a4038ef233eb9ae3cba96657c8f231b9aeac5a6914bd0",
           "at": "2026-07-07T08:52:17Z"
-        }
-      ]
-    },
-    "impl-plan": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:af2253ae892ab1cbec06f35d8958d8c87bb9465caec89385fc3dacf61a5bc0c5",
-          "at": "2026-07-07T08:35:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:af2253ae892ab1cbec06f35d8958d8c87bb9465caec89385fc3dacf61a5bc0c5",
-          "at": "2026-07-07T08:39:06Z"
         }
       ]
     },

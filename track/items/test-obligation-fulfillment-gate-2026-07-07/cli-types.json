@@ -1,0 +1,379 @@
+{
+  "crate_name": "cli",
+  "functions": {},
+  "inherent_impls": [],
+  "layer": "cli",
+  "schema_version": 5,
+  "traits": {},
+  "types": {
+    "TestObligationArgs": {
+      "action": "add",
+      "docs": "Top-level clap argument group for `sotp test-obligation`; see IN-11 / AC-14 / CN-09.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "subcommand",
+              "ty": "TestObligationSubcommand"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "subcommand",
+              "ty": "TestObligationSubcommand"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "test_obligation",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-11",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-14",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestObligationCheckArgs": {
+      "action": "add",
+      "docs": "Clap args for `sotp test-obligation check`; see IN-08 / AC-14.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "track_id",
+              "ty": "Option<String>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "test_obligation",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-14",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestObligationDeriveArgs": {
+      "action": "add",
+      "docs": "Clap args for `sotp test-obligation derive`; see IN-07 / AC-14.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "track_id",
+              "ty": "Option<String>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "test_obligation",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-07",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-14",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestObligationEvaluateArgs": {
+      "action": "add",
+      "docs": "Clap args for `sotp test-obligation evaluate`; see IN-09 / AC-14.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "track_id",
+              "ty": "Option<String>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "test_obligation",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-14",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestObligationResultsArgs": {
+      "action": "add",
+      "docs": "Clap args for `sotp test-obligation results`; see IN-10 / AC-09 / AC-14.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "track_id",
+              "ty": "Option<String>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "test_obligation",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-10",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-14",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestObligationSubcommand": {
+      "action": "add",
+      "docs": "Subcommand enum for `sotp test-obligation`; see AC-14 / CN-09.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Derive",
+            "payload": {
+              "fields": [
+                "TestObligationDeriveArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Check",
+            "payload": {
+              "fields": [
+                "TestObligationCheckArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Evaluate",
+            "payload": {
+              "fields": [
+                "TestObligationEvaluateArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Results",
+            "payload": {
+              "fields": [
+                "TestObligationResultsArgs"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "test_obligation",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-14",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "anchor": "CN-09"
+        }
+      ]
+    }
+  },
+  "trait_impls": [
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "TestObligationArgs"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "TestObligationArgs"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "TestObligationArgs"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "TestObligationArgs"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "TestObligationCheckArgs"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "TestObligationCheckArgs"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "TestObligationCheckArgs"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "TestObligationCheckArgs"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "TestObligationDeriveArgs"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "TestObligationDeriveArgs"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "TestObligationDeriveArgs"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "TestObligationDeriveArgs"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "TestObligationEvaluateArgs"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "TestObligationEvaluateArgs"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "TestObligationEvaluateArgs"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "TestObligationEvaluateArgs"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "TestObligationResultsArgs"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "TestObligationResultsArgs"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "TestObligationResultsArgs"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "TestObligationResultsArgs"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "TestObligationSubcommand"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "TestObligationSubcommand"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "TestObligationSubcommand"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "TestObligationSubcommand"
+    }
+  ]
+}

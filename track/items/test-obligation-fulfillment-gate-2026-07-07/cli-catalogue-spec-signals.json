@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "f136d2eae4ae0ddb42789c2d59b63a3c5f15f1d3182220f39d599dd5f0cec3ff",
+  "signals": [
+    {
+      "type_name": "TestObligationArgs",
+      "signal": "blue",
+      "entry_hash": "bbd657139b85e87a7c7cade9aa1bedc02c41a67de772e38ad53fc962cc045b50"
+    },
+    {
+      "type_name": "TestObligationCheckArgs",
+      "signal": "blue",
+      "entry_hash": "5248875f6b9e41ef16149c501bfc85cb8600db7d79fb4a38b6a4ec9342545545"
+    },
+    {
+      "type_name": "TestObligationDeriveArgs",
+      "signal": "blue",
+      "entry_hash": "4ae0cb6db7ac4bf4986bc521e6e4f3cae918ef6954958c9b9d4a333f46586997"
+    },
+    {
+      "type_name": "TestObligationEvaluateArgs",
+      "signal": "blue",
+      "entry_hash": "6320aaafddc7e3c77eede1629604c03b558421cb8f25d68c8f36454e2c1fe701"
+    },
+    {
+      "type_name": "TestObligationResultsArgs",
+      "signal": "blue",
+      "entry_hash": "e6ae9bf61c47fa5ea7a7f8f7e6283e5d7f9e7cb0962b651455a58730cb9ad8df"
+    },
+    {
+      "type_name": "TestObligationSubcommand",
+      "signal": "blue",
+      "entry_hash": "b82f097e08a8f886d8e726cb1e3e330b4f67ae069e428e137d757bbccb246ec9"
+    }
+  ]
+}

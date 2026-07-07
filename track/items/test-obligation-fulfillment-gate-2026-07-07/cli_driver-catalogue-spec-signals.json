@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "13f2bd6f80c3f73e299c83c1957a55120e2ae5e915895f24840d5c93333c3717",
+  "signals": [
+    {
+      "type_name": "TestObligationCheckHandler",
+      "signal": "blue",
+      "entry_hash": "7225954cfb7f6b5e2505301d5d91336daefc880913b44367f98ed1f98ad00c50"
+    },
+    {
+      "type_name": "TestObligationCheckInput",
+      "signal": "blue",
+      "entry_hash": "c7d751612a576303286a48c763afa7cf9a615530214fd93c937733a0e7040ee2"
+    },
+    {
+      "type_name": "TestObligationDeriveHandler",
+      "signal": "blue",
+      "entry_hash": "a69da63a8b2408c2e99b2ec1d298ebea2975074adbb2ae354f1509f50314a431"
+    },
+    {
+      "type_name": "TestObligationDeriveInput",
+      "signal": "blue",
+      "entry_hash": "5a79f43870ddaa7ad74b668c186d38704d7f9a69213725b0477bbbc4e0a9f850"
+    },
+    {
+      "type_name": "TestObligationEvaluateHandler",
+      "signal": "blue",
+      "entry_hash": "17d37679fb28e04ef6be9f680d294da449f334a36435a287a7a83e56cae07f11"
+    },
+    {
+      "type_name": "TestObligationEvaluateInput",
+      "signal": "blue",
+      "entry_hash": "69f59064ca40b997aad34c8835ba7f7d760fcb010a4bdec23e1c1e15087b2b0a"
+    },
+    {
+      "type_name": "TestObligationResultsHandler",
+      "signal": "blue",
+      "entry_hash": "fc14ec1a8d991699ad241bfbe69200da9969b5fddec908561aca1ea75eda397f"
+    },
+    {
+      "type_name": "TestObligationResultsInput",
+      "signal": "blue",
+      "entry_hash": "7e9fe041cc0dbdf689763a59728aee88036c759c7eba7229159abc377aeeb260"
+    }
+  ]
+}

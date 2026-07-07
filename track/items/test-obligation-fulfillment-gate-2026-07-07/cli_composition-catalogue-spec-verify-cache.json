@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "layer": "cli_composition",
+  "entries": [
+    {
+      "claim_hash": "77ab4622ae7d77e7db9257b064fd8648605713dc14948b3f3f4ee82f4a6f2e6c",
+      "evidence_hash": "5da59f9485edd1ca1f266cac3333a0279d7012c6de1aca8feac7695c8aa44ea8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "obligation-fulfillment 検証 capability と waiver 検証 capability を `.harness/config/agent-profiles.json` に別 capability として新設する。前者はコード（テスト関数本体） → 自然言語（anchor 本文）の意味論比較、後者は自然言語（waived 理由） → 自然言語（anchor 本文 × entry 宣言）の意味論比較で、判定基準・prompt が異なるため（chain 別 prompt 分離と同じ論理）。各 capability は fast/final の段階引き上げ設定を独立に持ち、`agent-profiles.json` の `resolve_execution` 経路（既存機構）を再利用する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/cli_composition-types.json",
+          "section_key": "types",
+          "entry_key": "TestObligationCompositionRoot"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-11",
+          "text_label": "obligation-fulfillment 検証 capability と waiver 検証 capability を `.harness/config/agent-profiles.json` に別 capability として新設する。前者はコード（テスト関数本体） → 自然言語（anchor 本文）の意味論比較、後者は自然言語（waived 理由） → 自然言語（anchor 本文 × entry 宣言）の意味論比較で、判定基準・prompt が異なるため（chain 別 prompt 分離と同じ論理）。各 capability は fast/final の段階引き上げ設定を独立に持ち、`agent-profiles.json` の `resolve_execution` 経路（既存機構）を再利用する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "77ab4622ae7d77e7db9257b064fd8648605713dc14948b3f3f4ee82f4a6f2e6c",
+      "evidence_hash": "f0b28a946964a66cfbfc5b2e1ccf6e196ab9d1ec9138f97837f09f8081d9ee66",
+      "verdict": {
+        "kind": "pass",
+        "citation": "obligation-fulfillment 検証 capability と waiver 検証 capability が `.harness/config/agent-profiles.json` に別 capability として登録されており、各 capability について fast / final の provider / model を独立に指定できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/cli_composition-types.json",
+          "section_key": "types",
+          "entry_key": "TestObligationCompositionRoot"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "obligation-fulfillment 検証 capability と waiver 検証 capability が `.harness/config/agent-profiles.json` に別 capability として登録されており、各 capability について fast / final の provider / model を独立に指定できる。`resolve_execution` が `RoundType::Fast` に対して `fast_provider ?? provider` / `fast_model ?? model` を解決し、`RoundType::Final` に対して `provider` / `model` を返すことを検証するテストがある。"
+        }
+      }
+    }
+  ]
+}

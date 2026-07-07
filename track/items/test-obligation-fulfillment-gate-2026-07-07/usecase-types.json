@@ -1,0 +1,1232 @@
+{
+  "crate_name": "usecase",
+  "functions": {},
+  "inherent_impls": [],
+  "layer": "usecase",
+  "schema_version": 5,
+  "traits": {
+    "CheckTestObligationsApplicationService": {
+      "action": "add",
+      "docs": "Primary port for `bin/sotp test-obligation check`; see IN-08 / AC-04 / AC-10.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "execute",
+          "params": [
+            {
+              "name": "cmd",
+              "ty": "&CheckTestObligationsCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<CheckTestObligationsOutcome, domain::tddd::test_obligation::errors::ObligationCheckError>"
+        }
+      ],
+      "module_path": "test_obligation::check",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "DeriveTestObligationsApplicationService": {
+      "action": "add",
+      "docs": "Primary port for `bin/sotp test-obligation derive`; see IN-07 / AC-03.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "execute",
+          "params": [
+            {
+              "name": "cmd",
+              "ty": "&DeriveTestObligationsCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<(), domain::tddd::test_obligation::errors::ObligationDeriveError>"
+        }
+      ],
+      "module_path": "test_obligation::derive",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-07",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "EvaluateTestObligationsApplicationService": {
+      "action": "add",
+      "docs": "Primary port for `bin/sotp test-obligation evaluate`; see IN-09 / AC-06 / AC-07.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "execute",
+          "params": [
+            {
+              "name": "cmd",
+              "ty": "&EvaluateTestObligationsCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<EvaluateTestObligationsOutcome, domain::tddd::test_obligation::errors::ObligationEvaluateError>"
+        }
+      ],
+      "module_path": "test_obligation::evaluate",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "SemanticEscalationDriverPort": {
+      "action": "add",
+      "docs": "Generic async driven port for the semantic-verdict core; P/K/V/E are verifier-owned payload, key, verdict, and error types (IN-01 / AC-15).",
+      "generics": [
+        {
+          "bounds": [],
+          "name": "P"
+        },
+        {
+          "bounds": [],
+          "name": "K"
+        },
+        {
+          "bounds": [],
+          "name": "V"
+        },
+        {
+          "bounds": [],
+          "name": "E"
+        }
+      ],
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": true,
+          "name": "evaluate_with_escalation",
+          "params": [
+            {
+              "name": "pair",
+              "ty": "&P"
+            },
+            {
+              "name": "key",
+              "ty": "&K"
+            },
+            {
+              "name": "initial_tier",
+              "ty": "domain::tddd::semantic_verify::ModelTier"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<V, E>",
+          "docs": "Caller-owned neutral core error type for the driver boundary."
+        }
+      ],
+      "module_path": "semantic_verdict_core::driver",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-15",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "SemanticEscalationVerdictBridge": {
+      "action": "add",
+      "docs": "Generic verdict projection port for semantic-verdict escalation; V is verifier-owned (IN-01 / AC-15).",
+      "generics": [
+        {
+          "bounds": [],
+          "name": "V"
+        }
+      ],
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "project",
+          "params": [
+            {
+              "name": "verdict",
+              "ty": "&V"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "domain::tddd::semantic_verify::SemanticVerdict"
+        }
+      ],
+      "module_path": "semantic_verdict_core::verdict",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-15",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestObligationResultsApplicationService": {
+      "action": "add",
+      "docs": "Primary port for `bin/sotp test-obligation results`; see IN-10 / AC-09.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "execute",
+          "params": [
+            {
+              "name": "cmd",
+              "ty": "&TestObligationResultsCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<TestObligationResultsOutput, domain::tddd::test_obligation::errors::ObligationResultsError>"
+        }
+      ],
+      "module_path": "test_obligation::results",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-10",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    }
+  },
+  "types": {
+    "CheckTestObligationsCommand": {
+      "action": "add",
+      "docs": "Command input for CheckTestObligationsApplicationService; see IN-08.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "domain::TrackId"
+            },
+            {
+              "name": "current_branch",
+              "ty": "String"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "test_obligation::check",
+      "role": {
+        "Command": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "CheckTestObligationsInteractor": {
+      "action": "add",
+      "docs": "Interactor implementing CheckTestObligationsApplicationService; see IN-08.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "rules_loader",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::TestObligationRulesLoaderPort>"
+            },
+            {
+              "name": "obligations_port",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::ObligationsArtifactPort>"
+            },
+            {
+              "name": "bindings_port",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::TestBindingsArtifactPort>"
+            },
+            {
+              "name": "source_scanner",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::TestSourceScannerPort>"
+            },
+            {
+              "name": "fulfillment_cache",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::ObligationFulfillmentCachePort>"
+            },
+            {
+              "name": "waiver_cache",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::WaiverCachePort>"
+            },
+            {
+              "name": "spec_reader",
+              "ty": "std::sync::Arc<dyn domain::SpecFileLoaderPort>"
+            },
+            {
+              "name": "catalogue_reader",
+              "ty": "std::sync::Arc<dyn domain::tddd::catalogue_v2::CatalogueDocumentReaderPort>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "test_obligation::check",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "CheckTestObligationsOutcome": {
+      "action": "add",
+      "docs": "Structured output of CheckTestObligationsInteractor; see IN-08 / AC-04 / AC-10 / AC-13.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new_verified_scope",
+          "params": [
+            {
+              "name": "resolved_edges",
+              "ty": "Vec<domain::tddd::test_obligation::ids::TestObligationEdgeId>"
+            },
+            {
+              "name": "uncited_findings",
+              "ty": "Vec<domain::tddd::test_obligation::scope::UncitedSpecElementFinding>"
+            }
+          ],
+          "returns": "Self",
+          "docs": "Constructor for a verified-scope check outcome."
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new_empty_scope",
+          "params": [
+            {
+              "name": "uncited_findings",
+              "ty": "Vec<domain::tddd::test_obligation::scope::UncitedSpecElementFinding>"
+            }
+          ],
+          "returns": "Self",
+          "docs": "Constructor for an empty-scope check outcome."
+        }
+      ],
+      "module_path": "test_obligation::check",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-13",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "DeriveTestObligationsCommand": {
+      "action": "add",
+      "docs": "Command input for DeriveTestObligationsApplicationService; see IN-07.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "domain::TrackId"
+            },
+            {
+              "name": "current_branch",
+              "ty": "String"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "test_obligation::derive",
+      "role": {
+        "Command": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-07",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "DeriveTestObligationsInteractor": {
+      "action": "add",
+      "docs": "Interactor implementing DeriveTestObligationsApplicationService; see IN-07.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "rules_loader",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::TestObligationRulesLoaderPort>"
+            },
+            {
+              "name": "obligations_port",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::ObligationsArtifactPort>"
+            },
+            {
+              "name": "spec_reader",
+              "ty": "std::sync::Arc<dyn domain::SpecFileLoaderPort>"
+            },
+            {
+              "name": "catalogue_reader",
+              "ty": "std::sync::Arc<dyn domain::tddd::catalogue_v2::CatalogueDocumentReaderPort>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "test_obligation::derive",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-07",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "EvaluateTestObligationsCommand": {
+      "action": "add",
+      "docs": "Command input for EvaluateTestObligationsApplicationService; see IN-09.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "domain::TrackId"
+            },
+            {
+              "name": "current_branch",
+              "ty": "String"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "test_obligation::evaluate",
+      "role": {
+        "Command": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "EvaluateTestObligationsInteractor": {
+      "action": "add",
+      "docs": "Interactor implementing EvaluateTestObligationsApplicationService; see IN-09 / AC-06 / AC-07.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "obligations_port",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::ObligationsArtifactPort>"
+            },
+            {
+              "name": "bindings_port",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::TestBindingsArtifactPort>"
+            },
+            {
+              "name": "source_scanner",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::TestSourceScannerPort>"
+            },
+            {
+              "name": "fulfillment_verifier",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::ObligationFulfillmentVerifierPort>"
+            },
+            {
+              "name": "waiver_verifier",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::WaiverVerifierPort>"
+            },
+            {
+              "name": "fulfillment_cache",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::ObligationFulfillmentCachePort>"
+            },
+            {
+              "name": "waiver_cache",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::WaiverCachePort>"
+            },
+            {
+              "name": "config",
+              "ty": "TestObligationEvaluateConfig"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "test_obligation::evaluate",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "EvaluateTestObligationsOutcome": {
+      "action": "add",
+      "docs": "Structured output of EvaluateTestObligationsInteractor; see IN-09 / AC-06.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "pass_count",
+              "ty": "usize"
+            },
+            {
+              "name": "fail_count",
+              "ty": "usize"
+            },
+            {
+              "name": "pending_count",
+              "ty": "usize"
+            },
+            {
+              "name": "known_bad_detection_rate",
+              "ty": "std::num::NonZeroU8"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "test_obligation::evaluate",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "SemanticCalibrationProbeConfig": {
+      "action": "add",
+      "docs": "Value-object config for the semantic-verdict calibration probe; see IN-01 / AC-15.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "injection",
+              "ty": "std::num::NonZeroU8"
+            },
+            {
+              "name": "threshold",
+              "ty": "std::num::NonZeroU8"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "semantic_verdict_core::probe",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-15",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestObligationChainLabel": {
+      "action": "add",
+      "docs": "Results-output lane discriminant for test-obligation verdict chains; see IN-10 / AC-09.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Fulfillment",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Waiver",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "test_obligation::results",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-10",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestObligationEvaluateConfig": {
+      "action": "add",
+      "docs": "Validated configuration for EvaluateTestObligationsInteractor; see IN-01 / AC-15.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "injection_rate",
+              "ty": "u8"
+            },
+            {
+              "name": "detection_threshold",
+              "ty": "u8"
+            },
+            {
+              "name": "parallelism",
+              "ty": "usize"
+            }
+          ],
+          "returns": "Result<Self, domain::tddd::test_obligation::errors::ObligationEvaluateError>",
+          "docs": "Producible variant: ObligationEvaluateError::InvalidConfig."
+        }
+      ],
+      "module_path": "test_obligation::evaluate",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-15",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestObligationLaneSummary": {
+      "action": "add",
+      "docs": "DTO row for a test-obligation results lane summary; see IN-10 / AC-09.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "chain_name",
+              "ty": "TestObligationChainLabel"
+            },
+            {
+              "name": "layer",
+              "ty": "domain::tddd::LayerId"
+            },
+            {
+              "name": "pass_count",
+              "ty": "usize"
+            },
+            {
+              "name": "fail_count",
+              "ty": "usize"
+            },
+            {
+              "name": "pending_count",
+              "ty": "usize"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "test_obligation::results",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-10",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestObligationResultsCommand": {
+      "action": "add",
+      "docs": "Command input for TestObligationResultsApplicationService; see IN-10 / AC-09.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "domain::TrackId"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "test_obligation::results",
+      "role": {
+        "Command": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-10",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestObligationResultsInteractor": {
+      "action": "add",
+      "docs": "Interactor implementing TestObligationResultsApplicationService; see IN-10 / AC-09.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "obligations_port",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::ObligationsArtifactPort>"
+            },
+            {
+              "name": "bindings_port",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::TestBindingsArtifactPort>"
+            },
+            {
+              "name": "fulfillment_cache",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::ObligationFulfillmentCachePort>"
+            },
+            {
+              "name": "waiver_cache",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::WaiverCachePort>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "test_obligation::results",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-10",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestObligationResultsOutput": {
+      "action": "add",
+      "docs": "Structured output of TestObligationResultsInteractor; see IN-10 / AC-09.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "lane_summaries",
+              "ty": "Vec<TestObligationLaneSummary>"
+            },
+            {
+              "name": "records",
+              "ty": "Vec<domain::tddd::test_obligation::drift::EdgeVerdictRecord>"
+            },
+            {
+              "name": "uncited_findings",
+              "ty": "Vec<domain::tddd::test_obligation::scope::UncitedSpecElementFinding>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "test_obligation::results",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-10",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    }
+  },
+  "trait_impls": [
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "CheckTestObligationsCommand"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "CheckTestObligationsCommand"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "CheckTestObligationsCommand"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "CheckTestObligationsCommand"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "CheckTestObligationsOutcome"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "CheckTestObligationsOutcome"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "CheckTestObligationsOutcome"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "CheckTestObligationsOutcome"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "DeriveTestObligationsCommand"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "DeriveTestObligationsCommand"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "DeriveTestObligationsCommand"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "DeriveTestObligationsCommand"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "EvaluateTestObligationsCommand"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "EvaluateTestObligationsCommand"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "EvaluateTestObligationsCommand"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "EvaluateTestObligationsCommand"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "EvaluateTestObligationsOutcome"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "EvaluateTestObligationsOutcome"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "EvaluateTestObligationsOutcome"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "EvaluateTestObligationsOutcome"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "SemanticCalibrationProbeConfig"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "SemanticCalibrationProbeConfig"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "SemanticCalibrationProbeConfig"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "SemanticCalibrationProbeConfig"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "TestObligationChainLabel"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "TestObligationChainLabel"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "TestObligationChainLabel"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "TestObligationChainLabel"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "TestObligationEvaluateConfig"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "TestObligationEvaluateConfig"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "TestObligationEvaluateConfig"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "TestObligationEvaluateConfig"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "TestObligationLaneSummary"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "TestObligationLaneSummary"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "TestObligationLaneSummary"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "TestObligationLaneSummary"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "TestObligationResultsCommand"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "TestObligationResultsCommand"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "TestObligationResultsCommand"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "TestObligationResultsCommand"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "TestObligationResultsOutput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "TestObligationResultsOutput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "TestObligationResultsOutput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "TestObligationResultsOutput"
+    }
+  ]
+}

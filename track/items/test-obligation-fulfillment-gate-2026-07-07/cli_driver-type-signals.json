@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-07T16:00:56Z",
+  "declaration_hash": "13f2bd6f80c3f73e299c83c1957a55120e2ae5e915895f24840d5c93333c3717",
+  "signals": [
+    {
+      "type_name": "TestObligationCheckHandler",
+      "kind_tag": "primary_adapter",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "TestObligationCheckInput",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "TestObligationDeriveHandler",
+      "kind_tag": "primary_adapter",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "TestObligationDeriveInput",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "TestObligationEvaluateHandler",
+      "kind_tag": "primary_adapter",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "TestObligationEvaluateInput",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "TestObligationResultsHandler",
+      "kind_tag": "primary_adapter",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "TestObligationResultsInput",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    }
+  ]
+}
