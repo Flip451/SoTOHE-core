@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "051f86f9041c7678e99bb14df474c09951c0e6d9471c671c1803357bbbf799da",
+  "signals": [
+    {
+      "type_name": "TemplateDriver",
+      "signal": "blue",
+      "entry_hash": "0b816e5805e4b75f556b648d5f8ec7dfa004e28af918e440a9fb244300a41e66"
+    },
+    {
+      "type_name": "TemplateExportInput",
+      "signal": "blue",
+      "entry_hash": "076bea12a2eeea2cd1eb2dca6b0c8b390e76a2814304fba97dacf151c46aadbf"
+    },
+    {
+      "type_name": "TemplateInput",
+      "signal": "blue",
+      "entry_hash": "d619f64fd77960ca3d6fc310c6c3399cd454d6a7b8c451a57a261bac03242a9b"
+    }
+  ]
+}

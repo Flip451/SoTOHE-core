@@ -26,14 +26,12 @@ None. The workflow resolves the base branch from the configured `BranchStrategyP
 cargo make track-switch-base
 ```
 
-Checks out the configured base branch and then runs a ff-only sync (`cargo make sync` /
-`bin/sotp git sync` / `git pull --ff-only`) against origin. Per ADR
-`knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md` D6, `track-switch-base`
-composes the branch switch and the ff-only pull into a single command by delegating internally
-to the usecase `TrackGitInteractor::switch_to_base` orchestration (which in turn calls
-`GitPrimitivePort::switch_branch` + `sync_current_branch`); all fail-closed sync modes are
-downgraded to the non-fatal "[WARN] Pull failed" message so the branch switch itself always
-succeeds when possible.
+Checks out the configured base branch and then runs a ff-only current-branch sync (the same pull
+operation exposed by `cargo make sync` / `bin/sotp git sync` / `git pull --ff-only`) against
+origin. The switch+sync composition belongs to `cargo make track-switch-base` /
+`bin/sotp track switch-base`: the CLI's track-git logic switches branches, then syncs the current
+branch; all fail-closed sync modes are downgraded to the non-fatal "[WARN] Pull failed" message
+so the branch switch itself always succeeds when possible.
 
 The wrapper delegates to `bin/sotp track switch-base`, which resolves `base_branch` from the
 active track's `metadata.json#branch_strategy_snapshot`. The current branch must be

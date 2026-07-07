@@ -27,6 +27,7 @@ pub mod symlink_guard_port;
 pub mod task_contract;
 pub mod task_coverage;
 pub mod tddd;
+pub mod template_export;
 mod timestamp;
 mod track;
 pub mod track_phase;
@@ -105,6 +106,10 @@ pub use tddd::semantic_verify::{
 };
 pub use tddd::type_signals_doc::{
     TYPE_SIGNALS_SCHEMA_VERSION, TypeSignalsDocument, TypeSignalsLoadResult,
+};
+pub use template_export::{
+    TemplateBoundaryManifest, TemplateBoundaryManifestError, TemplatePathClassification,
+    TemplatePathEntry, TemplatePathPattern, TemplatePathPatternError,
 };
 pub use timestamp::Timestamp;
 pub use track::{

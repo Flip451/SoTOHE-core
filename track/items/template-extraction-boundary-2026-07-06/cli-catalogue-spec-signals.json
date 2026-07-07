@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "a5ecbb3deb27d39e74969bb476535a707a0939ddb53b83526887a0e465761754",
+  "signals": [
+    {
+      "type_name": "CliCommand",
+      "signal": "blue",
+      "entry_hash": "2af36b5ebfd5b2c7c55611dae3e9b0d3d40ce0846d5aafd16945576d88960138"
+    },
+    {
+      "type_name": "TemplateCommand",
+      "signal": "blue",
+      "entry_hash": "a8d61ce1d5d17efd8df8276e04ad445d776e90c793ccbf2c0a8c26b54c28a156"
+    },
+    {
+      "type_name": "TemplateExportArgs",
+      "signal": "blue",
+      "entry_hash": "ed774653bf47f3bcd114d7101ad008afcbf0065bc9368cf7f08d5b585d9e8cab"
+    },
+    {
+      "type_name": "cli::commands::template::dispatch",
+      "signal": "blue",
+      "entry_hash": "9fd81482f11c5d30f08d6fec45c862e6e0cb11f3c4e6a697cb17a170cf7a34c2"
+    },
+    {
+      "type_name": "cli::commands::template::execute",
+      "signal": "blue",
+      "entry_hash": "57c2b18f7f1a1492ca1021d7f95d32b95fc074115571449d066de0965a7fa551"
+    }
+  ]
+}

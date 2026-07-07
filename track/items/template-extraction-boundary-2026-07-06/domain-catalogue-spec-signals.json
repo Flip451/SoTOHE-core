@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "0c86a23c24713e818f6d52b2f03a9ecedb127859aa03aaa3f7f6012cd2e4471f",
+  "signals": [
+    {
+      "type_name": "TemplateBoundaryManifest",
+      "signal": "blue",
+      "entry_hash": "235662b01ee888502091ee815f56ae4282e9de98c87cdf1112b519da48789ee0"
+    },
+    {
+      "type_name": "TemplateBoundaryManifestError",
+      "signal": "blue",
+      "entry_hash": "f142b2aea15d8dd811d66e8a4e523021bc54766fa8175cd6d14917e4ad635191"
+    },
+    {
+      "type_name": "TemplatePathClassification",
+      "signal": "blue",
+      "entry_hash": "959d276a0bf68ea0fdbc14472ee922ba56f6c76910cb21937309ebc48ef8578f"
+    },
+    {
+      "type_name": "TemplatePathEntry",
+      "signal": "blue",
+      "entry_hash": "b1e1b9ea9d019c43f74008217975232f6a18d9fcd670e3f5fd300a009f635ec4"
+    },
+    {
+      "type_name": "TemplatePathPattern",
+      "signal": "blue",
+      "entry_hash": "db4afab4b3cc2f97bc1e92275852b661b1bb5ddcb4b5f60dc795069b308a701e"
+    },
+    {
+      "type_name": "TemplatePathPatternError",
+      "signal": "blue",
+      "entry_hash": "0c8cc57f340ba310b396d06bdd44e5bacd83ef53da710c1668d78c037771bfc2"
+    }
+  ]
+}

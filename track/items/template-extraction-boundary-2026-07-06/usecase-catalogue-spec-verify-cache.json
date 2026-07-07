@@ -1,0 +1,702 @@
+{
+  "schema_version": 1,
+  "layer": "usecase",
+  "entries": [
+    {
+      "claim_hash": "6c3ae27617b16f4f0a1a462871e0aa82e1c7520822f22c853d4325f79a68f01e",
+      "evidence_hash": "0ad476f11c9a08723ac8eb4a693ce141b0b349fee10a33e06625b7da24dbe208",
+      "verdict": {
+        "kind": "pass",
+        "citation": "境界 SSoT としての機械可読 manifest の新設。workspace tree の各 path を `include` (テンプレートにそのまま含める) / `exclude` (テンプレートから外す) / `overlay` (overlay ディレクトリ側のテンプレート版で上書き) のいずれかに分類する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TemplateBoundaryManifestReadError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "境界 SSoT としての機械可読 manifest の新設。workspace tree の各 path を `include` (テンプレートにそのまま含める) / `exclude` (テンプレートから外す) / `overlay` (overlay ディレクトリ側のテンプレート版で上書き) のいずれかに分類する。sotp ソース (`libs/*` / `apps/*`) は `overlay` に分類する — overlay の適用意味論が同一パスに対する sotp ソースの除去と 6 crate 雛形の差し込みを同時に果たし、D3 の 6 crate プレースホルダ出荷と AC-06 の「テンプレート workspace に sotp ソース非含有」を同時に満たす (`exclude` 単独では雛形が出荷されない)。`vendor/` + patch、`Cargo.lock`、`build-sotp` タスク、`.gitignore` の sotp 動的 cache エントリ、`track/items/` や `knowledge/adr/` の開発履歴、Python 残渣、SoTOHE-core 固有の deny.toml exception 等は `exclude`。overlay 分類は overlay ディレクトリ側に対応するテンプレート版ファイルの存在を要求する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "6c3ae27617b16f4f0a1a462871e0aa82e1c7520822f22c853d4325f79a68f01e",
+      "evidence_hash": "f602d6f1a29c649323eb0e200bb9857e5d73b143e8cf56aeeb613b4556815f56",
+      "verdict": {
+        "kind": "pass",
+        "citation": "workspace tree の全 path を `include` / `exclude` / `overlay` のいずれかに分類する。未分類 path の存在、`overlay` 分類なのに overlay 側にファイルが存在しない矛盾、重複分類は、export 実行 (および manifest validation) の時点で fail-closed で検出される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TemplateBoundaryManifestReadError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "境界 SSoT の機械可読 manifest ファイルがリポジトリ内の固定位置に存在し、workspace tree の全 path を `include` / `exclude` / `overlay` のいずれかに分類する。未分類 path の存在、`overlay` 分類なのに overlay 側にファイルが存在しない矛盾、重複分類は、export 実行 (および manifest validation) の時点で fail-closed で検出される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "1e28f536cf0a016c8ac88a8ccad83dc8c7a7b3ed9fb3907333d8ca9054151a50",
+      "evidence_hash": "1b0a0125f1a45663d66d693c6b46fbed31a74347b9705beca58b7dcb97d1f3ac",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp template export` サブコマンドないし同等の cargo make タスクが、境界 manifest + overlay ディレクトリ + 実リポジトリ tree を入力として汎用テンプレートツリーを出力ディレクトリに生成する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TemplateExportCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "export 実行経路の新設。`sotp template export` サブコマンドないし同等の cargo make タスクが、境界 manifest + overlay ディレクトリ + 実リポジトリ tree を入力として汎用テンプレートツリーを出力ディレクトリに生成する。生成は境界 manifest の `include` / `exclude` / `overlay` 分類だけで駆動され、Makefile.toml / Cargo.toml / deny.toml / Dockerfile / track/*.md 等の内容をパースして書き換える経路を実装に含めない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "1e28f536cf0a016c8ac88a8ccad83dc8c7a7b3ed9fb3907333d8ca9054151a50",
+      "evidence_hash": "e4b8a64f4141fd9ed0c54b75135c3e9bcf5381aa84dbd256d49e8ba3f0ef7c66",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp template export` (または同等の cargo make タスク) が CLI に存在し、境界 manifest + overlay ディレクトリ + 実リポジトリ tree から、指定された出力ディレクトリに汎用テンプレートツリーを生成する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TemplateExportCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`sotp template export` (または同等の cargo make タスク) が CLI に存在し、境界 manifest + overlay ディレクトリ + 実リポジトリ tree から、指定された出力ディレクトリに汎用テンプレートツリーを生成する。同じ入力からは同じ出力が決定論的に得られる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "75caaa48ba5404790fecd73c5c92ff9fceab16590d05af0b4a7a2fd7796c4736",
+      "evidence_hash": "1b0a0125f1a45663d66d693c6b46fbed31a74347b9705beca58b7dcb97d1f3ac",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp template export` サブコマンドないし同等の cargo make タスクが、境界 manifest + overlay ディレクトリ + 実リポジトリ tree を入力として汎用テンプレートツリーを出力ディレクトリに生成する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TemplateExportError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "export 実行経路の新設。`sotp template export` サブコマンドないし同等の cargo make タスクが、境界 manifest + overlay ディレクトリ + 実リポジトリ tree を入力として汎用テンプレートツリーを出力ディレクトリに生成する。生成は境界 manifest の `include` / `exclude` / `overlay` 分類だけで駆動され、Makefile.toml / Cargo.toml / deny.toml / Dockerfile / track/*.md 等の内容をパースして書き換える経路を実装に含めない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "75caaa48ba5404790fecd73c5c92ff9fceab16590d05af0b4a7a2fd7796c4736",
+      "evidence_hash": "0ad476f11c9a08723ac8eb4a693ce141b0b349fee10a33e06625b7da24dbe208",
+      "verdict": {
+        "kind": "pass",
+        "citation": "境界 SSoT としての機械可読 manifest の新設。workspace tree の各 path を `include` (テンプレートにそのまま含める) / `exclude` (テンプレートから外す) / `overlay` (overlay ディレクトリ側のテンプレート版で上書き) のいずれかに分類する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TemplateExportError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "境界 SSoT としての機械可読 manifest の新設。workspace tree の各 path を `include` (テンプレートにそのまま含める) / `exclude` (テンプレートから外す) / `overlay` (overlay ディレクトリ側のテンプレート版で上書き) のいずれかに分類する。sotp ソース (`libs/*` / `apps/*`) は `overlay` に分類する — overlay の適用意味論が同一パスに対する sotp ソースの除去と 6 crate 雛形の差し込みを同時に果たし、D3 の 6 crate プレースホルダ出荷と AC-06 の「テンプレート workspace に sotp ソース非含有」を同時に満たす (`exclude` 単独では雛形が出荷されない)。`vendor/` + patch、`Cargo.lock`、`build-sotp` タスク、`.gitignore` の sotp 動的 cache エントリ、`track/items/` や `knowledge/adr/` の開発履歴、Python 残渣、SoTOHE-core 固有の deny.toml exception 等は `exclude`。overlay 分類は overlay ディレクトリ側に対応するテンプレート版ファイルの存在を要求する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "75caaa48ba5404790fecd73c5c92ff9fceab16590d05af0b4a7a2fd7796c4736",
+      "evidence_hash": "425f3f4c9872d9b8b9da4f25d46d3c083b7981f3f2b7d32f1a8937bc74db881a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「manifest は sotp 側のコードから読み込まれる schema 付き設定として管理し」「export 実行前に fail-closed で検出する」"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TemplateExportError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-12",
+          "text_label": "境界 manifest の運用属性。manifest は sotp 側のコードから読み込まれる schema 付き設定として管理し、path 分類の重複や未分類 path が発生した場合は export 実行前に fail-closed で検出する。manifest 側の分類変更は sotp 側のコード変更なしで反映される (schema と読み込みロジックの安定性が要件)。"
+        }
+      }
+    },
+    {
+      "claim_hash": "75caaa48ba5404790fecd73c5c92ff9fceab16590d05af0b4a7a2fd7796c4736",
+      "evidence_hash": "e4b8a64f4141fd9ed0c54b75135c3e9bcf5381aa84dbd256d49e8ba3f0ef7c66",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp template export` (または同等の cargo make タスク) が CLI に存在し、境界 manifest + overlay ディレクトリ + 実リポジトリ tree から、指定された出力ディレクトリに汎用テンプレートツリーを生成する。同じ入力からは同じ出力が決定論的に得られる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TemplateExportError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`sotp template export` (または同等の cargo make タスク) が CLI に存在し、境界 manifest + overlay ディレクトリ + 実リポジトリ tree から、指定された出力ディレクトリに汎用テンプレートツリーを生成する。同じ入力からは同じ出力が決定論的に得られる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "75caaa48ba5404790fecd73c5c92ff9fceab16590d05af0b4a7a2fd7796c4736",
+      "evidence_hash": "f602d6f1a29c649323eb0e200bb9857e5d73b143e8cf56aeeb613b4556815f56",
+      "verdict": {
+        "kind": "pass",
+        "citation": "未分類 path の存在、`overlay` 分類なのに overlay 側にファイルが存在しない矛盾、重複分類は、export 実行 (および manifest validation) の時点で fail-closed で検出される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TemplateExportError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "境界 SSoT の機械可読 manifest ファイルがリポジトリ内の固定位置に存在し、workspace tree の全 path を `include` / `exclude` / `overlay` のいずれかに分類する。未分類 path の存在、`overlay` 分類なのに overlay 側にファイルが存在しない矛盾、重複分類は、export 実行 (および manifest validation) の時点で fail-closed で検出される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "75caaa48ba5404790fecd73c5c92ff9fceab16590d05af0b4a7a2fd7796c4736",
+      "evidence_hash": "172080f9ca69879be51e2833a45ddd743016971a26f97dfba744417e6c48e0e9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "export はプログラム的なファイル書き換えを行わない。処理は境界 manifest の分類に従った `include` のコピー、`exclude` の除外、`overlay` 側テンプレート版ファイルの上書きだけで構成する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TemplateExportError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "export はプログラム的なファイル書き換えを行わない。処理は境界 manifest の分類に従った `include` のコピー、`exclude` の除外、`overlay` 側テンプレート版ファイルの上書きだけで構成する。Makefile.toml / Cargo.toml / deny.toml / Dockerfile 等の内容を parse して書き換える経路を実装に含めない (overlay 方式で単純さを優先)。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5c9c8831ac0b6a4f7a8cdc6037e70d2b815bc1cd1c683c9ebd4efff37c5f421c",
+      "evidence_hash": "1b0a0125f1a45663d66d693c6b46fbed31a74347b9705beca58b7dcb97d1f3ac",
+      "verdict": {
+        "kind": "pass",
+        "citation": "export 実行経路の新設。`sotp template export` サブコマンドないし同等の cargo make タスクが、境界 manifest + overlay ディレクトリ + 実リポジトリ tree を入力として汎用テンプレートツリーを出力ディレクトリに生成する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TemplateExportInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "export 実行経路の新設。`sotp template export` サブコマンドないし同等の cargo make タスクが、境界 manifest + overlay ディレクトリ + 実リポジトリ tree を入力として汎用テンプレートツリーを出力ディレクトリに生成する。生成は境界 manifest の `include` / `exclude` / `overlay` 分類だけで駆動され、Makefile.toml / Cargo.toml / deny.toml / Dockerfile / track/*.md 等の内容をパースして書き換える経路を実装に含めない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5c9c8831ac0b6a4f7a8cdc6037e70d2b815bc1cd1c683c9ebd4efff37c5f421c",
+      "evidence_hash": "e4b8a64f4141fd9ed0c54b75135c3e9bcf5381aa84dbd256d49e8ba3f0ef7c66",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp template export` (または同等の cargo make タスク) が CLI に存在し、境界 manifest + overlay ディレクトリ + 実リポジトリ tree から、指定された出力ディレクトリに汎用テンプレートツリーを生成する。同じ入力からは同じ出力が決定論的に得られる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TemplateExportInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`sotp template export` (または同等の cargo make タスク) が CLI に存在し、境界 manifest + overlay ディレクトリ + 実リポジトリ tree から、指定された出力ディレクトリに汎用テンプレートツリーを生成する。同じ入力からは同じ出力が決定論的に得られる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "953a69dd6c7e943801767106d668d771aa82f7fb8e0146df2ed96b2484647515",
+      "evidence_hash": "1b0a0125f1a45663d66d693c6b46fbed31a74347b9705beca58b7dcb97d1f3ac",
+      "verdict": {
+        "kind": "pass",
+        "citation": "export 実行経路の新設。`sotp template export` サブコマンドないし同等の cargo make タスクが、境界 manifest + overlay ディレクトリ + 実リポジトリ tree を入力として汎用テンプレートツリーを出力ディレクトリに生成する。生成は境界 manifest の `include` / `exclude` / `overlay` 分類だけで駆動され"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TemplateExportPortError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "export 実行経路の新設。`sotp template export` サブコマンドないし同等の cargo make タスクが、境界 manifest + overlay ディレクトリ + 実リポジトリ tree を入力として汎用テンプレートツリーを出力ディレクトリに生成する。生成は境界 manifest の `include` / `exclude` / `overlay` 分類だけで駆動され、Makefile.toml / Cargo.toml / deny.toml / Dockerfile / track/*.md 等の内容をパースして書き換える経路を実装に含めない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "953a69dd6c7e943801767106d668d771aa82f7fb8e0146df2ed96b2484647515",
+      "evidence_hash": "237fc6328c3b05092522f0558e42e04f4317b67777620535f98e98ecddc0a7fc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "overlay ディレクトリの新設。テンプレートに必要だが sotp 固有値を含むファイル (Makefile.toml / Cargo.toml / deny.toml / Dockerfile / bootstrap 系タスク / 汎用化した track/*.md 等) のテンプレート版を静的ファイルとして格納する。export はこれらを差し込むだけで、export 実行時にファイル内容を組み立てない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TemplateExportPortError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "overlay ディレクトリの新設。テンプレートに必要だが sotp 固有値を含むファイル (Makefile.toml / Cargo.toml / deny.toml / Dockerfile / bootstrap 系タスク / 汎用化した track/*.md 等) のテンプレート版を静的ファイルとして格納する。export はこれらを差し込むだけで、export 実行時にファイル内容を組み立てない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "953a69dd6c7e943801767106d668d771aa82f7fb8e0146df2ed96b2484647515",
+      "evidence_hash": "e4b8a64f4141fd9ed0c54b75135c3e9bcf5381aa84dbd256d49e8ba3f0ef7c66",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp template export` (または同等の cargo make タスク) が CLI に存在し、境界 manifest + overlay ディレクトリ + 実リポジトリ tree から、指定された出力ディレクトリに汎用テンプレートツリーを生成する。同じ入力からは同じ出力が決定論的に得られる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TemplateExportPortError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`sotp template export` (または同等の cargo make タスク) が CLI に存在し、境界 manifest + overlay ディレクトリ + 実リポジトリ tree から、指定された出力ディレクトリに汎用テンプレートツリーを生成する。同じ入力からは同じ出力が決定論的に得られる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "953a69dd6c7e943801767106d668d771aa82f7fb8e0146df2ed96b2484647515",
+      "evidence_hash": "a320070d6a3cef2727e1b5ac9f62aa646e2f3372c43438868c0fb3e939d7cb75",
+      "verdict": {
+        "kind": "pass",
+        "citation": "overlay ディレクトリがリポジトリ内に存在し、テンプレート版 Makefile.toml / Cargo.toml / deny.toml / Dockerfile / bootstrap タスク / 汎用化した track/*.md / 6 crate プレースホルダの Cargo.toml と placeholder ソース等を静的ファイルとして格納する。export はこれらを出力ディレクトリの対応 path に配置するのみで、テンプレート実行時にファイル内容を組み立てない (プログラム的書き換えなし)"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TemplateExportPortError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "overlay ディレクトリがリポジトリ内に存在し、テンプレート版 Makefile.toml / Cargo.toml / deny.toml / Dockerfile / bootstrap タスク / 汎用化した track/*.md / 6 crate プレースホルダの Cargo.toml と placeholder ソース等を静的ファイルとして格納する。export はこれらを出力ディレクトリの対応 path に配置するのみで、テンプレート実行時にファイル内容を組み立てない (プログラム的書き換えなし)。"
+        }
+      }
+    },
+    {
+      "claim_hash": "953a69dd6c7e943801767106d668d771aa82f7fb8e0146df2ed96b2484647515",
+      "evidence_hash": "172080f9ca69879be51e2833a45ddd743016971a26f97dfba744417e6c48e0e9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "export はプログラム的なファイル書き換えを行わない。処理は境界 manifest の分類に従った `include` のコピー、`exclude` の除外、`overlay` 側テンプレート版ファイルの上書きだけで構成する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TemplateExportPortError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "export はプログラム的なファイル書き換えを行わない。処理は境界 manifest の分類に従った `include` のコピー、`exclude` の除外、`overlay` 側テンプレート版ファイルの上書きだけで構成する。Makefile.toml / Cargo.toml / deny.toml / Dockerfile 等の内容を parse して書き換える経路を実装に含めない (overlay 方式で単純さを優先)。"
+        }
+      }
+    },
+    {
+      "claim_hash": "9f68689875ea1ea4dbf25a7d2b0e93e79eb090a5c6254ac74b57e1face72cc20",
+      "evidence_hash": "1b0a0125f1a45663d66d693c6b46fbed31a74347b9705beca58b7dcb97d1f3ac",
+      "verdict": {
+        "kind": "pass",
+        "citation": "export 実行経路の新設。`sotp template export` サブコマンドないし同等の cargo make タスクが、境界 manifest + overlay ディレクトリ + 実リポジトリ tree を入力として汎用テンプレートツリーを出力ディレクトリに生成する。生成は境界 manifest の `include` / `exclude` / `overlay` 分類だけで駆動され"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TemplateExportReport"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "export 実行経路の新設。`sotp template export` サブコマンドないし同等の cargo make タスクが、境界 manifest + overlay ディレクトリ + 実リポジトリ tree を入力として汎用テンプレートツリーを出力ディレクトリに生成する。生成は境界 manifest の `include` / `exclude` / `overlay` 分類だけで駆動され、Makefile.toml / Cargo.toml / deny.toml / Dockerfile / track/*.md 等の内容をパースして書き換える経路を実装に含めない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "9f68689875ea1ea4dbf25a7d2b0e93e79eb090a5c6254ac74b57e1face72cc20",
+      "evidence_hash": "e4b8a64f4141fd9ed0c54b75135c3e9bcf5381aa84dbd256d49e8ba3f0ef7c66",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp template export` (または同等の cargo make タスク) が CLI に存在し、境界 manifest + overlay ディレクトリ + 実リポジトリ tree から、指定された出力ディレクトリに汎用テンプレートツリーを生成する。同じ入力からは同じ出力が決定論的に得られる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TemplateExportReport"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`sotp template export` (または同等の cargo make タスク) が CLI に存在し、境界 manifest + overlay ディレクトリ + 実リポジトリ tree から、指定された出力ディレクトリに汎用テンプレートツリーを生成する。同じ入力からは同じ出力が決定論的に得られる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8d6404369e04cca8665a0bf73a2d427644a31a4ce73f27d1d497d181811125eb",
+      "evidence_hash": "0ad476f11c9a08723ac8eb4a693ce141b0b349fee10a33e06625b7da24dbe208",
+      "verdict": {
+        "kind": "pass",
+        "citation": "境界 SSoT としての機械可読 manifest の新設。workspace tree の各 path を `include` (テンプレートにそのまま含める) / `exclude` (テンプレートから外す) / `overlay` (overlay ディレクトリ側のテンプレート版で上書き) のいずれかに分類する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TemplateBoundaryManifestPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "境界 SSoT としての機械可読 manifest の新設。workspace tree の各 path を `include` (テンプレートにそのまま含める) / `exclude` (テンプレートから外す) / `overlay` (overlay ディレクトリ側のテンプレート版で上書き) のいずれかに分類する。sotp ソース (`libs/*` / `apps/*`) は `overlay` に分類する — overlay の適用意味論が同一パスに対する sotp ソースの除去と 6 crate 雛形の差し込みを同時に果たし、D3 の 6 crate プレースホルダ出荷と AC-06 の「テンプレート workspace に sotp ソース非含有」を同時に満たす (`exclude` 単独では雛形が出荷されない)。`vendor/` + patch、`Cargo.lock`、`build-sotp` タスク、`.gitignore` の sotp 動的 cache エントリ、`track/items/` や `knowledge/adr/` の開発履歴、Python 残渣、SoTOHE-core 固有の deny.toml exception 等は `exclude`。overlay 分類は overlay ディレクトリ側に対応するテンプレート版ファイルの存在を要求する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8d6404369e04cca8665a0bf73a2d427644a31a4ce73f27d1d497d181811125eb",
+      "evidence_hash": "f602d6f1a29c649323eb0e200bb9857e5d73b143e8cf56aeeb613b4556815f56",
+      "verdict": {
+        "kind": "pass",
+        "citation": "境界 SSoT の機械可読 manifest ファイルがリポジトリ内の固定位置に存在し、workspace tree の全 path を `include` / `exclude` / `overlay` のいずれかに分類する。未分類 path の存在、`overlay` 分類なのに overlay 側にファイルが存在しない矛盾、重複分類は、export 実行 (および manifest validation) の時点で fail-closed で検出される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TemplateBoundaryManifestPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "境界 SSoT の機械可読 manifest ファイルがリポジトリ内の固定位置に存在し、workspace tree の全 path を `include` / `exclude` / `overlay` のいずれかに分類する。未分類 path の存在、`overlay` 分類なのに overlay 側にファイルが存在しない矛盾、重複分類は、export 実行 (および manifest validation) の時点で fail-closed で検出される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8d6404369e04cca8665a0bf73a2d427644a31a4ce73f27d1d497d181811125eb",
+      "evidence_hash": "c83ec54956e5cf3df4959a6800854f8d7ba62b30f74e19827a3c8745f346e996",
+      "verdict": {
+        "kind": "pass",
+        "citation": "境界の SSoT は機械可読 manifest (path → include / exclude / overlay 分類) 一元管理とする。散文のみの境界文書は SSoT にしない。分類の変更は manifest 側の変更で完結し、sotp 側のコード側は schema と読み込みロジックの安定性のみを保証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TemplateBoundaryManifestPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "境界の SSoT は機械可読 manifest (path → include / exclude / overlay 分類) 一元管理とする。散文のみの境界文書は SSoT にしない。分類の変更は manifest 側の変更で完結し、sotp 側のコード側は schema と読み込みロジックの安定性のみを保証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "53f3b1f53c04d7058902020b3de57c1b91d2a7bd83b5bd8090b5e681bf44855c",
+      "evidence_hash": "1b0a0125f1a45663d66d693c6b46fbed31a74347b9705beca58b7dcb97d1f3ac",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp template export` サブコマンドないし同等の cargo make タスクが、境界 manifest + overlay ディレクトリ + 実リポジトリ tree を入力として汎用テンプレートツリーを出力ディレクトリに生成する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TemplateExportPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "export 実行経路の新設。`sotp template export` サブコマンドないし同等の cargo make タスクが、境界 manifest + overlay ディレクトリ + 実リポジトリ tree を入力として汎用テンプレートツリーを出力ディレクトリに生成する。生成は境界 manifest の `include` / `exclude` / `overlay` 分類だけで駆動され、Makefile.toml / Cargo.toml / deny.toml / Dockerfile / track/*.md 等の内容をパースして書き換える経路を実装に含めない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "53f3b1f53c04d7058902020b3de57c1b91d2a7bd83b5bd8090b5e681bf44855c",
+      "evidence_hash": "237fc6328c3b05092522f0558e42e04f4317b67777620535f98e98ecddc0a7fc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "overlay ディレクトリの新設。テンプレートに必要だが sotp 固有値を含むファイル (Makefile.toml / Cargo.toml / deny.toml / Dockerfile / bootstrap 系タスク / 汎用化した track/*.md 等) のテンプレート版を静的ファイルとして格納する。export はこれらを差し込むだけで、export 実行時にファイル内容を組み立てない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TemplateExportPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "overlay ディレクトリの新設。テンプレートに必要だが sotp 固有値を含むファイル (Makefile.toml / Cargo.toml / deny.toml / Dockerfile / bootstrap 系タスク / 汎用化した track/*.md 等) のテンプレート版を静的ファイルとして格納する。export はこれらを差し込むだけで、export 実行時にファイル内容を組み立てない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "53f3b1f53c04d7058902020b3de57c1b91d2a7bd83b5bd8090b5e681bf44855c",
+      "evidence_hash": "e4b8a64f4141fd9ed0c54b75135c3e9bcf5381aa84dbd256d49e8ba3f0ef7c66",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp template export` (または同等の cargo make タスク) が CLI に存在し、境界 manifest + overlay ディレクトリ + 実リポジトリ tree から、指定された出力ディレクトリに汎用テンプレートツリーを生成する。同じ入力からは同じ出力が決定論的に得られる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TemplateExportPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`sotp template export` (または同等の cargo make タスク) が CLI に存在し、境界 manifest + overlay ディレクトリ + 実リポジトリ tree から、指定された出力ディレクトリに汎用テンプレートツリーを生成する。同じ入力からは同じ出力が決定論的に得られる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "53f3b1f53c04d7058902020b3de57c1b91d2a7bd83b5bd8090b5e681bf44855c",
+      "evidence_hash": "a320070d6a3cef2727e1b5ac9f62aa646e2f3372c43438868c0fb3e939d7cb75",
+      "verdict": {
+        "kind": "pass",
+        "citation": "export はこれらを出力ディレクトリの対応 path に配置するのみで、テンプレート実行時にファイル内容を組み立てない (プログラム的書き換えなし)。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TemplateExportPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "overlay ディレクトリがリポジトリ内に存在し、テンプレート版 Makefile.toml / Cargo.toml / deny.toml / Dockerfile / bootstrap タスク / 汎用化した track/*.md / 6 crate プレースホルダの Cargo.toml と placeholder ソース等を静的ファイルとして格納する。export はこれらを出力ディレクトリの対応 path に配置するのみで、テンプレート実行時にファイル内容を組み立てない (プログラム的書き換えなし)。"
+        }
+      }
+    },
+    {
+      "claim_hash": "53f3b1f53c04d7058902020b3de57c1b91d2a7bd83b5bd8090b5e681bf44855c",
+      "evidence_hash": "172080f9ca69879be51e2833a45ddd743016971a26f97dfba744417e6c48e0e9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "export はプログラム的なファイル書き換えを行わない。処理は境界 manifest の分類に従った `include` のコピー、`exclude` の除外、`overlay` 側テンプレート版ファイルの上書きだけで構成する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TemplateExportPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "export はプログラム的なファイル書き換えを行わない。処理は境界 manifest の分類に従った `include` のコピー、`exclude` の除外、`overlay` 側テンプレート版ファイルの上書きだけで構成する。Makefile.toml / Cargo.toml / deny.toml / Dockerfile 等の内容を parse して書き換える経路を実装に含めない (overlay 方式で単純さを優先)。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a3cc4f262bfb33035326194e7e0e910f08e670740c47aa80ed0b722efd3048e0",
+      "evidence_hash": "1b0a0125f1a45663d66d693c6b46fbed31a74347b9705beca58b7dcb97d1f3ac",
+      "verdict": {
+        "kind": "pass",
+        "citation": "export 実行経路の新設。`sotp template export` サブコマンドないし同等の cargo make タスクが、境界 manifest + overlay ディレクトリ + 実リポジトリ tree を入力として汎用テンプレートツリーを出力ディレクトリに生成する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TemplateExportService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "export 実行経路の新設。`sotp template export` サブコマンドないし同等の cargo make タスクが、境界 manifest + overlay ディレクトリ + 実リポジトリ tree を入力として汎用テンプレートツリーを出力ディレクトリに生成する。生成は境界 manifest の `include` / `exclude` / `overlay` 分類だけで駆動され、Makefile.toml / Cargo.toml / deny.toml / Dockerfile / track/*.md 等の内容をパースして書き換える経路を実装に含めない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a3cc4f262bfb33035326194e7e0e910f08e670740c47aa80ed0b722efd3048e0",
+      "evidence_hash": "e4b8a64f4141fd9ed0c54b75135c3e9bcf5381aa84dbd256d49e8ba3f0ef7c66",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp template export` (または同等の cargo make タスク) が CLI に存在し、境界 manifest + overlay ディレクトリ + 実リポジトリ tree から、指定された出力ディレクトリに汎用テンプレートツリーを生成する。同じ入力からは同じ出力が決定論的に得られる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TemplateExportService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`sotp template export` (または同等の cargo make タスク) が CLI に存在し、境界 manifest + overlay ディレクトリ + 実リポジトリ tree から、指定された出力ディレクトリに汎用テンプレートツリーを生成する。同じ入力からは同じ出力が決定論的に得られる。"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,282 @@
+{
+  "schema_version": 5,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {
+    "TemplateExportCommand": {
+      "action": "add",
+      "role": { "Command": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "workspace_root", "ty": "std::path::PathBuf" },
+            { "name": "manifest_path",  "ty": "std::path::PathBuf" },
+            { "name": "overlay_dir",    "ty": "std::path::PathBuf" },
+            { "name": "output_dir",     "ty": "std::path::PathBuf" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "template_export",
+      "docs": "`sotp template export` command (IN-01, AC-01).",
+      "spec_refs": [
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "IN-01" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "AC-01" }
+      ],
+      "informal_grounds": []
+    },
+    "TemplateExportReport": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "included_count", "ty": "usize" },
+            { "name": "excluded_count", "ty": "usize" },
+            { "name": "overlay_applied_count", "ty": "usize" },
+            { "name": "output_dir",     "ty": "std::path::PathBuf" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "template_export",
+      "docs": "`sotp template export` report (IN-01, AC-01).",
+      "spec_refs": [
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "IN-01" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "AC-01" }
+      ],
+      "informal_grounds": []
+    },
+    "TemplateExportError": {
+      "action": "add",
+      "role": { "ErrorType": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "ManifestRead", "payload": { "kind": "struct", "fields": [{ "name": "source", "ty": "TemplateBoundaryManifestReadError" }] } },
+          { "name": "Export",       "payload": { "kind": "struct", "fields": [{ "name": "source", "ty": "TemplateExportPortError" }] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "template_export",
+      "docs": "`TemplateExportService::export` error (IN-01, IN-02, IN-12, AC-01, AC-02, CN-03).",
+      "spec_refs": [
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "IN-01" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "IN-02" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "IN-12" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "AC-01" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "AC-02" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "CN-03" }
+      ],
+      "informal_grounds": []
+    },
+    "TemplateBoundaryManifestReadError": {
+      "action": "add",
+      "role": { "ErrorType": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "NotFound",        "payload": { "kind": "struct", "fields": [{ "name": "path", "ty": "std::path::PathBuf" }] } },
+          { "name": "Parse",           "payload": { "kind": "struct", "fields": [{ "name": "path", "ty": "std::path::PathBuf" }, { "name": "reason", "ty": "domain::tddd::catalogue_linter::FreeText" }] } },
+          { "name": "InvalidPattern",  "payload": { "kind": "struct", "fields": [{ "name": "source", "ty": "domain::template_export::TemplatePathPatternError" }] } },
+          { "name": "InvalidManifest", "payload": { "kind": "struct", "fields": [{ "name": "source", "ty": "domain::template_export::TemplateBoundaryManifestError" }] } },
+          { "name": "Io",              "payload": { "kind": "struct", "fields": [{ "name": "path", "ty": "std::path::PathBuf" }, { "name": "reason", "ty": "domain::tddd::catalogue_linter::FreeText" }] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "template_export",
+      "docs": "`TemplateBoundaryManifestPort::read` error (IN-02, AC-02).",
+      "spec_refs": [
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "IN-02" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "AC-02" }
+      ],
+      "informal_grounds": []
+    },
+    "TemplateExportPortError": {
+      "action": "add",
+      "role": { "ErrorType": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "OutputDirExists",  "payload": { "kind": "struct", "fields": [{ "name": "path", "ty": "std::path::PathBuf" }] } },
+          { "name": "OverlayMissing",   "payload": { "kind": "struct", "fields": [{ "name": "pattern", "ty": "domain::template_export::TemplatePathPattern" }, { "name": "overlay_path", "ty": "std::path::PathBuf" }] } },
+          { "name": "SourceMissing",    "payload": { "kind": "struct", "fields": [{ "name": "path", "ty": "std::path::PathBuf" }] } },
+          { "name": "UnclassifiedPath", "payload": { "kind": "struct", "fields": [{ "name": "path", "ty": "domain::template_export::TemplatePathPattern" }] } },
+          { "name": "Io",               "payload": { "kind": "struct", "fields": [{ "name": "path", "ty": "std::path::PathBuf" }, { "name": "reason", "ty": "domain::tddd::catalogue_linter::FreeText" }] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "template_export",
+      "docs": "`TemplateExportPort::export` error (IN-01, IN-03, AC-01, AC-03, CN-03).",
+      "spec_refs": [
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "IN-01" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "IN-03" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "AC-01" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "AC-03" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "CN-03" }
+      ],
+      "informal_grounds": []
+    },
+    "TemplateExportInteractor": {
+      "action": "add",
+      "role": { "Interactor": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "template_export",
+      "docs": "`TemplateExportService` interactor (IN-01, AC-01).",
+      "spec_refs": [
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "IN-01" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "AC-01" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {
+    "TemplateExportService": {
+      "action": "add",
+      "role": { "ApplicationService": {} },
+      "methods": [
+        {
+          "name": "export",
+          "receiver": "&self",
+          "params": [
+            { "name": "command", "ty": "TemplateExportCommand" }
+          ],
+          "returns": "Result<TemplateExportReport, TemplateExportError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Primary port entrypoint (IN-01, AC-01)."
+        }
+      ],
+      "supertrait_bounds": ["core::marker::Send", "core::marker::Sync"],
+      "module_path": "template_export",
+      "docs": "`sotp template export` primary port (IN-01, AC-01).",
+      "spec_refs": [
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "IN-01" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "AC-01" }
+      ],
+      "informal_grounds": []
+    },
+    "TemplateBoundaryManifestPort": {
+      "action": "add",
+      "role": { "SecondaryPort": {} },
+      "methods": [
+        {
+          "name": "read",
+          "receiver": "&self",
+          "params": [
+            { "name": "manifest_path", "ty": "&std::path::Path" }
+          ],
+          "returns": "Result<domain::template_export::TemplateBoundaryManifest, TemplateBoundaryManifestReadError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Manifest-read operation (IN-02, AC-02, CN-02)."
+        }
+      ],
+      "supertrait_bounds": ["core::marker::Send", "core::marker::Sync"],
+      "module_path": "template_export",
+      "docs": "Boundary manifest secondary port (IN-02, AC-02, CN-02).",
+      "spec_refs": [
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "IN-02" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "AC-02" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "CN-02" }
+      ],
+      "informal_grounds": []
+    },
+    "TemplateExportPort": {
+      "action": "add",
+      "role": { "SecondaryPort": {} },
+      "methods": [
+        {
+          "name": "export",
+          "receiver": "&self",
+          "params": [
+            { "name": "command",  "ty": "&TemplateExportCommand" },
+            { "name": "manifest", "ty": "&domain::template_export::TemplateBoundaryManifest" }
+          ],
+          "returns": "Result<TemplateExportReport, TemplateExportPortError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Filesystem export operation (IN-01, IN-03, AC-01, AC-03, CN-03)."
+        }
+      ],
+      "supertrait_bounds": ["core::marker::Send", "core::marker::Sync"],
+      "module_path": "template_export",
+      "docs": "Template export secondary port (IN-01, IN-03, AC-01, AC-03, CN-03).",
+      "spec_refs": [
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "IN-01" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "IN-03" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "AC-01" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "AC-03" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "CN-03" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "functions": {},
+  "inherent_impls": [
+    {
+      "type_name": "TemplateExportInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "manifest_port", "ty": "std::sync::Arc<dyn TemplateBoundaryManifestPort>" },
+            { "name": "export_port",   "ty": "std::sync::Arc<dyn TemplateExportPort>" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Constructor."
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    { "trait_ref": "core::fmt::Debug",     "for_type": "TemplateExportCommand" },
+    { "trait_ref": "core::clone::Clone",   "for_type": "TemplateExportCommand" },
+    { "trait_ref": "core::cmp::PartialEq", "for_type": "TemplateExportCommand" },
+    { "trait_ref": "core::cmp::Eq",        "for_type": "TemplateExportCommand" },
+
+    { "trait_ref": "core::fmt::Debug",     "for_type": "TemplateExportReport" },
+    { "trait_ref": "core::clone::Clone",   "for_type": "TemplateExportReport" },
+    { "trait_ref": "core::cmp::PartialEq", "for_type": "TemplateExportReport" },
+    { "trait_ref": "core::cmp::Eq",        "for_type": "TemplateExportReport" },
+
+    { "trait_ref": "core::fmt::Debug",   "for_type": "TemplateExportError" },
+    { "trait_ref": "core::fmt::Display", "for_type": "TemplateExportError" },
+    { "trait_ref": "core::error::Error", "for_type": "TemplateExportError" },
+    { "trait_ref": "core::convert::From<TemplateBoundaryManifestReadError>", "for_type": "TemplateExportError" },
+    { "trait_ref": "core::convert::From<TemplateExportPortError>",           "for_type": "TemplateExportError" },
+
+    { "trait_ref": "core::fmt::Debug",   "for_type": "TemplateBoundaryManifestReadError" },
+    { "trait_ref": "core::fmt::Display", "for_type": "TemplateBoundaryManifestReadError" },
+    { "trait_ref": "core::error::Error", "for_type": "TemplateBoundaryManifestReadError" },
+    { "trait_ref": "core::convert::From<domain::template_export::TemplatePathPatternError>",      "for_type": "TemplateBoundaryManifestReadError" },
+    { "trait_ref": "core::convert::From<domain::template_export::TemplateBoundaryManifestError>", "for_type": "TemplateBoundaryManifestReadError" },
+
+    { "trait_ref": "core::fmt::Debug",   "for_type": "TemplateExportPortError" },
+    { "trait_ref": "core::fmt::Display", "for_type": "TemplateExportPortError" },
+    { "trait_ref": "core::error::Error", "for_type": "TemplateExportPortError" },
+
+    { "trait_ref": "TemplateExportService", "for_type": "TemplateExportInteractor" }
+  ]
+}

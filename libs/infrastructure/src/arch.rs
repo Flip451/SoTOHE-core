@@ -4,7 +4,7 @@
 //! workspace tree / members / direct-check matrices as strings.
 
 use std::collections::{BTreeMap, BTreeSet};
-use std::path::Path;
+use std::path::{Component, Path};
 
 use serde_json::Value;
 
@@ -44,6 +44,34 @@ impl ArchRules {
     pub(crate) fn layers(&self) -> &[LayerEntry] {
         &self.layers
     }
+
+    /// Resolve every layer opting into `kind` into a `<path>/src` scan target.
+    ///
+    /// Layers that do not declare the flag are skipped. An empty result means
+    /// no layer opted in — the caller reports OK/skip rather than an error.
+    pub(crate) fn verify_targets(&self, kind: VerifierKind) -> Vec<VerifyTarget> {
+        self.layers
+            .iter()
+            .filter(|layer| layer.verify.declares(kind))
+            .map(|layer| VerifyTarget {
+                src_dir: format!("{}/src", layer.path),
+                label: layer.crate_name.clone(),
+            })
+            .collect()
+    }
+}
+
+/// Load `architecture-rules.json` and resolve the scan targets for `kind`.
+///
+/// # Errors
+///
+/// Returns `ArchRulesError` if the rules file cannot be read, parsed, or is
+/// structurally invalid.
+pub(crate) fn resolve_verify_targets(
+    root: &Path,
+    kind: VerifierKind,
+) -> Result<Vec<VerifyTarget>, ArchRulesError> {
+    Ok(load_rules(root)?.verify_targets(kind))
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -52,6 +80,52 @@ pub(crate) struct LayerEntry {
     pub(crate) path: String,
     pub(crate) may_depend_on: Vec<String>,
     pub(crate) deny_reason: String,
+    pub(crate) verify: LayerVerify,
+}
+
+/// Opt-in purity/string verifiers a layer declares in its optional `verify` block.
+///
+/// Absence of the block (all fields `false`) means the layer opts out — the
+/// corresponding verifier skips it. This is what makes the verifiers generic:
+/// the source paths are resolved from the declaring layer's `path`, never
+/// hardcoded, and a target repo that declares no block is silently skipped.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub(crate) struct LayerVerify {
+    domain_purity: bool,
+    domain_strings: bool,
+    usecase_purity: bool,
+}
+
+impl LayerVerify {
+    /// Whether this layer opts into the given verifier.
+    fn declares(&self, kind: VerifierKind) -> bool {
+        match kind {
+            VerifierKind::DomainPurity => self.domain_purity,
+            VerifierKind::DomainStrings => self.domain_strings,
+            VerifierKind::UsecasePurity => self.usecase_purity,
+        }
+    }
+}
+
+/// The opt-in verifiers dispatched from `architecture-rules.json` layer entries.
+///
+/// Each variant maps to one `verify.<key>` boolean flag and to one public
+/// `bin/sotp verify <name>` subcommand, keeping the subcommand surface stable
+/// while the scanned source paths become config-driven.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum VerifierKind {
+    DomainPurity,
+    DomainStrings,
+    UsecasePurity,
+}
+
+/// A resolved scan target: the `<layer path>/src` directory plus a human label.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) struct VerifyTarget {
+    /// Repo-relative source directory to scan (e.g. `libs/domain/src`).
+    pub(crate) src_dir: String,
+    /// Human-readable layer label used in diagnostics (the crate name).
+    pub(crate) label: String,
 }
 
 #[derive(Debug)]
@@ -107,6 +181,95 @@ fn required_non_empty_string(
         .ok_or_else(|| invalid_rules(message))
 }
 
+fn validate_layer_path(crate_name: &str, path: &str) -> Result<(), ArchRulesError> {
+    if path.ends_with('/') || path.ends_with('\\') {
+        return Err(invalid_rules(format!(
+            "layer '{crate_name}' has invalid path '{path}': trailing separators are not allowed"
+        )));
+    }
+    if path.contains('\\') {
+        return Err(invalid_rules(format!(
+            "layer '{crate_name}' has invalid path '{path}': use repo-relative '/' separators"
+        )));
+    }
+    if has_windows_drive_prefix(path) {
+        return Err(invalid_rules(format!(
+            "layer '{crate_name}' has invalid path '{path}': Windows drive prefixes are not repo-relative"
+        )));
+    }
+    if path.chars().any(char::is_control) {
+        return Err(invalid_rules(format!(
+            "layer '{crate_name}' has invalid path: control characters are not allowed"
+        )));
+    }
+
+    for component in Path::new(path).components() {
+        match component {
+            Component::Normal(_) => {}
+            Component::CurDir => {
+                return Err(invalid_rules(format!(
+                    "layer '{crate_name}' has invalid path '{path}': '.' components are not allowed"
+                )));
+            }
+            Component::ParentDir => {
+                return Err(invalid_rules(format!(
+                    "layer '{crate_name}' has invalid path '{path}': '..' components are not allowed"
+                )));
+            }
+            Component::RootDir | Component::Prefix(_) => {
+                return Err(invalid_rules(format!(
+                    "layer '{crate_name}' has invalid path '{path}': path must be repo-relative"
+                )));
+            }
+        }
+    }
+
+    Ok(())
+}
+
+fn has_windows_drive_prefix(path: &str) -> bool {
+    matches!(
+        (path.as_bytes().first(), path.as_bytes().get(1)),
+        (Some(first), Some(second)) if *second == b':' && first.is_ascii_alphabetic()
+    )
+}
+
+/// Parse a layer's optional `verify` block into a [`LayerVerify`].
+///
+/// Absent block → all flags `false` (opt-out). Fail-closed: any non-boolean
+/// value or unknown key is rejected, matching the codebase's
+/// `deny_unknown_fields` deserialization convention.
+fn parse_layer_verify(
+    value: Option<&Value>,
+    crate_name: &str,
+) -> Result<LayerVerify, ArchRulesError> {
+    let Some(value) = value else {
+        return Ok(LayerVerify::default());
+    };
+    let object = value.as_object().ok_or_else(|| {
+        invalid_rules(format!(
+            "layer '{crate_name}' has invalid 'verify' block (must be an object)"
+        ))
+    })?;
+    let mut verify = LayerVerify::default();
+    for (key, val) in object {
+        let flag = val.as_bool().ok_or_else(|| {
+            invalid_rules(format!("layer '{crate_name}' verify.{key} must be a boolean"))
+        })?;
+        match key.as_str() {
+            "domain_purity" => verify.domain_purity = flag,
+            "domain_strings" => verify.domain_strings = flag,
+            "usecase_purity" => verify.usecase_purity = flag,
+            other => {
+                return Err(invalid_rules(format!(
+                    "layer '{crate_name}' has unknown verify key: {other}"
+                )));
+            }
+        }
+    }
+    Ok(verify)
+}
+
 pub(crate) fn parse_rules(value: &Value) -> Result<ArchRules, ArchRulesError> {
     let object = value
         .as_object()
@@ -136,6 +299,7 @@ pub(crate) fn parse_rules(value: &Value) -> Result<ArchRules, ArchRulesError> {
             "path",
             format!("layer '{crate_name}' must define a non-empty 'path'"),
         )?;
+        validate_layer_path(&crate_name, &path)?;
         let may_depend_on = match layer_object.get("may_depend_on") {
             Some(value) => {
                 let values = value.as_array().ok_or_else(|| {
@@ -166,6 +330,8 @@ pub(crate) fn parse_rules(value: &Value) -> Result<ArchRules, ArchRulesError> {
             None => String::new(),
         };
 
+        let verify = parse_layer_verify(layer_object.get("verify"), &crate_name)?;
+
         if !seen_crates.insert(crate_name.clone()) {
             return Err(invalid_rules(format!(
                 "duplicate crate in architecture rules: {crate_name}"
@@ -175,7 +341,7 @@ pub(crate) fn parse_rules(value: &Value) -> Result<ArchRules, ArchRulesError> {
             return Err(invalid_rules(format!("duplicate path in architecture rules: {path}")));
         }
 
-        layers.push(LayerEntry { crate_name, path, may_depend_on, deny_reason });
+        layers.push(LayerEntry { crate_name, path, may_depend_on, deny_reason, verify });
     }
 
     let known_crates: BTreeSet<&str> = layers.iter().map(|l| l.crate_name.as_str()).collect();
@@ -714,6 +880,27 @@ mod tests {
         let dir = setup_dir(r#"{ "layers": [] }"#);
         let err = render_workspace_members(dir.path()).unwrap_err();
         assert!(matches!(err, ArchRulesError::InvalidRules(_)), "unexpected: {err:?}");
+    }
+
+    #[test]
+    fn unsafe_layer_paths_return_invalid_rules_error() {
+        for path in ["../domain", "/tmp/domain", "C:/tmp/domain", "libs\\domain", "libs/domain/"] {
+            let path_json = serde_json::to_string(path).unwrap();
+            let rules = format!(
+                r#"{{
+  "layers": [
+    {{ "crate": "domain", "path": {path_json}, "may_depend_on": [] }}
+  ]
+}}"#
+            );
+            let dir = setup_dir(&rules);
+            let err = render_workspace_members(dir.path()).unwrap_err();
+            assert!(matches!(err, ArchRulesError::InvalidRules(_)), "unexpected: {err:?}");
+            assert!(
+                err.to_string().contains("layer 'domain' has invalid path"),
+                "unexpected error for {path:?}: {err}"
+            );
+        }
     }
 
     #[test]

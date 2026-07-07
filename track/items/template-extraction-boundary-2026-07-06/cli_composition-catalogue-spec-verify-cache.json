@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "layer": "cli_composition",
+  "entries": [
+    {
+      "claim_hash": "1e54d7001c2a24a956f4169ab01187e98d88969d423eb885251a880480a01e1c",
+      "evidence_hash": "1b0a0125f1a45663d66d693c6b46fbed31a74347b9705beca58b7dcb97d1f3ac",
+      "verdict": {
+        "kind": "pass",
+        "citation": "export 実行経路の新設。`sotp template export` サブコマンドないし同等の cargo make タスクが、境界 manifest + overlay ディレクトリ + 実リポジトリ tree を入力として汎用テンプレートツリーを出力ディレクトリに生成する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/cli_composition-types.json",
+          "section_key": "types",
+          "entry_key": "TemplateCompositionRoot"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "export 実行経路の新設。`sotp template export` サブコマンドないし同等の cargo make タスクが、境界 manifest + overlay ディレクトリ + 実リポジトリ tree を入力として汎用テンプレートツリーを出力ディレクトリに生成する。生成は境界 manifest の `include` / `exclude` / `overlay` 分類だけで駆動され、Makefile.toml / Cargo.toml / deny.toml / Dockerfile / track/*.md 等の内容をパースして書き換える経路を実装に含めない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "1e54d7001c2a24a956f4169ab01187e98d88969d423eb885251a880480a01e1c",
+      "evidence_hash": "e4b8a64f4141fd9ed0c54b75135c3e9bcf5381aa84dbd256d49e8ba3f0ef7c66",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp template export` (または同等の cargo make タスク) が CLI に存在し、境界 manifest + overlay ディレクトリ + 実リポジトリ tree から、指定された出力ディレクトリに汎用テンプレートツリーを生成する。同じ入力からは同じ出力が決定論的に得られる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/cli_composition-types.json",
+          "section_key": "types",
+          "entry_key": "TemplateCompositionRoot"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`sotp template export` (または同等の cargo make タスク) が CLI に存在し、境界 manifest + overlay ディレクトリ + 実リポジトリ tree から、指定された出力ディレクトリに汎用テンプレートツリーを生成する。同じ入力からは同じ出力が決定論的に得られる。"
+        }
+      }
+    }
+  ]
+}

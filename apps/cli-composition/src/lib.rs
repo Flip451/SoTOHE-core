@@ -30,6 +30,7 @@ pub mod signal;
 mod signal_layer_chain;
 pub mod task_contract;
 mod telemetry;
+mod template_export;
 pub mod track;
 pub mod verify;
 
@@ -85,6 +86,7 @@ pub use semantic_dup::SemanticDupCompositionRoot;
 pub use signal::SignalCompositionRoot;
 pub use task_contract::TaskContractCompositionRoot;
 pub use telemetry::TelemetryCompositionRoot;
+pub use template_export::TemplateCompositionRoot;
 pub use track::composition_root::TrackCompositionRoot;
 pub use verify::VerifyCompositionRoot;
 

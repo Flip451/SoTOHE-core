@@ -1,0 +1,137 @@
+{
+  "schema_version": 5,
+  "crate_name": "cli",
+  "layer": "cli",
+  "types": {
+    "TemplateCommand": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Export", "payload": { "kind": "tuple", "fields": ["TemplateExportArgs"] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "commands::template",
+      "docs": "`sotp template` subcommand enum (IN-01, AC-01).",
+      "spec_refs": [
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "IN-01" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "AC-01" }
+      ],
+      "informal_grounds": []
+    },
+    "TemplateExportArgs": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "workspace_root", "ty": "std::path::PathBuf" },
+            { "name": "manifest_path",  "ty": "std::path::PathBuf" },
+            { "name": "overlay_dir",    "ty": "std::path::PathBuf" },
+            { "name": "output_dir",     "ty": "std::path::PathBuf" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "commands::template",
+      "docs": "`sotp template export` clap args (IN-01, AC-01).",
+      "spec_refs": [
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "IN-01" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "AC-01" }
+      ],
+      "informal_grounds": []
+    },
+    "CliCommand": {
+      "action": "modify",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Arch",          "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "commands::arch::ArchCommand" }] } },
+          { "name": "Conventions",   "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "commands::conventions::ConventionsCommand" }] } },
+          { "name": "Domain",        "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "commands::domain::DomainCommand" }] } },
+          { "name": "Guard",         "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "commands::guard::GuardCommand" }] } },
+          { "name": "Hook",          "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "commands::hook::HookCommand" }] } },
+          { "name": "Track",         "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "commands::track::TrackCommand" }] } },
+          { "name": "Git",           "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "commands::git::GitCommand" }] } },
+          { "name": "Pr",            "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "commands::pr::PrCommand" }] } },
+          { "name": "Plan",          "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "commands::plan::PlanCommand" }] } },
+          { "name": "Review",        "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "commands::review::ReviewCommand" }] } },
+          { "name": "File",          "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "commands::file::FileCommand" }] } },
+          { "name": "Verify",        "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "commands::verify::VerifyCommand" }] } },
+          { "name": "FindSimilar",   "payload": { "kind": "tuple",  "fields": ["commands::semantic_dup::FindSimilarArgs"] } },
+          { "name": "DupIndex",      "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "commands::semantic_dup::DupIndexCommand" }] } },
+          { "name": "DupCheck",      "payload": { "kind": "tuple",  "fields": ["commands::semantic_dup::DupCheckArgs"] } },
+          { "name": "Telemetry",     "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "commands::telemetry::TelemetryCommand" }] } },
+          { "name": "Dry",           "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "commands::dry::DryCommand" }] } },
+          { "name": "RefVerify",     "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "commands::ref_verify::RefVerifyCommand" }] } },
+          { "name": "Signal",        "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "commands::signal::SignalCommand" }] } },
+          { "name": "TaskContract",  "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "commands::task_contract::TaskContractCommand" }] } },
+          { "name": "Catalog",       "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "commands::catalog::CatalogCommand" }] } },
+          { "name": "CatalogueLint", "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "commands::catalogue_lint::CatalogueLintCommand" }] } },
+          { "name": "Template",      "payload": { "kind": "struct", "fields": [{ "name": "cmd", "ty": "commands::template::TemplateCommand" }] } },
+          { "name": "Demo",          "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "",
+      "docs": "CLI subcommand enum (IN-01, AC-01).",
+      "spec_refs": [
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "IN-01" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "AC-01" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {
+    "cli::commands::template::execute": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [{ "name": "cmd", "ty": "TemplateCommand" }],
+      "returns": "std::process::ExitCode",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "`sotp template` entrypoint (IN-01, AC-01).",
+      "spec_refs": [
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "IN-01" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "AC-01" }
+      ],
+      "informal_grounds": []
+    },
+    "cli::commands::template::dispatch": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [{ "name": "input", "ty": "cli_driver::template_export::TemplateInput" }],
+      "returns": "std::process::ExitCode",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "`TemplateCompositionRoot` dispatch (IN-01, AC-01).",
+      "spec_refs": [
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "IN-01" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "AC-01" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "inherent_impls": [],
+  "trait_impls": [
+    { "action": "reference", "trait_ref": "clap_builder::derive::FromArgMatches", "for_type": "CliCommand" },
+    { "action": "reference", "trait_ref": "clap_builder::derive::Subcommand",     "for_type": "CliCommand" },
+
+    { "trait_ref": "core::fmt::Debug",                     "for_type": "TemplateCommand" },
+    { "trait_ref": "clap_builder::derive::FromArgMatches", "for_type": "TemplateCommand" },
+    { "trait_ref": "clap_builder::derive::Subcommand",     "for_type": "TemplateCommand" },
+
+    { "trait_ref": "core::fmt::Debug",                     "for_type": "TemplateExportArgs" },
+    { "trait_ref": "clap_builder::derive::Args",           "for_type": "TemplateExportArgs" },
+    { "trait_ref": "clap_builder::derive::FromArgMatches", "for_type": "TemplateExportArgs" }
+  ]
+}

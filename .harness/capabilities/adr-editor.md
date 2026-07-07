@@ -65,7 +65,7 @@ If the briefing asks for:
 
 ## Front-matter authoring rules
 
-ADR files use a leading YAML front-matter block to encode machine-checkable decision metadata (per ADR `2026-04-27-1234-adr-decision-traceability-lifecycle.md` D1-D3). When this capability writes or modifies an ADR's front-matter, the following rules apply.
+ADR files use a leading YAML front-matter block to encode machine-checkable decision metadata (the decision-traceability lifecycle contract). When this capability writes or modifies an ADR's front-matter, the following rules apply.
 
 ### Placement
 
@@ -81,8 +81,8 @@ The front-matter recognises exactly two top-level keys (`deny_unknown_fields` re
   - `user_decision_ref` (optional string): a reference to where the user explicitly approved the decision (chat segment ref, approval marker, etc.). Sets the signal to 🔵 Blue (highest priority — wins over `review_finding_ref` if both are set).
   - `review_finding_ref` (optional string): a reference to a review-process finding that surfaced the decision. Sets the signal to 🟡 Yellow when no `user_decision_ref` is set.
   - `candidate_selection` (optional string): when the decision selects from multiple candidates evaluated in `## Rejected Alternatives`, encode the choice (e.g. `"from:[A,B,C,D,E] chose:A"`).
-  - `status` (required string): one of `proposed` / `accepted` / `implemented` / `superseded` / `deprecated`. These five values dispatch through `parse_adr_frontmatter` (T003) to the corresponding domain typestate variants `ProposedDecision` / `AcceptedDecision` / `ImplementedDecision` / `SupersededDecision` / `DeprecatedDecision`. Any other value is rejected at parse time.
-  - `superseded_by` (optional string, **required when** `status: superseded`): a reference to the superseding decision (`<adr-slug>.md#<id>` form). Forbidden on any other status (the parser raises `InvalidDecisionField` even if the value is `null`).
+  - `status` (required string): one of `proposed` / `accepted` / `implemented` / `superseded` / `deprecated`. These five values dispatch through the ADR front-matter parser to the corresponding decision typestate variants (one per status). Any other value is rejected at parse time.
+  - `superseded_by` (optional string, **required when** `status: superseded`): a reference to the superseding decision (`<adr-slug>.md#<id>` form). Forbidden on any other status (the parser rejects it even if the value is `null`).
   - `implemented_in` (optional string, **required when** `status: implemented`): a non-empty commit hash or reference identifying where the decision was actualized (e.g. `"abc1234"` or `"track/my-feature@0c0f24c"`). Forbidden on any other status (same key-presence rule as `superseded_by`).
   - `grandfathered` (optional boolean): when `true`, exempts the decision from the `verify-adr-signals` Red/Yellow signal check (D4 grandfathered exemption). Use only for ADRs predating the front-matter format whose grounds cannot reasonably be reconstructed.
 

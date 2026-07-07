@@ -1,0 +1,13 @@
+{
+  "schema_version": 6,
+  "id": "template-extraction-boundary-2026-07-06",
+  "title": "sotp 開発領域と汎用テンプレートの分離境界・切り出し方式の実装",
+  "branch": "track/template-extraction-boundary-2026-07-06",
+  "created_at": "2026-07-06T17:21:41Z",
+  "updated_at": "2026-07-06T17:21:41Z",
+  "branch_strategy_snapshot": {
+    "base_branch": "develop",
+    "merge_target": "develop",
+    "merge_method": "squash"
+  }
+}

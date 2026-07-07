@@ -1,0 +1,1362 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "2046291e8878df6363984f3e976b49896727a5ba964f64f56f721b91052b552b",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「リポジトリ内に機械可読な境界 SSoT を置き、`sotp template export` (または同等の cargo make タスク) が汎用テンプレートツリーをビルド成果物として生成する。物理的なリポ分割は行わず」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "SoTOHE-core を sotp 開発リポジトリのまま維持しつつ (自己ホスト開発ループの継続)、リポジトリ内に機械可読な境界 SSoT を置き、`sotp template export` (または同等の cargo make タスク) が汎用テンプレートツリーをビルド成果物として生成できるようにする。物理的なリポ分割は行わず、export 出力が将来の分割の内容となる状態まで到達する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "a12259fc0e3662691920fb9ff29a30c65e89da1946758ceb0aaee6d30677e205",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "切り出されたテンプレートは sotp ソースをワークスペースに同梱せず、bootstrap 時に `cargo install --git <SoTOHE-core> --tag <pinned> --locked` で固定タグの sotp を bootstrap host 上にビルドして `bin/sotp` を導入する。バージョンピンは設定ファイル ... を SSoT とする。D2 の初期方式では sotp のビルド前提 ... はテンプレートの cargo workspace からは分離される"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-02",
+          "text_label": "切り出されたテンプレートを利用する側の cargo workspace を sotp ソース・vendor patch・sotp のビルド制約から分離し、テンプレート側の bootstrap では `cargo install --git <SoTOHE-core> --tag <pinned> --locked` により固定タグの sotp を bootstrap host 上にビルドして `bin/sotp` を導入する形にする。バージョンピンは設定ファイルを SSoT として管理する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "2f76f51c932ca449bccf6942f944b41ed56ac53729d8a2cc7f14522427ce00e3",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "テンプレートは現行標準の 6 crate 構成を最小のコンパイル可能プレースホルダとして同梱する。out-of-the-box で `cargo make ci` が green"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-03",
+          "text_label": "export 成果物としてのテンプレートが out-of-the-box でコンパイル可能な最小プレースホルダ workspace を提供し、初期状態から `cargo make ci` が green となる状態を得る。これにより TDDD の「ビルド可能な cargo workspace」前提を初期状態で満たし、利用者が既存の architecture-customizer skill で再構成できる出発点にする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "93ef0b18a535ab13d3bbc62b3bbea8e06acc0b80784fadff2c867d735475b563",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「機械可読 manifest (path → `include` / `exclude` / `overlay` の分類) を境界の SSoTとし、... export = 除外コピー + overlay 上書きのみで、プログラム的なファイル書き換えは行わない。overlay と実ファイルの drift は『export 出力に対して雛形 CI を回すスモークゲート』で検出する。これは旧 ADR の SPLIT-01 (論理境界の文書化) を機械可読形で実現するものである。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-04",
+          "text_label": "境界の SSoT を機械可読な manifest (path → 分類) + overlay ディレクトリで構成し、export をプログラム的書き換えなしの「除外コピー + overlay 上書き」に閉じる。overlay と実ファイルの drift は export 出力に対するスモークゲートで検出することで、旧 ADR の論理境界文書化 (SPLIT-01) を機械可読形で置き換える。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "95a78c5b6d8baa2f5ffadd441e6468e5020a4c97bd2121e4c8238f101de0736b",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "分離の成立条件となる以下の前提修正を本 ADR の決定範囲に含める (track 分割は impl-plan に委ねる):\n- D5-a: 3 verifier (`domain_purity` / `domain_strings` / `usecase_purity`) の `architecture-rules.json` 駆動化\n- D5-b: `review-scope.json` の層グループ、catalogue-lint `permitted_layers`、fix-lead 系 capability のアーキテクチャガードブロック、`workflows/track/init.md` のカタログ参照を `architecture-rules.json` から導出ないし整合させる\n- D5-c: ハーネス文書の sotp 固有 provenance 参照 ... を generic な記述に置換する\n- D5-d: Python 残渣 ... の除去"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-05",
+          "text_label": "テンプレートとしての汎用性が成立する前提修正 (層ハードコード verifier の arch-rules 駆動化、機械可読 harness 設定の arch-rules 由来化、harness 文書からの sotp 固有 provenance 参照の除去、Python 残渣の除去) を本トラックの範囲に含める。ADR 決定と impl 分解境界の橋渡しを明示することで、export だけを実装しても汎用性が成立しない状態を作らない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "1b0a0125f1a45663d66d693c6b46fbed31a74347b9705beca58b7dcb97d1f3ac",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "リポジトリ内に機械可読な 境界 SSoT を置き、`sotp template export` (または同等の cargo make タスク) が汎用テンプレートツリーを **ビルド成果物として生成** する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "export 実行経路の新設。`sotp template export` サブコマンドないし同等の cargo make タスクが、境界 manifest + overlay ディレクトリ + 実リポジトリ tree を入力として汎用テンプレートツリーを出力ディレクトリに生成する。生成は境界 manifest の `include` / `exclude` / `overlay` 分類だけで駆動され、Makefile.toml / Cargo.toml / deny.toml / Dockerfile / track/*.md 等の内容をパースして書き換える経路を実装に含めない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "1b0a0125f1a45663d66d693c6b46fbed31a74347b9705beca58b7dcb97d1f3ac",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "機械可読 manifest (path → `include` / `exclude` / `overlay` の分類) を境界の SSoT とし、\n「テンプレートに必要だが sotp 固有値を含む」ファイル (Makefile.toml / Cargo.toml / deny.toml /\nDockerfile / track/*.md 等) は **template 版を overlay ディレクトリに静置**する。\nexport = 除外コピー + overlay 上書きのみで、プログラム的なファイル書き換えは行わない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "export 実行経路の新設。`sotp template export` サブコマンドないし同等の cargo make タスクが、境界 manifest + overlay ディレクトリ + 実リポジトリ tree を入力として汎用テンプレートツリーを出力ディレクトリに生成する。生成は境界 manifest の `include` / `exclude` / `overlay` 分類だけで駆動され、Makefile.toml / Cargo.toml / deny.toml / Dockerfile / track/*.md 等の内容をパースして書き換える経路を実装に含めない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "0ad476f11c9a08723ac8eb4a693ce141b0b349fee10a33e06625b7da24dbe208",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "テンプレートは現行標準の 6 crate 構成 (`libs/domain` / `libs/usecase` / `libs/infrastructure` / `apps/cli` / `apps/cli-composition` / `apps/cli-driver`) を最小のコンパイル可能プレースホルダとして同梱する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "境界 SSoT としての機械可読 manifest の新設。workspace tree の各 path を `include` (テンプレートにそのまま含める) / `exclude` (テンプレートから外す) / `overlay` (overlay ディレクトリ側のテンプレート版で上書き) のいずれかに分類する。sotp ソース (`libs/*` / `apps/*`) は `overlay` に分類する — overlay の適用意味論が同一パスに対する sotp ソースの除去と 6 crate 雛形の差し込みを同時に果たし、D3 の 6 crate プレースホルダ出荷と AC-06 の「テンプレート workspace に sotp ソース非含有」を同時に満たす (`exclude` 単独では雛形が出荷されない)。`vendor/` + patch、`Cargo.lock`、`build-sotp` タスク、`.gitignore` の sotp 動的 cache エントリ、`track/items/` や `knowledge/adr/` の開発履歴、Python 残渣、SoTOHE-core 固有の deny.toml exception 等は `exclude`。overlay 分類は overlay ディレクトリ側に対応するテンプレート版ファイルの存在を要求する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "0ad476f11c9a08723ac8eb4a693ce141b0b349fee10a33e06625b7da24dbe208",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "機械可読 manifest (path → `include` / `exclude` / `overlay` の分類) を境界の SSoT とし、「テンプレートに必要だが sotp 固有値を含む」ファイル (Makefile.toml / Cargo.toml / deny.toml / Dockerfile / track/*.md 等) は **template 版を overlay ディレクトリに静置**する。export = 除外コピー + overlay 上書きのみで、プログラム的なファイル書き換えは行わない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "境界 SSoT としての機械可読 manifest の新設。workspace tree の各 path を `include` (テンプレートにそのまま含める) / `exclude` (テンプレートから外す) / `overlay` (overlay ディレクトリ側のテンプレート版で上書き) のいずれかに分類する。sotp ソース (`libs/*` / `apps/*`) は `overlay` に分類する — overlay の適用意味論が同一パスに対する sotp ソースの除去と 6 crate 雛形の差し込みを同時に果たし、D3 の 6 crate プレースホルダ出荷と AC-06 の「テンプレート workspace に sotp ソース非含有」を同時に満たす (`exclude` 単独では雛形が出荷されない)。`vendor/` + patch、`Cargo.lock`、`build-sotp` タスク、`.gitignore` の sotp 動的 cache エントリ、`track/items/` や `knowledge/adr/` の開発履歴、Python 残渣、SoTOHE-core 固有の deny.toml exception 等は `exclude`。overlay 分類は overlay ディレクトリ側に対応するテンプレート版ファイルの存在を要求する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "237fc6328c3b05092522f0558e42e04f4317b67777620535f98e98ecddc0a7fc",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「テンプレートに必要だが sotp 固有値を含む」ファイル (Makefile.toml / Cargo.toml / deny.toml /\nDockerfile / track/*.md 等) は **template 版を overlay ディレクトリに静置**する。\nexport = 除外コピー + overlay 上書きのみで、プログラム的なファイル書き換えは行わない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "overlay ディレクトリの新設。テンプレートに必要だが sotp 固有値を含むファイル (Makefile.toml / Cargo.toml / deny.toml / Dockerfile / bootstrap 系タスク / 汎用化した track/*.md 等) のテンプレート版を静的ファイルとして格納する。export はこれらを差し込むだけで、export 実行時にファイル内容を組み立てない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "dd2db6c8035fdcf3e0088ef261e7ad97803d6f31d5e06402452b8dcd7651a35b",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「現行標準の 6 crate 構成を最小のコンパイル可能プレースホルダとして同梱する」「`architecture-rules.json` / `deny.toml` / catalogue-lint 設定と整合し」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "テンプレートが同梱する雛形 workspace の設計。`architecture-rules.json` の現行標準構成 (6 crate: `libs/domain` / `libs/usecase` / `libs/infrastructure` / `apps/cli` / `apps/cli-composition` / `apps/cli-driver`) と一致する最小のコンパイル可能プレースホルダを overlay で用意する。`deny.toml` の bans layer リストと catalogue-lint `permitted_layers` の初期値は同じ 6 crate 構成と整合させる。プレースホルダは利用者が architecture-customizer skill で改名・再構成する前提とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "29d6a3dc71cdea7ea334fd6dd06bbce35d9326fba9370fffce6cb0e97d211732",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「切り出されたテンプレートは sotp ソースをワークスペースに同梱せず、bootstrap 時に `cargo install --git <SoTOHE-core> --tag <pinned> --locked` で固定タグの sotp を bootstrap host 上にビルドして `bin/sotp` を導入する。... sotp のビルド前提 (protoc / sotp の MSRV / vendor patch) はテンプレートの cargo workspace からは分離される」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "テンプレート側 bootstrap の設計。overlay 側 Makefile.toml / bootstrap タスクは `build-sotp` (sotp をワークスペース内でソースビルドするステップ) を持たず、代わりに `cargo install --git <SoTOHE-core repo> --tag <pinned> --locked` で固定タグの sotp を bootstrap host 上にビルドして `bin/sotp` を導入する経路を持つ。テンプレートの cargo workspace には sotp ソース・vendor patch・`[patch.crates-io] conch-parser` 等を含めない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "d3e8ba23c7e084fba351e62e626313ba77b9edca210ddad6c6bc10bcafbc6a74",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「bootstrap 時に `cargo install --git <SoTOHE-core> --tag <pinned> --locked` で固定タグの sotp を bootstrap host 上にビルドして `bin/sotp` を導入する。バージョンピンは設定ファイル (例: `.harness/config/sotp-version.json`) を SSoT とする。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "sotp バージョンピンの SSoT の新設。overlay 側の設定ファイル (例: `.harness/config/sotp-version.json`) を SSoT とし、bootstrap タスクはこのファイルからタグを読み出して `cargo install --git ... --tag ...` に渡す。テンプレート側からタグ値を書き換えれば bootstrap 経路が追随する形にする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "b446008672c2a962c33bd1fee875566bc600e2afb061ef994bd597fa023a1d8c",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「architecture-rules.json / deny.toml / catalogue-lint 設定と整合し、out-of-the-box で `cargo make ci` が green であることを要件とする」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "export 出力の out-of-the-box CI green 要件。export 実行結果に対して `cargo make ci` を回すスモークゲートを設け、雛形 workspace + overlay 側 CI 設定 + `architecture-rules.json` + `deny.toml` + catalogue-lint 初期値が矛盾なく整合しており、初回セットアップ時に green で終わることを機械的に検証する。overlay と実ファイルの drift はこのスモークゲートで検出される。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "b446008672c2a962c33bd1fee875566bc600e2afb061ef994bd597fa023a1d8c",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「template 版を overlay ディレクトリに静置する。export = 除外コピー + overlay 上書きのみで、プログラム的なファイル書き換えは行わない。overlay と実ファイルの drift は『export 出力に対して雛形 CI を回すスモークゲート』で検出する。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "export 出力の out-of-the-box CI green 要件。export 実行結果に対して `cargo make ci` を回すスモークゲートを設け、雛形 workspace + overlay 側 CI 設定 + `architecture-rules.json` + `deny.toml` + catalogue-lint 初期値が矛盾なく整合しており、初回セットアップ時に green で終わることを機械的に検証する。overlay と実ファイルの drift はこのスモークゲートで検出される。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "1db72199b5f32e136ac521d252fcfc68794e40be5d00abdd1fac29397b3c84f8",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D5-a: 3 verifier (`domain_purity` / `domain_strings` / `usecase_purity`) の `architecture-rules.json` 駆動化 (層 role ないし layer entry からの導出、または opt-in 化)。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "層ハードコード verifier の汎用化 (D5-a)。sotp ソース内で `libs/domain/src` / `libs/usecase/src` を定数として持ち、config を迂回して無条件 dispatch されている 3 verifier (`domain_purity` / `domain_strings` / `usecase_purity`) を、`architecture-rules.json` の layer role ないし layer entry から検査対象パスを解決する形か、layer entry の opt-in フラグから発火する形へ移行する。sotp 自身のワークスペースでも新 verifier が同じ層に対して等価な検査を継続することを維持する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "ec5939e049f46b2347b3ff46f874f829cc5aa01604240a4e0a0ebf75bbb0367a",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- **D5-b**: `review-scope.json` の層グループ、catalogue-lint `permitted_layers`、fix-lead 系 capability のアーキテクチャガードブロック、`workflows/track/init.md` のカタログ参照を `architecture-rules.json` から導出ないし整合させる (発見済みの `apps/cli-composition` vs `apps/cli` ガードブロック矛盾の解消を含む)。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-09",
+          "text_label": "機械可読 harness 設定の arch-rules 由来化 (D5-b)。`review-scope.json` の層グループ、catalogue-lint `permitted_layers` と `ForbidPrimitiveInTypes.layers`、fix-lead 系 capability 文書 (`dry-fix-lead.md` / `review-fix-lead.md` / `review-fix-lead-codex.md`) 内のアーキテクチャガードブロック、`workflows/track/init.md` のカタログ参照を、`architecture-rules.json` から導出するか、`architecture-rules.json` と整合する初期値を overlay 側で持つ形へ揃える。この作業の中で、`dry-fix-lead.md` の `apps/cli-composition/` と `review-fix-lead.md`(+codex twin) の `apps/cli/` のガードブロック矛盾を解消する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "0ecf2f5dd3bd9b5eeb9fd3ac51bf2d030d2946a7098ea2a525c3e76f5fbce866",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「ハーネス文書の sotp 固有 provenance 参照 (特定 ADR ファイル名・sotp ソースパスの cite) を generic な記述に置換する。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-10",
+          "text_label": "harness 文書からの sotp 固有 provenance 参照の除去 (D5-c)。特定 ADR ファイル名 (日付付きスラグ) や sotp 自身のソースパスを cite している harness ドキュメント (`workflows/track/done.md` / `capabilities/adr-editor.md` / `commands/track/diagnose.md` / `rules/07-dev-environment.md` の lancedb・protoc・`--crate domain` 参照 / `.codex/config.toml` のコメント等) を、任意の Rust プロジェクトで意味の通る generic な記述に置換する。sotp 自身の作業では別途 commit メッセージ or ADR 側で背景を保持することは pre-track-adr-authoring convention で許容される。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "ae7e7ab83cfc1a6c6f868d95fd8a47f72e2ddc9831274bf1a6a6dfadd670cb4a",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- **D5-d**: Python 残渣 (`.tool-versions` の python、`__pycache__` / `*.pyc` / `.cache/pytest` の gitignore エントリ) の除去."
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-11",
+          "text_label": "Python 残渣の除去 (D5-d)。`.tool-versions` の python エントリ、`.gitignore` の `__pycache__/` / `*.pyc` / `.cache/pytest/` エントリを除去する。テンプレートが Rust 専用 workspace として矛盾なく認識される状態にする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "425f3f4c9872d9b8b9da4f25d46d3c083b7981f3f2b7d32f1a8937bc74db881a",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "機械可読 manifest (path → `include` / `exclude` / `overlay` の分類) を境界の SSoT とし、\n「テンプレートに必要だが sotp 固有値を含む」ファイル ... は **template 版を overlay ディレクトリに静置**する。\nexport = 除外コピー + overlay 上書きのみで、プログラム的なファイル書き換えは行わない。\noverlay と実ファイルの drift は「export 出力に対して雛形 CI を回すスモークゲート」で検出する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-12",
+          "text_label": "境界 manifest の運用属性。manifest は sotp 側のコードから読み込まれる schema 付き設定として管理し、path 分類の重複や未分類 path が発生した場合は export 実行前に fail-closed で検出する。manifest 側の分類変更は sotp 側のコード変更なしで反映される (schema と読み込みロジックの安定性が要件)。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "6b43d64ec3ad7fbbe98a5769fbb6cf033cef1d90f0770f0078f358cf8a32acde",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「物理的なリポ分割は行わず、export 出力がそのまま将来の物理分割の内容となる」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-01",
+          "text_label": "SoTOHE-core とテンプレートの物理的リポ分割の実施。sotp 自身をテンプレートワークフローで開発する自己ホストループを維持し、export 成果物方式で分割を任意のタイミングに繰り延べるため、本トラックでは物理分割は行わない (Alternative A rejected)。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "b5466963a171fdabb459c2e10746f55259476e387e12a0c5218b0ad0cc66db3a",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "物理的なリポ分割は行わず"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-02",
+          "text_label": "ルートワークスペースを利用者雛形に置き換え、sotp ソースを `sotp/` サブツリーの独立ワークスペースに移す ルート入れ替え方式 (Alternative B rejected)。既存 track / ADR / CI / TDDD カタログ参照が大規模に壊れるコストが export 方式より大きいため対象外。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "d6d589acc1cd981f914f4124797686f44041fa6f01daec6657d2a9be13a39d93",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "切り出されたテンプレートは sotp ソースをワークスペースに同梱せず、bootstrap 時に `cargo install --git <SoTOHE-core> --tag <pinned> --locked` で固定タグの sotp を bootstrap host 上にビルドして `bin/sotp` を導入する。… D2 の初期方式では sotp のビルド前提 (protoc / sotp の MSRV / vendor patch) はテンプレートの cargo workspace からは分離されるが、bootstrap host には引き続き必要である。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-03",
+          "text_label": "GitHub Releases によるプラットフォーム matrix プレビルトバイナリ配布 (Alternative C deferred)。利用者のビルド制約 (protoc / MSRV) をゼロにできるが、リリースインフラ整備が先行投資として必要になる。テンプレート利用プロジェクトが複数登場した段階で D2 の上に再評価する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "c239d997ae8c74bf50ba36390ffe84199579f2f0fb2ec7cc982c0d3bfef85932",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「切り出されたテンプレートは sotp ソースをワークスペースに同梱せず」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-04",
+          "text_label": "テンプレートに sotp ソースを同梱したまま切り出す方式 (Alternative D rejected)。分離目標が達成されず、vendor patch と protoc 要件が全利用者に伝播するため対象外。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "0e48b0818e8d39f480a57a6bdab793a012135c682711057b67fd5f1886c619b8",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "export = 除外コピー + overlay 上書きのみで、プログラム的なファイル書き換えは行わない。overlay と実ファイルの drift は「export 出力に対して雛形 CI を回すスモークゲート」で検出する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-05",
+          "text_label": "export ツールが Makefile.toml / Cargo.toml 等をパースして書き換えるプログラム的変換 export 方式 (Alternative E rejected)。overlay 方式の単純さを優先し、drift リスクはスモークゲートで検出する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "af47c268703e67ba71e425a47764207698a6c33dd9fed5936ac8d7bc4043c83b",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "物理的なリポ分割は行わず、export 出力がそのまま将来の物理分割の内容となる (分割は「export 出力の確定作業」に縮退する)。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-06",
+          "text_label": "境界 manifest のみを整備し切り出しは手作業で行う方式 (Alternative F rejected)。「切り出す」という目標を満たさず、手作業切り出しは再現不能で drift 検出もできないため対象外。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "af47c268703e67ba71e425a47764207698a6c33dd9fed5936ac8d7bc4043c83b",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "機械可読 manifest (path → `include` / `exclude` / `overlay` の分類) を境界の SSoT とし、\n「テンプレートに必要だが sotp 固有値を含む」ファイル (...) は **template 版を overlay ディレクトリに静置**する。\nexport = 除外コピー + overlay 上書きのみで、プログラム的なファイル書き換えは行わない。\noverlay と実ファイルの drift は「export 出力に対して雛形 CI を回すスモークゲート」で検出する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-06",
+          "text_label": "境界 manifest のみを整備し切り出しは手作業で行う方式 (Alternative F rejected)。「切り出す」という目標を満たさず、手作業切り出しは再現不能で drift 検出もできないため対象外。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "0d59eea9beb330eb812914d07270fefa8d7230e170e4722ca6ba4693cb6bb4cc",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "テンプレートは現行標準の 6 crate 構成 ... を最小のコンパイル可能プレースホルダとして同梱する。`architecture-rules.json` / `deny.toml` / catalogue-lint 設定と整合し、out-of-the-box で `cargo make ci` が green であることを要件とする"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-07",
+          "text_label": "テンプレート同梱の雛形を最小 1 crate に縮小、または雛形を持たない方式 (Alternative G rejected)。層アーキテクチャの手本にならず、`architecture-rules.json` / `deny.toml` / catalogue-lint のデフォルトと乖離し、初回 CI が red になり TDDD 前提を満たせないため対象外。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "f80616210ec848400861a0768adf2109321ebc15c06e5038d4f48098de4b42c8",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「D2 の初期方式では sotp のビルド前提 (protoc / sotp の MSRV / vendor patch) はテンプレートの cargo workspace からは分離されるが、bootstrap host には引き続き必要である。将来 lancedb 系を feature-gate すれば protoc 要件は除去可能 (follow-up、本 ADR では決定しない).」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-08",
+          "text_label": "lancedb 系 (semantic dup / DRY index) の feature-gate 化による bootstrap host からの protoc / sotp MSRV 要件除去。D2 で follow-up として明示的に切り出されており、本 ADR では決定しない。将来別トラックで検討する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "31e985e051203c114a075be2e68f724e389eaf91a9e98e7bd0a5293d770385d4",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "テンプレートは現行標準の 6 crate 構成 (`libs/domain` / `libs/usecase` / `libs/infrastructure` / `apps/cli` / `apps/cli-composition` / `apps/cli-driver`) を最小のコンパイル可能プレースホルダとして同梱する。... 利用者は既存の architecture-customizer skill で改名・再構成する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-09",
+          "text_label": "sotp 自身の 6 crate 名の rename やワークスペース再構成。テンプレート側の雛形とは独立に、本リポジトリ側のワークスペース構造 (crate 名・ディレクトリ名) を本トラックで変更しない。テンプレート利用者による改名は architecture-customizer skill が担う経路として既に存在する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "ce95a2406395d76e443cc8b8df0d4f0685a4b4533b9741a4ff111bdf9373e51b",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "SoTOHE-core は sotp 開発リポジトリのまま維持し (自己ホスト開発ループの継続)、リポジトリ内に機械可読な境界 SSoT を置き、`sotp template export` (または同等の cargo make タスク) が汎用テンプレートツリーを ビルド成果物として生成する。物理的なリポ分割は行わず、export 出力がそのまま将来の物理分割の 内容となる"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-10",
+          "text_label": "利用者所有領域 (`.claude/settings.json` の permission allow/deny、`.codex/*` の provider / rules / hooks / agents、`.harness/config/signal-gates.json` の gate strictness、利用者 domain コード) に対する CI 強制の追加。責務境界を保つため、テンプレートは推奨デフォルト + docs 提供に留め、export のスモークゲートも sotp 自身の方法論 / framework コード整合性の範囲だけを検査対象とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "a2402abfab3934e4a1cdc82ca6596edf06385168319d7bc12d654562666fa145",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「SoTOHE-core は sotp 開発リポジトリのまま維持し ... リポジトリ内に機械可読な境界 SSoT を置き、`sotp template export` ... が汎用テンプレートツリーをビルド成果物として生成する。物理的なリポ分割は行わず」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-11",
+          "text_label": "SoTOHE-core 側の 141 ADR / 164 track items / archive の中身書き換えやマイグレーション。これらは sotp 自身の開発履歴として export の `exclude` 分類で扱う。archive 済み / completed track に本トラックの変更を遡及適用しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "cbdb9f3b94c3535afb2b5fa034573b22583522c1fef4a5a345966406bf476233",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "SoTOHE-core は sotp 開発リポジトリのまま維持し (自己ホスト開発ループの継続)、リポジトリ内に機械可読な境界 SSoT を置き、`sotp template export` (または同等の cargo make タスク) が汎用テンプレートツリーを ビルド成果物として生成する。物理的なリポ分割は行わず"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "SoTOHE-core は sotp 開発リポジトリのまま維持する。テンプレート抽出は物理分割ではなく、リポジトリ内の境界 SSoT + export ツールが生成する ビルド成果物として実現する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "c83ec54956e5cf3df4959a6800854f8d7ba62b30f74e19827a3c8745f346e996",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "機械可読 manifest (path → `include` / `exclude` / `overlay` の分類) を境界の SSoT とし"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "境界の SSoT は機械可読 manifest (path → include / exclude / overlay 分類) 一元管理とする。散文のみの境界文書は SSoT にしない。分類の変更は manifest 側の変更で完結し、sotp 側のコード側は schema と読み込みロジックの安定性のみを保証する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "172080f9ca69879be51e2833a45ddd743016971a26f97dfba744417e6c48e0e9",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "export = 除外コピー + overlay 上書きのみで、プログラム的なファイル書き換えは行わない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "export はプログラム的なファイル書き換えを行わない。処理は境界 manifest の分類に従った `include` のコピー、`exclude` の除外、`overlay` 側テンプレート版ファイルの上書きだけで構成する。Makefile.toml / Cargo.toml / deny.toml / Dockerfile 等の内容を parse して書き換える経路を実装に含めない (overlay 方式で単純さを優先)。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "09d59f498f9042448ed32373fdb1304583577e2d12fa12d174980fb7c010b87c",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "テンプレートは現行標準の 6 crate 構成 (`libs/domain` / `libs/usecase` / `libs/infrastructure` / `apps/cli` / `apps/cli-composition` / `apps/cli-driver`) を最小のコンパイル可能プレースホルダとして同梱する。`architecture-rules.json` / `deny.toml` / catalogue-lint 設定と整合し、out-of-the-box で `cargo make ci` が green であることを要件とする"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "テンプレート側 workspace は out-of-the-box で `cargo make ci` (fmt-check + clippy + test + deny + check-layers + verify-*) が green で終わる状態にする。`architecture-rules.json` / `deny.toml` / catalogue-lint 初期値と雛形 workspace の crate 構成が矛盾しないことを export スモークゲートで機械検証する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "09d59f498f9042448ed32373fdb1304583577e2d12fa12d174980fb7c010b87c",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "overlay と実ファイルの drift は「export 出力に対して雛形 CI を回すスモークゲート」で検出する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "テンプレート側 workspace は out-of-the-box で `cargo make ci` (fmt-check + clippy + test + deny + check-layers + verify-*) が green で終わる状態にする。`architecture-rules.json` / `deny.toml` / catalogue-lint 初期値と雛形 workspace の crate 構成が矛盾しないことを export スモークゲートで機械検証する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "8730c0edd18a13476b03f79dc5d21a1ef3840d1198b232d1d5bc38e4d2b49bfe",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "切り出されたテンプレートは sotp ソースをワークスペースに同梱せず、bootstrap 時に `cargo install --git <SoTOHE-core> --tag <pinned> --locked` で固定タグの sotp を bootstrap host 上にビルドして `bin/sotp` を導入する。D2 の初期方式では sotp のビルド前提 (protoc / sotp の MSRV / vendor patch) はテンプレートの cargo workspace からは分離されるが、bootstrap host には引き続き必要である。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-05",
+          "text_label": "テンプレート側の cargo workspace は sotp ソース・vendor patch・`[patch.crates-io] conch-parser`・lancedb 依存を含めない。sotp のビルド前提 (protoc / sotp の MSRV / vendor patch) はテンプレート利用者の cargo workspace からは分離される。bootstrap host には引き続き protoc / sotp MSRV が必要であることを許容する (D2 初期方式)。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "3828bc990c74cfae0d2f18c08f52b07121fbd2286a070f73ca96ad323e96064d",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "バージョンピンは設定ファイル (例: `.harness/config/sotp-version.json`) を SSoT とする。D2 の初期方式では sotp のビルド前提 ... はテンプレートの cargo workspace からは分離される"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-06",
+          "text_label": "sotp バージョンピンは overlay 側の単一の設定ファイル (例: `.harness/config/sotp-version.json`) を SSoT とする。bootstrap タスクは常にこのファイルからタグを解決し、値の書き換えだけで参照タグを追随できる形にする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "9cb53cccac642ccda9d1c804d09c7c756aa94bb9d4df3f29f3bcc748b316808c",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- **D5-a**: 3 verifier (`domain_purity` / `domain_strings` / `usecase_purity`) の `architecture-rules.json` 駆動化 (層 role ないし layer entry からの導出、または opt-in 化)。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-07",
+          "text_label": "3 verifier (`domain_purity` / `domain_strings` / `usecase_purity`) の対象パス選定は、`architecture-rules.json` の layer role / layer entry から解決するか、layer entry の opt-in フラグから発火する形にする。sotp ソースへの hardcoded パス (`libs/domain/src` / `libs/usecase/src`) を新実装に残さない。sotp 自身のワークスペースでも同じ層に対して等価な検査が継続する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "0d122199573b8810291d094f16f146a8d690626cdeb3a070966ded1f7bafe783",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D5-b: `review-scope.json` の層グループ、catalogue-lint `permitted_layers`、fix-lead 系 capability のアーキテクチャガードブロック、`workflows/track/init.md` のカタログ参照を `architecture-rules.json` から導出ないし整合させる (発見済みの `apps/cli-composition` vs `apps/cli` ガードブロック矛盾の解消を含む)."
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-08",
+          "text_label": "機械可読 harness 設定 (`review-scope.json` の層グループ、catalogue-lint `permitted_layers` / `ForbidPrimitiveInTypes.layers`、fix-lead 系 capability のアーキテクチャガードブロック、`workflows/track/init.md` のカタログ参照) は `architecture-rules.json` から導出するか、`architecture-rules.json` と整合する初期値を overlay 側で持つ。`apps/cli-composition` と `apps/cli` のガードブロック矛盾は本トラック内で片方に統一する形で解消する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "7d63b46b5cbd9f93f2a50926c735c8af3b3fcff23fee77836903367f9e181483",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "リポジトリ内に機械可読な\n境界 SSoT を置き、`sotp template export` (または同等の cargo make タスク) が汎用テンプレートツリーを\n**ビルド成果物として生成**する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-09",
+          "text_label": "テンプレートのスモークゲート・export 側 CI は sotp 自身の方法論 (SoT Chain 整合性、workflow 機構、architecture rule、framework コード品質) の範囲だけを検査対象にする。利用者所有領域 (permission allow/deny、provider 設定、signal gate strictness、利用者 domain コード) の設定値・存在・文言に結合させて hard-fail させない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "b7bae7d188f4912df019b1c17805c53ccad6bc825e6b81429f0b2f09e8b27e99",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「機械可読 manifest ... を境界の SSoT とし」および「export = 除外コピー + overlay 上書きのみで、プログラム的なファイル書き換えは行わない。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-10",
+          "text_label": "本トラックの schema / rule 変更 (境界 manifest schema、境界駆動化した verifier / harness 設定) は archive / completed track に遡及適用しない。active track (現ブランチを持つトラック) にのみ新機構が適用される。暫定 compatibility layer / grace period / opt-out は default に含めない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "89e9ebee6fc27f1c78acbc460f2bdbbc0c13208792516da82e27b37c047f8c41",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「機械可読 manifest (path → `include` / `exclude` / `overlay` の分類) を境界の SSoT とし」; 「export 出力に対して雛形 CI を回すスモークゲート」で検出する"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-11",
+          "text_label": "本トラックは人工的な状態フィールド (`approved` / `Status` 等) や要約ベースの事前承認ステップを導入しない。ゲートは境界 manifest schema validation、export スモークゲート、既存の SoT Chain 信号評価で構成する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "e4b8a64f4141fd9ed0c54b75135c3e9bcf5381aa84dbd256d49e8ba3f0ef7c66",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「リポジトリ内に機械可読な境界 SSoT を置き、`sotp template export` (または同等の cargo make タスク) が汎用テンプレートツリーを **ビルド成果物として生成** する。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`sotp template export` (または同等の cargo make タスク) が CLI に存在し、境界 manifest + overlay ディレクトリ + 実リポジトリ tree から、指定された出力ディレクトリに汎用テンプレートツリーを生成する。同じ入力からは同じ出力が決定論的に得られる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "e4b8a64f4141fd9ed0c54b75135c3e9bcf5381aa84dbd256d49e8ba3f0ef7c66",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "機械可読 manifest (path → `include` / `exclude` / `overlay` の分類) を境界の SSoT とし、\n「テンプレートに必要だが sotp 固有値を含む」ファイル ... は **template 版を overlay ディレクトリに静置**する。\nexport = 除外コピー + overlay 上書きのみで、プログラム的なファイル書き換えは行わない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`sotp template export` (または同等の cargo make タスク) が CLI に存在し、境界 manifest + overlay ディレクトリ + 実リポジトリ tree から、指定された出力ディレクトリに汎用テンプレートツリーを生成する。同じ入力からは同じ出力が決定論的に得られる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "f602d6f1a29c649323eb0e200bb9857e5d73b143e8cf56aeeb613b4556815f56",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "機械可読 manifest (path → `include` / `exclude` / `overlay` の分類) を境界の SSoT とし"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "境界 SSoT の機械可読 manifest ファイルがリポジトリ内の固定位置に存在し、workspace tree の全 path を `include` / `exclude` / `overlay` のいずれかに分類する。未分類 path の存在、`overlay` 分類なのに overlay 側にファイルが存在しない矛盾、重複分類は、export 実行 (および manifest validation) の時点で fail-closed で検出される。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "a320070d6a3cef2727e1b5ac9f62aa646e2f3372c43438868c0fb3e939d7cb75",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「template 版を overlay ディレクトリに静置」および「export = 除外コピー + overlay 上書きのみで、プログラム的なファイル書き換えは行わない。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "overlay ディレクトリがリポジトリ内に存在し、テンプレート版 Makefile.toml / Cargo.toml / deny.toml / Dockerfile / bootstrap タスク / 汎用化した track/*.md / 6 crate プレースホルダの Cargo.toml と placeholder ソース等を静的ファイルとして格納する。export はこれらを出力ディレクトリの対応 path に配置するのみで、テンプレート実行時にファイル内容を組み立てない (プログラム的書き換えなし)。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "01c609bf15b2fecec54da7aa39f0bf348267ef725f823de6f39de0d76ddf4992",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「6 crate コンパイル可能プレースホルダとして同梱する。`architecture-rules.json` / `deny.toml` / catalogue-lint 設定と整合し」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "export 出力の workspace は `architecture-rules.json` の現行標準 6 crate 構成 (`libs/domain` / `libs/usecase` / `libs/infrastructure` / `apps/cli` / `apps/cli-composition` / `apps/cli-driver`) のコンパイル可能プレースホルダを含む。`deny.toml` の bans layer リストと catalogue-lint `permitted_layers` の初期値がこの 6 crate 構成と整合する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "6e8e867d366823d99897f513adac1e6536374c8dba7717cd17f8c2bfb8d8ffb7",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「out-of-the-box で `cargo make ci` が green であることを要件とする」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "export 出力の workspace で `cargo make ci` を実行するとスモークゲートが green で終わる。fmt-check / clippy / test / deny / check-layers / verify-* が pass する。export 出力を対象とする CI スモークゲートが sotp 自身の CI 群に追加され、overlay と実ファイルの drift でこのゲートが red になる状態が回帰検出される。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "6e8e867d366823d99897f513adac1e6536374c8dba7717cd17f8c2bfb8d8ffb7",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "export = 除外コピー + overlay 上書きのみで、プログラム的なファイル書き換えは行わない。overlay と実ファイルの drift は「export 出力に対して雛形 CI を回すスモークゲート」で検出する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "export 出力の workspace で `cargo make ci` を実行するとスモークゲートが green で終わる。fmt-check / clippy / test / deny / check-layers / verify-* が pass する。export 出力を対象とする CI スモークゲートが sotp 自身の CI 群に追加され、overlay と実ファイルの drift でこのゲートが red になる状態が回帰検出される。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "b58c7859e5eb032a7f64e4d29f91f2653ceade0662b6fbc675c30dddde55c69e",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "切り出されたテンプレートは sotp ソースをワークスペースに同梱せず、bootstrap 時に `cargo install --git <SoTOHE-core> --tag <pinned> --locked` で固定タグの sotp を bootstrap host 上にビルドして `bin/sotp` を導入する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "export 出力の bootstrap タスクは `build-sotp` (ソースビルド) を含まず、代わりに `cargo install --git <SoTOHE-core repo> --tag <pinned> --locked` で固定タグの sotp を bootstrap host 上に導入して `bin/sotp` を配置する経路を持つ。テンプレートの cargo workspace には sotp ソース・vendor patch・`[patch.crates-io] conch-parser`・lancedb 依存が含まれない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "5cff9fb7ede46081a70f03bd2af33b45d7a1927bf81c17635841029272810201",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "バージョンピンは設定ファイル (例: `.harness/config/sotp-version.json`) を SSoT とする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "sotp バージョンピンが overlay 側の単一設定ファイル (例: `.harness/config/sotp-version.json`) を SSoT とし、bootstrap タスクがこのファイルからタグを解決する。設定ファイルのタグ値を書き換えるだけで参照タグが追随できる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "7a3bdad706a5e7622580c52d6b3b21064978ac0e45f877df5298368ee38a53f6",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- **D5-a**: 3 verifier (`domain_purity` / `domain_strings` / `usecase_purity`) の `architecture-rules.json` 駆動化 (層 role ないし layer entry からの導出、または opt-in 化)."
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "3 verifier (`domain_purity` / `domain_strings` / `usecase_purity`) が `libs/domain/src` / `libs/usecase/src` へのハードコード参照を持たなくなり、`architecture-rules.json` の layer role / layer entry から検査対象を解決するか、layer entry の opt-in フラグから発火する形へ移行している。sotp 自身のワークスペースに対しても同じ層に対する等価な検査が継続し、既存の `cargo make ci` が pass する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "e66f37217fb4ed5700f8a555ed1954e3b67860c1f73d8ed7ab508760a6edc83d",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- **D5-b**: `review-scope.json` の層グループ、catalogue-lint `permitted_layers`、fix-lead 系 capability のアーキテクチャガードブロック、`workflows/track/init.md` のカタログ参照を `architecture-rules.json` から導出ないし整合させる (発見済みの `apps/cli-composition` vs `apps/cli` ガードブロック矛盾の解消を含む)。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "`review-scope.json` の層グループ、catalogue-lint `permitted_layers` と `ForbidPrimitiveInTypes.layers`、fix-lead 系 capability 文書 (`dry-fix-lead.md` / `review-fix-lead.md` / `review-fix-lead-codex.md`) のアーキテクチャガードブロック、`workflows/track/init.md` のカタログ参照が、`architecture-rules.json` から導出されるか、`architecture-rules.json` と整合する初期値を overlay 側で持つ状態になっている。`dry-fix-lead.md` と `review-fix-lead.md`(+codex twin) のガードブロック内 layer 名 (`apps/cli-composition` vs `apps/cli`) の矛盾が本トラック内で解消されている。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "1bc1de7bab6697f46eadae2e203185a9d7fe2b64b80e3266387b45117c3ec5c5",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- **D5-c**: ハーネス文書の sotp 固有 provenance 参照 (特定 ADR ファイル名・sotp ソースパスの cite) を generic な記述に置換する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-10",
+          "text_label": "harness 文書 (`workflows/track/done.md` / `capabilities/adr-editor.md` / `commands/track/diagnose.md` / `rules/07-dev-environment.md` / `.codex/config.toml` 等) から、特定 ADR ファイル名 (日付付きスラグ) と sotp 自身のソースパスへの provenance 参照が除去されている。残った記述は任意の Rust プロジェクトで意味の通る generic 表現になっている。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "e85151f88684bed9c3241be5aaf47febb3bebde641ee73de31d1aebb9010e77a",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- **D5-d**: Python 残渣 (`.tool-versions` の python、`__pycache__` / `*.pyc` / `.cache/pytest` の gitignore エントリ) の除去。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-11",
+          "text_label": "`.tool-versions` から python エントリが除去され、`.gitignore` から `__pycache__/` / `*.pyc` / `.cache/pytest/` エントリが除去されている。テンプレートが Rust 専用 workspace として矛盾なく認識される状態である。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "32ee16e408e2fe3346513f3c33035fbf48138e004da3a8fb3c5893447e15cdd8",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "architecture-rules.json / deny.toml / catalogue-lint 設定と整合し、out-of-the-box で `cargo make ci` が green であることを要件とする (TDDD の「ビルド可能な cargo workspace」前提を初期状態で満たす)。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-12",
+          "text_label": "sotp 自身のリポジトリで `cargo make ci` が pass する (回帰なし)。境界 manifest schema、境界駆動化した verifier、arch-rules 由来化した harness 設定、除去した Python 残渣・provenance 参照によって既存の gate や verify-* が回帰していないことが確認できる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "32ee16e408e2fe3346513f3c33035fbf48138e004da3a8fb3c5893447e15cdd8",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「分離の成立条件となる以下の前提修正を本 ADR の決定範囲に含める」/「D5-a: 3 verifier (`domain_purity` / `domain_strings` / `usecase_purity`) の `architecture-rules.json` 駆動化」/「D5-b: ... `workflows/track/init.md` のカタログ参照を `architecture-rules.json` から導出ないし整合させる」/「D5-c: ハーネス文書の sotp 固有 provenance 参照 ... を generic な記述に置換する」/「D5-d: Python 残渣 ... の除去」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-12",
+          "text_label": "sotp 自身のリポジトリで `cargo make ci` が pass する (回帰なし)。境界 manifest schema、境界駆動化した verifier、arch-rules 由来化した harness 設定、除去した Python 残渣・provenance 参照によって既存の gate や verify-* が回帰していないことが確認できる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D5"
+        }
+      }
+    }
+  ]
+}

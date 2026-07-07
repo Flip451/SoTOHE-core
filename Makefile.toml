@@ -356,6 +356,85 @@ description = "[internal] Chain ② catalog→spec signal gate. Active track + l
 command = "cargo"
 args = ["run", "--quiet", "-p", "cli", "--", "signal", "check-catalog-spec", "--gate", "commit"]
 
+[tasks.template-export-smoke-local]
+private = true
+description = "[internal] Source-repo smoke gate: export the template tree to a fresh tmp dir OUTSIDE the workspace root, then run the exported tree's own gates with the ambient toolchain: skeleton fmt/clippy/test, exported-Makefile parseability, the exported tree's file-based `bin/sotp verify` gates (layers / module-size / canonical-modules / arch-docs / doc-links / purity trio, exercising the exported architecture-rules.json), and deny.toml validation (bans/licenses/sources) when cargo-deny is available. Smoke-level equivalent of AC-05 without docker-in-docker or network install: the freshly built source sotp binary is lent to the exported tree as bin/sotp. Uses `cargo run -p cli -- template export` (not the source bin/sotp) so the gate runs unchanged inside ci-container, where the host-built bin/sotp is absent. Scope boundary (OS-10/CN-09): the gate only asserts export success and exported-tree structural health; it deliberately does not hard-fail on consumer-owned config VALUES and skips when source-only overlay artifacts are absent."
+script_runner = "@shell"
+script = ['''
+set -e
+OVERLAY_DIR="${SOTP_TEMPLATE_OVERLAY_DIR:-overlay}"
+if [ ! -d "$OVERLAY_DIR" ]; then
+  echo "[SKIP] template-export-smoke-local: source overlay tree absent; skipping source-repo smoke."
+  exit 0
+fi
+
+# The output dir must live OUTSIDE the workspace root: the exporter fail-closes when
+# the output path is inside the source root. Use a fresh mktemp dir (a sibling of the
+# workspace under the system tmp), and always clean it up — including on failure — via
+# a shell trap.
+SMOKE_OUT="$(mktemp -d)/template-export-smoke"
+trap 'rm -rf "$(dirname "$SMOKE_OUT")"' EXIT
+
+cargo run --quiet -p cli -- template export \
+  --workspace-root . \
+  --manifest-path .harness/config/template-boundary.json \
+  --overlay-dir "$OVERLAY_DIR" \
+  --output-dir "$SMOKE_OUT"
+
+# Build the source repo's sotp binary (debug, incremental — the export step above
+# already warmed this build) and remember its absolute path. The exported template
+# normally obtains bin/sotp via the network-installing install-sotp task; the smoke
+# gate lends the freshly built source binary instead so the exported tree's
+# file-based verify gates run hermetically.
+cargo build --quiet -p cli
+TD="${CARGO_TARGET_DIR:-target}"
+case "$TD" in
+  /*) SOTP_SRC_BIN="$TD/debug/sotp" ;;
+  *) SOTP_SRC_BIN="$(pwd)/$TD/debug/sotp" ;;
+esac
+
+# Run the exported tree's gates with the ambient cargo toolchain (host toolchain on
+# `cargo make`, container toolchain in ci-container). A full `cargo make ci` inside
+# the export would require docker-in-docker and a git repository (out of scope for a
+# tmp-dir smoke); the block below is the smoke-level equivalent per AC-05. Pin
+# CARGO_TARGET_DIR INSIDE the tmp output so the exported crates (domain/usecase/...
+# share names with the source workspace) never collide with the source's baked
+# target dir, and the whole build is removed by the trap. No --locked: keep the
+# smoke resilient to skeleton Cargo.lock drift.
+export CARGO_TARGET_DIR="$SMOKE_OUT/target"
+cd "$SMOKE_OUT"
+cargo fmt --all -- --check
+cargo clippy --all-targets --all-features -- -D warnings
+cargo test --all-features
+
+# Overlay drift gates beyond the skeleton build: a broken overlay Makefile.toml /
+# architecture-rules.json / deny.toml must fail this smoke, not surface first in a
+# consumer checkout.
+mkdir -p bin
+cp "$SOTP_SRC_BIN" bin/sotp
+# Exported Makefile parses and enumerates its task graph.
+cargo make --list-all-steps >/dev/null
+# File-based verify gates against the exported tree (parse the exported
+# architecture-rules.json fail-closed; scan the skeleton sources; purity trio runs
+# via the exported arch-rules verify opt-ins).
+bin/sotp verify layers
+bin/sotp verify module-size
+bin/sotp verify canonical-modules
+bin/sotp verify arch-docs
+bin/sotp verify doc-links
+bin/sotp verify domain-purity
+bin/sotp verify domain-strings
+bin/sotp verify usecase-purity
+# deny.toml validation (bans/licenses/sources; advisories excluded to keep the smoke
+# hermetic from advisory-DB churn). Soft-skip only when cargo-deny is not installed
+# in the ambient toolchain.
+if command -v cargo-deny >/dev/null; then
+  cargo deny check bans licenses sources
+else
+  echo "[SKIP] cargo-deny not installed in the ambient toolchain; deny.toml validation skipped."
+fi
+''']
+
 [tasks.ci-rust-local]
 private = true
 description = "[internal] Run Rust-only CI checks (fmt + clippy + test + deny + check-layers + canonical-modules)"
@@ -364,7 +443,7 @@ dependencies = ["fmt-check-local", "clippy-local", "test-local", "deny-local", "
 [tasks.ci-local]
 private = true
 description = "[internal] Run local repo-wide CI checks. Track-aware gates live in ci-track-local."
-dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-hooks-path-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-adr-signals-local"]
+dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-hooks-path-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-adr-signals-local", "template-export-smoke-local"]
 
 [tasks.ci-track-local]
 private = true
@@ -377,7 +456,7 @@ dependencies = ["fmt-check-local", "clippy-local", "test-local", "deny-local", "
 
 [tasks.ci-container]
 description = "[gate] Run repo-wide CI checks inside a pre-existing container (no docker compose). Track-aware gates that require an active track/<id> branch are in ci-track-container."
-dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-hooks-path-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-adr-signals-local"]
+dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-hooks-path-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-adr-signals-local", "template-export-smoke-local"]
 
 [tasks.ci-track-container]
 description = "[gate] Track-aware CI gates that require a track/<id> branch context (task-contract coverage + check liveness + spec/catalogue/impl signal chains). Skip on base branch / non-track CI runs."
@@ -532,6 +611,12 @@ description = "[gate] Verify ADR decision signal grounds across knowledge/adr/ (
 dependencies = ["prepare-local-cache-dirs"]
 command = "docker"
 args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "verify-adr-signals-local"]
+
+[tasks.template-export-smoke]
+description = "[gate] Export the template tree and run the exported skeleton's fmt/clippy/test gates (docker compose)"
+dependencies = ["prepare-local-cache-dirs"]
+command = "docker"
+args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "template-export-smoke-local"]
 
 [tasks.ci-rust]
 description = "[gate] Run Rust-only CI checks (docker compose) — inner loop for app developers"

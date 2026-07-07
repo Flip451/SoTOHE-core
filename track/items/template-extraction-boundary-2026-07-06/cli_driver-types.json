@@ -1,0 +1,108 @@
+{
+  "schema_version": 5,
+  "crate_name": "cli_driver",
+  "layer": "cli_driver",
+  "types": {
+    "TemplateExportInput": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "workspace_root", "ty": "std::path::PathBuf" },
+            { "name": "manifest_path",  "ty": "std::path::PathBuf" },
+            { "name": "overlay_dir",    "ty": "std::path::PathBuf" },
+            { "name": "output_dir",     "ty": "std::path::PathBuf" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "template_export",
+      "docs": "`sotp template export` driver input (IN-01, AC-01).",
+      "spec_refs": [
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "IN-01" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "AC-01" }
+      ],
+      "informal_grounds": []
+    },
+    "TemplateInput": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Export", "payload": { "kind": "tuple", "fields": ["TemplateExportInput"] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "template_export",
+      "docs": "`sotp template` driver input enum (IN-01, AC-01).",
+      "spec_refs": [
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "IN-01" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "AC-01" }
+      ],
+      "informal_grounds": []
+    },
+    "TemplateDriver": {
+      "action": "add",
+      "role": { "PrimaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "template_export",
+      "docs": "`TemplateExportService` primary adapter (IN-01, AC-01).",
+      "spec_refs": [
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "IN-01" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "AC-01" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [
+    {
+      "type_name": "TemplateDriver",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "service", "ty": "std::sync::Arc<dyn usecase::template_export::TemplateExportService>" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Constructor."
+        },
+        {
+          "name": "handle",
+          "receiver": "&self",
+          "params": [
+            { "name": "input", "ty": "TemplateInput" }
+          ],
+          "returns": "CommandOutcome",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "`TemplateInput` handler (IN-01, AC-01)."
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    { "trait_ref": "core::fmt::Debug",     "for_type": "TemplateExportInput" },
+    { "trait_ref": "core::clone::Clone",   "for_type": "TemplateExportInput" },
+
+    { "trait_ref": "core::fmt::Debug",     "for_type": "TemplateInput" },
+    { "trait_ref": "core::clone::Clone",   "for_type": "TemplateInput" }
+  ]
+}

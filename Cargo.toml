@@ -7,7 +7,7 @@ members = [
   "apps/cli",
   "apps/cli-composition",
 ]
-exclude = ["vendor/*"]
+exclude = ["vendor/*", "overlay/*"]
 resolver = "2"
 
 [workspace.package]

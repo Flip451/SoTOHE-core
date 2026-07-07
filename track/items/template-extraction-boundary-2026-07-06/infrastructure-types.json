@@ -1,0 +1,218 @@
+{
+  "schema_version": 5,
+  "crate_name": "infrastructure",
+  "layer": "infrastructure",
+  "types": {
+    "FsTemplateBoundaryManifestAdapter": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "unit" }
+      },
+      "methods": [],
+      "module_path": "template_export",
+      "docs": "`TemplateBoundaryManifestPort` filesystem adapter (IN-02, AC-02, CN-02).",
+      "spec_refs": [
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "IN-02" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "AC-02" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "CN-02" }
+      ],
+      "informal_grounds": []
+    },
+    "FsTemplateExportAdapter": {
+      "action": "add",
+      "role": { "SecondaryAdapter": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "unit" }
+      },
+      "methods": [],
+      "module_path": "template_export",
+      "docs": "`TemplateExportPort` filesystem adapter (IN-01, IN-03, AC-01, AC-03, CN-03).",
+      "spec_refs": [
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "IN-01" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "IN-03" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "AC-01" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "AC-03" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "CN-03" }
+      ],
+      "informal_grounds": []
+    },
+    "TemplateBoundaryManifestDto": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "schema_version", "ty": "u32" },
+            { "name": "entries",        "ty": "Vec<TemplatePathEntryDto>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "template_export::codec",
+      "docs": "Manifest wire DTO (IN-02, AC-02, CN-02).",
+      "spec_refs": [
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "IN-02" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "AC-02" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "CN-02" }
+      ],
+      "informal_grounds": []
+    },
+    "TemplatePathEntryDto": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "pattern",        "ty": "String" },
+            { "name": "classification", "ty": "TemplatePathClassificationDto" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "template_export::codec",
+      "docs": "Manifest-entry wire DTO (IN-02, AC-02).",
+      "spec_refs": [
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "IN-02" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "AC-02" }
+      ],
+      "informal_grounds": []
+    },
+    "TemplatePathClassificationDto": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Include", "payload": { "kind": "unit" } },
+          { "name": "Exclude", "payload": { "kind": "unit" } },
+          { "name": "Overlay", "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "template_export::codec",
+      "docs": "`domain::template_export::TemplatePathClassification` serde mirror (IN-02, AC-02).",
+      "spec_refs": [
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "IN-02" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "AC-02" }
+      ],
+      "informal_grounds": []
+    },
+    "TemplateBoundaryManifestCodecError": {
+      "action": "add",
+      "role": { "ErrorType": {} },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "SchemaVersion", "payload": { "kind": "struct", "fields": [{ "name": "expected", "ty": "u32" }, { "name": "actual", "ty": "u32" }] } },
+          { "name": "Json",          "payload": { "kind": "struct", "fields": [{ "name": "reason", "ty": "domain::tddd::catalogue_linter::FreeText" }] } },
+          { "name": "Pattern",       "payload": { "kind": "struct", "fields": [{ "name": "source", "ty": "domain::template_export::TemplatePathPatternError" }] } },
+          { "name": "Manifest",      "payload": { "kind": "struct", "fields": [{ "name": "source", "ty": "domain::template_export::TemplateBoundaryManifestError" }] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "template_export::codec",
+      "docs": "`decode_manifest` error (IN-02, AC-02, CN-02).",
+      "spec_refs": [
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "IN-02" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "AC-02" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "CN-02" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {
+    "infrastructure::template_export::codec::decode_manifest": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "json", "ty": "&str" }
+      ],
+      "returns": "Result<domain::template_export::TemplateBoundaryManifest, TemplateBoundaryManifestCodecError>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Manifest JSON decoder (IN-02, AC-02, CN-02).",
+      "spec_refs": [
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "IN-02" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "AC-02" },
+        { "file": "track/items/template-extraction-boundary-2026-07-06/spec.json", "anchor": "CN-02" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "inherent_impls": [
+    {
+      "type_name": "FsTemplateBoundaryManifestAdapter",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Constructor."
+        }
+      ]
+    },
+    {
+      "type_name": "FsTemplateExportAdapter",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Constructor."
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    { "trait_ref": "core::fmt::Debug",       "for_type": "FsTemplateBoundaryManifestAdapter" },
+    { "trait_ref": "core::default::Default", "for_type": "FsTemplateBoundaryManifestAdapter" },
+    { "trait_ref": "usecase::template_export::TemplateBoundaryManifestPort", "for_type": "FsTemplateBoundaryManifestAdapter" },
+
+    { "trait_ref": "core::fmt::Debug",       "for_type": "FsTemplateExportAdapter" },
+    { "trait_ref": "core::default::Default", "for_type": "FsTemplateExportAdapter" },
+    { "trait_ref": "usecase::template_export::TemplateExportPort", "for_type": "FsTemplateExportAdapter" },
+
+    { "trait_ref": "core::fmt::Debug",                    "for_type": "TemplateBoundaryManifestDto" },
+    { "trait_ref": "core::clone::Clone",                  "for_type": "TemplateBoundaryManifestDto" },
+    { "trait_ref": "serde_core::de::Deserialize",         "for_type": "TemplateBoundaryManifestDto" },
+
+    { "trait_ref": "core::fmt::Debug",                    "for_type": "TemplatePathEntryDto" },
+    { "trait_ref": "core::clone::Clone",                  "for_type": "TemplatePathEntryDto" },
+    { "trait_ref": "serde_core::de::Deserialize",         "for_type": "TemplatePathEntryDto" },
+
+    { "trait_ref": "core::fmt::Debug",                    "for_type": "TemplatePathClassificationDto" },
+    { "trait_ref": "core::clone::Clone",                  "for_type": "TemplatePathClassificationDto" },
+    { "trait_ref": "core::marker::Copy",                  "for_type": "TemplatePathClassificationDto" },
+    { "trait_ref": "core::clone::TrivialClone",           "for_type": "TemplatePathClassificationDto" },
+    { "trait_ref": "core::cmp::PartialEq",                "for_type": "TemplatePathClassificationDto" },
+    { "trait_ref": "core::cmp::Eq",                       "for_type": "TemplatePathClassificationDto" },
+    { "trait_ref": "serde_core::de::Deserialize",         "for_type": "TemplatePathClassificationDto" },
+
+    { "trait_ref": "core::fmt::Debug",   "for_type": "TemplateBoundaryManifestCodecError" },
+    { "trait_ref": "core::fmt::Display", "for_type": "TemplateBoundaryManifestCodecError" },
+    { "trait_ref": "core::error::Error", "for_type": "TemplateBoundaryManifestCodecError" },
+    { "trait_ref": "core::convert::From<domain::template_export::TemplatePathPatternError>",      "for_type": "TemplateBoundaryManifestCodecError" },
+    { "trait_ref": "core::convert::From<domain::template_export::TemplateBoundaryManifestError>", "for_type": "TemplateBoundaryManifestCodecError" }
+  ]
+}

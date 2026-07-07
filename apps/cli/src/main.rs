@@ -129,6 +129,11 @@ enum CliCommand {
         #[command(subcommand)]
         cmd: commands::catalogue_lint::CatalogueLintCommand,
     },
+    /// Template export: build a generic template tree from the boundary manifest.
+    Template {
+        #[command(subcommand)]
+        cmd: commands::template::TemplateCommand,
+    },
     /// Run the example track state machine demo.
     Demo,
 }
@@ -173,6 +178,7 @@ fn run_cli_with(
         Some(CliCommand::TaskContract { cmd }) => commands::task_contract::execute(cmd),
         Some(CliCommand::Catalog { cmd }) => commands::catalog::execute(cmd),
         Some(CliCommand::CatalogueLint { cmd }) => commands::catalogue_lint::execute(cmd),
+        Some(CliCommand::Template { cmd }) => commands::template::execute(cmd),
         Some(CliCommand::Demo) | None => {
             let outcome = DemoCompositionRoot::new().demo_driver().handle(DemoInput::Run);
             if let Some(msg) = outcome.stdout {
@@ -894,6 +900,47 @@ mod tests {
         .unwrap();
         let exit = run_cli(cli, |_cmd| ExitCode::FAILURE);
         assert_eq!(exit, ExitCode::SUCCESS);
+    }
+
+    // ── CliCommand::Template entrypoint dispatch routing ─────────────────────
+
+    /// `sotp template export …` must parse into
+    /// `CliCommand::Template { cmd: TemplateCommand::Export }` with every path
+    /// argument mapped through the public CLI entrypoint.
+    #[test]
+    fn test_template_export_parses_to_template_export_variant() {
+        use crate::commands::template::{TemplateCommand, TemplateExportArgs};
+
+        let cli = Cli::try_parse_from([
+            "sotp",
+            "template",
+            "export",
+            "--workspace-root",
+            "/ws",
+            "--manifest-path",
+            "/ws/boundary.json",
+            "--overlay-dir",
+            "/ws/overlay",
+            "--output-dir",
+            "/out",
+        ])
+        .unwrap();
+
+        match cli.command {
+            Some(CliCommand::Template {
+                cmd: TemplateCommand::Export(TemplateExportArgs { output_dir, .. }),
+            }) => {
+                assert_eq!(output_dir, std::path::PathBuf::from("/out"));
+            }
+            _ => panic!("expected Template {{ Export }}, got a different variant"),
+        }
+    }
+
+    /// An unrecognized `sotp template` subcommand must be rejected by clap.
+    #[test]
+    fn test_template_unknown_subcommand_is_rejected() {
+        let result = Cli::try_parse_from(["sotp", "template", "unknown-subcmd"]);
+        assert!(result.is_err(), "unrecognized template subcommand must be rejected by clap");
     }
 
     // ── Hook telemetry wrapper paths ─────────────────────────────────────────

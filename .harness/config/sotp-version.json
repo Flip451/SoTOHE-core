@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "git_url": "https://github.com/Flip451/SoTOHE-core",
+  "tag": "sotp-v0.1.0",
+  "crate": "cli",
+  "binary": "sotp"
+}

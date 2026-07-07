@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "ef4c09fda48a6d272331c2920ad57529378c43d71dded9eb70d0a82aa87e6e44",
+  "signals": [
+    {
+      "type_name": "TemplateBoundaryManifestReadError",
+      "signal": "blue",
+      "entry_hash": "6c3ae27617b16f4f0a1a462871e0aa82e1c7520822f22c853d4325f79a68f01e"
+    },
+    {
+      "type_name": "TemplateExportCommand",
+      "signal": "blue",
+      "entry_hash": "1e28f536cf0a016c8ac88a8ccad83dc8c7a7b3ed9fb3907333d8ca9054151a50"
+    },
+    {
+      "type_name": "TemplateExportError",
+      "signal": "blue",
+      "entry_hash": "75caaa48ba5404790fecd73c5c92ff9fceab16590d05af0b4a7a2fd7796c4736"
+    },
+    {
+      "type_name": "TemplateExportInteractor",
+      "signal": "blue",
+      "entry_hash": "5c9c8831ac0b6a4f7a8cdc6037e70d2b815bc1cd1c683c9ebd4efff37c5f421c"
+    },
+    {
+      "type_name": "TemplateExportPortError",
+      "signal": "blue",
+      "entry_hash": "953a69dd6c7e943801767106d668d771aa82f7fb8e0146df2ed96b2484647515"
+    },
+    {
+      "type_name": "TemplateExportReport",
+      "signal": "blue",
+      "entry_hash": "9f68689875ea1ea4dbf25a7d2b0e93e79eb090a5c6254ac74b57e1face72cc20"
+    },
+    {
+      "type_name": "TemplateBoundaryManifestPort",
+      "signal": "blue",
+      "entry_hash": "8d6404369e04cca8665a0bf73a2d427644a31a4ce73f27d1d497d181811125eb"
+    },
+    {
+      "type_name": "TemplateExportPort",
+      "signal": "blue",
+      "entry_hash": "53f3b1f53c04d7058902020b3de57c1b91d2a7bd83b5bd8090b5e681bf44855c"
+    },
+    {
+      "type_name": "TemplateExportService",
+      "signal": "blue",
+      "entry_hash": "a3cc4f262bfb33035326194e7e0e910f08e670740c47aa80ed0b722efd3048e0"
+    }
+  ]
+}
