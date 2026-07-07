@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-07T06:31:37Z",
-  "declaration_hash": "c689cf18f6e3d3f97b7415d35653ad809cc354da75fd11846174e62283a40d1e",
+  "generated_at": "2026-07-07T06:56:56Z",
+  "declaration_hash": "0c86a23c24713e818f6d52b2f03a9ecedb127859aa03aaa3f7f6012cd2e4471f",
   "signals": [
     {
       "type_name": "TemplateBoundaryManifest",

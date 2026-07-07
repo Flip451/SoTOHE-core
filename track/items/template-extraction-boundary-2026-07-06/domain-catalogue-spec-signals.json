@@ -1,16 +1,16 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "c689cf18f6e3d3f97b7415d35653ad809cc354da75fd11846174e62283a40d1e",
+  "catalogue_declaration_hash": "0c86a23c24713e818f6d52b2f03a9ecedb127859aa03aaa3f7f6012cd2e4471f",
   "signals": [
     {
       "type_name": "TemplateBoundaryManifest",
       "signal": "blue",
-      "entry_hash": "fe651e14b5a9ed0147ca785a4157c7e3d7fb9ea8f74bb426eeb4cd099d5991a2"
+      "entry_hash": "235662b01ee888502091ee815f56ae4282e9de98c87cdf1112b519da48789ee0"
     },
     {
       "type_name": "TemplateBoundaryManifestError",
       "signal": "blue",
-      "entry_hash": "75f1279095482470e2b6405a02721d5f07e1b3a4b41e5ab26b8fc18206d22655"
+      "entry_hash": "f142b2aea15d8dd811d66e8a4e523021bc54766fa8175cd6d14917e4ad635191"
     },
     {
       "type_name": "TemplatePathClassification",

@@ -157,14 +157,17 @@ pub struct TemplateBoundaryManifest {
 }
 
 impl TemplateBoundaryManifest {
-    /// Constructs a `TemplateBoundaryManifest`, enforcing the non-empty and
-    /// unique-pattern invariants (spec IN-02, IN-12, AC-02).
+    /// Constructs a `TemplateBoundaryManifest`, enforcing the non-empty,
+    /// unique-pattern, and prefix-free invariants (spec IN-02, IN-12, AC-02).
     ///
     /// # Errors
     ///
     /// - [`TemplateBoundaryManifestError::EmptyManifest`] when `entries` is empty.
     /// - [`TemplateBoundaryManifestError::DuplicatePattern`] when two entries
     ///   share the same pattern.
+    /// - [`TemplateBoundaryManifestError::NestedPattern`] when one entry's pattern
+    ///   is a path-ancestor of another's, which would let an `include` subtree
+    ///   copy leak a differently-classified descendant (spec IN-12).
     pub fn try_new(entries: Vec<TemplatePathEntry>) -> Result<Self, TemplateBoundaryManifestError> {
         if entries.is_empty() {
             return Err(TemplateBoundaryManifestError::EmptyManifest);
@@ -177,6 +180,26 @@ impl TemplateBoundaryManifest {
                 return Err(TemplateBoundaryManifestError::DuplicatePattern {
                     pattern: entry.pattern().clone(),
                 });
+            }
+        }
+
+        // Fail-closed on nested classifications: a pattern that is a path-ancestor
+        // of another would make the ancestor's subtree copy leak the descendant's
+        // separately-classified path (spec IN-12). Reject the first such pair.
+        for (index, entry) in entries.iter().enumerate() {
+            for prior in entries.iter().take(index) {
+                if is_path_ancestor(prior.pattern(), entry.pattern()) {
+                    return Err(TemplateBoundaryManifestError::NestedPattern {
+                        ancestor: prior.pattern().clone(),
+                        descendant: entry.pattern().clone(),
+                    });
+                }
+                if is_path_ancestor(entry.pattern(), prior.pattern()) {
+                    return Err(TemplateBoundaryManifestError::NestedPattern {
+                        ancestor: entry.pattern().clone(),
+                        descendant: prior.pattern().clone(),
+                    });
+                }
             }
         }
 
@@ -211,6 +234,52 @@ impl TemplateBoundaryManifest {
             !self.entries.iter().take(index).any(|prior| prior.pattern() == entry.pattern())
         })
     }
+
+    /// Returns whether no entry's pattern is a path-ancestor of another's.
+    ///
+    /// Invariant predicate for `patterns_are_prefix_free`; construction guarantees
+    /// this holds, but it is exposed for downstream re-validation. Prefix-freeness
+    /// keeps every classification's subtree disjoint, so an `include` copy can
+    /// never leak a differently-classified descendant (spec IN-12).
+    #[must_use]
+    pub fn patterns_are_prefix_free(&self) -> bool {
+        self.entries.iter().enumerate().all(|(index, entry)| {
+            self.entries.iter().take(index).all(|prior| {
+                !is_path_ancestor(prior.pattern(), entry.pattern())
+                    && !is_path_ancestor(entry.pattern(), prior.pattern())
+            })
+        })
+    }
+}
+
+/// Returns whether `ancestor` is a strict path-ancestor of `descendant`,
+/// comparing canonical path segments rather than raw string prefixes.
+///
+/// `a` is an ancestor of `a/b`, but `ab` is not an ancestor of `a/b` (segment
+/// boundaries are respected). The workspace-root pattern `.` is an ancestor of
+/// every other pattern and of nothing but itself. Equal patterns are never
+/// ancestors of each other (the relation is strict).
+fn is_path_ancestor(ancestor: &TemplatePathPattern, descendant: &TemplatePathPattern) -> bool {
+    if ancestor == descendant {
+        return false;
+    }
+    // The workspace root contains every other path; nothing contains the root.
+    if ancestor.as_str() == "." {
+        return true;
+    }
+    if descendant.as_str() == "." {
+        return false;
+    }
+
+    let mut descendant_segments = descendant.as_str().split('/');
+    for ancestor_segment in ancestor.as_str().split('/') {
+        match descendant_segments.next() {
+            Some(descendant_segment) if descendant_segment == ancestor_segment => {}
+            _ => return false,
+        }
+    }
+    // Strict containment: the descendant must have at least one further segment.
+    descendant_segments.next().is_some()
 }
 
 /// Error produced by [`TemplateBoundaryManifest::try_new`]
@@ -222,6 +291,15 @@ pub enum TemplateBoundaryManifestError {
     DuplicatePattern {
         /// The pattern that appeared more than once.
         pattern: TemplatePathPattern,
+    },
+    /// One entry's pattern is a path-ancestor of another's, so an `include`
+    /// subtree copy would leak a differently-classified descendant (spec IN-12).
+    #[error("nested template path patterns: {ancestor:?} contains {descendant:?}")]
+    NestedPattern {
+        /// The ancestor pattern.
+        ancestor: TemplatePathPattern,
+        /// The descendant pattern nested beneath `ancestor`.
+        descendant: TemplatePathPattern,
     },
     /// The manifest contains no entries.
     #[error("template boundary manifest must not be empty")]
@@ -378,6 +456,77 @@ mod tests {
         let manifest = TemplateBoundaryManifest::try_new(entries).unwrap();
         assert_eq!(manifest.entries().len(), 3);
         assert!(manifest.patterns_are_unique());
+        assert!(manifest.patterns_are_prefix_free());
+    }
+
+    #[test]
+    fn manifest_rejects_nested_ancestor_descendant_pair() {
+        // `config` include + `config/secrets` exclude: the include subtree copy
+        // would leak the excluded child, so construction must fail closed.
+        let entries = vec![
+            entry("config", TemplatePathClassification::Include),
+            entry("config/secrets", TemplatePathClassification::Exclude),
+        ];
+        let err = TemplateBoundaryManifest::try_new(entries).unwrap_err();
+        assert!(
+            matches!(
+                err,
+                TemplateBoundaryManifestError::NestedPattern { ref ancestor, ref descendant }
+                    if ancestor.as_str() == "config" && descendant.as_str() == "config/secrets"
+            ),
+            "unexpected error: {err:?}"
+        );
+    }
+
+    #[test]
+    fn manifest_rejects_nested_pair_regardless_of_order() {
+        // Descendant listed before ancestor still reports ancestor/descendant
+        // in canonical (containment) order.
+        let entries = vec![
+            entry("config/secrets", TemplatePathClassification::Exclude),
+            entry("config", TemplatePathClassification::Include),
+        ];
+        let err = TemplateBoundaryManifest::try_new(entries).unwrap_err();
+        assert!(
+            matches!(
+                err,
+                TemplateBoundaryManifestError::NestedPattern { ref ancestor, ref descendant }
+                    if ancestor.as_str() == "config" && descendant.as_str() == "config/secrets"
+            ),
+            "unexpected error: {err:?}"
+        );
+    }
+
+    #[test]
+    fn manifest_accepts_sibling_prefix_that_is_not_a_path_ancestor() {
+        // `ab` is a string prefix of `a/b` but NOT a path-ancestor: segment
+        // boundaries are respected, so this pair is accepted.
+        let entries = vec![
+            entry("ab", TemplatePathClassification::Include),
+            entry("a/b", TemplatePathClassification::Exclude),
+        ];
+        let manifest = TemplateBoundaryManifest::try_new(entries).unwrap();
+        assert_eq!(manifest.entries().len(), 2);
+        assert!(manifest.patterns_are_prefix_free());
+    }
+
+    #[test]
+    fn manifest_rejects_workspace_root_combined_with_any_entry() {
+        // The workspace-root pattern `.` is an ancestor of everything, so it may
+        // never coexist with another entry.
+        let entries = vec![
+            entry(".", TemplatePathClassification::Include),
+            entry("libs/domain", TemplatePathClassification::Overlay),
+        ];
+        let err = TemplateBoundaryManifest::try_new(entries).unwrap_err();
+        assert!(
+            matches!(
+                err,
+                TemplateBoundaryManifestError::NestedPattern { ref ancestor, ref descendant }
+                    if ancestor.as_str() == "." && descendant.as_str() == "libs/domain"
+            ),
+            "unexpected error: {err:?}"
+        );
     }
 
     #[test]

@@ -69,7 +69,8 @@
       "role": {
         "ValueObject": {
           "invariants": [
-            { "name": "patterns_are_unique", "predicate": { "SelfMethod": "patterns_are_unique" } }
+            { "name": "patterns_are_unique",      "predicate": { "SelfMethod": "patterns_are_unique" } },
+            { "name": "patterns_are_prefix_free", "predicate": { "SelfMethod": "patterns_are_prefix_free" } }
           ]
         }
       },
@@ -114,7 +115,8 @@
         "kind": "enum",
         "variants": [
           { "name": "DuplicatePattern", "payload": { "kind": "struct", "fields": [{ "name": "pattern", "ty": "TemplatePathPattern" }] } },
-          { "name": "EmptyManifest", "payload": { "kind": "unit" } }
+          { "name": "EmptyManifest",    "payload": { "kind": "unit" } },
+          { "name": "NestedPattern",    "payload": { "kind": "struct", "fields": [{ "name": "ancestor", "ty": "TemplatePathPattern" }, { "name": "descendant", "ty": "TemplatePathPattern" }] } }
         ]
       },
       "methods": [],
@@ -222,7 +224,7 @@
           "generics": [],
           "has_default_impl": false,
           "where_predicates": [],
-          "docs": "Constructor (IN-02, AC-02); producible errors: `TemplateBoundaryManifestError::DuplicatePattern`, `TemplateBoundaryManifestError::EmptyManifest`."
+          "docs": "Constructor (IN-02, IN-12, AC-02); producible errors: `TemplateBoundaryManifestError::DuplicatePattern`, `TemplateBoundaryManifestError::EmptyManifest`, `TemplateBoundaryManifestError::NestedPattern`."
         },
         {
           "name": "entries",
@@ -256,6 +258,17 @@
           "has_default_impl": false,
           "where_predicates": [],
           "docs": "Invariant predicate for `patterns_are_unique`."
+        },
+        {
+          "name": "patterns_are_prefix_free",
+          "receiver": "&self",
+          "params": [],
+          "returns": "bool",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Invariant predicate for `patterns_are_prefix_free`."
         }
       ]
     }

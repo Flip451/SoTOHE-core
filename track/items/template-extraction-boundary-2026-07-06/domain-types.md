@@ -18,6 +18,6 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| TemplateBoundaryManifestError | error_type | add | DuplicatePattern, EmptyManifest | 🔵 | 🔵 |
+| TemplateBoundaryManifestError | error_type | add | DuplicatePattern, EmptyManifest, NestedPattern | 🔵 | 🔵 |
 | TemplatePathPatternError | error_type | add | InvalidPattern | 🔵 | 🔵 |
 

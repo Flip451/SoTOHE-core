@@ -3,11 +3,11 @@
   "layer": "domain",
   "entries": [
     {
-      "claim_hash": "fe651e14b5a9ed0147ca785a4157c7e3d7fb9ea8f74bb426eeb4cd099d5991a2",
+      "claim_hash": "235662b01ee888502091ee815f56ae4282e9de98c87cdf1112b519da48789ee0",
       "evidence_hash": "0ad476f11c9a08723ac8eb4a693ce141b0b349fee10a33e06625b7da24dbe208",
       "verdict": {
         "kind": "pass",
-        "citation": "「境界 SSoT としての機械可読 manifest の新設。workspace tree の各 path を `include` / `exclude` / `overlay` のいずれかに分類する。」"
+        "citation": "workspace tree の各 path を `include` (テンプレートにそのまま含める) / `exclude` (テンプレートから外す) / `overlay` (overlay ディレクトリ側のテンプレート版で上書き) のいずれかに分類する。sotp ソース (`libs/*` / `apps/*`) は `overlay` に分類する — overlay の適用意味論が同一パスに対する sotp ソースの除去と 6 crate 雛形の差し込みを同時に果たし"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -27,11 +27,11 @@
       }
     },
     {
-      "claim_hash": "fe651e14b5a9ed0147ca785a4157c7e3d7fb9ea8f74bb426eeb4cd099d5991a2",
+      "claim_hash": "235662b01ee888502091ee815f56ae4282e9de98c87cdf1112b519da48789ee0",
       "evidence_hash": "425f3f4c9872d9b8b9da4f25d46d3c083b7981f3f2b7d32f1a8937bc74db881a",
       "verdict": {
         "kind": "pass",
-        "citation": "path 分類の重複や未分類 path が発生した場合は export 実行前に fail-closed で検出する"
+        "citation": "manifest は sotp 側のコードから読み込まれる schema 付き設定として管理し、path 分類の重複や未分類 path が発生した場合は export 実行前に fail-closed で検出する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -51,7 +51,7 @@
       }
     },
     {
-      "claim_hash": "fe651e14b5a9ed0147ca785a4157c7e3d7fb9ea8f74bb426eeb4cd099d5991a2",
+      "claim_hash": "235662b01ee888502091ee815f56ae4282e9de98c87cdf1112b519da48789ee0",
       "evidence_hash": "f602d6f1a29c649323eb0e200bb9857e5d73b143e8cf56aeeb613b4556815f56",
       "verdict": {
         "kind": "pass",
@@ -75,11 +75,11 @@
       }
     },
     {
-      "claim_hash": "fe651e14b5a9ed0147ca785a4157c7e3d7fb9ea8f74bb426eeb4cd099d5991a2",
+      "claim_hash": "235662b01ee888502091ee815f56ae4282e9de98c87cdf1112b519da48789ee0",
       "evidence_hash": "c83ec54956e5cf3df4959a6800854f8d7ba62b30f74e19827a3c8745f346e996",
       "verdict": {
         "kind": "pass",
-        "citation": "境界の SSoT は機械可読 manifest (path → include / exclude / overlay 分類) 一元管理とする。"
+        "citation": "「境界の SSoT は機械可読 manifest (path → include / exclude / overlay 分類) 一元管理とする。散文のみの境界文書は SSoT にしない。分類の変更は manifest 側の変更で完結し、sotp 側のコード側は schema と読み込みロジックの安定性のみを保証する。」"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -99,11 +99,11 @@
       }
     },
     {
-      "claim_hash": "75f1279095482470e2b6405a02721d5f07e1b3a4b41e5ab26b8fc18206d22655",
+      "claim_hash": "f142b2aea15d8dd811d66e8a4e523021bc54766fa8175cd6d14917e4ad635191",
       "evidence_hash": "0ad476f11c9a08723ac8eb4a693ce141b0b349fee10a33e06625b7da24dbe208",
       "verdict": {
         "kind": "pass",
-        "citation": "境界 SSoT としての機械可読 manifest の新設。workspace tree の各 path を `include` (テンプレートにそのまま含める) / `exclude` (テンプレートから外す) / `overlay` (overlay ディレクトリ側のテンプレート版で上書き) のいずれかに分類する。"
+        "citation": "境界 SSoT としての機械可読 manifest の新設。workspace tree の各 path を `include` (テンプレートにそのまま含める) / `exclude` (テンプレートから外す) / `overlay` (overlay ディレクトリ側のテンプレート版で上書き) のいずれかに分類する。... overlay 分類は overlay ディレクトリ側に対応するテンプレート版ファイルの存在を要求する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -123,11 +123,11 @@
       }
     },
     {
-      "claim_hash": "75f1279095482470e2b6405a02721d5f07e1b3a4b41e5ab26b8fc18206d22655",
+      "claim_hash": "f142b2aea15d8dd811d66e8a4e523021bc54766fa8175cd6d14917e4ad635191",
       "evidence_hash": "425f3f4c9872d9b8b9da4f25d46d3c083b7981f3f2b7d32f1a8937bc74db881a",
       "verdict": {
         "kind": "pass",
-        "citation": "path 分類の重複や未分類 path が発生した場合は export 実行前に fail-closed で検出する。"
+        "citation": "manifest は sotp 側のコードから読み込まれる schema 付き設定として管理し、path 分類の重複や未分類 path が発生した場合は export 実行前に fail-closed で検出する。manifest 側の分類変更は sotp 側のコード変更なしで反映される (schema と読み込みロジックの安定性が要件)。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -147,11 +147,11 @@
       }
     },
     {
-      "claim_hash": "75f1279095482470e2b6405a02721d5f07e1b3a4b41e5ab26b8fc18206d22655",
+      "claim_hash": "f142b2aea15d8dd811d66e8a4e523021bc54766fa8175cd6d14917e4ad635191",
       "evidence_hash": "f602d6f1a29c649323eb0e200bb9857e5d73b143e8cf56aeeb613b4556815f56",
       "verdict": {
         "kind": "pass",
-        "citation": "workspace tree の全 path を `include` / `exclude` / `overlay` のいずれかに分類する。未分類 path の存在、`overlay` 分類なのに overlay 側にファイルが存在しない矛盾、重複分類は、export 実行 (および manifest validation) の時点で fail-closed で検出される。"
+        "citation": "未分類 path の存在、`overlay` 分類なのに overlay 側にファイルが存在しない矛盾、重複分類は、export 実行 (および manifest validation) の時点で fail-closed で検出される。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
