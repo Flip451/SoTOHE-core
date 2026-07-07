@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-07T00:35:35Z",
+  "generated_at": "2026-07-07T01:52:35Z",
   "declaration_hash": "94a59f52dab1b14bd33ea8a6d2aeff406417e87591ab0e115cefba18bbde56f7",
   "signals": [
     {
       "type_name": "FsTemplateBoundaryManifestAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "TemplateBoundaryManifestPort",
         "core::default::Default",
         "core::fmt::Debug"
@@ -17,9 +17,9 @@
     {
       "type_name": "FsTemplateExportAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "TemplateExportPort",
         "core::default::Default",
         "core::fmt::Debug"

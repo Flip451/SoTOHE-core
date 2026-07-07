@@ -4,32 +4,35 @@
     {
       "id": "T001",
       "description": "libs/domain/src/template_export/mod.rs and libs/domain/src/lib.rs — add TemplatePathPattern, TemplatePathPatternError, TemplatePathClassification, TemplatePathEntry, TemplateBoundaryManifest, TemplateBoundaryManifestError, module wiring, and unit tests for the listed symbols (GO-04, IN-02, IN-12, AC-02, CN-02).",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "6bc1e74fa8efe85ad027d9ec9125893b9c59900e"
     },
     {
       "id": "T002",
       "description": "libs/usecase/src/template_export/mod.rs and libs/usecase/src/lib.rs — add TemplateExportCommand, TemplateExportReport, TemplateExportError, TemplateBoundaryManifestReadError, TemplateExportPortError, TemplateExportService, TemplateBoundaryManifestPort, TemplateExportPort, TemplateExportInteractor, module wiring, and mock-port unit tests (GO-01, IN-01, IN-02, IN-03, AC-01, AC-03, CN-02, CN-03).",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "6bc1e74fa8efe85ad027d9ec9125893b9c59900e"
     },
     {
       "id": "T003",
       "description": "libs/infrastructure/src/template_export/codec.rs and libs/infrastructure/src/template_export/mod.rs — add TemplateBoundaryManifestDto, TemplatePathEntryDto, TemplatePathClassificationDto, TemplateBoundaryManifestCodecError, decode_manifest, module wiring, and codec unit tests (GO-04, IN-02, IN-12, AC-02, CN-02).",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "6bc1e74fa8efe85ad027d9ec9125893b9c59900e"
     },
     {
       "id": "T004",
       "description": "libs/infrastructure/src/template_export/mod.rs and libs/infrastructure/src/lib.rs — add FsTemplateBoundaryManifestAdapter, FsTemplateExportAdapter, module wiring, and tempdir-backed adapter tests (GO-01, GO-04, IN-01, IN-02, IN-03, IN-12, OS-05, OS-06, AC-01, AC-02, AC-03, CN-02, CN-03).",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T005",
       "description": "apps/cli-driver/src/template_export/mod.rs and apps/cli-driver/src/lib.rs — add TemplateExportInput, TemplateInput, TemplateDriver, module wiring, and TemplateDriver unit tests (GO-01, IN-01, AC-01).",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T006",
       "description": "apps/cli-composition/src/template_export/mod.rs, apps/cli/src/commands/template/mod.rs, and apps/cli/src/lib.rs — add TemplateCompositionRoot, TemplateCommand, TemplateExportArgs, CliCommand::Template, cli::commands::template::execute, cli::commands::template::dispatch, composition wiring, clap parse tests, and composition-root smoke test (GO-01, IN-01, AC-01).",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T007",

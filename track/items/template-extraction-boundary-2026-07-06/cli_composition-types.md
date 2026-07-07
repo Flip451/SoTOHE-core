@@ -4,5 +4,5 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| TemplateCompositionRoot | composition_root | add | — | 🟡 | 🔵 |
+| TemplateCompositionRoot | composition_root | add | — | 🔵 | 🔵 |
 

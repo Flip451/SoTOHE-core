@@ -23,8 +23,8 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| FsTemplateBoundaryManifestAdapter | secondary_adapter | add | impl Debug, impl Default, impl TemplateBoundaryManifestPort | 🟡 | 🔵 |
-| FsTemplateExportAdapter | secondary_adapter | add | impl Debug, impl Default, impl TemplateExportPort | 🟡 | 🔵 |
+| FsTemplateBoundaryManifestAdapter | secondary_adapter | add | impl Debug, impl Default, impl TemplateBoundaryManifestPort | 🔵 | 🔵 |
+| FsTemplateExportAdapter | secondary_adapter | add | impl Debug, impl Default, impl TemplateExportPort | 🔵 | 🔵 |
 
 ## Free Functions
 

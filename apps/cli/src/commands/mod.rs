@@ -23,6 +23,7 @@ pub mod semantic_dup;
 pub mod signal;
 pub mod task_contract;
 pub mod telemetry;
+pub mod template;
 pub mod track;
 pub mod verify;
 #[cfg(test)]
