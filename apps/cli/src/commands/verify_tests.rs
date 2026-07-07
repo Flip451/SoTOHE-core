@@ -184,6 +184,11 @@ fn test_module_size_subcommand_returns_failure_for_missing_rules() {
 #[test]
 fn test_domain_strings_subcommand_returns_success_for_clean_domain() {
     let tmp = TempDir::new().unwrap();
+    write_file(
+        tmp.path(),
+        "architecture-rules.json",
+        r#"{"version":2,"layers":[{"crate":"domain","path":"libs/domain","verify":{"domain_strings":true}}]}"#,
+    );
     write_file(tmp.path(), "libs/domain/src/lib.rs", "pub struct Foo { pub count: u32 }\n");
     let exit = execute(VerifyCommand::DomainStrings(make_args(tmp.path())));
     assert_eq!(exit, ExitCode::SUCCESS);
@@ -201,6 +206,11 @@ fn test_domain_strings_subcommand_returns_failure_for_missing_domain() {
 #[test]
 fn test_domain_purity_subcommand_returns_success_for_clean_domain() {
     let tmp = TempDir::new().unwrap();
+    write_file(
+        tmp.path(),
+        "architecture-rules.json",
+        r#"{"version":2,"layers":[{"crate":"domain","path":"libs/domain","verify":{"domain_purity":true}}]}"#,
+    );
     write_file(tmp.path(), "libs/domain/src/lib.rs", "pub struct Foo;\n");
     let exit = execute(VerifyCommand::DomainPurity(make_args(tmp.path())));
     assert_eq!(exit, ExitCode::SUCCESS);
@@ -218,6 +228,11 @@ fn test_domain_purity_subcommand_returns_failure_for_missing_domain() {
 #[test]
 fn test_usecase_purity_subcommand_returns_success_for_clean_usecase() {
     let tmp = TempDir::new().unwrap();
+    write_file(
+        tmp.path(),
+        "architecture-rules.json",
+        r#"{"version":2,"layers":[{"crate":"usecase","path":"libs/usecase","verify":{"usecase_purity":true}}]}"#,
+    );
     write_file(
         tmp.path(),
         "libs/usecase/src/lib.rs",

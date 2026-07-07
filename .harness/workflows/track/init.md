@@ -72,8 +72,9 @@ Regenerate `plan.md` and `track/registry.md` from `metadata.json`:
 bin/sotp track views sync
 ```
 
-A warning about `contract-map.md` skipping the new track (because no `domain-types.json`
-exists yet) is expected at this phase and is not an error.
+A warning about `contract-map.md` skipping the new track (because the first TDDD-enabled
+layer's `<layer>-types.json` — as declared by the first `tddd.enabled` layer in
+`architecture-rules.json` — does not exist yet) is expected at this phase and is not an error.
 
 **Step 5: Verify identity schema**
 

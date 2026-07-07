@@ -40,42 +40,47 @@
     {
       "id": "T007",
       "description": ".harness/config/template-boundary.json, .harness/config/sotp-version.json (include-shipped), overlay/Makefile.toml, overlay/knowledge/adr/README.md (empty index), overlay/knowledge/research/README.md, overlay/knowledge/research/version-baseline-template.md, overlay/knowledge/research/.gitignore (manifest entries for knowledge/adr + knowledge/research flipped from exclude to overlay), and libs/infrastructure/src/template_export/codec.rs tests — author boundary/bootstrap artifacts, overlay knowledge curation, manifest/schema tests, schema-application test, and scope-boundary assertions (GO-01, GO-02, GO-04, IN-02, IN-05, IN-06, IN-12, OS-01, OS-02, OS-03, OS-04, OS-06, OS-08, OS-11, AC-02, AC-03, AC-06, AC-07, CN-01, CN-02, CN-05, CN-06, CN-10).",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "864456deb49d3965bff3f60f358f1f37b00aacb5"
     },
     {
       "id": "T008",
       "description": "overlay/Cargo.toml, overlay/deny.toml, overlay/libs/{domain,usecase,infrastructure}/Cargo.toml, overlay/libs/{domain,usecase,infrastructure}/src/lib.rs, overlay/apps/{cli-driver,cli-composition,cli}/Cargo.toml, overlay/apps/{cli-driver,cli-composition,cli}/src/{lib.rs,main.rs}, root Cargo.toml (add \"overlay/*\" to workspace.exclude), and libs/infrastructure/src/template_export/codec.rs tests — author placeholder workspace files and add an overlay-file-existence test (GO-02, GO-03, IN-03, IN-04, OS-07, OS-09, AC-03, AC-04, AC-06, CN-04, CN-05).",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "864456deb49d3965bff3f60f358f1f37b00aacb5"
     },
     {
       "id": "T009",
       "description": "overlay/Dockerfile, overlay/architecture-rules.json, overlay/track/tech-stack.md, overlay/track/registry.md, overlay/track/product-*.md, and doc-links regression check — author supporting overlay files and the overlay track-doc check (GO-03, IN-03, IN-10, AC-03, AC-10, CN-04).",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "864456deb49d3965bff3f60f358f1f37b00aacb5"
     },
     {
       "id": "T010",
       "description": "Makefile.toml and smoke-gate unit tests — add template-export-smoke, register it in the ci-container chain, add smoke-gate regression and OS-10/CN-09 scope-boundary tests, and run the final cargo make ci check (GO-01, GO-03, GO-04, IN-07, OS-10, AC-05, AC-12, CN-04, CN-09, CN-11).",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "864456deb49d3965bff3f60f358f1f37b00aacb5"
     },
     {
       "id": "T011",
       "description": "architecture-rules.json, libs/infrastructure/src/verify/domain_purity.rs, libs/infrastructure/src/verify/domain_strings.rs, libs/infrastructure/src/verify/usecase_purity.rs, and verifier tests — add arch-rules-driven verifier dispatch and run the final cargo make ci check (GO-05, IN-08, AC-08, CN-07, CN-10, AC-12).",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T012",
       "description": "libs/infrastructure/src/review_v2/scope_config_loader.rs::load_scope_config, domain::review_v2::ReviewScopeConfig::new, .harness/config/review-scope.json, .harness/catalogue-lint/config.json, .harness/catalogue-lint/presets/ddd-strict.json, .harness/capabilities/dry-fix-lead.md, .harness/capabilities/review-fix-lead.md, .harness/capabilities/review-fix-lead-codex.md, and .harness/workflows/track/init.md — implement arch-rules-derived review scope loading, align catalogue-lint / capability / workflow config, and run final verification (GO-05, IN-09, AC-09, CN-08, CN-10, AC-12).",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T013",
       "description": ".harness/workflows/track/done.md, .harness/capabilities/adr-editor.md, .claude/commands/track/diagnose.md, .claude/rules/07-dev-environment.md, and .codex/config.toml — remove harness doc provenance references and add final grep verification (GO-05, IN-10, AC-10, AC-12).",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T014",
       "description": ".tool-versions and .gitignore — remove Python leftover entries and add final grep / cargo make ci verification (GO-05, IN-11, AC-11, AC-12).",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "864456deb49d3965bff3f60f358f1f37b00aacb5"
     }
   ],
   "plan": {

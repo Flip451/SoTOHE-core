@@ -52,7 +52,7 @@ statusMessage = "Checking git operation policy"
 
 # `apply_patch` is listed explicitly: Codex routes file edits through apply_patch,
 # which matches Write/Edit matchers but reports `tool_name: "apply_patch"` in the
-# hook input. The guard (libs/usecase/src/hook/test_file_deletion.rs) parses the
+# hook input. The guard (the CLI's test-file-deletion hook logic) parses the
 # apply_patch payload (carried in tool_input.command) for `*** Delete File:`
 # directives targeting test files. Without the explicit matcher entry the guard
 # would not fire on apply_patch test-file deletions.

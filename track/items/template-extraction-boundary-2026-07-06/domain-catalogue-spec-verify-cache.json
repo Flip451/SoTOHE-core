@@ -4,10 +4,10 @@
   "entries": [
     {
       "claim_hash": "fe651e14b5a9ed0147ca785a4157c7e3d7fb9ea8f74bb426eeb4cd099d5991a2",
-      "evidence_hash": "839cd186e89d18bf6c769a196049299ce47bb08016ba33b481f4feca0fa1a628",
+      "evidence_hash": "0ad476f11c9a08723ac8eb4a693ce141b0b349fee10a33e06625b7da24dbe208",
       "verdict": {
         "kind": "pass",
-        "citation": "workspace tree の各 path を `include` (テンプレートにそのまま含める) / `exclude` (テンプレートから外す) / `overlay` (overlay ディレクトリ側のテンプレート版で上書き) のいずれかに分類する。... overlay 分類は overlay ディレクトリ側に対応するテンプレート版ファイルの存在を要求する。"
+        "citation": "「境界 SSoT としての機械可読 manifest の新設。workspace tree の各 path を `include` / `exclude` / `overlay` のいずれかに分類する。」"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -22,7 +22,7 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-02",
-          "text_label": "境界 SSoT としての機械可読 manifest の新設。workspace tree の各 path を `include` (テンプレートにそのまま含める) / `exclude` (テンプレートから外す) / `overlay` (overlay ディレクトリ側のテンプレート版で上書き) のいずれかに分類する。sotp ソース (`libs/*` / `apps/*`) 、`vendor/` + patch、`build-sotp` タスク、`.gitignore` の sotp 動的 cache エントリ、Python 残渣、SoTOHE-core 固有の deny.toml exception 等は `exclude`。overlay 分類は overlay ディレクトリ側に対応するテンプレート版ファイルの存在を要求する。"
+          "text_label": "境界 SSoT としての機械可読 manifest の新設。workspace tree の各 path を `include` (テンプレートにそのまま含める) / `exclude` (テンプレートから外す) / `overlay` (overlay ディレクトリ側のテンプレート版で上書き) のいずれかに分類する。sotp ソース (`libs/*` / `apps/*`) は `overlay` に分類する — overlay の適用意味論が同一パスに対する sotp ソースの除去と 6 crate 雛形の差し込みを同時に果たし、D3 の 6 crate プレースホルダ出荷と AC-06 の「テンプレート workspace に sotp ソース非含有」を同時に満たす (`exclude` 単独では雛形が出荷されない)。`vendor/` + patch、`Cargo.lock`、`build-sotp` タスク、`.gitignore` の sotp 動的 cache エントリ、`track/items/` や `knowledge/adr/` の開発履歴、Python 残渣、SoTOHE-core 固有の deny.toml exception 等は `exclude`。overlay 分類は overlay ディレクトリ側に対応するテンプレート版ファイルの存在を要求する。"
         }
       }
     },
@@ -100,10 +100,10 @@
     },
     {
       "claim_hash": "75f1279095482470e2b6405a02721d5f07e1b3a4b41e5ab26b8fc18206d22655",
-      "evidence_hash": "839cd186e89d18bf6c769a196049299ce47bb08016ba33b481f4feca0fa1a628",
+      "evidence_hash": "0ad476f11c9a08723ac8eb4a693ce141b0b349fee10a33e06625b7da24dbe208",
       "verdict": {
         "kind": "pass",
-        "citation": "workspace tree の各 path を `include` / `exclude` / `overlay` のいずれかに分類する。"
+        "citation": "境界 SSoT としての機械可読 manifest の新設。workspace tree の各 path を `include` (テンプレートにそのまま含める) / `exclude` (テンプレートから外す) / `overlay` (overlay ディレクトリ側のテンプレート版で上書き) のいずれかに分類する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -118,7 +118,7 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-02",
-          "text_label": "境界 SSoT としての機械可読 manifest の新設。workspace tree の各 path を `include` (テンプレートにそのまま含める) / `exclude` (テンプレートから外す) / `overlay` (overlay ディレクトリ側のテンプレート版で上書き) のいずれかに分類する。sotp ソース (`libs/*` / `apps/*`) 、`vendor/` + patch、`build-sotp` タスク、`.gitignore` の sotp 動的 cache エントリ、Python 残渣、SoTOHE-core 固有の deny.toml exception 等は `exclude`。overlay 分類は overlay ディレクトリ側に対応するテンプレート版ファイルの存在を要求する。"
+          "text_label": "境界 SSoT としての機械可読 manifest の新設。workspace tree の各 path を `include` (テンプレートにそのまま含める) / `exclude` (テンプレートから外す) / `overlay` (overlay ディレクトリ側のテンプレート版で上書き) のいずれかに分類する。sotp ソース (`libs/*` / `apps/*`) は `overlay` に分類する — overlay の適用意味論が同一パスに対する sotp ソースの除去と 6 crate 雛形の差し込みを同時に果たし、D3 の 6 crate プレースホルダ出荷と AC-06 の「テンプレート workspace に sotp ソース非含有」を同時に満たす (`exclude` 単独では雛形が出荷されない)。`vendor/` + patch、`Cargo.lock`、`build-sotp` タスク、`.gitignore` の sotp 動的 cache エントリ、`track/items/` や `knowledge/adr/` の開発履歴、Python 残渣、SoTOHE-core 固有の deny.toml exception 等は `exclude`。overlay 分類は overlay ディレクトリ側に対応するテンプレート版ファイルの存在を要求する。"
         }
       }
     },
@@ -196,7 +196,7 @@
     },
     {
       "claim_hash": "959d276a0bf68ea0fdbc14472ee922ba56f6c76910cb21937309ebc48ef8578f",
-      "evidence_hash": "839cd186e89d18bf6c769a196049299ce47bb08016ba33b481f4feca0fa1a628",
+      "evidence_hash": "0ad476f11c9a08723ac8eb4a693ce141b0b349fee10a33e06625b7da24dbe208",
       "verdict": {
         "kind": "pass",
         "citation": "workspace tree の各 path を `include` (テンプレートにそのまま含める) / `exclude` (テンプレートから外す) / `overlay` (overlay ディレクトリ側のテンプレート版で上書き) のいずれかに分類する。"
@@ -214,7 +214,7 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-02",
-          "text_label": "境界 SSoT としての機械可読 manifest の新設。workspace tree の各 path を `include` (テンプレートにそのまま含める) / `exclude` (テンプレートから外す) / `overlay` (overlay ディレクトリ側のテンプレート版で上書き) のいずれかに分類する。sotp ソース (`libs/*` / `apps/*`) 、`vendor/` + patch、`build-sotp` タスク、`.gitignore` の sotp 動的 cache エントリ、Python 残渣、SoTOHE-core 固有の deny.toml exception 等は `exclude`。overlay 分類は overlay ディレクトリ側に対応するテンプレート版ファイルの存在を要求する。"
+          "text_label": "境界 SSoT としての機械可読 manifest の新設。workspace tree の各 path を `include` (テンプレートにそのまま含める) / `exclude` (テンプレートから外す) / `overlay` (overlay ディレクトリ側のテンプレート版で上書き) のいずれかに分類する。sotp ソース (`libs/*` / `apps/*`) は `overlay` に分類する — overlay の適用意味論が同一パスに対する sotp ソースの除去と 6 crate 雛形の差し込みを同時に果たし、D3 の 6 crate プレースホルダ出荷と AC-06 の「テンプレート workspace に sotp ソース非含有」を同時に満たす (`exclude` 単独では雛形が出荷されない)。`vendor/` + patch、`Cargo.lock`、`build-sotp` タスク、`.gitignore` の sotp 動的 cache エントリ、`track/items/` や `knowledge/adr/` の開発履歴、Python 残渣、SoTOHE-core 固有の deny.toml exception 等は `exclude`。overlay 分類は overlay ディレクトリ側に対応するテンプレート版ファイルの存在を要求する。"
         }
       }
     },
@@ -268,10 +268,10 @@
     },
     {
       "claim_hash": "b1e1b9ea9d019c43f74008217975232f6a18d9fcd670e3f5fd300a009f635ec4",
-      "evidence_hash": "839cd186e89d18bf6c769a196049299ce47bb08016ba33b481f4feca0fa1a628",
+      "evidence_hash": "0ad476f11c9a08723ac8eb4a693ce141b0b349fee10a33e06625b7da24dbe208",
       "verdict": {
         "kind": "pass",
-        "citation": "「境界 SSoT としての機械可読 manifest の新設。workspace tree の各 path を `include` (テンプレートにそのまま含める) / `exclude` (テンプレートから外す) / `overlay` (overlay ディレクトリ側のテンプレート版で上書き) のいずれかに分類する。」"
+        "citation": "workspace tree の各 path を `include` (テンプレートにそのまま含める) / `exclude` (テンプレートから外す) / `overlay` (overlay ディレクトリ側のテンプレート版で上書き) のいずれかに分類する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -286,7 +286,7 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-02",
-          "text_label": "境界 SSoT としての機械可読 manifest の新設。workspace tree の各 path を `include` (テンプレートにそのまま含める) / `exclude` (テンプレートから外す) / `overlay` (overlay ディレクトリ側のテンプレート版で上書き) のいずれかに分類する。sotp ソース (`libs/*` / `apps/*`) 、`vendor/` + patch、`build-sotp` タスク、`.gitignore` の sotp 動的 cache エントリ、Python 残渣、SoTOHE-core 固有の deny.toml exception 等は `exclude`。overlay 分類は overlay ディレクトリ側に対応するテンプレート版ファイルの存在を要求する。"
+          "text_label": "境界 SSoT としての機械可読 manifest の新設。workspace tree の各 path を `include` (テンプレートにそのまま含める) / `exclude` (テンプレートから外す) / `overlay` (overlay ディレクトリ側のテンプレート版で上書き) のいずれかに分類する。sotp ソース (`libs/*` / `apps/*`) は `overlay` に分類する — overlay の適用意味論が同一パスに対する sotp ソースの除去と 6 crate 雛形の差し込みを同時に果たし、D3 の 6 crate プレースホルダ出荷と AC-06 の「テンプレート workspace に sotp ソース非含有」を同時に満たす (`exclude` 単独では雛形が出荷されない)。`vendor/` + patch、`Cargo.lock`、`build-sotp` タスク、`.gitignore` の sotp 動的 cache エントリ、`track/items/` や `knowledge/adr/` の開発履歴、Python 残渣、SoTOHE-core 固有の deny.toml exception 等は `exclude`。overlay 分類は overlay ディレクトリ側に対応するテンプレート版ファイルの存在を要求する。"
         }
       }
     },
@@ -316,7 +316,7 @@
     },
     {
       "claim_hash": "db4afab4b3cc2f97bc1e92275852b661b1bb5ddcb4b5f60dc795069b308a701e",
-      "evidence_hash": "839cd186e89d18bf6c769a196049299ce47bb08016ba33b481f4feca0fa1a628",
+      "evidence_hash": "0ad476f11c9a08723ac8eb4a693ce141b0b349fee10a33e06625b7da24dbe208",
       "verdict": {
         "kind": "pass",
         "citation": "workspace tree の各 path を `include` (テンプレートにそのまま含める) / `exclude` (テンプレートから外す) / `overlay` (overlay ディレクトリ側のテンプレート版で上書き) のいずれかに分類する。"
@@ -334,7 +334,7 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-02",
-          "text_label": "境界 SSoT としての機械可読 manifest の新設。workspace tree の各 path を `include` (テンプレートにそのまま含める) / `exclude` (テンプレートから外す) / `overlay` (overlay ディレクトリ側のテンプレート版で上書き) のいずれかに分類する。sotp ソース (`libs/*` / `apps/*`) 、`vendor/` + patch、`build-sotp` タスク、`.gitignore` の sotp 動的 cache エントリ、Python 残渣、SoTOHE-core 固有の deny.toml exception 等は `exclude`。overlay 分類は overlay ディレクトリ側に対応するテンプレート版ファイルの存在を要求する。"
+          "text_label": "境界 SSoT としての機械可読 manifest の新設。workspace tree の各 path を `include` (テンプレートにそのまま含める) / `exclude` (テンプレートから外す) / `overlay` (overlay ディレクトリ側のテンプレート版で上書き) のいずれかに分類する。sotp ソース (`libs/*` / `apps/*`) は `overlay` に分類する — overlay の適用意味論が同一パスに対する sotp ソースの除去と 6 crate 雛形の差し込みを同時に果たし、D3 の 6 crate プレースホルダ出荷と AC-06 の「テンプレート workspace に sotp ソース非含有」を同時に満たす (`exclude` 単独では雛形が出荷されない)。`vendor/` + patch、`Cargo.lock`、`build-sotp` タスク、`.gitignore` の sotp 動的 cache エントリ、`track/items/` や `knowledge/adr/` の開発履歴、Python 残渣、SoTOHE-core 固有の deny.toml exception 等は `exclude`。overlay 分類は overlay ディレクトリ側に対応するテンプレート版ファイルの存在を要求する。"
         }
       }
     },
@@ -388,10 +388,10 @@
     },
     {
       "claim_hash": "0c8cc57f340ba310b396d06bdd44e5bacd83ef53da710c1668d78c037771bfc2",
-      "evidence_hash": "839cd186e89d18bf6c769a196049299ce47bb08016ba33b481f4feca0fa1a628",
+      "evidence_hash": "0ad476f11c9a08723ac8eb4a693ce141b0b349fee10a33e06625b7da24dbe208",
       "verdict": {
         "kind": "pass",
-        "citation": "workspace tree の各 path を `include` (テンプレートにそのまま含める) / `exclude` (テンプレートから外す) / `overlay` (overlay ディレクトリ側のテンプレート版で上書き) のいずれかに分類する。"
+        "citation": "境界 SSoT としての機械可読 manifest の新設。workspace tree の各 path を `include` (テンプレートにそのまま含める) / `exclude` (テンプレートから外す) / `overlay` (overlay ディレクトリ側のテンプレート版で上書き) のいずれかに分類する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -406,7 +406,7 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-02",
-          "text_label": "境界 SSoT としての機械可読 manifest の新設。workspace tree の各 path を `include` (テンプレートにそのまま含める) / `exclude` (テンプレートから外す) / `overlay` (overlay ディレクトリ側のテンプレート版で上書き) のいずれかに分類する。sotp ソース (`libs/*` / `apps/*`) 、`vendor/` + patch、`build-sotp` タスク、`.gitignore` の sotp 動的 cache エントリ、Python 残渣、SoTOHE-core 固有の deny.toml exception 等は `exclude`。overlay 分類は overlay ディレクトリ側に対応するテンプレート版ファイルの存在を要求する。"
+          "text_label": "境界 SSoT としての機械可読 manifest の新設。workspace tree の各 path を `include` (テンプレートにそのまま含める) / `exclude` (テンプレートから外す) / `overlay` (overlay ディレクトリ側のテンプレート版で上書き) のいずれかに分類する。sotp ソース (`libs/*` / `apps/*`) は `overlay` に分類する — overlay の適用意味論が同一パスに対する sotp ソースの除去と 6 crate 雛形の差し込みを同時に果たし、D3 の 6 crate プレースホルダ出荷と AC-06 の「テンプレート workspace に sotp ソース非含有」を同時に満たす (`exclude` 単独では雛形が出荷されない)。`vendor/` + patch、`Cargo.lock`、`build-sotp` タスク、`.gitignore` の sotp 動的 cache エントリ、`track/items/` や `knowledge/adr/` の開発履歴、Python 残渣、SoTOHE-core 固有の deny.toml exception 等は `exclude`。overlay 分類は overlay ディレクトリ側に対応するテンプレート版ファイルの存在を要求する。"
         }
       }
     },
