@@ -142,6 +142,99 @@ pub enum TargetEntryRoleKind {
     Pattern(TestObligationPatternKind),
 }
 
+/// Drift classification for a test-obligation edge (IN-13 / AC-05).
+///
+/// Split into two families. *Existence* drifts are independent deterministic
+/// checks on whether the edge still resolves: [`Missing`](Self::Missing) (an
+/// obligation has no binding, or a bound test no longer exists — a renamed test
+/// is caught here) and [`Orphaned`](Self::Orphaned) (a binding exists but no
+/// obligation is derived for it). *Freshness* drifts are the display names of a
+/// stale verdict, one per cache-key component: evidence-side
+/// [`SpecChanged`](Self::SpecChanged) (anchor text hash changed) /
+/// [`DeclChanged`](Self::DeclChanged) (entry declaration hash changed), and
+/// claim-side [`TestChanged`](Self::TestChanged) (bound test body hash changed) /
+/// [`ReasonChanged`](Self::ReasonChanged) (waived reason prose hash changed).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum TestObligationDriftKind {
+    /// An obligation has no binding (or its bound test no longer exists).
+    Missing,
+    /// A binding exists but no obligation is derived for it.
+    Orphaned,
+    /// The anchor text hash changed, staling the verdict.
+    SpecChanged,
+    /// The entry declaration hash changed, staling the verdict.
+    DeclChanged,
+    /// A bound test body hash changed, staling the verdict.
+    TestChanged,
+    /// The waived reason prose hash changed, staling the verdict.
+    ReasonChanged,
+}
+
+impl TestObligationDriftKind {
+    /// Returns the canonical kebab-case display name for this drift kind.
+    #[must_use]
+    pub fn as_kebab(&self) -> &'static str {
+        match self {
+            Self::Missing => "missing",
+            Self::Orphaned => "orphaned",
+            Self::SpecChanged => "spec_changed",
+            Self::DeclChanged => "decl_changed",
+            Self::TestChanged => "test_changed",
+            Self::ReasonChanged => "reason_changed",
+        }
+    }
+
+    /// Returns `true` for the existence family (`missing` / `orphaned`).
+    #[must_use]
+    pub fn is_existence(&self) -> bool {
+        match self {
+            Self::Missing | Self::Orphaned => true,
+            Self::SpecChanged | Self::DeclChanged | Self::TestChanged | Self::ReasonChanged => {
+                false
+            }
+        }
+    }
+
+    /// Returns `true` for the freshness family (the four `*_changed` kinds).
+    #[must_use]
+    pub fn is_freshness(&self) -> bool {
+        match self {
+            Self::SpecChanged | Self::DeclChanged | Self::TestChanged | Self::ReasonChanged => true,
+            Self::Missing | Self::Orphaned => false,
+        }
+    }
+}
+
+/// Failure category for an obligation-fulfillment verdict (IN-12 / AC-08).
+///
+/// Names why bound tests failed to fulfill an anchor's promise:
+/// [`Contradiction`](Self::Contradiction) — a test asserts the opposite of what
+/// the anchor promises; [`Substitution`](Self::Substitution) — a test cites the
+/// anchor but verifies unrelated content; [`CentralUnverified`](Self::CentralUnverified)
+/// — no contradiction or irrelevance, but the anchor's central behavior is left
+/// unverified.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum FulfillmentFailCategory {
+    /// A test asserts the opposite of the anchor's promise.
+    Contradiction,
+    /// A test cites the anchor but verifies unrelated content.
+    Substitution,
+    /// The anchor's central behavior is left unverified.
+    CentralUnverified,
+}
+
+impl FulfillmentFailCategory {
+    /// Returns the canonical kebab-case spelling for this fail category.
+    #[must_use]
+    pub fn as_kebab(&self) -> &'static str {
+        match self {
+            Self::Contradiction => "contradiction",
+            Self::Substitution => "substitution",
+            Self::CentralUnverified => "central_unverified",
+        }
+    }
+}
+
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
@@ -226,5 +319,52 @@ mod tests {
         assert_eq!(function, TargetEntryRoleKind::FunctionRole(FunctionRole::FreeFunction));
         assert_eq!(trait_impl, TargetEntryRoleKind::TraitImpl(ContractRole::ApplicationService));
         assert_ne!(data, pattern);
+    }
+
+    const ALL_DRIFT_KINDS: &[TestObligationDriftKind] = &[
+        TestObligationDriftKind::Missing,
+        TestObligationDriftKind::Orphaned,
+        TestObligationDriftKind::SpecChanged,
+        TestObligationDriftKind::DeclChanged,
+        TestObligationDriftKind::TestChanged,
+        TestObligationDriftKind::ReasonChanged,
+    ];
+
+    #[test]
+    fn test_drift_kind_families_partition_all_variants() {
+        for kind in ALL_DRIFT_KINDS {
+            assert_ne!(
+                kind.is_existence(),
+                kind.is_freshness(),
+                "each drift kind belongs to exactly one family: {kind:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn test_drift_kind_existence_and_freshness_membership() {
+        assert!(TestObligationDriftKind::Missing.is_existence());
+        assert!(TestObligationDriftKind::Orphaned.is_existence());
+        assert!(TestObligationDriftKind::SpecChanged.is_freshness());
+        assert!(TestObligationDriftKind::DeclChanged.is_freshness());
+        assert!(TestObligationDriftKind::TestChanged.is_freshness());
+        assert!(TestObligationDriftKind::ReasonChanged.is_freshness());
+    }
+
+    #[test]
+    fn test_drift_kind_kebab_spellings() {
+        assert_eq!(TestObligationDriftKind::Missing.as_kebab(), "missing");
+        assert_eq!(TestObligationDriftKind::Orphaned.as_kebab(), "orphaned");
+        assert_eq!(TestObligationDriftKind::SpecChanged.as_kebab(), "spec_changed");
+        assert_eq!(TestObligationDriftKind::DeclChanged.as_kebab(), "decl_changed");
+        assert_eq!(TestObligationDriftKind::TestChanged.as_kebab(), "test_changed");
+        assert_eq!(TestObligationDriftKind::ReasonChanged.as_kebab(), "reason_changed");
+    }
+
+    #[test]
+    fn test_fulfillment_fail_category_kebab_spellings() {
+        assert_eq!(FulfillmentFailCategory::Contradiction.as_kebab(), "contradiction");
+        assert_eq!(FulfillmentFailCategory::Substitution.as_kebab(), "substitution");
+        assert_eq!(FulfillmentFailCategory::CentralUnverified.as_kebab(), "central_unverified");
     }
 }

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "8e67aa965fdc3f01862718e0bfb3de8471c285226c245d7809c01dc02857af3b",
+  "catalogue_declaration_hash": "9e3b5f31241ec551037bf251b90c37a9a66feb96d0aa55dfc4e6312fbc58c086",
   "signals": [
     {
       "type_name": "AnchorTextHash",
@@ -41,6 +41,11 @@
       "type_name": "FulfillmentFailCategory",
       "signal": "blue",
       "entry_hash": "79f2c3b4bfec5e40295d27002bccfbd2878e5a16f07694284bfef477e63406cb"
+    },
+    {
+      "type_name": "NonEmptyTestLocations",
+      "signal": "blue",
+      "entry_hash": "8f43be4edf31ccc880eee46d8d22d4b4c9d569f1f4f212d5096e57ca5f958a5f"
     },
     {
       "type_name": "ObligationCheckError",
@@ -110,7 +115,7 @@
     {
       "type_name": "TestBindingRecord",
       "signal": "blue",
-      "entry_hash": "fbbb529ebec21020795d31fe34e94f7d67f4a906ecdd61305f6b0191b77d5ee6"
+      "entry_hash": "cedca2a43fbd85ff9fded00516235fe1a98c0b2c62222f1c65008600e165882c"
     },
     {
       "type_name": "TestBindingsDocument",

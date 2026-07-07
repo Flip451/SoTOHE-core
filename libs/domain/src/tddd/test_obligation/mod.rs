@@ -7,8 +7,14 @@
 //! fail-closed. See the track spec (IN-02 / IN-04 / IN-17 / CN-05 / CN-10) and
 //! ADR `2026-07-02-0359-test-obligation-and-fulfillment-gate`.
 
+pub mod binding;
+pub mod drift;
 pub mod errors;
+pub mod hashes;
 pub mod ids;
+pub mod obligations;
 pub mod ports;
 pub mod rules;
+pub mod scope;
+pub mod verdict;
 pub mod vocab;

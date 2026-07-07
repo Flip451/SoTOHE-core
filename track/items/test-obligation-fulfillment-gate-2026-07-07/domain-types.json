@@ -1014,6 +1014,26 @@
       "action": "reference",
       "for_type": "DomainError",
       "trait_ref": "core::convert::From<ValidationError>"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "NonEmptyTestLocations"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "NonEmptyTestLocations"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "NonEmptyTestLocations"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "NonEmptyTestLocations"
     }
   ],
   "traits": {
@@ -2732,7 +2752,7 @@
                 },
                 {
                   "name": "tests",
-                  "ty": "Vec<TestLocation>"
+                  "ty": "NonEmptyTestLocations"
                 }
               ],
               "kind": "struct"
@@ -2764,7 +2784,7 @@
                 },
                 {
                   "name": "tests",
-                  "ty": "Vec<TestLocation>"
+                  "ty": "NonEmptyTestLocations"
                 }
               ],
               "kind": "struct"
@@ -4830,6 +4850,117 @@
           "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
         }
       ]
+    },
+    "NonEmptyTestLocations": {
+      "action": "add",
+      "role": {
+        "ValueObject": {
+          "invariants": [
+            {
+              "name": "non_empty",
+              "predicate": {
+                "SelfMethod": "is_non_empty"
+              }
+            }
+          ]
+        }
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "tuple",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            {
+              "name": "first",
+              "ty": "TestLocation"
+            },
+            {
+              "name": "rest",
+              "ty": "Vec<TestLocation>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Constructor from a first TestLocation and remaining TestLocation values."
+        },
+        {
+          "name": "try_new",
+          "receiver": null,
+          "params": [
+            {
+              "name": "values",
+              "ty": "Vec<TestLocation>"
+            }
+          ],
+          "returns": "Result<Self, domain::tddd::catalogue_v2::roles::ConstructionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Fallible constructor from a TestLocation vector."
+        },
+        {
+          "name": "as_slice",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[TestLocation]",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Borrow the contained TestLocation values as a slice."
+        },
+        {
+          "name": "first",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&TestLocation",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Borrow the first contained TestLocation."
+        },
+        {
+          "name": "is_non_empty",
+          "receiver": "&self",
+          "params": [],
+          "returns": "bool",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Predicate for the `non_empty` invariant declaration."
+        }
+      ],
+      "module_path": "tddd::test_obligation::binding",
+      "docs": "Value object for TestLocation collections cited by IN-06 / AC-04 / AC-12.",
+      "spec_refs": [
+        {
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "anchor": "IN-06"
+        },
+        {
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "anchor": "AC-04"
+        },
+        {
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "anchor": "AC-12"
+        }
+      ],
+      "informal_grounds": []
     }
   }
 }

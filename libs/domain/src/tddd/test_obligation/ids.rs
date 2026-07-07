@@ -1,11 +1,24 @@
-//! Validated string newtypes shared across the test-obligation domain model.
+//! Validated string newtypes and identity value objects for the test-obligation
+//! domain model.
 //!
-//! Holds the foundational value objects that the rules / errors modules depend
-//! on: [`RoleName`] (a role identifier used in load-time diagnostics) and
-//! [`DiagnosticMessage`] (a non-empty human-readable diagnostic string). Both
-//! reject empty / whitespace-only input at construction (IN-04 / CN-05).
+//! Holds the foundational value objects the rules / errors / obligations modules
+//! depend on. Two families live here:
+//!
+//! * Load-time diagnostic newtypes: [`RoleName`] (a role identifier used in
+//!   load-time diagnostics) and [`DiagnosticMessage`] (a non-empty human-readable
+//!   diagnostic string), both rejecting empty / whitespace-only input (IN-04 /
+//!   CN-05).
+//! * Obligation / binding identity value objects: [`TestObligationId`],
+//!   [`TestObligationAnchorId`], [`TestObligationEdgeId`],
+//!   [`TestObligationItemIdentifier`], [`TestObligationBrief`],
+//!   [`TestModulePath`], [`TestFunctionName`], and [`WaivedReason`]. These carry
+//!   the obligation / edge identity derived from catalogue entry keys plus spec /
+//!   ADR anchors, kept as distinct types so identity fields cannot be swapped
+//!   (IN-05 / IN-06 / CN-01).
 
 use crate::ValidationError;
+use crate::tddd::semantic_verify::CatalogueEntryKey;
+use crate::tddd::test_obligation::vocab::TestObligationKind;
 
 /// A validated role name used in test-obligation rules diagnostics.
 ///
@@ -72,6 +85,272 @@ impl DiagnosticMessage {
     }
 }
 
+/// Validated non-empty item identifier component of a [`TestObligationId`].
+///
+/// Distinguishes the specific declaration facet (method name, invariant label,
+/// etc.) an obligation targets within a catalogue entry (IN-05 / CN-01).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TestObligationItemIdentifier {
+    value: String,
+}
+
+impl TestObligationItemIdentifier {
+    /// Validate and wrap `value` as a [`TestObligationItemIdentifier`].
+    ///
+    /// # Errors
+    ///
+    /// Returns [`ValidationError::EmptyString`] when `value` is empty or
+    /// whitespace-only.
+    pub fn try_new(value: String) -> Result<Self, ValidationError> {
+        if value.trim().is_empty() {
+            return Err(ValidationError::EmptyString);
+        }
+        Ok(Self { value })
+    }
+
+    /// Borrow the inner identifier string.
+    #[must_use]
+    pub fn as_str(&self) -> &str {
+        &self.value
+    }
+}
+
+/// Stable identity of a single derived test obligation.
+///
+/// Derived purely from identity inputs — the catalogue entry key, the obligation
+/// kind, and the item identifier — so the same obligation keeps the same id
+/// across runs regardless of surrounding declaration detail (IN-05 / CN-01 /
+/// AC-03, ADR D9).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TestObligationId {
+    entry_key: CatalogueEntryKey,
+    obligation_kind: TestObligationKind,
+    item_identifier: TestObligationItemIdentifier,
+}
+
+impl TestObligationId {
+    /// Builds a [`TestObligationId`] from its identity components.
+    #[must_use]
+    pub fn new(
+        entry_key: CatalogueEntryKey,
+        obligation_kind: TestObligationKind,
+        item_identifier: TestObligationItemIdentifier,
+    ) -> Self {
+        Self { entry_key, obligation_kind, item_identifier }
+    }
+
+    /// Returns the catalogue entry key this obligation targets.
+    #[must_use]
+    pub fn entry_key(&self) -> &CatalogueEntryKey {
+        &self.entry_key
+    }
+
+    /// Returns the obligation kind.
+    #[must_use]
+    pub fn obligation_kind(&self) -> &TestObligationKind {
+        &self.obligation_kind
+    }
+
+    /// Returns the item identifier component.
+    #[must_use]
+    pub fn item_identifier(&self) -> &TestObligationItemIdentifier {
+        &self.item_identifier
+    }
+}
+
+/// Identifier of a spec or ADR anchor a test obligation binds to.
+///
+/// Pairs the anchor's source file path with the element id (e.g. `IN-05`, `D9`).
+/// Both components are opaque non-empty strings, validated only for emptiness —
+/// path existence and anchor-format checks happen at their respective boundaries
+/// (IN-06).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TestObligationAnchorId {
+    file_path: String,
+    element_id: String,
+}
+
+impl TestObligationAnchorId {
+    /// Validate and wrap `file_path` / `element_id` as a
+    /// [`TestObligationAnchorId`].
+    ///
+    /// # Errors
+    ///
+    /// Returns [`ValidationError::EmptyString`] when either component is empty or
+    /// whitespace-only.
+    pub fn try_new(file_path: String, element_id: String) -> Result<Self, ValidationError> {
+        if file_path.trim().is_empty() || element_id.trim().is_empty() {
+            return Err(ValidationError::EmptyString);
+        }
+        Ok(Self { file_path, element_id })
+    }
+
+    /// Borrow the anchor's source file path.
+    #[must_use]
+    pub fn file_path(&self) -> &str {
+        &self.file_path
+    }
+
+    /// Borrow the anchor's element id.
+    #[must_use]
+    pub fn element_id(&self) -> &str {
+        &self.element_id
+    }
+}
+
+/// Stable identity of a single obligation → anchor binding edge.
+///
+/// Derived from the catalogue entry key plus the [`TestObligationAnchorId`] it
+/// resolves against, so a binding edge is addressable independently of the tests
+/// bound to it (IN-06 / IN-08 / CN-02).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TestObligationEdgeId {
+    entry_key: CatalogueEntryKey,
+    anchor_id: TestObligationAnchorId,
+}
+
+impl TestObligationEdgeId {
+    /// Builds a [`TestObligationEdgeId`] from its identity components.
+    #[must_use]
+    pub fn new(entry_key: CatalogueEntryKey, anchor_id: TestObligationAnchorId) -> Self {
+        Self { entry_key, anchor_id }
+    }
+
+    /// Returns the catalogue entry key this edge originates from.
+    #[must_use]
+    pub fn entry_key(&self) -> &CatalogueEntryKey {
+        &self.entry_key
+    }
+
+    /// Returns the anchor this edge resolves against.
+    #[must_use]
+    pub fn anchor_id(&self) -> &TestObligationAnchorId {
+        &self.anchor_id
+    }
+}
+
+/// Non-empty brief text describing what a derived obligation requires.
+///
+/// Expanded from a rule's brief template for the implementer; rejects empty /
+/// whitespace-only input so an obligation is never presented without guidance
+/// (IN-05 / CN-14).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TestObligationBrief {
+    text: String,
+}
+
+impl TestObligationBrief {
+    /// Validate and wrap `text` as a [`TestObligationBrief`].
+    ///
+    /// # Errors
+    ///
+    /// Returns [`ValidationError::EmptyString`] when `text` is empty or
+    /// whitespace-only.
+    pub fn try_new(text: String) -> Result<Self, ValidationError> {
+        if text.trim().is_empty() {
+            return Err(ValidationError::EmptyString);
+        }
+        Ok(Self { text })
+    }
+
+    /// Borrow the inner brief text.
+    #[must_use]
+    pub fn as_str(&self) -> &str {
+        &self.text
+    }
+}
+
+/// Validated non-empty module path (e.g. `foo::bar`) recorded in a test binding.
+///
+/// Stored as an opaque non-empty string — path-syntax validation happens where
+/// the binding is scanned (IN-06, ADR D9).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TestModulePath {
+    value: String,
+}
+
+impl TestModulePath {
+    /// Validate and wrap `value` as a [`TestModulePath`].
+    ///
+    /// # Errors
+    ///
+    /// Returns [`ValidationError::EmptyString`] when `value` is empty or
+    /// whitespace-only.
+    pub fn try_new(value: String) -> Result<Self, ValidationError> {
+        if value.trim().is_empty() {
+            return Err(ValidationError::EmptyString);
+        }
+        Ok(Self { value })
+    }
+
+    /// Borrow the inner module path.
+    #[must_use]
+    pub fn as_str(&self) -> &str {
+        &self.value
+    }
+}
+
+/// Validated non-empty Rust test function name recorded in a test binding.
+///
+/// Stored as an opaque non-empty string — identifier-syntax validation happens
+/// where the binding is scanned (IN-06, ADR D9).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TestFunctionName {
+    name: String,
+}
+
+impl TestFunctionName {
+    /// Validate and wrap `name` as a [`TestFunctionName`].
+    ///
+    /// # Errors
+    ///
+    /// Returns [`ValidationError::EmptyString`] when `name` is empty or
+    /// whitespace-only.
+    pub fn try_new(name: String) -> Result<Self, ValidationError> {
+        if name.trim().is_empty() {
+            return Err(ValidationError::EmptyString);
+        }
+        Ok(Self { name })
+    }
+
+    /// Borrow the inner function name.
+    #[must_use]
+    pub fn as_str(&self) -> &str {
+        &self.name
+    }
+}
+
+/// Non-empty free-text reason recorded when an obligation edge is waived.
+///
+/// Carried by a test-bindings artifact to justify a deliberately unbound
+/// obligation; empty / whitespace-only input is rejected so a waiver can never
+/// be silent (IN-06 / AC-11).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct WaivedReason {
+    text: String,
+}
+
+impl WaivedReason {
+    /// Validate and wrap `text` as a [`WaivedReason`].
+    ///
+    /// # Errors
+    ///
+    /// Returns [`ValidationError::EmptyString`] when `text` is empty or
+    /// whitespace-only.
+    pub fn try_new(text: String) -> Result<Self, ValidationError> {
+        if text.trim().is_empty() {
+            return Err(ValidationError::EmptyString);
+        }
+        Ok(Self { text })
+    }
+
+    /// Borrow the inner waiver reason.
+    #[must_use]
+    pub fn as_str(&self) -> &str {
+        &self.text
+    }
+}
+
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
@@ -110,5 +389,120 @@ mod tests {
             DiagnosticMessage::try_new(" \n\t ".to_owned()),
             Err(ValidationError::EmptyString)
         );
+    }
+
+    fn entry_key(raw: &str) -> CatalogueEntryKey {
+        CatalogueEntryKey::try_new(raw.to_owned()).unwrap()
+    }
+
+    #[test]
+    fn test_item_identifier_accepts_non_empty() {
+        let id = TestObligationItemIdentifier::try_new("method:find_by_email".to_owned()).unwrap();
+        assert_eq!(id.as_str(), "method:find_by_email");
+    }
+
+    #[test]
+    fn test_item_identifier_rejects_blank() {
+        assert_eq!(
+            TestObligationItemIdentifier::try_new("  ".to_owned()),
+            Err(ValidationError::EmptyString)
+        );
+    }
+
+    #[test]
+    fn test_obligation_id_exposes_identity_components() {
+        let item = TestObligationItemIdentifier::try_new("invariant:non_empty".to_owned()).unwrap();
+        let id = TestObligationId::new(
+            entry_key("domain::User"),
+            TestObligationKind::Boundary,
+            item.clone(),
+        );
+        assert_eq!(id.entry_key().as_str(), "domain::User");
+        assert_eq!(id.obligation_kind(), &TestObligationKind::Boundary);
+        assert_eq!(id.item_identifier(), &item);
+    }
+
+    #[test]
+    fn test_anchor_id_accepts_non_empty_pair() {
+        let anchor = TestObligationAnchorId::try_new(
+            "track/items/x/spec.json".to_owned(),
+            "IN-05".to_owned(),
+        )
+        .unwrap();
+        assert_eq!(anchor.file_path(), "track/items/x/spec.json");
+        assert_eq!(anchor.element_id(), "IN-05");
+    }
+
+    #[test]
+    fn test_anchor_id_rejects_empty_file_path() {
+        assert_eq!(
+            TestObligationAnchorId::try_new(String::new(), "IN-05".to_owned()),
+            Err(ValidationError::EmptyString)
+        );
+    }
+
+    #[test]
+    fn test_anchor_id_rejects_empty_element_id() {
+        assert_eq!(
+            TestObligationAnchorId::try_new("spec.json".to_owned(), "   ".to_owned()),
+            Err(ValidationError::EmptyString)
+        );
+    }
+
+    #[test]
+    fn test_edge_id_exposes_identity_components() {
+        let anchor =
+            TestObligationAnchorId::try_new("spec.json".to_owned(), "IN-06".to_owned()).unwrap();
+        let edge = TestObligationEdgeId::new(entry_key("domain::User"), anchor.clone());
+        assert_eq!(edge.entry_key().as_str(), "domain::User");
+        assert_eq!(edge.anchor_id(), &anchor);
+    }
+
+    #[test]
+    fn test_obligation_brief_rejects_blank() {
+        assert_eq!(
+            TestObligationBrief::try_new(" \t ".to_owned()),
+            Err(ValidationError::EmptyString)
+        );
+    }
+
+    #[test]
+    fn test_obligation_brief_accepts_non_empty() {
+        let brief =
+            TestObligationBrief::try_new("cover the empty-input branch".to_owned()).unwrap();
+        assert_eq!(brief.as_str(), "cover the empty-input branch");
+    }
+
+    #[test]
+    fn test_module_path_round_trips() {
+        let path = TestModulePath::try_new("domain::user::tests".to_owned()).unwrap();
+        assert_eq!(path.as_str(), "domain::user::tests");
+    }
+
+    #[test]
+    fn test_module_path_rejects_blank() {
+        assert_eq!(TestModulePath::try_new(String::new()), Err(ValidationError::EmptyString));
+    }
+
+    #[test]
+    fn test_function_name_round_trips() {
+        let name = TestFunctionName::try_new("test_rejects_empty".to_owned()).unwrap();
+        assert_eq!(name.as_str(), "test_rejects_empty");
+    }
+
+    #[test]
+    fn test_function_name_rejects_blank() {
+        assert_eq!(TestFunctionName::try_new("  ".to_owned()), Err(ValidationError::EmptyString));
+    }
+
+    #[test]
+    fn test_waived_reason_round_trips() {
+        let reason = WaivedReason::try_new("covered by integration suite".to_owned()).unwrap();
+        assert_eq!(reason.as_str(), "covered by integration suite");
+    }
+
+    #[test]
+    fn test_waived_reason_rejects_blank() {
+        assert_eq!(WaivedReason::try_new(String::new()), Err(ValidationError::EmptyString));
     }
 }

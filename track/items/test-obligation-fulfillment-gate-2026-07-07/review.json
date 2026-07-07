@@ -1,66 +1,36 @@
 {
   "schema_version": 2,
   "scopes": {
-    "infrastructure": {
+    "adr": {
       "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`JsonTestObligationRulesLoader::load` reads `config_path` with `read_to_string` but never rejects symlinks. That means a symlinked `test-obligation-rules.json` will be followed to its target instead of enforcing real-file semantics, unlike the other config loaders in this repo that `symlink_metadata()` and fail closed before reading.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/test_obligation/rules_codec.rs",
-              "line": 210,
-              "category": "symlink not rejected at boundary"
-            }
-          ],
-          "hash": "rvw1:sha256:b0b4404aafdcfb307011e69ec47d371899b048c4cac6b98324e932c7d49442f4",
-          "at": "2026-07-07T18:06:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This guard only rejects symlinks; it never canonicalizes or verifies that `config_path` stays within a fixed trusted root. A non-symlink path with `..` components can therefore escape the expected `.harness/config` boundary and be read directly. The existing `scope_config_loader.rs` pattern canonicalizes the root/path and `starts_with`-checks containment before reading.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/test_obligation/rules_codec.rs",
-              "line": 223,
-              "category": "trusted-root violation"
-            }
-          ],
-          "hash": "rvw1:sha256:4784c326a4e1cdc7dde7a31e580490fe89b9ce9649b3924ae4140a961ffa2e7d",
-          "at": "2026-07-07T18:29:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`JsonTestObligationRulesLoader` does not anchor its trust boundary to an external `trusted_root`. When `.harness/config` is absent, `infer_symlink_trusted_root` and `infer_config_boundary_root` both fall back to `config_path.parent()`, so the containment check at `guard_config_path` becomes tautological and the adapter will read arbitrary files or files under a symlinked directory if the leaf itself is not a symlink. This is a trusted-root violation; compare the explicit `trusted_root` + canonicalize pattern used by `load_v2_scope_config` in `review_v2/scope_config_loader.rs`.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/test_obligation/rules_codec.rs",
-              "line": 223,
-              "category": "trusted-root violation"
-            }
-          ],
-          "hash": "rvw1:sha256:de91c0b0d96e3feccfdecfcdfad33724c2ae5b1afdd806a1e4a07fe78f1d0b71",
-          "at": "2026-07-07T18:40:09Z"
-        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:590e618dac6a1f1cbcbc2c7ecaa84f231a59f8b88189febb8c00ff0241c0496c",
-          "at": "2026-07-07T18:50:31Z"
+          "hash": "rvw1:sha256:2bc64b9f58b9c4710696f36d1807aa28299c3ef207394ca315bb874c6a22c115",
+          "at": "2026-07-07T08:38:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D9 makes `anchor id` part of the obligation id, but D2 explicitly says obligations are derived per entry and are not multiplied by cite count. Downstream derivation cannot know whether to emit one obligation per declaration item, reusing its test group across all cited anchors, or one obligation per `(entry, anchor, kind, item)`. That changes obligation counts, binding shape, and totality semantics, so the ADR needs one consistent identity model before spec/types can translate it.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+              "line": 224,
+              "category": "inconsistent_decisions"
+            }
+          ],
+          "hash": "rvw1:sha256:2bc64b9f58b9c4710696f36d1807aa28299c3ef207394ca315bb874c6a22c115",
+          "at": "2026-07-07T08:41:44Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:590e618dac6a1f1cbcbc2c7ecaa84f231a59f8b88189febb8c00ff0241c0496c",
-          "at": "2026-07-07T18:54:31Z"
+          "hash": "rvw1:sha256:c597270bfdf492126d9a4038ef233eb9ae3cba96657c8f231b9aeac5a6914bd0",
+          "at": "2026-07-07T08:52:17Z"
         }
       ]
     },
@@ -404,127 +374,42 @@
           "findings": [],
           "hash": "rvw1:sha256:913242546aef791c7ff6d7de15532340adee77f4ea9f5bba188778cc0b16d354",
           "at": "2026-07-07T21:01:05Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:69f14b4393f0e49a8e5650a1baf701821f483d322973f8ee968bba24f18a9335",
-          "at": "2026-07-07T18:03:00Z"
+          "hash": "rvw1:sha256:fcddc6f0fbd933f223d45c24782b84c1da1370291fa2b2f6f038810bf78639f9",
+          "at": "2026-07-07T21:38:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fcddc6f0fbd933f223d45c24782b84c1da1370291fa2b2f6f038810bf78639f9",
+          "at": "2026-07-07T21:41:32Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`SemanticEscalationDriverPort` is the shared escalation/cache port for concurrent semantic evaluation, but the trait leaves `P`, `K`, `V`, `E`, and the future produced by the public `async fn` unconstrained. A non-`Send`/non-`Sync` implementation can satisfy this usecase port, so later ref-verify or obligation-gate orchestration cannot safely fan out evaluations across workers despite the port contract being the concurrency boundary. Add the required `Send`/`Sync` bounds and use a `Send` future shape at the trait boundary instead of an unconstrained public `async fn`.",
+              "message": "T007 now attributes the domain catalogue entry `NonEmptyTestLocations` in `task-contract.json`, but the T007 task text in `impl-plan.json`/`plan.md` only adds `TestObligation`, `ObligationsDocument`, `TestLocation`, `TestBindingRecord`, `TestBindingsDocument`, `TestObligationScopePresence`, and `UncitedSpecElementFinding`. That makes the task-contract claim work that the executable task description does not touch, so the implementer has no plan instruction to add or verify `NonEmptyTestLocations`. Remove this attribution or add the entry explicitly to T007's task description and rendered plan.",
               "severity": "P1",
-              "file": "libs/usecase/src/semantic_verdict_core/driver.rs",
-              "line": 21,
-              "category": "purity violation by trait or generic"
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/task-contract.json",
+              "line": 63,
+              "category": "task-contract attribution mismatch"
             }
           ],
-          "hash": "rvw1:sha256:69f14b4393f0e49a8e5650a1baf701821f483d322973f8ee968bba24f18a9335",
-          "at": "2026-07-07T18:07:11Z"
+          "hash": "rvw1:sha256:b583d7be9902e13507e8a7b8d679b2ae2e4b46c15af3d14fab6dc94ec1496c47",
+          "at": "2026-07-07T22:38:18Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7febbedb200015d97b4887d237b8bdc37a49453d65756bb9c28b8a2deeb3a3f7",
-          "at": "2026-07-07T18:26:51Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2bc64b9f58b9c4710696f36d1807aa28299c3ef207394ca315bb874c6a22c115",
-          "at": "2026-07-07T08:38:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D9 makes `anchor id` part of the obligation id, but D2 explicitly says obligations are derived per entry and are not multiplied by cite count. Downstream derivation cannot know whether to emit one obligation per declaration item, reusing its test group across all cited anchors, or one obligation per `(entry, anchor, kind, item)`. That changes obligation counts, binding shape, and totality semantics, so the ADR needs one consistent identity model before spec/types can translate it.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
-              "line": 224,
-              "category": "inconsistent_decisions"
-            }
-          ],
-          "hash": "rvw1:sha256:2bc64b9f58b9c4710696f36d1807aa28299c3ef207394ca315bb874c6a22c115",
-          "at": "2026-07-07T08:41:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c597270bfdf492126d9a4038ef233eb9ae3cba96657c8f231b9aeac5a6914bd0",
-          "at": "2026-07-07T08:52:17Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:882d1c1b6579f723fbe86dcecd992a43da36f1bf985771a45c5ab857cf7ea0fc",
-          "at": "2026-07-07T18:02:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TestObligationRulesLoaderPort` is a domain-owned trait for loading `.harness/config/test-obligation-rules.json` from a configured source and reporting I/O / malformed JSON failures. That abstracts an infrastructure/application capability, while `knowledge/conventions/hexagonal-architecture.md` §Port Placement Rules says ports for infrastructure functions belong in `usecase`, with domain ports reserved for domain concepts such as persistence/worktree state. Keeping this loader in `libs/domain` misplaces the port boundary for the derivation/check use cases.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/test_obligation/ports.rs",
-              "line": 17,
-              "category": "port misplaced"
-            }
-          ],
-          "hash": "rvw1:sha256:882d1c1b6579f723fbe86dcecd992a43da36f1bf985771a45c5ab857cf7ea0fc",
-          "at": "2026-07-07T18:07:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:882d1c1b6579f723fbe86dcecd992a43da36f1bf985771a45c5ab857cf7ea0fc",
-          "at": "2026-07-07T18:29:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TargetEntryRoleKind` does not make the role-section invariant unrepresentable: each section variant accepts the global `RoleKind`, so callers can construct invalid states such as `TargetEntryRoleKind::DataRole(RoleKind::Repository)` or `ContractRole(RoleKind::ValueObject)`. Because this is public domain API and there is no validating constructor or narrower per-section role type, downstream rule lookup can receive a target whose outer section and inner role disagree. This violates the domain enum/type-safety intent from `prefer-type-safe-abstractions.md` §Enum-first; use section-specific payloads or otherwise prevent mismatched construction.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/test_obligation/vocab.rs",
-              "line": 132,
-              "category": "enum-first violation"
-            }
-          ],
-          "hash": "rvw1:sha256:882d1c1b6579f723fbe86dcecd992a43da36f1bf985771a45c5ab857cf7ea0fc",
-          "at": "2026-07-07T18:33:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f1f3b6ec5a5828195fe15a0dfd8b619041583471af2be6b694649ec9f4a736c5",
-          "at": "2026-07-07T18:40:29Z"
+          "hash": "rvw1:sha256:b155724b5129f172884443ecfdc6f7e89fe7182d5d297f79eff21106e71522b7",
+          "at": "2026-07-07T22:41:28Z"
         }
       ]
     },
@@ -1136,31 +1021,142 @@
           "findings": [],
           "hash": "rvw1:sha256:e06912b99eb824069faed8194f05ddb4a70d51d71fb6d09b51c6253a0e49bb4e",
           "at": "2026-07-07T20:45:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`NonEmptyTestLocations` restates upstream behavior in its catalogue docs instead of limiting the type entry to the local declaration plus anchor cites. The entry explains the Fulfillment/VoluntaryBinding non-empty binding rule, the `JsonTestBindingsCodec` fail-closed boundary behavior, and the rationale for replacing `Vec<TestLocation>`; those are IN-06/AC-04/AC-12/D9 behavioral decisions and belong in the upstream spec/ADR per `knowledge/conventions/no-upstream-restatement.md`. Keeping that prose here creates a second source of truth if the binding semantics change.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "line": 4948,
+              "category": "SoT integrity / upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:1442ed071f897c9797d66e98ea4b2f783956899c456c02b7fe2abda41b2f3a88",
+          "at": "2026-07-07T22:39:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f255dc73e48cad342e48b5c404856949008103c3cff3af43ed535023f8985591",
+          "at": "2026-07-07T22:43:22Z"
         }
       ]
     },
-    "spec": {
+    "domain": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:6b7a9402253fdb24d2375eb435222baa00a442a17e006f253b8639ca97f30d90",
-          "at": "2026-07-07T11:44:55Z"
+          "hash": "rvw1:sha256:882d1c1b6579f723fbe86dcecd992a43da36f1bf985771a45c5ab857cf7ea0fc",
+          "at": "2026-07-07T18:02:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TestObligationRulesLoaderPort` is a domain-owned trait for loading `.harness/config/test-obligation-rules.json` from a configured source and reporting I/O / malformed JSON failures. That abstracts an infrastructure/application capability, while `knowledge/conventions/hexagonal-architecture.md` §Port Placement Rules says ports for infrastructure functions belong in `usecase`, with domain ports reserved for domain concepts such as persistence/worktree state. Keeping this loader in `libs/domain` misplaces the port boundary for the derivation/check use cases.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/test_obligation/ports.rs",
+              "line": 17,
+              "category": "port misplaced"
+            }
+          ],
+          "hash": "rvw1:sha256:882d1c1b6579f723fbe86dcecd992a43da36f1bf985771a45c5ab857cf7ea0fc",
+          "at": "2026-07-07T18:07:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:882d1c1b6579f723fbe86dcecd992a43da36f1bf985771a45c5ab857cf7ea0fc",
+          "at": "2026-07-07T18:29:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TargetEntryRoleKind` does not make the role-section invariant unrepresentable: each section variant accepts the global `RoleKind`, so callers can construct invalid states such as `TargetEntryRoleKind::DataRole(RoleKind::Repository)` or `ContractRole(RoleKind::ValueObject)`. Because this is public domain API and there is no validating constructor or narrower per-section role type, downstream rule lookup can receive a target whose outer section and inner role disagree. This violates the domain enum/type-safety intent from `prefer-type-safe-abstractions.md` §Enum-first; use section-specific payloads or otherwise prevent mismatched construction.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/test_obligation/vocab.rs",
+              "line": 132,
+              "category": "enum-first violation"
+            }
+          ],
+          "hash": "rvw1:sha256:882d1c1b6579f723fbe86dcecd992a43da36f1bf985771a45c5ab857cf7ea0fc",
+          "at": "2026-07-07T18:33:43Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:6b7a9402253fdb24d2375eb435222baa00a442a17e006f253b8639ca97f30d90",
-          "at": "2026-07-07T11:48:41Z"
+          "hash": "rvw1:sha256:f1f3b6ec5a5828195fe15a0dfd8b619041583471af2be6b694649ec9f4a736c5",
+          "at": "2026-07-07T18:40:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:688b238bb25eac6e6e64ec87b00ee0e380b719eece7ec2043ab39769c6496da9",
+          "at": "2026-07-07T21:41:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TestBindingRecord::Fulfillment` and `VoluntaryBinding` expose raw `Vec<TestLocation>` fields, so callers can construct a binding with `tests: vec![]`. That makes an obligation look bound while carrying no executable test evidence, undermining IN-06/AC-04's fail-closed binding check. Use a non-empty test-location collection newtype or private variants plus validating constructors so empty bindings are unrepresentable.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/test_obligation/binding.rs",
+              "line": 64,
+              "category": "primitive obsession"
+            }
+          ],
+          "hash": "rvw1:sha256:688b238bb25eac6e6e64ec87b00ee0e380b719eece7ec2043ab39769c6496da9",
+          "at": "2026-07-07T21:45:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TestBindingRecord` stores bound tests as a raw `Vec<TestLocation>` for fulfillment/voluntary bindings, with no non-empty value object or fallible constructor. The variant docs define these records as binding tests, but the domain type can still represent an empty test set, so the obligation gate can no longer rely on the type to distinguish a real test binding from no evidence. Encode the non-empty bound-test-set invariant in the type or constructor.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/test_obligation/binding.rs",
+              "line": 68,
+              "category": "primitive obsession"
+            }
+          ],
+          "hash": "rvw1:sha256:32e0fa2f2ce907da1dfcb1104f6b3bde909b6345930c3b231127c6dfb6f9162e",
+          "at": "2026-07-07T21:59:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`NonEmptyTestLocations::first` uses production index access (`&self.0[0]`). The domain severity policy classifies index access outside `#[cfg(test)]` as panic-able library code under `coding-principles.md` §No Panics in Library Code; this method should avoid a panic-capable indexing operation even though constructors intend to preserve the non-empty invariant.",
+              "severity": "P0",
+              "file": "libs/domain/src/tddd/test_obligation/binding.rs",
+              "line": 96,
+              "category": "panic-able production code"
+            }
+          ],
+          "hash": "rvw1:sha256:b3c0a60fae3b44c9432526d15f641c77f488b9bc7cb7103e23958579a0e692ff",
+          "at": "2026-07-07T22:23:31Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:17f63b9787ca911a334b5bfdc3527f95e13f36c1b32058ef87ff4c51f450a407",
-          "at": "2026-07-07T15:58:51Z"
+          "hash": "rvw1:sha256:6642d242b58593d1872147bac65e80f30b79bd8046cdb0000b5d73b18c68ff44",
+          "at": "2026-07-07T22:35:00Z"
         }
       ]
     },
@@ -1193,6 +1189,127 @@
           "findings": [],
           "hash": "rvw1:sha256:d221f13079ac52fea12d5d991e74d9aad1e3bc97af5b4d7ee79df944c2bf3983",
           "at": "2026-07-07T18:06:39Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6b7a9402253fdb24d2375eb435222baa00a442a17e006f253b8639ca97f30d90",
+          "at": "2026-07-07T11:44:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6b7a9402253fdb24d2375eb435222baa00a442a17e006f253b8639ca97f30d90",
+          "at": "2026-07-07T11:48:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:17f63b9787ca911a334b5bfdc3527f95e13f36c1b32058ef87ff4c51f450a407",
+          "at": "2026-07-07T15:58:51Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`JsonTestObligationRulesLoader::load` reads `config_path` with `read_to_string` but never rejects symlinks. That means a symlinked `test-obligation-rules.json` will be followed to its target instead of enforcing real-file semantics, unlike the other config loaders in this repo that `symlink_metadata()` and fail closed before reading.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/test_obligation/rules_codec.rs",
+              "line": 210,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:b0b4404aafdcfb307011e69ec47d371899b048c4cac6b98324e932c7d49442f4",
+          "at": "2026-07-07T18:06:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This guard only rejects symlinks; it never canonicalizes or verifies that `config_path` stays within a fixed trusted root. A non-symlink path with `..` components can therefore escape the expected `.harness/config` boundary and be read directly. The existing `scope_config_loader.rs` pattern canonicalizes the root/path and `starts_with`-checks containment before reading.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/test_obligation/rules_codec.rs",
+              "line": 223,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:4784c326a4e1cdc7dde7a31e580490fe89b9ce9649b3924ae4140a961ffa2e7d",
+          "at": "2026-07-07T18:29:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`JsonTestObligationRulesLoader` does not anchor its trust boundary to an external `trusted_root`. When `.harness/config` is absent, `infer_symlink_trusted_root` and `infer_config_boundary_root` both fall back to `config_path.parent()`, so the containment check at `guard_config_path` becomes tautological and the adapter will read arbitrary files or files under a symlinked directory if the leaf itself is not a symlink. This is a trusted-root violation; compare the explicit `trusted_root` + canonicalize pattern used by `load_v2_scope_config` in `review_v2/scope_config_loader.rs`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/test_obligation/rules_codec.rs",
+              "line": 223,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:de91c0b0d96e3feccfdecfcdfad33724c2ae5b1afdd806a1e4a07fe78f1d0b71",
+          "at": "2026-07-07T18:40:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:590e618dac6a1f1cbcbc2c7ecaa84f231a59f8b88189febb8c00ff0241c0496c",
+          "at": "2026-07-07T18:50:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:590e618dac6a1f1cbcbc2c7ecaa84f231a59f8b88189febb8c00ff0241c0496c",
+          "at": "2026-07-07T18:54:31Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69f14b4393f0e49a8e5650a1baf701821f483d322973f8ee968bba24f18a9335",
+          "at": "2026-07-07T18:03:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SemanticEscalationDriverPort` is the shared escalation/cache port for concurrent semantic evaluation, but the trait leaves `P`, `K`, `V`, `E`, and the future produced by the public `async fn` unconstrained. A non-`Send`/non-`Sync` implementation can satisfy this usecase port, so later ref-verify or obligation-gate orchestration cannot safely fan out evaluations across workers despite the port contract being the concurrency boundary. Add the required `Send`/`Sync` bounds and use a `Send` future shape at the trait boundary instead of an unconstrained public `async fn`.",
+              "severity": "P1",
+              "file": "libs/usecase/src/semantic_verdict_core/driver.rs",
+              "line": 21,
+              "category": "purity violation by trait or generic"
+            }
+          ],
+          "hash": "rvw1:sha256:69f14b4393f0e49a8e5650a1baf701821f483d322973f8ee968bba24f18a9335",
+          "at": "2026-07-07T18:07:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7febbedb200015d97b4887d237b8bdc37a49453d65756bb9c28b8a2deeb3a3f7",
+          "at": "2026-07-07T18:26:51Z"
         }
       ]
     }

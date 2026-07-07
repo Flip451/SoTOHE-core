@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-07T21:02:59Z",
-  "declaration_hash": "8e67aa965fdc3f01862718e0bfb3de8471c285226c245d7809c01dc02857af3b",
+  "generated_at": "2026-07-07T22:45:01Z",
+  "declaration_hash": "9e3b5f31241ec551037bf251b90c37a9a66feb96d0aa55dfc4e6312fbc58c086",
   "signals": [
     {
       "type_name": "AnchorTextHash",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -18,9 +18,9 @@
     {
       "type_name": "ArtifactCodecError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::error::Error",
         "core::fmt::Debug",
         "core::fmt::Display"
@@ -29,9 +29,9 @@
     {
       "type_name": "BoundTestsSetHash",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -41,9 +41,9 @@
     {
       "type_name": "DeclarationHash",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -66,9 +66,9 @@
     {
       "type_name": "EdgeResolutionOutcome",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -78,9 +78,9 @@
     {
       "type_name": "EdgeVerdictRecord",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -90,9 +90,21 @@
     {
       "type_name": "FulfillmentFailCategory",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "NonEmptyTestLocations",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -102,36 +114,36 @@
     {
       "type_name": "ObligationCheckError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::fmt::Debug"
       ]
     },
     {
       "type_name": "ObligationDeriveError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::fmt::Debug"
       ]
     },
     {
       "type_name": "ObligationEvaluateError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::fmt::Debug"
       ]
     },
     {
       "type_name": "ObligationFulfillmentCacheDocument",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -141,9 +153,9 @@
     {
       "type_name": "ObligationFulfillmentCacheEntry",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -153,9 +165,9 @@
     {
       "type_name": "ObligationFulfillmentCacheKey",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -165,15 +177,15 @@
     {
       "type_name": "ObligationFulfillmentCachePort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "ObligationFulfillmentVerdict",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -183,30 +195,30 @@
     {
       "type_name": "ObligationFulfillmentVerifierPort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "ObligationResultsError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::fmt::Debug"
       ]
     },
     {
       "type_name": "ObligationsArtifactPort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "ObligationsDocument",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -241,9 +253,9 @@
     {
       "type_name": "SemanticVerifierError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::error::Error",
         "core::fmt::Debug",
         "core::fmt::Display"
@@ -264,9 +276,9 @@
     {
       "type_name": "TestBindingRecord",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -276,15 +288,15 @@
     {
       "type_name": "TestBindingsArtifactPort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "TestBindingsDocument",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -294,9 +306,9 @@
     {
       "type_name": "TestBodySpanHash",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -306,9 +318,9 @@
     {
       "type_name": "TestFunctionName",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -318,9 +330,9 @@
     {
       "type_name": "TestLocation",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -330,9 +342,9 @@
     {
       "type_name": "TestModulePath",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -342,9 +354,9 @@
     {
       "type_name": "TestObligation",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -354,9 +366,9 @@
     {
       "type_name": "TestObligationAnchorId",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -366,9 +378,9 @@
     {
       "type_name": "TestObligationBrief",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -390,9 +402,9 @@
     {
       "type_name": "TestObligationDrift",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -402,9 +414,9 @@
     {
       "type_name": "TestObligationDriftKind",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -414,9 +426,9 @@
     {
       "type_name": "TestObligationEdgeId",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -426,9 +438,9 @@
     {
       "type_name": "TestObligationId",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -438,9 +450,9 @@
     {
       "type_name": "TestObligationItemIdentifier",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -537,9 +549,9 @@
     {
       "type_name": "TestObligationScopePresence",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -549,9 +561,9 @@
     {
       "type_name": "TestSourceScanError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::error::Error",
         "core::fmt::Debug",
         "core::fmt::Display"
@@ -560,15 +572,15 @@
     {
       "type_name": "TestSourceScannerPort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "UncitedSpecElementFinding",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -592,9 +604,9 @@
     {
       "type_name": "VerifyCacheError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::error::Error",
         "core::fmt::Debug",
         "core::fmt::Display"
@@ -603,9 +615,9 @@
     {
       "type_name": "WaivedReason",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -615,9 +627,9 @@
     {
       "type_name": "WaivedReasonHash",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -627,9 +639,9 @@
     {
       "type_name": "WaiverCacheDocument",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -639,9 +651,9 @@
     {
       "type_name": "WaiverCacheEntry",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -651,9 +663,9 @@
     {
       "type_name": "WaiverCacheKey",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -663,15 +675,15 @@
     {
       "type_name": "WaiverCachePort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "WaiverVerdict",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -681,8 +693,8 @@
     {
       "type_name": "WaiverVerifierPort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     }
   ]
 }
