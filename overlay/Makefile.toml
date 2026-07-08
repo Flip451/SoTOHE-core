@@ -283,12 +283,6 @@ description = "[internal] Verify track metadata.json: schema, task graph, and st
 script_runner = "@shell"
 script = ['bin/sotp track views validate --project-root .']
 
-[tasks.verify-tech-stack-local]
-private = true
-description = "[internal] Verify tech stack decisions are fully resolved"
-script_runner = "@shell"
-script = ['bin/sotp verify tech-stack']
-
 [tasks.verify-hooks-path-local]
 private = true
 description = "[internal] Verify local Git config core.hooksPath points at .githooks"
@@ -523,12 +517,6 @@ description = "[gate] Verify track metadata.json presence and required keys (doc
 dependencies = ["prepare-local-cache-dirs"]
 command = "docker"
 args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "verify-track-metadata-local"]
-
-[tasks.verify-tech-stack]
-description = "[gate] Verify tech stack TODOs are fully resolved (docker compose)"
-dependencies = ["prepare-local-cache-dirs"]
-command = "docker"
-args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "verify-tech-stack-local"]
 
 [tasks.verify-hooks-path]
 description = "[gate] Verify local Git config core.hooksPath points at .githooks (docker compose)"

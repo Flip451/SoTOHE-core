@@ -6,16 +6,15 @@ Run track workflow setup for this repository.
 
 Execution rules:
 - Verify that `bin/sotp` is available because track operations depend on it (run `cargo make build-sotp` if missing).
-- Read `knowledge/conventions/branch-strategy.md`, `knowledge/conventions/track-lifecycle.md`, `knowledge/conventions/git-notes.md`, `track/tech-stack.md`, `track/product.md`, `track/product-guidelines.md`.
+- Read `knowledge/conventions/branch-strategy.md`, `knowledge/conventions/track-lifecycle.md`, `knowledge/conventions/git-notes.md`, and `knowledge/adr/README.md` (pre-track ADR index).
 - Ensure `track/registry.md` exists; if missing, create it with a minimal template list section.
 - Ensure the track convention includes `track/items/<id>/metadata.json` alongside `spec.md` and `plan.md`; `observations.md` is optional (created only when machine-non-verifiable observations need recording).
 - Confirm the required top-level doc `CLAUDE.md` exists.
-- Strict tech-stack guardrails are on by default. Only template maintainers may disable them locally for template work via `TRACK_TEMPLATE_DEV=1` or an untracked `.track-template-dev` marker.
 - Do not start implementation work in this command.
-- Summarize what was initialized and what TODO items must be filled next.
+- Summarize what was initialized.
 
 Output format:
 1. Setup status (done / already initialized)
 2. Commands checked or executed
 3. Files checked or created
-4. Next required user actions (especially unresolved `TODO:` in `track/tech-stack.md`)
+4. Next required user actions (e.g., authoring a pre-track ADR for the first feature)

@@ -139,7 +139,7 @@ impl UserRepository for PostgresUserRepository {
 }
 ```
 
-> **Note**: async runtime（tokio 等）を `track/tech-stack.md` で採用した場合は、
+> **Note**: async runtime（tokio 等）の採用を ADR で決定した場合は、
 > native `async fn in trait`（Rust 1.75+）を優先する。`async-trait` クレートは
 > dyn dispatch（object safety）や明示的な future auto-trait bounds が必要な場合に使用する。
 
@@ -149,4 +149,4 @@ impl UserRepository for PostgresUserRepository {
 - `deny.toml`: Cargo レベルのレイヤー強制
 - `knowledge/conventions/prefer-type-safe-abstractions.md`: 型安全パターン（Newtype / Enum-first / Typestate）
 - `knowledge/conventions/coding-principles.md`: Error handling / naming / module size / no-panics
-- `track/tech-stack.md`: アーキテクチャパターンの決定
+- `knowledge/adr/`: アーキテクチャパターンの決定（pre-track ADR）

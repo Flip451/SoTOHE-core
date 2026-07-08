@@ -57,10 +57,12 @@ accumulation:
    task description's listed files through `.harness/config/review-scope.json` patterns.
    Do not infer scope from file extension alone: markdown under `.claude/**` / `.harness/**`
    is `harness-policy`; `knowledge/adr/**` and `knowledge/research/**` are `adr`;
-   `track/items/<track-id>/spec.json` / `spec.md` are `spec`;
-   `track/items/<track-id>/*-types.json` / `contract-map.md` are `types`;
+   `track/items/<track-id>/spec.json` is `spec`;
+   `track/items/<track-id>/*-types.json` are `types`;
    `track/items/<track-id>/impl-plan.json` / `task-coverage.json` / `task-contract.json` /
-   `plan.md` / `observations.md` are `impl-plan`.
+   `observations.md` are `impl-plan`. Rendered views (`spec.md`, `plan.md`,
+   `contract-map.md`) are review-operational: they carry no scope and do not
+   participate in scope hashes.
    For DonePending tasks, use the already-accumulated working-tree diff.
 3. If this task's own contribution would exceed a configured ceiling for a layer whose current
    batch cumulative diff is still **zero**, and the current batch is non-empty, close the current
@@ -174,8 +176,8 @@ Procedure (after Step 3 of the **last** batch):
    `track/items/<track-id>/impl-plan.json` and `track/items/<track-id>/plan.md` only.
 2. If those (and only those) files are modified, run a tail review refresh before committing:
    - Invoke the `review` workflow. Expected required scope: `impl-plan` (the tail diff is
-     only the D4 backfill in `impl-plan.json` and the rendered `plan.md`, both of which
-     belong to the `impl-plan` scope).
+     only the D4 backfill in `impl-plan.json`; the rendered `plan.md` is review-operational
+     and does not affect scope hashes).
    - Continue only after `bin/sotp review check-approved` succeeds and:
      `bin/sotp review results --track-id <track-id> --scope impl-plan --round-type final --limit 1`
      shows a recorded final `zero_findings` round for the tail diff.

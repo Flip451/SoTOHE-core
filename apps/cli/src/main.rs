@@ -442,7 +442,6 @@ fn execute_verify_with_telemetry(cmd: commands::verify::VerifyCommand) -> ExitCo
 fn verify_command_gate_name(cmd: &commands::verify::VerifyCommand) -> &'static str {
     use commands::verify::VerifyCommand;
     match cmd {
-        VerifyCommand::TechStack(_) => "verify-tech-stack",
         VerifyCommand::LatestTrack(_) => "verify-latest-track",
         VerifyCommand::ArchDocs(_) => "verify-arch-docs",
         VerifyCommand::Layers(_) => "verify-layers",
@@ -957,21 +956,6 @@ mod tests {
 
     // ── Verify telemetry wrapper paths ───────────────────────────────────────
 
-    /// `sotp verify tech-stack` routes through `execute_verify_with_telemetry`.
-    /// With a CWD that has no tech-stack.md the command exits non-zero (findings),
-    /// but the wrapper itself must not panic and must forward the exit code.
-    #[test]
-    fn test_verify_tech_stack_dispatch_via_run_cli_does_not_panic() {
-        let dir = TempDir::new().unwrap();
-        let project_root = dir.path().to_str().unwrap();
-        let cli =
-            Cli::try_parse_from(["sotp", "verify", "tech-stack", "--project-root", project_root])
-                .unwrap();
-        // Non-zero exit is expected (no tech-stack.md). The wrapper must not panic.
-        let exit = run_cli(cli, |_cmd| ExitCode::FAILURE);
-        assert_ne!(exit, ExitCode::from(2u8), "exit 2 reserved for hook blocks");
-    }
-
     /// `sotp verify layers` routes through `execute_verify_with_telemetry`.
     /// With a temp dir (no Cargo.toml) cargo-metadata fails → non-zero exit, but
     /// the wrapper must not panic and must not return exit code 2 (reserved for
@@ -997,7 +981,6 @@ mod tests {
         use super::verify_command_gate_name;
 
         let subcommands = [
-            ["sotp", "verify", "tech-stack"],
             ["sotp", "verify", "latest-track"],
             ["sotp", "verify", "arch-docs"],
             ["sotp", "verify", "layers"],

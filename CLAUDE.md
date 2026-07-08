@@ -41,7 +41,7 @@ Workflow logic SSoT for workflow-backed track commands is `.harness/workflows/tr
 | Concern | SSoT |
 |---|---|
 | Workspace layers / dependency direction / module limits | `architecture-rules.json` |
-| Tech stack decisions | `track/tech-stack.md` |
+| Tech stack / product-policy decisions | `knowledge/adr/` (pre-track ADRs; index: `knowledge/adr/README.md`) |
 | Capability → provider routing | `.harness/config/agent-profiles.json` |
 | Branch strategy (base / merge target / method) | `.harness/config/branch-strategy.json` (+ per-track `metadata.json#branch_strategy_snapshot`) |
 | Review scopes / signal gates / DRY gate | `.harness/config/{review-scope,signal-gates,dry-check}.json` |
@@ -57,7 +57,6 @@ Derived read-only views — never hand-edit, regenerate via `bin/sotp track view
 ## Hard invariants
 
 - Public UI is `/track:*`; never use legacy aliases.
-- Implementation is blocked while `track/tech-stack.md` has unresolved `TODO:` markers.
 - No direct `git add` / `commit` / `merge` / `rebase` / `switch` — hooks block them; go through `cargo make` wrappers and `/track:commit` (`.claude/rules/10-guardrails.md`).
 - The orchestrator never edits SoT files directly (1 file = 1 writer): ADR → `adr-editor`, `spec.json` → `spec-designer`, catalogues → `type-designer`, `impl-plan.json` → `impl-planner`. Task state transitions go through `bin/sotp track transition`.
 - Every commit (plan artifacts included) is preceded by a reviewer-capability cycle to `zero_findings`; inline self-review is never a substitute (`knowledge/conventions/review-protocol.md`).

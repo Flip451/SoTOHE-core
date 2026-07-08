@@ -16,4 +16,4 @@ Then reflect the decisions in:
 
 - `Cargo.toml` (`rust-version`)
 - `Dockerfile` (`RUST_VERSION` and tool versions)
-- `track/tech-stack.md` (`Version Baseline`, MSRV, changelog)
+- a pre-track ADR under `knowledge/adr/` when the version choice is a decision worth recording

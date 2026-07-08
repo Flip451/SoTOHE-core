@@ -65,7 +65,7 @@ fn test_register_user_flow() {
 }
 ```
 
-> **Note**: `track/tech-stack.md` で async runtime を採用した場合は `#[tokio::test]` + `async fn` に切り替える。
+> **Note**: async runtime の採用を ADR で決定した場合は `#[tokio::test]` + `async fn` に切り替える。
 
 ### Naming Convention
 
@@ -89,7 +89,7 @@ pub trait UserRepository: Send + Sync {
 }
 ```
 
-> **Note**: `track/tech-stack.md` で async runtime を採用した場合は native `async fn in trait`（Rust 1.75+）または `async-trait` クレートと組み合わせる。`mockall` は `#[automock]` + `#[async_trait]` の順で属性を付与する。
+> **Note**: async runtime の採用を ADR で決定した場合は native `async fn in trait`（Rust 1.75+）または `async-trait` クレートと組み合わせる。`mockall` は `#[automock]` + `#[async_trait]` の順で属性を付与する。
 
 ---
 

@@ -21,7 +21,7 @@ Required workflow:
    - `Makefile.toml`
 4. Update crates and dependency edges.
 5. Update architecture-facing documents:
-   - `track/tech-stack.md`
+   - a pre-track ADR under `knowledge/adr/` recording the architecture decision
    - `knowledge/conventions/branch-strategy.md` / `knowledge/conventions/track-lifecycle.md` / `knowledge/conventions/git-notes.md` if the day-to-day workflow shape changes
    - `CLAUDE.md` when the file tree changes
 6. Run:

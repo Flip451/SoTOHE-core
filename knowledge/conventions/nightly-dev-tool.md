@@ -27,7 +27,7 @@ Rules for using Rust nightly as a dev-only tool while keeping crates on stable.
 
 ## Exceptions
 
-- None currently. If a nightly-only feature is needed in production code, it requires an ADR and tech-stack.md update
+- None currently. If a nightly-only feature is needed in production code, it requires an ADR
 
 ## Review Checklist
 
@@ -38,6 +38,5 @@ Rules for using Rust nightly as a dev-only tool while keeping crates on stable.
 
 ## Related Documents
 
-- `track/tech-stack.md` — Dev-only Tooling (nightly) section
 - `knowledge/conventions/hexagonal-architecture.md` — rustdoc JSON parsing stays in infrastructure layer
-- `track/items/bridge01-export-schema-2026-04-06/spec.json` — BRIDGE-01 spec
+- `knowledge/adr/2026-05-08-0258-tddd-typegraph-hybrid-and-codec.md` — rustdoc_types-based TDDD TypeGraph design

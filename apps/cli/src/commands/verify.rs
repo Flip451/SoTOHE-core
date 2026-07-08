@@ -20,8 +20,6 @@ pub struct SpecVerifyArgs {
 /// Verify subcommands for CI validation.
 #[derive(Subcommand)]
 pub enum VerifyCommand {
-    /// Check tech-stack.md for unresolved TODO markers.
-    TechStack(VerifyArgs),
     /// Check latest track artifacts for completeness.
     LatestTrack(VerifyArgs),
     /// Check architecture docs synchronization and text patterns.
@@ -110,8 +108,7 @@ impl VerifyCommand {
     pub fn items_dir(&self) -> PathBuf {
         match self {
             // Project-root–based commands: derive items_dir from project_root.
-            VerifyCommand::TechStack(a)
-            | VerifyCommand::LatestTrack(a)
+            VerifyCommand::LatestTrack(a)
             | VerifyCommand::ArchDocs(a)
             | VerifyCommand::Layers(a)
             | VerifyCommand::HooksPath(a)
@@ -174,13 +171,10 @@ impl VerifyCommand {
 /// Dispatches `cmd` to the verify driver and returns the raw `CommandOutcome`
 /// without printing anything.
 ///
-/// `execute_with_summary` delegates here so the 20-arm match is not duplicated.
+/// `execute_with_summary` delegates here so the per-variant match is not duplicated.
 #[allow(clippy::too_many_lines)]
 fn dispatch_to_outcome(driver: &VerifyDriver, cmd: VerifyCommand) -> cli_driver::CommandOutcome {
     match cmd {
-        VerifyCommand::TechStack(args) => {
-            driver.handle(VerifyInput::TechStack { project_root: args.project_root })
-        }
         VerifyCommand::LatestTrack(args) => {
             driver.handle(VerifyInput::LatestTrack { project_root: args.project_root })
         }

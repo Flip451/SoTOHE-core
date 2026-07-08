@@ -13,13 +13,13 @@ Every requirement, constraint, and acceptance criterion in `spec.md` must carry 
 
 | Tag | Meaning | Signal | Example |
 |-----|---------|--------|---------|
-| `[source: <document> §<section>]` | Explicit reference to a document, section, or external standard | Blue | `[source: PRD §3.2]`, `[source: track/tech-stack.md]` |
+| `[source: <document> §<section>]` | Explicit reference to a document, section, or external standard | Blue | `[source: PRD §3.2]`, `[source: knowledge/adr/2026-03-11-0070-conch-parser-selection.md]` |
 | `[source: convention — <file>]` | Established project convention with specific file reference | Blue | `[source: convention — knowledge/conventions/security.md]` |
 | `[source: feedback — <context>]` | User feedback or correction (undocumented, not persisted) | Yellow | `[source: feedback — Rust-first policy]` |
 | `[source: inference — <reason>]` | Inferred from context, conventions, or common practice; not explicitly stated | Yellow | `[source: inference — security best practice]` |
 | `[source: discussion]` | Agreed upon in team discussion or user conversation | Yellow | `[source: discussion]` |
 
-**Blue sources** reference persistent, version-controlled files (ADR, convention document, PRD, tech-stack, etc).
+**Blue sources** reference persistent, version-controlled files (ADR, convention document, PRD, etc).
 **Yellow sources** lack persistent documentation; they capture intent without an artifact.
 
 ### Strict gate semantics
@@ -50,7 +50,7 @@ Tags appear inline at the end of the requirement statement:
 
 - New logic must be implemented in Rust, not Python [source: feedback — Rust-first policy]
 - TDD workflow is mandatory [source: convention — knowledge/conventions/testing.md]
-- Input validation uses domain types [source: track/tech-stack.md §Architecture]
+- Input validation uses domain types [source: knowledge/conventions/hexagonal-architecture.md §domain]
 ```
 
 For acceptance criteria:

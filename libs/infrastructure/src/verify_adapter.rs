@@ -266,19 +266,6 @@ impl FsVerifyAdapter {
 }
 
 impl VerifyPort for FsVerifyAdapter {
-    fn verify_tech_stack(&self, project_root: &Path) -> Result<VerifyOutcome, VerifyPortError> {
-        if let Some(outcome) =
-            reject_symlinked_trusted_root("verify tech stack readiness", project_root)
-        {
-            return Ok(outcome);
-        }
-
-        Ok(render_outcome(
-            "verify tech stack readiness",
-            &crate::verify::tech_stack::verify(project_root),
-        ))
-    }
-
     fn verify_latest_track(&self, project_root: &Path) -> Result<VerifyOutcome, VerifyPortError> {
         if let Some(outcome) =
             reject_symlinked_trusted_root("verify latest track files", project_root)
@@ -592,13 +579,13 @@ mod tests {
 
     #[cfg(unix)]
     #[test]
-    fn test_verify_tech_stack_rejects_symlinked_project_root() {
+    fn test_verify_latest_track_rejects_symlinked_project_root() {
         let real_root = tempfile::tempdir().unwrap();
         let link_parent = tempfile::tempdir().unwrap();
         let root_link = link_parent.path().join("workspace-link");
         std::os::unix::fs::symlink(real_root.path(), &root_link).unwrap();
 
-        let outcome = FsVerifyAdapter::new().verify_tech_stack(&root_link).unwrap();
+        let outcome = FsVerifyAdapter::new().verify_latest_track(&root_link).unwrap();
 
         assert_eq!(outcome.exit_code, 1);
         let stderr = outcome.stderr.unwrap_or_default();

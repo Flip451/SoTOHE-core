@@ -10,7 +10,6 @@ Always consider:
   - `knowledge/conventions/branch-strategy.md`
   - `knowledge/conventions/track-lifecycle.md`
   - `knowledge/conventions/git-notes.md`
-  - `track/tech-stack.md`
   - `track/registry.md`
 - enforcement:
   - `Makefile.toml`
